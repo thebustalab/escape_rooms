@@ -1,0 +1,411 @@
+{
+  "chapter": "flat_clustering",
+  "scenario": "waterfalls",
+  "id": 10,
+  "title": "Where the Waters Divide",
+  "subtitle": "Flat Clustering · k-means (assignment + choosing k)",
+  "story": "They called themselves the Assay — an order of alchemists who held that all things, base and worthy alike, could be reduced to their true kinds and sorted, the worthy kept and the rest poured away. To feed their great engine they bled a whole valley of its water, and tore from its people the Wellheart — a living stone the vale-folk say holds the first clean water, that had kept their springs sweet for a thousand years. The springs have run bitter ever since. The Assay are long gone now, and their engine — a drowned waterworks at the bottom of a flooded shaft, that parts distilled essences into sacred pools — is failing, the cistern filling. You have come to take the Wellheart back and carry it home to the vale. But the engine keeps its makers' conceit, and opens only to one who can sort as they did. Climb down its bridges and ladders, throw the diverters that turn the falling water aside, and answer the reading at each of its fonts. Reach the drowned floor before the water does, read the last of the Assay's sorting, and bring the Wellheart back into the light.",
+  "enterLabel": "Descend into the shaft →",
+  "done": {
+    "title": "The engine turns over",
+    "body": "The last diverter grinds home under your hands, and deep below a sluice the Assay meant never to be reached gives way. The falling water finds new channels; the way down clears to the drowned floor. The engine is finishing the sort its makers died believing in — and the vault at the bottom, with the Wellheart sealed inside it, is finally within reach."
+  },
+  "escapeDone": {
+    "title": "Out, and the Wellheart with you",
+    "body": "You wade the rising floor and see the Assay's work whole at last: every thread of falling water gathered into its own great pool, the essences parted into their kinds — three in one, two in another, four in the last. You read the sort the way its makers would have, set the reckoning into the vault, and it yields. You lift the Wellheart from its cradle and climb the rising passage as the water closes over the engine behind you — out into daylight, the Assay's cold conceit turned against them at last, and the vale's first clean water on its way home.",
+    "note": "PROVISIONAL: the counts (3,2,4) and the lock code are placeholders keyed to what the basin ART depicts; fix once the scene is generated. The escape is data-free / independent of the reliquary_phials dataset."
+  },
+  "packages": [
+    "dplyr",
+    "ggplot2",
+    "readr",
+    "ggiraph"
+  ],
+  "datasets": [
+    {
+      "name": "reliquary_phials",
+      "url": "https://thebustalab.github.io/escape_rooms/rooms/flat_clustering/waterfalls/data/reliquary_phials.csv"
+    }
+  ],
+  "setup": "suppressMessages({library(dplyr); library(ggplot2)})",
+  "state": {
+    "rooms_solved": 0
+  },
+  "ambient": "none",
+  "fx": [],
+  "coverPrompt": "Minimalist stylised thumbnail poster of a lone circular temple cistern seen from directly above: one dark round shaft opening downward, three small still pools glowing warm amber deep at its base, thin threads of falling water between them, a cool teal stone ring around. One bold high-contrast silhouette, iconic and uncluttered, minimal detail. Flat limited palette: deep teal, icy blue, one warm amber glow. Soft film grain, painterly but clean, strong negative space, single centred focal subject. No people, no text, no lettering, no logos. Square composition.",
+  "debrief": {
+    "title": "How this world worked",
+    "intro": "The whole engine was one idea the Assay built into stone and water: flat clustering — sorting many things into a few true kinds by which they most belong together. Every font you answered was one move of it, every diverter an assignment, and the flooded floor was the result laid bare — the essences gathered into k groups, waiting only to be read. The Assay used the sort to decide what was worthy of keeping; you used the very same skill to walk out with everything they kept."
+  },
+  "rooms": [
+    {
+      "key": "catwalk",
+      "title": "The catwalk and the viewing port",
+      "technique": "orientation — read the whole structure before acting",
+      "puzzleType": 0,
+      "built": false,
+      "debrief": "Before you touched a thing, the viewing port showed you the whole shaft as one picture — every falling stream, every drowned bridge, the pools far below. Standing back to see the whole structure at once, before you act, is where every clustering begins.",
+      "authoring": {
+        "tag": "catwalk",
+        "scenePrompt": "This is a panorama. A 360-degree view from the centre of a swaying rope-and-plank catwalk strung across the very top of a vast circular stone shaft that plunges down into darkness, the scene wrapping continuously all the way around so the left and right edges meet seamlessly. Ahead, a heavy brass viewing port is bolted into the catwalk rail — a round downward-angled lens faintly aglow with a schematic amber light, as if a map were lit inside it. To one side, a mossy stone post and a heavy coil of ancient rope mark where the catwalk meets the shaft wall. Set into the shaft wall opposite, a carved archway — the closed way down — with coiled rope ladders beside it. Around the rest of the ring, ancient teal-streaked stonework, slack guide ropes, and far overhead a narrow disc of deep dusk sky letting a shaft of cold light down; below the catwalk, waterfall-threads spill from openings in the walls and vanish into the dark. Cold dusk light from above against warm amber lamp-glow, deep teal shadow, drifting spray and mist, painterly, cinematic, richly detailed. No people, no lettering, no captions, no text.",
+        "doorPrompt": "The carved archway down now stands open, revealing a first flight of wet stone steps and a rope ladder descending into amber-lit gloom deeper in the shaft; the viewing port's glow and the dusk light from above are unchanged. Same painterly teal-and-amber style, no people, no lettering, no text."
+      },
+      "unlockedWhen": true,
+      "designNote": "FRAME / ORIENTATION room (no graded puzzle). Top of the shaft, highest vantage (dusk sky above). Holds the VIEWING PORT = the live player-map (cave_engine/router.py + player_map.html) showing the whole shaft: falling streams, cut bridges, reachable route, diverter states. Cold open: seed the mechanic — the player sees water drowning bridges and the diverter levers, and must work out the order. MAZE MODEL is engine work (the waterfall router, already built). Passages: the way DOWN (closed->open door) plus roamable rope bridges. Depth arc is SPATIAL only (backtrack-safe, because the S3 re-throw means the player doubles back): this is the highest vantage; deeper rooms lose the sky and gain amber temple-light. NEW ART.",
+      "plannedHotspots": [
+        {
+          "type": "mapview",
+          "label": "The viewing port",
+          "note": "the live shaft map (router/player_map) — whole-structure planning view; updates as diverters are thrown"
+        },
+        {
+          "type": "door",
+          "label": "Ladder down into the shaft",
+          "direction": "forward",
+          "note": "DOWN -> station1"
+        }
+      ]
+    },
+    {
+      "key": "station1",
+      "title": "The first reading-landing",
+      "entry": {
+        "title": "The first font",
+        "text": "Down the first ladder, and the water's roar closes overhead. A stone font juts from the landing, a tray of the Assay's phials jammed in its basin, the diverter beside it dead until the font is answered. The engine will not let you pass on trust — only on a reading."
+      },
+      "technique": "flat clustering — k-means (assignment, step 1)",
+      "puzzleType": 1,
+      "built": false,
+      "debrief": "This landing was one decision of the sort: which pool a stream of samples belongs to. Solving it and throwing the diverter committed that assignment, and the water below fell differently for it.",
+      "authoring": {
+        "tag": "station1",
+        "scenePrompt": "This is a panorama. A 360-degree view from the centre of a broad stone landing partway down a vast flooded shaft — a junction where three ways meet — the scene wrapping continuously all the way around so the left and right edges meet seamlessly. Ahead, a low carved reading-font of dark stone, its surface a shallow scrying-basin of still water aglow with faint chart-like amber light — the place where the phials are read. To one side, a makers' diverter lever set in a stone housing. Three ways lead off the landing, each a rope bridge or ladder with a thread of waterfall sheeting across it: a rope ladder climbing UP toward the catwalk and its high disc of dusk sky; a ladder dropping DOWN into the gloom toward a lower landing; and a long rope bridge running straight ACROSS the open gulf of the shaft to a far landing at the same height. Around the rest of the ring, teal-streaked pillars, falling water threading down through the shaft, wet ledges and coiled rope. Warm amber font-glow against cool teal shaft-shadow, a thin disc of dusk sky far above, drifting spray, painterly, cinematic, richly detailed. No people, no lettering, no captions, no text.",
+        "doorPrompt": "The thread of waterfall that veiled the DOWNWARD ladder is diverted aside, its water now falling clear of the rungs so the way down to the lower landing stands open; the up-ladder to the catwalk and the long rope bridge across the shaft are unchanged, still curtained by falling water. Same painterly teal-and-amber style, no people, no lettering, no text."
+      },
+      "unlockedWhen": true,
+      "onSolve": [
+        {
+          "set": "station1_solved"
+        },
+        {
+          "inc": "rooms_solved"
+        }
+      ],
+      "designNote": "PUZZLE (verified, escape_room_puzzles 2026-07-26). Dataset reliquary_phials. TYPE 1 MCQ. CODE: km <- kmeans(reliquary_phials[,c('clarity','mineral','resin','ash')], centers=3, nstart=25); table(km$cluster). Q: 'Cluster the phials into 3 families by their four profile measures. How many phials are in the LARGEST family?' ANSWER: 10 (families sized 10/8/6; ARI 1.0 vs true). DISTRACTORS(>=6): 8, 6, 12, 9, 3, 24. Solving UNLOCKS diverter S1 -> D1 (a dial). Upper shaft. NEW ART.",
+      "plannedHotspots": [
+        {
+          "type": "puzzle",
+          "label": "The reading-console",
+          "note": "kmeans(4 profiles,k=3) -> largest family = 10"
+        },
+        {
+          "type": "dial",
+          "label": "The S1 diverter lever",
+          "note": "flips diverter D1 (starts '/', throws to '|'); throwable after the puzzle is solved"
+        },
+        {
+          "type": "door",
+          "label": "Ladder down to the lower landing",
+          "direction": "forward",
+          "note": "DOWN -> station2 (open rope/ladder, water-gated)"
+        },
+        {
+          "type": "door",
+          "label": "Ladder up to the catwalk",
+          "direction": "back",
+          "note": "UP -> catwalk"
+        },
+        {
+          "type": "door",
+          "label": "Rope bridge across the shaft",
+          "direction": "back",
+          "note": "ACROSS -> station3 (same level; this is the 3-way JUNCTION)"
+        }
+      ]
+    },
+    {
+      "key": "station2",
+      "title": "The second reading-landing",
+      "entry": {
+        "title": "Deeper, a subtler test",
+        "text": "Lower, dimmer, the sky a coin of dusk far above. This font asks less kindly than the last: not how large a kind is, but how many true kinds there even are. The Assay set it to turn away anyone who could only count what they were handed."
+      },
+      "technique": "flat clustering — k-means (choosing k, the elbow)",
+      "puzzleType": 4,
+      "built": false,
+      "debrief": "A second assignment, deeper in the machine: read which group these samples belong to, throw the diverter, and watch the falling water re-route for everything below.",
+      "authoring": {
+        "tag": "station2",
+        "scenePrompt": "This is a panorama. A 360-degree view from the centre of a stone landing set low on the shaft's main column, one drop below the junction, deeper and dimmer, the scene wrapping continuously all the way around so the left and right edges meet seamlessly. Ahead, a carved reading-font of dark stone with a shallow scrying-basin of still glowing water — the reading-place. To one side, a makers' diverter lever in a stone housing, threads of waterfall sheeting past into the dark. Three ways lead off, each veiled by falling water: a ladder climbing UP toward the junction landing above; a long rope bridge running ACROSS the open gulf to a narrow side-landing at the same level — the Assay's cast-off gallery; and, dropping steeply away below, a long ladder-and-plank descent falling toward a faint amber glow at the very bottom of the shaft — the drowned floor, far down. Around the rest of the landing, ribbed teal-streaked stone, pouring water, wet ledges and coiled rope; only a small pale disc of dusk sky remains, far up. Warm amber font-glow against deep teal shaft-shadow, heavier spray and mist, painterly, cinematic, richly detailed. No people, no lettering, no captions, no text.",
+        "doorPrompt": "The waterfall veiling the long DOWNWARD descent is diverted aside, the water falling clear so the ladder-and-plank drop toward the amber glow at the bottom of the shaft stands open; the up-ladder to the junction and the rope bridge across to the cast-off gallery are unchanged. Same painterly teal-and-amber style, no people, no lettering, no text."
+      },
+      "unlockedWhen": true,
+      "onSolve": [
+        {
+          "set": "station2_solved"
+        },
+        {
+          "inc": "rooms_solved"
+        }
+      ],
+      "designNote": "PUZZLE (verified). Dataset reliquary_phials. TYPE 4 PICK-THE-POINT (click the elbow) — for puzzle-type variety. The student plots within-cluster spread vs k and CLICKS the elbow. starterCode: reliquary_phials. pick.plotCode (WebR, ggiraph): wss <- sapply(1:6, function(k) kmeans(reliquary_phials[,c('clarity','mineral','resin','ash')], centers=k, nstart=25)$tot.withinss); df <- data.frame(k=1:6, wss=wss); p <- ggplot(df, aes(k, wss)) + geom_line() + ggiraph::geom_point_interactive(aes(data_id=k, tooltip=k), size=4) + labs(x='number of families (k)', y='within-cluster spread'). pick.prompt: 'Adding families always tightens the clusters a little — but only up to a point. Plot the within-cluster spread against k and click the ELBOW: the k past which more families barely help.' ANSWER: the point at k=3 (WSS 37689 -> 11667 -> 966 [elbow] -> 810 -> 661 -> 543; the drop collapses after 3). Solving UNLOCKS diverter S2 -> D2. Mid shaft. NEW ART.",
+      "plannedHotspots": [
+        {
+          "type": "puzzle",
+          "label": "The reading-console",
+          "note": "TYPE 4 pick-the-point: click the elbow at k=3 on the within-cluster-spread plot"
+        },
+        {
+          "type": "dial",
+          "label": "The S2 diverter lever",
+          "note": "flips diverter D2 (starts '|', throws to '\\')"
+        },
+        {
+          "type": "door",
+          "label": "Ladder up to the junction",
+          "direction": "back",
+          "note": "UP -> station1"
+        },
+        {
+          "type": "door",
+          "label": "Rope bridge across to the cast-off gallery",
+          "direction": "back",
+          "note": "ACROSS -> spillway (2,1); same level (row 2), water-gated; the side-spur, not on the critical path"
+        },
+        {
+          "type": "door",
+          "label": "The long descent to the drowned floor",
+          "direction": "forward",
+          "note": "DOWN -> basin (the final drop; opens only once the sort is complete)"
+        }
+      ]
+    },
+    {
+      "key": "spillway",
+      "title": "The cast-off gallery",
+      "entry": {
+        "title": "The cast-off gallery",
+        "text": "A bridge out from the second landing ends not at a font but at a reeking side-gallery — the Assay's spillway, where all they judged base was sluiced away. No reading waits here, only their cold accounting of everything they threw out, and a ladder dropping on into the dark."
+      },
+      "technique": "flavour — the discard stream (no graded puzzle)",
+      "puzzleType": 0,
+      "built": false,
+      "debrief": "Nothing here had to be solved — it was the engine's waste channel, where the Assay poured away everything their sort judged base. Every clustering has a flip side: deciding what belongs together is also deciding what gets left out.",
+      "authoring": {
+        "tag": "spillway",
+        "scenePrompt": "This is a panorama. A 360-degree view from the centre of a narrow stone side-landing set out across the shaft from the second reading-landing, level with it and deep down the flooded shaft, the scene wrapping continuously all the way around so the left and right edges meet seamlessly. This is no reading-place — it is where the Assay sluiced away everything their engine judged base: ranks of choked discard-channels and stained spillway-mouths line the walls, their mineral crust run through with foul teal and rust. Ahead, set into the wall above the channels, a carved discard-tally stone — a long cold marker scored with the count of all that was poured away — lit by a faint amber glow. Two ways lead off the landing, each a span veiled by a thread of falling water: a long rope bridge running back ACROSS the open gulf toward the second reading-landing you came from, and a ladder dropping DOWN into deeper dark toward a drowned dead-end sump below. To one side, the stubs of a third bridge jut broken from the wall, its span long collapsed into the dark, plainly no way across. Around the rest of the ring, ribbed teal-streaked stone, pouring discard-water, wet ledges and coiled rope; only a small pale disc of dusk sky remains, far up. Cold teal shaft-shadow against a grim amber glow, heavy spray and mist, painterly, cinematic, richly detailed. No people, no lettering, no captions, no text.",
+        "doorPrompt": "The thread of waterfall veiling the DOWNWARD ladder is diverted aside, its water falling clear of the rungs so the way down to the drowned sump below stands open; the rope bridge back across to the second reading-landing and the collapsed bridge-stubs are unchanged. Same painterly teal-and-amber style, no people, no lettering, no text."
+      },
+      "unlockedWhen": true,
+      "designNote": "FLAVOUR / SIDE ROOM (no graded puzzle, no diverter, no console). Reachable platform (2,1), level with station2 (row 2), reached ACROSS from station2 via bridge H-2-0. Added 2026-07-28 (open-decision #1: Lucas wants (2,1)/(3,1) visitable). Off the critical path — pure lore, reinforcing the Assay-as-villains via the discard/waste stream (what they judged 'base' and poured away). Holds a single `clue` hotspot (the discard-tally stone); deliberately NO lever/wheel/console/font/keypad so there is no orphan interactive object. Passages: ACROSS(back) -> station2; DOWN(forward) -> sump (3,1) via ladder V-2-1. NOTE: map bridge H-2-1 leads only to platform (2,2), which is UNREACHABLE and roomless, so that third side is depicted as a COLLAPSED bridge (no passage, no hotspot) rather than a phantom way on. State-variance is single-view strict (reach_art mode A); the down-ladder to the sump is water-gated by the global diverter state (part of the deferred state-variant work, open-decisions #2/#3). unlockedWhen true; ungraded; not in codec. NEW ART.",
+      "plannedHotspots": [
+        {
+          "type": "clue",
+          "label": "The discard-tally stone",
+          "note": "the Assay's cold accounting of all they poured away as 'base' — lore only, reinforces the villain framing; no coding help, no answer"
+        },
+        {
+          "type": "door",
+          "label": "Rope bridge back across to the second landing",
+          "direction": "back",
+          "note": "ACROSS -> station2 (same level, row 2; the way in)"
+        },
+        {
+          "type": "door",
+          "label": "Ladder down to the drowned sump",
+          "direction": "forward",
+          "note": "DOWN -> sump (3,1) via V-2-1"
+        }
+      ]
+    },
+    {
+      "key": "sump",
+      "title": "The drowned sump",
+      "entry": {
+        "title": "The drowned sump",
+        "text": "The ladder lets you down into a dead-end pocket at the very bottom of the shaft, where the cast-off gathered and went foul years ago. A ruined vale-folk marker lies half-drowned in the wall — left to rot among the discards. There is nothing down here but the one way back up, and the water still rising."
+      },
+      "technique": "flavour — the drowned discard sump (no graded puzzle)",
+      "puzzleType": 0,
+      "built": false,
+      "debrief": "A dead-end, and meant to be one: the bottom of the waste stream, where everything the Assay cast off finally settled. Seeing it is the point — the sort's grand sacred pools have a foul twin, and the vale-folk's marker rotting here says who paid for the Assay's tidy kinds.",
+      "authoring": {
+        "tag": "sump",
+        "scenePrompt": "This is a panorama. A 360-degree view from the centre of a drowned dead-end sump at the very bottom of the shaft, a cramped ruined pocket off the main cistern, the scene wrapping continuously all the way around so the left and right edges meet seamlessly. This is where everything the Assay cast off finally came to rest: the risen flood stands stagnant and knee-deep, a foul mirror-black skim across it, and the poured-away essences have pooled here and gone bad, staining the water sickly amber and bruised teal. Ahead, half-drowned in the wall, a ruined marker-stone of the vale-folk the Assay stripped bare — a worn, weathered relic left to rot down here among the discards, faintly aglow. A single ladder climbs back UP out of the sump toward the side-landing above, the only way in or out, a thread of water sheeting past its rungs. Around the rest of the pocket, colossal ribbed stonework streaked with mineral rot, half-submerged rubble ledges, broken channel-mouths dribbling foul water, and no sky at all — only the dark climbing away overhead. Deep teal shadow and a sickly amber underglow off the stagnant flood, drifting mist across the water, a heavy sense of a drowned dead-end, painterly, cinematic, richly detailed. No people, no lettering, no captions, no text.",
+        "doorPrompt": "The thread of water sheeting past the single UP ladder is diverted aside, the rungs falling clear so the climb back up to the side-landing stands open; nothing else changes — this drowned pocket has only the one way in and out. Same painterly teal-and-amber style, no people, no lettering, no text."
+      },
+      "unlockedWhen": true,
+      "designNote": "FLAVOUR / SIDE ROOM (no graded puzzle, no diverter, no console) and a true DEAD-END. Reachable platform (3,1), bottom of the shaft (row 3, basin's depth) but WALLED OFF from the basin (H-3-0 absent, no bridge between (3,0) and (3,1)). Reached only DOWN from the spillway (2,1) via ladder V-2-1; its ONLY passage is that one ladder back up. Added 2026-07-28 with the spillway (open-decision #1). Pure lore: the drowned discard-sump, a grim mirror of the sacred basins, reinforcing the villain framing (holds a ruined vale-folk marker among the cast-off). Single `clue` hotspot; deliberately NO interactive machinery so no orphan object. Environmental arc: bottom-of-shaft = flooded / no sky / rising water, consistent with the basin, but ruined and stagnant vs the grand basins. reach_art: single-view (mode A and B). unlockedWhen true; ungraded; not in codec. NEW ART.",
+      "plannedHotspots": [
+        {
+          "type": "clue",
+          "label": "The ruined vale-folk marker",
+          "note": "a weathered relic of the people the Assay stripped bare, left to rot among the discards — lore only, deepens the villain framing; no coding help, no answer"
+        },
+        {
+          "type": "door",
+          "label": "Ladder up to the cast-off gallery",
+          "direction": "back",
+          "note": "UP -> spillway (2,1); the ONLY way in or out of this dead-end"
+        }
+      ]
+    },
+    {
+      "key": "station3",
+      "title": "The third reading-landing",
+      "entry": {
+        "title": "The measuring font",
+        "text": "Back up to the junction, and out across the shaft on a swaying bridge to a landing level with it on the far side. This font is not satisfied that you can sort — it wants you to weigh what you have sorted, to read a kind by its own measure. The makers' inscription gloats that most who came this far turned back here."
+      },
+      "technique": "flat clustering — k-means (summarise by cluster)",
+      "puzzleType": 3,
+      "built": false,
+      "debrief": "The third assignment seals the way behind you as it opens the way on — the sort commits, and there is no reading it backward without turning the machine over first.",
+      "authoring": {
+        "tag": "station3",
+        "scenePrompt": "This is a panorama. A 360-degree view from the centre of a stone landing far out across the shaft from the junction, level with it, slung between two long rope bridges, the scene wrapping continuously all the way around so the left and right edges meet seamlessly. Ahead, a carved reading-font of dark stone with a shallow scrying-basin of still glowing water — the reading-place for this sort. To one side, a makers' diverter lever in a heavy stone housing, a broad sheet of waterfall pouring past beyond it. There is no way up or down from here — only across: one long rope bridge runs back ACROSS the open gulf toward the junction landing you came from, and another runs ACROSS toward a great hall on the far side of the shaft, each veiled by a falling curtain of water. Around the rest of the landing, ranks of the Assay's stone channels streaked with mineral teal, water pouring everywhere into the gloom, wet ledges and rope; the same thin disc of dusk sky hangs far above as over the junction. Deep amber font-glow against cold teal depth, heavy spray, painterly, cinematic, richly detailed. No people, no lettering, no captions, no text.",
+        "doorPrompt": "The curtain of waterfall veiling the far rope bridge — the one running ACROSS toward the great hall — is diverted aside, the water falling clear so that span stands open; the bridge back toward the junction is unchanged. Same painterly teal-and-amber style, no people, no lettering, no text."
+      },
+      "unlockedWhen": true,
+      "onSolve": [
+        {
+          "set": "station3_solved"
+        },
+        {
+          "inc": "rooms_solved"
+        }
+      ],
+      "designNote": "PUZZLE (verified). Dataset reliquary_phials. TYPE 3 CONSOLE-CHECK (summarise by cluster) — for puzzle-type variety; the student writes the pipeline, the check verifies. starterCode seeds: km <- kmeans(reliquary_phials[,c('clarity','mineral','resin','ash')], centers=3, nstart=25). TASK: compute the mean resin of each family and assign to `answer` the SIZE (number of phials) of the family with the highest average resin. Model soln: d <- cbind(reliquary_phials, cluster=km$cluster); tab <- aggregate(resin~cluster, d, mean); win <- tab$cluster[which.max(tab$resin)]; answer <- sum(km$cluster==win). check.requires: ['answer']; check.expr: answer == 6. ANSWER: 6 (highest-resin family mean 68.1 vs 28.3 vs 21.8; it is the size-6 family). HINT: cluster, then average resin within each family and look at how big the winning family is. Solving UNLOCKS diverter S3 -> D3. Lower shaft. NOTE the backtracker: throwing S3 opens the way to the boss and seals the way back; after the boss the player RETURNS here to throw S3 again (puzzle.json states 4->5). NEW ART.",
+      "plannedHotspots": [
+        {
+          "type": "puzzle",
+          "label": "The reading-console",
+          "note": "TYPE 3 console-check: answer == 6 (size of the highest-mean-resin family)"
+        },
+        {
+          "type": "dial",
+          "label": "The S3 diverter lever",
+          "note": "flips diverter D3 (starts '|', throws to '/'); thrown twice across the solution (the backtracker)"
+        },
+        {
+          "type": "door",
+          "label": "Rope bridge across to the junction",
+          "direction": "back",
+          "note": "ACROSS -> station1 (same level)"
+        },
+        {
+          "type": "door",
+          "label": "Rope bridge across to the engine-hall",
+          "direction": "forward",
+          "note": "ACROSS -> boss (same level; open, water-gated)"
+        }
+      ]
+    },
+    {
+      "key": "boss",
+      "title": "The engine-hall",
+      "entry": {
+        "title": "The engine-hall",
+        "text": "One more bridge across the gulf, to the great hall at the far reach of the gallery — the Assay's masterwork, the whole engine grinding around you. Here they laid their final conceit for the greedy: it hands you every measure at once and dares you to trust the reading as it comes. A warning is cut into the wall, though it reads more like a taunt."
+      },
+      "technique": "flat clustering — k-means (the deciding assignment / choosing k)",
+      "puzzleType": 2,
+      "isBoss": true,
+      "built": false,
+      "debrief": "The last decision was the hardest — the one assignment that only makes sense once you have seen how all the others fall. Setting it turned the whole machine over to its final, sorted state, and the floor below opened.",
+      "authoring": {
+        "tag": "boss",
+        "scenePrompt": "This is a panorama. A 360-degree view from the centre of a great engine-hall at the far reach of the shaft's high gallery — the Assay's masterwork, and the biggest chamber yet — the hall wrapping continuously all the way around so the left and right edges meet seamlessly. Ahead, a tall master reading-font of carved stone and verdigris brass, a wide scrying-basin of still glowing water set into it — the reading-place for the final sort. To one side, the largest diverter of all, a two-handed stone wheel in a great housing, a broad sheet of waterfall thundering past beyond it. A single long rope bridge runs back ACROSS the open gulf of the shaft toward the far landing you crossed from — the only way in or out of this hall, veiled by falling water. Around the rest of the hall, ranks of ancient channels, sluices and colossal mineral-teal stonework, water pouring everywhere into the dark; the same thin disc of dusk sky hangs far above as over the gallery. Deep amber engine-glow against cold teal depth, heavy spray and mist, monumental scale, painterly, cinematic, richly detailed. No people, no lettering, no captions, no text.",
+        "doorPrompt": "The sheet of waterfall veiling the single rope bridge back ACROSS the shaft is diverted aside, the water falling clear so the way out of the hall stands open; nothing else changes — this hall has only the one way in and out. Same painterly teal-and-amber style, no people, no lettering, no text."
+      },
+      "unlockedWhen": {
+        "allSolved": [
+          "station1",
+          "station2",
+          "station3"
+        ]
+      },
+      "onSolve": [
+        {
+          "set": "boss_solved"
+        },
+        {
+          "inc": "rooms_solved"
+        }
+      ],
+      "deliverable": {
+        "type": "figure",
+        "submitCodec": true
+      },
+      "designNote": "BOSS PUZZLE (verified; the SCALING TRAP). isBoss, puzzleType 2, deliverable figure + submitCodec. Dataset reliquary_phials, using ALL FIVE measures incl. weight. NAIVE (tempting, WRONG): kmeans(reliquary_phials[,c('clarity','mineral','resin','ash','weight')], centers=3, nstart=25) — weight (grains, thousands) drowns everything, ARI 0.07. CORRECT: kmeans(scale(reliquary_phials[,c('clarity','mineral','resin','ash','weight')]), centers=3, nstart=25). Q: 'Cluster the phials using ALL five measurements into 3 families. Which phial ends up in the same family as JASPER?' ANSWER: Selenite (scaled -> Jasper's true family A = Amber/Cinnabar/Onyx/Selenite/Verdigris; seed-robust in base R). DECOY (the trap): Antimony — Jasper's UNSCALED weight-band mate, what you get if you forget to scale. FILLER DISTRACTORS: Bloodstone, Galena, Chrysolite, Ochre (family B/C). DO NOT offer Onyx (in family A AND Jasper's weight band -> ambiguous). unlockedWhen allSolved [station1,station2,station3]. Solving UNLOCKS the final diverter (S4 -> D4). Throwing S4 gives 'no visible change' alone (puzzle.json) — the player must deduce that returning to S3 and re-throwing it opens the descent. NEW ART.",
+      "plannedHotspots": [
+        {
+          "type": "puzzle",
+          "label": "The master console",
+          "note": "scale() all 5 then kmeans(k=3): Jasper's family-mate = Selenite (decoy Antimony = unscaled)"
+        },
+        {
+          "type": "dial",
+          "label": "The great S4 diverter wheel",
+          "note": "flips diverter D4 (starts '/', throws to '|'; shifts 2 columns); no visible change until S3 is re-thrown"
+        },
+        {
+          "type": "clue",
+          "label": "The Assay's warning-stone",
+          "note": "a taunt that carries the clue: 'Our weights we keep in grains, our virtues in tenths — and we let the grains decide. Weigh as we weighed, and the vault is yours.' i.e. weight runs to thousands where every other measure runs to tens; unless you put them on equal footing (scale), weight alone dictates the sort"
+        },
+        {
+          "type": "door",
+          "label": "Rope bridge back across to the gallery",
+          "direction": "back",
+          "note": "ACROSS -> station3 (the ONLY way in or out of the hall)"
+        }
+      ]
+    },
+    {
+      "key": "basin",
+      "title": "The drowned floor",
+      "entry": {
+        "title": "The drowned floor",
+        "text": "The final stair drops you into the risen flood on the cistern floor — knee-deep already and climbing — and there it is: the Assay's sorting made whole, three great pools towering from the water, the essences gathered into their kinds. Across the flood the vault stands sealed, the Wellheart behind it. Read the sort the way its makers did, before the water takes the floor."
+      },
+      "phase": "escape",
+      "technique": "flat clustering — k-means (recognition: read the clusters)",
+      "puzzleType": 0,
+      "built": false,
+      "debrief": "The floor was the analysis made physical: the samples you had been routing all the way down, gathered at last into their pools — k clusters, each holding its own. Reading how many pools there are and how full each one is IS the output of k-means; counting them is literally what opened the door home.",
+      "authoring": {
+        "tag": "basin",
+        "scenePrompt": "This is a panorama. A 360-degree view from the centre of the vast drowned floor of the Assay's engine — a great circular cistern chamber at the very bottom of the shaft, monumental in scale — the chamber wrapping continuously all the way around so the left and right edges meet seamlessly, its entire floor under a still sheet of risen flood-water that laps knee-high against every ledge, pillar and step, halfway up the stonework. Ahead, three enormous round stone basins rise from the flood, grand and deep and set well apart, each brimming with dark water and lit from beneath by a huge soft amber glow. From high in the darkness overhead, broad ribbons of waterfall pour straight down into the basins, gathered into distinct clusters rather than one sheet — the nearest basin fed by three falling ribbons, the next by two, the farthest by four — so the water pools into separate towering groups. To one side, a carved stone vault-keypad set into a colossal pillar, its glyphs lit amber just above the waterline, the reckoning that works the way out. Opposite, a huge closed stone vault door — the way home, and the Wellheart sealed behind it — its foot already drowned by the rising water. Around the rest of the chamber, colossal ribbed stonework streaked with mineral teal, half-submerged ledges, and the rope-and-plank descent climbing away up into shadow. Still black flood-water throwing mirror reflections of the towering amber basin-glow, cool teal shadow and warm amber light, drifting mist across the water, an unmistakable sense of the flood steadily rising, painterly, cinematic, richly detailed, monumental. No people, no lettering, no captions, no text.",
+        "doorPrompt": "The huge stone vault door — the way home — now grinds open across the risen water, revealing a stone cradle where the Wellheart rested and a rising flooded passage beyond climbing toward a distant cool disc of daylight; the three great glowing basins and their falling ribbons are unchanged, the flood still knee-high across the floor. Same painterly teal-and-amber style, no people, no lettering, no text."
+      },
+      "unlockedWhen": true,
+      "designNote": "ESCAPE (phase:escape; data-free k-means RECOGNITION — the finale, and the PRIORITY scene to generate). The floor of the cistern: k pools each fed by a cluster of falling threads = the k-means result made physical. RECOGNITION beat: the student realises they have been inside the analysis — the samples routed down the shaft are gathered into k clusters. ACTION: read the pools and enter the CLUSTER SIZES as the code. PROVISIONAL code = '324' (near->far basins fed by 3, 2, 4 threads; a plain text keypad lock, digits). The escape is INDEPENDENT of the WebR dataset (Lucas 2026-07-26) — the streams are NOT the student's samples; this stays a data-free recognition of 'a k-means clustering' in the abstract, not 'my clustering'. So the code is just the cluster sizes the ART depicts (currently 3,2,4 -> '324'); no need to tie it to the dataset's true clusters. Just fix an unambiguous reading order for the code in the final art (near->far, or left->right) once generated. Ungraded, NOT in the codec, not touched by validate_keys.py. Way-home door requires the keypad lock + endsEscape -> escapeDone. OPTIONAL bite: land 1-2 threads ambiguously between two pools so nearest-basin assignment is needed to read them. NEW ART.",
+      "plannedHotspots": [
+        {
+          "type": "clue",
+          "label": "The gathered pools",
+          "note": "the k basins fed by clusters of threads — the k-means result to be read (how many pools, how full each)"
+        },
+        {
+          "type": "lock",
+          "label": "The reckoning keypad",
+          "note": "code = the cluster sizes read across the basins; PROVISIONAL '324' until the dataset's true cluster sizes are set"
+        },
+        {
+          "type": "door",
+          "label": "The descent back up the column",
+          "direction": "back",
+          "note": "UP -> station2 (the way you came down)"
+        },
+        {
+          "type": "door",
+          "label": "The vault door - the way home",
+          "direction": "forward",
+          "note": "the CLOSED stone gate; requires the keypad lock; endsEscape -> escapeDone"
+        }
+      ]
+    }
+  ]
+}

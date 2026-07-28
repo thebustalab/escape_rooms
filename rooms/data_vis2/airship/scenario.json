@@ -1,0 +1,721 @@
+{
+  "chapter": "data_vis2",
+  "scenario": "airship",
+  "id": 9,
+  "title": "The Alembic",
+  "subtitle": "Data Visualization II · multiple mappings + solvent selection",
+  "story": "You wake to alarm bells and a floor tilting under your boots — and a cold, spreading mark on your forearm, where something alien slipped under your skin as you came aboard. This is the Alembic, a brass-and-canvas airship gone adrift over a world of floating islands and green alien sky, and she is listing further by the minute, sliding toward the crags. Two problems share one answer: the ship's medicine and its control-locks both run off the same rack of solvents, so the one liquid that kills the thing in your arm is the same one that frees the ship's seized helm. Cure yourself, work your way through the ship to the engine that mixes the cure, then climb to the bridge and take the wheel — because the only way to steer the Alembic clear is to read your way home by the stars.",
+  "enterLabel": "Check the mark on your arm →",
+  "done": {
+    "title": "The cure, and the ship set free",
+    "body": "You've named it — the one solvent that won't mix with water, sits at middling polarity, and rides lighter than water. You tip a measured charge into the dispensary funnel: the cold spreading stops dead across the lesion, and the same solvent floods the ship's lock-hydraulics. Every seized control shudders loose — the helm is alive again, up on the bridge, waiting for a bearing."
+  },
+  "escapeDone": {
+    "title": "Home by the stars",
+    "body": "Up in the crow's nest the captain's astrolabe turns under your hands — three plates for one sky — and only a single star holds its place in the homeward house through every one of them. You set the wheel to its bearing. The Alembic answers, banking off the black crags and climbing into clean night, and glides toward the one safe island the whole sky agreed upon — cured, and flying, the mark on your arm already fading."
+  },
+  "packages": [
+    "dplyr",
+    "ggplot2",
+    "readr",
+    "ggrepel"
+  ],
+  "datasets": [
+    {
+      "name": "solvents",
+      "url": "https://thebustalab.github.io/phylochemistry/sample_data/solvents.csv"
+    }
+  ],
+  "setup": "suppressMessages({library(dplyr); library(ggplot2)})",
+  "state": {},
+  "ambient": "embers",
+  "heel": {
+    "mode": "progressive",
+    "by": "analysis",
+    "toward": "right",
+    "maxDeg": 7
+  },
+  "cover": "cover.png",
+  "rooms": [
+    {
+      "key": "room1",
+      "title": "The apothecary bay",
+      "technique": "read one property of the solvents; the mapping still-kit",
+      "phase": "analysis",
+      "puzzleType": 1,
+      "built": true,
+      "designNote": "TEACHING ROOM 1 — THE APOTHECARY BAY. Story: the player finds the cold alien lesion on their arm and a brass field TEST-KIT; the ship's medicine and its door-locks both run on the same solvent rack, so curing themselves and reaching the helm are one problem. This station reads the FIRST property of the cure (e.g. it must NOT mix with water — read miscible_with_water). Per the pre/post principle, pose it as a MULTI-VARIABLE MAPPING plot (map several solvent properties to aesthetics, read one off) — NOT a single-column filter — mirroring hospital's question style. Solving narrows the cure AND releases the door onward. ALSO the home of the brass mapping DIAL (obj_dial): flipping it sets gameState.mapping to a sigil (m1/m2/m3); its effect isn't explained or visible here — it drives the crow's-nest chart much later (Riven: a control changing a distant display). Exact MCQ/plot TBD in the teaching-room design pass.",
+      "authoring": {
+        "tag": "room1",
+        "scenePrompt": "This is a panorama. A 360-degree view from the centre of the apothecary bay of a steampunk airship, the room wrapping continuously all the way around so the left and right edges meet seamlessly. Along one wall, brass racks of small glass solvent vials above a workbench with a copper distillation still and a BRASS FIELD TEST-KIT — a boxy analytical instrument with a small glowing glass screen showing a faint scatter-plot. On one side an open riveted companion-ladder climbs UP to a hatch onto the deep night sky of the weather deck; on the other, an open floor-hatch with a ladder descends DOWN into the dim cargo hold. Around the rest of the bay: gauges, coiled copper pipes, hanging oil lanterns, a wooden apothecary chest, and portholes onto a dark, green-tinged night sky with the first stars out over floating islands. Steady warm brass lamplight against the night beyond the portholes, brass-and-verdigris palette, drifting steam, film grain, richly detailed. No people, no lettering, no captions, no text.",
+        "doorPrompt": ""
+      },
+      "hotspots": [
+        {
+          "id": "the_field_test_kit",
+          "type": "puzzle",
+          "label": "The field test-kit",
+          "box": [
+            0.5348,
+            0.4415,
+            0.568,
+            0.5724
+          ],
+          "starterCode": "solvents",
+          "question": {
+            "prompt": "Your test-kit's first panel reacts only to solvents that will <b>not</b> mix with water. How does whether a solvent mixes with water relate to its polarity — which statement is true?",
+            "options": [
+              "Solvents that mix with water tend to sit at LOWER relative polarity",
+              "Solvents that mix with water tend to sit at HIGHER relative polarity",
+              "Whether a solvent mixes with water is unrelated to its polarity",
+              "Every solvent that mixes with water is denser than water",
+              "Only chlorinated solvents mix with water",
+              "Solvents that mix with water tend to be less dense"
+            ],
+            "correct": 1,
+            "maxAttempts": 4,
+            "feedback": {
+              "correct": "Right — the water-mixers cluster toward higher polarity. So your cure, which won't mix with water, is one of the lower-polarity, water-shy solvents. The kit's first light goes green and the bay door unlatches.",
+              "wrong": [
+                "Colour the points by <code>miscible_with_water</code> and compare where each colour sits along <code>relative_polarity</code>.",
+                "Look again — the water-mixing group sits toward the HIGHER-polarity end.",
+                "The polar solvents are the ones that dissolve into water."
+              ]
+            }
+          }
+        },
+        {
+          "id": "up_to_the_weather_deck",
+          "type": "door",
+          "label": "Up to the weather deck",
+          "box": [
+            0.2405,
+            0.0607,
+            0.3095,
+            0.1779
+          ],
+          "direction": "open",
+          "to": "room2"
+        },
+        {
+          "id": "down_to_the_cargo_hold",
+          "type": "door",
+          "label": "Down to the cargo hold",
+          "box": [
+            0.6995,
+            0.7345,
+            0.762,
+            0.8439
+          ],
+          "direction": "open",
+          "to": "room3"
+        }
+      ],
+      "plannedHotspots": [
+        {
+          "type": "puzzle",
+          "label": "The field test-kit",
+          "starterCode": "solvents",
+          "question": {
+            "prompt": "Your test-kit's first panel reacts only to solvents that will <b>not</b> mix with water. How does whether a solvent mixes with water relate to its polarity — which statement is true?",
+            "options": [
+              "Solvents that mix with water tend to sit at LOWER relative polarity",
+              "Solvents that mix with water tend to sit at HIGHER relative polarity",
+              "Whether a solvent mixes with water is unrelated to its polarity",
+              "Every solvent that mixes with water is denser than water",
+              "Only chlorinated solvents mix with water",
+              "Solvents that mix with water tend to be less dense"
+            ],
+            "correct": 1,
+            "maxAttempts": 4,
+            "feedback": {
+              "correct": "Right — the water-mixers cluster toward higher polarity. So your cure, which won't mix with water, is one of the lower-polarity, water-shy solvents. The kit's first light goes green and the bay door unlatches.",
+              "wrong": [
+                "Colour the points by <code>miscible_with_water</code> and compare where each colour sits along <code>relative_polarity</code>.",
+                "Look again — the water-mixing group sits toward the HIGHER-polarity end.",
+                "The polar solvents are the ones that dissolve into water."
+              ]
+            }
+          },
+          "note": "PUZZLE (field test-kit) — RUNG 1: colour by miscible_with_water, read group separation → water-mixers sit at HIGHER polarity (0.536 vs 0.187). correct idx 1."
+        },
+        {
+          "type": "door",
+          "label": "Up to the weather deck",
+          "direction": "open",
+          "to": "room2",
+          "note": "open passage up to the weather-deck hatch"
+        },
+        {
+          "type": "door",
+          "label": "Down to the cargo hold",
+          "direction": "open",
+          "to": "room3",
+          "note": "open floor-hatch + ladder down to the hold"
+        }
+      ],
+      "unlockedWhen": true,
+      "panorama": "room1/scene.png",
+      "builtFrom": "gpt_room1_11.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -7,
+        "pitch": -7
+      }
+    },
+    {
+      "key": "room2",
+      "title": "The weather deck",
+      "technique": "read a second solvent property; the ship's open hub",
+      "phase": "analysis",
+      "puzzleType": 1,
+      "built": true,
+      "designNote": "TEACHING ROOM 2 — OUT ON DECK. Story: the test-kit reads the SECOND property of the cure (e.g. relative_polarity near a value). Wind, rigging, the alien horizon. A MULTI-VARIABLE MAPPING plot (mirror hospital's style) that narrows the cure and opens the hatch down into the hold. Exact content TBD in the design pass.",
+      "authoring": {
+        "tag": "room2",
+        "scenePrompt": "This is a panorama. A 360-degree view from the centre of the open weather deck of a steampunk airship in flight, the scene wrapping continuously all the way around so the left and right edges meet seamlessly. Amidships, a brass binnacle holds a BRASS FIELD TEST-KIT with a small glowing glass screen. Forward, a short railed gangway leads to an enclosed brass-and-glass wheelhouse — the bridge. Rising from the centre of the deck, the great mast climbs into rigging with a laddered ratline leading UP toward the crow's nest high above. Set into the deck, an open hatch with a companion-ladder leads down to the apothecary bay. Around: riveted deck plates, taut canvas gas-bag lines overhead, a ship's rail giving onto a vast night sky — deep indigo pricked with stars, a low green glow lingering at the horizon — over distant floating islands and slow airships, coiled ropes, oil deck-lamps. Constant deep night under a star-strewn sky with a low green horizon glow, wind-torn cloud, warm brass fittings, film grain, richly detailed. No people, no lettering, no captions, no text.",
+        "doorPrompt": ""
+      },
+      "hotspots": [
+        {
+          "id": "the_field_test_kit",
+          "type": "puzzle",
+          "label": "The field test-kit",
+          "box": [
+            0.4033,
+            0.5861,
+            0.441,
+            0.6954
+          ],
+          "starterCode": "solvents",
+          "question": {
+            "prompt": "The cure has to float on the wound-wash, not sink — it must be <b>lighter than water</b>. Most of the solvents that are denser than water come from which single category?",
+            "options": [
+              "alcohol",
+              "oxygen_containing",
+              "hydrocarbon",
+              "chlorinated",
+              "nitrogen_containing",
+              "sulfide",
+              "amide"
+            ],
+            "correct": 3,
+            "maxAttempts": 4,
+            "feedback": {
+              "correct": "Yes — the chlorinated solvents sit above the density-of-water line. Your cure isn't one of those heavy liquids; you want a lighter family. The hatch to the hold drops open.",
+              "wrong": [
+                "Map <code>density</code> against <code>category</code> and see which category sits past the density-of-water line (about 1).",
+                "Several categories have a stray heavy member — look for the one whose members are MOSTLY denser than water.",
+                "It's the halogen-bearing family."
+              ]
+            }
+          },
+          "availableWhen": {
+            "solved": "room1"
+          },
+          "lockedBody": "The deck panel won't read yet — take your first reading at the apothecary still."
+        },
+        {
+          "id": "down_to_the_apothecary_bay",
+          "type": "door",
+          "label": "Down to the apothecary bay",
+          "box": [
+            0.4859,
+            0.5665,
+            0.5237,
+            0.6915
+          ],
+          "direction": "open",
+          "to": "room1"
+        },
+        {
+          "id": "up_the_mast_to_the_crow_s_nest",
+          "type": "door",
+          "label": "Up the mast to the crow's nest",
+          "box": [
+            0.4879,
+            0.1583,
+            0.5055,
+            0.2423
+          ],
+          "direction": "open",
+          "to": "nest"
+        },
+        {
+          "id": "forward_to_the_bridge",
+          "type": "door",
+          "label": "Forward to the bridge",
+          "box": [
+            0.5667,
+            0.4279,
+            0.5999,
+            0.5138
+          ],
+          "direction": "open",
+          "to": "bridge"
+        }
+      ],
+      "entry": "You climb out onto the open weather deck — wind, rigging, a green sky over floating islands. The mast rises at the ship's heart to the crow's nest far above; forward, the glassed-in bridge. A brass test-kit stands at the binnacle, waiting for its reading.",
+      "plannedHotspots": [
+        {
+          "type": "puzzle",
+          "label": "The field test-kit",
+          "starterCode": "solvents",
+          "question": {
+            "prompt": "The cure has to float on the wound-wash, not sink — it must be <b>lighter than water</b>. Most of the solvents that are denser than water come from which single category?",
+            "options": [
+              "alcohol",
+              "oxygen_containing",
+              "hydrocarbon",
+              "chlorinated",
+              "nitrogen_containing",
+              "sulfide",
+              "amide"
+            ],
+            "correct": 3,
+            "maxAttempts": 4,
+            "feedback": {
+              "correct": "Yes — the chlorinated solvents sit above the density-of-water line. Your cure isn't one of those heavy liquids; you want a lighter family. The hatch to the hold drops open.",
+              "wrong": [
+                "Map <code>density</code> against <code>category</code> and see which category sits past the density-of-water line (about 1).",
+                "Several categories have a stray heavy member — look for the one whose members are MOSTLY denser than water.",
+                "It's the halogen-bearing family."
+              ]
+            }
+          },
+          "note": "PUZZLE (field test-kit) — RUNG 2: density × category; densest family across the water line = chlorinated (4 of 7). correct idx 3.",
+          "availableWhen": {
+            "solved": "room1"
+          },
+          "lockedBody": "The deck panel won't read yet — take your first reading at the apothecary still."
+        },
+        {
+          "type": "door",
+          "label": "Down to the apothecary bay",
+          "direction": "open",
+          "to": "room1",
+          "note": "open riveted doorway into the deckhouse / apothecary"
+        },
+        {
+          "type": "door",
+          "label": "Up the mast to the crow's nest",
+          "direction": "open",
+          "to": "nest",
+          "note": "laddered ratline up the mast to the nest"
+        },
+        {
+          "type": "door",
+          "label": "Forward to the bridge",
+          "direction": "open",
+          "to": "bridge",
+          "note": "railed gangway forward to the wheelhouse"
+        }
+      ],
+      "unlockedWhen": true,
+      "panorama": "room2/scene.png",
+      "builtFrom": "gpt_room2_12.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -8,
+        "pitch": -8.4
+      }
+    },
+    {
+      "key": "room3",
+      "title": "The cargo hold",
+      "technique": "facet_wrap(~category) — the taught trap: the pooled polarity rule breaks inside the alcohols",
+      "phase": "analysis",
+      "puzzleType": 1,
+      "built": true,
+      "designNote": "TEACHING ROOM 3 — DEEP IN THE HOLD. THE TAUGHT TRAP (reworked 2026-07-22). Story: the test-kit now faces the cure's own family. Room 1 established the pooled rule — water-mixers are the more polar solvents. Here the player facets by category and looks inside the ALCOHOLS, where that rule collapses: 2-propanol mixes with water yet is LESS polar (0.546) than 1-butanol (0.586), which doesn't; polarity can't separate the alcohols, but density (chain length) does, cleanly. Load-bearing — the cure (1-butanol) is itself one of the polar-but-immiscible exceptions. Dark, cavernous hold; the plot lives on the laptop. Mirrors hospital's room-3 facet subversion. Verified vs solvents.csv; correct = idx 2.",
+      "authoring": {
+        "tag": "room3",
+        "scenePrompt": "This is a panorama. A 360-degree view from the centre of the cavernous cargo hold deep inside a steampunk airship, the space wrapping continuously all the way around so the left and right edges meet seamlessly. On a low bench, a BRASS FIELD TEST-KIT with a small glowing glass screen. On one side a brass ladder climbs UP through a hatch back to the apothecary bay; on the other, a low riveted bulk-door stands open onto a throbbing red-lit ladderway leading DOWN to the engine room. Around: stacked wooden crates and brass ballast tanks lashed against the tilt, an iron catwalk, chains and pulleys, barrels of ship's solvent, condensation on riveted hull plates, a single caged work-lamp throwing long shadows. Constant deep gloom cut by one warm amber work-lamp, brass-and-verdigris palette, faint haze, film grain, quietly ominous, richly detailed. No people, no lettering, no captions, no text.",
+        "doorPrompt": ""
+      },
+      "hotspots": [
+        {
+          "id": "deeper_to_the_engine_room",
+          "type": "door",
+          "label": "Deeper to the engine room",
+          "box": [
+            0.8629,
+            0.3908,
+            0.9052,
+            0.7111
+          ],
+          "direction": "open",
+          "to": "boss"
+        },
+        {
+          "id": "up_to_the_apothecary_bay",
+          "type": "door",
+          "label": "Up to the apothecary bay",
+          "box": [
+            0.0777,
+            0.0763,
+            0.1305,
+            0.1622
+          ],
+          "direction": "open",
+          "to": "room1"
+        },
+        {
+          "id": "the_field_test_kit",
+          "type": "puzzle",
+          "label": "The field test-kit",
+          "box": [
+            0.3935,
+            0.6036,
+            0.4319,
+            0.6974
+          ],
+          "starterCode": "solvents",
+          "question": {
+            "prompt": "Room 1's rule — the solvents that mix with water are the more polar ones — was read across the whole rack. Now look inside one family, the <b>alcohols</b>, coloured by whether they mix with water: what actually separates the alcohols that mix from those that don't?",
+            "options": [
+              "The same rule holds — the alcohols that mix are simply the more polar ones",
+              "Nothing separates them — every alcohol mixes with water",
+              "Polarity barely separates them; it's the heavier, longer-chain alcohols that stop mixing, so density tells them apart — not polarity",
+              "The alcohols that mix are the denser ones",
+              "Only chlorinated alcohols fail to mix",
+              "The alcohols that don't mix are simply the least polar ones"
+            ],
+            "correct": 2,
+            "maxAttempts": 4,
+            "feedback": {
+              "correct": "Exactly — inside the alcohols the polarities overlap, but density (chain length) decides. Only two polar alcohols refuse to mix with water: 1-butanol and 1-octanol — and your cure is one of them. The companionway to the bridge grinds open.",
+              "wrong": [
+                "Split the rack into small multiples by <code>category</code> and look only at the alcohol panel; colour by <code>miscible_with_water</code>, and check whether polarity actually separates the two colours.",
+                "Inside the alcohols the polarities overlap — two that don't mix sit right among ones that do. Compare their densities instead.",
+                "The alcohols that refuse to mix are the heavier, longer-chain ones — read density, not polarity."
+              ]
+            }
+          },
+          "availableWhen": {
+            "solved": "room2"
+          },
+          "lockedBody": "Nothing to read here yet — the kit needs the weather-deck reading before it will run the hold panel."
+        }
+      ],
+      "entry": "A ladder drops you into the swaying cargo hold, lantern-lit and close, crates roped hard against the growing list. A test-kit waits on a low bench; a bulk-door leads deeper, toward a red glow — the engine room.",
+      "plannedHotspots": [
+        {
+          "type": "puzzle",
+          "label": "The field test-kit",
+          "starterCode": "solvents",
+          "question": {
+            "prompt": "Room 1's rule — the solvents that mix with water are the more polar ones — was read across the whole rack. Now look inside one family, the <b>alcohols</b>, coloured by whether they mix with water: what actually separates the alcohols that mix from those that don't?",
+            "options": [
+              "The same rule holds — the alcohols that mix are simply the more polar ones",
+              "Nothing separates them — every alcohol mixes with water",
+              "Polarity barely separates them; it's the heavier, longer-chain alcohols that stop mixing, so density tells them apart — not polarity",
+              "The alcohols that mix are the denser ones",
+              "Only chlorinated alcohols fail to mix",
+              "The alcohols that don't mix are simply the least polar ones"
+            ],
+            "correct": 2,
+            "maxAttempts": 4,
+            "feedback": {
+              "correct": "Exactly — inside the alcohols the polarities overlap, but density (chain length) decides. Only two polar alcohols refuse to mix with water: 1-butanol and 1-octanol — and your cure is one of them. The companionway to the bridge grinds open.",
+              "wrong": [
+                "Split the rack into small multiples by <code>category</code> and look only at the alcohol panel; colour by <code>miscible_with_water</code>, and check whether polarity actually separates the two colours.",
+                "Inside the alcohols the polarities overlap — two that don't mix sit right among ones that do. Compare their densities instead.",
+                "The alcohols that refuse to mix are the heavier, longer-chain ones — read density, not polarity."
+              ]
+            }
+          },
+          "note": "PUZZLE (field test-kit) — RUNG 3, THE TAUGHT TRAP: facet_wrap(~category), inside the alcohols polarity fails, density (chain length) separates. correct idx 2.",
+          "availableWhen": {
+            "solved": "room2"
+          },
+          "lockedBody": "Nothing to read here yet — the kit needs the weather-deck reading before it will run the hold panel."
+        },
+        {
+          "type": "door",
+          "label": "Up to the apothecary bay",
+          "direction": "open",
+          "to": "room1",
+          "note": "ladder up through a hatch to the apothecary"
+        },
+        {
+          "type": "door",
+          "label": "Deeper to the engine room",
+          "direction": "open",
+          "to": "boss",
+          "note": "riveted bulk-door onto the red-lit passage to the engine room"
+        }
+      ],
+      "unlockedWhen": true,
+      "panorama": "room3/scene.png",
+      "builtFrom": "gpt_room3_15.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5.7
+      }
+    },
+    {
+      "key": "boss",
+      "title": "The engine room",
+      "technique": "the full three-condition solvent selection (graded Q3), administered at the dispensary; mints the Canvas code",
+      "phase": "analysis",
+      "puzzleType": 2,
+      "isBoss": true,
+      "built": true,
+      "deliverable": {
+        "type": "figure",
+        "submitCodec": true
+      },
+      "designNote": "BOSS (graded -> Canvas code) — THE ENGINE ROOM / DISPENSARY. Combining all three readings, the player names the ONE solvent that is immiscible with water, relative_polarity nearest 0.6, AND density below water (Data-Vis-II Q3). Verified answer: 1-BUTANOL. It is mixed and poured at the dispensary console, curing the lesion AND flooding the ship's lock-hydraulics so the seized helm frees. availableWhen {allSolved room1/room2/room3} gates the boss puzzle to this room. Ends the ANALYSIS objective + mints the code.",
+      "authoring": {
+        "tag": "boss",
+        "scenePrompt": "This is a panorama. A 360-degree view from the centre of the engine room at the heart of a steampunk airship — the ship's central still-works — the chamber wrapping continuously all the way around so the left and right edges meet seamlessly. Dominating the space, a towering brass distillation apparatus: a master solvent rack of glass reservoirs and copper coils where all the ship's fluid lines converge — medicine lines to one side, lock-hydraulic lines to the other — with a central DISPENSARY CONSOLE, a brass field test-kit writ large, its wide glass screen showing a density-versus-polarity scatter-plot above a single funnel where the chosen solvent is poured. To one side, a riveted bulk-door stands open onto a ladder leading back up to the cargo hold. Around: thrumming pistons, pressure gauges and speaking-tubes, riveted boilers, glowing valve-wheels, jets of steam, tall glass sight-gauges of coloured solvent. Constant hot amber-and-red furnace glow with brass highlights, heavy haze and steam, film grain, grand and tense, richly detailed. No people, no lettering, no captions, no text.",
+        "doorPrompt": ""
+      },
+      "hotspots": [
+        {
+          "id": "the_dispensary_console",
+          "type": "puzzle",
+          "label": "The dispensary console",
+          "box": [
+            0.4456,
+            0.4298,
+            0.553,
+            0.6251
+          ],
+          "starterCode": "solvents",
+          "question": {
+            "prompt": "This is it — name the cure. Using the solvents data, find the one solvent that is <b>not</b> miscible with water, has a <code>relative_polarity</code> nearest <b>0.6</b>, and is <b>less dense</b> than water.",
+            "options": [
+              "Chloroform",
+              "Ethyl Acetate",
+              "1-Octanol",
+              "Hexane",
+              "1-Butanol",
+              "2-Butanone",
+              "Dichloromethane"
+            ],
+            "correct": 4,
+            "maxAttempts": 4,
+            "feedback": {
+              "correct": "1-butanol — immiscible, polarity 0.586, lighter than water. You swab a bead across the lesion and the cold spreading stops dead; the same solvent hisses into the bulkhead lock and the bridge grinds open.",
+              "wrong": [
+                "Keep the water-immiscible solvents, then among those find density below 1 and <code>relative_polarity</code> closest to 0.6.",
+                "1-octanol is close on polarity, but check which sits nearer 0.6.",
+                "Chloroform and dichloromethane are denser than water — the cure floats."
+              ]
+            }
+          },
+          "availableWhen": {
+            "allSolved": [
+              "room1",
+              "room2",
+              "room3"
+            ]
+          },
+          "lockedBody": "The dispensary won't cycle until all three readings are in — finish the apothecary, the weather deck, and the hold first."
+        },
+        {
+          "id": "back_up_to_the_cargo_hold",
+          "type": "door",
+          "label": "Back up to the cargo hold",
+          "box": [
+            0.1715,
+            0.4044,
+            0.2112,
+            0.6525
+          ],
+          "direction": "open",
+          "to": "room3"
+        }
+      ],
+      "entry": "The passage opens into the engine room: the ship's roaring still-works, every fluid line converging on a great brass dispensary. This is where the cure is mixed and poured — and where the ship's seized locks will answer to it.",
+      "plannedHotspots": [
+        {
+          "type": "puzzle",
+          "label": "The dispensary console",
+          "starterCode": "solvents",
+          "question": {
+            "prompt": "This is it — name the cure. Using the solvents data, find the one solvent that is <b>not</b> miscible with water, has a <code>relative_polarity</code> nearest <b>0.6</b>, and is <b>less dense</b> than water.",
+            "options": [
+              "Chloroform",
+              "Ethyl Acetate",
+              "1-Octanol",
+              "Hexane",
+              "1-Butanol",
+              "2-Butanone",
+              "Dichloromethane"
+            ],
+            "correct": 4,
+            "maxAttempts": 4,
+            "feedback": {
+              "correct": "1-butanol — immiscible, polarity 0.586, lighter than water. You swab a bead across the lesion and the cold spreading stops dead; the same solvent hisses into the bulkhead lock and the bridge grinds open.",
+              "wrong": [
+                "Keep the water-immiscible solvents, then among those find density below 1 and <code>relative_polarity</code> closest to 0.6.",
+                "1-octanol is close on polarity, but check which sits nearer 0.6.",
+                "Chloroform and dichloromethane are denser than water — the cure floats."
+              ]
+            }
+          },
+          "note": "GRADED BOSS (Q3): the one solvent immiscible + relative_polarity nearest 0.6 + density < water = 1-butanol (1-octanol the near-miss). correct idx 4. Mints the Canvas code.",
+          "availableWhen": {
+            "allSolved": [
+              "room1",
+              "room2",
+              "room3"
+            ]
+          },
+          "lockedBody": "The dispensary won't cycle until all three readings are in — finish the apothecary, the weather deck, and the hold first."
+        },
+        {
+          "type": "door",
+          "label": "Back up to the cargo hold",
+          "direction": "open",
+          "to": "room3",
+          "note": "bulk-door + ladder back up to the hold"
+        }
+      ],
+      "unlockedWhen": true,
+      "panorama": "boss/scene.png",
+      "builtFrom": "gpt_boss_18.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5.4
+      }
+    },
+    {
+      "key": "nest",
+      "title": "The crow's nest",
+      "technique": "escape — read the dial-driven star-plates (multiple mappings)",
+      "phase": "escape",
+      "built": false,
+      "unlockedWhen": true,
+      "designNote": "ESCAPE part 1 — THE CROW'S NEST (deep night, high on the mast, 'see the whole', very Riven). STAR REDESIGN 2026-07-22 (was solvent charts). The captain's star-astrolabe (obj_chart, a mapview) shows a field of NAMED STARS under whichever plate the room-1 astrolabe plate-dial selects (m1/m2/m3) as a pre-rendered PNG. Each plate projects the same stars a different way; the Anchor (homeward house) is marked on every plate. Exactly one star — SOLIRA — holds the Anchor across all three plates; its NAME is the helm lock. The star-log clue (obj_starlog) names the Anchor + the method, not the answer. Fully data-free (no solvents). PNGs + answer from nest/make_starchart.py; equal-length star names keep the lock a fixed length. The plate-dial is co-located here beside the astrolabe (moved out of room1 so there's no cross-ship back-nav during the escape); the player turns it, reads each plate, takes the intersection → SOLIRA → helm.",
+      "authoring": {
+        "tag": "nest",
+        "scenePrompt": "This is a panorama. A 360-degree view from the centre of the crow's nest atop a steampunk airship, a small round railed platform high on the mast, the scene wrapping continuously so the left and right edges meet seamlessly. It is deep, clear night up here above the cloud. Ahead, the captain's great brass STAR-ASTROLABE on a swivel mount — a tall ringed instrument with a large engraved circular star-plate — and beside it a heavy BRASS PLATE-DIAL with three engraved marks and a needle for turning the astrolabe to a new plate; a chart table holds an open leather star-log and a spyglass. A railed ratline and ladder lead DOWN the mast to the weather deck below. All around, the railing gives onto an immense night sky blazing with stars over dark floating islands far below, rigging lines rising to the gas-bag above, a glowing signal lantern, a windsock snapping. Cold, constant starlight and warm brass highlights, wind-torn cloud, film grain, richly detailed. No people, no lettering, no captions, no text.",
+        "doorPrompt": ""
+      },
+      "hotspots": [],
+      "entry": "You climb the mast into full night. The crow's nest sways under a sky blazing with stars, and the captain's astrolabe stands ready — three plates for one sky.",
+      "plannedHotspots": [
+        {
+          "type": "dial",
+          "label": "The astrolabe plate-dial",
+          "key": "mapping",
+          "hint": "Three plate-marks engraved around a brass ring — ◈ ⬢ ✶ — and a heavy needle, set beside the astrolabe. Turn it and the astrolabe swings to a new plate of the sky.",
+          "states": [
+            {
+              "value": "m1",
+              "label": "◈"
+            },
+            {
+              "value": "m2",
+              "label": "⬢"
+            },
+            {
+              "value": "m3",
+              "label": "✶"
+            }
+          ],
+          "note": "DIAL — astrolabe plate-dial (key 'mapping', 3 states ◈/⬢/✶). Co-located with the astrolabe; sets which star-plate obj_chart shows."
+        },
+        {
+          "type": "mapview",
+          "label": "The captain's star-astrolabe",
+          "key": "mapping",
+          "caption": "The astrolabe's plate turns and the star field redraws — the same sky under a different projection each time, the Anchor marked on every face. Stars drift from plate to plate; the one that holds the Anchor through all three faces is your bearing home.",
+          "empty": "The astrolabe's plate-ring is unset — the stars won't show. Turn the plate-dial beside it to choose a face of the sky.",
+          "images": {
+            "m1": "nest/map_m1.png",
+            "m2": "nest/map_m2.png",
+            "m3": "nest/map_m3.png"
+          },
+          "note": "MAPVIEW keyed on 'mapping' — three star-plate PNGs (nest/map_m{1,2,3}.png). Anchor marked on every plate; SOLIRA is the only star holding it across all three."
+        },
+        {
+          "type": "clue",
+          "label": "The captain's star-log",
+          "body": "Open to a marked page, the captain's hand: “Steer always by the Anchor — the house high to the north-east that every plate of the astrolabe shares. Stars wander from face to face, but one alone keeps the Anchor through all three. That star is our bearing home; set the helm to its name.”",
+          "note": "CLUE — captain's star-log; names the Anchor + the method, NOT the answer. (renders `body`.)"
+        },
+        {
+          "type": "door",
+          "label": "Down the mast to the weather deck",
+          "direction": "open",
+          "to": "room2",
+          "note": "ratline + ladder down the mast to the deck"
+        }
+      ]
+    },
+    {
+      "key": "bridge",
+      "title": "The bridge",
+      "technique": "escape — set the invariant star's bearing at the helm to steer home",
+      "phase": "escape",
+      "built": false,
+      "unlockedWhen": true,
+      "designNote": "ESCAPE part 2 — THE BRIDGE (the helm; the finish). The helm bearing-keypad (obj_lock, answer SOLIRA, len 6) is DEAD until the cure has cycled (availableWhen {solved boss} + lockedBody). Enter the invariant star's name read off the astrolabe in the nest, then take the wheel (the forward 'Take the wheel' door, requires obj_lock, no `to`) -> escapeDone. The helm lives on the bridge, not a captain's cabin.",
+      "authoring": {
+        "tag": "bridge",
+        "scenePrompt": "This is a panorama. A 360-degree view from the centre of the bridge — the enclosed wheelhouse — of a steampunk airship, the room wrapping continuously so the left and right edges meet seamlessly. Ahead, the great spoked ship's WHEEL at the helm, and mounted on the binnacle before it a brass KEYPAD of engraved rings where a bearing is set. Tall arched windows wrap the front, giving onto a star-filled night sky and dark floating islands and jagged floating crags rushing past below. Aft, an open doorway gives onto the short railed gangway back to the weather deck. Around: banks of brass engine-order telegraphs, a chart table, a barometer and a ship's chronometer, speaking-tubes, wall sconces of warm amber light, riveted trim, the deck canted underfoot. Warm amber instrument light against cold starlit night through the windows, brass-and-mahogany palette, faint haze, film grain, richly detailed. No people, no lettering, no captions, no text.",
+        "doorPrompt": ""
+      },
+      "hotspots": [],
+      "entry": "You step onto the bridge. The great wheel waits at the helm, a bearing-keypad at the binnacle beside it, tall windows onto the dark floating crags rushing past. Set her course, and take her home.",
+      "plannedHotspots": [
+        {
+          "type": "lock",
+          "label": "The helm bearing-keypad",
+          "answer": "SOLIRA",
+          "length": 6,
+          "feedback": {
+            "correct": "The name rings true — the plate-ring spins home and the door to the helm clicks open. The one star that held the Anchor through every face of the sky.",
+            "wrong": "The rings grind and reset. That star wanders; it is not our bearing home."
+          },
+          "note": "LOCK — helm keypad, answer SOLIRA (len 6), the invariant star. Source of truth: nest/make_starchart.py. Not in the codec.",
+          "availableWhen": {
+            "solved": "boss"
+          },
+          "lockedBody": "The helm is dead — the ship's control-locks won't release until the solvent-cure has cycled through the engine. Treat the infection first."
+        },
+        {
+          "type": "door",
+          "label": "Take the wheel",
+          "direction": "forward",
+          "requires": "obj_lock",
+          "note": "the great spoked wheel — requires the helm keypad; fires escapeDone"
+        },
+        {
+          "type": "door",
+          "label": "Aft to the weather deck",
+          "direction": "open",
+          "to": "room2",
+          "note": "open doorway aft onto the weather deck"
+        }
+      ]
+    }
+  ],
+  "music": "audio/kora_passage.mp3",
+  "musicVolume": 0.1,
+  "musicCredit": {
+    "text": "Passage | Studio Mix by Kora",
+    "url": "https://www.youtube.com/watch?v=5lXtJVsi3D0"
+  },
+  "coverPrompt": "Minimalist stylised thumbnail poster of a lone steampunk airship — a brass-and-canvas vessel with a great gas-bag and a tall mast crowned by a small crow's nest — adrift over an archipelago of floating islands at nightfall. One bold, simple, high-contrast silhouette of the ship against a sky that gradients from deep green-violet dusk at the horizon to a star-blazing indigo night above, a single bright bearing-star high in the upper sky. Iconic and uncluttered. Flat, limited palette: brass gold, verdigris teal, deep indigo, dusk violet, one warm lamplit window-glow. Soft film grain, painterly but clean, simple geometric shapes, strong negative space, single centred focal subject. No people, no text, no lettering, no logos. Square composition.",
+  "sickness": {
+    "ramp": "analysis",
+    "clearOn": "cure",
+    "maxDim": 0.55
+  }
+}

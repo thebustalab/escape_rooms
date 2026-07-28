@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Waterfalls — player map (live)</title>
+<style>
+  :root { --line:#8b98a2; --cut:#c0392b; --reach:#bfe6c8; }
+  body { margin:0; font:14px/1.4 system-ui, sans-serif; color:#233; background:#eef2f5; }
+  header { padding:10px 14px; background:#1f2d3a; color:#eaf0f5; }
+  header b { font-size:16px; }
+  .wrap { padding:14px; max-width:520px; }
+  .panel { background:#fff; border:1px solid #cdd6dd; border-radius:10px; padding:12px; }
+  svg { touch-action:manipulation; background:#fbfdff; border-radius:8px; display:block; }
+  .platform { fill:#fff; stroke:#4d5d69; stroke-width:2; cursor:pointer; }
+  .platform.reach { fill:var(--reach); }
+  .bridge { stroke:var(--line); stroke-width:6; stroke-linecap:round; }
+  .bridge.cut { stroke:var(--cut); stroke-width:5; stroke-dasharray:2 6; }
+  .bridge.absent { stroke:#dde5eb; stroke-width:2; stroke-dasharray:1 9; }
+  .river { fill:none; stroke-width:4; opacity:.4; stroke-linecap:round; stroke-linejoin:round; }
+  .divg { stroke-width:3; stroke-linecap:round; }
+  .divg.cur { stroke:#1a5276; }
+  .divg.alt { stroke:#cfd8de; }
+  .mlbl { font:bold 11px system-ui; fill:#222; pointer-events:none; }
+  button { font:14px system-ui; padding:7px 12px; border:1px solid #cdd6dd; border-radius:8px;
+           background:#fff; cursor:pointer; }
+  button.throw { background:#1f6feb; color:#fff; border-color:#1f6feb; font-weight:bold; }
+  .row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin:8px 0; }
+  .hint { font-size:12px; color:#667; }
+  .warn { color:#b9770e; font-size:12px; }
+  label.tog { user-select:none; }
+</style>
+</head>
+<body>
+<header><b>Waterfalls — your map</b> &nbsp;<span class="hint">tap a platform you can reach to move · throw a switch when you're on it</span></header>
+<div class="wrap"><div class="panel">
+  <svg id="map"></svg>
+  <div class="row" id="actions"></div>
+  <div class="row">
+    <label class="tog"><input type="checkbox" id="reachTog" checked> highlight where I can reach</label>
+    <button id="reset">reset</button>
+  </div>
+  <div class="row hint" id="info"></div>
+  <div class="row warn" id="warn"></div>
+  <div class="row hint">puzzle not loading? <input type="file" id="file" accept=".json"></div>
+</div></div>
+
+<script>
+const MARG=60, CELL=100, RP=15;
+let data=null, pos=[0,0], showReach=true;
+
+// which switch flips which diverter, and each diverter's two glyph positions (bit 0 = start)
+const SW2DIV = { S1:"D1", S2:"D2", S3:"D3", S4:"D4" };
+const DIVORDER = ["D1","D2","D3","D4"];
+const DIV = { D1:{a:"/", b:"|"}, D2:{a:"|", b:"\\"}, D3:{a:"|", b:"/"}, D4:{a:"/", b:"|"} };
+let bits = { D1:0, D2:0, D3:0, D4:0 };            // 0 = start position
+
+// --- ROUTER (ported from router.py): compute cut bridges + river paths LIVE
+// from the diverter positions, for ANY combination (no 5-state lookup needed).
+const SOURCES = [0, 1];                                       // active stream lanes (gaps)
+const SHIFT = { D1:[-1,0], D2:[0,1], D3:[0,-1], D4:[-2,0] };  // columns shifted, by bit
+function gapX(g){ return MARG + (g+0.5)*CELL; }
+function yRow(r){ return MARG + r*CELL; }
+
+function px(r,c){ return { x: MARG + c*CELL, y: MARG + r*CELL }; }
+function bidOf(k,r,c){ return `${k}-${r}-${c}`; }
+function grid(){ return data.grid; }
+function toGrid(x,y){ return { r:(y-74)/118, c:(x-74)/118 }; }
+
+function bridges(){
+  const {rows,cols}=grid(), out=[];
+  for(let r=0;r<rows;r++) for(let c=0;c<cols;c++){
+    if(c<cols-1) out.push({id:bidOf("H",r,c), a:[r,c], b:[r,c+1]});
+    if(r<rows-1) out.push({id:bidOf("V",r,c), a:[r,c], b:[r+1,c]});
+  }
+  return out;
+}
+function presentSet(){
+  const {rows,cols}=grid(), absent=new Set(data.absentBridges||[]), s=new Set();
+  for(let r=0;r<rows;r++) for(let c=0;c<cols;c++){
+    if(c<cols-1){ const id=`H-${r}-${c}`; if(!absent.has(id)) s.add(id); }
+    if(r<rows-1){ const id=`V-${r}-${c}`; if(!absent.has(id)) s.add(id); }
+  }
+  return s;
+}
+function diverterDefs(){
+  return (data.markers||[]).filter(m=>m.kind==="diverter" && SHIFT[m.label])
+    .map(m=>({ label:m.label, lane:Math.floor((m.x-74)/118), y:(m.y-74)/118 }));
+}
+function crossedCols(a,b){ const o=[];
+  if(b>a){ for(let c=a+1;c<=b;c++) o.push(c); } else { for(let c=b+1;c<=a;c++) o.push(c); }
+  return o; }
+// route each stream: straight-down cuts the H bridge in its gap; a diverter shifts it
+// sideways, cutting the V ladders crossed. Streams fall through diverters in height order.
+function route(){
+  const {rows}=grid(), present=presentSet(), defs=diverterDefs();
+  const cut=new Set(), rivers=[], colors=["#2e6fb0","#e67e22","#27ae60"];
+  SOURCES.forEach((src,si)=>{
+    let lane=src;
+    const ev=[];
+    for(let r=0;r<rows;r++) ev.push({y:r, row:r});
+    defs.forEach(d=> ev.push({y:d.y, div:d}));
+    ev.sort((a,b)=>a.y-b.y);
+    const pts=[[gapX(lane), yRow(-0.4)]];
+    for(const e of ev){
+      if(e.row!==undefined){ const id=`H-${e.row}-${lane}`; if(present.has(id)) cut.add(id); }
+      else { const d=e.div;
+        if(d.lane===lane){ const sh=SHIFT[d.label][bits[d.label]];
+          if(sh){ pts.push([gapX(lane), yRow(d.y)]);
+            const nl=lane+sh, band=Math.floor(d.y);
+            crossedCols(lane,nl).forEach(c=>{ const id=`V-${band}-${c}`; if(present.has(id)) cut.add(id); });
+            lane=nl; pts.push([gapX(lane), yRow(d.y)]); } }
+      }
+    }
+    pts.push([gapX(lane), yRow(rows-1+0.5)]);
+    rivers.push({ color:colors[si%colors.length], pts });
+  });
+  return { cut, rivers };
+}
+function passable(cut){
+  const absent=new Set(data.absentBridges||[]);
+  return bridges().filter(b=> !absent.has(b.id) && !cut.has(b.id));
+}
+function reachFrom(start, cut){
+  const adj={}; passable(cut).forEach(b=>{ const k=b.a.join(","),l=b.b.join(",");
+    (adj[k]=adj[k]||[]).push(b.b); (adj[l]=adj[l]||[]).push(b.a); });
+  const seen=new Set([start.join(",")]), q=[start.slice()];
+  while(q.length){ const n=q.shift();
+    (adj[n.join(",")]||[]).forEach(m=>{ const mk=m.join(","); if(!seen.has(mk)){ seen.add(mk); q.push(m); } }); }
+  return seen;
+}
+function markerAt(kind){
+  const m={};
+  (data.markers||[]).filter(x=>x.kind===kind).forEach(x=>{
+    const g=toGrid(x.x,x.y); m[`${Math.round(g.r)},${Math.round(g.c)}`]=x.label; });
+  return m;
+}
+function divGlyph(x,y,glyph,cls){
+  const d=9;
+  let x1,y1,x2,y2;
+  if(glyph==="|"){ x1=x; y1=y-d; x2=x; y2=y+d; }
+  else if(glyph==="/"){ x1=x-d; y1=y+d; x2=x+d; y2=y-d; }
+  else { x1=x-d; y1=y-d; x2=x+d; y2=y+d; }          // "\"
+  return `<line class="divg ${cls}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`;
+}
+
+function render(){
+  const {rows,cols}=grid();
+  const W=MARG*2+(cols-1)*CELL, H=MARG*2+(rows-1)*CELL;
+  const svg=document.getElementById("map");
+  svg.setAttribute("width",W); svg.setAttribute("height",H); svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
+  const absent=new Set(data.absentBridges||[]);
+  const routed=route(), cut=routed.cut;
+  const reach = showReach ? reachFrom(pos, cut) : new Set([pos.join(",")]);
+  const sw=markerAt("switch"), exit=`${rows-1},0`;
+  let s="";
+  // rivers (under) — computed live by the router; points already in pixel coords
+  routed.rivers.forEach(riv=>{
+    const pts=riv.pts.map(p=>`${p[0]},${p[1]}`).join(" ");
+    s+=`<polyline class="river" points="${pts}" style="stroke:${riv.color}"/>`;
+  });
+  // bridges
+  for(const b of bridges()){
+    const A=px(...b.a), B=px(...b.b);
+    const cls = absent.has(b.id)?"absent":(cut.has(b.id)?"cut":"");
+    s+=`<line class="bridge ${cls}" x1="${A.x}" y1="${A.y}" x2="${B.x}" y2="${B.y}"/>`;
+  }
+  // platforms
+  for(let r=0;r<rows;r++) for(let c=0;c<cols;c++){
+    const P=px(r,c), key=`${r},${c}`, rc=reach.has(key)?" reach":"";
+    s+=`<circle class="platform${rc}" data-rc="${r},${c}" cx="${P.x}" cy="${P.y}" r="${RP}"/>`;
+    let lbl = sw[key]||""; if(key===exit) lbl="EXIT";
+    if(lbl) s+=`<text class="mlbl" x="${P.x}" y="${P.y+4}" text-anchor="middle">${lbl}</text>`;
+  }
+  // diverters: current glyph solid, alternate greyed
+  (data.markers||[]).filter(x=>x.kind==="diverter").forEach(m=>{
+    const g=toGrid(m.x,m.y), q=px(g.r,g.c), meta=DIV[m.label];
+    if(!meta) return;
+    const curG = bits[m.label] ? meta.b : meta.a, altG = bits[m.label] ? meta.a : meta.b;
+    s+=divGlyph(q.x,q.y,altG,"alt");
+    s+=divGlyph(q.x,q.y,curG,"cur");
+    s+=`<text class="mlbl" x="${q.x+14}" y="${q.y+4}" style="font-size:9px">${m.label}</text>`;
+  });
+  // player
+  const P=px(...pos);
+  s+=`<text x="${P.x}" y="${P.y+7}" text-anchor="middle" style="font-size:22px">★</text>`;
+  svg.innerHTML=s;
+  svg.querySelectorAll(".platform").forEach(el=> el.onclick=()=>{
+    const t=el.dataset.rc.split(",").map(Number);
+    if(reachFrom(pos, route().cut).has(t.join(","))){ pos=t; render(); } });
+
+  // actions: throw switch if standing on one
+  const here = `${pos[0]},${pos[1]}`, act=document.getElementById("actions");
+  if(sw[here]){
+    const lbl=sw[here], div=SW2DIV[lbl];
+    act.innerHTML = `<button class="throw" id="throwBtn">Throw ${lbl} (flips diverter ${div})</button>`;
+    document.getElementById("throwBtn").onclick=()=>{ bits[div]^=1; render(); };
+  } else act.innerHTML = `<span class="hint">you're at ${here} — no switch here</span>`;
+
+  document.getElementById("info").textContent =
+    `diverters: ${DIVORDER.map(d=>`${d}=${bits[d]?DIV[d].b:DIV[d].a}`).join("  ")}`;
+  document.getElementById("warn").textContent = "";
+}
+
+function boot(d){ data=d; pos=[0,0]; bits={D1:0,D2:0,D3:0,D4:0}; render(); }
+document.getElementById("reachTog").onchange=e=>{ showReach=e.target.checked; render(); };
+document.getElementById("reset").onclick=()=>boot(data);
+document.getElementById("file").onchange=e=>{
+  const f=e.target.files[0]; if(!f) return; const rd=new FileReader();
+  rd.onload=()=>{ try{ boot(JSON.parse(rd.result)); }catch(err){ alert("bad JSON: "+err.message); } };
+  rd.readAsText(f);
+};
+fetch("puzzle.json").then(r=>{ if(!r.ok) throw 0; return r.json(); })
+  .then(boot).catch(()=>{ document.getElementById("warn").textContent =
+     "Couldn't auto-load puzzle.json — use the file picker below."; });
+</script>
+</body>
+</html>

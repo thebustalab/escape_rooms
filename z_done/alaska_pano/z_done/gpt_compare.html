@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>gpt-image-2 comparison</title>
+  <style>
+    html, body { margin: 0; background: #0a141c; color: #e8eef2; font: 15px/1.5 system-ui, sans-serif; }
+    header { padding: 18px 22px; }
+    h1 { margin: 0 0 4px; font-size: 20px; }
+    .note { opacity: 0.78; font-size: 13px; max-width: 900px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(420px, 1fr)); gap: 16px; padding: 0 22px 40px; }
+    .card { background: #10202a; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; overflow: hidden; }
+    .card img { display: block; width: 100%; aspect-ratio: 3/2; object-fit: cover; background: #06111a; cursor: pointer; }
+    .card .cap { padding: 8px 12px; font-size: 13px; color: #ffd88c; }
+    a { color: #ffd88c; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>gpt-image-2 — cabin comparison</h1>
+    <p class="note">Five gpt-image-2 renders of the current harness prompt, at its widest (1536×1024, high quality).
+    These are ordinary flat images — <b>view them as-is</b> (not in the 360 viewer): gpt-image-2 can't make a true
+    equirectangular 360, so this is a like-for-like check of its <b>look and quality</b> against your DiT360 funnel output.
+    Click any image to open full-size.</p>
+  </header>
+  <div class="grid" id="grid">generating… refresh in a minute.</div>
+  <script>
+    const files = ["gpt_test_1.png","gpt_test_2.png","gpt_test_3.png","gpt_test_4.png","gpt_test_5.png"];
+    const t = Date.now();
+    document.getElementById("grid").innerHTML = files.map((f, i) => `
+      <div class="card">
+        <a href="scene/${f}?t=${t}" target="_blank"><img src="scene/${f}?t=${t}" alt="gpt-image-2 #${i + 1}"
+          onerror="this.parentElement.parentElement.querySelector('.cap').textContent='#${i + 1} — not ready yet, refresh'"></a>
+        <div class="cap">gpt-image-2 · #${i + 1}</div>
+      </div>`).join("");
+  </script>
+</body>
+</html>

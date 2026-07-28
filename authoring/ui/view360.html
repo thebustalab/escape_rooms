@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>360 viewer — gpt pseudo-pano + hotspots</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css" />
+  <style>
+    html, body { margin:0; height:100%; background:#06111a; overflow:hidden; font:14px system-ui, sans-serif; color:#e8eef2; }
+    #pano { position:fixed; inset:0; }
+    .pnlm-controls-container, .pnlm-load-box { display:none !important; }
+    /* hotspot marker */
+    .hs-mark { width:26px; height:26px; margin:-13px 0 0 -13px; border-radius:50%;
+      background:rgba(255,216,140,.30); border:2px solid #ffd88c; cursor:pointer;
+      box-shadow:0 0 0 4px rgba(255,216,140,.12), 0 0 14px rgba(255,216,140,.6);
+      animation:pulse 1.8s ease-in-out infinite; }
+    /* opacity-only — never animate transform on a Pannellum hotspot; it overrides
+       Pannellum's transform:translate() positioning and snaps the marker to the corner. */
+    @keyframes pulse { 0%,100%{ opacity:.72; } 50%{ opacity:1; } }
+    #fovbar { position:fixed; left:12px; bottom:12px; z-index:10; background:rgba(9,18,26,.9);
+      border:1px solid rgba(255,255,255,.14); border-radius:10px; padding:8px 12px; width:210px; }
+    #fovbar label { display:flex; justify-content:space-between; font-size:12px; opacity:.9; }
+    #fovbar b { color:#ffd88c; } input[type=range]{ width:100%; }
+    /* modal */
+    #modal { position:fixed; inset:0; z-index:30; display:none; align-items:center; justify-content:center; background:rgba(3,8,13,.7); }
+    #modal .card { background:#0b1b28; border:1px solid rgba(255,255,255,.16); border-radius:12px; padding:20px 22px; max-width:440px; }
+    #modal h3 { margin:0 0 8px; color:#ffd88c; font-size:15px; }
+    #modal p { margin:0 0 14px; opacity:.9; }
+    #modal .tag { font-size:11px; text-transform:uppercase; letter-spacing:.08em; opacity:.55; }
+    #modal button { background:#ffd88c; color:#10202a; border:0; border-radius:8px; padding:7px 14px; font:inherit; font-weight:600; cursor:pointer; }
+  </style>
+</head>
+<body>
+  <div id="pano"></div>
+  <div id="fovbar"><label>Field of view <b id="fovV">120</b>°</label>
+    <input type="range" id="fov" min="40" max="120" step="5" value="120" /></div>
+  <div id="modal"><div class="card">
+    <div class="tag" id="mTag"></div><h3 id="mTitle"></h3><p id="mBody"></p>
+    <button id="mClose">Close</button></div></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
+  <script>
+    const $ = s => document.querySelector(s);
+    const qp = new URLSearchParams(location.search);
+    let IMG = qp.get("img") || "gpt_gen_5.png";
+    // defaults (overridden by wrap.json / hotspots.json when they match IMG)
+    let COV = { haov:360, vaov:95, vOffset:-5, hfov:120, pitch:0 };
+    let SPOTS = [];
+    let viewer = null;
+
+    async function getJSON(path) { try { return await (await fetch(path + "?t=" + Date.now())).json(); } catch (e) { return null; } }
+
+    async function loadConfig() {
+      const w = await getJSON("scene/wrap.json");
+      const wi = w && (w[IMG] || (w.image === IMG ? w : null));   // per-image map, or legacy flat
+      if (wi) COV = { haov:wi.haov ?? 360, vaov:wi.vaov ?? 135, vOffset:wi.vOffset ?? 0, hfov:wi.hfov ?? 70, pitch:wi.pitch ?? 0 };
+      const h = await getJSON("scene/hotspots.json");
+      if (h && h.image === IMG) {
+        if (h.haov != null) COV.haov = h.haov;
+        if (h.vaov != null) COV.vaov = h.vaov;
+        if (h.vOffset != null) COV.vOffset = h.vOffset;
+        SPOTS = h.hotspots || [];
+      }
+      // Pannellum only accepts a limited vOffset (image band must stay inside the
+      // sphere) and hfov within bounds — clamp so a bad saved value can't blank it.
+      const vMax = Math.max(0, (180 - COV.vaov) / 2);
+      const clampedV = Math.max(-vMax, Math.min(vMax, COV.vOffset));
+      if (clampedV !== COV.vOffset) console.warn(`vOffset ${COV.vOffset} out of range (±${vMax}); clamped to ${clampedV}`);
+      COV.vOffset = clampedV;
+      COV.hfov = Math.max(40, Math.min(120, COV.hfov));
+      $("#fov").value = COV.hfov; $("#fovV").textContent = COV.hfov;
+    }
+
+    // box [x0,y0,x1,y1] fractions -> yaw/pitch across the wrap coverage
+    function boxToYawPitch(box) {
+      const cx = (box[0] + box[2]) / 2, cy = (box[1] + box[3]) / 2;
+      return { yaw: cx * COV.haov - COV.haov / 2,
+               pitch: COV.vaov / 2 - cy * COV.vaov + COV.vOffset };
+    }
+
+    function build() {
+      if (viewer) { try { viewer.destroy(); } catch (e) {} }
+      viewer = pannellum.viewer("pano", {
+        type: "equirectangular", panorama: "scene/" + IMG,
+        haov: COV.haov, vaov: COV.vaov, vOffset: COV.vOffset,
+        autoLoad: true, showControls: false, autoRotate: 0,
+        hfov: COV.hfov, minHfov: 40, maxHfov: 120,
+        yaw: 0, pitch: COV.pitch,
+        backgroundColor: [0.02, 0.05, 0.09],
+      });
+      viewer.on("load", placeHotspots);
+    }
+
+    function placeHotspots() {
+      SPOTS.forEach(s => {
+        const { yaw, pitch } = boxToYawPitch(s.box);
+        viewer.addHotSpot({
+          id: s.id, yaw, pitch, cssClass: "hs-mark",
+          createTooltipFunc: (div) => { div.classList.add("hs-mark"); div.title = s.label || s.id; },
+          clickHandlerFunc: () => onHotspot(s),
+        });
+      });
+    }
+
+    function onHotspot(s) {
+      if (s.action === "swap" && s.target) { IMG = s.target; SPOTS = []; build(); return; }
+      const titles = { puzzle:"Puzzle", note:"Note", clue:"Clue" };
+      $("#mTag").textContent = s.action;
+      $("#mTitle").textContent = s.label || s.id;
+      $("#mBody").textContent = s.action === "puzzle"
+        ? `Opens puzzle: ${s.target || "(unset)"} — wired to the room engine when this scene becomes playable.`
+        : (s.target || "(no text set)");
+      $("#modal").style.display = "flex";
+    }
+    $("#mClose").onclick = () => { $("#modal").style.display = "none"; };
+    $("#modal").onclick = e => { if (e.target.id === "modal") $("#modal").style.display = "none"; };
+
+    $("#fov").addEventListener("input", e => {
+      COV.hfov = +e.target.value; $("#fovV").textContent = COV.hfov;
+      if (viewer) viewer.setHfov(COV.hfov, false);
+    });
+
+    (async () => { await loadConfig(); build(); })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,808 @@
+{
+  "chapter": "comparing_means",
+  "scenario": "spa",
+  "id": 12,
+  "title": "First Guest",
+  "subtitle": "Comparing Means Assignment · t-test, ANOVA, pairwise tests",
+  "story": "The storm has passed and Fjellro is yours alone — for one more hour. Dagny Vold is already boarding the funicular far below, her friends beside her: the first guests of the day, and the last people you want to hand a flaw. Every bath must read true before they arrive. You start in the dim entry hall, where two summoning cords hang by the hidden stair — old servants' bells, though today they'll do something stranger. Thermometer in hand, you slip down to where the water is coldest.",
+  "enterLabel": "Begin the morning rounds →",
+  "done": {
+    "title": "The house reads true",
+    "body": "Every bath, certified — cold plunge to hot spring, nothing out of balance and nothing for Dagny to find. Now to leave before she reaches the door."
+  },
+  "escapeDone": {
+    "title": "First tracks",
+    "body": "The five balance-candles hold their pattern and the gate to the piste clicks open. You step onto untouched snow just as the funicular crests the rise — flawless, and first. Let her follow."
+  },
+  "packages": [
+    "dplyr",
+    "ggplot2",
+    "rstatix",
+    "readr"
+  ],
+  "datasets": [
+    {
+      "name": "spa_water_chem",
+      "url": "https://thebustalab.github.io/escape_rooms/rooms/comparing_means/spa/data/spa_water_chem.csv"
+    }
+  ],
+  "setup": "suppressMessages({library(dplyr); library(ggplot2); library(rstatix)})",
+  "state": {
+    "rooms_solved": 0,
+    "candle_vermillion": false,
+    "candle_blue": false,
+    "candle_yellow": false,
+    "candle_green": false,
+    "candle_purple": false
+  },
+  "ambient": "snow",
+  "coverPrompt": "Minimalist stylised thumbnail poster of a single steaming Nordic hot-spring pool ringed by a few small candles at the foot of a great snowy mountain peak, one warm amber candle-glow reflected in the dark still water at dawn. Designed to read clearly as a small thumbnail: one bold, simple, high-contrast silhouette, iconic and uncluttered, minimal fine detail. Flat, limited palette: deep teal, icy blue, and one warm amber glow. Soft film grain, painterly but clean with simple geometric shapes. Strong negative space, single centred focal subject. No people, no text, no lettering, no logos. Square composition.",
+  "debrief": {
+    "title": "How Fjellro worked",
+    "intro": "Every room asked the question a spa-keeper asks each morning: is this difference real, or just the wobble of water? You certified each bath by choosing the honest test for its data, and the springs by refusing to cry wolf on every pool after the storm. Here is how each room embodied the comparison of means."
+  },
+  "rooms": [
+    {
+      "key": "entry",
+      "title": "The entry hall",
+      "technique": "none — threshold + two escape cords",
+      "puzzleType": null,
+      "built": true,
+      "authoring": {
+        "tag": "entry",
+        "scenePrompt": "This is a panorama. A 360-degree view from the centre of a dark, hushed candlelit entry hall of a Nordic mountain spa, deep inside the building with no windows, walls of dark timber and stone, the hall wrapping continuously all the way around so the left and right edges meet seamlessly. There are no baths here — this is the threshold. Ahead, two summoning bell-cords hang side by side from the ceiling: one with a VERMILLION (orange-red) SQUARE tag, one with a BLUE CIRCLE tag. Set into one wall, a CLOSED concealed panel, a hidden staff passage with a barely-visible seam. Around the rest of the hall, iron candle-stands with warm candles, a low wooden bench, folded linen, hanging lanterns of amber glass. painterly, cinematic, serene and luxurious, warm amber candlelight with deep teal shadows, subtle film grain. No people, no lettering, no text, no captions, no UI.",
+        "doorPrompt": "The concealed panel now stands open, revealing a spiral staircase of dark timber leading down toward the baths; everything else unchanged. Same warm candlelight, same painterly style, no people, no lettering, no text."
+      },
+      "unlockedWhen": true,
+      "onSolve": [],
+      "debrief": "Where it begins — and where two of the five cords wait. The gate at the end will ask you to remember what you saw in the baths; the cords here are how you answer.",
+      "plannedHotspots": [
+        {
+          "type": "dial",
+          "label": "Vermillion bell-cord (square tag)",
+          "note": "#16 bell-pull (to-build) -> lights the VERMILLION/square candle at the gate. Its candle-pair is one room on, in the cold plunge. Pull it IF that pair's candles differ in size."
+        },
+        {
+          "type": "dial",
+          "label": "Blue bell-cord (circle tag)",
+          "note": "#16 bell-pull -> lights the BLUE/circle gate candle. Its candle-pair is in the saltwater room."
+        },
+        {
+          "type": "door",
+          "label": "The concealed passage down",
+          "direction": "forward",
+          "note": "no puzzle here — an OPEN passage (not gated) down to the cold plunge; single forward door (first room, no back door)."
+        }
+      ],
+      "designNote": "ENTRY (no puzzle). Dark candlelit spa threshold, no baths. Holds 2 of the 5 escape cords: VERMILLION/square (-> the vermillion gate candle, whose pair is in the cold plunge) and BLUE/circle (-> the blue gate candle, pair in saltwater). Forward door is an open passage (no solve gate). First room -> no entry card (landing story covers it). New art.",
+      "panorama": "entry/scene.png",
+      "builtFrom": "gpt_entry_8.png",
+      "panoramaOpen": "entry/scene_open.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5.4
+      },
+      "hotspots": [
+        {
+          "id": "vermillion_bell_cord_square_tag",
+          "type": "dial",
+          "label": "Vermillion bell-cord (square tag)",
+          "box": [
+            0.4813,
+            0.4782,
+            0.5003,
+            0.5352
+          ]
+        },
+        {
+          "id": "blue_bell_cord_circle_tag",
+          "type": "dial",
+          "label": "Blue bell-cord (circle tag)",
+          "box": [
+            0.5075,
+            0.4743,
+            0.5278,
+            0.5333
+          ]
+        },
+        {
+          "id": "the_concealed_passage_down",
+          "type": "door",
+          "label": "The concealed passage down",
+          "box": [
+            0.71,
+            0.3327,
+            0.7866,
+            0.7259
+          ],
+          "direction": "forward"
+        }
+      ]
+    },
+    {
+      "key": "cold_plunge",
+      "title": "The cold-plunge chamber",
+      "technique": "two means — t-test (Shapiro/Levene then t)",
+      "puzzleType": 1,
+      "built": true,
+      "authoring": {
+        "tag": "cold_plunge",
+        "scenePrompt": "This is a panorama. A 360-degree view from the centre of a dark candlelit cold-plunge chamber, walls of pale blue-grey stone, no windows, the chamber wrapping continuously all the way around so the left and right edges meet seamlessly. Ahead, TWO cold-plunge pools side by side forming a clear pair: the left pool is ringed by a cluster of MASSIVE tall VERMILLION (orange-red) candles, the right pool by a cluster of TINY short VERMILLION candles — the two pools' candles plainly different in size. Set into one wall, a brass control panel with a softly glowing console screen. Nearby, a single summoning bell-cord with a YELLOW DIAMOND tag. Set into one wall, a CLOSED concealed stone passage onward, and above it a lit vermillion candle; on another wall, an OPEN archway back toward the entry hall. Around the rest of the chamber, wrought-iron candle-stands, birch stools, folded white linen. painterly, cinematic, serene and luxurious, warm amber candlelight with deep teal shadows, drifting cold steam, subtle film grain. No people, no lettering, no text, no captions, no UI.",
+        "doorPrompt": "The concealed stone passage now stands open, revealing a spiral stair climbing onward; the lit vermillion candle above it and the open archway back are unchanged. Same warm candlelight, same painterly style, no people, no lettering, no text."
+      },
+      "unlockedWhen": true,
+      "onSolve": [
+        {
+          "set": "cold_plunge_solved"
+        },
+        {
+          "inc": "rooms_solved"
+        }
+      ],
+      "entry": {
+        "title": "The cold plunge",
+        "text": "You leave the entry hall by the hidden stair and drop into the cold-plunge chamber, dark and close. Far down the mountain, Dagny's funicular has begun to climb. Two plunges here — and their candles are anything but alike.",
+        "button": "Into the cold plunge →"
+      },
+      "debrief": "Two cold plunges, one test. A t-test asks whether the gap between the two pools' mean temperatures is bigger than the noise within each; Shapiro and Levene both pass, so the t-test is the honest tool.",
+      "plannedHotspots": [
+        {
+          "type": "puzzle",
+          "label": "The plunge control panel",
+          "note": "cold_plunge x temperature_C -> Shapiro/Levene pass -> t-test glacier vs fjord; fjord warmer, significant (p=9e-9)",
+          "starterCode": "spa_water_chem",
+          "question": {
+            "prompt": "The storm chilled the plunges overnight. Are the two cold plunges genuinely at different temperatures — and if so, which one is warmer?",
+            "options": [
+              "Yes — a significant difference; plunge_fjord is the warmer of the two",
+              "No — the two plunges are not significantly different",
+              "Yes — but plunge_glacier is the warmer one",
+              "You can't test it — the data are non-normal, so no test applies",
+              "It's significant only if you skip the normality check first",
+              "They differ in salinity, but not in temperature",
+              "The variances are unequal, so the difference is untestable"
+            ],
+            "correct": 0,
+            "maxAttempts": 4,
+            "feedback": {
+              "correct": "Certified — plunge_fjord runs warmer than plunge_glacier (about 11.3°C vs 9.4°C), a real difference. The candle above the passage lights.",
+              "wrong": [
+                "Keep only bath_type == 'cold_plunge' and parameter == 'temperature_C', then compare the two baths.",
+                "Check the assumptions first: a Shapiro test (within each bath) and a Levene test (across the two) decide whether a t-test is fair here. Both pass — so the t-test is the honest, most powerful tool.",
+                "The two plunges do differ — look again at which bath's mean temperature is the higher one, not just whether they differ."
+              ]
+            }
+          }
+        },
+        {
+          "type": "clue",
+          "label": "The two plunges' vermillion candles",
+          "note": "ESCAPE comparison (data-free, by eye): left pool MASSIVE vermillion candles, right pool TINY -> plainly DIFFER -> the VERMILLION gate candle should be LIT. Its cord is the vermillion/square pull back in the entry."
+        },
+        {
+          "type": "dial",
+          "label": "Yellow bell-cord (diamond tag)",
+          "note": "#16 -> YELLOW/diamond gate candle. Its candle-pair is one room on, in the warm hall."
+        },
+        {
+          "type": "door",
+          "label": "The concealed passage onward (lit vermillion candle above)",
+          "direction": "forward",
+          "note": "gated on solving the plunge puzzle -> saltwater; a LIT vermillion candle sits above it."
+        },
+        {
+          "type": "door",
+          "label": "Back to the entry hall",
+          "direction": "back"
+        }
+      ],
+      "designNote": "ROOM 2 — COLD PLUNGE — two means, t-test (puzzleType 1). Graded puzzle unchanged (t-test glacier vs fjord; fjord warmer). ESCAPE overlay: a VERMILLION candle-pair (massive vs tiny = DIFFER -> vermillion gate candle LIT); its cord lives back in the ENTRY (vermillion/square). This room HOLDS the YELLOW/diamond cord (for the warm-hall pair). Door-candle above the exit: LIT vermillion. New art.",
+      "panorama": "cold_plunge/scene.png",
+      "builtFrom": "gpt_cold_plunge_10.png",
+      "panoramaOpen": "cold_plunge/scene_open.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -4.7
+      },
+      "hotspots": [
+        {
+          "id": "the_plunge_control_panel",
+          "type": "puzzle",
+          "label": "The plunge control panel",
+          "box": [
+            0.1274,
+            0.4585,
+            0.1719,
+            0.5313
+          ],
+          "starterCode": "spa_water_chem",
+          "question": {
+            "prompt": "The storm chilled the plunges overnight. Are the two cold plunges genuinely at different temperatures — and if so, which one is warmer?",
+            "options": [
+              "Yes — a significant difference; plunge_fjord is the warmer of the two",
+              "No — the two plunges are not significantly different",
+              "Yes — but plunge_glacier is the warmer one",
+              "You can't test it — the data are non-normal, so no test applies",
+              "It's significant only if you skip the normality check first",
+              "They differ in salinity, but not in temperature",
+              "The variances are unequal, so the difference is untestable"
+            ],
+            "correct": 0,
+            "maxAttempts": 4,
+            "feedback": {
+              "correct": "Certified — plunge_fjord runs warmer than plunge_glacier (about 11.3°C vs 9.4°C), a real difference. The candle above the passage lights.",
+              "wrong": [
+                "Keep only bath_type == 'cold_plunge' and parameter == 'temperature_C', then compare the two baths.",
+                "Check the assumptions first: a Shapiro test (within each bath) and a Levene test (across the two) decide whether a t-test is fair here. Both pass — so the t-test is the honest, most powerful tool.",
+                "The two plunges do differ — look again at which bath's mean temperature is the higher one, not just whether they differ."
+              ]
+            }
+          }
+        },
+        {
+          "id": "yellow_bell_cord_diamond_tag",
+          "type": "dial",
+          "label": "Yellow bell-cord (diamond tag)",
+          "box": [
+            0.189,
+            0.6217,
+            0.2073,
+            0.6905
+          ]
+        },
+        {
+          "id": "the_concealed_passage_onward_lit_vermillion_candle_above",
+          "type": "door",
+          "label": "The concealed passage onward (lit vermillion candle above)",
+          "box": [
+            0.8535,
+            0.3426,
+            0.9177,
+            0.7161
+          ],
+          "direction": "forward"
+        },
+        {
+          "id": "back_to_the_entry_hall",
+          "type": "door",
+          "label": "Back to the entry hall",
+          "box": [
+            0.7067,
+            0.4291,
+            0.7427,
+            0.608
+          ],
+          "direction": "back"
+        }
+      ]
+    },
+    {
+      "key": "saltwater",
+      "title": "The saltwater room",
+      "technique": "two means — non-parametric (test selection -> Wilcox)",
+      "puzzleType": 1,
+      "built": true,
+      "authoring": {
+        "tag": "saltwater",
+        "scenePrompt": "This is a panorama. A 360-degree view from the centre of a saltwater bathing room, cool green sea-glass tiles and verdigris copper, a little brighter now with soft PRE-DAWN light falling through small windows banked with snow drifts, the room wrapping continuously all the way around so the left and right edges meet seamlessly. Ahead, TWO brine pools side by side forming a pair: BOTH pools are ringed by clusters of many SMALL SHORT BLUE candles of similar size, none of them large — the two pools' candles clearly matched. Set into one wall, a brass control panel with a softly glowing console screen. Nearby, a single summoning bell-cord with a GREEN TRIANGLE tag. Set into one wall, a CLOSED concealed sea-glass passage onward, and above it an UNLIT blue candle that does NOT have a flame. On another wall, an OPEN archway back toward the cold-plunge chamber. Around the rest of the room, copper ewers, jars of salt, amber lanterns. painterly, cinematic, serene and luxurious, warm candlelight meeting cool blue pre-dawn light, soft teal shadows, drifting steam, subtle film grain. No people, no lettering, no text, no captions, no UI.",
+        "doorPrompt": "The concealed sea-glass passage now stands open, revealing a stair climbing onward; the unlit blue candle above it and the open archway back are unchanged. Same soft pre-dawn light, same painterly style, no people, no lettering, no text."
+      },
+      "unlockedWhen": {
+        "solved": "cold_plunge"
+      },
+      "onSolve": [
+        {
+          "set": "saltwater_solved"
+        },
+        {
+          "inc": "rooms_solved"
+        }
+      ],
+      "entry": {
+        "title": "The brine room",
+        "text": "The plunge is certified. Up a spiral stair into green light — pale pre-dawn now, falling through snow-banked windows. The funicular is higher, laughter drifting up. Two brine baths, and these candles look... matched.",
+        "button": "Into the brine room →"
+      },
+      "debrief": "The brine readings are skewed, so a t-test would lie. Reading that from the Shapiro/Levene checks and switching to the non-parametric Wilcox test is the lesson: pick the test the data has earned.",
+      "plannedHotspots": [
+        {
+          "type": "puzzle",
+          "label": "The brine control panel",
+          "note": "saltwater x salinity_ppt -> Shapiro FAILS (skewed) -> Wilcox; brine_south saltier, significant (p=9e-4)",
+          "starterCode": "spa_water_chem",
+          "question": {
+            "prompt": "The brine baths spiked overnight and their salinity readings are jumpy. Is one brine bath genuinely over-salted — and which test is honest for data shaped like this?",
+            "options": [
+              "A t-test — significant, brine_south is saltier",
+              "The two baths are not significantly different",
+              "A Wilcox test — significant, brine_south is saltier",
+              "A Wilcox test — significant, but brine_north is saltier",
+              "A Kruskal test — the right tool for these two groups",
+              "The data are normal, so a plain t-test is fine",
+              "The difference shows in dissolved solids, not salinity"
+            ],
+            "correct": 2,
+            "maxAttempts": 4,
+            "feedback": {
+              "correct": "Certified — the salinity is skewed, so the non-parametric Wilcox test is the honest call, and it confirms brine_south is the saltier bath (median ~38 vs ~33 ppt).",
+              "wrong": [
+                "Filter to bath_type == 'saltwater_bath' and parameter == 'salinity_ppt', then check normality before you pick a test.",
+                "The Shapiro test fails here — the salinity is right-skewed — so a t-test would mislead. Which two-group test makes no normality assumption?",
+                "A Kruskal test is for three or more groups; you have two. Reach for the two-group non-parametric test instead."
+              ]
+            }
+          }
+        },
+        {
+          "type": "clue",
+          "label": "The two brine baths' blue candles",
+          "note": "ESCAPE comparison (by eye): both pools carry many SMALL blue candles, none large -> MATCHED -> the BLUE gate candle stays DARK. Its cord is the blue/circle pull in the entry."
+        },
+        {
+          "type": "dial",
+          "label": "Green bell-cord (triangle tag)",
+          "note": "#16 -> GREEN/triangle gate candle. Its candle-pair is a foreground pair at the springs."
+        },
+        {
+          "type": "door",
+          "label": "The passage onward (unlit blue candle above)",
+          "direction": "forward",
+          "note": "gated on solve -> warm_baths; an UNLIT blue candle sits above it."
+        },
+        {
+          "type": "door",
+          "label": "Back to the cold plunge",
+          "direction": "back"
+        }
+      ],
+      "designNote": "ROOM 3 — SALTWATER — two means, non-parametric / Wilcox (puzzleType 1). Graded puzzle unchanged. ESCAPE overlay: a BLUE candle-pair (both all-small = SAME -> blue gate candle DARK); its cord is back in the ENTRY (blue/circle). This room HOLDS the GREEN/triangle cord (for a springs pair). Door-candle: UNLIT blue. New art.",
+      "panorama": "saltwater/scene.png",
+      "builtFrom": "gpt_saltwater_16.png",
+      "panoramaOpen": "saltwater/scene_open.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5.6
+      },
+      "hotspots": [
+        {
+          "id": "the_brine_control_panel",
+          "type": "puzzle",
+          "label": "The brine control panel",
+          "box": [
+            0.4164,
+            0.4369,
+            0.4465,
+            0.5097
+          ],
+          "starterCode": "spa_water_chem",
+          "question": {
+            "prompt": "The brine baths spiked overnight and their salinity readings are jumpy. Is one brine bath genuinely over-salted — and which test is honest for data shaped like this?",
+            "options": [
+              "A t-test — significant, brine_south is saltier",
+              "The two baths are not significantly different",
+              "A Wilcox test — significant, brine_south is saltier",
+              "A Wilcox test — significant, but brine_north is saltier",
+              "A Kruskal test — the right tool for these two groups",
+              "The data are normal, so a plain t-test is fine",
+              "The difference shows in dissolved solids, not salinity"
+            ],
+            "correct": 2,
+            "maxAttempts": 4,
+            "feedback": {
+              "correct": "Certified — the salinity is skewed, so the non-parametric Wilcox test is the honest call, and it confirms brine_south is the saltier bath (median ~38 vs ~33 ppt).",
+              "wrong": [
+                "Filter to bath_type == 'saltwater_bath' and parameter == 'salinity_ppt', then check normality before you pick a test.",
+                "The Shapiro test fails here — the salinity is right-skewed — so a t-test would mislead. Which two-group test makes no normality assumption?",
+                "A Kruskal test is for three or more groups; you have two. Reach for the two-group non-parametric test instead."
+              ]
+            }
+          }
+        },
+        {
+          "id": "green_bell_cord_triangle_tag",
+          "type": "dial",
+          "label": "Green bell-cord (triangle tag)",
+          "box": [
+            0.4957,
+            0.4585,
+            0.518,
+            0.5195
+          ]
+        },
+        {
+          "id": "the_passage_onward_unlit_blue_candle_above",
+          "type": "door",
+          "label": "The passage onward (unlit blue candle above)",
+          "box": [
+            0.824,
+            0.2914,
+            0.8928,
+            0.663
+          ],
+          "direction": "forward"
+        },
+        {
+          "id": "back_to_the_cold_plunge",
+          "type": "door",
+          "label": "Back to the cold plunge",
+          "box": [
+            0.1143,
+            0.3838,
+            0.1647,
+            0.6237
+          ],
+          "direction": "back"
+        }
+      ]
+    },
+    {
+      "key": "warm_baths",
+      "title": "The warm bathing hall",
+      "technique": "more than two means — ANOVA + Tukey",
+      "puzzleType": 1,
+      "built": true,
+      "authoring": {
+        "tag": "warm_baths",
+        "scenePrompt": "This is a panorama. A 360-degree view from the centre of the spa's warm bathing hall, honey-coloured wood and gold, brighter still with LARGE windows looking out onto a snowy mountain expanse in cool PRE-SUNRISE light, the hall wrapping continuously all the way around so the left and right edges meet seamlessly. Ahead, FOUR warm pools in a row: THREE are ringed by clusters of SMALL SHORT YELLOW candles, but ONE pool is ringed by a cluster of LARGE TALL YELLOW candles — that single pool's candles plainly bigger than the other three. Set into one wall, a brass control panel with a softly glowing console screen. Nearby, a single summoning bell-cord with a PURPLE STAR tag. Set into one wall, a CLOSED concealed wooden passage onward, and above it a lit yellow candle; on another wall, an OPEN archway back toward the saltwater room. Around the rest of the hall, stacked towels, wooden pails, tall candelabra. painterly, cinematic, serene and luxurious, warm gold candlelight meeting pale pre-sunrise light over snow, soft teal shadows, drifting steam, subtle film grain. No people, no lettering, no text, no captions, no UI.",
+        "doorPrompt": "The concealed wooden passage now stands open, revealing a ladder climbing onward; the lit yellow candle above it and the open archway back are unchanged. Same pale pre-sunrise light, same painterly style, no people, no lettering, no text."
+      },
+      "unlockedWhen": {
+        "solved": "saltwater"
+      },
+      "onSolve": [
+        {
+          "set": "warm_baths_solved"
+        },
+        {
+          "inc": "rooms_solved"
+        }
+      ],
+      "entry": {
+        "title": "The warm hall",
+        "text": "One brine bath was off; caught. A ladder lifts you into the warm hall, big windows blazing pale over the snowy peaks, sunrise close. The funicular nears the top. Four baths here — and one keeps different company than the rest.",
+        "button": "Into the warm hall →"
+      },
+      "debrief": "Four baths, so a t-test won't do. ANOVA asks whether ANY of the four pH means differ; when it says yes, Tukey names WHICH one — the single drifted bath — without you fishing through every pair.",
+      "plannedHotspots": [
+        {
+          "type": "puzzle",
+          "label": "The warm-bath control panel",
+          "note": "warm_bath x pH -> Shapiro/Levene pass -> ANOVA (sig) + Tukey -> warm_spruce is the odd bath",
+          "starterCode": "spa_water_chem",
+          "question": {
+            "prompt": "Four warm baths, and one of them has let its pH drift. Which single bath is out of line with the rest?",
+            "options": [
+              "warm_birch",
+              "warm_spruce",
+              "warm_cedar",
+              "warm_pine",
+              "None of them — the four baths don't differ",
+              "All four baths differ from one another",
+              "Two baths are off, not one"
+            ],
+            "correct": 1,
+            "maxAttempts": 4,
+            "feedback": {
+              "correct": "Certified — warm_spruce is the odd bath, its pH (~7.85) sitting well above the other three (~7.4). The Tukey follow-up pins it as the only one out of line.",
+              "wrong": [
+                "Filter to bath_type == 'warm_bath' and parameter == 'pH'. With four baths, an ANOVA asks whether ANY of them differ.",
+                "ANOVA tells you something differs but not which — run a Tukey follow-up to name the single bath that stands apart.",
+                "Three of the baths sit together and agree; look for the one the follow-up flags against all the others."
+              ]
+            }
+          }
+        },
+        {
+          "type": "clue",
+          "label": "The four baths' yellow candles",
+          "note": "ESCAPE comparison (by eye): three pools SMALL yellow candles, one pool LARGE -> one DIFFERS -> the YELLOW gate candle should be LIT. Its cord is the yellow/diamond pull back in the cold plunge."
+        },
+        {
+          "type": "dial",
+          "label": "Purple bell-cord (star tag)",
+          "note": "#16 -> PURPLE/star gate candle. Its candle-pair is a foreground pair at the springs."
+        },
+        {
+          "type": "door",
+          "label": "The passage onward (lit yellow candle above)",
+          "direction": "forward",
+          "note": "gated on solve -> springs; a LIT yellow candle sits above it."
+        },
+        {
+          "type": "door",
+          "label": "Back to the saltwater room",
+          "direction": "back"
+        }
+      ],
+      "designNote": "ROOM 4 — WARM BATHS — ANOVA + Tukey (puzzleType 1). Graded puzzle unchanged (warm_spruce is the odd bath). ESCAPE overlay: a YELLOW candle-group across the 4 baths (three small, one LARGE = DIFFER -> yellow gate candle LIT — the big-candle pool echoes the ANOVA odd-one-out visually); its cord is back in the COLD PLUNGE (yellow/diamond). This room HOLDS the PURPLE/star cord (for a springs pair). Door-candle: LIT yellow. New art.",
+      "panorama": "warm_baths/scene.png",
+      "builtFrom": "gpt_warm_baths_5.png",
+      "panoramaOpen": "warm_baths/scene_open.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5.5
+      },
+      "hotspots": [
+        {
+          "id": "the_warm_bath_control_panel",
+          "type": "puzzle",
+          "label": "The warm-bath control panel",
+          "box": [
+            0.1641,
+            0.431,
+            0.1962,
+            0.5097
+          ],
+          "starterCode": "spa_water_chem",
+          "question": {
+            "prompt": "Four warm baths, and one of them has let its pH drift. Which single bath is out of line with the rest?",
+            "options": [
+              "warm_birch",
+              "warm_spruce",
+              "warm_cedar",
+              "warm_pine",
+              "None of them — the four baths don't differ",
+              "All four baths differ from one another",
+              "Two baths are off, not one"
+            ],
+            "correct": 1,
+            "maxAttempts": 4,
+            "feedback": {
+              "correct": "Certified — warm_spruce is the odd bath, its pH (~7.85) sitting well above the other three (~7.4). The Tukey follow-up pins it as the only one out of line.",
+              "wrong": [
+                "Filter to bath_type == 'warm_bath' and parameter == 'pH'. With four baths, an ANOVA asks whether ANY of them differ.",
+                "ANOVA tells you something differs but not which — run a Tukey follow-up to name the single bath that stands apart.",
+                "Three of the baths sit together and agree; look for the one the follow-up flags against all the others."
+              ]
+            }
+          }
+        },
+        {
+          "id": "purple_bell_cord_star_tag",
+          "type": "dial",
+          "label": "Purple bell-cord (star tag)",
+          "box": [
+            0.2054,
+            0.5116,
+            0.2185,
+            0.5804
+          ]
+        },
+        {
+          "id": "the_passage_onward_lit_yellow_candle_above",
+          "type": "door",
+          "label": "The passage onward (lit yellow candle above)",
+          "box": [
+            0.7958,
+            0.376,
+            0.8456,
+            0.6827
+          ],
+          "direction": "forward"
+        },
+        {
+          "id": "back_to_the_saltwater_room",
+          "type": "door",
+          "label": "Back to the saltwater room",
+          "box": [
+            0.9708,
+            0.4644,
+            0.9983,
+            0.6394
+          ],
+          "direction": "back"
+        }
+      ]
+    },
+    {
+      "key": "springs",
+      "title": "The outdoor hot springs",
+      "technique": "pairs of means — pairwise t + multiple-comparison correction (Holm)",
+      "puzzleType": 2,
+      "built": true,
+      "isBoss": true,
+      "authoring": {
+        "tag": "springs",
+        "scenePrompt": "This is a panorama. A 360-degree view from the centre of the spa's outdoor hot springs at SUNRISE, open to a snowy mountain sky washed gold and rose, a broad stone deck, everything wrapping continuously all the way around so the left and right edges meet seamlessly. In the FOREGROUND, close at hand, are TWO clear pairs of soaking pools: the first pair's two pools are BOTH ringed with clusters of SMALL SHORT GREEN candles of matched size; the second pair has one pool ringed with TINY PURPLE candles and its partner ringed with MASSIVE TALL PURPLE candles, plainly different. Further off across the deck, reached by little stone paths, lie THREE MORE pairs of steaming pools, smaller with distance and clearly set apart from the two nearest pairs. Ahead, a weather-worn brass control panel on a stone plinth with a softly glowing console screen; beside it, a small pinned field-note under glass. Set into a low stone wall, a CLOSED heavy timber gate onward, and above it two candles — a GREEN one (unlit) and a PURPLE one (lit); on another side, an OPEN archway back down into the warm hall. painterly, cinematic, serene and triumphant, warm gold sunrise light and candle-amber, cool teal shadows, rising steam, subtle film grain. No people, no lettering, no text, no captions, no UI.",
+        "doorPrompt": "The heavy timber gate now stands open, revealing a short snow path onward; the green (unlit) and purple (lit) candles above it and the open archway back are unchanged. Same gold sunrise light, same painterly style, no people, no lettering, no text."
+      },
+      "unlockedWhen": {
+        "allSolved": [
+          "cold_plunge",
+          "saltwater",
+          "warm_baths"
+        ]
+      },
+      "onSolve": [
+        {
+          "set": "springs_solved"
+        },
+        {
+          "inc": "rooms_solved"
+        }
+      ],
+      "deliverable": {
+        "type": "figure",
+        "submitCodec": true
+      },
+      "entry": {
+        "title": "The outdoor springs",
+        "text": "The warm hall reads true. The last passage opens onto cold sunrise air and the outdoor springs, steaming gold. Dagny is nearly at the door. Five pairs of pools in all — two close at hand, three further off along the paths.",
+        "button": "Out to the springs →"
+      },
+      "debrief": "Five pairs, five comparisons. Run that many tests and one will look significant by chance; the Holm correction strips out that false alarm, leaving only the pairs that truly differ — so you never 'fix' a spring that was fine.",
+      "plannedHotspots": [
+        {
+          "type": "puzzle",
+          "label": "The springs certification panel",
+          "note": "hot_spring x temperature_C; pairwiseTTest(value ~ bath) grouped by `pair`, Holm -> ember/aurora/frost differ; slate flips OUT under correction; gale n.s.",
+          "starterCode": "spa_water_chem",
+          "question": {
+            "prompt": "The five spring pairs all wobble after the storm. Which pools' two tubs are TRULY mismatched in temperature, once you account for testing all five pairs at once?",
+            "options": [
+              "All five pairs differ",
+              "None of the pairs differ",
+              "ember, aurora, frost and slate",
+              "ember, aurora and frost",
+              "ember and aurora only",
+              "slate and gale",
+              "frost and slate"
+            ],
+            "correct": 3,
+            "maxAttempts": 4,
+            "feedback": {
+              "correct": "Certified — ember, aurora and frost are genuinely mismatched; slate and gale are not. Correcting for the five simultaneous tests strips out slate, which only looked off by chance.",
+              "wrong": [
+                "Filter to bath_type == 'hot_spring' and parameter == 'temperature_C', then compare the two tubs within each pair — group by 'pair' and run the pairwise test.",
+                "You're running five comparisons at once. Uncorrected, one pair will look 'significant' by chance — apply the multiple-comparison correction the pairwise test offers.",
+                "Watch the borderline pair: it clears the line uncorrected but not once you adjust for the many tests. Don't 'fix' a spring that was actually fine."
+              ]
+            }
+          }
+        },
+        {
+          "type": "clue",
+          "label": "The pinned field-note (hint)",
+          "body": "A note in the last keeper's hand: “After a storm the pools all shiver — test enough of them and one is bound to look wrong when it isn't. Judge them together, not one at a time, and forgive the pool that only wavers by chance.”",
+          "note": "boss hint: after a storm, the more pools you test the more likely one looks off by chance -> correct for multiple comparisons; does NOT name the answer"
+        },
+        {
+          "type": "clue",
+          "label": "The two foreground pairs (green & purple candles)",
+          "note": "ESCAPE comparisons: the GREEN pair both SMALL -> MATCHED (green gate candle dark); the PURPLE pair one TINY, one MASSIVE -> DIFFER (purple gate candle lit). Cords: green/triangle in the saltwater room, purple/star in the warm hall. The THREE further pairs on the paths are console DATA only, NOT part of the escape."
+        },
+        {
+          "type": "door",
+          "label": "The timber gate onward (green unlit + purple lit candles above)",
+          "direction": "forward",
+          "note": "gated on boss solve -> piste"
+        },
+        {
+          "type": "door",
+          "label": "Back down to the warm hall",
+          "direction": "back"
+        }
+      ],
+      "designNote": "BOSS — OUTDOOR HOT SPRINGS — pairwise t + Holm correction (puzzleType 2, isBoss, deliverable figure+codec). GRADED puzzle UNCHANGED: pairwiseTTest(value~bath) grouped by 'pair' across the 5 hot_spring pairs, Holm-corrected -> ember/aurora/frost differ; slate flips OUT under correction; gale n.s. All 5 data pairs exist (2 foreground + 3 background on paths). ESCAPE overlay uses only the 2 FOREGROUND pairs by candle size, DECOUPLED from the water-chem verdict: GREEN pair all-small = SAME (green gate candle dark); PURPLE pair tiny-vs-massive = DIFFER (purple gate candle lit). Cords elsewhere (green in saltwater, purple in warm hall). Two door-candles above the gate: green unlit, purple lit. New art.",
+      "panorama": "springs/scene.png",
+      "builtFrom": "gpt_springs_6.png",
+      "panoramaOpen": "springs/scene_open.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5.4
+      },
+      "hotspots": [
+        {
+          "id": "the_springs_certification_panel",
+          "type": "puzzle",
+          "label": "The springs certification panel",
+          "box": [
+            0.4406,
+            0.608,
+            0.4806,
+            0.7102
+          ],
+          "starterCode": "spa_water_chem",
+          "question": {
+            "prompt": "The five spring pairs all wobble after the storm. Which pools' two tubs are TRULY mismatched in temperature, once you account for testing all five pairs at once?",
+            "options": [
+              "All five pairs differ",
+              "None of the pairs differ",
+              "ember, aurora, frost and slate",
+              "ember, aurora and frost",
+              "ember and aurora only",
+              "slate and gale",
+              "frost and slate"
+            ],
+            "correct": 3,
+            "maxAttempts": 4,
+            "feedback": {
+              "correct": "Certified — ember, aurora and frost are genuinely mismatched; slate and gale are not. Correcting for the five simultaneous tests strips out slate, which only looked off by chance.",
+              "wrong": [
+                "Filter to bath_type == 'hot_spring' and parameter == 'temperature_C', then compare the two tubs within each pair — group by 'pair' and run the pairwise test.",
+                "You're running five comparisons at once. Uncorrected, one pair will look 'significant' by chance — apply the multiple-comparison correction the pairwise test offers.",
+                "Watch the borderline pair: it clears the line uncorrected but not once you adjust for the many tests. Don't 'fix' a spring that was actually fine."
+              ]
+            }
+          }
+        },
+        {
+          "id": "the_timber_gate_onward_green_unlit_purple_lit_candles_above",
+          "type": "door",
+          "label": "The timber gate onward (green unlit + purple lit candles above)",
+          "box": [
+            0.8535,
+            0.3288,
+            0.9295,
+            0.6021
+          ],
+          "direction": "forward"
+        },
+        {
+          "id": "back_down_to_the_warm_hall",
+          "type": "door",
+          "label": "Back down to the warm hall",
+          "box": [
+            0.0304,
+            0.4133,
+            0.0743,
+            0.5569
+          ],
+          "direction": "back"
+        }
+      ]
+    },
+    {
+      "key": "piste",
+      "title": "The balance gate",
+      "technique": "escape — data-free recognition of candle-size difference (no codec)",
+      "puzzleType": null,
+      "built": false,
+      "authoring": {
+        "tag": "piste",
+        "scenePrompt": "This is a panorama. A 360-degree view from a threshold at the edge of the outdoor springs in full golden SUNRISE, the snowy slopes opening ahead, everything wrapping continuously around so the left and right edges meet seamlessly. Set into a final stone archway, a heavy secret door out to the slopes, and mounted above it a row of FIVE ceremonial balance-candles in an iron bracket, ALL UNLIT, each a distinct colour AND shape so they can't be confused: a VERMILLION SQUARE candle, a BLUE CIRCLE candle, a YELLOW DIAMOND candle, a GREEN TRIANGLE candle, and a PURPLE STAR candle. Around the threshold, iron sconces, a snow-dusted bench, hanging icicles catching the light. painterly, cinematic, serene and hopeful, warm gold sunrise light and candle-amber, cool teal shadows, rising steam, subtle film grain. No people, no lettering, no text, no captions, no UI.",
+        "doorPrompt": "The heavy secret door now stands open onto bright open snow and the ski slopes; the five balance-candles glowing above it; everything else unchanged. Same golden sunrise light, same painterly style, no people, no lettering, no text."
+      },
+      "unlockedWhen": {
+        "solved": "springs"
+      },
+      "onSolve": [],
+      "entry": {
+        "title": "The balance gate",
+        "text": "Every bath certified, honestly — nothing for Dagny to find. Sunrise breaks over the slopes; only the balance gate remains, its five candles dark. Go back, read each pair, and pull the right cords.",
+        "button": "To the gate →"
+      },
+      "debrief": "No console at the gate — just your eye. All morning you asked whether a difference was real; here you ask it of candlelight. A pair whose candles are plainly one massive, one tiny truly differ — light that colour; a pair whose candles all match does not — leave it dark. Recognising that, then finding each colour's cord a room behind, is the whole comparison made physical.",
+      "plannedHotspots": [
+        {
+          "type": "lock",
+          "label": "The balance gate — five colour+shape candles above the door",
+          "answer": "vermillion,yellow,purple",
+          "note": "ESCAPE lock. 5 candles: vermillion/square, blue/circle, yellow/diamond, green/triangle, purple/star. CORRECT = vermillion, yellow, purple LIT (their candle-pairs DIFFER); blue, green DARK (their pairs MATCH). Set by the bell-cords in earlier rooms. -> escapeDone. ENGINE #16 (bell-pull) + #8 (state-gate) TO-BUILD; 'answer' records design intent."
+        },
+        {
+          "type": "door",
+          "label": "Back to the springs deck",
+          "direction": "back"
+        }
+      ],
+      "designNote": "ESCAPE — THE BALANCE GATE (ungraded, no codec; fires escapeDone). Five ceremonial candles above the final door, each a distinct COLOUR + SHAPE (colour-blind-safe: vermillion/square, blue/circle, yellow/diamond, green/triangle, purple/star), all initially UNLIT. The player recognises, by eye, which of the five candle-pairs seen in the earlier rooms DIFFER in size (vermillion, yellow, purple) vs MATCH (blue, green), then backtracks to pull each colour's cord (each sits one room before its pair) to LIGHT the differing three and leave the matched two dark. CORRECT = vermillion+yellow+purple lit. DATA-FREE (candles, not the water-chem). ENGINE #16 + #8 TO-BUILD. Colour never load-bearing alone — every colour carries a shape. New art."
+    }
+  ],
+  "cover": "cover.png"
+}

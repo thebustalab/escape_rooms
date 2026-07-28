@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Test play · escape room</title>
+  <script>
+    // Generic test player: test-play ANY scenario via ?chapter=&scenario=. A <base> points relative
+    // URLs (scenario.json + every room asset — panorama/music/sfx, all authored relative to play.html)
+    // at that scenario's folder; the shared JS/CSS below use ABSOLUTE paths so <base> never redirects
+    // them. Serve from the SITE ROOT (e.g. the :8055 playtest server), same as play.html. SFX_MIXER on
+    // loads the sound-mixer overlay (shared/sfx-mixer.js).
+    (function () {
+      const q = new URLSearchParams(location.search);
+      const ch = (q.get("chapter") || "").replace(/[^A-Za-z0-9_]/g, "");
+      const sc = (q.get("scenario") || "").replace(/[^A-Za-z0-9_]/g, "");
+      if (ch && sc) document.write('<base href="/escape_rooms/rooms/' + ch + '/' + sc + '/">');
+      window.SFX_MIXER = true;
+      window.TEST_PLAY = true;   // enables author-only affordances in the player (e.g. the puzzle "Solve" shortcut)
+    })();
+  </script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css" />
+  <link rel="stylesheet" href="/escape_rooms/shared/pano-player.css?v=53" />
+</head>
+<body>
+  <!-- Shell only. pano-player fetches this scenario's scenario.json (resolved via <base>) and injects
+       its own DOM; sfx-mixer adds the test-play sound mixer. -->
+  <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
+  <script src="/escape_rooms/shared/codec.js?v=30"></script>
+  <script src="/escape_rooms/shared/debrief.js?v=1"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script type="module" src="/escape_rooms/shared/pano-player.js?v=56"></script>
+  <script type="module" src="/escape_rooms/shared/sfx-mixer.js?v=6"></script>
+</body>
+</html>

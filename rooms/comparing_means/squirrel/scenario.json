@@ -1,0 +1,704 @@
+{
+  "chapter": "comparing_means",
+  "scenario": "squirrel",
+  "id": 13,
+  "title": "Seedfall",
+  "subtitle": "Comparing Means Assignment · t-test, ANOVA, pairwise/Tukey",
+  "story": "The wood is going gold and cold, and the first snow is a day off, maybe less. You are a jay, and before the white comes you have one task that matters more than all your others: work out which trees here grow the best nuts, and cache their seeds in the best ground — because the few you never dig up again will be the forest your grandchildren fly through. You begin in the crown of the Mother Oak, where a strange grid of empty niches glows in the trunk — you don't yet know what it wants. So you set off the way a jay reads a forest: tree to tree, up and down and across, weighing the wood as you go.",
+  "enterLabel": "Take wing →",
+  "done": {
+    "title": "The wood has told you true",
+    "body": "You know it now — the reliable ground, and the two kinds of tree whose nuts are honestly the best. The survey holds together, careful all the way down."
+  },
+  "escapeDone": {
+    "title": "The long cache",
+    "body": "The tiers hold; the cache-frame seals warm in the Mother Oak's heartwood. You tuck the last seed away as the snow begins, and fold your wings into the roost — the wood around you already, quietly, the shape of the forest to come."
+  },
+  "packages": [
+    "dplyr",
+    "ggplot2",
+    "rstatix"
+  ],
+  "datasets": [
+    {
+      "name": "nut_census",
+      "url": "https://thebustalab.github.io/escape_rooms/rooms/comparing_means/squirrel/data/nut_census.csv"
+    }
+  ],
+  "setup": "suppressMessages({library(dplyr); library(ggplot2); library(rstatix)})",
+  "state": {
+    "rooms_solved": 0
+  },
+  "ambient": "leaves",
+  "coverPrompt": "Minimalist stylised thumbnail poster of a single jay perched before one great ancient oak in an autumn wood, a scatter of acorns below and one warm amber glow low in the tree's hollow. Designed to read clearly as a small thumbnail: one bold, simple, high-contrast silhouette, iconic and uncluttered, minimal fine detail. Flat, limited palette: deep teal, russet, and one warm amber glow. Soft film grain, painterly but clean with simple geometric shapes. Strong negative space, single centred focal subject. No people, no text, no lettering, no logos. Square composition.",
+  "debrief": {
+    "title": "How the wood worked",
+    "intro": "The whole wood was open to you from the first, but the survey had its order: each reading waited on the one before it, the way a careful comparison waits on a fair test. You weighed groves and kinds by choosing the honest test each time — a t-test where the nuts behaved, a rank test where a few gusher trees would have fooled the average, ANOVA and its follow-up to name which kind, and a corrected read that refused to crown a winner over a tie. And you sealed the cache not with numbers but with your wings, grouping the kinds by the heights you'd flown among. Here is how each part embodied the comparison of means."
+  },
+  "rooms": [
+    {
+      "key": "mother_oak",
+      "title": "The Mother Oak — the crown",
+      "technique": "hub / start (no puzzle)",
+      "puzzleType": null,
+      "built": false,
+      "authoring": {
+        "tag": "mother_oak",
+        "scenePrompt": "This is a panorama. A 360-degree view from a broad platform in the crown-fork of a vast ancient oak at the heart of an autumn wood, the branches wrapping continuously all the way around so the left and right edges meet seamlessly. Ahead, set into the living trunk, a strange weathered cache-frame panel — a lattice of small empty niches, glowing faint amber, clearly meaningful but unreadable. To one side a broad branch-way leads off toward a russet-red stand of trees; to the other, an opening leads down into the warm heartwood of the oak. Far off, glimpsed through the canopy, stands at different heights: tall gold, middling red and green, low silver. Around the platform: old acorns, jay-feathers, moss. serene, earnest, grand, warm autumn light, drifting fallen leaves, subtle film grain. painterly, cinematic, no people, no lettering, no text, no captions, no UI.",
+        "doorPrompt": "(Open passage — always walkable; no closed/open swap image needed.)"
+      },
+      "unlockedWhen": true,
+      "onSolve": null,
+      "plannedHotspots": [
+        {
+          "type": "clue",
+          "label": "The cache-frame panel (foreshadow)",
+          "note": "the mysterious tiered niche grid; unreadable now, pays off at the roost escape",
+          "body": "Set into the old trunk, a lattice of empty niches glows faintly, as if it wants filling. You have no idea what it means yet. (Learn the wood first; it will make sense.)"
+        },
+        {
+          "type": "door",
+          "label": "Branch-way to roost",
+          "to": "roost",
+          "note": "open circle passage (direction:'open' at wiring)"
+        },
+        {
+          "type": "door",
+          "label": "Branch-way to red_a",
+          "to": "red_a",
+          "note": "open circle passage (direction:'open' at wiring)"
+        }
+      ],
+      "designNote": "HUB + START. The player begins in the Mother Oak's crown and sees the mysterious cache-frame panel ('what on earth is this?'). No puzzle. Circle neighbours: roost (down into the heartwood — the escape) and red_a (the first survey-tree; R1). UNIQUE art. Place-constant; global ambient 'leaves'."
+    },
+    {
+      "key": "red_a",
+      "title": "Survey-tree — red_a",
+      "technique": "two means — t-test (Shapiro/Levene then t) [grove: kernel mass]",
+      "puzzleType": 1,
+      "built": false,
+      "authoring": {
+        "tag": "red_a",
+        "scenePrompt": "This is a panorama. A 360-degree view from a branch in a stand of red-leaved maples of MIDDLING height, the canopy wrapping continuously all the way around so the left and right edges meet seamlessly. Ahead, the red-orange maple boughs heavy with their nut-crop. On a mossy stump sits a brass surveyor's lantern with a softly glowing amber glass face. Branch-ways lead off toward the oak's crown and deeper into the maples. serene, earnest, warm autumn light, drifting fallen leaves, subtle film grain. painterly, cinematic, no people, no lettering, no text, no captions, no UI.",
+        "doorPrompt": "(Open passage — always walkable; no closed/open swap image needed.)"
+      },
+      "unlockedWhen": true,
+      "onSolve": [
+        {
+          "set": "red_a_solved"
+        },
+        {
+          "inc": "rooms_solved"
+        }
+      ],
+      "plannedHotspots": [
+        {
+          "type": "puzzle",
+          "label": "The surveyor's lantern",
+          "starterCode": "nut_census",
+          "question": {
+            "prompt": "You start by weighing nuts in two neighbouring stands — the sunlit Sunhollow and the shaded, brook-side Downbriar. Are Sunhollow's nuts genuinely heavier, or does the sunny stand just look fuller?",
+            "options": [
+              "No — the two groves' nuts aren't significantly different",
+              "Yes — a significant difference; Sunhollow grows the heavier nuts",
+              "Yes — but Downbriar grows the heavier nuts",
+              "You can't test it — the data are non-normal, so no test applies",
+              "It's significant only if you skip the normality check first",
+              "They differ in oil content, but not in nut weight",
+              "The variances are unequal, so the difference is untestable"
+            ],
+            "correct": 1,
+            "maxAttempts": 4,
+            "feedback": {
+              "correct": "Certified — Sunhollow's nuts run heavier than Downbriar's (about 31.1 g vs 28.3 g), a real difference.",
+              "wrong": [
+                "Keep only grove %in% c('Sunhollow','Downbriar') and parameter == 'kernel_mass_g', then compare the two groves.",
+                "Check the assumptions first: a Shapiro test (within each grove) and a Levene test (across the two) decide whether a t-test is fair here. Both pass — so the t-test is the honest, most powerful tool.",
+                "The two groves do differ — look again at which grove's mean nut weight is the higher one."
+              ]
+            }
+          },
+          "note": "SURVEY-TREE (red maple, MID height) — RUNG 1, two means t-test (pT1). availableWhen TRUE (first; the tree the hub opens onto)"
+        },
+        {
+          "type": "clue",
+          "label": "This stand's height",
+          "note": "shows this kind's height (flavour; no counter — the escape is ungated)",
+          "body": "You take the measure of the stand's height with a glance, the way a jay knows a wood."
+        },
+        {
+          "type": "door",
+          "label": "Branch-way to mother_oak",
+          "to": "mother_oak",
+          "note": "open circle passage (direction:'open' at wiring)"
+        },
+        {
+          "type": "door",
+          "label": "Branch-way to red_b",
+          "to": "red_b",
+          "note": "open circle passage (direction:'open' at wiring)"
+        }
+      ],
+      "designNote": "SURVEY-TREE (red maple, MID height) — RUNG 1, two means t-test (pT1). availableWhen TRUE (first; the tree the hub opens onto). TASK: grove %in% c('Sunhollow','Downbriar') & parameter=='kernel_mass_g'; Shapiro/Levene PASS -> t-test -> Sunhollow heavier (31.1 vs 28.3, p=7e-8). correct index 1.",
+      "debrief": "Two groves, one test. A t-test asks whether the gap between the two stands' mean nut weight beats the scatter within each; the readings behaved, so the t-test was the honest tool and Sunhollow's nuts really are heavier."
+    },
+    {
+      "key": "red_b",
+      "title": "The red maple stand (quiet)",
+      "technique": "height-experience (no puzzle)",
+      "puzzleType": null,
+      "built": false,
+      "authoring": {
+        "tag": "red_b",
+        "scenePrompt": "This is a panorama. A 360-degree view from a branch in a quieter part of the same MIDDLING-height red maples, the canopy wrapping continuously all the way around so the left and right edges meet seamlessly. Ahead, the deep russet maple boughs heavy with their nut-crop. No lantern here — just an old jay's nest, scattered acorn-caps, and an opening toward a green stand at the very same height. A restful place to feel how the maples sit level with the wood around them. serene, earnest, warm autumn light, drifting fallen leaves, subtle film grain. painterly, cinematic, no people, no lettering, no text, no captions, no UI.",
+        "doorPrompt": "(Open passage — always walkable; no closed/open swap image needed.)"
+      },
+      "unlockedWhen": true,
+      "onSolve": null,
+      "plannedHotspots": [
+        {
+          "type": "clue",
+          "label": "A second red maple tree, the same height",
+          "note": "repeated-sampling: a 2nd member of this colour-population at the same height; atmospheric",
+          "body": "Another red maple tree, standing at just the same height as its neighbour — the kind keeps to its level."
+        },
+        {
+          "type": "door",
+          "label": "Branch-way to red_a",
+          "to": "red_a",
+          "note": "open circle passage (direction:'open' at wiring)"
+        },
+        {
+          "type": "door",
+          "label": "Branch-way to t_rg",
+          "to": "t_rg",
+          "note": "open circle passage (direction:'open' at wiring)"
+        }
+      ],
+      "designNote": "EMPTY/ATMOSPHERIC TREE (red maple) — the 2nd rep of the population; NO puzzle. Repeated-sampling + a restful spot to feel this kind's height and the neighbouring leaps. UNIQUE art. Place-constant."
+    },
+    {
+      "key": "t_rg",
+      "title": "Between the stands",
+      "technique": "height transition (no puzzle; #18 beat)",
+      "puzzleType": null,
+      "built": false,
+      "authoring": {
+        "tag": "t_rg",
+        "scenePrompt": "This is a panorama. A 360-degree view caught mid-glide between the red-maple stand and the green-oak stand, which stand at exactly the SAME middling height, the wood wrapping continuously around so the left and right edges meet seamlessly. The composition makes the two canopies plainly LEVEL — the red canopy on one side and the green on the other meeting at the same height, no climb and no drop, a flat glide straight across. serene, earnest, red and green canopies exactly level, warm autumn light, drifting fallen leaves, subtle film grain. painterly, cinematic, no people, no lettering, no text, no captions, no UI.",
+        "doorPrompt": "(Open passage — always walkable; no closed/open swap image needed.)"
+      },
+      "unlockedWhen": true,
+      "onSolve": null,
+      "plannedHotspots": [
+        {
+          "type": "clue",
+          "label": "The height between the stands",
+          "note": "demonstrates the the red and green stands sit at exactly the SAME height — a level glide, no climb, no drop — a leap the player feels; no counter (escape ungated)",
+          "body": "You hang in the open air between the two stands: the red and green stands sit at exactly the SAME height — a level glide, no climb, no drop. You feel it in your wings."
+        },
+        {
+          "type": "door",
+          "label": "Branch-way to red_b",
+          "to": "red_b",
+          "note": "open circle passage (direction:'open' at wiring)"
+        },
+        {
+          "type": "door",
+          "label": "Branch-way to green_a",
+          "to": "green_a",
+          "note": "open circle passage (direction:'open' at wiring)"
+        }
+      ],
+      "designNote": "TRANSITION red_b<->green_a — the red and green stands sit at exactly the SAME height — a level glide, no climb, no drop. Demonstrates the pairwise HEIGHT difference (the #18 up/down/level beat). No puzzle, no counter. UNIQUE art. Place-constant."
+    },
+    {
+      "key": "green_a",
+      "title": "Survey-tree — green_a",
+      "technique": "two means — Wilcox / mean-vs-median trap [grove: oil]",
+      "puzzleType": 1,
+      "built": false,
+      "authoring": {
+        "tag": "green_a",
+        "scenePrompt": "This is a panorama. A 360-degree view from a branch in a stand of green oaks of MIDDLING height, the same height as the maples, the canopy wrapping continuously all the way around so the left and right edges meet seamlessly. Ahead, the broad green oak boughs heavy with their nut-crop. On a mossy stump sits a brass surveyor's lantern with a softly glowing amber glass face. Branch-ways lead off toward the red maples (level) and up toward a taller gold stand. serene, earnest, warm autumn light, drifting fallen leaves, subtle film grain. painterly, cinematic, no people, no lettering, no text, no captions, no UI.",
+        "doorPrompt": "(Open passage — always walkable; no closed/open swap image needed.)"
+      },
+      "unlockedWhen": true,
+      "onSolve": [
+        {
+          "set": "green_a_solved"
+        },
+        {
+          "inc": "rooms_solved"
+        }
+      ],
+      "plannedHotspots": [
+        {
+          "type": "puzzle",
+          "label": "The surveyor's lantern",
+          "starterCode": "nut_census",
+          "question": {
+            "prompt": "Winter nuts must be rich and oily. You test a dry ridge (Larkspur) against the boggy fen (Emberfen), where a few trees are gushers. Which grove is the reliably oilier ground — and which test is honest for data shaped like this?",
+            "options": [
+              "A t-test — significant; Emberfen is the oilier grove",
+              "The two groves aren't significantly different",
+              "A Wilcox test — significant; Larkspur is the reliably oilier grove",
+              "A Wilcox test — significant; but Emberfen is oilier",
+              "A t-test — significant; Larkspur is oilier",
+              "The data are normal, so a plain t-test is fine",
+              "A Kruskal test — the right tool for these two groves"
+            ],
+            "correct": 2,
+            "maxAttempts": 4,
+            "feedback": {
+              "correct": "Certified — Emberfen's few gusher trees pull its average up, but most of its nuts are poor. The oil is skewed, so the rank-based Wilcox test is the honest call: the typical Larkspur tree (median ~14.2%) beats the typical Emberfen tree (~10.5%).",
+              "wrong": [
+                "Filter to grove %in% c('Larkspur','Emberfen') and parameter == 'oil_content_pct', then check the shape of Emberfen's readings before you pick a test.",
+                "The Shapiro test fails on Emberfen — a few gusher trees make it wildly right-skewed — so the mean (and a t-test) is dragged upward and names the wrong grove. Which two-group test uses ranks, not the mean?",
+                "Compare the medians, not the means: the outliers inflate Emberfen's average, but the ordinary Larkspur tree is oilier. A Kruskal test is for >2 groups; you have two."
+              ]
+            }
+          },
+          "note": "SURVEY-TREE (green oak, MID height) — RUNG 2, Wilcox + mean-vs-median TRAP (pT1). availableWhen {solved:'red_a'}"
+        },
+        {
+          "type": "clue",
+          "label": "This stand's height",
+          "note": "shows this kind's height (flavour; no counter — the escape is ungated)",
+          "body": "You take the measure of the stand's height with a glance, the way a jay knows a wood."
+        },
+        {
+          "type": "door",
+          "label": "Branch-way to t_rg",
+          "to": "t_rg",
+          "note": "open circle passage (direction:'open' at wiring)"
+        },
+        {
+          "type": "door",
+          "label": "Branch-way to green_b",
+          "to": "green_b",
+          "note": "open circle passage (direction:'open' at wiring)"
+        }
+      ],
+      "designNote": "SURVEY-TREE (green oak, MID height) — RUNG 2, Wilcox + mean-vs-median TRAP (pT1). availableWhen {solved:'red_a'}. TASK: grove %in% c('Larkspur','Emberfen') & parameter=='oil_content_pct'; Emberfen Shapiro FAILS (gushers) -> Wilcox -> Larkspur reliably oilier (median 14.2 vs 10.5). TRAP: Emberfen MEAN 16.9>Larkspur 14.0 so naive t/mean names Emberfen (WRONG). correct index 2 (distractor 0=trap).",
+      "debrief": "The fen's oil was lopsided — most trees poor, a few gushers huge — so the average, and a t-test, were fooled into naming the wrong grove. Reading that skew and switching to the rank-based Wilcox test is the lesson: trust the typical tree, not the mean the outliers dragged up."
+    },
+    {
+      "key": "green_b",
+      "title": "The green oak stand (quiet)",
+      "technique": "height-experience (no puzzle)",
+      "puzzleType": null,
+      "built": false,
+      "authoring": {
+        "tag": "green_b",
+        "scenePrompt": "This is a panorama. A 360-degree view from a branch in a still corner of the same MIDDLING-height green oaks, the canopy wrapping continuously all the way around so the left and right edges meet seamlessly. Ahead, the shady green oak boughs heavy with their nut-crop. No lantern — only deep green shade, a spill of acorns, and an opening that climbs toward the tall gold aspens above. A quiet spot to feel the oaks standing level with the maples and below the gold. serene, earnest, warm autumn light, drifting fallen leaves, subtle film grain. painterly, cinematic, no people, no lettering, no text, no captions, no UI.",
+        "doorPrompt": "(Open passage — always walkable; no closed/open swap image needed.)"
+      },
+      "unlockedWhen": true,
+      "onSolve": null,
+      "plannedHotspots": [
+        {
+          "type": "clue",
+          "label": "A second green oak tree, the same height",
+          "note": "repeated-sampling: a 2nd member of this colour-population at the same height; atmospheric",
+          "body": "Another green oak tree, standing at just the same height as its neighbour — the kind keeps to its level."
+        },
+        {
+          "type": "door",
+          "label": "Branch-way to green_a",
+          "to": "green_a",
+          "note": "open circle passage (direction:'open' at wiring)"
+        },
+        {
+          "type": "door",
+          "label": "Branch-way to t_gg",
+          "to": "t_gg",
+          "note": "open circle passage (direction:'open' at wiring)"
+        }
+      ],
+      "designNote": "EMPTY/ATMOSPHERIC TREE (green oak) — the 2nd rep of the population; NO puzzle. Repeated-sampling + a restful spot to feel this kind's height and the neighbouring leaps. UNIQUE art. Place-constant."
+    },
+    {
+      "key": "t_gg",
+      "title": "Between the stands",
+      "technique": "height transition (no puzzle; #18 beat)",
+      "puzzleType": null,
+      "built": false,
+      "authoring": {
+        "tag": "t_gg",
+        "scenePrompt": "This is a panorama. A 360-degree view caught mid-leap between the middling green-oak stand and the towering golden aspens ONE clear tier above, the wood wrapping continuously around so the left and right edges meet seamlessly. The composition makes the one-tier climb unmistakable: the green canopy lower on one side, the gold canopy a full level up on the other, open air between. serene, earnest, green below and gold above, warm autumn light, drifting fallen leaves, subtle film grain. painterly, cinematic, no people, no lettering, no text, no captions, no UI.",
+        "doorPrompt": "(Open passage — always walkable; no closed/open swap image needed.)"
+      },
+      "unlockedWhen": true,
+      "onSolve": null,
+      "plannedHotspots": [
+        {
+          "type": "clue",
+          "label": "The height between the stands",
+          "note": "demonstrates the the golden stand rises one clear tier ABOVE the green — a leap the player feels; no counter (escape ungated)",
+          "body": "You hang in the open air between the two stands: the golden stand rises one clear tier ABOVE the green. You feel it in your wings."
+        },
+        {
+          "type": "door",
+          "label": "Branch-way to green_b",
+          "to": "green_b",
+          "note": "open circle passage (direction:'open' at wiring)"
+        },
+        {
+          "type": "door",
+          "label": "Branch-way to gold_a",
+          "to": "gold_a",
+          "note": "open circle passage (direction:'open' at wiring)"
+        }
+      ],
+      "designNote": "TRANSITION green_b<->gold_a — the golden stand rises one clear tier ABOVE the green. Demonstrates the pairwise HEIGHT difference (the #18 up/down/level beat). No puzzle, no counter. UNIQUE art. Place-constant."
+    },
+    {
+      "key": "gold_a",
+      "title": "Survey-tree — gold_a",
+      "technique": "more than two means — ANOVA + Tukey [kind: yield]",
+      "puzzleType": 1,
+      "built": false,
+      "authoring": {
+        "tag": "gold_a",
+        "scenePrompt": "This is a panorama. A 360-degree view from a branch in high in a stand of TOWERING golden aspens, the tallest trees in the wood, the canopy wrapping continuously all the way around so the left and right edges meet seamlessly. Ahead, the luminous golden aspen boughs heavy with their nut-crop. On a mossy stump sits a brass surveyor's lantern with a softly glowing amber glass face. The pale aspen trunks rise far above the rest of the canopy. Branch-ways lead down toward the middling green stand and, far below, a low silver stand. serene, earnest, warm autumn light, drifting fallen leaves, subtle film grain. painterly, cinematic, no people, no lettering, no text, no captions, no UI.",
+        "doorPrompt": "(Open passage — always walkable; no closed/open swap image needed.)"
+      },
+      "unlockedWhen": true,
+      "onSolve": [
+        {
+          "set": "gold_a_solved"
+        },
+        {
+          "inc": "rooms_solved"
+        }
+      ],
+      "plannedHotspots": [
+        {
+          "type": "puzzle",
+          "label": "The surveyor's lantern",
+          "starterCode": "nut_census",
+          "question": {
+            "prompt": "All four kinds of tree stand together. Starting with sheer yield — how many nuts each bears — which single kind out-bears the rest?",
+            "options": [
+              "green oak",
+              "golden aspen",
+              "red maple",
+              "silver birch",
+              "None of them — the four kinds don't differ",
+              "All four kinds differ from one another",
+              "Two kinds tie for most, not one"
+            ],
+            "correct": 0,
+            "maxAttempts": 4,
+            "feedback": {
+              "correct": "Certified — the green oak out-bears the other three (about 43 vs ~40 nuts), and the Tukey follow-up pins it as the only kind standing apart.",
+              "wrong": [
+                "Filter to parameter == 'kernel_yield_ct' and group by leaf_colour. With four kinds, an ANOVA asks whether ANY of them differ in yield.",
+                "ANOVA tells you something differs but not which — run a Tukey follow-up to name the single kind that stands apart.",
+                "Three of the kinds sit together and agree; look for the one the follow-up flags against all the others."
+              ]
+            }
+          },
+          "note": "SURVEY-TREE (golden aspen, HIGH) — RUNG 3, ANOVA+Tukey (pT1). availableWhen {solved:'green_a'}"
+        },
+        {
+          "type": "clue",
+          "label": "This stand's height",
+          "note": "shows this kind's height (flavour; no counter — the escape is ungated)",
+          "body": "You take the measure of the stand's height with a glance, the way a jay knows a wood."
+        },
+        {
+          "type": "door",
+          "label": "Branch-way to t_gg",
+          "to": "t_gg",
+          "note": "open circle passage (direction:'open' at wiring)"
+        },
+        {
+          "type": "door",
+          "label": "Branch-way to gold_b",
+          "to": "gold_b",
+          "note": "open circle passage (direction:'open' at wiring)"
+        }
+      ],
+      "designNote": "SURVEY-TREE (golden aspen, HIGH) — RUNG 3, ANOVA+Tukey (pT1). availableWhen {solved:'green_a'}. TASK: parameter=='kernel_yield_ct' by leaf_colour; ANOVA sig + Tukey -> green single winner (~43 vs ~40, +3.25). correct index 0.",
+      "debrief": "Four kinds, so a t-test won't do. ANOVA asks whether ANY of the kinds' mean yield differ; Tukey's follow-up then names which — the green oak — without fishing through every pair by hand."
+    },
+    {
+      "key": "gold_b",
+      "title": "The golden aspen stand (quiet)",
+      "technique": "height-experience (no puzzle)",
+      "puzzleType": null,
+      "built": false,
+      "authoring": {
+        "tag": "gold_b",
+        "scenePrompt": "This is a panorama. A 360-degree view from a branch in a windy top branch of the same TOWERING golden aspens, the canopy wrapping continuously all the way around so the left and right edges meet seamlessly. Ahead, the shimmering golden aspen boughs heavy with their nut-crop. No lantern — just gold leaves streaming past, the whole wood spread out far below, and an opening that drops steeply toward a low silver stand. The height is dizzying; you are clearly higher than everything else. serene, earnest, warm autumn light, drifting fallen leaves, subtle film grain. painterly, cinematic, no people, no lettering, no text, no captions, no UI.",
+        "doorPrompt": "(Open passage — always walkable; no closed/open swap image needed.)"
+      },
+      "unlockedWhen": true,
+      "onSolve": null,
+      "plannedHotspots": [
+        {
+          "type": "clue",
+          "label": "A second golden aspen tree, the same height",
+          "note": "repeated-sampling: a 2nd member of this colour-population at the same height; atmospheric",
+          "body": "Another golden aspen tree, standing at just the same height as its neighbour — the kind keeps to its level."
+        },
+        {
+          "type": "door",
+          "label": "Branch-way to gold_a",
+          "to": "gold_a",
+          "note": "open circle passage (direction:'open' at wiring)"
+        },
+        {
+          "type": "door",
+          "label": "Branch-way to t_gs",
+          "to": "t_gs",
+          "note": "open circle passage (direction:'open' at wiring)"
+        }
+      ],
+      "designNote": "EMPTY/ATMOSPHERIC TREE (golden aspen) — the 2nd rep of the population; NO puzzle. Repeated-sampling + a restful spot to feel this kind's height and the neighbouring leaps. UNIQUE art. Place-constant."
+    },
+    {
+      "key": "t_gs",
+      "title": "Between the stands",
+      "technique": "height transition (no puzzle; #18 beat)",
+      "puzzleType": null,
+      "built": false,
+      "authoring": {
+        "tag": "t_gs",
+        "scenePrompt": "This is a panorama. A 360-degree view caught mid-leap across the wood's biggest gap — from the TOWERING golden aspens all the way DOWN to the low silver birches, TWO clear tiers below, the wood wrapping continuously around so the left and right edges meet seamlessly. The composition makes the large two-tier drop dramatic and unmistakable: gold canopy far above, silver canopy far below, a great column of open air between. serene, earnest, gold high above and pale silver far below, warm autumn light, drifting fallen leaves, subtle film grain. painterly, cinematic, no people, no lettering, no text, no captions, no UI.",
+        "doorPrompt": "(Open passage — always walkable; no closed/open swap image needed.)"
+      },
+      "unlockedWhen": true,
+      "onSolve": null,
+      "plannedHotspots": [
+        {
+          "type": "clue",
+          "label": "The height between the stands",
+          "note": "demonstrates the the low silver stand lies TWO full tiers below the towering gold — the wood's biggest drop — a leap the player feels; no counter (escape ungated)",
+          "body": "You hang in the open air between the two stands: the low silver stand lies TWO full tiers below the towering gold — the wood's biggest drop. You feel it in your wings."
+        },
+        {
+          "type": "door",
+          "label": "Branch-way to gold_b",
+          "to": "gold_b",
+          "note": "open circle passage (direction:'open' at wiring)"
+        },
+        {
+          "type": "door",
+          "label": "Branch-way to silver_a",
+          "to": "silver_a",
+          "note": "open circle passage (direction:'open' at wiring)"
+        }
+      ],
+      "designNote": "TRANSITION gold_b<->silver_a — the low silver stand lies TWO full tiers below the towering gold — the wood's biggest drop. Demonstrates the pairwise HEIGHT difference (the #18 up/down/level beat). No puzzle, no counter. UNIQUE art. Place-constant."
+    },
+    {
+      "key": "silver_a",
+      "title": "Survey-tree — silver_a",
+      "technique": "pairs of means — pairwise + Tukey CLD (multiple-comparison trap) [kind: quality]",
+      "puzzleType": 2,
+      "built": false,
+      "authoring": {
+        "tag": "silver_a",
+        "scenePrompt": "This is a panorama. A 360-degree view from a branch in a low branch in a stand of slender SHORT silver birches, the lowest trees in the wood, the canopy wrapping continuously all the way around so the left and right edges meet seamlessly. Ahead, the pale silver birch boughs heavy with their nut-crop. On a mossy stump sits a brass surveyor's lantern with a softly glowing amber glass face. The fine birch boughs sit close to the forest floor. Branch-ways lead up toward the tall gold stand and on toward the oak's heartwood. serene, earnest, warm autumn light, drifting fallen leaves, subtle film grain. painterly, cinematic, no people, no lettering, no text, no captions, no UI.",
+        "doorPrompt": "(Open passage — always walkable; no closed/open swap image needed.)"
+      },
+      "unlockedWhen": true,
+      "onSolve": [
+        {
+          "set": "silver_a_solved"
+        },
+        {
+          "inc": "rooms_solved"
+        }
+      ],
+      "plannedHotspots": [
+        {
+          "type": "puzzle",
+          "label": "The surveyor's lantern",
+          "starterCode": "nut_census",
+          "question": {
+            "prompt": "The last question, and the hardest: which kinds truly make the BEST nuts for the cache? Compare all four, pair by pair — but account for having compared so many. What does the honest reading say?",
+            "options": [
+              "All four kinds differ — rank them and cache the single best",
+              "Only green oak is best; the other three are tied below it",
+              "green oak, golden aspen and red maple are tied at the top",
+              "green oak and golden aspen are tied at the top; red maple and silver birch are the lower tier",
+              "red maple and silver birch are the best pair",
+              "None of the kinds differ — cache any of them",
+              "golden aspen alone is best"
+            ],
+            "correct": 3,
+            "maxAttempts": 4,
+            "feedback": {
+              "correct": "Certified — corrected for all six comparisons, the kinds fall into two honest tiers: green oak and golden aspen tied at the top (you can't separate them), red maple and silver birch below. Cache both top kinds.",
+              "wrong": [
+                "Filter to parameter == 'nut_quality_index' and compare the four kinds pairwise — anova_test then tukey_hsd(value ~ leaf_colour), which corrects for the multiple comparisons.",
+                "You're running six comparisons at once. Uncorrected, small gaps look 'significant' by chance — apply the correction (Tukey / a p.adjust), and watch which apparent differences vanish.",
+                "Two apparent gaps are just noise: green vs gold at the top, and red vs silver at the bottom, both collapse once corrected. Don't crown a single winner over a genuine tie."
+              ]
+            }
+          },
+          "note": "SURVEY-TREE (silver birch, LOW) / BOSS — RUNG 4, pairwise + Tukey CLD, multiple-comparison TRAP (pT2, isBoss, deliverable figure+codec). availableWhen {allSolved:['red_a','green_a','gold_a']}"
+        },
+        {
+          "type": "clue",
+          "label": "This stand's height",
+          "note": "shows this kind's height (flavour; no counter — the escape is ungated)",
+          "body": "You take the measure of the stand's height with a glance, the way a jay knows a wood."
+        },
+        {
+          "type": "door",
+          "label": "Branch-way to t_gs",
+          "to": "t_gs",
+          "note": "open circle passage (direction:'open' at wiring)"
+        },
+        {
+          "type": "door",
+          "label": "Branch-way to silver_b",
+          "to": "silver_b",
+          "note": "open circle passage (direction:'open' at wiring)"
+        }
+      ],
+      "designNote": "SURVEY-TREE (silver birch, LOW) / BOSS — RUNG 4, pairwise + Tukey CLD, multiple-comparison TRAP (pT2, isBoss, deliverable figure+codec). availableWhen {allSolved:['red_a','green_a','gold_a']}. TASK: parameter=='nut_quality_index'; anova_test + tukey_hsd(value~leaf_colour) -> CLD {green,gold}top / {red,silver}bottom. TRAP: naive uncorrected calls all four different; correction merges green-gold AND red-silver. Graded on the built MCQ engine (options=candidate tierings). correct index 3 (distractor 0=uncorrected trap).",
+      "isBoss": true,
+      "deliverable": {
+        "type": "figure",
+        "submitCodec": true
+      },
+      "debrief": "Four kinds means six pairwise comparisons, and test that many and some gap looks real by chance. Correcting collapses the four into two honest tiers — green oak and golden aspen tied at the top, red maple and silver birch below. The wisdom is refusing to crown a winner over a genuine tie."
+    },
+    {
+      "key": "silver_b",
+      "title": "The silver birch stand (quiet)",
+      "technique": "height-experience (no puzzle)",
+      "puzzleType": null,
+      "built": false,
+      "authoring": {
+        "tag": "silver_b",
+        "scenePrompt": "This is a panorama. A 360-degree view from a branch in the leaf-litter edge of the same SHORT silver birches, the canopy wrapping continuously all the way around so the left and right edges meet seamlessly. Ahead, the white-barked silver birch boughs heavy with their nut-crop. No lantern — only pale bark, low light, fallen leaves underfoot, and an opening toward the warm hollow of the great oak. Down here you can feel how far below the rest of the wood these little trees sit. serene, earnest, warm autumn light, drifting fallen leaves, subtle film grain. painterly, cinematic, no people, no lettering, no text, no captions, no UI.",
+        "doorPrompt": "(Open passage — always walkable; no closed/open swap image needed.)"
+      },
+      "unlockedWhen": true,
+      "onSolve": null,
+      "plannedHotspots": [
+        {
+          "type": "clue",
+          "label": "A second silver birch tree, the same height",
+          "note": "repeated-sampling: a 2nd member of this colour-population at the same height; atmospheric",
+          "body": "Another silver birch tree, standing at just the same height as its neighbour — the kind keeps to its level."
+        },
+        {
+          "type": "door",
+          "label": "Branch-way to silver_a",
+          "to": "silver_a",
+          "note": "open circle passage (direction:'open' at wiring)"
+        },
+        {
+          "type": "door",
+          "label": "Branch-way to roost",
+          "to": "roost",
+          "note": "open circle passage (direction:'open' at wiring)"
+        }
+      ],
+      "designNote": "EMPTY/ATMOSPHERIC TREE (silver birch) — the 2nd rep of the population; NO puzzle. Repeated-sampling + a restful spot to feel this kind's height and the neighbouring leaps. UNIQUE art. Place-constant."
+    },
+    {
+      "key": "roost",
+      "title": "The Mother Oak — the roost",
+      "technique": "escape — data-free height grouping (grid-select #15; no codec)",
+      "phase": "escape",
+      "puzzleType": null,
+      "built": false,
+      "authoring": {
+        "tag": "roost",
+        "scenePrompt": "This is a panorama. A 360-degree view from inside the warm hollow heartwood of the great oak, amber light glowing from the grain, everything wrapping continuously around so the left and right edges meet seamlessly. Ahead, the cache-frame fills one curved wall: a lattice of niches arranged in tiers of height, ready to be filled — an open cache-map. Around the hollow: stores of acorns tucked into the grain, downy feathers, the hush of a tree in deep autumn. A passage leads back up to the crown, and another out past a low silver stand. serene and triumphant, warm amber heartwood glow, deep teal shadows, warm autumn light, drifting fallen leaves, subtle film grain. painterly, cinematic, no people, no lettering, no text, no captions, no UI.",
+        "doorPrompt": "(Open passage — always walkable; no closed/open swap image needed.)"
+      },
+      "unlockedWhen": true,
+      "onSolve": null,
+      "plannedHotspots": [
+        {
+          "type": "grid",
+          "label": "The cache-frame",
+          "prompt": "Set each kind on the tier it grows to — the ones of a height share a tier.",
+          "items": [
+            {
+              "key": "gold",
+              "label": "Golden aspen"
+            },
+            {
+              "key": "red",
+              "label": "Red maple"
+            },
+            {
+              "key": "green",
+              "label": "Green oak"
+            },
+            {
+              "key": "silver",
+              "label": "Silver birch"
+            }
+          ],
+          "buckets": [
+            {
+              "key": "high",
+              "label": "Tallest"
+            },
+            {
+              "key": "mid",
+              "label": "Middle"
+            },
+            {
+              "key": "low",
+              "label": "Lowest"
+            }
+          ],
+          "answer": {
+            "gold": "high",
+            "red": "mid",
+            "green": "mid",
+            "silver": "low"
+          },
+          "availableWhen": {
+            "allSolved": [
+              "red_a",
+              "green_a",
+              "gold_a",
+              "silver_a"
+            ]
+          },
+          "lockedBody": "The frame won't take yet — finish the survey first, every reading weighed, before you seal the cache.",
+          "feedback": {
+            "correct": "The cache-frame settles: gold aspen tallest, red maple and green oak level in the middle, silver birch lowest. The cache is sealed.",
+            "wrong": "That doesn't sit right — look again at how the kinds stand against each other.",
+            "out": "The frame goes dark."
+          },
+          "note": "GRID-SELECT (#15). Kinds x height-tiers. answer gold=high, red=mid, green=mid, silver=low (red & green SHARE the middle tier — the compact-letter grouping, by height). availableWhen {allSolved: the 4 survey-trees} (NOT gated on leaps, per Lucas) + lockedBody. Data-free: heights learned by flying/looking, NOT the nut data; a DIFFERENT grouping from the boss nut-CLD so it can't be back-solved."
+        },
+        {
+          "type": "clue",
+          "label": "The cache-rite",
+          "note": "recognition framing (no method spoiler)",
+          "body": "The old cache-rite, worn into the grain: set each kind on the tier it grows to. The ones that stand at the same height share a tier; the tallest and the least each keep their own."
+        },
+        {
+          "type": "door",
+          "label": "Branch-way to silver_b",
+          "to": "silver_b",
+          "note": "open circle passage (direction:'open' at wiring)"
+        },
+        {
+          "type": "door",
+          "label": "Branch-way to mother_oak",
+          "to": "mother_oak",
+          "note": "open circle passage (direction:'open' at wiring)"
+        }
+      ],
+      "designNote": "ESCAPE (phase:escape; ungraded, no codec; fires escapeDone). Mother Oak heartwood. GRID-SELECT (#15, engine BUILT 2026-07-26 in pano-player.js, browser-test pending): place the 4 kinds on 4x3 height-tiers (Tallest/Middle/Lowest). ANSWER gold=Tallest, red=Middle, green=Middle, silver=Lowest — red & green SHARE the middle tier (the height compact-letter display). Heights learned by FLYING (the 3 transition beats + each tree shown at its height), NOT nut_census; deliberately a DIFFERENT grouping from the boss nut-quality CLD ({green,gold}/{red,silver}). UNGATED on leaps (Lucas); the grid availableWhen {allSolved: 4 survey-trees} + lockedBody (finish the survey first). Circle neighbours: silver_b and mother_oak. NOTE: 3 height tiers (data has 3 levels), not 4 — flag if a 4th (empty) tier is wanted for the '4x4' look. UNIQUE art (show the tiered cache-frame clearly).",
+      "debrief": "No lantern this time — just your wings. Sorting the four kinds by height is the very act you'd been coding all along: grouping by whether things truly stand together or apart, now with no numbers. The heights you flew among are a compact letter display made of branches."
+    }
+  ]
+}

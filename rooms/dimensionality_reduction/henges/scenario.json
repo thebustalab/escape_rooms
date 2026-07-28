@@ -1,0 +1,730 @@
+{
+  "chapter": "dimensionality_reduction",
+  "scenario": "henges",
+  "id": 11,
+  "title": "The Drowned Henges",
+  "subtitle": "Dimensionality Reduction · PCA — scores, scree, loadings",
+  "story": "You aware coughing brine, colder than you have ever been. Around you, a ring of standing arches leans against a sky thick with stars. Something is wrong in your blood: a cold light under your skin,  some sort of sickness from your teleportation gone wrong.\n\nYou remember that there is a cure. It's an old potion that can only be brewed under the light of the stars. Solve the puzzles to gather the ingredients you need to brew the potion, and travel through the arches to teleport back home.",
+  "enterLabel": "Wake on the shore →",
+  "done": {
+    "title": "The potion takes — you are cured",
+    "body": "The potion takes with a sound like a held breath let go. The cold light drains from your hands and the shaking stops. You worked out what the henge-country's ingredients truly are — the one specimen flung farthest out, how much of the spread lies on the great axis, what that axis is built from, and, at the last, that the glowing mushrooms answer not to the great axis at all but to a quieter one. You will live. But you are not yet home, and low in the east the first true gold is on the water. The great henge is close now. Read its stones, and go."
+  },
+  "packages": [
+    "dplyr",
+    "ggplot2",
+    "readr",
+    "ggiraph"
+  ],
+  "datasets": [
+    {
+      "name": "druid_ingredients",
+      "url": "https://thebustalab.github.io/escape_rooms/rooms/dimensionality_reduction/henges/data/druid_ingredients.csv"
+    }
+  ],
+  "setup": "suppressMessages({library(dplyr); library(ggplot2)})",
+  "state": {
+    "rooms_solved": 0
+  },
+  "rooms": [
+    {
+      "key": "beach",
+      "title": "The shore henge",
+      "debrief": "This first ring taught you the grammar of the whole night: an arch is a way of looking, and a mark keyed into stone opens the one that answers. Nothing to compute yet — only to see that the stones on the monolith are the same stones you will meet again and again, thrown a different way in every henge, and that a keyed mark wakes a portal. Every rule the escape will lean on was shown to you here, for free.",
+      "technique": "orientation — no graded puzzle; teaches the mark-stone keypad + the monolith motif",
+      "built": true,
+      "authoring": {
+        "tag": "beach",
+        "scenePrompt": "This is a panorama — a single 360-degree stone circle seen from its exact centre, every feature described below arranged in a ring on a black, tidal, sandy shore at deep night, the image wrapping all the way around so the left and right edges meet seamlessly. Wet black sand mirrors a sky thick with stars, shallow water laps at the stones, and a sea-mist drifts. Reading the circle from left to right: first, the three stones of a fallen arch lying in a short, clear row across the sand — reading left to right, the first stone standing tall and upright, the second stone lying flat on the ground, the third stone standing tall and upright: a deliberate up, down, up pattern of exactly three stones. Next, a VERY WIDE, broad weathered monolith — an unusually wide slab of stone spanning much of the view — bearing three small green pebbles spread FAR apart across its wide face, about FIVE FEET between each, with a subtle, glowing magical symbol carved into the stone below them. Then, half-buried in the sand nearby, a leather satchel and a scatter of dried herbs. Last, on the right, a rough, barnacle-pale standing trilithon arch — two uprights capped by a lintel, like the arches of Stonehenge — that is dark and asleep, its opening flat, depthless black. Around and between them all, the black shore and the star-thick sky. Cold starlit blue, faint and quiet; painterly and cinematic, film grain, richly detailed. No people, no lettering, no captions, no text.",
+        "doorPrompt": "The dark trilithon arch on the right wakes and fills with a bright, slow, swirling field of stars and a distant galaxy — a fully open portal you could step straight through; the fallen stones and the wide monolith are unchanged. Cold starlit blue, the new portal glowing warm at its heart; painterly and cinematic, film grain, richly detailed. No people, no lettering, no captions, no text."
+      },
+      "unlockedWhen": true,
+      "onSolve": [
+        {
+          "set": "beach_solved"
+        }
+      ],
+      "designNote": "ORIENTATION ROOM — NOT graded, NOT in the codec (no puzzleType). STORY: you wash up star-sick; the washed-up satchel/herbs establish the goal (brew the potion). TEACHES THE STONE CIPHER + KEYPAD AT DIFFICULTY ZERO. The mark is a fallen-arch STONE PATTERN — three stones, each standing \"|\" or fallen \"_\", read left-to-right = BEACH PATTERN | _ | (up, down, up). The one arch is PRE-AWAKENED (already a dim starry portal); the player reads its own fallen stones and keys | _ | on the two-symbol STONE KEYPAD (\"|\", \"_\", X=clear, spiral=submit) to UNLOCK it (bright galaxy) and step through — learning the alphabet + \"patterns are codes\" + the device, with no analysis. HOTSPOTS: (1) lock \"The mark-stone\" = stone keypad, answer \"|_|\"; forward arch requires it. (2) clue \"The washed-up satchel\" — sickness + potion goal; add a one-line \"the old ones wrote in stones raised and fallen\". (3) clue (monolith stones) pickup -> notebook as a DETERMINISTIC pattern graphic; spread rank 1/4 (WIDEST, ~5 ft) -> scree. (4) door forward requires the lock, to mountain. NO back door. Monolith bears 3 green pebbles (spread rank 1/4) + the glowing keypad symbol. WIRING: beach gateless -> forward arch gates on the trivial keypad; confirm mountain.unlockedWhen:{solved:beach} fires off it. Stone keypad = NEW engine render-mode (see notes.md). BUILT (art).",
+      "plannedHotspots": [
+        {
+          "type": "lock",
+          "label": "The mark-stone",
+          "note": "stone keypad; read the beach fallen stones | _ | and key it; answer \"|_|\"; forward arch requires it",
+          "mode": "stones",
+          "answer": "|_|",
+          "length": 3
+        },
+        {
+          "type": "clue",
+          "label": "The washed-up satchel",
+          "note": "in-world: the star-sickness + the potion goal; no coding help"
+        },
+        {
+          "type": "clue",
+          "label": "The monolith's four stones",
+          "pickup": true,
+          "note": "escape: deterministic pattern graphic -> notebook; spread rank 1/4 (WIDEST, ~5 ft) -> scree"
+        },
+        {
+          "type": "door",
+          "label": "The star-filled arch",
+          "direction": "forward",
+          "note": "to mountain; requires the mark-stone lock"
+        }
+      ],
+      "entry": null,
+      "panorama": "beach/scene.png",
+      "builtFrom": "gpt_beach_15.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5.8
+      },
+      "hotspots": [
+        {
+          "id": "the_mark_stone",
+          "type": "lock",
+          "label": "The mark-stone",
+          "box": [
+            0.4799,
+            0.5293,
+            0.5186,
+            0.6276
+          ],
+          "mode": "stones",
+          "answer": "|_|",
+          "length": 3
+        },
+        {
+          "id": "the_washed_up_satchel",
+          "type": "clue",
+          "label": "The washed-up satchel",
+          "box": [
+            0.6674,
+            0.667,
+            0.7106,
+            0.7731
+          ],
+          "body": ""
+        },
+        {
+          "id": "the_star_filled_arch",
+          "type": "door",
+          "label": "The star-filled arch",
+          "box": [
+            0.8306,
+            0.4114,
+            0.8686,
+            0.6335
+          ],
+          "direction": "forward",
+          "requires": "the_mark_stone",
+          "to": "mountain"
+        }
+      ],
+      "preAwakened": true,
+      "panoramaOpen": "beach/scene_open.png"
+    },
+    {
+      "key": "mountain",
+      "title": "The high henge",
+      "debrief": "PCA rotates a cloud of measurements to the view that spreads it most — PC1 — and the sample flung farthest along that view is the most singular thing in the set. You ran the analysis, plotted the scores, and clicked the one ingredient thrown clear past all the others. That is reading a scores plot: let the projection do the spreading, then read who lands at the far edge.",
+      "technique": "PCA scores plot — click the PC1 extreme (Pick-the-Point)",
+      "puzzleType": 1,
+      "built": true,
+      "authoring": {
+        "tag": "mountain",
+        "scenePrompt": "This is a panorama — a single 360-degree stone circle seen from its exact centre, every feature described below arranged in a ring on a narrow, wind-scoured mountain summit at night, the ground falling to sheer drops just beyond the ring, the image wrapping all the way around so the left and right edges meet seamlessly. Reading the circle from left to right: first, a frost-rimed dark-basalt standing trilithon arch — two uprights capped by a lintel, like the arches of Stonehenge — that is an open portal, its opening a calm, dim field of distant stars, the way you came, still glowing softly behind you. Next, the three stones of a fallen arch lying in a short, clear row across the rock — reading left to right, the first stone standing tall and upright, the second stone standing tall and upright, the third stone lying flat on the ground: a deliberate up, up, down pattern of exactly three stones. Then, straight ahead, a low dark-stone altar holding a shallow scrying basin of black water that glimmers with a faint scatter of starlight, one point flung far out past the rest. Next, a tall weathered monolith bearing three small green pebbles set about one foot apart across its face, with a subtle, glowing magical symbol set into the stone below them. Last, on the right, a second frost-rimed dark-basalt standing trilithon arch that is dark, its opening flat, depthless black. Around and far below, a vast sea of cloud pale under the stars with only the black teeth of distant peaks breaking through, thin cold air and wind-driven spindrift, the sky a shade less black than the shore and thick with keen stars. Cool starlit blue, the open portal glowing warm at its heart; painterly and cinematic, dizzying altitude, film grain, richly detailed. No people, no lettering, no captions, no text.",
+        "doorPrompt": "The dark-basalt trilithon arch on the right now fills with a bright, slow, swirling galaxy of stars, becoming a living portal — the way onward; the calm dim arrival-portal on the left, the fallen stones, the altar-basin and the monolith are all unchanged. Cool starlit blue, the new portal glowing warm; painterly and cinematic, dizzying altitude, film grain, richly detailed. No people, no lettering, no captions, no text."
+      },
+      "unlockedWhen": {
+        "solved": "beach"
+      },
+      "onSolve": [
+        {
+          "set": "mountain_solved"
+        },
+        {
+          "inc": "rooms_solved"
+        }
+      ],
+      "entry": {
+        "title": "A world away, and higher",
+        "text": "The arch takes you and lets you go a world away: a knife of black rock high above the drowned country, the air thin and needled with cold. Here too a ring of stones, and in the basin the same field of star-points — but one is thrown far past the rest. The monolith's stones stand wide apart. Read the scattering; find the one flung clear.",
+        "button": "Read the high henge →"
+      },
+      "designNote": "GRADED — ROOM 1. TYPE 4 Pick-the-Point (ggiraph). TWO-GATE PORTAL: (a) AWAKEN by solving the analysis (arch -> dim starry), (b) UNLOCK by keying this henge's stone pattern (arch -> bright galaxy). STORY BEAT: which single ingredient is flung farthest along the great axis of spread (PC1). TASK: standardized PCA on the 9 numeric properties, plot scores (PC1 vs PC2), CLICK the point farthest along PC1. CODE (pick.plotCode): pc <- prcomp(dplyr::select(druid_ingredients, potency:ash_weight), scale.=TRUE); scores <- data.frame(pc$x, ingredient = druid_ingredients$ingredient); ggplot(scores, aes(PC1, PC2)) + ggiraph::geom_point_interactive(aes(data_id = ingredient, tooltip = ingredient)) + labs(x=\"PC1\", y=\"PC2\"). ANSWER: \"Deathwatch Scarab\" (|PC1|=4.50, +19% clear of Glasswing Beetle II 3.64). Distractors = the other 224 points. HINT: one point sits far past all the rest along the horizontal spread. Solving AWAKENS the forward arch; the STONE KEYPAD then unlocks it with MOUNTAIN PATTERN | | _ (up,up,down), answer \"||_\" — the keypad is INERT until awakened (\"this portal must be awakened first\"). Monolith stones spread rank 3/4 (~1 ft) -> scree; deterministic graphic -> notebook. Codec: pick encodes solved=1. NEW ART.",
+      "plannedHotspots": [
+        {
+          "type": "puzzle",
+          "label": "The scrying basin",
+          "note": "Type 4 pick: PCA scores, click PC1 extreme -> Deathwatch Scarab (|PC1|=4.50, +19%)"
+        },
+        {
+          "type": "lock",
+          "label": "The mark-stone",
+          "note": "stone keypad; unlock with mountain pattern | | _ (answer \"||_\"); INERT until the pick awakens it; forward arch requires it",
+          "mode": "stones",
+          "answer": "||_",
+          "length": 3
+        },
+        {
+          "type": "clue",
+          "label": "The monolith's four stones",
+          "pickup": true,
+          "note": "escape: deterministic pattern graphic -> notebook; spread rank 3/4 (~1 ft) -> scree"
+        },
+        {
+          "type": "door",
+          "label": "The star-filled arch",
+          "direction": "forward",
+          "note": "to plains; requires the mark-stone lock"
+        },
+        {
+          "type": "door",
+          "label": "The arch back to the shore",
+          "direction": "back",
+          "note": "to beach"
+        }
+      ],
+      "panorama": "mountain/scene.png",
+      "builtFrom": "gpt_mountain_14.png",
+      "panoramaOpen": "mountain/scene_open.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "hotspots": [
+        {
+          "id": "the_scrying_basin",
+          "type": "puzzle",
+          "label": "The scrying basin",
+          "box": [
+            0.4629,
+            0.6257,
+            0.5219,
+            0.6748
+          ],
+          "starterCode": "druid_ingredients",
+          "pick": {
+            "prompt": "Run a PCA on all the ingredients and plot the scores. One specimen is flung far out along PC1 — the axis of greatest spread, the most singular thing in the whole set. Click it.",
+            "plotCode": "pc <- prcomp(dplyr::select(druid_ingredients, potency:ash_weight), scale. = TRUE)\nscores <- data.frame(pc$x, ingredient = druid_ingredients$ingredient)\np <- ggplot(scores, aes(PC1, PC2)) +\n     ggiraph::geom_point_interactive(aes(data_id = ingredient, tooltip = ingredient), size = 2, alpha = 0.85) +\n     labs(x = \"PC1\", y = \"PC2\")",
+            "answer": "Deathwatch Scarab",
+            "width": 6,
+            "height": 5.5,
+            "maxAttempts": 4,
+            "hint": "One point sits far past all the others along the horizontal PC1 axis — the single specimen flung farthest from the crowd. Click that one.",
+            "feedback": {
+              "correct": "Correct — noted in your field notebook: the Deathwatch Scarab is flung farthest out along PC1, the most singular specimen in the set.",
+              "wrong": [
+                "Run prcomp() on the nine numeric properties with scale. = TRUE, plot the scores, and look along the horizontal PC1 axis.",
+                "That's not the extreme — one point stands clear out past every other along PC1; click the single farthest one.",
+                "Look for the lone point far from the main cloud along PC1, not one near the middle."
+              ],
+              "reveal": ""
+            }
+          }
+        },
+        {
+          "id": "the_mark_stone",
+          "type": "lock",
+          "label": "The mark-stone",
+          "box": [
+            0.6477,
+            0.5018,
+            0.6818,
+            0.6237
+          ],
+          "mode": "stones",
+          "answer": "||_",
+          "length": 3
+        },
+        {
+          "id": "the_star_filled_arch",
+          "type": "door",
+          "label": "The star-filled arch",
+          "box": [
+            0.8535,
+            0.3406,
+            0.9138,
+            0.7181
+          ],
+          "direction": "forward",
+          "requires": "the_mark_stone",
+          "to": "plains"
+        },
+        {
+          "id": "the_arch_back_to_the_shore",
+          "type": "door",
+          "label": "The arch back to the shore",
+          "box": [
+            0.0835,
+            0.317,
+            0.13,
+            0.7122
+          ],
+          "direction": "back",
+          "to": "beach"
+        }
+      ]
+    },
+    {
+      "key": "plains",
+      "title": "The firefly henge",
+      "debrief": "A scree plot asks how the spread is shared out across the views. You computed the share of the total variation carried by the first, greatest view — a quarter of everything — and set it against the smaller shares behind it. Quantifying spread across components, not within one, is what tells you how much of the story lives on the main axis and how much hides behind it.",
+      "technique": "PCA scree — variance explained by PC1 (Compute-the-Key)",
+      "puzzleType": 1,
+      "built": true,
+      "authoring": {
+        "tag": "plains",
+        "scenePrompt": "This is a panorama — a single 360-degree stone circle seen from its exact centre, every feature described below arranged in a ring on a wide grassy moor at the edge of dawn, the image wrapping all the way around so the left and right edges meet seamlessly. A slow green drift of fireflies rises from the grass. Reading the circle from left to right: first, a standing trilithon arch — two uprights capped by a lintel, like the arches of Stonehenge — that is an open portal, its opening a calm, dim field of distant stars. Next, the three stones of a fallen arch lying in a short, clear row across the grass — reading left to right, the first stone lying flat on the ground, the second stone lying flat on the ground, and the third stone standing tall and upright: a deliberate down, down, up pattern of exactly three stones. Then, straight ahead, a low dark-stone altar holding a shallow scrying basin of black water that glimmers with a faint reflection of starlight. Next, a WIDE weathered monolith bearing three small green pebbles set FAR apart, about THREE FEET between each, across its broad face, with a subtle, glowing magical symbol set into the stone below them. Last, on the right, a second standing trilithon arch that is dark, its opening flat, depthless black. Around and between them all, open windblown grassland rolling to a low horizon just beginning to grey with the first dawn, green fireflies drifting over the grass. Cool night blue warming to the first grey of dawn, green firefly light and the open portal glowing warm at its heart; painterly and cinematic, film grain, richly detailed. No people, no lettering, no captions, no text.",
+        "doorPrompt": "The dark trilithon arch on the right now fills with a bright, slow, swirling galaxy of stars, becoming a living portal — the way onward; the calm dim arrival-portal on the left, the fallen stones, the altar-basin and the monolith are all unchanged. Cool blue and green firefly light, the new portal glowing warm; painterly and cinematic, film grain, richly detailed. No people, no lettering, no captions, no text."
+      },
+      "unlockedWhen": {
+        "solved": "mountain"
+      },
+      "onSolve": [
+        {
+          "set": "plains_solved"
+        },
+        {
+          "inc": "rooms_solved"
+        }
+      ],
+      "entry": {
+        "title": "Down onto the plain",
+        "text": "Through, and down onto a plain without end, a slow green snow of fireflies rising against a horizon that has begun, faintly, to grey. The stones on this altar sit close, huddled together. In the basin the views step down like a ladder — how much of the whole spread does the first, greatest view carry?",
+        "button": "Read the scree →"
+      },
+      "designNote": "GRADED — ROOM 2. TYPE 1 Compute-the-Key (console check). TWO-GATE PORTAL (awaken by analysis, unlock by stone pattern). STORY BEAT: how much of the total spread lives on the great axis. TASK: standardized PCA; percent of total variance explained by PC1 -> `answer`. CODE: pc <- prcomp(dplyr::select(druid_ingredients, potency:ash_weight), scale.=TRUE); ve <- 100 * pc$sdev^2 / sum(pc$sdev^2); answer <- round(ve[1], 1). ANSWER: 25.0 (%) — PC1 25.0, PC2 17.8, PC3 12.7 (PC1/PC2=1.40). check: abs(answer - 25.0) < 0.6. HINT: square the sdevs, divide by their sum, take the first. (Alt framings: PC1+PC2 ~43, or #components to pass half = 3; pick ONE at wiring.) Solving AWAKENS the arch; STONE KEYPAD unlocks with PLAINS PATTERN _ _ | (down,down,up), answer \"__|\". Monolith stones spread rank 2/4 (~3 ft) -> scree; deterministic graphic -> notebook. NEW ART.",
+      "plannedHotspots": [
+        {
+          "type": "puzzle",
+          "label": "The scrying basin",
+          "note": "Type 1 check: PC1 variance % -> 25.0 (PC2 17.8, PC3 12.7)"
+        },
+        {
+          "type": "lock",
+          "label": "The mark-stone",
+          "note": "stone keypad; unlock with plains pattern _ _ | (answer \"__|\"); INERT until the check awakens it; forward arch requires it",
+          "mode": "stones",
+          "answer": "__|",
+          "length": 3
+        },
+        {
+          "type": "clue",
+          "label": "The monolith's four stones",
+          "pickup": true,
+          "note": "escape: deterministic pattern graphic -> notebook; spread rank 2/4 (~3 ft) -> scree"
+        },
+        {
+          "type": "door",
+          "label": "The star-filled arch",
+          "direction": "forward",
+          "note": "to saltflat; requires the mark-stone lock"
+        },
+        {
+          "type": "door",
+          "label": "The arch back to the mountain",
+          "direction": "back",
+          "note": "to mountain"
+        }
+      ],
+      "panorama": "plains/scene.png",
+      "builtFrom": "gpt_plains_15.png",
+      "panoramaOpen": "plains/scene_open.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5.8
+      },
+      "hotspots": [
+        {
+          "id": "the_scrying_basin",
+          "type": "puzzle",
+          "label": "The scrying basin",
+          "box": [
+            0.4806,
+            0.6552,
+            0.5468,
+            0.7004
+          ],
+          "starterCode": "druid_ingredients",
+          "check": {
+            "prompt": "From the scree, how much of the total variation does the first principal component (PC1) capture? Run the PCA and assign that percentage (a number from 0 to 100) to `answer`.",
+            "requires": [
+              "answer"
+            ],
+            "expr": "abs(as.numeric(answer) - 25) <= 0.6",
+            "maxAttempts": 4,
+            "hint": "Square the standard deviations (pc$sdev^2) to get each component's variance, divide by their total, times 100 — then take the first.",
+            "feedback": {
+              "correct": "Correct — noted in your field notebook: PC1 captures 25% of the spread — a quarter of everything, and by far the greatest single view.",
+              "wrong": [
+                "Run prcomp(dplyr::select(druid_ingredients, potency:ash_weight), scale. = TRUE); the variances are pc$sdev^2.",
+                "You want PC1's SHARE of the total, as a percentage: 100 * pc$sdev^2 / sum(pc$sdev^2), then the first element.",
+                "That looks like a proportion or a different component — PC1's share is around a quarter of the whole."
+              ],
+              "reveal": ""
+            }
+          }
+        },
+        {
+          "id": "the_mark_stone",
+          "type": "lock",
+          "label": "The mark-stone",
+          "box": [
+            0.7113,
+            0.5431,
+            0.7473,
+            0.667
+          ],
+          "mode": "stones",
+          "answer": "__|",
+          "length": 3
+        },
+        {
+          "id": "the_star_filled_arch",
+          "type": "door",
+          "label": "The star-filled arch",
+          "box": [
+            0.8908,
+            0.3838,
+            0.9348,
+            0.7535
+          ],
+          "direction": "forward",
+          "requires": "the_mark_stone",
+          "to": "saltflat"
+        },
+        {
+          "id": "the_arch_back_to_the_mountain",
+          "type": "door",
+          "label": "The arch back to the mountain",
+          "box": [
+            0.0848,
+            0.372,
+            0.1254,
+            0.7259
+          ],
+          "direction": "back",
+          "to": "mountain"
+        }
+      ]
+    },
+    {
+      "key": "saltflat",
+      "title": "The mirror henge",
+      "debrief": "Loadings turn the question from samples to variables: not who spreads out, but what the spread is made of. You read which measured property contributes most to the great axis — its single strongest driver. From points to properties: naming the trait a view is built from is how PCA tells you what a separation is actually about.",
+      "technique": "PCA loadings — the top driver of PC1 (Compute-the-Key)",
+      "puzzleType": 1,
+      "built": true,
+      "authoring": {
+        "tag": "saltflat",
+        "scenePrompt": "This is a panorama — a single 360-degree stone circle seen from its exact centre, every feature described below arranged in a ring on an endless mirror-flat white salt playa at the edge of dawn, the fading stars reflected in the glassy salt underfoot so the stones seem to float upon the sky, the image wrapping all the way around so the left and right edges meet seamlessly. Reading the circle from left to right: first, a white salt-crusted standing trilithon arch — two uprights capped by a lintel, like the arches of Stonehenge — that is an open portal, its opening a calm, dim field of distant stars, the way you came, still glowing softly behind you. Next, the three stones of a fallen arch lying in a short, clear row across the salt — reading left to right, the first stone lying flat on the ground, the second stone standing tall and upright, the third stone lying flat on the ground: a deliberate down, up, down pattern of exactly three stones. Then, straight ahead, a low salt-pale altar holding a shallow scrying basin of dark water that glimmers with a faint spray of star-points fanning out from a centre, one reaching farthest. Next, a tall weathered salt-pale monolith bearing three small green pebbles set TOUCHING one another, barely an INCH apart, across its face, with a subtle, glowing magical symbol set into the stone below them. Last, on the right, a second white salt-crusted standing trilithon arch that is dark, its opening flat, depthless black. Around and between them all, a dead-flat white salt desert without edge or end, long pale shadows thrown from the stones, the sky silvering low in the east while the last stars still hang above. Pale silver-blue pre-dawn, the open portal glowing warm at its heart; painterly and cinematic, film grain, richly detailed. No people, no lettering, no captions, no text.",
+        "doorPrompt": "The salt-crusted trilithon arch on the right now fills with a bright, slow, swirling galaxy of stars, becoming a living portal — the way onward; the calm dim arrival-portal on the left, the fallen stones, the altar-basin and the monolith are all unchanged, the mirror-salt reflection undisturbed. Pale silver-blue pre-dawn, the new portal glowing warm; painterly and cinematic, film grain, richly detailed. No people, no lettering, no captions, no text."
+      },
+      "unlockedWhen": {
+        "solved": "plains"
+      },
+      "onSolve": [
+        {
+          "set": "saltflat_solved"
+        },
+        {
+          "inc": "rooms_solved"
+        }
+      ],
+      "entry": {
+        "title": "The floor of white salt",
+        "text": "Through, and out onto a floor of white salt without edge or end — so flat, so still, that the fading stars lie mirrored beneath your boots and you seem to walk upon the sky itself. The henge stands alone in all that emptiness. In the basin the arrows fan out from a centre; one reaches farthest. Which property drives the great axis?",
+        "button": "Read the loadings →"
+      },
+      "designNote": "GRADED — ROOM 3. TYPE 1 Compute-the-Key (console check). TWO-GATE PORTAL (awaken by analysis, unlock by stone pattern). STORY BEAT: what the great axis is built from — its strongest driver. TASK: standardized PCA; property with the largest |PC1 loading| -> `answer` (NAME). CODE: pc <- prcomp(dplyr::select(druid_ingredients, potency:ash_weight), scale.=TRUE); load <- pc$rotation[, \"PC1\"]; answer <- names(which.max(abs(load))). ANSWER: \"potency\" (0.582 > bitterness 0.477 > aroma_intensity 0.468 > volatility 0.423; +18%). check: answer == \"potency\". HINT: rotation matrix PC1 column; longest arrow drives it. Solving AWAKENS the arch; STONE KEYPAD unlocks with the SALTFLAT PATTERN _ | _ (down, up, down — mirror-symmetric, fitting the mirror henge), answer \"_|_\". Monolith stones spread rank 4/4 (TIGHTEST, touching) -> scree; deterministic graphic -> notebook. NEW ART.",
+      "plannedHotspots": [
+        {
+          "type": "puzzle",
+          "label": "The scrying basin",
+          "note": "Type 1 check: top |PC1 loading| -> 'potency' (0.582, +18%)"
+        },
+        {
+          "type": "lock",
+          "label": "The mark-stone",
+          "note": "stone keypad; unlock with saltflat pattern _ | _ (answer \"_|_\"); INERT until the check awakens it; forward arch requires it",
+          "mode": "stones",
+          "answer": "_|_",
+          "length": 3
+        },
+        {
+          "type": "clue",
+          "label": "The monolith's four stones",
+          "pickup": true,
+          "note": "escape: deterministic pattern graphic -> notebook; spread rank 4/4 (TIGHTEST, touching) -> scree"
+        },
+        {
+          "type": "door",
+          "label": "The star-filled arch",
+          "direction": "forward",
+          "note": "to boss; requires the mark-stone lock"
+        },
+        {
+          "type": "door",
+          "label": "The arch back to the plain",
+          "direction": "back",
+          "note": "to plains"
+        }
+      ],
+      "panorama": "saltflat/scene.png",
+      "builtFrom": "gpt_saltflat_4.png",
+      "panoramaOpen": "saltflat/scene_open.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -4.9
+      },
+      "hotspots": [
+        {
+          "id": "the_scrying_basin",
+          "type": "puzzle",
+          "label": "The scrying basin",
+          "box": [
+            0.4799,
+            0.663,
+            0.5455,
+            0.7417
+          ],
+          "starterCode": "druid_ingredients",
+          "check": {
+            "prompt": "Which single measured property contributes most to PC1 — the trait the great axis of spread is built from? Run the PCA and assign that property's name (as a string) to `answer`.",
+            "requires": [
+              "answer"
+            ],
+            "expr": "tolower(as.character(answer)) == \"potency\"",
+            "maxAttempts": 4,
+            "hint": "Look at the loadings — pc$rotation[, \"PC1\"]. The property with the largest magnitude (abs) is the driver.",
+            "feedback": {
+              "correct": "Correct — noted in your field notebook: potency is the strongest driver of PC1 (loading 0.58), the trait the great axis is built from.",
+              "wrong": [
+                "Run the PCA, then read the PC1 column of the loadings: pc$rotation[, \"PC1\"].",
+                "Take absolute values — which property has the largest |loading| on PC1? Try which.max(abs(pc$rotation[, \"PC1\"])).",
+                "Close in the ranking, but another property has a larger PC1 loading — check the whole PC1 column by magnitude."
+              ],
+              "reveal": ""
+            }
+          }
+        },
+        {
+          "id": "the_mark_stone",
+          "type": "lock",
+          "label": "The mark-stone",
+          "box": [
+            0.6648,
+            0.5372,
+            0.689,
+            0.6355
+          ],
+          "mode": "stones",
+          "answer": "_|_",
+          "length": 3
+        },
+        {
+          "id": "the_star_filled_arch",
+          "type": "door",
+          "label": "The star-filled arch",
+          "box": [
+            0.8456,
+            0.3819,
+            0.9059,
+            0.7043
+          ],
+          "direction": "forward",
+          "requires": "the_mark_stone",
+          "to": "boss"
+        },
+        {
+          "id": "the_arch_back_to_the_plain",
+          "type": "door",
+          "label": "The arch back to the plain",
+          "box": [
+            0.0894,
+            0.372,
+            0.1326,
+            0.6925
+          ],
+          "direction": "back",
+          "to": "plains"
+        }
+      ]
+    },
+    {
+      "key": "boss",
+      "title": "The great henge",
+      "debrief": "The whole night's lesson, and its trap. The mushrooms are the potion's heart, but they do NOT stand out on the great axis you had followed all night — on PC1 they sit mid-pack with the common rabble. They draw together only on the SECOND view, and it is that view's driver, luminance, their glow, that marks them out. The tempting answer was potency, the great axis's driver you had just read — but a group can live on a later axis, and reading the wrong component is the classic PCA mistake. Fixing the code from PC1 to PC2 is that lesson made physical.",
+      "technique": "PCA marker under misdirection — which axis separates the mushrooms, then its driver (Repair-the-Pipeline)",
+      "puzzleType": 2,
+      "isBoss": true,
+      "built": true,
+      "authoring": {
+        "tag": "boss",
+        "scenePrompt": "This is a panorama — a single 360-degree ring of colossal, cyclopean standing stones seen from its exact centre, the great henge at dawn, every feature described below arranged around the ring. The image wraps all the way around so the left and right edges meet seamlessly, including the colors in the sky. Reading the circle from left to right: first, a towering standing trilithon arch that is an open portal, its opening a calm, dim field of distant stars, but the space outside and behind the arch still consistent with the sunrise. Then, STRAIGHT AHEAD AND DEAD CENTRE, the SUNRISE — the sun breaking the horizon exactly in the middle of the view, gold light flooding through another trilithon arch; the sunrise is the focal heart of the image. Just below it, a low altar holding a wide scrying basin of dark water reflecting the sunrise. Next, a tall weathered monolith with a carved, REVERSED scree-plot — a row of four upright bars stepping UP from shortest to tallest — and below it a subtle, glowing magical symbol set into the stone. Last, on the right, a third towering trilithon arch — the way home — that is dark and asleep, its opening flat, depthless black. The colossal gold-lit stones catch the first sunrise. The Cliffs of Moher landscape is vast and pale behind and below. Deep blue night giving way to warm gold dawn centred on the sunrise; painterly and cinematic, grand and reverent, film grain, richly detailed. No people, no lettering, no captions, no text.",
+        "doorPrompt": "The towering arch on the right — the way home — fills with a light that is not starlight but morning, a clear open portal onto a sunlit homeward shore; the arrival-portal on the left, the sunrise, the basin and the heart-stone monolith are unchanged, the dawn at its height. Triumphant gold morning; painterly and cinematic, grand and reverent, film grain, richly detailed. No people, no lettering, no captions, no text."
+      },
+      "unlockedWhen": {
+        "allSolved": [
+          "mountain",
+          "plains",
+          "saltflat"
+        ]
+      },
+      "deliverable": {
+        "type": "figure",
+        "submitCodec": true
+      },
+      "entry": {
+        "title": "The great henge, at dawn",
+        "text": "The last arch sets you down before the great henge, its stones like cliffs against a sky going gold at the rim of the world. The potion wants the glowing mushrooms — but in the basin they do not lie at either end of the great spread; on that first axis they sit with the common rabble. Only when the view turns to the second do they draw together, apart from all the rest. Read what that second view is built from, and you have the mushrooms' mark.",
+        "button": "Face the great henge →"
+      },
+      "designNote": "GRADED BOSS + ESCAPE in ONE room (the great henge — no inner sanctum). isBoss, puzzleType 2, deliverable figure + submitCodec. The SUNRISE is the centred focal point of the scene. Great henge has NO fallen stones and NO pebble-monolith. STAGE 1 (analysis / AWAKEN) TYPE 3 Repair-the-Pipeline (console check): TRAP (PC1-fixation) — mushrooms do NOT separate on PC1 (mushroom PC1 mean 0.03, mid-pack; beetles own PC1); they separate on PC2 (mean 1.46), driver = luminance. Decoy = potency (PC1 driver from room 3). BROKEN CODE reads PC1's top loading (returns potency): pc <- prcomp(dplyr::select(druid_ingredients, potency:ash_weight), scale.=TRUE); load <- pc$rotation[, 'PC1']; answer <- names(which.max(abs(load))). FIX 'PC1' -> 'PC2'. ANSWER 'luminance' (0.625 > resin_content 0.533 > pigment 0.489; +15%). check: answer == 'luminance'. Solving AWAKENS the way-home arch (dim starfield) and mints the potion/cure. ANTI-FIXATION HINT now lives in THIS puzzle's hint + wrong-answer feedback (mushrooms sit mid-pack on the great axis; turn to the second view; read what it is built from) — the separate 'mushroom-sigil stone' was DROPPED 2026-07-25 (clutter); the basin plot already foreshadows it (green cluster gathered apart high on the vertical/PC2 axis). STAGE 2 (escape / UNLOCK): the heart-stone monolith is the ESCAPE stone-keypad (mode:stones, long display, NOT in codec) — styled like the other rooms' mark-stones but with NO pebbles; in their place a carved REVERSED scree-plot (bars shortest->tallest = ASCENDING) that carries BOTH the order-by-scree rule and the tightest->widest direction, + the glowing keypad symbol below. (The separate rising frieze was dropped 2026-07-26 — the reversed scree-plot conveys the direction.) Enter the four henge patterns in SCREE order (read off the four pebble-monoliths), ASCENDING tightest->widest = saltflat, mountain, plains, beach. answer = '_|_||___||_|' (len 12). Way-home door requires the heart-stone lock + endsEscape -> escapeDone. WIRING: set the way-home door to require the placed heart-stone lock + endsEscape. NEW ART.",
+      "plannedHotspots": [
+        {
+          "type": "puzzle",
+          "label": "The great scrying basin",
+          "note": "Type 3 repair: fix PC1->PC2 -> 'luminance' (0.625); trap decoy = potency; AWAKENS the way-home arch. ANTI-FIXATION HINT lives here (hint/feedback): mushrooms mid-pack on PC1, gather on PC2"
+        },
+        {
+          "type": "lock",
+          "label": "The heart-stone",
+          "mode": "stones",
+          "answer": "_|_||___||_|",
+          "length": 12,
+          "note": "ESCAPE keypad; styled like the other mark-stones, NO pebbles; a carved REVERSED scree-plot (bars shortest->tallest = ascending) that carries BOTH the order-by-scree rule and the tightest->widest direction, + keypad symbol; 4 patterns in scree order saltflat+mountain+plains+beach; way-home requires it; NOT in codec"
+        },
+        {
+          "type": "door",
+          "label": "The way home",
+          "direction": "forward",
+          "endsEscape": true,
+          "note": "requires the heart-stone lock (set in harness) + endsEscape -> escapeDone; terminal, no to"
+        },
+        {
+          "type": "door",
+          "label": "The arch back to the salt-flat",
+          "direction": "back",
+          "note": "to saltflat"
+        }
+      ],
+      "panorama": "boss/scene.png",
+      "builtFrom": "gpt_boss_12.png",
+      "panoramaOpen": "boss/scene_open.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5.4
+      },
+      "hotspots": [
+        {
+          "id": "the_great_scrying_basin",
+          "type": "puzzle",
+          "label": "The great scrying basin",
+          "box": [
+            0.4419,
+            0.7574,
+            0.5553,
+            0.8223
+          ],
+          "starterCode": "pc <- prcomp(dplyr::select(druid_ingredients, potency:ash_weight), scale. = TRUE)\n\n# This is meant to find the property that marks out the MUSHROOMS.\n# It reads the great axis, PC1 — but do the mushrooms actually separate there?\nloadings <- pc$rotation[, \"PC1\"]\nanswer <- names(which.max(abs(loadings)))\nanswer",
+          "check": {
+            "prompt": "The potion needs the property that sets the MUSHROOMS apart from every other ingredient. The code below reads the great axis (PC1) and returns potency — but the mushrooms don't separate on PC1. Fix it to read the axis that actually gathers the mushrooms, then assign that property's name to `answer`.",
+            "requires": [
+              "answer"
+            ],
+            "expr": "tolower(as.character(answer)) == \"luminance\"",
+            "maxAttempts": 5,
+            "hint": "On PC1 the mushrooms sit mid-pack — they neither top nor bottom it; they gather on PC2 instead. Change the component the code reads from \"PC1\" to \"PC2\".",
+            "feedback": {
+              "correct": "Correct — noted in your field notebook: the mushrooms answer to luminance, the driver of PC2 (loading 0.62) — their glow, not the great axis at all.",
+              "wrong": [
+                "potency drives PC1, but check where the mushrooms sit on PC1 — they're middling, not extreme. Which axis separates them?",
+                "The mushrooms gather on the SECOND component — read pc$rotation[, \"PC2\"] instead of PC1.",
+                "Change \"PC1\" to \"PC2\" in the loadings line, then take names(which.max(abs(...))) of that."
+              ],
+              "reveal": ""
+            }
+          }
+        },
+        {
+          "id": "the_heart_stone",
+          "type": "lock",
+          "label": "The heart-stone",
+          "box": [
+            0.6654,
+            0.5844,
+            0.706,
+            0.6925
+          ],
+          "mode": "stones",
+          "answer": "_|_||___||_|",
+          "length": 12
+        },
+        {
+          "id": "the_arch_back_to_the_salt_flat",
+          "type": "door",
+          "label": "The arch back to the salt-flat",
+          "box": [
+            0.0802,
+            0.2325,
+            0.1844,
+            0.7731
+          ],
+          "direction": "back",
+          "to": "saltflat"
+        },
+        {
+          "id": "the_way_home",
+          "type": "door",
+          "label": "The way home",
+          "box": [
+            0.8404,
+            0.2167,
+            0.9328,
+            0.7947
+          ],
+          "direction": "forward",
+          "endsEscape": true,
+          "requires": "the_heart_stone"
+        }
+      ]
+    }
+  ],
+  "escapeDone": {
+    "title": "Home, as the sun clears the sea",
+    "body": "You set the marks into the stone in the order the henges gave you — least-spread first, rising to the widest, as the moon-signs rise — and the great arch fills with a light that is not starlight but morning. Beyond it: your own shore, your own year, unbroken. You step through as the sun clears the sea, and the henges go dark behind you, one by one."
+  },
+  "debrief": {
+    "title": "How this world worked",
+    "intro": "This whole night was one skill in disguise: taking a cloud of measurements, turning it to the view that spreads it most, and reading which trait that spread is built from — then remembering that a group you care about may live on a quieter view entirely. Here is how each henge was teaching that, and how the way home was the very same move, made physical in stone."
+  },
+  "ambient": "fireflies",
+  "fx": [],
+  "cover": "cover.png",
+  "coverPrompt": "Minimalist stylised thumbnail poster of a single lone standing-stone arch on a black starlit shore at night, one warm amber portal of stars glowing through the arch, its reflection on wet mirror-sand below. Designed to read clearly as a small thumbnail: one bold, simple, high-contrast silhouette, iconic and uncluttered, minimal fine detail. Flat, limited palette: deep teal, icy blue, and one warm amber glow. Soft film grain, painterly but clean with simple geometric shapes. Strong negative space of night sky and mirrored shore, single centred focal subject. Quiet, cold, otherworldly. No people, no text, no lettering, no logos. Square composition.",
+  "stonePortals": true,
+  "music": "audio/drowned_henges_theme.mp3",
+  "musicVolume": 0.1,
+  "musicCredit": {
+    "text": "Beautiful Fantasy Ambient Music — Mystical, Enchanting, Epic-Like (YouTube)",
+    "url": "https://youtu.be/AohPsuy65hQ"
+  }
+}

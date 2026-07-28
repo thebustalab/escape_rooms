@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Wrap tester — gpt-image-2</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css" />
+  <style>
+    html, body { margin: 0; height: 100%; background: #06111a; color: #e8eef2; font: 14px system-ui, sans-serif; overflow: hidden; }
+    #pano { position: fixed; inset: 0; }
+    .pnlm-controls-container, .pnlm-load-box { display: none !important; }
+    .arrow { position: fixed; top: 50%; transform: translateY(-50%); z-index: 10; width: 3rem; height: 3rem; border-radius: 50%; border: 0; cursor: pointer; font-size: 1.7rem; color: #10202a; background: rgba(240,245,250,0.9); box-shadow: 0 2px 12px rgba(0,0,0,.5); }
+    .arrow.l { left: 1rem; } .arrow.r { right: 1rem; }
+    #panel { position: fixed; left: 12px; top: 12px; z-index: 10; width: 268px; background: rgba(9,18,26,0.92); border: 1px solid rgba(255,255,255,0.14); border-radius: 12px; padding: 12px 14px; }
+    #panel h1 { font-size: 14px; margin: 0 0 8px; }
+    .row { margin: 9px 0; }
+    label { display: flex; justify-content: space-between; font-size: 12px; opacity: 0.9; margin-bottom: 3px; }
+    label b { color: #ffd88c; font-variant-numeric: tabular-nums; }
+    input[type=range] { width: 100%; }
+    select { width: 100%; background: #0a1620; color: inherit; border: 1px solid rgba(255,255,255,0.16); border-radius: 6px; padding: 4px; }
+    button { background:#ffd88c; color:#10202a; border:0; border-radius:8px; padding:8px 12px; font:inherit; font-weight:600; cursor:pointer; margin-top:6px; }
+    .hint { font-size: 11px; opacity: 0.6; margin-top: 8px; }
+    #status { font-size:12px; margin-top:6px; min-height:15px; }
+    .err { color:#ff9b9b; }
+  </style>
+</head>
+<body>
+  <div id="pano"></div>
+  <button class="arrow l" id="prev">‹</button>
+  <button class="arrow r" id="next">›</button>
+  <div id="panel">
+    <h1>Wrap tester</h1>
+    <div class="row"><label>Image</label><select id="img"></select></div>
+    <div class="row"><label>Horizontal coverage <b id="haovV">360</b>°</label>
+      <input type="range" id="haov" min="90" max="360" step="5" value="360" /></div>
+    <div class="row"><label>Vertical coverage <b id="vaovV">95</b>°</label>
+      <input type="range" id="vaov" min="60" max="180" step="5" value="95" /></div>
+    <div class="row"><label>Field of view <b id="fovV">120</b>°</label>
+      <input type="range" id="fov" min="40" max="120" step="5" value="120" /></div>
+    <div class="row"><label>Vertical offset <b id="voffV">-5</b>°</label>
+      <input type="range" id="voff" min="-42" max="42" step="1" value="-5" /></div>
+    <div class="row"><label>Turn step <b id="stepV">40</b>°</label>
+      <input type="range" id="step" min="15" max="90" step="5" value="40" /></div>
+    <button id="save">Save params for this image</button>
+    <div id="status"></div>
+    <div class="hint">Drag to look around (that vertical aim is saved as <b>pitch</b>). Tune coverage until walls look straight, then Save — the harness reads these back per image.</div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
+  <script>
+    const $ = s => document.querySelector(s);
+    let HAOV = 360, VAOV = 95, FOV = 120, VOFF = -5, STEP = 40, viewer = null;
+    const sel = $("#img");
+    const IMGS_FALLBACK = ["gpt_gen_5.png","gpt_room1_2.png","gpt_room2_2.png","gpt_room3_2.png","gpt_room4_2.png"];
+    const params = new URLSearchParams(location.search);
+    const startImg = params.get("img");
+    const ROOM_KEY = params.get("room");   // Phase 8: IDE mode — edit this room node's wrap, save to scenario.json
+    const CH = params.get("chapter"), SC = params.get("scenario");   // Finding 2: target THIS scenario, not active
+    const SCQ = (CH && SC) ? ("chapter=" + encodeURIComponent(CH) + "&scenario=" + encodeURIComponent(SC)) : "";
+    let IMG_URL = null;                     // in room mode, the committed scene URL (served via /sfile/…)
+    const currentImgUrl = () => ROOM_KEY ? IMG_URL : ("scene/" + sel.value);
+    const postJSON = async (p, b) => (await fetch(p, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(b) })).json();
+
+    // NB: query-aware cache-buster — "/api/scenario?chapter=…&scenario=…" must gain "&t=",
+    // not a second "?", or the server parses scenario as "…?t=123" and 500s (broke room mode).
+    async function getJSON(p){ try { return await (await fetch(p + (p.includes("?") ? "&" : "?") + "t=" + Date.now())).json(); } catch(e){ return null; } }
+
+    async function loadPicker() {
+      const r = await getJSON("/api/scenes");
+      const imgs = (r && r.scenes ? r.scenes.filter(f => !f.startsWith(".") && !f.includes("_x2")) : IMGS_FALLBACK);
+      sel.innerHTML = imgs.map(f => `<option value="${f}">${f}</option>`).join("");
+      if (startImg && imgs.includes(startImg)) sel.value = startImg;
+    }
+
+    // vOffset is bounded so the image band stays inside the sphere
+    function vMax(){ return Math.max(0, (180 - VAOV) / 2); }
+    function clampVoff(){ const m = vMax(); VOFF = Math.max(-m, Math.min(m, VOFF));
+      const s = $("#voff"); s.min = -Math.floor(m); s.max = Math.floor(m); s.value = VOFF; $("#voffV").textContent = VOFF; }
+
+    function build() {
+      const cur = viewer ? { yaw: viewer.getYaw(), pitch: viewer.getPitch(), hfov: viewer.getHfov() }
+                         : { yaw: 0, pitch: 0, hfov: FOV };
+      if (viewer) { try { viewer.destroy(); } catch (e) {} }
+      viewer = pannellum.viewer("pano", {
+        type: "equirectangular", panorama: currentImgUrl(),
+        haov: HAOV, vaov: VAOV, vOffset: VOFF,
+        autoLoad: true, showControls: false,
+        hfov: cur.hfov, minHfov: 40, maxHfov: 120,
+        yaw: cur.yaw, pitch: cur.pitch, autoRotate: 0,
+        backgroundColor: [0.02, 0.05, 0.09],
+      });
+    }
+
+    const bindRebuild = (id, out, set) => { const e = $(id), o = $(out);
+      e.addEventListener("input", () => { o.textContent = e.value; set(+e.value); clampVoff(); build(); }); };
+    bindRebuild("#haov", "#haovV", v => HAOV = v);
+    bindRebuild("#vaov", "#vaovV", v => VAOV = v);
+    $("#voff").addEventListener("input", e => { VOFF = +e.target.value; $("#voffV").textContent = VOFF; build(); });
+    $("#fov").addEventListener("input", e => { FOV = +e.target.value; $("#fovV").textContent = FOV; if (viewer) viewer.setHfov(FOV, false); });
+    $("#step").addEventListener("input", e => { STEP = +e.target.value; $("#stepV").textContent = STEP; });
+    sel.addEventListener("change", () => { build(); prefill(); });
+    $("#prev").onclick = () => viewer && viewer.setYaw(viewer.getYaw() - STEP, 700);
+    $("#next").onclick = () => viewer && viewer.setYaw(viewer.getYaw() + STEP, 700);
+
+    $("#save").onclick = async () => {
+      const body = { image: sel.value, haov: HAOV, vaov: VAOV,
+        hfov: Math.round(viewer ? viewer.getHfov() : FOV), vOffset: VOFF,
+        pitch: +(viewer ? viewer.getPitch() : 0).toFixed(1) };
+      const r = await (await fetch("/api/save-wrap", { method:"POST",
+        headers:{"Content-Type":"application/json"}, body:JSON.stringify(body) })).json();
+      $("#status").innerHTML = r.ok
+        ? `saved for ${body.image} · hfov ${body.hfov}, pitch ${body.pitch}°`
+        : `<span class="err">${r.error}</span>`;
+    };
+
+    function applyWrap(wi) {
+      HAOV = wi.haov ?? 360; VAOV = wi.vaov ?? 90; FOV = wi.hfov ?? 110; VOFF = wi.vOffset ?? 0;
+      $("#haov").value = HAOV; $("#haovV").textContent = HAOV;
+      $("#vaov").value = VAOV; $("#vaovV").textContent = VAOV;
+      $("#fov").value = FOV;   $("#fovV").textContent = FOV;
+      clampVoff();
+    }
+
+    async function prefill() {
+      const w = await getJSON("scene/wrap.json");
+      const wi = w && (w[sel.value] || (w.image === sel.value ? w : null));
+      if (wi) {
+        applyWrap(wi);
+        build();
+        if (viewer) viewer.on("load", () => { viewer.setHfov(FOV, false); viewer.setPitch(wi.pitch ?? 0, false); });
+      }
+    }
+
+    // Edit ONE room's wrap. DRAFT mode (?img=<candidate>): frame a picked candidate from _scratch,
+    // save to the room's _scratch draft (promoted on "Send to room"). Committed mode (no img):
+    // edit the live node's scene and save straight to scenario.json.
+    async function initRoomMode() {
+      const DRAFT_IMG = startImg;   // a candidate filename ⇒ draft mode
+      const doc = await getJSON("/api/scenario" + (SCQ ? "?" + SCQ : ""));
+      const node = doc && (doc.rooms || []).find(r => r.key === ROOM_KEY);
+      const draft = DRAFT_IMG ? await getJSON("/api/draft?roomKey=" + encodeURIComponent(ROOM_KEY) + (SCQ ? "&" + SCQ : "")) : null;
+      if (DRAFT_IMG) {
+        IMG_URL = "/sfile/_scratch/" + encodeURIComponent(DRAFT_IMG) + "?t=" + Date.now() + (SCQ ? "&" + SCQ : "");
+      } else if (node && node.panorama) {
+        IMG_URL = "/sfile/" + node.panorama + "?t=" + Date.now() + (SCQ ? "&" + SCQ : "");
+      } else {
+        $("#status").innerHTML = `<span class="err">no image — pick a candidate first (draft), or commit the room</span>`;
+        return;
+      }
+      sel.closest(".row").style.display = "none";     // single fixed image in room mode
+      $("#panel h1").textContent = "Wrap · " + ROOM_KEY + (DRAFT_IMG ? " (draft)" : "");
+      // per-candidate draft wins (draft.imgs[thisImage].wrap), then legacy top-level, then the node's
+      const per = draft && draft.imgs && draft.imgs[DRAFT_IMG];
+      const wi = (per && per.wrap) || (draft && draft.wrap) || (node && node.wrap);
+      if (wi) applyWrap(wi);
+      build();
+      if (wi && viewer) viewer.on("load", () => { viewer.setHfov(FOV, false); viewer.setPitch(wi.pitch ?? 0, false); });
+      const btn = $("#save"); btn.textContent = "Save and close";
+      btn.onclick = async () => {
+        const wrap = { haov: HAOV, vaov: VAOV, hfov: Math.round(viewer ? viewer.getHfov() : FOV),
+          vOffset: VOFF, pitch: +(viewer ? viewer.getPitch() : 0).toFixed(1) };
+        const r = DRAFT_IMG
+          ? await postJSON("/api/draft-save", { chapter: CH, scenario: SC, roomKey: ROOM_KEY, image: DRAFT_IMG, wrap })
+          : await postJSON("/api/room-patch", { chapter: CH, scenario: SC, roomKey: ROOM_KEY, fields: { wrap } });
+        if (r.ok) { $("#status").textContent = "saved · closing…"; setTimeout(() => window.close(), 400); }
+        else $("#status").innerHTML = `<span class="err">${r.error || "save failed"}</span>`;
+      };
+    }
+
+    (async () => {
+      if (ROOM_KEY) { await initRoomMode(); }
+      else { await loadPicker(); build(); await prefill(); }
+    })();
+  </script>
+</body>
+</html>

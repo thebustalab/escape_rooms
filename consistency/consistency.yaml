@@ -1,0 +1,120 @@
+# Consistency spec for the escape-room repo (Phase 0/1 worked example).
+# Grounded in real rooms/data_vis/alaska/scenario.json. The engine that reads this lives in
+# Utilities/consistency_audit/ (repo-agnostic); everything escape-room-specific is HERE.
+# Contract: Utilities/consistency_audit/SCHEMAS.md.  NB: use `over:`, not `on:` (YAML reserves `on`).
+
+name: escape_rooms
+report: consistency/findings.json     # relative to --repo-root (the escape_rooms dir)
+surface_to_brief: true
+
+targets:
+  scenarios:                 # every scenario.json, built or stub
+    glob: "rooms/*/*/scenario.json"
+    parse: json
+  built_scenarios:           # only scenarios with at least one built room (skip design-stage stubs)
+    glob: "rooms/*/*/scenario.json"
+    parse: json
+    where: "$.rooms[?(@.built==true)].key"
+
+groups:
+  # Study invariant: two scenarios per chapter (the crossover units). Counts stubs too.
+  chapter_pairs:
+    of: scenarios
+    key: "$.chapter"
+    expect_size: 2            # WARN if a chapter doesn't have exactly two scenarios
+
+checks:
+  # --- apply to ALL scenarios (stubs included) ---
+  - id: has-title
+    type: field_present
+    over: scenarios
+    path: "$.title"
+    severity: error
+
+  - id: unique-scenario-id
+    type: field_unique
+    over: scenarios
+    path: "$.id"
+    severity: error
+
+  - id: pair-shares-chapter
+    type: field_equal_across_group
+    group: chapter_pairs
+    path: "$.chapter"
+    severity: error
+
+  # --- apply only to BUILT scenarios ---
+  - id: boss-unlock-allsolved
+    type: field_present
+    over: built_scenarios
+    path: "$.rooms[?(@.isBoss==true)].unlockedWhen.allSolved"
+    severity: error
+
+  - id: min-6-options
+    type: count_at_least
+    over: built_scenarios
+    for_each: "$.rooms[*].hotspots[?(@.type=='puzzle')].question.options"
+    min: 6
+    severity: error
+
+  - id: no-reveal-field
+    type: value_absent
+    over: built_scenarios
+    for_each: "$.rooms[*].hotspots[?(@.type=='puzzle')].question.feedback.reveal"
+    pattern: ".+"
+    severity: warn
+    message: "Puzzle feedback should omit 'reveal' (no answer give-away)."
+
+  - id: no-pipeline-in-starter
+    type: value_absent
+    over: built_scenarios
+    for_each: "$.rooms[*].hotspots[?(@.type=='puzzle')].starterCode"
+    pattern: "filter\\(|ggplot\\("
+    severity: warn
+    message: "Starter code should not contain the solving pipeline."
+    exempt:
+      - locator: "rooms/data_vis/alaska/scenario.json::room2::obj_2"
+        reason: "Deliberate broken-code (fix-the-pipeline) puzzle — story is 'their code isn't working'."
+
+  - id: no-default-hotspot-labels
+    type: value_absent
+    over: built_scenarios
+    for_each: "$.rooms[*].hotspots[*].label"
+    pattern: "^Object \\d+$"
+    severity: warn
+    message: "Hotspot label looks like an un-renamed default ('Object N') — give it an in-world name."
+
+  # --- codec / grading integrity (custom, over built scenarios) ---
+  - id: correct-index-not-all-same-slot
+    type: custom
+    over: built_scenarios
+    module: checks.py
+    fn: check_correct_not_all_same_slot
+    severity: warn
+
+  - id: codec-lockstep
+    type: custom
+    over: built_scenarios
+    module: checks.py
+    fn: check_codec_lockstep
+    severity: error
+
+# LLM tier — enabled in Phase 2; prompts drafted then.
+rubrics:
+  - id: art-style-consistency
+    applies_to: built_scenarios
+    prompt: rubrics/art_style.md          # dusk/teal-amber/painterly/no-people/no-text drift
+    severity: warn
+  - id: pair-parallel-difficulty
+    applies_to: chapter_pairs
+    prompt: rubrics/parallel_difficulty.md # are the two scenarios genuinely equal in difficulty?
+    severity: warn
+  - id: narrative-voice
+    applies_to: built_scenarios
+    prompt: rubrics/voice.md               # second-person voice, clue style, tone consistency
+    severity: info
+
+# Planned checks — enable once these fields exist on scenario.json (study build items):
+#   - every chapter's two scenarios each carry a debrief/interview room
+#   - each room carries a Bloom-tier label (climb per chapter)
+#   - each pair records encounter-vs-review role + difficulty-match metadata (experiment invariants)

@@ -1,0 +1,889 @@
+{
+  "chapter": "data_vis2",
+  "scenario": "hospital",
+  "id": 8,
+  "title": "Vital Signs",
+  "subtitle": "Data Visualization II · filter, count & read the plot",
+  "story": "You're the hospital's instrument technician, clocking off at last — one step from the elevator, and from finally meeting the person you've been hoping to see for a long-overdue dinner up in the break room. Then the pharmacist catches your sleeve. “Before you go — I need a hand.” A shipment of salt-sensitive medicine was being canoed out to a remote clinic when the canoe tipped; the vials went into the lake. The drug degrades in salty, mineral-rich water, but the field kit at the scene can only measure chloride, not sodium. So the question is whether chloride is a trustworthy stand-in for sodium — total salt — across Alaska's lakes. The lake survey is open on the bench laptop.",
+  "enterLabel": "Clock back in →",
+  "done": {
+    "title": "Right antibiotic, in time",
+    "body": "Chlorine ran highest in North Killeak Lake, so the infection is Chlorosoma — and Elias gets Chlorocidin. Four reads of one dataset, one life. Your submission code is below."
+  },
+  "packages": [
+    "dplyr",
+    "ggplot2",
+    "readr",
+    "tidyr"
+  ],
+  "datasets": [
+    {
+      "name": "alaska_lake_data",
+      "url": "https://thebustalab.github.io/phylochemistry/sample_data/alaska_lake_data.csv"
+    }
+  ],
+  "setup": "suppressMessages({library(dplyr); library(ggplot2)})",
+  "state": {
+    "rooms_solved": 0
+  },
+  "ambient": "leaves",
+  "hud": {
+    "kind": "vitals",
+    "healAt": "analysis"
+  },
+  "fx": [
+    "flicker"
+  ],
+  "coverPrompt": "Minimalist stylised thumbnail poster of a lone small-town hospital block on a bright sunny summer day — a simple cheerful institutional building with a row of sunlit windows and a rooftop helipad — on a green plain under a clear blue sky. One bold, simple, high-contrast silhouette, iconic and uncluttered. Flat, limited WARM palette: sky blue, fresh green, sunny yellow and clean white. Soft film grain, painterly but clean, simple geometric shapes, strong negative space, single centred focal subject. No people, no text, no lettering, no logos. Square composition.",
+  "rooms": [
+    {
+      "key": "room1",
+      "title": "The pharmacy",
+      "debrief": "First you reshaped the data — pivot_wider, one column per element — so two variables could be plotted against each other: sodium versus chloride, with a smoothing line. Getting a table into the right shape is half of most analyses; only then can a relationship show up as a trend on a chart.",
+      "technique": "pivot_wider + geom_point/geom_smooth — correlate two elements (salt proxy)",
+      "puzzleType": 1,
+      "built": true,
+      "authoring": {
+        "tag": "room1",
+        "scenePrompt": "This is a panorama. A 360-degree view from the centre of a small hospital pharmacy on a bright summer afternoon, the room wrapping continuously all the way around so the left and right edges meet seamlessly. Warm and cheerful: golden summer sunlight pours through a big window onto pale mint walls and clean stainless surfaces, a sunlit green birch canopy and blue sky outside. Ahead, a steel repair bench with an opened piece of medical analytical equipment, tools laid out, and an open laptop glowing softly. To one side, tall glass-fronted cabinets of medicine bottles and a corkboard crowded with bright postcards from staff summer trips. Opposite, a stainless counter with a sink and a glass-door fridge covered in summer-trip postcards and magnets. Set into one wall, a CLOSED brushed-steel elevator door with a call panel beside it — the way onward. Around the rest of the room, a supply trolley, an IV pole, a wheeled stool, a potted plant and a jar of wildflowers. Painterly, cinematic, sunny and colourful. No people, no lettering, no readable text.",
+        "doorPrompt": "The closed brushed-steel elevator door slides fully OPEN, revealing the sunlit elevator interior within; everything else in the summery pharmacy is unchanged. Same warm daylight, painterly and colourful, no people, no lettering, no text."
+      },
+      "unlockedWhen": true,
+      "onSolve": [
+        {
+          "set": "room1_solved"
+        },
+        {
+          "inc": "rooms_solved"
+        }
+      ],
+      "designNote": "NEW ART. TECHNIQUE — pivot_wider (long→wide) + geom_point + geom_smooth (two continuous), forces multi-variable mapping. STORY: salt-sensitive medicine capsized; the field kit logged only chloride, not sodium — is chloride a trustworthy proxy for sodium (total salt)? TASK: pivot the long data wider (one column per element) with tidyr::pivot_wider, then plot Na vs Cl with geom_point + geom_smooth. VERIFIED ANSWER: yes — a tight positive linear relationship, Pearson r = 0.999 across all 20 lakes (still r = 0.994 without the North_Killeak outlier). ≥6 options describing the relationship (strong positive / a read-off-the-line prediction, vs distractors: none, negative, weak positive). Teaches pivot_wider + scatter + smooth, and SETS UP room 3, which challenges this pooled conclusion. DOORS: first room, single CLOSED forward door = the elevator. TECH: add tidyr to packages (verify WebR build); geom_smooth defaults to loess at n=20, base R, runs in WebR (no mgcv).",
+      "panorama": "room1/scene.png",
+      "panoramaOpen": "room1/scene_open.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -9,
+        "pitch": -8.1
+      },
+      "hotspots": [
+        {
+          "id": "the_bench_laptop",
+          "type": "puzzle",
+          "label": "The bench laptop",
+          "box": [
+            0.5157,
+            0.5363,
+            0.5542,
+            0.6088
+          ],
+          "starterCode": "alaska_lake_data",
+          "question": {
+            "prompt": "Pivot the survey wider (one column per element) and plot sodium (Na) against chloride (Cl) for all 20 lakes, with a smoothing line. What does it tell you — is chloride a trustworthy stand-in for sodium?",
+            "options": [
+              "No relationship — the points scatter with no trend, so chloride tells you nothing about sodium.",
+              "A negative relationship — lakes high in chloride run low in sodium, so chloride would mislead you.",
+              "A weak positive trend — the points loosely rise but scatter widely, so chloride is only a rough guide.",
+              "A strong, tight positive line — sodium rises almost perfectly with chloride (r ≈ 0.999), so chloride is a trustworthy proxy.",
+              "A strong line, but only because one extreme lake creates it — drop that lake and the relationship falls apart.",
+              "A curved relationship — chloride predicts sodium at low values but flattens out at high ones."
+            ],
+            "correct": 3,
+            "maxAttempts": 4,
+            "feedback": {
+              "correct": "Correct — logged: sodium tracks chloride almost perfectly (r ≈ 0.999), so chloride is a safe stand-in for total salt.",
+              "wrong": [
+                "Look at the overall shape of the cloud: do the points rise together, fall, or just scatter? Add the smoothing line and see how tightly they hug it.",
+                "The points sit almost exactly on one rising line — that's a very strong positive link. Check that it holds across the whole range, not just at one end.",
+                "Even setting the single saltiest lake aside, the rest still rise tightly together — so the relationship is real, not an artefact of one outlier."
+              ]
+            }
+          }
+        },
+        {
+          "id": "the_elevator_door",
+          "type": "door",
+          "label": "The elevator door",
+          "box": [
+            0.2503,
+            0.2951,
+            0.3203,
+            0.7304
+          ],
+          "direction": "forward",
+          "to": "room2"
+        },
+        {
+          "id": "trip_postcard_1",
+          "type": "clue",
+          "label": "Trip postcard #1",
+          "box": [
+            0.7739,
+            0.3029,
+            0.8072,
+            0.3833
+          ],
+          "body": "Priya's card — a June day-drive, camera on the dash, home before the midnight sun even dips. Pocket it for the collage.",
+          "pickup": "Postcard #1 — June · roadside · a day · digit 3",
+          "image": "postcards/postcard_1.png"
+        },
+        {
+          "id": "trip_postcard_2",
+          "type": "clue",
+          "label": "Trip postcard #2",
+          "box": [
+            0.134,
+            0.4912,
+            0.149,
+            0.5559
+          ],
+          "body": "Marco's card — a muddy June weekend, an hour in from the lot, two nights to dry the boots. One for the pile.",
+          "pickup": "Postcard #2 — June · short hike · a weekend · digit 8",
+          "image": "postcards/postcard_2.png"
+        }
+      ],
+      "plannedHotspots": [
+        {
+          "type": "puzzle",
+          "label": "The bench laptop",
+          "note": "pivot_wider → Na vs Cl scatter+smooth (is Cl a proxy for Na?)"
+        },
+        {
+          "type": "door",
+          "label": "The elevator door",
+          "direction": "forward",
+          "note": "the way onward"
+        },
+        {
+          "type": "clue",
+          "label": "Trip postcard #1",
+          "pickup": true,
+          "note": "escape faceting card (opaque); on the corkboard"
+        },
+        {
+          "type": "clue",
+          "label": "Trip postcard #2",
+          "pickup": true,
+          "note": "escape faceting card (opaque); on the corkboard"
+        }
+      ],
+      "entry": null,
+      "sfx": {
+        "src": "audio/room1.mp3",
+        "loop": true,
+        "volume": 0.7
+      },
+      "builtFrom": "gpt_room1_7.png"
+    },
+    {
+      "key": "room2",
+      "title": "The elevator",
+      "debrief": "A heatmap turns a whole table into colour — element across, lake up, concentration as the fill. You read down the tiles for the row that blazed hottest, filtering and ranking done entirely by eye. Sometimes the fastest way to find the maximum is to plot the data so it points at itself.",
+      "technique": "filter() by element + rank to a max",
+      "puzzleType": 1,
+      "built": true,
+      "authoring": {
+        "tag": "room2",
+        "scenePrompt": "This is a panorama. A 360-degree view from the centre of a hospital elevator car on a bright summer afternoon, the space wrapping continuously all the way around so the left and right edges meet seamlessly. Warm and cheerful: soft warm light on brushed steel and mirrored panels, a bright friendly mood. Ahead, a CLOSED set of stainless elevator doors — the way onward — with a floor-indicator panel and a column of buttons. To one side, a smartphone in a wall clip and, taped up beside it, a couple of bright summer-trip postcards left by staff. Opposite, a long handrail and a small framed print of a sunny lake. Behind, an OPEN doorway giving back down toward the pharmacy. Around the car, quilted grey moving pads and a cheerful poster of summer wildflowers. Painterly, cinematic, warm and colourful. No people, no lettering, no readable text.",
+        "doorPrompt": "The closed elevator doors ahead slide OPEN onto a bright sunlit hospital corridor beyond; the open passage back toward the pharmacy is unchanged. Same warm daylight, painterly and colourful, no people, no lettering, no text."
+      },
+      "unlockedWhen": true,
+      "onSolve": [
+        {
+          "set": "room2_solved"
+        },
+        {
+          "inc": "rooms_solved"
+        }
+      ],
+      "designNote": "NEW ART. TECHNIQUE — geom_tile HEATMAP (2 discrete × 1 continuous), forces multi-variable mapping. STORY: the lake data is texted to your phone. Which lake is the closest chemical MATCH to North_Killeak_Lake across ALL elements? TASK: geom_tile(aes(x = element, y = lake, fill = mg_per_L)) + a fill colour scale — read which lake's row of tiles looks most like North_Killeak's. VERIFIED ANSWER: White_Fish_Lake (Euclidean distance 257 vs next 363; profile-shape correlation r = 0.993; the only other lake that lights up on Cl and Na — White_Fish Cl 105.3, Na 54.16). Real distractors (next-nearest): Devil_Mountain_Lake, Lake_Matcharak, Lava_Lake, Kurupa_Lake, Kuzitrin_Lake → ≥6 lake options. Threads the salt story (North_Killeak & White_Fish are the two saline lakes; sets up the boss's chloride answer). DOORS: forward CLOSED (elevator → corridor) + back OPEN (→ room1).",
+      "entry": {
+        "title": "Going up",
+        "text": "Chloride tracks sodium almost perfectly, so you tell the pharmacist yes — the field kit's chloride reading is a safe stand-in for total salt, and that the shipment may have been compromised. The elevator doors close. Your phone buzzes: a bush pilot has been pulled from North Killeak Lake and they need you in the lab, and a colleague has texted over the lake survey data. North Killeak is barely studied — start by finding the lake most like it, chemically, so you have something to reason from.",
+        "button": "Read the data →"
+      },
+      "panorama": "room2/scene.png",
+      "panoramaOpen": "room2/scene_open.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -9,
+        "pitch": -5.5
+      },
+      "hotspots": [
+        {
+          "id": "the_phone_in_the_wall_clip",
+          "type": "puzzle",
+          "label": "The phone in the wall clip",
+          "box": [
+            0.7039,
+            0.3716,
+            0.7314,
+            0.5049
+          ],
+          "starterCode": "alaska_lake_data",
+          "question": {
+            "prompt": "Draw a heatmap — element across the x-axis, lake up the y-axis, filled by concentration — and find the lake whose whole row of tiles looks most like North_Killeak_Lake's. Which lake is its closest chemical match?",
+            "options": [
+              "Devil_Mountain_Lake",
+              "White_Fish_Lake",
+              "Lake_Matcharak",
+              "Lava_Lake",
+              "Kurupa_Lake",
+              "Okoklik_Lake"
+            ],
+            "correct": 1,
+            "maxAttempts": 4,
+            "feedback": {
+              "correct": "Correct — logged: White_Fish_Lake is North Killeak's closest chemical match, so it's the lake to reason from.",
+              "wrong": [
+                "Find North Killeak's row of tiles first, then scan the other rows for the one whose colours match it most closely across every element.",
+                "North Killeak stands out because two elements run very high — look for the only other lake whose row lights up in those same two columns, not just one.",
+                "Plenty of lakes are 'quiet' (every tile dim) and so resemble each other; the match you want mirrors North Killeak's bright cells too, not only its dark ones."
+              ]
+            }
+          }
+        },
+        {
+          "id": "the_elevator_doors",
+          "type": "door",
+          "label": "The elevator doors",
+          "box": [
+            0.4379,
+            0.2186,
+            0.5673,
+            0.8284
+          ],
+          "direction": "forward",
+          "to": "room3"
+        },
+        {
+          "id": "passage_back_to_the_pharmacy",
+          "type": "door",
+          "label": "Passage back to the pharmacy",
+          "box": [
+            0.317,
+            0.248,
+            0.3935,
+            0.8167
+          ],
+          "direction": "back",
+          "to": "room1"
+        },
+        {
+          "id": "trip_postcard_3",
+          "type": "clue",
+          "label": "Trip postcard #3",
+          "box": [
+            0.897,
+            0.3139,
+            0.9479,
+            0.4446
+          ],
+          "body": "Nadia's card — a June floatplane week, no road for fifty miles, seven days of nobody. Worth keeping.",
+          "pickup": "Postcard #3 — June · backcountry · a week · digit 1",
+          "image": "postcards/postcard_3.png"
+        },
+        {
+          "id": "trip_postcard_4",
+          "type": "clue",
+          "label": "Trip postcard #4",
+          "box": [
+            0.9003,
+            0.4723,
+            0.9446,
+            0.6485
+          ],
+          "body": "Deb's card — peak-summer, a camper right off the highway, t-shirt weather at midnight. Add it to the collage.",
+          "pickup": "Postcard #4 — July · roadside · a weekend · digit 7",
+          "image": "postcards/postcard_4.png"
+        }
+      ],
+      "plannedHotspots": [
+        {
+          "type": "puzzle",
+          "label": "The phone in the wall clip",
+          "note": "geom_tile heatmap → lake most like North Killeak (White_Fish)"
+        },
+        {
+          "type": "door",
+          "label": "The elevator doors",
+          "direction": "forward",
+          "note": "onward to the corridor"
+        },
+        {
+          "type": "door",
+          "label": "Passage back to the pharmacy",
+          "direction": "back"
+        },
+        {
+          "type": "clue",
+          "label": "Trip postcard #3",
+          "pickup": true,
+          "note": "escape faceting card (opaque); taped by the phone"
+        },
+        {
+          "type": "clue",
+          "label": "Trip postcard #4",
+          "pickup": true,
+          "note": "escape faceting card (opaque); taped by the phone"
+        }
+      ],
+      "sfx": {
+        "src": "audio/room2.mp3",
+        "loop": true,
+        "volume": 1.0
+      },
+      "builtFrom": "gpt_room2_8.png"
+    },
+    {
+      "key": "room3",
+      "title": "The corridor",
+      "debrief": "The trap, and the lesson. Pooled together, sodium and chloride tracked almost perfectly — until you faceted by park and the single clean line broke into three different ones. Splitting a plot by group can overturn what the whole looked like; always ask whether one trend is really several in disguise.",
+      "technique": "pivot_wider + geom_smooth + facet_wrap(~park) — does the correlation differ by park?",
+      "puzzleType": 1,
+      "built": true,
+      "authoring": {
+        "tag": "room3",
+        "scenePrompt": "This is a panorama. A 360-degree view from the centre of a hospital corridor on a bright summer afternoon, the hallway wrapping continuously all the way around so the left and right edges meet seamlessly. Warm and cheerful: summer sunlight streams through tall windows onto pale mint walls and a polished floor, green birch leaves and blue sky outside. Ahead, a CLOSED door to the LABORATORY — the way onward — with a small wired-glass window and a card reader beside it. To one side, a noticeboard crowded with bright summer-trip postcards and a wall map dotted with parks. Opposite, a steel nurses' station counter with a laptop and a jar of wildflowers. Behind, an OPEN set of elevator doors giving back the way you came. Around the corridor, a gurney, a wheelchair, handrails, potted plants and cheerful sunlight. Painterly, cinematic, sunny and colourful. No people, no lettering, no readable text.",
+        "doorPrompt": "The closed laboratory door ahead swings OPEN onto a bright sunlit lab within; the open elevator doors behind and the postcards on the noticeboard are unchanged. Same warm daylight, painterly and colourful, no people, no lettering, no text."
+      },
+      "unlockedWhen": true,
+      "onSolve": [
+        {
+          "set": "room3_solved"
+        },
+        {
+          "inc": "rooms_solved"
+        }
+      ],
+      "designNote": "NEW ART (corridor). TECHNIQUE — pivot_wider + geom_point + geom_smooth + facet_wrap(~ park), forces multi-variable mapping + small multiples. STORY: your crush stops you and gently CHALLENGES room 1 — 'the pharmacist said you decided sodium and chloride track together… but is that really true in every park?' TASK: the same Na vs Cl scatter, now facet_wrap(~ park). VERIFIED ANSWER: NOT uniform — the pooled r = 0.999 is largely manufactured by BELA (r = 1.000, which holds the North_Killeak outlier); GAAR r = 0.675, NOAT r = 0.424. The tight aggregate line hides weak within-park relationships. MCQ: (crisp) 'which park shows the weakest Na–Cl relationship?' → NOAT; or (conceptual / critical-thinking) 'the pooled r was 0.999 — after faceting, what do you conclude?' → it's driven by pooling + BELA's outlier, weak within GAAR & NOAT. Spicier alt pair: Ca~Mg flips NEGATIVE in NOAT (r = -0.43). The crush also plants the weekend dinner-date throughline → the ESCAPE facet-collage meta-puzzle (see escape1). DOORS: forward CLOSED (LAB) + back OPEN (→ room2).",
+      "entry": {
+        "title": "The corridor",
+        "text": "White Fish Lake is North Killeak's chemical twin — nearly identical across every element — so at least you have a comparison to work from. You are three doors from the lab when a classmate you've been hoping to see catches your arm and presses a folded note into your hand: \"Some of us are going this weekend — you should come.\" Then they are gone into the elevator before either of you can say more. No time now — but they had overheard the pharmacist, and they are grinning: \"sodium and chloride, always together? You sure that holds <i>everywhere</i>?\"",
+        "button": "Prove it →"
+      },
+      "panorama": "room3/scene.png",
+      "panoramaOpen": "room3/scene_open.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -9,
+        "pitch": -5.6
+      },
+      "hotspots": [
+        {
+          "id": "the_nurses_station_laptop",
+          "type": "puzzle",
+          "label": "The nurses' station laptop",
+          "box": [
+            0.0438,
+            0.4441,
+            0.098,
+            0.5441
+          ],
+          "starterCode": "alaska_lake_data",
+          "question": {
+            "prompt": "Re-plot sodium vs chloride, but facet by park (BELA, GAAR, NOAT). Pooled together the line looked almost perfect (r ≈ 0.999). Once you split it by park, what's the right conclusion?",
+            "options": [
+              "The link is just as tight inside every park — faceting confirms sodium and chloride always track together.",
+              "BELA shows the weakest sodium–chloride link, so the coastal park breaks the pattern.",
+              "GAAR shows essentially no relationship, while BELA and NOAT stay tight.",
+              "All three parks show a negative sodium–chloride relationship once separated.",
+              "NOAT shows the weakest relationship — the tight pooled line is largely driven by pooling and BELA's extreme lake, and it hides weak within-park links.",
+              "The parks can't be compared because each holds a different number of lakes."
+            ],
+            "correct": 4,
+            "maxAttempts": 4,
+            "feedback": {
+              "correct": "Correct — logged: split by park, sodium–chloride is weakest in NOAT and only looks perfect when pooled — BELA's outlier carries the aggregate line.",
+              "wrong": [
+                "Look at each park's panel on its own: in which one do the points scatter most loosely, rather than sitting on a line?",
+                "BELA's panel is nearly a perfect line (one very salty lake anchors it). Compare GAAR and NOAT — one of those two is much looser than the other.",
+                "The loosest panel has the fewest, most scattered points — the pooled 'perfect' line was an artefact of combining parks, not a within-park truth."
+              ]
+            }
+          }
+        },
+        {
+          "id": "the_lab_door",
+          "type": "door",
+          "label": "The lab door",
+          "box": [
+            0.4412,
+            0.2284,
+            0.5444,
+            0.7598
+          ],
+          "direction": "forward",
+          "to": "boss"
+        },
+        {
+          "id": "passage_back_to_the_elevator",
+          "type": "door",
+          "label": "Passage back to the elevator",
+          "box": [
+            0.2158,
+            0.2881,
+            0.2719,
+            0.6208
+          ],
+          "direction": "back",
+          "to": "room2"
+        },
+        {
+          "id": "trip_postcard_5",
+          "type": "clue",
+          "label": "Trip postcard #5",
+          "box": [
+            0.6455,
+            0.2525,
+            0.6693,
+            0.3059
+          ],
+          "body": "Kim's card — a July week in a wildflower meadow, an hour from the trailhead, sun on the tent by seven. A keeper.",
+          "pickup": "Postcard #5 — July · short hike · a week · digit 2",
+          "image": "postcards/postcard_5.png"
+        },
+        {
+          "id": "trip_postcard_6",
+          "type": "clue",
+          "label": "Trip postcard #6",
+          "box": [
+            0.5888,
+            0.2446,
+            0.6099,
+            0.3198
+          ],
+          "body": "Theo's card — a single chartered day on a gravel bar, high summer, warm enough to swim. Pocket it.",
+          "pickup": "Postcard #6 — July · backcountry · a day · digit 9",
+          "image": "postcards/postcard_6.png"
+        },
+        {
+          "id": "trip_postcard_7",
+          "type": "clue",
+          "label": "Trip postcard #7",
+          "box": [
+            0.6337,
+            0.405,
+            0.6554,
+            0.4723
+          ],
+          "body": "Sol's card — an August week by the highway, first chill at 2am, the aurora faintly back. One for the pile.",
+          "pickup": "Postcard #7 — August · roadside · a week · digit 5",
+          "image": "postcards/postcard_7.png"
+        }
+      ],
+      "plannedHotspots": [
+        {
+          "type": "puzzle",
+          "label": "The nurses' station laptop",
+          "note": "facet_wrap(~park) → Na~Cl not uniform (NOAT weakest)"
+        },
+        {
+          "type": "door",
+          "label": "The lab door",
+          "direction": "forward",
+          "note": "onward to the lab"
+        },
+        {
+          "type": "door",
+          "label": "Passage back to the elevator",
+          "direction": "back"
+        },
+        {
+          "type": "clue",
+          "label": "Trip postcard #5",
+          "pickup": true,
+          "note": "escape faceting card (opaque); on the noticeboard"
+        },
+        {
+          "type": "clue",
+          "label": "Trip postcard #6",
+          "pickup": true,
+          "note": "escape faceting card (opaque); on the noticeboard"
+        },
+        {
+          "type": "clue",
+          "label": "Trip postcard #7",
+          "pickup": true,
+          "note": "escape faceting card (opaque); on the noticeboard"
+        }
+      ],
+      "sfx": [
+        {
+          "src": "audio/room3_roomtone.mp3",
+          "mode": "loop",
+          "volume": 1.0
+        }
+      ],
+      "builtFrom": "gpt_room3_5.png"
+    },
+    {
+      "key": "boss",
+      "title": "The lab",
+      "debrief": "The payoff. You filtered to the crash-site lake, found its most abundant element, and mapped that to the infection — chlorine highest means Chlorosoma, which means Chlorocidin. Four reads of one dataset, and the plot told you which antibiotic to reach for.",
+      "technique": "filter() to one lake + find the most abundant element, then map to the answer",
+      "puzzleType": 2,
+      "isBoss": true,
+      "built": true,
+      "authoring": {
+        "tag": "boss",
+        "scenePrompt": "This is a panorama. A 360-degree view from the centre of a hospital laboratory on a bright summer afternoon, the room wrapping continuously all the way around so the left and right edges meet seamlessly. Warm and cheerful: summer daylight floods through a big window onto stainless benches and glass, a green canopy and blue sky outside. Ahead, a lab workstation with an open laptop and a mud-caked flight-data recorder resting beside it. To one side, a bench of analytical instruments, racks of sample vials and a microscope, and a fridge covered in magnets and children's-ward crayon drawings. Opposite, an isolation window onto a sunlit recovery bay. Set into one wall, a CLOSED door — the way onward to the staff break room. Behind, an OPEN doorway giving back toward the corridor. Around the lab, a fume hood, a whiteboard, a centrifuge and a potted plant. Painterly, cinematic, sunny and colourful. No people, no lettering, no readable text.",
+        "doorPrompt": "The closed door ahead opens onto a bright sunlit staff break room beyond; the open passage back toward the corridor and the drawings on the fridge are unchanged. Same warm daylight, painterly and colourful, no people, no lettering, no text."
+      },
+      "unlockedWhen": {
+        "allSolved": [
+          "room1",
+          "room2",
+          "room3"
+        ]
+      },
+      "deliverable": {
+        "type": "figure",
+        "submitCodec": true
+      },
+      "designNote": "NEW ART. THIS IS THE ASSESSED EXERCISE — exercises.csv, '[exercises] data visualization ii' Q1 (dataset alaska_lake_data). STORY (from the exercise): bush pilot Elias Kane was pulled from North Killeak Lake and has a bacterial infection narrowed to five bacteria, each growing in water rich in one element — Sulfuromonas (sulfur, S → Sulfomycin), Nitrobacterium (nitrogen, N → Nitroflavin), Chlorosoma (chlorine, Cl → Chlorocidin), Bromoflux (bromine, Br → Bromostatin), Calcimicrobe (calcium, Ca → Calcihexin). TASK: which element is MOST abundant in North_Killeak_Lake, then pick the matching antibiotic. VERIFIED DATA (North_Killeak_Lake mg_per_L): Cl 337.23 (max) > Na 161.89 > Mg 37.68 > Ca 29.75 > K 8.32 > C 4.3 > Br 1.08 > F 0.11 > S 0.04 > N 0.037 > P 0.001. Among the five candidate elements (S, N, Cl, Br, Ca), Cl is by far the highest → Chlorosoma → CHLOROCIDIN. OPTIONS (the five antibiotics, verbatim from exercises.csv 'answers'): Sulfomycin; Nitroflavin; Chlorocidin; Bromostatin; Calcihexin. CORRECT = Chlorocidin (exercises.csv correct_answer = 3, 1-based → 0-based index 2). NOTE: canonical exercise has exactly 5 options; the skill prefers ≥6 — decide at wiring whether to add a 6th plausible-antibiotic distractor or keep the five as assessed. CODE (exercise): alaska_lake_data %>% ggplot(aes(x = mg_per_L, y = lake)) + geom_point(aes(fill = element), shape = 21) — read North_Killeak_Lake's row. CLUE HOTSPOT: the five bacteria→element→antibiotic table (from the flight-recorder printout). DELIVERABLE figure (submitCodec) deferred repo-wide. DOORS: forward CLOSED (→ the escape phase, TBD) + back OPEN (→ room3/corridor). REFRAME 2026-07-22 (Lucas): the prompt no longer NAMES the lake — it gives the park (Bering Land Bridge) + the flight-log pH (8.04); the student filters to BELA and finds the lake at that pH (North_Killeak — BELA's unique & highest pH, verified single winner) before reading its elements. Adds a derive-the-lake step to escalate the boss. Still MCQ, same options + answer (Chlorocidin, idx 2), decoder key untouched; starter dropped to bare alaska_lake_data (derivation method moved to feedback.wrong[0], per the 2026-07-21 convention); the off-list Na/Mg abundance trap preserved.",
+      "entry": {
+        "title": "The lab",
+        "text": "They are right — pool the parks together and the sodium–chloride line looks perfect, but split it by park and it falls apart; up in Noatak it barely holds at all. Worth remembering. The lab doors part. The pilot, Elias, is stable but fading — a bacterial infection the doctors have narrowed to five suspects, each keyed to a different element. All anyone knows is he went down somewhere over Bering Land Bridge, and the flight recorder logged the crash-site water at pH 8.04. Work out which lake that is, find the element that runs highest there, and you name the bug.",
+        "button": "Run it →"
+      },
+      "panorama": "boss/scene.png",
+      "panoramaOpen": "boss/scene_open.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -9,
+        "pitch": -9.2
+      },
+      "hotspots": [
+        {
+          "id": "the_lab_workstation_laptop",
+          "type": "puzzle",
+          "label": "The lab workstation laptop",
+          "box": [
+            0.4065,
+            0.5461,
+            0.4601,
+            0.7363
+          ],
+          "starterCode": "alaska_lake_data",
+          "question": {
+            "prompt": "Elias was pulled from a lake in Bering Land Bridge, and the flight-data recorder logged the crash-site water at pH 8.04. His infection is one of five bacteria, each thriving where one element runs high: Sulfuromonas (S→Sulfomycin), Nitrobacterium (N→Nitroflavin), Chlorosoma (Cl→Chlorocidin), Bromoflux (Br→Bromostatin), Calcimicrobe (Ca→Calcihexin). Work out which lake he went down in, find which of those five elements runs highest there — and so which antibiotic he needs.",
+            "options": [
+              "Sulfomycin",
+              "Nitroflavin",
+              "Chlorocidin",
+              "Bromostatin",
+              "Calcihexin",
+              "Magnistatin"
+            ],
+            "correct": 2,
+            "maxAttempts": 4,
+            "feedback": {
+              "correct": "Correct — logged: chlorine runs highest in North Killeak (Cl ≈ 337 mg/L), so the bug is Chlorosoma and Elias gets Chlorocidin.",
+              "wrong": [
+                "Start from the crash site: filter the survey to the Bering Land Bridge lakes and find the one whose pH reads 8.04 — that's where he went down. Then read that lake's elements.",
+                "Only five elements are in play (each keyed to a bug: S, N, Cl, Br, Ca). Among just those five, one runs far higher than the rest in the crash lake.",
+                "Sodium and magnesium run high too, but neither is on the five-bug list — restrict yourself to the five candidates and pick the highest of those."
+              ]
+            }
+          }
+        },
+        {
+          "id": "the_flight_recorder_printout",
+          "type": "clue",
+          "label": "The flight-recorder printout",
+          "box": [
+            0.581,
+            0.6931,
+            0.6255,
+            0.7853
+          ],
+          "body": "<p>A printout clipped to the gurney — the infectious-disease worksheet:</p><pre style=\"font:12px/1.4 ui-monospace,Menlo,Consolas,monospace\">BACTERIUM        THRIVES IN     → ANTIBIOTIC\nSulfuromonas     sulfur   (S)   → Sulfomycin\nNitrobacterium   nitrogen (N)   → Nitroflavin\nChlorosoma       chlorine (Cl)  → Chlorocidin\nBromoflux        bromine  (Br)  → Bromostatin\nCalcimicrobe     calcium  (Ca)  → Calcihexin</pre><p>Name the element that runs highest in the pilot's lake, and you name the bug — and the drug. The survey is long format: one row per lake × element, with the concentration in <code>mg_per_L</code>.</p>"
+        },
+        {
+          "id": "the_door_out_to_the_break_room",
+          "type": "door",
+          "label": "The door out to the break room",
+          "box": [
+            0.7,
+            0.2775,
+            0.7634,
+            0.6853
+          ],
+          "direction": "forward",
+          "to": "escape1"
+        },
+        {
+          "id": "passage_back_to_the_corridor",
+          "type": "door",
+          "label": "Passage back to the corridor",
+          "box": [
+            0.2132,
+            0.3079,
+            0.2634,
+            0.6446
+          ],
+          "direction": "back",
+          "to": "room3"
+        }
+      ],
+      "plannedHotspots": [
+        {
+          "type": "puzzle",
+          "label": "The lab workstation laptop",
+          "note": "most abundant element in North Killeak → antibiotic (Chlorocidin)"
+        },
+        {
+          "type": "clue",
+          "label": "The flight-recorder printout",
+          "note": "bacteria → element → antibiotic table (not a pickup)"
+        },
+        {
+          "type": "door",
+          "label": "The door out to the break room",
+          "direction": "forward",
+          "note": "onward to the escape phase"
+        },
+        {
+          "type": "door",
+          "label": "Passage back to the corridor",
+          "direction": "back"
+        }
+      ],
+      "sfx": [
+        {
+          "src": "audio/boss_monitorbeep.mp3",
+          "mode": "interval",
+          "volume": 0.15
+        }
+      ],
+      "builtFrom": "gpt_boss_22.png"
+    },
+    {
+      "key": "escape1",
+      "title": "The break room",
+      "debrief": "The escape was the whole skill with the labels torn off. Faced with an unlabelled plot, you rebuilt it yourself — pivot the data, plot it, and let geom_text write the names back on — until you could find the point you needed and read the code. That is the real test of reading a chart: you can locate a thing even when nothing on the axes tells you where it is.",
+      "phase": "escape",
+      "technique": "pivot_wider + geom_text label reveal — locate a named lake on an unlabelled plot",
+      "puzzleType": 2,
+      "built": true,
+      "authoring": {
+        "tag": "escape1",
+        "scenePrompt": "This is a panorama. A 360-degree view from the centre of a bright, sunny hospital staff break room on a summer afternoon, the room wrapping continuously all the way around so the left and right edges meet seamlessly. Warm and inviting: golden late-afternoon sun pours through big windows onto a green birch canopy and blue sky, warm light across a laminate table and moulded plastic chairs. Ahead, the WAY OUT — a door with a numeric KEYPAD lock beside the handle, and pinned to the inner face of that door a part-finished magazine COLLAGE: a three-by-three grid layout board with a few postcards already tucked into its slots and the rest of the slots empty and waiting. To one side, a kitchenette and a steel fridge, and above the laminate table a large CORKBOARD covered in bright summer-trip postcards. On the table, an editor's marked-up proof pages and a couple of handwritten notes, a coffee mug and a closed laptop pushed to one side. Opposite, a bank of steel lockers and a vending machine. Behind, an OPEN doorway giving back toward the corridor. Around the room, a coat rack, a potted plant and a jar of wildflowers. Painterly, cinematic, sunny and colourful. No people, no readable text.",
+        "doorPrompt": "The keypad door ahead swings OPEN onto a sunny parking lot and warm summer evening beyond — the way out; the collage board on the door, the corkboard of postcards, the editor's notes on the table and the open passage back toward the corridor are unchanged. Same warm daylight, painterly and colourful, no people, no lettering, no text."
+      },
+      "unlockedWhen": {
+        "solved": "boss"
+      },
+      "entry": {
+        "title": "One more thing",
+        "text": "The break room at last — and there they are, looking up from a table buried in postcards. “You made it! I'm nearly done — laying out readers' summer postcards for the tourism magazine — but the way out's on a keypad and I've completely blanked on the code. I started the arrangement on the back of the door; help me finish it and dinner's on me.” Postcards everywhere, two editor's notes on the table, and a keypad by the door.",
+        "button": "Help with the collage →"
+      },
+      "designNote": "BREAK ROOM — v3 facet-collage escape (WIRED 2026-07-21). Ungraded, out of the codec. Keypad lock answer 729 = the middle row of the 9 summer-trip postcards faceted rows=season × cols=remoteness (two editorial-note clues pin the pairing; length is the decoy). Postcards are opaque pickup clues → the notebook collage board (boardCols 3); the started-collage clue is the non-pickup format key; the way-out door is gated on the keypad and fires escapeDone. Full record: notes.md → 'Escape redesign v3' + 'Phase 4 wiring — DONE'; verifier escape2_facets.py. (The v1 click-the-map deduction this note used to describe is retired; map assets archived to escape1/z_archive/.)",
+      "plannedHotspots": [
+        {
+          "type": "lock",
+          "label": "The keypad on the door",
+          "note": "escape solve; answer 729 (the July row of the collage). No instructions."
+        },
+        {
+          "type": "clue",
+          "label": "The started collage on the door",
+          "note": "non-pickup; image postcards/collage_door.png — 3×3, middle row = code. FORMAT key."
+        },
+        {
+          "type": "clue",
+          "label": "Editor's note A",
+          "pickup": true,
+          "note": "escape: pins ROWS = season, Jun→Aug top→bottom (July across the middle)"
+        },
+        {
+          "type": "clue",
+          "label": "Editor's note B",
+          "pickup": true,
+          "note": "escape: pins COLS = remoteness L→R; rules out trip length"
+        },
+        {
+          "type": "clue",
+          "label": "Trip postcard #8",
+          "pickup": true,
+          "note": "escape faceting card (opaque); on the corkboard"
+        },
+        {
+          "type": "clue",
+          "label": "Trip postcard #9",
+          "pickup": true,
+          "note": "escape faceting card (opaque); on the corkboard"
+        },
+        {
+          "type": "door",
+          "label": "The way out",
+          "direction": "forward",
+          "note": "gated on the keypad (requires the lock) → escape finish"
+        },
+        {
+          "type": "door",
+          "label": "Passage back to the corridor",
+          "direction": "back"
+        }
+      ],
+      "panorama": "escape1/scene.png",
+      "panoramaOpen": "escape1/scene_open.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -9,
+        "pitch": -5.9
+      },
+      "hotspots": [
+        {
+          "id": "the_keypad_on_the_door",
+          "type": "lock",
+          "label": "The keypad on the door",
+          "box": [
+            0.4641,
+            0.4284,
+            0.4797,
+            0.5049
+          ],
+          "answer": "729",
+          "length": 3,
+          "feedback": {
+            "correct": "The keypad blinks green and the bolt slides back.",
+            "wrong": "The keypad flashes red. The door doesn't budge.",
+            "out": "The keypad goes quiet. Take another look at how the collage should sit."
+          }
+        },
+        {
+          "id": "the_started_collage_on_the_door",
+          "type": "clue",
+          "label": "The started collage on the door",
+          "box": [
+            0.4771,
+            0.2912,
+            0.5444,
+            0.5363
+          ],
+          "body": "<p>Taped to the inside of the door, a half-started magazine layout: an empty <b>3×3 grid</b> with the <b>middle row</b> glowing. In the crush's hand beside it: “I've started the layout here — help me fill it in? <b>The three across the middle are the ones I need</b> — read left to right, that's the code for the door.”</p>",
+          "image": "postcards/collage_door.png"
+        },
+        {
+          "id": "editor_s_note_a",
+          "type": "clue",
+          "label": "Editor's note A",
+          "box": [
+            0.4653,
+            0.7653,
+            0.5267,
+            0.8307
+          ],
+          "body": "“Love the pile of postcards! For the spread, take the reader through the season — run them from the first of summer at the top down to the tail end at the bottom, so the height of summer sits right across the middle of the page. That July band is the heart of the piece.”",
+          "pickup": "Editor's note A: order the rows top→bottom by season (June→July→August), so the July band sits across the middle."
+        },
+        {
+          "id": "trip_postcard_8",
+          "type": "clue",
+          "label": "Trip postcard #8",
+          "box": [
+            0.165,
+            0.1733,
+            0.1993,
+            0.2386
+          ],
+          "body": "Ivy's card — a quick August berry-hike, an hour up and back before supper, leaves just turning. Add it to the collage.",
+          "pickup": "Postcard #8 — August · short hike · a day · digit 6",
+          "image": "postcards/postcard_8.png"
+        },
+        {
+          "id": "trip_postcard_9",
+          "type": "clue",
+          "label": "Trip postcard #9",
+          "box": [
+            0.2158,
+            0.3713,
+            0.2442,
+            0.4465
+          ],
+          "body": "Wes's card — a packrafted August long-weekend, termination dust on the peaks, nights properly dark again. The last of the set.",
+          "pickup": "Postcard #9 — August · backcountry · a weekend · digit 4",
+          "image": "postcards/postcard_9.png"
+        },
+        {
+          "id": "editor_s_note_b",
+          "type": "clue",
+          "label": "Editor's note B",
+          "box": [
+            0.3314,
+            0.7832,
+            0.365,
+            0.8248
+          ],
+          "body": "“And read them left to right by how far you've got to go to get there: the easy roadside stops on the left, the deep backcountry on the right. I don't care how <i>long</i> anyone stayed — that's not the story. It's <b>when</b>, and <b>how far out</b>.”",
+          "pickup": "Editor's note B: order the columns left→right by remoteness (roadside→backcountry); trip length doesn't matter."
+        },
+        {
+          "id": "the_way_out",
+          "type": "door",
+          "label": "The way out",
+          "box": [
+            0.464,
+            0.2188,
+            0.5551,
+            0.7495
+          ],
+          "direction": "forward",
+          "requires": "the_keypad_on_the_door"
+        },
+        {
+          "id": "passage_back_to_the_corridor",
+          "type": "door",
+          "label": "Passage back to the corridor",
+          "box": [
+            0.7168,
+            0.2545,
+            0.765,
+            0.7376
+          ],
+          "direction": "back",
+          "to": "room3"
+        }
+      ],
+      "sfx": [
+        {
+          "src": "audio/escape1_drinksmachine.mp3",
+          "mode": "loop",
+          "volume": 0.3
+        }
+      ],
+      "builtFrom": "gpt_escape1_10.png"
+    }
+  ],
+  "escape": {
+    "enterLabel": "You never did figure out that lake…"
+  },
+  "escapeDone": {
+    "title": "Dinner, at last",
+    "body": "Season down the page, roadside to backcountry across — the three postcards along the middle read 7, 2, 9, and the keypad blinks green. Your crush sweeps the pile into a folder, grabs their coat, and holds the door. The pilot's stable, the infection's named, and the magazine spread can wait till Monday. You made every read of the way — now go enjoy dinner."
+  },
+  "cover": "cover.png",
+  "music": "audio/milk_tea.mp3",
+  "musicVolume": 0.1,
+  "musicCredit": {
+    "text": "Vinyl Jazz Hiphop | TOKYO (Nujabes / MF Doom / Madlib / J Dilla)",
+    "url": "https://www.youtube.com/watch?v=9tLs-vq0yCw"
+  },
+  "boardCols": 3,
+  "debrief": {
+    "title": "How this world worked",
+    "intro": "One dataset, read four different ways — pivoted, plotted, heat-mapped, and faceted — until the numbers named an infection and, in time, saved a life. Here is how each room taught a different way of looking, and how the escape was the same skill with every label stripped away."
+  }
+}

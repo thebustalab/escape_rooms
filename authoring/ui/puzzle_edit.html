@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Puzzle editor</title>
+  <style>
+    :root { --bg:#06111a; --panel:#0b1b28; --line:rgba(255,255,255,.14); --amber:#ffd88c; --ink:#e8eef2; }
+    * { box-sizing:border-box; }
+    html, body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.5 system-ui, sans-serif; }
+    header { padding:10px 16px; border-bottom:1px solid var(--line); display:flex; align-items:center; gap:12px; position:sticky; top:0; background:var(--bg); z-index:5; }
+    header h1 { font-size:15px; margin:0; } header h1 span { color:var(--amber); }
+    button { background:var(--amber); color:#10202a; border:0; border-radius:8px; padding:7px 13px; font:inherit; font-weight:600; cursor:pointer; }
+    /* a button running a background job (Generate) — the same "working" blue the main harness uses */
+    button.busy { background:#274a63; color:#bfe0f5; cursor:default; }
+    #status { font-size:12px; opacity:.85; } .err { color:#ff9b9b; } .ok2 { color:#9fe6b5; }
+    main { padding:16px; max-width:900px; margin:0 auto; }
+    .puz { background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:14px 16px; margin-bottom:16px; }
+    .puz h2 { font-size:14px; margin:0 0 4px; } .puz h2 span { color:var(--amber); }
+    .lbl { font-size:11px; opacity:.75; margin:10px 0 3px; text-transform:uppercase; letter-spacing:.03em; }
+    .hr { display:flex; gap:8px; align-items:center; margin-top:8px; }
+    .hr label { font-size:12px; opacity:.75; width:72px; flex:none; margin:0; }
+    /* width:100% so block-level fields (prompt/expr/options/starter/feedback) span; the flex:1 +
+       min-width:0 keeps the .hr label-rows sharing correctly, and inline max-width caps the number inputs */
+    input[type=text], input[type=number], select, textarea { flex:1; min-width:0; width:100%; background:#0a1620; color:inherit; border:1px solid var(--line); border-radius:6px; padding:5px 7px; font:inherit; }
+    textarea { resize:vertical; } textarea.mono { font:12px/1.45 ui-monospace, Menlo, Consolas, monospace; }
+    .fb { border-left:2px solid var(--line); padding-left:12px; margin-top:10px; }
+    .hint { font-size:12px; opacity:.65; }
+    .none { opacity:.7; padding:20px; text-align:center; }
+    /* ALL-ROOMS mode: one section per room with a sticky room heading so cross-room content lines up */
+    .roomgroup { margin-bottom:26px; }
+    .roomh { font-size:15px; color:var(--amber); border-bottom:1px solid var(--line); padding-bottom:6px; margin:0 0 12px; position:sticky; top:44px; background:var(--bg); z-index:4; }
+    /* all-rooms grid: rooms laid out horizontally (~4 across, wraps), each a column of its cards */
+    body.all main { max-width:none; }
+    body.all #list { display:grid; grid-template-columns:repeat(auto-fill, minmax(340px, 1fr)); gap:16px 18px; align-items:start; }
+    body.all .roomgroup { margin-bottom:0; min-width:0; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Puzzles &amp; clues · <span id="roomName"></span></h1>
+    <button id="save">Save and close</button>
+    <span id="status"></span>
+    <span class="hint" style="margin-left:auto">edit each puzzle &amp; clue · mark boxes in “Edit hotspots”</span>
+  </header>
+  <main id="list"></main>
+
+  <script src="puzzle_cards.js"></script>
+  <script>
+    const $ = s => document.querySelector(s);
+    const _p = new URLSearchParams(location.search);
+    const ROOM_KEY = _p.get("room");
+    const DRAFT_IMG = _p.get("img");                                 // draft mode (else committed node)
+    const CH = _p.get("chapter"), SC = _p.get("scenario");
+    const SCQ = (CH && SC) ? ("chapter=" + encodeURIComponent(CH) + "&scenario=" + encodeURIComponent(SC)) : "";
+    const getJSON = async p => { try { return await (await fetch(p + (p.includes("?") ? "&" : "?") + "t=" + Date.now())).json(); } catch (e) { return null; } };
+    const postJSON = async (p, b) => (await fetch(p, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(b) })).json();
+    const esc = s => String(s == null ? "" : s).replace(/[<>&"]/g, c => ({ "<":"&lt;", ">":"&gt;", "&":"&amp;", '"':"&quot;" }[c]));
+    const PC = EscapePuzzleCards.make({ esc, getJSON, postJSON, chapter: CH, scenario: SC });
+    // MUST mirror hotspots_edit.html's slug + harness_server._slug — the (type,slug) key that links a
+    // planned hotspot to the box it becomes, so pre-art content attaches at commit.
+    const slug = s => (String(s || "")).toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "") || "obj";
+
+
+    let SPOTS = [];   // single-room mode: full hotspots (draft ?? node); we edit content in place
+    // ALL-ROOMS mode (opened with no ?room=): edit EVERY built room's puzzles/clues/locks at once, so
+    // they can be made to correspond. ROOMS_ALL = [{key,title,spots:[...]}]; "Save all" patches each room.
+    let ALL_MODE = false, ROOMS_ALL = [];
+
+    async function init() {
+      const doc = await getJSON("/api/scenario" + (SCQ ? "?" + SCQ : ""));
+      if (!doc) { $("#status").innerHTML = `<span class="err">could not load the scenario</span>`; return; }
+      if (ROOM_KEY) {                                   // single-room mode (supports the draft flow)
+        const node = (doc.rooms || []).find(r => r.key === ROOM_KEY);
+        const draft = DRAFT_IMG ? await getJSON("/api/draft?roomKey=" + encodeURIComponent(ROOM_KEY) + (SCQ ? "&" + SCQ : "")) : null;
+        SPOTS = ((draft && draft.hotspots) || (node && node.hotspots) || []).map(h => JSON.parse(JSON.stringify(h)));
+        $("#roomName").textContent = ROOM_KEY + (DRAFT_IMG ? " (draft)" : "");
+      } else {                                          // ALL-ROOMS mode: every room with content to author
+        ALL_MODE = true;
+        document.body.classList.add("all");             // switches #list to the horizontal room grid
+        // A BUILT room (placed hotspots) is edited on its hotspots, as before. A room with only
+        // plannedHotspots (no art yet) is edited PRE-ART on those planned entries — content authored
+        // here attaches to the box when it is placed at commit (server _attach_planned_content). Each
+        // planned entry carries a stable id = slug(label) for the cards' headings + clue-image slots.
+        ROOMS_ALL = (doc.rooms || []).map(r => {
+          const hs = r.hotspots || [];
+          if (hs.length) return { key: r.key, title: r.title || "", target: "hotspots", planned: false,
+                                  spots: hs.map(h => JSON.parse(JSON.stringify(h))) };
+          const ph = r.plannedHotspots || [];
+          if (ph.length) return { key: r.key, title: r.title || "", target: "plannedHotspots", planned: true,
+                                  spots: ph.map(h => { const s = JSON.parse(JSON.stringify(h)); s.id = s.id || slug(s.label); return s; }) };
+          return null;                                   // nothing to author for this room yet
+        }).filter(Boolean);
+        $("#roomName").textContent = "all rooms";
+        $("#save").textContent = "Save all";
+      }
+      render();
+    }
+
+
+    function render() {
+      const host = $("#list"); host.innerHTML = "";
+      if (ALL_MODE) {
+        if (!ROOMS_ALL.length) { host.innerHTML = `<div class="none">No built rooms yet.</div>`; return; }
+        ROOMS_ALL.forEach(r => {                        // one section per room, all editable at once
+          const sec = document.createElement("section"); sec.className = "roomgroup";
+          sec.innerHTML = `<h2 class="roomh">${esc(r.key)} <span class="hint" style="text-transform:none;font-weight:400">· ${esc(r.title || "")}${r.planned ? ' · <span style="color:#7fd1ff">planned — pre-art</span>' : ""}</span></h2>`;
+          const inner = document.createElement("div");
+          PC.roomCardsInto(inner, r.spots, r.key);
+          sec.appendChild(inner);
+          host.appendChild(sec);
+        });
+      } else {
+        PC.roomCardsInto(host, SPOTS, ROOM_KEY);
+      }
+    }
+
+    const cleanHotspots = spots => spots.map(s => Object.fromEntries(Object.entries(s).filter(([k]) => !k.startsWith("_"))));
+    $("#save").onclick = async () => {
+      if (ALL_MODE) {                                   // patch every room; stay open so editing continues
+        $("#status").innerHTML = `<span class="hint">saving…</span>`;
+        for (const r of ROOMS_ALL) {                    // built rooms → hotspots; pre-art rooms → plannedHotspots
+          const fields = {}; fields[r.target || "hotspots"] = cleanHotspots(r.spots);
+          const res = await postJSON("/api/room-patch", { chapter: CH, scenario: SC, roomKey: r.key, fields });
+          if (!res.ok) { $("#status").innerHTML = `<span class="err">save failed on ${esc(r.key)}: ${res.error || ""}</span>`; return; }
+        }
+        $("#status").innerHTML = `<span class="ok2">all rooms saved ✓</span>`;
+        return;
+      }
+      const hotspots = cleanHotspots(SPOTS);
+      const r = DRAFT_IMG
+        ? await postJSON("/api/draft-save", { chapter: CH, scenario: SC, roomKey: ROOM_KEY, image: DRAFT_IMG, hotspots })
+        : await postJSON("/api/room-patch", { chapter: CH, scenario: SC, roomKey: ROOM_KEY, fields: { hotspots } });
+      if (r.ok) { $("#status").innerHTML = `<span class="ok2">saved · closing…</span>`; setTimeout(() => window.close(), 400); }
+      else $("#status").innerHTML = `<span class="err">${r.error || "save failed"}</span>`;
+    };
+
+    init();
+  </script>
+</body>
+</html>

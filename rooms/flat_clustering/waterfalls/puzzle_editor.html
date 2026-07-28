@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Waterfalls — puzzle editor</title>
+<style>
+  :root { --ink:#233; --line:#b9c4cc; --riv:#2e6fb0; --cut:#c0392b; }
+  * { box-sizing: border-box; }
+  body { margin:0; font:14px/1.4 system-ui, sans-serif; color:var(--ink); background:#f4f6f8; }
+  header { padding:10px 14px; background:#1f2d3a; color:#eaf0f5; }
+  header b { font-size:16px; } header span { opacity:.75; font-size:12px; }
+  .wrap { display:flex; flex-wrap:wrap; gap:14px; padding:14px; align-items:flex-start; }
+  .panel { background:#fff; border:1px solid var(--line); border-radius:10px; padding:12px; }
+  svg { touch-action:none; background:#fbfdff; border-radius:8px; }
+  .platform { fill:#fff; stroke:#5a6b78; stroke-width:2; }
+  .bridge { stroke:var(--line); stroke-width:6; stroke-linecap:round; cursor:pointer; }
+  .bridge.cut { stroke:var(--cut); stroke-dasharray:2 7; }
+  .bridge-absent { stroke:#dde5eb; stroke-width:2; stroke-dasharray:1 9; }
+  .bridge-hit { stroke:transparent; stroke-width:20; cursor:pointer; }
+  .river { fill:none; stroke:var(--riv); stroke-width:3.5; opacity:.85; stroke-linejoin:round; }
+  .marker-sw { fill:#f4d03f; stroke:#7d6608; stroke-width:2; }
+  .marker-dv { fill:#58d68d; stroke:#1e7d47; stroke-width:2; }
+  .marker-off { opacity:.45; }
+  .mlabel { font:bold 11px system-ui; fill:#222; pointer-events:none; }
+  button, select, input { font:13px system-ui; padding:6px 9px; border:1px solid var(--line);
+      border-radius:7px; background:#fff; cursor:pointer; }
+  button.on { background:#1f6feb; color:#fff; border-color:#1f6feb; }
+  .row { display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin:6px 0; }
+  .col { width:290px; }
+  h4 { margin:10px 0 4px; font-size:13px; text-transform:uppercase; letter-spacing:.4px; color:#556; }
+  textarea { width:100%; height:150px; font:11px ui-monospace, monospace; border:1px solid var(--line);
+      border-radius:7px; padding:8px; resize:vertical; }
+  .hint { font-size:12px; color:#667; }
+  .pill { padding:2px 7px; border-radius:10px; background:#eef2f6; font-size:12px; }
+  ul.mlist { list-style:none; padding:0; margin:4px 0; max-height:120px; overflow:auto; }
+  ul.mlist li { display:flex; gap:6px; align-items:center; padding:2px 0; }
+</style>
+</head>
+<body>
+<header>
+  <b>Waterfalls — puzzle editor</b>
+  &nbsp; <span>rivers cut bridges · platforms are always standable · describe your paper design, then send me the JSON</span>
+</header>
+
+<div class="wrap">
+  <!-- CANVAS -->
+  <div class="panel"><svg id="board"></svg>
+    <div class="hint" style="margin-top:6px">
+      <b>Modes:</b> pick one, then tap the board. &nbsp;
+      <span class="pill">bridge on/off</span> tap an edge to add/remove the bridge itself (faint dotted = no bridge) ·
+      <span class="pill" style="color:var(--cut)">cut bridge</span> tap a bridge to toggle a river across it ·
+      <span class="pill" style="color:#7d6608">switch</span>/<span class="pill" style="color:#1e7d47">diverter</span> tap to drop one ·
+      <span class="pill">toggle</span> tap a switch to flip it in this state ·
+      <span class="pill" style="color:var(--riv)">river</span> tap points to trace a stream, then Finish ·
+      <span class="pill">erase</span> tap a marker / river / bridge to remove.
+    </div>
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="panel col">
+    <h4>Grid</h4>
+    <div class="row">
+      rows <input id="rows" type="number" min="2" max="9" value="4" style="width:56px">
+      cols <input id="cols" type="number" min="2" max="9" value="3" style="width:56px">
+      <button id="applyGrid">apply</button>
+    </div>
+
+    <h4>Mode</h4>
+    <div class="row" id="modes">
+      <button data-mode="bridgeexist">bridge on/off</button>
+      <button data-mode="bridge" class="on">cut bridge</button>
+      <button data-mode="switch">switch</button>
+      <button data-mode="diverter">diverter</button>
+      <button data-mode="toggle">toggle switch</button>
+      <button data-mode="river">river</button>
+      <button data-mode="erase">erase</button>
+      <button id="finishRiver">finish river</button>
+    </div>
+
+    <h4>States <span class="hint">(a state = one switch configuration + its river/bridge picture)</span></h4>
+    <div class="row">
+      <select id="stateSel"></select>
+      <button id="newState">+ new</button>
+      <button id="dupState">duplicate</button>
+      <button id="renState">rename</button>
+      <button id="delState">delete</button>
+    </div>
+    <div class="row hint" id="swSummary"></div>
+    <div class="row">notes <input id="stateNotes" type="text" placeholder="e.g. after throwing S1" style="flex:1"></div>
+
+    <h4>Markers in this design</h4>
+    <ul class="mlist" id="mlist"></ul>
+
+    <h4>JSON — copy this and send it to me</h4>
+    <textarea id="jsonOut" readonly></textarea>
+    <div class="row">
+      <button id="copyJson">copy</button>
+      <button id="dlJson">download</button>
+    </div>
+    <h4>Load / paste JSON</h4>
+    <textarea id="jsonIn" placeholder="paste a JSON design here to edit it"></textarea>
+    <div class="row"><button id="loadJson">load</button></div>
+  </div>
+</div>
+
+<script>
+const CELL = 118, MARG = 74, R_PLAT = 15;
+let model, mode = "bridge", curRiver = null;
+
+function blank() {
+  return { rows:4, cols:3, markers:[], absent:[], nextId:{switch:1,diverter:1},
+           states:[{name:"start", switches:{}, cut:[], rivers:[], notes:""}], cur:0 };
+}
+function px(r,c){ return { x: MARG + c*CELL, y: MARG + r*CELL }; }
+function state(){ return model.states[model.cur]; }
+function bid(kind,r,c){ return `${kind}-${r}-${c}`; }
+function present(id){ return !model.absent.includes(id); }
+
+// ---- bridges present in the grid ----
+function bridges(){
+  const out=[];
+  for(let r=0;r<model.rows;r++) for(let c=0;c<model.cols;c++){
+    if(c<model.cols-1) out.push({id:bid("H",r,c), a:[r,c], b:[r,c+1]});
+    if(r<model.rows-1) out.push({id:bid("V",r,c), a:[r,c], b:[r+1,c]});
+  }
+  return out;
+}
+
+// ---------------------------------------------------------------- render ---
+function render(){
+  const W = MARG*2 + (model.cols-1)*CELL, H = MARG*2 + (model.rows-1)*CELL;
+  const svg = document.getElementById("board");
+  svg.setAttribute("width", W); svg.setAttribute("height", H);
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  const st = state();
+  let s = "";
+
+  // bridges: absent (faint dotted) | present-open (grey) | present-cut (red dashed)
+  for(const br of bridges()){
+    const A=px(...br.a), B=px(...br.b);
+    if(!present(br.id)){
+      s += `<line class="bridge-absent" x1="${A.x}" y1="${A.y}" x2="${B.x}" y2="${B.y}"/>`;
+    } else {
+      const cut = st.cut.includes(br.id);
+      s += `<line class="bridge${cut?' cut':''}" x1="${A.x}" y1="${A.y}" x2="${B.x}" y2="${B.y}"/>`;
+    }
+    s += `<line class="bridge-hit" data-br="${br.id}" x1="${A.x}" y1="${A.y}" x2="${B.x}" y2="${B.y}"/>`;
+  }
+  // rivers (per state)
+  st.rivers.forEach((riv,i)=>{
+    const pts = riv.points.map(p=>`${p.x},${p.y}`).join(" ");
+    s += `<polyline class="river" points="${pts}" style="stroke:${riv.color||'#2e6fb0'}"/>`;
+    riv.points.forEach(p=> s += `<circle cx="${p.x}" cy="${p.y}" r="2.5" fill="${riv.color||'#2e6fb0'}"/>`);
+  });
+  // platforms
+  for(let r=0;r<model.rows;r++) for(let c=0;c<model.cols;c++){
+    const P=px(r,c);
+    s += `<circle class="platform" cx="${P.x}" cy="${P.y}" r="${R_PLAT}"/>`;
+    s += `<text class="mlabel" x="${P.x}" y="${P.y-20}" text-anchor="middle" fill="#9aa">${r},${c}</text>`;
+  }
+  // markers
+  for(const m of model.markers){
+    const on = st.switches[m.id] !== false; // default on/true; irrelevant for diverters
+    const off = m.kind==="switch" && st.switches[m.id]===false;
+    if(m.kind==="switch")
+      s += `<rect class="marker-sw${off?' marker-off':''}" data-m="${m.id}" x="${m.x-12}" y="${m.y-12}" width="24" height="24" rx="4"/>`;
+    else
+      s += `<polygon class="marker-dv" data-m="${m.id}" points="${m.x},${m.y-14} ${m.x+13},${m.y+10} ${m.x-13},${m.y+10}"/>`;
+    s += `<text class="mlabel" x="${m.x}" y="${m.y+4}" text-anchor="middle">${m.label}</text>`;
+  }
+  svg.innerHTML = s;
+  document.getElementById("swSummary").innerHTML =
+    "switches here: " + (model.markers.filter(m=>m.kind==="switch").map(m=>
+      `<span class="pill">${m.label}:${st.switches[m.id]===false?"off":"on"}</span>`).join(" ") || "<span class='hint'>none yet</span>");
+  refreshStates(); refreshMlist(); emit();
+}
+
+// --------------------------------------------------------------- picking ---
+function svgXY(evt){
+  const svg=document.getElementById("board"), r=svg.getBoundingClientRect();
+  const t = evt.touches ? evt.touches[0] : evt;
+  return { x:(t.clientX-r.left)*(svg.viewBox.baseVal.width/r.width),
+           y:(t.clientY-r.top)*(svg.viewBox.baseVal.height/r.height) };
+}
+function nearestBridge(p){
+  let best=null,bd=1e9;
+  for(const br of bridges()){
+    const A=px(...br.a),B=px(...br.b);
+    const d=distSeg(p,A,B); if(d<bd){bd=d;best=br;}
+  }
+  return bd<22?best:null;
+}
+function distSeg(p,a,b){
+  const dx=b.x-a.x,dy=b.y-a.y,L=dx*dx+dy*dy;
+  let t=L?((p.x-a.x)*dx+(p.y-a.y)*dy)/L:0; t=Math.max(0,Math.min(1,t));
+  return Math.hypot(p.x-(a.x+t*dx), p.y-(a.y+t*dy));
+}
+function nearestMarker(p){
+  let best=null,bd=1e9;
+  for(const m of model.markers){ const d=Math.hypot(p.x-m.x,p.y-m.y); if(d<bd){bd=d;best=m;} }
+  return bd<20?best:null;
+}
+
+// ---------------------------------------------------------------- actions ---
+function onBoard(evt){
+  evt.preventDefault();
+  const p = svgXY(evt), st = state();
+  if(mode==="bridgeexist"){
+    const br=nearestBridge(p); if(!br) return;
+    const i=model.absent.indexOf(br.id);
+    if(i>=0){ model.absent.splice(i,1); }                 // add a bridge back
+    else { model.absent.push(br.id);                      // remove the bridge entirely
+           model.states.forEach(s=>{ const j=s.cut.indexOf(br.id); if(j>=0) s.cut.splice(j,1); }); }
+  } else if(mode==="bridge"){
+    const br=nearestBridge(p); if(!br || !present(br.id)) return;   // can't cut a bridge that isn't there
+    const i=st.cut.indexOf(br.id); i>=0?st.cut.splice(i,1):st.cut.push(br.id);
+  } else if(mode==="switch" || mode==="diverter"){
+    const kind = mode; const id = kind[0].toUpperCase()+model.nextId[kind]++;
+    model.markers.push({id, kind, x:Math.round(p.x), y:Math.round(p.y), label:id});
+    if(kind==="switch") model.states.forEach(s=> s.switches[id]=false); // starts off
+  } else if(mode==="toggle"){
+    const m=nearestMarker(p); if(m&&m.kind==="switch") st.switches[m.id] = st.switches[m.id]===false;
+  } else if(mode==="river"){
+    if(!curRiver){ curRiver={color:pickColor(st.rivers.length), points:[]}; st.rivers.push(curRiver); }
+    curRiver.points.push({x:Math.round(p.x),y:Math.round(p.y)});
+  } else if(mode==="erase"){
+    const m=nearestMarker(p);
+    if(m){ model.markers=model.markers.filter(x=>x!==m); model.states.forEach(s=>delete s.switches[m.id]); render(); return; }
+    const br=nearestBridge(p); if(br){ const i=st.cut.indexOf(br.id); if(i>=0){st.cut.splice(i,1);render();return;} }
+    // else remove nearest river
+    let bi=-1,bd=1e9;
+    st.rivers.forEach((riv,idx)=> riv.points.forEach(pt=>{const d=Math.hypot(p.x-pt.x,p.y-pt.y); if(d<bd){bd=d;bi=idx;}}));
+    if(bi>=0 && bd<20) st.rivers.splice(bi,1);
+  }
+  render();
+}
+function pickColor(i){ return ["#2e6fb0","#e67e22","#27ae60","#8e44ad","#16a085","#c0392b"][i%6]; }
+
+// ---------------------------------------------------------------- states ---
+function refreshStates(){
+  const sel=document.getElementById("stateSel");
+  sel.innerHTML = model.states.map((s,i)=>`<option value="${i}"${i===model.cur?' selected':''}>${s.name}</option>`).join("");
+  document.getElementById("stateNotes").value = state().notes||"";
+}
+function refreshMlist(){
+  document.getElementById("mlist").innerHTML = model.markers.map(m=>
+    `<li><span class="pill" style="background:${m.kind==='switch'?'#fcf3cf':'#d5f5e3'}">${m.kind}</span>
+     <input value="${m.label}" data-rel="${m.id}" style="width:70px"></li>`).join("") || "<li class='hint'>none yet</li>";
+  document.querySelectorAll('#mlist input').forEach(inp=>inp.onchange=()=>{
+    const m=model.markers.find(x=>x.id===inp.dataset.rel); if(m){m.label=inp.value; render();}
+  });
+}
+
+// ----------------------------------------------------------------- io ---
+function emit(){
+  const out={ grid:{rows:model.rows,cols:model.cols}, absentBridges: model.absent,
+    markers: model.markers.map(({id,kind,x,y,label})=>({id,kind,x,y,label})),
+    states: model.states.map(s=>({name:s.name, switches:s.switches,
+        cutBridges:s.cut, rivers:s.rivers, notes:s.notes||""})) };
+  document.getElementById("jsonOut").value = JSON.stringify(out,null,2);
+}
+
+// ----------------------------------------------------------------- wire ---
+function setMode(m){ mode=m; curRiver=null;
+  document.querySelectorAll('#modes button[data-mode]').forEach(b=>b.classList.toggle('on', b.dataset.mode===m)); }
+window.addEventListener("DOMContentLoaded",()=>{
+  model = blank();
+  const svg=document.getElementById("board");
+  svg.addEventListener("click", onBoard);
+  document.querySelectorAll('#modes button[data-mode]').forEach(b=> b.onclick=()=>setMode(b.dataset.mode));
+  document.getElementById("finishRiver").onclick=()=>{curRiver=null;};
+  document.getElementById("applyGrid").onclick=()=>{
+    model.rows=+document.getElementById("rows").value; model.cols=+document.getElementById("cols").value;
+    // drop cuts/markers outside new grid
+    const ok=new Set(bridges().map(b=>b.id));
+    model.states.forEach(s=> s.cut=s.cut.filter(id=>ok.has(id)));
+    model.absent=model.absent.filter(id=>ok.has(id));
+    render();
+  };
+  document.getElementById("stateSel").onchange=e=>{model.cur=+e.target.value; curRiver=null; render();};
+  document.getElementById("newState").onclick=()=>{ model.states.push({name:"state "+(model.states.length+1),
+     switches:Object.fromEntries(model.markers.filter(m=>m.kind==='switch').map(m=>[m.id,false])), cut:[], rivers:[], notes:""});
+     model.cur=model.states.length-1; render(); };
+  document.getElementById("dupState").onclick=()=>{ const s=state();
+     model.states.splice(model.cur+1,0,JSON.parse(JSON.stringify({...s,name:s.name+" copy"}))); model.cur++; render(); };
+  document.getElementById("renState").onclick=()=>{ const n=prompt("state name", state().name); if(n){state().name=n; render();} };
+  document.getElementById("delState").onclick=()=>{ if(model.states.length<2)return;
+     model.states.splice(model.cur,1); model.cur=Math.max(0,model.cur-1); render(); };
+  document.getElementById("stateNotes").oninput=e=>{ state().notes=e.target.value; emit(); };
+  document.getElementById("copyJson").onclick=()=>{ navigator.clipboard.writeText(document.getElementById("jsonOut").value); };
+  document.getElementById("dlJson").onclick=()=>{ const b=new Blob([document.getElementById("jsonOut").value],{type:"application/json"});
+     const a=document.createElement("a"); a.href=URL.createObjectURL(b); a.download="waterfalls_puzzle.json"; a.click(); };
+  document.getElementById("loadJson").onclick=()=>{ try{
+     const j=JSON.parse(document.getElementById("jsonIn").value);
+     model={ rows:j.grid.rows, cols:j.grid.cols, markers:j.markers||[], absent:j.absentBridges||[],
+       nextId:{switch:1+Math.max(0,...(j.markers||[]).filter(m=>m.kind==='switch').map(m=>+m.id.slice(1)||0)),
+               diverter:1+Math.max(0,...(j.markers||[]).filter(m=>m.kind==='diverter').map(m=>+m.id.slice(1)||0))},
+       states:j.states.map(s=>({name:s.name,switches:s.switches||{},cut:s.cutBridges||[],rivers:s.rivers||[],notes:s.notes||""})),
+       cur:0 };
+     render();
+   }catch(e){ alert("Could not parse JSON: "+e.message); } };
+  render();
+});
+</script>
+</body>
+</html>

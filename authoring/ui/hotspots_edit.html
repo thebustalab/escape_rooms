@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hotspots editor</title>
+  <style>
+    :root { --bg:#06111a; --panel:#0b1b28; --line:rgba(255,255,255,.14); --amber:#ffd88c; --ink:#e8eef2; }
+    * { box-sizing:border-box; }
+    html, body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.5 system-ui, sans-serif; }
+    header { padding:10px 16px; border-bottom:1px solid var(--line); display:flex; align-items:center; gap:12px; position:sticky; top:0; background:var(--bg); z-index:5; }
+    header h1 { font-size:15px; margin:0; } header h1 span { color:var(--amber); }
+    button { background:var(--amber); color:#10202a; border:0; border-radius:8px; padding:7px 13px; font:inherit; font-weight:600; cursor:pointer; }
+    button.ghost { background:transparent; color:var(--ink); border:1px solid var(--line); font-weight:400; }
+    #status { font-size:12px; opacity:.85; } .err { color:#ff9b9b; } .ok2 { color:#9fe6b5; }
+    main { display:grid; grid-template-columns:1fr 320px; gap:16px; padding:16px; align-items:start; }
+    .hstage { background:#02080d; border:1px solid var(--line); border-radius:8px; padding:10px; display:flex; justify-content:center; position:sticky; top:56px; }
+    .hframe { position:relative; line-height:0; cursor:crosshair; user-select:none; max-width:100%; }
+    .hframe img { display:block; max-width:100%; }
+    .hbox { position:absolute; border:2px solid var(--amber); background:rgba(255,216,140,.14); box-shadow:0 0 0 1px rgba(0,0,0,.5); }
+    .hbox.sel { border-color:#7fd1ff; background:rgba(127,209,255,.18); }
+    .hbox .htag { position:absolute; top:-18px; left:-2px; background:var(--amber); color:#10202a; font-size:11px; font-weight:700; padding:0 5px; border-radius:4px 4px 0 0; white-space:nowrap; line-height:16px; }
+    .hitem { border:1px solid var(--line); border-radius:8px; padding:8px; margin-top:8px; background:var(--panel); }
+    .hitem.sel { border-color:#7fd1ff; }
+    .hitem .htop { display:flex; justify-content:space-between; align-items:center; }
+    .hitem .htop b { color:var(--amber); font-size:12px; }
+    .hr { display:flex; gap:6px; align-items:center; margin-top:6px; }
+    .hr label { font-size:11px; opacity:.7; width:64px; margin:0; flex:none; }
+    input[type=text], input[type=number], select, textarea { flex:1; min-width:0; background:#0a1620; color:inherit; border:1px solid var(--line); border-radius:6px; padding:4px 6px; font:inherit; }
+    textarea { resize:vertical; }
+    textarea.mono { font:12px/1.45 ui-monospace, Menlo, Consolas, monospace; min-height:96px; }
+    .hdel { background:transparent; color:#ff9b9b; border:1px solid rgba(255,155,155,.4); border-radius:6px; padding:2px 8px; font-size:11px; font-weight:400; flex:none; }
+    .hint { font-size:12px; opacity:.65; }
+    .cov { font-size:11px; opacity:.7; margin-bottom:6px; }
+    #content { padding:0 16px 28px; }
+    #content .box { background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:12px 14px; }
+    #content h2 { font-size:14px; margin:0 0 6px; } #content h2 span { color:var(--amber); }
+    .lbl { font-size:11px; opacity:.75; margin:10px 0 3px; text-transform:uppercase; letter-spacing:.03em; }
+    .fb { border-left:2px solid var(--line); padding-left:10px; margin-top:8px; }
+    .plan { border:1px solid var(--line); border-radius:8px; background:var(--panel); padding:8px; margin-bottom:10px; }
+    .planhd { font-size:12px; font-weight:700; color:var(--amber); margin-bottom:2px; }
+    .planhd .hint { font-weight:400; color:var(--ink); }
+    .planitem { border:1px solid var(--line); border-radius:6px; padding:6px 8px; margin-top:6px; cursor:pointer; background:#0a1620; }
+    .planitem:hover { border-color:#7fd1ff; }
+    .planitem.armed { border-color:#7fd1ff; box-shadow:0 0 0 1px #7fd1ff inset; }
+    .planitem.done { opacity:.5; }
+    .planitem .ptop { display:flex; align-items:center; gap:6px; }
+    .planitem .ptop b { flex:1; font-size:13px; }
+    .planitem .pmark { font-weight:700; color:#9fe6b5; }
+    .ptag { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.03em; padding:1px 6px; border-radius:10px; background:rgba(255,216,140,.16); color:var(--amber); flex:none; }
+    .ptag.door { background:rgba(127,209,255,.16); color:#7fd1ff; }
+    .ptag.clue { background:rgba(159,230,181,.16); color:#9fe6b5; }
+    .pnote { font-size:11px; opacity:.72; margin-top:3px; }
+    .pnote i { font-style:normal; opacity:.9; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Hotspots · <span id="roomName"></span></h1>
+    <button id="save">Save and close</button>
+    <span id="status"></span>
+    <span class="hint" style="margin-left:auto">drag on the scene to add a box · click a box to edit</span>
+  </header>
+  <main>
+    <div>
+      <div class="cov" id="cov"></div>
+      <div class="hstage"><div class="hframe" id="hsFrame"><img id="hsScene" alt="" /></div></div>
+    </div>
+    <div>
+      <div id="planned"></div>
+      <div id="hsList"></div>
+    </div>
+  </main>
+  <div id="content"></div>
+
+  <script>
+    const $ = s => document.querySelector(s);
+    const _p = new URLSearchParams(location.search);
+    const ROOM_KEY = _p.get("room");
+    const DRAFT_IMG = _p.get("img");                                 // a candidate ⇒ DRAFT mode (else committed node)
+    const CH = _p.get("chapter"), SC = _p.get("scenario");           // Finding 2: target THIS scenario
+    const SCQ = (CH && SC) ? ("chapter=" + encodeURIComponent(CH) + "&scenario=" + encodeURIComponent(SC)) : "";
+    const getJSON = async p => { try { return await (await fetch(p + (p.includes("?") ? "&" : "?") + "t=" + Date.now())).json(); } catch (e) { return null; } };
+    const postJSON = async (p, b) => (await fetch(p, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(b) })).json();
+    const esc = s => String(s == null ? "" : s).replace(/[<>&"]/g, c => ({ "<":"&lt;", ">":"&gt;", "&":"&amp;", '"':"&quot;" }[c]));
+    const slug = s => (String(s || "")).toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "") || "obj";
+    const linesToArr = s => String(s || "").split("\n").filter(x => x.trim().length);
+    const arrToLines = a => (a || []).join("\n");
+    const csvToArr = s => String(s || "").split(",").map(x => x.trim()).filter(Boolean);
+    const arrToCsv = a => (a || []).join(", ");
+    const TYPES = ["puzzle", "clue", "door", "lock", "dial", "mapview"];
+    const checkSkel = () => ({ prompt:"", requires:[], expr:"", hint:"", maxAttempts:4, feedback:{ correct:"", wrong:[], reveal:"" } });
+    const questionSkel = () => ({ prompt:"", options:[], correct:0, maxAttempts:4, feedback:{ correct:"", wrong:[], reveal:"" } });
+
+    const hsFrame = $("#hsFrame");
+    let SPOTS = [];        // full hotspot objects, edited in place
+    let SEL = -1, seq = 0, temp = null;
+    let DOOR_PROMPT_DEFAULT = "";   // this room's open-door prompt (from authoring), for the door-open generator
+    let ROOM_KEYS = [];             // all room keys in this scenario, for a door's target-room dropdown
+    let PLANNED = [];               // node.plannedHotspots — the design manifest (what this room SHOULD have)
+    let ARMED = -1;                 // index into PLANNED currently loaded to draw next (arm-then-draw); -1 = none
+
+    const pct = b => ({ left:b[0]*100+"%", top:b[1]*100+"%", width:(b[2]-b[0])*100+"%", height:(b[3]-b[1])*100+"%" });
+    const uniqueId = (base, self) => { let id = base, n = 1; while (SPOTS.some((s, j) => j !== self && s.id === id)) id = base + "_" + (++n); return id; };
+
+    // Build a new hotspot for a freshly-drawn box. If `plan` (an armed plannedHotspots entry) is
+    // given, seed the box's type/label (+ door direction / clue pickup) from it — the "click a planned
+    // item, then draw" flow — so a planned box lands typed+labelled in one drag. Content (grading,
+    // clue body, map, door target) is still authored in the Edit-puzzle tab, same as a hand-drawn box.
+    function makeSpot(box, plan) {
+      if (plan) {
+        const s = { id: uniqueId(slug(plan.label) || ("obj_" + (++seq))), type: plan.type || "puzzle",
+                    label: plan.label || ("Object " + SPOTS.length), box };
+        if (s.type === "puzzle") { s.starterCode = ""; s.check = checkSkel(); }
+        else if (s.type === "clue") { s.body = ""; if (plan.pickup) s.pickup = true; }
+        else if (s.type === "door" && plan.direction) s.direction = plan.direction;
+        return s;
+      }
+      return { id: uniqueId("obj_" + (++seq)), type: "puzzle", label: "Object " + SPOTS.length, box, starterCode: "", check: checkSkel() };
+    }
+
+    // a planned item counts as placed once a hotspot of the same type carries its label (slug-matched)
+    const planPlaced = p => SPOTS.some(s => s.type === p.type && slug(s.label) === slug(p.label));
+
+    function renderPlanned() {
+      const host = $("#planned"); if (!host) return;
+      if (!PLANNED.length) { host.innerHTML = ""; return; }
+      const rows = PLANNED.map((p, i) => {
+        const done = planPlaced(p), extra = p.direction || (p.pickup ? "pickup" : "");
+        return `<div class="planitem${i === ARMED ? " armed" : ""}${done ? " done" : ""}" data-i="${i}">
+          <div class="ptop"><span class="ptag ${esc(p.type)}">${esc(p.type)}</span><b>${esc(p.label || "")}</b>
+            <span class="pmark">${done ? "✓" : "＋"}</span></div>
+          ${(p.note || extra) ? `<div class="pnote">${extra ? `<i>${esc(extra)}</i> ` : ""}${esc(p.note || "")}</div>` : ""}
+        </div>`;
+      }).join("");
+      host.innerHTML = `<div class="plan"><div class="planhd">Planned for this room <span class="hint">— click one, then drag its box</span></div>${rows}</div>`;
+      host.querySelectorAll(".planitem").forEach(el => el.onclick = () => {
+        const i = +el.dataset.i;
+        ARMED = (ARMED === i) ? -1 : i;
+        $("#status").innerHTML = ARMED >= 0 ? `<span class="ok2">armed: ${esc(PLANNED[ARMED].label || "")} — drag its box on the scene</span>` : "";
+        renderPlanned();
+      });
+    }
+
+    async function init() {
+      if (!ROOM_KEY) { $("#status").innerHTML = `<span class="err">no ?room=… given</span>`; return; }
+      const doc = await getJSON("/api/scenario" + (SCQ ? "?" + SCQ : ""));
+      const node = doc && (doc.rooms || []).find(r => r.key === ROOM_KEY);
+      ROOM_KEYS = (((doc && doc.rooms) || []).map(r => r.key)).filter(k => k && k !== ROOM_KEY);  // door targets (exclude self)
+      const draft = DRAFT_IMG ? await getJSON("/api/draft?roomKey=" + encodeURIComponent(ROOM_KEY) + (SCQ ? "&" + SCQ : "")) : null;
+      let sceneSrc;
+      if (DRAFT_IMG) sceneSrc = "/sfile/_scratch/" + encodeURIComponent(DRAFT_IMG) + "?t=" + Date.now() + (SCQ ? "&" + SCQ : "");
+      else if (node && node.panorama) sceneSrc = "/sfile/" + node.panorama + "?t=" + Date.now() + (SCQ ? "&" + SCQ : "");
+      else { $("#status").innerHTML = `<span class="err">no image — pick a candidate first (draft), or commit the room</span>`; return; }
+      DOOR_PROMPT_DEFAULT = (node && node.authoring && node.authoring.doorPrompt) || "";
+      PLANNED = (node && node.plannedHotspots) || [];
+      $("#roomName").textContent = ROOM_KEY + (DRAFT_IMG ? " (draft)" : "");
+      $("#hsScene").src = sceneSrc;
+      // per-candidate draft wins (draft.imgs[thisImage]), then legacy top-level, then the committed node
+      const per = draft && draft.imgs && draft.imgs[DRAFT_IMG];
+      const w = (per && per.wrap) || (draft && draft.wrap) || (node && node.wrap) || {};
+      $("#cov").innerHTML = `wrap coverage: haov <b>${w.haov ?? 360}</b>, vaov <b>${w.vaov ?? 90}</b>, vOffset <b>${w.vOffset ?? 0}</b> — the player maps box centres → yaw/pitch across this.`;
+      const src = (per && per.hotspots) || (draft && draft.hotspots) || (node && node.hotspots) || [];
+      SPOTS = src.map(h => {
+        const s = JSON.parse(JSON.stringify(h));
+        s.id = s.id || ("h" + (++seq));
+        s.type = TYPES.includes(s.type) ? s.type : "puzzle";
+        s.label = s.label || s.id;
+        s.box = (s.box || [0, 0, 0, 0]).slice();
+        return s;
+      });
+      render();
+    }
+
+    // ---- drag to create a box ----
+    hsFrame.addEventListener("mousedown", e => {
+      if (e.target.closest(".hbox")) return;
+      const r = hsFrame.getBoundingClientRect();
+      temp = { x0:(e.clientX-r.left)/r.width, y0:(e.clientY-r.top)/r.height };
+      e.preventDefault();
+    });
+    window.addEventListener("mousemove", e => {
+      if (!temp) return;
+      const r = hsFrame.getBoundingClientRect();
+      temp.x1 = Math.min(1, Math.max(0, (e.clientX-r.left)/r.width));
+      temp.y1 = Math.min(1, Math.max(0, (e.clientY-r.top)/r.height));
+      let el = hsFrame.querySelector(".hbox.tmp");
+      if (!el) { el = document.createElement("div"); el.className = "hbox tmp"; hsFrame.appendChild(el); }
+      Object.assign(el.style, pct([Math.min(temp.x0,temp.x1), Math.min(temp.y0,temp.y1), Math.max(temp.x0,temp.x1), Math.max(temp.y0,temp.y1)]));
+    });
+    window.addEventListener("mouseup", () => {
+      if (!temp) return;
+      if (temp.x1 != null && Math.abs(temp.x1-temp.x0) > 0.01 && Math.abs(temp.y1-temp.y0) > 0.01) {
+        const box = [Math.min(temp.x0,temp.x1), Math.min(temp.y0,temp.y1), Math.max(temp.x0,temp.x1), Math.max(temp.y0,temp.y1)].map(v => +v.toFixed(4));
+        SPOTS.push(makeSpot(box, ARMED >= 0 ? PLANNED[ARMED] : null));
+        SEL = SPOTS.length - 1;
+        if (ARMED >= 0) { $("#status").innerHTML = `<span class="ok2">placed ${esc(SPOTS[SEL].label)} ✓</span>`; ARMED = -1; }
+      }
+      temp = null; render();
+    });
+
+    function renderBoxes() {
+      hsFrame.querySelectorAll(".hbox").forEach(b => b.remove());
+      SPOTS.forEach((s, i) => {
+        const d = document.createElement("div"); d.className = "hbox" + (i === SEL ? " sel" : "");
+        Object.assign(d.style, pct(s.box));
+        d.innerHTML = `<span class="htag">${esc(s.label || s.id)}</span>`;
+        d.onclick = ev => { ev.stopPropagation(); SEL = i; render(); };
+        hsFrame.appendChild(d);
+      });
+    }
+    function renderList() {
+      const list = $("#hsList"); list.innerHTML = "";
+      SPOTS.forEach((s, i) => {
+        const el = document.createElement("div"); el.className = "hitem" + (i === SEL ? " sel" : "");
+        el.innerHTML =
+          `<div class="htop"><b>${esc(s.id)}</b><button class="hdel">delete</button></div>
+           <div class="hr"><label>label</label><input type="text" data-k="label"></div>
+           <div class="hr"><label>type</label><select data-k="type">${TYPES.map(t => `<option${t===s.type?" selected":""}>${t}</option>`).join("")}</select></div>`;
+        el.querySelector('[data-k="label"]').value = s.label || "";
+        el.onclick = ev => { if (ev.target.closest("input,select,button")) return; SEL = i; render(); };
+        el.querySelector(".hdel").onclick = ev => { ev.stopPropagation(); SPOTS.splice(i,1); if (SEL>=SPOTS.length) SEL=SPOTS.length-1; render(); };
+        el.querySelectorAll("[data-k]").forEach(inp => inp.oninput = () => {
+          const k = inp.dataset.k;
+          if (k === "type") { setType(s, inp.value); }
+          else { s[k] = inp.value; if (k === "label") s.id = uniqueId(slug(inp.value), i); }
+          render();
+        });
+        list.appendChild(el);
+      });
+    }
+
+    // switch a hotspot's type. Non-destructive (leftover fields are ignored by the player). This tab
+    // owns only box/type/label + door-open; a PUZZLE's grading AND a CLUE's body are both authored in
+    // the Edit puzzle tab, so we don't create their content skeletons here.
+    function setType(s, type) {
+      s.type = type;
+      if (type === "clue" && s.body == null) s.body = "";
+    }
+
+    // ---- per-hotspot side panel: door-open only (puzzle grading + clue body live in the puzzle tab) ----
+    function renderContent() {
+      const host = $("#content"); host.innerHTML = "";
+      if (SEL < 0 || !SPOTS[SEL]) return;
+      const s = SPOTS[SEL];
+      const box = document.createElement("div"); box.className = "box";
+      if (s.type === "door") {
+        // navigation: forward (gated, shows entry, advances) | back (always open, no gate/entry)
+        const dirSel = ["forward", "back"].map(dv =>
+          `<option value="${dv}"${(s.direction || "forward") === dv ? " selected" : ""}>${dv}</option>`).join("");
+        const toSel = [`<option value=""${!s.to ? " selected" : ""}>— none (linear · boss→finish) —</option>`]
+          .concat(ROOM_KEYS.map(k => `<option value="${esc(k)}"${s.to === k ? " selected" : ""}>${esc(k)}</option>`)).join("");
+        // which GATE opens this door: a specific puzzle/lock in THIS room, or the room's main gate
+        const gateSpots = SPOTS.filter(g => g.type === "puzzle" || g.type === "lock");
+        const reqSel = [`<option value=""${!s.requires ? " selected" : ""}>— the room's main gate —</option>`]
+          .concat(gateSpots.map(g => `<option value="${esc(g.id)}"${s.requires === g.id ? " selected" : ""}>${esc(g.id)}${g.label ? " · " + esc(g.label) : ""}</option>`)).join("");
+        const nav = `<h2>Content · <span>${esc(s.id)}</span> (door)</h2>
+          <div class="lbl">navigation</div>
+          <div class="hr"><label>direction</label><select data-nav="direction">${dirSel}</select></div>
+          <div class="hr"><label>to room</label><select data-nav="to">${toSel}</select></div>
+          <div class="hr"><label>requires gate</label><select data-nav="requires">${reqSel}</select></div>
+          <div class="hint"><b>forward</b>: opens on its gate — pick a specific puzzle/lock in <i>requires gate</i> (e.g. a separate escape lock), else the room's main gate — then shows the target's entry and advances. <b>back</b>: always open, no gate, no entry. Leave <i>to</i> empty on a forward door to advance linearly (the boss's forward door → finish).</div>`;
+        let gen;
+        if (DRAFT_IMG) {
+          gen = `<div class="hint" style="margin-top:12px">The open-door image is made from the committed scene — mark this door's box now, <b>Send to room</b>, then reopen this tab to “Generate open-door image”.</div>`;
+        } else {
+          gen = `<div class="hint" style="margin-top:12px">Generate the room's open image by masking this door's box on the committed scene.</div>
+            <div class="lbl">open-door prompt</div><textarea data-door="prompt" rows="3"></textarea>
+            <div class="hr" style="margin-top:8px"><button id="genDoor">Generate open-door image</button><span class="hint" id="doorStat" style="margin-left:8px"></span></div>`;
+        }
+        box.innerHTML = nav + gen;
+        box.querySelector('[data-nav="direction"]').onchange = e => { s.direction = e.target.value; };
+        box.querySelector('[data-nav="to"]').onchange = e => { const v = e.target.value; if (v) s.to = v; else delete s.to; };
+        box.querySelector('[data-nav="requires"]').onchange = e => { const v = e.target.value; if (v) s.requires = v; else delete s.requires; };
+        if (!DRAFT_IMG) {
+          const dp = box.querySelector('[data-door="prompt"]');
+          dp.value = DOOR_PROMPT_DEFAULT || "The door now stands wide open, revealing the space beyond; identical lighting and style, no people, no lettering, no text.";
+          box.querySelector("#genDoor").onclick = () => generateDoor(s, dp.value, box.querySelector("#doorStat"));
+        }
+      } else if (s.type === "clue") {
+        box.innerHTML = `<h2>Content · <span>${esc(s.id)}</span> (clue)</h2><div class="hint">Clue text is authored alongside the puzzles in the room's <b>Edit puzzle →</b> tab. This tab owns the box, type &amp; label.</div>`;
+      } else if (s.type === "lock") {
+        box.innerHTML = `<h2>Content · <span>${esc(s.id)}</span> (lock)</h2><div class="hint">The lock's <b>code</b> (answer) &amp; feedback are authored in the room's <b>Edit puzzle →</b> tab. This tab owns the box, type &amp; label. A lock is a no-instructions keypad gate and <b>never enters the submission code</b>.</div>`;
+      } else if (s.type === "dial") {
+        box.innerHTML = `<h2>Content · <span>${esc(s.id)}</span> (dial)</h2><div class="hint">A <b>world-state dial</b> — flipping it sets a <code>gameState</code> value that a <b>mapview</b> elsewhere reads. Its <code>key</code> + <code>states</code> are hand-authored in <code>scenario.json</code> for now (no editor yet). This tab owns the box, type &amp; label.</div>`;
+      } else if (s.type === "mapview") {
+        box.innerHTML = `<h2>Content · <span>${esc(s.id)}</span> (mapview)</h2><div class="hint">A <b>state-conditioned chart</b> — shows the image mapped to the current dial state. Its <code>key</code> + per-state <code>images</code> are hand-authored in <code>scenario.json</code> for now. This tab owns the box, type &amp; label.</div>`;
+      } else {
+        box.innerHTML = `<h2>Content · <span>${esc(s.id)}</span> (puzzle)</h2><div class="hint">Edit this puzzle's starter code, check / multiple-choice and feedback in the room's <b>Edit puzzle →</b> tab.</div>`;
+      }
+      host.appendChild(box);
+    }
+
+    function render() { renderBoxes(); renderList(); renderContent(); renderPlanned(); }
+
+    // generate the room's open-door panorama from this door's box (masked gpt edit → scene_open.png,
+    // sets node.panoramaOpen). Uses the box currently in the editor, so no need to save first.
+    async function generateDoor(s, prompt, statEl) {
+      statEl.textContent = "requesting…";
+      const r = await postJSON("/api/dooropen-room", { chapter: CH, scenario: SC, roomKey: ROOM_KEY, box: s.box, prompt });
+      if (!r.ok) { statEl.innerHTML = `<span class="err">${r.error || "failed"}</span>`; return; }
+      statEl.textContent = "generating… (~20s)";
+      const poll = setInterval(async () => {
+        const j = await getJSON("/api/status?slot=door");
+        if (!j) return;
+        if (j.error) { statEl.innerHTML = `<span class="err">${j.error}</span>`; clearInterval(poll); return; }
+        if (!j.active) { clearInterval(poll); statEl.innerHTML = `<span class="ok2">made scene_open.png · panoramaOpen set ✓</span>`; }
+      }, 1500);
+    }
+
+    $("#save").onclick = async () => {
+      // strip editor/marker keys (leading underscore); keep all real content (puzzle content preserved by id)
+      const hotspots = SPOTS.map(s => Object.fromEntries(Object.entries(s).filter(([k]) => !k.startsWith("_"))));
+      const r = DRAFT_IMG
+        ? await postJSON("/api/draft-save", { chapter: CH, scenario: SC, roomKey: ROOM_KEY, image: DRAFT_IMG, hotspots })
+        : await postJSON("/api/room-patch", { chapter: CH, scenario: SC, roomKey: ROOM_KEY, fields: { hotspots } });
+      if (r.ok) { $("#status").innerHTML = `<span class="ok2">saved · closing…</span>`; setTimeout(() => window.close(), 400); }
+      else $("#status").innerHTML = `<span class="err">${r.error || "save failed"}</span>`;
+    };
+
+    init();
+  </script>
+</body>
+</html>

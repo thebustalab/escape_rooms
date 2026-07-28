@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Field Analyst — Data Visualization (CHEM 5725)</title>
+  <link rel="stylesheet" href="../alaska/style.css" />
+  <style>
+    /* ----- journey / chain-of-rooms ----- */
+    .map-wrap { position: relative; }
+    #node-map.map {
+      position: relative; width: 100%; aspect-ratio: 3 / 2;
+      border-radius: 14px; overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+    .map .map-bg {
+      position: absolute; inset: 0;
+      background-size: cover; background-position: center;
+      background-color: #0c2029;
+      transition: background-image 0.4s ease;
+    }
+    .map .room-caption {
+      position: absolute; left: 0; right: 0; top: 0; z-index: 3;
+      padding: 0.55rem 0.9rem; font-size: 0.9rem; font-weight: 600;
+      background: linear-gradient(rgba(0,0,0,0.6), transparent);
+      pointer-events: none;
+    }
+    .map .journey-door {
+      position: absolute; left: 50%; bottom: 1rem; transform: translateX(-50%);
+      z-index: 4; cursor: pointer; font: inherit; font-weight: 600;
+      color: #10202a; background: rgba(255, 216, 140, 0.95);
+      border: 0; border-radius: 999px; padding: 0.6rem 1.3rem;
+      box-shadow: 0 0 20px 5px rgba(255, 205, 120, 0.55);
+      animation: doorpulse 1.7s ease-in-out infinite;
+    }
+    .map .journey-door[hidden] { display: none; }
+    @keyframes doorpulse {
+      0%, 100% { box-shadow: 0 0 16px 4px rgba(255, 205, 120, 0.45); }
+      50%      { box-shadow: 0 0 28px 8px rgba(255, 205, 120, 0.8); }
+    }
+
+    /* ----- detail overlay over the scene ----- */
+    #node-detail.node-detail {
+      position: absolute; inset: 0; z-index: 5; display: none;
+      overflow: auto; padding: 1rem;
+      background: rgba(8, 16, 22, 0.94); border-radius: 14px;
+    }
+    #node-detail.node-detail.open { display: block; }
+    .boss-card .figure-spec { margin: 0.6rem 0; padding: 0.6rem 0.8rem; border-left: 3px solid rgba(255, 210, 120, 0.7); background: rgba(255, 210, 120, 0.08); border-radius: 6px; }
+    .boss-card .boss-placeholder { margin: 0.6rem 0 0.9rem; font-size: 0.9rem; opacity: 0.85; }
+    .room-begin { margin-top: 0.4rem; }
+  </style>
+</head>
+<body>
+
+  <!-- ===== Screen 1: the story ===== -->
+  <section id="screen1" class="screen active">
+    <div class="scene">
+      <img id="scene-image" alt="" />
+      <div class="scene-overlay">
+        <div class="tagline" id="scenario-title">…</div>
+        <h1 id="scene-heading">…</h1>
+        <div id="scene-story" class="story"></div>
+
+        <div class="entry">
+          <label for="student-id">Your x500</label>
+          <input id="student-id" type="text" autocomplete="off"
+                 placeholder="e.g. bust0037" />
+          <button id="enter-btn" class="primary">Enter →</button>
+          <div id="id-error" class="error"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <audio id="ambience" preload="none"></audio>
+  <button id="music-toggle" class="music-toggle">♪ on</button>
+
+  <!-- ===== Screen 2: the workroom ===== -->
+  <section id="screen2" class="screen">
+    <div id="screen2-bg" class="screen2-bg"></div>
+    <header class="workroom-header">
+      <span class="dot"></span> Field Analyst — case room
+    </header>
+
+    <div class="workroom">
+      <div class="left">
+        <div id="briefing" class="briefing"></div>
+
+        <div class="console">
+          <div id="paste-banner" class="paste-banner">
+            <span>Pasting a big chunk? Make sure you're not shortcutting your own
+            learning — you'll remember this far better if you type it. (You can
+            still paste.)</span>
+            <button id="paste-dismiss">Got it</button>
+          </div>
+          <div class="console-label">R console</div>
+          <textarea id="code-input" spellcheck="false"></textarea>
+          <div class="console-bar">
+            <button id="run-btn" class="primary">Run</button>
+            <span id="webr-status" class="status">Loading…</span>
+          </div>
+          <div id="webr-output" class="output"></div>
+        </div>
+      </div>
+
+      <div class="right">
+        <h2>The case-files</h2>
+        <div class="map-wrap">
+          <div id="node-map" class="map"></div>
+          <div id="node-detail" class="node-detail"></div>
+        </div>
+
+        <div id="finish" class="finish">
+          <h3>Case closed</h3>
+          <div id="finish-body"></div>
+          <div class="code-box">
+            <div id="final-code" class="code">…</div>
+            <button id="copy-code" class="primary">Copy code</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script src="../shared/codec.js"></script>
+  <script src="scenario.js"></script>
+  <script type="module" src="../shared/escape-engine.js"></script>
+</body>
+</html>

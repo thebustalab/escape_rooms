@@ -1,0 +1,459 @@
+{
+  "chapter": "hierarchical_clustering",
+  "scenario": "canyon",
+  "id": 14,
+  "title": "The Confluence",
+  "subtitle": "Hierarchical Clustering · hclust + cutree + summarise",
+  "story": "You came down into the red canyon to map its springs, and the flood season came early. Sheltering, you find a stair into a drowned hall the old makers left behind — their floodworks, a single sealed tunnel that climbs to safety, an engraved panel no living hand has set, and a map of the whole canyon with every height left blank. A ladder climbs from the hall to the high springs. The makers built this place to be run by someone who could read the canyon as they did — its waters sorted into families, its channels into one branching tree. Climb, and roam the whole canyon: read the springs at each junction to learn which waters are kin, and mark each junction's height on your map as you pass it. Then come back down to the hall and read the shape of the land itself — before the water climbs to meet you.",
+  "enterLabel": "Climb into the canyon →",
+  "done": {
+    "title": "The map lied",
+    "body": "The carved map grouped the springs by the fork they rise in — but two springs' water swore a different kin, and you saw it. The storm breaks; the canyon fills. Kinship hides beneath the surface, and only the reading finds it. Back down to the hall — the panel is waiting, and your map of heights is full."
+  },
+  "escapeDone": {
+    "title": "Free of the canyon",
+    "body": "You draw the waterline across your map and count the canyon's severed limbs — and the panel takes it. You throw the great wheel; a sluice grinds, the flood turns aside, and the sealed tunnel opens. You climb as the hall drowns behind you, into rain and open sky. The canyon kept its one promise: read me truly, and go free."
+  },
+  "packages": [
+    "dplyr",
+    "ggplot2",
+    "readr"
+  ],
+  "setup": "suppressMessages({library(dplyr); library(ggplot2)})",
+  "state": {
+    "rooms_solved": 0
+  },
+  "datasets": [
+    {
+      "name": "canyon_water_chem",
+      "url": "https://thebustalab.github.io/escape_rooms/rooms/hierarchical_clustering/canyon/data/canyon_water_chem.csv"
+    },
+    {
+      "name": "unknown_spring",
+      "url": "https://thebustalab.github.io/escape_rooms/rooms/hierarchical_clustering/canyon/data/unknown_spring.csv"
+    }
+  ],
+  "ambient": "none",
+  "fx": [],
+  "coverPrompt": "Minimalist stylised thumbnail poster of a lone red slot-canyon: a single narrow cleft in dark sandstone opening downward into a branching gorge, one warm amber light glowing deep in the rock below, a cool teal storm-sky above. One bold high-contrast silhouette, iconic and uncluttered, minimal detail. Flat limited palette: deep teal, icy blue, one warm amber glow. Soft film grain, painterly but clean, strong negative space, single centred focal subject. No people, no text, no lettering, no logos. Square composition.",
+  "debrief": {
+    "title": "How this world worked",
+    "intro": "The whole canyon was one skill in disguise: sorting many things into a nested tree of families by how alike they are. Each junction taught one move of hierarchical clustering, and the escape was the move made physical — reading the true branching structure of the land and cutting it into groups."
+  },
+  "rooms": [
+    {
+      "key": "undercroft",
+      "title": "The drowned hall",
+      "technique": "Framing — the makers' floodworks",
+      "built": false,
+      "unlockedWhen": true,
+      "authoring": {
+        "tag": "undercroft",
+        "scenePrompt": "This is a panorama. A 360-degree view from the centre of a vast underground stone hall — the drowned floodworks of a vanished people — the chamber wrapping continuously all the way around so the left and right edges meet seamlessly. Warm amber lamplight pools on wet red-sandstone walls carved with channels and sluice-gates. Ahead, a great engraved control panel of brass dials and a grid of empty stone cells, unlit and unreadable, set into the rock. To one side, a low stone table where a rolled canyon map lies half-open, its markings blank. Opposite, a tall iron sluice-wheel beside a sealed tunnel mouth, its heavy door shut. Set into one wall, a rough-hewn ladder climbs up into darkness toward the canyon above; near it, a low arch opens onto the drowned trunk passage. Still black water lies at the floor's edge. Painterly, cinematic, red-sandstone canyon in cool teal shadow with warm amber light, no people, no lettering or text.",
+        "doorPrompt": "The same hall with the ladder-shaft up into the canyon brightening with cool daylight from above; the sealed tunnel and panel unchanged."
+      },
+      "entry": {
+        "title": "The drowned hall",
+        "body": "A stair takes you down out of the rising wind into a hall no living hand tends. An engraved panel you cannot read. A blank map you roll and pocket. A sealed tunnel that will not open. And a ladder, climbing up into the canyon. Start by climbing — and mark every junction's height as you go."
+      },
+      "designNote": "FRAME ROOM (no graded puzzle). Cold open: seed the mystery — the PANEL (clue, unreadable now; pays off at 'works') and the blank MAP (clue, pickup; the escape's reading surface). Passages: a LADDER up to j_c1 (the high springs) and a TRUNK arch to j_c7. Both UNGATED. NEW ART; the escape room 'works' REUSES this scene (water higher, panel lit). MAZE MODEL (engine work Lucas will build): every passage is OPEN from the start (roam freely, backtrack anytime); a puzzle at a junction is served next-in-queue via availableWhen (a diegetic 'not yet' if out of order); the survey is DRY so nothing seals off; the escape panel refuses an INCOMPLETE map, so the player goes back for any junction whose height is still blank. Scene shows OPEN fork-passages (no closed-door art needed on maze passages) — only the escape tunnel is a gated closed->open door.",
+      "plannedHotspots": [
+        {
+          "type": "clue",
+          "label": "The engraved control panel",
+          "note": "the calibration matrix; unreadable now, pays off at the escape"
+        },
+        {
+          "type": "clue",
+          "label": "The rolled canyon map",
+          "pickup": true,
+          "note": "blank map; the escape's reading surface (fills as you read junction heights)"
+        },
+        {
+          "type": "door",
+          "label": "The ladder up to the high springs",
+          "to": "j_c1",
+          "note": "UNGATED climb to the top"
+        },
+        {
+          "type": "door",
+          "label": "The trunk arch",
+          "to": "j_c7",
+          "note": "UNGATED; open maze"
+        }
+      ]
+    },
+    {
+      "key": "j_c1",
+      "title": "The high confluence",
+      "technique": "hclust — read the tree (nearest relative)",
+      "puzzleType": 1,
+      "built": false,
+      "unlockedWhen": true,
+      "onSolve": [
+        {
+          "set": "j_c1_solved"
+        },
+        {
+          "inc": "rooms_solved"
+        }
+      ],
+      "debrief": "Put every spring's water on the same footing, measure how alike any two are, and read off the closest kin — a distance matrix and the first join of a dendrogram.",
+      "authoring": {
+        "tag": "j_c1",
+        "scenePrompt": "This is a panorama. A 360-degree view from the centre of the highest confluence in the canyon, where two clear spring-slots meet high in a banded red gorge under a wide bruised sky, the walls and sky wrapping continuously all the way around so the left and right edges meet seamlessly. Ahead, a weathered makers' reading-table — a carved stone slab set with a glowing glass slate — stands where the two waters mingle in a clear pool, pale water beading from limestone seeps. To one side, a carved benchmark stone incised with a survey mark. Two OPEN spring-slots climb away opposite each other (the tributaries), and a third OPEN slot drops down-canyon; a rough ladder falls back toward the hall. Wind, pale rock, first cold light catching amber. Painterly, cinematic, red-sandstone canyon in cool teal shadow with warm amber light, no people, no lettering or text.",
+        "doorPrompt": "The same high confluence; all fork-passages already open (maze) — no change."
+      },
+      "entry": {
+        "title": "The high confluence",
+        "body": "The ladder lets you out at the highest place two waters meet. Here is the makers' first instrument — a way to weigh one spring against another. Which of these waters is kin to which? And mark this junction's height before you go on."
+      },
+      "designNote": "PUZZLE (Read-the-tree / nearest relative). CODE (WebR-safe base R, NO ggtree): m<-canyon_water_chem; hc<-hclust(dist(m[,3:8]),method='ward.D2'); plot(hc,labels=m$spring). Q: 'Which spring is most chemically similar to Dripstone?' ANSWER: Lime_Hollow (d 2.45; runner-up Chalkseep 2.83; 15%% margin). DISTRACTORS(>=6): Chalkseep, Palegate, Brimstone_Font, Glasswater, Brineseep, Bitterwell. Benchmark height 1400. NEW ART.",
+      "plannedHotspots": [
+        {
+          "type": "puzzle",
+          "label": "The makers' reading-table",
+          "note": "NN of Dripstone -> Lime_Hollow"
+        },
+        {
+          "type": "clue",
+          "label": "The junction benchmark",
+          "pickup": true,
+          "note": "confluence height 1400 — mark it on the map (escape)"
+        },
+        {
+          "type": "door",
+          "label": "Down-canyon slot",
+          "to": "j_c3",
+          "note": "open maze"
+        },
+        {
+          "type": "door",
+          "label": "Ladder back to the hall",
+          "to": "undercroft",
+          "note": "open"
+        }
+      ]
+    },
+    {
+      "key": "j_c2",
+      "title": "The orphan junction",
+      "technique": "hclust — classify an unknown into the tree",
+      "puzzleType": 1,
+      "built": false,
+      "unlockedWhen": true,
+      "onSolve": [
+        {
+          "set": "j_c2_solved"
+        },
+        {
+          "inc": "rooms_solved"
+        }
+      ],
+      "debrief": "Add an unlabelled sample and see which clade it falls into — the water's own profile decides its family, not where you found it.",
+      "authoring": {
+        "tag": "j_c2",
+        "scenePrompt": "This is a panorama. A 360-degree view from the centre of a high, narrow confluence where an unmarked spring-slot joins the canyon — no carved name beside it — the close red walls and strip of sky wrapping continuously all the way around so the left and right edges meet seamlessly. Ahead, a makers' reading-table with a glowing glass slate stands where the nameless water wells in from a bare stone niche. To one side, a blank benchmark stone. OPEN slots climb to the joining springs and drop down-canyon toward a deeper junction. Cool light, mineral-streaked rock, an amber lamp on the console. Painterly, cinematic, red-sandstone canyon in cool teal shadow with warm amber light, no people, no lettering or text.",
+        "doorPrompt": "The same junction; fork-passages already open (maze) — no change."
+      },
+      "entry": {
+        "title": "The orphan junction",
+        "body": "A spring the makers never named joins the canyon here — no mark, no family carved beside it. Whose kin is this orphan water? Place it — and mark this junction's height."
+      },
+      "designNote": "PUZZLE (Classify-the-Unknown; wood_smoke style). CODE: all<-rbind(canyon_water_chem,unknown_spring); hc<-hclust(dist(all[,3:8]),method='ward.D2'); plot(hc,labels=all$spring). Q: 'Which family does Unmarked_Spring join?' ANSWER: the SILICA / North_Branch family (Glasswater/Flintrun/Obsidian_Weep/Silverglass). DISTRACTORS: carbonate/West, sulfate/East, saline/South, 'its own new group', 'closest to Bitterwell', 'cannot tell'. Benchmark height 1380. NEW ART.",
+      "plannedHotspots": [
+        {
+          "type": "puzzle",
+          "label": "The reading-table",
+          "note": "Classify-the-Unknown -> silica/North family"
+        },
+        {
+          "type": "clue",
+          "label": "The junction benchmark",
+          "pickup": true,
+          "note": "confluence height 1380 — mark it on the map (escape)"
+        },
+        {
+          "type": "door",
+          "label": "Down-canyon slot",
+          "to": "j_c3",
+          "note": "open maze"
+        }
+      ]
+    },
+    {
+      "key": "j_c3",
+      "title": "The left fork",
+      "technique": "Junction — read the height",
+      "built": false,
+      "unlockedWhen": true,
+      "authoring": {
+        "tag": "j_c3",
+        "scenePrompt": "This is a panorama. A 360-degree view from the centre of a deeper junction where the two upper slots of the left canyon merge into one, the walls pressing closer and the sky narrowed to a bright band, the space wrapping continuously all the way around so the left and right edges meet seamlessly. Ahead, the merged water slides over stepped red stone. To one side, a carved benchmark stone incised with a survey mark. Two OPEN slots climb away toward the higher confluences, and one OPEN slot drops steeply down toward the trunk. Dim cool light, mineral-stained walls, a shaft of amber where the sun strikes. Painterly, cinematic, red-sandstone canyon in cool teal shadow with warm amber light, no people, no lettering or text.",
+        "doorPrompt": "The same fork; passages already open (maze) — no change."
+      },
+      "entry": {
+        "title": "The left fork",
+        "body": "Where the left canyon's two slots come together. No spring to read here — only the junction itself. Mark its height and read on."
+      },
+      "designNote": "PLAIN JUNCTION (no chemistry puzzle) — exists so the player reads confluence height 1050 for the escape map, and to branch the maze (up to j_c1/j_c2, down to j_c7). Benchmark height 1050. NEW ART.",
+      "plannedHotspots": [
+        {
+          "type": "clue",
+          "label": "The junction benchmark",
+          "pickup": true,
+          "note": "confluence height 1050 — mark it on the map (escape)"
+        },
+        {
+          "type": "door",
+          "label": "Up to the high confluence",
+          "to": "j_c1",
+          "note": "open maze"
+        },
+        {
+          "type": "door",
+          "label": "Up to the orphan junction",
+          "to": "j_c2",
+          "note": "open maze"
+        },
+        {
+          "type": "door",
+          "label": "Down to the trunk",
+          "to": "j_c7",
+          "note": "open maze"
+        }
+      ]
+    },
+    {
+      "key": "j_c4",
+      "title": "The bitter confluence",
+      "technique": "cutree(k=4) + group_by |> summarise(mean)",
+      "puzzleType": 1,
+      "built": false,
+      "unlockedWhen": true,
+      "onSolve": [
+        {
+          "set": "j_c4_solved"
+        },
+        {
+          "inc": "rooms_solved"
+        }
+      ],
+      "debrief": "Cut the tree into families and summarise each with a single number — the bridge from a tree to an answer you can act on.",
+      "authoring": {
+        "tag": "j_c4",
+        "scenePrompt": "This is a panorama. A 360-degree view from the centre of a high confluence stained with sulphur, where a foul yellow-crusted tributary joins the canyon, the red rock weeping ochre and the air thick, the space wrapping continuously all the way around so the left and right edges meet seamlessly. Ahead, a makers' reading-table with a glowing glass slate stands beside the bitter spring, pale yellow crust rimming the pool. To one side, a carved benchmark stone. OPEN slots climb to the joining waters and drop down-canyon. Sulphur haze, ochre-streaked walls, an amber lamp on the console. Painterly, cinematic, red-sandstone canyon in cool teal shadow with warm amber light, no people, no lettering or text.",
+        "doorPrompt": "The same sulphurous confluence; passages already open (maze) — no change."
+      },
+      "entry": {
+        "title": "The bitter confluence",
+        "body": "The air goes bitter and the rock weeps yellow. A family of foul water runs somewhere in the canyon and the makers keyed their works to it. Cut the canyon into its families and find which runs most sour — and mark this junction's height."
+      },
+      "designNote": "PUZZLE (Cut + summarise — the chapter expansion). CODE: m<-canyon_water_chem; m$cluster<-cutree(hclust(dist(m[,3:8]),method='ward.D2'),4); m %>% group_by(cluster) %>% summarise(meanSO4=mean(sulfate)). Q: 'Cut into 4 families; which has the highest average sulfate?' ANSWER: the SULFATE family (East + Bitterwell), mean SO4 61.0 vs 8.0/8.0/7.8 — dominant. DISTRACTORS: carbonate, silica, saline families, 'the single highest sample', 'the largest cluster', 'the chloride family'. Benchmark height 1420. NEW ART.",
+      "plannedHotspots": [
+        {
+          "type": "puzzle",
+          "label": "The reading-table",
+          "note": "cut k=4, highest mean sulfate -> sulfate family"
+        },
+        {
+          "type": "clue",
+          "label": "The junction benchmark",
+          "pickup": true,
+          "note": "confluence height 1420 — mark it on the map (escape)"
+        },
+        {
+          "type": "door",
+          "label": "Down-canyon slot",
+          "to": "j_c6",
+          "note": "open maze"
+        }
+      ]
+    },
+    {
+      "key": "j_c5",
+      "title": "The still pool",
+      "technique": "Junction — read the height",
+      "built": false,
+      "unlockedWhen": true,
+      "authoring": {
+        "tag": "j_c5",
+        "scenePrompt": "This is a panorama. A 360-degree view from the centre of a quiet high junction where two clear slots meet at a still green pool, the banded red walls and a bright ribbon of sky wrapping continuously all the way around so the left and right edges meet seamlessly. Ahead, the pool lies mirror- still between the two joining slots. To one side, a carved benchmark stone incised with a survey mark. OPEN slots climb to the springs and one drops down-canyon. Cool clear light, pale reflections, a touch of amber on the rim. Painterly, cinematic, red-sandstone canyon in cool teal shadow with warm amber light, no people, no lettering or text.",
+        "doorPrompt": "The same pool; passages already open (maze) — no change."
+      },
+      "entry": {
+        "title": "The still pool",
+        "body": "A quiet junction, two clear waters meeting at a mirror pool. No spring to read — only the height. Mark it and read on."
+      },
+      "designNote": "PLAIN JUNCTION (no chemistry puzzle) — the player reads confluence height 1390 here for the escape map. Benchmark height 1390. NEW ART.",
+      "plannedHotspots": [
+        {
+          "type": "clue",
+          "label": "The junction benchmark",
+          "pickup": true,
+          "note": "confluence height 1390 — mark it on the map (escape)"
+        },
+        {
+          "type": "door",
+          "label": "Down-canyon slot",
+          "to": "j_c6",
+          "note": "open maze"
+        }
+      ]
+    },
+    {
+      "key": "j_c6",
+      "title": "The right fork",
+      "technique": "Junction — read the height",
+      "built": false,
+      "unlockedWhen": true,
+      "authoring": {
+        "tag": "j_c6",
+        "scenePrompt": "This is a panorama. A 360-degree view from the centre of a deeper junction where the two upper slots of the right canyon merge into one, walls closing and the sky a narrow bright seam, the space wrapping continuously all the way around so the left and right edges meet seamlessly. Ahead, the merged water pours over dark stepped stone. To one side, a carved benchmark stone. Two OPEN slots climb toward the higher confluences and one OPEN slot drops steeply toward the trunk. Dim cool light, wet red walls, a shaft of amber. Painterly, cinematic, red-sandstone canyon in cool teal shadow with warm amber light, no people, no lettering or text.",
+        "doorPrompt": "The same fork; passages already open (maze) — no change."
+      },
+      "entry": {
+        "title": "The right fork",
+        "body": "Where the right canyon's two slots come together. Only the junction to read — mark its height and go on."
+      },
+      "designNote": "PLAIN JUNCTION (no chemistry puzzle) — confluence height 1200 for the escape map, and the right-branch fork (up to j_c4/j_c5, down to j_c7). Benchmark height 1200. NEW ART.",
+      "plannedHotspots": [
+        {
+          "type": "clue",
+          "label": "The junction benchmark",
+          "pickup": true,
+          "note": "confluence height 1200 — mark it on the map (escape)"
+        },
+        {
+          "type": "door",
+          "label": "Up to the bitter confluence",
+          "to": "j_c4",
+          "note": "open maze"
+        },
+        {
+          "type": "door",
+          "label": "Up to the still pool",
+          "to": "j_c5",
+          "note": "open maze"
+        },
+        {
+          "type": "door",
+          "label": "Down to the trunk",
+          "to": "j_c7",
+          "note": "open maze"
+        }
+      ]
+    },
+    {
+      "key": "j_c7",
+      "title": "The trunk — the carved map",
+      "technique": "hclust — outliers: kinship beats adjacency",
+      "puzzleType": 2,
+      "isBoss": true,
+      "built": false,
+      "unlockedWhen": {
+        "allSolved": [
+          "j_c1",
+          "j_c2",
+          "j_c4"
+        ]
+      },
+      "deliverable": {
+        "type": "figure",
+        "submitCodec": true
+      },
+      "debrief": "The makers' carved map grouped the springs by the fork they rise in — but two springs' water swears a different kin. Clustering the chemistry, not trusting the surface arrangement, is what exposes them. Kinship hides beneath the surface.",
+      "authoring": {
+        "tag": "j_c7",
+        "scenePrompt": "This is a panorama. A 360-degree view from the centre of the trunk — a great deep cavernous junction where all the canyon's waters converge into one dark channel — dominated by a towering carved wall-map incised with rows of spring-names grouped into forks, the chamber wrapping continuously all the way around so the left and right edges meet seamlessly. Ahead, the carved wall-map fills the red rock face. To one side, a makers' reading-table with a glowing glass slate for the analysis. To another, a carved benchmark stone. Two OPEN slots climb away up the left and right branches, and a low arch drops down toward the drowned hall. Deep echoing shadow, a single amber lamp, black water sliding through. Painterly, cinematic, red-sandstone canyon in cool teal shadow with warm amber light, no people, no lettering or text.",
+        "doorPrompt": "The same trunk chamber; the branch-passages already open (maze), the arch down to the hall unchanged."
+      },
+      "entry": {
+        "title": "The trunk — the carved map",
+        "body": "All the canyon's waters meet here, beneath a wall the makers cut with every spring's name, sorted by the fork it rises in. But two names sit wrong: their water swears a different kin than the stone says. Trust the carving, or trust the water — and be right."
+      },
+      "designNote": "BOSS PUZZLE (misdirection: adjacency vs data). Sited at the trunk (root of the tree). CODE: m<-canyon_water_chem; m$cluster<-cutree(hclust(dist(m[,3:8]),method='ward.D2'),4); m %>% arrange(cluster) # compare cluster vs fork. TEMPTING(wrong)=trust the carved map / group by fork. CORRECT: Bitterwell (West->sulfate) AND Saltglass (North->saline). DELIVERABLE figure + submitCodec. HINT CLUE = the carved wall-map (two names sit wrong). DISTRACTORS: only Bitterwell; only Saltglass; Bitterwell+Brimstone; Saltglass+Brineseep; a within-fork pair; 'none, the map is right'. unlockedWhen allSolved [j_c1,j_c2,j_c4]. Benchmark height 850. NEW ART.",
+      "plannedHotspots": [
+        {
+          "type": "puzzle",
+          "label": "The reading-table",
+          "note": "BOSS: outliers Bitterwell + Saltglass (fork vs chemistry)"
+        },
+        {
+          "type": "clue",
+          "label": "The carved wall-map",
+          "note": "the makers' fork grouping (misdirection); two names sit wrong — the hint"
+        },
+        {
+          "type": "clue",
+          "label": "The junction benchmark",
+          "pickup": true,
+          "note": "confluence height 850 — mark it on the map (escape)"
+        },
+        {
+          "type": "door",
+          "label": "Up the left branch",
+          "to": "j_c3",
+          "note": "open maze"
+        },
+        {
+          "type": "door",
+          "label": "Up the right branch",
+          "to": "j_c6",
+          "note": "open maze"
+        },
+        {
+          "type": "door",
+          "label": "Down to the hall",
+          "to": "works",
+          "note": "to the escape once the boss is solved"
+        }
+      ]
+    },
+    {
+      "key": "works",
+      "title": "The floodworks",
+      "technique": "Escape — cut the land's tree (data-free)",
+      "phase": "escape",
+      "built": false,
+      "unlockedWhen": {
+        "solved": "j_c7"
+      },
+      "debrief": "The escape was the whole skill made physical and stripped of data: read the canyon's own branching tree from the heights you gathered, then CUT it at a flood-height and count the families that remain. Reading the true structure beneath the surface — in the water, then in the rock — is literally what opened the way out.",
+      "authoring": {
+        "tag": "works",
+        "scenePrompt": "This is a panorama. A 360-degree view from the centre of the makers' drowned hall, returned to and now understood, the flood higher and climbing, the chamber wrapping continuously all the way around so the left and right edges meet seamlessly. Ahead, the great engraved control panel now glowing — brass dials and a grid of stone cells, two rows already lit and one row dark and waiting. To one side, the makers' canyon map spread and lit, its channels drawn as a branching tree marked with heights. Opposite, the tall iron sluice-wheel beside the sealed tunnel mouth, its heavy door still shut. A low arch opens back up the canyon. Rising black water, warm amber lamplight on wet red stone. Painterly, cinematic, red-sandstone canyon in cool teal shadow with warm amber light, no people, no lettering or text.",
+        "doorPrompt": "The same hall with the sealed tunnel mouth grinding open — a dark escape passage beyond the thrown sluice-wheel; the way back up unchanged."
+      },
+      "entry": {
+        "title": "The floodworks",
+        "body": "Rain roars down the slots and the first surge chases you to the stair. In the drowned hall the panel glows, two rows lit and one dark. Your map is a tree of heights now; the tunnel is one true reading away."
+      },
+      "designNote": "ESCAPE (data-free meta-echo; the cut). MECHANIC (current engine): a LOCK whose code is the panel's missing row, read off the wall MAP (a clue showing the confluence tree + the heights the player gathered: c1 1400, c2 1380, c4 1420, c5 1390, LEFT-mid c3 1050, RIGHT-mid c6 1200, trunk c7 850). The panel gives three flood-heights x cluster sizes; two rows lit, one dark: HIGH 1300 -> 2,2,2,2 (lit); LOW 950 -> 4,4 (lit); MIDDLE 1125 -> ? (dark). Player draws the 1125 waterline: above c3(1050), below c6(1200) -> the RIGHT half stays whole (4) while the LEFT splits (2,2) => 2,2,4. LOCK ANSWER = '224' (left-to-right across the canyon). Verified: _scratch/verify_escape_topology.py. NO data/CSV — heights are world props. EXIT tunnel requires the lock; ALSO gate on MAP-COMPLETENESS (all 7 junction heights read) — engine. REUSES 'undercroft' scene (water higher, panel lit). MAZE MODEL (engine work Lucas will build): every passage is OPEN from the start (roam freely, backtrack anytime); a puzzle at a junction is served next-in-queue via availableWhen (a diegetic 'not yet' if out of order); the survey is DRY so nothing seals off; the escape panel refuses an INCOMPLETE map, so the player goes back for any junction whose height is still blank. Scene shows OPEN fork-passages (no closed-door art needed on maze passages) — only the escape tunnel is a gated closed->open door. FUTURE UPGRADE: replace the lock with the draggable-node map + live matrix-grid panel (puzzle_inventory #19).",
+      "plannedHotspots": [
+        {
+          "type": "clue",
+          "label": "The lit canyon map",
+          "note": "the confluence tree + gathered heights — the escape's reading surface"
+        },
+        {
+          "type": "lock",
+          "label": "The calibration panel",
+          "note": "answer 224 (fill the 1125 row: left splits 2,2, right stays 4)"
+        },
+        {
+          "type": "door",
+          "label": "The emergency tunnel",
+          "to": "EXIT",
+          "note": "requires the panel lock (and a complete map) — the way out"
+        },
+        {
+          "type": "door",
+          "label": "Back up the canyon",
+          "to": "j_c7",
+          "note": "open"
+        }
+      ]
+    }
+  ]
+}
