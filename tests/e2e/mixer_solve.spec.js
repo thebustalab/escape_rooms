@@ -40,8 +40,7 @@ test("alaska room 1: PanoMixer exposes the room's solve stings, deduped, and can
   // Alaska room 1 has a puzzle sting, so there is at least one to test (guards a vacuous pass).
   expect(expected.length).toBeGreaterThan(0);
 
-  // enter the scenario and wait for the room to come up
-  await page.fill("#x500", "test0001");
+  // enter the scenario and wait for the room to come up (x500 is now collected at submission, not here)
   await page.locator("#enter").click();
   await expect(page.locator(".hsmark.puzzle")).not.toHaveCount(0, { timeout: 30_000 });
 

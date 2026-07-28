@@ -1,6 +1,6 @@
 {
   "chapter": "data_vis",
-  "scenario": "Hawaii",
+  "scenario": "hawaii",
   "id": 7,
   "title": "Saltwater Intrusion",
   "subtitle": "Data Visualization Assignment 1 · filtering + plotting",
@@ -384,16 +384,22 @@
             0.6784,
             0.638
           ],
-          "starterCode": "",
+          "starterCode": "# your colleague's chloride check — it won't run. fix it, then find the answer.\nhawaii_aquifers %>%\n  filter(aquifer_code = \"aquifer_6\", analyte = Cl) %>%\n  filter(abundance > 250)",
           "check": {
-            "prompt": "",
-            "requires": [],
-            "expr": "",
-            "hint": "",
+            "prompt": "Your colleague's chloride code is broken and won't run. Fix it, then find the one aquifer_6 well whose chloride crosses the 250 mg/L alarm line, and assign that well's name — exactly as it appears in <code>well_name</code> — to an object called <code>answer</code>. The click \"Check my answer\".",
+            "requires": [
+              "answer"
+            ],
+            "expr": "toupper(trimws(as.character(answer))) == \"KEEI_B\"",
+            "hint": "The two <code>=</code> should each be <code>==</code>, and <code>Cl</code> needs quotes: <code>filter(aquifer_code == \"aquifer_6\", analyte == \"Cl\")</code>. Then keep <code>abundance > 250</code> and read off the <code>well_name</code>.",
             "maxAttempts": 4,
             "feedback": {
-              "correct": "",
-              "wrong": [],
+              "correct": "Correct — noted in your field notebook: KEEI_B's chloride is 280 mg/L, the only aquifer_6 well over the 250 alarm line — a possible seawater intrusion. Time to check the sodium.",
+              "wrong": [
+                "Fix the pipeline first — <code>filter(aquifer_code == \"aquifer_6\", analyte == \"Cl\")</code> — then keep the wells with <code>abundance > 250</code> and read off the well_name.",
+                "Only one aquifer_6 well clears 250; the next-highest chloride sits at 210, safely under the line.",
+                "Assign the flagged well's exact <code>well_name</code> to <code>answer</code> — mind the spelling and capitals."
+              ],
               "reveal": ""
             }
           }
@@ -408,7 +414,7 @@
             0.64,
             0.677
           ],
-          "body": ""
+          "body": "Trying to figure out if this well's chloride levels are over 250... but I'm stuck! Out of time too."
         },
         {
           "id": "the_wellhead_panel",

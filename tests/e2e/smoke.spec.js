@@ -9,7 +9,7 @@ const { test, expect } = require("@playwright/test");
 // The scenarios to smoke. Add a row when a new one is built.
 const SCENARIOS = [
   { name: "alaska", path: "/escape_rooms/rooms/data_vis/alaska/play.html" },
-  { name: "hawaii", path: "/escape_rooms/rooms/data_vis/Hawaii/play.html" },
+  { name: "hawaii", path: "/escape_rooms/rooms/data_vis/hawaii/play.html" },
 ];
 
 for (const sc of SCENARIOS) {
@@ -24,8 +24,7 @@ for (const sc of SCENARIOS) {
     await expect(enter).toBeVisible();
     await expect(enter).not.toHaveText("");
 
-    // Enter requires an x500 id.
-    await page.fill("#x500", "test0001");
+    // Begin — no x500 needed here anymore (it's collected on the submission-prep screen).
     await enter.click();
 
     // We're now in a room: the panorama container is showing.

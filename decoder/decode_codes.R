@@ -274,15 +274,17 @@ DATA_VIS_ALASKA_KEY <- list(
   }
 )
 
-# data_vis / Hawaii (scenario id 7): 4 MCQ rooms (room1, room2, room3, boss),
-# correct option indices (0-based, room order) = 2, 4, 1, 3. Keep in lockstep with the
-# `question.correct` values in the scenario's scenario.json (the player does not shuffle options).
+# data_vis / hawaii (scenario id 7): room1, room2, boss are MCQ; room3 is a CONSOLE-CHECK
+# (repair-the-broken-filter, grades on the live R session). Room order room1, room2, room3, boss.
+# Encoded values = 3, 5, 1, 2: MCQ rooms encode their 0-based question.correct index; the console-check
+# room encodes 1 ("solved"). Keep in lockstep with the scenario's scenario.json — MCQ `question.correct`
+# values and the fact that room3 carries a `check` (not a `question`), since the player does not shuffle.
 DATA_VIS_HAWAII_KEY <- list(
   scenario_id = 7,
-  # Room order room1, room2, room3, boss. 0-based MCQ correct indices, re-wired 2026-07-21 when the
-  # puzzles were re-authored (7/6/6-option questions). room2's puzzle hotspot is being (re)placed on the
-  # art — its index (5) is fixed here so grading is ready the moment the box lands; keep in lockstep.
-  correct = c(3, 5, 0, 2),
+  # Room order room1, room2, room3, boss. room1/room2/boss = 0-based MCQ correct indices; room3 = 1
+  # because it is a console-check (2026-07-28: room3 upgraded from MCQ index 0 to the repair-the-filter
+  # console-check, which the codec encodes as answer=1 on solve). Keep in lockstep with scenario.json.
+  correct = c(3, 5, 1, 2),
   score_step = function(correct, answer, attempts) {
     if (answer != correct) return(0)
     if (attempts <= 1) return(10)
@@ -432,21 +434,22 @@ if (identical(environment(), globalenv()) && sys.nframe() == 0) {
     stop("REGRESSION: journey grade wrong — expected 17 pts + boss_reached=TRUE")
   }
 
-  # Regression: pano scenario (current format) — 4 MCQ rooms (room1, room2, room3, boss),
-  # correct option indices 3, 5, 0, 2. Round-trips scenario id 7 (hawaii) with all four solved
-  # first-try and grades it. FAILURE MODE this guards: if the pano player or the key drifts so a
-  # room's encoded index no longer matches DATA_VIS_HAWAII_KEY$correct, grade_one scores it 0.
+  # Regression: pano scenario (current format) — room1/room2/boss MCQ + room3 console-check
+  # (room1, room2, room3, boss), encoded values 3, 5, 1, 2 (room3's 1 = console-check solved).
+  # Round-trips scenario id 7 (hawaii) with all four solved first-try and grades it. FAILURE MODE this
+  # guards: if the pano player or the key drifts so a room's encoded value no longer matches
+  # DATA_VIS_HAWAII_KEY$correct, grade_one scores it 0.
   # Asserts the id-7 code round-trips and an all-first-try solve scores 40 (4 x 10).
   psteps <- list(list(answer = 3, attempts = 1),
                  list(answer = 5, attempts = 1),
-                 list(answer = 0, attempts = 1),
+                 list(answer = 1, attempts = 1),
                  list(answer = 2, attempts = 1))
   pcode <- encode_code(version = 1, scenario_id = 7, steps = psteps, student_id = "pano_test")
   pd <- decode_code(pcode, "pano_test")
   pok <- pd$valid && pd$scenario_id == 7 &&
-    identical(pd$answers, c(3L, 5L, 0L, 2L)) && identical(pd$attempts, c(1L, 1L, 1L, 1L))
-  cat("Pano MCQ round-trip OK (should be TRUE):", pok, "\n")
-  if (!pok) stop("REGRESSION: pano MCQ round-trip failed")
+    identical(pd$answers, c(3L, 5L, 1L, 2L)) && identical(pd$attempts, c(1L, 1L, 1L, 1L))
+  cat("Pano round-trip OK (should be TRUE):", pok, "\n")
+  if (!pok) stop("REGRESSION: pano round-trip failed")
   pg <- grade_one(pcode, "pano_test", DATA_VIS_HAWAII_KEY)
   cat("Pano hawaii grade — points:", pg$points, "|", pg$detail, "\n")
   if (!isTRUE(pg$valid && pg$points == 40)) {

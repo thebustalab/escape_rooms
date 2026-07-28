@@ -77,7 +77,6 @@ root.innerHTML = `
       <h1 id="s1title"></h1>
       <p id="s1story"></p>
       <div class="x500">
-        <input id="x500" placeholder="your x500 (e.g. bust0037)" autocomplete="off" />
         <button id="enter"></button>
       </div>
       </div>
@@ -88,6 +87,7 @@ root.innerHTML = `
     <div id="fxLayer"></div>
     <div id="sickness"></div>
     <div id="musicChip" style="display:none;position:absolute;bottom:10px;left:14px;z-index:20;background:rgba(0,0,0,.4);padding:4px 11px;border-radius:14px;font:12px system-ui;color:rgba(255,216,140,.9);user-select:none">♪ <a id="musicCredit" target="_blank" rel="noopener" title="Open the track on YouTube" style="color:inherit;text-decoration:underline"></a>: <span id="musicState" title="Toggle music on/off" style="cursor:pointer;text-decoration:underline;font-weight:600"></span></div>
+    <div id="sfxChip" style="display:none;position:absolute;bottom:10px;left:14px;z-index:20;background:rgba(0,0,0,.4);padding:4px 11px;border-radius:14px;font:12px system-ui;color:rgba(255,216,140,.9);user-select:none">♫ sound effects: <span id="sfxState" title="Toggle sound effects on/off" style="cursor:pointer;text-decoration:underline;font-weight:600"></span></div>
     <button id="notebookChip" style="display:none;position:absolute;bottom:10px;right:14px;z-index:20;background:rgba(0,0,0,.42);padding:5px 12px;border-radius:14px;border:1px solid rgba(255,216,140,.35);font:12px system-ui;color:rgba(255,216,140,.92);cursor:pointer;user-select:none" title="Everything you've confirmed or picked up so far">🗒 Field notebook <span id="notebookCount" style="opacity:.7"></span></button>
     <button id="debriefChip" style="display:none;position:absolute;bottom:10px;left:50%;transform:translateX(-50%);z-index:20;background:rgba(0,0,0,.42);padding:5px 12px;border-radius:14px;border:1px solid rgba(255,216,140,.35);font:12px system-ui;color:rgba(255,216,140,.92);cursor:pointer;user-select:none" title="A look behind the scenes — how this world was built to teach the technique">🔎 Reveal how this world worked</button>
     <div id="hud"><span id="hudroom"></span></div>
@@ -124,16 +124,22 @@ root.innerHTML = `
         <div class="subcard">
           <button class="mclose" id="subClose" aria-label="Close" title="Close">✕</button>
           <h2>Prepare your submission</h2>
-          <div id="subCodeWrap" style="display:none;margin-bottom:6px">
-            <div class="lbl">Your submission code — paste this into Canvas:</div>
-            <div id="subCodeVal"></div>
-            <button class="ghost" id="subCopyCode" style="margin-top:8px">Copy code</button>
+          <div id="subId" style="display:none">
+            <div class="lbl">Enter your x500 to generate your submission code and figures:</div>
+            <div class="idrow"><input id="subX500" placeholder="your x500 (e.g. bust0037)" autocomplete="off" /><button id="subX500Go">Confirm</button></div>
           </div>
-          <div id="subWork"></div>
-          <div class="subactions">
-            <button id="subPdf">⬇ Download PDF (figures + code)</button>
-            <button class="ghost" id="subDebrief" style="display:none">🔎 How this world worked</button>
-            <button class="ghost" id="subBack">Back to the room</button>
+          <div id="subBody" style="display:none">
+            <div id="subCodeWrap" style="display:none;margin-bottom:6px">
+              <div class="lbl">Your submission code — paste this into Canvas:</div>
+              <div id="subCodeVal"></div>
+              <button class="ghost" id="subCopyCode" style="margin-top:8px">Copy code</button>
+            </div>
+            <div id="subWork"></div>
+            <div class="subactions">
+              <button id="subPdf">⬇ Download PDF (figures + code)</button>
+              <button class="ghost" id="subDebrief" style="display:none">🔎 How this world worked</button>
+              <button class="ghost" id="subBack">Back to the room</button>
+            </div>
           </div>
         </div>
       </div>
@@ -203,6 +209,7 @@ const SECRET = "chem5725-noatak-2026";
 // (0–1). Loops; starts on the Enter click (a user gesture, so autoplay policy is satisfied). An
 // in-room button toggles it, and the choice is remembered in localStorage.
 let music = null, musicOn = true, musicBaseVol = 0.5;   // musicBaseVol remembered for sfx ducking
+let sfxOn = true;   // global sound-effects on/off (per-room ambience layers + solve/door stings); its own bottom-left chip, independent of the music toggle
 
 // screen 1 — wired once scenario.json has loaded
 function init(data) {
@@ -239,7 +246,10 @@ function init(data) {
   };
   $("#subPdf").onclick = exportSubmissionPdf;
   $("#subDebrief").onclick = () => openDebrief(false);   // debrief lives here now, not on an in-room chip
-  $("#x500").addEventListener("keydown", e => { if (e.key === "Enter") $("#enter").click(); });
+  // x500 is collected HERE (on the submission-prep screen), not on the landing screen — the code +
+  // figures are personalised only at compile time.
+  $("#subX500Go").onclick = confirmX500;
+  $("#subX500").addEventListener("keydown", e => { if (e.key === "Enter") confirmX500(); });
   $("#notebookChip").onclick = openNotebook;
   // Exit debrief (scenario.debrief): the in-room chip guards against spoiling a still-unsolved escape;
   // the escape-done button doesn't need to. Close returns to wherever the player was.
@@ -247,9 +257,6 @@ function init(data) {
   $("#doneDebrief").onclick = () => openDebrief(false);
   $("#debriefClose").onclick = () => $("#debrief").classList.remove("open");
   $("#enter").onclick = () => {
-    const id = $("#x500").value.trim();
-    if (!/\S/.test(id)) { $("#x500").focus(); return; }
-    window.__x500 = id;
     $("#screen1").classList.remove("active");
     $("#screen2").classList.add("active");
     gameState = JSON.parse(JSON.stringify(SCENARIO.state || {}));
@@ -269,6 +276,7 @@ function init(data) {
     startRoom(first);
   };
   setupMusic();
+  setupSfxToggle();
 }
 
 // optional looping background music as ONE bottom-left chip: "♪ <credit link>: <on/off>".
@@ -313,6 +321,35 @@ function updateMusicBtn() {
   $("#musicState").textContent = musicOn ? "on" : "off";
 }
 
+// optional global sound-effects on/off as a SECOND bottom-left chip, sibling to the music chip:
+// "♫ sound effects: <on/off>". SFX (per-room ambience layers + solve/door stings) are otherwise
+// independent of the music toggle; this lets a player silence them without silencing the music.
+// Shown ONLY if the scenario actually has sfx somewhere; stacked above the music chip when both show;
+// the choice is remembered per browser. NOTE: a few scenarios use a sound AS a puzzle clue (e.g. a
+// dripped key code) — turning sfx off would silence those too; none in the current data_vis scenarios.
+function setupSfxToggle() {
+  const chip = $("#sfxChip"), state = $("#sfxState");
+  const rooms = SCENARIO.rooms || [];
+  const anySfx = rooms.some(r => sfxListFor(r).length) ||
+    rooms.some(r => r.solveSfx || (r.hotspots || []).some(h => h.solveSfx)) ||
+    !!SCENARIO.solveSfx;
+  if (!anySfx) { chip.style.display = "none"; return; }
+  sfxOn = localStorage.getItem("panoSfx") !== "off";   // default on; remembers "off"
+  chip.style.bottom = SCENARIO.music ? "42px" : "10px";   // stack above the music chip when both show
+  chip.style.display = "";
+  updateSfxBtn();
+  state.onclick = () => {
+    sfxOn = !sfxOn;
+    localStorage.setItem("panoSfx", sfxOn ? "on" : "off");
+    if (sfxOn) { if (room) startRoomSfx(room); }   // turn back on → restart the current room's layers
+    else stopRoomSfx();                            // turn off → silence layers now (also un-ducks music)
+    updateSfxBtn();
+  };
+}
+function updateSfxBtn() {
+  $("#sfxState").textContent = sfxOn ? "on" : "off";
+}
+
 // ---- per-room sound effects (optional) ----
 // A room may carry `sfx`: one object, or an array of them (layers that play together). Each entry:
 //   { src (path rel. to play.html), volume?=0.7, duckMusicTo?, delay?=0 (SECONDS before first start),
@@ -340,7 +377,7 @@ function notifySfxChange() { try { if (window.__onSfxChange) window.__onSfxChang
 // fallback. NOT gated by the music on/off toggle. Fires when a gate is solved — a graded puzzle OR a lock
 // releasing (i.e. the door opening).
 function playOneShot(src, volume) {
-  if (!src) return;
+  if (!src || !sfxOn) return;
   try { const a = new Audio(src); a.volume = (volume != null) ? volume : 0.9; a.play().catch(() => {}); }
   catch (e) {}
 }
@@ -412,7 +449,7 @@ function _sfxCrossfade(src, vol, cfg) {
 function startRoomSfx(r) {
   const list = sfxListFor(r);
   sfxMixer = [];
-  if (!list.length) { notifySfxChange(); return; }
+  if (!sfxOn || !list.length) { notifySfxChange(); return; }   // sfx toggled off → start no layers (music undisturbed)
   let deepestDuck = null;
   list.forEach((cfg, idx) => {
     const vol = (cfg.volume != null) ? cfg.volume : 0.7;
@@ -1033,9 +1070,15 @@ function handleDoor(h) {
   if ((h.direction || "forward") === "back") {
     return navigateTo(resolveDoorTarget(h, "back"), false);   // back: no gate, no entry
   }
-  if (!doorIsOpen(h, room)) return toast((SCENARIO.stonePortals && portalAwakened(room))
-    ? "The portal is awake, but sealed — key the stones to open it."
-    : "The door won't budge — solve the puzzle first.");
+  if (!doorIsOpen(h, room)) {
+    // Test-play only: authors walk through locked doors so they can check downstream rooms without
+    // solving each gate. isTestPlay() is set by shared/test_play.html; a real student run (play.html)
+    // sets neither flag, so this bypass never fires for students — the door stays gated for them.
+    if (isTestPlay()) toast("Test-play: locked door bypassed.");
+    else return toast((SCENARIO.stonePortals && portalAwakened(room))
+      ? "The portal is awake, but sealed — key the stones to open it."
+      : "The door won't budge — solve the puzzle first.");
+  }
   if (h.endsEscape) return showEscapeDone();                  // a terminal escape exit inside any room
   if (h.to) {                                                  // explicit forward target
     const idx = SCENARIO.rooms.findIndex(r => r.key === h.to && isBuilt(r));
@@ -1482,10 +1525,14 @@ function buildPickCard(pick, onSolved, pid) {
     `<div class="qprompt">${pick.prompt || "Plot the data, then click your answer on the chart."}</div>
      <div class="pickholder" style="margin:8px 0;min-height:60px"></div>
      <div class="qfeedback"></div>
-     <button class="qsubmit">Draw the chart</button>`;
+     <button class="qsubmit">Draw the clickable chart</button>`;
   const holder = card.querySelector(".pickholder"), fb = card.querySelector(".qfeedback"),
         btn = card.querySelector(".qsubmit");
   let done = attempts >= maxA;
+  // The student must MAKE the plot themselves in the console first — a rendered plot there is the gate
+  // for drawing the (authored, tagged) clickable version. Output is cleared on modal open, so this only
+  // passes once they've run a plot in THIS puzzle.
+  const madePlot = () => { const o = $("#webr-output"); return !!(o && o.querySelector("canvas.webr-plot")); };
 
   const wireClicks = () => {
     holder.querySelectorAll("[data-id]").forEach(el => {
@@ -1517,6 +1564,11 @@ function buildPickCard(pick, onSolved, pid) {
       fb.className = "qfeedback no"; fb.innerHTML = "R is still starting — give it a moment, then press Draw.";
       return;
     }
+    if (!madePlot()) {   // enforce "make the plot yourself" before handing over the clickable picker
+      fb.className = "qfeedback no";
+      fb.innerHTML = "Plot the data in the console first (left) — run your chart, then draw the clickable version to make your pick.";
+      return;
+    }
     btn.disabled = true; const label = btn.textContent; btn.textContent = "drawing…";
     try {
       await ensureGgiraph(rconsole.webR);
@@ -1537,13 +1589,15 @@ function buildPickCard(pick, onSolved, pid) {
     }
   };
   btn.addEventListener("click", draw);
-  // Auto-draw once if R is already up (smooth on re-entry); otherwise the student presses Draw.
-  if (rconsole && rconsole.ready && !done) setTimeout(draw, 30);
+  // NO auto-draw: the student must plot in the console themselves, then draw the clickable picker and
+  // click their answer (the old auto-draw handed them the pick surface with no work once R was warm).
   // Restore end-state if attempts were exhausted earlier this session.
   if (done && attempts >= maxA) {
     fb.className = "qfeedback out"; fb.innerHTML = fbk.reveal || pick.hint || "Out of attempts.";
   } else if (attempts > 0) {
     fb.className = "qfeedback no"; fb.innerHTML = `<span class="attempts">(${attempts} of ${maxA} attempts used)</span>`;
+  } else {
+    fb.className = "qfeedback no"; fb.innerHTML = "Plot the data in the console (left), then draw the clickable chart to make your pick.";
   }
   return card;
 }
@@ -1786,7 +1840,8 @@ function finishAnalysis() {
   // Deliberately does NOT navigate or stop the room ambience: the window just presents the code and
   // CLOSES back to the room. The player walks on themselves (e.g. through the door to the escape phase),
   // so the code window is independent of room structure — it can fire from any room, in any order.
-  mintCode("analysis");
+  // The code is NOT minted here: it's keyed on the student's x500, which is now collected on the
+  // submission-prep screen (mintCode runs in buildSubmission after x500 is confirmed).
   // No escape phase → the graded work IS the end: go straight to the submission-prep screen.
   if (!hasEscapePhase()) { openSubmitPrep(); return; }
   // Escape phase exists → show the analysis finish card, offering to skip the (ungraded) escape.
@@ -1838,10 +1893,12 @@ function captureSubmissionWork(r, h) {
   const out = $("#webr-output");
   const plots = out ? out.querySelectorAll("canvas.webr-plot") : [];
   const src = plots[plots.length - 1];
-  let figure = null;
-  if (src) { try { figure = stampedFigureDataURL(src); } catch (e) { figure = null; } }
+  // Store the figure RAW here — the x500 stamp/watermark is applied later, on the submission screen,
+  // once the student enters their x500 (see stampAllFigures). Figures aren't shown until then.
+  let figureRaw = null;
+  if (src) { try { figureRaw = src.toDataURL("image/png"); } catch (e) { figureRaw = null; } }
   const question = (h && h.question && h.question.prompt) || (h && h.prompt) || "";   // carry the question forward
-  submissionWork.set(r.key, { title: r.title || r.key, code, figure, question });
+  submissionWork.set(r.key, { title: r.title || r.key, code, figure: null, figureRaw, question });
 }
 function renderSubmitWork() {
   const host = $("#subWork"); if (!host) return;
@@ -1886,7 +1943,8 @@ async function runSubmitBlock(roomKey, ta, figWrap, stat, runBtn) {
     const plots = $("#webr-output").querySelectorAll("canvas.webr-plot");
     const src = plots[plots.length - 1];
     if (src) {
-      w.figure = stampedFigureDataURL(src); submissionWork.set(roomKey, w);
+      w.figureRaw = src.toDataURL("image/png");                 // keep raw as the re-stampable source of truth
+      w.figure = stampedFigureDataURL(src); submissionWork.set(roomKey, w);   // x500 is known on this screen
       figWrap.innerHTML = `<img src="${w.figure}" alt="figure">`; stat.textContent = "figure updated ✓";
     } else stat.textContent = "ran — but no figure was drawn";
   } catch (e) { stat.textContent = "error: " + (e && e.message ? e.message : e); }
@@ -1895,15 +1953,37 @@ async function runSubmitBlock(roomKey, ta, figWrap, stat, runBtn) {
 function openSubmitPrep() {
   $("#done").classList.remove("open");
   bootConsole();                                            // warm up WebR so the refine-consoles are ready
-  const cw = $("#subCodeWrap");
-  if (mintedCode) { $("#subCodeVal").textContent = mintedCode; cw.style.display = ""; } else cw.style.display = "none";
-  $("#subDebrief").style.display = SCENARIO.debrief ? "" : "none";
-  renderSubmitWork();
+  // x500 is collected HERE, not on the landing screen. Until it's entered, show only the x500 prompt;
+  // once confirmed (this session, or on a re-open) show the code + figures + PDF.
+  const confirmed = !!window.__x500;
+  $("#subId").style.display = confirmed ? "none" : "";
+  $("#subBody").style.display = confirmed ? "" : "none";
+  if (confirmed) buildSubmission();
+  else setTimeout(() => $("#subX500").focus(), 30);
   const host = $("#submitPrep .subintro");
   const old = host.querySelector(".particles"); if (old) old.remove();
   const amb = SCENARIO.ambient || "fireflies";
   if (amb !== "none") spawnParticles(host, amb, amb === "snow" ? 40 : 18);
   $("#submitPrep").classList.add("open");
+}
+// Confirm the entered x500, then reveal + build the submission payload (code + stamped figures).
+function confirmX500() {
+  const id = $("#subX500").value.trim();
+  if (!/\S/.test(id)) { $("#subX500").focus(); return; }
+  window.__x500 = id;
+  $("#subId").style.display = "none";
+  $("#subBody").style.display = "";
+  buildSubmission();
+}
+// Fill the submission payload once the x500 is known: mint the (x500-keyed) code, personalise every
+// figure captured during play with the x500 stamp + watermark, then render the refine blocks.
+async function buildSubmission() {
+  mintCode("analysis");                                     // now keyed on the confirmed x500
+  const cw = $("#subCodeWrap");
+  if (mintedCode) { $("#subCodeVal").textContent = mintedCode; cw.style.display = ""; } else cw.style.display = "none";
+  $("#subDebrief").style.display = SCENARIO.debrief ? "" : "none";
+  await stampAllFigures();                                  // apply the x500 stamp to figures captured during play
+  renderSubmitWork();
 }
 // Build a PDF of the student's figures + code with jsPDF (loaded from a CDN in play.html/test_play.html).
 function exportSubmissionPdf() {
@@ -2068,10 +2148,12 @@ function embedWatermark(ctx, w, h, payload) {
 // Stamp a WebR figure canvas with a visible x500 corner + an invisible LSB watermark (carrying
 // `x500|scenario|epoch`); return a PNG data URL. Client-only, GitHub-Pages safe. Used when capturing
 // each room's figure for the submission PDF (downloads happen only on the submission-prep screen now).
+// `src` is a source drawable — a canvas (at solve/refine time) OR a decoded <img> (when re-stamping a
+// stored raw figure); naturalWidth/Height covers the <img> case, width/height the canvas case.
 function stampedFigureDataURL(src) {
   const who = window.__x500 || "anon";
   const c = document.createElement("canvas");
-  c.width = src.width; c.height = src.height;
+  c.width = src.naturalWidth || src.width; c.height = src.naturalHeight || src.height;
   const ctx = c.getContext("2d");
   ctx.drawImage(src, 0, 0);
   // visible corner stamp — just the x500
@@ -2087,6 +2169,25 @@ function stampedFigureDataURL(src) {
   embedWatermark(ctx, c.width, c.height, `${who}|${SCENARIO.scenario || ""}|${Date.now()}`);
   return c.toDataURL("image/png");
 }
+// Decode a raw figure dataURL into an <img>, then return it stamped with the current x500. Async
+// (image decode is async). Figures are captured raw during play (x500 unknown then) and stamped here
+// once the student enters their x500 on the submission screen. Falls back to the raw image on failure.
+function stampDataURL(raw) {
+  return new Promise(resolve => {
+    if (!raw) { resolve(raw); return; }
+    const img = new Image();
+    img.onload = () => { try { resolve(stampedFigureDataURL(img)); } catch (e) { resolve(raw); } };
+    img.onerror = () => resolve(raw);
+    img.src = raw;
+  });
+}
+// Stamp every captured figure's raw image with the confirmed x500 → `figure` (used by the on-screen
+// refine blocks and the PDF). Always derives from `figureRaw`, so it never double-stamps.
+async function stampAllFigures() {
+  for (const [k, w] of submissionWork) {
+    if (w && w.figureRaw) { w.figure = await stampDataURL(w.figureRaw); submissionWork.set(k, w); }
+  }
+}
 
 function bootConsole() {
   if (rconsole) return;
@@ -2098,6 +2199,15 @@ function bootConsole() {
   rconsole.init().then(() => { runBtn.disabled = false; })
     .catch(e => { $("#webr-status").textContent = "R failed to start: " + (e.message || e); });
   runBtn.addEventListener("click", () => rconsole.run($("#code-input").value));
+  // Ctrl/⌘+Enter in the editor runs it, like the standalone WebR sandbox. #code-input is the single
+  // persistent console textarea (moved into whichever puzzle modal is open), so this one listener
+  // covers every puzzle modal that carries a console (MCQ, check, and pick).
+  $("#code-input").addEventListener("keydown", e => {
+    if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+      e.preventDefault();
+      if (!runBtn.disabled) runBtn.click();
+    }
+  });
 }
 
 // ---- load the scenario (single source of truth) and go ----

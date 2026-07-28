@@ -248,7 +248,7 @@ spot→candle-size). Candidates, best-structured first:
 |---|---|---|---|
 | **tequila_chemistry** | 4720×6 | **16 bottles × 5 reps**, per compound; bottles also fall into classes (Blanco/Reposado/Añejo) | **Best raw structure.** 16 groups → plenty of distractors + a natural 2-level (two bottles → t) → many-level (bottle class → ANOVA) → pairwise-across-bottles (boss). Exercises.csv Q1 dataset. |
 | **algae_data** | 180×5 | 3 strains × 2 regimes × 3 reps | The exercise's own `pairwiseTTest` set — but only 3 strains / 3 reps: **too thin** for ≥6 distractors and a rich ANOVA/pairwise boss. |
-| **hawaii_aquifers** | 954×6 | 10 aquifers × ~ wells, per analyte | The **chapter's own worked example** → risks feeling like the lecture; and **Hawaii is already a scenario** (`data_vis/Hawaii`, id 7). Good structure though. |
+| **hawaii_aquifers** | 954×6 | 10 aquifers × ~ wells, per analyte | The **chapter's own worked example** → risks feeling like the lecture; and **hawaii is already a scenario** (`data_vis/hawaii`, id 7). Good structure though. |
 | **wine_grape_data** | 1070×5 | 5 cultivars × 2 treatments (dry/well-watered) × 2 chroma, per metabolite | Clean **two-factor** design (treatment → t; cultivar → ANOVA). Replicate depth unclear (may be 1 per cell) — check before use. |
 | **wine_quality** | 6497×14 | 2 types (red/white) + 7 quality scores, 11 continuous props | Huge n → a **very strong two-means** (red vs white), but only 2 main groups; quality_score (7) for ANOVA. |
 | **beer_components** | 3625×6 | 5 ingredients × 5 reps, per analyte | Decent (5 groups, 5 reps); 5 groups is a bit tight for ≥6 distractors on the many-means rung. |

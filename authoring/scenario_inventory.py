@@ -31,7 +31,7 @@ def main():
         phases = sorted({r.get("phase", "analysis") for r in rooms})
         # An escape exists in any of three forms: the legacy phase="escape" room, OR the current style —
         # a `lock` hotspot (the no-instructions keypad) in any room, OR a scenario-level `escapeDone`
-        # screen. The phases-only check missed the current style (Hawaii's valve-keypad escape, flagged
+        # screen. The phases-only check missed the current style (hawaii's valve-keypad escape, flagged
         # 2026-07-22), so detect all three.
         has_escape = (
             "escape" in phases

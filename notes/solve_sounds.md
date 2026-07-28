@@ -19,7 +19,7 @@ gate for audition + one-click "Use this" (materialises into `audio/` and sets `s
 - `boss` the_workbench_laptop — **heavy exterior door → wind/snow** (helicopter rotors beyond)
 - `escape1` the_keypad_panel (lock) — **helicopter passenger hatch** opening
 
-**Hawai'i — `data_vis/Hawaii` ("Saltwater Intrusion"), field lab + wellheads**
+**Hawai'i — `data_vis/hawaii` ("Saltwater Intrusion"), field lab + wellheads**
 - `room1` the_lab_laptop — **heavy wooden door** (to night porch)
 - `room2` the_field_laptop — **creaky wooden gate** (mossy jungle gate)
 - `room3` the_colleague_s_laptop — **steel access hatch** flipping open (metal + ladder)

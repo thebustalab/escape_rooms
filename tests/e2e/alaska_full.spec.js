@@ -81,7 +81,12 @@ test("alaska: full analysis + notebook image-stack + keypad escape", async ({ pa
     await expect(page.locator("#modal.open")).toBeVisible();
     // The picker needs the booted WebR session; wait for it (boots eagerly at scenario start).
     await expect(page.locator("#webr-status")).toContainText("ready", { timeout: 90_000 });
-    // "Draw the chart" → renderPickSvg (first pick room also lazy-installs ggiraph → allow generous time).
+    // The student must MAKE the plot in the console first — that rendered plot is now the gate for
+    // drawing the clickable picker (auto-draw removed 2026-07-28). Run a plot, wait for its canvas.
+    await page.locator("#code-input").fill("ggplot(alaska_lake_data, aes(lake, mg_per_L)) + geom_col()");
+    await page.locator("#run-btn").click();
+    await expect(page.locator("#webr-output canvas.webr-plot")).not.toHaveCount(0, { timeout: 120_000 });
+    // "Draw the clickable chart" → renderPickSvg (first pick room also lazy-installs ggiraph → allow generous time).
     const holder = page.locator("#modal .pickholder");
     await page.locator("#modal .qsubmit").click();
     await expect(holder.locator("[data-id]")).not.toHaveCount(0, { timeout: 120_000 });
@@ -130,8 +135,7 @@ test("alaska: full analysis + notebook image-stack + keypad escape", async ({ pa
     }
   }
 
-  // --- enter -----------------------------------------------------------------
-  await page.fill("#x500", "test0001");
+  // --- enter (x500 is now collected on the submission screen, not here) ------
   await page.locator("#enter").click();
   await expect(page.locator("#hudroom")).toHaveText(room("room1").title, { timeout: 30_000 });
 
@@ -167,6 +171,10 @@ test("alaska: full analysis + notebook image-stack + keypad escape", async ({ pa
   await expect(page.locator("#codeWrap")).toBeHidden();
   await page.locator("#doneToSubmit").click();                                          // → submission-prep screen
   await expect(page.locator("#submitPrep.open")).toBeVisible({ timeout: 10_000 });
+  // x500 is now entered HERE (not on the landing screen); confirming it mints + reveals the code.
+  await page.fill("#subX500", "test0001");
+  await page.locator("#subX500Go").click();
+  await expect(page.locator("#subCodeVal")).toBeVisible({ timeout: 10_000 });
   expect((await page.locator("#subCodeVal").textContent()).trim().length).toBeGreaterThan(0);
   await page.locator("#subBack").click();                                               // back to the room
   await expect(page.locator("#submitPrep.open")).toBeHidden();

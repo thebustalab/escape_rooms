@@ -40,8 +40,7 @@ test("alaska room 1: correct MCQ logs the answer, swaps the door, and advances",
   });
   expect(info.nopts).toBeGreaterThanOrEqual(6);                     // house rule: ≥6 options
 
-  // enter the scenario
-  await page.fill("#x500", "test0001");
+  // enter the scenario (x500 is now collected at submission, not here)
   await page.locator("#enter").click();
 
   // the room is up once its puzzle hotspot has registered (present, not necessarily in-view)

@@ -8,6 +8,18 @@ Escape-room case for the **Data Visualization** chapter (first data-vis
 assignment). Three practice rooms then a boss room. Each room adds one new move
 on the same dataset so it's familiar by the boss.
 
+> **STATE 2026-07-28 — GitHub Pages 404 (folder case) fix in progress.** Hawaii 404'd online
+> while Alaska worked. Root cause: the `escape_rooms` repo (its own standalone git repo,
+> `github.com/thebustalab/escape_rooms.git`) tracked the folder as **`rooms/data_vis/Hawaii/`**
+> (capital H, on `origin/main` HEAD `55d0e0c`), but the book links + on-disk folder are lowercase
+> `hawaii`. GitHub Pages is case-sensitive → lowercase link 404s. **Fix (Lucas, on the Mac):**
+> `git rm -r --cached rooms/data_vis/Hawaii` → `git add rooms/data_vis/hawaii` → verify `git status`
+> shows the capital→lowercase rename → commit + push. Pages rebuilds in ~1 min. Separately, ALL
+> internal capital-`Hawaii` path/identifier references were lowercased on 2026-07-28 (scenario.json
+> `"scenario":"hawaii"`, generated `scenario_inventory.json`, `tests/e2e/smoke.spec.js`, decoder
+> comments, notes/AGENTS path refs) — leaving only correct English ("Hawaiian" adjective in art
+> prompts, "Hawai'i" place name, and two geographic place-name mentions in `notes/candidate_locations.md`).
+
 ## REDESIGN 2026-07-16 (Lucas) — a continuous field-rounds story
 
 The generic filter-and-facet ladder (below, kept for history) was replaced by a
@@ -284,8 +296,8 @@ After Lucas placed the art + hotspots, the puzzle/clue/lock/door content was wir
 - **Puzzle-authoring rules tightened (2026-07-21, Lucas → skill).** Two new conventions in the design
   skill, applied across ALL scenarios (alaska/hawaii/airship/hospital): (3) `starterCode` is the **bare
   data-object name only** — no commented instruction lines (exception: repair-the-pipeline puzzles like
-  Hawaii **room3**, which keeps its intentionally-broken `filter(...)` code); (4) the `question.prompt`
-  is the **raw question only** — the method (filter/plot/reshape) moves to `feedback.wrong[0]`. Hawaii's
+  hawaii **room3**, which keeps its intentionally-broken `filter(...)` code); (4) the `question.prompt`
+  is the **raw question only** — the method (filter/plot/reshape) moves to `feedback.wrong[0]`. hawaii's
   starters/prompts were swept to match.
 
 ---
@@ -336,3 +348,27 @@ reshaped so each rung adds a real increment (the old room1/room2 and room2/room3
   **filter-first-vs-global-max**; left as candidates for the boss map-pick's companion console if wanted.
   At assignment-1 level the existing boundary nudge (19 feels over 20) + the boss's read-the-right-analyte
   distractors were judged proportionate.
+
+---
+
+## Room 3 console-check wired + decoder fixed (2026-07-28, Claude ← Lucas)
+
+Room 3 had been switched to console-check mode in the harness but left as an **empty skeleton**
+(`expr:""`, no prompt/requires/feedback), so hitting "Check my answer" evaluated an empty R
+expression → error → it could never grade correct. This is the Phase-2 upgrade the format notes
+above planned (student repairs the pipeline instead of picking an MCQ option). Wired it up:
+
+- **Room 3 check.** `starterCode` = the colleague's intentionally-**broken** chloride filter
+  (`filter(aquifer_code = "aquifer_6", analyte = Cl)` — `=` for `==`, unquoted `Cl`). Student fixes
+  it, keeps `abundance > 250`, and assigns the flagged `well_name` to `answer`. `requires:["answer"]`,
+  `expr: toupper(trimws(as.character(answer))) == "KEEI_B"`. Answer re-verified against the CSV:
+  **KEEI_B (280) is the only aquifer_6 Cl well over 250** (next is HOLUALOA at 210). Prompt is the raw
+  question + assign mechanic; filtering method sits in `feedback.wrong[0]`; no `reveal`.
+- **Decoder fixed — the real second bug.** A console-check room encodes `answer=1` on solve, but
+  `DATA_VIS_HAWAII_KEY` still had room 3 as MCQ index **0** (`c(3,5,0,2)`), so a correctly-solved
+  room 3 would have graded WRONG. Key → **`c(3,5,1,2)`**; comments + the decoder self-test's `psteps`
+  updated (Q3 answer 0→1). `validate_keys.py`: hawaii **PASS**. Rscript self-test: hawaii **40/40**.
+- **Added `test_hawaii.py`** (there was none) — pins all four answers to the CSV, asserts room 3 stays a
+  console-check targeting KEEI_B (not a reverted MCQ), MCQ correct-index↔option-text lockstep, and the
+  decoder key `c(3,5,1,2)`. All pass.
+- **Still MCQ:** room 1, room 2, boss. Only room 3 is a console-check for now.

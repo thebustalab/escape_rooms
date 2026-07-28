@@ -15,7 +15,7 @@ What it checks, per rooms/<chapter>/<scenario>/scenario.json:
     `correct` vector of the decoder key whose scenario_id matches the scenario's id;
   - every correct index is within its options list;
   - no MCQ has duplicate option text (a duplicated option lets the correct index resolve to the wrong
-    slot while still matching the decoder number — the Hawaii room2 bug, 2026-07-22);
+    slot while still matching the decoder number — the hawaii room2 bug, 2026-07-22);
   - exactly one decoder key matches the scenario id (else: missing / ambiguous).
 
 Soft (non-failing) WARN: a scenario whose built rooms all key to the same option index
@@ -65,7 +65,7 @@ def scenario_expected(doc):
             opts, c = q["question"].get("options", []), q["question"].get("correct")
             # Duplicate options are always a bug: the codec records the *index*, so if two options carry
             # the same text the correct index can silently resolve to the wrong (or a duplicated) slot —
-            # exactly the Hawaii room2 failure (2026-07-22), which passed the index-vs-key check because
+            # exactly the hawaii room2 failure (2026-07-22), which passed the index-vs-key check because
             # scenario.json and the decoder agreed on the number while that slot held the wrong text.
             dupes = sorted({o for o in opts if opts.count(o) > 1})
             if dupes:

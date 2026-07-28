@@ -41,7 +41,7 @@ henges arc); re-light freely for other chapters. **Best use** applies the scale 
 
 | Location | Image / mood | Best use | Overlap flags |
 |----------|--------------|----------|---------------|
-| **Waterfall gorge** | henge on a ledge beside a great cascade, drifting spray, first rainbows, moss-wet stones | **Whole scenario** — structured, could carry a room-chain (ledges/pools/cave-behind) | **Clean** — water, but unlike Egypt's harbour or Hawaii's coast. |
+| **Waterfall gorge** | henge on a ledge beside a great cascade, drifting spray, first rainbows, moss-wet stones | **Whole scenario** — structured, could carry a room-chain (ledges/pools/cave-behind) | **Clean** — water, but unlike Egypt's harbour or hawaii's coast. |
 | **Red-rock slot canyon** ⇒ **CLAIMED** (`hierarchical_clustering/canyon`, 2026-07-25) | dawn light sliding down narrow sandstone walls, warm, vertical, close | **Whole scenario** — a network of canyons/chambers threads naturally | **Clean** — no dry warm canyon in use. |
 | **Blooming heather moor** | endless purple heather, mist pooled in the hollows, stones rising from it | Room or scenario | **Clean** — very henge-authentic; no moor in use. |
 | **Basalt giant's-causeway** | hexagonal columns stepping into a misty sea; arches formed of the columns | Room or scenario | Mild — basalt reads faintly *volcanic* (Hawaii); a cold misty causeway is otherwise distinct. |

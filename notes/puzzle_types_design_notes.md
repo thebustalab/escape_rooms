@@ -196,6 +196,15 @@ handler reads `evt.target.closest('[data-id]').getAttribute('data-id')` and comp
 with the same feedback ladder as the MCQ/`check` cards. The student still writes real plotting code in
 the console to reason about the data; the picker is the graded "click the answer" surface.
 
+**Making the plot is now ENFORCED (2026-07-28).** Originally the picker **auto-drew** as soon as WebR was
+warm, so once R had booted from an earlier room a student could open a pick room and click the answer
+without plotting anything (Lucas caught this on alaska room3). Removed the auto-draw; the "Draw the
+clickable chart" button now checks that the student has **rendered a plot in the console** (a
+`canvas.webr-plot` in `#webr-output`, which is cleared on modal open) before it will draw the tagged
+picker — otherwise it nudges "plot the data in the console first". So the flow is genuinely: make the
+plot yourself → draw the clickable version → click your pick. (`buildPickCard`/`madePlot` in
+`pano-player.js`; the e2e `solvePick` helper now runs a plot before drawing.)
+
 **Engine — BUILT 2026-07-22** (`shared/pano-player.js`). `openPuzzle` dispatches `h.pick` →
 `openPickPuzzle` (live console left + picker right). `renderPickSvg` runs the authored `pick.plotCode`
 (leaves the ggplot in `p`) through ggiraph's `dsvg` device and returns the tagged SVG;
