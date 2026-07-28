@@ -4,7 +4,7 @@
   "id": 6,
   "title": "Signal in the Cold",
   "subtitle": "Data Visualization · filter() + plotting",
-  "story": "You're a trainee data analyst and helicopter pilot at a remote Alaskan field station, in for a routine afternoon of water chemistry work. But somewhere out on the tundra a pilot has gone missing — and by the time you reach the helipad, you're the only one left who can work out where they really are. Can you save the day?",
+  "story": "You're a trainee data analyst and helicopter pilot at a remote Alaskan field station, in for a routine afternoon of water chemistry work. But somewhere out on the tundra a pilot has gone missing. By the time you reach the helipad, you're the only one left who can work out where they really are. Can you save the day?",
   "enterLabel": "Start your shift →",
   "done": {
     "title": "The pilot is found!",
@@ -119,7 +119,7 @@
             0.3583,
             0.5361
           ],
-          "body": "Hand drawn on a piece of thin paper, captioned in Claire's tidy hand: “Red pane — thinking about putting this one up in the window in here.\" — Claire, your favorite helicopter pilot.”",
+          "body": "Hand drawn on a piece of thin paper, captioned in Claire's tidy hand:\n\n\"My red pane pattern — thinking about putting this one up in the window. What do you all think?\n— Claire, your favorite helicopter pilot.\"",
           "image": "escape_grids/mask_room1.png?v=4",
           "pickup": "Claire's RED template",
           "overlay": true
@@ -202,7 +202,7 @@
       ],
       "entry": {
         "title": "A coffee and a favour",
-        "text": "One lake flagged — North_Killeak — and your training task is done for the day. You wander into the kitchen for a coffee, and your coworker is there, buried in magnesium readings. “Since you're up,” they say, “would you mind checking my work? I measured magnesium across all the lakes and I want to know which one comes out on top. Can you please help me?”",
+        "text": "One lake flagged and your training task is done for the day. You wander into the kitchen for a coffee, and your coworker is there, buried in magnesium readings. “Since you're up,” they say, “would you mind checking my work? I measured magnesium across all the lakes and I want to know which one comes out on top in the Noatak preserve. Can you please help me?”",
         "button": "Pour a coffee and have a seat →"
       },
       "panorama": "room2/scene.png",
@@ -225,16 +225,16 @@
             0.6462,
             0.734
           ],
-          "starterCode": "alaska_lake_data %>%",
+          "starterCode": "alaska_lake_data %>%\nfilter(park = NOAT) %>%\nggplot()",
           "question": {
             "prompt": "Your coworker wants to know: among the Noatak preserve (NOAT) lakes, which one has the most magnesium?",
             "options": [
-              "North_Killeak_Lake — BELA",
-              "Wild_Lake — GAAR",
-              "Feniak_Lake — NOAT",
-              "Desperation_Lake — NOAT",
-              "Lake_Kangilipak — NOAT",
-              "Okoklik_Lake — NOAT"
+              "North_Killeak_Lake",
+              "Wild_Lake",
+              "Feniak_Lake",
+              "Desperation_Lake",
+              "Lake_Kangilipak",
+              "Okoklik_Lake"
             ],
             "correct": 2,
             "maxAttempts": 4,
@@ -259,7 +259,7 @@
             0.4617,
             0.9184
           ],
-          "body": "Hand drawn on a piece of thin paper, captioned in Claire's tidy hand: “Green pane design — this one's my favorite!\" — Claire, your favorite helicopter pilot.”",
+          "body": "Hand drawn on a piece of thin paper, captioned in Claire's tidy hand: \"Green pane design — this one's my favorite! Can we put it up in the kitchen? — Claire, your favorite helicopter pilot.\"",
           "image": "escape_grids/mask_room2.png?v=4",
           "pickup": "Claire's GREEN template",
           "overlay": true
@@ -321,7 +321,7 @@
         {
           "src": "audio/room2_kettle_boil.mp3",
           "mode": "interval",
-          "volume": 0.02
+          "volume": 0.05
         }
       ]
     },
@@ -350,7 +350,7 @@
       ],
       "entry": {
         "title": "Nobody home",
-        "text": "Walker Lake tops the magnesium list — your coworker nods, satisfied, and points you to the radio room. But when you get there it's empty: a chair overturned, headphones on the floor, everyone gone in a hurry. A note is left behind — an exploration pilot is missing, last known to be flying over the lake with the highest chloride. You'd better find out which lake that is.",
+        "text": "The magnesium list is sorted. Your coworker nods, satisfied, and you head to the radio room. But when you get there it's empty: a chair overturned, headphones on the floor, everyone gone in a hurry. A note is left behind: an exploration pilot is missing, last known to be flying over the lake with the highest chloride. You'd better find out which lake that is.",
         "button": "Enter the radio room →"
       },
       "panorama": "room3/scene.png",
@@ -375,7 +375,7 @@
           ],
           "starterCode": "alaska_lake_data",
           "pick": {
-            "prompt": "The note says the missing pilot went to the lake with the highest chloride. Twenty lakes is too many to eyeball — plot chloride across all of them and assign your plot to <code>p</code>, then draw the clickable chart and click the lake that spikes above the rest.",
+            "prompt": "The note says the missing pilot went to the lake with the highest chloride. Which lake is that?",
             "plotCode": "p <- ggplot(dplyr::filter(alaska_lake_data, element == \"Cl\"),\n            aes(reorder(lake, mg_per_L), mg_per_L)) +\n     ggiraph::geom_col_interactive(aes(data_id = lake, tooltip = lake)) +\n     coord_flip() +\n     labs(x = NULL, y = \"Chloride (mg/L)\")",
             "answer": "North_Killeak_Lake",
             "width": 6,
@@ -405,7 +405,7 @@
             0.3485,
             0.4345
           ],
-          "body": "Hand drawn on a piece of thin paper, captioned in Claire's tidy hand: “Blue pane design — this one's for the radio room!\" — Claire, your favorite helicopter pilot.”",
+          "body": "Hand drawn on a piece of thin paper, captioned in Claire's tidy hand:\n\n\"Blue pane design — this one's for the radio room!\n— Claire, your favorite helicopter pilot.\"",
           "image": "escape_grids/mask_room3.png?v=4",
           "pickup": "Claire's BLUE template",
           "overlay": true
@@ -467,7 +467,7 @@
         {
           "src": "audio/room3_radio_noise_alt.mp3",
           "mode": "interval",
-          "volume": 0.2
+          "volume": 0.15
         },
         {
           "src": "audio/room3_radio_static.mp3",
@@ -532,7 +532,7 @@
           ],
           "starterCode": "alaska_lake_data",
           "pick": {
-            "prompt": "Everyone flew to North_Killeak — the high-chloride lake — but the beacon still transmits, so the pilot is alive and must be somewhere milder. Plot the water temperature across the lakes and assign your plot to <code>p</code>, then draw the clickable chart and click the one to fly to.",
+            "prompt": "Everyone flew to North_Killeak — the high-chloride lake — but the beacon still transmits, so the pilot must still be alive.",
             "plotCode": "p <- ggplot(dplyr::distinct(alaska_lake_data, lake, water_temp),\n            aes(reorder(lake, water_temp), water_temp)) +\n     ggiraph::geom_col_interactive(aes(data_id = lake, tooltip = lake)) +\n     coord_flip() +\n     labs(x = NULL, y = \"Water temperature (°C)\")",
             "answer": "Lava_Lake",
             "width": 6,
