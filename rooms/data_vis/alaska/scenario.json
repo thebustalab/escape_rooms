@@ -532,7 +532,7 @@
           ],
           "starterCode": "alaska_lake_data",
           "pick": {
-            "prompt": "Everyone flew to North_Killeak — the high-chloride lake — but the beacon still transmits, so the pilot must still be alive.",
+            "prompt": "Everyone flew to North_Killeak — the high-chloride lake — but the beacon still transmits, so the pilot is alive and must be somewhere milder. Plot the water temperature across the lakes and assign your plot to <code>p</code>, then draw the clickable chart and click the one to fly to.",
             "plotCode": "p <- ggplot(dplyr::distinct(alaska_lake_data, lake, water_temp),\n            aes(reorder(lake, water_temp), water_temp)) +\n     ggiraph::geom_col_interactive(aes(data_id = lake, tooltip = lake)) +\n     coord_flip() +\n     labs(x = NULL, y = \"Water temperature (°C)\")",
             "answer": "Lava_Lake",
             "width": 6,
@@ -562,7 +562,7 @@
             0.3271,
             0.619
           ],
-          "body": "Beacons transmit only while the wearer's heart is still beating. A beacon still active after many hours means the wearer is alive — and to have lasted that long out in the field, they must be somewhere where they can keep warm, or where the environment is relatively warm on its own."
+          "body": "From the beacon company's owner's manual:\n\nBeacons transmit only while the wearer's heart is still beating. A beacon still active after many hours means the wearer is alive. To have lasted a long time out in the field, they must be somewhere where they can keep warm, or where the environment is relatively warm on its own."
         },
         {
           "id": "claire_s_tail_number_board",
@@ -574,7 +574,7 @@
             0.2424,
             0.5254
           ],
-          "body": "Claire's dispatch board hangs on the wall.",
+          "body": "A chart in Claire's handwriting on the wall.",
           "image": "escape_grids/code_grid.png?v=4",
           "pickup": true
         },
@@ -641,7 +641,7 @@
         {
           "src": "audio/boss_distress_beep.mp3",
           "mode": "interval",
-          "volume": 0.1
+          "volume": 0.05
         },
         {
           "src": "audio/boss_instrument_hum.mp3",
@@ -675,7 +675,7 @@
       },
       "entry": {
         "title": "Out onto the pad",
-        "text": "Cold air and floodlights. Claire's helicopter waits on the pad — its hatch sealed by a four-character keypad. Work out the four-digit entry code to open the hatch and fly to the missing pilot.",
+        "text": "Cold air and floodlights. Claire's helicopter waits on the pad. You know where to take it to save the missing pilot, but the chopper's hatch is sealed by a four-character keypad. Work out the four-digit entry code to open the hatch and fly to the missing pilot.",
         "button": "Step out →"
       },
       "hotspots": [
