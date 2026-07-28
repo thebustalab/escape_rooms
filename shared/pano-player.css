@@ -191,7 +191,11 @@ button.ghost { background:transparent; color:var(--ink); border:1px solid var(--
 /* test-play only — the "Solve" shortcut, tucked just left of the ✕ close (see isTestPlay in the player) */
 .mbox #devSolveBtn { position:absolute; top:8px; right:44px; z-index:2; font-size:12px; padding:5px 10px; opacity:.8; }
 .mbox #devSolveBtn:hover { opacity:1; }
-.mtitle { color:var(--amber); font-size:15px; font-weight:600; margin-bottom:8px; padding-right:34px; }
+/* Modal titles are suppressed in the player + test player (2026-07-28, Lucas): the header text is
+   hidden but the strip is kept (min-height) so the ✕ close / ⏭ Solve buttons never overlap the body.
+   openModal still writes #mtitle.textContent (harmless) — only the display is turned off here, so
+   restoring titles is a one-line CSS revert. */
+.mtitle { visibility:hidden; min-height:20px; margin-bottom:8px; }
 /* weight the split toward the console (left); MC/question pane (right) is narrow (~2/3 of a 3:2 split) */
 .qa { display:grid; grid-template-columns:minmax(0,11fr) minmax(0,4fr); gap:16px; }
 @media (max-width:760px){ .qa { grid-template-columns:1fr; } }

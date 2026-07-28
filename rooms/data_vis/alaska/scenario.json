@@ -375,7 +375,7 @@
           ],
           "starterCode": "alaska_lake_data",
           "pick": {
-            "prompt": "The note says the missing pilot went to the lake with the highest chloride. Twenty lakes is too many to eyeball — plot chloride across all of them, then click the lake that spikes above the rest.",
+            "prompt": "The note says the missing pilot went to the lake with the highest chloride. Twenty lakes is too many to eyeball — plot chloride across all of them and assign your plot to <code>p</code>, then draw the clickable chart and click the lake that spikes above the rest.",
             "plotCode": "p <- ggplot(dplyr::filter(alaska_lake_data, element == \"Cl\"),\n            aes(reorder(lake, mg_per_L), mg_per_L)) +\n     ggiraph::geom_col_interactive(aes(data_id = lake, tooltip = lake)) +\n     coord_flip() +\n     labs(x = NULL, y = \"Chloride (mg/L)\")",
             "answer": "North_Killeak_Lake",
             "width": 6,
@@ -389,7 +389,9 @@
                 "That's not the outlier — look for the single bar that dwarfs the rest, then click it."
               ],
               "reveal": "The chloride outlier is North_Killeak_Lake (337 mg/L)."
-            }
+            },
+            "idColumn": "lake",
+            "idNoun": "lake"
           },
           "solveSfx": "audio/solve_room3_a_still_glowing_laptop_2.mp3"
         },
@@ -530,7 +532,7 @@
           ],
           "starterCode": "alaska_lake_data",
           "pick": {
-            "prompt": "Everyone flew to North_Killeak — the high-chloride lake — but the beacon still transmits, so the pilot is alive and must be somewhere milder. Plot the water temperature across the lakes and click the one to fly to.",
+            "prompt": "Everyone flew to North_Killeak — the high-chloride lake — but the beacon still transmits, so the pilot is alive and must be somewhere milder. Plot the water temperature across the lakes and assign your plot to <code>p</code>, then draw the clickable chart and click the one to fly to.",
             "plotCode": "p <- ggplot(dplyr::distinct(alaska_lake_data, lake, water_temp),\n            aes(reorder(lake, water_temp), water_temp)) +\n     ggiraph::geom_col_interactive(aes(data_id = lake, tooltip = lake)) +\n     coord_flip() +\n     labs(x = NULL, y = \"Water temperature (°C)\")",
             "answer": "Lava_Lake",
             "width": 6,
@@ -544,7 +546,9 @@
                 "That's not the warmest — the tallest temperature bar is the lake to fly to."
               ],
               "reveal": "The warmest lake is Lava_Lake (~20°C)."
-            }
+            },
+            "idColumn": "lake",
+            "idNoun": "lake"
           },
           "solveSfx": "audio/solve_boss_the_workbench_laptop_1.mp3"
         },

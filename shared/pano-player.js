@@ -782,7 +782,7 @@ function spawnParticles(parent, kind, n) {
     if (kind === "snow") {
       const drifts = ["snowFall", "snowFall2", "snowFall3"];
       const size = (2 + Math.random() * 4).toFixed(1);         // 2–6px flakes
-      const fd = 8 + Math.random() * 9;                        // 8–17s fall
+      const fd = 15 + Math.random() * 13;                      // 15–28s fall (gentle, slow drift)
       f.className = "snowflake";
       f.style.left = (Math.random() * 100).toFixed(2) + "%";
       f.style.width = f.style.height = size + "px";
@@ -1471,14 +1471,17 @@ async function checkAnswer(check, webR) {
 }
 
 // ---- Type 4: pick-the-point (make the plot, click the answer) ----
-// The student explores in the live console (left pane), then the engine renders an INTERACTIVE ggiraph
-// plot — authored in `pick.plotCode`, its geoms tagged with `data_id` — into the right pane; clicking the
-// point whose `data-id` === `pick.answer` solves the room. Graded like a `check`: reports { answer:1,
+// The student builds their OWN plot in the live console (left pane) and assigns it to `p`; the engine
+// then renders THAT plot as the clickable surface (right pane) by swapping each layer's geom for its
+// ggiraph interactive twin and splicing `data_id`/`tooltip = <idColumn>` (renderStudentPickSvg). Clicking
+// the mark whose `data-id` === `pick.answer` solves the room. Graded like a `check`: reports { answer:1,
 // attempts } so it flows through solveRoom -> roomResults -> codec with NO schema change (a pick room's
 // decoder-key slot is therefore 1, the "solved" byte, same as a console-check). ggiraph is installed
 // LAZILY on first use so only picker rooms pay its ~6.5s install (it's off the scenario-wide boot).
-// Feasibility + timings verified 2026-07-22 (tests/ggiraph_smoke.mjs; notes/puzzle_types_design_notes.md).
-// pick: { prompt, plotCode, answer, width?, height?, maxAttempts?, hint?, feedback?:{correct,wrong[],reveal} }
+// Rendering the student's own plot (2026-07-28): robust to aes() in ggplot() OR the geom, coord_flip,
+// points/bars, piped data — validated in tests/student_pick_smoke.mjs. `pick.plotCode` (the authored
+// plot) is retained as a reference/fallback but is NOT rendered in normal play.
+// pick: { prompt, answer, idColumn, idNoun?, plotCode?, width?, height?, maxAttempts?, hint?, feedback?:{correct,wrong[],reveal} }
 let ggiraphReady = false;
 async function ensureGgiraph(webR) {
   if (ggiraphReady) return;
@@ -1487,9 +1490,9 @@ async function ensureGgiraph(webR) {
   if (!have) await webR.installPackages(["ggiraph"], { quiet: true });
   ggiraphReady = true;
 }
-// Run the authored plot code (which must leave its ggplot in `p`) through ggiraph's dsvg device and return
-// the SVG markup. dsvg tags each interactive geom with data-id='<value>' (single-quoted). ggplot2/ggiraph/
-// dplyr are attached here so plotCode can use bare ggplot()/aes()/geom_*_interactive()/filter().
+// LEGACY / reference: render the AUTHORED plot code (which must leave its ggplot in `p`) through
+// ggiraph's dsvg device. Retained for the smoke test + as an optional fallback; NOT used in normal play
+// now that the picker renders the student's own plot (renderStudentPickSvg below).
 async function renderPickSvg(webR, pick) {
   const w = pick.width || 7, h = pick.height || 4.2;
   const rcode =
@@ -1501,11 +1504,51 @@ async function renderPickSvg(webR, pick) {
     "paste(readLines(.er_f), collapse = \"\\n\") }";
   return webR.evalRString(rcode);
 }
+// Render the STUDENT'S own plot (the ggplot they assigned to `p` in the console) as the clickable picker:
+// swap each layer's geom for its ggiraph interactive twin and splice data_id/tooltip = <pick.idColumn>,
+// so the marks on their chart become clickable + identity-tagged. `data_id` only needs the id column to
+// exist in the layer data, so it's robust to WHERE aes() lives (ggplot() vs the geom), to coord_flip,
+// points/bars, and piped data (validated: tests/student_pick_smoke.mjs). Throws if `p` isn't a taggable
+// ggplot — the caller turns that into a "use a standard ggplot" nudge.
+async function renderStudentPickSvg(webR, pick) {
+  const w = pick.width || 7, h = pick.height || 4.2;
+  const idcol = JSON.stringify(pick.idColumn || "");
+  const rcode = `{ suppressWarnings(suppressMessages({ library(ggplot2); library(ggiraph); library(dplyr) }))
+.er_make_interactive <- function(p, idcol) {
+  if (!inherits(p, "ggplot")) stop("not a ggplot")
+  ns <- asNamespace("ggiraph")
+  twin <- function(geom) {
+    cand <- paste0("GeomInteractive", sub("^Geom", "", class(geom)[1]))
+    if (exists(cand, envir = ns, inherits = FALSE)) get(cand, envir = ns) else NULL
+  }
+  changed <- FALSE
+  for (i in seq_along(p$layers)) {
+    g <- twin(p$layers[[i]]$geom)
+    if (is.null(g)) next
+    p$layers[[i]]$geom <- g
+    add <- ggplot2::aes(data_id = !!rlang::sym(idcol), tooltip = !!rlang::sym(idcol))
+    m <- p$layers[[i]]$mapping
+    p$layers[[i]]$mapping <- if (is.null(m)) add else utils::modifyList(m, add)
+    changed <- TRUE
+  }
+  if (!changed) stop("no taggable layer")
+  p
+}
+.er_p <- .er_make_interactive(p, ${idcol})
+.er_f <- tempfile(fileext = ".svg")
+ggiraph::dsvg(file = .er_f, width = ${w}, height = ${h})
+print(.er_p); grDevices::dev.off()
+paste(readLines(.er_f), collapse = "\\n") }`;
+  return webR.evalRString(rcode);
+}
 function openPickPuzzle(h) {
   if (viewer) resumeYaw = viewer.getYaw();
   // Seed the console while it's still in the document (querying #code-input after the move returns null).
   $("#code-input").value = h.starterCode || "";
   $("#webr-output").innerHTML = "";
+  // Clear any `p` left over from an earlier pick room so THIS room requires the student to build their
+  // own plot (the draw gate is `p` being a fresh ggplot). Best-effort, fire-and-forget.
+  if (rconsole && rconsole.ready) rconsole.webR.evalRVoid('suppressWarnings(if (exists("p")) rm(p))').catch(() => {});
   const cb = $("#console-block");
   const grid = document.createElement("div"); grid.className = "qa";
   const left = document.createElement("div");    // live console pane
@@ -1529,10 +1572,13 @@ function buildPickCard(pick, onSolved, pid) {
   const holder = card.querySelector(".pickholder"), fb = card.querySelector(".qfeedback"),
         btn = card.querySelector(".qsubmit");
   let done = attempts >= maxA;
-  // The student must MAKE the plot themselves in the console first — a rendered plot there is the gate
-  // for drawing the (authored, tagged) clickable version. Output is cleared on modal open, so this only
-  // passes once they've run a plot in THIS puzzle.
-  const madePlot = () => { const o = $("#webr-output"); return !!(o && o.querySelector("canvas.webr-plot")); };
+  // The student must MAKE the plot themselves: they build a ggplot in the console and assign it to `p`,
+  // and the engine renders THAT as the clickable picker. `p` is cleared on modal open, so this gate only
+  // passes once they've built a fresh plot in THIS puzzle.
+  const hasStudentPlot = async () => {
+    try { return await rconsole.webR.evalRBoolean('exists("p") && inherits(p, "ggplot")'); }
+    catch (e) { return false; }
+  };
 
   const wireClicks = () => {
     holder.querySelectorAll("[data-id]").forEach(el => {
@@ -1559,20 +1605,21 @@ function buildPickCard(pick, onSolved, pid) {
     });
   };
 
+  const noun = pick.idNoun || "point";
   const draw = async () => {
     if (!rconsole || !rconsole.ready) {
       fb.className = "qfeedback no"; fb.innerHTML = "R is still starting — give it a moment, then press Draw.";
       return;
     }
-    if (!madePlot()) {   // enforce "make the plot yourself" before handing over the clickable picker
+    if (!(await hasStudentPlot())) {   // enforce "make the plot yourself": they must build + assign `p`
       fb.className = "qfeedback no";
-      fb.innerHTML = "Plot the data in the console first (left) — run your chart, then draw the clickable version to make your pick.";
+      fb.innerHTML = `Build your chart in the console and assign it to <code>p</code> (e.g. <code>p &lt;- ggplot(...) + geom_col()</code>), run it, then draw the clickable chart.`;
       return;
     }
     btn.disabled = true; const label = btn.textContent; btn.textContent = "drawing…";
     try {
       await ensureGgiraph(rconsole.webR);
-      const svg = await renderPickSvg(rconsole.webR, pick);
+      const svg = await renderStudentPickSvg(rconsole.webR, pick);   // render the STUDENT'S own plot, tagged
       holder.innerHTML = svg;
       const svgEl = holder.querySelector("svg");
       if (svgEl) {   // make it responsive within the pane (keep the viewBox, drop fixed px size)
@@ -1582,22 +1629,26 @@ function buildPickCard(pick, onSolved, pid) {
       wireClicks();
       btn.textContent = "Redraw";
     } catch (e) {
-      fb.className = "qfeedback no"; fb.innerHTML = "The chart didn't render — check your code and try again.";
+      // Two failure modes, kept distinct: their code errored vs. their plot can't be made clickable.
+      const msg = /not a ggplot/.test(String(e && (e.message || e)))
+        ? `Assign your finished plot to <code>p</code> and run it, then draw.`
+        : `That plot can’t be made clickable — use a standard ggplot with one mark per ${noun} (points or bars), then draw again.`;
+      fb.className = "qfeedback no"; fb.innerHTML = msg;
       btn.textContent = label;
     } finally {
       btn.disabled = false;
     }
   };
   btn.addEventListener("click", draw);
-  // NO auto-draw: the student must plot in the console themselves, then draw the clickable picker and
-  // click their answer (the old auto-draw handed them the pick surface with no work once R was warm).
+  // NO auto-draw: the student builds the plot in the console themselves (assigning it to `p`), then draws
+  // the clickable version and clicks their answer.
   // Restore end-state if attempts were exhausted earlier this session.
   if (done && attempts >= maxA) {
     fb.className = "qfeedback out"; fb.innerHTML = fbk.reveal || pick.hint || "Out of attempts.";
   } else if (attempts > 0) {
     fb.className = "qfeedback no"; fb.innerHTML = `<span class="attempts">(${attempts} of ${maxA} attempts used)</span>`;
   } else {
-    fb.className = "qfeedback no"; fb.innerHTML = "Plot the data in the console (left), then draw the clickable chart to make your pick.";
+    fb.className = "qfeedback no"; fb.innerHTML = "Build your chart in the console and assign it to <code>p</code>, then draw the clickable chart to make your pick.";
   }
   return card;
 }
