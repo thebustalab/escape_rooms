@@ -45,6 +45,10 @@ const results = await page.evaluate(async ({ port, picks }) => {
   let have = false;
   try { have = await webR.evalRBoolean('requireNamespace("ggiraph", quietly = TRUE)'); } catch (e) {}
   if (!have) await webR.installPackages(["ggiraph"], { quiet: true });
+  // Mirror the scenario `setup`: the student's console session has these attached, so `p <- ggplot(...)`
+  // resolves bare ggplot()/aes()/filter() (the engine relies on this — libraries aren't re-attached when
+  // the student's plot code runs, only inside the render block).
+  await webR.evalRVoid(`suppressMessages({ library(dplyr); library(ggplot2); library(readr) })`);
 
   // VERBATIM renderStudentPickSvg() R block from shared/pano-player.js — reads `p` from the session.
   const renderStudent = async (idcolJson) => {

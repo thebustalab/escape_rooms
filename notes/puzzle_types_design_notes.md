@@ -196,14 +196,27 @@ handler reads `evt.target.closest('[data-id]').getAttribute('data-id')` and comp
 with the same feedback ladder as the MCQ/`check` cards. The student still writes real plotting code in
 the console to reason about the data; the picker is the graded "click the answer" surface.
 
-**Making the plot is now ENFORCED (2026-07-28).** Originally the picker **auto-drew** as soon as WebR was
-warm, so once R had booted from an earlier room a student could open a pick room and click the answer
-without plotting anything (Lucas caught this on alaska room3). Removed the auto-draw; the "Draw the
-clickable chart" button now checks that the student has **rendered a plot in the console** (a
-`canvas.webr-plot` in `#webr-output`, which is cleared on modal open) before it will draw the tagged
-picker — otherwise it nudges "plot the data in the console first". So the flow is genuinely: make the
-plot yourself → draw the clickable version → click your pick. (`buildPickCard`/`madePlot` in
-`pano-player.js`; the e2e `solvePick` helper now runs a plot before drawing.)
+**The picker now renders the STUDENT'S OWN plot (2026-07-28).** Two problems were fixed together:
+(1) the picker **auto-drew** as soon as WebR was warm, so a student could open a pick room and click the
+answer without plotting anything (Lucas caught this on alaska room3); (2) even after drawing, it rendered
+the **authored** `pick.plotCode`, not the student's plot. Both gone. Now:
+
+- The student builds their own ggplot in the console and **assigns it to `p`** (the schema gains
+  `pick.idColumn` — the identity column, e.g. `"lake"` — and optional `pick.idNoun` for the error copy).
+- "Draw the clickable chart" is gated on `p` being a fresh ggplot (`exists("p") && inherits(p,"ggplot")`;
+  `p` is `rm()`-ed on modal open so each pick room needs its own plot — no stale carryover).
+- The engine renders **that `p`** via `renderStudentPickSvg`: it swaps each layer's geom for its ggiraph
+  interactive twin and splices `data_id = tooltip = !!sym(idColumn)`, so the marks on the student's chart
+  become clickable + identity-tagged, then `dsvg` → SVG. `data_id` only needs the id column present in the
+  layer data, so it's **robust to where `aes()` lives (ggplot() vs the geom), coord_flip, bars/points, and
+  piped data** — validated end-to-end in a real browser+WebR by `tests/student_pick_smoke.mjs` (all four
+  styles tag; both shipped answers clickable). If `p` isn't a taggable ggplot it throws → the card shows
+  a distinct nudge ("assign your plot to `p`" vs "use a standard ggplot with one mark per <idNoun>").
+
+`pick.plotCode` (the authored plot) is **retained as a reference/fallback but no longer rendered** in
+normal play; `renderPickSvg` is kept for the old `pick_point_smoke.mjs`. Flow now: build your plot yourself
+→ draw the clickable version → click your pick. (`buildPickCard`/`renderStudentPickSvg` in `pano-player.js`;
+the e2e `solvePick` assigns `p` before drawing.)
 
 **Engine — BUILT 2026-07-22** (`shared/pano-player.js`). `openPuzzle` dispatches `h.pick` →
 `openPickPuzzle` (live console left + picker right). `renderPickSvg` runs the authored `pick.plotCode`

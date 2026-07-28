@@ -1563,18 +1563,20 @@ function openPickPuzzle(h) {
 function buildPickCard(pick, onSolved, pid) {
   const maxA = pick.maxAttempts || 4; let attempts = attemptCounts.get(pid) || 0;
   const fbk = pick.feedback || {};
+  // STUDENT mode (`pick.idColumn` set) renders the student's own plot (`p`) tagged by idColumn; LEGACY
+  // mode (no idColumn) renders the authored `pick.plotCode`. Both no longer auto-draw.
+  const studentMode = !!pick.idColumn;
   const card = document.createElement("div"); card.className = "qcard";
   card.innerHTML =
     `<div class="qprompt">${pick.prompt || "Plot the data, then click your answer on the chart."}</div>
      <div class="pickholder" style="margin:8px 0;min-height:60px"></div>
      <div class="qfeedback"></div>
-     <button class="qsubmit">Draw the clickable chart</button>`;
+     <button class="qsubmit">${studentMode ? "Draw the clickable chart" : "Draw the chart"}</button>`;
   const holder = card.querySelector(".pickholder"), fb = card.querySelector(".qfeedback"),
         btn = card.querySelector(".qsubmit");
   let done = attempts >= maxA;
-  // The student must MAKE the plot themselves: they build a ggplot in the console and assign it to `p`,
-  // and the engine renders THAT as the clickable picker. `p` is cleared on modal open, so this gate only
-  // passes once they've built a fresh plot in THIS puzzle.
+  // STUDENT mode: they build a ggplot in the console and assign it to `p`, and the engine renders THAT.
+  // `p` is cleared on modal open, so this gate only passes once they've built a fresh plot in THIS puzzle.
   const hasStudentPlot = async () => {
     try { return await rconsole.webR.evalRBoolean('exists("p") && inherits(p, "ggplot")'); }
     catch (e) { return false; }
@@ -1611,7 +1613,7 @@ function buildPickCard(pick, onSolved, pid) {
       fb.className = "qfeedback no"; fb.innerHTML = "R is still starting — give it a moment, then press Draw.";
       return;
     }
-    if (!(await hasStudentPlot())) {   // enforce "make the plot yourself": they must build + assign `p`
+    if (studentMode && !(await hasStudentPlot())) {   // enforce "make the plot yourself": build + assign `p`
       fb.className = "qfeedback no";
       fb.innerHTML = `Build your chart in the console and assign it to <code>p</code> (e.g. <code>p &lt;- ggplot(...) + geom_col()</code>), run it, then draw the clickable chart.`;
       return;
@@ -1619,7 +1621,9 @@ function buildPickCard(pick, onSolved, pid) {
     btn.disabled = true; const label = btn.textContent; btn.textContent = "drawing…";
     try {
       await ensureGgiraph(rconsole.webR);
-      const svg = await renderStudentPickSvg(rconsole.webR, pick);   // render the STUDENT'S own plot, tagged
+      const svg = studentMode
+        ? await renderStudentPickSvg(rconsole.webR, pick)   // render the STUDENT'S own plot, tagged
+        : await renderPickSvg(rconsole.webR, pick);         // legacy: render the authored plot
       holder.innerHTML = svg;
       const svgEl = holder.querySelector("svg");
       if (svgEl) {   // make it responsive within the pane (keep the viewBox, drop fixed px size)
@@ -1629,10 +1633,12 @@ function buildPickCard(pick, onSolved, pid) {
       wireClicks();
       btn.textContent = "Redraw";
     } catch (e) {
-      // Two failure modes, kept distinct: their code errored vs. their plot can't be made clickable.
-      const msg = /not a ggplot/.test(String(e && (e.message || e)))
-        ? `Assign your finished plot to <code>p</code> and run it, then draw.`
-        : `That plot can’t be made clickable — use a standard ggplot with one mark per ${noun} (points or bars), then draw again.`;
+      // Student mode has two distinct failure modes: their code errored vs. their plot can't be tagged.
+      const msg = !studentMode
+        ? "The chart didn't render — check your code and try again."
+        : /not a ggplot/.test(String(e && (e.message || e)))
+          ? `Assign your finished plot to <code>p</code> and run it, then draw.`
+          : `That plot can’t be made clickable — use a standard ggplot with one mark per ${noun} (points or bars), then draw again.`;
       fb.className = "qfeedback no"; fb.innerHTML = msg;
       btn.textContent = label;
     } finally {
@@ -1640,15 +1646,17 @@ function buildPickCard(pick, onSolved, pid) {
     }
   };
   btn.addEventListener("click", draw);
-  // NO auto-draw: the student builds the plot in the console themselves (assigning it to `p`), then draws
-  // the clickable version and clicks their answer.
+  // NO auto-draw (either mode): the student presses Draw. In student mode they must first build the plot
+  // in the console and assign it to `p`.
   // Restore end-state if attempts were exhausted earlier this session.
   if (done && attempts >= maxA) {
     fb.className = "qfeedback out"; fb.innerHTML = fbk.reveal || pick.hint || "Out of attempts.";
   } else if (attempts > 0) {
     fb.className = "qfeedback no"; fb.innerHTML = `<span class="attempts">(${attempts} of ${maxA} attempts used)</span>`;
+  } else if (studentMode) {
+    fb.className = "qfeedback no"; fb.innerHTML = "Build your graph in the console using ggplot and assign it to an object <code>p</code>. Then click “Draw the clickable chart” to render the clickable version of your graph and click on the geometric object that represents the answer to the question.";
   } else {
-    fb.className = "qfeedback no"; fb.innerHTML = "Build your chart in the console and assign it to <code>p</code>, then draw the clickable chart to make your pick.";
+    fb.className = "qfeedback no"; fb.innerHTML = "Press “Draw the chart”, then click your answer on it.";
   }
   return card;
 }

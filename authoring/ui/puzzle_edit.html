@@ -45,7 +45,7 @@
   </header>
   <main id="list"></main>
 
-  <script src="puzzle_cards.js?v=2"></script>
+  <script src="puzzle_cards.js?v=3"></script>
   <script>
     const $ = s => document.querySelector(s);
     const _p = new URLSearchParams(location.search);
@@ -56,7 +56,24 @@
     const getJSON = async p => { try { return await (await fetch(p + (p.includes("?") ? "&" : "?") + "t=" + Date.now())).json(); } catch (e) { return null; } };
     const postJSON = async (p, b) => (await fetch(p, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(b) })).json();
     const esc = s => String(s == null ? "" : s).replace(/[<>&"]/g, c => ({ "<":"&lt;", ">":"&gt;", "&":"&amp;", '"':"&quot;" }[c]));
-    const PC = EscapePuzzleCards.make({ esc, getJSON, postJSON, chapter: CH, scenario: SC });
+    // autosave one room's content on blur (called by the shared cards via ctx.autosave). Mirrors the
+    // "Save" button's routing: ALL-ROOMS → room-patch each room's target; single-room draft → draft-save;
+    // single-room committed → room-patch hotspots. Never closes the tab (only the explicit Save does).
+    async function autosaveRoom(roomKey) {
+      const setSt = res => { $("#status").innerHTML = (res && res.ok)
+        ? `<span class="ok2">autosaved ✓</span>` : `<span class="err">${(res && res.error) || "autosave failed"}</span>`; };
+      if (ALL_MODE) {
+        const r = ROOMS_ALL.find(x => x.key === roomKey); if (!r) return;
+        const fields = {}; fields[r.target || "hotspots"] = cleanHotspots(r.spots);
+        setSt(await postJSON("/api/room-patch", { chapter: CH, scenario: SC, roomKey, fields }));
+      } else {
+        const hotspots = cleanHotspots(SPOTS);
+        setSt(DRAFT_IMG
+          ? await postJSON("/api/draft-save", { chapter: CH, scenario: SC, roomKey: ROOM_KEY, image: DRAFT_IMG, hotspots })
+          : await postJSON("/api/room-patch", { chapter: CH, scenario: SC, roomKey: ROOM_KEY, fields: { hotspots } }));
+      }
+    }
+    const PC = EscapePuzzleCards.make({ esc, getJSON, postJSON, chapter: CH, scenario: SC, autosave: autosaveRoom });
     // MUST mirror hotspots_edit.html's slug + harness_server._slug — the (type,slug) key that links a
     // planned hotspot to the box it becomes, so pre-art content attaches at commit.
     const slug = s => (String(s || "")).toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "") || "obj";

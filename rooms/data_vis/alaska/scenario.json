@@ -532,7 +532,7 @@
           ],
           "starterCode": "alaska_lake_data",
           "pick": {
-            "prompt": "Everyone flew to North_Killeak — the high-chloride lake — but the beacon still transmits, so the pilot is alive and must be somewhere milder. Plot the water temperature across the lakes and assign your plot to <code>p</code>, then draw the clickable chart and click the one to fly to.",
+            "prompt": "Everyone flew to North_Killeak — the high-chloride lake — but the beacon still transmits, so the pilot is still alive. Plot the water temperature across the lakes and assign your plot to <code>p</code>, then draw the clickable chart and click the one to fly to.",
             "plotCode": "p <- ggplot(dplyr::distinct(alaska_lake_data, lake, water_temp),\n            aes(reorder(lake, water_temp), water_temp)) +\n     ggiraph::geom_col_interactive(aes(data_id = lake, tooltip = lake)) +\n     coord_flip() +\n     labs(x = NULL, y = \"Water temperature (°C)\")",
             "answer": "Lava_Lake",
             "width": 6,

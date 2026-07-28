@@ -8,6 +8,16 @@ window.EscapePuzzleCards = (function () {
   function make(ctx) {
     const esc = ctx.esc, getJSON = ctx.getJSON, postJSON = ctx.postJSON;
     const CH = ctx.chapter, SC = ctx.scenario;
+    // Autosave (2026-07-28): if the host supplies ctx.autosave(roomKey), any card-field edit persists on
+    // blur — the HOST owns the routing (built room → hotspots, pre-art room → plannedHotspots, draft →
+    // draft-save). Debounced per room so rapid edits coalesce. No-op if the host passes no callback.
+    const autosave = ctx.autosave || null;
+    const _saveTimers = {};
+    function scheduleAutosave(roomKey) {
+      if (!autosave) return;
+      clearTimeout(_saveTimers[roomKey]);
+      _saveTimers[roomKey] = setTimeout(() => { try { autosave(roomKey); } catch (e) {} }, 400);
+    }
     const SCQ = (CH && SC) ? ("chapter=" + encodeURIComponent(CH) + "&scenario=" + encodeURIComponent(SC)) : "";
     const linesToArr = s => String(s || "").split("\n").filter(x => x.trim().length);
     const arrToLines = a => (a || []).join("\n");
@@ -96,6 +106,7 @@ window.EscapePuzzleCards = (function () {
           if (!res.ok) { btn.textContent = "failed"; return; }
           btn.textContent = "Use this";
           srcEl.value = res.src; sync();   // sets solveSfx + preview + highlight
+          scheduleAutosave(roomKey);
         };
         cands.appendChild(row);
       });
@@ -321,7 +332,8 @@ window.EscapePuzzleCards = (function () {
       showPrev();
       el.querySelector(".clrImg").onclick = () => {
         delete s.image; delete s.imageFrom; markPickedClue(cands, null); showPrev();
-        stat.textContent = "cleared — Save to apply";
+        scheduleAutosave(roomKey);
+        stat.textContent = "cleared";
       };
       const genBtn = el.querySelector(".genImg");
       genBtn.onclick = () => genClueImage(s, roomKey, promptEl.value, stat, cands, showPrev, genBtn);
@@ -376,7 +388,8 @@ window.EscapePuzzleCards = (function () {
       // commit the pick (server copied _scratch/<file> -> <room>/clue_<id>.png) and remember WHICH
       // candidate it was, so the grid stays put and highlights it — like a scene's builtFrom/Save chip.
       s.image = r.src; s.imageFrom = file; markPickedClue(cands, file); showPrev();
-      stat.innerHTML = `<span class="ok2">image set ✓ — committed to the room folder · Save to apply</span>`;
+      scheduleAutosave(roomKey);
+      stat.innerHTML = `<span class="ok2">image set ✓ — committed to the room folder</span>`;
     }
 
     // append the editable cards (puzzle / clue / lock) for ONE room's hotspots into `host`
@@ -417,6 +430,9 @@ window.EscapePuzzleCards = (function () {
         renderGradeFields(el.querySelector(".gfields"), s, mode);
         wireSolveSfx(el, s, roomKey);
       });
+      // autosave: persist this room whenever any field in its cards changes (fires on blur for
+      // text/number/select/textarea; the image + solve-sound pickers call scheduleAutosave directly)
+      if (autosave) host.addEventListener("change", () => scheduleAutosave(roomKey));
     }
     return { roomCardsInto };
   }

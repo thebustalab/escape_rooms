@@ -81,12 +81,14 @@ test("alaska: full analysis + notebook image-stack + keypad escape", async ({ pa
     await expect(page.locator("#modal.open")).toBeVisible();
     // The picker needs the booted WebR session; wait for it (boots eagerly at scenario start).
     await expect(page.locator("#webr-status")).toContainText("ready", { timeout: 90_000 });
-    // The student must MAKE the plot in the console first — that rendered plot is now the gate for
-    // drawing the clickable picker (auto-draw removed 2026-07-28). Run a plot, wait for its canvas.
-    await page.locator("#code-input").fill("ggplot(alaska_lake_data, aes(lake, mg_per_L)) + geom_col()");
+    // The picker now renders the STUDENT'S OWN plot (2026-07-28): they build a ggplot and assign it to
+    // `p`, and the engine tags it by idColumn. Assign a per-lake plot to `p` (tags all lakes, so the
+    // room's answer is clickable in both pick rooms) and print it — its rendered canvas is our signal the
+    // run finished (so `p` is assigned) before we draw.
+    await page.locator("#code-input").fill("p <- ggplot(dplyr::distinct(alaska_lake_data, lake, water_temp), aes(lake, water_temp)) + geom_col()\np");
     await page.locator("#run-btn").click();
     await expect(page.locator("#webr-output canvas.webr-plot")).not.toHaveCount(0, { timeout: 120_000 });
-    // "Draw the clickable chart" → renderPickSvg (first pick room also lazy-installs ggiraph → allow generous time).
+    // "Draw the clickable chart" → renderStudentPickSvg (first pick room also lazy-installs ggiraph → allow generous time).
     const holder = page.locator("#modal .pickholder");
     await page.locator("#modal .qsubmit").click();
     await expect(holder.locator("[data-id]")).not.toHaveCount(0, { timeout: 120_000 });

@@ -275,7 +275,7 @@ git add -A && git commit -m "whatever changed" && git push</pre>
 
   <script src="open_target.js"></script>
   <script src="cand_state.js"></script>
-  <script src="puzzle_cards.js?v=2"></script>
+  <script src="puzzle_cards.js?v=3"></script>
   <script>
     const $ = s => document.querySelector(s);
     const esc = s => String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -658,10 +658,27 @@ git add -A && git commit -m "whatever changed" && git push</pre>
     // A BUILT room edits its placed `hotspots`; a pre-art room edits its `plannedHotspots` (content
     // attaches to the box at commit, server _attach_planned_content). Per-room Save patches the right
     // field. Rebuilt by refreshAll after a commit flips a room planned→built (so it switches fields).
+    // Autosave one room's puzzle/clue/lock/grid content (called on blur by the shared cards via
+    // ctx.autosave). Same routing as Save-all's per-room write, scoped to the room the card belongs to;
+    // built rooms patch `hotspots`, pre-art rooms patch `plannedHotspots` (c.target). Cheap + field-scoped.
+    async function autosaveContent(roomKey) {
+      const c = (CONTENT || []).find(x => x.key === roomKey);
+      if (!c) return;
+      const fields = {}; fields[c.target] = cleanSpots(c.spots);
+      const st = $("#saveAllStatus");
+      if (st) st.textContent = "autosaving…";
+      const r = await post("/api/room-patch", { ...SCQ(), roomKey, fields });
+      if (r.ok) {
+        const room = ROOMS.find(x => x.key === roomKey);
+        if (room) room[c.target] = fields[c.target];        // keep in-memory node in step with disk
+        if (st) st.innerHTML = `<span class="ok2">autosaved ✓</span>`;
+      } else if (st) st.innerHTML = `<span class="err">autosave failed (${esc(roomKey)})</span>`;
+    }
+
     function buildContent() {
       const host = $("#contentCols"); if (!host) return;
       host.innerHTML = "";
-      const PC = EscapePuzzleCards.make({ esc, getJSON: pcGetJSON, postJSON: post, chapter: ACTIVESC.chapter, scenario: ACTIVESC.scenario });
+      const PC = EscapePuzzleCards.make({ esc, getJSON: pcGetJSON, postJSON: post, chapter: ACTIVESC.chapter, scenario: ACTIVESC.scenario, autosave: autosaveContent });
       CONTENT = (ROOMS || []).map(r => {
         const hs = r.hotspots || [];
         if (hs.length) return { key: r.key, title: r.title || "", target: "hotspots", planned: false, spots: hs.map(h => JSON.parse(JSON.stringify(h))) };
