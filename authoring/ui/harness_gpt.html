@@ -178,6 +178,13 @@
         <button class="step commit ready" id="saveAllBtn" style="width:auto;margin:0">Save all</button>
       </div>
     </div>
+    <div class="row" style="align-items:center;gap:10px;margin-top:8px">
+      <span class="hint" style="margin:0;white-space:nowrap">push changes (Mac terminal):</span>
+      <pre id="pushCmds" style="margin:0;flex:1;min-width:0;font:12px/1.5 ui-monospace,Menlo,Consolas,monospace;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:6px 10px;white-space:pre;overflow:auto">cd ~/Documents/Tools/websites/thebustalab.github.io/escape_rooms
+git add -A && git commit -m "whatever changed" && git push</pre>
+      <button class="step ghost" id="copyPushBtn" style="width:auto;margin:0" title="Copy these commands"
+        onclick="navigator.clipboard&&navigator.clipboard.writeText(document.getElementById('pushCmds').textContent);this.textContent='Copied ✓';setTimeout(()=>this.textContent='Copy',1200)">Copy</button>
+    </div>
   </header>
   <main>
 
