@@ -15,6 +15,21 @@ window.EscapePuzzleCards = (function () {
     const arrToCsv = a => (a || []).join(", ");
     const checkSkel = () => ({ prompt:"", requires:[], expr:"", hint:"", maxAttempts:4, feedback:{ correct:"", wrong:[], reveal:"" } });
     const questionSkel = () => ({ prompt:"", options:[], correct:0, maxAttempts:4, feedback:{ correct:"", wrong:[], reveal:"" } });
+    // pick = make-the-plot, click the tagged point (Type 4). plotCode builds an interactive ggiraph
+    // plot into `p`, geoms tagged aes(data_id=…); `answer` is the winning data_id. Graded like a check.
+    const pickSkel = () => ({ prompt:"", plotCode:"", answer:"", width:6, height:5.5, maxAttempts:4, hint:"", feedback:{ correct:"", wrong:[], reveal:"" } });
+    // map = pick-a-point on a static (script-rendered) plot image; points are image-fraction hit-boxes.
+    const mapSkel = () => ({ image:"", points:[], answer:"", instructions:"", feedback:{ correct:"", wrong:"" } });
+    // grid = matrix selector (items × buckets); ungraded escape gate. answer maps itemKey→bucketKey.
+    const gridSkel = () => ({ prompt:"", items:[], buckets:[], answer:{}, maxAttempts:0, feedback:{ correct:"", wrong:"", out:"" } });
+    // A JSON textarea helper: parses on input, updates the model only when valid, red-flags bad JSON.
+    function wireJsonField(el, get, set) {
+      el.value = JSON.stringify(get(), null, el.dataset.compact ? 0 : 2);
+      el.oninput = () => {
+        try { const v = JSON.parse(el.value); set(v); el.style.borderColor = ""; }
+        catch (_) { el.style.borderColor = "var(--err, #c0392b)"; }
+      };
+    }
 
     // solve / door-open sound — an optional per-gate one-shot the player plays when this is solved (a graded
     // puzzle OR a lock releasing). Stored on the hotspot as `solveSfx` = a path string, or { src, volume }.
@@ -103,7 +118,54 @@ window.EscapePuzzleCards = (function () {
 
     function renderGradeFields(host, s, mode) {
       host.innerHTML = "";
-      if (mode === "check") {
+      if (mode === "pick") {
+        const p = s.pick; p.feedback = p.feedback || { correct:"", wrong:[], reveal:"" };
+        host.innerHTML =
+          `<div class="lbl">prompt / instructions (HTML ok)</div><textarea data-pk="prompt" rows="3"></textarea>
+           <div class="lbl">plot code (R) <span class="hint" style="text-transform:none">· build an interactive plot into <code>p</code> with <code>ggiraph::geom_*_interactive(aes(data_id = …, tooltip = …))</code> — the student clicks the tagged mark</span></div>
+           <textarea data-pk="plotCode" class="mono" rows="7"></textarea>
+           <div class="hr"><label>answer</label><input type="text" data-pk="answer" placeholder="the winning data_id, e.g. Lava_Lake"></div>
+           <div class="hr"><label>plot w×h</label><input type="number" data-pk="width" step="0.5" min="1" style="max-width:70px"><span style="opacity:.6">×</span><input type="number" data-pk="height" step="0.5" min="1" style="max-width:70px"><span class="hint">inches</span></div>
+           <div class="hr"><label>hint</label><input type="text" data-pk="hint"></div>
+           <div class="hr"><label>max tries</label><input type="number" data-pk="maxAttempts" min="1" max="7" style="max-width:70px"></div>
+           ${feedbackFields("pk")}`;
+        host.querySelector('[data-pk="prompt"]').value = p.prompt || "";
+        host.querySelector('[data-pk="plotCode"]').value = p.plotCode || "";
+        host.querySelector('[data-pk="answer"]').value = p.answer || "";
+        host.querySelector('[data-pk="width"]').value = p.width || "";
+        host.querySelector('[data-pk="height"]').value = p.height || "";
+        host.querySelector('[data-pk="hint"]').value = p.hint || "";
+        host.querySelector('[data-pk="maxAttempts"]').value = p.maxAttempts || 4;
+        host.querySelector('[data-pk="prompt"]').oninput = e => { p.prompt = e.target.value; };
+        host.querySelector('[data-pk="plotCode"]').oninput = e => { p.plotCode = e.target.value; };
+        host.querySelector('[data-pk="answer"]').oninput = e => { p.answer = e.target.value; };
+        host.querySelector('[data-pk="width"]').oninput = e => { const v = parseFloat(e.target.value); if (v) p.width = v; else delete p.width; };
+        host.querySelector('[data-pk="height"]').oninput = e => { const v = parseFloat(e.target.value); if (v) p.height = v; else delete p.height; };
+        host.querySelector('[data-pk="hint"]').oninput = e => { p.hint = e.target.value; };
+        host.querySelector('[data-pk="maxAttempts"]').oninput = e => { p.maxAttempts = +e.target.value || 4; };
+        wireFeedback(host, "pk", p.feedback);
+      } else if (mode === "map") {
+        const m = s.map; m.feedback = m.feedback || { correct:"", wrong:"" };
+        host.innerHTML =
+          `<div class="hr"><label>image</label><input type="text" data-mp="image" placeholder="escapefig.png (path relative to play.html)"></div>
+           <div class="hr"><label>answer</label><input type="text" data-mp="answer" placeholder="the point key that solves"></div>
+           <div class="lbl">instructions <span class="hint" style="text-transform:none">· optional — blank means no prompt (the blankness is the puzzle)</span></div><textarea data-mp="instructions" rows="2"></textarea>
+           <div class="lbl">points (JSON) <span class="hint" style="text-transform:none">· <code>[{"lake":"…","box":[x0,y0,x1,y1]}]</code> in image fractions — usually script-generated</span></div>
+           <textarea data-mp="points" class="mono" rows="6"></textarea>
+           <div class="fb"><div class="lbl">feedback — correct</div><textarea data-mpf="correct" rows="2"></textarea>
+             <div class="lbl">feedback — wrong <span class="hint" style="text-transform:none">· blank = "Nothing happens."</span></div><textarea data-mpf="wrong" rows="2"></textarea></div>`;
+        host.querySelector('[data-mp="image"]').value = m.image || "";
+        host.querySelector('[data-mp="answer"]').value = m.answer || "";
+        host.querySelector('[data-mp="instructions"]').value = m.instructions || "";
+        host.querySelector('[data-mp="image"]').oninput = e => { m.image = e.target.value; };
+        host.querySelector('[data-mp="answer"]').oninput = e => { m.answer = e.target.value; };
+        host.querySelector('[data-mp="instructions"]').oninput = e => { const v = e.target.value; if (v) m.instructions = v; else delete m.instructions; };
+        wireJsonField(host.querySelector('[data-mp="points"]'), () => m.points || [], v => { m.points = v; });
+        host.querySelector('[data-mpf="correct"]').value = m.feedback.correct || "";
+        host.querySelector('[data-mpf="wrong"]').value = m.feedback.wrong || "";
+        host.querySelector('[data-mpf="correct"]').oninput = e => { m.feedback.correct = e.target.value; };
+        host.querySelector('[data-mpf="wrong"]').oninput = e => { m.feedback.wrong = e.target.value; };
+      } else if (mode === "check") {
         const c = s.check; c.feedback = c.feedback || { correct:"", wrong:[], reveal:"" };
         host.innerHTML =
           `<div class="lbl">prompt (HTML ok)</div><textarea data-ck="prompt" rows="3"></textarea>
@@ -170,6 +232,40 @@ window.EscapePuzzleCards = (function () {
       el.querySelector('[data-lf="correct"]').oninput = e => { s.feedback.correct = e.target.value; };
       el.querySelector('[data-lf="wrong"]').oninput = e => { s.feedback.wrong = e.target.value; };
       el.querySelector('[data-lf="out"]').oninput = e => { s.feedback.out = e.target.value; };
+      wireSolveSfx(el, s, roomKey);
+      return el;
+    }
+
+    // grid card — the matrix selector (items × buckets), an ungraded escape gate. items/buckets are
+    // {key,label} lists; `answer` maps each itemKey→bucketKey. Bulk-structured, so edited as JSON.
+    function gridCard(s, roomKey) {
+      s.feedback = s.feedback || { correct:"", wrong:"", out:"" };
+      const el = document.createElement("div"); el.className = "puz";
+      el.innerHTML =
+        `<h2>Grid · <span>${esc(s.id)}</span> <span class="hint" style="text-transform:none">${esc(s.label || "")}</span></h2>
+         <div class="hint">A matrix selector — one bucket per item, checked against the answer map. Ungraded (never enters the submission code); solving it opens the escape.</div>
+         <div class="lbl">prompt (HTML ok) <span class="hint" style="text-transform:none">· optional</span></div><textarea data-g="prompt" rows="2"></textarea>
+         <div class="lbl">items (JSON) <span class="hint" style="text-transform:none">· <code>[{"key":"…","label":"…"}]</code> — one row each</span></div><textarea data-g="items" class="mono" rows="4"></textarea>
+         <div class="lbl">buckets (JSON) <span class="hint" style="text-transform:none">· <code>[{"key":"…","label":"…"}]</code> — one column each</span></div><textarea data-g="buckets" class="mono" rows="3"></textarea>
+         <div class="lbl">answer (JSON) <span class="hint" style="text-transform:none">· <code>{"itemKey":"bucketKey"}</code></span></div><textarea data-g="answer" class="mono" rows="4"></textarea>
+         <div class="hr"><label>max tries</label><input type="number" data-g="maxAttempts" min="0" max="20" style="max-width:70px"> <span class="hint">0 or blank = unlimited</span></div>
+         <div class="fb"><div class="lbl">feedback — correct</div><textarea data-gf="correct" rows="2"></textarea>
+           <div class="lbl">feedback — wrong</div><textarea data-gf="wrong" rows="2"></textarea>
+           <div class="lbl">feedback — out (max tries hit)</div><textarea data-gf="out" rows="2"></textarea></div>
+         ${solveSfxHTML()}`;
+      el.querySelector('[data-g="prompt"]').value = s.prompt || "";
+      el.querySelector('[data-g="prompt"]').oninput = e => { const v = e.target.value; if (v) s.prompt = v; else delete s.prompt; };
+      wireJsonField(el.querySelector('[data-g="items"]'),   () => s.items || [],   v => { s.items = v; });
+      wireJsonField(el.querySelector('[data-g="buckets"]'), () => s.buckets || [], v => { s.buckets = v; });
+      wireJsonField(el.querySelector('[data-g="answer"]'),  () => s.answer || {},  v => { s.answer = v; });
+      el.querySelector('[data-g="maxAttempts"]').value = s.maxAttempts || "";
+      el.querySelector('[data-g="maxAttempts"]').oninput = e => { const v = +e.target.value; if (v) s.maxAttempts = v; else delete s.maxAttempts; };
+      el.querySelector('[data-gf="correct"]').value = s.feedback.correct || "";
+      el.querySelector('[data-gf="wrong"]').value = s.feedback.wrong || "";
+      el.querySelector('[data-gf="out"]').value = s.feedback.out || "";
+      el.querySelector('[data-gf="correct"]').oninput = e => { s.feedback.correct = e.target.value; };
+      el.querySelector('[data-gf="wrong"]').oninput = e => { s.feedback.wrong = e.target.value; };
+      el.querySelector('[data-gf="out"]').oninput = e => { s.feedback.out = e.target.value; };
       wireSolveSfx(el, s, roomKey);
       return el;
     }
@@ -285,31 +381,37 @@ window.EscapePuzzleCards = (function () {
 
     // append the editable cards (puzzle / clue / lock) for ONE room's hotspots into `host`
     function roomCardsInto(host, spots, roomKey) {
-      const editable = spots.filter(s => s.type === "puzzle" || s.type === "clue" || s.type === "lock");
+      const editable = spots.filter(s => s.type === "puzzle" || s.type === "clue" || s.type === "lock" || s.type === "grid");
       if (!editable.length) {
-        host.insertAdjacentHTML("beforeend", `<div class="none" style="padding:10px">No puzzle, clue or lock hotspots here yet — add them in <b>Edit hotspots</b> (draw a box, set its type), then reload.</div>`);
+        host.insertAdjacentHTML("beforeend", `<div class="none" style="padding:10px">No puzzle, clue, lock or grid hotspots here yet — add them in <b>Edit hotspots</b> (draw a box, set its type), then reload.</div>`);
         return;
       }
       editable.forEach(s => {
         if (s.type === "clue") { host.appendChild(clueCard(s, roomKey)); return; }
         if (s.type === "lock") { host.appendChild(lockCard(s, roomKey)); return; }
-        if (!s.check && !s.question) s.check = checkSkel();
-        const mode = s.check ? "check" : "question";
+        if (s.type === "grid") { host.appendChild(gridCard(s, roomKey)); return; }
+        if (!s.check && !s.question && !s.pick && !s.map) s.check = checkSkel();
+        const mode = s.map ? "map" : s.pick ? "pick" : s.check ? "check" : "question";
+        const opt = (v, txt) => `<option value="${v}"${mode === v ? " selected" : ""}>${txt}</option>`;
         const el = document.createElement("div"); el.className = "puz";
         el.innerHTML =
           `<h2>Puzzle · <span>${esc(s.id)}</span> <span class="hint" style="text-transform:none">${esc(s.label || "")}</span></h2>
-           <div class="lbl">starter code (R, pre-filled in the console)</div>
+           <div class="lbl">starter code (R, pre-filled in the console) <span class="hint" style="text-transform:none">· ignored by the pick-on-map type</span></div>
            <textarea data-c="starterCode" class="mono" rows="6"></textarea>
            <div class="hr" style="margin-top:10px"><label>grading</label>
-             <select class="gmode"><option value="check"${mode==="check"?" selected":""}>console-check (grade live R)</option><option value="question"${mode==="question"?" selected":""}>multiple-choice</option></select></div>
+             <select class="gmode">${opt("check", "console-check (grade live R)")}${opt("question", "multiple-choice")}${opt("pick", "plot &amp; click (interactive chart)")}${opt("map", "pick-on-map (static plot image)")}</select></div>
            <div class="gfields"></div>
            ${solveSfxHTML()}`;
         el.querySelector('[data-c="starterCode"]').value = s.starterCode || "";
         el.querySelector('[data-c="starterCode"]').oninput = e => { s.starterCode = e.target.value; };
         el.querySelector(".gmode").onchange = e => {
-          if (e.target.value === "check") { delete s.question; s.check = s.check || checkSkel(); }
-          else { delete s.check; s.question = s.question || questionSkel(); }
-          renderGradeFields(el.querySelector(".gfields"), s, e.target.value);
+          const v = e.target.value;
+          delete s.check; delete s.question; delete s.pick; delete s.map;
+          if (v === "check") s.check = checkSkel();
+          else if (v === "question") s.question = questionSkel();
+          else if (v === "pick") s.pick = pickSkel();
+          else s.map = mapSkel();
+          renderGradeFields(el.querySelector(".gfields"), s, v);
         };
         host.appendChild(el);
         renderGradeFields(el.querySelector(".gfields"), s, mode);

@@ -208,7 +208,7 @@
 
     <!-- STEP 2b — inline puzzle/clue/lock content (shared cards via puzzle_cards.js); pre-art rooms author onto plannedHotspots -->
     <div class="steplbl" style="margin-top:10px"><span class="n">2b</span><h2>Room content</h2>
-      <span>every room's puzzles, clues &amp; locks on one page — pre-art rooms author onto their <code>plannedHotspots</code> (content attaches when the box is placed at commit)</span></div>
+      <span>every room's puzzles, clues, locks &amp; grids on one page — pre-art rooms author onto their <code>plannedHotspots</code> (content attaches when the box is placed at commit). Edits here are written by the header <b>Save all</b>.</span></div>
     <div class="mapwrap"><div id="contentCols"></div></div>
 
 
@@ -268,7 +268,7 @@
 
   <script src="open_target.js"></script>
   <script src="cand_state.js"></script>
-  <script src="puzzle_cards.js"></script>
+  <script src="puzzle_cards.js?v=2"></script>
   <script>
     const $ = s => document.querySelector(s);
     const esc = s => String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -669,16 +669,7 @@
         sec.innerHTML = `<h2 class="roomh">${esc(r.key)} <span class="hint" style="text-transform:none;font-weight:400">· ${esc(r.title || "")}${r.planned ? ' · <span style="color:#7fd1ff">planned — pre-art</span>' : ""}</span></h2>`;
         const inner = document.createElement("div");
         PC.roomCardsInto(inner, r.spots, r.key);
-        const save = document.createElement("button"); save.className = "step commit ready"; save.textContent = "Save " + r.key + " content"; save.style.marginTop = "4px";
-        const stat = document.createElement("span"); stat.className = "status"; stat.style.marginLeft = "8px";
-        save.onclick = async () => {
-          stat.textContent = "saving…";
-          const fields = {}; fields[r.target] = cleanSpots(r.spots);
-          const res = await post("/api/room-patch", { ...SCQ(), roomKey: r.key, fields });
-          stat.innerHTML = res.ok ? `<span class="ok2">saved ✓</span>` : `<span class="err">${res.error || "save failed"}</span>`;
-          if (res.ok) { const room = ROOMS.find(x => x.key === r.key); if (room) room[r.target] = fields[r.target]; buildMap(); }
-        };
-        sec.appendChild(inner); sec.appendChild(save); sec.appendChild(stat);
+        sec.appendChild(inner);
         host.appendChild(sec);
       });
     }
@@ -889,7 +880,9 @@
     async function saveAll() {
       const btn = $("#saveAllBtn"), st = $("#saveAllStatus");
       btn.disabled = true; st.textContent = "saving everything…";
-      let ok = 0, fail = 0;
+      let ok = 0, fail = 0, savedContent = false;
+      const contentByKey = {};                           // Save all also flushes puzzle/clue/lock/grid content
+      for (const c of (CONTENT || [])) contentByKey[c.key] = c;
       for (const room of ROOMS) {
         const key = room.key, bc = $("#build_" + cssId(key));
         const fields = { title: room.title || "" };
@@ -898,8 +891,10 @@
           fields.authoring = { tag: tagOf(key), scenePrompt: bc.querySelector(".prompt").value, doorPrompt: bc.querySelector(".doorprompt").value };
         }
         if (!isFirstRoom(key)) fields.entry = room.entry || null;   // first room's opening is scenario-level (below)
+        const c = contentByKey[key];                     // this room's edited hotspots/plannedHotspots (if any)
+        if (c) fields[c.target] = cleanSpots(c.spots);
         const r = await post("/api/room-patch", { ...SCQ(), roomKey: key, fields });
-        if (r.ok) ok++; else fail++;
+        if (r.ok) { ok++; if (c) { room[c.target] = fields[c.target]; savedContent = true; } } else fail++;
       }
       const d = SCENARIO_DOC || {};
       const sfields = {
@@ -910,6 +905,7 @@
       if (d.escapeDone && (d.escapeDone.title || (d.escapeDone.body || "").trim())) sfields.escapeDone = d.escapeDone;
       const sr = await post("/api/scenario-patch", { ...SCQ(), fields: sfields });
       if (sr.ok) { ok++; if (SCENARIO_DOC) Object.assign(SCENARIO_DOC, sfields); } else fail++;
+      if (savedContent) buildMap();                      // repaint map chips (green ✓ content set) for saved rooms
       btn.disabled = false;
       st.innerHTML = fail ? `<span class="err">saved ${ok}, ${fail} failed</span>` : `<span class="ok2">saved everything ✓ (${ok} writes)</span>`;
     }
@@ -961,10 +957,10 @@
     async function loadScenarios() {
       const r = await getj("/api/scenarios");
       const sel = $("#scenarioPick"); sel.innerHTML = "";
-      (r.scenarios || []).forEach(s => {
+      (r.scenarios || []).slice().sort((a, b) => a.scenario.localeCompare(b.scenario)).forEach(s => {
         const o = document.createElement("option");
         o.value = s.chapter + "/" + s.scenario;
-        o.textContent = s.chapter + " / " + s.scenario + (s.title ? " — " + s.title : "");
+        o.textContent = s.scenario;   // folder name only (e.g. "alaska", "hospital")
         sel.appendChild(o);
       });
       if (r.active) sel.value = r.active.chapter + "/" + r.active.scenario;
