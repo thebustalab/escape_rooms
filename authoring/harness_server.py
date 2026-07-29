@@ -728,6 +728,14 @@ class H(http.server.SimpleHTTPRequestHandler):
     def log_message(self, *a):
         pass
 
+    def end_headers(self):
+        # Dev harness: never let the browser cache the authoring pages/JS/CSS, so edits to
+        # harness_gpt.html / puzzle_cards.js / etc. always show on a plain reload (the harness page
+        # itself has no ?v cache-buster). `no-cache` still allows a Last-Modified 304 revalidation, so
+        # it stays cheap. Applies to every response (static + JSON), which is correct for a dev tool.
+        self.send_header("Cache-Control", "no-cache, must-revalidate")
+        super().end_headers()
+
     def _cors(self):
         """Permit cross-origin API calls from the playtest server (test_play.html on :8055 posts the
         sound-mixer volumes here to :8751). The server binds 127.0.0.1 only, so reflecting the origin

@@ -3,20 +3,18 @@
 #
 # Run in Terminal (or double-click in Finder once it's executable: `chmod +x harness_launch.command`).
 # It:
-#   1. SSHes into host2 (the Linux desktop) and runs serve_harness.sh to make sure BOTH servers are up
-#      (harness API :8751 + playtest :8055) — starting them in their tmux sessions if needed.
+#   1. SSHes into host2 (the Linux desktop) and runs serve_harness.sh with HARNESS_RESTART=1 to
+#      (re)start BOTH servers FRESH (harness API :8751 + playtest :8055) — so every launch picks up the
+#      latest code (server changes like the no-cache headers only take effect on a fresh process).
 #   2. Opens ONE SSH tunnel mapping the Mac's own localhost:8751 and :8055 to host2's, so the Mac sees
 #      both servers exactly where host2 does. That keeps the test-play flow's origins consistent
 #      (the mixer on localhost:8055 posts volumes to the harness on localhost:8751 — same as on host2).
 #   3. Opens the harness in the default browser.
-#   4. HOLDS THE TERMINAL. The tunnel lives for as long as this process runs. Press Ctrl+C (or close the
-#      window) to tear the tunnel down and exit cleanly — no stray background tunnels left behind.
+#   4. HOLDS THE TERMINAL. Press Ctrl+C (or close the window) to TEAR THE WHOLE THING DOWN — the SSH
+#      tunnel AND both host2 servers — so nothing is left running. The next launch then spins it all up
+#      fresh. (Set KEEP_SERVERS=1 to leave the servers running on exit, the old behaviour.)
 #
-# The host2 servers are persistent tmux sessions and are LEFT RUNNING on exit (they're cheap to keep and
-# shared with other launches). To also stop them, run with STOP_SERVERS=1 ./harness_launch.command.
-#
-# Re-running is safe: an already-up server is left alone. If a tunnel from a previous run is still bound
-# to the ports, it's reused; otherwise a fresh one is opened and owned by this process.
+# Lifecycle in one line: each launch = fresh servers + tunnel; each Ctrl+C = full teardown.
 #
 # ── CONFIG ─────────────────────────────────────────────────────────────────────────────────────────
 HOST2="${HARNESS_HOST:-bustalab@131.212.57.217}"      # override: HARNESS_HOST=bustalab@… ./harness_launch.command
@@ -37,8 +35,8 @@ echo "  host2: $HOST2   ${SSH_OPTS:+(ssh opts: $SSH_OPTS)}"
 
 # 1) ensure the servers are up on host2. ControlMaster=no: this call must NOT open/reuse a shared master
 #    (which is what let the tunnel below no-op against an existing connection).
-echo "① ensuring servers on host2…"
-if ! ssh $SSH_OPTS -o ControlMaster=no -o ConnectTimeout=8 "$HOST2" "bash '$REMOTE_ENSURE'"; then
+echo "① (re)starting servers FRESH on host2…"   # HARNESS_RESTART=1 → both servers relaunched so code changes take effect
+if ! ssh $SSH_OPTS -o ControlMaster=no -o ConnectTimeout=8 "$HOST2" "HARNESS_RESTART=1 bash '$REMOTE_ENSURE'"; then
   echo "✗ couldn't reach host2 over SSH (or the ensure script failed)."
   echo "  Check you can run:  ssh $SSH_OPTS $HOST2   — on campus / VPN, key authorized on the desktop."
   echo "  If you must hop through host1:  HARNESS_SSH_OPTS='-J host1' $0"
@@ -87,8 +85,13 @@ cleanup() {
   else
     echo "⏹ leaving the pre-existing tunnel in place (this run didn't open it)."
   fi
-  if [ "${STOP_SERVERS:-0}" = 1 ]; then
-    echo "⏹ stopping host2 servers (STOP_SERVERS=1)…"
+  # Full teardown by default (2026-07-28, Lucas): Ctrl+C / closing the window stops BOTH host2 servers, not
+  # just the tunnel — so nothing is left running and the next launch spins everything up fresh. Set
+  # KEEP_SERVERS=1 to leave them up (the old behaviour) if you ever want a launch to not tear them down.
+  if [ "${KEEP_SERVERS:-0}" = 1 ]; then
+    echo "⏹ leaving host2 servers running (KEEP_SERVERS=1)."
+  else
+    echo "⏹ stopping host2 servers…"
     ssh $SSH_OPTS -o ControlMaster=no -o ConnectTimeout=8 "$HOST2" \
         "tmux send-keys -t harness_ui C-c 2>/dev/null; tmux send-keys -t playtest C-c 2>/dev/null" \
         && echo "   servers stopped ✓" || echo "   (couldn't reach host2 to stop servers)"

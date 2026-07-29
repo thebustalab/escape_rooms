@@ -90,6 +90,7 @@ root.innerHTML = `
     <div id="sfxChip" style="display:none;position:absolute;bottom:10px;left:14px;z-index:20;background:rgba(0,0,0,.4);padding:4px 11px;border-radius:14px;font:12px system-ui;color:rgba(255,216,140,.9);user-select:none">♫ sound effects: <span id="sfxState" title="Toggle sound effects on/off" style="cursor:pointer;text-decoration:underline;font-weight:600"></span></div>
     <button id="notebookChip" style="display:none;position:absolute;bottom:10px;right:14px;z-index:20;background:rgba(0,0,0,.42);padding:5px 12px;border-radius:14px;border:1px solid rgba(255,216,140,.35);font:12px system-ui;color:rgba(255,216,140,.92);cursor:pointer;user-select:none" title="Everything you've confirmed or picked up so far">🗒 Field notebook <span id="notebookCount" style="opacity:.7"></span></button>
     <button id="debriefChip" style="display:none;position:absolute;bottom:10px;left:50%;transform:translateX(-50%);z-index:20;background:rgba(0,0,0,.42);padding:5px 12px;border-radius:14px;border:1px solid rgba(255,216,140,.35);font:12px system-ui;color:rgba(255,216,140,.92);cursor:pointer;user-select:none" title="A look behind the scenes — how this world was built to teach the technique">🔎 Reveal how this world worked</button>
+    <button id="skipChip" style="display:none;position:absolute;bottom:10px;left:50%;transform:translateX(-50%);z-index:20;background:rgba(0,0,0,.42);padding:5px 12px;border-radius:14px;border:1px solid rgba(255,216,140,.35);font:12px system-ui;color:rgba(255,216,140,.92);cursor:pointer;user-select:none" title="Skip the ungraded escape and go straight to your submission">Skip the ungraded escape phase →</button>
     <div id="hud"><span id="hudroom"></span></div>
     <div id="motifHud"></div>
 
@@ -244,6 +245,7 @@ function init(data) {
   $("#subX500Go").onclick = confirmX500;
   $("#subX500").addEventListener("keydown", e => { if (e.key === "Enter") confirmX500(); });
   $("#notebookChip").onclick = openNotebook;
+  $("#skipChip").onclick = openSubmitPrep;   // persistent in-room "skip the ungraded escape" → submission
   $("#enter").onclick = () => {
     $("#screen1").classList.remove("active");
     $("#screen2").classList.add("active");
@@ -255,6 +257,7 @@ function init(data) {
     caseFile.length = 0; pickedClues.clear(); updateNotebookChip();   // fresh field notebook
     $("#notebookChip").style.display = "";                            // persistent chip, in-room only
     $("#debriefChip").style.display = "none";                        // appears only once analysis completes
+    $("#skipChip").style.display = "none";                           // appears once analysis is done + an escape remains
     if (SCENARIO.heel) $("#pano").classList.add("heel");              // slow crash-heel of the horizon (opt-in)
     initMotif();                                                      // story-motif HUD (e.g. infection lesion)
     bootConsole();
@@ -1905,15 +1908,13 @@ function finishAnalysis() {
   $("#continueOut").style.display = "none";
   $("#doneDebrief").style.display = "none";                   // "how this world worked" now lives on the submission screen
   $("#doneClose").onclick = () => $("#done").classList.remove("open");   // X → back to the room to do the escape
-  // Analysis-finish card: the finish message + the ✕, plus a low-key "skip" chip (styled like the music
-  // chip) that jumps straight to the submission screen for anyone skipping the ungraded escape. No
-  // play-again here. (2026-07-28, Lucas)
-  const toSub = $("#doneToSubmit");
-  toSub.className = "skipchip";
-  toSub.textContent = "Skip this ungraded escape phase →";
-  toSub.onclick = openSubmitPrep;
-  toSub.style.display = "";
+  // Analysis-finish card is just the finish message + the ✕. The "skip the ungraded escape" affordance is
+  // NOT on this card — it's a persistent bottom-of-screen chip (#skipChip, like the music/notebook chips),
+  // revealed here so the player can try the escape and bail to submission from the room if stuck. No
+  // play-again. (2026-07-28, Lucas)
+  $("#doneToSubmit").style.display = "none";
   $("#replay").style.display = "none";
+  $("#skipChip").style.display = "";
   $("#done").classList.add("open");
 }
 
@@ -1921,6 +1922,7 @@ function finishAnalysis() {
 // of the analysis phase. Content from scenario.escapeDone {title, body}.
 function showEscapeDone() {
   escapeFinished = true;                            // the escape is solved → debrief no longer needs a spoiler guard
+  $("#skipChip").style.display = "none";            // escape is done — nothing left to skip
   stopRoomSfx();                                    // silence the escape-room ambience on the finish card
   const e = SCENARIO.escapeDone || {};
   $("#doneTitle").textContent = e.title || "You escaped!";

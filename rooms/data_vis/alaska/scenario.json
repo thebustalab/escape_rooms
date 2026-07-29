@@ -36,7 +36,7 @@
     {
       "key": "room1",
       "title": "The dispatch cabin",
-      "debrief": "Your first move was the analyst's first move: take the whole lake table and keep only the rows that clear a threshold. Counting the lakes above pH 8 is filter() — screen the many down to the few that meet a condition, and read off what is left.",
+      "debrief": "Your first analysis was to take the whole lake table and keep only the rows that clear a threshold. Counting the lakes above pH 8 is filter() — screen the many down to the few that meet a condition, and read off what is left. This could also be solved by just plotting.",
       "technique": "filter() — single condition, count/identify",
       "puzzleType": 1,
       "built": true,
@@ -181,7 +181,7 @@
     {
       "key": "room2",
       "title": "The station kitchen",
-      "debrief": "Here you filtered to a group and then read one variable within it: among only the Noatak (NOAT) lakes, which carries the most magnesium. Subset first, then compare — the everyday shape of asking a big table one focused question.",
+      "debrief": "Here you filtered to a group and then read one variable within it: among only the Noatak (NOAT) lakes, which carries the most magnesium. Subset first, then compare. Plotting can also be used to directly solve the problem.",
       "technique": "filter() by element, read a grouping (which park)",
       "puzzleType": 1,
       "built": true,
@@ -329,7 +329,7 @@
     {
       "key": "room3",
       "title": "The empty radio room",
-      "debrief": "Twenty lakes are too many to eyeball, so you plotted chloride across all of them and let the picture do the work — the one lake spiking above the rest jumps straight out. That is what a chart is for: it turns a column of numbers into a shape your eye can read in a second.",
+      "debrief": "Twenty lakes are approaching too many to eyeball, so you plotted chloride across all of them and let the graph do the work: the one lake spiking above the rest jumps straight out. That is what a chart is for: it turns a long column of numbers into a shape your eye can read in a second.",
       "technique": "filter() by element + a plot, spot the outlier",
       "puzzleType": 1,
       "built": true,
@@ -485,7 +485,7 @@
     {
       "key": "boss",
       "title": "The helipad prep room",
-      "debrief": "The twist, and the real lesson. Everyone flew to the high-chloride lake, but a still-transmitting beacon meant the pilot was alive — so must be somewhere milder. You plotted a different variable, water temperature, and read the gentlest lake instead. Choosing which column to look at is the whole game: the right plot of the right variable pointed you to Lava Lake while the crowd searched the wrong place.",
+      "debrief": "A bit of a twist: everyone flew to the high-chloride lake, but a still-transmitting beacon meant the pilot was alive — so must be somewhere milder. You plotted a different variable, water temperature, and found the gentlest lake instead. Choosing which column to look at is the whole game: the right plot of the right variable pointed you to Lava Lake while the crowd searched the wrong place.",
       "technique": "filter()/sort on a different variable — resist the obvious answer",
       "puzzleType": 2,
       "isBoss": true,
@@ -533,7 +533,7 @@
           ],
           "starterCode": "alaska_lake_data",
           "pick": {
-            "prompt": "Everyone flew to North_Killeak — the high-chloride lake — but the beacon still transmits, so the pilot is still alive. Plot the water temperature across the lakes and assign your plot to <code>p</code>, then draw the clickable chart and click the one to fly to.",
+            "prompt": "Everyone flew to North_Killeak — the high-chloride lake — but the beacon still transmits, so the pilot is still alive. Where are they?",
             "plotCode": "p <- ggplot(dplyr::distinct(alaska_lake_data, lake, water_temp),\n            aes(reorder(lake, water_temp), water_temp)) +\n     ggiraph::geom_col_interactive(aes(data_id = lake, tooltip = lake)) +\n     coord_flip() +\n     labs(x = NULL, y = \"Water temperature (°C)\")",
             "answer": "Lava_Lake",
             "width": 6,
@@ -654,7 +654,7 @@
     {
       "key": "escape1",
       "title": "Out on the helipad",
-      "debrief": "The way out was this entire lesson made physical. Each of Claire's three glass templates is a filter(): lay one over the tail-number board and it covers every number that fails its condition. Stack all three and exactly one tail number is still a clear window through every filter — the row that survives filter after filter after filter. That is why the escape was a code you could only read by filtering: filter(), filter(), filter(), and the one left standing is your answer.",
+      "debrief": "Getting the helicopter open was this entire lesson enacted physically. Each of Claire's three glass templates is a filter: lay one over the code board and it covers every number that fails its condition. Stack all three and exactly one tail number is still a clear window through every filter — the row that survives filter after filter after filter. That is why the escape was a code you could only read by filtering: filter(), filter(), filter(), and the one left standing is your answer.",
       "phase": "escape",
       "built": true,
       "unlockedWhen": {
@@ -755,7 +755,7 @@
   },
   "debrief": {
     "title": "How this world worked",
-    "intro": "This whole shift was one skill in disguise: taking a table full of numbers and narrowing it, plotting it, and reading it until the answer is something you can simply see. Here is how each room was quietly teaching that — and how the escape was the very same move, made physical."
+    "intro": "The key move in this scenario was unlocking the helicopter door in order to rescue the lost pilot. Accomplishing that move required performing a real-world version of the coding task taught and tested in this scenario: filtering."
   },
   "ambient": "snow",
   "fx": [

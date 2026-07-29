@@ -11,7 +11,7 @@
     html, body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.5 system-ui, sans-serif; }
     header { padding:14px 20px; border-bottom:1px solid var(--line); position:sticky; top:0; z-index:50; background:var(--bg); }
     header h1 { margin:0; font-size:16px; } header p { margin:4px 0 0; opacity:.6; font-size:12px; }
-    main { max-width:1680px; margin:0 auto; padding:20px; }
+    main { margin:0 auto; padding:20px; }   /* no max-width: use the full window width, like the header (so card grids keep adding columns as you widen / zoom out) */
     textarea { width:100%; min-height:130px; background:#0a1620; color:inherit; border:1px solid var(--line); border-radius:8px; padding:10px; font:inherit; resize:vertical; }
     label { font-size:12px; opacity:.85; margin-right:6px; }
     select, input[type=number], input[type=text] { background:#0a1620; color:inherit; border:1px solid var(--line); border-radius:6px; padding:5px 7px; }
@@ -33,11 +33,17 @@
     /* step 1 — full-width scenario card, spanning the room row beneath */
     .scenecard { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:14px 16px; }
     .scenecard .row label { min-width:0; }
+    /* the first row: three setup cards (analog · scenario spec · cover & landing) side by side */
+    .setuprow { display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:16px; align-items:start; margin:26px 0 10px; }
+    .setuprow .scenecard { margin:0; height:100%; }
+    .setuprow .steplbl { margin:0 0 10px; }
+    @media (max-width:1000px) { .setuprow { grid-template-columns:1fr; } }
 
     /* room columns (steps 2 + 3) */
-    .cols { display:grid; grid-template-columns:repeat(4, 1fr); gap:14px; }
-    @media (max-width:1200px) { .cols { grid-template-columns:repeat(2, 1fr); } }
-    @media (max-width:640px) { .cols { grid-template-columns:1fr; } }
+    /* auto-fill (not a fixed 4) so section 5 build cards + section 3 sound cards add columns as the window
+       widens / you zoom out, instead of staying 4 per row. */
+    .cols { display:grid; grid-template-columns:repeat(auto-fill, minmax(360px, 1fr)); gap:14px; }
+    @media (max-width:760px) { .cols { grid-template-columns:1fr; } }
     .col { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:12px 12px 14px; display:flex; flex-direction:column; }
     .col .tagrow { display:flex; align-items:center; gap:6px; margin-bottom:8px; }
     .col .tagrow b { color:var(--amber); font-size:13px; white-space:nowrap; }
@@ -146,22 +152,27 @@
     .mapnode .mnsep { font-size:10px; text-transform:uppercase; letter-spacing:.04em; color:#7fd1ff; opacity:.85; margin-top:2px; }
     .mapnode .mnStatus { font-size:10px; min-height:12px; }
     /* Phase 2b — inline puzzle/clue/lock content cards (shared with puzzle_edit.html via puzzle_cards.js).
-       Scoped to #contentCols so the card CSS never touches the rest of the harness. */
-    #contentCols { display:grid; grid-template-columns:repeat(auto-fill, minmax(340px, 1fr)); gap:16px 18px; align-items:start; }
-    #contentCols .roomgroup { min-width:0; }
-    #contentCols .roomh { font-size:14px; color:var(--amber); border-bottom:1px solid var(--line); padding-bottom:6px; margin:0 0 10px; }
-    #contentCols .puz { background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:14px 16px; margin-bottom:12px; }
-    #contentCols .puz h2 { font-size:14px; margin:0 0 4px; } #contentCols .puz h2 span { color:var(--amber); }
-    #contentCols .lbl { font-size:11px; opacity:.75; margin:10px 0 3px; text-transform:uppercase; letter-spacing:.03em; }
-    #contentCols .hr { display:flex; gap:8px; align-items:center; margin-top:8px; }
-    #contentCols .hr label { font-size:12px; opacity:.75; width:72px; flex:none; margin:0; }
-    #contentCols input[type=text], #contentCols input[type=number], #contentCols select, #contentCols textarea {
+       Scoped to #contentCols so the card CSS never touches the rest of the harness. #debriefCols (step 6,
+       "how this world worked") reuses the SAME rules so its per-room cards go side-by-side to match. */
+    #contentCols, #debriefCols { display:grid; grid-template-columns:repeat(auto-fill, minmax(340px, 1fr)); gap:16px 18px; align-items:start; }
+    /* "How this world worked" cards match the Build rooms / Sounds card width (360px min) so they're the
+       same size as the other sections' cards; they still add columns as the window widens / you zoom out. */
+    #debriefCols { grid-template-columns:repeat(auto-fill, minmax(360px, 1fr)); }
+    #contentCols .roomgroup, #debriefCols .roomgroup { min-width:0; }
+    #contentCols .roomh, #debriefCols .roomh { font-size:14px; color:var(--amber); border-bottom:1px solid var(--line); padding-bottom:6px; margin:0 0 10px; }
+    #contentCols .puz, #debriefCols .puz { background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:14px 16px; margin-bottom:12px; }
+    #contentCols .puz h2, #debriefCols .puz h2 { font-size:14px; margin:0 0 4px; } #contentCols .puz h2 span, #debriefCols .puz h2 span { color:var(--amber); }
+    #contentCols .lbl, #debriefCols .lbl { font-size:11px; opacity:.75; margin:10px 0 3px; text-transform:uppercase; letter-spacing:.03em; }
+    #contentCols .hr, #debriefCols .hr { display:flex; gap:8px; align-items:center; margin-top:8px; }
+    #contentCols .hr label, #debriefCols .hr label { font-size:12px; opacity:.75; width:72px; flex:none; margin:0; }
+    #contentCols input[type=text], #contentCols input[type=number], #contentCols select, #contentCols textarea,
+    #debriefCols input[type=text], #debriefCols input[type=number], #debriefCols select, #debriefCols textarea {
                flex:1; min-width:0; width:100%; background:#0a1620; color:inherit; border:1px solid var(--line); border-radius:6px; padding:5px 7px; font:inherit; }
-    #contentCols textarea { resize:vertical; } #contentCols textarea.mono { font:12px/1.45 ui-monospace, Menlo, Consolas, monospace; }
-    #contentCols .fb { border-left:2px solid var(--line); padding-left:12px; margin-top:10px; }
-    #contentCols .none { opacity:.7; padding:14px; text-align:center; }
-    #contentCols button { background:var(--amber); color:#10202a; border:0; border-radius:8px; padding:7px 13px; font:inherit; font-weight:600; cursor:pointer; }
-    #contentCols button.busy { background:#274a63; color:#bfe0f5; cursor:default; }
+    #contentCols textarea, #debriefCols textarea { resize:vertical; } #contentCols textarea.mono, #debriefCols textarea.mono { font:12px/1.45 ui-monospace, Menlo, Consolas, monospace; }
+    #contentCols .fb, #debriefCols .fb { border-left:2px solid var(--line); padding-left:12px; margin-top:10px; }
+    #contentCols .none, #debriefCols .none { opacity:.7; padding:14px; text-align:center; }
+    #contentCols button, #debriefCols button { background:var(--amber); color:#10202a; border:0; border-radius:8px; padding:7px 13px; font:inherit; font-weight:600; cursor:pointer; }
+    #contentCols button.busy, #debriefCols button.busy { background:#274a63; color:#bfe0f5; cursor:default; }
   </style>
 </head>
 <body>
@@ -188,53 +199,18 @@ git add -A && git commit -m "whatever changed" && git push</pre>
   </header>
   <main>
 
-    <!-- STEP 0 — the analog grounding: think before designing -->
-    <div class="steplbl"><span class="n">0</span><h2>Find the real-life analog</h2></div>
-    <div class="scenecard">
+    <!-- SETUP ROW — analog · scenario spec · cover & landing (three cards in a row) -->
+    <div class="setuprow">
+      <div class="scenecard">
+        <div class="steplbl" style="margin-top:0"><span class="n">1</span><h2>Find the real-life analog</h2></div>
       <div class="hint" style="margin-top:0">Before designing anything, ask: <b>where in ordinary life do people already perform, by hand, what this chapter's code does?</b> Name the everyday act behind the technique's verbs — <code>group_by</code>/<code>summarise</code> is sorting things into piles by a shared trait and reading one number off each pile (a naturalist tallying a transect); a <code>filter</code> is walking a shelf and pulling only what matches; clustering is sorting a mixed heap into "these belong together."<br><br>For computation-heavy techniques, look especially for the case where <b>the computation is already done and a person only has to RECOGNISE it</b> — reading which grouping produced a display, spotting the odd one out, matching a shape. That recognition-not-computation move usually makes the sharpest, fairest <b>escape</b> (the unlabelled echo of the boss technique). Let this analog seed the world, the puzzles, and above all the escape — then move on to Step 1. <span class="hint">(Worked example: <code>wrangling/trees</code> — the monorail cars are already grouped-and-summarised, and the escape is recognising <i>which</i> grouping each car used.)</span></div>
     </div>
-
-    <!-- STEP 1 — design the scenario with Claude (happens in chat; the skill writes scenario.json) -->
-    <div class="steplbl"><span class="n">1</span><h2>Build the scenario spec with Claude</h2></div>
-    <div class="scenecard">
+      <div class="scenecard">
+        <div class="steplbl" style="margin-top:0"><span class="n">2</span><h2>Build the scenario spec with Claude</h2></div>
       <div class="hint" style="margin-top:0">Work with Claude and the <code>escape_room_design</code> skill to write <code>scenario.json</code> and generate most scenario content.</div>
     </div>
-
-    <!-- STEP 2 — room map + STORY: straighten the whole story here BEFORE generating any art -->
-    <div class="steplbl"><span class="n">2</span><h2>Room map &amp; story</h2>
-      <span>straighten the whole story before any art — nodes = rooms; edit each room's title, entry/opening text &amp; finish right on the graph</span></div>
-    <div class="mapwrap" id="mapWrap">
-      <div class="maplegend">
-        <span class="sw"><span class="ln door"></span> doorway — walk between rooms</span>
-        <span class="sw"><i class="ex"></i> existing hotspot (built)</span>
-        <span class="sw"><i class="pl"></i> planned hotspot</span>
-        <span class="sw">✓/○ puzzle-clue content set / blank</span>
-      </div>
-      <div class="mapcanvas" id="mapCanvas"></div>
-    </div>
-
-    <!-- STEP 2b — inline puzzle/clue/lock content (shared cards via puzzle_cards.js); pre-art rooms author onto plannedHotspots -->
-    <div class="steplbl" style="margin-top:10px"><span class="n">2b</span><h2>Room content</h2>
-      <span>every room's puzzles, clues, locks &amp; grids on one page — pre-art rooms author onto their <code>plannedHotspots</code> (content attaches when the box is placed at commit). Edits here are written by the header <b>Save all</b>.</span></div>
-    <div class="mapwrap"><div id="contentCols"></div></div>
-
-
-    <!-- STEP 3 — per-room sound: audition Claude-fetched candidates, pick one -->
-    <div class="steplbl"><span class="n">3</span><h2>Sounds</h2></div>
-    <div class="scenecard">
-      <div class="hint" style="margin-top:0">Ask Claude to <b>pull candidates per room</b> (from freesound) into the scenario's
-        <code>_scratch/audio/</code> pool — <b>two clear ambient loops + two intermittent one-shots</b> each — saying what each should evoke
-        (e.g. "elevator motor hum" + "break-room fridge drone" for beds; "distant beep", "occasional clunk" for the intermittent ones).
-        They appear below per room; <b>audition each</b> with its play button and hit <b>Add</b> to layer it in. A room can hold <b>several layers</b> that
-        play together, each with a <b>mode</b>: <b>loop</b> (a continuous bed — the seam is equal-power crossfaded by the <b>crossfade s</b> overlap, default 4s)
-        or <b>interval</b> (replays after a random gap — a one-shot like a distant beep). Set volume/delay/duck per layer, then <b>Save sounds</b>. Sounds play while you're in the
-        room and are <b>not</b> muted by the music toggle.</div>
-    </div>
-    <section class="cols" id="soundCols" style="margin-top:14px"></section>
-
-    <!-- STEP 4 — cover art + landing screen (scenario poster + landing text; scenario picker is in the header) -->
-    <div class="steplbl"><span class="n">4</span><h2>Cover &amp; landing</h2></div>
-    <div class="scenecard">
+      <div class="scenecard">
+        <div class="steplbl" style="margin-top:0"><span class="n">3</span><h2>Cover &amp; landing</h2></div>
       <div class="row" style="gap:22px;align-items:flex-start">
         <div style="flex:1;min-width:260px">
           <label class="collbl">cover art prompt</label>
@@ -265,10 +241,48 @@ git add -A && git commit -m "whatever changed" && git push</pre>
         </div>
       </div>
     </div>
+    </div>
+
+    <!-- STEP 2 — room map + STORY: straighten the whole story here BEFORE generating any art -->
+    <div class="steplbl"><span class="n">4</span><h2>Room map &amp; story</h2>
+      <span>straighten the whole story before any art — nodes = rooms; edit each room's title, entry/opening text &amp; finish right on the graph</span></div>
+    <div class="mapwrap" id="mapWrap">
+      <div class="maplegend">
+        <span class="sw"><span class="ln door"></span> doorway — walk between rooms</span>
+        <span class="sw"><i class="ex"></i> existing hotspot (built)</span>
+        <span class="sw"><i class="pl"></i> planned hotspot</span>
+        <span class="sw">✓/○ puzzle-clue content set / blank</span>
+      </div>
+      <div class="mapcanvas" id="mapCanvas"></div>
+    </div>
+
+    <!-- STEP 2b — inline puzzle/clue/lock content (shared cards via puzzle_cards.js); pre-art rooms author onto plannedHotspots -->
+    <div class="steplbl" style="margin-top:10px"><span class="n">5</span><h2>Room content</h2>
+      <span>every room's puzzles, clues, locks &amp; grids on one page — pre-art rooms author onto their <code>plannedHotspots</code> (content attaches when the box is placed at commit). Edits here are written by the header <b>Save all</b>.</span></div>
+    <div class="mapwrap"><div id="contentCols"></div></div>
+
 
     <!-- STEP 5 — BUILD ROOMS = the ART step, done LAST: everything above is authored first, so art is generated once. generate → wrap → place the planned hotspots → make open door → Save room (commit). -->
-    <div class="steplbl"><span class="n">5</span><h2>Build rooms — generate the art (do this last)</h2></div>
+    <div class="steplbl"><span class="n">6</span><h2>Build rooms — generate the art</h2></div>
     <section class="cols" id="buildCols"></section>
+
+    <!-- STEP 3 — per-room sound: audition Claude-fetched candidates, pick one -->
+    <div class="steplbl"><span class="n">7</span><h2>Sounds</h2></div>
+    <div class="scenecard">
+      <div class="hint" style="margin-top:0">Ask Claude to <b>pull candidates per room</b> (from freesound) into the scenario's
+        <code>_scratch/audio/</code> pool — <b>two clear ambient loops + two intermittent one-shots</b> each — saying what each should evoke
+        (e.g. "elevator motor hum" + "break-room fridge drone" for beds; "distant beep", "occasional clunk" for the intermittent ones).
+        They appear below per room; <b>audition each</b> with its play button and hit <b>Add</b> to layer it in. A room can hold <b>several layers</b> that
+        play together, each with a <b>mode</b>: <b>loop</b> (a continuous bed — the seam is equal-power crossfaded by the <b>crossfade s</b> overlap, default 4s)
+        or <b>interval</b> (replays after a random gap — a one-shot like a distant beep). Set volume/delay/duck per layer, then <b>Save sounds</b>. Sounds play while you're in the
+        room and are <b>not</b> muted by the music toggle.</div>
+    </div>
+    <section class="cols" id="soundCols" style="margin-top:14px"></section>
+
+    <!-- STEP 6 — "how this world worked" exit debrief: scenario heading+intro + one card per room (comes last) -->
+    <div class="steplbl" style="margin-top:10px"><span class="n">8</span><h2>How this world worked</h2>
+      <span>the exit debrief (the second tab on the submission screen): a scenario-level heading &amp; intro, then a card per room for the &ldquo;why this room worked this way&rdquo; blurb shown beside its scene. Edits save on blur.</span></div>
+    <div id="debriefCols"></div>
 
 
   </main>
@@ -637,25 +651,18 @@ git add -A && git commit -m "whatever changed" && git push</pre>
            <label class="collbl">analysis finish · title</label><input class="mnDnT" value="${esc(dn.title || "")}" placeholder="Complete">
            <label class="collbl">analysis finish · body</label><textarea class="mnDnB" placeholder="Nice work — you've finished."></textarea>
            <label class="collbl">escape finish · title <span style="opacity:.55">· optional</span></label><input class="mnEsT" value="${esc(es.title || "")}" placeholder="You escaped!">
-           <label class="collbl">escape finish · body</label><textarea class="mnEsB" placeholder="You made it out."></textarea>
-           <div class="mnsep" style="margin-top:14px">how this world worked <span style="opacity:.55">· the debrief tab on the submission screen</span></div>
-           <label class="collbl">debrief · heading</label><input class="mnDbT" value="${esc((SCENARIO_DOC && SCENARIO_DOC.debrief && SCENARIO_DOC.debrief.title) || "")}" placeholder="How this world worked">
-           <label class="collbl">debrief · intro <span style="opacity:.55">· lead paragraph above the room-by-room gallery (each room's own debrief text is edited on that room)</span></label><textarea class="mnDbI" placeholder="This afternoon was one skill wearing a lab coat: …"></textarea>`;
+           <label class="collbl">escape finish · body</label><textarea class="mnEsB" placeholder="You made it out."></textarea>`;
         el.appendChild(fin);
         const dnT = fin.querySelector(".mnDnT"), dnB = fin.querySelector(".mnDnB"), esT = fin.querySelector(".mnEsT"), esB = fin.querySelector(".mnEsB");
-        const dbT = fin.querySelector(".mnDbT"), dbI = fin.querySelector(".mnDbI");
         dnB.value = dn.body || ""; esB.value = es.body || "";
-        dbI.value = (SCENARIO_DOC && SCENARIO_DOC.debrief && SCENARIO_DOC.debrief.intro) || "";
         const save = async () => {
           const fields = { done: { title: dnT.value.trim(), body: dnB.value } };
           if (esT.value.trim() || esB.value.trim()) fields.escapeDone = { title: esT.value.trim(), body: esB.value };
-          // preserve any other debrief keys (per-room text lives on rooms, not here; body/sections on older scenarios)
-          fields.debrief = { ...((SCENARIO_DOC && SCENARIO_DOC.debrief) || {}), title: dbT.value.trim(), intro: dbI.value.trim() };
           const r = await post("/api/scenario-patch", { ...SCQ(), fields });
           if (r.ok && SCENARIO_DOC) Object.assign(SCENARIO_DOC, fields);
           r.ok ? ok("finish saved ✓") : err(r.error || "save failed");
         };
-        [dnT, dnB, esT, esB, dbT, dbI].forEach(inp => inp.onchange = save);
+        [dnT, dnB, esT, esB].forEach(inp => inp.onchange = save);
       }
     }
 
@@ -702,6 +709,61 @@ git add -A && git commit -m "whatever changed" && git push</pre>
         PC.roomCardsInto(inner, r.spots, r.key);
         sec.appendChild(inner);
         host.appendChild(sec);
+      });
+    }
+
+    // ================= STEP 2c — "how this world worked" (exit debrief) =================
+    // A scenario-level heading + intro, then one card per BUILT room for its debrief blurb
+    // (room.debrief: string | {heading, body}). Renders into #debriefCols; saves on blur
+    // (scenario-patch for the heading/intro, room-patch for each room). Rebuilt by refreshAll.
+    function buildDebrief() {
+      const host = $("#debriefCols"); if (!host) return;
+      host.innerHTML = "";
+      const d = (SCENARIO_DOC && SCENARIO_DOC.debrief) || {};
+      // scenario-level card (heading + intro shown above the room gallery)
+      const sc = document.createElement("section"); sc.className = "roomgroup";
+      sc.innerHTML =
+        `<h2 class="roomh">the debrief screen <span class="hint" style="text-transform:none;font-weight:400">· heading + intro, above the room gallery</span></h2>
+         <div class="puz">
+           <div class="lbl">heading</div><input class="dbScTitle" type="text" placeholder="How this world worked">
+           <div class="lbl">intro <span class="hint" style="text-transform:none">· the lead paragraph above the room-by-room gallery</span></div>
+           <textarea class="dbScIntro" rows="3" placeholder="This afternoon was one skill wearing a lab coat: …"></textarea>
+         </div>`;
+      host.appendChild(sc);
+      const scT = sc.querySelector(".dbScTitle"), scI = sc.querySelector(".dbScIntro");
+      scT.value = d.title || ""; scI.value = d.intro || "";
+      const saveScenario = async () => {
+        const fields = { debrief: { ...((SCENARIO_DOC && SCENARIO_DOC.debrief) || {}), title: scT.value.trim(), intro: scI.value.trim() } };
+        const r = await post("/api/scenario-patch", { ...SCQ(), fields });
+        if (r.ok && SCENARIO_DOC) SCENARIO_DOC.debrief = fields.debrief;
+      };
+      scT.onchange = saveScenario; scI.onchange = saveScenario;
+      // one card per room (the player's debrief gallery shows the BUILT ones in order; authoring all here
+      // is harmless). NB: don't call the player's isBuilt() — it doesn't exist in the harness (that
+      // ReferenceError aborted buildDebrief AND the rest of refreshAll, hiding the section-5 art too).
+      const rooms = (ROOMS || []);
+      if (!rooms.length) { host.insertAdjacentHTML("beforeend", `<div class="hint" style="margin:6px 0">No rooms yet.</div>`); return; }
+      rooms.forEach(room => {
+        const cur = room.debrief;
+        const heading = (cur && typeof cur === "object") ? (cur.heading || cur.title || "") : "";
+        const body = (typeof cur === "string") ? cur : ((cur && (cur.body || cur.text)) || "");
+        const sec = document.createElement("section"); sec.className = "roomgroup";
+        sec.innerHTML =
+          `<h2 class="roomh">${esc(room.key)} <span class="hint" style="text-transform:none;font-weight:400">· ${esc(room.title || "")}</span></h2>
+           <div class="puz">
+             <div class="lbl">heading <span class="hint" style="text-transform:none">· optional — defaults to the room title</span></div><input class="dbRT" type="text">
+             <div class="lbl">debrief text <span class="hint" style="text-transform:none">· why this room worked the way it did; shown beside its scene</span></div><textarea class="dbRB" rows="4"></textarea>
+           </div>`;
+        host.appendChild(sec);
+        const rT = sec.querySelector(".dbRT"), rB = sec.querySelector(".dbRB");
+        rT.value = heading; rB.value = body;
+        const saveRoom = async () => {
+          const h = rT.value.trim(), b = rB.value.trim();
+          const val = (!h && !b) ? null : (!h ? b : { heading: h, body: b });   // string, {heading,body}, or clear
+          room.debrief = val;
+          await post("/api/room-patch", { ...SCQ(), roomKey: room.key, fields: { debrief: val } });
+        };
+        rT.onchange = saveRoom; rB.onchange = saveRoom;
       });
     }
 
@@ -1024,6 +1086,7 @@ git add -A && git commit -m "whatever changed" && git push</pre>
       ROOMS.forEach(room => { renderGrid(room.key); renderCandidates(room.key); updateSoundBadge(room); });
       syncSoundVolumesFromDisk();     // pull in any volumes the test-play mixer just saved
       refreshProgress();
+      buildDebrief();                 // LAST — non-critical, so an error here can never block the art path above
     }
 
     // ---- generate (per-slot poll; slot = room key) ----
@@ -1068,11 +1131,13 @@ git add -A && git commit -m "whatever changed" && git push</pre>
           const st = candState(key, f);
           const card = document.createElement("div");
           card.className = "card" + (f === picked[key] ? " sel" : "");
-          // no ?t= cache-buster: candidate filenames are unique + immutable, so the browser can
-          // cache them — otherwise every re-render refetched the whole column and it flashed.
+          // Cache key is the SCENARIO (`?s=`), not a timestamp: the /scene/ route is scenario-global, so
+          // two scenarios can share a candidate filename (gpt_room1_6.png) — without namespacing, the
+          // browser could show the wrong scenario's cached image after a switch. `?s=` is stable per
+          // scenario, so it still caches within a scenario (no re-render flashing) but never collides across.
           card.innerHTML =
             `<button class="cdel" title="Delete this candidate">×</button>
-             <img src="scene/${f}" loading="lazy">
+             <img src="scene/${f}?s=${encodeURIComponent(ACTIVESC.scenario || '')}" loading="lazy">
              <div class="cap">${f}</div>
              <div class="cchips">
                <button class="cchip${st.wrap ? " done" : ""}" data-step="wrap" title="Edit wrap for this candidate">wrap</button>
