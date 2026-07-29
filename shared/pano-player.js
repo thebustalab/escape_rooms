@@ -123,32 +123,27 @@ root.innerHTML = `
       <div class="subintro">
         <div class="subcard">
           <button class="mclose" id="subClose" aria-label="Close" title="Close">✕</button>
-          <h2>Prepare your submission</h2>
-          <div id="subId" style="display:none">
-            <div class="lbl">Enter your x500 to generate your submission code and figures:</div>
-            <div class="idrow"><input id="subX500" placeholder="your x500 (e.g. bust0037)" autocomplete="off" /><button id="subX500Go">Confirm</button></div>
+          <div class="subtabs">
+            <button class="subtab on" id="subTabPrep">Prepare submission</button>
+            <button class="subtab" id="subTabDebrief" style="display:none">How this world worked</button>
           </div>
-          <div id="subBody" style="display:none">
-            <div id="subCodeWrap" style="display:none;margin-bottom:6px">
-              <div class="lbl">Your submission code — paste this into Canvas:</div>
-              <div id="subCodeVal"></div>
-              <button class="ghost" id="subCopyCode" style="margin-top:8px">Copy code</button>
+          <div id="subPanePrep">
+            <div id="subId" style="display:none">
+              <div class="lbl">Enter your x500 to generate your figures:</div>
+              <div class="idrow"><input id="subX500" placeholder="your x500 (e.g. bust0037)" autocomplete="off" /><button id="subX500Go">Confirm</button></div>
             </div>
-            <div id="subWork"></div>
-            <div class="subactions">
-              <button id="subPdf">⬇ Download PDF (figures + code)</button>
-              <button class="ghost" id="subDebrief" style="display:none">🔎 How this world worked</button>
-              <button class="ghost" id="subBack">Back to the room</button>
+            <div id="subBody" style="display:none">
+              <div id="subWork"></div>
+              <div class="subactions">
+                <button id="subPdf">⬇ Download PDF (figures + code)</button>
+              </div>
             </div>
+          </div>
+          <div id="subPaneDebrief" style="display:none">
+            <h2 id="debriefTitle" style="text-align:left;margin-top:4px"></h2>
+            <div id="debriefBody"></div>
           </div>
         </div>
-      </div>
-    </div>
-    <div id="debrief">
-      <div class="card">
-        <h2 id="debriefTitle"></h2>
-        <div id="debriefBody"></div>
-        <button class="ghost" id="debriefClose">Close</button>
       </div>
     </div>
     <div id="loading">
@@ -237,25 +232,18 @@ function init(data) {
     const b = $("#copyCode"); b.textContent = "Copied ✓";
     setTimeout(() => { b.textContent = "Copy code"; }, 1500);
   };
-  // submission-prep screen buttons (static — the code/work are filled when it opens)
-  $("#subClose").onclick = $("#subBack").onclick = () => $("#submitPrep").classList.remove("open");
-  $("#subCopyCode").onclick = () => {
-    if (!mintedCode) return;
-    if (navigator.clipboard) navigator.clipboard.writeText(mintedCode).catch(() => {});
-    const b = $("#subCopyCode"); b.textContent = "Copied ✓"; setTimeout(() => { b.textContent = "Copy code"; }, 1500);
-  };
+  // submission-prep screen buttons (static — the work is filled when it opens)
+  $("#subClose").onclick = () => $("#submitPrep").classList.remove("open");
   $("#subPdf").onclick = exportSubmissionPdf;
-  $("#subDebrief").onclick = () => openDebrief(false);   // debrief lives here now, not on an in-room chip
-  // x500 is collected HERE (on the submission-prep screen), not on the landing screen — the code +
-  // figures are personalised only at compile time.
+  // Two tabs in the submission card: prepare the submission, or read "how this world worked". The debrief
+  // now renders INSIDE this card as a tab (fixes it opening behind the submission modal), not a separate one.
+  $("#subTabPrep").onclick = () => switchSubTab("prep");
+  $("#subTabDebrief").onclick = () => switchSubTab("debrief");
+  // x500 is collected HERE (on the submission-prep screen), not on the landing screen — the figures are
+  // personalised only at compile time.
   $("#subX500Go").onclick = confirmX500;
   $("#subX500").addEventListener("keydown", e => { if (e.key === "Enter") confirmX500(); });
   $("#notebookChip").onclick = openNotebook;
-  // Exit debrief (scenario.debrief): the in-room chip guards against spoiling a still-unsolved escape;
-  // the escape-done button doesn't need to. Close returns to wherever the player was.
-  $("#debriefChip").onclick = () => openDebrief(true);
-  $("#doneDebrief").onclick = () => openDebrief(false);
-  $("#debriefClose").onclick = () => $("#debrief").classList.remove("open");
   $("#enter").onclick = () => {
     $("#screen1").classList.remove("active");
     $("#screen2").classList.add("active");
@@ -1917,10 +1905,15 @@ function finishAnalysis() {
   $("#continueOut").style.display = "none";
   $("#doneDebrief").style.display = "none";                   // "how this world worked" now lives on the submission screen
   $("#doneClose").onclick = () => $("#done").classList.remove("open");   // X → back to the room to do the escape
+  // Analysis-finish card: the finish message + the ✕, plus a low-key "skip" chip (styled like the music
+  // chip) that jumps straight to the submission screen for anyone skipping the ungraded escape. No
+  // play-again here. (2026-07-28, Lucas)
   const toSub = $("#doneToSubmit");
-  toSub.style.display = "";
+  toSub.className = "skipchip";
   toSub.textContent = "Skip this ungraded escape phase →";
   toSub.onclick = openSubmitPrep;
+  toSub.style.display = "";
+  $("#replay").style.display = "none";
   $("#done").classList.add("open");
 }
 
@@ -1939,9 +1932,11 @@ function showEscapeDone() {
   $("#doneDebrief").style.display = "none";                   // "how this world worked" stays on the in-room chip
   $("#doneClose").onclick = () => $("#done").classList.remove("open");
   const toSub = $("#doneToSubmit");
+  toSub.className = "";                           // default button style (the analysis card uses the chip style)
   toSub.style.display = "";
   toSub.textContent = "Prepare submission →";
   toSub.onclick = openSubmitPrep;
+  $("#replay").style.display = "none";           // no play-again on the escape finish card (2026-07-28, Lucas)
   $("#done").classList.add("open");
 }
 
@@ -1968,7 +1963,7 @@ function renderSubmitWork() {
   const rooms = (SCENARIO.rooms || []).filter(r => isBuilt(r) && phaseOf(r) === "analysis" && submissionWork.has(r.key));
   if (!rooms.length) { host.innerHTML = `<div class="swnone">No puzzle code captured yet.</div>`; return; }
   const intro = document.createElement("div"); intro.className = "swintro";
-  intro.textContent = "Each puzzle's R console is pre-filled with the code you ran. Refine it — style the plot, add labels, colours — and press Run to update the figure. The PDF uses the latest version.";
+  intro.textContent = "The R console from each puzzle in this scenario is shown below, pre-filled with the code you ran. You can refine that code, styling the plot, adding labels and colors, and more. Press Run to update the figure. At the end, use the download button to download a PDF of your work and submit it on Canvas.";
   host.appendChild(intro);
   rooms.forEach(r => {
     const w = submissionWork.get(r.key);
@@ -2026,7 +2021,19 @@ function openSubmitPrep() {
   const old = host.querySelector(".particles"); if (old) old.remove();
   const amb = SCENARIO.ambient || "fireflies";
   if (amb !== "none") spawnParticles(host, amb, amb === "snow" ? 40 : 18);
+  $("#subTabDebrief").style.display = SCENARIO.debrief ? "" : "none";   // "how this world worked" tab only if authored
+  switchSubTab("prep");                                                 // always open on the prepare-submission tab
   $("#submitPrep").classList.add("open");
+}
+// Switch the submission card between its two tabs: prepare-submission and the "how this world worked"
+// debrief. The debrief renders inline here (into #debriefBody), so it can't open behind the modal (#6).
+function switchSubTab(which) {
+  const dbg = which === "debrief";
+  $("#subPanePrep").style.display = dbg ? "none" : "";
+  $("#subPaneDebrief").style.display = dbg ? "" : "none";
+  $("#subTabPrep").classList.toggle("on", !dbg);
+  $("#subTabDebrief").classList.toggle("on", dbg);
+  if (dbg) renderDebrief();                                             // (re)render the gallery into #debriefBody
 }
 // Confirm the entered x500, then reveal + build the submission payload (code + stamped figures).
 function confirmX500() {
@@ -2040,10 +2047,10 @@ function confirmX500() {
 // Fill the submission payload once the x500 is known: mint the (x500-keyed) code, personalise every
 // figure captured during play with the x500 stamp + watermark, then render the refine blocks.
 async function buildSubmission() {
-  mintCode("analysis");                                     // now keyed on the confirmed x500
-  const cw = $("#subCodeWrap");
-  if (mintedCode) { $("#subCodeVal").textContent = mintedCode; cw.style.display = ""; } else cw.style.display = "none";
-  $("#subDebrief").style.display = SCENARIO.debrief ? "" : "none";
+  mintCode("analysis");                                     // keyed on the confirmed x500 — goes into the PDF ONLY.
+  // The submission code is NOT shown on screen and has no copy button (2026-07-28): it's baked into the
+  // downloaded PDF the student submits (see exportSubmissionPdf), so they never handle it directly.
+  $("#subTabDebrief").style.display = SCENARIO.debrief ? "" : "none";
   await stampAllFigures();                                  // apply the x500 stamp to figures captured during play
   renderSubmitWork();
 }
@@ -2141,7 +2148,7 @@ function renderDebrief() {
     p.textContent = (typeof d.body === "string") ? d.body : "";
     body.appendChild(p);
   }
-  $("#debrief").classList.add("open");
+  // Renders inline into the submission card's debrief tab now — no separate #debrief modal to open.
 }
 
 // One-line spoiler interstitial shown when the debrief is opened from the in-room chip while the escape

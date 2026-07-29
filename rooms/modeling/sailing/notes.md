@@ -113,14 +113,18 @@ reckoning engine**: two bronze dials (one **sea/tide** cycle, one **moon/swell**
 sweeping the harbour's channels.
 
 **The interaction (three moves = the modeling arc):**
-1. **Set two component inputs.** Two dials/gears/rings, one per rhythm; the player sets each to the
-   **period + phase** they decoded from the tide-gauge history (move (2)/(3) above).
+1. **Set two component inputs — TWO CONCENTRIC DIALS (settled, Lucas 2026-07-28).** An orrery-style
+   pair of concentric rings/dials, one per rhythm (inner = one cycle, outer = the other); the player
+   sets each to the **period + phase** they decoded from the tide-gauge history (move (2)/(3) above).
+   Concentric rings read as a single reckoning instrument and reinforce "two components, one device."
 2. **The machine superimposes + projects forward, LIVE.** As the dials turn, the device draws the
    **combined trace across the coming beats** and shows **which channel is safe next** — updating in
    real time, exactly like watching `geom_smooth` redraw as the model changes. This is the
    fit-and-see-the-prediction loop.
-3. **Commit the prediction.** Mark the predicted **safe channel/beat** on the projected trace and
-   steer there. Solve = the projection matches the world's true next opening.
+3. **Commit the prediction — BOTH channel AND time (settled, Lucas 2026-07-28).** The player must
+   choose **which channel** is safe **and at what time/beat** — not just the channel. Two coordinates
+   to commit (channel + time), so the prediction is a full read of the projected trace, not a single
+   pick. Solve = both match the world's true next safe opening (right channel, right beat).
 
 **Why it's honest + self-checking (the elegant bit).** The engine just shows the *consequence* of the
 two dial settings — no separate grading of the dials. Wrong decomposition → wrong projection → you
@@ -139,9 +143,12 @@ keep it graded-checkable without continuous-guess frustration. Logic-test + brow
 Add to `puzzle_inventory.md` as a new mechanic row once the shape is settled; consider whether it
 belongs in `consistency/consistency.yaml`.
 
-**Open sub-questions:** how many channels (readability vs richness)? dials vs rotating-ring/orrery UI?
-does the projector show the full combined *curve* or just per-channel safe/unsafe lights? how much to
-signpost that TWO components must be set (fairness vs discovery)?
+**Settled:** two **concentric dials** (orrery-style rings) for the component inputs; the player commits
+**both channel AND time** (two coordinates), not just the channel.
+
+**Open sub-questions:** how many channels (readability vs richness — likely 3–4)? does the projector
+show the full combined *curve* or just per-channel safe/shut lights? how much to signpost that TWO
+components must be set (fairness vs discovery)?
 
 ## Open questions (resolve at PUZZLE / STORY / DESIGN phases)
 - Greek-canonical (Scylla & Charybdis) vs invented/fantastical? (Lucas leaning fantastical-friendly.)

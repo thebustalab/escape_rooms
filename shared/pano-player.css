@@ -238,6 +238,11 @@ code { background:#0a1620; padding:1px 5px; border-radius:4px; }
 #done { position:fixed; inset:0; z-index:20; display:none; align-items:center; justify-content:center; background:rgba(3,8,13,.8); }
 #done.open { display:flex; }
 #done .card { background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:26px 28px; max-width:460px; text-align:center; }
+/* low-key "skip the ungraded escape" chip on the analysis-finish card — styled like the bottom-left music
+   chip (subtle pill), not a primary button. */
+#done .skipchip { display:inline-block; margin:16px auto 0; background:rgba(0,0,0,.4); border:0; border-radius:14px;
+  padding:5px 13px; font:12px system-ui; font-weight:400; color:rgba(255,216,140,.9); cursor:pointer; }
+#done .skipchip:hover { color:#ffd88c; background:rgba(0,0,0,.55); }
 #done h2 { color:var(--amber); margin:0 0 10px; }
 
 /* exit debrief — the standalone, opt-in "how this world worked" screen (scenario.debrief). Its own
@@ -247,20 +252,20 @@ code { background:#0a1620; padding:1px 5px; border-radius:4px; }
 #debrief.open { display:flex; }
 #debrief .card { background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:26px 28px; max-width:620px; text-align:left; }
 #debrief h2 { color:var(--amber); margin:0 0 12px; }
-#debrief #debriefBody p { margin:0 0 12px; }
-#debrief .dbsec { margin:0 0 14px; }
-#debrief .dbsec h3 { color:var(--amber); font-size:15px; margin:0 0 4px; }
+#debriefBody p { margin:0 0 12px; }
+.dbsec { margin:0 0 14px; }
+.dbsec h3 { color:var(--amber); font-size:15px; margin:0 0 4px; }
 #debrief #debriefClose { margin-top:6px; }
 /* room-by-room gallery: each built room's scene (a 2:1 panorama thumbnail) with its text alongside. */
-#debrief .dbintro { margin:0 0 18px; opacity:.92; }
-#debrief .dbroom { display:flex; gap:14px; align-items:flex-start; margin:0 0 18px; padding:0 0 16px; border-bottom:1px solid var(--line); }
-#debrief .dbroom:last-child { border-bottom:0; padding-bottom:0; }
-#debrief .dbshot { width:240px; flex:none; aspect-ratio:2/1; object-fit:cover; border-radius:8px; border:1px solid var(--line); background:#0a1620; }
-#debrief .dbtext { flex:1; min-width:0; }
-#debrief .dbtext h3 { color:var(--amber); font-size:15px; margin:0 0 4px; }
-#debrief .dbpuzzle { font-size:13px; opacity:.62; font-style:italic; margin:0 0 6px; }
-#debrief .dbtext p { margin:0 0 8px; }
-@media (max-width:560px) { #debrief .dbroom { flex-direction:column; } #debrief .dbshot { width:100%; } }
+.dbintro { margin:0 0 18px; opacity:.92; }
+.dbroom { display:flex; gap:14px; align-items:flex-start; margin:0 0 18px; padding:0 0 16px; border-bottom:1px solid var(--line); }
+.dbroom:last-child { border-bottom:0; padding-bottom:0; }
+.dbshot { width:240px; flex:none; aspect-ratio:2/1; object-fit:cover; border-radius:8px; border:1px solid var(--line); background:#0a1620; }
+.dbtext { flex:1; min-width:0; }
+.dbtext h3 { color:var(--amber); font-size:15px; margin:0 0 4px; }
+.dbpuzzle { font-size:13px; opacity:.62; font-style:italic; margin:0 0 6px; }
+.dbtext p { margin:0 0 8px; }
+@media (max-width:560px) { .dbroom { flex-direction:column; } .dbshot { width:100%; } }
 
 /* pick-a-point-on-the-plot puzzle (escape map). Transparent clickable hit-boxes overlaid on the chart
    image at each point's fraction coords; hover shows an amber ring, the correct pick a green one. */
@@ -311,10 +316,16 @@ code { background:#0a1620; padding:1px 5px; border-radius:4px; }
 #submitPrep { position: fixed; inset: 0; z-index: 25; display: none; align-items: center; justify-content: center;
   background: rgba(3,8,13,.86); overflow: auto; }
 #submitPrep.open { display: flex; }
-#submitPrep .subintro { position: relative; z-index: 1; padding: 28px; width: 100%; max-width: 780px; display: flex; justify-content: center; }
+#submitPrep .subintro { position: relative; z-index: 1; padding: 28px; width: 100%; max-width: 1000px; display: flex; justify-content: center; }
 #submitPrep .subcard { position: relative; background: var(--panel); border: 1px solid var(--line); border-radius: 14px;
-  padding: 26px 28px; width: 100%; max-width: 740px; max-height: 88vh; overflow: auto; text-align: left; }
+  padding: 26px 28px; width: 100%; max-width: 960px; max-height: 88vh; overflow: auto; text-align: left; }
 #submitPrep .subcard h2 { color: var(--amber); margin: 0 0 12px; text-align: center; }
+/* two-tab header inside the submission card: Prepare submission | How this world worked */
+#submitPrep .subtabs { display: flex; gap: 6px; margin: 2px 34px 16px 0; border-bottom: 1px solid var(--line); }
+#submitPrep .subtab { background: transparent; color: var(--ink); border: 0; border-bottom: 2px solid transparent;
+  border-radius: 0; font: inherit; font-weight: 600; opacity: .6; padding: 6px 10px; cursor: pointer; }
+#submitPrep .subtab.on { color: var(--amber); border-bottom-color: var(--amber); opacity: 1; }
+#submitPrep .subtab:hover { opacity: 1; }
 #submitPrep .lbl { font-size: 13px; opacity: .75; margin-bottom: 6px; }
 #submitPrep .idrow { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 #submitPrep #subX500 { background: #0a1620; color: inherit; border: 1px solid var(--line); border-radius: 8px;

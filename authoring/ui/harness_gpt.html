@@ -637,18 +637,25 @@ git add -A && git commit -m "whatever changed" && git push</pre>
            <label class="collbl">analysis finish · title</label><input class="mnDnT" value="${esc(dn.title || "")}" placeholder="Complete">
            <label class="collbl">analysis finish · body</label><textarea class="mnDnB" placeholder="Nice work — you've finished."></textarea>
            <label class="collbl">escape finish · title <span style="opacity:.55">· optional</span></label><input class="mnEsT" value="${esc(es.title || "")}" placeholder="You escaped!">
-           <label class="collbl">escape finish · body</label><textarea class="mnEsB" placeholder="You made it out."></textarea>`;
+           <label class="collbl">escape finish · body</label><textarea class="mnEsB" placeholder="You made it out."></textarea>
+           <div class="mnsep" style="margin-top:14px">how this world worked <span style="opacity:.55">· the debrief tab on the submission screen</span></div>
+           <label class="collbl">debrief · heading</label><input class="mnDbT" value="${esc((SCENARIO_DOC && SCENARIO_DOC.debrief && SCENARIO_DOC.debrief.title) || "")}" placeholder="How this world worked">
+           <label class="collbl">debrief · intro <span style="opacity:.55">· lead paragraph above the room-by-room gallery (each room's own debrief text is edited on that room)</span></label><textarea class="mnDbI" placeholder="This afternoon was one skill wearing a lab coat: …"></textarea>`;
         el.appendChild(fin);
         const dnT = fin.querySelector(".mnDnT"), dnB = fin.querySelector(".mnDnB"), esT = fin.querySelector(".mnEsT"), esB = fin.querySelector(".mnEsB");
+        const dbT = fin.querySelector(".mnDbT"), dbI = fin.querySelector(".mnDbI");
         dnB.value = dn.body || ""; esB.value = es.body || "";
+        dbI.value = (SCENARIO_DOC && SCENARIO_DOC.debrief && SCENARIO_DOC.debrief.intro) || "";
         const save = async () => {
           const fields = { done: { title: dnT.value.trim(), body: dnB.value } };
           if (esT.value.trim() || esB.value.trim()) fields.escapeDone = { title: esT.value.trim(), body: esB.value };
+          // preserve any other debrief keys (per-room text lives on rooms, not here; body/sections on older scenarios)
+          fields.debrief = { ...((SCENARIO_DOC && SCENARIO_DOC.debrief) || {}), title: dbT.value.trim(), intro: dbI.value.trim() };
           const r = await post("/api/scenario-patch", { ...SCQ(), fields });
           if (r.ok && SCENARIO_DOC) Object.assign(SCENARIO_DOC, fields);
           r.ok ? ok("finish saved ✓") : err(r.error || "save failed");
         };
-        [dnT, dnB, esT, esB].forEach(inp => inp.onchange = save);
+        [dnT, dnB, esT, esB, dbT, dbI].forEach(inp => inp.onchange = save);
       }
     }
 

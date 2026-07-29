@@ -400,12 +400,12 @@ completes the analysis → `finishAnalysis` saw no escape phase → `openSubmitP
 
 Fixed generally (option B — future-proofs any boss-room escape), in `shared/pano-player.js`:
 - New `hasPendingEscape()` — an unsolved `lock` flagged `endsEscape` counts as a pending escape, so
-  `finishAnalysis` shows the *analysis-complete* card (copy code / skip-to-submission) instead of jumping
+  `finishAnalysis` shows the *analysis-complete* card (finish message + ✕ only — no skip/play-again) instead of jumping
   to submission; the exit-debrief spoiler guard also honours it.
 - Solving an `endsEscape` lock now fires `showEscapeDone()` (the in-room analogue of an `endsEscape` door).
 - Hawaii's valve keypad got **`endsEscape:true`** + **`availableWhen:{solved:"boss"}`** (so it can't be
   keyed before the boss puzzle reveals the panel — closes the enter-011-early exploit).
 
-Flow now: solve boss puzzle → "analysis complete, copy your code" card → close → wellroom with the valve
+Flow now: solve boss puzzle → analysis-complete card (message + ✕ only) → close → wellroom with the valve
 panel open → key `011` → escapeDone ("you disconnected the well"). Submission reachable from both the
 analysis-complete card and the escape-done screen. Player-script cache bumped (js v58 / css v55).
