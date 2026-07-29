@@ -99,16 +99,31 @@
     let ROOM_KEYS = [];             // all room keys in this scenario, for a door's target-room dropdown
     let PLANNED = [];               // node.plannedHotspots — the design manifest (what this room SHOULD have)
     let ARMED = -1;                 // index into PLANNED currently loaded to draw next (arm-then-draw); -1 = none
+    let RETAINED = [];              // the room's LAST-COMMITTED hotspots — re-attached by label when you redraw
+                                    // on new art, so wiring (door to/direction, grading, clue body) survives a re-gen
 
     const pct = b => ({ left:b[0]*100+"%", top:b[1]*100+"%", width:(b[2]-b[0])*100+"%", height:(b[3]-b[1])*100+"%" });
     const uniqueId = (base, self) => { let id = base, n = 1; while (SPOTS.some((s, j) => j !== self && s.id === id)) id = base + "_" + (++n); return id; };
 
+    // Retain wiring across art re-gens: if a previously-committed hotspot has the SAME label (+type),
+    // re-attach its FULL content — door to/direction/requires, puzzle grading, clue body/pickup/image,
+    // etc. — onto the freshly-drawn box. So after new art you only re-PLACE the boxes; the routing and
+    // content survive. Match by label-slug (the stable identity); no match ⇒ a fresh hotspot as before.
+    function retainedFor(label, type) {
+      const want = slug(label || "");
+      if (!want) return null;
+      const hit = RETAINED.find(h => slug(h.label || "") === want && (!type || h.type === type));
+      return hit ? JSON.parse(JSON.stringify(hit)) : null;
+    }
+
     // Build a new hotspot for a freshly-drawn box. If `plan` (an armed plannedHotspots entry) is
-    // given, seed the box's type/label (+ door direction / clue pickup) from it — the "click a planned
-    // item, then draw" flow — so a planned box lands typed+labelled in one drag. Content (grading,
-    // clue body, map, door target) is still authored in the Edit-puzzle tab, same as a hand-drawn box.
+    // given, seed the box's type/label (+ door direction / clue pickup) from it. Either way, if the room
+    // already had a committed hotspot of that label, its wiring is re-attached (retainedFor) — so a
+    // re-gen'd room keeps all its door targets / grading / clue bodies once the boxes are re-placed.
     function makeSpot(box, plan) {
       if (plan) {
+        const keep = retainedFor(plan.label, plan.type);
+        if (keep) { keep.id = uniqueId(keep.id || slug(keep.label) || ("obj_" + (++seq))); keep.box = box; return keep; }
         const s = { id: uniqueId(slug(plan.label) || ("obj_" + (++seq))), type: plan.type || "puzzle",
                     label: plan.label || ("Object " + SPOTS.length), box };
         if (s.type === "puzzle") { s.starterCode = ""; s.check = checkSkel(); }
@@ -154,6 +169,7 @@
       else { $("#status").innerHTML = `<span class="err">no image — pick a candidate first (draft), or commit the room</span>`; return; }
       DOOR_PROMPT_DEFAULT = (node && node.authoring && node.authoring.doorPrompt) || "";
       PLANNED = (node && node.plannedHotspots) || [];
+      RETAINED = (node && node.hotspots) || [];   // last-committed wiring, re-attached by label on redraw
       $("#roomName").textContent = ROOM_KEY + (DRAFT_IMG ? " (draft)" : "");
       $("#hsScene").src = sceneSrc;
       // per-candidate draft wins (draft.imgs[thisImage]), then legacy top-level, then the committed node
@@ -194,7 +210,14 @@
         const box = [Math.min(temp.x0,temp.x1), Math.min(temp.y0,temp.y1), Math.max(temp.x0,temp.x1), Math.max(temp.y0,temp.y1)].map(v => +v.toFixed(4));
         SPOTS.push(makeSpot(box, ARMED >= 0 ? PLANNED[ARMED] : null));
         SEL = SPOTS.length - 1;
-        if (ARMED >= 0) { $("#status").innerHTML = `<span class="ok2">placed ${esc(SPOTS[SEL].label)} ✓</span>`; ARMED = -1; }
+        if (ARMED >= 0) {
+          const s = SPOTS[SEL];
+          const reWired = s.type === "door" ? !!(s.to || s.requires)
+            : s.type === "clue" ? !!(s.body || s.pickup || s.image)
+            : !!((s.check && s.check.expr) || s.question || s.pick || s.map);
+          $("#status").innerHTML = `<span class="ok2">placed ${esc(s.label)} ✓${reWired ? " · wiring re-attached" : ""}</span>`;
+          ARMED = -1;
+        }
       }
       temp = null; render();
     });

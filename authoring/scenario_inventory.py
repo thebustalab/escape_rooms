@@ -41,6 +41,10 @@ def main():
         sid = d.get("id")
         rec = {
             "id": sid,
+            # "ready" scenarios are the ones surfaced to students (e.g. the
+            # newsletter escape-room submission dropdown). Absent ⇒ in_development
+            # so a new scenario is never shown to students until marked ready.
+            "status": d.get("status", "in_development"),
             "chapter": d.get("chapter"),
             "scenario": d.get("scenario"),
             "title": d.get("title"),

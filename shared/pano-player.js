@@ -1856,6 +1856,9 @@ function solveRoom(result, h) {
   const openState = SCENARIO.stonePortals ? portalUnlocked(room) : isPrimarySolved(room);
   const img = openState ? (room.panoramaOpen || room.panorama) : room.panorama;
   buildViewer(img, resumeYaw);                         // stay facing where you were, not snap to front
+  // An escape gate flagged `endsEscape` (e.g. a boss-room valve keypad) ends the ungraded escape when
+  // solved — the in-room analogue of an endsEscape DOOR (handleDoor). Terminal: show the escape finish.
+  if (h && h.endsEscape) return showEscapeDone();
   // If solving THIS analysis puzzle completes the whole analysis objective, end it here — the trigger is
   // "all analysis puzzles solved", not reaching a particular door/room. Let the scene settle, then show
   // the finish (mint code, then Close). Solving an escape puzzle, or a non-final analysis one,
@@ -1902,7 +1905,7 @@ function finishAnalysis() {
   // The code is NOT minted here: it's keyed on the student's x500, which is now collected on the
   // submission-prep screen (mintCode runs in buildSubmission after x500 is confirmed).
   // No escape phase → the graded work IS the end: go straight to the submission-prep screen.
-  if (!hasEscapePhase()) { openSubmitPrep(); return; }
+  if (!hasEscapePhase() && !hasPendingEscape()) { openSubmitPrep(); return; }
   // Escape phase exists → show the analysis finish card, offering to skip the (ungraded) escape.
   $("#doneTitle").textContent = (SCENARIO.done && SCENARIO.done.title) ||
     ((SCENARIO.title || "Scenario") + " — analysis complete");
@@ -2099,6 +2102,14 @@ function exportSubmissionPdf() {
 // card. Opened from the chip while the escape is still unsolved, it warns first (it gives the escape
 // away). Static and in-room — no server, no LLM (that's the deliberately out-of-band interview).
 const hasEscapePhase = () => (SCENARIO.rooms || []).some(r => isBuilt(r) && phaseOf(r) === "escape");
+// In-room escape (2026-07-28): a boss/analysis room can carry the escape as a `lock` gate flagged
+// `endsEscape` instead of a separate phase:"escape" room. An UNSOLVED such lock is a *pending* escape, so
+// the analysis finish must not jump straight to submission while one remains, and the exit debrief keeps
+// its spoiler guard. Composes with the phase model — either shape defers the jump and reaches showEscapeDone.
+// (The lock should carry `availableWhen` so it can't be keyed before it's meant to — same as an escape
+// DOOR being gated by `requires`; onHotspot enforces that. See handleDoor's endsEscape door path.)
+const hasPendingEscape = () => (SCENARIO.rooms || []).some(r => isBuilt(r) &&
+  (r.hotspots || []).some(h => h.type === "lock" && h.endsEscape && !solvedGates.has(gateKey(r.key, h.id))));
 
 // Reveal the in-room "reveal how this world worked" chip. Called once the analysis objective finishes.
 // No-op unless the scenario carries debrief text — the feature is opt-in per scenario.
@@ -2112,7 +2123,7 @@ function revealDebriefChip() {
 // can't give the escape away by accident. The escape-done button passes guardEscape=false.
 function openDebrief(guardEscape) {
   if (!SCENARIO.debrief) return;
-  if (guardEscape && hasEscapePhase() && !escapeFinished) { renderDebriefSpoilerGuard(); return; }
+  if (guardEscape && (hasEscapePhase() || hasPendingEscape()) && !escapeFinished) { renderDebriefSpoilerGuard(); return; }
   renderDebrief();
 }
 

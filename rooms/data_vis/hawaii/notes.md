@@ -20,6 +20,24 @@ on the same dataset so it's familiar by the boss.
 > comments, notes/AGENTS path refs) — leaving only correct English ("Hawaiian" adjective in art
 > prompts, "Hawai'i" place name, and two geographic place-name mentions in `notes/candidate_locations.md`).
 
+> **STATE 2026-07-28 — door wiring fix (beach door mis-routed to the start).** room3 (the Ke‘ei
+> coast/"beach" wellhead) had **both** its doors authored with `to: null` — the back door ("The path
+> back") and the forward hatch ("The access hatch"). With no explicit target the engine falls back to a
+> positional guess (`resolveDoorTarget`: a back door with no `to` walks to the nearest **built** room
+> below the current index; a forward with no `to` runs `goThrough`). Fixed by setting explicit targets to
+> match the sibling Alaska scenario: **room3 back → room2, room3 forward → boss.** The full graph is now
+> linear + backtrackable: room1→room2→room3→boss, each with a back door to the previous (boss "ladder up"
+> → room3). scenario.json is fetched `no-store`, so no cache bump — but it needs the Mac push to reach
+> GitHub Pages.
+> **On the exact cause (not fully confirmed):** `to:null` *alone* does NOT send a back door to the start —
+> for a strictly-linear, all-built chain the back fallback lands on the previous room. The "→ start"
+> symptom most likely arose because the fallback loop **skips non-`built` rooms** — during the art re-gen
+> a room between was transiently not-built, so room3's targetless back door fell through to room1. Either
+> way the lesson holds: **author every door's `to` explicitly** so routing never depends on build-state or
+> room order. Now guarded by `tests/door_graph.test.js` (which also prompted converting the
+> `comparing_means/spa` scenario from the all-`to:null` fallback to explicit targets). See the root
+> `AGENTS.md` retain-wiring note for how the hotspot-redraw drop is now prevented.
+
 ## REDESIGN 2026-07-16 (Lucas) — a continuous field-rounds story
 
 The generic filter-and-facet ladder (below, kept for history) was replaced by a
@@ -372,3 +390,22 @@ above planned (student repairs the pipeline instead of picking an MCQ option). W
   console-check targeting KEEI_B (not a reverted MCQ), MCQ correct-index↔option-text lockstep, and the
   decoder key `c(3,5,1,2)`. All pass.
 - **Still MCQ:** room 1, room 2, boss. Only room 3 is a console-check for now.
+
+## Escape flow fixed — in-room escape lock now recognised (2026-07-28, Claude ← Lucas)
+
+Completing the analysis jumped **straight to the submission window**, skipping the valve-keypad escape.
+Cause: the player detected an escape objective only via a separate `phase:"escape"` room, but Hawaii's
+escape is a `lock` (the valve keypad, `011`) **inside the boss (analysis) room**. Solving the boss puzzle
+completes the analysis → `finishAnalysis` saw no escape phase → `openSubmitPrep()`.
+
+Fixed generally (option B — future-proofs any boss-room escape), in `shared/pano-player.js`:
+- New `hasPendingEscape()` — an unsolved `lock` flagged `endsEscape` counts as a pending escape, so
+  `finishAnalysis` shows the *analysis-complete* card (copy code / skip-to-submission) instead of jumping
+  to submission; the exit-debrief spoiler guard also honours it.
+- Solving an `endsEscape` lock now fires `showEscapeDone()` (the in-room analogue of an `endsEscape` door).
+- Hawaii's valve keypad got **`endsEscape:true`** + **`availableWhen:{solved:"boss"}`** (so it can't be
+  keyed before the boss puzzle reveals the panel — closes the enter-011-early exploit).
+
+Flow now: solve boss puzzle → "analysis complete, copy your code" card → close → wellroom with the valve
+panel open → key `011` → escapeDone ("you disconnected the well"). Submission reachable from both the
+analysis-complete card and the escape-done screen. Player-script cache bumped (js v58 / css v55).

@@ -1,0 +1,160 @@
+---
+authority: intent
+---
+
+# sailing — modeling chapter escape room (design notes)
+
+**Status:** intent / early design. Session "sailing" (Lucas), 2026-07-28. PUZZLE/STORY phase not
+started — this is the pre-design conversation record. No dataset or verified ladder yet.
+
+## What this fills
+
+- **Chapter:** `modeling` (the numerical-models chapter, book ch.11 — regression / curve-fitting /
+  prediction / random forest). **It had NO scenario at all** — this is the first, filling the only
+  book chapter with zero rooms. Folder: `rooms/modeling/sailing/`.
+- **Pairing:** `modeling` needs two scenarios eventually (the pre/post-test convention). `sailing` is
+  scenario 1; a partner on a different dataset comes later.
+- **Codec id:** take `next_free_id` from `rooms/scenario_inventory.json` at build time (was 15;
+  re-check — the inventory is stale and doesn't list temple/egypt/japan).
+
+## The core mapping (why sailing = modeling)
+
+Sailing **is** modelling: a navigator reads past observations (soundings, tides, currents) to
+**predict** an unobserved value that decides safe passage. The travel mechanic (captaining a small
+ship through Mediterranean channels, pools, canals — cliffs of Greece, Venice-like canals,
+somewhere fantastical) is the real-world incarnation of *fit a relationship, then predict*.
+
+- **Boss / graded rooms (real WebR modeling):** fit a model to a sailing dataset and predict an
+  unobserved value. Ladder climbs: fit a **straight line** → fit a **curve** (nonlinear) →
+  **multi-variable** model → **boss** (fuller prediction; room for the ch.11 random forest).
+  Candidate dataset stories (pick at PUZZLE phase, engineer for clean single-winner answers):
+  depth-soundings-vs-distance along a channel → predict whether the keel clears at an unsounded
+  point; tide-height-vs-time → predict the level at the far gate; passage-safety from wind/tide/
+  load/draft (the multivariable / RF boss).
+
+## The escape — a data-free meta-echo of modeling
+
+Per the standing convention (`notes/puzzle_inventory.md` — the escape is a **data-free meta-echo**
+of the boss's cognitive move, enacted on in-world props, no CSV/console): modeling's move is
+**"read the trend, predict the next value, act on it."** So the escape = **extrapolate a hazard's
+rhythm, predict the next safe window, and time your passage through it.**
+
+**Premise (chosen 2026-07-28):** the mythological Mediterranean — a **Charybdis-style rhythmic
+hazard**. A whirlpool / tidal sea-gate / a sea-beast that opens and closes a passage on a pattern.
+You observe its past openings, infer the rule, predict the next safe window, and slip the ship
+through on the beat. Odysseus timing Charybdis.
+
+**Why this premise (orthogonality — checked against the whole catalogue):**
+- **No myth-creature / hazard-timing escape exists yet.** Existing escapes: overlay masks (alaska),
+  valve choice (hawaii), pick-a-point (hospital), world-state dial/intersection (airship), grid-select
+  mappings (trees/egypt/squirrel), dendrogram-drag + cut-matrix (canyon), bell-cords (spa),
+  projection gallery (henges), count-the-pools (waterfalls). A **predict-the-next-window** escape is
+  genuinely new.
+- Rejected **"deliver goods into a city"** — overlaps egypt (Alexandria cargo delivery) AND arrival/
+  routing isn't a prediction goal, so modeling doesn't fall out of it.
+- Rejected **"escape a storm through a channel"** as the framing (kept as a fallback) — it fits
+  modeling well (time the tide) but a rising-water/closing clock overlaps canyon (flood clock) +
+  alaska (storm). The myth framing is more orthogonal and just as good a fit for prediction.
+
+## THE OPEN PROBLEM — a rich pattern on a tiny scene budget (Lucas, 2026-07-28)
+
+The escape is authored **from the art** (the world comes from the scenes). But we can afford **~a
+dozen scenes at most** to establish the pattern the player must recognise. A dozen beats is plenty
+for **period-2 ("every other")** — but every-other is obvious and boring. We want something richer,
+and richer patterns usually need more beats than we can draw. Three ways through (not exclusive):
+
+1. **Make it a TREND, not a bare cycle (truest modeling fit).** The hazard doesn't just alternate —
+   it **drifts**: the interval between openings grows each time, or the safe gap steps around a ring
+   of channels by a changing amount (acceleration). The player **extrapolates** the trend to predict
+   the next window. This is literally regression by eye, reads from only **4–6 beats**, and is a
+   better match to the *modeling* chapter than periodicity (which is more time-series/Fourier).
+   Risk: can read as a maths puzzle — fine, modeling is quantitative, but keep it diegetic.
+
+2. **SUPERPOSE two simple cycles → decompose them (strongest — a true additive model).** Two natural
+   drivers each on a simple cycle (e.g. the **tide** period-2, the **whirlpool** period-3) combine so
+   the *joint* safe-window pattern has period-6 and **looks complex but is generated by two simple
+   parts**. The player decomposes: "the tide does A every 2, the swell does B every 3 — I need the
+   beat where both line up." Legible from ~6 beats; **physically true** (real tides are a
+   superposition — spring/neap = sun + moon), so it's diegetic not arbitrary; and
+   **decompose-into-additive-components-then-recombine is exactly an additive model `y ~ a + b`** —
+   the ch.11 multivariable/additive-regression lesson, made physical. This is my lead recommendation.
+
+3. **Carry the HISTORY on a prop, not on scenes (the real unlock — decouples pattern length from
+   scene count).** The past beats don't each need their own generated scene. Record them as an
+   **in-world instrument/artifact**: a column of **tide-marks** on a cliff, **tally scratches** the
+   monster left on the canal walls, a **navigator's logbook**, a gauge. The player reads the whole
+   accumulated pattern off **one drawable prop** (a `clue`/`mapview` hotspot), then predicts. Scene
+   budget then collapses to **~1 live scene** (the current channel/hazard) + the record prop — and
+   the live scene's state can be a **cheap composited overlay** on one base panorama (the door-open /
+   henges-starfield-baked-into-texture trick), not a fresh gen per beat. This is what makes (1) or (2)
+   affordable at all.
+
+**Art steer that resolves the "rhythmic monster is hard to draw" worry:** make the **pattern
+environmental** (whirlpool open/closed, tide high/low, sea-gate raised/lowered, which channel the
+gap sits in) — these composite cheaply and read clearly as state deltas on one base scene. Keep the
+**monster as the STAKES** (it's coming / it guards the strait) rather than the thing whose *pose*
+encodes the beat — re-posing a creature per beat is expensive and hard to read; an environmental
+state is not.
+
+**Recommended combination:** (2) two superposed natural cycles [additive model] + (3) history read
+off an in-world log/tide-gauge, with the live hazard state as a composited overlay on one base
+panorama. Fall back to (1) a single drifting trend if the two-cycle version tests as too fiddly.
+
+## The escape MECHANISM — a NEW type: the "prediction engine" (Lucas + agent, 2026-07-28)
+
+A keypad `lock` hides the reasoning; this escape's whole point IS the reasoning, so we want a **new
+hotspot type** that *is* the modeling workflow. Working name **`predict` / "prediction engine"** —
+sibling of `dial`/`grid`/`mapview`, ungraded, out of the codec (escape-phase).
+
+**The device (skin = the Antikythera mechanism).** The ancient Greek bronze geared computer, dredged
+from a Mediterranean shipwreck, that predicted **superposed** astronomical cycles — a perfect,
+diegetic, on-theme home for "sum two rhythms and predict." In-world it's a **harbourmaster's
+reckoning engine**: two bronze dials (one **sea/tide** cycle, one **moon/swell** cycle), a pointer
+sweeping the harbour's channels.
+
+**The interaction (three moves = the modeling arc):**
+1. **Set two component inputs.** Two dials/gears/rings, one per rhythm; the player sets each to the
+   **period + phase** they decoded from the tide-gauge history (move (2)/(3) above).
+2. **The machine superimposes + projects forward, LIVE.** As the dials turn, the device draws the
+   **combined trace across the coming beats** and shows **which channel is safe next** — updating in
+   real time, exactly like watching `geom_smooth` redraw as the model changes. This is the
+   fit-and-see-the-prediction loop.
+3. **Commit the prediction.** Mark the predicted **safe channel/beat** on the projected trace and
+   steer there. Solve = the projection matches the world's true next opening.
+
+**Why it's honest + self-checking (the elegant bit).** The engine just shows the *consequence* of the
+two dial settings — no separate grading of the dials. Wrong decomposition → wrong projection → you
+commit the wrong channel → the strait stays shut. The prediction self-checks. That's the whole modeling
+loop in one object: **specify the two-term model → the machine plots its forward prediction → act on
+it.** It's an additive model `y ~ tide + swell` made physical — the ch.11 multivariable lesson.
+
+**Ties to "multiple channels" (Lucas liked this).** The multiple channels ARE the output: the sum of
+the two rhythms selects **which channel opens next**, so "figure out their sum" literally = "predict
+the safe channel." Spatial output, reads well in one panorama showing the ring of channels.
+
+**Engine work (Lucas builds in the harness, like `grid`):** a `predict` hotspot — N component controls
+(each `{period, phase}` from a small discrete set), a deterministic superposition projector rendered
+client-side, a commit selection checked against the true next-safe channel/beat. Discrete periods/phases
+keep it graded-checkable without continuous-guess frustration. Logic-test + browser-test in `play.html`.
+Add to `puzzle_inventory.md` as a new mechanic row once the shape is settled; consider whether it
+belongs in `consistency/consistency.yaml`.
+
+**Open sub-questions:** how many channels (readability vs richness)? dials vs rotating-ring/orrery UI?
+does the projector show the full combined *curve* or just per-channel safe/unsafe lights? how much to
+signpost that TWO components must be set (fairness vs discovery)?
+
+## Open questions (resolve at PUZZLE / STORY / DESIGN phases)
+- Greek-canonical (Scylla & Charybdis) vs invented/fantastical? (Lucas leaning fantastical-friendly.)
+- Pattern: single drifting trend (1) or two-cycle superposition (2)? Lead = (2).
+- History prop form: tide-gauge column / cliff tally / logbook / gauge?
+- The commit action: lock vs dial vs timed cord-pull?
+- Boss dataset + the graded ladder (own PUZZLE-phase job; engineer for clean single-winner answers).
+- Travel topology: the channels/pools suit an **open maze** (T2) or **vessel-between-nodes** (T6);
+  see `notes/travel_mechanic_inventory.md`. One-directional current flow (T9) is a candidate.
+
+## Next steps
+1. Lock the pattern shape (1 vs 2) + the history-prop form — that pins the escape.
+2. Then `escape_room_puzzles`: ground the technique, engineer the sailing dataset, verify the boss
+   ladder (line → curve → multivariable → RF), single-winner answers.
+3. Then `escape_room_story` (world/stakes/beats/escape payoff), then `escape_room_design` (scenes +
+   scenario.json), then art last on the `:8751` harness, then `escape_room_wiring`.
