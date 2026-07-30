@@ -216,14 +216,18 @@ def _clamp01(v):
     return max(0.0, min(1.0, float(v)))
 
 
-def _apply_mix(music_volume, room_vols, base=None):
+def _apply_mix(music_volume, room_vols, base=None, solve_vols=None):
     """Volume-ONLY writeback for the test-play sound mixer. `music_volume` (or None) sets the
     scenario-level `musicVolume`; `room_vols` is {roomKey: {src: volume}} setting each matching sfx
-    layer's `volume` in place. Deliberately surgical — it reloads scenario.json FRESH and touches
-    only the volume field of layers matched by src, so it can never clobber a layer the harness
-    added/edited between test-play start and save (unlike sending a whole stale sfx array back).
-    Every other field (mode/delay/duck/gap/crossfade) and every unmatched layer is preserved."""
+    layer's `volume` in place; `solve_vols` is {roomKey: {src: volume}} setting the volume of each
+    matching solve / door-open sting (authored as `solveSfx` on a gate hotspot, the room, or the
+    scenario, as a bare path string or a {src, volume} object). Deliberately surgical — it reloads
+    scenario.json FRESH and touches only the volume field of items matched by src, so it can never
+    clobber a layer the harness added/edited between test-play start and save (unlike sending a whole
+    stale sfx array back). Every other field (mode/delay/duck/gap/crossfade) and every unmatched
+    layer is preserved. A bare-string solveSfx matched by src is promoted to {src, volume}."""
     room_vols = room_vols or {}
+    solve_vols = solve_vols or {}
     with SAVE_LOCK:
         doc = _load_scenario(base)
         touched_music = False
@@ -242,9 +246,43 @@ def _apply_mix(music_volume, room_vols, base=None):
                 if isinstance(layer, dict) and layer.get("src") in vols:
                     layer["volume"] = _clamp01(vols[layer["src"]])
                     n_layers += 1
-        if touched_music or n_layers:
+
+        # solve / door stings: match by src within the room's scope (its gate hotspots + the room
+        # itself) plus the scenario level — the same resolution order the player uses — and set the
+        # volume in place. Only holders that ACTUALLY define that src are touched, so a gate that
+        # merely inherits the room/scenario sting is never given a spurious own copy.
+        n_solves = 0
+
+        def _set_solve_vol(holder, src, vol):
+            nonlocal n_solves
+            if not isinstance(holder, dict):
+                return
+            ss = holder.get("solveSfx")
+            cur_src = ss if isinstance(ss, str) else (ss.get("src") if isinstance(ss, dict) else None)
+            if not cur_src or cur_src != src:
+                return
+            if isinstance(ss, dict):
+                ss["volume"] = _clamp01(vol)
+            else:                                   # promote bare string → {src, volume}
+                holder["solveSfx"] = {"src": src, "volume": _clamp01(vol)}
+            n_solves += 1
+
+        for key, vols in solve_vols.items():
+            if not isinstance(vols, dict):
+                continue
+            room = rooms.get(key)
+            holders = []
+            if isinstance(room, dict):
+                holders.extend(h for h in (room.get("hotspots") or []) if isinstance(h, dict))
+                holders.append(room)
+            holders.append(doc)                     # scenario-level fallback sting
+            for src, vol in vols.items():
+                for h in holders:
+                    _set_solve_vol(h, src, vol)
+
+        if touched_music or n_layers or n_solves:
             _save_scenario(doc, base)
-    return {"music": touched_music, "layers": n_layers}
+    return {"music": touched_music, "layers": n_layers, "solves": n_solves}
 
 
 # ---- planned-content decoupling (author content BEFORE art) ----
@@ -914,7 +952,8 @@ class H(http.server.SimpleHTTPRequestHandler):
                     base = _scenario_base(req.get("chapter"), req.get("scenario"))
                     mv = req.get("musicVolume")
                     summary = _apply_mix(mv if mv is not None else None,
-                                         req.get("rooms") or {}, base)
+                                         req.get("rooms") or {}, base,
+                                         solve_vols=req.get("solves") or {})
                 except (ValueError, TypeError) as ve:
                     return self._json({"ok": False, "error": str(ve)}, 400)
                 return self._json({"ok": True, **summary})

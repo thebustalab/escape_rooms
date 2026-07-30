@@ -495,6 +495,7 @@ window.PanoMixer = {
   },
   fireSolve: (src, volume) => playOneShot(src, volume),
   hasMusic: () => !!music,
+  musicSrc: () => (SCENARIO && SCENARIO.music) || null,   // for the mixer's amplitude auto-balance
   musicVolume: () => musicBaseVol,
   setMusicVolume: (v) => { musicBaseVol = v; if (music) music.volume = v; },
   onChange: (cb) => { window.__onSfxChange = cb; }

@@ -273,8 +273,15 @@ git add -A && git commit -m "whatever changed" && git push</pre>
     <div class="steplbl"><span class="n">6</span><h2>Build rooms — generate the art</h2></div>
     <section class="cols" id="buildCols"></section>
 
-    <!-- STEP 3 — per-room sound: audition Claude-fetched candidates, pick one -->
-    <div class="steplbl"><span class="n">7</span><h2>Sounds</h2></div>
+    <!-- STEP 7 — "how this world worked" exit debrief: scenario heading+intro + one card per room -->
+    <div class="steplbl"><span class="n">7</span><h2>How this world worked</h2>
+      <span>the exit debrief (the second tab on the submission screen): a scenario-level heading &amp; intro, then a card per room for the &ldquo;why this room worked this way&rdquo; blurb shown beside its scene. Edits save on blur.</span></div>
+    <div id="debriefCols"></div>
+
+    <!-- STEP 8 — per-room sound: audition Claude-fetched candidates, pick one. LAST authoring step (after
+         the debrief) — sfx are wired once everything else is settled, then auto-balanced against the music
+         and fine-tuned in test-play, right before the audit. -->
+    <div class="steplbl" style="margin-top:10px"><span class="n">8</span><h2>Sounds</h2></div>
     <div class="scenecard">
       <div class="hint" style="margin-top:0">Ask Claude to <b>pull candidates per room</b> (from freesound) into the scenario's
         <code>_scratch/audio/</code> pool — <b>two clear ambient loops + two intermittent one-shots</b> each — saying what each should evoke
@@ -282,14 +289,10 @@ git add -A && git commit -m "whatever changed" && git push</pre>
         They appear below per room; <b>audition each</b> with its play button and hit <b>Add</b> to layer it in. A room can hold <b>several layers</b> that
         play together, each with a <b>mode</b>: <b>loop</b> (a continuous bed — the seam is equal-power crossfaded by the <b>crossfade s</b> overlap, default 4s)
         or <b>interval</b> (replays after a random gap — a one-shot like a distant beep). Set volume/delay/duck per layer, then <b>Save sounds</b>. Sounds play while you're in the
-        room and are <b>not</b> muted by the music toggle.</div>
+        room and are <b>not</b> muted by the music toggle. <b>Do the music first</b>, then let the agent wire every room's sfx + solve stings and
+        <b>auto-balance</b> them to perceived-loudness under the music; fine-tune by ear in <b>▶ Test play</b>.</div>
     </div>
     <section class="cols" id="soundCols" style="margin-top:14px"></section>
-
-    <!-- STEP 6 — "how this world worked" exit debrief: scenario heading+intro + one card per room (comes last) -->
-    <div class="steplbl" style="margin-top:10px"><span class="n">8</span><h2>How this world worked</h2>
-      <span>the exit debrief (the second tab on the submission screen): a scenario-level heading &amp; intro, then a card per room for the &ldquo;why this room worked this way&rdquo; blurb shown beside its scene. Edits save on blur.</span></div>
-    <div id="debriefCols"></div>
 
 
   </main>

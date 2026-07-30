@@ -294,7 +294,7 @@ def test_apply_mix_volume_only_by_src():
         ]})
         hs._select_scenario("data_vis", "x")
         out = hs._apply_mix(0.25, {"room1": {"room1/hum.mp3": 0.9, "room1/nope.mp3": 0.1}})
-        assert out == {"music": True, "layers": 1}          # only the matched src counted
+        assert out == {"music": True, "layers": 1, "solves": 0}   # only the matched src counted
         disk = json.load(open(os.path.join(d, "scenario.json")))
         assert disk["musicVolume"] == 0.25
         r1 = disk["rooms"][0]["sfx"]
@@ -311,7 +311,7 @@ def test_apply_mix_clamps_and_handles_single_object_sfx():
         ]})
         hs._select_scenario("data_vis", "x")
         out = hs._apply_mix(2.0, {"room1": {"room1/hum.mp3": -3}})
-        assert out == {"music": True, "layers": 1}
+        assert out == {"music": True, "layers": 1, "solves": 0}
         disk = json.load(open(os.path.join(d, "scenario.json")))
         assert disk["musicVolume"] == 1.0                    # clamped high
         assert disk["rooms"][0]["sfx"]["volume"] == 0.0      # clamped low, shape preserved
@@ -325,10 +325,39 @@ def test_apply_mix_no_music_no_op_when_nothing_matches():
         ]})
         hs._select_scenario("data_vis", "x")
         out = hs._apply_mix(None, {"room1": {"room1/ghost.mp3": 0.9}, "nope": {"a": 0.1}})
-        assert out == {"music": False, "layers": 0}
+        assert out == {"music": False, "layers": 0, "solves": 0}
         # nothing matched and no music → no backup written (never touched the file)
         assert not os.path.exists(os.path.join(d, "scenario.json.bak"))
         assert json.load(open(os.path.join(d, "scenario.json")))["rooms"][0]["sfx"][0]["volume"] == 0.5
+    _with_rooms_root(body)
+
+
+# FAILURE MODE UNDER TEST — a solve/door sting had no volume slider in the mixer, so its volume could
+# never be tuned. _apply_mix must now set the volume of a `solveSfx` matched by src, at whichever level
+# defines it (gate hotspot / room / scenario), promoting a bare-string form to {src, volume}, touching
+# nothing else, and never minting a spurious own copy on a gate that merely inherits the sting.
+
+def test_apply_mix_solve_volume_by_src_across_levels():
+    def body(tmp):
+        d = _write_scenario("data_vis", "x", {"rooms": [
+            {"key": "room1", "solveSfx": "room1/door.mp3", "hotspots": [        # room-level, bare string
+                {"id": "p1", "type": "puzzle", "solveSfx": {"src": "room1/ding.mp3", "volume": 0.4}},
+                {"id": "p2", "type": "lock"},                                    # inherits room sting, no own
+            ]},
+            {"key": "room2", "hotspots": [{"id": "p3", "type": "puzzle"}]},      # falls back to scenario sting
+        ], "solveSfx": {"src": "shared/chime.mp3", "volume": 0.5}})
+        hs._select_scenario("data_vis", "x")
+        out = hs._apply_mix(None, {}, solve_vols={
+            "room1": {"room1/ding.mp3": 0.8, "room1/door.mp3": 0.2},
+            "room2": {"shared/chime.mp3": 0.3},
+        })
+        assert out == {"music": False, "layers": 0, "solves": 3}
+        disk = json.load(open(os.path.join(d, "scenario.json")))
+        r1 = disk["rooms"][0]
+        assert r1["hotspots"][0]["solveSfx"] == {"src": "room1/ding.mp3", "volume": 0.8}  # object updated
+        assert r1["solveSfx"] == {"src": "room1/door.mp3", "volume": 0.2}                  # string promoted
+        assert "solveSfx" not in r1["hotspots"][1]                                         # inheritor untouched
+        assert disk["solveSfx"] == {"src": "shared/chime.mp3", "volume": 0.3}              # scenario level set
     _with_rooms_root(body)
 
 

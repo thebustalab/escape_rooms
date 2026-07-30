@@ -23,6 +23,14 @@ Per rooms/<chapter>/<scenario>/scenario.json, for every BUILT room:
   - MISS  a one-way passage: a forward/open door A->B with no return door back to A in B (or a door
           targeting a missing/unbuilt room). The ART half (inverse geometry both ends) stays an eyeball check.
 
+  CONTENT / TESTS (per scenario)
+  - MISS  a clue hotspot renders blank — no body, no committed image, no pickup (opens an empty modal)
+  - MISS  a `ready` scenario has no test_<name>.py (pins each room's answer to the CSV + decoder lockstep)
+
+  GLOBAL (whole repo — only on a full run, not a single-scenario check)
+  - STALE   rooms/scenario_inventory.json is out of date (re-run authoring/scenario_inventory.py)
+  - IDDUPE  two scenarios share a codec `id` — their submission codes would decode into each other
+
 FAIL = a broken reference (hard bug). MISS = a completeness gap. Status-aware, matching the audit's
 promotion gate: a **`status:"ready"` scenario must be perfect** — any FAIL or MISS gates (non-zero exit).
 An **`in_development` scenario is a work in progress** — its issues print loudly (`fail (in-dev)` /
@@ -121,8 +129,17 @@ def check_scenario(path):
         for h in r.get("hotspots", []):
             if h.get("type") in ("puzzle", "lock") and not h.get("solveSfx"):
                 misses.append(f"gate '{r['key']}/{h.get('id')}' ({h.get('type')}) has no solveSfx")
+            # a clue with no body, no committed image, and no pickup opens an EMPTY modal (imagePrompt
+            # alone doesn't render — the image must be generated). This shipped blank modals before.
+            if h.get("type") == "clue" and not (h.get("body", "") or "").strip() \
+               and not h.get("image") and not h.get("pickup"):
+                extra = " (imagePrompt set but no committed image)" if h.get("imagePrompt") else ""
+                misses.append(f"clue '{r['key']}/{h.get('id')}' renders blank — no body, image, or pickup{extra}")
     if ready and not scen.get("cover"):
         misses.append("ready scenario has no cover image")
+    # every ready scenario must carry a test_<name>.py (pins each room's answer to the CSV + decoder lockstep)
+    if ready and not glob.glob(os.path.join(d, "test_*.py")):
+        misses.append("no test_<name>.py (pins answers to the CSV + decoder lockstep — a ready scenario needs one)")
     misses.extend(door_reciprocity(scen))                # topology: every passage has a return door
     # integrity (FAIL) — every referenced file must exist. Strip a ?v= cache-buster / #frag first: some
     # refs carry one (e.g. alaska's clue images "escape_grids/mask_room1.png?v=4") — the file on disk has
@@ -153,6 +170,25 @@ def main():
         else:
             for f in fails:  print(f"fail (in-dev)  {rel}: {f}")
             for m in misses: print(f"miss (in-dev)  {rel}: {m}")
+    # global: rooms/scenario_inventory.json must be FRESH (else id/status/has_escape drift) and have NO
+    # duplicate codec ids (a collision makes two scenarios' submission codes decode into each other).
+    if not want:                                          # only on a full run, not a single-scenario check
+        try:
+            import scenario_inventory as si
+            expected, dupes = si.build_inventory()
+            invp = os.path.join(ROOMS, "scenario_inventory.json")
+            # round-trip `expected` through JSON so the comparison matches the on-disk file's types
+            # (dict int keys — e.g. duplicate_ids {10:…} — become strings once written, so a raw dict
+            # compare would always mismatch when there are dupes).
+            expected_norm = json.loads(json.dumps(expected))
+            if not os.path.isfile(invp) or json.load(open(invp, encoding="utf-8")) != expected_norm:
+                print("STALE  scenario_inventory.json out of date — run: python3 authoring/scenario_inventory.py")
+                any_bad = True
+            if dupes:
+                print(f"IDDUPE scenario_inventory: duplicate codec ids {dupes} — give one a fresh id (see next_free_id)")
+                any_bad = True
+        except Exception as e:
+            print(f"(inventory check skipped: {e})")
     sys.exit(1 if any_bad else 0)
 
 if __name__ == "__main__":

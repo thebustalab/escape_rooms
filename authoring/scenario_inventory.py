@@ -19,7 +19,9 @@ OUT = ROOT / "rooms" / "scenario_inventory.json"
 DECODER = ROOT / "decoder" / "decode_codes.R"
 
 
-def main():
+def build_inventory():
+    """Pure build of the inventory dict (no file write) — returns (inventory_dict, duplicate_ids).
+    Used both by main() to write scenario_inventory.json and by validate_assets.py to check it's fresh."""
     scenarios, ids = [], {}
     for p in sorted(ROOT.glob("rooms/*/*/scenario.json")):
         try:
@@ -72,8 +74,13 @@ def main():
         "duplicate_ids": dupes,
         "scenarios": sorted(scenarios, key=lambda s: (s["id"] is None, s["id"] or 0)),
     }
+    return out, dupes
+
+
+def main():
+    out, dupes = build_inventory()
     OUT.write_text(json.dumps(out, indent=2) + "\n")
-    print(f"wrote {OUT.relative_to(ROOT)} — {len(scenarios)} scenarios, next_free_id={next_free}")
+    print(f"wrote {OUT.relative_to(ROOT)} — {len(out['scenarios'])} scenarios, next_free_id={out['next_free_id']}")
     if dupes:
         print("!! DUPLICATE ids:", dupes)
         return 1
