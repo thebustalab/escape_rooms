@@ -36,7 +36,7 @@
     {
       "key": "room1",
       "title": "The Honolulu field lab",
-      "debrief": "You started with the grammar of a plot: map abundance against analyte for one aquifer and let the tallest bar name itself. Before you filter or threshold anything, you have to be able to read a chart — which axis is which, and what “highest” looks like on it.",
+      "debrief": "You started with the grammar of a plot: map abundance against analyte for one aquifer and let the tallest bar (or point or whatever) reveal itself. Before you filter or threshold anything, you have to be able to read a chart — which axis is which, and what “highest” looks like on it, since highest might instead be \"furthest right\" or something else.",
       "technique": "plot grammar — abundance x analyte (no filter)",
       "puzzleType": 1,
       "built": true,
@@ -87,7 +87,8 @@
                 "You want the analyte whose whole spread sits highest inside aquifer_1, not just one high reading — which one?"
               ]
             }
-          }
+          },
+          "solveSfx": "audio/solve_room1_the_lab_laptop_1.mp3"
         },
         {
           "id": "a_pinned_note",
@@ -182,7 +183,7 @@
     {
       "key": "room2",
       "title": "The Moanalua jungle wellhead",
-      "debrief": "Here you filtered on two conditions at once — one aquifer, one analyte — and read the winner off the plot: the well carrying the most sulfate. Narrowing a table to exactly the slice your question is about is the move you make again and again.",
+      "debrief": "Here you filtered on two conditions at once — one aquifer, one analyte — and read the winner off the plot: the well with the most sulfate. Narrowing a table to exactly the slice your question is about is the move that data analysts make again and again.",
       "technique": "filter() aquifer + analyte, read the highest well",
       "puzzleType": 1,
       "built": true,
@@ -222,7 +223,7 @@
             0.9938,
             0.4559
           ],
-          "body": "<p>Staring off yields a thought: <b>Why sulfate?</b> Sulfate (SO4) is a farmland watch-marker: fertiliser and irrigation return-flow push it up, so a well trending high in sulfate can signal agricultural influence on the groundwater. Field teams carry a <em>watch line</em> &mdash; a value that doesn&rsquo;t mean danger, just &lsquo;keep an eye on this one&rsquo;. On a round you find the highest reading in the aquifer you&rsquo;re walking and see which side of that line it sits on.</p><p>The survey is in <em>long format</em>: one row per well per analyte — 954 rows in all (106 wells &times; 9 analytes), though some readings come back blank (<code>NA</code>). There are <b>10 aquifer codes</b> (<code>aquifer_1</code>&hellip;<code>aquifer_10</code>) and <b>9 analytes</b> (Ca, Cl, HCO3, K, Mg, Na, SiO2, SO4, dissolved_solids). So a single well shows up on nine rows, one per analyte.</p><pre>tibble [954 x 6] (S3: tbl_df/tbl/data.frame)\n $ aquifer_code: chr [1:954] \"aquifer_1\" \"aquifer_1\" \"aquifer_1\" ...\n $ well_name   : chr [1:954] \"Alewa_Heights_Spring\" \"Alewa_Heights_Spring\" ...\n $ longitude   : num [1:954] NA NA NA NA ...\n $ latitude    : num [1:954] NA NA NA NA ...\n $ analyte     : chr [1:954] \"SiO2\" \"Cl\" \"Mg\" \"Na\" ...\n $ abundance   : num [1:954] 11 20 7.6 14 0.6 7 ...</pre>"
+          "body": "<p>Staring off yields a thought: <b>Why sulfate?</b> Sulfate (SO4) is a farmland watch-marker: fertiliser can push it up, so a well trending high in sulfate can signal agricultural influence on the groundwater. Field teams carry a <em>watch line</em> &mdash; a value that doesn&rsquo;t mean danger, just &lsquo;keep an eye on this one&rsquo;. On a round you find the highest reading in the aquifer you&rsquo;re walking and see which side of that line it sits on.</p><p>The survey is in <em>long format</em>: one row per well per analyte — 954 rows in all (106 wells &times; 9 analytes), though some readings come back blank (<code>NA</code>). There are <b>10 aquifer codes</b> (<code>aquifer_1</code>&hellip;<code>aquifer_10</code>) and <b>9 analytes</b> (Ca, Cl, HCO3, K, Mg, Na, SiO2, SO4, dissolved_solids). So a single well shows up on nine rows, one per analyte.</p><pre>tibble [954 x 6] (S3: tbl_df/tbl/data.frame)\n $ aquifer_code: chr [1:954] \"aquifer_1\" \"aquifer_1\" \"aquifer_1\" ...\n $ well_name   : chr [1:954] \"Alewa_Heights_Spring\" \"Alewa_Heights_Spring\" ...\n $ longitude   : num [1:954] NA NA NA NA ...\n $ latitude    : num [1:954] NA NA NA NA ...\n $ analyte     : chr [1:954] \"SiO2\" \"Cl\" \"Mg\" \"Na\" ...\n $ abundance   : num [1:954] 11 20 7.6 14 0.6 7 ...</pre>"
         },
         {
           "id": "the_standing_installation",
@@ -296,7 +297,8 @@
                 "Pump 3 edges out the other two (19 vs 16 and 15) — the single highest sulfate reading in aquifer_1."
               ]
             }
-          }
+          },
+          "solveSfx": "audio/solve_room2_the_field_laptop_1.mp3"
         }
       ],
       "entry": {
@@ -345,7 +347,7 @@
     {
       "key": "room3",
       "title": "The Ke'ei coast wellhead",
-      "debrief": "Now the filtering gained a threshold. You pulled the chloride readings for one aquifer and asked a yes/no question of a line: does any well cross the 250 mg/L alarm? Reading data against a fixed standard — over or under — is how a number becomes a decision.",
+      "debrief": "Now the filtering gained a threshold. You pulled the chloride readings for one aquifer and asked a yes/no question of a line: does any well cross the 250 mg/L alarm? Reading data against a fixed standard — over or under — is one way that a number can become a decision.",
       "technique": "filter() aquifer + analyte, apply a threshold",
       "puzzleType": 1,
       "built": true,
@@ -403,7 +405,8 @@
               ],
               "reveal": ""
             }
-          }
+          },
+          "solveSfx": "audio/solve_room3_the_colleague_s_laptop_1.mp3"
         },
         {
           "id": "the_colleague_s_field_notes",
@@ -509,7 +512,7 @@
     {
       "key": "boss",
       "title": "Down inside the Ke'ei well",
-      "debrief": "The verdict. You filtered down to the one flagged well and tested a second line — sodium over 150 — and the two thresholds together spelled saltwater intrusion. That is the whole lesson in one move: narrow to the case that matters, test it against the standards, and let the data deliver the diagnosis.",
+      "debrief": "Here, you filtered down to the one flagged well and tested a second threshold — sodium over 150 — and the two thresholds together spelled saltwater intrusion. In short: narrow to the data subset that matters, test it against the reference, and let the data deliver the diagnosis. This room also held the escape: a physical representation of the filtering that's been happening throughout the whole scenario. Interpreting the art as filters and the nature of those filters as a binary RGB switches leads to the code that activates the shut off valve.",
       "technique": "filter to the flagged well, second-threshold verdict",
       "puzzleType": 2,
       "isBoss": true,
@@ -577,7 +580,8 @@
           "endsEscape": true,
           "availableWhen": {
             "solved": "boss"
-          }
+          },
+          "solveSfx": "audio/solve_boss_the_valve_keypad_1.mp3"
         },
         {
           "id": "the_ladder_up",
@@ -623,7 +627,8 @@
                 "With chloride already past 250, sodium clearing 150 is what confirms it — does KEEI_B&rsquo;s sodium clear the line or not?"
               ]
             }
-          }
+          },
+          "solveSfx": "audio/solve_boss_the_waterproof_laptop_1.mp3"
         },
         {
           "id": "a_checklist_clipped_to_the_pump",
@@ -690,6 +695,6 @@
   },
   "debrief": {
     "title": "How this world worked",
-    "intro": "This afternoon was one skill wearing a lab coat: take a big table of well readings, narrow it to the wells and analytes that matter, plot them, and test each reading against a line. String those moves together and a hidden saltwater intrusion gives itself away. Here is how each room was teaching that."
+    "intro": "This scenario was all about taking a big table of readings, filtering it down to a certain subset, plotting the results, and interpreting them. Here is how each room, and the escape, was teaching that."
   }
 }

@@ -56,6 +56,10 @@ materialised `audio/*.mp3` ships.
 - exterior_door_wind — deleted_user_7146007/383830, Garuda1982/633122
 - heli_hatch — craigsmith/438732 (submarine hatch), Irolan/488221 (small metal hatch) · the one helicopter
   clip found had an unknown licence and was dropped for a CC0 hatch
+- **helicopter (Alaska escape solve, added 2026-07-29):** qubodup/187681 "Helicopter Rotor Loop" — **CC0**,
+  6.3s, wired as `escape1` `the_keypad_panel` `solveSfx` (`audio/solve_escape1_the_keypad_panel_1.mp3`). NB
+  it's a steady **rotor** clip, not a literal engine spin-up — the good spin-up clips (Paul368/410604 ignition
+  sequence) are CC-BY and ~2 min, unusable as a short CC0 one-shot. Swap if a short CC0 spin-up ever turns up.
 - wooden_gate_creak — WavJunction.com/456763, RealSquink/788015
 - metal_hatch — Rudmer_Rotteveel/718445, Irolan/488221
 - valve_panel — magnuswaker/530075, SpliceSound/369869
@@ -65,4 +69,16 @@ materialised `audio/*.mp3` ships.
 - elevator_door — T.I.B/788698, buzzatsea/427109
 - swing_door — kyles/453974, squareal/237403
 - exit_door — Anthousai/398749, LamaMakesMusic/403536
+
+## Wired solve sounds (verified CC0)
+
+- **Alaska (2026-07-29):** all four analysis puzzles + boss + the `escape1` keypad now have `solveSfx`
+  (escape = qubodup/187681 helicopter rotor, see above). Complete.
+- **Hawaii (2026-07-29):** was missing ALL solve sounds; now pulled + wired (each licence re-verified CC0
+  on freesound before pulling):
+  - `room1` the_lab_laptop → wooden door — **Ryding/125958** (2.9s)
+  - `room2` the_field_laptop → creaky wooden gate — **RealSquink/788015** (3.1s)
+  - `room3` the_colleague_s_laptop → steel access hatch — **Rudmer_Rotteveel/718445** (4.5s)
+  - `boss` the_waterproof_laptop (puzzle, panel slides open) → **magnuswaker/530075** (1.2s)
+  - `boss` the_valve_keypad (lock/escape, valve turns) → **SpliceSound/369869** (5.7s)
 

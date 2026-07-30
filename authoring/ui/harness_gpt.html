@@ -196,6 +196,13 @@ git add -A && git commit -m "whatever changed" && git push</pre>
       <button class="step ghost" id="copyPushBtn" style="width:auto;margin:0" title="Copy these commands"
         onclick="navigator.clipboard&&navigator.clipboard.writeText(document.getElementById('pushCmds').textContent);this.textContent='Copied ✓';setTimeout(()=>this.textContent='Copy',1200)">Copy</button>
     </div>
+    <div class="row" style="align-items:center;gap:10px;margin-top:8px">
+      <label for="widthSlider" style="margin:0;white-space:nowrap">harness width</label>
+      <input type="range" id="widthSlider" min="800" max="3200" step="20" style="flex:1;max-width:460px">
+      <span class="hint" id="widthVal" style="margin:0;white-space:nowrap;min-width:56px"></span>
+      <button class="step ghost" id="widthFullBtn" style="width:auto;margin:0" title="Remove the width cap — use the full browser window">Full width</button>
+      <span class="hint" style="margin:0;white-space:nowrap">· zoom with the browser, set the page width here</span>
+    </div>
   </header>
   <main>
 
@@ -728,14 +735,17 @@ git add -A && git commit -m "whatever changed" && git push</pre>
            <div class="lbl">heading</div><input class="dbScTitle" type="text" placeholder="How this world worked">
            <div class="lbl">intro <span class="hint" style="text-transform:none">· the lead paragraph above the room-by-room gallery</span></div>
            <textarea class="dbScIntro" rows="3" placeholder="This afternoon was one skill wearing a lab coat: …"></textarea>
+           <div class="status dbScStatus"></div>
          </div>`;
       host.appendChild(sc);
-      const scT = sc.querySelector(".dbScTitle"), scI = sc.querySelector(".dbScIntro");
+      const scT = sc.querySelector(".dbScTitle"), scI = sc.querySelector(".dbScIntro"), scSt = sc.querySelector(".dbScStatus");
       scT.value = d.title || ""; scI.value = d.intro || "";
       const saveScenario = async () => {
+        scSt.textContent = "saving…";
         const fields = { debrief: { ...((SCENARIO_DOC && SCENARIO_DOC.debrief) || {}), title: scT.value.trim(), intro: scI.value.trim() } };
         const r = await post("/api/scenario-patch", { ...SCQ(), fields });
-        if (r.ok && SCENARIO_DOC) SCENARIO_DOC.debrief = fields.debrief;
+        if (r.ok) { if (SCENARIO_DOC) SCENARIO_DOC.debrief = fields.debrief; scSt.innerHTML = `<span class="ok2">saved ✓</span>`; }
+        else scSt.innerHTML = `<span class="err">${esc(r.error || "save failed")}</span>`;
       };
       scT.onchange = saveScenario; scI.onchange = saveScenario;
       // one card per room (the player's debrief gallery shows the BUILT ones in order; authoring all here
@@ -753,15 +763,18 @@ git add -A && git commit -m "whatever changed" && git push</pre>
            <div class="puz">
              <div class="lbl">heading <span class="hint" style="text-transform:none">· optional — defaults to the room title</span></div><input class="dbRT" type="text">
              <div class="lbl">debrief text <span class="hint" style="text-transform:none">· why this room worked the way it did; shown beside its scene</span></div><textarea class="dbRB" rows="4"></textarea>
+             <div class="status dbRStatus"></div>
            </div>`;
         host.appendChild(sec);
-        const rT = sec.querySelector(".dbRT"), rB = sec.querySelector(".dbRB");
+        const rT = sec.querySelector(".dbRT"), rB = sec.querySelector(".dbRB"), rSt = sec.querySelector(".dbRStatus");
         rT.value = heading; rB.value = body;
         const saveRoom = async () => {
+          rSt.textContent = "saving…";
           const h = rT.value.trim(), b = rB.value.trim();
           const val = (!h && !b) ? null : (!h ? b : { heading: h, body: b });   // string, {heading,body}, or clear
           room.debrief = val;
-          await post("/api/room-patch", { ...SCQ(), roomKey: room.key, fields: { debrief: val } });
+          const r = await post("/api/room-patch", { ...SCQ(), roomKey: room.key, fields: { debrief: val } });
+          rSt.innerHTML = r.ok ? `<span class="ok2">saved ✓</span>` : `<span class="err">${esc(r.error || "save failed")}</span>`;
         };
         rT.onchange = saveRoom; rB.onchange = saveRoom;
       });
@@ -1269,6 +1282,29 @@ git add -A && git commit -m "whatever changed" && git push</pre>
       window.open(url, "_blank");
     };
     loadScenarios();
+  </script>
+  <!-- Harness width control: caps <main>'s max-width so you can zoom the browser AND set page width independently.
+       Value persists in localStorage; "full" means no cap (the historical default). Isolated from the main script. -->
+  <script>
+    (function () {
+      const KEY = "harnessMaxWidth";
+      const main = document.querySelector("main");
+      const slider = document.getElementById("widthSlider");
+      const valEl = document.getElementById("widthVal");
+      const fullBtn = document.getElementById("widthFullBtn");
+      if (!main || !slider || !valEl || !fullBtn) return;
+      const MIN = +slider.min, MAX = +slider.max;
+      function apply(v) {                         // v is a px number, or "full"
+        if (v === "full") { main.style.maxWidth = "none"; valEl.textContent = "full"; fullBtn.disabled = true; }
+        else { main.style.maxWidth = v + "px"; valEl.textContent = v + "px"; fullBtn.disabled = false; }
+      }
+      let saved = localStorage.getItem(KEY);      // null on first ever load → keep historical full-width default
+      if (saved === null) saved = "full";
+      if (saved === "full") { slider.value = MAX; apply("full"); }
+      else { const n = Math.min(MAX, Math.max(MIN, parseInt(saved, 10) || MAX)); slider.value = n; apply(n); }
+      slider.addEventListener("input", () => { const n = +slider.value; apply(n); localStorage.setItem(KEY, String(n)); });
+      fullBtn.addEventListener("click", () => { slider.value = MAX; apply("full"); localStorage.setItem(KEY, "full"); });
+    })();
   </script>
 </body>
 </html>
