@@ -50,7 +50,7 @@ if (window.SFX_MIXER && window.PanoMixer) (function () {
   <div id="mxMusic"></div>
   <div id="mxLayers"></div>
   <div id="mxSolve"></div>
-  <button class="balance" id="mxBalance" disabled title="Measure each effect's peak amplitude and lower any that would play louder than the music (at its current slider level). Reduce-only; current room.">Auto-balance vs music</button>
+  <button class="balance" id="mxBalance" disabled title="Measure perceived loudness (LUFS) of every effect and lower any that would play louder than the music at its authored volume. Reduce-only. Applies this room's changes to the sliders; Save to keep.">Auto-balance vs music</button>
   <div class="balmsg" id="mxBalMsg"></div>
   <button class="save" id="mxSave" disabled>Save volumes → harness</button>
   <div class="savemsg" id="mxSaveMsg"></div>
@@ -142,56 +142,41 @@ if (window.SFX_MIXER && window.PanoMixer) (function () {
     return wrap;
   }
 
-  // ---- amplitude auto-balance (Web Audio) ----------------------------------------------------------
-  // Every effect slider registers here so Auto-balance can find its <input> and the source it drives.
-  // Rebuilt each render(); the input elements stay valid for the length of one balance pass (dispatching
-  // "input" on them re-runs the slider's own handler, so live volume + save-marking update for free).
+  // ---- perceived-loudness auto-balance -------------------------------------------------------------
+  // The heavy lifting (measuring LUFS with ffmpeg, computing reduce-only targets) is done server-side by
+  // the harness — SAME implementation the agent's wire-time pass uses (harness_server._apply_balance) —
+  // so the button and the automated pass always agree. We ask for the plan (apply:false), then drop the
+  // returned volumes onto THIS room's sliders (dispatching "input" re-runs each slider's handler, so live
+  // volume + save-marking happen for free); the author reviews and hits Save. Every effect slider
+  // registers in BAL (rebuilt each render) so we can find its <input> by src.
   const BAL = [];                              // [{ src, inp }] for the current room's layers + solves
-  let _actx = null;
-  const peakCache = new Map();                 // absolute URL -> true peak 0–1 (or null if unanalysable)
-  const actx = () => _actx || (_actx = new (window.AudioContext || window.webkitAudioContext)());
-  async function peakOf(src) {                 // decode the file, return max |sample| across channels
-    if (!src) return null;
-    const url = new URL(src, document.baseURI).href;
-    if (peakCache.has(url)) return peakCache.get(url);
-    let peak = null;
-    try {
-      const buf = await fetch(url).then(r => { if (!r.ok) throw new Error("HTTP " + r.status); return r.arrayBuffer(); });
-      const audio = await actx().decodeAudioData(buf);
-      let mx = 0;
-      for (let c = 0; c < audio.numberOfChannels; c++) {
-        const d = audio.getChannelData(c);
-        for (let i = 0; i < d.length; i++) { const a = d[i] < 0 ? -d[i] : d[i]; if (a > mx) mx = a; }
-      }
-      peak = mx;
-    } catch (e) { peak = null; }
-    peakCache.set(url, peak);
-    return peak;
-  }
-  // Cap every effect so its PLAYED peak (filePeak × volume) can't exceed the music's played peak
-  // (musicPeak × music slider). Reduce-only — a compliant/quiet effect is left where it is.
   async function autoBalance() {
-    balBtn.disabled = true; balMsg.className = "balmsg"; balMsg.textContent = "analysing…";
+    if (!HARNESS) { balMsg.className = "balmsg err"; balMsg.textContent = "open via ▶ Test play to auto-balance"; return; }
+    balBtn.disabled = true; balMsg.className = "balmsg"; balMsg.textContent = "measuring loudness…";
     try {
-      if (!M.hasMusic() || !M.musicSrc()) { balMsg.className = "balmsg err"; balMsg.textContent = "no background music to balance against"; return; }
-      const mPeak = await peakOf(M.musicSrc());
-      if (!mPeak) { balMsg.className = "balmsg err"; balMsg.textContent = "couldn’t analyse the music track"; return; }
-      const ceiling = mPeak * M.musicVolume();      // the music's PLAYED peak at its current slider
-      const items = BAL.slice();                    // snapshot; inputs stay live through the pass
-      let lowered = 0, okAlready = 0, skipped = 0;
-      for (const it of items) {
-        const p = await peakOf(it.src);
-        if (!p) { skipped++; continue; }
-        const cur = parseFloat(it.inp.value);
-        const newV = Math.min(cur, Math.min(1, ceiling / p));   // v s.t. p×v ≤ ceiling, never a boost
-        if (newV < cur - 1e-4) { it.inp.value = newV; it.inp.dispatchEvent(new Event("input")); lowered++; }
-        else okAlready++;
-      }
+      const r = await fetch(HARNESS.replace(/\/$/, "") + "/api/auto-balance", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chapter: CHAPTER, scenario: SCENARIO, apply: false })
+      });
+      const j = await r.json();
+      if (!j.ok) throw new Error(j.error || "balance failed");
+      if (j.error) { balMsg.className = "balmsg err"; balMsg.textContent = j.error; return; }
+      const target = {};                          // src -> newVolume (lowered effects, all rooms)
+      (j.changes || []).forEach(c => { target[c.src] = c.newVolume; });
+      let here = 0;
+      BAL.slice().forEach(it => {                 // apply the ones that live on this room's sliders
+        if (!(it.src in target)) return;
+        const cur = parseFloat(it.inp.value), nv = target[it.src];
+        if (nv < cur - 1e-4) { it.inp.value = nv; it.inp.dispatchEvent(new Event("input")); here++; }
+      });
+      const total = (j.changes || []).length, elsewhere = total - here;
       balMsg.className = "balmsg ok";
-      balMsg.textContent = `balanced ✓ ${lowered} lowered · ${okAlready} already ok` + (skipped ? ` · ${skipped} skipped` : "");
+      balMsg.textContent = total
+        ? `balanced ✓ ${here} lowered here` + (elsewhere > 0 ? ` · ${elsewhere} in other rooms` : "") + " · Save to keep"
+        : "already balanced ✓ nothing plays over the music";
     } catch (e) {
       balMsg.className = "balmsg err"; balMsg.textContent = "balance failed — " + (e.message || e);
-    } finally { balBtn.disabled = !(M.hasMusic() && BAL.length); }
+    } finally { balBtn.disabled = !(HARNESS && BAL.length); }
   }
   balBtn.onclick = () => { if (!balBtn.disabled) autoBalance(); };
 
@@ -252,7 +237,7 @@ if (window.SFX_MIXER && window.PanoMixer) (function () {
         solveHost.appendChild(row);
       });
     }
-    balBtn.disabled = !(M.hasMusic() && BAL.length);   // needs music (the reference) + at least one effect
+    balBtn.disabled = !(HARNESS && BAL.length);   // needs the harness link (server measures) + ≥1 effect
   }
 
   M.onChange(render);

@@ -48,6 +48,7 @@ import re
 import copy
 import json
 import glob
+import math
 import shutil
 import threading
 import subprocess
@@ -283,6 +284,180 @@ def _apply_mix(music_volume, room_vols, base=None, solve_vols=None):
         if touched_music or n_layers or n_solves:
             _save_scenario(doc, base)
     return {"music": touched_music, "layers": n_layers, "solves": n_solves}
+
+
+# ---- perceived-loudness auto-balance (EBU R128 / LUFS via ffmpeg) --------------------------------
+# The LAST sfx step: "make nothing play louder than the music." We measure PERCEIVED loudness (not
+# peak) of the music and every effect with ffmpeg's ebur128 scanner — integrated LUFS — then lower any
+# effect whose PLAYED loudness would exceed the music's PLAYED loudness. Playing at volume v scales
+# amplitude by v, i.e. shifts loudness by 20·log10(v) dB, so for effect E under music M the cap is:
+#     v_E ≤ v_music · 10**((LUFS_music − LUFS_E)/20)      (clamped to [0,1], reduce-only — never raised).
+# ffmpeg runs as a subprocess (no python audio deps). Integrated LUFS is unreliable on very short
+# stings (<~0.4s gating blocks), so those fall back to RMS mean (volumedetect). Both are dBFS-referenced
+# so the same volume math applies; the small LUFS-vs-RMS offset is well within what Lucas fine-tunes by
+# ear afterwards. Results cached by (path, size, mtime). Used by the CLI (auto_balance.py) and the
+# /api/auto-balance endpoint (the test-play mixer's Auto-balance button).
+
+_LOUDNESS_CACHE = {}   # abspath -> (size, mtime, lufs_or_None, rms_or_None)
+
+
+def _ffmpeg_loudness(path):
+    """(integrated LUFS, RMS mean dBFS) for an audio file, each a negative float or None. Cached by
+    stat so a re-run (or repeated src) never re-decodes. Returns (None, None) if the file is missing."""
+    try:
+        st = os.stat(path)
+    except OSError:
+        return (None, None)
+    key = os.path.abspath(path)
+    hit = _LOUDNESS_CACHE.get(key)
+    if hit and hit[0] == st.st_size and hit[1] == st.st_mtime:
+        return (hit[2], hit[3])
+    lufs = rms = None
+    try:
+        # loudnorm's analysis pass prints a JSON block whose `input_i` is the integrated loudness
+        # (LUFS). Works cleanly on both long beds and short stings (unlike ebur128's summary, which
+        # this ffmpeg build zeroes out on very short input).
+        out = subprocess.run(
+            ["ffmpeg", "-nostats", "-hide_banner", "-i", path,
+             "-af", "loudnorm=print_format=json", "-f", "null", "-"],
+            capture_output=True, text=True, timeout=300).stderr
+        m = re.search(r'"input_i"\s*:\s*"(-?\d+(?:\.\d+)?|-?inf)"', out)
+        if m and m.group(1) not in ("inf", "-inf"):
+            v = float(m.group(1))
+            if v > -70:                         # near-silent → unmeasurable as LUFS
+                lufs = v
+    except (subprocess.SubprocessError, OSError, ValueError):
+        lufs = None
+    if lufs is None:                            # short/quiet file: fall back to RMS mean
+        try:
+            out = subprocess.run(
+                ["ffmpeg", "-nostats", "-hide_banner", "-i", path,
+                 "-af", "volumedetect", "-f", "null", "-"],
+                capture_output=True, text=True, timeout=120).stderr
+            m = re.search(r"mean_volume:\s*(-?\d+(?:\.\d+)?)\s*dB", out)
+            if m:
+                v = float(m.group(1))
+                if v > -90:
+                    rms = v
+        except (subprocess.SubprocessError, OSError, ValueError):
+            rms = None
+    _LOUDNESS_CACHE[key] = (st.st_size, st.st_mtime, lufs, rms)
+    return (lufs, rms)
+
+
+def _audio_loudness(base, src):
+    """Perceived loudness (dB) + which metric, for a scenario-relative audio `src` under `base`.
+    Prefers integrated LUFS, falls back to RMS mean; (None, None) if nothing measurable."""
+    if not src:
+        return (None, None)
+    path = os.path.normpath(os.path.join(base or COMMIT_BASE, src))
+    lufs, rms = _ffmpeg_loudness(path)
+    if lufs is not None:
+        return (lufs, "lufs")
+    if rms is not None:
+        return (rms, "rms")
+    return (None, None)
+
+
+# player defaults when an authored volume is absent (mirror pano-player.js)
+_SFX_DEFAULT_VOL = 1.0        # a room sfx layer with no `volume`
+_SOLVE_DEFAULT_VOL = 0.9      # playOneShot's fallback for a solve/door sting
+_MUSIC_DEFAULT_VOL = 0.1      # SCENARIO.musicVolume default
+
+
+def _solve_src_vol(holder):
+    """(src, current volume) of a holder's `solveSfx` (string | {src, volume}), or (None, None)."""
+    ss = holder.get("solveSfx") if isinstance(holder, dict) else None
+    if not ss:
+        return (None, None)
+    if isinstance(ss, str):
+        return (ss, _SOLVE_DEFAULT_VOL)
+    if isinstance(ss, dict):
+        v = ss.get("volume")
+        return (ss.get("src"), _clamp01(v) if v is not None else _SOLVE_DEFAULT_VOL)
+    return (None, None)
+
+
+def _apply_balance(base=None, apply=True):
+    """Perceived-loudness auto-balance for one scenario. Reads FRESH, measures the music + every
+    effect (room `sfx` layers and every `solveSfx` at hotspot/room/scenario level), and lowers each
+    effect whose played loudness would exceed the music's played loudness. Reduce-only; a bare-string
+    solveSfx that gets lowered is promoted to {src, volume}. `apply=False` computes the plan without
+    writing (the mixer's dry-run). Returns a dict with `changes` (lowered), `skipped` (unmeasurable),
+    and the music reference; on no measurable music returns `{... "error": ...}` and changes nothing."""
+    with SAVE_LOCK:
+        doc = _load_scenario(base)
+        music_src = doc.get("music")
+        mv = doc.get("musicVolume")
+        music_vol = _clamp01(mv) if mv is not None else _MUSIC_DEFAULT_VOL
+        music_loud, music_metric = _audio_loudness(base, music_src) if music_src else (None, None)
+        res = {"music": music_src, "musicVolume": round(music_vol, 3),
+               "musicLoudness": round(music_loud, 1) if music_loud is not None else None,
+               "musicMetric": music_metric, "applied": bool(apply),
+               "changes": [], "skipped": []}
+        if not music_src or music_loud is None:
+            res["error"] = "no measurable background music to balance against"
+            res["nChanged"] = 0
+            return res
+
+        music_played = music_loud + 20.0 * math.log10(music_vol) if music_vol > 0 else music_loud - 120.0
+        changed = False
+
+        def consider(kind, room_key, src, cur_vol, setter):
+            nonlocal changed
+            loud, metric = _audio_loudness(base, src)
+            if loud is None:
+                res["skipped"].append({"kind": kind, "room": room_key, "src": src, "reason": "unmeasurable"})
+                return
+            # v such that (loud + 20log10 v) ≤ music_played → v ≤ v_music · 10**((L_music − L_E)/20)
+            max_v = music_vol * (10.0 ** ((music_loud - loud) / 20.0))
+            new_v = max(0.0, min(cur_vol, max_v, 1.0))
+            if new_v < cur_vol - 1e-4:
+                if apply:
+                    setter(new_v)
+                changed = True
+                res["changes"].append({
+                    "kind": kind, "room": room_key, "src": src, "metric": metric,
+                    "loudness": round(loud, 1), "oldVolume": round(cur_vol, 3),
+                    "newVolume": round(new_v, 3)})
+
+        def solve_setter(holder):
+            def setter(v):
+                ss = holder.get("solveSfx")
+                if isinstance(ss, dict):
+                    ss["volume"] = _clamp01(v)
+                else:                                   # promote bare string → {src, volume}
+                    holder["solveSfx"] = {"src": ss, "volume": _clamp01(v)}
+            return setter
+
+        def layer_setter(layer):
+            return lambda v: layer.__setitem__("volume", _clamp01(v))
+
+        rooms = [r for r in doc.get("rooms", []) if isinstance(r, dict)]
+        for room in rooms:
+            rk = room.get("key")
+            sfx = room.get("sfx")
+            layers = sfx if isinstance(sfx, list) else ([sfx] if isinstance(sfx, dict) else [])
+            for layer in layers:
+                if not isinstance(layer, dict) or not layer.get("src"):
+                    continue
+                v = layer.get("volume")
+                cur = _clamp01(v) if v is not None else _SFX_DEFAULT_VOL
+                consider("layer", rk, layer["src"], cur, layer_setter(layer))
+            # solve/door stings that this room (its gate hotspots or the room itself) DEFINES
+            for holder in [h for h in (room.get("hotspots") or []) if isinstance(h, dict)] + [room]:
+                src, cur = _solve_src_vol(holder)
+                if src:
+                    consider("solve", rk, src, cur, solve_setter(holder))
+        # scenario-level fallback sting
+        s_src, s_cur = _solve_src_vol(doc)
+        if s_src:
+            consider("solve", None, s_src, s_cur, solve_setter(doc))
+
+        if apply and changed:
+            _save_scenario(doc, base)
+    res["nChanged"] = len(res["changes"])
+    return res
 
 
 # ---- planned-content decoupling (author content BEFORE art) ----
@@ -954,6 +1129,17 @@ class H(http.server.SimpleHTTPRequestHandler):
                     summary = _apply_mix(mv if mv is not None else None,
                                          req.get("rooms") or {}, base,
                                          solve_vols=req.get("solves") or {})
+                except (ValueError, TypeError) as ve:
+                    return self._json({"ok": False, "error": str(ve)}, 400)
+                return self._json({"ok": True, **summary})
+            if route == "/api/auto-balance":
+                # perceived-loudness (LUFS) auto-balance: lower every effect that would play louder
+                # than the music. apply=true writes scenario.json (the agent's wire-time pass);
+                # apply=false returns the plan only (the mixer's dry-run → applied to sliders).
+                req = self._body()
+                try:
+                    base = _scenario_base(req.get("chapter"), req.get("scenario"))
+                    summary = _apply_balance(base, apply=bool(req.get("apply", False)))
                 except (ValueError, TypeError) as ve:
                     return self._json({"ok": False, "error": str(ve)}, 400)
                 return self._json({"ok": True, **summary})

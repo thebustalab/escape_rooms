@@ -361,6 +361,73 @@ def test_apply_mix_solve_volume_by_src_across_levels():
     _with_rooms_root(body)
 
 
+# --- perceived-loudness auto-balance (_apply_balance) --------------------------------------------
+# FAILURE MODE UNDER TEST — an effect that PLAYS louder than the music slips through. _apply_balance
+# must lower ONLY effects whose played loudness (LUFS + 20log10(volume)) exceeds the music's played
+# loudness, leave quieter ones alone, promote a bare-string solveSfx it lowers to {src, volume}, keep
+# every other field, and (apply=False) compute without writing. Loudness measurement is stubbed so the
+# test is deterministic and never shells out to ffmpeg.
+
+def _stub_loudness(monkey_map):
+    """Return a fake _audio_loudness keyed by src (dict src->LUFS); (None,None) for unknown/None."""
+    def fake(base, src):
+        v = monkey_map.get(src)
+        return (v, "lufs") if v is not None else (None, None)
+    return fake
+
+
+def test_apply_balance_lowers_over_music_and_promotes_string():
+    def body(tmp):
+        d = _write_scenario("data_vis", "x", {
+            "music": "audio/m.mp3", "musicVolume": 0.5,
+            "rooms": [{"key": "room1",
+                       "sfx": [{"src": "audio/loud.mp3", "mode": "loop", "volume": 0.9, "duckMusicTo": 0.3},
+                               {"src": "audio/quiet.mp3", "mode": "loop", "volume": 0.2}],
+                       "hotspots": [{"id": "p", "type": "puzzle", "solveSfx": "audio/sting.mp3"}]}],
+            "solveSfx": {"src": "audio/scen.mp3", "volume": 0.8},
+        })
+        # music −14 @ 0.5 → played −20.0. loud −6 & sting −10 play OVER it; quiet −40 & scen −30 sit under.
+        loud = {"audio/m.mp3": -14.0, "audio/loud.mp3": -6.0, "audio/quiet.mp3": -40.0,
+                "audio/sting.mp3": -10.0, "audio/scen.mp3": -30.0}
+        orig = hs._audio_loudness
+        hs._audio_loudness = _stub_loudness(loud)
+        try:
+            out = hs._apply_balance(d, apply=True)
+        finally:
+            hs._audio_loudness = orig
+        assert out["nChanged"] == 2 and "error" not in out
+        disk = json.load(open(os.path.join(d, "scenario.json")))
+        r1 = disk["rooms"][0]
+        assert abs(r1["sfx"][0]["volume"] - 0.199) < 0.002        # 0.5·10**((−14−−6)/20) ≈ 0.199
+        assert r1["sfx"][0]["duckMusicTo"] == 0.3 and r1["sfx"][0]["mode"] == "loop"   # only volume moved
+        assert r1["sfx"][1]["volume"] == 0.2                      # quiet layer untouched
+        sting = r1["hotspots"][0]["solveSfx"]                     # string promoted to {src, volume}
+        assert sting["src"] == "audio/sting.mp3" and abs(sting["volume"] - 0.316) < 0.002
+        assert disk["solveSfx"] == {"src": "audio/scen.mp3", "volume": 0.8}   # already under music → untouched
+    _with_rooms_root(body)
+
+
+def test_apply_balance_dry_run_and_no_music():
+    def body(tmp):
+        # dry run computes but writes nothing
+        d = _write_scenario("data_vis", "x", {"music": "audio/m.mp3", "musicVolume": 0.5, "rooms": [
+            {"key": "room1", "sfx": [{"src": "audio/loud.mp3", "volume": 0.9}]}]})
+        orig = hs._audio_loudness
+        hs._audio_loudness = _stub_loudness({"audio/m.mp3": -14.0, "audio/loud.mp3": -6.0})
+        try:
+            out = hs._apply_balance(d, apply=False)
+            assert out["nChanged"] == 1 and out["applied"] is False
+            assert json.load(open(os.path.join(d, "scenario.json")))["rooms"][0]["sfx"][0]["volume"] == 0.9  # unwritten
+            # no measurable music → error, nothing changed
+            d2 = _write_scenario("data_vis", "y", {"rooms": [
+                {"key": "room1", "sfx": [{"src": "audio/loud.mp3", "volume": 0.9}]}]})
+            out2 = hs._apply_balance(d2, apply=True)
+            assert out2.get("error") and out2["nChanged"] == 0
+        finally:
+            hs._audio_loudness = orig
+    _with_rooms_root(body)
+
+
 def test_commit_node_points_and_builds():
     """Committing points the node at images + marks built; seeds wrap from the passed seed_wrap
     (the candidate's tuned wrap), else a sane default so the room is ALWAYS playable (Finding 1
