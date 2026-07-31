@@ -5,11 +5,11 @@
   "id": 8,
   "title": "Vital Signs",
   "subtitle": "Data Visualization II · filter, count & read the plot",
-  "story": "You're the hospital's instrument technician, clocking off at last — one step from the elevator, and from finally meeting the person you've been hoping to see for a long-overdue dinner up in the break room. Then the pharmacist catches your sleeve. “Before you go — I need a hand.” A shipment of salt-sensitive medicine was being canoed out to a remote clinic when the canoe tipped; the vials went into the lake. The drug degrades in salty, mineral-rich water, but the field kit at the scene can only measure chloride, not sodium. So the question is whether chloride is a trustworthy stand-in for sodium — total salt — across Alaska's lakes. The lake survey is open on the bench laptop.",
+  "story": "You're an Alaskan hospital's instrument technician, clocking off at last — one step from the elevator, and one step from finally meeting the person you've been hoping to go out to dinner with for months. They're up in the break room waiting for you. Then the pharmacist catches your sleeve. “Before you go — I need a hand. A patient, Elias, came in fading this morning, and I can't make sense of these data on my laptop. Can you have a look?”",
   "enterLabel": "Clock back in →",
   "done": {
-    "title": "Right antibiotic, in time",
-    "body": "Chlorine ran highest in North Killeak Lake, so the infection is Chlorosoma — and Elias gets Chlorocidin. Four reads of one dataset, one life. Your submission code is below."
+    "title": "Right treatment, in time",
+    "body": "Creatinine ran highest in Elias's panel, so it's renal strain — and Elias gets Nephrocidin. Four reads of one dataset, one life. Great job!"
   },
   "packages": [
     "dplyr",
@@ -19,8 +19,12 @@
   ],
   "datasets": [
     {
-      "name": "alaska_lake_data",
-      "url": "https://thebustalab.github.io/phylochemistry/sample_data/alaska_lake_data.csv"
+      "name": "metabolomics_hospital",
+      "url": "https://thebustalab.github.io/phylochemistry/sample_data/metabolomics_hospital.csv"
+    },
+    {
+      "name": "metabolomics_hospital_unknown",
+      "url": "https://thebustalab.github.io/phylochemistry/sample_data/metabolomics_hospital_unknown.csv"
     }
   ],
   "setup": "suppressMessages({library(dplyr); library(ggplot2)})",
@@ -35,13 +39,13 @@
   "fx": [
     "flicker"
   ],
-  "coverPrompt": "Minimalist stylised thumbnail poster of a lone small-town hospital block on a bright sunny summer day — a simple cheerful institutional building with a row of sunlit windows and a rooftop helipad — on a green plain under a clear blue sky. One bold, simple, high-contrast silhouette, iconic and uncluttered. Flat, limited WARM palette: sky blue, fresh green, sunny yellow and clean white. Soft film grain, painterly but clean, simple geometric shapes, strong negative space, single centred focal subject. No people, no text, no lettering, no logos. Square composition.",
+  "coverPrompt": "Minimalist stylised thumbnail poster of a lone small-town hospital block on a bright sunny summer day — a simple cheerful institutional building with a row of sunlit windows — on a green plain under a clear blue sky. One bold, simple, high-contrast silhouette, iconic and uncluttered. Flat, limited WARM palette: sky blue, fresh green, sunny yellow and clean white. Soft film grain, painterly but clean, simple geometric shapes, strong negative space, single centred focal subject. No people, no text, no lettering, no logos. Square composition.",
   "rooms": [
     {
       "key": "room1",
       "title": "The pharmacy",
-      "debrief": "First you reshaped the data — pivot_wider, one column per element — so two variables could be plotted against each other: sodium versus chloride, with a smoothing line. Getting a table into the right shape is half of most analyses; only then can a relationship show up as a trend on a chart.",
-      "technique": "pivot_wider + geom_point/geom_smooth — correlate two elements (salt proxy)",
+      "debrief": "First you reshaped the data — pivot_wider, one column per metabolite — so two variables could be plotted against each other: choline versus 2-aminoisobutyric acid, with a smoothing line. Getting a table into the right shape is half of most analyses; only then can a relationship show up as a trend on a chart.",
+      "technique": "pivot_wider + geom_point/geom_smooth — correlate two metabolites (proxy marker)",
       "puzzleType": 1,
       "built": true,
       "authoring": {
@@ -58,7 +62,7 @@
           "inc": "rooms_solved"
         }
       ],
-      "designNote": "NEW ART. TECHNIQUE — pivot_wider (long→wide) + geom_point + geom_smooth (two continuous), forces multi-variable mapping. STORY: salt-sensitive medicine capsized; the field kit logged only chloride, not sodium — is chloride a trustworthy proxy for sodium (total salt)? TASK: pivot the long data wider (one column per element) with tidyr::pivot_wider, then plot Na vs Cl with geom_point + geom_smooth. VERIFIED ANSWER: yes — a tight positive linear relationship, Pearson r = 0.999 across all 20 lakes (still r = 0.994 without the North_Killeak outlier). ≥6 options describing the relationship (strong positive / a read-off-the-line prediction, vs distractors: none, negative, weak positive). Teaches pivot_wider + scatter + smooth, and SETS UP room 3, which challenges this pooled conclusion. DOORS: first room, single CLOSED forward door = the elevator. TECH: add tidyr to packages (verify WebR build); geom_smooth defaults to loess at n=20, base R, runs in WebR (no mgcv).",
+      "designNote": "METABOLOMICS REWRITE (2026-07-30). TECHNIQUE unchanged — pivot_wider (long→wide) + geom_point + geom_smooth (two continuous). STORY: 2-aminoisobutyric acid is a slow/expensive assay; is choline a trustworthy proxy? TASK: pivot metabolomics_hospital wider (one col per metabolite), plot 2-AIB vs Choline + geom_smooth. VERIFIED (20 patients): tight positive, Pearson r = 0.99 pooled (and holds within group: healthy 0.95, kidney 0.98 — deliberately NOT a Simpson pair; room 3 is). ≥6 options; correct = strong positive (idx 3). Sets up room 3's Simpson twist on a DIFFERENT pair.",
       "panorama": "room1/scene.png",
       "panoramaOpen": "room1/scene_open.png",
       "wrap": {
@@ -79,25 +83,25 @@
             0.5542,
             0.6088
           ],
-          "starterCode": "alaska_lake_data",
+          "starterCode": "metabolomics_hospital %>%\ntidyr::pivot_wider(names_from = \"metabolite\", values_from = \"concentration\")",
           "question": {
-            "prompt": "Pivot the survey wider (one column per element) and plot sodium (Na) against chloride (Cl) for all 20 lakes, with a smoothing line. What does it tell you — is chloride a trustworthy stand-in for sodium?",
+            "prompt": "The pharmacist says: “Elias's panel is missing a marker I need — 2-aminoisobutyric acid — and that assay is slow and expensive. Choline is quick and cheap, and I'm hoping it correlates with 2-aminoisobutyric acid tightly enough to stand in for it. I've got the analysis started, but can't figure out the plotting. Please can you plot 2-aminoisobutyric acid against choline for all 20 patients, with a straight line through them? What does it tell you — is choline a trustworthy stand-in?”",
             "options": [
-              "No relationship — the points scatter with no trend, so chloride tells you nothing about sodium.",
-              "A negative relationship — lakes high in chloride run low in sodium, so chloride would mislead you.",
-              "A weak positive trend — the points loosely rise but scatter widely, so chloride is only a rough guide.",
-              "A strong, tight positive line — sodium rises almost perfectly with chloride (r ≈ 0.999), so chloride is a trustworthy proxy.",
-              "A strong line, but only because one extreme lake creates it — drop that lake and the relationship falls apart.",
-              "A curved relationship — chloride predicts sodium at low values but flattens out at high ones."
+              "No relationship — the points scatter with no trend, so choline tells you nothing about 2-aminoisobutyric acid.",
+              "A negative relationship — patients high in choline run low in 2-aminoisobutyric acid, so choline would mislead you.",
+              "A weak positive trend — the points loosely rise but scatter widely, so choline is only a rough guide.",
+              "A strong positive line — 2-aminoisobutyric acid rises clearly with choline.",
+              "A curved relationship — choline predicts 2-aminoisobutyric acid at high values but flattens out at low ones.",
+              "A curved relationship — choline predicts 2-aminoisobutyric acid at low values but flattens out at high ones."
             ],
             "correct": 3,
             "maxAttempts": 4,
             "feedback": {
-              "correct": "Correct — logged: sodium tracks chloride almost perfectly (r ≈ 0.999), so chloride is a safe stand-in for total salt.",
+              "correct": "Correct — logged: 2-aminoisobutyric acid tracks choline almost perfectly, so choline is a safe stand-in.",
               "wrong": [
                 "Look at the overall shape of the cloud: do the points rise together, fall, or just scatter? Add the smoothing line and see how tightly they hug it.",
                 "The points sit almost exactly on one rising line — that's a very strong positive link. Check that it holds across the whole range, not just at one end.",
-                "Even setting the single saltiest lake aside, the rest still rise tightly together — so the relationship is real, not an artefact of one outlier."
+                "Even setting the most extreme patient aside, the rest still rise tightly together — so the relationship is real, not an artefact of one outlier."
               ]
             }
           }
@@ -125,7 +129,7 @@
             0.8072,
             0.3833
           ],
-          "body": "Priya's card — a June day-drive, camera on the dash, home before the midnight sun even dips. Pocket it for the collage.",
+          "body": "Priya's postcard — a June day-drive, camera on the dash, home before the midnight sun even dips. Pocket it for the collage.",
           "pickup": "Postcard #1 — June · roadside · a day · digit 3",
           "image": "postcards/postcard_1.png"
         },
@@ -139,7 +143,7 @@
             0.149,
             0.5559
           ],
-          "body": "Marco's card — a muddy June weekend, an hour in from the lot, two nights to dry the boots. One for the pile.",
+          "body": "Marco's postcard — a muddy June weekend, an hour in from the lot, two nights to dry the boots. One for the pile.",
           "pickup": "Postcard #2 — June · short hike · a weekend · digit 8",
           "image": "postcards/postcard_2.png"
         }
@@ -180,8 +184,8 @@
     {
       "key": "room2",
       "title": "The elevator",
-      "debrief": "A heatmap turns a whole table into colour — element across, lake up, concentration as the fill. You read down the tiles for the row that blazed hottest, filtering and ranking done entirely by eye. Sometimes the fastest way to find the maximum is to plot the data so it points at itself.",
-      "technique": "filter() by element + rank to a max",
+      "debrief": "A heatmap turns a whole table into colour — metabolite across, patient up, level as the fill. Scaling each metabolite so the columns are comparable, you read down the tiles for the patient whose row of colour matched Elias's most closely, comparing whole profiles entirely by eye. Sometimes the fastest way to find a match is to plot the data so it points at itself.",
+      "technique": "geom_tile heatmap (scaled) — match a whole profile by eye",
       "puzzleType": 1,
       "built": true,
       "authoring": {
@@ -198,10 +202,10 @@
           "inc": "rooms_solved"
         }
       ],
-      "designNote": "NEW ART. TECHNIQUE — geom_tile HEATMAP (2 discrete × 1 continuous), forces multi-variable mapping. STORY: the lake data is texted to your phone. Which lake is the closest chemical MATCH to North_Killeak_Lake across ALL elements? TASK: geom_tile(aes(x = element, y = lake, fill = mg_per_L)) + a fill colour scale — read which lake's row of tiles looks most like North_Killeak's. VERIFIED ANSWER: White_Fish_Lake (Euclidean distance 257 vs next 363; profile-shape correlation r = 0.993; the only other lake that lights up on Cl and Na — White_Fish Cl 105.3, Na 54.16). Real distractors (next-nearest): Devil_Mountain_Lake, Lake_Matcharak, Lava_Lake, Kurupa_Lake, Kuzitrin_Lake → ≥6 lake options. Threads the salt story (North_Killeak & White_Fish are the two saline lakes; sets up the boss's chloride answer). DOORS: forward CLOSED (elevator → corridor) + back OPEN (→ room1).",
+      "designNote": "METABOLOMICS REWRITE (2026-07-30). TECHNIQUE — geom_tile HEATMAP (2 discrete × 1 continuous). STORY: Elias's chemistry is barely characterised — find the prior patient most like him as a reference. TASK: bind Elias (metabolomics_hospital_unknown) to the cohort, EXCLUDE Creatinine (the renal assay is still pending — this both hides the boss answer and gives a clean match), scale() each metabolite, geom_tile(metabolite × patient, fill = level). VERIFIED ANSWER: Patient 54 (Elias ≈ patient 54; nearest d = 0.10 vs 2nd 1.00, margin 0.89). Elias is engineered as patient 54's near-twin + a Creatinine spike, so 54 is his clean single match. ≥6 patient options (54,58,56,57,52,60); correct = Patient 54 (idx 1). No boss leak: Creatinine is not in this panel.",
       "entry": {
         "title": "Going up",
-        "text": "Chloride tracks sodium almost perfectly, so you tell the pharmacist yes — the field kit's chloride reading is a safe stand-in for total salt, and that the shipment may have been compromised. The elevator doors close. Your phone buzzes: a bush pilot has been pulled from North Killeak Lake and they need you in the lab, and a colleague has texted over the lake survey data. North Killeak is barely studied — start by finding the lake most like it, chemically, so you have something to reason from.",
+        "text": "Choline tracks 2-aminoisobutyric acid almost perfectly, so you tell the pharmacist yes — choline is a safe stand-in for the marker she needs. The elevator doors close. Your phone buzzes: another delay! Elias is fading fast and they need you in the lab to help read his data. A colleague has texted over the ward's patient survey — 20 prior patients, some healthy and some with kidney-disease, fully profiled. Elias's chemistry is barely characterised — start by finding the patient most like him, so you have a reference point for understanding his results.",
         "button": "Read the data →"
       },
       "panorama": "room2/scene.png",
@@ -224,25 +228,25 @@
             0.7314,
             0.5049
           ],
-          "starterCode": "alaska_lake_data",
+          "starterCode": "metabolomics_hospital %>%\nmutate(patient_number = as.character(patient_number)) %>%\nbind_rows(dplyr::mutate(metabolomics_hospital_unknown, patient_status = \"Elias\")) %>%\nfilter(metabolite != \"Creatinine\") %>%\ngroup_by(metabolite) %>%\nmutate(level = scale(concentration)) %>%\nungroup()",
           "question": {
-            "prompt": "Draw a heatmap — element across the x-axis, lake up the y-axis, filled by concentration — and find the lake whose whole row of tiles looks most like North_Killeak_Lake's. Which lake is its closest chemical match?",
+            "prompt": "Draw a heatmap — metabolite and patient on the axes, colour intensity from each metabolite's scaled level — and find the patient whose whole row of tiles looks most like Elias's. (Creatinine, the specialist renal assay, is still pending from the lab, so it's not in the panel yet.) Which patient is his closest chemical match?",
             "options": [
-              "Devil_Mountain_Lake",
-              "White_Fish_Lake",
-              "Lake_Matcharak",
-              "Lava_Lake",
-              "Kurupa_Lake",
-              "Okoklik_Lake"
+              "Patient 58",
+              "Patient 54",
+              "Patient 56",
+              "Patient 57",
+              "Patient 52",
+              "Patient 60"
             ],
             "correct": 1,
             "maxAttempts": 4,
             "feedback": {
-              "correct": "Correct — logged: White_Fish_Lake is North Killeak's closest chemical match, so it's the lake to reason from.",
+              "correct": "Correct — logged: patient 54 is Elias's closest chemical match, so it's the case to reason from.",
               "wrong": [
-                "Find North Killeak's row of tiles first, then scan the other rows for the one whose colours match it most closely across every element.",
-                "North Killeak stands out because two elements run very high — look for the only other lake whose row lights up in those same two columns, not just one.",
-                "Plenty of lakes are 'quiet' (every tile dim) and so resemble each other; the match you want mirrors North Killeak's bright cells too, not only its dark ones."
+                "Find Elias's row of tiles first, then scan the other rows for the one whose colours match it most closely across every metabolite.",
+                "Scaling matters — without scale(), one high-concentration metabolite drowns out the rest. Once every column is on the same footing, one patient's row mirrors Elias's far better than the others.",
+                "Plenty of patients are 'quiet' (every tile mid-range) and so resemble each other; the match you want mirrors Elias's pattern across the whole row, highs and lows alike."
               ]
             }
           }
@@ -283,7 +287,7 @@
             0.9479,
             0.4446
           ],
-          "body": "Nadia's card — a June floatplane week, no road for fifty miles, seven days of nobody. Worth keeping.",
+          "body": "Nadia's postcard — a June floatplane week, no road for fifty miles, seven days of nobody. Worth keeping.",
           "pickup": "Postcard #3 — June · backcountry · a week · digit 1",
           "image": "postcards/postcard_3.png"
         },
@@ -297,7 +301,7 @@
             0.9446,
             0.6485
           ],
-          "body": "Deb's card — peak-summer, a camper right off the highway, t-shirt weather at midnight. Add it to the collage.",
+          "body": "Deb's postcard — peak-summer, a camper right off the highway, t-shirt weather at midnight. Add it to the collage.",
           "pickup": "Postcard #4 — July · roadside · a weekend · digit 7",
           "image": "postcards/postcard_4.png"
         }
@@ -342,8 +346,8 @@
     {
       "key": "room3",
       "title": "The corridor",
-      "debrief": "The trap, and the lesson. Pooled together, sodium and chloride tracked almost perfectly — until you faceted by park and the single clean line broke into three different ones. Splitting a plot by group can overturn what the whole looked like; always ask whether one trend is really several in disguise.",
-      "technique": "pivot_wider + geom_smooth + facet_wrap(~park) — does the correlation differ by park?",
+      "debrief": "The trap, and the lesson. Pooled together, indoxyl sulfate and p-cresyl sulfate tracked almost perfectly — until you faceted by patient status and the single clean line broke apart. Splitting a plot by group can overturn what the whole looked like; always ask whether one trend is really several in disguise.",
+      "technique": "pivot_wider + geom_smooth + facet_wrap(~patient_status) — does the correlation differ by group?",
       "puzzleType": 1,
       "built": true,
       "authoring": {
@@ -360,10 +364,10 @@
           "inc": "rooms_solved"
         }
       ],
-      "designNote": "NEW ART (corridor). TECHNIQUE — pivot_wider + geom_point + geom_smooth + facet_wrap(~ park), forces multi-variable mapping + small multiples. STORY: your crush stops you and gently CHALLENGES room 1 — 'the pharmacist said you decided sodium and chloride track together… but is that really true in every park?' TASK: the same Na vs Cl scatter, now facet_wrap(~ park). VERIFIED ANSWER: NOT uniform — the pooled r = 0.999 is largely manufactured by BELA (r = 1.000, which holds the North_Killeak outlier); GAAR r = 0.675, NOAT r = 0.424. The tight aggregate line hides weak within-park relationships. MCQ: (crisp) 'which park shows the weakest Na–Cl relationship?' → NOAT; or (conceptual / critical-thinking) 'the pooled r was 0.999 — after faceting, what do you conclude?' → it's driven by pooling + BELA's outlier, weak within GAAR & NOAT. Spicier alt pair: Ca~Mg flips NEGATIVE in NOAT (r = -0.43). The crush also plants the weekend dinner-date throughline → the ESCAPE facet-collage meta-puzzle (see escape1). DOORS: forward CLOSED (LAB) + back OPEN (→ room2).",
+      "designNote": "METABOLOMICS REWRITE (2026-07-30). TECHNIQUE — pivot_wider + geom_point + geom_smooth + facet_wrap(~ patient_status) (small multiples). STORY: a colleague challenges the assumption that indoxyl sulfate and p-cresyl sulfate (two gut toxins) are linked. TASK: pivot wide, plot p-cresyl vs indoxyl, facet by patient_status. VERIFIED: SIMPSON'S PARADOX — pooled r = 0.95, but within healthy r = -0.22 and within kidney r = 0.21; the tight pooled line is an artefact of the two groups sitting at different levels. (This pair is ENGINEERED into the dataset to carry the Simpson effect — see sample_data note.) ≥6 options; correct = the 'vanishes within group' conclusion (idx 4).",
       "entry": {
         "title": "The corridor",
-        "text": "White Fish Lake is North Killeak's chemical twin — nearly identical across every element — so at least you have a comparison to work from. You are three doors from the lab when a classmate you've been hoping to see catches your arm and presses a folded note into your hand: \"Some of us are going this weekend — you should come.\" Then they are gone into the elevator before either of you can say more. No time now — but they had overheard the pharmacist, and they are grinning: \"sodium and chloride, always together? You sure that holds <i>everywhere</i>?\"",
+        "text": "Patient 54 is Elias's chemical twin — nearly identical across every metabolite — so at least you have a comparison to work from. You are three doors from the lab when a colleague catches your arm: “One more thing — indoxyl sulfate and p-cresyl sulfate, the two gut-derived toxins, look beautifully correlated across the ward. Everyone assumes one drives the other. But I'm not so sure that holds up once you separate the healthy patients from the kidney-disease ones. Care to check before you go in?”",
         "button": "Prove it →"
       },
       "panorama": "room3/scene.png",
@@ -386,25 +390,25 @@
             0.098,
             0.5441
           ],
-          "starterCode": "alaska_lake_data",
+          "starterCode": "metabolomics_hospital %>%\ntidyr::pivot_wider(names_from = \"metabolite\", values_from = \"concentration\")",
           "question": {
-            "prompt": "Re-plot sodium vs chloride, but facet by park (BELA, GAAR, NOAT). Pooled together the line looked almost perfect (r ≈ 0.999). Once you split it by park, what's the right conclusion?",
+            "prompt": "Plot p-cresyl sulfate against indoxyl sulfate, then facet by patient_status (healthy vs kidney_disease). Pooled together the line looks almost perfect (r ≈ 0.95). Once you split it by group, what's the right conclusion?",
             "options": [
-              "The link is just as tight inside every park — faceting confirms sodium and chloride always track together.",
-              "BELA shows the weakest sodium–chloride link, so the coastal park breaks the pattern.",
-              "GAAR shows essentially no relationship, while BELA and NOAT stay tight.",
-              "All three parks show a negative sodium–chloride relationship once separated.",
-              "NOAT shows the weakest relationship — the tight pooled line is largely driven by pooling and BELA's extreme lake, and it hides weak within-park links.",
-              "The parks can't be compared because each holds a different number of lakes."
+              "The link is just as tight inside each group — faceting confirms the two toxins always rise together.",
+              "The correlation is strong in healthy patients but disappears in the kidney-disease group.",
+              "The correlation is strong in the kidney-disease group but disappears in healthy patients.",
+              "Both groups show a strong negative relationship once separated.",
+              "Within either group the relationship all but vanishes — the tight pooled line is largely an artefact of the two groups sitting at different levels, not a real within-patient link.",
+              "The groups can't be compared because each holds a different number of patients."
             ],
             "correct": 4,
             "maxAttempts": 4,
             "feedback": {
-              "correct": "Correct — logged: split by park, sodium–chloride is weakest in NOAT and only looks perfect when pooled — BELA's outlier carries the aggregate line.",
+              "correct": "Correct — logged: split by group, the indoxyl–p-cresyl link all but vanishes; the pooled line only looked tight because the two groups sit at different levels.",
               "wrong": [
-                "Look at each park's panel on its own: in which one do the points scatter most loosely, rather than sitting on a line?",
-                "BELA's panel is nearly a perfect line (one very salty lake anchors it). Compare GAAR and NOAT — one of those two is much looser than the other.",
-                "The loosest panel has the fewest, most scattered points — the pooled 'perfect' line was an artefact of combining parks, not a within-park truth."
+                "Look at each group's panel on its own: within the healthy points alone, and within the kidney points alone, do they still sit on a tight line — or scatter?",
+                "The pooled line is steep and clean, but each group's own cloud is nearly shapeless. What does that tell you about where the pooled correlation really comes from?",
+                "This is Simpson's paradox: two groups at different levels can fake a strong overall trend that isn't there within either one."
               ]
             }
           }
@@ -445,7 +449,7 @@
             0.6693,
             0.3059
           ],
-          "body": "Kim's card — a July week in a wildflower meadow, an hour from the trailhead, sun on the tent by seven. A keeper.",
+          "body": "Kim's postcard — a July week in a wildflower meadow, an hour from the trailhead, sun on the tent by seven. A keeper.",
           "pickup": "Postcard #5 — July · short hike · a week · digit 2",
           "image": "postcards/postcard_5.png"
         },
@@ -459,7 +463,7 @@
             0.6099,
             0.3198
           ],
-          "body": "Theo's card — a single chartered day on a gravel bar, high summer, warm enough to swim. Pocket it.",
+          "body": "Theo's postcard — a single chartered day on a gravel bar, high summer, warm enough to swim. Pocket it.",
           "pickup": "Postcard #6 — July · backcountry · a day · digit 9",
           "image": "postcards/postcard_6.png"
         },
@@ -473,7 +477,7 @@
             0.6554,
             0.4723
           ],
-          "body": "Sol's card — an August week by the highway, first chill at 2am, the aurora faintly back. One for the pile.",
+          "body": "Sol's postcard — an August week by the highway, first chill at 2am, the aurora faintly back. One for the pile.",
           "pickup": "Postcard #7 — August · roadside · a week · digit 5",
           "image": "postcards/postcard_7.png"
         }
@@ -526,8 +530,8 @@
     {
       "key": "boss",
       "title": "The lab",
-      "debrief": "The payoff. You filtered to the crash-site lake, found its most abundant element, and mapped that to the infection — chlorine highest means Chlorosoma, which means Chlorocidin. Four reads of one dataset, and the plot told you which antibiotic to reach for.",
-      "technique": "filter() to one lake + find the most abundant element, then map to the answer",
+      "debrief": "The payoff. You compared Elias's panel against the patient cohort, found the marker he was most abnormal on, and mapped that to a syndrome — creatinine highest means renal strain, which means Nephrocidin. Four reads of one dataset, and the plot told you which treatment to reach for.",
+      "technique": "compare a panel to the cohort + find the most elevated marker, then map to the answer",
       "puzzleType": 2,
       "isBoss": true,
       "built": true,
@@ -547,10 +551,10 @@
         "type": "figure",
         "submitCodec": true
       },
-      "designNote": "NEW ART. THIS IS THE ASSESSED EXERCISE — exercises.csv, '[exercises] data visualization ii' Q1 (dataset alaska_lake_data). STORY (from the exercise): bush pilot Elias Kane was pulled from North Killeak Lake and has a bacterial infection narrowed to five bacteria, each growing in water rich in one element — Sulfuromonas (sulfur, S → Sulfomycin), Nitrobacterium (nitrogen, N → Nitroflavin), Chlorosoma (chlorine, Cl → Chlorocidin), Bromoflux (bromine, Br → Bromostatin), Calcimicrobe (calcium, Ca → Calcihexin). TASK: which element is MOST abundant in North_Killeak_Lake, then pick the matching antibiotic. VERIFIED DATA (North_Killeak_Lake mg_per_L): Cl 337.23 (max) > Na 161.89 > Mg 37.68 > Ca 29.75 > K 8.32 > C 4.3 > Br 1.08 > F 0.11 > S 0.04 > N 0.037 > P 0.001. Among the five candidate elements (S, N, Cl, Br, Ca), Cl is by far the highest → Chlorosoma → CHLOROCIDIN. OPTIONS (the five antibiotics, verbatim from exercises.csv 'answers'): Sulfomycin; Nitroflavin; Chlorocidin; Bromostatin; Calcihexin. CORRECT = Chlorocidin (exercises.csv correct_answer = 3, 1-based → 0-based index 2). NOTE: canonical exercise has exactly 5 options; the skill prefers ≥6 — decide at wiring whether to add a 6th plausible-antibiotic distractor or keep the five as assessed. CODE (exercise): alaska_lake_data %>% ggplot(aes(x = mg_per_L, y = lake)) + geom_point(aes(fill = element), shape = 21) — read North_Killeak_Lake's row. CLUE HOTSPOT: the five bacteria→element→antibiotic table (from the flight-recorder printout). DELIVERABLE figure (submitCodec) deferred repo-wide. DOORS: forward CLOSED (→ the escape phase, TBD) + back OPEN (→ room3/corridor). REFRAME 2026-07-22 (Lucas): the prompt no longer NAMES the lake — it gives the park (Bering Land Bridge) + the flight-log pH (8.04); the student filters to BELA and finds the lake at that pH (North_Killeak — BELA's unique & highest pH, verified single winner) before reading its elements. Adds a derive-the-lake step to escalate the boss. Still MCQ, same options + answer (Chlorocidin, idx 2), decoder key untouched; starter dropped to bare alaska_lake_data (derivation method moved to feedback.wrong[0], per the 2026-07-21 convention); the off-list Na/Mg abundance trap preserved.",
+      "designNote": "METABOLOMICS REWRITE (2026-07-30). ASSESSED BOSS. STORY: Elias's renal assay is finally back; his condition is one of five syndromes, each flagged by one metabolite running high (creatinine→renal strain→Nephrocidin; methylmalonate→B12 block→Cobalatide; hydroxyphenylpyruvic acid→tyrosine overload→Tyrostat; 1-methyladenosine→nucleoside surge→Adenoquel; myoinositol→osmolyte imbalance→Inositex). TASK: bind Elias to the cohort, find which of the five he is most abnormally high on (markers are on different scales — must compare each to the cohort, e.g. z-score). VERIFIED: Creatinine is Elias's clear outlier — z = +6.0 vs healthy / +3.6 vs full cohort (next marker −4.4z away) AND the dataset max → Nephrocidin. OPTIONS: the five treatments + Glucostat decoy; correct = Nephrocidin (idx 0). ASSESSMENT NOTE: this REPLACES the former alaska_lake_data exercise (exercises.csv '[exercises] data visualization ii' Q1) — exercises.csv is now DECOUPLED and may need a matching metabolomics entry if this boss is still the graded item.",
       "entry": {
         "title": "The lab",
-        "text": "They are right — pool the parks together and the sodium–chloride line looks perfect, but split it by park and it falls apart; up in Noatak it barely holds at all. Worth remembering. The lab doors part. The pilot, Elias, is stable but fading — a bacterial infection the doctors have narrowed to five suspects, each keyed to a different element. All anyone knows is he went down somewhere over Bering Land Bridge, and the flight recorder logged the crash-site water at pH 8.04. Work out which lake that is, find the element that runs highest there, and you name the bug.",
+        "text": "Your colleague is right — pool the groups together and the indoxyl–p-cresyl line looks perfect, but split it by patient group and it falls apart. Worth remembering. The lab doors part. Elias is stable but fading — and the renal assay is finally back, so his panel is complete at last. His condition matches one of five syndromes, each flagged by a different metabolite running high. Compare his panel to the patient cohort, find the marker he's most abnormal on, and you'll know what to treat.",
         "button": "Run it →"
       },
       "panorama": "boss/scene.png",
@@ -573,25 +577,25 @@
             0.4601,
             0.7363
           ],
-          "starterCode": "alaska_lake_data",
+          "starterCode": "metabolomics_hospital %>%\nmutate(patient_number = as.character(patient_number)) %>%\nbind_rows(dplyr::mutate(metabolomics_hospital_unknown, patient_status = \"Elias\"))",
           "question": {
-            "prompt": "Elias was pulled from a lake in Bering Land Bridge, and the flight-data recorder logged the crash-site water at pH 8.04. His infection is one of five bacteria, each thriving where one element runs high: Sulfuromonas (S→Sulfomycin), Nitrobacterium (N→Nitroflavin), Chlorosoma (Cl→Chlorocidin), Bromoflux (Br→Bromostatin), Calcimicrobe (Ca→Calcihexin). Work out which lake he went down in, find which of those five elements runs highest there — and so which antibiotic he needs.",
+            "prompt": "Elias's renal assay is back, so his panel is complete. His condition is one of five syndromes, each flagged by one metabolite running high: renal strain (creatinine → Nephrocidin), B12 block (methylmalonate → Cobalatide), tyrosine overload (hydroxyphenylpyruvic acid → Tyrostat), nucleoside surge (1-methyladenosine → Adenoquel), osmolyte imbalance (myoinositol → Inositex). Compare Elias's panel to the patient cohort, find which of those five metabolites he runs most abnormally high on — and so which treatment he needs.",
             "options": [
-              "Sulfomycin",
-              "Nitroflavin",
-              "Chlorocidin",
-              "Bromostatin",
-              "Calcihexin",
-              "Magnistatin"
+              "Nephrocidin",
+              "Cobalatide",
+              "Tyrostat",
+              "Adenoquel",
+              "Inositex",
+              "Glucostat"
             ],
-            "correct": 2,
+            "correct": 0,
             "maxAttempts": 4,
             "feedback": {
-              "correct": "Correct — logged: chlorine runs highest in North Killeak (Cl ≈ 337 mg/L), so the bug is Chlorosoma and Elias gets Chlorocidin.",
+              "correct": "Correct — logged: creatinine runs far higher in Elias than in any patient in the cohort, so it's renal strain and Elias gets Nephrocidin.",
               "wrong": [
-                "Start from the crash site: filter the survey to the Bering Land Bridge lakes and find the one whose pH reads 8.04 — that's where he went down. Then read that lake's elements.",
-                "Only five elements are in play (each keyed to a bug: S, N, Cl, Br, Ca). Among just those five, one runs far higher than the rest in the crash lake.",
-                "Sodium and magnesium run high too, but neither is on the five-bug list — restrict yourself to the five candidates and pick the highest of those."
+                "The five metabolites are on wildly different scales, so you can't just compare Elias's raw numbers to each other. Compare each of his markers to the cohort — how many standard deviations above the patients' average does each sit? — and find the one where he's the extreme outlier.",
+                "Only five metabolites are in play, each keyed to a syndrome. Among just those five, Elias is off the chart on exactly one of them.",
+                "Some of Elias's markers sit near the middle of the pack; one sits far above every other patient. That single extreme marker is the one that names his syndrome — and his treatment."
               ]
             }
           }
@@ -599,14 +603,14 @@
         {
           "id": "the_flight_recorder_printout",
           "type": "clue",
-          "label": "The flight-recorder printout",
+          "label": "The worksheet on the gurney",
           "box": [
             0.581,
             0.6931,
             0.6255,
             0.7853
           ],
-          "body": "<p>A printout clipped to the gurney — the infectious-disease worksheet:</p><pre style=\"font:12px/1.4 ui-monospace,Menlo,Consolas,monospace\">BACTERIUM        THRIVES IN     → ANTIBIOTIC\nSulfuromonas     sulfur   (S)   → Sulfomycin\nNitrobacterium   nitrogen (N)   → Nitroflavin\nChlorosoma       chlorine (Cl)  → Chlorocidin\nBromoflux        bromine  (Br)  → Bromostatin\nCalcimicrobe     calcium  (Ca)  → Calcihexin</pre><p>Name the element that runs highest in the pilot's lake, and you name the bug — and the drug. The survey is long format: one row per lake × element, with the concentration in <code>mg_per_L</code>.</p>"
+          "body": "<p>A printout clipped to the gurney — the metabolic-syndrome worksheet:</p><pre style=\"font:12px/1.4 ui-monospace,Menlo,Consolas,monospace\">MARKER RUNNING HIGH        SYNDROME            → TREATMENT\ncreatinine                 renal strain        → Nephrocidin\nmethylmalonate             B12 block           → Cobalatide\nhydroxyphenylpyruvic acid  tyrosine overload   → Tyrostat\n1-methyladenosine          nucleoside surge    → Adenoquel\nmyoinositol                osmolyte imbalance  → Inositex</pre><p>Name the marker Elias runs most abnormally high on, and you name the syndrome — and the treatment. The survey is long format: one row per patient × metabolite, with the value in <code>concentration</code>.</p>"
         },
         {
           "id": "the_door_out_to_the_break_room",
@@ -800,7 +804,7 @@
             0.1993,
             0.2386
           ],
-          "body": "Ivy's card — a quick August berry-hike, an hour up and back before supper, leaves just turning. Add it to the collage.",
+          "body": "Ivy's postcard — a quick August berry-hike, an hour up and back before supper, leaves just turning. Add it to the collage.",
           "pickup": "Postcard #8 — August · short hike · a day · digit 6",
           "image": "postcards/postcard_8.png"
         },
@@ -814,7 +818,7 @@
             0.2442,
             0.4465
           ],
-          "body": "Wes's card — a packrafted August long-weekend, termination dust on the peaks, nights properly dark again. The last of the set.",
+          "body": "Wes's postcard — a packrafted August long-weekend, termination dust on the peaks, nights properly dark again. The last of the set.",
           "pickup": "Postcard #9 — August · backcountry · a weekend · digit 4",
           "image": "postcards/postcard_9.png"
         },
@@ -845,9 +849,9 @@
           "requires": "the_keypad_on_the_door"
         },
         {
-          "id": "passage_back_to_the_corridor",
+          "id": "passage_back_to_the_lab",
           "type": "door",
-          "label": "Passage back to the corridor",
+          "label": "Passage back to the lab",
           "box": [
             0.7168,
             0.2545,
@@ -855,7 +859,7 @@
             0.7376
           ],
           "direction": "back",
-          "to": "room3"
+          "to": "boss"
         }
       ],
       "sfx": [
@@ -869,7 +873,7 @@
     }
   ],
   "escape": {
-    "enterLabel": "You never did figure out that lake…"
+    "enterLabel": "The collage on the door still isn't finished…"
   },
   "escapeDone": {
     "title": "Dinner, at last",
@@ -885,6 +889,6 @@
   "boardCols": 3,
   "debrief": {
     "title": "How this world worked",
-    "intro": "One dataset, read four different ways — pivoted, plotted, heat-mapped, and faceted — until the numbers named an infection and, in time, saved a life. Here is how each room taught a different way of looking, and how the escape was the same skill with every label stripped away."
+    "intro": "One dataset, read four different ways — pivoted, plotted, heat-mapped, and faceted — until the numbers named a diagnosis and, in time, saved a life. Here is how each room taught a different way of looking, and how the escape was the same skill with every label stripped away."
   }
 }

@@ -7,17 +7,19 @@ lockstep with the real data + the decoder key, the v3 facet-collage escape keypa
 combinatorics prove (729, from escape2_facets.py), the escape's clue/lock structure, the scenario graph
 shape, and a static presence-check of two 2026-07-18 player bug-fixes. Run: python3 test_hospital.py
 
+The scenario was re-themed from Alaska lake chemistry to a hospital METABOLOMICS panel (2026-07-30):
+Elias's case, dataset metabolomics_hospital.csv (LONG: patient × metabolite × concentration) + Elias's
+own panel in metabolomics_hospital_unknown.csv. The engine, escape and codec are untouched; only the
+analysis-room DATA and wording changed. This file re-derives each answer from the two CSVs.
+
 Failure modes it guards:
-  - the CSV changes and a room's verified answer (Na~Cl proxy / nearest lake / weakest park / max element)
-    silently stops matching the wired correct option;
-  - a correct-index drifts out of lockstep with decode_codes.R's DATA_VIS2_HOSPITAL_KEY = c(3,1,4,2);
+  - a CSV changes and a room's verified answer (Choline~2-AIB proxy / Elias's nearest patient / the
+    Simpson pair / Elias's most-elevated marker) silently stops matching the wired correct option;
+  - a correct-index drifts out of lockstep with decode_codes.R's DATA_VIS2_HOSPITAL_KEY = c(3,1,4,0);
   - the escape keypad code drifts from the facet combinatorics (escape2_facets.py -> 729);
   - the escape loses its lock/collage/postcard wiring or its phase/gate wiring;
-  - a starter leaks the solving pipeline, an option set drops below six, or a `reveal` sneaks back in;
+  - an option set drops below six, a `reveal` sneaks back in, or a starter leaks the plotting pipeline;
   - a refactor drops the analysis-finish idempotency guard or the music position-restore.
-
-History: the v1 `map`-puzzle escape (click Imuruk on a pH×Ca chart) was retired for the v3 facet-collage
-keypad; this file's old map-asset/Imuruk guards were replaced 2026-07-21 to match.
 """
 import csv, json, math, os, sys
 
@@ -27,10 +29,11 @@ import escape2_facets  # the escape's verified combinatorics (keypad code 729)
 
 SITE = HERE
 for _ in range(8):
-    if os.path.exists(os.path.join(SITE, "phylochemistry", "sample_data", "alaska_lake_data.csv")):
+    if os.path.exists(os.path.join(SITE, "phylochemistry", "sample_data", "metabolomics_hospital.csv")):
         break
     SITE = os.path.dirname(SITE)
-CSV = os.path.join(SITE, "phylochemistry", "sample_data", "alaska_lake_data.csv")
+CSV = os.path.join(SITE, "phylochemistry", "sample_data", "metabolomics_hospital.csv")
+UNK = os.path.join(SITE, "phylochemistry", "sample_data", "metabolomics_hospital_unknown.csv")
 PLAYER = os.path.join(SITE, "escape_rooms", "shared", "pano-player.js")
 
 fails = []
@@ -46,63 +49,94 @@ def pearson(xs, ys):
     return cov / (sx * sy)
 
 def main():
+    # --- load the cohort (LONG -> per-patient dict) + Elias's own panel ---
     rows = list(csv.DictReader(open(CSV, encoding="utf-8")))
-    num = lambda x: float(x) if x not in ("", "NA") else None
-    lakes = sorted(set(r["lake"] for r in rows))
-    elements = sorted(set(r["element"] for r in rows))
-    park = {r["lake"]: r["park"] for r in rows}
-    val = {l: {} for l in lakes}
+    patients, status, val = [], {}, {}
     for r in rows:
-        val[r["lake"]][r["element"]] = num(r["mg_per_L"])
+        p = r["patient_number"]
+        if p not in val:
+            val[p] = {}; status[p] = r["patient_status"]; patients.append(p)
+        val[p][r["metabolite"]] = float(r["concentration"])
+    metabolites = sorted({r["metabolite"] for r in rows})
+    elias = {r["metabolite"]: float(r["concentration"]) for r in csv.DictReader(open(UNK, encoding="utf-8"))}
 
     scen = json.load(open(os.path.join(HERE, "scenario.json"), encoding="utf-8"))
     R = {r["key"]: r for r in scen["rooms"]}
     def puzzle(rk):
         return next(h for h in R[rk]["hotspots"] if h.get("type") == "puzzle")
 
+    def zstats(names, ids):
+        st = {}
+        for m in names:
+            xs = [val[p][m] for p in ids]; mu = sum(xs) / len(xs)
+            sd = math.sqrt(sum((x - mu) ** 2 for x in xs) / len(xs))
+            st[m] = (mu, sd)
+        return st
+
     print("== analysis answers vs data (each correct option is the verified answer) ==")
-    # room1 — chloride is a strong proxy for sodium (Na~Cl r ~ 0.999)
-    na = [val[l]["Na"] for l in lakes]; cl = [val[l]["Cl"] for l in lakes]
-    r_nacl = pearson(na, cl)
+    # room1 — choline is a strong proxy for 2-aminoisobutyric acid (r > 0.99, holds within group too)
+    ch = [val[p]["Choline"] for p in patients]; aib = [val[p]["2-Aminoisobutyric acid"] for p in patients]
+    r1 = pearson(ch, aib)
     q1 = puzzle("room1")["question"]
-    check(r_nacl > 0.99, "Na~Cl correlation is very strong (%.4f) — room1's 'strong proxy' answer holds" % r_nacl)
-    check(q1["correct"] == 3 and "0.999" in q1["options"][3], "room1 correct = idx 3 (the strong-positive proxy option)")
+    check(r1 > 0.97, "Choline~2-AIB correlation is very strong (%.4f) — room1's 'strong proxy' answer holds" % r1)
+    check(q1["correct"] == 3 and "rises clearly with choline" in q1["options"][3],
+          "room1 correct = idx 3 (the strong-positive proxy option)")
 
-    # room2 — nearest chemical match to North_Killeak == White_Fish_Lake
-    nk = "North_Killeak_Lake"
-    dist = sorted(((math.sqrt(sum((val[l][e] - val[nk][e]) ** 2 for e in elements
-                                   if val[l][e] is not None and val[nk][e] is not None)), l)
-                   for l in lakes if l != nk))
+    # room2 — Elias's nearest patient over the SCALED panel EXCLUDING Creatinine (the pending assay) == patient 54
+    heat = [m for m in metabolites if m != "Creatinine"]
+    st = zstats(heat, patients)
+    z = lambda v, m: (v - st[m][0]) / st[m][1] if st[m][1] else 0.0
+    ez = {m: z(elias[m], m) for m in heat}
+    dist = sorted((math.sqrt(sum((z(val[p][m], m) - ez[m]) ** 2 for m in heat)), p) for p in patients)
     q2 = puzzle("room2")["question"]
-    check(dist[0][1] == "White_Fish_Lake", "nearest lake to North_Killeak is White_Fish_Lake (got %s)" % dist[0][1])
-    check(q2["correct"] == 1 and q2["options"][1] == "White_Fish_Lake", "room2 correct = idx 1 = White_Fish_Lake")
+    check(dist[0][1] == "54", "Elias's nearest patient (scaled, excl. Creatinine) is 54 (got %s)" % dist[0][1])
+    check(dist[1][0] - dist[0][0] > 0.5, "patient 54 is a clear single match (margin %.2f)" % (dist[1][0] - dist[0][0]))
+    check(q2["correct"] == 1 and q2["options"][1] == "Patient 54", "room2 correct = idx 1 = Patient 54")
 
-    # room3 — NOAT is the weakest per-park Na~Cl
-    def park_r(pk):
-        ll = [l for l in lakes if park[l] == pk]
-        return pearson([val[l]["Na"] for l in ll], [val[l]["Cl"] for l in ll])
-    weakest = min(["BELA", "GAAR", "NOAT"], key=park_r)
+    # room3 — Simpson: Indoxyl~p-Cresyl strong POOLED, near-zero WITHIN each patient group
+    ix = [val[p]["Indoxyl_Sulfate"] for p in patients]; pc = [val[p]["p_Cresyl_Sulfate"] for p in patients]
+    pooled = pearson(ix, pc)
+    def grp_r(g):
+        pp = [p for p in patients if status[p] == g]
+        return pearson([val[p]["Indoxyl_Sulfate"] for p in pp], [val[p]["p_Cresyl_Sulfate"] for p in pp])
+    rh, rk = grp_r("healthy"), grp_r("kidney_disease")
     q3 = puzzle("room3")["question"]
-    check(weakest == "NOAT", "NOAT has the weakest per-park Na~Cl relationship (got %s)" % weakest)
-    check(q3["correct"] == 4 and "NOAT" in q3["options"][4], "room3 correct = idx 4 (the NOAT-weakest option)")
+    check(pooled > 0.9, "Indoxyl~p-Cresyl pooled correlation is strong (%.2f)" % pooled)
+    check(abs(rh) < 0.5 and abs(rk) < 0.5,
+          "within-group correlation collapses — Simpson's paradox (healthy %.2f, kidney %.2f)" % (rh, rk))
+    check(q3["correct"] == 4 and "all but vanishes" in q3["options"][4], "room3 correct = idx 4 (the Simpson conclusion)")
 
-    # boss — chlorine is the max element in North_Killeak among the five candidates -> Chlorocidin
-    cand = {"S": "Sulfomycin", "N": "Nitroflavin", "Cl": "Chlorocidin", "Br": "Bromostatin", "Ca": "Calcihexin"}
-    top = max(cand, key=lambda e: val[nk][e])
+    # boss — Elias's most abnormal (z-score) marker among the five candidates is Creatinine -> Nephrocidin
+    cand = {"Creatinine": "Nephrocidin", "Methylmalonate": "Cobalatide",
+            "Hydroxyphenylpyruvic acid": "Tyrostat", "1-Methyladenosine": "Adenoquel", "myoinositol": "Inositex"}
+    bst = zstats(list(cand), patients)
+    ez_boss = {m: (elias[m] - bst[m][0]) / bst[m][1] for m in cand}
+    topm = max(cand, key=lambda m: ez_boss[m])
     q4 = puzzle("boss")["question"]
-    check(top == "Cl", "chlorine is the most abundant of the five candidate elements in North_Killeak (got %s)" % top)
-    check(q4["correct"] == 2 and q4["options"][2] == "Chlorocidin", "boss correct = idx 2 = Chlorocidin")
+    check(topm == "Creatinine", "Elias's most elevated candidate marker is Creatinine (got %s, z=%.1f)" % (topm, ez_boss[topm]))
+    check(elias["Creatinine"] > max(val[p]["Creatinine"] for p in patients),
+          "Elias's Creatinine exceeds every patient in the cohort (unambiguous 'runs highest')")
+    check(q4["correct"] == 0 and q4["options"][0] == "Nephrocidin", "boss correct = idx 0 = Nephrocidin")
 
     print("== MCQ hygiene + decoder lockstep ==")
     correct = [puzzle(rk)["question"]["correct"] for rk in ("room1", "room2", "room3", "boss")]
-    check(correct == [3, 1, 4, 2], "correct indices == DATA_VIS2_HOSPITAL_KEY c(3,1,4,2): %s" % correct)
+    check(correct == [3, 1, 4, 0], "correct indices == DATA_VIS2_HOSPITAL_KEY c(3,1,4,0): %s" % correct)
     for rk in ("room1", "room2", "room3", "boss"):
         q = puzzle(rk)["question"]
         check(len(q["options"]) >= 6, "%s has >= 6 options (%d)" % (rk, len(q["options"])))
         check("reveal" not in q.get("feedback", {}), "%s has no feedback.reveal" % rk)
-    for rk in ("room1", "room2", "room3"):   # practice starters give nothing away (boss = the assessed plot, exempt)
+    for rk in ("room1", "room2", "room3"):   # practice starters may shape data but must not draw the plot (boss exempt)
         sc = puzzle(rk).get("starterCode", "")
-        check("ggplot(" not in sc and "filter(" not in sc, "%s starterCode has no solving pipeline" % rk)
+        check("ggplot(" not in sc and "geom_" not in sc, "%s starterCode has no plotting pipeline" % rk)
+    # Regression (2026-07-30 playtest): Elias's patient_number is the string "Elias" while the cohort's are
+    # bare numbers, so readr types the two CSVs' patient_number differently (character vs double) and
+    # bind_rows() aborts with "Can't combine ... <double> and ... <character>". Any starter that binds the
+    # unknown to the cohort must first coerce patient_number to a common type, or R fails before plotting.
+    for rk in ("room1", "room2", "room3", "boss"):
+        sc = puzzle(rk).get("starterCode", "")
+        if "bind_rows" in sc and "metabolomics_hospital_unknown" in sc:
+            check("as.character(patient_number)" in sc,
+                  "%s binds the unknown to the cohort and coerces patient_number to character" % rk)
 
     print("== escape v3: facet-collage keypad ==")
     # the combinatorics module still proves the intended pairing -> 729, and all six codes are distinct
@@ -135,12 +169,22 @@ def main():
     check(esc.get("unlockedWhen") == {"solved": "boss"}, "escape1 unlocks on solving the boss")
     check(bool(scen.get("escapeDone")), "scenario has an escapeDone finish screen")
     check(R.get("boss", {}).get("isBoss") is True, "boss is flagged isBoss")
+    # scenario points at the metabolomics datasets, not the retired lake data
+    dsn = [d.get("name") for d in scen.get("datasets", [])]
+    check(dsn == ["metabolomics_hospital", "metabolomics_hospital_unknown"],
+          "datasets are the metabolomics cohort + Elias's unknown panel: %s" % dsn)
     # forward doors chain room1->room2->room3->boss->escape1; the way out is gated on the keypad
     fwd = {rk: next((h.get("to") for h in R[rk]["hotspots"]
                      if h.get("type") == "door" and (h.get("direction") or "forward") == "forward"), None)
            for rk in ("room1", "room2", "room3", "boss")}
     check(fwd == {"room1": "room2", "room2": "room3", "room3": "boss", "boss": "escape1"},
           "forward doors chain room1->room2->room3->boss->escape1: %s" % fwd)
+    # back doors step back exactly one room (linear): each returns to its immediate predecessor
+    back = {rk: next((h.get("to") for h in R[rk]["hotspots"]
+                      if h.get("type") == "door" and h.get("direction") == "back"), None)
+            for rk in ("room2", "room3", "boss", "escape1")}
+    check(back == {"room2": "room1", "room3": "room2", "boss": "room3", "escape1": "boss"},
+          "back doors step back one room escape1->boss->room3->room2->room1: %s" % back)
     wayout = next((h for h in hs if h.get("type") == "door" and (h.get("direction") or "forward") == "forward"), None)
     check(wayout and wayout.get("requires") == "the_keypad_on_the_door" and not wayout.get("to"),
           "the way-out door is gated on the keypad and has no `to` (fires the escape finish)")

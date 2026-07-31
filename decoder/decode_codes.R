@@ -319,7 +319,7 @@ DATA_VIS2_AIRSHIP_KEY <- list(
 # break-room MAP puzzle -> click Imuruk) is phase:"escape", ungraded, and never enters the code.
 DATA_VIS2_HOSPITAL_KEY <- list(
   scenario_id = 8,
-  correct = c(3, 1, 4, 2),
+  correct = c(3, 1, 4, 0),
   score_step = function(correct, answer, attempts) {
     if (answer != correct) return(0)
     if (attempts <= 1) return(10)
@@ -457,17 +457,17 @@ if (identical(environment(), globalenv()) && sys.nframe() == 0) {
   }
 
   # Regression: pano scenario id 8 (data_vis2/hospital "Vital Signs") — 4 analysis MCQ rooms,
-  # correct option indices 3, 1, 4, 2. Round-trips the id-8 code with all four solved first-try and
+  # correct option indices 3, 1, 4, 0. Round-trips the id-8 code with all four solved first-try and
   # grades it against DATA_VIS2_HOSPITAL_KEY; asserts an all-first-try solve scores 40 (4 x 10). The
   # escape MAP room is phase:"escape" and excluded from the code, so only these four bytes appear.
   hsteps <- list(list(answer = 3, attempts = 1),
                  list(answer = 1, attempts = 1),
                  list(answer = 4, attempts = 1),
-                 list(answer = 2, attempts = 1))
+                 list(answer = 0, attempts = 1))
   hcode <- encode_code(version = 1, scenario_id = 8, steps = hsteps, student_id = "hosp_test")
   hd <- decode_code(hcode, "hosp_test")
   hok <- hd$valid && hd$scenario_id == 8 &&
-    identical(hd$answers, c(3L, 1L, 4L, 2L)) && identical(hd$attempts, c(1L, 1L, 1L, 1L))
+    identical(hd$answers, c(3L, 1L, 4L, 0L)) && identical(hd$attempts, c(1L, 1L, 1L, 1L))
   cat("Pano MCQ round-trip OK id 8 (should be TRUE):", hok, "\n")
   if (!hok) stop("REGRESSION: pano MCQ round-trip failed (id 8 hospital)")
   hg <- grade_one(hcode, "hosp_test", DATA_VIS2_HOSPITAL_KEY)

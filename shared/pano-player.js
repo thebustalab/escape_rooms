@@ -174,6 +174,11 @@ let analysisFinished = false;
 // whether the exit-debrief spoiler guard is still needed (opening the debrief after the escape is
 // solved never needs to warn). Set in showEscapeDone(), reset on a fresh run.
 let escapeFinished = false;
+// Per-phase timing (2026-07-30, plain Date.now() ms — GitHub-Pages-safe, human-facing only, NOT in the
+// codec/decoder). startTime is stamped when the player hits Enter; analysisFinishedTime once in
+// finishAnalysis(); escapeFinishedTime once in showEscapeDone(). All reset to null on a fresh run.
+// Durations surface on the submission-prep screen + the submission PDF (see computeTimings/timingLines).
+let startTime = null, analysisFinishedTime = null, escapeFinishedTime = null;
 // yaw the player was facing when the puzzle was opened — restored after the door swaps in,
 // so solving keeps your orientation (and the "where's the door now?" hunt) instead of snapping to front.
 let resumeYaw = 0;
@@ -254,6 +259,8 @@ function init(data) {
     solvedGates.clear();
     attemptCounts.clear();
     analysisFinished = false; escapeFinished = false;                // fresh objective state
+    startTime = Date.now();                                           // per-phase timing: game starts now
+    analysisFinishedTime = null; escapeFinishedTime = null;           // fresh timing state
     caseFile.length = 0; pickedClues.clear(); updateNotebookChip();   // fresh field notebook
     $("#notebookChip").style.display = "";                            // persistent chip, in-room only
     $("#debriefChip").style.display = "none";                        // appears only once analysis completes
@@ -1890,6 +1897,7 @@ function goThrough() {
 function finishAnalysis() {
   if (analysisFinished) return;                     // once only — auto-complete + door path both call this
   analysisFinished = true;
+  if (analysisFinishedTime == null) analysisFinishedTime = Date.now();   // stamp analysis-phase end (once)
   if (!(SCENARIO.hud && SCENARIO.hud.healAt === "escape")) healMotif();   // the cure is named → lesion heals
   // Deliberately does NOT navigate or stop the room ambience: the window just presents the code and
   // CLOSES back to the room. The player walks on themselves (e.g. through the door to the escape phase),
@@ -1923,6 +1931,7 @@ function finishAnalysis() {
 // of the analysis phase. Content from scenario.escapeDone {title, body}.
 function showEscapeDone() {
   escapeFinished = true;                            // the escape is solved → debrief no longer needs a spoiler guard
+  if (escapeFinishedTime == null) escapeFinishedTime = Date.now();   // stamp escape-phase end (once)
   $("#skipChip").style.display = "none";            // escape is done — nothing left to skip
   stopRoomSfx();                                    // silence the escape-room ambience on the finish card
   const e = SCENARIO.escapeDone || {};
@@ -1960,6 +1969,36 @@ function captureSubmissionWork(r, h) {
   const question = (h && h.question && h.question.prompt) || (h && h.prompt) || "";   // carry the question forward
   submissionWork.set(r.key, { title: r.title || r.key, code, figure: null, figureRaw, question });
 }
+// ---- per-phase timing (human-facing only; NOT in the codec/decoder) ----
+// Format a duration in ms as "12m 34s" (or "1h 05m 39s" past an hour); "—" for a missing/invalid span.
+function fmtDuration(ms) {
+  if (ms == null || !isFinite(ms) || ms < 0) return "—";
+  const total = Math.round(ms / 1000);
+  const h = Math.floor(total / 3600), m = Math.floor((total % 3600) / 60), s = total % 60;
+  const pad = n => String(n).padStart(2, "0");
+  return h > 0 ? `${h}h ${pad(m)}m ${pad(s)}s` : `${m}m ${pad(s)}s`;
+}
+// Compute the three spans from the stamped timestamps. Analysis = analysisFinished − start. Escape =
+// escapeFinished − analysisFinished, but is null when the escape was SKIPPED (escapeFinishedTime never
+// set — the #skipChip path jumps to submission without showEscapeDone). Total runs to the escape finish
+// if it happened, else to now (submission time) so a skipped run still reads sensibly.
+function computeTimings() {
+  const escaped = escapeFinishedTime != null;
+  const analysisMs = (startTime != null && analysisFinishedTime != null) ? analysisFinishedTime - startTime : null;
+  const escapeMs = (escaped && analysisFinishedTime != null) ? escapeFinishedTime - analysisFinishedTime : null;
+  const endTime = escaped ? escapeFinishedTime : Date.now();   // skipped escape → count total to submission time
+  const totalMs = (startTime != null) ? endTime - startTime : null;
+  return { escaped, analysisMs, escapeMs, totalMs };
+}
+// The three display strings — escape reads "not completed (escape skipped)" when the escape wasn't done.
+function timingLines() {
+  const t = computeTimings();
+  return {
+    analysis: fmtDuration(t.analysisMs),
+    escape: t.escaped ? fmtDuration(t.escapeMs) : "not completed (escape skipped)",
+    total: fmtDuration(t.totalMs),
+  };
+}
 function renderSubmitWork() {
   const host = $("#subWork"); if (!host) return;
   host.innerHTML = "";
@@ -1968,6 +2007,14 @@ function renderSubmitWork() {
   const intro = document.createElement("div"); intro.className = "swintro";
   intro.textContent = "The R console from each puzzle in this scenario is shown below, pre-filled with the code you ran. You can refine that code, styling the plot, adding labels and colors, and more. Press Run to update the figure. At the end, use the download button to download a PDF of your work and submit it on Canvas.";
   host.appendChild(intro);
+  // Per-phase timing summary (also printed in the PDF). Human-facing only; the graded code is unaffected.
+  const tl = timingLines();
+  const timing = document.createElement("div"); timing.className = "swtiming";
+  timing.style.cssText = "margin:10px 0 4px;font:13px system-ui;opacity:.85;line-height:1.6";
+  timing.innerHTML =
+    `<span style="font-weight:600">Your times —</span> ` +
+    `Analysis: ${escHtml(tl.analysis)} · Escape: ${escHtml(tl.escape)} · Total: ${escHtml(tl.total)}`;
+  host.appendChild(timing);
   rooms.forEach(r => {
     const w = submissionWork.get(r.key);
     const div = document.createElement("div"); div.className = "swroom";
@@ -2076,6 +2123,12 @@ function exportSubmissionPdf() {
     doc.splitTextToSize(mintedCode, W - 2 * M).forEach(ln => { ensure(12); doc.text(ln, M, y); y += 12; });
     doc.setFont("helvetica", "normal"); y += 8;
   }
+  // Per-phase timing (human-facing only — NOT in the submission code, so grading is unaffected).
+  const tl = timingLines();
+  doc.setFontSize(11);
+  ensure(14); doc.text(`Analysis time: ${tl.analysis}`, M, y); y += 14;
+  ensure(14); doc.text(`Escape time: ${tl.escape}`, M, y); y += 14;
+  ensure(14); doc.text(`Total: ${tl.total}`, M, y); y += 16;
   (SCENARIO.rooms || []).filter(r => isBuilt(r) && phaseOf(r) === "analysis" && submissionWork.has(r.key)).forEach(r => {
     const w = submissionWork.get(r.key);
     ensure(26); doc.setFont("helvetica", "bold"); doc.setFontSize(13); doc.text(w.title || r.key, M, y); y += 18;

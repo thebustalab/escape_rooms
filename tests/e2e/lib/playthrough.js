@@ -313,6 +313,12 @@ class Playthrough {
     await page.locator("#subX500Go").click();
     // the per-room refine blocks render for each graded analysis room
     await expect(page.locator("#subWork .swroom")).not.toHaveCount(0, { timeout: 20_000 });
+    // per-phase timing summary renders (Analysis / Escape / Total) — human-facing, not in the code
+    await expect(page.locator("#subWork .swtiming")).toBeVisible({ timeout: 10_000 });
+    const timingText = await page.locator("#subWork .swtiming").textContent();
+    expect(timingText).toMatch(/Analysis:/);
+    expect(timingText).toMatch(/Escape:/);
+    expect(timingText).toMatch(/Total:/);
     // and the code was minted + logged to the notebook (mintCode only logs it when mintedCode is truthy)
     await expect(async () => {
       expect(await this._notebookCount()).toBe(nbBefore + 1);

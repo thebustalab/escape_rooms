@@ -599,7 +599,7 @@
       "title": "The crow's nest",
       "technique": "escape — read the dial-driven star-plates (multiple mappings)",
       "phase": "escape",
-      "built": false,
+      "built": true,
       "unlockedWhen": true,
       "designNote": "ESCAPE part 1 — THE CROW'S NEST (deep night, high on the mast, 'see the whole', very Riven). STAR REDESIGN 2026-07-22 (was solvent charts). The captain's star-astrolabe (obj_chart, a mapview) shows a field of NAMED STARS under whichever plate the room-1 astrolabe plate-dial selects (m1/m2/m3) as a pre-rendered PNG. Each plate projects the same stars a different way; the Anchor (homeward house) is marked on every plate. Exactly one star — SOLIRA — holds the Anchor across all three plates; its NAME is the helm lock. The star-log clue (obj_starlog) names the Anchor + the method, not the answer. Fully data-free (no solvents). PNGs + answer from nest/make_starchart.py; equal-length star names keep the lock a fixed length. The plate-dial is co-located here beside the astrolabe (moved out of room1 so there's no cross-ship back-nav during the escape); the player turns it, reads each plate, takes the intersection → SOLIRA → helm.",
       "authoring": {
@@ -607,7 +607,79 @@
         "scenePrompt": "This is a panorama. A 360-degree view from the centre of the crow's nest atop a steampunk airship, a small round railed platform high on the mast, the scene wrapping continuously so the left and right edges meet seamlessly. It is deep, clear night up here above the cloud. Ahead, the captain's great brass STAR-ASTROLABE on a swivel mount — a tall ringed instrument with a large engraved circular star-plate — and beside it a heavy BRASS PLATE-DIAL with three engraved marks and a needle for turning the astrolabe to a new plate; a chart table holds an open leather star-log and a spyglass. A railed ratline and ladder lead DOWN the mast to the weather deck below. All around, the railing gives onto an immense night sky blazing with stars over dark floating islands far below, rigging lines rising to the gas-bag above, a glowing signal lantern, a windsock snapping. Cold, constant starlight and warm brass highlights, wind-torn cloud, film grain, richly detailed. No people, no lettering, no captions, no text.",
         "doorPrompt": ""
       },
-      "hotspots": [],
+      "hotspots": [
+        {
+          "id": "the_astrolabe_plate_dial",
+          "type": "dial",
+          "label": "The astrolabe plate-dial",
+          "box": [
+            0.3629,
+            0.6544,
+            0.4254,
+            0.8107
+          ],
+          "key": "mapping",
+          "hint": "Three plate-marks engraved around a brass ring — ◈ ⬢ ✶ — and a heavy needle, set beside the astrolabe. Turn it and the astrolabe swings to a new plate of the sky.",
+          "states": [
+            {
+              "value": "m1",
+              "label": "◈"
+            },
+            {
+              "value": "m2",
+              "label": "⬢"
+            },
+            {
+              "value": "m3",
+              "label": "✶"
+            }
+          ]
+        },
+        {
+          "id": "down_the_mast_to_the_weather_deck",
+          "type": "door",
+          "label": "Down the mast to the weather deck",
+          "box": [
+            0.4944,
+            0.7501,
+            0.566,
+            0.9044
+          ],
+          "direction": "open",
+          "to": "room2"
+        },
+        {
+          "id": "the_captain_s_star_astrolabe",
+          "type": "mapview",
+          "label": "The captain's star-astrolabe",
+          "box": [
+            0.2809,
+            0.2931,
+            0.3701,
+            0.5548
+          ],
+          "key": "mapping",
+          "caption": "The astrolabe's plate turns and the star field redraws — the same sky under a different projection each time, the Anchor marked on every face. Stars drift from plate to plate; the one that holds the Anchor through all three faces is your bearing home.",
+          "empty": "The astrolabe's plate-ring is unset — the stars won't show. Turn the plate-dial beside it to choose a face of the sky.",
+          "images": {
+            "m1": "nest/map_m1.png",
+            "m2": "nest/map_m2.png",
+            "m3": "nest/map_m3.png"
+          }
+        },
+        {
+          "id": "the_captain_s_star_log",
+          "type": "clue",
+          "label": "The captain's star-log",
+          "box": [
+            0.637,
+            0.7384,
+            0.7301,
+            0.8497
+          ],
+          "body": "Open to a marked page, the captain's hand: “Steer always by the Anchor — the house high to the north-east that every plate of the astrolabe shares. Stars wander from face to face, but one alone keeps the Anchor through all three. That star is our bearing home; set the helm to its name.”"
+        }
+      ],
       "entry": "You climb the mast into full night. The crow's nest sways under a sky blazing with stars, and the captain's astrolabe stands ready — three plates for one sky.",
       "plannedHotspots": [
         {
@@ -657,7 +729,16 @@
           "to": "room2",
           "note": "ratline + ladder down the mast to the deck"
         }
-      ]
+      ],
+      "panorama": "nest/scene.png",
+      "builtFrom": "gpt_nest_4.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      }
     },
     {
       "key": "bridge",
@@ -688,21 +769,24 @@
           "availableWhen": {
             "solved": "boss"
           },
-          "lockedBody": "The helm is dead — the ship's control-locks won't release until the solvent-cure has cycled through the engine. Treat the infection first."
+          "lockedBody": "The helm is dead — the ship's control-locks won't release until the solvent-cure has cycled through the engine. Treat the infection first.",
+          "id": "the_helm_bearing_keypad"
         },
         {
           "type": "door",
           "label": "Take the wheel",
           "direction": "forward",
           "requires": "obj_lock",
-          "note": "the great spoked wheel — requires the helm keypad; fires escapeDone"
+          "note": "the great spoked wheel — requires the helm keypad; fires escapeDone",
+          "id": "take_the_wheel"
         },
         {
           "type": "door",
           "label": "Aft to the weather deck",
           "direction": "open",
           "to": "room2",
-          "note": "open doorway aft onto the weather deck"
+          "note": "open doorway aft onto the weather deck",
+          "id": "aft_to_the_weather_deck"
         }
       ]
     }

@@ -428,6 +428,44 @@ def test_apply_balance_dry_run_and_no_music():
     _with_rooms_root(body)
 
 
+# INTEGRATION — exercises the REAL ffmpeg measurement path (the stubbed tests above can't catch an
+# ffmpeg-invocation regression, e.g. the `framelog=quiet`-returns-0.0 bug that shipped 0.0 LUFS for
+# every file during dev). Generates three sine tones — a music bed + a clearly-louder and a clearly-
+# quieter effect — and asserts the loud one is lowered and the quiet one is left alone. Skips (no-op,
+# so it's safe under both the plain-script runner and pytest) when ffmpeg isn't on PATH.
+
+def test_apply_balance_real_ffmpeg_lowers_only_loud():
+    import shutil
+    import subprocess as _sp
+    if not shutil.which("ffmpeg"):
+        print("  skip test_apply_balance_real_ffmpeg_lowers_only_loud (no ffmpeg on PATH)")
+        return
+
+    def body(tmp):
+        d = _write_scenario("data_vis", "x", {
+            "music": "audio/music.wav", "musicVolume": 0.5,
+            "rooms": [{"key": "room1", "sfx": [
+                {"src": "audio/loud.wav", "mode": "loop", "volume": 1.0},
+                {"src": "audio/quiet.wav", "mode": "loop", "volume": 1.0}]}]})
+        adir = os.path.join(d, "audio")
+        os.makedirs(adir, exist_ok=True)
+
+        def tone(name, vol):
+            _sp.run(["ffmpeg", "-y", "-f", "lavfi", "-i", "sine=frequency=440:duration=5",
+                     "-filter:a", "volume=%s" % vol, os.path.join(adir, name)],
+                    capture_output=True, check=True)
+
+        tone("music.wav", 0.3)      # the bed
+        tone("loud.wav", 0.9)       # plays well over the bed → must be lowered
+        tone("quiet.wav", 0.02)     # far under the bed → left alone
+        out = hs._apply_balance(d, apply=True)
+        assert "error" not in out, out
+        sfx = {l["src"]: l for l in json.load(open(os.path.join(d, "scenario.json")))["rooms"][0]["sfx"]}
+        assert sfx["audio/loud.wav"]["volume"] < 1.0        # real LUFS measurement lowered it
+        assert sfx["audio/quiet.wav"]["volume"] == 1.0      # quiet one untouched
+    _with_rooms_root(body)
+
+
 def test_commit_node_points_and_builds():
     """Committing points the node at images + marks built; seeds wrap from the passed seed_wrap
     (the candidate's tuned wrap), else a sane default so the room is ALWAYS playable (Finding 1

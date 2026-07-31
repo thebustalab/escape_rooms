@@ -943,6 +943,7 @@ git add -A && git commit -m "whatever changed" && git push</pre>
       $("#coverGrid").innerHTML = "";
       $("#coverGen").onclick = coverGen;
       renderCoverPreview();
+      refreshCoverGrid();   // list existing gpt_cover_* candidates on load — not only after a fresh Generate
     }
     function renderCoverPreview() {
       const el = $("#coverPreview"), cov = SCENARIO_DOC && SCENARIO_DOC.cover;

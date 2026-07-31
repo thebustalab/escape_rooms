@@ -3,9 +3,9 @@
   "chapter": "dimensionality_reduction",
   "scenario": "henges",
   "id": 11,
-  "title": "The Drowned Henges",
+  "title": "The Portal Henges",
   "subtitle": "Dimensionality Reduction · PCA — scores, scree, loadings",
-  "story": "You aware coughing brine, colder than you have ever been. Around you, a ring of standing arches leans against a sky thick with stars. Something is wrong in your blood: a cold light under your skin,  some sort of sickness from your teleportation gone wrong.\n\nYou remember that there is a cure. It's an old potion that can only be brewed under the light of the stars. Solve the puzzles to gather the ingredients you need to brew the potion, and travel through the arches to teleport back home.",
+  "story": "You awake coughing brine, colder than you have ever been. Around you, a ring of standing arches leans against a sky thick with stars. Something is wrong in your blood: some sort of sickness from your teleportation gone wrong. You remember that there is a cure. It's an old potion that can only be brewed under the light of the stars. Solve the puzzles to gather the ingredients you need to brew the potion, and travel through the arches to teleport back home.",
   "enterLabel": "Wake on the shore →",
   "done": {
     "title": "The potion takes — you are cured",
@@ -96,7 +96,12 @@
           ],
           "mode": "stones",
           "answer": "|_|",
-          "length": 3
+          "length": 3,
+          "solveSfx": {
+            "src": "audio/solve_portal_open.mp3",
+            "volume": 0.41
+          },
+          "feedback": {}
         },
         {
           "id": "the_washed_up_satchel",
@@ -108,7 +113,7 @@
             0.7106,
             0.7731
           ],
-          "body": ""
+          "body": "You find a satchel washed up next to you. How long has it been here? Inside it are inneumerable vials, seemingly far more than it could possible for it to contain. Surreal. A crumpled note rests atop the vials. It reads:<br><br>\"The fallen arch stones hold the keys to unlocking the portals, but the portals must first be awakened. Here, the fallen stones show that the key is |_|. Also, do not discount the green stones' spread on the monoliths. Like astral projections, they show you the way home.\"<br><br>You scoop up and carry the satchel along with you, hopefully it contains what you need to brew the healing potion."
         },
         {
           "id": "the_star_filled_arch",
@@ -126,7 +131,24 @@
         }
       ],
       "preAwakened": true,
-      "panoramaOpen": "beach/scene_open.png"
+      "panoramaOpen": "beach/scene_open.png",
+      "sfx": [
+        {
+          "src": "audio/beach_waves_night.mp3",
+          "mode": "loop",
+          "volume": 1.0
+        },
+        {
+          "src": "audio/wind_cold_loop.mp3",
+          "mode": "loop",
+          "volume": 0.09
+        },
+        {
+          "src": "audio/stone_drone.mp3",
+          "mode": "loop",
+          "volume": 0.06
+        }
+      ]
     },
     {
       "key": "mountain",
@@ -153,7 +175,7 @@
       ],
       "entry": {
         "title": "A world away, and higher",
-        "text": "The arch takes you and lets you go a world away: a knife of black rock high above the drowned country, the air thin and needled with cold. Here too a ring of stones, and in the basin the same field of star-points — but one is thrown far past the rest. The monolith's stones stand wide apart. Read the scattering; find the one flung clear.",
+        "text": "The arch takes you and lets you go a world away: a knife of black rock high above the countryside, the air thin and needled with cold. Here too is a ring of stones, and in a basin, reflected stars. The monolith's stones stand wide apart. Find the potion ingredient you need, awaken the next arch portal, then unlock it and travel forward.",
         "button": "Read the high henge →"
       },
       "designNote": "GRADED — ROOM 1. TYPE 4 Pick-the-Point (ggiraph). TWO-GATE PORTAL: (a) AWAKEN by solving the analysis (arch -> dim starry), (b) UNLOCK by keying this henge's stone pattern (arch -> bright galaxy). STORY BEAT: which single ingredient is flung farthest along the great axis of spread (PC1). TASK: standardized PCA on the 9 numeric properties, plot scores (PC1 vs PC2), CLICK the point farthest along PC1. CODE (pick.plotCode): pc <- prcomp(dplyr::select(druid_ingredients, potency:ash_weight), scale.=TRUE); scores <- data.frame(pc$x, ingredient = druid_ingredients$ingredient); ggplot(scores, aes(PC1, PC2)) + ggiraph::geom_point_interactive(aes(data_id = ingredient, tooltip = ingredient)) + labs(x=\"PC1\", y=\"PC2\"). ANSWER: \"Deathwatch Scarab\" (|PC1|=4.50, +19% clear of Glasswing Beetle II 3.64). Distractors = the other 224 points. HINT: one point sits far past all the rest along the horizontal spread. Solving AWAKENS the forward arch; the STONE KEYPAD then unlocks it with MOUNTAIN PATTERN | | _ (up,up,down), answer \"||_\" — the keypad is INERT until awakened (\"this portal must be awakened first\"). Monolith stones spread rank 3/4 (~1 ft) -> scree; deterministic graphic -> notebook. Codec: pick encodes solved=1. NEW ART.",
@@ -229,6 +251,10 @@
               ],
               "reveal": ""
             }
+          },
+          "solveSfx": {
+            "src": "audio/solve_portal_awaken.mp3",
+            "volume": 0.7
           }
         },
         {
@@ -243,7 +269,12 @@
           ],
           "mode": "stones",
           "answer": "||_",
-          "length": 3
+          "length": 3,
+          "solveSfx": {
+            "src": "audio/solve_portal_open.mp3",
+            "volume": 0.7
+          },
+          "feedback": {}
         },
         {
           "id": "the_star_filled_arch",
@@ -272,6 +303,18 @@
           "direction": "back",
           "to": "beach"
         }
+      ],
+      "sfx": [
+        {
+          "src": "audio/wind_cold_loop.mp3",
+          "mode": "loop",
+          "volume": 0.16
+        },
+        {
+          "src": "audio/stone_drone.mp3",
+          "mode": "loop",
+          "volume": 0.03
+        }
       ]
     },
     {
@@ -299,7 +342,7 @@
       ],
       "entry": {
         "title": "Down onto the plain",
-        "text": "Through, and down onto a plain without end, a slow green snow of fireflies rising against a horizon that has begun, faintly, to grey. The stones on this altar sit close, huddled together. In the basin the views step down like a ladder — how much of the whole spread does the first, greatest view carry?",
+        "text": "Through, and down onto a plain without end, a slow green blanket of fireflies rising against a horizon that has begun, faintly, to grey. The stones on this altar sit close, huddled together. Continue to identify key ingredients, awaken the next portal, and unlock it.",
         "button": "Read the scree →"
       },
       "designNote": "GRADED — ROOM 2. TYPE 1 Compute-the-Key (console check). TWO-GATE PORTAL (awaken by analysis, unlock by stone pattern). STORY BEAT: how much of the total spread lives on the great axis. TASK: standardized PCA; percent of total variance explained by PC1 -> `answer`. CODE: pc <- prcomp(dplyr::select(druid_ingredients, potency:ash_weight), scale.=TRUE); ve <- 100 * pc$sdev^2 / sum(pc$sdev^2); answer <- round(ve[1], 1). ANSWER: 25.0 (%) — PC1 25.0, PC2 17.8, PC3 12.7 (PC1/PC2=1.40). check: abs(answer - 25.0) < 0.6. HINT: square the sdevs, divide by their sum, take the first. (Alt framings: PC1+PC2 ~43, or #components to pass half = 3; pick ONE at wiring.) Solving AWAKENS the arch; STONE KEYPAD unlocks with PLAINS PATTERN _ _ | (down,down,up), answer \"__|\". Monolith stones spread rank 2/4 (~3 ft) -> scree; deterministic graphic -> notebook. NEW ART.",
@@ -375,6 +418,10 @@
               ],
               "reveal": ""
             }
+          },
+          "solveSfx": {
+            "src": "audio/solve_portal_awaken.mp3",
+            "volume": 0.49
           }
         },
         {
@@ -389,7 +436,12 @@
           ],
           "mode": "stones",
           "answer": "__|",
-          "length": 3
+          "length": 3,
+          "solveSfx": {
+            "src": "audio/solve_portal_open.mp3",
+            "volume": 0.49
+          },
+          "feedback": {}
         },
         {
           "id": "the_star_filled_arch",
@@ -418,6 +470,23 @@
           "direction": "back",
           "to": "mountain"
         }
+      ],
+      "sfx": [
+        {
+          "src": "audio/plains_meadow.mp3",
+          "mode": "loop",
+          "volume": 0.51
+        },
+        {
+          "src": "audio/shimmer_crystal.mp3",
+          "mode": "loop",
+          "volume": 0.09
+        },
+        {
+          "src": "audio/stone_drone.mp3",
+          "mode": "loop",
+          "volume": 0.0
+        }
       ]
     },
     {
@@ -445,7 +514,7 @@
       ],
       "entry": {
         "title": "The floor of white salt",
-        "text": "Through, and out onto a floor of white salt without edge or end — so flat, so still, that the fading stars lie mirrored beneath your boots and you seem to walk upon the sky itself. The henge stands alone in all that emptiness. In the basin the arrows fan out from a centre; one reaches farthest. Which property drives the great axis?",
+        "text": "Through, and out onto a floor of white salt without edge or end — so flat, so still, that you seem to walk upon the sky itself. The henge stands alone in all that emptiness. In the basin, the secrets to the ingredients you need, the means to awaken the next portal, with its unlock to follow.",
         "button": "Read the loadings →"
       },
       "designNote": "GRADED — ROOM 3. TYPE 1 Compute-the-Key (console check). TWO-GATE PORTAL (awaken by analysis, unlock by stone pattern). STORY BEAT: what the great axis is built from — its strongest driver. TASK: standardized PCA; property with the largest |PC1 loading| -> `answer` (NAME). CODE: pc <- prcomp(dplyr::select(druid_ingredients, potency:ash_weight), scale.=TRUE); load <- pc$rotation[, \"PC1\"]; answer <- names(which.max(abs(load))). ANSWER: \"potency\" (0.582 > bitterness 0.477 > aroma_intensity 0.468 > volatility 0.423; +18%). check: answer == \"potency\". HINT: rotation matrix PC1 column; longest arrow drives it. Solving AWAKENS the arch; STONE KEYPAD unlocks with the SALTFLAT PATTERN _ | _ (down, up, down — mirror-symmetric, fitting the mirror henge), answer \"_|_\". Monolith stones spread rank 4/4 (TIGHTEST, touching) -> scree; deterministic graphic -> notebook. NEW ART.",
@@ -521,6 +590,10 @@
               ],
               "reveal": ""
             }
+          },
+          "solveSfx": {
+            "src": "audio/solve_portal_awaken.mp3",
+            "volume": 0.47
           }
         },
         {
@@ -535,7 +608,12 @@
           ],
           "mode": "stones",
           "answer": "_|_",
-          "length": 3
+          "length": 3,
+          "solveSfx": {
+            "src": "audio/solve_portal_open.mp3",
+            "volume": 0.5
+          },
+          "feedback": {}
         },
         {
           "id": "the_star_filled_arch",
@@ -563,6 +641,23 @@
           ],
           "direction": "back",
           "to": "plains"
+        }
+      ],
+      "sfx": [
+        {
+          "src": "audio/saltflat_wind_vast.mp3",
+          "mode": "loop",
+          "volume": 0.52
+        },
+        {
+          "src": "audio/shimmer_crystal.mp3",
+          "mode": "loop",
+          "volume": 0.0
+        },
+        {
+          "src": "audio/stone_drone.mp3",
+          "mode": "loop",
+          "volume": 0.04
         }
       ]
     },
@@ -592,7 +687,7 @@
       },
       "entry": {
         "title": "The great henge, at dawn",
-        "text": "The last arch sets you down before the great henge, its stones like cliffs against a sky going gold at the rim of the world. The potion wants the glowing mushrooms — but in the basin they do not lie at either end of the great spread; on that first axis they sit with the common rabble. Only when the view turns to the second do they draw together, apart from all the rest. Read what that second view is built from, and you have the mushrooms' mark.",
+        "text": "The last arch sets you down before the great henge, its stones like cliffs against a sky going gold at the rim of the world. The potion wants only one more ingredient, but in the basin that one does not lie at either end of the great spread: on that first axis it sits with the common rabble. Find the last ingredient to cure yourself, awaken and unlock the final portal, and step through to go home.",
         "button": "Face the great henge →"
       },
       "designNote": "GRADED BOSS + ESCAPE in ONE room (the great henge — no inner sanctum). isBoss, puzzleType 2, deliverable figure + submitCodec. The SUNRISE is the centred focal point of the scene. Great henge has NO fallen stones and NO pebble-monolith. STAGE 1 (analysis / AWAKEN) TYPE 3 Repair-the-Pipeline (console check): TRAP (PC1-fixation) — mushrooms do NOT separate on PC1 (mushroom PC1 mean 0.03, mid-pack; beetles own PC1); they separate on PC2 (mean 1.46), driver = luminance. Decoy = potency (PC1 driver from room 3). BROKEN CODE reads PC1's top loading (returns potency): pc <- prcomp(dplyr::select(druid_ingredients, potency:ash_weight), scale.=TRUE); load <- pc$rotation[, 'PC1']; answer <- names(which.max(abs(load))). FIX 'PC1' -> 'PC2'. ANSWER 'luminance' (0.625 > resin_content 0.533 > pigment 0.489; +15%). check: answer == 'luminance'. Solving AWAKENS the way-home arch (dim starfield) and mints the potion/cure. ANTI-FIXATION HINT now lives in THIS puzzle's hint + wrong-answer feedback (mushrooms sit mid-pack on the great axis; turn to the second view; read what it is built from) — the separate 'mushroom-sigil stone' was DROPPED 2026-07-25 (clutter); the basin plot already foreshadows it (green cluster gathered apart high on the vertical/PC2 axis). STAGE 2 (escape / UNLOCK): the heart-stone monolith is the ESCAPE stone-keypad (mode:stones, long display, NOT in codec) — styled like the other rooms' mark-stones but with NO pebbles; in their place a carved REVERSED scree-plot (bars shortest->tallest = ASCENDING) that carries BOTH the order-by-scree rule and the tightest->widest direction, + the glowing keypad symbol below. (The separate rising frieze was dropped 2026-07-26 — the reversed scree-plot conveys the direction.) Enter the four henge patterns in SCREE order (read off the four pebble-monoliths), ASCENDING tightest->widest = saltflat, mountain, plains, beach. answer = '_|_||___||_|' (len 12). Way-home door requires the heart-stone lock + endsEscape -> escapeDone. WIRING: set the way-home door to require the placed heart-stone lock + endsEscape. NEW ART.",
@@ -663,6 +758,10 @@
               ],
               "reveal": ""
             }
+          },
+          "solveSfx": {
+            "src": "audio/solve_portal_awaken.mp3",
+            "volume": 0.4
           }
         },
         {
@@ -677,7 +776,12 @@
           ],
           "mode": "stones",
           "answer": "_|_||___||_|",
-          "length": 12
+          "length": 12,
+          "solveSfx": {
+            "src": "audio/solve_way_home.mp3",
+            "volume": 0.4
+          },
+          "feedback": {}
         },
         {
           "id": "the_arch_back_to_the_salt_flat",
@@ -706,24 +810,41 @@
           "endsEscape": true,
           "requires": "the_heart_stone"
         }
+      ],
+      "sfx": [
+        {
+          "src": "audio/boss_dawn_birds.mp3",
+          "mode": "loop",
+          "volume": 0.15
+        },
+        {
+          "src": "audio/wind_cold_loop.mp3",
+          "mode": "loop",
+          "volume": 0.0
+        },
+        {
+          "src": "audio/stone_drone.mp3",
+          "mode": "loop",
+          "volume": 0.04
+        }
       ]
     }
   ],
   "escapeDone": {
     "title": "Home, as the sun clears the sea",
-    "body": "You set the marks into the stone in the order the henges gave you — least-spread first, rising to the widest, as the moon-signs rise — and the great arch fills with a light that is not starlight but morning. Beyond it: your own shore, your own year, unbroken. You step through as the sun clears the sea, and the henges go dark behind you, one by one."
+    "body": "You set the marks into the stone in the order the henges gave you — least-spread first, rising to the widest— and the great arch fills with a light that is not starlight but morning. Beyond it: your own shore, your own year, unbroken. You step through as the sun clears the sea, and the henges go dark behind you, one by one."
   },
   "debrief": {
     "title": "How this world worked",
-    "intro": "This whole night was one skill in disguise: taking a cloud of measurements, turning it to the view that spreads it most, and reading which trait that spread is built from — then remembering that a group you care about may live on a quieter view entirely. Here is how each henge was teaching that, and how the way home was the very same move, made physical in stone."
+    "intro": "In this scenario, you were literally inside a principal components analysis. The stars were the high dimensional data, the henges were the principal components, and the green rocks on the monolith were the projections into low dimensional (one dimensional) space."
   },
   "ambient": "fireflies",
   "fx": [],
   "cover": "cover.png",
-  "coverPrompt": "Minimalist stylised thumbnail poster of a single lone standing-stone arch on a black starlit shore at night, one warm amber portal of stars glowing through the arch, its reflection on wet mirror-sand below. Designed to read clearly as a small thumbnail: one bold, simple, high-contrast silhouette, iconic and uncluttered, minimal fine detail. Flat, limited palette: deep teal, icy blue, and one warm amber glow. Soft film grain, painterly but clean with simple geometric shapes. Strong negative space of night sky and mirrored shore, single centred focal subject. Quiet, cold, otherworldly. No people, no text, no lettering, no logos. Square composition.",
+  "coverPrompt": "Minimalist stylised thumbnail poster of a single lone standing-stone trilithioin arch on a black starlit shore at night, one warm amber portal of stars glowing through the arch, its reflection on wet mirror-sand below. Designed to read clearly as a small thumbnail: one bold, simple, high-contrast silhouette, iconic and uncluttered, minimal fine detail. Flat, limited palette: deep teal, icy blue, and one warm amber glow. Soft film grain, painterly but clean with simple geometric shapes. Strong negative space of night sky and mirrored shore, single centred focal subject. Quiet, cold, otherworldly. No people, no text, no lettering, no logos. Square composition.",
   "stonePortals": true,
   "music": "audio/drowned_henges_theme.mp3",
-  "musicVolume": 0.1,
+  "musicVolume": 0.19,
   "musicCredit": {
     "text": "Beautiful Fantasy Ambient Music — Mystical, Enchanting, Epic-Like (YouTube)",
     "url": "https://youtu.be/AohPsuy65hQ"

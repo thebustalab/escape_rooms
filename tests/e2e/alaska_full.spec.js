@@ -165,22 +165,28 @@ test("alaska: full analysis + notebook image-stack + keypad escape", async ({ pa
   // --- boss: solve (pick-the-point) → analysis finishes and mints the graded code
   await solvePick(room("boss"));
   await expect(page.locator("#done.open")).toBeVisible({ timeout: 10_000 });
-  // The graded completion code moved OFF the finish card onto the submission-prep screen (submission-prep
-  // refactor): a scenario WITH an escape shows an "analysis complete" card with the code hidden + a
-  // "skip to submit" route. Peek at the submission screen to confirm the code is minted + non-empty, then
-  // back out to the room to do the (ungraded) escape (openSubmitPrep + subBack are non-destructive; the
-  // escape stays gated on the already-solved boss).
+  // The graded completion code moved OFF the finish card (submission-prep refactor, 2026-07-28): a scenario
+  // WITH an escape shows an "analysis complete" card whose code is hidden. The code is now minted + logged
+  // to the field notebook + baked into the PDF (NOT shown on-screen — there's no #subCodeVal anymore, and
+  // #doneToSubmit is hidden on the analysis card). Close the finish card, then peek the submission screen
+  // via the persistent #skipChip: enter an x500, confirm, and assert the code minted (a new field-notebook
+  // entry) + the per-room submission work rendered. Then close back to the room to do the (ungraded)
+  // escape (the escape stays gated on the already-solved boss).
   await expect(page.locator("#codeWrap")).toBeHidden();
-  await page.locator("#doneToSubmit").click();                                          // → submission-prep screen
+  await page.locator("#doneClose").click();                                             // close the analysis card
+  await expect(page.locator("#done.open")).toBeHidden();
+  const nbBeforeCode = await notebookCount();
+  await page.locator("#skipChip").click();                                              // → submission-prep screen
   await expect(page.locator("#submitPrep.open")).toBeVisible({ timeout: 10_000 });
-  // x500 is now entered HERE (not on the landing screen); confirming it mints + reveals the code.
+  // x500 is entered HERE; confirming it mints the (x500-keyed) code and renders the per-room refine blocks.
   await page.fill("#subX500", "test0001");
   await page.locator("#subX500Go").click();
-  await expect(page.locator("#subCodeVal")).toBeVisible({ timeout: 10_000 });
-  expect((await page.locator("#subCodeVal").textContent()).trim().length).toBeGreaterThan(0);
-  await page.locator("#subBack").click();                                               // back to the room
+  await expect(page.locator("#subWork .swroom")).not.toHaveCount(0, { timeout: 20_000 });
+  await expect(async () => {                                                            // code minted → logged to the notebook
+    expect(await notebookCount()).toBe(nbBeforeCode + 1);
+  }).toPass({ timeout: 10_000 });
+  await page.locator("#subClose").click();                                             // back to the room
   await expect(page.locator("#submitPrep.open")).toBeHidden();
-  await expect(page.locator("#done.open")).toBeHidden();
   expect(await pickupClues()).toBe(1);                                                   // Claire's tail-number board
 
   // the notebook now holds all FOUR image fragments, stacked (the feature under test)

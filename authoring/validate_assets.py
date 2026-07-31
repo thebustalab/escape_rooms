@@ -23,8 +23,10 @@ Per rooms/<chapter>/<scenario>/scenario.json, for every BUILT room:
   - MISS  a one-way passage: a forward/open door A->B with no return door back to A in B (or a door
           targeting a missing/unbuilt room). The ART half (inverse geometry both ends) stays an eyeball check.
 
-  CONTENT / TESTS (per scenario)
+  CONTENT / TESTS (per scenario — generic conventions, promoted from the per-scenario tests 2026-07-29)
   - MISS  a clue hotspot renders blank — no body, no committed image, no pickup (opens an empty modal)
+  - MISS  a graded engine (question/check/pick/map) hands the answer away via feedback.reveal
+  - MISS  an MCQ has fewer than 6 options (need >=6 data-derived distractors)
   - MISS  a `ready` scenario has no test_<name>.py (pins each room's answer to the CSV + decoder lockstep)
 
   GLOBAL (whole repo — only on a full run, not a single-scenario check)
@@ -135,6 +137,15 @@ def check_scenario(path):
                and not h.get("image") and not h.get("pickup"):
                 extra = " (imagePrompt set but no committed image)" if h.get("imagePrompt") else ""
                 misses.append(f"clue '{r['key']}/{h.get('id')}' renders blank — no body, image, or pickup{extra}")
+            # GENERIC content conventions (all scenarios, promoted from the per-scenario tests 2026-07-29):
+            # no graded engine may hand the answer away via feedback.reveal, and every MCQ needs >=6 options.
+            for eng in ("question", "check", "pick", "map"):
+                e = h.get(eng)
+                if isinstance(e, dict) and (e.get("feedback", {}) or {}).get("reveal"):
+                    misses.append(f"{eng} '{r['key']}/{h.get('id')}' hands the answer away via feedback.reveal (blank it)")
+            q = h.get("question")
+            if isinstance(q, dict) and len(q.get("options", [])) < 6:
+                misses.append(f"MCQ '{r['key']}/{h.get('id')}' has {len(q.get('options', []))} options (need >=6 data-derived)")
     if ready and not scen.get("cover"):
         misses.append("ready scenario has no cover image")
     # every ready scenario must carry a test_<name>.py (pins each room's answer to the CSV + decoder lockstep)

@@ -578,3 +578,20 @@ The live `scenario.json` `designNote`s + `plannedHotspots` still describe the **
 room's `designNote` to the stone-cipher + two-gate mechanic, set each `lock`'s `answer` to the `|`/`_`
 pattern, and add the keypad-length + awaken-gating fields once the engine mode exists. Do NOT overwrite
 Lucas's `scenePrompt`s / `built` flags / placed `hotspots` — targeted field edits only, harness closed.
+
+### 10. Sound effects wired (2026-07-30) — VERIFICATION + BALANCE PENDING
+All 5 rooms now carry ambience `sfx` arrays and all 9 graded gates (each puzzle + each lock) carry
+`solveSfx`, wired directly into `scenario.json` (Lucas confirmed out of the harness). Design: a shared
+`stone_drone.mp3` (sacred hum) under every room + per-room beds (beach waves+wind, mountain wind, plains
+meadow+shimmer, saltflat vast-wind+shimmer, boss dawn-birds+wind). Solve stings (Lucas-chosen, CC0):
+`solve_portal_awaken.mp3` (magical bell flourish, on scrying-basin puzzles), `solve_portal_open.mp3`
+(warp-in, on mark-stone locks), `solve_way_home.mp3` (teleport, on boss heart-stone). All CC0 from
+freesound; provenance in `audio/CREDITS.md`. Pulled via the `sound_pull` observer (2 rows fired; the 2nd
+re-pulled the 3 Lucas-picked solve stings after deleting the old picks so idempotency didn't skip them).
+- **STATUS:** 8 of 10 mp3s on disk; **`beach_waves_night.mp3` + `plains_meadow.mp3` NOT YET landed** (pull
+  still in flight or those 2 URLs failed). `validate_assets.py dimensionality_reduction/henges` will FAIL
+  on those two missing files until they arrive (all other lines are green — every room has sfx, every gate
+  has solveSfx). A pre-existing unrelated MISS: `cover.png` absent (henges cover not set; flagged to Lucas).
+- **NEXT:** once both files land, run `python3 authoring/auto_balance.py dimensionality_reduction/henges`
+  (LUFS reduce-only so nothing beats the 0.1 music bed), then it's done. If the 2 files never appear,
+  re-pull just those (spec at `_scratch/sfx_pull_spec.json`; sources = el_boss/587164, ali.g/855326).

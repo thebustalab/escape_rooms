@@ -7,6 +7,49 @@ authority: intent
 Design conversation with Lucas, 2026-07-18 (walked through with the harness). Durable facts (verified
 answers, ladder) live in `AGENTS.md`; this is the narrative/design log and the open decisions.
 
+## Metabolomics re-theme (2026-07-30)
+
+**Why.** The scenario shared `alaska_lake_data` with `data_vis/alaska`, and the two puzzles collided:
+room 2's heatmap already revealed which lake the pilot fell into, which the boss then asked for again
+(a room2→boss redundancy Lucas flagged). Fix: re-theme the **analysis rooms** onto a hospital
+**metabolomics panel** for a patient, **Elias** (woven in from the opening line), and restructure so no
+room hands the next its answer. The **engine, codec, escape (facet-collage keypad 729), doors and art**
+are unchanged — only the analysis-room **data + wording** changed.
+
+**Data.** New LONG-format teaching set built + verified by `build_metabolomics.py` (deterministic;
+reproduces the two committed CSVs byte-for-byte): `metabolomics_hospital.csv` (20 patients × 10
+metabolites) + `metabolomics_hospital_unknown.csv` (Elias). Eight metabolites are real values from
+`metabolomics_data`; two are engineered — the **indoxyl/p-cresyl Simpson pair** and **Elias** (patient
+54's near-twin + a creatinine spike). See `phylochemistry/sample_data/AGENTS.md`.
+
+**The four rungs (no leaks; verified in `test_hospital.py`).**
+- **R1** pivot_wider + scatter+smooth: is **choline** a proxy for **2-aminoisobutyric acid**? → strong
+  positive, r ≈ 0.985, holds within group (idx 3).
+- **R2** scaled `geom_tile` heatmap: Elias's closest patient → **Patient 54** (margin 0.89). **Creatinine
+  is excluded** ("renal assay pending") — this both kills the boss leak *and* gives the clean match; the
+  exclusion is then the boss's dramatic reveal (idx 1).
+- **R3** facet_wrap(~patient_status): the indoxyl/p-cresyl link is **Simpson's paradox** — pooled 0.95,
+  within-group ≈ 0 (idx 4).
+- **Boss** compare Elias's panel to the cohort, most-elevated of five markers → **creatinine → Nephrocidin**
+  (z +6 vs healthy, cohort max; idx 0). Clue = *the worksheet on the gurney* (marker→syndrome→treatment).
+
+Decoder key `DATA_VIS2_HOSPITAL_KEY` boss index **2 → 0** → `c(3,1,4,0)` (+ self-test). Status left
+`in_development` pending a playtest of the new data/puzzles.
+
+**Playtest fix (2026-07-30).** First playtest hit `bind_rows(): Can't combine ..$patient_number <double>
+and ..$patient_number <character>` in room 2 + boss. Cause: Elias's `patient_number` is the string
+`"Elias"` (so his column reads "Elias" on the heatmap) while the cohort's are bare numbers → readr types
+the two CSVs' `patient_number` differently. Fix: both binding starters now
+`mutate(patient_number = as.character(patient_number))` before the bind — keeps Elias's label, changes no
+answers/options/decoder/data. Guarded in `test_hospital.py` (any unknown-binding starter must coerce).
+(Separately, R also can't start until the two new CSVs + `datasets.R` are pushed live from the Mac — the
+github.io URLs 404 otherwise; that's a publish step, not a code bug.)
+
+**Open / follow-ups.** (a) The boss was the chapter's assessed `exercises.csv` item (on the lake data);
+the re-theme **decouples it** — add a metabolomics entry there if the boss must stay the graded item.
+(b) `solveSfx` is still unset on all five gates (pre-existing; harmless while in-dev). (c) Two art
+residues left un-regenerated: room 2's *framed print of a sunny lake*, room 3's *wall map of parks*.
+
 ## Premise & voice
 
 The player is the **hospital's instrument-repair technician**, night shift, in a medium-sized Alaskan
