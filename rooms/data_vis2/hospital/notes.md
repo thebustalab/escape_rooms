@@ -45,6 +45,43 @@ answers/options/decoder/data. Guarded in `test_hospital.py` (any unknown-binding
 (Separately, R also can't start until the two new CSVs + `datasets.R` are pushed live from the Mac — the
 github.io URLs 404 otherwise; that's a publish step, not a code bug.)
 
+**Full audit (2026-07-30, `escape_room_audit`).** Puzzles/data/decoder/wiring all clean — every answer
+re-derived from the CSVs (R1 choline~2-AIB pooled 0.99 / within 0.95–0.98; R2 nearest 54 d=0.10 vs 2nd 58
+d=1.00; R3 Simpson pooled 0.95 / within −0.22 & 0.21; boss creatinine z+6.0, cohort max, every other
+candidate marker ≤0z), single-winner margins, ≥6 data-derived distractors (R2 options 54/58/56/57/52/60 =
+the genuine six nearest), decoder lockstep `c(3,1,4,0)`, `validate_assets` clean bar in-dev `solveSfx`.
+The audit caught a cluster of **stale-Alaska/v1 residues in player-facing text** (survived the re-theme):
+fixed — `escapeDone.body` ("the pilot's stable, the infection's named" → Elias), `escape1.debrief` +
+`.technique` (still described the retired geom_text map puzzle → facet-collage keypad), `subtitle`
+("filter, count" → "pivot, heatmap, facet"), and the boss `scenePrompt` prop ("mud-caked flight-data
+recorder" → clipboard of lab results). Added a stale-theme guard to `test_hospital.py` (scans player-facing
+narrative for Alaska/v1 tokens; scene/design/plannedHotspots excluded).
+
+**Solve sounds wired + normalized (2026-07-31, Lucas's ask).** All 5 gates now have `solveSfx` (CC0
+freesound, trimmed to the door event + loudnorm'd to −18 LUFS, wired at `volume 0.65` ≈ −22 LUFS effective
+vs the −34 LUFS-effective music bed). `validate_assets` now PASSes hospital. Full record + sources +
+reproducible method: `escape_rooms/notes/solve_sounds.md` → "Hospital (2026-07-31)". **Still blocking
+`ready`:** the boss scene art still shows the flight-recorder (prompt fixed; needs a :8751 regen), plus the
+decorative lake-print (room2) / parks-map (room3) residues — all art-harness work. Left `in_development`
+pending those + Lucas's playtest.
+
+**Removed the vitals-pulse HUD (2026-07-31, Lucas — "too game-like").** Dropped the top-level
+`hud: {kind:"vitals", healAt:"analysis"}` (green pulsing heartbeat emblem) from `scenario.json`. The `fx:
+["flicker"]` fluorescent overlay is kept. Engine unchanged — `vitals` stays available as a `hud.kind` for
+other scenarios; hospital just no longer opts in.
+
+**Black zenith cap in room3 + break room (2026-07-31, Lucas playtest).** The player showed a black disc at
+the top of the corridor (room3) and break room (escape1). Cause: the panoramas cover only `vaov:90`
+vertically, so the sphere's top is uncovered (near-black background); it's invisible unless the ceiling is
+bright AND the view is level — room3 (top luma 226) and escape1 (161) at pitch −5.6/−5.9 hit both, while
+room1/boss look down more (−8.1/−9.2, cap out of frame) and room2's top is dark (luma 62, cap blends). The
+harness wrap tester didn't reveal it because free-drag tuning looks away from the cap. **Durable fix
+shipped:** a **"Preview as player"** toggle in `authoring/ui/reproject_test.html` (locks drag off + pinned
+pitch + faces the door = exactly the player) — see `escape_rooms/AGENTS.md` `wrap` bullet. **STILL TO DO
+(Lucas, harness):** re-tune room3 + break-room `wrap` with that toggle on — raise `vaov` toward ~110–120
+until the cap is painted out — and Save. The two rooms' committed `wrap` is unchanged so far (fix enables
+the tuning; it doesn't guess the values).
+
 **Open / follow-ups.** (a) The boss was the chapter's assessed `exercises.csv` item (on the lake data);
 the re-theme **decouples it** — add a metabolomics entry there if the boss must stay the graded item.
 (b) `solveSfx` is still unset on all five gates (pre-existing; harmless while in-dev). (c) Two art
@@ -653,3 +690,32 @@ key **unchanged**; the off-list Na/Mg abundance trap stays. **Wired 2026-07-22:*
 bare `alaska_lake_data` (method → the wrong-hint, per the 2026-07-21 convention). `test_hospital.py` +
 `validate_keys.py` stay green (answer/index unchanged). Chosen over the plot-picker/map-pick because it
 adds a real derive-the-lake step and keeps the analyte traps, with zero new engine work.
+
+---
+
+## Audit + promotion to `ready` (2026-08-05, `escape_room_audit`)
+
+Full four-phase audit, all clean. Every answer independently re-derived from the **served** long-format
+CSVs (`phylochemistry/sample_data/metabolomics_hospital*.csv`): R1 choline~2-AIB pooled r 0.985 (within
+0.95/0.98) → idx 3; R2 nearest to Elias (creatinine excluded) = Patient 54 d 0.10 vs 2nd 0.97 → idx 1; R3
+p-cresyl~indoxyl pooled 0.95 / within −0.22 & 0.21 (Simpson) → idx 4; boss creatinine z +3.5 vs cohort,
+cohort max, next candidate −0.83 → Nephrocidin idx 0. Decoder `c(3,1,4,0)` in lockstep; `test_hospital.py`,
+`escape2_facets.py`, `validate_keys.py`, `Rscript decode_codes.R`, `validate_assets.py` (ready-strict) all
+green.
+
+**One bug found + fixed — the blank Editor's note B.** `escape1`'s `editor_s_note_b` had `body: ""` +
+`pickup: true` + no image → it opened a blank modal and logged a contentless notebook entry. Note A had
+absorbed both axis instructions at wiring, so B was a dead orphan. Per Lucas: **deleted B**, renamed A to
+"Editor's note" (the escape now has a single note; A carries the full rows=season + cols=remoteness + ignore-
+length guidance). `test_hospital.py` updated to expect **one** editorial note with a non-empty body.
+
+**Central-validator gap closed (generic class → central check).** `validate_assets.py`'s blank-clue check
+treated any truthy `pickup` as content, so a boolean `pickup:true` masked the empty body. Tightened: only a
+**non-empty string** pickup is a caption; a boolean `pickup:true` with empty body + no image is now flagged.
+New regression test **`authoring/test_validate_assets.py`** pins the string-vs-boolean distinction.
+
+**Promoted `status` → `ready`** and regenerated `scenario_inventory.json`. Publish dependency: the two
+metabolomics CSVs must be pushed live from the Mac (github.io URLs 404 otherwise). Non-blocking polish left:
+the two decorative Alaska art residues (room2 lake print, room3 parks map) + the boss flight-recorder prop
+regen — all art-harness work. Not yet in the JS e2e `SCENARIOS` list (`tests/e2e/{smoke,full_playthrough}.spec.js`)
+— add when convenient so the Playwright playthrough covers it (needs the CSVs live first).

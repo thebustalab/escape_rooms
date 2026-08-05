@@ -1,15 +1,15 @@
 {
-  "status": "in_development",
+  "status": "ready",
   "chapter": "data_vis2",
   "scenario": "hospital",
   "id": 8,
   "title": "Vital Signs",
-  "subtitle": "Data Visualization II · filter, count & read the plot",
-  "story": "You're an Alaskan hospital's instrument technician, clocking off at last — one step from the elevator, and one step from finally meeting the person you've been hoping to go out to dinner with for months. They're up in the break room waiting for you. Then the pharmacist catches your sleeve. “Before you go — I need a hand. A patient, Elias, came in fading this morning, and I can't make sense of these data on my laptop. Can you have a look?”",
+  "subtitle": "Data Visualization II · pivot, heatmap, facet & read the plot",
+  "story": "You're an Alaskan hospital's instrument technician, clocking off at last — one step from the elevator, and one step from finally meeting the person you've been hoping to go out to dinner with for months. They're up in the break room waiting for you. Then the pharmacist catches your sleeve. “Before you go — I need a hand. A patient, Elias, came in fading this morning, and I can't make sense of his data on my laptop. Can you have a look?”",
   "enterLabel": "Clock back in →",
   "done": {
     "title": "Right treatment, in time",
-    "body": "Creatinine ran highest in Elias's panel, so it's renal strain — and Elias gets Nephrocidin. Four reads of one dataset, one life. Great job!"
+    "body": "Creatinine ran highest in Elias's panel, so it's renal strain — and Elias gets Nephrocidin. Great job!"
   },
   "packages": [
     "dplyr",
@@ -32,10 +32,6 @@
     "rooms_solved": 0
   },
   "ambient": "leaves",
-  "hud": {
-    "kind": "vitals",
-    "healAt": "analysis"
-  },
   "fx": [
     "flicker"
   ],
@@ -44,7 +40,7 @@
     {
       "key": "room1",
       "title": "The pharmacy",
-      "debrief": "First you reshaped the data — pivot_wider, one column per metabolite — so two variables could be plotted against each other: choline versus 2-aminoisobutyric acid, with a smoothing line. Getting a table into the right shape is half of most analyses; only then can a relationship show up as a trend on a chart.",
+      "debrief": "First you reshaped the data — pivot_wider, one column per metabolite — so two variables could be plotted against each other: choline versus 2-aminoisobutyric acid, with a fit line. Looking at how two variables relate is a key data analysis technique.",
       "technique": "pivot_wider + geom_point/geom_smooth — correlate two metabolites (proxy marker)",
       "puzzleType": 1,
       "built": true,
@@ -70,11 +66,15 @@
         "vaov": 90,
         "hfov": 120,
         "vOffset": -9,
-        "pitch": -8.1
+        "pitch": -8.9
       },
       "hotspots": [
         {
           "id": "the_bench_laptop",
+          "solveSfx": {
+            "src": "audio/solve_room1_the_bench_laptop_1.mp3",
+            "volume": 0.24
+          },
           "type": "puzzle",
           "label": "The bench laptop",
           "box": [
@@ -129,7 +129,7 @@
             0.8072,
             0.3833
           ],
-          "body": "Priya's postcard — a June day-drive, camera on the dash, home before the midnight sun even dips. Pocket it for the collage.",
+          "body": "A postcard.",
           "pickup": "Postcard #1 — June · roadside · a day · digit 3",
           "image": "postcards/postcard_1.png"
         },
@@ -143,7 +143,7 @@
             0.149,
             0.5559
           ],
-          "body": "Marco's postcard — a muddy June weekend, an hour in from the lot, two nights to dry the boots. One for the pile.",
+          "body": "A postcard.",
           "pickup": "Postcard #2 — June · short hike · a weekend · digit 8",
           "image": "postcards/postcard_2.png"
         }
@@ -184,7 +184,7 @@
     {
       "key": "room2",
       "title": "The elevator",
-      "debrief": "A heatmap turns a whole table into colour — metabolite across, patient up, level as the fill. Scaling each metabolite so the columns are comparable, you read down the tiles for the patient whose row of colour matched Elias's most closely, comparing whole profiles entirely by eye. Sometimes the fastest way to find a match is to plot the data so it points at itself.",
+      "debrief": "A heatmap turns a whole table into color — metabolite across, patient up, level as the fill. Scaling each metabolite so the columns are comparable, you read down the tiles for the patient whose row of color matched Elias's most closely, comparing whole profiles entirely by eye.",
       "technique": "geom_tile heatmap (scaled) — match a whole profile by eye",
       "puzzleType": 1,
       "built": true,
@@ -205,7 +205,7 @@
       "designNote": "METABOLOMICS REWRITE (2026-07-30). TECHNIQUE — geom_tile HEATMAP (2 discrete × 1 continuous). STORY: Elias's chemistry is barely characterised — find the prior patient most like him as a reference. TASK: bind Elias (metabolomics_hospital_unknown) to the cohort, EXCLUDE Creatinine (the renal assay is still pending — this both hides the boss answer and gives a clean match), scale() each metabolite, geom_tile(metabolite × patient, fill = level). VERIFIED ANSWER: Patient 54 (Elias ≈ patient 54; nearest d = 0.10 vs 2nd 1.00, margin 0.89). Elias is engineered as patient 54's near-twin + a Creatinine spike, so 54 is his clean single match. ≥6 patient options (54,58,56,57,52,60); correct = Patient 54 (idx 1). No boss leak: Creatinine is not in this panel.",
       "entry": {
         "title": "Going up",
-        "text": "Choline tracks 2-aminoisobutyric acid almost perfectly, so you tell the pharmacist yes — choline is a safe stand-in for the marker she needs. The elevator doors close. Your phone buzzes: another delay! Elias is fading fast and they need you in the lab to help read his data. A colleague has texted over the ward's patient survey — 20 prior patients, some healthy and some with kidney-disease, fully profiled. Elias's chemistry is barely characterised — start by finding the patient most like him, so you have a reference point for understanding his results.",
+        "text": "Choline tracks 2-aminoisobutyric acid almost perfectly, so you tell the pharmacist yes — choline is a safe stand-in for the marker she needs. The elevator doors close. Your phone buzzes: another delay! Elias is fading fast and they need you in the lab to help read more data. A colleague has texted over the ward's patient survey — 20 prior patients, some healthy and some with kidney-disease, fully profiled. Elias's chemistry is barely characterised — start by finding the patient most like him, so you have a reference point for understanding his results.",
         "button": "Read the data →"
       },
       "panorama": "room2/scene.png",
@@ -215,11 +215,15 @@
         "vaov": 90,
         "hfov": 120,
         "vOffset": -9,
-        "pitch": -5.5
+        "pitch": -9.3
       },
       "hotspots": [
         {
           "id": "the_phone_in_the_wall_clip",
+          "solveSfx": {
+            "src": "audio/solve_room2_the_phone_in_the_wall_clip_1.mp3",
+            "volume": 0.12
+          },
           "type": "puzzle",
           "label": "The phone in the wall clip",
           "box": [
@@ -228,9 +232,9 @@
             0.7314,
             0.5049
           ],
-          "starterCode": "metabolomics_hospital %>%\nmutate(patient_number = as.character(patient_number)) %>%\nbind_rows(dplyr::mutate(metabolomics_hospital_unknown, patient_status = \"Elias\")) %>%\nfilter(metabolite != \"Creatinine\") %>%\ngroup_by(metabolite) %>%\nmutate(level = scale(concentration)) %>%\nungroup()",
+          "starterCode": "metabolomics_hospital %>%\nmutate(patient_number = as.character(patient_number)) %>%\nbind_rows(dplyr::mutate(metabolomics_hospital_unknown, patient_status = \"Elias\")) %>%\nfilter(metabolite != \"Creatinine\") %>%\ngroup_by(metabolite) %>%\nmutate(level = as.numeric(scale(concentration))) %>%\nungroup() -> metabolomics_hospital\n\nmetabolomics_hospital",
           "question": {
-            "prompt": "Draw a heatmap — metabolite and patient on the axes, colour intensity from each metabolite's scaled level — and find the patient whose whole row of tiles looks most like Elias's. (Creatinine, the specialist renal assay, is still pending from the lab, so it's not in the panel yet.) Which patient is his closest chemical match?",
+            "prompt": "The data analysis is started, but not finished. Draw a heatmap — metabolite and patient on the axes, colour intensity from each metabolite's scaled level — and find the patient whose whole row of tiles looks most like Elias's. (Creatinine, the specialist renal assay, is still pending from the lab, so it's not in the panel yet.) Which patient is Elias' closest chemical match?",
             "options": [
               "Patient 58",
               "Patient 54",
@@ -287,7 +291,7 @@
             0.9479,
             0.4446
           ],
-          "body": "Nadia's postcard — a June floatplane week, no road for fifty miles, seven days of nobody. Worth keeping.",
+          "body": "A postcard.",
           "pickup": "Postcard #3 — June · backcountry · a week · digit 1",
           "image": "postcards/postcard_3.png"
         },
@@ -301,7 +305,7 @@
             0.9446,
             0.6485
           ],
-          "body": "Deb's postcard — peak-summer, a camper right off the highway, t-shirt weather at midnight. Add it to the collage.",
+          "body": "A postcard.",
           "pickup": "Postcard #4 — July · roadside · a weekend · digit 7",
           "image": "postcards/postcard_4.png"
         }
@@ -346,7 +350,7 @@
     {
       "key": "room3",
       "title": "The corridor",
-      "debrief": "The trap, and the lesson. Pooled together, indoxyl sulfate and p-cresyl sulfate tracked almost perfectly — until you faceted by patient status and the single clean line broke apart. Splitting a plot by group can overturn what the whole looked like; always ask whether one trend is really several in disguise.",
+      "debrief": "The trap, and a lesson. Pooled together, indoxyl sulfate and p-cresyl sulfate tracked almost perfectly — until you faceted by patient status and the single clean line broke apart. Splitting a plot by group can overturn what the whole looked like. We should always ask whether one trend is really something else in disguise.",
       "technique": "pivot_wider + geom_smooth + facet_wrap(~patient_status) — does the correlation differ by group?",
       "puzzleType": 1,
       "built": true,
@@ -367,8 +371,8 @@
       "designNote": "METABOLOMICS REWRITE (2026-07-30). TECHNIQUE — pivot_wider + geom_point + geom_smooth + facet_wrap(~ patient_status) (small multiples). STORY: a colleague challenges the assumption that indoxyl sulfate and p-cresyl sulfate (two gut toxins) are linked. TASK: pivot wide, plot p-cresyl vs indoxyl, facet by patient_status. VERIFIED: SIMPSON'S PARADOX — pooled r = 0.95, but within healthy r = -0.22 and within kidney r = 0.21; the tight pooled line is an artefact of the two groups sitting at different levels. (This pair is ENGINEERED into the dataset to carry the Simpson effect — see sample_data note.) ≥6 options; correct = the 'vanishes within group' conclusion (idx 4).",
       "entry": {
         "title": "The corridor",
-        "text": "Patient 54 is Elias's chemical twin — nearly identical across every metabolite — so at least you have a comparison to work from. You are three doors from the lab when a colleague catches your arm: “One more thing — indoxyl sulfate and p-cresyl sulfate, the two gut-derived toxins, look beautifully correlated across the ward. Everyone assumes one drives the other. But I'm not so sure that holds up once you separate the healthy patients from the kidney-disease ones. Care to check before you go in?”",
-        "button": "Prove it →"
+        "text": "Patient 54 is Elias's chemical twin — nearly identical across every metabolite — so at least you have a comparison to work from. You are three doors from the lab when a colleague catches your arm: “The pharmacist told me that you helped them with a correlation problem. I have one too: indoxyl sulfate and p-cresyl sulfate, two gut-derived toxins, seem nicely correlated, but we have doubts that they are equally correlated once healthy patients and ones with kidney-disease are separated. Can you please check that before you go in?”",
+        "button": "Help check it →"
       },
       "panorama": "room3/scene.png",
       "panoramaOpen": "room3/scene_open.png",
@@ -377,11 +381,15 @@
         "vaov": 90,
         "hfov": 120,
         "vOffset": -9,
-        "pitch": -5.6
+        "pitch": -8.7
       },
       "hotspots": [
         {
           "id": "the_nurses_station_laptop",
+          "solveSfx": {
+            "src": "audio/solve_room3_the_nurses_station_laptop_1.mp3",
+            "volume": 0.14
+          },
           "type": "puzzle",
           "label": "The nurses' station laptop",
           "box": [
@@ -449,8 +457,8 @@
             0.6693,
             0.3059
           ],
-          "body": "Kim's postcard — a July week in a wildflower meadow, an hour from the trailhead, sun on the tent by seven. A keeper.",
-          "pickup": "Postcard #5 — July · short hike · a week · digit 2",
+          "body": "A postcard.",
+          "pickup": true,
           "image": "postcards/postcard_5.png"
         },
         {
@@ -463,8 +471,8 @@
             0.6099,
             0.3198
           ],
-          "body": "Theo's postcard — a single chartered day on a gravel bar, high summer, warm enough to swim. Pocket it.",
-          "pickup": "Postcard #6 — July · backcountry · a day · digit 9",
+          "body": "A postcard.",
+          "pickup": true,
           "image": "postcards/postcard_6.png"
         },
         {
@@ -477,8 +485,8 @@
             0.6554,
             0.4723
           ],
-          "body": "Sol's postcard — an August week by the highway, first chill at 2am, the aurora faintly back. One for the pile.",
-          "pickup": "Postcard #7 — August · roadside · a week · digit 5",
+          "body": "A postcard.",
+          "pickup": true,
           "image": "postcards/postcard_7.png"
         }
       ],
@@ -530,14 +538,14 @@
     {
       "key": "boss",
       "title": "The lab",
-      "debrief": "The payoff. You compared Elias's panel against the patient cohort, found the marker he was most abnormal on, and mapped that to a syndrome — creatinine highest means renal strain, which means Nephrocidin. Four reads of one dataset, and the plot told you which treatment to reach for.",
+      "debrief": "You compared Elias's panel against the patient cohort, found the marker he was most abnormal on, and mapped that to a syndrome — creatinine highest means renal strain, which means Nephrocidin.",
       "technique": "compare a panel to the cohort + find the most elevated marker, then map to the answer",
       "puzzleType": 2,
       "isBoss": true,
       "built": true,
       "authoring": {
         "tag": "boss",
-        "scenePrompt": "This is a panorama. A 360-degree view from the centre of a hospital laboratory on a bright summer afternoon, the room wrapping continuously all the way around so the left and right edges meet seamlessly. Warm and cheerful: summer daylight floods through a big window onto stainless benches and glass, a green canopy and blue sky outside. Ahead, a lab workstation with an open laptop and a mud-caked flight-data recorder resting beside it. To one side, a bench of analytical instruments, racks of sample vials and a microscope, and a fridge covered in magnets and children's-ward crayon drawings. Opposite, an isolation window onto a sunlit recovery bay. Set into one wall, a CLOSED door — the way onward to the staff break room. Behind, an OPEN doorway giving back toward the corridor. Around the lab, a fume hood, a whiteboard, a centrifuge and a potted plant. Painterly, cinematic, sunny and colourful. No people, no lettering, no readable text.",
+        "scenePrompt": "This is a panorama. A 360-degree view from the centre of a hospital laboratory on a bright summer afternoon, the room wrapping continuously all the way around so the left and right edges meet seamlessly. Warm and cheerful: summer daylight floods through a big window onto stainless benches and glass, a green canopy and blue sky outside. Ahead, a lab workstation with an open laptop and a clipboard of printed lab results resting beside it. To one side, a bench of analytical instruments, racks of sample vials and a microscope, and a fridge covered in magnets and children's-ward crayon drawings. Opposite, an isolation window onto a sunlit recovery bay. Set into one wall, a CLOSED door — the way onward to the staff break room. Behind, an OPEN doorway giving back toward the corridor. Around the lab, a fume hood, a whiteboard, a centrifuge and a potted plant. Painterly, cinematic, sunny and colourful. No people, no lettering, no readable text.",
         "doorPrompt": "The closed door ahead opens onto a bright sunlit staff break room beyond; the open passage back toward the corridor and the drawings on the fridge are unchanged. Same warm daylight, painterly and colourful, no people, no lettering, no text."
       },
       "unlockedWhen": {
@@ -554,7 +562,7 @@
       "designNote": "METABOLOMICS REWRITE (2026-07-30). ASSESSED BOSS. STORY: Elias's renal assay is finally back; his condition is one of five syndromes, each flagged by one metabolite running high (creatinine→renal strain→Nephrocidin; methylmalonate→B12 block→Cobalatide; hydroxyphenylpyruvic acid→tyrosine overload→Tyrostat; 1-methyladenosine→nucleoside surge→Adenoquel; myoinositol→osmolyte imbalance→Inositex). TASK: bind Elias to the cohort, find which of the five he is most abnormally high on (markers are on different scales — must compare each to the cohort, e.g. z-score). VERIFIED: Creatinine is Elias's clear outlier — z = +6.0 vs healthy / +3.6 vs full cohort (next marker −4.4z away) AND the dataset max → Nephrocidin. OPTIONS: the five treatments + Glucostat decoy; correct = Nephrocidin (idx 0). ASSESSMENT NOTE: this REPLACES the former alaska_lake_data exercise (exercises.csv '[exercises] data visualization ii' Q1) — exercises.csv is now DECOUPLED and may need a matching metabolomics entry if this boss is still the graded item.",
       "entry": {
         "title": "The lab",
-        "text": "Your colleague is right — pool the groups together and the indoxyl–p-cresyl line looks perfect, but split it by patient group and it falls apart. Worth remembering. The lab doors part. Elias is stable but fading — and the renal assay is finally back, so his panel is complete at last. His condition matches one of five syndromes, each flagged by a different metabolite running high. Compare his panel to the patient cohort, find the marker he's most abnormal on, and you'll know what to treat.",
+        "text": "Your colleague is right — pool the groups together and the indoxyl–p-cresyl line looks perfect, but split it by patient group and it falls apart. Worth remembering. The lab doors part. Elias is stable but fading — and the renal assay is finally back, so his panel is complete at last. His condition seems likely to be one of five syndromes, each flagged by a different metabolite running high. Compare his panel to the patient cohort, find the marker he's most abnormal on, and you'll know what to treat.",
         "button": "Run it →"
       },
       "panorama": "boss/scene.png",
@@ -569,17 +577,21 @@
       "hotspots": [
         {
           "id": "the_lab_workstation_laptop",
+          "solveSfx": {
+            "src": "audio/solve_boss_the_lab_workstation_laptop_1.mp3",
+            "volume": 0.25
+          },
           "type": "puzzle",
           "label": "The lab workstation laptop",
           "box": [
-            0.4065,
-            0.5461,
-            0.4601,
-            0.7363
+            0.4064,
+            0.5201,
+            0.4786,
+            0.7233
           ],
           "starterCode": "metabolomics_hospital %>%\nmutate(patient_number = as.character(patient_number)) %>%\nbind_rows(dplyr::mutate(metabolomics_hospital_unknown, patient_status = \"Elias\"))",
           "question": {
-            "prompt": "Elias's renal assay is back, so his panel is complete. His condition is one of five syndromes, each flagged by one metabolite running high: renal strain (creatinine → Nephrocidin), B12 block (methylmalonate → Cobalatide), tyrosine overload (hydroxyphenylpyruvic acid → Tyrostat), nucleoside surge (1-methyladenosine → Adenoquel), osmolyte imbalance (myoinositol → Inositex). Compare Elias's panel to the patient cohort, find which of those five metabolites he runs most abnormally high on — and so which treatment he needs.",
+            "prompt": "Elias's renal assay is back, so his panel is complete. His condition is one of five syndromes, each flagged by one metabolite running high: renal strain (creatinine → treat with Nephrocidin), B12 block (methylmalonate → treat with Cobalatide), tyrosine overload (hydroxyphenylpyruvic acid → Tyrostat), nucleoside surge (1-methyladenosine → Adenoquel), osmolyte imbalance (myoinositol → Inositex). Compare Elias's panel to the patient cohort, find which of those five metabolites he runs most abnormally high on — and so which treatment he needs.",
             "options": [
               "Nephrocidin",
               "Cobalatide",
@@ -601,26 +613,14 @@
           }
         },
         {
-          "id": "the_flight_recorder_printout",
-          "type": "clue",
-          "label": "The worksheet on the gurney",
-          "box": [
-            0.581,
-            0.6931,
-            0.6255,
-            0.7853
-          ],
-          "body": "<p>A printout clipped to the gurney — the metabolic-syndrome worksheet:</p><pre style=\"font:12px/1.4 ui-monospace,Menlo,Consolas,monospace\">MARKER RUNNING HIGH        SYNDROME            → TREATMENT\ncreatinine                 renal strain        → Nephrocidin\nmethylmalonate             B12 block           → Cobalatide\nhydroxyphenylpyruvic acid  tyrosine overload   → Tyrostat\n1-methyladenosine          nucleoside surge    → Adenoquel\nmyoinositol                osmolyte imbalance  → Inositex</pre><p>Name the marker Elias runs most abnormally high on, and you name the syndrome — and the treatment. The survey is long format: one row per patient × metabolite, with the value in <code>concentration</code>.</p>"
-        },
-        {
           "id": "the_door_out_to_the_break_room",
           "type": "door",
           "label": "The door out to the break room",
           "box": [
-            0.7,
-            0.2775,
-            0.7634,
-            0.6853
+            0.68,
+            0.2901,
+            0.7299,
+            0.6537
           ],
           "direction": "forward",
           "to": "escape1"
@@ -630,10 +630,10 @@
           "type": "door",
           "label": "Passage back to the corridor",
           "box": [
-            0.2132,
-            0.3079,
-            0.2634,
-            0.6446
+            0.9225,
+            0.2848,
+            0.9822,
+            0.6965
           ],
           "direction": "back",
           "to": "room3"
@@ -669,14 +669,14 @@
           "volume": 0.15
         }
       ],
-      "builtFrom": "gpt_boss_22.png"
+      "builtFrom": "gpt_boss_26.png"
     },
     {
       "key": "escape1",
       "title": "The break room",
-      "debrief": "The escape was the whole skill with the labels torn off. Faced with an unlabelled plot, you rebuilt it yourself — pivot the data, plot it, and let geom_text write the names back on — until you could find the point you needed and read the code. That is the real test of reading a chart: you can locate a thing even when nothing on the axes tells you where it is.",
+      "debrief": "The escape was the chapter's signature technique done by hand — no console at all. You arranged nine postcards into a 3×3, season down the page and remoteness across, and read the answer straight off the middle row. That is faceting: split the pile by the right two variables and the pattern you need lines up where you can read it.",
       "phase": "escape",
-      "technique": "pivot_wider + geom_text label reveal — locate a named lake on an unlabelled plot",
+      "technique": "facet by hand — arrange the nine postcards into a 3×3 grid (season × remoteness) and read the middle row",
       "puzzleType": 2,
       "built": true,
       "authoring": {
@@ -689,10 +689,10 @@
       },
       "entry": {
         "title": "One more thing",
-        "text": "The break room at last — and there they are, looking up from a table buried in postcards. “You made it! I'm nearly done — laying out readers' summer postcards for the tourism magazine — but the way out's on a keypad and I've completely blanked on the code. I started the arrangement on the back of the door; help me finish it and dinner's on me.” Postcards everywhere, two editor's notes on the table, and a keypad by the door.",
+        "text": "The break room at last — and there's the person you've been waiting to see, looking up from a table buried in postcards. “You made it! I'm nearly done — I'm laying out readers' summer postcards for the tourism magazine. I started the arrangement on the back of the door. Once you help me finish, we can go for dinner!” Postcards everywhere, an editor's note on the table, and a keypad by the door.",
         "button": "Help with the collage →"
       },
-      "designNote": "BREAK ROOM — v3 facet-collage escape (WIRED 2026-07-21). Ungraded, out of the codec. Keypad lock answer 729 = the middle row of the 9 summer-trip postcards faceted rows=season × cols=remoteness (two editorial-note clues pin the pairing; length is the decoy). Postcards are opaque pickup clues → the notebook collage board (boardCols 3); the started-collage clue is the non-pickup format key; the way-out door is gated on the keypad and fires escapeDone. Full record: notes.md → 'Escape redesign v3' + 'Phase 4 wiring — DONE'; verifier escape2_facets.py. (The v1 click-the-map deduction this note used to describe is retired; map assets archived to escape1/z_archive/.)",
+      "designNote": "BREAK ROOM — v3 facet-collage escape (WIRED 2026-07-21). Ungraded, out of the codec. Keypad lock answer 729 = the middle row of the 9 summer-trip postcards faceted rows=season × cols=remoteness (a single editorial-note clue pins the pairing; length is the decoy). Postcards are opaque pickup clues → the notebook collage board (boardCols 3); the started-collage clue is the non-pickup format key; the way-out door is gated on the keypad and fires escapeDone. Full record: notes.md → 'Escape redesign v3' + 'Phase 4 wiring — DONE'; verifier escape2_facets.py. (The v1 click-the-map deduction this note used to describe is retired; map assets archived to escape1/z_archive/.)",
       "plannedHotspots": [
         {
           "type": "lock",
@@ -706,15 +706,9 @@
         },
         {
           "type": "clue",
-          "label": "Editor's note A",
+          "label": "Editor's note",
           "pickup": true,
-          "note": "escape: pins ROWS = season, Jun→Aug top→bottom (July across the middle)"
-        },
-        {
-          "type": "clue",
-          "label": "Editor's note B",
-          "pickup": true,
-          "note": "escape: pins COLS = remoteness L→R; rules out trip length"
+          "note": "escape: single editor's note — pins ROWS = season (Jun→Aug top→bottom, July across the middle) AND COLS = remoteness (roadside→backcountry L→R), and rules out trip length"
         },
         {
           "type": "clue",
@@ -747,11 +741,15 @@
         "vaov": 90,
         "hfov": 120,
         "vOffset": -9,
-        "pitch": -5.9
+        "pitch": -9
       },
       "hotspots": [
         {
           "id": "the_keypad_on_the_door",
+          "solveSfx": {
+            "src": "audio/solve_escape1_the_keypad_on_the_door_1.mp3",
+            "volume": 0.65
+          },
           "type": "lock",
           "label": "The keypad on the door",
           "box": [
@@ -778,21 +776,21 @@
             0.5444,
             0.5363
           ],
-          "body": "<p>Taped to the inside of the door, a half-started magazine layout: an empty <b>3×3 grid</b> with the <b>middle row</b> glowing. In the crush's hand beside it: “I've started the layout here — help me fill it in? <b>The three across the middle are the ones I need</b> — read left to right, that's the code for the door.”</p>",
+          "body": "<p>Taped to the inside of the door, a half-started magazine layout: an empty <b>3×3 grid</b> with the <b>middle row</b> highlighted.",
           "image": "postcards/collage_door.png"
         },
         {
           "id": "editor_s_note_a",
           "type": "clue",
-          "label": "Editor's note A",
+          "label": "Editor's note",
           "box": [
             0.4653,
             0.7653,
             0.5267,
             0.8307
           ],
-          "body": "“Love the pile of postcards! For the spread, take the reader through the season — run them from the first of summer at the top down to the tail end at the bottom, so the height of summer sits right across the middle of the page. That July band is the heart of the piece.”",
-          "pickup": "Editor's note A: order the rows top→bottom by season (June→July→August), so the July band sits across the middle."
+          "body": "A note from the magazine editor:<br><br>“Love the postcard collage idea! For the spread, take the reader through the season — run them from the first of summer at the top down to the tail end of summer at the bottom. Then, take them left to right by how far you've got to go to get there: the easy roadside stops on the left, the deep backcountry on the right. I don't care how long anyone stayed — that's not the story. It's when, and how far out. The issue runs early next week!”",
+          "pickup": true
         },
         {
           "id": "trip_postcard_8",
@@ -804,8 +802,8 @@
             0.1993,
             0.2386
           ],
-          "body": "Ivy's postcard — a quick August berry-hike, an hour up and back before supper, leaves just turning. Add it to the collage.",
-          "pickup": "Postcard #8 — August · short hike · a day · digit 6",
+          "body": "A postcard.",
+          "pickup": true,
           "image": "postcards/postcard_8.png"
         },
         {
@@ -818,22 +816,9 @@
             0.2442,
             0.4465
           ],
-          "body": "Wes's postcard — a packrafted August long-weekend, termination dust on the peaks, nights properly dark again. The last of the set.",
-          "pickup": "Postcard #9 — August · backcountry · a weekend · digit 4",
+          "body": "A postcard.",
+          "pickup": true,
           "image": "postcards/postcard_9.png"
-        },
-        {
-          "id": "editor_s_note_b",
-          "type": "clue",
-          "label": "Editor's note B",
-          "box": [
-            0.3314,
-            0.7832,
-            0.365,
-            0.8248
-          ],
-          "body": "“And read them left to right by how far you've got to go to get there: the easy roadside stops on the left, the deep backcountry on the right. I don't care how <i>long</i> anyone stayed — that's not the story. It's <b>when</b>, and <b>how far out</b>.”",
-          "pickup": "Editor's note B: order the columns left→right by remoteness (roadside→backcountry); trip length doesn't matter."
         },
         {
           "id": "the_way_out",
@@ -877,7 +862,7 @@
   },
   "escapeDone": {
     "title": "Dinner, at last",
-    "body": "Season down the page, roadside to backcountry across — the three postcards along the middle read 7, 2, 9, and the keypad blinks green. Your crush sweeps the pile into a folder, grabs their coat, and holds the door. The pilot's stable, the infection's named, and the magazine spread can wait till Monday. You made every read of the way — now go enjoy dinner."
+    "body": "Season down the page, roadside to backcountry across — the three postcards along the middle read off the code, and the keypad blinks green. Your crush sweeps the pile into a folder, grabs their coat, and smiles and you head out the door. Elias is stable, and the magazine spread is complete. Now go enjoy dinner."
   },
   "cover": "cover.png",
   "music": "audio/milk_tea.mp3",
@@ -889,6 +874,6 @@
   "boardCols": 3,
   "debrief": {
     "title": "How this world worked",
-    "intro": "One dataset, read four different ways — pivoted, plotted, heat-mapped, and faceted — until the numbers named a diagnosis and, in time, saved a life. Here is how each room taught a different way of looking, and how the escape was the same skill with every label stripped away."
+    "intro": "One dataset, read four different ways — pivoted, plotted, heat-mapped, and faceted — until the numbers named a diagnosis and saved a life. Here is how each room taught a different way of looking at data, and how the escape was the same skill."
   }
 }

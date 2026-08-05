@@ -312,6 +312,15 @@ The two arcs reinforce each other: the day advances *and* you ascend, so the fin
 
 ## Monorail mechanic — RESOLVED 2026-07-21 (two doors, car = its own scene)
 
+> **SUPERSEDED 2026-08-04 (art-pipeline session):** reverted to a **single-door, world-state-switch** car.
+> One door per car; a **lever (world-state switch)** inside picks direction; the SAME door shows a different
+> station per state — a **multi-view door** (`door.opensOnto:[{state,reveal}]` in the scene spec → one
+> state-tagged door-open variant per station, all art generated in the art step; runtime pick-by-state is
+> **deferred wiring**). Chosen because later stations carry TWO monorail lines, and two-doors-per-car would
+> fill the panorama with doors. This replaces BOTH the two-door model here AND the shared-"down"-node back-nav
+> referenced throughout — the single door + switch is now the back-nav. See `notes/art_pipeline.md` → session
+> 2026-08-04. The two-door reasoning below is kept for history.
+
 Confirmed the **two-door car-as-scene** model (rejected a single-door bidirectional portal). Reason:
 engine doors point at a **fixed** destination; a single door that delivers you to the *opposite*
 platform from wherever you boarded would need custom "remember where I got on" state — more to build,
@@ -357,6 +366,14 @@ to its trait. **Collections are NOT pickups (REVISED 2026-07-21 — Lucas wants 
 the clickable clue on each car is a **framed collector's note** beside the cabinet, whose verbiage
 describes that collection and cues the player it matters. Re-inspection is by **riding back through the
 cars** — so the single-door **back-nav (shared down-nodes) is now load-bearing**, not optional.
+
+> **SUPERSEDED 2026-08-04 (Lucas): the framed collector's note is CUT — no written clue in the cars.** The
+> grouping reads from the **tray art alone**, with the car's **shape motif on the display case** carrying the
+> shape→trait link (□ on the beetle cabinet, etc.). It holds because re-inspection is by riding back down (now
+> the single-door two-view door, not shared down-nodes) — the note was never load-bearing once backtracking
+> exists. **Station** clues (field cards, science context for the WebR puzzles) stay. So each car now has **no
+> `clue` hotspot** — just the grouped-specimen centrepiece (+ its shape motif), the drive-lever `switch`, and
+> the single multi-view door. The `clue` cells for the three cars in the table below are therefore void.
 
 | # | Scene | Time/light | Hotspots |
 |---|-------|-----------|----------|
@@ -432,3 +449,30 @@ is pushed from the Mac (alt: move to `sample_data/`).
 - **Aesthetic layer:** `ambient` mist/spores (a new particle? "spores" akin to fireflies), `fx` a soft
   drifting-mist overlay, per-room SFX = wind through canopy + creaking cable + distant alien birdcall;
   a mist-clears reveal as a scene beat. House teal-and-amber holds (dusk canopy + amber lichen-glow).
+
+## ART BUILD — scene-spec pipeline (2026-08-05)
+
+Trees is the **first scenario through the automated scene-spec art pipeline** (see
+`notes/art_pipeline.md` for the pipeline itself). State: **all 8 rooms spec'd (`authoring.sceneSpec`) +
+`scenePrompt`s rendered; a `worldPlate` prompt authored; art generation IN PROGRESS** (Lucas rendering rooms
+via build-world step 2's level-1 pano stage on `:8752`). Trees-specific decisions this session:
+
+- **World plate** — scenario-level `worldPlatePrompt` (top of `scenario.json`, also the `worldPlate` entry in
+  the stage-1 spec bundle): a time-neutral "world bible" (canopy world, cars with the 3 door motifs, peaks,
+  teal-amber palette). Generated first; referenced by every room. gpt-image-2 refs it high-fidelity (no
+  loosen); Lucas tested and it "didn't pull station1 too hard", so keeping the single plate for now.
+- **Strong dark→bright gradient.** `station1` + `car_sq` rebuilt to be the **deep, dark, enclosed bottom** —
+  immense trunks vanishing into mist above AND below, a few god-rays, lichen/spore glow only, negatives ban
+  mountains/open-sky/sun — to maximise contrast with the sunlit boss/vault. car_sq's two door-reveals carry
+  the gradient (dark station1 back ↔ brightening station2 forward).
+- **Seam + vehicle-door conventions applied to all 3 stations** (now canon in `SCENE_SPEC_GUIDE.md`): the wrap
+  seam is continuous trunk/canopy backdrop with structural objects in the FRONT and cables running UP (not off
+  the edge); and each station door **is the docked gondola's own sliding door**, not a separate boarding door
+  with a car behind (stations 2/3 therefore show two gondolas — the line you rode + the line you board).
+- **Cars** (`car_sq`/`car_ci`/`car_tr`): single multi-view switch door (`opensOnto` back/forward) + a
+  drive-lever `switch` + the grouped-specimen cabinet carrying its **shape motif** (□ colour / ○ size /
+  △ shape) — **NO written clue** (the clue-drop; the art carries the grouping). Vault gate is a `lock`
+  (`grid-select`, new engine type still to build).
+- **STILL DEFERRED to the WIRING pass** (`escape_room_wiring`, not blocking art): the world-state switch
+  runtime (lever → state → door view/target + freeze/hum sfx), the `grid-select` puzzle type, the ride-beat,
+  `WRANGLING_TREES_KEY` decoder lockstep + `test_trees.py`, ambience/sfx, and `design_notes.md` (step-0 record).

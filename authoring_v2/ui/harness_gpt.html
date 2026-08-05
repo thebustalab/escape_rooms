@@ -1,0 +1,1411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>escape room editor</title>
+  <style>
+    :root { --bg:#06111a; --panel:#0b1b28; --line:rgba(255,255,255,.14); --amber:#ffd88c; --ink:#e8eef2;
+            --green:#8ff0c0; --greenbg:#123024; --greenln:#2f7d5a; }
+    * { box-sizing: border-box; }
+    html, body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.5 system-ui, sans-serif; }
+    header { padding:14px 20px; border-bottom:1px solid var(--line); position:sticky; top:0; z-index:50; background:var(--bg); }
+    header h1 { margin:0; font-size:16px; } header p { margin:4px 0 0; opacity:.6; font-size:12px; }
+    main { margin:0 auto; padding:20px; }   /* no max-width: use the full window width, like the header (so card grids keep adding columns as you widen / zoom out) */
+    textarea { width:100%; min-height:130px; background:#0a1620; color:inherit; border:1px solid var(--line); border-radius:8px; padding:10px; font:inherit; resize:vertical; }
+    label { font-size:12px; opacity:.85; margin-right:6px; }
+    select, input[type=number], input[type=text] { background:#0a1620; color:inherit; border:1px solid var(--line); border-radius:6px; padding:5px 7px; }
+    button { background:var(--amber); color:#10202a; border:0; border-radius:8px; padding:8px 14px; font:inherit; font-weight:600; cursor:pointer; margin:6px 6px 0 0; }
+    button.ghost { background:transparent; color:var(--ink); border:1px solid var(--line); font-weight:400; }
+    button:disabled { opacity:.4; cursor:default; }
+    .row { display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+    .hint { font-size:12px; opacity:.6; margin-top:8px; }
+    .err { color:#ff9b9b; }
+    .ok2 { color:var(--green); }
+    a { color:var(--amber); } code { background:#0a1620; padding:1px 5px; border-radius:4px; }
+
+    /* --- step sections --- */
+    .steplbl { display:flex; align-items:baseline; gap:10px; margin:26px 0 10px; }
+    .steplbl .n { display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:50%;
+                  background:var(--amber); color:#10202a; font-weight:700; font-size:12px; flex:none; }
+    .steplbl h2 { margin:0; font-size:14px; } .steplbl span { opacity:.55; font-size:12px; }
+
+    /* step 1 — full-width scenario card, spanning the room row beneath */
+    .scenecard { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:14px 16px; }
+    .scenecard .row label { min-width:0; }
+    /* the first row: three setup cards (analog · scenario spec · cover & landing) side by side */
+    .setuprow { display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:16px; align-items:start; margin:26px 0 10px; }
+    .setuprow .scenecard { margin:0; height:100%; }
+    .setuprow .steplbl { margin:0 0 10px; }
+    @media (max-width:1000px) { .setuprow { grid-template-columns:1fr; } }
+
+    /* room columns (steps 2 + 3) */
+    /* auto-fill (not a fixed 4) so section 5 build cards + section 3 sound cards add columns as the window
+       widens / you zoom out, instead of staying 4 per row. */
+    .cols { display:grid; grid-template-columns:repeat(auto-fill, minmax(360px, 1fr)); gap:14px; }
+    @media (max-width:760px) { .cols { grid-template-columns:1fr; } }
+    .col { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:12px 12px 14px; display:flex; flex-direction:column; }
+    .col .tagrow { display:flex; align-items:center; gap:6px; margin-bottom:8px; }
+    .col .tagrow b { color:var(--amber); font-size:13px; white-space:nowrap; }
+    .badge { font-size:10px; padding:1px 7px; border-radius:20px; border:1px solid var(--line); opacity:.85; white-space:nowrap; }
+    .badge.built { color:var(--green); border-color:var(--greenln); background:var(--greenbg); }
+    .badge.draft { color:var(--amber); border-color:rgba(255,216,140,.5); }
+    .col .collbl, .collbl { display:block; font-size:11px; opacity:.7; margin:8px 0 4px; text-transform:uppercase; letter-spacing:.04em; }
+    .col textarea.prompt { min-height:120px; } .col textarea.doorprompt { min-height:70px; }
+    .col .ctl { display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin-top:8px; }
+    .col .ctl label { margin:0; }
+    .status { font-size:12px; opacity:.85; margin-top:8px; min-height:16px; }
+    .grid { display:grid; grid-template-columns:1fr; gap:8px; margin-top:10px; }
+    .card { position:relative; border:2px solid transparent; border-radius:8px; overflow:hidden; cursor:pointer; background:#0a1620; }
+    .card.sel { border-color:var(--amber); }
+    .card img { width:100%; display:block; }
+    /* Scene candidates are wide 3:1 panoramas (generated at 1536×512 by default) and load="lazy".
+       Reserve their box up front so an unloaded thumbnail isn't full-width × 0px — that killed the
+       layout (a jump as each candidate loaded) and left the img with no height until scrolled to,
+       which is what the harness_pick e2e test tripped over. Scoped to .scenes so the square cover
+       candidates in #coverGrid keep their natural box. */
+    .scenes .card img { aspect-ratio: 3 / 1; object-fit: cover; }
+    .card .cap { font-size:11px; padding:4px 6px; opacity:.8; }
+    /* delete a candidate you no longer want */
+    .card .cdel { position:absolute; top:3px; right:3px; z-index:2; width:20px; height:20px; padding:0; margin:0; line-height:18px;
+                  text-align:center; background:rgba(6,17,26,.72); color:#ff9b9b; border:1px solid rgba(255,155,155,.4);
+                  border-radius:5px; font-size:13px; font-weight:700; opacity:.85; }
+    .card .cdel:hover { opacity:1; background:rgba(60,10,10,.9); }
+    /* per-candidate build-step chips: wrap → spots → door → save, each green once done for THIS image */
+    .card .cchips { display:flex; gap:3px; padding:4px 5px 6px; }
+    .cchip { flex:1; padding:3px 0; margin:0; font-size:10px; font-weight:600; text-align:center; border-radius:5px; text-transform:none;
+             background:transparent; color:var(--ink); border:1px solid var(--line); opacity:.72; }
+    .cchip:hover { opacity:1; }
+    .cchip.done { background:var(--greenbg); border-color:var(--greenln); color:var(--green); opacity:1; }
+    /* a button running a background job (Generate / open-door) — a distinct "working" blue, not amber(ready)/green(done) */
+    @keyframes busyPulse { 0%,100% { opacity:.6; } 50% { opacity:1; } }
+    button.busy, .cchip.busy { background:#274a63; color:#bfe0f5; border-color:#3f7ba3; opacity:1;
+             animation:busyPulse 1.1s ease-in-out infinite; cursor:progress; }
+
+    /* closed→open preview, shown once the open-door image exists */
+    .doorPreview { display:none; gap:8px; margin-top:10px; }
+    .doorPreview.on { display:flex; }
+    .doorPreview figure { margin:0; flex:1; min-width:0; }
+    .doorPreview img { width:100%; display:block; border:1px solid var(--line); border-radius:6px; }
+    .doorPreview figcaption { font-size:10px; opacity:.7; text-transform:uppercase; letter-spacing:.04em; margin-top:3px; }
+    .doorPreview figcaption.open { color:var(--green); }
+
+    /* the forced-order step buttons */
+    .steps { margin-top:10px; padding-top:10px; border-top:1px dashed var(--line); }
+    .step { display:block; width:100%; text-align:left; background:transparent; color:var(--ink);
+            border:1px solid var(--line); font-weight:500; margin:6px 0 0; padding:8px 12px; position:relative; }
+    .step .k { opacity:.5; font-weight:400; font-size:11px; margin-left:6px; }
+    .step.ready { border-color:var(--amber); box-shadow:0 0 0 1px var(--amber); color:var(--amber); }
+    .step.done { background:var(--greenbg); border-color:var(--greenln); color:var(--green); }
+    .step.done::before { content:"✓ "; font-weight:700; }
+    .step.commit.ready { background:var(--amber); color:#10202a; box-shadow:none; }
+    .step.commit.ready::after { content:""; }
+    .col.done { border-color:var(--greenln); }
+
+    /* step 6 — sound layer editor */
+    .layer { border:1px solid var(--line); border-radius:8px; padding:8px; margin-top:8px; background:#0a1620; }
+    .layer .lhead { display:flex; align-items:center; gap:6px; }
+    .layer .lhead b { flex:1; font-size:12px; color:var(--amber); word-break:break-all; }
+    .layer .lhead .ldel { background:transparent; color:#ff9b9b; border:1px solid rgba(255,155,155,.4); border-radius:6px; padding:0 8px; font-weight:400; margin:0; line-height:20px; }
+    .layer .lr { display:flex; align-items:center; gap:6px; margin-top:5px; }
+    .layer .lr label { font-size:11px; opacity:.7; width:84px; flex:none; margin:0; }
+    .layer .lr input, .layer .lr select { flex:1; min-width:0; }
+
+    /* step 2 — room network map (nodes = rooms, edges from unlockedWhen; chips = hotspots) */
+    .mapwrap { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:14px 16px; overflow-x:auto; }
+    .maplegend { display:flex; gap:18px; align-items:center; font-size:11px; opacity:.85; margin-bottom:12px; flex-wrap:wrap; }
+    .maplegend .sw { display:inline-flex; align-items:center; gap:6px; }
+    .maplegend i { width:11px; height:11px; border-radius:3px; display:inline-block; border:1px solid var(--line); }
+    .maplegend i.ex { background:var(--greenbg); border-color:var(--greenln); }
+    .maplegend i.pl { background:rgba(255,216,140,.1); border-color:rgba(255,216,140,.6); }
+    .maplegend .ln { width:22px; height:0; border-top:2px solid; display:inline-block; border-radius:0; }
+    .maplegend .ln.unlock { border-color:rgba(255,255,255,.5); }
+    .maplegend .ln.door { border-color:#79b8ff; }
+    .mapcanvas { position:relative; min-height:40px; }
+    .mapedges { position:absolute; top:0; left:0; pointer-events:none; z-index:0; overflow:visible; }
+    .mapedge { fill:none; stroke:rgba(255,255,255,.3); stroke-width:1.6; }
+    .mapedge.door { stroke:#79b8ff; stroke-width:1.8; }
+    .mapnode { position:absolute; z-index:1; background:#0a1620; border:1px solid var(--line); border-radius:10px;
+               padding:10px 10px 9px; display:flex; flex-direction:column; gap:6px; }
+    .mapnode.built { border-color:var(--greenln); }
+    .mapnode .maphd { display:flex; align-items:baseline; gap:6px; }
+    .mapnode .maphd b { color:var(--amber); font-size:13px; line-height:1.2; }
+    .mapnode .mapkey { font-size:10px; opacity:.5; margin-left:auto; white-space:nowrap; }
+    .mapnode .maptech { font-size:11px; opacity:.6; }
+    .hchips { display:flex; flex-wrap:wrap; gap:4px; margin-top:2px; }
+    .hchip { font-size:10px; padding:2px 7px; border-radius:20px; border:1px solid var(--line); display:inline-flex; gap:5px; align-items:center; max-width:100%; }
+    .hchip .hty { font-style:normal; opacity:.55; text-transform:uppercase; letter-spacing:.03em; font-size:8px; }
+    .hchip.ex { color:var(--green); border-color:var(--greenln); background:var(--greenbg); }
+    .hchip.pl { color:var(--amber); border-color:rgba(255,216,140,.5); background:rgba(255,216,140,.08); }
+    .hchip { cursor:pointer; } .hchip.blank { opacity:.6; border-style:dashed; }
+    /* step 2 — inline story editors inside each map node (the map is now the story-authoring surface) */
+    .mapnode .maphd input.mnTitle { flex:1; min-width:0; background:transparent; border:1px solid transparent; border-radius:5px;
+               color:var(--amber); font:inherit; font-size:13px; font-weight:600; padding:1px 4px; }
+    .mapnode .maphd input.mnTitle:hover { border-color:var(--line); }
+    .mapnode .maphd input.mnTitle:focus { border-color:var(--amber); outline:none; background:#0a1620; }
+    .mapnode .mnstory, .mapnode .mnfinish { display:flex; flex-direction:column; gap:3px; margin-top:2px; }
+    .mapnode .mnfinish { margin-top:8px; border-top:1px dashed var(--line); padding-top:6px; }
+    .mapnode .mnstory .collbl, .mapnode .mnfinish .collbl { margin:4px 0 0; }
+    .mapnode textarea, .mapnode .mnstory input, .mapnode .mnfinish input {
+               width:100%; background:#0a1620; color:var(--ink); border:1px solid var(--line); border-radius:6px; padding:4px 6px; font:inherit; font-size:12px; }
+    .mapnode textarea { resize:vertical; min-height:46px; line-height:1.4; }
+    .mapnode .mnsep { font-size:10px; text-transform:uppercase; letter-spacing:.04em; color:#7fd1ff; opacity:.85; margin-top:2px; }
+    .mapnode .mnStatus { font-size:10px; min-height:12px; }
+    /* Phase 2b — inline puzzle/clue/lock content cards (shared with puzzle_edit.html via puzzle_cards.js).
+       Scoped to #contentCols so the card CSS never touches the rest of the harness. #debriefCols (step 6,
+       "how this world worked") reuses the SAME rules so its per-room cards go side-by-side to match. */
+    #contentCols, #debriefCols { display:grid; grid-template-columns:repeat(auto-fill, minmax(340px, 1fr)); gap:16px 18px; align-items:start; }
+    /* "How this world worked" cards match the Build rooms / Sounds card width (360px min) so they're the
+       same size as the other sections' cards; they still add columns as the window widens / you zoom out. */
+    #debriefCols { grid-template-columns:repeat(auto-fill, minmax(360px, 1fr)); }
+    #contentCols .roomgroup, #debriefCols .roomgroup { min-width:0; }
+    #contentCols .roomh, #debriefCols .roomh { font-size:14px; color:var(--amber); border-bottom:1px solid var(--line); padding-bottom:6px; margin:0 0 10px; }
+    #contentCols .puz, #debriefCols .puz { background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:14px 16px; margin-bottom:12px; }
+    #contentCols .puz h2, #debriefCols .puz h2 { font-size:14px; margin:0 0 4px; } #contentCols .puz h2 span, #debriefCols .puz h2 span { color:var(--amber); }
+    #contentCols .lbl, #debriefCols .lbl { font-size:11px; opacity:.75; margin:10px 0 3px; text-transform:uppercase; letter-spacing:.03em; }
+    #contentCols .hr, #debriefCols .hr { display:flex; gap:8px; align-items:center; margin-top:8px; }
+    #contentCols .hr label, #debriefCols .hr label { font-size:12px; opacity:.75; width:72px; flex:none; margin:0; }
+    #contentCols input[type=text], #contentCols input[type=number], #contentCols select, #contentCols textarea,
+    #debriefCols input[type=text], #debriefCols input[type=number], #debriefCols select, #debriefCols textarea {
+               flex:1; min-width:0; width:100%; background:#0a1620; color:inherit; border:1px solid var(--line); border-radius:6px; padding:5px 7px; font:inherit; }
+    #contentCols textarea, #debriefCols textarea { resize:vertical; } #contentCols textarea.mono, #debriefCols textarea.mono { font:12px/1.45 ui-monospace, Menlo, Consolas, monospace; }
+    #contentCols .fb, #debriefCols .fb { border-left:2px solid var(--line); padding-left:12px; margin-top:10px; }
+    #contentCols .none, #debriefCols .none { opacity:.7; padding:14px; text-align:center; }
+    #contentCols button, #debriefCols button { background:var(--amber); color:#10202a; border:0; border-radius:8px; padding:7px 13px; font:inherit; font-weight:600; cursor:pointer; }
+    #contentCols button.busy, #debriefCols button.busy { background:#274a63; color:#bfe0f5; cursor:default; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="row" style="flex-wrap:nowrap;align-items:center;gap:14px">
+      <h1 style="margin:0;white-space:nowrap">escape room editor</h1>
+      <label for="scenarioPick" style="margin:0">scenario</label>
+      <select id="scenarioPick" style="min-width:260px"></select>
+      <span class="hint" id="sceneMeta" style="margin:0;white-space:nowrap"></span>
+      <label class="hint" style="margin:0;white-space:nowrap" title="Applies to every 'world plate' generation: how closely a referenced gen follows the plate. Low keeps this room's composition freedom (recommended); high hews closely to the plate.">plate fidelity <select id="genFidelity" style="width:74px"><option value="">low</option><option value="high">high</option></select></label>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:10px;white-space:nowrap">
+        <span class="hint" id="saveAllStatus" style="margin:0"></span>
+        <button class="step" id="testPlayBtn" style="width:auto;margin:0" title="Open this scenario in the test player (:8055) with the sound mixer + in-place text editing — needs the playtest tmux server running on :8055">▶ Test play</button>
+        <button class="step ghost" id="playBtn" style="width:auto;margin:0" title="Open this scenario in NORMAL play mode (exactly what a student sees — no test tools) over the :8055 playtest server">▶ Play</button>
+        <button class="step commit ready" id="saveAllBtn" style="width:auto;margin:0">Save all</button>
+      </div>
+    </div>
+    <div class="row" style="align-items:center;gap:10px;margin-top:8px">
+      <span class="hint" style="margin:0;white-space:nowrap">push changes (Mac terminal):</span>
+      <pre id="pushCmds" style="margin:0;flex:1;min-width:0;font:12px/1.5 ui-monospace,Menlo,Consolas,monospace;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:6px 10px;white-space:pre;overflow:auto">cd ~/Documents/Tools/websites/thebustalab.github.io/escape_rooms
+git add -A && git commit -m "whatever changed" && git push</pre>
+      <button class="step ghost" id="copyPushBtn" style="width:auto;margin:0" title="Copy these commands"
+        onclick="navigator.clipboard&&navigator.clipboard.writeText(document.getElementById('pushCmds').textContent);this.textContent='Copied ✓';setTimeout(()=>this.textContent='Copy',1200)">Copy</button>
+    </div>
+    <div class="row" style="align-items:center;gap:10px;margin-top:8px">
+      <label for="widthSlider" style="margin:0;white-space:nowrap">harness width</label>
+      <input type="range" id="widthSlider" min="800" max="3200" step="20" style="flex:1;max-width:460px">
+      <span class="hint" id="widthVal" style="margin:0;white-space:nowrap;min-width:56px"></span>
+      <button class="step ghost" id="widthFullBtn" style="width:auto;margin:0" title="Remove the width cap — use the full browser window">Full width</button>
+      <span class="hint" style="margin:0;white-space:nowrap">· zoom with the browser, set the page width here</span>
+    </div>
+  </header>
+  <main>
+
+    <!-- SETUP ROW — analog · scenario spec · cover & landing (three cards in a row) -->
+    <div class="setuprow">
+      <div class="scenecard">
+        <div class="steplbl" style="margin-top:0"><span class="n">1</span><h2>Find the real-life analog</h2></div>
+      <div class="hint" style="margin-top:0">Before designing anything, ask: <b>where in ordinary life do people already perform, by hand, what this chapter's code does?</b> Name the everyday act behind the technique's verbs — <code>group_by</code>/<code>summarise</code> is sorting things into piles by a shared trait and reading one number off each pile (a naturalist tallying a transect); a <code>filter</code> is walking a shelf and pulling only what matches; clustering is sorting a mixed heap into "these belong together."<br><br>For computation-heavy techniques, look especially for the case where <b>the computation is already done and a person only has to RECOGNISE it</b> — reading which grouping produced a display, spotting the odd one out, matching a shape. That recognition-not-computation move usually makes the sharpest, fairest <b>escape</b> (the unlabelled echo of the boss technique). Let this analog seed the world, the puzzles, and above all the escape — then move on to Step 1. <span class="hint">(Worked example: <code>wrangling/trees</code> — the monorail cars are already grouped-and-summarised, and the escape is recognising <i>which</i> grouping each car used.)</span></div>
+    </div>
+      <div class="scenecard">
+        <div class="steplbl" style="margin-top:0"><span class="n">2</span><h2>Build the scenario spec with Claude</h2></div>
+      <div class="hint" style="margin-top:0">Work with Claude and the <code>escape_room_design</code> skill to write <code>scenario.json</code> and generate most scenario content.</div>
+    </div>
+      <div class="scenecard">
+        <div class="steplbl" style="margin-top:0"><span class="n">3</span><h2>Cover &amp; landing</h2></div>
+      <div class="row" style="gap:22px;align-items:flex-start">
+        <div style="flex:1;min-width:260px">
+          <label class="collbl">cover art prompt</label>
+          <textarea id="coverPrompt" style="min-height:80px" placeholder="A portrait poster of this scenario's world — dusk, teal-and-amber, painterly, no people, no text…"></textarea>
+          <div class="ctl" style="margin-top:6px">
+            <button class="step ready" id="coverGen" style="width:auto">Generate cover ×2</button>
+            <span class="hint" id="coverStatus" style="margin:0"></span>
+          </div>
+          <div class="grid" id="coverGrid" style="grid-template-columns:1fr 1fr"></div>
+        </div>
+        <div id="landingCard" style="flex:1;min-width:260px;border-left:1px dashed var(--line);padding-left:22px">
+          <div class="tagrow" style="display:flex;align-items:center;gap:6px;margin-bottom:6px"><b style="color:var(--amber)">Landing screen</b></div>
+          <div class="row" style="gap:16px;align-items:flex-start">
+            <div style="flex:1;min-width:180px">
+              <label class="collbl">title</label><input type="text" id="ldTitle" style="width:100%">
+              <label class="collbl">ambient particles <span style="opacity:.55">· entry screens</span></label>
+              <select id="ldAmbient" style="width:100%">
+                <option value="fireflies">fireflies</option><option value="snow">snow</option><option value="embers">embers</option><option value="leaves">leaves</option><option value="none">none</option>
+              </select>
+              <button class="step commit ready" id="ldSave" style="width:auto;margin-top:10px">Save landing screen</button>
+              <div class="status" id="ldStatus"></div>
+            </div>
+            <div style="flex:none">
+              <label class="collbl">current cover</label>
+              <div id="coverPreview" class="hint" style="margin-top:0">none yet</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+
+    <!-- STEP 2 — room map + STORY: straighten the whole story here BEFORE generating any art -->
+    <div class="steplbl"><span class="n">4</span><h2>Room map &amp; story</h2>
+      <span>straighten the whole story before any art — nodes = rooms; edit each room's title, entry/opening text &amp; finish right on the graph</span></div>
+    <div class="mapwrap" id="mapWrap">
+      <div class="maplegend">
+        <span class="sw"><span class="ln door"></span> doorway — walk between rooms</span>
+        <span class="sw"><i class="ex"></i> existing hotspot (built)</span>
+        <span class="sw"><i class="pl"></i> planned hotspot</span>
+        <span class="sw">✓/○ puzzle-clue content set / blank</span>
+      </div>
+      <div class="mapcanvas" id="mapCanvas"></div>
+    </div>
+
+    <!-- STEP 2b — inline puzzle/clue/lock content (shared cards via puzzle_cards.js); pre-art rooms author onto plannedHotspots -->
+    <div class="steplbl" style="margin-top:10px"><span class="n">5</span><h2>Room content</h2>
+      <span>every room's puzzles, clues, locks &amp; grids on one page — pre-art rooms author onto their <code>plannedHotspots</code> (content attaches when the box is placed at commit). Edits here are written by the header <b>Save all</b>.</span></div>
+    <div class="mapwrap"><div id="contentCols"></div></div>
+
+
+    <!-- STEP 5 — BUILD ROOMS = the ART step, done LAST: everything above is authored first, so art is generated once. generate → wrap → place the planned hotspots → make open door → Save room (commit). -->
+    <div class="steplbl"><span class="n">6</span><h2>Build rooms — generate the art</h2></div>
+    <section class="cols" id="buildCols"></section>
+
+    <!-- STEP 7 — "how this world worked" exit debrief: scenario heading+intro + one card per room -->
+    <div class="steplbl"><span class="n">7</span><h2>How this world worked</h2>
+      <span>the exit debrief (the second tab on the submission screen): a scenario-level heading &amp; intro, then a card per room for the &ldquo;why this room worked this way&rdquo; blurb shown beside its scene. Edits save on blur.</span></div>
+    <div id="debriefCols"></div>
+
+    <!-- STEP 8 — per-room sound: audition Claude-fetched candidates, pick one. LAST authoring step (after
+         the debrief) — sfx are wired once everything else is settled, then auto-balanced against the music
+         and fine-tuned in test-play, right before the audit. -->
+    <div class="steplbl" style="margin-top:10px"><span class="n">8</span><h2>Sounds</h2></div>
+    <div class="scenecard">
+      <div class="hint" style="margin-top:0">Ask Claude to <b>pull candidates per room</b> (from freesound) into the scenario's
+        <code>_scratch/audio/</code> pool — <b>two clear ambient loops + two intermittent one-shots</b> each — saying what each should evoke
+        (e.g. "elevator motor hum" + "break-room fridge drone" for beds; "distant beep", "occasional clunk" for the intermittent ones).
+        They appear below per room; <b>audition each</b> with its play button and hit <b>Add</b> to layer it in. A room can hold <b>several layers</b> that
+        play together, each with a <b>mode</b>: <b>loop</b> (a continuous bed — the seam is equal-power crossfaded by the <b>crossfade s</b> overlap, default 4s)
+        or <b>interval</b> (replays after a random gap — a one-shot like a distant beep). Set volume/delay/duck per layer, then <b>Save sounds</b>. Sounds play while you're in the
+        room and are <b>not</b> muted by the music toggle. <b>Do the music first</b>, then let the agent wire every room's sfx + solve stings and
+        <b>auto-balance</b> them to perceived-loudness under the music; fine-tune by ear in <b>▶ Test play</b>.</div>
+    </div>
+    <section class="cols" id="soundCols" style="margin-top:14px"></section>
+
+
+  </main>
+
+  <script src="open_target.js"></script>
+  <script src="cand_state.js"></script>
+  <script src="puzzle_cards.js?v=3"></script>
+  <script>
+    const $ = s => document.querySelector(s);
+    const esc = s => String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+    let SCENARIO_DOC = null;               // active scenario.json
+    let ROOMS = [];                        // SCENARIO_DOC.rooms — one card per room in each row
+    let ACTIVESC = { chapter: "", scenario: "" };
+    let DRAFTS = {};                       // roomKey -> { image?, wrap?, hotspots? } (the _scratch draft)
+    let lastScenes = [];                   // filenames in the active _scratch pool
+    let picked = {};                       // roomKey -> chosen candidate filename (this session)
+    let openVer = {};                      // roomKey -> cache-buster stamp for the open-door preview (bumped on regenerate)
+    let CONTENT = [];                      // [{key,title,target,spots}] working copy for the inline content editor (step 2b)
+    // getJSON with the module's contract (path in — may already carry ?query — json out), for puzzle_cards.js
+    const pcGetJSON = async p => { try { return await (await fetch(p + (p.includes("?") ? "&" : "?") + "t=" + Date.now())).json(); } catch (e) { return null; } };
+    const contentSlug = s => (String(s || "")).toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "") || "obj";
+    const cleanSpots = spots => spots.map(s => Object.fromEntries(Object.entries(s).filter(([k]) => !k.startsWith("_"))));
+
+    // ---- fetch helpers (query-aware cache-buster; a 2nd "?" would 404 the scenario) ----
+    const qstr = o => Object.entries(o).filter(([, v]) => v != null && v !== "")
+      .map(([k, v]) => `${k}=${encodeURIComponent(v)}`).join("&");
+    async function getj(path, params) {
+      const r = await fetch(path + "?" + qstr({ ...(params || {}), _: Date.now() }));
+      return r.json();
+    }
+    async function post(path, body) {
+      const r = await fetch(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+      return r.json();
+    }
+    const SCQ = () => ({ chapter: ACTIVESC.chapter, scenario: ACTIVESC.scenario });
+
+    const tagOf = key => {
+      const el = document.querySelector(`#build_${cssId(key)} .tag`);
+      const v = (el && el.value) || key;
+      return v.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "") || key;
+    };
+    const cssId = k => String(k).replace(/[^A-Za-z0-9_]/g, "_");
+    const stem = f => (f || "").replace(/\.png$/i, "");
+
+    // per-candidate draft entry for image `f` (falls back to legacy top-level draft fields for old drafts)
+    function draftPer(key, f) {
+      const d = DRAFTS[key] || {};
+      const per = (f && d.imgs && d.imgs[f]) || {};
+      return {
+        wrap: (per.wrap != null) ? per.wrap : d.wrap,
+        hotspots: (per.hotspots != null) ? per.hotspots : d.hotspots,
+      };
+    }
+    // per-candidate build-step state, for the chips under each candidate image
+    // Chip states for one candidate. The committed-fallback (read the node once the draft is cleared on
+    // Save) lives in cand_state.js so the Node test exercises this exact logic — see tests/cand_state.test.js.
+    function candState(key, f) {
+      const d = DRAFTS[key] || {};
+      const per = (d.imgs && d.imgs[f]) || {};
+      const room = ROOMS.find(r => r.key === key) || {};
+      return EscapeCandState.compute(per, room, f, lastScenes);
+    }
+
+    // ---- per-room progress, read off draft + node + on-disk scenes ----
+    function progress(room) {
+      const key = room.key;
+      const built = !!(room.built || room.panorama);
+      // After Save, `picked` + the draft are cleared, so fall back to the committed candidate
+      // (`builtFrom`) — this keeps the closed/open comparison on screen once the room is saved
+      // (it's overwritten again if the door is regenerated). Its _scratch copies persist post-commit.
+      const image = picked[key] || (DRAFTS[key] || {}).image || (built && room.builtFrom) || null;
+      const per = draftPer(key, image);
+      const hs = (per.hotspots != null ? per.hotspots : (built ? room.hotspots : null)) || [];
+      // "Make open door" masks the box of whatever the open image should REVEAL (forward door, or a
+      // lock's valve panel on an escape/boss room). Selection + gate live in open_target.js so the
+      // logic is shared with the Node test suite. See makeOpenDoor() for the same call.
+      const hasDoor = EscapeOpenTarget.hasOpenTarget(hs);
+      const openFile = image ? stem(image) + "_open.png" : null;
+      const puzzleDone = built && Array.isArray(room.hotspots) && room.hotspots.some(h =>
+        h.type === "puzzle" && ((h.check && h.check.expr) ||
+          (h.question && Array.isArray(h.question.options) && h.question.options.length)));
+      return {
+        key, built, image, openFile,
+        pickedOK: !!image,
+        wrapDone: !!(per.wrap || (built && room.wrap)),
+        hotspotsDone: hasDoor,                                  // a door box is what "make open door" needs
+        openDoorDone: built ? !!room.panoramaOpen : !!(openFile && lastScenes.includes(openFile)),
+        committed: built,
+        puzzleDone,
+      };
+    }
+
+    // ================= STEP 2 — build cards =================
+    function buildStep2() {
+      const wrap = $("#buildCols"); wrap.innerHTML = "";
+      (ROOMS.length ? ROOMS : []).forEach(room => {
+        const key = room.key, a = room.authoring || {};
+        const c = document.createElement("div");
+        c.className = "col"; c.id = "build_" + cssId(key); c.dataset.key = key;
+        c.innerHTML = `
+          <div class="tagrow"><b>${esc(key)}</b><span class="badge" data-badge></span>${room.built ? `<button class="openCommitted" style="margin-left:auto;font-size:11px;padding:1px 8px" title="Open the COMMITTED room directly (wrap + Spots), no recommit — use this for a room you've already built">open ▸</button>` : ""}</div>
+          <label class="collbl">title</label>
+          <input type="text" class="rtitle" value="${esc(room.title || '')}">
+          <label class="collbl">filename tag</label>
+          <input type="text" class="tag" value="${esc(a.tag || key)}" title="filename tag for this room's candidates">
+          <label class="collbl">scene prompt (must include a closed door)</label>
+          <textarea class="prompt" placeholder="Describe this room's 360 scene…"></textarea>
+          <details class="specbox">
+            <summary style="cursor:pointer;font-size:12px;color:var(--amber);margin:2px 0">scene spec — auto-write the prompt + queue cinemagraphs ▸</summary>
+            <div class="hint" style="margin:4px 0">A structured left-to-right spec renders the prompt above AND makes every animated element a cinemagraph for free. (Later: an agent drafts this from the network + vibes.)</div>
+            <textarea class="sceneSpec" rows="6" placeholder='{"room":"…","setting":"…","interior":true,"elements":[{"id":"lantern","at":"on the far left","desc":"a brass lantern on a chain","animate":{"motion":"swaying gently","loop":"boomerang"}}],"atmosphere":"…"}' style="font-family:monospace;font-size:11px"></textarea>
+            <div class="ctl"><button class="specRender">Render &amp; save → prompt</button> <span class="hint specStat" style="margin:0"></span></div>
+            <div class="ctl"><button class="specApply">Place hotspots + queue cinemagraphs</button> <span class="hint specApplyStat" style="margin:0"></span></div>
+            <div class="hint" style="margin:2px 0">Do this AFTER the art's committed: creates each element's hotspot with an approximate box from the layout, and queues every animated one as a cinemagraph. Then open the room, nudge the boxes in the flat editor, and hit Run all in the batch tray.</div>
+          </details>
+          <div class="ctl">
+            <label>height<input type="number" class="wideH" value="512" min="512" max="1536" step="32" style="width:64px"></label>
+            <label>scale<select class="genScale" style="width:92px" title="native output resolution (Phase 1)"><option value="1">1× (1536 w)</option><option value="2">2× (3072 w)</option></select></label>
+            <span class="hint genSizeHint" style="margin:0">px · 512 min (3:1) · n=2 · high</span>
+          </div>
+          <div class="ctl">
+            <label title="generate this room referencing the scenario's world plate for backdrop continuity (fidelity set globally in the top bar)"><input type="checkbox" class="useWorldPlate"> world plate</label>
+            <label title="generate this room referencing a crop of where it's seen from the connecting room (the incoming door's box) — anchors the interior to its exterior look + scale; overrides the world plate for this room"><input type="checkbox" class="useRoomRef"> room reference</label>
+            <span class="hint worldPlateHint" style="margin:0"></span>
+          </div>
+          <div class="ctl"><button class="gen">Generate</button></div>
+          <div class="status genStatus"></div>
+          <div class="grid scenes"></div>
+          <label class="collbl">open-door modifier</label>
+          <textarea class="doorprompt" placeholder="How this room's closed door looks once opened…"></textarea>
+          <div class="status commitStatus"></div>
+          <div class="doorPreview"></div>`;
+        wrap.appendChild(c);
+        c.querySelector(".prompt").value = a.scenePrompt || "";
+        c.querySelector(".doorprompt").value = a.doorPrompt || "";
+        const specTA = c.querySelector(".sceneSpec");
+        if (a.sceneSpec) specTA.value = JSON.stringify(a.sceneSpec, null, 2);
+        c.querySelector(".specRender").onclick = async () => {
+          const st = c.querySelector(".specStat");
+          let spec; try { spec = JSON.parse(specTA.value); } catch (e) { st.innerHTML = `<span class="err">not valid JSON: ${esc(e.message)}</span>`; return; }
+          st.textContent = "rendering…";
+          const r = await post("/api/save-scene-spec", { ...SCQ(), roomKey: key, spec });
+          if (!r.ok) { st.innerHTML = `<span class="err">${esc(r.error)}</span>`; return; }
+          c.querySelector(".prompt").value = r.prompt;               // spec → the prompt gen reads
+          if (room.authoring) { room.authoring.sceneSpec = spec; room.authoring.scenePrompt = r.prompt; }
+          const nc = (r.cinemagraphs || []).length;
+          st.innerHTML = `<span class="ok2">prompt written ✓ · ${nc} cinemagraph${nc === 1 ? "" : "s"} will fall out (queue them after the art's committed)</span>`;
+        };
+        c.querySelector(".specApply").onclick = async () => {
+          const st = c.querySelector(".specApplyStat");
+          st.textContent = "placing…";
+          const r = await post("/api/apply-spec", { ...SCQ(), roomKey: key });
+          if (!r.ok) { st.innerHTML = `<span class="err">${esc(r.error)}</span>`; return; }
+          const nc = (r.created || []).length, nq = (r.queued || []).length;
+          st.innerHTML = `<span class="ok2">${nc} hotspot${nc === 1 ? "" : "s"} placed · ${nq} cinemagraph${nq === 1 ? "" : "s"} queued — open the room to nudge boxes, then Run all</span>`;
+        };
+        c.querySelector(".gen").onclick = () => generate(key);
+        const oc = c.querySelector(".openCommitted");   // room-level door into the COMMITTED room (no img → committed mode)
+        if (oc) oc.onclick = () => openEditor("reproject_test.html", key, false);
+        c.querySelector(".tag").oninput = () => renderGrid(key);
+        // live output-size readout: scale multiplies BOTH axes for native higher-res (Phase 1)
+        const updGenSize = () => {
+          const sc = parseInt(c.querySelector(".genScale").value || "1", 10) || 1;
+          const h = parseInt(c.querySelector(".wideH").value || "512", 10) || 512;
+          const w = 1536 * sc, oh = h * sc;
+          const hintEl = c.querySelector(".genSizeHint");
+          const bad = (w > 3840 || oh > 3840 || (w * oh) > 8294400 || (w % 16) || (oh % 16));
+          hintEl.textContent = bad ? `→ ${w}×${oh}px — too big (edge ≤3840, ≤8.29M px)` : `→ ${w}×${oh}px · n=2 · high`;
+          hintEl.style.color = bad ? "#c0392b" : "";
+        };
+        c.querySelector(".genScale").onchange = updGenSize;
+        c.querySelector(".wideH").oninput = updGenSize;
+        updGenSize();
+        updateWorldPlateHints();   // reflect current scenario's world-plate state (Phase 2)
+      });
+    }
+
+    // ================= STEP 2 — room network map =================
+    // Nodes = rooms; edges are DOORWAYS (walk-between-rooms), read from door hotspots + plannedHotspots.
+    // The map shows NAVIGATION, not unlock order — so it reads like the navigable world (locks are fine;
+    // you're understanding how you move, not the solve sequence). Chips are the room's hotspots, ONE per
+    // hotspot: a planned chip (amber) turns green in place once a matching hotspot is placed — no duplicate.
+    // Pure client render from ROOMS — no art needed, so it's viewable before any scene is generated, and
+    // repaints after commits create real hotspots.
+    const mapPreds = r => {
+      const u = r && r.unlockedWhen;
+      if (!u || u === true) return [];
+      if (typeof u === "object") {
+        if (typeof u.solved === "string") return [u.solved];
+        if (Array.isArray(u.allSolved)) return u.allSolved.slice();
+        if (Array.isArray(u.anySolved)) return u.anySolved.slice();
+      }
+      return [];
+    };
+    function buildMap() {
+      const canvas = $("#mapCanvas");
+      if (!canvas) return;
+      canvas.innerHTML = "";
+      const rooms = ROOMS || [];
+      if (!rooms.length) { canvas.innerHTML = `<div class="hint" style="margin:0">No rooms yet — build the scenario spec in step 1 first.</div>`; return; }
+
+      const byKey = {}; rooms.forEach(r => byKey[r.key] = r);
+      // (unlock-order edges removed — the map shows navigation only, from the doorways below)
+
+      // doorway links: physical walk-connections from built door hotspots (type "door" with a `to`
+      // pointing at another room in this scenario). Doors come as forward/back pairs, so collapse to one
+      // undirected link per room pair, remembering which directions exist (both → bidirectional).
+      const doorLinks = {};
+      rooms.forEach(r => [...(Array.isArray(r.hotspots) ? r.hotspots : []), ...(Array.isArray(r.plannedHotspots) ? r.plannedHotspots : [])].forEach(h => {
+        if (h && h.type === "door" && h.to && byKey[h.to] && h.to !== r.key) {
+          const [ka, kb] = [r.key, h.to].sort();
+          const dl = doorLinks[ka + " " + kb] || (doorLinks[ka + " " + kb] = { a: ka, b: kb, ab: false, ba: false });
+          if (r.key === ka) dl.ab = true; else dl.ba = true;   // ab = a→b door exists, ba = b→a door exists
+        }
+      }));
+
+      // column depth = walking distance from the entry room over the DOORWAY graph, so the map reads as the
+      // navigable world (not the unlock order). BFS; rooms not reachable by doorways trail in a last column.
+      const adj = {}; rooms.forEach(r => adj[r.key] = new Set());
+      Object.values(doorLinks).forEach(dl => { adj[dl.a].add(dl.b); adj[dl.b].add(dl.a); });
+      const depth = {};
+      const root = rooms[0] && rooms[0].key;
+      if (root != null) { depth[root] = 0; const q = [root];
+        while (q.length) { const k = q.shift(); adj[k].forEach(n => { if (!(n in depth)) { depth[n] = depth[k] + 1; q.push(n); } }); } }
+      const _md = Object.values(depth).length ? Math.max(...Object.values(depth)) : 0;
+      rooms.forEach(r => { if (!(r.key in depth)) depth[r.key] = _md + 1; });
+      const cols = {};
+      rooms.forEach(r => { (cols[depth[r.key]] = cols[depth[r.key]] || []).push(r); });
+      const maxDepth = Math.max(...Object.keys(cols).map(Number));
+
+      const NODEW = 320, COLGAP = 82, ROWGAP = 22, PADX = 34, PADY = 8;   // wider: nodes now carry the story editors
+      const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.setAttribute("class", "mapedges");
+      canvas.appendChild(svg);
+
+      // graph entry + exit — the opening story hangs on the first room, the finish screens on the last
+      // room in scenario order (the escape/exit), independent of the doorway layout.
+      const firstKey = rooms[0] && rooms[0].key;
+      const terminalKey = (rooms[rooms.length - 1] || {}).key;
+
+      const chip = (h, existing) => {
+        const ty = h.type || "?", lbl = h.label || h.type || "?";
+        const gradeable = ty === "puzzle" || ty === "clue" || ty === "lock";
+        const set = hotspotHasContent(h);                    // ✓ authored / ○ still blank — read the story at a glance
+        const mark = gradeable ? (set ? " ✓" : " ○") : "";
+        return `<span class="hchip ${existing ? "ex" : "pl"}${(gradeable && !set) ? " blank" : ""}" title="${esc((existing ? "existing" : "planned") + " · " + ty + " · " + lbl + (gradeable ? (set ? " · content set" : " · content blank") : ""))}"><i class="hty">${esc(ty)}</i>${esc(lbl)}${mark}</span>`;
+      };
+      // ONE chip per hotspot: a planned entry (amber) turns green in place once a hotspot of the same type
+      // + label(slug) is placed — no duplicate chip. Built hotspots with no matching planned entry (extras)
+      // show as green. (Same slug-match the hotspots editor uses to tick a planned item off.)
+      const slug = s => String(s || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+      const chipsFor = (hs, ph) => {
+        const used = new Array(hs.length).fill(false);
+        const planned = ph.map(p => {
+          let idx = -1;
+          for (let i = 0; i < hs.length; i++) { if (!used[i] && hs[i].type === p.type && slug(hs[i].label) === slug(p.label)) { idx = i; break; } }
+          if (idx >= 0) { used[idx] = true; return chip(hs[idx], true); }   // planned → placed → GREEN
+          return chip(p, false);                                            // still planned → amber
+        });
+        const extras = hs.filter((_, i) => !used[i]).map(h => chip(h, true));
+        return planned.join("") + extras.join("");
+      };
+      const nodeEl = {};
+      rooms.forEach((r, idx) => {
+        const hs = Array.isArray(r.hotspots) ? r.hotspots : [];
+        const ph = Array.isArray(r.plannedHotspots) ? r.plannedHotspots : [];
+        const built = !!r.built;
+        const el = document.createElement("div");
+        el.className = "mapnode" + (built ? " built" : "");
+        el.style.width = NODEW + "px";
+        el.innerHTML =
+          `<div class="maphd"><input class="mnTitle" value="${esc(r.title || "")}" placeholder="${esc(r.key)}"><span class="mapkey">${esc(r.key)}</span></div>
+           ${(r.technique || r.puzzleType) ? `<div class="maptech">${esc(r.technique || r.puzzleType)}</div>` : ""}
+           <span class="badge ${built ? "built" : "draft"}" style="align-self:flex-start">${built ? "built" : "planned"}</span>
+           <div class="hchips">
+             ${chipsFor(hs, ph)}
+             ${(!hs.length && !ph.length) ? `<span class="hint" style="margin:0">no hotspots yet</span>` : ""}
+           </div>
+           <div class="mnstory"></div>
+           <div class="status mnStatus"></div>`;
+        canvas.appendChild(el);
+        nodeEl[r.key] = el;
+        wireMapNode(el, r, r.key === firstKey, r.key === terminalKey);
+      });
+
+      // place: stack each depth-column vertically, measuring real heights so edges hit box centres
+      let maxBottom = 0;
+      for (let d = 0; d <= maxDepth; d++) {
+        let y = PADY;
+        (cols[d] || []).forEach(r => {
+          const el = nodeEl[r.key];
+          el.style.left = (PADX + d * (NODEW + COLGAP)) + "px";
+          el.style.top = y + "px";
+          const h = el.offsetHeight;
+          el.dataset.cy = String(y + h / 2);
+          y += h + ROWGAP;
+        });
+        maxBottom = Math.max(maxBottom, y);
+      }
+      const totalW = PADX * 2 + (maxDepth + 1) * NODEW + maxDepth * COLGAP;
+      canvas.style.height = maxBottom + "px";
+      svg.setAttribute("width", totalW); svg.setAttribute("height", maxBottom);
+      const NS = "http://www.w3.org/2000/svg", DOORCOL = "#79b8ff";
+      svg.innerHTML =
+        `<defs>
+           <marker id="mkUnlock" markerWidth="9" markerHeight="9" refX="7.5" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="rgba(255,255,255,.5)"/></marker>
+           <marker id="mkDoorEnd" markerWidth="9" markerHeight="9" refX="7.5" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="${DOORCOL}"/></marker>
+           <marker id="mkDoorStart" markerWidth="9" markerHeight="9" refX="1.5" refY="3" orient="auto"><path d="M7,0 L0,3 L7,6 z" fill="${DOORCOL}"/></marker>
+         </defs>`;
+      const addPath = (d, cls, mEnd, mStart) => {
+        const p = document.createElementNS(NS, "path");
+        p.setAttribute("d", d); p.setAttribute("class", cls);
+        if (mEnd) p.setAttribute("marker-end", mEnd);
+        if (mStart) p.setAttribute("marker-start", mStart);
+        svg.appendChild(p);
+      };
+      const nx = k => parseFloat(nodeEl[k].style.left);   // node left edge
+      const ny = k => parseFloat(nodeEl[k].dataset.cy);   // node vertical centre
+
+
+      // doorway edges — blue. Cross-column: bow downward so parallel links between a pair stay legible.
+      // Same-column: a leftward arc joining two nodes at the same walking depth. Arrowheads reflect
+      // direction; both ends when the doorway is bidirectional.
+      Object.values(doorLinks).forEach(dl => {
+        if (!nodeEl[dl.a] || !nodeEl[dl.b]) return;
+        let lk = dl.a, rk = dl.b;
+        if (nx(dl.a) > nx(dl.b)) { lk = dl.b; rk = dl.a; }
+        const l2r = (lk === dl.a && dl.ab) || (lk === dl.b && dl.ba);   // door goes toward the right node
+        const r2l = (rk === dl.a && dl.ab) || (rk === dl.b && dl.ba);   // door goes toward the left node
+        const mEnd = l2r ? "url(#mkDoorEnd)" : null, mStart = r2l ? "url(#mkDoorStart)" : null;
+        if (nx(lk) === nx(rk)) {                    // same column → left-side arc
+          const x = nx(lk), bx = x - 26;
+          addPath(`M${x - 2},${ny(lk)} C${bx},${ny(lk)} ${bx},${ny(rk)} ${x - 2},${ny(rk)}`, "mapedge door", mEnd, mStart);
+        } else {
+          const x1 = nx(lk) + NODEW, y1 = ny(lk), x2 = nx(rk), y2 = ny(rk), mx = (x1 + x2) / 2;
+          addPath(`M${x1},${y1} C${mx},${y1 + 30} ${mx},${y2 + 30} ${x2 - (l2r ? 3 : 0)},${y2}`, "mapedge door", mEnd, mStart);
+        }
+      });
+    }
+
+    // does a hotspot carry authored content yet? (drives the map chip's ✓/○ completeness marker).
+    // Works for both a placed hotspot and a plannedHotspots entry — both hold the same content fields.
+    function hotspotHasContent(h) {
+      if (!h) return false;
+      if (h.type === "puzzle") return !!((h.check && h.check.expr) || (h.question && Array.isArray(h.question.options) && h.question.options.length));
+      if (h.type === "clue") return !!(h.body || h.image);
+      if (h.type === "lock") return !!h.answer;
+      return true;   // doors / dial / mapview have no puzzle content to author
+    }
+
+    // Wire one map node's inline STORY editors (Phase 2, 2026-07-21 — the map is the story surface).
+    // Fields bind to the in-memory doc on `oninput` (so a repaint keeps unsaved text) and PERSIST on
+    // `change` (blur), so leaving a field saves it. Each map edit also syncs into the matching
+    // standalone step editor (entry-cards / finish step) so those + Save-all never show stale text —
+    // the standalone editors are transitional and get removed in Phase 4 (see notes/harness_reorder_plan.md).
+    function wireMapNode(el, room, isFirst, isTerminal) {
+      const key = room.key, st = el.querySelector(".mnStatus"), box = el.querySelector(".mnstory");
+      const ok = m => { st.innerHTML = `<span class="ok2">${esc(m)}</span>`; };
+      const err = m => { st.innerHTML = `<span class="err">${esc(m)}</span>`; };
+      // editable room title (kept in step with the step-4 build card's title field)
+      const ti = el.querySelector(".mnTitle");
+      ti.oninput = () => { room.title = ti.value; };
+      ti.onchange = async () => {
+        room.title = ti.value;
+        const bc = $("#build_" + cssId(key)), bt = bc && bc.querySelector(".rtitle"); if (bt) bt.value = ti.value;
+        const r = await post("/api/room-patch", { ...SCQ(), roomKey: key, fields: { title: ti.value } });
+        r.ok ? ok("title saved ✓") : err(r.error || "save failed");
+      };
+      // hotspot chips scroll to that room's inline content cards (step 2b, same page)
+      el.querySelectorAll(".hchip").forEach(c => c.onclick = () => { const t = $("#content_" + cssId(key)); if (t) t.scrollIntoView({ behavior: "smooth", block: "start" }); });
+
+      if (isFirst) {                                   // first room = the landing-screen opening story + enter button
+        box.innerHTML =
+          `<label class="collbl">opening story <span style="opacity:.55">· the landing screen</span></label>
+           <textarea class="mnOpen" placeholder="The opening the player reads on the landing screen…"></textarea>
+           <label class="collbl">enter button</label><input class="mnEnter" placeholder="Begin →">`;
+        const openEl = box.querySelector(".mnOpen"), enterEl = box.querySelector(".mnEnter");
+        openEl.value = (SCENARIO_DOC && SCENARIO_DOC.story) || "";
+        enterEl.value = (SCENARIO_DOC && SCENARIO_DOC.enterLabel) || "";
+        openEl.oninput = () => { if (SCENARIO_DOC) SCENARIO_DOC.story = openEl.value; };
+        enterEl.oninput = () => { if (SCENARIO_DOC) SCENARIO_DOC.enterLabel = enterEl.value; };
+        const save = async () => {
+          const fields = { story: openEl.value.trim(), enterLabel: enterEl.value.trim() };
+          const r = await post("/api/scenario-patch", { ...SCQ(), fields });
+          if (r.ok && SCENARIO_DOC) Object.assign(SCENARIO_DOC, fields);
+          r.ok ? ok("opening saved ✓") : err(r.error || "save failed");
+        };
+        openEl.onchange = save; enterEl.onchange = save;
+      } else {                                         // between-room interstitial (room.entry)
+        const e = room.entry;
+        box.innerHTML =
+          `<label class="collbl">entry card <span style="opacity:.55">· shown passing into this room</span></label>
+           <input class="mnEtitle" placeholder="card title · defaults to room title" value="${esc((e && typeof e === "object" && e.title) || "")}">
+           <textarea class="mnEtext" placeholder="Shown as the player passes into this room…"></textarea>
+           <input class="mnEbtn" placeholder="button · defaults to “Continue →”" value="${esc((e && typeof e === "object" && e.button) || "")}">`;
+        const tEl = box.querySelector(".mnEtitle"), xEl = box.querySelector(".mnEtext"), bEl = box.querySelector(".mnEbtn");
+        xEl.value = entryText(e);
+        const toEntry = () => {
+          const text = xEl.value.trim();
+          return text ? { ...(tEl.value.trim() ? { title: tEl.value.trim() } : {}), text, ...(bEl.value.trim() ? { button: bEl.value.trim() } : {}) } : null;
+        };
+        [tEl, xEl, bEl].forEach(inp => inp.oninput = () => { room.entry = toEntry(); });
+        const save = async () => {
+          const entry = toEntry(); room.entry = entry;
+          const r = await post("/api/room-patch", { ...SCQ(), roomKey: key, fields: { entry } });
+          r.ok ? ok("entry saved ✓") : err(r.error || "save failed");
+        };
+        [tEl, xEl, bEl].forEach(inp => inp.onchange = save);
+      }
+
+      if (isTerminal) {                                // finish screens hang on the graph's exit node
+        const dn = (SCENARIO_DOC && SCENARIO_DOC.done) || {}, es = (SCENARIO_DOC && SCENARIO_DOC.escapeDone) || {};
+        const fin = document.createElement("div"); fin.className = "mnfinish";
+        fin.innerHTML =
+          `<div class="mnsep">finish screens</div>
+           <label class="collbl">analysis finish · title</label><input class="mnDnT" value="${esc(dn.title || "")}" placeholder="Complete">
+           <label class="collbl">analysis finish · body</label><textarea class="mnDnB" placeholder="Nice work — you've finished."></textarea>
+           <label class="collbl">escape finish · title <span style="opacity:.55">· optional</span></label><input class="mnEsT" value="${esc(es.title || "")}" placeholder="You escaped!">
+           <label class="collbl">escape finish · body</label><textarea class="mnEsB" placeholder="You made it out."></textarea>`;
+        el.appendChild(fin);
+        const dnT = fin.querySelector(".mnDnT"), dnB = fin.querySelector(".mnDnB"), esT = fin.querySelector(".mnEsT"), esB = fin.querySelector(".mnEsB");
+        dnB.value = dn.body || ""; esB.value = es.body || "";
+        const save = async () => {
+          const fields = { done: { title: dnT.value.trim(), body: dnB.value } };
+          if (esT.value.trim() || esB.value.trim()) fields.escapeDone = { title: esT.value.trim(), body: esB.value };
+          const r = await post("/api/scenario-patch", { ...SCQ(), fields });
+          if (r.ok && SCENARIO_DOC) Object.assign(SCENARIO_DOC, fields);
+          r.ok ? ok("finish saved ✓") : err(r.error || "save failed");
+        };
+        [dnT, dnB, esT, esB].forEach(inp => inp.onchange = save);
+      }
+    }
+
+    // ================= STEP 2b — inline puzzle/clue/lock content =================
+    // Every room's puzzle/clue/lock cards on THIS page (Phase 2b, 2026-07-21), via the shared
+    // puzzle_cards.js module (same cards as the standalone puzzle_edit.html — single source of truth).
+    // A BUILT room edits its placed `hotspots`; a pre-art room edits its `plannedHotspots` (content
+    // attaches to the box at commit, server _attach_planned_content). Per-room Save patches the right
+    // field. Rebuilt by refreshAll after a commit flips a room planned→built (so it switches fields).
+    // Autosave one room's puzzle/clue/lock/grid content (called on blur by the shared cards via
+    // ctx.autosave). Same routing as Save-all's per-room write, scoped to the room the card belongs to;
+    // built rooms patch `hotspots`, pre-art rooms patch `plannedHotspots` (c.target). Cheap + field-scoped.
+    async function autosaveContent(roomKey) {
+      const c = (CONTENT || []).find(x => x.key === roomKey);
+      if (!c) return;
+      const fields = {}; fields[c.target] = cleanSpots(c.spots);
+      const st = $("#saveAllStatus");
+      if (st) st.textContent = "autosaving…";
+      const r = await post("/api/room-patch", { ...SCQ(), roomKey, fields });
+      if (r.ok) {
+        const room = ROOMS.find(x => x.key === roomKey);
+        if (room) room[c.target] = fields[c.target];        // keep in-memory node in step with disk
+        if (st) st.innerHTML = `<span class="ok2">autosaved ✓</span>`;
+      } else if (st) st.innerHTML = `<span class="err">autosave failed (${esc(roomKey)})</span>`;
+    }
+
+    function buildContent() {
+      const host = $("#contentCols"); if (!host) return;
+      host.innerHTML = "";
+      const PC = EscapePuzzleCards.make({ esc, getJSON: pcGetJSON, postJSON: post, chapter: ACTIVESC.chapter, scenario: ACTIVESC.scenario, autosave: autosaveContent });
+      CONTENT = (ROOMS || []).map(r => {
+        const hs = r.hotspots || [];
+        if (hs.length) return { key: r.key, title: r.title || "", target: "hotspots", planned: false, spots: hs.map(h => JSON.parse(JSON.stringify(h))) };
+        const ph = r.plannedHotspots || [];
+        if (ph.length) return { key: r.key, title: r.title || "", target: "plannedHotspots", planned: true,
+                                spots: ph.map(h => { const s = JSON.parse(JSON.stringify(h)); s.id = s.id || contentSlug(s.label); return s; }) };
+        return null;
+      }).filter(Boolean);
+      if (!CONTENT.length) { host.innerHTML = `<div class="hint" style="margin:0">No rooms with hotspots or planned hotspots yet — design the ladder first.</div>`; return; }
+      CONTENT.forEach(r => {
+        const sec = document.createElement("section"); sec.className = "roomgroup"; sec.id = "content_" + cssId(r.key);
+        sec.innerHTML = `<h2 class="roomh">${esc(r.key)} <span class="hint" style="text-transform:none;font-weight:400">· ${esc(r.title || "")}${r.planned ? ' · <span style="color:#7fd1ff">planned — pre-art</span>' : ""}</span></h2>`;
+        const inner = document.createElement("div");
+        PC.roomCardsInto(inner, r.spots, r.key);
+        sec.appendChild(inner);
+        host.appendChild(sec);
+      });
+    }
+
+    // ================= STEP 2c — "how this world worked" (exit debrief) =================
+    // A scenario-level heading + intro, then one card per BUILT room for its debrief blurb
+    // (room.debrief: string | {heading, body}). Renders into #debriefCols; saves on blur
+    // (scenario-patch for the heading/intro, room-patch for each room). Rebuilt by refreshAll.
+    function buildDebrief() {
+      const host = $("#debriefCols"); if (!host) return;
+      host.innerHTML = "";
+      const d = (SCENARIO_DOC && SCENARIO_DOC.debrief) || {};
+      // scenario-level card (heading + intro shown above the room gallery)
+      const sc = document.createElement("section"); sc.className = "roomgroup";
+      sc.innerHTML =
+        `<h2 class="roomh">the debrief screen <span class="hint" style="text-transform:none;font-weight:400">· heading + intro, above the room gallery</span></h2>
+         <div class="puz">
+           <div class="lbl">heading</div><input class="dbScTitle" type="text" placeholder="How this world worked">
+           <div class="lbl">intro <span class="hint" style="text-transform:none">· the lead paragraph above the room-by-room gallery</span></div>
+           <textarea class="dbScIntro" rows="3" placeholder="This afternoon was one skill wearing a lab coat: …"></textarea>
+           <div class="status dbScStatus"></div>
+         </div>`;
+      host.appendChild(sc);
+      const scT = sc.querySelector(".dbScTitle"), scI = sc.querySelector(".dbScIntro"), scSt = sc.querySelector(".dbScStatus");
+      scT.value = d.title || ""; scI.value = d.intro || "";
+      const saveScenario = async () => {
+        scSt.textContent = "saving…";
+        const fields = { debrief: { ...((SCENARIO_DOC && SCENARIO_DOC.debrief) || {}), title: scT.value.trim(), intro: scI.value.trim() } };
+        const r = await post("/api/scenario-patch", { ...SCQ(), fields });
+        if (r.ok) { if (SCENARIO_DOC) SCENARIO_DOC.debrief = fields.debrief; scSt.innerHTML = `<span class="ok2">saved ✓</span>`; }
+        else scSt.innerHTML = `<span class="err">${esc(r.error || "save failed")}</span>`;
+      };
+      scT.onchange = saveScenario; scI.onchange = saveScenario;
+      // one card per room (the player's debrief gallery shows the BUILT ones in order; authoring all here
+      // is harmless). NB: don't call the player's isBuilt() — it doesn't exist in the harness (that
+      // ReferenceError aborted buildDebrief AND the rest of refreshAll, hiding the section-5 art too).
+      const rooms = (ROOMS || []);
+      if (!rooms.length) { host.insertAdjacentHTML("beforeend", `<div class="hint" style="margin:6px 0">No rooms yet.</div>`); return; }
+      rooms.forEach(room => {
+        const cur = room.debrief;
+        const heading = (cur && typeof cur === "object") ? (cur.heading || cur.title || "") : "";
+        const body = (typeof cur === "string") ? cur : ((cur && (cur.body || cur.text)) || "");
+        const sec = document.createElement("section"); sec.className = "roomgroup";
+        sec.innerHTML =
+          `<h2 class="roomh">${esc(room.key)} <span class="hint" style="text-transform:none;font-weight:400">· ${esc(room.title || "")}</span></h2>
+           <div class="puz">
+             <div class="lbl">heading <span class="hint" style="text-transform:none">· optional — defaults to the room title</span></div><input class="dbRT" type="text">
+             <div class="lbl">debrief text <span class="hint" style="text-transform:none">· why this room worked the way it did; shown beside its scene</span></div><textarea class="dbRB" rows="4"></textarea>
+             <div class="status dbRStatus"></div>
+           </div>`;
+        host.appendChild(sec);
+        const rT = sec.querySelector(".dbRT"), rB = sec.querySelector(".dbRB"), rSt = sec.querySelector(".dbRStatus");
+        rT.value = heading; rB.value = body;
+        const saveRoom = async () => {
+          rSt.textContent = "saving…";
+          const h = rT.value.trim(), b = rB.value.trim();
+          const val = (!h && !b) ? null : (!h ? b : { heading: h, body: b });   // string, {heading,body}, or clear
+          room.debrief = val;
+          const r = await post("/api/room-patch", { ...SCQ(), roomKey: room.key, fields: { debrief: val } });
+          rSt.innerHTML = r.ok ? `<span class="ok2">saved ✓</span>` : `<span class="err">${esc(r.error || "save failed")}</span>`;
+        };
+        rT.onchange = saveRoom; rB.onchange = saveRoom;
+      });
+    }
+
+    // ================= STEP 4 — landing screen (scenario meta) =================
+    // Landing = scenario-level title + ambient via scenario-patch. The opening STORY + enter button and
+    // every per-room entry card now live on the STORY-MAP (step 2, wireMapNode) — this step is just the
+    // landing title/ambient that sit beside the cover.
+    const entryText = e => !e ? "" : (typeof e === "string" ? e : (e.text || ""));
+    function buildStep4() {
+      const d = SCENARIO_DOC || {};
+      $("#ldTitle").value = d.title || "";
+      $("#ldAmbient").value = d.ambient || "fireflies";
+      $("#ldStatus").textContent = "";
+      $("#ldSave").onclick = saveLanding;
+    }
+
+    // ================= STEP 6 — per-room sound: audition candidates, add LAYERS =================
+    // Claude fetches candidate loops per room into <scenario>/_scratch/audio/ (freesound). Each card
+    // lists this room's candidates (files prefixed "<roomKey>_") with an <audio> player + "Add", which
+    // materialises the file into audio/ (/api/commit-sound) and appends a LAYER. A room can hold several
+    // layers that play together, each { src, mode:loop|interval, volume, delay, duckMusicTo,
+    // gapMin/gapMax (interval), crossfade (loop seam overlap secs, default 4) }. "Save sounds" writes the whole sfx array via
+    // /api/room-patch. LAYERS is the client-side working copy (survives focus refresh until saved).
+    let AUDIO_CANDS = [];   // filenames in _scratch/audio/ (all rooms; filtered per card by prefix)
+    let LAYERS = {};        // roomKey -> array of sfx layer objects (mirrors room.sfx, edited in place)
+    const sfxArr = sfx => !sfx ? [] : (Array.isArray(sfx) ? sfx : [sfx]).filter(x => x && x.src);
+    function buildSounds() {
+      const wrap = $("#soundCols"); wrap.innerHTML = ""; LAYERS = {};
+      ROOMS.forEach(room => {
+        const key = room.key;
+        LAYERS[key] = sfxArr(room.sfx).map(s => ({ ...s }));
+        const c = document.createElement("div");
+        c.className = "col"; c.id = "snd_" + cssId(key); c.dataset.key = key;
+        c.innerHTML = `
+          <div class="tagrow"><b>${esc(key)}</b><span class="badge" data-sbadge></span></div>
+          <div class="hint" style="margin-top:0">${esc(room.title || "")}</div>
+          <label class="collbl">candidates <span style="opacity:.55">· audition &amp; add</span></label>
+          <div class="cands"></div>
+          <label class="collbl" style="margin-top:10px">layers <span style="opacity:.55">· sounds playing in this room</span></label>
+          <div class="layers"></div>
+          <div class="steps" style="border-top:0;padding-top:4px">
+            <button class="step commit ready sSave">Save sounds</button>
+            <div class="status sStatus"></div>
+          </div>`;
+        wrap.appendChild(c);
+        c.querySelector(".sSave").onclick = () => saveSounds(key);
+        renderCandidates(key);
+        renderLayers(key);
+      });
+    }
+    function renderCandidates(key) {
+      const c = $("#snd_" + cssId(key)); if (!c) return;
+      const box = c.querySelector(".cands");
+      const mine = AUDIO_CANDS.filter(f => f.startsWith(key + "_"));
+      if (!mine.length) { box.innerHTML = `<div class="hint" style="margin:0">no candidates yet — ask Claude to fetch some for “${esc(key)}”.</div>`; return; }
+      box.innerHTML = "";
+      mine.forEach(f => {
+        const row = document.createElement("div");
+        row.style.cssText = "display:flex;align-items:center;gap:6px;margin-top:6px;flex-wrap:wrap";
+        row.innerHTML =
+          `<audio controls preload="none" style="height:30px;max-width:170px" src="/sfile/_scratch/audio/${encodeURIComponent(f)}?${qstr(SCQ())}"></audio>
+           <button class="useCand" style="margin:0">Add</button>
+           <span class="hint" style="margin:0;flex-basis:100%">${esc(f)}</span>`;
+        row.querySelector(".useCand").onclick = () => addLayer(key, f);
+        box.appendChild(row);
+      });
+    }
+    async function addLayer(key, file) {
+      const c = $("#snd_" + cssId(key)), st = c.querySelector(".sStatus");
+      st.textContent = "adding…";
+      const r = await post("/api/commit-sound", { ...SCQ(), file });
+      if (!r.ok) { st.innerHTML = `<span class="err">${r.error}</span>`; return; }
+      (LAYERS[key] = LAYERS[key] || []).push({ src: r.src, mode: "loop", volume: 0.7 });
+      renderLayers(key);
+      st.innerHTML = `<span class="ok2">added ${esc(file)} — set its mode, then Save sounds</span>`;
+    }
+    function renderLayers(key) {
+      const c = $("#snd_" + cssId(key)); if (!c) return;
+      const box = c.querySelector(".layers"), L = LAYERS[key] || [];
+      updateSoundBadge({ key });
+      if (!L.length) { box.innerHTML = `<div class="hint" style="margin:0">no sounds yet — audition a candidate and hit “Add”.</div>`; return; }
+      box.innerHTML = "";
+      L.forEach((s, i) => {
+        const mode = s.mode || "loop";
+        const el = document.createElement("div"); el.className = "layer";
+        el.innerHTML = `
+          <div class="lhead"><b>${esc((s.src || "").split("/").pop())}</b><button class="ldel">×</button></div>
+          <div class="lr"><label>mode</label><select data-k="mode">${["loop","interval"].map(m => `<option${m===mode?" selected":""}>${m}</option>`).join("")}</select></div>
+          <div class="lr"><label>volume</label><input type="number" data-k="volume" min="0" max="1" step="0.05" value="${s.volume!=null?s.volume:0.7}"></div>
+          <div class="lr lmode lmode-interval"><label>gap min/max s</label><input type="number" data-k="gapMin" min="0" step="1" value="${s.gapMin!=null?s.gapMin:8}" style="flex:1;min-width:0"><input type="number" data-k="gapMax" min="0" step="1" value="${s.gapMax!=null?s.gapMax:20}" style="flex:1;min-width:0"></div>
+          <div class="lr lmode lmode-loop"><label>crossfade s</label><input type="number" data-k="crossfade" min="0.2" step="0.5" value="${s.crossfade!=null?s.crossfade:4}"></div>
+          <div class="lr"><label>delay s</label><input type="number" data-k="delay" min="0" step="1" value="${s.delay!=null?s.delay:0}"></div>
+          <div class="lr"><label>duck music</label><input type="number" data-k="duckMusicTo" min="0" max="1" step="0.05" value="${s.duckMusicTo!=null?s.duckMusicTo:''}" placeholder="—"></div>
+          <audio controls preload="none" style="height:28px;width:100%;margin-top:4px" src="/sfile/${s.src}?${qstr(SCQ())}"></audio>`;
+        box.appendChild(el);
+        const applyVis = () => {
+          el.querySelectorAll(".lmode").forEach(r => r.style.display = "none");
+          const mr = el.querySelector(".lmode-" + el.querySelector('[data-k="mode"]').value);
+          if (mr) mr.style.display = "";
+        };
+        applyVis();
+        el.querySelector(".ldel").onclick = () => { LAYERS[key].splice(i, 1); renderLayers(key); };
+        el.querySelectorAll("[data-k]").forEach(inp => inp.oninput = () => {
+          const k = inp.dataset.k, v = inp.value;
+          if (k === "mode") { s.mode = v; applyVis(); }
+          else if (v === "") delete s[k];
+          else s[k] = (inp.type === "number") ? parseFloat(v) : v;
+        });
+      });
+    }
+    async function saveSounds(key) {
+      const c = $("#snd_" + cssId(key)), st = c.querySelector(".sStatus");
+      st.textContent = "saving…";
+      const sfx = (LAYERS[key] || []).filter(s => s && s.src);
+      const r = await post("/api/room-patch", { ...SCQ(), roomKey: key, fields: { sfx: sfx.length ? sfx : null } });
+      if (!r.ok) { st.innerHTML = `<span class="err">${r.error}</span>`; return; }
+      const room = ROOMS.find(x => x.key === key); if (room) room.sfx = sfx.length ? sfx : null;
+      updateSoundBadge({ key });
+      st.innerHTML = `<span class="ok2">saved ✓ — ${sfx.length} layer${sfx.length===1?"":"s"}</span>`;
+    }
+    // Reflect volumes the test-play mixer wrote to scenario.json back into the sound panel's working
+    // copy — volume-ONLY, matched by src, so unsaved layer additions / mode edits here are preserved
+    // (their src either matches, syncing just the number, or doesn't, leaving the row untouched).
+    function syncSoundVolumesFromDisk() {
+      if (!ROOMS.length) return;
+      ROOMS.forEach(room => {
+        const key = room.key, L = LAYERS[key]; if (!L) return;
+        const disk = {}; sfxArr(room.sfx).forEach(s => { if (s.src) disk[s.src] = s.volume; });
+        let changed = false;
+        L.forEach(s => {
+          if (s.src in disk && disk[s.src] != null && s.volume !== disk[s.src]) { s.volume = disk[s.src]; changed = true; }
+        });
+        if (changed) renderLayers(key);
+      });
+    }
+    function updateSoundBadge(room) {
+      const key = room.key, c = $("#snd_" + cssId(key)); if (!c) return;
+      const n = (LAYERS[key] || []).length, b = c.querySelector("[data-sbadge]");
+      b.className = "badge " + (n ? "built" : "");
+      b.textContent = n ? (n + " layer" + (n === 1 ? "" : "s")) : "none";
+    }
+    const isFirstRoom = key => ROOMS[0] && key === ROOMS[0].key;
+    async function saveLanding() {
+      const st = $("#ldStatus"); st.textContent = "saving…";
+      const fields = {
+        title: $("#ldTitle").value.trim(), ambient: $("#ldAmbient").value,
+      };
+      const r = await post("/api/scenario-patch", { ...SCQ(), fields });
+      if (!r.ok) { st.innerHTML = `<span class="err">${r.error}</span>`; return; }
+      if (SCENARIO_DOC) Object.assign(SCENARIO_DOC, fields);
+      st.innerHTML = `<span class="ok2">saved ✓</span>`;
+    }
+    // ================= Scenario cover art (Step 4 card) =================
+    // gpt-image-2 poster for the book's exercises page. Candidates go to _scratch as gpt_cover_*
+    // (reusing /api/generate at a square size); "set cover" copies the pick to <scenario>/cover.png
+    // + sets scenario.cover (via /api/set-cover). coverPrompt persists on scenario.json.
+    function buildCover() {
+      const d = SCENARIO_DOC || {};
+      $("#coverPrompt").value = d.coverPrompt || "";
+      $("#coverStatus").textContent = "";
+      $("#coverGrid").innerHTML = "";
+      $("#coverGen").onclick = coverGen;
+      renderCoverPreview();
+      refreshCoverGrid();   // list existing gpt_cover_* candidates on load — not only after a fresh Generate
+    }
+    function renderCoverPreview() {
+      const el = $("#coverPreview"), cov = SCENARIO_DOC && SCENARIO_DOC.cover;
+      if (cov) el.innerHTML = `<img src="/sfile/${encodeURIComponent(cov)}?${qstr(SCQ())}&_=${Date.now()}" style="width:120px;border:1px solid var(--line);border-radius:6px">`;
+      else el.textContent = "none yet";
+    }
+    async function coverGen() {
+      const prompt = $("#coverPrompt").value.trim(), st = $("#coverStatus");
+      if (!prompt) { st.innerHTML = `<span class="err">enter a cover prompt</span>`; return; }
+      await post("/api/scenario-patch", { ...SCQ(), fields: { coverPrompt: prompt } });
+      if (SCENARIO_DOC) SCENARIO_DOC.coverPrompt = prompt;
+      const r = await post("/api/generate", { prompt, n: 2, quality: "high", size: "1024x1024", slot: "cover", tag: "cover" });
+      if (!r.ok) { st.innerHTML = `<span class="err">${r.error}</span>`; return; }
+      st.textContent = "generating…";
+      watch("cover", st, refreshCoverGrid);
+    }
+    async function refreshCoverGrid() {
+      const sc = await getj("/api/scenes");
+      const covers = (sc.scenes || []).filter(f => f.startsWith("gpt_cover_") && !f.includes("_open") && !f.includes("_x2"));
+      const grid = $("#coverGrid"); grid.innerHTML = "";
+      covers.forEach(f => {
+        const card = document.createElement("div"); card.className = "card";
+        card.innerHTML = `<img src="scene/${f}?t=${Date.now()}" loading="lazy"><div class="cap">${f}</div>`;
+        card.onclick = () => setCover(f);
+        grid.appendChild(card);
+      });
+    }
+    async function setCover(f) {
+      const st = $("#coverStatus"); st.textContent = "setting cover…";
+      const r = await post("/api/set-cover", { ...SCQ(), image: f });
+      if (!r.ok) { st.innerHTML = `<span class="err">${r.error}</span>`; return; }
+      if (SCENARIO_DOC) SCENARIO_DOC.cover = r.cover;
+      renderCoverPreview();
+      st.innerHTML = `<span class="ok2">cover set ✓ — ${esc(f)}</span>`;
+    }
+
+    // (finish screens moved to the story-map's exit node — wireMapNode owns done/escapeDone now.)
+
+    // ================= Save all (pinned in the header) — save every text field at once =================
+    // Story text (title/story/entry/finish) is authored on the STORY-MAP and kept live in-memory
+    // (wireMapNode binds ROOMS[*].entry + SCENARIO_DOC.story/done/escapeDone on input, persists on blur);
+    // Save-all just flushes that in-memory state + the build-card authoring + landing meta in one pass.
+    // Text only: never commits scratch → room or generates art (those stay deliberate per-room actions).
+    async function saveAll() {
+      const btn = $("#saveAllBtn"), st = $("#saveAllStatus");
+      btn.disabled = true; st.textContent = "saving everything…";
+      let ok = 0, fail = 0, savedContent = false;
+      const contentByKey = {};                           // Save all also flushes puzzle/clue/lock/grid content
+      for (const c of (CONTENT || [])) contentByKey[c.key] = c;
+      for (const room of ROOMS) {
+        const key = room.key, bc = $("#build_" + cssId(key));
+        const fields = { title: room.title || "" };
+        if (bc) {                                        // build card present → also flush its authoring (art prompts)
+          fields.title = bc.querySelector(".rtitle").value;
+          fields.authoring = { tag: tagOf(key), scenePrompt: bc.querySelector(".prompt").value, doorPrompt: bc.querySelector(".doorprompt").value };
+        }
+        if (!isFirstRoom(key)) fields.entry = room.entry || null;   // first room's opening is scenario-level (below)
+        const c = contentByKey[key];                     // this room's edited hotspots/plannedHotspots (if any)
+        if (c) fields[c.target] = cleanSpots(c.spots);
+        const r = await post("/api/room-patch", { ...SCQ(), roomKey: key, fields });
+        if (r.ok) { ok++; if (c) { room[c.target] = fields[c.target]; savedContent = true; } } else fail++;
+      }
+      const d = SCENARIO_DOC || {};
+      const sfields = {
+        title: $("#ldTitle").value.trim(), ambient: $("#ldAmbient").value,
+        story: d.story || "", enterLabel: d.enterLabel || "",
+        done: d.done || { title: "", body: "" },
+      };
+      if (d.escapeDone && (d.escapeDone.title || (d.escapeDone.body || "").trim())) sfields.escapeDone = d.escapeDone;
+      const sr = await post("/api/scenario-patch", { ...SCQ(), fields: sfields });
+      if (sr.ok) { ok++; if (SCENARIO_DOC) Object.assign(SCENARIO_DOC, sfields); } else fail++;
+      if (savedContent) buildMap();                      // repaint map chips (green ✓ content set) for saved rooms
+      btn.disabled = false;
+      st.innerHTML = fail ? `<span class="err">saved ${ok}, ${fail} failed</span>` : `<span class="ok2">saved everything ✓ (${ok} writes)</span>`;
+    }
+
+    // paint every button's locked / ready / done state from progress()
+    function refreshProgress() {
+      ROOMS.forEach(room => {
+        const p = progress(room);
+        // ---- step 2 ----
+        const c = $("#build_" + cssId(room.key));
+        if (c) {
+          const badge = c.querySelector("[data-badge]");
+          badge.className = "badge " + (p.committed ? "built" : (p.pickedOK ? "draft" : ""));
+          badge.textContent = p.committed ? "built" : (p.pickedOK ? "drafting" : "stub");
+          c.classList.toggle("done", p.committed);
+          // The per-step actions (wrap · spots · door · save) live on the per-candidate chips under
+          // each thumbnail now (see renderGrid/candStep); the old bottom step-button stack was removed.
+          // closed→open preview: shown once the open image exists (in _scratch, or the committed pair)
+          const pv = c.querySelector(".doorPreview");
+          const openInScratch = p.openFile && lastScenes.includes(p.openFile);
+          if (openInScratch) {
+            openVer[room.key] = openVer[room.key] || Date.now();
+            pv.className = "doorPreview on";
+            pv.innerHTML =
+              `<figure><img src="scene/${esc(p.image)}?t=${openVer[room.key]}"><figcaption>closed</figcaption></figure>
+               <figure><img src="scene/${esc(p.openFile)}?t=${openVer[room.key]}"><figcaption class="open">open</figcaption></figure>`;
+          } else {
+            pv.className = "doorPreview"; pv.innerHTML = "";
+          }
+        }
+        // step 4's puzzle/clue content is edited via the single "Edit all rooms together" button now
+        // (the per-room cards + their per-room progress badges were removed 2026-07-21).
+      });
+    }
+
+    // open a per-room editor tab. draftMode → pass the picked candidate (?img) so it edits the
+    // _scratch draft; else (puzzles) open on the committed node.
+    function openEditor(page, key, draftMode) {
+      const sq = qstr(SCQ());
+      let url = `${page}?room=${encodeURIComponent(key)}&${sq}`;
+      if (draftMode) {
+        const img = picked[key] || (DRAFTS[key] || {}).image;
+        if (img) url += `&img=${encodeURIComponent(img)}`;
+      }
+      window.open(url, "_blank");
+    }
+
+    // ---- scenario picker ----
+    async function loadScenarios() {
+      const r = await getj("/api/scenarios");
+      const sel = $("#scenarioPick"); sel.innerHTML = "";
+      (r.scenarios || []).slice().sort((a, b) => a.scenario.localeCompare(b.scenario)).forEach(s => {
+        const o = document.createElement("option");
+        o.value = s.chapter + "/" + s.scenario;
+        o.textContent = s.scenario;   // folder name only (e.g. "alaska", "hospital")
+        sel.appendChild(o);
+      });
+      if (r.active) sel.value = r.active.chapter + "/" + r.active.scenario;
+      sel.onchange = () => applyScenario(sel.value);
+      await applyScenario(sel.value);
+    }
+    async function applyScenario(val) {
+      const [chapter, scenario] = (val || "").split("/");
+      const r = await post("/api/select-scenario", { chapter, scenario });
+      if (!r.ok) { $("#sceneMeta").innerHTML = `<span class="err">${r.error || "select failed"}</span>`; return; }
+      ACTIVESC = r.active || { chapter, scenario };
+      picked = {};
+      SCENARIO_DOC = await getj("/api/scenario", SCQ());
+      ROOMS = (SCENARIO_DOC && SCENARIO_DOC.rooms) || [];
+      $("#sceneMeta").textContent = `id ${SCENARIO_DOC.id ?? "?"} · ${ROOMS.length} room${ROOMS.length === 1 ? "" : "s"}`;
+      buildMap(); buildStep2(); buildContent(); buildStep4(); buildSounds(); buildCover();
+      await refreshAll();
+    }
+    // reload the doc + drafts + scenes and repaint (after a commit or when returning from a tab)
+    async function refreshAll() {
+      SCENARIO_DOC = await getj("/api/scenario", SCQ());
+      ROOMS = (SCENARIO_DOC && SCENARIO_DOC.rooms) || [];
+      buildMap(); buildContent();
+      const sc = await getj("/api/scenes"); lastScenes = sc.scenes || [];
+      DRAFTS = {};
+      await Promise.all(ROOMS.map(async room => {
+        DRAFTS[room.key] = await getj("/api/draft", { ...SCQ(), roomKey: room.key }) || {};
+      }));
+      const ac = await getj("/api/audio-candidates", SCQ()); AUDIO_CANDS = ac.files || [];
+      ROOMS.forEach(room => { renderGrid(room.key); renderCandidates(room.key); updateSoundBadge(room); });
+      syncSoundVolumesFromDisk();     // pull in any volumes the test-play mixer just saved
+      refreshProgress();
+      buildDebrief();                 // LAST — non-critical, so an error here can never block the art path above
+    }
+
+    // ---- generate (per-slot poll; slot = room key) ----
+    const polls = {};
+    function watch(slot, statusEl, onDone) {
+      clearInterval(polls[slot]);
+      polls[slot] = setInterval(async () => {
+        const j = await getj("/api/status", { slot });
+        if (j.error) { statusEl.innerHTML = `<span class="err">${j.error}</span>`; clearInterval(polls[slot]); return; }
+        statusEl.textContent = `working… ${j.done}/${j.total}`;
+        if (!j.active) { clearInterval(polls[slot]); statusEl.textContent = `done (${j.done})`; onDone && onDone(); }
+      }, 1500);
+    }
+    async function generate(key) {
+      const c = $("#build_" + cssId(key));
+      // Phase 1 native higher-res: scale multiplies both axes (1×=1536 wide, 2×=3072 wide)
+      const scale = parseInt(c.querySelector(".genScale")?.value || "1", 10) || 1;
+      const h = parseInt(c.querySelector(".wideH").value || "512", 10) || 512;
+      const w = 1536 * scale, oh = h * scale;
+      const size = w + "x" + oh;
+      const statusEl = c.querySelector(".genStatus");
+      const genBtn = c.querySelector(".gen");
+      // mirror the server _valid_size guard: edges ≤3840 & mult of 16, ≤8.29M px, ≤3:1
+      if (w > 3840 || oh > 3840 || (w * oh) > 8294400 || (w % 16) || (oh % 16)) {
+        statusEl.innerHTML = `<span class="err">${size} exceeds gpt-image-2 limits (edge ≤3840, ≤8.29M px) — lower height or scale</span>`;
+        return;
+      }
+      // persist the prompts onto the node so a later reload keeps them
+      await saveMeta(key);
+      genBtn.classList.add("busy");                    // in-progress colour (item 3)
+      const body = {
+        prompt: c.querySelector(".prompt").value, n: 2, quality: "high",
+        size, slot: key, tag: tagOf(key),
+      };
+      if (c.querySelector(".useWorldPlate")?.checked) body.worldPlate = true;   // Phase 2 reference
+      if (c.querySelector(".useRoomRef")?.checked) body.roomRef = true;         // per-room context crop (overrides plate)
+      const fid = document.getElementById("genFidelity")?.value || "";           // global plate fidelity
+      if (fid) body.inputFidelity = fid;
+      const r = await post("/api/generate", body);
+      if (!r.ok) { statusEl.innerHTML = `<span class="err">${r.error}</span>`; genBtn.classList.remove("busy"); return; }
+      statusEl.textContent = "starting…";
+      watch(key, statusEl, () => { genBtn.classList.remove("busy"); fetchScenes(); });
+    }
+    async function fetchScenes() {
+      const sc = await getj("/api/scenes"); lastScenes = sc.scenes || [];
+      ROOMS.forEach(room => renderGrid(room.key));
+      refreshProgress();
+    }
+    function renderGrid(key) {
+      const c = $("#build_" + cssId(key)); if (!c) return;
+      const grid = c.querySelector(".scenes"), prefix = "gpt_" + tagOf(key) + "_";
+      grid.innerHTML = "";
+      lastScenes
+        .filter(f => f.startsWith(prefix) && !f.includes("_open") && !f.includes("_x2"))
+        .forEach(f => {
+          const st = candState(key, f);
+          const card = document.createElement("div");
+          card.className = "card" + (f === picked[key] ? " sel" : "");
+          // Cache key is the SCENARIO (`?s=`), not a timestamp: the /scene/ route is scenario-global, so
+          // two scenarios can share a candidate filename (gpt_room1_6.png) — without namespacing, the
+          // browser could show the wrong scenario's cached image after a switch. `?s=` is stable per
+          // scenario, so it still caches within a scenario (no re-render flashing) but never collides across.
+          card.innerHTML =
+            `<button class="cdel" title="Delete this candidate">×</button>
+             <img src="scene/${f}?s=${encodeURIComponent(ACTIVESC.scenario || '')}" loading="lazy">
+             <div class="cap">${f}</div>
+             <div class="cchips">
+               <button class="cchip${st.wrap ? " done" : ""}" data-step="wrap" title="Edit wrap for this candidate">wrap</button>
+               <button class="cchip${st.hotspots ? " done" : ""}" data-step="hotspots" title="Edit hotspots for this candidate">spots</button>
+               <button class="cchip${st.door ? " done" : ""}" data-step="door" title="Make the open-door image for this candidate">door</button>
+               <button class="cchip${st.save ? " done" : ""}" data-step="save" title="Save this candidate as the room (commit)">save</button>
+               <button class="cchip" data-step="plate" title="Set this candidate as the scenario's world plate (backdrop reference for other rooms)">plate</button>
+               <button class="cchip" data-step="seam" title="Seam-safe 360 wrap — makes a new _seam candidate whose left/right edges meet cleanly">seam</button>
+             </div>`;
+          card.querySelector("img").onclick = () => pickScene(key, f);
+          card.querySelector(".cap").onclick = () => pickScene(key, f);
+          card.querySelector(".cdel").onclick = e => { e.stopPropagation(); deleteScene(key, f); };
+          card.querySelectorAll(".cchip").forEach(b =>
+            b.onclick = e => { e.stopPropagation(); candStep(key, f, b.dataset.step); });
+          grid.appendChild(card);
+        });
+    }
+    // run a build step for a SPECIFIC candidate: pick it first (so the shared actions target it),
+    // then fire the same action the shared row uses. Chip colours repaint on return (focus → refreshAll).
+    async function candStep(key, f, step) {
+      await pickScene(key, f);
+      if (step === "wrap") openEditor("reproject_test.html", key, true);
+      else if (step === "hotspots") openEditor("hotspots_edit.html", key, true);
+      else if (step === "door") makeOpenDoor(key);
+      else if (step === "save") saveRoom(key);
+      else if (step === "plate") setWorldPlate(key, f);
+      else if (step === "seam") seamfix(key, f);
+    }
+    // Seam-safe 360 wrap: produces a new <name>_seam candidate whose L/R edges meet (Phase V3 art polish)
+    async function seamfix(key, f) {
+      const c = $("#build_" + cssId(key)), st = c && c.querySelector(".genStatus");
+      if (st) st.textContent = "seam-fixing 360 wrap… (~20s)";
+      const r = await post("/api/seamfix", { ...SCQ(), image: f });
+      if (!r.ok) { if (st) st.innerHTML = `<span class="err">${r.error}</span>`; return; }
+      watch("seam", st, () => fetchScenes());
+    }
+    // Phase 2: promote a candidate to the scenario's world plate (backdrop reference for other rooms)
+    async function setWorldPlate(key, f) {
+      const c = $("#build_" + cssId(key)), st = c && c.querySelector(".genStatus");
+      if (st) st.textContent = "setting world plate…";
+      const r = await post("/api/set-world-plate", { ...SCQ(), image: f });
+      if (!r.ok) { if (st) st.innerHTML = `<span class="err">${r.error}</span>`; return; }
+      if (SCENARIO_DOC) SCENARIO_DOC.worldPlate = r.worldPlate;
+      if (st) st.innerHTML = `<span class="ok2">world plate set ✓ — ${esc(f)}</span>`;
+      updateWorldPlateHints();
+    }
+    // reflect whether a world plate is set into every room's "world plate" control hint
+    function updateWorldPlateHints() {
+      const set = !!(SCENARIO_DOC && SCENARIO_DOC.worldPlate);
+      document.querySelectorAll(".worldPlateHint").forEach(el => {
+        el.textContent = set ? "plate: set ✓" : "no plate yet — set one from a candidate";
+        el.style.color = set ? "" : "#a26";
+      });
+    }
+    async function deleteScene(key, f) {
+      if (!confirm("Delete candidate\n" + f + "\n(and its open-door image, if any) from _scratch?")) return;
+      const c = $("#build_" + cssId(key)), st = c && c.querySelector(".genStatus");
+      const r = await post("/api/delete-scene", { ...SCQ(), file: f });
+      if (!r.ok) { if (st) st.innerHTML = `<span class="err">${r.error}</span>`; return; }
+      if (picked[key] === f) delete picked[key];
+      if (st) st.innerHTML = `<span class="ok2">deleted ${esc(f)}</span>`;
+      await refreshAll();
+    }
+    // toggle the selected-candidate highlight WITHOUT rebuilding the grid (rebuilding recreates every
+    // <img> and made the whole column flash/reload on each click)
+    function markPicked(key) {
+      const c = $("#build_" + cssId(key)); if (!c) return;
+      c.querySelectorAll(".scenes .card").forEach(card => {
+        const cap = card.querySelector(".cap");
+        card.classList.toggle("sel", !!cap && cap.textContent === picked[key]);
+      });
+    }
+    async function pickScene(key, f) {
+      picked[key] = f;
+      // persist the pick into the room's _scratch draft so the editor tabs open on it
+      await post("/api/draft-save", { ...SCQ(), roomKey: key, image: f });
+      DRAFTS[key] = { ...(DRAFTS[key] || {}), image: f };
+      markPicked(key);
+      refreshProgress();
+    }
+
+    // persist a card's title/technique/tag/prompts onto the node (folds in the old "save all rooms")
+    async function saveMeta(key) {
+      const c = $("#build_" + cssId(key)); if (!c) return { ok: false };
+      return post("/api/room-patch", {
+        ...SCQ(), roomKey: key, fields: {
+          title: c.querySelector(".rtitle").value,
+          authoring: {
+            tag: tagOf(key),
+            scenePrompt: c.querySelector(".prompt").value,
+            doorPrompt: c.querySelector(".doorprompt").value,
+          },
+        }
+      });
+    }
+
+    // find a candidate card's build-step chip (wrap/spots/door/save) by its filename + step
+    function candChip(key, f, step) {
+      const c = $("#build_" + cssId(key)); if (!c) return null;
+      const card = [...c.querySelectorAll(".scenes .card")]
+        .find(cd => { const cap = cd.querySelector(".cap"); return cap && cap.textContent === f; });
+      return card && card.querySelector(`.cchip[data-step="${step}"]`);
+    }
+
+    // ---- make open door: masked edit of the door box on the picked _scratch candidate ----
+    async function makeOpenDoor(key) {
+      const c = $("#build_" + cssId(key));
+      const st = c.querySelector(".commitStatus");
+      const img = picked[key] || (DRAFTS[key] || {}).image;
+      const hs = draftPer(key, img).hotspots || [];
+      // Mask the box the open image should REVEAL (forward door → lock → any door). Shared with the
+      // Node test suite; see open_target.js for the priority order and why a BACK door never wins.
+      const door = EscapeOpenTarget.pickOpenMaskHotspot(hs);
+      if (!img) { st.innerHTML = `<span class="err">pick a candidate first</span>`; return; }
+      if (!door) { st.innerHTML = `<span class="err">draw a forward door (or a lock, for a valve/keypad reveal) in Edit hotspots first</span>`; return; }
+      const prompt = (c.querySelector(".doorprompt").value || "").trim()
+        || "The door now stands wide open, revealing the space beyond; identical lighting and style, no people, no lettering, no text.";
+      const doorChip = candChip(key, img, "door");
+      doorChip && doorChip.classList.add("busy");       // in-progress colour (item 3); the re-render on done repaints it
+      const r = await post("/api/dooropen", { image: img, box: door.box, prompt });
+      if (!r.ok) { st.innerHTML = `<span class="err">${r.error}</span>`; doorChip && doorChip.classList.remove("busy"); return; }
+      st.textContent = "opening the door…";
+      // door-open runs on the server's shared "door" slot (not this room's slot)
+      watch("door", st, async () => {
+        openVer[key] = Date.now();                    // bust the preview cache so the regenerated image shows
+        st.innerHTML = `<span class="ok2">open-door image made ✓ — inspect below, then Save (chip) the room</span>`;
+        await fetchScenes();                          // re-renders the grid → door chip repaints green
+      });
+    }
+
+    // ---- save room: commit the finished closed+open pair out of _scratch, promote wrap+hotspots ----
+    async function saveRoom(key) {
+      const c = $("#build_" + cssId(key));
+      const st = c.querySelector(".commitStatus");
+      await saveMeta(key);                                  // keep the node's title/prompts current
+      st.textContent = "saving room…";
+      const r = await post("/api/commit-room", { ...SCQ(), roomKey: key });
+      if (!r.ok) { st.innerHTML = `<span class="err">${r.error}</span>`; return; }
+      st.innerHTML = `<span class="ok2">saved → ${esc(r.dest)}/ (${(r.written || []).join(", ")})</span>`;
+      delete picked[key];
+      await refreshAll();
+    }
+
+    // Deliberately NO focus→refreshAll (removed Lucas 2026-07-31): auto-refresh on every tab-return was
+    // disorienting and could clobber unsaved field edits. refreshAll still runs on load + after commits;
+    // reload the page manually when you know external changes (art gen, box-marking, mixer) have landed.
+
+    $("#saveAllBtn").onclick = saveAll;
+    // open the loaded scenario in the test player over the :8055 playtest server, with the sound mixer
+    $("#testPlayBtn").onclick = () => {
+      if (!ACTIVESC.chapter) return;
+      // pass our own origin so the mixer can POST balanced volumes back to this harness (/api/save-mix)
+      const url = `http://localhost:8055/escape_rooms/shared/test_play.html?chapter=${encodeURIComponent(ACTIVESC.chapter)}&scenario=${encodeURIComponent(ACTIVESC.scenario)}&harness=${encodeURIComponent(location.origin)}`;
+      window.open(url, "_blank");
+    };
+    // ▶ Play — the scenario in NORMAL play mode (a student's view: no mixer, no test tools, no editing)
+    $("#playBtn").onclick = () => {
+      if (!ACTIVESC.chapter) return;
+      const url = `http://localhost:8055/escape_rooms/rooms/${encodeURIComponent(ACTIVESC.chapter)}/${encodeURIComponent(ACTIVESC.scenario)}/play.html`;
+      window.open(url, "_blank");
+    };
+    loadScenarios();
+  </script>
+  <!-- Harness width control: caps <main>'s max-width so you can zoom the browser AND set page width independently.
+       Value persists in localStorage; "full" means no cap (the historical default). Isolated from the main script. -->
+  <script>
+    (function () {
+      const KEY = "harnessMaxWidth";
+      const main = document.querySelector("main");
+      const slider = document.getElementById("widthSlider");
+      const valEl = document.getElementById("widthVal");
+      const fullBtn = document.getElementById("widthFullBtn");
+      if (!main || !slider || !valEl || !fullBtn) return;
+      const MIN = +slider.min, MAX = +slider.max;
+      function apply(v) {                         // v is a px number, or "full"
+        if (v === "full") { main.style.maxWidth = "none"; valEl.textContent = "full"; fullBtn.disabled = true; }
+        else { main.style.maxWidth = v + "px"; valEl.textContent = v + "px"; fullBtn.disabled = false; }
+      }
+      let saved = localStorage.getItem(KEY);      // null on first ever load → keep historical full-width default
+      if (saved === null) saved = "full";
+      if (saved === "full") { slider.value = MAX; apply("full"); }
+      else { const n = Math.min(MAX, Math.max(MIN, parseInt(saved, 10) || MAX)); slider.value = n; apply(n); }
+      slider.addEventListener("input", () => { const n = +slider.value; apply(n); localStorage.setItem(KEY, String(n)); });
+      fullBtn.addEventListener("click", () => { slider.value = MAX; apply("full"); localStorage.setItem(KEY, "full"); });
+    })();
+  </script>
+</body>
+</html>

@@ -138,6 +138,35 @@ def main():
             check("as.character(patient_number)" in sc,
                   "%s binds the unknown to the cohort and coerces patient_number to character" % rk)
 
+    print("== re-theme hygiene: no stale Alaska/v1 text in player-facing fields ==")
+    # Regression (2026-07-30 audit): re-themed off alaska_lake_data, residual Alaska/v1 terms leaked into
+    # player-facing narrative (escapeDone said "the pilot's stable, the infection's named"; the escape
+    # debrief/technique still described the retired geom_text map puzzle; the subtitle said "filter,
+    # count"). Guard the narrative surfaces the player actually reads (scene/design/plannedHotspots are
+    # authoring-only and intentionally excluded — the decorative lake-print / parks-map residues live there).
+    STALE = ["pilot", "north killeak", "chlorocidin", "white_fish", "white fish", "geom_text",
+             "unlabelled plot", "unlabeled plot", "highest sodium", "most lakes", "filter, count",
+             "flight-data recorder", "flight recorder"]
+    surfaces = [("subtitle", scen.get("subtitle", "")), ("story", scen.get("story", "")),
+                ("done.body", scen.get("done", {}).get("body", "")),
+                ("escapeDone.body", scen.get("escapeDone", {}).get("body", "")),
+                ("escape.enterLabel", scen.get("escape", {}).get("enterLabel", ""))]
+    for rk, r in R.items():
+        surfaces += [(rk + ".debrief", r.get("debrief", "")), (rk + ".technique", r.get("technique", "")),
+                     (rk + ".entry.text", (r.get("entry") or {}).get("text", ""))]
+        for h in r.get("hotspots", []):
+            q = h.get("question")
+            if q:
+                surfaces.append((rk + "/" + h.get("id", "") + ".prompt", q.get("prompt", "")))
+                fb = q.get("feedback", {})
+                surfaces.append((rk + ".feedback.correct", fb.get("correct", "")))
+                surfaces += [(rk + ".feedback.wrong[%d]" % i, w) for i, w in enumerate(fb.get("wrong", []))]
+            if h.get("type") == "clue" and h.get("body"):
+                surfaces.append((rk + "/" + h.get("id", "") + ".body", h["body"]))
+    for name, s in surfaces:
+        hit = next((t for t in STALE if t in s.lower()), None)
+        check(hit is None, "%s: no stale Alaska/v1 term%s" % (name, "" if hit is None else " (found '%s')" % hit))
+
     print("== escape v3: facet-collage keypad ==")
     # the combinatorics module still proves the intended pairing -> 729, and all six codes are distinct
     codes = escape2_facets.all_codes()
@@ -151,8 +180,8 @@ def main():
     collage = [h for h in hs if h.get("type") == "clue" and h.get("image") == "postcards/collage_door.png"]
     check(len(collage) == 1 and not collage[0].get("pickup"), "one non-pickup started-collage clue (the format key)")
     notes = [h for h in hs if h.get("type") == "clue" and h.get("id", "").startswith("editor_s_note")]
-    check(len(notes) == 2 and all(n.get("pickup") and not n.get("image") for n in notes),
-          "two pickup editorial-note clues (text, no image)")
+    check(len(notes) == 1 and all(n.get("pickup") and (n.get("body") or "").strip() and not n.get("image") for n in notes),
+          "one pickup editorial-note clue (non-empty text body, no image)")
     # nine postcards total, all pickup + image, across the whole scenario
     cards = [h for r in scen["rooms"] for h in r.get("hotspots", [])
              if h.get("type") == "clue" and str(h.get("image", "")).startswith("postcards/postcard_")]

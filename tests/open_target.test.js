@@ -12,6 +12,7 @@ const fwd  = (label = "fwd")  => ({ type: "door", label, direction: "forward", b
 const back = (label = "back") => ({ type: "door", label, direction: "back", box });
 const lock = (label = "valve") => ({ type: "lock", label, box });
 const legacyDoor = (label = "legacy") => ({ type: "door", label, box }); // no direction set
+const open = (label = "passage") => ({ type: "door", label, direction: "open", box }); // open-world always-walkable passage
 
 test("boss room: back-door ladder + valve lock -> masks the LOCK (the fix)", () => {
   const hs = [{ type: "puzzle", box }, back("ladder up"), lock("valve keypad"), { type: "clue", box }];
@@ -44,6 +45,23 @@ test("legacy door with no direction is treated as forward", () => {
 
 test("room with ONLY a back door and no lock has nothing to reveal -> null / disabled", () => {
   const hs = [back("passage back"), { type: "puzzle", box }, { type: "clue", box }];
+  assert.equal(pickOpenMaskHotspot(hs), null);
+  assert.equal(hasOpenTarget(hs), false);
+});
+
+test("open-world room: OPEN passages listed before the forward door -> masks the FORWARD door (2026-07-31 airship-deck fix)", () => {
+  // the weather deck: apothecary (open) + mast to nest (open) come before the forward bridge door
+  const hs = [{ type: "puzzle", box }, open("down to apothecary"), open("up the mast"), fwd("forward to the bridge"), lock("bridge hatch keypad")];
+  assert.equal(pickOpenMaskHotspot(hs).label, "forward to the bridge");
+});
+
+test("open passages never win over a lock either (forward -> lock -> nothing)", () => {
+  const hs = [open("passage a"), lock("valve"), open("passage b")];
+  assert.equal(pickOpenMaskHotspot(hs).type, "lock");
+});
+
+test("room whose only doors are OPEN passages has nothing to reveal -> null / disabled", () => {
+  const hs = [open("north"), open("south"), { type: "puzzle", box }];
   assert.equal(pickOpenMaskHotspot(hs), null);
   assert.equal(hasOpenTarget(hs), false);
 });

@@ -1268,8 +1268,9 @@ git add -A && git commit -m "whatever changed" && git push</pre>
       await refreshAll();
     }
 
-    // returning from an editor tab: drafts/scenes/node may have changed → repaint the walk-through
-    window.addEventListener("focus", () => { if (ACTIVESC.chapter) refreshAll(); });
+    // Deliberately NO focus→refreshAll (removed Lucas 2026-07-31): auto-refresh on every tab-return was
+    // disorienting and could clobber unsaved field edits. refreshAll still runs on load + after commits;
+    // reload the page manually when you know external changes (art gen, box-marking, mixer) have landed.
 
     $("#saveAllBtn").onclick = saveAll;
     // open the loaded scenario in the test player over the :8055 playtest server, with the sound mixer

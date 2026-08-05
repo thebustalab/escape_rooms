@@ -1,0 +1,238 @@
+{
+  "status": "design-stub — NOT built; awaits engine work (see notes.md → Engine work) then art harness",
+  "chapter": "dimensionality_reduction",
+  "scenario": "clouds",
+  "id": 16,
+  "title": "Where the City Opens",
+  "subtitle": "A cloud-drowned city, and a borrowed plane that won't leave until you've read it.",
+  "story": "The ring-current has you. However you bank, the wind curls you back over the same vast city — towers and terraces half-drowned in gold cloud, only their upper floors breaking the surface. Down in the streets you'd see nothing but the nearest tower; the shape of the whole place shows only from up here, along the right headings — if you can find them. Others drift the ring with you, silent, their cockpits long empty; their planes never read the city, so they never woke. The one dial that might free yours sits dark on the dash. You have the light of one low sun. Sample the cloud-gardens, chart the two axes, wake the plane, and climb out.",
+  "enterLabel": "Take the controls",
+  "done": "Both axes charted; the city's grain lies open beneath you, and on the dash the dead dial stirs. Out along the two headings where the city opened — and only those — the cloud parts on a column of gold: the Eye of the ring. Fly an opening heading in.",
+  "escapeDone": "The current lets go. You pull up into the gold column and the ring falls away beneath you — the city, the silent drifting planes, all of it sinking into cloud as you climb out at last into open, endless sun.",
+  "packages": ["dplyr", "ggplot2", "readr", "ggiraph"],
+  "datasets": [
+    {
+      "name": "cloud_gardens",
+      "url": "https://thebustalab.github.io/escape_rooms/rooms/dimensionality_reduction/clouds/data/cloud_gardens.csv"
+    }
+  ],
+  "setup": "suppressMessages({library(dplyr); library(ggplot2)})",
+  "state": { "rooms_solved": 0 },
+  "ambient": "fine golden sun-motes and thin wisps of cloud drifting across the view",
+  "coverPrompt": "Minimalist stylised thumbnail poster of a single small open-cockpit biplane banking above an endless sea of gold cloud, with a few dark alien skyscraper-tops breaking the cloud surface far below and one low sun behind. Designed to read clearly as a small thumbnail: one bold, simple, high-contrast silhouette, iconic and uncluttered, minimal fine detail. Flat, limited palette: deep teal and icy blue cloud-shadow with one warm amber glow of low sun. Soft film grain, painterly but clean with simple geometric shapes. Strong negative space, single centred focal subject. No people, no text, no lettering, no logos. Square composition.",
+  "debrief": {
+    "title": "How this world worked",
+    "intro": "The whole flight was one act of principal-components analysis, made into a place. A cloud of things — a city of districts — looks like a muddle from most directions, and opens into legible order only along a couple of special headings. That is exactly what PCA finds: the directions of greatest spread (the principal components), and what each is made of (the loadings). You solved the numbers from your seat, then flew the ring to hunt those few opening headings by eye — and the trap you met was that the biggest axis does not show you everything."
+  },
+  "_engineNotes": "clouds needs engine features that do not yet exist — CONFIRMED to build (no fallback fork). See notes.md § 'Engine work required'. In brief: (1) a cockpit CONSOLE serving the 4 graded puzzles in SERIES (parked 'dynamic puzzle queue'); realised as 4 availableWhen-chained puzzle hotspots in one room — needs a CODEC decision (per-gate vs cockpit=1 slot + submission PDF); (2) ONE new escape widget: the 3-state lower-triangle correlation GRID (the pick-two beat was dropped — the Eye is reachable ONLY via the two OPENER apertures' pillars, so identifying the axes is enacted by TRAVERSAL); (3) the Eye/pillar activation of the dormant panel, with the pillar forward-door existing ONLY in ap_grainrun + ap_stillstand (availableWhen the 4 console puzzles solved). Ring is 7 nodes (cockpit + 6 apertures) + eye. Do not take to art until (1)–(3) are resolved.",
+  "rooms": [
+    {
+      "key": "cockpit",
+      "title": "The pilot's seat",
+      "technique": "PCA survey console — serves all four graded analyses in series (scores → scree → loadings → marker)",
+      "puzzleType": 1,
+      "built": false,
+      "unlockedWhen": true,
+      "onSolve": null,
+      "deliverable": { "type": "figure", "submitCodec": true },
+      "authoring": {
+        "tag": "cockpit",
+        "scenePrompt": "This is a panorama — a single 360-degree view from the seat of a small open-cockpit aeroplane, the whole scene wrapping continuously all the way around so the left and right edges meet seamlessly. Late golden afternoon high above an endless sea of gold cloud; a low sun throws long warm rays and the cloud-shadows are icy blue. Ahead and below, filling the lower forward arc, the aircraft's dashboard: a worn brass-and-glass SURVEY CONSOLE with a single glowing reading-plate and small dials, and beside it a DARK, DEAD hexagonal OVERRIDE DIAL recessed into the panel, unlit and cold; a large ship's COMPASS to one side. Around and above, past the windscreen and open sides of the cockpit, a vast alien city stands far below with only its skyscraper-tops and spires breaking up through the gold cloud, stretching to every horizon. To one side and to the other, gaps in the cloud-wall open as passages onward. Painterly, cinematic, warm gold and icy blue with one amber glow. No people, no lettering, no text.",
+        "doorPrompt": "Same scene; the dead hexagonal override dial on the dashboard now glows warm amber, awakened. No column of gold opens here — the way through shows only out along the two headings where the city itself opens. The side cloud-gaps are unchanged."
+      },
+      "entry": {
+        "title": "The pilot's seat",
+        "text": "Your hands find the controls of a plane that isn't yours. The survey console glows; the override dial beside it is dead. Read the city, and it may wake."
+      },
+      "debrief": "Everything graded happened here, at one seat: the console served the four analyses in order, the way a real PCA is read — first where the data spreads (scores), then how much that spread is worth (scree), then what it's made of (loadings), then the trap. You never had to move to do the analysis; the reading is the work, and it's done from one vantage.",
+      "designNote": "COCKPIT = the whole graded ladder as a CONSOLE serving four puzzles in SERIES. Realise as 4 puzzle hotspots chained by availableWhen (+ lockedBody 'the console is still compiling the next reading'). Dataset cloud_gardens (212 blooms × 7 props; district=group). Answers VERIFIED (notes.md ladder).\n  P1 SCORES (pick, type4): scores plot, click the PC1 extreme bloom → 'Emberbloom-01' (foundry; |PC1|=4.71, +14.4%). idColumn=bloom.\n  P2 SCREE (check, type1): PC1 variance % → 44.2 (PC2 30.4; PC1+PC2 74.5). availableWhen P1.\n  P3 LOADINGS (check/MCQ, type1): top PC1 driver → 'filament_length' (0.945, +8.0% vs spore_density). distractors=other 6 props. availableWhen P2.\n  P4 MARKER/BOSS (check repair, type3): which prop distinguishes ARCHIVE? MISDIRECTION — archive mid-pack on PC1 (the axis P1–P3 drilled); separates on PC2 → 'acidity' (PC2 loading 0.904; gap 1.90; +10.7% loading / +39.2% gap vs pigment_load). decoy='filament_length'. anti-fixation hint here. Solving all 4 fires survey-complete (opens the Eye). availableWhen P3.\nALSO clue on the dead override dial (foreshadow); clue on the compass (principal headings 90° apart). Doors: OPEN to ap_grainrun + ap_backwind (ring neighbours). NO Eye pillar here — the Eye is reachable ONLY from the two opener apertures (ap_grainrun, ap_stillstand). NEW ART.",
+      "plannedHotspots": [
+        { "type": "puzzle", "label": "Console — scores reading", "note": "P1 pick type4 → Emberbloom-01; idColumn=bloom" },
+        { "type": "puzzle", "label": "Console — scree reading", "note": "P2 check type1 → 44.2%; availableWhen P1" },
+        { "type": "puzzle", "label": "Console — loadings reading", "note": "P3 check type1 → filament_length; availableWhen P2" },
+        { "type": "puzzle", "label": "Console — marker reading", "note": "P4 boss check type3 repair PC1→PC2 → acidity; decoy filament_length; availableWhen P3" },
+        { "type": "clue", "label": "The dead override dial", "note": "foreshadow: keyed to the city's grain; dormant until the Eye (an opener) is entered" },
+        { "type": "clue", "label": "The compass", "note": "the two principal headings sit 90° apart — orthogonality cue" },
+        { "type": "door", "label": "Cloud-gap to grain-run heading", "direction": "open", "note": "to ap_grainrun" },
+        { "type": "door", "label": "Cloud-gap to the backwind heading", "direction": "open", "note": "to ap_backwind" }
+      ]
+    },
+    {
+      "key": "ap_grainrun",
+      "title": "The grain-run heading",
+      "technique": "view-aperture (ungraded) — an OPENER: the city unfolds along its first axis (PC1)",
+      "puzzleType": 0,
+      "built": false,
+      "unlockedWhen": true,
+      "onSolve": null,
+      "authoring": {
+        "tag": "ap_grainrun",
+        "scenePrompt": "This is a panorama — a 360-degree view banked over the open side of a small biplane's cockpit, wrapping continuously so the left and right edges meet seamlessly. Late golden afternoon, low sun, warm rays, icy-blue cloud-shadow. Below and all around, the vast alien city breaks through a gold cloud-sea, and from THIS heading it visibly STRETCHES OUT along one long axis toward a far horizon: the towers run in a clear line from a blazing furnace-lit quarter glowing amber at one distant end, down to low cool spires at the other — the whole city legible and unfolded, its grain plain. A thin wing-edge and cockpit rim frame the lower view. Cloud-gaps to either side open as passages onward. Painterly, cinematic, warm gold and icy blue with one amber glow. No people, no lettering, no text.",
+        "doorPrompt": "Same scene; a bright column of gold light — the Eye — has opened in the cloud ahead as the way onward. The side cloud-gaps are unchanged."
+      },
+      "entry": {
+        "title": "The grain-run heading",
+        "text": "You bank onto a new bearing and the city seems to lengthen — towers falling into a single long line, the furnace-quarter blazing at the far end. Here, its grain is unmistakable. Mark this heading."
+      },
+      "debrief": "One of the two openers: the first principal component made visible — the direction the city spreads out the most. Bank onto it and the muddle resolves into a line. What runs along it, the blazing furnace-quarter, is what the loadings named.",
+      "designNote": "OPENER aperture (PC1), ungraded. Shows the city unfolded along the long axis; the player marks this as one of the two opening headings (feeds the escape's pick-two). CLUE: the escape reading visible here — along this heading tall towers run WITH bright ones, hue runs opposite height, spires scattered (world-furniture, NOT dataset numbers). Compass ~034°. Doors: OPEN to cockpit + ap_pileup; PILLAR to eye (availableWhen 4 console puzzles solved) — this is an OPENER, so this pillar IS one of the only two ways into the Eye. NEW ART.",
+      "plannedHotspots": [
+        { "type": "clue", "label": "The unfolded grain", "note": "OPENER; escape reading — height & glow run together, hue opposite height, spires independent; compass ~034°" },
+        { "type": "door", "label": "Cloud-gap to the seat", "direction": "open", "note": "to cockpit" },
+        { "type": "door", "label": "Cloud-gap to the pile-up heading", "direction": "open", "note": "to ap_pileup" },
+        { "type": "door", "label": "The Eye pillar", "direction": "forward", "note": "to eye; availableWhen all 4 console puzzles solved; ONLY here + ap_stillstand (the two openers)" }
+      ]
+    },
+    {
+      "key": "ap_pileup",
+      "title": "The pile-up heading",
+      "technique": "view-aperture (ungraded) — a MUDDLE: off-axis, the city collapses into overlap",
+      "puzzleType": 0,
+      "built": false,
+      "unlockedWhen": true,
+      "onSolve": null,
+      "authoring": {
+        "tag": "ap_pileup",
+        "scenePrompt": "This is a panorama — a 360-degree view banked over the open side of a small biplane's cockpit, wrapping continuously so the left and right edges meet seamlessly. Late golden afternoon, low sun, warm rays, thicker gold cloud and icy-blue shadow. Below and around, the same alien city breaks through the cloud, but from THIS off-kilter heading it reads as an overlapping MUDDLE — towers piled directly behind towers with no line or order, quarters jumbled together, the grain lost, nothing standing apart. A thin wing-edge and cockpit rim frame the lower view. Cloud-gaps to either side open as passages onward. Painterly, cinematic, warm gold and icy blue with one amber glow. No people, no lettering, no text.",
+        "doorPrompt": "(No forward door on this heading — the cloud never parts here; only the two opening headings reach the Eye. No open variant needed.)"
+      },
+      "entry": {
+        "title": "The pile-up heading",
+        "text": "This bearing gives you nothing. The towers stack behind one another, quarters jumbled, no grain at all. Not this one."
+      },
+      "debrief": "A muddle heading — the contrast that makes the lesson land. From most directions a cloud of points is just overlap. PCA matters precisely because only a few special directions unfold it; flying a bad heading and getting nothing is why finding the good ones is worth the flight.",
+      "designNote": "MUDDLE aperture, ungraded — the city collapses into overlap; teaches the player to reject non-opening headings (raises the difficulty of the escape's pick-two). No escape reading here. Compass ~070°. Doors: OPEN to ap_grainrun + ap_stillstand. NO Eye pillar (muddle heading — the cloud never parts here). NEW ART.",
+      "plannedHotspots": [
+        { "type": "clue", "label": "The jumble", "note": "MUDDLE; most headings hide the grain — reject this one; compass ~070°" },
+        { "type": "door", "label": "Cloud-gap to the grain-run heading", "direction": "open", "note": "to ap_grainrun" },
+        { "type": "door", "label": "Cloud-gap to the still-stand heading", "direction": "open", "note": "to ap_stillstand" }
+      ]
+    },
+    {
+      "key": "ap_stillstand",
+      "title": "The still-stand heading",
+      "technique": "view-aperture (ungraded) — an OPENER: the perpendicular axis (PC2), where the archive quarter separates",
+      "puzzleType": 0,
+      "built": false,
+      "unlockedWhen": true,
+      "onSolve": null,
+      "authoring": {
+        "tag": "ap_stillstand",
+        "scenePrompt": "This is a panorama — a 360-degree view banked over the open side of a small biplane's cockpit, wrapping continuously so the left and right edges meet seamlessly. Late golden afternoon, low sun at a different angle, warm rays, icy-blue cloud-shadow. Below and around, the same alien city breaks through the gold cloud-sea, but from THIS heading — turned about ninety degrees from the grain-run view — a single STILL, PALE quarter of ancient archive-towers stands clearly APART from the rest of the crowded city, set off on its own along a second, crosswise axis, while the furnace-quarter that dominated before now sits lost mid-crowd. A thin wing-edge and cockpit rim frame the lower view. Cloud-gaps to either side open as passages onward. Painterly, cinematic, warm gold and icy blue with one amber glow. No people, no lettering, no text.",
+        "doorPrompt": "Same scene; a bright column of gold light — the Eye — has opened in the cloud ahead as the way onward. The side cloud-gaps are unchanged."
+      },
+      "entry": {
+        "title": "The still-stand heading",
+        "text": "A quarter-turn on, and the city rearranges. The furnace-quarter that led before is lost in the crowd — but a still, pale district of old towers now stands out alone, along a second grain entirely. Mark this heading too."
+      },
+      "debrief": "The second opener — the second principal component, perpendicular to the first (your compass showed the ninety degrees). A group invisible on the great axis stands out here: the archive quarter, mid-pack on PC1, separates cleanly on PC2. The boss's whole lesson, seen from the air.",
+      "designNote": "OPENER aperture (PC2), ungraded. Shows the city opened on the crosswise axis where the ARCHIVE quarter stands apart; the player marks this as the second opening heading (feeds pick-two) and it reinforces the boss trap visually. CLUE: escape reading here — the archive-towers share a pale, cool-hued, low-glow character (the PC2 signature). Compass ~124° (90° from ap_grainrun). Doors: OPEN to ap_pileup + ap_halflight; PILLAR to eye — this is the OTHER OPENER, so this pillar is the second (and last) way into the Eye. NEW ART.",
+      "plannedHotspots": [
+        { "type": "clue", "label": "The quarter that stands apart", "note": "OPENER; escape reading — archive-towers pale, cool-hued, low-glow together; compass ~124°" },
+        { "type": "door", "label": "Cloud-gap to the pile-up heading", "direction": "open", "note": "to ap_pileup" },
+        { "type": "door", "label": "Cloud-gap to the half-light heading", "direction": "open", "note": "to ap_halflight" },
+        { "type": "door", "label": "The Eye pillar", "direction": "forward", "note": "to eye; availableWhen all 4 console puzzles solved; ONLY here + ap_grainrun (the two openers)" }
+      ]
+    },
+    {
+      "key": "ap_halflight",
+      "title": "The half-light heading",
+      "technique": "view-aperture (ungraded) — a HALF-RESOLVE: the city partly opens (a spectrum, not a switch)",
+      "puzzleType": 0,
+      "built": false,
+      "unlockedWhen": true,
+      "onSolve": null,
+      "authoring": {
+        "tag": "ap_halflight",
+        "scenePrompt": "This is a panorama — a 360-degree view banked over the open side of a small biplane's cockpit, wrapping continuously so the left and right edges meet seamlessly. Late golden afternoon, low sun, warm rays, icy-blue cloud-shadow. Below and around, the same alien city breaks through the cloud, and from THIS heading it HALF-resolves: you can almost see a line forming — some towers loosely trending one way — but it's smeared and uncertain, quarters partly overlapping, the grain hinted at but not clean, neither a true line nor a full muddle. A thin wing-edge and cockpit rim frame the lower view. Cloud-gaps to either side open as passages onward. Painterly, cinematic, warm gold and icy blue with one amber glow. No people, no lettering, no text.",
+        "doorPrompt": "(No forward door on this heading — it only half-opens; the cloud never fully parts here. No open variant needed.)"
+      },
+      "entry": {
+        "title": "The half-light heading",
+        "text": "Here the city almost opens — a line half-forming, then smearing away. Close, but not it. The grain is a spectrum, and this isn't its peak."
+      },
+      "debrief": "The half-resolve — proof that opening is a spectrum, not a switch. Headings near a principal axis partly reveal the grain; only at the axis itself does it snap clean. Learning to tell 'almost' from 'yes' is exactly reading which direction carries the most spread.",
+      "designNote": "HALF-RESOLVE aperture, ungraded — the city partly opens; teaches that spread is a spectrum peaking at the openers (makes the pick-two a real judgement, not a binary). Not an opener; the tempting near-miss (its pillar never opens — a hard lesson that 'almost' isn't an axis). Compass ~205°. Doors: OPEN to ap_stillstand + ap_smear. NO Eye pillar (only half-opens). NEW ART.",
+      "plannedHotspots": [
+        { "type": "clue", "label": "The half-formed line", "note": "HALF-RESOLVE; tempting near-miss — close but not a true opener, so its cloud never parts; compass ~205°" },
+        { "type": "door", "label": "Cloud-gap to the still-stand heading", "direction": "open", "note": "to ap_stillstand" },
+        { "type": "door", "label": "Cloud-gap to the smear heading", "direction": "open", "note": "to ap_smear" }
+      ]
+    },
+    {
+      "key": "ap_smear",
+      "title": "The smear heading",
+      "technique": "view-aperture (ungraded) — a MUDDLE: off-axis overlap",
+      "puzzleType": 0,
+      "built": false,
+      "unlockedWhen": true,
+      "onSolve": null,
+      "authoring": {
+        "tag": "ap_smear",
+        "scenePrompt": "This is a panorama — a 360-degree view banked over the open side of a small biplane's cockpit, wrapping continuously so the left and right edges meet seamlessly. Late golden afternoon, low sun low on the horizon, long warm rays, thick gold haze and icy-blue shadow. Below and around, the same alien city breaks through the cloud, but from THIS heading it smears into a formless overlap — towers blurred across one another in the haze, no line, no quarter standing apart, the grain gone. A thin wing-edge and cockpit rim frame the lower view. Cloud-gaps to either side open as passages onward. Painterly, cinematic, warm gold and icy blue with one amber glow. No people, no lettering, no text.",
+        "doorPrompt": "(No forward door on this heading — the cloud never parts here; only the two opening headings reach the Eye. No open variant needed.)"
+      },
+      "entry": {
+        "title": "The smear heading",
+        "text": "Haze and overlap. The city smears into nothing you can read. Another dead heading — move on."
+      },
+      "debrief": "Another muddle, deeper in the day's haze — reinforcing that most of the compass tells you nothing. The more bad headings you rule out, the more the two that open the city mean.",
+      "designNote": "MUDDLE aperture, ungraded — off-axis overlap, reinforces the reject-most-headings lesson and pads the ring so the pick-two isn't trivial. No escape reading. Compass ~160°. Doors: OPEN to ap_halflight + ap_backwind. NO Eye pillar (muddle). NEW ART.",
+      "plannedHotspots": [
+        { "type": "clue", "label": "The formless haze", "note": "MUDDLE; reject; compass ~160°" },
+        { "type": "door", "label": "Cloud-gap to the half-light heading", "direction": "open", "note": "to ap_halflight" },
+        { "type": "door", "label": "Cloud-gap to the backwind heading", "direction": "open", "note": "to ap_backwind" }
+      ]
+    },
+    {
+      "key": "ap_backwind",
+      "title": "The backwind heading",
+      "technique": "view-aperture (ungraded) — a near-MUDDLE; the derelict planes drift here (stakes motif)",
+      "puzzleType": 0,
+      "built": false,
+      "unlockedWhen": true,
+      "onSolve": null,
+      "authoring": {
+        "tag": "ap_backwind",
+        "scenePrompt": "This is a panorama — a 360-degree view banked over the open side of a small biplane's cockpit, wrapping continuously so the left and right edges meet seamlessly. Late golden afternoon, low sun, warm rays, icy-blue cloud-shadow. Below and around, the same alien city breaks through the cloud in a near-formless overlap from this heading; and drifting through the gold cloud at this bearing are two or three other SILENT, EMPTY biplanes, ghost-still, caught in the same slow ring-current, their open cockpits long abandoned. A thin wing-edge and cockpit rim frame the lower view. Cloud-gaps to either side open as passages onward. Painterly, cinematic, warm gold and icy blue with one amber glow, faintly mournful. No people (the drifting planes are empty), no lettering, no text.",
+        "doorPrompt": "(No forward door on this heading — the cloud never parts here; only the two opening headings reach the Eye. No open variant needed.)"
+      },
+      "entry": {
+        "title": "The backwind heading",
+        "text": "The current carries you past the others — empty planes drifting silent in the gold, cockpits abandoned. They never read the city. You will not join them."
+      },
+      "debrief": "The stakes, made visible: the empty planes are pilots who never found the openers, never woke their craft, and never left. The ring keeps whatever can't read it. That's the cost the whole flight is racing.",
+      "designNote": "NEAR-MUDDLE aperture, ungraded — carries the DERELICT-PLANES stakes motif (empty craft drifting; no people, the planes are empty). Also a non-opener. Compass ~285°. Doors: OPEN to ap_smear + cockpit (closes the ring). NO Eye pillar (near-muddle). NEW ART.",
+      "plannedHotspots": [
+        { "type": "clue", "label": "The drifting derelicts", "note": "stakes motif: empty planes that never read the city; near-muddle; compass ~285°" },
+        { "type": "door", "label": "Cloud-gap to the smear heading", "direction": "open", "note": "to ap_smear" },
+        { "type": "door", "label": "Cloud-gap back to the seat", "direction": "open", "note": "to cockpit (closes the ring)" }
+      ]
+    },
+    {
+      "key": "eye",
+      "title": "The Eye of the ring",
+      "technique": "ESCAPE (data-free) — reconstruct the correlation panel, then the release gesture (recognition of the two axes is enacted by ENTERING via an opener)",
+      "puzzleType": 0,
+      "phase": "escape",
+      "built": false,
+      "unlockedWhen": { "allSolved": ["cockpit"] },
+      "onSolve": null,
+      "authoring": {
+        "tag": "eye",
+        "scenePrompt": "This is a panorama — a 360-degree view from the seat of the small biplane, now hanging still inside a towering COLUMN OF GOLD LIGHT that punches straight up through the cloud at the calm centre of the ring, the scene wrapping continuously so the left and right edges meet seamlessly. The low sun blazes directly down the column; the churning gold cloud-wall of the ring stands all around, and far below through the column's floor the whole alien city can be glimpsed at its true centre. Filling the lower forward arc, the aircraft dashboard, now fully lit: the once-dead hexagonal OVERRIDE DIAL glowing warm amber; a control PANEL bearing a small triangular array of six blank slate tiles; and a heavy brass THROTTLE / release lever. Painterly, cinematic, radiant gold light with icy-blue cloud beyond and one strong amber glow. No people, no lettering, no text.",
+        "doorPrompt": "Same scene; the throttle lever is thrown fully forward and the whole column of gold light flares brilliant white-gold as the plane begins to climb out of it."
+      },
+      "entry": {
+        "title": "The Eye of the ring",
+        "text": "You fly an opening heading straight into the column of gold, and everything goes calm — you could only reach the centre along an axis that opened the city. The dash has woken. Set the grain you read into the panel, and the plane is yours."
+      },
+      "debrief": "The escape was the whole technique with the numbers stripped away. You could only reach the Eye — the city's centre — by flying IN along a heading that opened the city: reaching the centroid along a principal axis, exactly as PCA works. Then you rebuilt, from memory of the two opening views, which of the city's traits move together and which run opposite — the correlation structure PCA is built from. Reading all that off the world, unaided, is the surest sign you understood what the axes were.",
+      "designNote": "ESCAPE room (data-free meta-echo; DECOUPLED from cloud_gardens). Reached ONLY via the PILLAR door from an OPENER aperture (ap_grainrun or ap_stillstand) once the 4 console puzzles are solved — so the RECOGNITION of the two axes is enacted by TRAVERSAL (you fly an opener in), no separate pick-two puzzle needed. Entering activates the dormant dash. ONE BEAT + release:\n  OVERRIDE PANEL (new 3-state lower-triangle GRID widget): 6 pairwise tiles of the 4 building attributes height/glow/hue/spires, each cycling flat / up-slope / down-slope. ANSWER (authored world-furniture, read from ap_grainrun + ap_stillstand art, NOT the dataset): height~glow UP; height~hue DOWN; height~spires FLAT; glow~hue DOWN; glow~spires FLAT; hue~spires FLAT. Requires having SEEN both openers (split the readings across the two so both must be visited). Solving fires endsEscape.\n  RELEASE — a DIAL/throttle gesture (one control, one motion) = the player-performed release → climb out.\nNo onward doors (endsEscape). Escape carries NO codec slot (ungraded). NEW ART. ONE NEW WIDGET (3-state grid) — the pick-two was dropped (traversal replaces it). See notes.md Engine work.",
+      "plannedHotspots": [
+        { "type": "grid", "label": "The override correlation panel", "note": "NEW 3-state lower-triangle: height/glow/hue/spires → up/down/flat/down/flat/flat; endsEscape; needs both openers seen" },
+        { "type": "dial", "label": "The throttle / release lever", "note": "ceremonial player-performed release after the panel solves — one control, one motion → climb out" }
+      ]
+    }
+  ]
+}

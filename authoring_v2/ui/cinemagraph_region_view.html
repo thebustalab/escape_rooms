@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cinemagraph — region composite (sky patch)</title>
+  <!-- The REAL region approach: a full-res STILL panorama stays untouched; each frame we stamp only the
+       box region from a small high-detail video back over it (feathered), and hand the canvas to Pannellum
+       with dynamic:true. Pan around — the whole deck is crisp and static, only the sky patch drifts. This
+       is compositeVariants promoted to per-frame, scoped to one box (the Phase-1 runtime prototype). -->
+  <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css" />
+  <style>
+    html,body{margin:0;height:100%;background:#06111a;color:#e8eef2;font:14px/1.5 system-ui,sans-serif;}
+    #pano{position:absolute;inset:0 0 46px 0;}
+    #bar{position:absolute;left:0;right:0;bottom:0;height:46px;display:flex;align-items:center;gap:12px;padding:0 14px;background:#0b1b28;border-top:1px solid rgba(255,255,255,.14);}
+    .ok2{color:#9fe6b5;} #stat{margin-left:auto;font-size:12px;opacity:.85;} b.k{color:#ffd88c;}
+    button{background:transparent;color:#e8eef2;border:1px solid rgba(255,255,255,.2);border-radius:7px;padding:5px 11px;font:inherit;cursor:pointer;}
+  </style>
+</head>
+<body>
+  <div id="pano"></div>
+  <div id="bar">
+    <span class="ok2">Full-res still — only the <b class="k">sky patch</b> animates. Pan around; the deck stays crisp &amp; still.</span>
+    <button id="togglebox">show region box</button>
+    <span id="stat">loading…</span>
+  </div>
+  <video id="v" src="region_sky.mp4" muted loop playsinline crossorigin="anonymous" style="display:none"></video>
+  <script>
+    const WRAP = { haov: 360, vaov: 90, hfov: 120, vOffset: -7, pitch: -7 };   // airship room2 wrap
+    const v = document.getElementById("v"), stat = document.getElementById("stat");
+    let BOX = [0.40, 0.08, 0.64, 0.44], base = null, viewer = null, showBox = false;
+    let frames = 0, fpsT = 0, fps = 0;
+    const live = document.createElement("canvas");
+    const lx = live.getContext("2d");
+
+    function drawFrame() {
+      const W = live.width, H = live.height;
+      lx.drawImage(base, 0, 0, W, H);                          // full-res still, every frame
+      const [x0, y0, x1, y1] = BOX;
+      const bx = x0 * W, by = y0 * H, bw = (x1 - x0) * W, bh = (y1 - y0) * H;
+      if (v.readyState >= 2 && bw > 0 && bh > 0) {
+        // feather the animated patch into the still (oval fade at the edges — no hard rectangle seam)
+        const fc = document.createElement("canvas"); fc.width = Math.round(bw); fc.height = Math.round(bh);
+        const fx = fc.getContext("2d");
+        fx.drawImage(v, 0, 0, v.videoWidth, v.videoHeight, 0, 0, fc.width, fc.height);
+        fx.globalCompositeOperation = "destination-in";
+        const g = fx.createRadialGradient(fc.width/2, fc.height/2, Math.min(fc.width,fc.height)*0.15,
+                                          fc.width/2, fc.height/2, Math.max(fc.width,fc.height)*0.62);
+        g.addColorStop(0, "rgba(0,0,0,1)"); g.addColorStop(0.72, "rgba(0,0,0,1)"); g.addColorStop(1, "rgba(0,0,0,0)");
+        fx.fillStyle = g; fx.fillRect(0, 0, fc.width, fc.height);
+        lx.drawImage(fc, bx, by);
+      }
+      if (showBox) { lx.strokeStyle = "#7fd1ff"; lx.lineWidth = 3; lx.strokeRect(bx, by, bw, bh); }
+    }
+
+    function loop(t) {
+      if (t - fpsT > 500) { fps = Math.round(frames * 1000 / (t - fpsT)); frames = 0; fpsT = t; }
+      frames++;
+      drawFrame();
+      try { viewer && viewer.setUpdate(true); } catch (e) {}
+      stat.innerHTML = `region composite · <b class="k">${fps} fps</b> · base ${live.width}×${live.height}, patch ${v.videoWidth||"?"}×${v.videoHeight||"?"}`;
+      requestAnimationFrame(loop);
+    }
+
+    async function init() {
+      try { const j = await (await fetch("region_box.json")).json(); if (Array.isArray(j.box)) BOX = j.box; } catch (e) {}
+      base = new Image();
+      base.onload = () => {
+        live.width = base.naturalWidth; live.height = base.naturalHeight;
+        drawFrame();
+        viewer = pannellum.viewer("pano", {
+          type: "equirectangular", panorama: live, dynamic: true,
+          haov: WRAP.haov, vaov: WRAP.vaov, vOffset: WRAP.vOffset, hfov: WRAP.hfov, pitch: WRAP.pitch, yaw: 0,
+          autoLoad: true, showControls: true, draggable: true, mouseZoom: false, backgroundColor: [0.02,0.05,0.09],
+        });
+        v.play().catch(() => {});
+        requestAnimationFrame(loop);
+      };
+      base.onerror = () => stat.innerHTML = `<span style="color:#ff9b9b">base panorama failed to load</span>`;
+      base.src = "region_base.png";
+    }
+    document.getElementById("togglebox").onclick = e => { showBox = !showBox; e.target.textContent = showBox ? "hide region box" : "show region box"; };
+    init();
+  </script>
+</body>
+</html>

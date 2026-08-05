@@ -495,8 +495,74 @@
       "built": true,
       "authoring": {
         "tag": "boss",
-        "scenePrompt": "This is a panorama. A 360-degree view from the centre of the helipad preparation room of a rustic Alaskan field station at night, the room wrapping continuously all the way around so the left and right edges meet seamlessly. Ahead, a workbench with an open laptop showing a faint water-temperature scatter-plot. To one side, a rack of glowing beacon-monitor screens each showing a different faint pulsing signal, an open equipment manual on the bench beneath them, and a dispatch clipboard ruled into a grid of empty squares hanging beside the rack. Opposite, a row of hanging insulated flight and survival suits with helmets on a shelf. Set into one wall, a large window onto a floodlit snowy helipad where a single helicopter waits, dark mountains beyond, and beside it a CLOSED exterior door — the way out. On another wall, an OPEN doorway giving back toward a dark, deserted radio and communications room of a rustic Alaskan field station at night that has an overturned chair in it. Around the rest of the room, steel lockers and cold instrument panels. Tense and quiet, warm amber instrument light against cold blue night, muted teal-and-amber palette, drifting haze, film grain, richly detailed. No people, no lettering, no captions, no text.",
-        "doorPrompt": "The closed exterior door by the window now stands wide open to a blast of snow and floodlight, the waiting helicopter's rotors beginning to turn; the other, open doorway back toward the dark, deserted, and upended radio room is unchanged. Same painterly teal-and-amber style, no people, no lettering, no text."
+        "scenePrompt": "This is a panorama. A 360-degree view from a rocky ledge high on the mountain, the trees left far below, in golden-hour evening light — a steep boulder-strewn scramble to a cleft in the rock, the whole canopy spread far beneath and the peaks close and glowing, with the horizon wrapping continuously all the way around so the left and right edges meet seamlessly. On the far left, an open trail winding back down off the ledge toward the waiting triangle cable-car below; to the left, the vast canopy spread far below the ledge, glowing in the low golden light with drifting cloud between the ledge and the trees; left of centre, a weathered field note pinned under a stone on the rock; dead ahead in the centre, a weathered brass-and-timber survey console set on a flat rock, its open screen showing a faint bar chart; just right of centre, drifting motes of pollen and spore catching the low golden-hour sun over the rock; to the right, the close mountain peaks standing sharp against the golden evening sky; on the far right, a great boulder wedged across a cleft in the rock, blocking the final climb, an alien gate faintly visible in the shadow beyond. Painterly, cinematic, warm and triumphant; rich golden-hour evening light, long amber shadows on the rock, gentle bioluminescent spore-glow, subtle film grain; hopeful, never grim. No people, no lettering, no text, no captions, no UI.",
+        "doorPrompt": "The closed exterior door by the window now stands wide open to a blast of snow and floodlight, the waiting helicopter's rotors beginning to turn; the other, open doorway back toward the dark, deserted, and upended radio room is unchanged. Same painterly teal-and-amber style, no people, no lettering, no text.",
+        "sceneSpec": {
+          "room": "boss",
+          "interior": false,
+          "setting": "a rocky ledge high on the mountain, the trees left far below, in golden-hour evening light — a steep boulder-strewn scramble to a cleft in the rock, the whole canopy spread far beneath and the peaks close and glowing",
+          "elements": [
+            {
+              "id": "trail_back",
+              "at": "on the far left",
+              "desc": "an open trail winding back down off the ledge toward the waiting triangle cable-car below",
+              "door": {
+                "direction": "back",
+                "to": "car_tr"
+              }
+            },
+            {
+              "id": "canopy_below",
+              "at": "to the left",
+              "desc": "the vast canopy spread far below the ledge, glowing in the low golden light with drifting cloud between the ledge and the trees",
+              "animate": {
+                "motion": "cloud drifting slowly across the canopy far below in the warm evening light",
+                "loop": "crossfade"
+              }
+            },
+            {
+              "id": "field_note",
+              "at": "left of centre",
+              "desc": "a weathered field note pinned under a stone on the rock",
+              "clue": true
+            },
+            {
+              "id": "survey_console",
+              "at": "dead ahead in the centre",
+              "desc": "a weathered brass-and-timber survey console set on a flat rock, its open screen showing a faint bar chart",
+              "puzzle": true
+            },
+            {
+              "id": "golden_motes",
+              "at": "just right of centre",
+              "desc": "drifting motes of pollen and spore catching the low golden-hour sun over the rock",
+              "animate": {
+                "motion": "motes of pollen and glowing spore drifting slowly through the warm slanting light",
+                "loop": "crossfade"
+              }
+            },
+            {
+              "id": "peaks_close",
+              "at": "to the right",
+              "desc": "the close mountain peaks standing sharp against the golden evening sky",
+              "animate": {
+                "motion": "thin cloud streaming slowly past the close glowing peaks",
+                "loop": "crossfade"
+              }
+            },
+            {
+              "id": "boulder_cleft",
+              "at": "on the far right",
+              "desc": "a great boulder wedged across a cleft in the rock, blocking the final climb, an alien gate faintly visible in the shadow beyond",
+              "door": {
+                "direction": "forward",
+                "to": "vault"
+              }
+            }
+          ],
+          "atmosphere": "Painterly, cinematic, warm and triumphant; rich golden-hour evening light, long amber shadows on the rock, gentle bioluminescent spore-glow, subtle film grain; hopeful, never grim",
+          "negatives": "No people, no lettering, no text, no captions, no UI"
+        }
       },
       "unlockedWhen": {
         "allSolved": [

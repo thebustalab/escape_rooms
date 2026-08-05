@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hotspots editor</title>
+  <style>
+    :root { --bg:#06111a; --panel:#0b1b28; --line:rgba(255,255,255,.14); --amber:#ffd88c; --ink:#e8eef2; }
+    * { box-sizing:border-box; }
+    html, body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.5 system-ui, sans-serif; }
+    header { padding:10px 16px; border-bottom:1px solid var(--line); display:flex; align-items:center; gap:12px; position:sticky; top:0; background:var(--bg); z-index:5; }
+    header h1 { font-size:15px; margin:0; } header h1 span { color:var(--amber); }
+    button { background:var(--amber); color:#10202a; border:0; border-radius:8px; padding:7px 13px; font:inherit; font-weight:600; cursor:pointer; }
+    button.ghost { background:transparent; color:var(--ink); border:1px solid var(--line); font-weight:400; }
+    #status { font-size:12px; opacity:.85; } .err { color:#ff9b9b; } .ok2 { color:#9fe6b5; }
+    main { display:grid; grid-template-columns:1fr 320px; gap:16px; padding:16px; align-items:start; }
+    .hstage { background:#02080d; border:1px solid var(--line); border-radius:8px; padding:10px; display:flex; justify-content:center; position:sticky; top:56px; }
+    .hframe { position:relative; line-height:0; cursor:crosshair; user-select:none; max-width:100%; }
+    .hframe img { display:block; max-width:100%; }
+    .hbox { position:absolute; border:2px solid var(--amber); background:rgba(255,216,140,.14); box-shadow:0 0 0 1px rgba(0,0,0,.5); }
+    .hbox.sel { border-color:#7fd1ff; background:rgba(127,209,255,.18); }
+    .hbox .htag { position:absolute; top:-18px; left:-2px; background:var(--amber); color:#10202a; font-size:11px; font-weight:700; padding:0 5px; border-radius:4px 4px 0 0; white-space:nowrap; line-height:16px; }
+    .hitem { border:1px solid var(--line); border-radius:8px; padding:8px; margin-top:8px; background:var(--panel); }
+    .hitem.sel { border-color:#7fd1ff; }
+    .hitem .htop { display:flex; justify-content:space-between; align-items:center; }
+    .hitem .htop b { color:var(--amber); font-size:12px; }
+    .hr { display:flex; gap:6px; align-items:center; margin-top:6px; }
+    .hr label { font-size:11px; opacity:.7; width:64px; margin:0; flex:none; }
+    input[type=text], input[type=number], select, textarea { flex:1; min-width:0; background:#0a1620; color:inherit; border:1px solid var(--line); border-radius:6px; padding:4px 6px; font:inherit; }
+    textarea { resize:vertical; }
+    textarea.mono { font:12px/1.45 ui-monospace, Menlo, Consolas, monospace; min-height:96px; }
+    .hdel { background:transparent; color:#ff9b9b; border:1px solid rgba(255,155,155,.4); border-radius:6px; padding:2px 8px; font-size:11px; font-weight:400; flex:none; }
+    .hint { font-size:12px; opacity:.65; }
+    .cov { font-size:11px; opacity:.7; margin-bottom:6px; }
+    #content { padding:0 16px 28px; }
+    #content .box { background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:12px 14px; }
+    #content h2 { font-size:14px; margin:0 0 6px; } #content h2 span { color:var(--amber); }
+    .lbl { font-size:11px; opacity:.75; margin:10px 0 3px; text-transform:uppercase; letter-spacing:.03em; }
+    .fb { border-left:2px solid var(--line); padding-left:10px; margin-top:8px; }
+    .plan { border:1px solid var(--line); border-radius:8px; background:var(--panel); padding:8px; margin-bottom:10px; }
+    .planhd { font-size:12px; font-weight:700; color:var(--amber); margin-bottom:2px; }
+    .planhd .hint { font-weight:400; color:var(--ink); }
+    .planitem { border:1px solid var(--line); border-radius:6px; padding:6px 8px; margin-top:6px; cursor:pointer; background:#0a1620; }
+    .planitem:hover { border-color:#7fd1ff; }
+    .planitem.armed { border-color:#7fd1ff; box-shadow:0 0 0 1px #7fd1ff inset; }
+    .planitem.done { opacity:.5; }
+    .planitem .ptop { display:flex; align-items:center; gap:6px; }
+    .planitem .ptop b { flex:1; font-size:13px; }
+    .planitem .pmark { font-weight:700; color:#9fe6b5; }
+    .ptag { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.03em; padding:1px 6px; border-radius:10px; background:rgba(255,216,140,.16); color:var(--amber); flex:none; }
+    .ptag.door { background:rgba(127,209,255,.16); color:#7fd1ff; }
+    .ptag.clue { background:rgba(159,230,181,.16); color:#9fe6b5; }
+    .pnote { font-size:11px; opacity:.72; margin-top:3px; }
+    .pnote i { font-style:normal; opacity:.9; }
+    .tabbar { display:flex; gap:6px; margin-bottom:12px; border-bottom:1px solid var(--line); padding-bottom:8px; }
+    .tabbtn { background:transparent; color:var(--ink); border:1px solid var(--line); font-weight:400; padding:5px 14px; }
+    .tabbtn.on { background:var(--amber); color:#10202a; font-weight:600; }
+    .wargs { display:inline-flex; gap:6px; flex:1; }
+    .wargs input, .wargs select { flex:none; }
+    .vthumb { max-width:100%; border-radius:6px; margin-top:6px; border:1px solid var(--line); }
+    .wupdate { background:transparent; color:#7fd1ff; border:1px solid rgba(127,209,255,.4); font-weight:400; padding:2px 8px; font-size:11px; flex:none; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Hotspots · <span id="roomName"></span></h1>
+    <button id="save">Save and close</button>
+    <span id="status"></span>
+    <span class="hint" style="margin-left:auto">drag on the scene to add a box · click a box to edit</span>
+  </header>
+  <main>
+    <div>
+      <div class="cov" id="cov"></div>
+      <div class="hstage"><div class="hframe" id="hsFrame"><img id="hsScene" alt="" /></div></div>
+    </div>
+    <div>
+      <div id="planned"></div>
+      <div id="hsList"></div>
+    </div>
+  </main>
+  <div id="content"></div>
+
+  <script>
+    const $ = s => document.querySelector(s);
+    const _p = new URLSearchParams(location.search);
+    const ROOM_KEY = _p.get("room");
+    const DRAFT_IMG = _p.get("img");                                 // a candidate ⇒ DRAFT mode (else committed node)
+    const CH = _p.get("chapter"), SC = _p.get("scenario");           // Finding 2: target THIS scenario
+    const SCQ = (CH && SC) ? ("chapter=" + encodeURIComponent(CH) + "&scenario=" + encodeURIComponent(SC)) : "";
+    const getJSON = async p => { try { return await (await fetch(p + (p.includes("?") ? "&" : "?") + "t=" + Date.now())).json(); } catch (e) { return null; } };
+    const postJSON = async (p, b) => (await fetch(p, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(b) })).json();
+    const esc = s => String(s == null ? "" : s).replace(/[<>&"]/g, c => ({ "<":"&lt;", ">":"&gt;", "&":"&amp;", '"':"&quot;" }[c]));
+    const slug = s => (String(s || "")).toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "") || "obj";
+    const linesToArr = s => String(s || "").split("\n").filter(x => x.trim().length);
+    const arrToLines = a => (a || []).join("\n");
+    const csvToArr = s => String(s || "").split(",").map(x => x.trim()).filter(Boolean);
+    const arrToCsv = a => (a || []).join(", ");
+    const TYPES = ["puzzle", "clue", "door", "lock", "dial", "mapview", "ambient"];   // ambient = cinemagraph-only, no player marker
+    const checkSkel = () => ({ prompt:"", requires:[], expr:"", hint:"", maxAttempts:4, feedback:{ correct:"", wrong:[], reveal:"" } });
+    const questionSkel = () => ({ prompt:"", options:[], correct:0, maxAttempts:4, feedback:{ correct:"", wrong:[], reveal:"" } });
+
+    const hsFrame = $("#hsFrame");
+    let SPOTS = [];        // full hotspot objects, edited in place
+    let SEL = -1, seq = 0, temp = null;
+    let DOOR_PROMPT_DEFAULT = "";   // this room's open-door prompt (from authoring), for the door-open generator
+    let ROOM_KEYS = [];             // all room keys in this scenario, for a door's target-room dropdown
+    let PLANNED = [];               // node.plannedHotspots — the design manifest (what this room SHOULD have)
+    let ARMED = -1;                 // index into PLANNED currently loaded to draw next (arm-then-draw); -1 = none
+    let RETAINED = [];              // the room's LAST-COMMITTED hotspots — re-attached by label when you redraw
+                                    // on new art, so wiring (door to/direction, grading, clue body) survives a re-gen
+    let NODE = null;               // the committed room node — source of server-owned per-hotspot variants
+    let TAB = "content";           // which content-panel tab is active: "content" | "variants"
+    // Cinemagraphs / variants / door-open are generated from the COMMITTED scene, so they work whenever the
+    // room is committed — even while you're viewing a candidate (img=). Only truly-uncommitted rooms block.
+    const isCommitted = () => !!(NODE && (NODE.panorama || NODE.built));
+
+    // ---- state-variant "when" trigger builder (Phase 3) — maps the condOK DSL to a small UI ----
+    const WHEN_KINDS = [["always", "always on"], ["thisSolved", "this room solved"],
+                        ["roomSolved", "another room solved"], ["eq", "state = value"], ["gte", "state ≥ number"]];
+    function whenToKind(w) {
+      if (w === undefined || w === true || w === null) return "always";
+      if (w.solved === ROOM_KEY) return "thisSolved";
+      if ("solved" in w) return "roomSolved";
+      if ("eq" in w) return "eq";
+      if ("gte" in w) return "gte";
+      return "always";
+    }
+    function whenArgs(w) {
+      if (!w || typeof w !== "object") return ["", ""];
+      if ("solved" in w) return [w.solved, ""];
+      if ("eq" in w) return [w.eq[0], w.eq[1]];
+      if ("gte" in w) return [w.gte[0], w.gte[1]];
+      return ["", ""];
+    }
+    function buildWhen(kind, a1, a2) {
+      if (kind === "thisSolved") return { solved: ROOM_KEY };
+      if (kind === "roomSolved") return a1 ? { solved: a1 } : true;
+      if (kind === "eq") return { eq: [a1, a2] };
+      if (kind === "gte") return { gte: [a1, Number(a2) || 0] };
+      return true;                                   // "always"
+    }
+    // Render a kind-select + contextual args into `container`, pre-filled from `when`. No live
+    // callbacks — the caller reads the current value with readWhen() when it needs it.
+    function renderWhenEditor(container, when) {
+      const kind0 = whenToKind(when), [a1, a2] = whenArgs(when);
+      const roomOpts = ROOM_KEYS.map(k => `<option value="${esc(k)}"${a1 === k ? " selected" : ""}>${esc(k)}</option>`).join("");
+      container.innerHTML = `<select class="wkind">${WHEN_KINDS.map(([v, l]) => `<option value="${v}"${v === kind0 ? " selected" : ""}>${l}</option>`).join("")}</select><span class="wargs"></span>`;
+      const kindSel = container.querySelector(".wkind"), args = container.querySelector(".wargs");
+      const draw = (fresh) => {
+        const k = kindSel.value;
+        if (k === "roomSolved") args.innerHTML = `<select class="wa1"><option value="">— room —</option>${roomOpts}</select>`;
+        else if (k === "eq") args.innerHTML = `<input class="wa1" type="text" placeholder="state key" style="width:96px"><input class="wa2" type="text" placeholder="value" style="width:84px">`;
+        else if (k === "gte") args.innerHTML = `<input class="wa1" type="text" placeholder="state key" style="width:96px"><input class="wa2" type="number" placeholder="n" style="width:60px">`;
+        else args.innerHTML = "";
+        if (!fresh) return;                          // on kind CHANGE, start args blank; on first draw, prefill
+        const wa1 = args.querySelector(".wa1"), wa2 = args.querySelector(".wa2");
+        if (wa1 && k !== "roomSolved") wa1.value = a1 || "";
+        if (wa2) wa2.value = a2 || "";
+      };
+      kindSel.onchange = () => draw(false);
+      draw(true);
+    }
+    function readWhen(container) {
+      const kindSel = container.querySelector(".wkind");
+      if (!kindSel) return true;
+      const wa1 = container.querySelector(".wa1"), wa2 = container.querySelector(".wa2");
+      return buildWhen(kindSel.value, wa1 ? String(wa1.value).trim() : "", wa2 ? String(wa2.value).trim() : "");
+    }
+    const variantsFor = id => { const h = NODE && (NODE.hotspots || []).find(x => x.id === id); return (h && h.variants) || []; };
+
+    const pct = b => ({ left:b[0]*100+"%", top:b[1]*100+"%", width:(b[2]-b[0])*100+"%", height:(b[3]-b[1])*100+"%" });
+    const uniqueId = (base, self) => { let id = base, n = 1; while (SPOTS.some((s, j) => j !== self && s.id === id)) id = base + "_" + (++n); return id; };
+
+    // Retain wiring across art re-gens: if a previously-committed hotspot has the SAME label (+type),
+    // re-attach its FULL content — door to/direction/requires, puzzle grading, clue body/pickup/image,
+    // etc. — onto the freshly-drawn box. So after new art you only re-PLACE the boxes; the routing and
+    // content survive. Match by label-slug (the stable identity); no match ⇒ a fresh hotspot as before.
+    function retainedFor(label, type) {
+      const want = slug(label || "");
+      if (!want) return null;
+      const hit = RETAINED.find(h => slug(h.label || "") === want && (!type || h.type === type));
+      return hit ? JSON.parse(JSON.stringify(hit)) : null;
+    }
+
+    // Build a new hotspot for a freshly-drawn box. If `plan` (an armed plannedHotspots entry) is
+    // given, seed the box's type/label (+ door direction / clue pickup) from it. Either way, if the room
+    // already had a committed hotspot of that label, its wiring is re-attached (retainedFor) — so a
+    // re-gen'd room keeps all its door targets / grading / clue bodies once the boxes are re-placed.
+    function makeSpot(box, plan) {
+      if (plan) {
+        const keep = retainedFor(plan.label, plan.type);
+        if (keep) { keep.id = uniqueId(keep.id || slug(keep.label) || ("obj_" + (++seq))); keep.box = box; return keep; }
+        const s = { id: uniqueId(slug(plan.label) || ("obj_" + (++seq))), type: plan.type || "puzzle",
+                    label: plan.label || ("Object " + SPOTS.length), box };
+        if (s.type === "puzzle") { s.starterCode = ""; s.check = checkSkel(); }
+        else if (s.type === "clue") { s.body = ""; if (plan.pickup) s.pickup = true; }
+        else if (s.type === "door" && plan.direction) s.direction = plan.direction;
+        return s;
+      }
+      return { id: uniqueId("obj_" + (++seq)), type: "puzzle", label: "Object " + SPOTS.length, box, starterCode: "", check: checkSkel() };
+    }
+
+    // a planned item counts as placed once a hotspot of the same type carries its label (slug-matched)
+    const planPlaced = p => SPOTS.some(s => s.type === p.type && slug(s.label) === slug(p.label));
+
+    function renderPlanned() {
+      const host = $("#planned"); if (!host) return;
+      if (!PLANNED.length) { host.innerHTML = ""; return; }
+      const rows = PLANNED.map((p, i) => {
+        const done = planPlaced(p), extra = p.direction || (p.pickup ? "pickup" : "");
+        return `<div class="planitem${i === ARMED ? " armed" : ""}${done ? " done" : ""}" data-i="${i}">
+          <div class="ptop"><span class="ptag ${esc(p.type)}">${esc(p.type)}</span><b>${esc(p.label || "")}</b>
+            <span class="pmark">${done ? "✓" : "＋"}</span></div>
+          ${(p.note || extra) ? `<div class="pnote">${extra ? `<i>${esc(extra)}</i> ` : ""}${esc(p.note || "")}</div>` : ""}
+        </div>`;
+      }).join("");
+      host.innerHTML = `<div class="plan"><div class="planhd">Planned for this room <span class="hint">— click one, then drag its box</span></div>${rows}</div>`;
+      host.querySelectorAll(".planitem").forEach(el => el.onclick = () => {
+        const i = +el.dataset.i;
+        ARMED = (ARMED === i) ? -1 : i;
+        $("#status").innerHTML = ARMED >= 0 ? `<span class="ok2">armed: ${esc(PLANNED[ARMED].label || "")} — drag its box on the scene</span>` : "";
+        renderPlanned();
+      });
+    }
+
+    async function init() {
+      if (!ROOM_KEY) { $("#status").innerHTML = `<span class="err">no ?room=… given</span>`; return; }
+      const doc = await getJSON("/api/scenario" + (SCQ ? "?" + SCQ : ""));
+      const node = doc && (doc.rooms || []).find(r => r.key === ROOM_KEY);
+      NODE = node || null;                          // committed node — source of server-owned variants
+      ROOM_KEYS = (((doc && doc.rooms) || []).map(r => r.key)).filter(k => k && k !== ROOM_KEY);  // door targets (exclude self)
+      const draft = DRAFT_IMG ? await getJSON("/api/draft?roomKey=" + encodeURIComponent(ROOM_KEY) + (SCQ ? "&" + SCQ : "")) : null;
+      let sceneSrc;
+      if (DRAFT_IMG) sceneSrc = "/sfile/_scratch/" + encodeURIComponent(DRAFT_IMG) + "?t=" + Date.now() + (SCQ ? "&" + SCQ : "");
+      else if (node && node.panorama) sceneSrc = "/sfile/" + node.panorama + "?t=" + Date.now() + (SCQ ? "&" + SCQ : "");
+      else { $("#status").innerHTML = `<span class="err">no image — pick a candidate first (draft), or commit the room</span>`; return; }
+      DOOR_PROMPT_DEFAULT = (node && node.authoring && node.authoring.doorPrompt) || "";
+      PLANNED = (node && node.plannedHotspots) || [];
+      RETAINED = (node && node.hotspots) || [];   // last-committed wiring, re-attached by label on redraw
+      $("#roomName").textContent = ROOM_KEY + (DRAFT_IMG ? " (draft)" : "");
+      $("#hsScene").src = sceneSrc;
+      // per-candidate draft wins (draft.imgs[thisImage]), then legacy top-level, then the committed node
+      const per = draft && draft.imgs && draft.imgs[DRAFT_IMG];
+      const w = (per && per.wrap) || (draft && draft.wrap) || (node && node.wrap) || {};
+      $("#cov").innerHTML = `wrap coverage: haov <b>${w.haov ?? 360}</b>, vaov <b>${w.vaov ?? 90}</b>, vOffset <b>${w.vOffset ?? 0}</b> — the player maps box centres → yaw/pitch across this.`;
+      const src = (per && per.hotspots) || (draft && draft.hotspots) || (node && node.hotspots) || [];
+      SPOTS = src.map(h => {
+        const s = JSON.parse(JSON.stringify(h));
+        s.id = s.id || ("h" + (++seq));
+        s.type = TYPES.includes(s.type) ? s.type : "puzzle";
+        s.label = s.label || s.id;
+        s.box = (s.box || [0, 0, 0, 0]).slice();
+        return s;
+      });
+      render();
+    }
+
+    // ---- drag to create a box ----
+    hsFrame.addEventListener("mousedown", e => {
+      if (e.target.closest(".hbox")) return;
+      const r = hsFrame.getBoundingClientRect();
+      temp = { x0:(e.clientX-r.left)/r.width, y0:(e.clientY-r.top)/r.height };
+      e.preventDefault();
+    });
+    window.addEventListener("mousemove", e => {
+      if (!temp) return;
+      const r = hsFrame.getBoundingClientRect();
+      temp.x1 = Math.min(1, Math.max(0, (e.clientX-r.left)/r.width));
+      temp.y1 = Math.min(1, Math.max(0, (e.clientY-r.top)/r.height));
+      let el = hsFrame.querySelector(".hbox.tmp");
+      if (!el) { el = document.createElement("div"); el.className = "hbox tmp"; hsFrame.appendChild(el); }
+      Object.assign(el.style, pct([Math.min(temp.x0,temp.x1), Math.min(temp.y0,temp.y1), Math.max(temp.x0,temp.x1), Math.max(temp.y0,temp.y1)]));
+    });
+    window.addEventListener("mouseup", () => {
+      if (!temp) return;
+      if (temp.x1 != null && Math.abs(temp.x1-temp.x0) > 0.01 && Math.abs(temp.y1-temp.y0) > 0.01) {
+        const box = [Math.min(temp.x0,temp.x1), Math.min(temp.y0,temp.y1), Math.max(temp.x0,temp.x1), Math.max(temp.y0,temp.y1)].map(v => +v.toFixed(4));
+        SPOTS.push(makeSpot(box, ARMED >= 0 ? PLANNED[ARMED] : null));
+        SEL = SPOTS.length - 1;
+        if (ARMED >= 0) {
+          const s = SPOTS[SEL];
+          const reWired = s.type === "door" ? !!(s.to || s.requires)
+            : s.type === "clue" ? !!(s.body || s.pickup || s.image)
+            : !!((s.check && s.check.expr) || s.question || s.pick || s.map);
+          $("#status").innerHTML = `<span class="ok2">placed ${esc(s.label)} ✓${reWired ? " · wiring re-attached" : ""}</span>`;
+          ARMED = -1;
+        }
+      }
+      temp = null; render();
+    });
+
+    function renderBoxes() {
+      hsFrame.querySelectorAll(".hbox").forEach(b => b.remove());
+      SPOTS.forEach((s, i) => {
+        const d = document.createElement("div"); d.className = "hbox" + (i === SEL ? " sel" : "");
+        Object.assign(d.style, pct(s.box));
+        d.innerHTML = `<span class="htag">${esc(s.label || s.id)}</span>`;
+        d.onclick = ev => { ev.stopPropagation(); SEL = i; render(); };
+        hsFrame.appendChild(d);
+      });
+    }
+    function renderList() {
+      const list = $("#hsList"); list.innerHTML = "";
+      SPOTS.forEach((s, i) => {
+        const el = document.createElement("div"); el.className = "hitem" + (i === SEL ? " sel" : "");
+        el.innerHTML =
+          `<div class="htop"><b>${esc(s.id)}</b><button class="hdel">delete</button></div>
+           <div class="hr"><label>label</label><input type="text" data-k="label"></div>
+           <div class="hr"><label>type</label><select data-k="type">${TYPES.map(t => `<option${t===s.type?" selected":""}>${t}</option>`).join("")}</select></div>`;
+        el.querySelector('[data-k="label"]').value = s.label || "";
+        el.onclick = ev => { if (ev.target.closest("input,select,button")) return; SEL = i; render(); };
+        el.querySelector(".hdel").onclick = ev => { ev.stopPropagation(); SPOTS.splice(i,1); if (SEL>=SPOTS.length) SEL=SPOTS.length-1; render(); };
+        el.querySelectorAll("[data-k]").forEach(inp => inp.oninput = () => {
+          const k = inp.dataset.k;
+          if (k === "type") { setType(s, inp.value); }
+          else { s[k] = inp.value; if (k === "label") s.id = uniqueId(slug(inp.value), i); }
+          render();
+        });
+        list.appendChild(el);
+      });
+    }
+
+    // switch a hotspot's type. Non-destructive (leftover fields are ignored by the player). This tab
+    // owns only box/type/label + door-open; a PUZZLE's grading AND a CLUE's body are both authored in
+    // the Edit puzzle tab, so we don't create their content skeletons here.
+    function setType(s, type) {
+      s.type = type;
+      if (type === "clue" && s.body == null) s.body = "";
+    }
+
+    // ---- per-hotspot side panel: a [Content][Variants] tab bar over the selected hotspot ----
+    function renderContent() {
+      const host = $("#content"); host.innerHTML = "";
+      if (SEL < 0 || !SPOTS[SEL]) return;
+      const s = SPOTS[SEL];
+      const wrap = document.createElement("div"); wrap.className = "box";
+      const vn = variantsFor(s.id).length;
+      wrap.innerHTML = `<div class="tabbar">
+          <button class="tabbtn${TAB === "content" ? " on" : ""}" data-tab="content">Content</button>
+          <button class="tabbtn${TAB === "variants" ? " on" : ""}" data-tab="variants">Variants${vn ? ` (${vn})` : ""}</button>
+          <button class="tabbtn${TAB === "cinemagraph" ? " on" : ""}" data-tab="cinemagraph">Cinemagraph${cineOf(s.id) ? " ✓" : ""}</button>
+        </div><div id="tabbody"></div>`;
+      host.appendChild(wrap);
+      wrap.querySelectorAll(".tabbtn").forEach(b => b.onclick = () => { TAB = b.dataset.tab; renderContent(); });
+      const body = wrap.querySelector("#tabbody");
+      if (TAB === "variants") return renderVariants(body, s);
+      if (TAB === "cinemagraph") return renderCinemagraph(body, s);
+      renderContentBody(body, s);
+    }
+
+    // the original per-type content panel (door nav + door-open gen; puzzle/clue/lock/dial/mapview notes)
+    function renderContentBody(box, s) {
+      if (s.type === "door") {
+        // navigation: forward (gated, shows entry, advances) | back (always open, no gate/entry)
+        const dirSel = ["forward", "back"].map(dv =>
+          `<option value="${dv}"${(s.direction || "forward") === dv ? " selected" : ""}>${dv}</option>`).join("");
+        const toSel = [`<option value=""${!s.to ? " selected" : ""}>— none (linear · boss→finish) —</option>`]
+          .concat(ROOM_KEYS.map(k => `<option value="${esc(k)}"${s.to === k ? " selected" : ""}>${esc(k)}</option>`)).join("");
+        // which GATE opens this door: a specific puzzle/lock in THIS room, or the room's main gate
+        const gateSpots = SPOTS.filter(g => g.type === "puzzle" || g.type === "lock");
+        const reqSel = [`<option value=""${!s.requires ? " selected" : ""}>— the room's main gate —</option>`]
+          .concat(gateSpots.map(g => `<option value="${esc(g.id)}"${s.requires === g.id ? " selected" : ""}>${esc(g.id)}${g.label ? " · " + esc(g.label) : ""}</option>`)).join("");
+        const nav = `<h2>Content · <span>${esc(s.id)}</span> (door)</h2>
+          <div class="lbl">navigation</div>
+          <div class="hr"><label>direction</label><select data-nav="direction">${dirSel}</select></div>
+          <div class="hr"><label>to room</label><select data-nav="to">${toSel}</select></div>
+          <div class="hr"><label>requires gate</label><select data-nav="requires">${reqSel}</select></div>
+          <div class="hint"><b>forward</b>: opens on its gate — pick a specific puzzle/lock in <i>requires gate</i> (e.g. a separate escape lock), else the room's main gate — then shows the target's entry and advances. <b>back</b>: always open, no gate, no entry. Leave <i>to</i> empty on a forward door to advance linearly (the boss's forward door → finish).</div>`;
+        let gen;
+        if (DRAFT_IMG && !isCommitted()) {
+          gen = `<div class="hint" style="margin-top:12px">The open-door image is made from the committed scene — mark this door's box now, <b>Send to room</b>, then generate here.</div>`;
+        } else {
+          gen = `<div class="hint" style="margin-top:12px">Generate the room's open image by masking this door's box on the committed scene.</div>
+            <div class="lbl">open-door prompt</div><textarea data-door="prompt" rows="3"></textarea>
+            <div class="hr" style="margin-top:8px"><button id="genDoor">Generate open-door image</button><span class="hint" id="doorStat" style="margin-left:8px"></span></div>`;
+        }
+        box.innerHTML = nav + gen;
+        box.querySelector('[data-nav="direction"]').onchange = e => { s.direction = e.target.value; };
+        box.querySelector('[data-nav="to"]').onchange = e => { const v = e.target.value; if (v) s.to = v; else delete s.to; };
+        box.querySelector('[data-nav="requires"]').onchange = e => { const v = e.target.value; if (v) s.requires = v; else delete s.requires; };
+        if (!DRAFT_IMG || isCommitted()) {
+          const dp = box.querySelector('[data-door="prompt"]');
+          dp.value = DOOR_PROMPT_DEFAULT || "The door now stands wide open, revealing the space beyond; identical lighting and style, no people, no lettering, no text.";
+          box.querySelector("#genDoor").onclick = () => generateDoor(s, dp.value, box.querySelector("#doorStat"));
+        }
+      } else if (s.type === "clue") {
+        box.innerHTML = `<h2>Content · <span>${esc(s.id)}</span> (clue)</h2><div class="hint">Clue text is authored alongside the puzzles in the room's <b>Edit puzzle →</b> tab. This tab owns the box, type &amp; label.</div>`;
+      } else if (s.type === "lock") {
+        box.innerHTML = `<h2>Content · <span>${esc(s.id)}</span> (lock)</h2><div class="hint">The lock's <b>code</b> (answer) &amp; feedback are authored in the room's <b>Edit puzzle →</b> tab. This tab owns the box, type &amp; label. A lock is a no-instructions keypad gate and <b>never enters the submission code</b>.</div>`;
+      } else if (s.type === "dial") {
+        box.innerHTML = `<h2>Content · <span>${esc(s.id)}</span> (dial)</h2><div class="hint">A <b>world-state dial</b> — flipping it sets a <code>gameState</code> value that a <b>mapview</b> elsewhere reads. Its <code>key</code> + <code>states</code> are hand-authored in <code>scenario.json</code> for now (no editor yet). This tab owns the box, type &amp; label.</div>`;
+      } else if (s.type === "mapview") {
+        box.innerHTML = `<h2>Content · <span>${esc(s.id)}</span> (mapview)</h2><div class="hint">A <b>state-conditioned chart</b> — shows the image mapped to the current dial state. Its <code>key</code> + per-state <code>images</code> are hand-authored in <code>scenario.json</code> for now. This tab owns the box, type &amp; label.</div>`;
+      } else {
+        box.innerHTML = `<h2>Content · <span>${esc(s.id)}</span> (puzzle)</h2><div class="hint">Edit this puzzle's starter code, check / multiple-choice and feedback in the room's <b>Edit puzzle →</b> tab.</div>`;
+      }
+    }
+
+    // ---- Variants tab: per-object state variants (Phase 3 / Option 2), server-owned on this hotspot ----
+    function renderVariants(body, s) {
+      if (DRAFT_IMG && !isCommitted()) {
+        body.innerHTML = `<h2>Variants · <span>${esc(s.id)}</span></h2><div class="hint">This room isn't committed yet — variants are generated from the committed scene. Mark this object's box, <b>Send to room</b>, then author them here.</div>`;
+        return;
+      }
+      const vs = variantsFor(s.id);
+      const rows = vs.map(v => `<div class="hitem" data-state="${esc(v.state)}">
+          <div class="htop"><b>${esc(v.state)}</b><button class="hdel vdel" data-state="${esc(v.state)}">delete</button></div>
+          <div class="hr"><label>trigger</label><span class="whenbox"></span><button class="wupdate" data-state="${esc(v.state)}">update</button></div>
+          <img class="vthumb" src="/sfile/${esc(v.panorama)}?t=${Date.now()}${SCQ ? "&" + SCQ : ""}" alt="">
+        </div>`).join("") || `<div class="hint">No variants yet — add one below.</div>`;
+      body.innerHTML = `<h2>Variants · <span>${esc(s.id)}</span></h2>
+        <div class="hint">Each variant is an alternate look for this object, made by editing its box on the committed scene. It shows when its <b>trigger</b> is true; several objects' active variants composite together at play time.</div>
+        ${rows}
+        <div class="plan" style="margin-top:12px">
+          <div class="planhd">Add / regenerate a variant</div>
+          <div class="hr"><label>state</label><input type="text" id="vState" placeholder="e.g. on · thrown · broken (regen replaces same state)"></div>
+          <div class="hr"><label>trigger</label><span id="vWhen"></span></div>
+          <div class="lbl">prompt — what changes INSIDE the box</div>
+          <textarea id="vPrompt" rows="3" placeholder="e.g. the brass lever is thrown fully down; identical lighting, palette and style, no people, no lettering, no text."></textarea>
+          <div class="hr" style="margin-top:8px"><button id="genVariant">Generate variant</button><span class="hint" id="vStat" style="margin-left:8px"></span></div>
+        </div>`;
+      // existing variants: fill their trigger editors + wire update/delete
+      vs.forEach(v => renderWhenEditor(body.querySelector(`.hitem[data-state="${cssEsc(v.state)}"] .whenbox`), v.when));
+      body.querySelectorAll(".wupdate").forEach(b => b.onclick = () => patchVariant(s, b.dataset.state,
+        readWhen(b.closest(".hitem").querySelector(".whenbox")), b));
+      body.querySelectorAll(".vdel").forEach(b => b.onclick = () => deleteVariant(s, b.dataset.state));
+      // add form
+      renderWhenEditor(body.querySelector("#vWhen"), { solved: ROOM_KEY });   // sensible default: this room solved
+      body.querySelector("#genVariant").onclick = () => generateVariant(s, body);
+    }
+    const cssEsc = s => String(s).replace(/["\\]/g, "\\$&");
+
+    async function refreshNode() {
+      const doc = await getJSON("/api/scenario" + (SCQ ? "?" + SCQ : ""));
+      NODE = (doc && (doc.rooms || []).find(r => r.key === ROOM_KEY)) || NODE;
+    }
+    async function generateVariant(s, body) {
+      const state = (body.querySelector("#vState").value || "").trim();
+      const prompt = (body.querySelector("#vPrompt").value || "").trim();
+      const when = readWhen(body.querySelector("#vWhen"));
+      const stat = body.querySelector("#vStat");
+      if (!state) { stat.innerHTML = `<span class="err">give the variant a state name</span>`; return; }
+      if (!prompt) { stat.innerHTML = `<span class="err">describe what changes in the box</span>`; return; }
+      stat.textContent = "requesting…";
+      const r = await postJSON("/api/gen-variant-room", { chapter: CH, scenario: SC, roomKey: ROOM_KEY, hotspotId: s.id, state, box: s.box, prompt, when });
+      if (!r.ok) { stat.innerHTML = `<span class="err">${esc(r.error || "failed")}</span>`; return; }
+      stat.textContent = "generating… (~20s)";
+      const poll = setInterval(async () => {
+        const j = await getJSON("/api/status?slot=variant");
+        if (!j) return;
+        if (j.error) { stat.innerHTML = `<span class="err">${esc(j.error)}</span>`; clearInterval(poll); return; }
+        if (!j.active) { clearInterval(poll); await refreshNode(); stat.innerHTML = `<span class="ok2">variant "${esc(state)}" made ✓</span>`; renderContent(); }
+      }, 1500);
+    }
+    async function patchVariant(s, state, when, btn) {
+      const r = await postJSON("/api/patch-variant", { chapter: CH, scenario: SC, roomKey: ROOM_KEY, hotspotId: s.id, state, fields: { when } });
+      if (!r.ok) { $("#status").innerHTML = `<span class="err">${esc(r.error || "patch failed")}</span>`; return; }
+      await refreshNode();
+      $("#status").innerHTML = `<span class="ok2">trigger updated for "${esc(state)}" ✓</span>`;
+    }
+    async function deleteVariant(s, state) {
+      if (!confirm(`Delete variant "${state}" of ${s.id}? (the PNG stays on disk)`)) return;
+      const r = await postJSON("/api/delete-variant", { chapter: CH, scenario: SC, roomKey: ROOM_KEY, hotspotId: s.id, state });
+      if (!r.ok) { $("#status").innerHTML = `<span class="err">${esc(r.error || "delete failed")}</span>`; return; }
+      await refreshNode(); renderContent();
+    }
+
+    // ---- Cinemagraph tab: animate ONLY this hotspot's box with a small looping LTX video ----
+    const cineOf = id => { const h = NODE && (NODE.hotspots || []).find(x => x.id === id); return h && h.cinemagraph; };
+    let _cinePoll = null;
+    function renderCinemagraph(body, s) {
+      if (DRAFT_IMG && !isCommitted()) {
+        body.innerHTML = `<h2>Cinemagraph · <span>${esc(s.id)}</span></h2><div class="hint">This room isn't committed yet — cinemagraphs are generated from the committed scene. Mark this object's box, <b>Send to room</b>, then generate here.</div>`;
+        return;
+      }
+      const cine = cineOf(s.id);
+      const existing = cine ? `<div class="hitem"><div class="htop"><b>current cinemagraph</b><button class="hdel cdelc">delete</button></div>
+          <video src="/sfile/${esc(cine.video)}?t=${Date.now()}${SCQ ? "&" + SCQ : ""}" muted loop autoplay playsinline class="vthumb"></video>
+          <div class="hint">${esc(cine.prompt || "")}</div></div>` : `<div class="hint">No cinemagraph on this object yet.</div>`;
+      body.innerHTML = `<h2>Cinemagraph · <span>${esc(s.id)}</span></h2>
+        <div class="hint">Animate ONLY this object's box with a small looping video, composited over the still scene — best on a small moving thing (a flame, water, a lantern, drifting cloud). Generation runs on the GPU (~5 min) and briefly pauses the local LLM server; you can keep working and it'll appear here when done.</div>
+        ${existing}
+        <div class="plan" style="margin-top:12px">
+          <div class="planhd">Animate this region</div>
+          <div class="lbl">motion — one thing that physically MOVES (+ a pace)</div>
+          <textarea id="cinePrompt" rows="3" placeholder="e.g. a torch flame flickering and dancing, embers drifting up">${esc((cine && cine.prompt) || "")}</textarea>
+          <div class="hint" style="margin-top:4px">Name ONE physical motion — flicker · sway · ripple · drift · flap — and a pace (slow / gentle / steadily). It animates <b>movement, not brightness</b>: "a pulsing glow" holds still, but "a flame flickering, light rippling on the wall" moves. If your thing only brightens, give it a carrier: "the lantern sways on its bracket, shadows swinging." (Static camera is added for you.)</div>
+          <div class="lbl">loop style</div>
+          <select id="cineLoop">
+            <option value="boomerang"${(cine && cine.loop) === "crossfade" ? "" : " selected"}>boomerang — oscillating (flame, water, flag)</option>
+            <option value="crossfade"${(cine && cine.loop) === "crossfade" ? " selected" : ""}>crossfade — directional (smoke, bubbles, embers)</option>
+          </select>
+          <div class="hr" style="margin-top:8px"><button id="genCine">Generate cinemagraph</button><span class="hint" id="cineStat" style="margin-left:8px"></span></div>
+        </div>`;
+      const cdel = body.querySelector(".cdelc"); if (cdel) cdel.onclick = () => deleteCinemagraph(s);
+      body.querySelector("#genCine").onclick = () => generateCinemagraph(s, body);
+    }
+    async function generateCinemagraph(s, body) {
+      const prompt = (body.querySelector("#cinePrompt").value || "").trim();
+      const stat = body.querySelector("#cineStat");
+      if (!prompt) { stat.innerHTML = `<span class="err">describe the motion first</span>`; return; }
+      if (!Array.isArray(s.box) || s.box.length !== 4) { stat.innerHTML = `<span class="err">this hotspot has no box — draw one first</span>`; return; }
+      const loop = (body.querySelector("#cineLoop") || {}).value || "boomerang";
+      stat.textContent = "starting…";
+      const r = await postJSON("/api/gen-cinemagraph", { chapter: CH, scenario: SC, roomKey: ROOM_KEY, hotspotId: s.id, box: s.box, prompt, loop });
+      if (!r.ok) { stat.innerHTML = `<span class="err">${esc(r.error || "failed")}</span>`; return; }
+      if (_cinePoll) clearInterval(_cinePoll);
+      _cinePoll = setInterval(async () => {
+        const j = await postJSON("/api/cinemagraph-status", { chapter: CH, scenario: SC, roomKey: ROOM_KEY, hotspotId: s.id });
+        const st = j && j.status;
+        if (!st) { stat.textContent = "generating…"; return; }
+        if (st.state === "error") { clearInterval(_cinePoll); stat.innerHTML = `<span class="err">${esc(st.detail || "failed")}</span>`; return; }
+        if (st.state === "done") { clearInterval(_cinePoll); await refreshNode(); stat.innerHTML = `<span class="ok2">cinemagraph ready ✓</span>`; renderContent(); return; }
+        stat.textContent = `generating… (${esc(st.step || "working")})`;
+      }, 4000);
+    }
+    async function deleteCinemagraph(s) {
+      if (!confirm(`Delete the cinemagraph on ${s.id}? (the mp4 stays on disk)`)) return;
+      const r = await postJSON("/api/delete-cinemagraph", { chapter: CH, scenario: SC, roomKey: ROOM_KEY, hotspotId: s.id });
+      if (!r.ok) { $("#status").innerHTML = `<span class="err">${esc(r.error || "delete failed")}</span>`; return; }
+      await refreshNode(); renderContent();
+    }
+
+    function render() { renderBoxes(); renderList(); renderContent(); renderPlanned(); }
+
+    // generate the room's open-door panorama from this door's box (masked gpt edit → scene_open.png,
+    // sets node.panoramaOpen). Uses the box currently in the editor, so no need to save first.
+    async function generateDoor(s, prompt, statEl) {
+      statEl.textContent = "requesting…";
+      const r = await postJSON("/api/dooropen-room", { chapter: CH, scenario: SC, roomKey: ROOM_KEY, box: s.box, prompt });
+      if (!r.ok) { statEl.innerHTML = `<span class="err">${r.error || "failed"}</span>`; return; }
+      statEl.textContent = "generating… (~20s)";
+      const poll = setInterval(async () => {
+        const j = await getJSON("/api/status?slot=door");
+        if (!j) return;
+        if (j.error) { statEl.innerHTML = `<span class="err">${j.error}</span>`; clearInterval(poll); return; }
+        if (!j.active) { clearInterval(poll); statEl.innerHTML = `<span class="ok2">made scene_open.png · panoramaOpen set ✓</span>`; }
+      }, 1500);
+    }
+
+    $("#save").onclick = async () => {
+      // strip editor/marker keys (leading underscore); keep all real content (puzzle content preserved by id).
+      // `variants` are server-owned (generated/patched/deleted via their own routes) — never write them from
+      // here, or a Save with a stale in-memory copy would clobber a just-generated variant.
+      const hotspots = SPOTS.map(s => Object.fromEntries(Object.entries(s).filter(([k]) => !k.startsWith("_") && k !== "variants" && k !== "cinemagraph")));
+      const r = DRAFT_IMG
+        ? await postJSON("/api/draft-save", { chapter: CH, scenario: SC, roomKey: ROOM_KEY, image: DRAFT_IMG, hotspots })
+        : await postJSON("/api/room-patch", { chapter: CH, scenario: SC, roomKey: ROOM_KEY, fields: { hotspots } });
+      if (r.ok) { $("#status").innerHTML = `<span class="ok2">saved · closing…</span>`; setTimeout(() => window.close(), 400); }
+      else $("#status").innerHTML = `<span class="err">${r.error || "save failed"}</span>`;
+    };
+
+    init();
+  </script>
+</body>
+</html>

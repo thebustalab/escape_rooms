@@ -82,3 +82,23 @@ materialised `audio/*.mp3` ships.
   - `boss` the_waterproof_laptop (puzzle, panel slides open) → **magnuswaker/530075** (1.2s)
   - `boss` the_valve_keypad (lock/escape, valve turns) → **SpliceSound/369869** (5.7s)
 
+- **Hospital (2026-07-31):** was missing ALL solve sounds (flagged in the 2026-07-30 `escape_room_audit`);
+  now pulled + wired (each licence re-verified CC0 on freesound before pulling, via the `sound_pull` runner):
+  - `room1` the_bench_laptop → elevator door — **T.I.B/788698**
+  - `room2` the_phone_in_the_wall_clip → **elevator arrival ding** — **lmbubec/119448** (2026-07-31: swapped
+    from the buzzatsea/427109 door clip on Lucas's request — the elevator *arriving on a floor* wants a ding,
+    not a door; trimmed to the ~2.2s ding)
+  - `room3` the_nurses_station_laptop → swinging lab door — **kyles/453974**
+  - `boss` the_lab_workstation_laptop → swinging door → break room — **squareal/237403**
+  - `escape1` the_keypad_on_the_door (lock) → exit door to the car park — **Anthousai/398749**
+  - **Perceived-volume normalization (relative to the music, 2026-07-31 — Lucas's ask).** The raw freesound
+    clips were long (35–79s) and uneven, so each was **trimmed to its door event** (strip leading/trailing
+    silence, cap 5s) and **loudness-normalized to I=−18 LUFS / TP=−1.5 dBTP** (ffmpeg `loudnorm`), giving
+    five files of equal perceived loudness with safe peaks. They're then wired at **`volume 0.65`**. Method:
+    the music (`milk_tea.mp3`) is **−14.1 LUFS** integrated, played at `musicVolume 0.1` → ≈ **−34 LUFS
+    effective**; 0.65 puts the −18 LUFS cues at ≈ **−22 LUFS effective**, ~**+12 dB** above the music bed —
+    clearly foreground, no clipping. Reproduce: `loudnorm` to −18 LUFS, then `volume = 10^((target−(−18))/20)`
+    where `target = music_LUFS + 20·log10(musicVolume) + ~12`. **Consistency gap flagged to Lucas:** the
+    alaska/hawaii solve sounds were NOT put through this trim+normalize pass — they use raw clips at ad-hoc
+    volumes; worth back-applying the same normalization if the levels feel uneven across scenarios.
+

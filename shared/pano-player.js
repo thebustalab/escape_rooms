@@ -20,6 +20,9 @@
  *            set, else the room's PRIMARY gate — swaps to panoramaOpen, shows the target's entry,
  *            advances. back: always live, no gate, NO entry; returns to `to`. A door with no
  *            direction/to uses the legacy linear fallback (goThrough → next unsolved room / finish).
+ *            A door may ALSO carry `availableWhen` (+ diegetic `lockedBody`) — a cross-room condition
+ *            ({solved:key}|{allSolved}|{gte}) that seals it regardless of direction until met (e.g. a
+ *            mast the player is too queasy to climb until the cure has cycled). 2026-07-31.
  *   lock   → { answer, length?, maxAttempts?, feedback? } — a NO-INSTRUCTIONS keypad gate for the
  *            escape objective: matches a fixed, derivable code; not in the codec (two-phase design).
  *   dial   → { key, states:[{value,label}], hint? } — a world-state control; sets gameState[key]
@@ -64,6 +67,7 @@
  *   independent of room structure). See notes/two_phase_escape_design_notes.md.
  */
 import { WebRConsole } from "./webr-console.js";
+import { pickActiveVariants } from "./variant_resolve.js";   // Phase 3: per-hotspot state variants
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 
@@ -686,6 +690,7 @@ function condOK(cond) {
     if ("solved" in cond) return solvedRooms.has(cond.solved);
     if ("allSolved" in cond) return (cond.allSolved || []).every(k => solvedRooms.has(k));
     if ("gte" in cond) { const g = cond.gte || []; return (Number(gameState[g[0]]) || 0) >= Number(g[1]); }
+    if ("eq" in cond) { const e = cond.eq || []; return String(gameState[e[0]]) === String(e[1]); }  // dial/state equality (variants)
   }
   console.warn("pano-player: unsupported unlockedWhen (treating as locked):", cond);
   return false;
@@ -721,6 +726,7 @@ function isPrimarySolved(r) {
   return g ? solvedGates.has(gateKey(r.key, g.id)) : false;
 }
 function doorIsOpen(h, r) {
+  if (h.availableWhen != null && !condOK(h.availableWhen)) return false;  // cross-room door gate (e.g. cured) — 2026-07-31
   if (h.direction === "open") return true;                     // maze passage: always walkable (entry on first visit)
   if ((h.direction || "forward") === "back") return true;      // back doors always live
   if (h.requires != null) {                                    // gate on specific gate(s) in THIS room
@@ -763,8 +769,8 @@ function startRoom(i) {
   // open panorama, forward door live, puzzle short-circuits as done.
   solved = !!(room.key && solvedRooms.has(room.key));
   $("#hudroom").textContent = room.title || "";
-  const openState = SCENARIO.stonePortals ? portalUnlocked(room) : solved;
-  const img = (openState && room.panoramaOpen) ? room.panoramaOpen : room.panorama;
+  const openState = portalUnlocked(room);   // open panorama once the room's FORWARD door is actually open (its gate solved) — generalised from `solved` 2026-07-31 so a door gated on a SECONDARY lock (airship room2's bridge hatch) opens the art at the right moment; a no-op where the forward door gates on the primary
+  const img = basePanorama(room, openState);
   buildViewer(img, doorYaw(room));   // face the forward (closed) door on entry
   startRoomSfx(room);                // start this room's sound effect(s) (+ optional music duck)
   updateEnvironment();               // progressive heel/sickness reflect current state (persist across rooms)
@@ -858,7 +864,9 @@ function healMotif() {
 }
 
 // fx — setting-matched environment overlays over the room (opt-in: scenario.fx and/or room.fx, an array
-// of names: "flicker" | "frost" | …). Gentle by design, never a horror strobe. Re-applied per room.
+// of names: "flicker" | "frost" | "godrays" | "rain" | "dust" | "haze" | …). Data-driven: each name maps to
+// a .fx-<name> CSS overlay in pano-player.css, so adding an effect is CSS-only. Gentle by design, never a
+// horror strobe. Re-applied per room.
 function applyFx() {
   const layer = $("#fxLayer"); if (!layer) return;
   layer.innerHTML = "";
@@ -975,14 +983,134 @@ function compositeAwakened(room, baseUrl, cb) {
   base.onerror = () => cb(baseUrl);
   base.src = baseUrl;
 }
-function buildViewer(img, yaw = 0) {
-  // Awakened portal: bake the starfield into the texture so it tracks + wraps (see compositeAwakened).
-  if (SCENARIO.stonePortals && portalAwakened(room) && img === room.panorama) {
-    return compositeAwakened(room, img, url => _renderViewer(url, yaw));
-  }
-  _renderViewer(img, yaw);
+// --- Per-hotspot state variants (Phase 3 / Option 2) ------------------------------------------------
+// A hotspot may carry `variants:[{state,when,box,panorama}]`. The ACTIVE variant per object is the last
+// whose `when` (condOK) holds; multiple objects can be active at once. We composite each active
+// variant's box region over the base panorama on a canvas, so independent object states render together.
+// Inert for every room without variants (the vast majority) — activeVariants returns [] and buildViewer
+// renders exactly as before.
+function activeVariants(r) {
+  const vs = pickActiveVariants(r.hotspots, condOK);
+  // Per-door open art: a door carrying `openImage` composites (exactly like a variant — box region stamped
+  // from a base-sized image) when it is open. `doorIsOpen` already handles per-door gating (each door's own
+  // `requires` gate, back doors, cross-room availability), so MULTIPLE doors can be open at once, each
+  // showing its own art, and the base panorama stays "all closed" (see basePanorama). Inert for rooms with
+  // no `openImage` door (they use the legacy room-level `panoramaOpen` swap).
+  const openDoors = (r.hotspots || [])
+    .filter(h => h && h.type === "door" && h.openImage && Array.isArray(h.box) && doorIsOpen(h, r))
+    .map(h => ({ box: h.box, panorama: h.openImage }));
+  return openDoors.length ? vs.concat(openDoors) : vs;
 }
-function _renderViewer(img, yaw = 0) {
+// The base panorama for a room: the closed scene — UNLESS the room uses the legacy room-level
+// `panoramaOpen` whole-scene swap (and has NO per-door `openImage`) and its forward door is open. A per-door
+// room keeps the closed base and composites each open door (activeVariants). Guards the two mechanisms from
+// double-opening if a room ever carries both.
+function basePanorama(room, openState) {
+  const perDoor = (room.hotspots || []).some(h => h && h.type === "door" && h.openImage);
+  return (openState && room.panoramaOpen && !perDoor) ? room.panoramaOpen : room.panorama;
+}
+function _loadImg(src) {
+  return new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = () => rej(new Error("img " + src)); im.src = src; });
+}
+function compositeVariants(baseUrl, active, cb) {
+  _loadImg(baseUrl).then(base => {
+    const w = base.naturalWidth || base.width, h = base.naturalHeight || base.height;
+    const cv = document.createElement("canvas"); cv.width = w; cv.height = h;
+    const ctx = cv.getContext("2d"); ctx.drawImage(base, 0, 0);
+    return Promise.all(active.map(v => _loadImg(v.panorama).then(img => ({ v, img })))).then(loaded => {
+      loaded.forEach(({ v, img }) => {
+        const b = v.box, iw = img.naturalWidth || img.width, ih = img.naturalHeight || img.height;
+        // Copy just this object's box region from the (base-sized) variant PNG onto the base canvas.
+        // Source rect is taken from the variant's OWN dimensions so a size mismatch still maps correctly.
+        ctx.drawImage(img,
+          Math.round(b[0] * iw), Math.round(b[1] * ih), Math.round((b[2] - b[0]) * iw), Math.round((b[3] - b[1]) * ih),
+          Math.round(b[0] * w),  Math.round(b[1] * h),  Math.round((b[2] - b[0]) * w),  Math.round((b[3] - b[1]) * h));
+      });
+      cb(cv.toDataURL("image/png"));
+    });
+  }).catch(e => { console.error("variant composite failed", e); cb(baseUrl); });  // never block render on a bad variant
+}
+// --- Ambient cinemagraphs (Phase: living scenes) ----------------------------------------------------
+// A hotspot may carry `cinemagraph:{box, video}` — a small looping video that animates ONLY its box over
+// the (otherwise still) scene. At render time we draw the composited still base once per frame, stamp each
+// cinemagraph's box region from its <video> (feathered), and feed the canvas to Pannellum with
+// dynamic:true so it re-uploads each frame. Everything else — pan, hotspots, doors, variants — is
+// unchanged. Inert for every room without a `cinemagraph` field (the vast majority).
+let _cineStop = null;   // tears down the current room's cinemagraph rAF + <video>s (set by startCinemagraph)
+function activeCinemagraphs(r) {
+  return (r.hotspots || [])
+    .filter(h => h && h.cinemagraph && h.cinemagraph.video && Array.isArray(h.cinemagraph.box))
+    .map(h => h.cinemagraph);
+}
+function startCinemagraph(baseUrl, cines, yaw) {
+  _loadImg(baseUrl).then(baseImg => {
+    const W = baseImg.naturalWidth || baseImg.width, H = baseImg.naturalHeight || baseImg.height;
+    const cv = document.createElement("canvas"); cv.width = W; cv.height = H;
+    const ctx = cv.getContext("2d");
+    const vids = cines.map(c => {
+      const v = document.createElement("video");
+      v.src = c.video; v.muted = true; v.loop = true; v.playsInline = true; v.autoplay = true;
+      v.play().catch(() => {});
+      return { v, box: c.box };
+    });
+    _renderViewer(cv, yaw, true);                       // dynamic:true → Pannellum re-uploads the canvas
+    let raf = 0;
+    const draw = () => {
+      ctx.drawImage(baseImg, 0, 0, W, H);               // the crisp composited still, every frame
+      vids.forEach(({ v, box }) => {
+        if (v.readyState < 2) return;
+        const [x0, y0, x1, y1] = box;
+        // A WRAP box (x0 > x1) straddles the L/R seam: region [x0..1] ∪ [0..x1]. The clip was generated from a
+        // rolled, contiguous crop (see cinemagraph_gen), so we feather the whole thing then draw it in TWO
+        // slices — left part onto the right edge, right part onto the left edge. Normal boxes are one draw.
+        const wrap = x0 > x1;
+        const wfrac = wrap ? (1 - x0) + x1 : (x1 - x0), bh = (y1 - y0) * H, bw = wfrac * W;
+        if (bw < 1 || bh < 1) return;
+        const fc = document.createElement("canvas"); fc.width = Math.round(bw); fc.height = Math.round(bh);
+        const fx = fc.getContext("2d");
+        fx.drawImage(v, 0, 0, v.videoWidth, v.videoHeight, 0, 0, fc.width, fc.height);
+        fx.globalCompositeOperation = "destination-in";  // feather edges → blends into the still, no seam
+        const g = fx.createRadialGradient(fc.width/2, fc.height/2, Math.min(fc.width,fc.height)*0.12,
+                                          fc.width/2, fc.height/2, Math.max(fc.width,fc.height)*0.62);
+        g.addColorStop(0, "rgba(0,0,0,1)"); g.addColorStop(0.7, "rgba(0,0,0,1)"); g.addColorStop(1, "rgba(0,0,0,0)");
+        fx.fillStyle = g; fx.fillRect(0, 0, fc.width, fc.height);
+        if (!wrap) {
+          ctx.drawImage(fc, x0 * W, y0 * H);
+        } else {
+          const leftW = Math.round((1 - x0) * W);          // right-edge slice width (feather intact at the seam)
+          ctx.drawImage(fc, 0, 0, leftW, fc.height, x0 * W, y0 * H, leftW, fc.height);            // → right edge
+          ctx.drawImage(fc, leftW, 0, fc.width - leftW, fc.height, 0, y0 * H, fc.width - leftW, fc.height);  // → left edge
+        }
+      });
+      try { viewer && viewer.setUpdate && viewer.setUpdate(true); } catch (e) {}
+      raf = requestAnimationFrame(draw);
+    };
+    raf = requestAnimationFrame(draw);
+    _cineStop = () => { cancelAnimationFrame(raf); vids.forEach(({ v }) => { try { v.pause(); v.removeAttribute("src"); v.load(); } catch (e) {} }); };
+  }).catch(e => { console.error("cinemagraph start failed", e); _renderViewer(baseUrl, yaw); });
+}
+function buildViewer(img, yaw = 0) {
+  const withCinemagraph = url => {
+    const cines = activeCinemagraphs(room);
+    if (!cines.length) return _renderViewer(url, yaw);   // no cinemagraph → static render (all existing rooms)
+    startCinemagraph(url, cines, yaw);
+  };
+  const withVariants = url => {
+    const active = activeVariants(room);
+    if (!active.length) return withCinemagraph(url);     // no variants → straight to cinemagraph check
+    compositeVariants(url, active, withCinemagraph);
+  };
+  // Awakened portal: bake the starfield into the texture so it tracks + wraps (see compositeAwakened),
+  // THEN stamp any active variants, THEN run any ambient cinemagraphs on top of that composited base.
+  if (SCENARIO.stonePortals && portalAwakened(room) && img === room.panorama) {
+    return compositeAwakened(room, img, withVariants);
+  }
+  withVariants(img);
+}
+function _renderViewer(img, yaw = 0, dynamic = false) {
+  // Stop any prior room's cinemagraph rAF + <video>s before we tear down its viewer (else the loop keeps
+  // drawing into a destroyed viewer). No-op for non-cinemagraph rooms.
+  if (_cineStop) { try { _cineStop(); } catch (e) {} _cineStop = null; }
   // Snapshot music position: tearing down + rebuilding the WebGL viewer can interrupt/reset the
   // background loop on some browsers. We restore it once the new scene is in (see `reveal`), so a
   // door-swap rebuild can't make the music jump back to the start.
@@ -995,7 +1123,9 @@ function _renderViewer(img, yaw = 0) {
   const p = c.pitch || 0, f = c.hfov || 110;
   // Build hotspots up front and pass them in the config (the reliable path on a
   // static, non-draggable viewer — addHotSpot-after-load leaves them unpositioned).
-  const hotSpots = (room.hotspots || []).map(h => {
+  // `ambient` hotspots are decoration-only: they carry a cinemagraph (composited by activeCinemagraphs,
+  // independent of markers) but get NO player marker/ring and aren't clickable. Every other type gets a marker.
+  const hotSpots = (room.hotspots || []).filter(h => h.type !== "ambient").map(h => {
     const { yaw, pitch } = boxToYP(h.box, c);
     let cssClass = "hsmark " + h.type;
     if (h.type === "door") { cssClass += doorIsOpen(h, room) ? " open" : " locked"; if ((h.direction || "forward") === "forward" && portalAwakened(room)) cssClass += " awakened"; }
@@ -1008,7 +1138,7 @@ function _renderViewer(img, yaw = 0) {
   const stage = $("#pano");
   stage.style.opacity = "0";                  // hidden until the new scene loads, so no white/blank flash
   viewer = pannellum.viewer("pano", {
-    type: "equirectangular", panorama: img,
+    type: "equirectangular", panorama: img, dynamic: dynamic,
     haov: c.haov, vaov: c.vaov, vOffset: c.vOffset || 0,
     hfov: f, pitch: p, yaw,
     autoLoad: true, showControls: false, autoRotate: 0,
@@ -1074,6 +1204,8 @@ function handleDoor(h) {
     // solving each gate. isTestPlay() is set by shared/test_play.html; a real student run (play.html)
     // sets neither flag, so this bypass never fires for students — the door stays gated for them.
     if (isTestPlay()) toast("Test-play: locked door bypassed.");
+    else if (h.availableWhen != null && !condOK(h.availableWhen))
+      return toast(h.lockedBody || "Not yet — something else must be done first.");  // diegetic cross-room gate (e.g. too queasy to climb)
     else return toast((SCENARIO.stonePortals && portalAwakened(room))
       ? "The portal is awake, but sealed — key the stones to open it."
       : "The door won't budge — solve the puzzle first.");
@@ -1852,8 +1984,8 @@ function solveRoom(result, h) {
   }
   updateMotif();                                       // story-motif HUD (e.g. the lesion spreads)
   updateEnvironment();                                 // progressive heel lists further; sickness dim deepens/clears
-  const openState = SCENARIO.stonePortals ? portalUnlocked(room) : isPrimarySolved(room);
-  const img = openState ? (room.panoramaOpen || room.panorama) : room.panorama;
+  const openState = portalUnlocked(room);   // see startRoom: follow the forward door's actual open state (handles a door gated on a secondary lock)
+  const img = basePanorama(room, openState);
   buildViewer(img, resumeYaw);                         // stay facing where you were, not snap to front
   // An escape gate flagged `endsEscape` (e.g. a boss-room valve keypad) ends the ungraded escape when
   // solved — the in-room analogue of an endsEscape DOOR (handleDoor). Terminal: show the escape finish.

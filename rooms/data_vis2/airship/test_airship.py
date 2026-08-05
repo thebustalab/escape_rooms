@@ -136,9 +136,9 @@ def main():
     print("== escape lockstep: star-astrolabe (dial -> mapview -> lock) ==")
     codes = json.load(open(os.path.join(HERE, "nest", "codes.json"), encoding="utf-8"))
     ans = codes["answer_star"]
-    lock = next(h for h in spots("bridge") if h.get("type") == "lock")
+    lock = next(h for h in spots("room2") if h.get("type") == "lock")  # moved onto the deck 2026-07-31 — it now gates the bridge door
     check(str(lock.get("answer", "")).upper() == ans.upper(),
-          "bridge helm lock answer (%s) == the invariant star from make_starchart.py (%s)" % (lock.get("answer"), ans))
+          "bridge-hatch keypad answer (%s) == the invariant star from make_starchart.py (%s)" % (lock.get("answer"), ans))
     # all star names the same length, and the lock length matches (fixed-length lock — Lucas's constraint)
     name_lens = {len(n) for n in codes["stars"]}
     check(name_lens == {codes["name_length"]},
@@ -170,26 +170,44 @@ def main():
     check({"dplyr", "ggplot2", "readr"}.issubset(scen.get("packages", [])),
           "packages include ggplot2 + dplyr + readr")
     check(R.get("boss", {}).get("isBoss") is True, "boss is flagged isBoss")
-    check(R.get("nest", {}).get("phase") == "escape" and R.get("bridge", {}).get("phase") == "escape",
-          "nest + bridge are phase:escape (ungraded, out of codec)")
+    check(R.get("nest", {}).get("phase") == "escape",
+          "nest is phase:escape (ungraded, out of codec)")
+    check("bridge" not in R, "the bridge room was removed — the escape ends on the weather deck (2026-08-05)")
     check(all(R[k].get("unlockedWhen") is True for k in R),
           "open world: every room is freely enterable (unlockedWhen True)")
     check(bool(scen.get("escapeDone")), "scenario has an escapeDone finish screen")
 
-    print("== open-world nav + puzzle-gated order ==")
-    # every door is an always-walkable open passage, except the bridge's escapeDone way-out (no `to`)
+    print("== nav graph: re-locked doors (2026-07-31) + puzzle-gated order ==")
+    DOORS = {}
     for r in scen["rooms"]:
         for h in spots(r["key"]):
             if h.get("type") == "door" and h.get("to"):
-                check(h.get("direction") == "open",
-                      "%s door -> %s is direction:open" % (r["key"], h["to"]))
-    # the weather deck is the hub — reaches the apothecary, the crow's nest, and the bridge
+                DOORS[(r["key"], h["to"])] = h
+    # (a) the two interior progression doors are LOCKED forward doors gated on their own room's puzzle
+    for (frm, to, who) in [("room1", "room3", "apothecary->hold hatch"),
+                           ("room3", "boss", "hold->engine bulk-door")]:
+        d = DOORS.get((frm, to), {})
+        check(d.get("direction") == "forward" and not d.get("requires"),
+              "%s is a forward door gated on its own room's puzzle" % who)
+    # (b) the mast to the nest: an open passage, but sealed on the CURE (too queasy until boss solved)
+    mast = DOORS.get(("room2", "nest"), {})
+    check(mast.get("availableWhen") == {"solved": "boss"} and bool(mast.get("lockedBody")),
+          "the mast to the nest is gated on the cure (boss) with a diegetic lockedBody: %s" % (mast.get("availableWhen"),))
+    # (c) the escape now ENDS on the weather deck: the former forward-to-bridge door is the 'take the
+    #     wheel' door — forward, gated on the deck bearing-keypad, no `to`, fires escapeDone (2026-08-05).
+    wheel = next((h for h in spots("room2") if h.get("type") == "door" and h.get("endsEscape")), None)
+    check(wheel is not None and wheel.get("direction") == "forward"
+          and wheel.get("requires") == "the_bridge_hatch_keypad" and not wheel.get("to"),
+          "room2 'take the wheel' door: forward, requires the bridge-hatch keypad, no target, fires escapeDone")
+    # everything else stays an open passage
+    for edge in [("room1", "room2"), ("room2", "room1"), ("room3", "room1"),
+                 ("boss", "room3"), ("nest", "room2")]:
+        check(DOORS.get(edge, {}).get("direction") == "open", "%s->%s stays an open passage" % edge)
+    # the weather deck is still the hub — reaches the apothecary and the crow's nest (bridge removed)
     deck = {h.get("to") for h in spots("room2") if h.get("type") == "door"}
-    check({"room1", "nest", "bridge"} <= deck, "weather-deck hub reaches apothecary + nest + bridge: %s" % deck)
-    # the crow's nest hangs off the weather deck (the mast), NOT off the engine-room boss
-    check(any(h.get("to") == "nest" for h in spots("room2")), "crow's nest is reached from the weather deck")
+    check({"room1", "nest"} <= deck, "weather-deck hub reaches apothecary + nest: %s" % deck)
     check(not any(h.get("to") == "nest" for h in spots("boss")), "crow's nest is NOT hung off the engine-room boss")
-    # progression is enforced on the PUZZLES via availableWhen, not on the doors
+    # progression is ALSO enforced on the PUZZLES via availableWhen
     def gate(rk, t="puzzle"):
         return next((h.get("availableWhen") for h in spots(rk) if h.get("type") == t), "NO-HOTSPOT")
     check(gate("room1") is None, "room1 puzzle is available from the start")
@@ -200,13 +218,9 @@ def main():
     for rk in ("room2", "room3", "boss"):
         check(bool(next((h.get("lockedBody") for h in spots(rk) if h.get("type") == "puzzle"), None)),
               "%s gated puzzle has a diegetic lockedBody" % rk)
-    # the escape: the helm lock is dead until cured; 'take the wheel' fires escapeDone
-    check(gate("bridge", "lock") == {"solved": "boss"},
-          "bridge helm lock gated on the cure (boss solved): %s" % (gate("bridge", "lock"),))
-    wheel = next((h for h in spots("bridge")
-                  if h.get("type") == "door" and (h.get("direction") or "forward") == "forward"), None)
-    check(wheel is not None and wheel.get("requires") == "obj_lock" and not wheel.get("to"),
-          "the bridge 'take the wheel' door is gated on the helm lock and fires escapeDone (no `to`)")
+    # the escape lock now lives ON THE DECK (room2), gating the bridge door; dead until cured
+    check(gate("room2", "lock") == {"solved": "boss"},
+          "the bridge-hatch keypad (on the deck) is gated on the cure (boss solved): %s" % (gate("room2", "lock"),))
 
     print("\n%d failure(s)" % len(fails))
     return 1 if fails else 0

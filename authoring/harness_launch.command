@@ -4,10 +4,10 @@
 # Run in Terminal (or double-click in Finder once it's executable: `chmod +x harness_launch.command`).
 # It:
 #   1. SSHes into host2 (the Linux desktop) and runs serve_harness.sh with HARNESS_RESTART=1 to
-#      (re)start BOTH servers FRESH (harness API :8751 + playtest :8055) — so every launch picks up the
-#      latest code (server changes like the no-cache headers only take effect on a fresh process).
-#   2. Opens ONE SSH tunnel mapping the Mac's own localhost:8751 and :8055 to host2's, so the Mac sees
-#      both servers exactly where host2 does. That keeps the test-play flow's origins consistent
+#      (re)start the servers FRESH (harness API :8751 + V2 image-pipeline harness :8752 + playtest :8055)
+#      — so every launch picks up the latest code (server changes only take effect on a fresh process).
+#   2. Opens ONE SSH tunnel mapping the Mac's own localhost:8751, :8752 and :8055 to host2's, so the Mac
+#      sees all servers exactly where host2 does. That keeps the test-play flow's origins consistent
 #      (the mixer on localhost:8055 posts volumes to the harness on localhost:8751 — same as on host2).
 #   3. Opens the harness in the default browser.
 #   4. HOLDS THE TERMINAL. Press Ctrl+C (or close the window) to TEAR THE WHOLE THING DOWN — the SSH
@@ -51,15 +51,16 @@ if tunnel_up; then
   echo "② tunnel already up (localhost:8751 reaches the harness) — reusing (won't be torn down on exit)"
 else
   ssh $SSH_OPTS -S "$CTRL" -O exit "$HOST2" 2>/dev/null  # clear any stale/dead master on our socket
-  echo "② opening SSH tunnel  localhost:8751→host2 + localhost:8055→host2 …"
+  echo "② opening SSH tunnel  localhost:8751→host2 + localhost:8752→host2 + localhost:8055→host2 …"
   ssh $SSH_OPTS -M -S "$CTRL" -f -N \
       -L 8751:localhost:8751 \
+      -L 8752:localhost:8752 \
       -L 8055:localhost:8055 \
       -o ExitOnForwardFailure=yes -o ServerAliveInterval=30 "$HOST2"
   rc=$?
   if [ $rc -ne 0 ]; then
-    echo "✗ tunnel command exited $rc — most likely local :8751 or :8055 is already bound by something else."
-    echo "  Inspect:  lsof -nP -iTCP:8751 -sTCP:LISTEN ;  lsof -nP -iTCP:8055 -sTCP:LISTEN"
+    echo "✗ tunnel command exited $rc — most likely local :8751, :8752 or :8055 is already bound by something else."
+    echo "  Inspect:  lsof -nP -iTCP:8751 -sTCP:LISTEN ;  lsof -nP -iTCP:8752 -sTCP:LISTEN ;  lsof -nP -iTCP:8055 -sTCP:LISTEN"
     exit 1
   fi
   for _ in 1 2 3 4 5; do tunnel_up && break; sleep 1; done
@@ -93,7 +94,7 @@ cleanup() {
   else
     echo "⏹ stopping host2 servers…"
     ssh $SSH_OPTS -o ControlMaster=no -o ConnectTimeout=8 "$HOST2" \
-        "tmux send-keys -t harness_ui C-c 2>/dev/null; tmux send-keys -t playtest C-c 2>/dev/null" \
+        "tmux send-keys -t harness_ui C-c 2>/dev/null; tmux send-keys -t harness_v2 C-c 2>/dev/null; tmux send-keys -t playtest C-c 2>/dev/null" \
         && echo "   servers stopped ✓" || echo "   (couldn't reach host2 to stop servers)"
   fi
   echo "bye."
@@ -105,7 +106,7 @@ trap cleanup EXIT
 echo "③ opening $URL"
 open "$URL" 2>/dev/null || echo "  (open the URL manually: $URL)"
 
-echo "✓ ready. Harness: $URL   ·   test-play server: http://localhost:8055/"
+echo "✓ ready. Harness: $URL   ·   V2 harness: http://localhost:8752/harness_gpt.html   ·   test-play server: http://localhost:8055/"
 echo "  Holding the tunnel open. Press Ctrl+C (or close this window) to close it and exit."
 
 # 4) HOLD — keep the terminal (and the tunnel) alive until Ctrl+C. If the tunnel drops on its own

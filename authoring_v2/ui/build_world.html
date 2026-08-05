@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Build world</title>
+<style>
+  :root { --bg:#0a141d; --panel:#0e1c28; --line:rgba(255,255,255,0.14); --amber:#ffd88c; --blue:#7fd1ff; --green:#7bd88c; --dim:#8fa3b0; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:#dfe9f0; font:14px/1.5 system-ui,sans-serif; padding:16px 18px 60px; }
+  h1 { font-size:18px; margin:0 0 2px; }
+  .sub { color:var(--dim); font-size:12px; margin-bottom:14px; }
+  select, button, textarea { font:inherit; color:inherit; background:#12222f; border:1px solid var(--line); border-radius:7px; padding:6px 9px; }
+  button { cursor:pointer; } button:hover { border-color:var(--blue); } button:disabled { opacity:.5; cursor:default; }
+  a { color:var(--blue); }
+  .stage { background:var(--panel); border:1px solid var(--line); border-radius:11px; padding:12px 14px; margin-top:12px; }
+  .stage h2 { font-size:14px; margin:0 0 6px; } .stage h2 .n { color:var(--amber); margin-right:6px; }
+  .hint { color:var(--dim); font-size:12px; }
+  .status { font-size:12px; margin-left:8px; } .ok { color:var(--green); } .err { color:#ff9c9c; }
+  textarea { width:100%; min-height:120px; font-family:ui-monospace,monospace; font-size:11px; }
+  table { width:100%; border-collapse:collapse; margin-top:10px; font-size:12px; }
+  th,td { text-align:left; padding:5px 8px; border-top:1px solid rgba(255,255,255,0.08); }
+  th { color:var(--dim); font-weight:600; }
+  .tick { color:var(--green); } .no { color:var(--dim); } .warn { color:var(--amber); }
+  .pill { font-size:10px; font-weight:700; padding:1px 6px; border-radius:10px; border:1px solid var(--line); }
+  #netWrap { position:relative; margin-top:12px; overflow-x:auto; }
+  #netSvg { display:block; }
+  .rmcircle { fill:#12222f; stroke:var(--line); stroke-width:1.5; }
+  .rmlabel { fill:var(--amber); font-weight:700; font-size:11px; text-anchor:middle; }
+  .rmsub { fill:var(--dim); font-size:8.5px; text-anchor:middle; }
+  .hs { stroke:#0a141d; stroke-width:1; cursor:pointer; }
+  .hstype { font-size:7.5px; pointer-events:none; }
+  #netTip { position:absolute; z-index:5; max-width:230px; background:#0a141d; border:1px solid var(--blue); border-radius:7px; padding:5px 8px; font-size:11px; line-height:1.35; color:#dfe9f0; pointer-events:none; display:none; box-shadow:0 4px 14px rgba(0,0,0,.55); }
+  .legend { font-size:11px; color:var(--dim); margin-top:6px; display:flex; flex-wrap:wrap; gap:3px 12px; }
+  .legend b { font-weight:700; }
+  .panothumb { height:40px; border-radius:4px; border:1px solid var(--line); vertical-align:middle; }
+  #roomTbl tr.built td { background:rgba(123,216,140,0.07); }
+  #roomTbl button.done { border-color:var(--green); color:var(--green); }
+  /* Merged room table: two column-groups with a vertical divider each — ② Panorama (blue) and ③ Hotspots
+     & cinemagraphs (amber) — so it's clear which columns are which step's material. */
+  #roomTbl th.g2, #roomTbl td.c-cands { border-left:2px solid rgba(127,209,255,0.55); }
+  #roomTbl th.g3, #roomTbl td.c-spec  { border-left:2px solid rgba(255,216,140,0.55); }
+  /* Clickable ✓ review flags (placed / verified) — like the built badge, but you toggle them. */
+  .flagbtn { background:none; border:1px solid var(--line); border-radius:5px; padding:1px 9px; font-size:13px; color:var(--dim); cursor:pointer; }
+  .flagbtn.on { color:var(--green); border-color:var(--green); }
+  .flagbtn:hover { border-color:var(--blue); }
+  #roomTbl .grouphd th { border-top:0; font-size:11px; font-weight:700; padding-bottom:3px; }
+  #roomTbl .grouphd th.g2 { color:var(--blue); }
+  #roomTbl .grouphd th.g3 { color:var(--amber); text-align:left; }
+  .g2hd { color:var(--blue); font-weight:700; }
+  /* Column 1 shrinks to fit the room name + caption (so the blue ② divider sits as far left as it can). */
+  #roomTbl td.c-room, #roomTbl thead th:first-child { width:1%; white-space:nowrap; }
+  /* Every cell middle-aligned so each room's name, buttons, thumbnails + built badge line up horizontally. */
+  #roomTbl tbody td { vertical-align:middle; }
+  /* view prompt + Generate sit side by side, immediately LEFT of the candidate thumbnails. */
+  .candrow { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .genrow { display:flex; flex-direction:row; gap:6px; align-items:center; }
+  #roomTbl td.c-art { white-space:nowrap; }   /* the "✓ built" indicator, right side of the ② Panorama group */
+  /* ③ actions (Place all hotspots · Generate all cinemagraphs) live in the group header, above the columns. */
+  .g3acts { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .g3acts button { font-size:12px; }
+  .g3acts .status { margin-left:0; }
+  /* Level-1 candidate tiles: up to 3 per room, each with corner action icons. */
+  .cands { display:flex; gap:10px; flex-wrap:wrap; align-items:flex-start; }
+  .cand { position:relative; width:132px; height:44px; border-radius:5px; border:1px solid var(--line); overflow:hidden; background:#0a141d; }
+  .cand.committed { border-color:var(--green); box-shadow:0 0 0 1px var(--green); }
+  .cand img { width:100%; height:100%; object-fit:cover; display:block; }
+  .cand .ic { position:absolute; top:2px; width:17px; height:17px; padding:0; line-height:15px; text-align:center;
+              font-size:11px; border-radius:4px; border:1px solid var(--line); background:rgba(10,20,29,0.86); }
+  .cand .ic.seam   { left:2px; color:var(--blue); text-decoration:none; }
+  .cand .ic.del    { right:2px; color:#ff9c9c; }
+  .cand .ic:hover  { background:#0a141d; border-color:currentColor; }
+  .cand.committed .badge { position:absolute; bottom:2px; left:2px; font-size:9px; font-weight:700; color:var(--green);
+              background:rgba(10,20,29,0.86); border-radius:4px; padding:0 4px; }
+  .candempty { color:var(--dim); font-size:12px; padding:12px 0; }
+  /* Cover candidates (square) — click to set as the scenario cover. */
+  .covcand { width:64px; height:64px; border-radius:6px; border:1px solid var(--line); overflow:hidden; cursor:pointer; background:#0a141d; }
+  .covcand img { width:100%; height:100%; object-fit:cover; display:block; }
+  .covcand:hover { border-color:var(--blue); }
+  #coverThumb { object-fit:cover; }
+  /* Story flow — read-only narrative under the network, in room order, so it reads as the storyline. */
+  .storyhd { font-weight:700; color:var(--amber); font-size:13px; margin-bottom:6px; }
+  .storyblk { border-left:2px solid var(--line); padding:1px 0 1px 10px; margin:7px 0; }
+  .storylbl { font-size:10px; text-transform:uppercase; letter-spacing:.04em; color:var(--dim); }
+  .storytitle { font-weight:700; }
+  .storybody { font-size:12px; color:#cfe0ea; }
+  .storybody b { color:var(--amber); }
+</style>
+</head>
+<body>
+  <h1>Build world</h1>
+  <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap">
+    <label>scenario <select id="scenPick"></select></label>
+    <button id="refresh">↻ refresh</button>
+    <span style="margin-left:auto"></span>
+    <button id="testPlay" title="Open this scenario in the test player (:8055) — sound mixer + in-place text editing; needs the playtest tmux server running on :8055">▶ Test play</button>
+    <button id="play" title="Open this scenario in NORMAL play mode (a student's view — no test tools) over the :8055 playtest server">▶ Play</button>
+    <span class="status" id="topStat"></span>
+  </div>
+  <div style="display:flex; align-items:center; gap:10px; margin-top:8px">
+    <span class="hint" style="white-space:nowrap">push changes (Mac terminal):</span>
+    <pre id="pushCmds" style="margin:0; flex:1; min-width:0; font:12px/1.5 ui-monospace,Menlo,Consolas,monospace; background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:6px 10px; white-space:pre; overflow:auto">cd ~/Documents/Tools/websites/thebustalab.github.io/escape_rooms
+git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
+    <button id="copyPush" title="Copy these commands"
+      onclick="navigator.clipboard&&navigator.clipboard.writeText(document.getElementById('pushCmds').textContent);this.textContent='Copied ✓';setTimeout(()=>this.textContent='Copy',1200)">Copy</button>
+  </div>
+
+  <div class="stage">
+    <h2><span class="n">1</span>Concept, spec &amp; world</h2>
+    <div class="hint" style="margin-bottom:8px">Dream up the real-world version of the technique and how it leads to an escape. Run the <b>escape</b> skill (new — coming), the <b>puzzle-phase</b> skill, and the <b>story-phase</b> skill, and write it all into <code>design_notes.md</code>. Then build the spec for the entire scenario. Scenario-level entries in the bundle: <code>worldPlate</code> (prompt string) and <code>cover</code> (<code>{prompt, title, ambient}</code>).</div>
+    <div style="display:flex; gap:16px; align-items:flex-start; flex-wrap:wrap">
+      <div style="flex:1 1 340px; min-width:300px">
+        <textarea id="specsJson" placeholder='{ "worldPlate":"…", "cover":{"prompt":"…","title":"…","ambient":"fireflies"}, "room1": { … } }'></textarea>
+        <div style="margin-top:6px"><button id="loadSpecs">Write spec to disk</button> <button id="fromDisk">↻ load from disk</button> <span class="status" id="specsStat"></span></div>
+      </div>
+      <div style="flex:1 1 300px; min-width:280px; display:flex; flex-direction:column; gap:10px">
+        <div id="platePanel" style="display:none; padding:8px 10px; background:#12222f; border:1px solid var(--line); border-radius:8px; align-items:center; gap:10px; flex-wrap:wrap;">
+          <b>World plate</b>
+          <img id="plateThumb" class="panothumb" style="display:none">
+          <button onclick="viewWorldPrompt()">view prompt</button>
+          <button onclick="genPlate()">Generate plate</button>
+          <span class="status" id="plateStat"></span>
+        </div>
+        <div id="coverPanel" style="display:none; padding:8px 10px; background:#12222f; border:1px solid var(--line); border-radius:8px;">
+          <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap">
+            <b>Cover art</b>
+            <img id="coverThumb" class="panothumb" style="display:none; aspect-ratio:1/1; height:44px">
+            <button onclick="viewCoverPrompt()">view prompt</button>
+            <button onclick="genCover()">Generate cover ×2</button>
+            <span class="status" id="coverStat"></span>
+          </div>
+          <div id="coverFlags" class="hint" style="margin-top:6px"></div>
+          <div id="coverGrid" style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px"></div>
+        </div>
+      </div>
+    </div>
+    <div id="netWrap" style="display:none; margin-top:10px"><svg id="netSvg"></svg><div id="netTip"></div></div>
+    <div id="storyFlow" style="margin-top:12px"></div>
+  </div>
+
+  <div class="stage">
+    <h2>Rooms</h2>
+    <div class="hint"><span class="g2hd">②</span> generate up to three candidate panos per room — <span style="color:var(--blue)">⤢</span> open the wrap/seam editor (commit the room from there, capturing pitch/yaw/wrap) · <span style="color:#ff9c9c">✕</span> delete. The <b style="color:var(--amber)">③</b> actions live in the header above their columns.</div>
+    <table id="roomTbl">
+      <thead>
+        <tr class="grouphd">
+          <th></th>
+          <th class="g2" colspan="2">② Panorama</th>
+          <th class="g3" colspan="6">
+            <div class="g3acts">
+              <span>③ Hotspots &amp; cinemagraphs</span>
+              <button id="applyAll" title="Place each element's hotspot (approx box) + queue every animated one as a cinemagraph — do this after the art is committed">Place all hotspots</button>
+              <span class="status" id="applyStat"></span>
+              <button id="runBatch" title="Run the queued cinemagraphs — each makes 5 candidates to pick from; voice is down while it runs">Generate all cinemagraphs</button>
+              <span class="status" id="batchStat"></span>
+            </div>
+          </th>
+        </tr>
+        <tr>
+          <th>room</th>
+          <th class="g2">candidates (up to 3)</th><th>built</th>
+          <th class="g3">spec</th><th>hotspots</th><th></th><th>placed</th><th>cinemagraphs</th><th>verified</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <div class="hint" style="margin-top:6px">Work each room left → right: <b>Generate</b> a panorama and commit it (⤢), then <b>Place all hotspots</b>, nudge the rough boxes via <b>edit hotspots</b>, and <b>Generate all cinemagraphs</b> (each makes 5 candidates to pick).</div>
+  </div>
+
+  <div class="stage">
+    <h2><span class="n">5</span>Finish &amp; publish</h2>
+    <div class="hint" style="margin-bottom:8px">Close it out: audit the built scenario, mark it complete in the inventory, and publish it in the Integrated Bioanalytics book.</div>
+    <div style="display:flex; flex-direction:column; gap:10px">
+      <label style="display:flex; align-items:flex-start; gap:8px; cursor:pointer">
+        <input type="checkbox" id="fAudited" style="width:auto; margin:3px 0 0">
+        <span><b>Audited</b> — run the <code>escape_room_audit</code> skill in Claude (it re-derives every answer and checks puzzles · story · design · wiring). The harness can't launch Claude, so tick this once you've run it.</span>
+      </label>
+      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap">
+        <button id="markComplete">Mark complete in inventory</button>
+        <span class="hint" id="statusHint"></span>
+        <span class="status" id="finishStat"></span>
+      </div>
+      <label style="display:flex; align-items:flex-start; gap:8px; cursor:pointer">
+        <input type="checkbox" id="fPublished" style="width:auto; margin:3px 0 0">
+        <span><b>Published in the book</b> — push the escape_rooms repo (the Copy command at the top), then link <code>…/rooms/&lt;chapter&gt;/&lt;scenario&gt;/play.html</code> from its Integrated Bioanalytics chapter. Tick when done.</span>
+      </label>
+    </div>
+  </div>
+
+  <div id="promptModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:20; align-items:center; justify-content:center;">
+    <div style="background:var(--panel); border:1px solid var(--line); border-radius:11px; padding:14px; width:min(720px,94vw); max-height:88vh; display:flex; flex-direction:column;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <b id="promptTitle">Prompt</b> <button onclick="closePrompt()">✕</button>
+      </div>
+      <textarea id="promptText" style="width:100%; flex:1; min-height:340px; font-family:ui-monospace,monospace; font-size:11px;"></textarea>
+      <div style="margin-top:8px; display:flex; gap:8px; align-items:center;">
+        <button onclick="closePrompt()">Close</button>
+        <span class="hint" id="promptHint"></span>
+      </div>
+    </div>
+  </div>
+
+<script src="net_graph.js"></script>
+<script>
+  const $ = s => document.querySelector(s);
+  let CH = "", SC = "", poll = 0;
+  const getj = async u => (await fetch(u)).json();
+  const post = async (route, body) => (await fetch(route, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) })).json();
+  const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+  async function loadScenarios() {
+    const r = await getj("/api/scenarios");
+    const sel = $("#scenPick"); sel.innerHTML = "";
+    (r.scenarios || []).slice().sort((a, b) => (a.chapter + a.scenario).localeCompare(b.chapter + b.scenario)).forEach(s => {
+      const o = document.createElement("option");
+      o.value = s.chapter + "/" + s.scenario; o.textContent = s.chapter + " / " + s.scenario;
+      sel.appendChild(o);
+    });
+    const act = r.active || {};
+    sel.value = (act.chapter && act.scenario) ? act.chapter + "/" + act.scenario : (sel.options[0] && sel.options[0].value) || "";
+    onScenario();
+  }
+  function onScenario() {
+    const v = $("#scenPick").value || ""; [CH, SC] = v.split("/");
+    loadSpecsFromDisk();   // survive a restart: repopulate the specs textarea from disk
+    refresh();
+    refreshCoverGrid();    // list any existing cover candidates for this scenario
+  }
+  async function refresh() {
+    if (!CH || !SC) return;
+    const r = await post("/api/scenario-state", { chapter: CH, scenario: SC });
+    if (!r.ok) { $("#topStat").innerHTML = `<span class="err">${esc(r.error)}</span>`; return; }
+    render(r);
+  }
+  function render(st) {
+    const rooms = st.rooms || [];
+    const b = st.batch, running = b && b.state === "running";
+    $("#runBatch").disabled = running || !st.queued;
+    $("#runBatch").textContent = running ? "generating…" : `Generate all cinemagraphs${st.queued ? " (" + st.queued + " queued)" : ""}`;
+    if (running) {
+      const cur = b.current ? `${b.current.type} · ${esc(b.current.room)}/${esc(b.current.hotspot)}${b.current.step ? " · " + esc(b.current.step) : ""}` : "starting…";
+      $("#batchStat").innerHTML = `<span class="warn">running ${b.done || 0}/${b.total || 0}</span> · ${cur} · voice is down`;
+      if (!poll) startPoll();
+    } else if (b && b.state === "done" && (b.results || []).length) {
+      const ok = b.results.filter(x => x.state === "done").length, bad = b.results.filter(x => x.state === "error").length;
+      $("#batchStat").innerHTML = `<span class="ok">last batch: ${ok} done${bad ? ` · <span class="err">${bad} failed</span>` : ""}</span> — pick candidates in each room's hub`;
+    }
+    $("#topStat").innerHTML = `<span class="hint">${rooms.length} rooms · ${rooms.filter(r => r.hasSpec).length} spec'd · ${rooms.filter(r => r.built).length} built · ${st.queued} queued</span>`;
+    renderNetwork(rooms);
+    renderPlate(st);
+    renderCover(st);
+    renderStory(st);
+    renderFinish(st);
+    renderRooms(rooms);
+  }
+  // Finish & publish (step 5): audited/published flags + the inventory status. Audit runs in Claude (the
+  // escape_room_audit skill), so the flag is a tracked checkbox; "mark complete" sets status + rebuilds the inventory.
+  function renderFinish(st) {
+    $("#fAudited").checked = !!st.audited;
+    $("#fPublished").checked = !!st.published;
+    $("#statusHint").innerHTML = `inventory status: <b>${esc(st.status || "in_development")}</b>`;
+  }
+  async function patchScenario(fields) { return post("/api/scenario-patch", { chapter: CH, scenario: SC, fields }); }
+  // Select this scenario as the server's ACTIVE one — /api/generate (used by cover gen) writes to the
+  // active scenario's _scratch, so we must select before generating (mirrors the reproject hub's flow).
+  async function selectActive() {
+    const r = await post("/api/select-scenario", { chapter: CH, scenario: SC });
+    return !!(r && r.ok);
+  }
+
+  // World plate — the scenario's shared continuity reference, generated first in step 2 and carried (low
+  // fidelity) by every room Generate. Its prompt is a scenario-level field in the spec.
+  let WORLDPROMPT = "", PLATEV = 0;
+  const plateSrc = () => `/sfile/_world/plate.png?chapter=${encodeURIComponent(CH)}&scenario=${encodeURIComponent(SC)}&v=${PLATEV}`;
+  function renderPlate(st) {
+    const has = !!st.worldPlatePrompt;
+    $("#platePanel").style.display = has ? "flex" : "none";
+    if (!has) return;
+    WORLDPROMPT = st.worldPlatePrompt || "";
+    const thumb = $("#plateThumb");
+    if (st.worldPlate) { thumb.style.display = ""; if (!thumb.src || !PLATEV) { PLATEV = PLATEV || 1; thumb.src = plateSrc(); } }
+  }
+  // The world-plate prompt lives in the spec bundle (the `worldPlate` entry, stage 1) — read-only here.
+  function viewWorldPrompt() {
+    $("#promptTitle").textContent = "World plate prompt";
+    const t = $("#promptText"); t.value = WORLDPROMPT || ""; t.readOnly = true;
+    $("#promptHint").innerHTML = "Read-only — it's the <b>worldPlate</b> entry in the spec (stage 1); edit it there, then re-render.";
+    $("#promptModal").style.display = "flex";
+  }
+  async function genPlate() {
+    const st = $("#plateStat"); st.innerHTML = `<span class="warn">generating plate… (~1 min)</span>`;
+    const r = await post("/api/gen-world-plate", { chapter: CH, scenario: SC });
+    if (!r.ok) { st.innerHTML = `<span class="err">${esc(r.error)}</span>`; return; }
+    const poll = setInterval(async () => {
+      const s = await getj(`/api/status?slot=${encodeURIComponent(r.slot)}`);
+      if (s.active) return;
+      clearInterval(poll);
+      if (s.error) { st.innerHTML = `<span class="err">${esc(s.error)}</span>`; return; }
+      PLATEV = Date.now();
+      const thumb = $("#plateThumb"); thumb.style.display = ""; thumb.src = plateSrc();
+      st.innerHTML = `<span class="ok">plate set ✓ — now generate the rooms</span>`;
+    }, 2500);
+  }
+
+  // Cover art — the scenario's poster (book exercises page + landing). Prompt/title/ambient live in the spec
+  // bundle's `cover` entry (single source, edited in the textarea); Generate makes 2 candidates, click to set.
+  let COVERPROMPT = "", COVERV = 0;
+  const coverSrc = f => `/sfile/${encodeURIComponent(f)}?chapter=${encodeURIComponent(CH)}&scenario=${encodeURIComponent(SC)}&v=${COVERV}`;          // the SET cover (e.g. cover.png)
+  const coverCandSrc = f => `/sfile/_scratch/${encodeURIComponent(f)}?chapter=${encodeURIComponent(CH)}&scenario=${encodeURIComponent(SC)}&v=${COVERV}`;   // a _scratch candidate
+  function renderCover(st) {
+    $("#coverPanel").style.display = "";   // always visible so the ✓/✕ marks show what's missing from the spec
+    COVERPROMPT = st.coverPrompt || "";
+    const thumb = $("#coverThumb");
+    if (st.cover) { thumb.style.display = ""; if (!thumb.src || !COVERV) { COVERV = COVERV || 1; thumb.src = coverSrc(st.cover); } }
+    else thumb.style.display = "none";
+    // Status marks — is each piece present in the spec? (read-only; edit them in the spec bundle's `cover`)
+    const m = ok => ok ? `<span style="color:var(--green)">✓</span>` : `<span style="color:#ff9c9c">✕</span>`;
+    const has = v => !!(v && String(v).trim());
+    $("#coverFlags").innerHTML = `prompt ${m(has(st.coverPrompt))} · cover set ${m(has(st.cover))} · title ${m(has(st.title))} · ambient ${m(has(st.ambient))}`;
+  }
+  // Story flow — read-only narrative under the network, in room order, so you can read the storyline and see
+  // how it threads through the network. All authored in the spec bundle's `story` entry.
+  function renderStory(st) {
+    const host = $("#storyFlow"); if (!host) return;
+    const rooms = st.rooms || [];
+    const any = st.openingStory || st.enterLabel || st.analysisFinish || st.escapeFinish || rooms.some(r => r.entry);
+    if (!any) { host.innerHTML = ""; return; }
+    const blk = (label, title, body) =>
+      `<div class="storyblk"><div class="storylbl">${esc(label)}</div>${title ? `<div class="storytitle">${esc(title)}</div>` : ""}${body ? `<div class="storybody">${body}</div>` : ""}</div>`;
+    let html = `<div class="storyhd">Story flow <span class="hint">— read-only; authored in the spec bundle's <code>story</code></span></div>`;
+    if (st.openingStory || st.enterLabel)
+      html += blk("Opening" + (st.enterLabel ? ` · enter: “${esc(st.enterLabel)}”` : ""), st.title || "", esc(st.openingStory || ""));
+    rooms.forEach(r => { if (r.entry) html += blk("Entry · " + r.key, r.entry.title || "", r.entry.text || ""); });
+    if (st.analysisFinish) html += blk("Analysis finish", st.analysisFinish.title || "", st.analysisFinish.body || "");
+    if (st.escapeFinish) html += blk("Escape finish", st.escapeFinish.title || "", st.escapeFinish.body || "");
+    host.innerHTML = html;
+  }
+  function viewCoverPrompt() {
+    $("#promptTitle").textContent = "Cover art prompt";
+    const t = $("#promptText"); t.value = COVERPROMPT || ""; t.readOnly = true;
+    $("#promptHint").innerHTML = "Read-only — it's the <b>cover.prompt</b> entry in the spec bundle (stage 1); edit it there, then re-render.";
+    $("#promptModal").style.display = "flex";
+  }
+  async function genCover() {
+    const st = $("#coverStat");
+    if (!COVERPROMPT.trim()) { st.innerHTML = `<span class="err">set cover.prompt in the spec first</span>`; return; }
+    st.innerHTML = `<span class="warn">generating cover ×2… (~1 min)</span>`;
+    if (!(await selectActive())) { st.innerHTML = `<span class="err">could not select scenario</span>`; return; }
+    const r = await post("/api/generate", { prompt: COVERPROMPT, n: 2, quality: "high", size: "1024x1024", slot: "cover", tag: "cover" });
+    if (!r.ok) { st.innerHTML = `<span class="err">${esc(r.error)}</span>`; return; }
+    const poll = setInterval(async () => {
+      const s = await getj(`/api/status?slot=cover`);
+      if (s.active) return;
+      clearInterval(poll);
+      if (s.error) { st.innerHTML = `<span class="err">${esc(s.error)}</span>`; return; }
+      COVERV = Date.now();
+      st.innerHTML = `<span class="ok">candidates ready — click one to set the cover</span>`;
+      refreshCoverGrid();
+    }, 2500);
+  }
+  async function refreshCoverGrid() {
+    if (!(await selectActive())) return;
+    const sc = await getj("/api/scenes");
+    const covers = (sc.scenes || []).filter(f => f.startsWith("gpt_cover_") && !f.includes("_open") && !f.includes("_x2"));
+    const grid = $("#coverGrid"); grid.innerHTML = "";
+    covers.forEach(f => {
+      const d = document.createElement("div"); d.className = "covcand"; d.title = "set as cover";
+      d.innerHTML = `<img src="${coverCandSrc(f)}" onerror="this.style.opacity=0.2">`;
+      d.onclick = () => setCover(f);
+      grid.appendChild(d);
+    });
+  }
+  async function setCover(f) {
+    const st = $("#coverStat"); st.textContent = "setting cover…";
+    const r = await post("/api/set-cover", { chapter: CH, scenario: SC, image: f });
+    if (!r.ok) { st.innerHTML = `<span class="err">${esc(r.error)}</span>`; return; }
+    COVERV = Date.now();
+    const thumb = $("#coverThumb"); thumb.style.display = ""; thumb.src = coverSrc(r.cover || f);
+    st.innerHTML = `<span class="ok">cover set ✓</span>`;
+  }
+
+  // Level 1 — up to MAX candidate panos per room in _scratch (l1_<room>_<n>.png). Each Generate adds one;
+  // per-candidate icons open the wrap-seam editor (⤢, where commit lives now) / delete (✕) it. GENV cache-busts the
+  // candidate thumbs; it only advances on an action (gen/delete/refresh), so a batch poll won't re-download.
+  const MAX_CANDS = 3;
+  const PROMPTS = {};   // per-room scenePrompt, source for the view-prompt modal
+  let GENV = 0;
+  const candSrc = img => `/sfile/_scratch/${encodeURIComponent(img)}?chapter=${encodeURIComponent(CH)}&scenario=${encodeURIComponent(SC)}&v=${GENV}`;
+  const hubUrl = (key, img) => `reproject_test.html?room=${encodeURIComponent(key)}&chapter=${encodeURIComponent(CH)}&scenario=${encodeURIComponent(SC)}&img=${encodeURIComponent(img)}&level1=1`;
+  // Open the hotspot-edit hub for a room (③ per-room entry — styled as a button, like Generate in ②).
+  function openEdit(key) { window.open(`reproject_test.html?room=${encodeURIComponent(key)}&chapter=${encodeURIComponent(CH)}&scenario=${encodeURIComponent(SC)}&edit=hotspots`, "_blank"); }
+  // Clickable ✓ review flag — "placed" (hotspotsReviewed, auto-set on Save & close) and "verified"
+  // (cinemagraphsVerified). Click toggles it so you can track which rooms you've been through.
+  const flagCell = (key, field, on) =>
+    `<button class="flagbtn${on ? " on" : ""}" onclick="toggleFlag('${esc(key)}','${field}',${on ? "false" : "true"})" title="click to toggle">${on ? "✓" : "—"}</button>`;
+  async function toggleFlag(key, field, val) {
+    const r = await post("/api/set-review-flag", { chapter: CH, scenario: SC, roomKey: key, field, value: val });
+    if (r.ok) refresh();
+  }
+  // The merged room table. LEFT group (②) = panorama candidates (Generate + ⤢/✕); RIGHT group (③) = the
+  // hotspot/cinemagraph checklist + edit-hotspots link. ALL rooms show (non-spec rooms can't Generate yet).
+  // Rows are rebuilt only when the room set changes (never wiping an in-flight Generate); the ③ checklist
+  // cells refresh every tick (no input state), the ② candidates cell refreshes unless a Generate is busy.
+  function renderRooms(rooms) {
+    const tb = $("#roomTbl tbody");
+    rooms.forEach(rm => { if (rm.hasSpec) PROMPTS[rm.key] = rm.scenePrompt || ""; });   // prompt-modal source
+    const have = [...tb.querySelectorAll("tr")].map(tr => tr.dataset.key).join(",");
+    const want = rooms.map(r => r.key).join(",");
+    if (have !== want) {   // (re)build rows only when the room set changes
+      tb.innerHTML = rooms.map(rm => `<tr data-key="${esc(rm.key)}">
+        <td class="c-room"><b>${esc(rm.key)}</b> <span class="hint">${esc(rm.title)}</span></td>
+        <td class="c-cands">
+          <div class="candrow">
+            <div class="genrow"><button onclick="viewPrompt('${esc(rm.key)}')" title="View this room's generation prompt (read-only — edit the spec to change it)">view prompt</button>
+              <button data-act="gen" onclick="genPano('${esc(rm.key)}')">Generate</button></div>
+            <div class="cands"></div></div>
+          <div class="panostat" style="margin:3px 0 0"></div></td>
+        <td class="c-art"></td>
+        <td class="c-spec"></td><td class="c-hot"></td>
+        <td class="c-edit"><button onclick="openEdit('${esc(rm.key)}')" title="Fine-tune this room's hotspots on the live 360">edit hotspots</button></td>
+        <td class="c-placed"></td><td class="c-cine"></td><td class="c-verified"></td>
+      </tr>`).join("");
+    }
+    rooms.forEach(rm => {
+      const tr = tb.querySelector(`tr[data-key="${rm.key}"]`); if (!tr) return;
+      tr.classList.toggle("built", !!rm.built);
+      // ③ checklist cells — safe to refresh every tick
+      tr.querySelector(".c-spec").innerHTML = rm.hasSpec ? `<span class="tick">✓</span> <span class="hint">${rm.animateCount} anim</span>` : `<span class="no">—</span>`;
+      tr.querySelector(".c-art").innerHTML = rm.built ? `<span class="tick">✓ built</span>` : `<span class="no">—</span>`;
+      tr.querySelector(".c-hot").innerHTML = rm.hotspots || "—";
+      tr.querySelector(".c-placed").innerHTML = flagCell(rm.key, "hotspotsReviewed", rm.hotspotsReviewed);
+      tr.querySelector(".c-cine").innerHTML = rm.candidatesPending
+        ? `<span class="warn">${rm.candidatesPending} to pick</span>`
+        : (rm.cinemagraphs ? `<span class="tick">${rm.cinemagraphs} ✓</span>` : `<span class="no">—</span>`);
+      tr.querySelector(".c-verified").innerHTML = flagCell(rm.key, "cinemagraphsVerified", rm.cinemagraphsVerified);
+      // ② candidates cell — don't disturb an in-flight Generate
+      if (tr.dataset.busy) return;
+      const genrow = tr.querySelector(".genrow"), cell = tr.querySelector(".cands");
+      if (!rm.hasSpec) { genrow.style.display = "none"; cell.innerHTML = `<span class="candempty">needs a spec first (step 1)</span>`; return; }
+      genrow.style.display = "";
+      const cands = rm.panoCandidates || [], full = cands.length >= MAX_CANDS;
+      tr.querySelector("button[data-act='gen']").title = full ? `${MAX_CANDS} candidates already — delete one to generate more` : "Generate a candidate pano (~1 min)";
+      cell.innerHTML = cands.length ? cands.map(img => {
+        const live = rm.builtFrom && img === rm.builtFrom;
+        return `<div class="cand${live ? " committed" : ""}" data-img="${esc(img)}">
+          <img src="${candSrc(img)}" onerror="this.style.opacity=0.2">
+          <a class="ic seam" title="Open the wrap/seam editor — commit the room from there (captures pitch, yaw + wrap)" href="${hubUrl(rm.key, img)}" target="_blank">⤢</a>
+          <button class="ic del" title="Delete this candidate" onclick="delCand('${esc(rm.key)}','${esc(img)}')">✕</button>
+          ${live ? '<span class="badge">live</span>' : ""}</div>`;
+      }).join("") : `<span class="candempty">no candidates yet — Generate one</span>`;
+    });
+  }
+  async function genPano(key) {
+    const tr = $(`#roomTbl tr[data-key="${key}"]`), st = tr.querySelector(".panostat");
+    if (tr.querySelectorAll(".cand").length >= MAX_CANDS) {   // refuse a 4th (backend enforces too)
+      st.innerHTML = `<span class="err">${MAX_CANDS} candidates already — delete one first</span>`; return;
+    }
+    tr.dataset.busy = "1"; st.innerHTML = `<span class="warn">generating… (~1 min)</span>`;
+    const r = await post("/api/gen-room-pano", { chapter: CH, scenario: SC, roomKey: key });
+    if (!r.ok) { st.innerHTML = `<span class="err">${esc(r.error)}</span>`; delete tr.dataset.busy; return; }
+    const poll = setInterval(async () => {
+      const s = await getj(`/api/status?slot=${encodeURIComponent(r.slot)}`);
+      if (s.active) return;
+      clearInterval(poll); delete tr.dataset.busy;
+      if (s.error) { st.innerHTML = `<span class="err">${esc(s.error)}</span>`; return; }
+      GENV = Date.now();
+      st.innerHTML = `<span class="ok">candidate ready — commit ✓ or edit ⤢</span>`;
+      refresh();
+    }, 2500);
+  }
+  // Committing a candidate now happens inside the wrap/seam hub (⤢) via "Commit room", so the on-screen
+  // pitch/yaw/wrap persist with the scene — there's no quick-commit button on the tile any more.
+  async function delCand(key, img) {
+    const tr = $(`#roomTbl tr[data-key="${key}"]`), st = tr.querySelector(".panostat");
+    st.textContent = "deleting…";
+    const r = await post("/api/delete-room-pano", { chapter: CH, scenario: SC, roomKey: key, image: img });
+    if (!r.ok) { st.innerHTML = `<span class="err">${esc(r.error)}</span>`; return; }
+    GENV = Date.now(); st.textContent = ""; refresh();
+  }
+  // A room's generation prompt is READ-ONLY (derived from the spec — edit the spec to change it).
+  function viewPrompt(key) {
+    $("#promptTitle").textContent = "Prompt — " + key;
+    const t = $("#promptText"); t.value = PROMPTS[key] || ""; t.readOnly = true;
+    $("#promptHint").innerHTML = "Read-only — edit the room's <b>spec</b> (stage 1) to change the prompt.";
+    $("#promptModal").style.display = "flex";
+  }
+  function closePrompt() { $("#promptModal").style.display = "none"; }
+
+  // Network view — the deterministic metro-map builder (layoutRooms / buildNetSvg + the palette) lives in
+  // net_graph.js (loaded above; window.NetGraph), shared with tests/net_graph.test.js. renderNetwork injects it.
+
+  function renderNetwork(rooms) {
+    const spec = rooms.filter(r => r.hasSpec), svg = $("#netSvg"), show = spec.length > 0;
+    $("#netWrap").style.display = show ? "" : "none";
+    if (!show) { svg.innerHTML = ""; return; }
+    const g = NetGraph.buildNetSvg(spec);
+    svg.setAttribute("width", g.W); svg.setAttribute("height", g.H); svg.setAttribute("viewBox", `0 0 ${g.W} ${g.H}`);
+    svg.innerHTML = g.html;
+  }
+
+  function bindNetTips() {                                       // hover (desktop) + tap (touch) tooltips on a hotspot dot
+    const wrap = $("#netWrap"), tip = $("#netTip");
+    const at = (el, cx, cy) => {
+      const info = el.getAttribute("data-info"); if (!info) return;
+      tip.innerHTML = info; tip.style.display = "block";
+      const w = wrap.getBoundingClientRect();
+      tip.style.left = Math.max(2, Math.min(cx - w.left + 12, wrap.clientWidth - tip.offsetWidth - 6)) + "px";
+      tip.style.top = (cy - w.top + 14) + "px";
+    };
+    const hide = () => { tip.style.display = "none"; };
+    wrap.addEventListener("mouseover", e => { if (e.target.classList.contains("hs")) at(e.target, e.clientX, e.clientY); });
+    wrap.addEventListener("mousemove", e => { if (e.target.classList.contains("hs")) at(e.target, e.clientX, e.clientY); });
+    wrap.addEventListener("mouseout", e => { if (e.target.classList.contains("hs")) hide(); });
+    wrap.addEventListener("click", e => { if (e.target.classList.contains("hs")) { const r = e.target.getBoundingClientRect(); at(e.target, r.left + r.width / 2, r.top); } else hide(); });
+  }
+  async function loadSpecsFromDisk() {
+    if (!CH || !SC) return;
+    const r = await post("/api/scene-specs", { chapter: CH, scenario: SC });
+    if (r.ok && r.specs && Object.keys(r.specs).length) {
+      $("#specsJson").value = JSON.stringify(r.specs, null, 2);
+    }
+  }
+  function startPoll() { clearInterval(poll); poll = setInterval(async () => {
+    const r = await post("/api/scenario-state", { chapter: CH, scenario: SC });
+    if (r.ok) { render(r); if (!(r.batch && r.batch.state === "running")) { clearInterval(poll); poll = 0; } }
+  }, 3000); }
+
+  $("#loadSpecs").onclick = async () => {
+    const stat = $("#specsStat");
+    let specs; try { specs = JSON.parse($("#specsJson").value); } catch (e) { stat.innerHTML = `<span class="err">not valid JSON: ${esc(e.message)}</span>`; return; }
+    stat.textContent = "loading…";
+    const r = await post("/api/save-scene-specs", { chapter: CH, scenario: SC, specs });
+    if (!r.ok) { stat.innerHTML = `<span class="err">${esc(r.error)}</span>`; return; }
+    const rooms = r.rooms || {}, ks = Object.keys(rooms);
+    const errs = ks.filter(k => rooms[k].error);
+    stat.innerHTML = `<span class="ok">${ks.length - errs.length} spec${ks.length - errs.length === 1 ? "" : "s"} written to disk ✓ — network below</span>${errs.length ? ` · <span class="err">${errs.length} failed: ${esc(errs.join(", "))}</span>` : ""}`;
+    refresh();
+  };
+  $("#applyAll").onclick = async () => {
+    const stat = $("#applyStat"); stat.textContent = "placing…";
+    const r = await post("/api/apply-spec-all", { chapter: CH, scenario: SC });
+    if (!r.ok) { stat.innerHTML = `<span class="err">${esc(r.error)}</span>`; return; }
+    const rooms = r.rooms || {};
+    let created = 0, queued = 0; const errs = [];
+    Object.entries(rooms).forEach(([k, v]) => { created += (v.created || []).length; queued += (v.queued || []).length; if (v.error) errs.push(k); });
+    stat.innerHTML = `<span class="ok">✓ ${created} hotspot${created === 1 ? "" : "s"} placed · ${queued} cinemagraph${queued === 1 ? "" : "s"} queued</span>${errs.length ? ` · <span class="err">${errs.length} failed: ${esc(errs.join(", "))}</span>` : ""}`;
+    refresh();
+  };
+  $("#runBatch").onclick = async () => {
+    const stat = $("#batchStat"); stat.textContent = "starting…";
+    const r = await post("/api/batch-run", { chapter: CH, scenario: SC });
+    if (!r.ok) { stat.innerHTML = `<span class="err">${esc(r.error)}</span>`; return; }
+    startPoll(); refresh();
+  };
+  $("#refresh").onclick = () => { GENV = Date.now(); refresh(); };   // bump so a hub seam-edit (in-place) reloads thumbs
+  $("#fromDisk").onclick = loadSpecsFromDisk;
+  $("#scenPick").onchange = onScenario;
+  // ▶ Test play (mixer + in-place editing) and ▶ Play (student view), both over the :8055 playtest server.
+  $("#testPlay").onclick = () => { if (CH && SC) window.open(`http://localhost:8055/escape_rooms/shared/test_play.html?chapter=${encodeURIComponent(CH)}&scenario=${encodeURIComponent(SC)}&harness=${encodeURIComponent(location.origin)}`, "_blank"); };
+  $("#play").onclick = () => { if (CH && SC) window.open(`http://localhost:8055/escape_rooms/rooms/${encodeURIComponent(CH)}/${encodeURIComponent(SC)}/play.html`, "_blank"); };
+  // Finish & publish (step 5) wiring.
+  $("#fAudited").onchange = e => patchScenario({ audited: e.target.checked });
+  $("#fPublished").onchange = e => patchScenario({ published: e.target.checked });
+  $("#markComplete").onclick = async () => {
+    const st = $("#finishStat"); st.textContent = "marking…";
+    const p = await patchScenario({ status: "ready" });
+    if (!p.ok) { st.innerHTML = `<span class="err">${esc(p.error)}</span>`; return; }
+    const inv = await post("/api/rebuild-inventory", {});
+    st.innerHTML = inv.ok ? `<span class="ok">status → ready · inventory rebuilt (${inv.scenarios} scenarios)</span>` : `<span class="err">${esc(inv.error)}</span>`;
+    refresh();
+  };
+  bindNetTips();
+  loadScenarios();
+</script>
+</body>
+</html>

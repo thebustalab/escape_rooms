@@ -332,3 +332,135 @@ escape ahead of its build):
    `door_up` hotspot already existed but wasn't drawn). Every hotspot in every room now has a depicted
    object in its prompt. Guarded by a back-door-chain check in `test_airship.py` (49 green). **These four
    prompts changed → regenerate their art.** Backup: `_scratch/scenario.json.pre_backdoors.bak`.
+
+---
+
+## Door re-lock — progression felt at the doors (2026-07-31, Lucas)
+
+Partial rollback of the 27 Jul open-world decision (doors were all `direction:"open"`, order enforced only
+on the puzzles). Lucas wanted four doors gated. Implemented + `test_airship.py` green (0 fail); backup
+`_scratch/scenario.json.pre_doorlocks.bak`.
+
+**What changed (both `hotspots` and `plannedHotspots`):**
+- **room1→room3 (hold hatch)** and **room3→boss (engine bulk-door)** → `forward` doors, gated on their own
+  room's puzzle. Solve the apothecary to drop into the hold; solve the hold to reach the engine.
+- **room2→nest (the mast)** → stays an open passage but carries `availableWhen:{solved:"boss"}` + a
+  "too queasy to climb until cured" `lockedBody`. **Needed a new engine capability** — a door gated on a
+  *cross-room* condition (see below).
+- **room2→bridge** → `forward` + `requires:"the_bridge_hatch_keypad"`. The SOLIRA bearing-keypad **moved out
+  of the bridge onto the weather deck** as *the bridge hatch keypad* (`availableWhen:{solved:"boss"}`, dead
+  until cured); the door into the bridge is now the escape lock. The bridge's **"Take the wheel"** door is
+  now `direction:"open"`+`endsEscape` (ungated — you already keyed the bearing at the hatch). Reframed
+  narratively as the captain sealing the wheelhouse with the homeward bearing.
+- Escape flow now fully post-cure: cure at the engine → climb the mast (un-queasy) → read the astrolabe →
+  key SOLIRA at the deck hatch → the bridge opens → take the wheel → `escapeDone`.
+- Feedback/prompt/entry text resynced to the new doors (e.g. room3 solve now opens the *engine* door, not
+  "the bridge"; boss solve now says the locks free + the queasiness lifts; bridge entry/prompt no longer
+  mention an interior keypad).
+
+**Engine change (`shared/pano-player.js`, cache `js v=63` across all play.html):** `doorIsOpen` now returns
+false when a door's `availableWhen` (cross-room `condOK`) isn't met; `handleDoor` shows the door's
+`lockedBody`. Opt-in + backward-compatible (only the mast door uses it). Documented in the engine
+doc-comment + `../../AGENTS.md` door schema. **Untested in a browser (no JS runtime on this box) — needs a
+playtest.**
+
+**Still for Lucas (his "regenerate the art + doors" pass):**
+1. **Re-place the new `the_bridge_hatch_keypad` lock box** on the weather-deck art (it's live at a placeholder
+   box `[0.6033,0.44,0.636,0.55]` for now; re-place precisely + re-commit so `_attach_planned_content` binds it).
+2. **Regenerate art** for the four changed scenePrompts: **room1** (hold hatch now dogged shut), **room3**
+   (engine bulk-door now sealed), **room2** (sealed bridge hatch + bearing-keypad on the deck), **bridge**
+   (interior keypad removed). No open-state art pairs exist, so a solved locked door just gets the engine's
+   `.open` styling over closed-door art — add `panoramaOpen` pairs only if you want them to visibly swing.
+3. **Browser playtest** the re-locked nav + the cross-room door gate (queasy mast, bridge-hatch lock).
+
+### Addendum — open-door art prompts added (2026-07-31)
+
+Follow-on to the re-lock: authored the `authoring.doorPrompt` (open-door modifier for the masked
+`/api/dooropen` edit → `panoramaOpen`/scene_open) for the three rooms whose forward door now visibly opens:
+- **room1** — the dogged floor-hatch flings open onto the ladder down to the hold.
+- **room3** — the sealed bulk-door swings wide onto the red-lit engine ladderway.
+- **room2** — the sealed wheelhouse hatch swings open onto the bridge interior (the ship's wheel).
+House style matched to hospital/alaska (name the door, what's revealed, "…unchanged", same lighting, no
+people/lettering). The mast→nest is an OPEN passage (no swap image — like squirrel's passages); the boss and
+bridge have no forward-locked door, so no doorPrompt. So this **supersedes** the earlier "no open-state pairs
+exist" caveat above: Lucas can now run the harness **door** step per candidate to make each scene_open.
+
+**Second engine change (`shared/pano-player.js`, same `js v=63`):** `openState` (which panorama to show —
+closed vs `panoramaOpen`) now follows the room's **forward-door** state via `portalUnlocked(room)` at BOTH
+sites (room-enter + after-solve), replacing the old `solved`/`isPrimarySolved`. **No-op for every existing
+room** (their forward door gates on the primary, so it already equalled `solved`); the one room it changes is
+airship **room2**, whose bridge hatch gates on the SECONDARY deck lock — so its open art now appears only when
+SOLIRA is keyed, not when the 2nd reading is solved. **Both engine changes (door `availableWhen`, this
+`openState` generalisation) are untested in a browser — playtest together.**
+
+### Bugfix — harness "door" step masked the wrong door on the deck (2026-07-31)
+
+Lucas hit this doing the art: on the weather deck, "Make open door" opened the **apothecary** door, not the
+bridge. Cause: `authoring/ui/open_target.js` `pickOpenMaskHotspot` picked the first door with
+`direction !== "back"` — written before open-world `open` passages existed, so it grabbed room2's first
+`open` passage (down to apothecary) ahead of the `forward` bridge door. Fix: only a `forward`/legacy
+(no-direction) door qualifies — `back` AND `open` passages are both always-walkable, never an "opening".
+Regression tests added (`tests/open_target.test.js`, `node --test` green, 11 pass). Corpus sweep: the picker
+changes behaviour for **only the four airship rooms** and **no built room anywhere has open art yet**, so
+nothing else needs regenerating (boss + nest correctly become "nothing to open" — no forward door).
+**`open_target.js`/`harness_gpt.html` are harness UI files (NOT cache-busted) → HARD-REFRESH the :8751
+harness before re-running the "door" step, or the browser keeps the old cached JS.**
+
+---
+
+## SFX wiring pass — DONE (2026-08-05)
+
+Sound was fully wired for test-play. The `_scratch/audio/` pool (2 beds + 2 one-shots per room + solve
+candidates, all CC0, sourced 2026-08-02) was already complete, so this was the wiring only — no new pull.
+
+- **Per-room `sfx`** (loop bed(s) + one interval accent each), materialised into `audio/`:
+  room1 bubbling still + faint engine hum + vial-clink; room2 wind/rigging + distant engine drone + wind-gust;
+  room3 hull creak + engine rumble + chain rattle; boss boiler-steam + machinery + steam-burst; nest high wind
+  + mast creak + bell chime; bridge engine hum + rope creak + wind-gust.
+- **`solveSfx`** on every graded gate: room1/room2/room3 `the_field_test_kit`, boss `the_dispensary_console`,
+  room2 `the_bridge_hatch_keypad` (lock) — reused the CC0 iron/hatch/bulkhead/brass solve clips.
+- Loudness-balanced vs the music with `authoring/auto_balance.py` (music −15.8 LUFS @ 0.1). Reduce-only, so
+  solve stings ended up conservative (capped at music level) — **raise by ear in ▶ Test play** if wanted.
+- `validate_assets` clean on the sound. `test_airship.py` unchanged (2 pre-existing bridge failures, below).
+- Backup of the pre-sfx scenario: `_scratch/scenario.json.pre_sfx_20260805_174607.bak`.
+
+**⚠️ Bridge room is in a broken mid-edit state (NOT touched here — flag for Lucas).** `bridge`'s hotspots
+are duplicated from the engine room: a stray `puzzle` `the_dispensary_console`, engine-room ambient anchors,
+and a `door` pointing at a non-existent room key `cargo` (direction `back`). The "take the wheel"
+`endsEscape` exit door the design calls for is **gone**. Consequences: `test_airship.py` fails "the bridge
+'take the wheel' door fires escapeDone, ungated" + a stray-hotspot check, and `validate_assets` flags the
+`bridge/the_dispensary_console` missing-solveSfx and the `room2->bridge` one-way passage. All pre-date the
+sfx pass (verified against the backup). The escape can't currently complete — needs the bridge hotspots
+rebuilt (drop the duplicated engine-room boxes, restore the ungated take-the-wheel `endsEscape` door).
+
+---
+
+## Bridge room REMOVED — escape moved onto the weather deck (2026-08-05, Lucas)
+
+Supersedes the "bridge broken mid-edit" flag above — the bridge room is now gone by design, not fixed.
+Lucas's call: rather than walk into a separate wheelhouse room, the player keys **SOLIRA** at the deck
+hatch keypad, the wheelhouse hatch opens (revealing the ship's wheel through `room2/scene_open.png`), and
+clicking the wheel ends the escape.
+
+**Changes:**
+- Removed the `bridge` room from `rooms[]` (it had drifted to a broken duplicate of the engine room anyway).
+- room2's former `forward_to_the_bridge` door → **`take_the_wheel`**: `direction:"forward"`,
+  `requires:"the_bridge_hatch_keypad"`, **no `to`**, `endsEscape:true`. Applied to BOTH `hotspots` and
+  `plannedHotspots`. The `panoramaOpen` reveal follows `portalUnlocked(room2)` (forward-door gate), so
+  keying the keypad shows the wheel with no extra step.
+- The finish screen is `scenario.escapeDone` (scenario-level — fires wherever `endsEscape` triggers), so
+  nothing per-room needed moving.
+- Decoder unaffected: `validate_keys` skips `phase:"escape"` rooms, so the vector stays `[1,3,2,4]`
+  (PASS). `test_airship.py` updated (bridge assertions → the deck wheel door); 0 failures.
+  `validate_assets` PASS.
+- **solveSfx durability:** the earlier sfx pass's per-hotspot `solveSfx` were wiped when the harness
+  re-committed hotspots from `plannedHotspots` (placed-only content doesn't survive a re-commit). Re-applied
+  AND mirrored onto `plannedHotspots` (which `_attach_planned_content` re-attaches), so they now survive a
+  harness re-save. Re-balanced with `auto_balance.py`.
+- Backup: `_scratch/scenario.json.pre_removebridge_20260805_175812.bak`.
+
+**Left for Lucas:** (1) the orphaned `bridge/` art dir (scene.png + cinemagraphs) — no longer referenced;
+archive if wanted. (2) In the harness, re-place the `take_the_wheel` box onto the wheel in `room2`'s open
+view if its current position (inherited from the old hatch door) isn't on the wheel. (3) Browser playtest
+the escape: cure at the engine → climb the mast → read the astrolabe → key SOLIRA on the deck → click the
+wheel → escape-done.

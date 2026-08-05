@@ -131,12 +131,19 @@ def check_scenario(path):
         for h in r.get("hotspots", []):
             if h.get("type") in ("puzzle", "lock") and not h.get("solveSfx"):
                 misses.append(f"gate '{r['key']}/{h.get('id')}' ({h.get('type')}) has no solveSfx")
-            # a clue with no body, no committed image, and no pickup opens an EMPTY modal (imagePrompt
-            # alone doesn't render — the image must be generated). This shipped blank modals before.
+            # a clue with no body, no committed image, and no pickup CAPTION opens an EMPTY modal
+            # (imagePrompt alone doesn't render — the image must be generated). This shipped blank modals
+            # before. NOTE: only a STRING pickup supplies display content (the notebook caption); a boolean
+            # `pickup:true` with an empty body + no image still renders a blank modal AND logs a contentless
+            # notebook entry (this shipped in hospital's Editor's note B — pickup:true masked the empty body).
+            pickup = h.get("pickup")
+            pickup_caption = pickup.strip() if isinstance(pickup, str) else ""
             if h.get("type") == "clue" and not (h.get("body", "") or "").strip() \
-               and not h.get("image") and not h.get("pickup"):
+               and not h.get("image") and not pickup_caption:
                 extra = " (imagePrompt set but no committed image)" if h.get("imagePrompt") else ""
-                misses.append(f"clue '{r['key']}/{h.get('id')}' renders blank — no body, image, or pickup{extra}")
+                if pickup is True:
+                    extra += " (pickup:true but empty body + no image → blank modal, contentless notebook entry)"
+                misses.append(f"clue '{r['key']}/{h.get('id')}' renders blank — no body, image, or pickup caption{extra}")
             # GENERIC content conventions (all scenarios, promoted from the per-scenario tests 2026-07-29):
             # no graded engine may hand the answer away via feedback.reveal, and every MCQ needs >=6 options.
             for eng in ("question", "check", "pick", "map"):

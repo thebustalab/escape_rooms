@@ -41,15 +41,18 @@
       <input type="range" id="voff" min="-42" max="42" step="1" value="-5" /></div>
     <div class="row"><label>Turn step <b id="stepV">40</b>°</label>
       <input type="range" id="step" min="15" max="90" step="5" value="40" /></div>
+    <div class="row"><label style="justify-content:flex-start;gap:8px;cursor:pointer">
+      <input type="checkbox" id="playerView" style="width:auto;margin:0" />
+      Preview as player <span style="opacity:.6">(locked · no drag · faces the door)</span></label></div>
     <button id="save">Save params for this image</button>
     <div id="status"></div>
-    <div class="hint">Drag to look around (that vertical aim is saved as <b>pitch</b>). Tune coverage until walls look straight, then Save — the harness reads these back per image.</div>
+    <div class="hint">Drag to look around (that vertical aim is saved as <b>pitch</b>). Tune coverage until walls look straight, then tick <b>Preview as player</b> to see exactly what the student sees — this reveals any black cap at the top/bottom (raise <b>Vertical coverage</b> to paint it out). Save — the harness reads these back per image.</div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
   <script>
     const $ = s => document.querySelector(s);
-    let HAOV = 360, VAOV = 95, FOV = 120, VOFF = -5, STEP = 40, viewer = null;
+    let HAOV = 360, VAOV = 95, FOV = 120, VOFF = -5, STEP = 40, viewer = null, PLAYER_VIEW = false, NODE = null;
     const sel = $("#img");
     const IMGS_FALLBACK = ["gpt_gen_5.png","gpt_room1_2.png","gpt_room2_2.png","gpt_room3_2.png","gpt_room4_2.png"];
     const params = new URLSearchParams(location.search);
@@ -77,18 +80,34 @@
     function clampVoff(){ const m = vMax(); VOFF = Math.max(-m, Math.min(m, VOFF));
       const s = $("#voff"); s.min = -Math.floor(m); s.max = Math.floor(m); s.value = VOFF; $("#voffV").textContent = VOFF; }
 
+    // The player faces a room's forward (closed) door on entry — replicate that yaw so "Preview as
+    // player" frames exactly what the student sees. (Cap visibility is yaw-invariant, but the framing
+    // should still match.) Mirrors doorYaw() in shared/pano-player.js.
+    function doorYawOf(node, haov) {
+      if (!node) return 0;
+      const doors = (node.hotspots || []).filter(h => h.type === "door" && Array.isArray(h.box));
+      const d = doors.find(h => (h.direction || "forward") === "forward") || doors[0];
+      if (!d) return 0;
+      return ((d.box[0] + d.box[2]) / 2) * haov - haov / 2;
+    }
+
     function build() {
       const cur = viewer ? { yaw: viewer.getYaw(), pitch: viewer.getPitch(), hfov: viewer.getHfov() }
                          : { yaw: 0, pitch: 0, hfov: FOV };
       if (viewer) { try { viewer.destroy(); } catch (e) {} }
-      viewer = pannellum.viewer("pano", {
+      const cfg = {
         type: "equirectangular", panorama: currentImgUrl(),
         haov: HAOV, vaov: VAOV, vOffset: VOFF,
         autoLoad: true, showControls: false,
         hfov: cur.hfov, minHfov: 40, maxHfov: 120,
-        yaw: cur.yaw, pitch: cur.pitch, autoRotate: 0,
+        yaw: PLAYER_VIEW ? doorYawOf(NODE, HAOV) : cur.yaw, pitch: cur.pitch, autoRotate: 0,
         backgroundColor: [0.02, 0.05, 0.09],
-      });
+      };
+      // Faithful player view: exactly what shared/pano-player.js renders — drag/zoom OFF, pinned at the
+      // tuned pitch + door yaw. This is what surfaces the zenith/nadir cap (a bright ceiling over the
+      // uncovered top reads as a black disc); free-drag tuning mode hides it because you look away.
+      if (PLAYER_VIEW) Object.assign(cfg, { draggable: false, mouseZoom: false, doubleClickZoom: false, keyboardZoom: false, disableKeyboardCtrl: true });
+      viewer = pannellum.viewer("pano", cfg);
     }
 
     const bindRebuild = (id, out, set) => { const e = $(id), o = $(out);
@@ -98,6 +117,7 @@
     $("#voff").addEventListener("input", e => { VOFF = +e.target.value; $("#voffV").textContent = VOFF; build(); });
     $("#fov").addEventListener("input", e => { FOV = +e.target.value; $("#fovV").textContent = FOV; if (viewer) viewer.setHfov(FOV, false); });
     $("#step").addEventListener("input", e => { STEP = +e.target.value; $("#stepV").textContent = STEP; });
+    $("#playerView").addEventListener("change", e => { PLAYER_VIEW = e.target.checked; build(); });
     sel.addEventListener("change", () => { build(); prefill(); });
     $("#prev").onclick = () => viewer && viewer.setYaw(viewer.getYaw() - STEP, 700);
     $("#next").onclick = () => viewer && viewer.setYaw(viewer.getYaw() + STEP, 700);
@@ -138,6 +158,7 @@
       const DRAFT_IMG = startImg;   // a candidate filename ⇒ draft mode
       const doc = await getJSON("/api/scenario" + (SCQ ? "?" + SCQ : ""));
       const node = doc && (doc.rooms || []).find(r => r.key === ROOM_KEY);
+      NODE = node;   // so "Preview as player" can face this room's forward door
       const draft = DRAFT_IMG ? await getJSON("/api/draft?roomKey=" + encodeURIComponent(ROOM_KEY) + (SCQ ? "&" + SCQ : "")) : null;
       if (DRAFT_IMG) {
         IMG_URL = "/sfile/_scratch/" + encodeURIComponent(DRAFT_IMG) + "?t=" + Date.now() + (SCQ ? "&" + SCQ : "");

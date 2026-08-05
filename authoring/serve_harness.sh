@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 # serve_harness.sh — ensure the escape-room authoring stack is up on host2 (bustalab-desktop).
 #
-# Two servers, each in its own persistent tmux session:
-#   harness_ui  -> harness_server.py           on 127.0.0.1:8751  (authoring UI + /api, localhost-only)
-#   playtest    -> python -m http.server 8055  on 0.0.0.0:8055     (serves the site root for test-play)
+# Three servers, each in its own persistent tmux session:
+#   harness_ui  -> harness_server.py             on 127.0.0.1:8751  (authoring UI + /api, localhost-only)
+#   harness_v2  -> authoring_v2/harness_server.py on 127.0.0.1:8752  (V2 image-pipeline harness; non-fatal)
+#   playtest    -> python -m http.server 8055    on 0.0.0.0:8055     (serves the site root for test-play)
 #
 # Idempotent by default: a server already answering is left ALONE; only a missing/wedged one is
 # (re)started in its session. Safe to run repeatedly. Meant to be called locally on host2, or over SSH
@@ -28,6 +29,7 @@ fi
 TOOLS="/home/bustalab/Documents/Tools"
 SITE="$TOOLS/websites/thebustalab.github.io"                       # doc root: /escape_rooms/... resolves here
 HARNESS="$SITE/escape_rooms/authoring/harness_server.py"
+HARNESS_V2="$SITE/escape_rooms/authoring_v2/harness_server.py"     # V2 image-pipeline harness, binds :8752
 
 answers() { curl -s -o /dev/null -m 2 "$1"; }                      # 0 if the URL responds at all
 
@@ -42,12 +44,32 @@ restart_in() {                                                    # <session> <c
   tmux new-session -d -s "$1" "bash -lic \"$2 ; exec bash -l\""
 }
 
+# Free a TCP port before a (re)start: kill any process LISTENing on it. Without this, a STRAY harness
+# started outside tmux (e.g. a manual `python3 harness_server.py` in a non-interactive shell that has NO
+# OPENAI_API_KEY) keeps holding the port, so the tmux (re)launch can't bind and silently drops to an idle
+# shell — leaving the keyless stray serving, and every gen failing with "OPENAI_API_KEY not set" (2026-07-31).
+free_port() {                                                     # <port>
+  local pids; pids=$(ss -ltnpH "sport = :$1" 2>/dev/null | grep -oE 'pid=[0-9]+' | cut -d= -f2 | sort -u)
+  [ -n "$pids" ] && { echo "  freeing :$1 (killing stray $(echo $pids))"; kill $pids 2>/dev/null; sleep 1; }
+  return 0
+}
+
 # --- harness API on :8751 ---
 if [ "$FORCE_RESTART" != 1 ] && answers "http://127.0.0.1:8751/api/scenarios"; then
   echo "harness  :8751  already up"
 else
   [ "$FORCE_RESTART" = 1 ] && echo "harness  :8751  force-restarting (fresh) in tmux 'harness_ui'…" || echo "harness  :8751  (re)starting in tmux 'harness_ui'…"
+  free_port 8751
   restart_in harness_ui "python3 '$HARNESS'"
+fi
+
+# --- harness V2 (image-pipeline upgrades) on :8752 ---
+if [ "$FORCE_RESTART" != 1 ] && answers "http://127.0.0.1:8752/api/scenarios"; then
+  echo "harness2 :8752  already up"
+else
+  [ "$FORCE_RESTART" = 1 ] && echo "harness2 :8752  force-restarting (fresh) in tmux 'harness_v2'…" || echo "harness2 :8752  (re)starting in tmux 'harness_v2'…"
+  free_port 8752
+  restart_in harness_v2 "python3 '$HARNESS_V2'"
 fi
 
 # --- playtest static server on :8055 ---
@@ -62,5 +84,6 @@ fi
 sleep 2
 ok=1
 answers "http://127.0.0.1:8751/api/scenarios"                        && echo "  ✓ harness   http://localhost:8751/harness_gpt.html" || { echo "  ✗ harness  not answering on :8751"; ok=0; }
+answers "http://127.0.0.1:8752/api/scenarios"                        && echo "  ✓ harness2  http://localhost:8752/harness_gpt.html" || echo "  ⚠ harness2 not answering on :8752 (V2, non-fatal)"
 answers "http://127.0.0.1:8055/escape_rooms/shared/test_play.html"   && echo "  ✓ playtest  http://localhost:8055/"                    || { echo "  ✗ playtest not answering on :8055"; ok=0; }
 exit $((1 - ok))
