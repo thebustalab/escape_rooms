@@ -64,11 +64,21 @@
     .lbl { font-size: 10px; opacity: 0.7; text-transform: uppercase; letter-spacing: 0.03em; margin: 8px 0 3px; }
     .hitem { border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 8px; background: #0a1620; margin-bottom: 8px; }
     .vthumb { max-width: 100%; border-radius: 6px; border: 1px solid rgba(255,255,255,0.14); display: block; }
-    /* Cinemagraph candidate picker: N clips side by side, "Use this" promotes one. */
-    .cinecands { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 6px; }
-    .cinecand { display: flex; flex-direction: column; gap: 3px; }
-    .cinecand .vthumb { width: 80px; }
-    .cinecand .cpick { font-size: 11px; padding: 1px 4px; }
+    /* Cinemagraph pool: every stored clip as a tile with corner controls — ✓ deploy (top-left),
+       ↔/⇄ boomerang/crossfade toggle (top-middle), ✕ delete (top-right). Only the ✓-checked clip plays. */
+    .cinegrid { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+    .cinetile { position: relative; width: 132px; }
+    .cinetile video { width: 132px; height: 74px; object-fit: cover; border-radius: 6px; border: 1px solid rgba(255,255,255,0.14); display: block; background: #000; }
+    .cinetile.active video { border-color: #7bd88c; box-shadow: 0 0 0 1px #7bd88c; }
+    .cinetile .ct { position: absolute; top: 3px; height: 20px; min-width: 20px; padding: 0 4px; line-height: 18px; text-align: center;
+                    font-size: 12px; border-radius: 5px; border: 1px solid rgba(255,255,255,0.14); background: rgba(10,20,29,0.85); color: #dfe9f0; cursor: pointer; }
+    .cinetile .ct:hover { border-color: #7fd1ff; }
+    .cinetile .ct-check { left: 3px; }
+    .cinetile .ct-check.on { color: #7bd88c; border-color: #7bd88c; }
+    .cinetile .ct-loop { left: 50%; transform: translateX(-50%); }
+    .cinetile .ct-del { right: 3px; color: #ff9c9c; }
+    .cinetile .ct-lbl { position: absolute; bottom: 2px; left: 3px; font-size: 9px; background: rgba(10,20,29,0.85); border-radius: 4px; padding: 0 4px; color: #8fa3b0; }
+    .cinetile.active .ct-lbl { color: #7bd88c; }
     .hdel { background: transparent; color: #ff9b9b; border: 1px solid rgba(255,155,155,0.4); border-radius: 6px; padding: 2px 8px; font-size: 11px; font-weight: 400; margin-top: 6px; }
     #spotContent textarea, #spotContent input, #spotContent select { width: 100%; background: #0a1620; color: inherit; border: 1px solid rgba(255,255,255,0.16); border-radius: 6px; padding: 4px 6px; font: inherit; }
     #spotContent textarea { resize: vertical; }
@@ -84,6 +94,8 @@
     #flatEdit .fhead { font-size: 11px; opacity: 0.7; margin-bottom: 5px; text-align: center; }
     #flatFrame { position: relative; line-height: 0; cursor: crosshair; user-select: none; margin: 0 auto; width: max-content; max-width: 100%; }
     #flatFrame img { display: block; max-height: 30vh; max-width: 100%; }
+    /* Hotspot-edit (Spots) mode: no planned list beside the scene, so the scene image gets more room. */
+    #flatEdit:not(.seammode) #flatFrame img { max-height: 46vh; }
     /* wrap margin: the left FLAT_MARGIN of the scene repeated past the right edge, so a box can be DRAWN across
        the L/R seam. A dashed line marks the seam (the true right edge); a wrap box renders dashed. */
     /* The wrap margin repeats the left FLAT_MARGIN of the scene past the right edge. It's a REAL <img>
@@ -119,7 +131,10 @@
     #flatFrame .hbox .hres.sw { left: -6px; bottom: -6px; cursor: nesw-resize; }
     #flatFrame .hbox .hres.se { right: -6px; bottom: -6px; cursor: nwse-resize; }
     #flatRow { display: flex; gap: 12px; align-items: flex-start; justify-content: center; }
-    #flatPlanned { width: 210px; flex: none; max-height: 30vh; overflow: auto; }
+    /* Planned-hotspots list intentionally hidden in the Spots lower dock (Lucas 2026-08-06): boxes are
+       auto-placed via build_world's "Place all hotspots"; drawing a fresh box here still works (unarmed).
+       Hiding it (rather than deleting the node) keeps renderPlanned + the arm-then-draw code inert-safe. */
+    #flatPlanned { display: none; }
     #flatPlanned:empty { display: none; }
     #flatPlanned .planhd { font-size: 12px; font-weight: 700; color: #ffd88c; margin-bottom: 4px; }
     #flatPlanned .planhd .hint { font-weight: 400; }
@@ -227,7 +242,7 @@
     let SEAM_POS = 1.0;      // seam location the band straddles, fraction of width: 1.0 = L/R wrap edge (default); drag the band onto a mid-image seam to fix it
     let HUB_TAB = "content", hubCinePoll = 0, ROOM_KEYS = [];   // Phase 2b: per-hotspot content panel
     let batchPoll = 0;   // walk-away batch: status poll handle while a run is in flight
-    const TYPES = ["puzzle", "clue", "door", "lock", "dial", "mapview", "ambient"];   // ambient = cinemagraph-only, no player marker
+    const TYPES = ["puzzle", "clue", "door", "lock", "grid", "dial", "mapview", "ambient"];   // ambient = cinemagraph-only, no player marker; grid = the matrix-select escape (content hand-authored in scenario.json)
     // Cinemagraph preset prompts — rich, model-tuned motion descriptions for the things we animate most.
     // Picking one fills the motion box (still editable) AND sets the right loop (crossfade = one-way/rising,
     // boomerang = oscillating). LTX+Gemma wants prose, not keywords; these are written long on purpose.
@@ -320,6 +335,9 @@
     const HS_EDIT = params.get("edit") === "hotspots";   // build-world Rooms list: HOTSPOT-EDIT hub — Wrap spoke is a
                                                          // look-around 360 with dots visible + arrows, NO left coverage/seam
                                                          // panel (wrap + seam are tuned in step 2); Spots spoke unchanged.
+    const FOCUS = params.get("focus");   // "cine" = build-world "pick cinemagraphs" deep link: open on the Spots spoke,
+                                          // Cinemagraph tab, at the first hotspot that still has candidates to pick.
+    if (FOCUS === "cine") HUB_TAB = "cine";
     const SCQ = (CH && SC) ? ("chapter=" + encodeURIComponent(CH) + "&scenario=" + encodeURIComponent(SC)) : "";
     let IMG_URL = null;                     // in room mode, the committed scene URL (served via /sfile/…)
     const currentImgUrl = () => ROOM_KEY ? IMG_URL : ("scene/" + sel.value);
@@ -405,7 +423,14 @@
     // Select a hotspot from the list, a 360 marker, or a flat box. No viewer rebuild (marker handlers must
     // not destroy their own viewer mid-click); list + flat boxes show the selection, the 360 sel-marker
     // refreshes on the next build().
-    function selectSpot(i) { SEL = i; refreshSpotViews(); renderSpotContent(); }
+    function selectSpot(i) {
+      SEL = i;
+      // Pick-cinemagraphs deep link (?focus=cine): a DOOR has no cinemagraph — its open view is a variant —
+      // so land it on the Variants tab; everything else lands on the Cinemagraph tab (the pick UI). Only on
+      // selection, so manual tab clicks afterward are respected until the next hotspot is picked.
+      if (FOCUS === "cine" && SPOTS[i]) HUB_TAB = SPOTS[i].type === "door" ? "variants" : "cine";
+      refreshSpotViews(); renderSpotContent();
+    }
     function refreshSpotViews() { renderSpotsList(); renderFlatBoxes(); renderPlanned(); }
     // The planned-hotspots manifest beside the flat scene: click one to ARM it, then drag its box (which
     // seeds type/label + re-attaches retained wiring). Placed items show ✓; click an armed item to disarm.
@@ -617,7 +642,14 @@
           <button class="htab${HUB_TAB === "variants" ? " on" : ""}" data-t="variants">Variants${vn ? ` (${vn})` : ""}</button>
           <button class="htab${HUB_TAB === "cine" ? " on" : ""}" data-t="cine">Cinemagraph${cineOf(s.id) ? " ✓" : ""}</button>
         </div><div id="spotTabBody"></div>`;
-      host.querySelectorAll(".htab").forEach(b => b.onclick = () => { HUB_TAB = b.dataset.t; renderSpotContent(); });
+      // Opening Variants / Cinemagraph pulls a FRESH node first, so assets the BATCH attached externally
+      // (door-open variants, cinemagraph candidates) show up without waiting for the whole batch to finish or a
+      // page reload. Content has no batch-owned state, so it skips the fetch (and never clobbers an in-progress edit).
+      host.querySelectorAll(".htab").forEach(b => b.onclick = async () => {
+        HUB_TAB = b.dataset.t;
+        if (HUB_TAB === "variants" || HUB_TAB === "cine") await refreshNode();
+        renderSpotContent();
+      });
       const body = $("#spotTabBody");
       if (HUB_TAB === "cine") return renderCineTab(body, s);
       if (HUB_TAB === "variants") return renderVariantsTab(body, s);
@@ -635,17 +667,10 @@
         const gates = SPOTS.filter(g => g.type === "puzzle" || g.type === "lock");
         const reqOpts = [`<option value=""${!s.requires ? " selected" : ""}>— the room's main gate —</option>`]
           .concat(gates.map(g => `<option value="${escHtml(g.id)}"${s.requires === g.id ? " selected" : ""}>${escHtml(g.id)}${g.label ? " · " + escHtml(g.label) : ""}</option>`)).join("");
-        const doorPrompt = ((NODE && NODE.authoring && NODE.authoring.doorPrompt) || "").trim()
-          || "The door now stands wide open, revealing the space beyond; identical lighting and style, no people, no lettering, no text.";
         html += `<div class="lbl">direction</div><select id="cDir">${dirOpts}</select>
           <div class="lbl">to room</div><select id="cTo">${toOpts}</select>
-          <div class="lbl">requires gate</div><select id="cReq">${reqOpts}</select>` +
-          (RoomEditCore.isCommitted(NODE)
-            ? `<div class="lbl">open-door image${s.openImage ? " · set ✓" : ""}</div>
-               <textarea id="cDoorPrompt" rows="2">${escHtml(doorPrompt)}</textarea>
-               <div style="margin-top:6px"><button id="cDoorGen">${s.openImage ? "Regenerate open image" : "Open this door"}</button> <button id="cDoorBatch">+ Batch</button> <span class="hint" id="cDoorStat"></span></div>
-               <div class="hint" style="margin-top:4px">Masks this door's box on the committed scene → the door opens with its OWN art when its gate is solved (each door independent; several can be open at once).</div>`
-            : `<div class="hint" style="margin-top:8px">Commit the room first — the open-door image is made from the committed scene.</div>`);
+          <div class="lbl">requires gate</div><select id="cReq">${reqOpts}</select>
+          <div class="hint" style="margin-top:8px">Open-door art now lives on the <b>Variants</b> tab — add an <b>open</b> view (its trigger defaults to <i>this room solved</i>; a switch door gets one view per lever state). One mechanism for every door.</div>`;
       } else if (s.type === "ambient") {
         html += `<div class="hint" style="margin-top:8px">Decoration only — <b>no player marker or click</b>. Give it an animation on the <b>Cinemagraph</b> tab; that's all it does in-game.</div>`;
       }
@@ -660,14 +685,7 @@
         body.querySelector("#cDir").onchange = e => { s.direction = e.target.value; };
         body.querySelector("#cTo").onchange = e => { const v = e.target.value; if (v) s.to = v; else delete s.to; };
         body.querySelector("#cReq").onchange = e => { const v = e.target.value; if (v) s.requires = v; else delete s.requires; };
-        const dg = body.querySelector("#cDoorGen");
-        if (dg) dg.onclick = () => genOpenDoor(s, body.querySelector("#cDoorPrompt").value, body.querySelector("#cDoorStat"));
-        const db = body.querySelector("#cDoorBatch");
-        if (db) db.onclick = () => {
-          const prompt = (body.querySelector("#cDoorPrompt").value || "").trim()
-            || "The door now stands wide open, revealing the space beyond; identical lighting and style, no people, no lettering, no text.";
-          addToBatch(s, { type: "door", box: s.box, prompt }, body.querySelector("#cDoorStat"));
-        };
+        // (open-door art is now authored on the Variants tab — no separate open-image control here)
       }
       body.querySelector("#cSave").onclick = () => saveHotspots(body.querySelector("#cStat"));
       body.querySelector("#cDelSpot").onclick = () => {
@@ -913,37 +931,45 @@
         body.innerHTML = `<div class="hint">Commit the room first — cinemagraphs are generated from the committed scene.</div>`;
         return;
       }
-      const cine = cineOf(s.id);
-      const existing = cine
-        ? `<div class="hitem"><video src="/sfile/${escHtml(cine.video)}?t=${Date.now()}${SCQ ? "&" + SCQ : ""}" muted loop autoplay playsinline class="vthumb"></video>
-             <div class="hint" style="margin-top:6px">${escHtml(cine.prompt || "")}</div>
-             <button id="cineDel" class="hdel">delete</button></div>`
-        : `<div class="hint">No cinemagraph on this object yet.</div>`;
-      const cands = cineCandsOf(s.id);
-      const candsHtml = cands.length ? `
-        <div class="lbl">pick a cinemagraph — ${cands.length} options (different seeds)</div>
-        <div class="cinecands">${cands.map((c, i) => `
-          <div class="cinecand">
-            <video src="/sfile/${escHtml(c.video)}?t=${Date.now()}${SCQ ? "&" + SCQ : ""}" muted loop autoplay playsinline class="vthumb"></video>
-            <button class="cpick" data-i="${i}">Use this</button>
-          </div>`).join("")}</div>
-        <div class="hint" style="margin-bottom:6px">These were generated from the batch; "Use this" sets one as the object's cinemagraph. Or make more below.</div>` : "";
+      const cine = cineOf(s.id);                  // the ACTIVE (deployed) clip, or null
+      const cands = cineCandsOf(s.id);            // the stored pool
+      // Unified tiles: every candidate, plus the active clip if it's standalone (not in the pool — e.g. an
+      // older single-shot gen). i = pool index; i<0 = standalone active. active = this is the deployed clip.
+      const tiles = cands.map((c, i) => ({ c, i, active: !!(cine && cine.video === c.video) }));
+      if (cine && !cands.some(c => c.video === cine.video)) tiles.unshift({ c: cine, i: -1, active: true });
+      const vv = `?t=${Date.now()}${SCQ ? "&" + SCQ : ""}`;
+      const grid = tiles.length ? `
+        <div class="cinegrid">${tiles.map(t => {
+          const xf = (t.c.loop === "crossfade");
+          return `<div class="cinetile${t.active ? " active" : ""}" data-i="${t.i}" data-loop="${xf ? "crossfade" : "boomerang"}">
+            <video src="/sfile/${escHtml(t.c.video)}${vv}" muted loop autoplay playsinline></video>
+            <button class="ct ct-check${t.active ? " on" : ""}" title="${t.active ? "deployed — click to store but NOT deploy" : "deploy: make this the live clip"}">✓</button>
+            <button class="ct ct-loop" title="switch to ${xf ? "boomerang" : "crossfade"} (re-loops this clip)">${xf ? "⇄" : "↔"}</button>
+            <button class="ct ct-del" title="delete this clip from the pool">✕</button>
+            <span class="ct-lbl">${xf ? "crossfade" : "boomerang"}${t.active ? " · live" : ""}</span>
+          </div>`; }).join("")}</div>
+        <div class="hint" style="margin-bottom:6px"><b>✓</b> deploy (click again to store-but-not-deploy) · <b>↔/⇄</b> boomerang/crossfade · <b>✕</b> delete. Only the ✓ clip plays in-game; the rest are stored.</div>`
+        : `<div class="hint">No cinemagraphs yet — generate one below.</div>`;
       const presetOpts = CINE_PRESETS.map((p, i) => `<option value="${i}">${escHtml(p.label)}</option>`).join("");
-      body.innerHTML = `${candsHtml}${existing}
+      body.innerHTML = `${grid}
         <div class="lbl">preset (optional) — pick a common motion, then tweak</div>
         <select id="cinePreset"><option value="">— choose a preset —</option>${presetOpts}</select>
         <div class="lbl" style="margin-top:8px">motion — one thing that physically MOVES (+ a pace)</div>
-        <textarea id="cinePrompt" rows="3" placeholder="e.g. a torch flame flickering and dancing, embers drifting up">${escHtml((cine && cine.prompt) || "")}</textarea>
+        <textarea id="cinePrompt" rows="3" placeholder="e.g. a torch flame flickering and dancing, embers drifting up">${escHtml((cine && cine.prompt) || (cands[0] && cands[0].prompt) || "")}</textarea>
         <div class="hint" style="margin-top:4px">Name ONE physical motion — flicker · sway · ripple · drift · flap — and a pace (slow / gentle / steadily). It animates <b>movement, not brightness</b>: "a pulsing glow" holds still, but "a flame flickering, light rippling on the wall" moves. If your thing only brightens, give it a carrier: "the lantern sways on its bracket, shadows swinging." (Static camera is added for you.)</div>
         <div class="lbl">loop style</div>
         <select id="cineLoop">
-          <option value="boomerang"${(cine && cine.loop) === "crossfade" ? "" : " selected"}>boomerang — oscillating (flame, water, flag)</option>
-          <option value="crossfade"${(cine && cine.loop) === "crossfade" ? " selected" : ""}>crossfade — directional (smoke, bubbles, embers)</option>
+          <option value="boomerang"${((cine && cine.loop) || (cands[0] && cands[0].loop)) === "crossfade" ? "" : " selected"}>boomerang — oscillating (flame, water, flag)</option>
+          <option value="crossfade"${((cine && cine.loop) || (cands[0] && cands[0].loop)) === "crossfade" ? " selected" : ""}>crossfade — directional (smoke, bubbles, embers)</option>
         </select>
         <div style="margin-top:8px"><button id="cineGen">Generate cinemagraph</button> <button id="cineBatch">+ Batch</button> <span class="hint" id="cineStat"></span></div>
         <div class="hint" style="margin-top:6px">Generate = now (~5 min, pauses the LLM server). <b>+ Batch</b> = queue it and keep working; run the whole queue in one go from the tray up top.</div>`;
-      const del = body.querySelector("#cineDel"); if (del) del.onclick = () => deleteHubCine(s);
-      body.querySelectorAll(".cpick").forEach(b => b.onclick = () => pickHubCine(s, +b.dataset.i));
+      body.querySelectorAll(".cinetile").forEach(tile => {
+        const i = +tile.dataset.i, active = tile.classList.contains("active"), curXf = tile.dataset.loop === "crossfade";
+        tile.querySelector(".ct-check").onclick = () => active ? uncommitCine(s) : setActiveCine(s, i);
+        tile.querySelector(".ct-del").onclick = () => deleteCineTile(s, i);
+        tile.querySelector(".ct-loop").onclick = e => reloopCine(s, i, curXf ? "boomerang" : "crossfade", e.currentTarget);
+      });
       const pre = body.querySelector("#cinePreset");
       if (pre) pre.onchange = () => {
         const p = CINE_PRESETS[pre.value]; if (!p) return;
@@ -977,17 +1003,31 @@
         stat.textContent = `generating… (${escHtml(st.step || "working")})`;
       }, 4000);
     }
-    async function pickHubCine(s, index) {
+    function cineErr(r) { $("#hubStatus").innerHTML = `<span class="err">${escHtml((r && r.error) || "failed")}</span>`; }
+    async function setActiveCine(s, index) {          // ✓ on: deploy this stored clip (keeps the pool)
       const r = await postJSON("/api/pick-cinemagraph", { chapter: CH, scenario: SC, roomKey: ROOM_KEY, hotspotId: s.id, index });
-      if (!r || !r.ok) { $("#hubStatus").innerHTML = `<span class="err">${escHtml((r && r.error) || "pick failed")}</span>`; return; }
-      await afterCineChange();   // reload node → candidates cleared, chosen clip set → plays on the 360
-      $("#hubStatus").innerHTML = `<span class="ok2">cinemagraph set — playing on the 360</span>`;
+      if (!r || !r.ok) return cineErr(r);
+      await afterCineChange(); $("#hubStatus").innerHTML = `<span class="ok2">deployed — playing on the 360</span>`;
     }
-    async function deleteHubCine(s) {
-      if (!confirm(`Delete the cinemagraph on ${s.id}? (the mp4 stays on disk)`)) return;
-      const r = await postJSON("/api/delete-cinemagraph", { chapter: CH, scenario: SC, roomKey: ROOM_KEY, hotspotId: s.id });
-      if (!r.ok) { $("#hubStatus").innerHTML = `<span class="err">${escHtml(r.error || "delete failed")}</span>`; return; }
+    async function uncommitCine(s) {                  // ✓ off: un-deploy but KEEP the clip in the pool (never lose it)
+      const r = await postJSON("/api/uncommit-cinemagraph", { chapter: CH, scenario: SC, roomKey: ROOM_KEY, hotspotId: s.id });
+      if (!r || !r.ok) return cineErr(r);
+      await afterCineChange(); $("#hubStatus").innerHTML = `<span class="ok2">stored — not deployed</span>`;
+    }
+    async function deleteCineTile(s, index) {         // ✕: remove from the pool (or un-deploy a standalone active)
+      if (!confirm("Delete this clip? (the mp4 stays on disk)")) return;
+      const body = index < 0 ? {} : { index };
+      const route = index < 0 ? "/api/delete-cinemagraph" : "/api/delete-cinemagraph-candidate";
+      const r = await postJSON(route, { chapter: CH, scenario: SC, roomKey: ROOM_KEY, hotspotId: s.id, ...body });
+      if (!r || !r.ok) return cineErr(r);
       await afterCineChange();
+    }
+    async function reloopCine(s, index, loop, btn) {  // ↔/⇄: switch boomerang↔crossfade after generation
+      if (btn) { btn.textContent = "…"; btn.disabled = true; }
+      const r = await postJSON("/api/reloop-cinemagraph", { chapter: CH, scenario: SC, roomKey: ROOM_KEY, hotspotId: s.id,
+        which: index < 0 ? "active" : "candidate", index: index < 0 ? 0 : index, loop });
+      if (!r || !r.ok) return cineErr(r);
+      await afterCineChange(); $("#hubStatus").innerHTML = `<span class="ok2">re-looped → ${escHtml(loop)}</span>`;
     }
     // Reload the node so cineOf() sees the new/removed clip, re-init the compositor, and rebuild so the
     // live 360 reflects it immediately.
@@ -1087,13 +1127,17 @@
       const rows = vs.map(v => `<div class="hitem" data-state="${escHtml(v.state)}">
           <div class="lbl" style="margin-top:0">${escHtml(v.state)}<button class="hdel vdel" data-state="${escHtml(v.state)}" style="float:right;margin:0">delete</button></div>
           <div class="lbl">trigger</div><span class="whenbox"></span> <button class="wupdate" data-state="${escHtml(v.state)}">update</button>
-          <img class="vthumb" style="margin-top:6px" src="/sfile/${escHtml(v.panorama)}?t=${Date.now()}${SCQ ? "&" + SCQ : ""}" alt="">
+          <div class="lbl">prompt — what this view shows (edit &amp; Regenerate to re-run)</div>
+          <textarea class="vrprompt" rows="3">${escHtml(v.prompt || "")}</textarea>
+          <div style="margin-top:6px"><button class="vregen" data-state="${escHtml(v.state)}">Regenerate</button> <button class="vrbatch" data-state="${escHtml(v.state)}">+ Batch</button> <span class="hint vrstat"></span></div>
+          ${v.panorama ? `<img class="vthumb" style="margin-top:6px" src="/sfile/${escHtml(v.panorama)}?t=${Date.now()}${SCQ ? "&" + SCQ : ""}" alt="">` : `<div class="hint" style="margin-top:6px">no image yet — Regenerate (or run the batch) to make it</div>`}
         </div>`).join("") || `<div class="hint">No variants yet — add one below.</div>`;
       body.innerHTML = `<div class="hint">Each variant is an alternate look for this object, made by editing its box on the committed scene; it shows when its trigger is true (active variants composite at play time).</div>
         ${rows}
         <div class="plan">
-          <div class="planhd">Add / regenerate a variant</div>
-          <div class="lbl">state</div><input type="text" id="vState" placeholder="e.g. on · thrown · broken (regen replaces same state)">
+          <div class="planhd">${s.type === "door" ? "Add an open-door view" : "Add / regenerate a variant"}</div>
+          ${s.type === "door" ? `<div class="hint" style="margin-bottom:6px">A door's open view is just a variant: name it <b>open</b> and trigger it on <i>this room solved</i> (the default). A switch door gets one view per lever state — trigger each on the dial's value.</div>` : ""}
+          <div class="lbl">state</div><input type="text" id="vState" value="${s.type === "door" ? "open" : ""}" placeholder="e.g. on · thrown · broken (regen replaces same state)">
           <div class="lbl">trigger</div><span id="vWhen"></span>
           <div class="lbl">prompt — what changes INSIDE the box</div>
           <textarea id="vPrompt" rows="3" placeholder="e.g. the brass lever is thrown fully down; identical lighting, palette and style, no people, no lettering, no text."></textarea>
@@ -1102,6 +1146,18 @@
       vs.forEach(v => renderWhenEditor(body.querySelector(`.hitem[data-state="${cssEsc(v.state)}"] .whenbox`), v.when));
       body.querySelectorAll(".wupdate").forEach(b => b.onclick = () => patchVariant(s, b.dataset.state, readWhen(b.closest(".hitem").querySelector(".whenbox"))));
       body.querySelectorAll(".vdel").forEach(b => b.onclick = () => deleteVariant(s, b.dataset.state));
+      // per-row Regenerate / +Batch — re-run an EXISTING variant with its (editable) prompt + trigger
+      body.querySelectorAll(".vregen").forEach(b => b.onclick = () => {
+        const row = b.closest(".hitem");
+        runVariantGen(s, b.dataset.state, (row.querySelector(".vrprompt").value || "").trim(),
+          readWhen(row.querySelector(".whenbox")), row.querySelector(".vrstat"));
+      });
+      body.querySelectorAll(".vrbatch").forEach(b => b.onclick = () => {
+        const row = b.closest(".hitem"), prompt = (row.querySelector(".vrprompt").value || "").trim();
+        const stat = row.querySelector(".vrstat");
+        if (!prompt) { stat.innerHTML = `<span class="err">prompt is empty</span>`; return; }
+        addToBatch(s, { type: "variant", box: s.box, prompt, state: b.dataset.state, when: readWhen(row.querySelector(".whenbox")) }, stat);
+      });
       renderWhenEditor(body.querySelector("#vWhen"), { solved: ROOM_KEY });   // sensible default: this room solved
       body.querySelector("#genVar").onclick = () => generateVariant(s, body);
       body.querySelector("#varBatch").onclick = () => {
@@ -1114,11 +1170,9 @@
         addToBatch(s, { type: "variant", box: s.box, prompt, state, when }, stat);
       };
     }
-    async function generateVariant(s, body) {
-      const state = (body.querySelector("#vState").value || "").trim();
-      const prompt = (body.querySelector("#vPrompt").value || "").trim();
-      const when = readWhen(body.querySelector("#vWhen"));
-      const stat = body.querySelector("#vStat");
+    // Shared variant-gen core so BOTH the bottom "add" form AND each existing variant's per-row Regenerate
+    // button run it with explicit state/prompt/when (the per-row button passes the row's edited values).
+    async function runVariantGen(s, state, prompt, when, stat) {
       if (!state) { stat.innerHTML = `<span class="err">give the variant a state name</span>`; return; }
       if (!prompt) { stat.innerHTML = `<span class="err">describe what changes in the box</span>`; return; }
       if (!(await ensureHotspotSaved(s, stat))) return;
@@ -1132,6 +1186,11 @@
         if (j.error) { stat.innerHTML = `<span class="err">${escHtml(j.error)}</span>`; clearInterval(poll); return; }
         if (!j.active) { clearInterval(poll); await refreshNode(); stat.innerHTML = `<span class="ok2">variant "${escHtml(state)}" made ✓</span>`; renderSpotContent(); }
       }, 1500);
+    }
+    function generateVariant(s, body) {
+      runVariantGen(s, (body.querySelector("#vState").value || "").trim(),
+        (body.querySelector("#vPrompt").value || "").trim(), readWhen(body.querySelector("#vWhen")),
+        body.querySelector("#vStat"));
     }
     async function patchVariant(s, state, when) {
       const r = await postJSON("/api/patch-variant", { chapter: CH, scenario: SC, roomKey: ROOM_KEY, hotspotId: s.id, state, fields: { when } });
@@ -1269,6 +1328,14 @@
       if (canSpots) { $("#fixSeam").style.display = ""; $("#fixSeam").onclick = () => enterSeamMode("room"); }
       // Level 1: seam-fix the candidate pano IN PLACE, before committing.
       if (LEVEL1 && DRAFT_IMG) { $("#fixSeam").style.display = ""; $("#fixSeam").onclick = () => enterSeamMode("scratch"); }
+      // Pick-cinemagraphs deep link (?focus=cine): jump straight to the Spots spoke, on the Cinemagraph tab
+      // (HUB_TAB primed above), landing on the first hotspot that still has candidates to pick (else the first).
+      if (HS_EDIT && FOCUS === "cine" && canSpots) {
+        setSpoke("spots");
+        const pend = SPOTS.findIndex(s => cineCandsOf(s.id).length);
+        selectSpot(pend >= 0 ? pend : (SPOTS.length ? 0 : -1));
+        $("#hubStatus").innerHTML = `<span class="hint">Pick this room's cinemagraphs: choose a hotspot, then a clip on the <b>Cinemagraph</b> tab. Leave any you don't want unpicked. <b>Save &amp; close</b> when done.</span>`;
+      }
       if (DRAFT_IMG) {
         $("#hubActs").style.display = "flex";
         const hst = $("#hubStatus");

@@ -98,7 +98,16 @@
               "desc": "a small alien monorail gondola docked at the platform edge, boarded directly through its own sliding door — a bold square motif on the door — the gondola's cables rising straight up and vanishing into the dark misty trunks overhead",
               "door": {
                 "direction": "forward",
-                "to": "car_sq"
+                "to": "car_sq",
+                "opensOnto": [
+                  {
+                    "state": "open",
+                    "when": {
+                      "solved": "station1"
+                    },
+                    "reveal": "the sliding square-marked door drawn fully open onto the cable-car cabin interior beyond: warm brass fittings and a glowing lantern, a tall glass cabinet of jewel-bright collected BEETLES, a polished timber floor — cosy, warm and clearly lit, the cabin interior filling the open doorway."
+                  }
+                ]
               }
             },
             {
@@ -159,6 +168,68 @@
             0.4321,
             0.2055,
             0.9821
+          ],
+          "cinemagraphCandidates": [
+            {
+              "video": "station1/cine_lanterns_c1.mp4",
+              "seed": 1797551200,
+              "prompt": "lanterns that glow and flicker slowly",
+              "loop": "boomerang",
+              "box": [
+                0.0455,
+                0.4321,
+                0.2055,
+                0.9821
+              ]
+            },
+            {
+              "video": "station1/cine_lanterns_c2.mp4",
+              "seed": 1612921789,
+              "prompt": "lanterns that glow and flicker slowly",
+              "loop": "boomerang",
+              "box": [
+                0.0455,
+                0.4321,
+                0.2055,
+                0.9821
+              ]
+            },
+            {
+              "video": "station1/cine_lanterns_c3.mp4",
+              "seed": 392567933,
+              "prompt": "lanterns that glow and flicker slowly",
+              "loop": "boomerang",
+              "box": [
+                0.0455,
+                0.4321,
+                0.2055,
+                0.9821
+              ]
+            },
+            {
+              "video": "station1/cine_lanterns_c4.mp4",
+              "seed": 1002473946,
+              "prompt": "lanterns that glow and flicker slowly",
+              "loop": "boomerang",
+              "box": [
+                0.0455,
+                0.4321,
+                0.2055,
+                0.9821
+              ]
+            },
+            {
+              "video": "station1/cine_lanterns_c5.mp4",
+              "seed": 1910601786,
+              "prompt": "lanterns that glow and flicker slowly",
+              "loop": "boomerang",
+              "box": [
+                0.0455,
+                0.4321,
+                0.2055,
+                0.9821
+              ]
+            }
           ]
         },
         {
@@ -201,6 +272,10 @@
               ],
               "reveal": ""
             }
+          },
+          "solveSfx": {
+            "src": "audio/solve_chime.mp3",
+            "volume": 0.26760855931993316
           }
         },
         {
@@ -212,6 +287,68 @@
             0.2122,
             0.6925,
             0.7622
+          ],
+          "cinemagraphCandidates": [
+            {
+              "video": "station1/cine_glow_shelves_c1.mp4",
+              "seed": 1730183495,
+              "prompt": "glowing spores drifting and floating upward past the fungal shelves",
+              "loop": "crossfade",
+              "box": [
+                0.5325,
+                0.2122,
+                0.6925,
+                0.7622
+              ]
+            },
+            {
+              "video": "station1/cine_glow_shelves_c2.mp4",
+              "seed": 1141583884,
+              "prompt": "glowing spores drifting and floating upward past the fungal shelves",
+              "loop": "crossfade",
+              "box": [
+                0.5325,
+                0.2122,
+                0.6925,
+                0.7622
+              ]
+            },
+            {
+              "video": "station1/cine_glow_shelves_c3.mp4",
+              "seed": 1472720280,
+              "prompt": "glowing spores drifting and floating upward past the fungal shelves",
+              "loop": "crossfade",
+              "box": [
+                0.5325,
+                0.2122,
+                0.6925,
+                0.7622
+              ]
+            },
+            {
+              "video": "station1/cine_glow_shelves_c4.mp4",
+              "seed": 1332882571,
+              "prompt": "glowing spores drifting and floating upward past the fungal shelves",
+              "loop": "crossfade",
+              "box": [
+                0.5325,
+                0.2122,
+                0.6925,
+                0.7622
+              ]
+            },
+            {
+              "video": "station1/cine_glow_shelves_c5.mp4",
+              "seed": 1532481276,
+              "prompt": "glowing spores drifting and floating upward past the fungal shelves",
+              "loop": "crossfade",
+              "box": [
+                0.5325,
+                0.2122,
+                0.6925,
+                0.7622
+              ]
+            }
           ]
         },
         {
@@ -225,9 +362,32 @@
             0.7732
           ],
           "direction": "forward",
-          "to": "car_sq"
+          "to": "car_sq",
+          "variants": [
+            {
+              "state": "open",
+              "box": [
+                0.7051,
+                0.3986,
+                0.7532,
+                0.7732
+              ],
+              "prompt": "the sliding square-marked door drawn fully open onto the cable-car cabin interior beyond: warm brass fittings and a glowing lantern, a tall glass cabinet of jewel-bright collected BEETLES, a polished timber floor — cosy, warm and clearly lit, the cabin interior filling the open doorway.",
+              "panorama": "station1/var_square_door_open.png",
+              "when": {
+                "solved": "station1"
+              }
+            }
+          ]
         }
-      ]
+      ],
+      "sfx": {
+        "src": "audio/forest_bed.mp3",
+        "volume": 0.6,
+        "mode": "loop",
+        "crossfade": 4
+      },
+      "debrief": "One instrument, one question: of all the tree kinds out there, which grows the stoutest trunk? You binned the census by species and read the mean girth off each pile — group_by(species) |> summarise — and Bloomspire came out widest. The plainest move in wrangling: one grouping, one summary per group."
     },
     {
       "key": "car_sq",
@@ -339,6 +499,68 @@
             0.0507,
             0.1312,
             0.7663
+          ],
+          "cinemagraphCandidates": [
+            {
+              "video": "car_sq/cine_window_mist_c1.mp4",
+              "seed": 701179455,
+              "prompt": "mist that undulates",
+              "loop": "boomerang",
+              "box": [
+                0,
+                0.0507,
+                0.1312,
+                0.7663
+              ]
+            },
+            {
+              "video": "car_sq/cine_window_mist_c2.mp4",
+              "seed": 1205508914,
+              "prompt": "mist that undulates",
+              "loop": "boomerang",
+              "box": [
+                0,
+                0.0507,
+                0.1312,
+                0.7663
+              ]
+            },
+            {
+              "video": "car_sq/cine_window_mist_c3.mp4",
+              "seed": 1776072715,
+              "prompt": "mist that undulates",
+              "loop": "boomerang",
+              "box": [
+                0,
+                0.0507,
+                0.1312,
+                0.7663
+              ]
+            },
+            {
+              "video": "car_sq/cine_window_mist_c4.mp4",
+              "seed": 1521263646,
+              "prompt": "mist that undulates",
+              "loop": "boomerang",
+              "box": [
+                0,
+                0.0507,
+                0.1312,
+                0.7663
+              ]
+            },
+            {
+              "video": "car_sq/cine_window_mist_c5.mp4",
+              "seed": 227680873,
+              "prompt": "mist that undulates",
+              "loop": "boomerang",
+              "box": [
+                0,
+                0.0507,
+                0.1312,
+                0.7663
+              ]
+            }
           ]
         },
         {
@@ -350,6 +572,80 @@
             0.1366,
             0.2411,
             0.543
+          ],
+          "cinemagraph": {
+            "box": [
+              0.1429,
+              0.1366,
+              0.2411,
+              0.543
+            ],
+            "video": "car_sq/cine_cabin_lantern_c4.mp4",
+            "prompt": "the hanging lantern swaying gently with the car's motion, its amber glow trembling",
+            "loop": "crossfade",
+            "seed": null
+          },
+          "cinemagraphCandidates": [
+            {
+              "video": "car_sq/cine_cabin_lantern_c1.mp4",
+              "seed": null,
+              "prompt": "the hanging lantern swaying gently with the car's motion, its amber glow trembling",
+              "loop": "boomerang",
+              "box": [
+                0.1429,
+                0.1366,
+                0.2411,
+                0.543
+              ]
+            },
+            {
+              "video": "car_sq/cine_cabin_lantern_c2.mp4",
+              "seed": null,
+              "prompt": "the hanging lantern swaying gently with the car's motion, its amber glow trembling",
+              "loop": "boomerang",
+              "box": [
+                0.1429,
+                0.1366,
+                0.2411,
+                0.543
+              ]
+            },
+            {
+              "video": "car_sq/cine_cabin_lantern_c3.mp4",
+              "seed": null,
+              "prompt": "the hanging lantern swaying gently with the car's motion, its amber glow trembling",
+              "loop": "crossfade",
+              "box": [
+                0.1429,
+                0.1366,
+                0.2411,
+                0.543
+              ]
+            },
+            {
+              "video": "car_sq/cine_cabin_lantern_c4.mp4",
+              "seed": null,
+              "prompt": "the hanging lantern swaying gently with the car's motion, its amber glow trembling",
+              "loop": "crossfade",
+              "box": [
+                0.1429,
+                0.1366,
+                0.2411,
+                0.543
+              ]
+            },
+            {
+              "video": "car_sq/cine_cabin_lantern_c5.mp4",
+              "seed": null,
+              "prompt": "the hanging lantern swaying gently with the car's motion, its amber glow trembling",
+              "loop": "boomerang",
+              "box": [
+                0.1429,
+                0.1366,
+                0.2411,
+                0.543
+              ]
+            }
           ]
         },
         {
@@ -361,6 +657,68 @@
             0.1813,
             0.6077,
             0.7457
+          ],
+          "cinemagraphCandidates": [
+            {
+              "video": "car_sq/cine_beetle_cabinet_c1.mp4",
+              "seed": null,
+              "prompt": "the iridescent beetles catching the light, their shells shimmering and slowly shifting colour",
+              "loop": "boomerang",
+              "box": [
+                0.3822,
+                0.1813,
+                0.6077,
+                0.7457
+              ]
+            },
+            {
+              "video": "car_sq/cine_beetle_cabinet_c2.mp4",
+              "seed": null,
+              "prompt": "the iridescent beetles catching the light, their shells shimmering and slowly shifting colour",
+              "loop": "boomerang",
+              "box": [
+                0.3822,
+                0.1813,
+                0.6077,
+                0.7457
+              ]
+            },
+            {
+              "video": "car_sq/cine_beetle_cabinet_c3.mp4",
+              "seed": null,
+              "prompt": "the iridescent beetles catching the light, their shells shimmering and slowly shifting colour",
+              "loop": "boomerang",
+              "box": [
+                0.3822,
+                0.1813,
+                0.6077,
+                0.7457
+              ]
+            },
+            {
+              "video": "car_sq/cine_beetle_cabinet_c4.mp4",
+              "seed": null,
+              "prompt": "the iridescent beetles catching the light, their shells shimmering and slowly shifting colour",
+              "loop": "boomerang",
+              "box": [
+                0.3822,
+                0.1813,
+                0.6077,
+                0.7457
+              ]
+            },
+            {
+              "video": "car_sq/cine_beetle_cabinet_c5.mp4",
+              "seed": null,
+              "prompt": "the iridescent beetles catching the light, their shells shimmering and slowly shifting colour",
+              "loop": "boomerang",
+              "box": [
+                0.3822,
+                0.1813,
+                0.6077,
+                0.7457
+              ]
+            }
           ]
         },
         {
@@ -384,7 +742,11 @@
               "label": "Down-line ▼"
             }
           ],
-          "hint": "Throw the lever to send the car up-line or down, then step through the door."
+          "hint": "Throw the lever to send the car up-line or down, then step through the door.",
+          "sfx": {
+            "src": "audio/lever.mp3",
+            "volume": 0.7
+          }
         },
         {
           "id": "square_door",
@@ -400,30 +762,53 @@
           "to": "station2",
           "variants": [
             {
-              "state": "to_station2",
-              "when": {
-                "eq": [
-                  "car_sq_dir",
-                  "forward"
-                ]
-              },
-              "to": "station2",
-              "direction": "open"
-            },
-            {
               "state": "to_station1",
+              "box": [
+                0.7266,
+                0.1572,
+                0.8288,
+                0.9175
+              ],
+              "prompt": "the sliding square-marked door drawn fully open BACK onto the deep, dark STATION-ONE platform: living-wood decking and amber lichen-lanterns dim in the gloom, immense trunks and drifting mist above and below, only a few faint rays of light — the deepest point of the climb",
+              "panorama": "car_sq/var_square_door_to_station1.png",
+              "to": "station1",
+              "direction": "back",
               "when": {
                 "eq": [
                   "car_sq_dir",
                   "back"
                 ]
-              },
-              "to": "station1",
-              "direction": "back"
+              }
+            },
+            {
+              "state": "to_station2",
+              "box": [
+                0.7266,
+                0.1572,
+                0.8288,
+                0.9175
+              ],
+              "prompt": "the sliding square-marked door drawn fully open FORWARD onto the higher STATION-TWO platform where the mist is beginning to thin and the first pale light breaks through, brighter and more open than the depths below",
+              "panorama": "car_sq/var_square_door_to_station2.png",
+              "to": "station2",
+              "direction": "open",
+              "when": {
+                "eq": [
+                  "car_sq_dir",
+                  "forward"
+                ]
+              }
             }
           ]
         }
-      ]
+      ],
+      "sfx": {
+        "src": "audio/monorail_hum.mp3",
+        "volume": 0.22130947096056378,
+        "mode": "loop",
+        "crossfade": 4
+      },
+      "debrief": "Nothing to compute here — the trays were already sorted for you. The square line's beetles sat binned by colour, each drawer a hue. Reading which trait laid the collection out, rather than working a number, is exactly the recognition the vault would later ask for: colour was this line's grouping."
     },
     {
       "key": "station2",
@@ -481,7 +866,16 @@
               "desc": "the onward circle-line gondola docked at the platform edge, boarded through its own closed sliding door — a bold circle motif on the door — its cables rising straight up into the canopy overhead",
               "door": {
                 "direction": "forward",
-                "to": "car_ci"
+                "to": "car_ci",
+                "opensOnto": [
+                  {
+                    "state": "open",
+                    "when": {
+                      "solved": "station2"
+                    },
+                    "reveal": "the sliding circle-marked door drawn fully open onto the cable-car cabin interior beyond: warm brass fittings and a glowing lantern, a glass cabinet of collected CONES and seed-pods, a timber floor — cosy, warm and clearly lit, the cabin interior filling the open doorway."
+                  }
+                ]
               }
             },
             {
@@ -595,6 +989,10 @@
               ],
               "reveal": ""
             }
+          },
+          "solveSfx": {
+            "src": "audio/solve_chime.mp3",
+            "volume": 0.26760855931993316
           }
         },
         {
@@ -606,6 +1004,68 @@
             0.1022,
             0.6799,
             0.6522
+          ],
+          "cinemagraphCandidates": [
+            {
+              "video": "station2/cine_glow_shelves_c1.mp4",
+              "seed": 299092366,
+              "prompt": "fungi around which fireflies bob and weave",
+              "loop": "boomerang",
+              "box": [
+                0.5199,
+                0.1022,
+                0.6799,
+                0.6522
+              ]
+            },
+            {
+              "video": "station2/cine_glow_shelves_c2.mp4",
+              "seed": 577429782,
+              "prompt": "fungi around which fireflies bob and weave",
+              "loop": "boomerang",
+              "box": [
+                0.5199,
+                0.1022,
+                0.6799,
+                0.6522
+              ]
+            },
+            {
+              "video": "station2/cine_glow_shelves_c3.mp4",
+              "seed": 2082729666,
+              "prompt": "fungi around which fireflies bob and weave",
+              "loop": "boomerang",
+              "box": [
+                0.5199,
+                0.1022,
+                0.6799,
+                0.6522
+              ]
+            },
+            {
+              "video": "station2/cine_glow_shelves_c4.mp4",
+              "seed": 689543359,
+              "prompt": "fungi around which fireflies bob and weave",
+              "loop": "boomerang",
+              "box": [
+                0.5199,
+                0.1022,
+                0.6799,
+                0.6522
+              ]
+            },
+            {
+              "video": "station2/cine_glow_shelves_c5.mp4",
+              "seed": 1045611664,
+              "prompt": "fungi around which fireflies bob and weave",
+              "loop": "boomerang",
+              "box": [
+                0.5199,
+                0.1022,
+                0.6799,
+                0.6522
+              ]
+            }
           ]
         },
         {
@@ -619,9 +1079,118 @@
             0.6935
           ],
           "direction": "forward",
-          "to": "car_ci"
+          "to": "car_ci",
+          "variants": [
+            {
+              "state": "open",
+              "box": [
+                0.7647,
+                0.4502,
+                0.8024,
+                0.6935
+              ],
+              "prompt": "the sliding circle-marked door drawn fully open onto the cable-car cabin interior beyond: warm brass fittings and a glowing lantern, a glass cabinet of collected CONES and seed-pods, a timber floor — cosy, warm and clearly lit, the cabin interior filling the open doorway.",
+              "panorama": "station2/var_circle_door_open.png",
+              "when": {
+                "solved": "station2"
+              }
+            }
+          ]
+        },
+        {
+          "id": "mist",
+          "type": "ambient",
+          "label": "mist",
+          "box": [
+            0.0017,
+            0.3402,
+            0.1988,
+            0.9656
+          ],
+          "starterCode": "",
+          "check": {
+            "prompt": "",
+            "requires": [],
+            "expr": "",
+            "hint": "",
+            "maxAttempts": 4,
+            "feedback": {
+              "correct": "",
+              "wrong": [],
+              "reveal": ""
+            }
+          },
+          "cinemagraphCandidates": [
+            {
+              "video": "station2/cine_mist_c1.mp4",
+              "seed": 519105268,
+              "prompt": "clouds drifting slowly and continuously across the sky, wisps of vapour sliding past, the light shifting gently as they move",
+              "loop": "crossfade",
+              "box": [
+                0.0017,
+                0.3402,
+                0.1988,
+                0.9656
+              ]
+            },
+            {
+              "video": "station2/cine_mist_c2.mp4",
+              "seed": 989464337,
+              "prompt": "clouds drifting slowly and continuously across the sky, wisps of vapour sliding past, the light shifting gently as they move",
+              "loop": "crossfade",
+              "box": [
+                0.0017,
+                0.3402,
+                0.1988,
+                0.9656
+              ]
+            },
+            {
+              "video": "station2/cine_mist_c3.mp4",
+              "seed": 1943056587,
+              "prompt": "clouds drifting slowly and continuously across the sky, wisps of vapour sliding past, the light shifting gently as they move",
+              "loop": "crossfade",
+              "box": [
+                0.0017,
+                0.3402,
+                0.1988,
+                0.9656
+              ]
+            },
+            {
+              "video": "station2/cine_mist_c4.mp4",
+              "seed": 1053453512,
+              "prompt": "clouds drifting slowly and continuously across the sky, wisps of vapour sliding past, the light shifting gently as they move",
+              "loop": "crossfade",
+              "box": [
+                0.0017,
+                0.3402,
+                0.1988,
+                0.9656
+              ]
+            },
+            {
+              "video": "station2/cine_mist_c5.mp4",
+              "seed": 848958521,
+              "prompt": "clouds drifting slowly and continuously across the sky, wisps of vapour sliding past, the light shifting gently as they move",
+              "loop": "crossfade",
+              "box": [
+                0.0017,
+                0.3402,
+                0.1988,
+                0.9656
+              ]
+            }
+          ]
         }
-      ]
+      ],
+      "sfx": {
+        "src": "audio/forest_bed.mp3",
+        "volume": 0.6,
+        "mode": "loop",
+        "crossfade": 4
+      },
+      "debrief": "A different bin, the same move: sort the trees by vigour class and read the mean bark-glow off each pile — group_by(vigor) |> summarise. The Radiant class glowed brightest. (Crown height sat right there in the table as a temptation; a clean summary reads only the column the question asks for.)"
     },
     {
       "key": "car_ci",
@@ -681,11 +1250,11 @@
                 "opensOnto": [
                   {
                     "state": "to_station2",
-                    "reveal": "the sliding circle-marked door drawn fully open BACK onto the STATION-TWO platform just below, its living-wood decking and amber lichen-lanterns in the thinning golden haze, the canopy falling away beyond"
+                    "reveal": "the sliding circle-marked door drawn fully open, revealing the STATION-TWO canopy platform beyond — among the treetops in soft late-morning light: living-wood decking and brass railings, thinning mist, a low ridge of peaks just emerging. The daylit view fills the entire open doorway; nothing dark."
                   },
                   {
                     "state": "to_station3",
-                    "reveal": "the sliding circle-marked door drawn fully open FORWARD onto the higher STATION-THREE platform above the canopy, bright and clear in the midday light with a ridge of mountain peaks sharp across the horizon"
+                    "reveal": "the sliding circle-marked door drawn fully open, revealing the STATION-THREE canopy platform beyond — high above the treetops in bright, clear midday light: living-wood decking and brass railings, a far ridge of sunlit mountain peaks across the horizon, a sea of mist far below. The bright daylit view fills the entire open doorway; no dark void."
                   }
                 ]
               }
@@ -733,6 +1302,80 @@
             0.4012,
             0.2308,
             0.6735
+          ],
+          "cinemagraph": {
+            "box": [
+              0.0103,
+              0.4012,
+              0.2308,
+              0.6735
+            ],
+            "video": "car_ci/cine_window_view_c3.mp4",
+            "prompt": "haze drifting past the window and cloud sliding slowly across the distant rising peaks as the car climbs",
+            "loop": "crossfade",
+            "seed": 841989052
+          },
+          "cinemagraphCandidates": [
+            {
+              "video": "car_ci/cine_window_view_c1.mp4",
+              "seed": null,
+              "prompt": "haze drifting past the window and cloud sliding slowly across the distant rising peaks as the car climbs",
+              "loop": "crossfade",
+              "box": [
+                0.0103,
+                0.4012,
+                0.2308,
+                0.6735
+              ]
+            },
+            {
+              "video": "car_ci/cine_window_view_c2.mp4",
+              "seed": null,
+              "prompt": "haze drifting past the window and cloud sliding slowly across the distant rising peaks as the car climbs",
+              "loop": "crossfade",
+              "box": [
+                0.0103,
+                0.4012,
+                0.2308,
+                0.6735
+              ]
+            },
+            {
+              "video": "car_ci/cine_window_view_c3.mp4",
+              "seed": null,
+              "prompt": "haze drifting past the window and cloud sliding slowly across the distant rising peaks as the car climbs",
+              "loop": "crossfade",
+              "box": [
+                0.0103,
+                0.4012,
+                0.2308,
+                0.6735
+              ]
+            },
+            {
+              "video": "car_ci/cine_window_view_c4.mp4",
+              "seed": null,
+              "prompt": "haze drifting past the window and cloud sliding slowly across the distant rising peaks as the car climbs",
+              "loop": "crossfade",
+              "box": [
+                0.0103,
+                0.4012,
+                0.2308,
+                0.6735
+              ]
+            },
+            {
+              "video": "car_ci/cine_window_view_c5.mp4",
+              "seed": null,
+              "prompt": "haze drifting past the window and cloud sliding slowly across the distant rising peaks as the car climbs",
+              "loop": "crossfade",
+              "box": [
+                0.0103,
+                0.4012,
+                0.2308,
+                0.6735
+              ]
+            }
           ]
         },
         {
@@ -744,6 +1387,80 @@
             0.0713,
             0.3019,
             0.4502
+          ],
+          "cinemagraph": {
+            "box": [
+              0.2254,
+              0.0713,
+              0.3019,
+              0.4502
+            ],
+            "video": "car_ci/cine_cabin_lantern_c3.mp4",
+            "prompt": "a lantern flickering and shimmering brightly",
+            "loop": "boomerang",
+            "seed": 1898619983
+          },
+          "cinemagraphCandidates": [
+            {
+              "video": "car_ci/cine_cabin_lantern_c1.mp4",
+              "seed": null,
+              "prompt": "the hanging lantern swaying gently with the car's motion, its amber glow trembling",
+              "loop": "boomerang",
+              "box": [
+                0.2254,
+                0.0713,
+                0.3019,
+                0.4502
+              ]
+            },
+            {
+              "video": "car_ci/cine_cabin_lantern_c2.mp4",
+              "seed": null,
+              "prompt": "the hanging lantern swaying gently with the car's motion, its amber glow trembling",
+              "loop": "boomerang",
+              "box": [
+                0.2254,
+                0.0713,
+                0.3019,
+                0.4502
+              ]
+            },
+            {
+              "video": "car_ci/cine_cabin_lantern_c3.mp4",
+              "seed": null,
+              "prompt": "the hanging lantern swaying gently with the car's motion, its amber glow trembling",
+              "loop": "boomerang",
+              "box": [
+                0.2254,
+                0.0713,
+                0.3019,
+                0.4502
+              ]
+            },
+            {
+              "video": "car_ci/cine_cabin_lantern_c4.mp4",
+              "seed": null,
+              "prompt": "the hanging lantern swaying gently with the car's motion, its amber glow trembling",
+              "loop": "boomerang",
+              "box": [
+                0.2254,
+                0.0713,
+                0.3019,
+                0.4502
+              ]
+            },
+            {
+              "video": "car_ci/cine_cabin_lantern_c5.mp4",
+              "seed": null,
+              "prompt": "the hanging lantern swaying gently with the car's motion, its amber glow trembling",
+              "loop": "boomerang",
+              "box": [
+                0.2254,
+                0.0713,
+                0.3019,
+                0.4502
+              ]
+            }
           ]
         },
         {
@@ -755,6 +1472,68 @@
             0.1985,
             0.6455,
             0.7801
+          ],
+          "cinemagraphCandidates": [
+            {
+              "video": "car_ci/cine_specimen_cabinet_c1.mp4",
+              "seed": null,
+              "prompt": "faint bioluminescent spores drifting slowly upward past the glass cabinet, the cones' pale surfaces catching the light",
+              "loop": "crossfade",
+              "box": [
+                0.3559,
+                0.1985,
+                0.6455,
+                0.7801
+              ]
+            },
+            {
+              "video": "car_ci/cine_specimen_cabinet_c2.mp4",
+              "seed": null,
+              "prompt": "faint bioluminescent spores drifting slowly upward past the glass cabinet, the cones' pale surfaces catching the light",
+              "loop": "crossfade",
+              "box": [
+                0.3559,
+                0.1985,
+                0.6455,
+                0.7801
+              ]
+            },
+            {
+              "video": "car_ci/cine_specimen_cabinet_c3.mp4",
+              "seed": null,
+              "prompt": "faint bioluminescent spores drifting slowly upward past the glass cabinet, the cones' pale surfaces catching the light",
+              "loop": "crossfade",
+              "box": [
+                0.3559,
+                0.1985,
+                0.6455,
+                0.7801
+              ]
+            },
+            {
+              "video": "car_ci/cine_specimen_cabinet_c4.mp4",
+              "seed": null,
+              "prompt": "faint bioluminescent spores drifting slowly upward past the glass cabinet, the cones' pale surfaces catching the light",
+              "loop": "crossfade",
+              "box": [
+                0.3559,
+                0.1985,
+                0.6455,
+                0.7801
+              ]
+            },
+            {
+              "video": "car_ci/cine_specimen_cabinet_c5.mp4",
+              "seed": null,
+              "prompt": "faint bioluminescent spores drifting slowly upward past the glass cabinet, the cones' pale surfaces catching the light",
+              "loop": "crossfade",
+              "box": [
+                0.3559,
+                0.1985,
+                0.6455,
+                0.7801
+              ]
+            }
           ]
         },
         {
@@ -778,46 +1557,57 @@
               "label": "Down-line ▼"
             }
           ],
-          "hint": "Throw the lever to send the car up-line or down, then step through the door."
+          "hint": "Throw the lever to send the car up-line or down, then step through the door.",
+          "sfx": {
+            "src": "audio/lever.mp3",
+            "volume": 0.7
+          }
         },
         {
           "id": "circle_door",
           "type": "door",
           "label": "The car door",
           "box": [
-            0.8171,
-            0.1366,
-            0.9674,
-            0.9759
+            0.817,
+            0.137,
+            0.95,
+            0.976
           ],
           "direction": "open",
           "to": "station3",
           "variants": [
             {
-              "state": "to_station3",
-              "when": {
-                "eq": [
-                  "car_ci_dir",
-                  "forward"
-                ]
-              },
-              "to": "station3",
-              "direction": "open"
+              "state": "to_station2",
+              "box": [
+                0.817,
+                0.137,
+                0.95,
+                0.976
+              ],
+              "prompt": "the sliding circle-marked door drawn fully open, revealing the STATION-TWO canopy platform beyond — among the treetops in soft late-morning light: living-wood decking and brass railings, thinning mist, a low ridge of peaks just emerging. The daylit view fills the entire open doorway; nothing dark.",
+              "panorama": "car_ci/var_circle_door_to_station2.png"
             },
             {
-              "state": "to_station2",
-              "when": {
-                "eq": [
-                  "car_ci_dir",
-                  "back"
-                ]
-              },
-              "to": "station2",
-              "direction": "back"
+              "state": "to_station3",
+              "box": [
+                0.817,
+                0.137,
+                0.95,
+                0.976
+              ],
+              "prompt": "the sliding circle-marked door drawn fully open, revealing the STATION-THREE canopy platform beyond — high above the treetops in bright, clear midday light: living-wood decking and brass railings, a far ridge of sunlit mountain peaks across the horizon, a sea of mist far below. The bright daylit view fills the entire open doorway; no dark void.",
+              "panorama": "car_ci/var_circle_door_to_station3.png"
             }
           ]
         }
-      ]
+      ],
+      "sfx": {
+        "src": "audio/monorail_hum.mp3",
+        "volume": 0.22130947096056378,
+        "mode": "loop",
+        "crossfade": 4
+      },
+      "debrief": "The circle line's cones were racked smallest to largest — sorted by size, one drawer per band. Again no arithmetic, only recognition: size was the trait this collection was grouped by. Two lines read, one to go."
     },
     {
       "key": "station3",
@@ -875,7 +1665,16 @@
               "desc": "the onward triangle-line gondola docked at the platform edge, boarded through its own closed sliding door — a bold triangle motif on the door — its cables rising straight up into the clear sky overhead",
               "door": {
                 "direction": "forward",
-                "to": "car_tr"
+                "to": "car_tr",
+                "opensOnto": [
+                  {
+                    "state": "open",
+                    "when": {
+                      "solved": "station3"
+                    },
+                    "reveal": "the sliding triangle-marked door drawn fully open onto the cable-car cabin interior beyond: warm brass fittings and a glowing lantern, a glass cabinet of collected SHELLS, a timber floor — cosy, warm and clearly lit, the cabin interior filling the open doorway."
+                  }
+                ]
               }
             },
             {
@@ -988,6 +1787,10 @@
               ],
               "reveal": ""
             }
+          },
+          "solveSfx": {
+            "src": "audio/solve_chime.mp3",
+            "volume": 0.26760855931993316
           }
         },
         {
@@ -999,6 +1802,80 @@
             0.2096,
             0.7257,
             0.6625
+          ],
+          "cinemagraph": {
+            "box": [
+              0.6001,
+              0.2096,
+              0.7257,
+              0.6625
+            ],
+            "video": "station3/cine_glow_shelves_c4.mp4",
+            "prompt": "fungi around which fireflies bob and weave",
+            "loop": "crossfade",
+            "seed": 1568740276
+          },
+          "cinemagraphCandidates": [
+            {
+              "video": "station3/cine_glow_shelves_c1.mp4",
+              "seed": 518480903,
+              "prompt": "fungi around which fireflies bob and weave",
+              "loop": "boomerang",
+              "box": [
+                0.6001,
+                0.2096,
+                0.7257,
+                0.6625
+              ]
+            },
+            {
+              "video": "station3/cine_glow_shelves_c2.mp4",
+              "seed": 1225358794,
+              "prompt": "fungi around which fireflies bob and weave",
+              "loop": "boomerang",
+              "box": [
+                0.6001,
+                0.2096,
+                0.7257,
+                0.6625
+              ]
+            },
+            {
+              "video": "station3/cine_glow_shelves_c3.mp4",
+              "seed": 1197818896,
+              "prompt": "fungi around which fireflies bob and weave",
+              "loop": "boomerang",
+              "box": [
+                0.6001,
+                0.2096,
+                0.7257,
+                0.6625
+              ]
+            },
+            {
+              "video": "station3/cine_glow_shelves_c4.mp4",
+              "seed": 1568740276,
+              "prompt": "fungi around which fireflies bob and weave",
+              "loop": "crossfade",
+              "box": [
+                0.6001,
+                0.2096,
+                0.7257,
+                0.6625
+              ]
+            },
+            {
+              "video": "station3/cine_glow_shelves_c5.mp4",
+              "seed": 1442642908,
+              "prompt": "fungi around which fireflies bob and weave",
+              "loop": "boomerang",
+              "box": [
+                0.6001,
+                0.2096,
+                0.7257,
+                0.6625
+              ]
+            }
           ]
         },
         {
@@ -1012,9 +1889,118 @@
             0.7553
           ],
           "direction": "forward",
-          "to": "car_tr"
+          "to": "car_tr",
+          "variants": [
+            {
+              "state": "open",
+              "box": [
+                0.8002,
+                0.4089,
+                0.8608,
+                0.7553
+              ],
+              "prompt": "the sliding triangle-marked door drawn fully open onto the cable-car cabin interior beyond: warm brass fittings and a glowing lantern, a glass cabinet of collected SHELLS, a timber floor — cosy, warm and clearly lit, the cabin interior filling the open doorway.",
+              "panorama": "station3/var_triangle_door_open.png",
+              "when": {
+                "solved": "station3"
+              }
+            }
+          ]
+        },
+        {
+          "id": "leaves",
+          "type": "ambient",
+          "label": "leaves",
+          "box": [
+            0.4004,
+            0.0137,
+            0.5516,
+            0.299
+          ],
+          "starterCode": "",
+          "check": {
+            "prompt": "",
+            "requires": [],
+            "expr": "",
+            "hint": "",
+            "maxAttempts": 4,
+            "feedback": {
+              "correct": "",
+              "wrong": [],
+              "reveal": ""
+            }
+          },
+          "cinemagraphCandidates": [
+            {
+              "video": "station3/cine_leaves_c1.mp4",
+              "seed": 196427510,
+              "prompt": "leaves slowly wave in the wind",
+              "loop": "boomerang",
+              "box": [
+                0.4004,
+                0.0137,
+                0.5516,
+                0.299
+              ]
+            },
+            {
+              "video": "station3/cine_leaves_c2.mp4",
+              "seed": 407483396,
+              "prompt": "leaves slowly wave in the wind",
+              "loop": "boomerang",
+              "box": [
+                0.4004,
+                0.0137,
+                0.5516,
+                0.299
+              ]
+            },
+            {
+              "video": "station3/cine_leaves_c3.mp4",
+              "seed": 258966535,
+              "prompt": "leaves slowly wave in the wind",
+              "loop": "boomerang",
+              "box": [
+                0.4004,
+                0.0137,
+                0.5516,
+                0.299
+              ]
+            },
+            {
+              "video": "station3/cine_leaves_c4.mp4",
+              "seed": 1593000222,
+              "prompt": "leaves slowly wave in the wind",
+              "loop": "boomerang",
+              "box": [
+                0.4004,
+                0.0137,
+                0.5516,
+                0.299
+              ]
+            },
+            {
+              "video": "station3/cine_leaves_c5.mp4",
+              "seed": 1993371756,
+              "prompt": "leaves slowly wave in the wind",
+              "loop": "boomerang",
+              "box": [
+                0.4004,
+                0.0137,
+                0.5516,
+                0.299
+              ]
+            }
+          ]
         }
-      ]
+      ],
+      "sfx": {
+        "src": "audio/forest_bed.mp3",
+        "volume": 0.6,
+        "mode": "loop",
+        "crossfade": 4
+      },
+      "debrief": "Bin by canopy zone, read the mean vitality off each pile, and the grove that stands healthiest is Cragside. It felt like the same easy move as the first two stations — and it was, which is exactly the trap the boulder was about to spring. A grand mean over all the trees quietly lets the most crowded zones vote hardest."
     },
     {
       "key": "car_tr",
@@ -1074,11 +2060,11 @@
                 "opensOnto": [
                   {
                     "state": "to_station3",
-                    "reveal": "the sliding triangle-marked door drawn fully open BACK onto the STATION-THREE platform above the canopy, bright midday light and a ridge of mountain peaks across the horizon, the trees still below"
+                    "reveal": "the sliding triangle-marked door drawn fully open, revealing the STATION-THREE canopy platform beyond — high above the treetops in bright midday light: living-wood decking and brass railings, sunlit peaks across the horizon, mist far below. The bright daylit view fills the entire open doorway; no dark void."
                   },
                   {
                     "state": "to_boss",
-                    "reveal": "the sliding triangle-marked door drawn fully open FORWARD onto a bare rocky mountain shoulder in golden-hour light, a steep scramble of boulders climbing away with the peaks close and the whole canopy spread far beneath"
+                    "reveal": "the sliding triangle-marked door drawn fully open, revealing a high mountain trail beyond — out above the trees in warm golden-hour sunlight: a winding rocky ledge with a great boulder on the path, close sunlit peaks, and a sea of canopy far below. The bright golden view fills the entire open doorway, brightly lit; no dark void."
                   }
                 ]
               }
@@ -1123,9 +2109,83 @@
           "label": "a wide window onto warm afternoon sky, the last treetops fal",
           "box": [
             0.0321,
-            0.4742,
-            0.1896,
-            0.7107
+            0.3368,
+            0.1919,
+            0.8763
+          ],
+          "cinemagraph": {
+            "box": [
+              0.0321,
+              0.3368,
+              0.1919,
+              0.8763
+            ],
+            "video": "car_tr/cine_window_view_c1.mp4",
+            "prompt": "clouds drifting slowly and continuously across the sky, wisps of vapour sliding past, the light shifting gently as they move",
+            "loop": "crossfade",
+            "seed": 2003353813
+          },
+          "cinemagraphCandidates": [
+            {
+              "video": "car_tr/cine_window_view_c1.mp4",
+              "seed": 2003353813,
+              "prompt": "clouds drifting slowly and continuously across the sky, wisps of vapour sliding past, the light shifting gently as they move",
+              "loop": "crossfade",
+              "box": [
+                0.0321,
+                0.3368,
+                0.1919,
+                0.8763
+              ]
+            },
+            {
+              "video": "car_tr/cine_window_view_c2.mp4",
+              "seed": 13498753,
+              "prompt": "clouds drifting slowly and continuously across the sky, wisps of vapour sliding past, the light shifting gently as they move",
+              "loop": "crossfade",
+              "box": [
+                0.0321,
+                0.3368,
+                0.1919,
+                0.8763
+              ]
+            },
+            {
+              "video": "car_tr/cine_window_view_c3.mp4",
+              "seed": 555643460,
+              "prompt": "clouds drifting slowly and continuously across the sky, wisps of vapour sliding past, the light shifting gently as they move",
+              "loop": "crossfade",
+              "box": [
+                0.0321,
+                0.3368,
+                0.1919,
+                0.8763
+              ]
+            },
+            {
+              "video": "car_tr/cine_window_view_c4.mp4",
+              "seed": 1659210224,
+              "prompt": "clouds drifting slowly and continuously across the sky, wisps of vapour sliding past, the light shifting gently as they move",
+              "loop": "crossfade",
+              "box": [
+                0.0321,
+                0.3368,
+                0.1919,
+                0.8763
+              ]
+            },
+            {
+              "video": "car_tr/cine_window_view_c5.mp4",
+              "seed": 1490536134,
+              "prompt": "clouds drifting slowly and continuously across the sky, wisps of vapour sliding past, the light shifting gently as they move",
+              "loop": "crossfade",
+              "box": [
+                0.0321,
+                0.3368,
+                0.1919,
+                0.8763
+              ]
+            }
           ]
         },
         {
@@ -1137,6 +2197,80 @@
             0.0507,
             0.3064,
             0.4983
+          ],
+          "cinemagraph": {
+            "box": [
+              0.2311,
+              0.0507,
+              0.3064,
+              0.4983
+            ],
+            "video": "car_tr/cine_cabin_lantern_c4.mp4",
+            "prompt": "a torch flame flickering and dancing, licking upward and guttering, tiny embers drifting up from it, the warm glow trembling on the nearby surfaces",
+            "loop": "crossfade",
+            "seed": 1331956265
+          },
+          "cinemagraphCandidates": [
+            {
+              "video": "car_tr/cine_cabin_lantern_c1.mp4",
+              "seed": 2139855152,
+              "prompt": "a torch flame flickering and dancing, licking upward and guttering, tiny embers drifting up from it, the warm glow trembling on the nearby surfaces",
+              "loop": "boomerang",
+              "box": [
+                0.2311,
+                0.0507,
+                0.3064,
+                0.4983
+              ]
+            },
+            {
+              "video": "car_tr/cine_cabin_lantern_c2.mp4",
+              "seed": 94364830,
+              "prompt": "a torch flame flickering and dancing, licking upward and guttering, tiny embers drifting up from it, the warm glow trembling on the nearby surfaces",
+              "loop": "boomerang",
+              "box": [
+                0.2311,
+                0.0507,
+                0.3064,
+                0.4983
+              ]
+            },
+            {
+              "video": "car_tr/cine_cabin_lantern_c3.mp4",
+              "seed": 76285366,
+              "prompt": "a torch flame flickering and dancing, licking upward and guttering, tiny embers drifting up from it, the warm glow trembling on the nearby surfaces",
+              "loop": "boomerang",
+              "box": [
+                0.2311,
+                0.0507,
+                0.3064,
+                0.4983
+              ]
+            },
+            {
+              "video": "car_tr/cine_cabin_lantern_c4.mp4",
+              "seed": 1331956265,
+              "prompt": "a torch flame flickering and dancing, licking upward and guttering, tiny embers drifting up from it, the warm glow trembling on the nearby surfaces",
+              "loop": "crossfade",
+              "box": [
+                0.2311,
+                0.0507,
+                0.3064,
+                0.4983
+              ]
+            },
+            {
+              "video": "car_tr/cine_cabin_lantern_c5.mp4",
+              "seed": 1908444116,
+              "prompt": "a torch flame flickering and dancing, licking upward and guttering, tiny embers drifting up from it, the warm glow trembling on the nearby surfaces",
+              "loop": "boomerang",
+              "box": [
+                0.2311,
+                0.0507,
+                0.3064,
+                0.4983
+              ]
+            }
           ]
         },
         {
@@ -1148,6 +2282,68 @@
             0.1744,
             0.6455,
             0.7216
+          ],
+          "cinemagraphCandidates": [
+            {
+              "video": "car_tr/cine_specimen_cabinet_c1.mp4",
+              "seed": 1928741551,
+              "prompt": "faint bioluminescent spores drifting slowly upward past the glass cabinet, the shells' iridescent surfaces glinting as the light shifts",
+              "loop": "crossfade",
+              "box": [
+                0.3662,
+                0.1744,
+                0.6455,
+                0.7216
+              ]
+            },
+            {
+              "video": "car_tr/cine_specimen_cabinet_c2.mp4",
+              "seed": 528542748,
+              "prompt": "faint bioluminescent spores drifting slowly upward past the glass cabinet, the shells' iridescent surfaces glinting as the light shifts",
+              "loop": "crossfade",
+              "box": [
+                0.3662,
+                0.1744,
+                0.6455,
+                0.7216
+              ]
+            },
+            {
+              "video": "car_tr/cine_specimen_cabinet_c3.mp4",
+              "seed": 1917061179,
+              "prompt": "faint bioluminescent spores drifting slowly upward past the glass cabinet, the shells' iridescent surfaces glinting as the light shifts",
+              "loop": "crossfade",
+              "box": [
+                0.3662,
+                0.1744,
+                0.6455,
+                0.7216
+              ]
+            },
+            {
+              "video": "car_tr/cine_specimen_cabinet_c4.mp4",
+              "seed": 2011043062,
+              "prompt": "faint bioluminescent spores drifting slowly upward past the glass cabinet, the shells' iridescent surfaces glinting as the light shifts",
+              "loop": "crossfade",
+              "box": [
+                0.3662,
+                0.1744,
+                0.6455,
+                0.7216
+              ]
+            },
+            {
+              "video": "car_tr/cine_specimen_cabinet_c5.mp4",
+              "seed": 1244996992,
+              "prompt": "faint bioluminescent spores drifting slowly upward past the glass cabinet, the shells' iridescent surfaces glinting as the light shifts",
+              "loop": "crossfade",
+              "box": [
+                0.3662,
+                0.1744,
+                0.6455,
+                0.7216
+              ]
+            }
           ]
         },
         {
@@ -1171,7 +2367,11 @@
               "label": "Down-line ▼"
             }
           ],
-          "hint": "Throw the lever to send the car up-line or down, then step through the door."
+          "hint": "Throw the lever to send the car up-line or down, then step through the door.",
+          "sfx": {
+            "src": "audio/lever.mp3",
+            "volume": 0.7
+          }
         },
         {
           "id": "triangle_door",
@@ -1179,38 +2379,45 @@
           "label": "The car door",
           "box": [
             0.832,
-            0.0404,
-            0.9868,
-            0.9863
+            0.04,
+            0.955,
+            0.986
           ],
           "direction": "open",
           "to": "boss",
           "variants": [
             {
-              "state": "to_boss",
-              "when": {
-                "eq": [
-                  "car_tr_dir",
-                  "forward"
-                ]
-              },
-              "to": "boss",
-              "direction": "open"
+              "state": "to_station3",
+              "box": [
+                0.832,
+                0.04,
+                0.955,
+                0.986
+              ],
+              "prompt": "the sliding triangle-marked door drawn fully open, revealing the STATION-THREE canopy platform beyond — high above the treetops in bright midday light: living-wood decking and brass railings, sunlit peaks across the horizon, mist far below. The bright daylit view fills the entire open doorway; no dark void.",
+              "panorama": "car_tr/var_triangle_door_to_station3.png"
             },
             {
-              "state": "to_station3",
-              "when": {
-                "eq": [
-                  "car_tr_dir",
-                  "back"
-                ]
-              },
-              "to": "station3",
-              "direction": "back"
+              "state": "to_boss",
+              "box": [
+                0.832,
+                0.04,
+                0.955,
+                0.986
+              ],
+              "prompt": "the sliding triangle-marked door drawn fully open, revealing a high mountain trail beyond — out above the trees in warm golden-hour sunlight: a winding rocky ledge with a great boulder on the path, close sunlit peaks, and a sea of canopy far below. The bright golden view fills the entire open doorway, brightly lit; no dark void.",
+              "panorama": "car_tr/var_triangle_door_to_boss.png"
             }
           ]
         }
-      ]
+      ],
+      "sfx": {
+        "src": "audio/monorail_hum.mp3",
+        "volume": 0.22130947096056378,
+        "mode": "loop",
+        "crossfade": 4
+      },
+      "debrief": "The triangle line's shells were sorted by shape — spiral, fan, whorl, each its own tray. The last of the three lines recognised: □ by colour, ○ by size, △ by shape. That little map was the key you'd carry up to the gate."
     },
     {
       "key": "boss",
@@ -1367,6 +2574,80 @@
             0.2818,
             0.421,
             0.6144
+          ],
+          "cinemagraph": {
+            "box": [
+              0.1922,
+              0.2818,
+              0.421,
+              0.6144
+            ],
+            "video": "boss/cine_canopy_below_c4.mp4",
+            "prompt": "clouds drifting slowly and continuously across the sky, wisps of vapour sliding past, the light shifting gently as they move",
+            "loop": "crossfade",
+            "seed": 244100233
+          },
+          "cinemagraphCandidates": [
+            {
+              "video": "boss/cine_canopy_below_c1.mp4",
+              "seed": 502122574,
+              "prompt": "clouds drifting slowly and continuously across the sky, wisps of vapour sliding past, the light shifting gently as they move",
+              "loop": "crossfade",
+              "box": [
+                0.1922,
+                0.2818,
+                0.421,
+                0.6144
+              ]
+            },
+            {
+              "video": "boss/cine_canopy_below_c2.mp4",
+              "seed": 454134291,
+              "prompt": "clouds drifting slowly and continuously across the sky, wisps of vapour sliding past, the light shifting gently as they move",
+              "loop": "crossfade",
+              "box": [
+                0.1922,
+                0.2818,
+                0.421,
+                0.6144
+              ]
+            },
+            {
+              "video": "boss/cine_canopy_below_c3.mp4",
+              "seed": 523948590,
+              "prompt": "clouds drifting slowly and continuously across the sky, wisps of vapour sliding past, the light shifting gently as they move",
+              "loop": "crossfade",
+              "box": [
+                0.1922,
+                0.2818,
+                0.421,
+                0.6144
+              ]
+            },
+            {
+              "video": "boss/cine_canopy_below_c4.mp4",
+              "seed": 244100233,
+              "prompt": "clouds drifting slowly and continuously across the sky, wisps of vapour sliding past, the light shifting gently as they move",
+              "loop": "crossfade",
+              "box": [
+                0.1922,
+                0.2818,
+                0.421,
+                0.6144
+              ]
+            },
+            {
+              "video": "boss/cine_canopy_below_c5.mp4",
+              "seed": 579014830,
+              "prompt": "clouds drifting slowly and continuously across the sky, wisps of vapour sliding past, the light shifting gently as they move",
+              "loop": "crossfade",
+              "box": [
+                0.1922,
+                0.2818,
+                0.421,
+                0.6144
+              ]
+            }
           ]
         },
         {
@@ -1409,6 +2690,10 @@
               ],
               "reveal": ""
             }
+          },
+          "solveSfx": {
+            "src": "audio/solve_chime.mp3",
+            "volume": 0.26760855931993316
           }
         },
         {
@@ -1420,6 +2705,80 @@
             0.4158,
             0.7875,
             0.6832
+          ],
+          "cinemagraph": {
+            "box": [
+              0.6299,
+              0.4158,
+              0.7875,
+              0.6832
+            ],
+            "video": "boss/cine_golden_motes_c4.mp4",
+            "prompt": "motes of pollen and glowing spore drifting slowly through the warm slanting light",
+            "loop": "crossfade",
+            "seed": 1371877973
+          },
+          "cinemagraphCandidates": [
+            {
+              "video": "boss/cine_golden_motes_c1.mp4",
+              "seed": null,
+              "prompt": "motes of pollen and glowing spore drifting slowly through the warm slanting light",
+              "loop": "crossfade",
+              "box": [
+                0.6299,
+                0.4158,
+                0.7875,
+                0.6832
+              ]
+            },
+            {
+              "video": "boss/cine_golden_motes_c2.mp4",
+              "seed": null,
+              "prompt": "motes of pollen and glowing spore drifting slowly through the warm slanting light",
+              "loop": "crossfade",
+              "box": [
+                0.6299,
+                0.4158,
+                0.7875,
+                0.6832
+              ]
+            },
+            {
+              "video": "boss/cine_golden_motes_c3.mp4",
+              "seed": null,
+              "prompt": "motes of pollen and glowing spore drifting slowly through the warm slanting light",
+              "loop": "crossfade",
+              "box": [
+                0.6299,
+                0.4158,
+                0.7875,
+                0.6832
+              ]
+            },
+            {
+              "video": "boss/cine_golden_motes_c4.mp4",
+              "seed": null,
+              "prompt": "motes of pollen and glowing spore drifting slowly through the warm slanting light",
+              "loop": "crossfade",
+              "box": [
+                0.6299,
+                0.4158,
+                0.7875,
+                0.6832
+              ]
+            },
+            {
+              "video": "boss/cine_golden_motes_c5.mp4",
+              "seed": null,
+              "prompt": "motes of pollen and glowing spore drifting slowly through the warm slanting light",
+              "loop": "crossfade",
+              "box": [
+                0.6299,
+                0.4158,
+                0.7875,
+                0.6832
+              ]
+            }
           ]
         },
         {
@@ -1429,8 +2788,70 @@
           "box": [
             0.6295,
             0,
-            0.8288,
+            0.9204,
             0.3265
+          ],
+          "cinemagraphCandidates": [
+            {
+              "video": "boss/cine_peaks_close_c1.mp4",
+              "seed": 1267621798,
+              "prompt": "thin cloud streaming slowly past the close glowing peaks",
+              "loop": "crossfade",
+              "box": [
+                0.6295,
+                0,
+                0.9204,
+                0.3265
+              ]
+            },
+            {
+              "video": "boss/cine_peaks_close_c2.mp4",
+              "seed": 1281556613,
+              "prompt": "thin cloud streaming slowly past the close glowing peaks",
+              "loop": "boomerang",
+              "box": [
+                0.6295,
+                0,
+                0.9204,
+                0.3265
+              ]
+            },
+            {
+              "video": "boss/cine_peaks_close_c3.mp4",
+              "seed": 8403478,
+              "prompt": "thin cloud streaming slowly past the close glowing peaks",
+              "loop": "boomerang",
+              "box": [
+                0.6295,
+                0,
+                0.9204,
+                0.3265
+              ]
+            },
+            {
+              "video": "boss/cine_peaks_close_c4.mp4",
+              "seed": 832971559,
+              "prompt": "thin cloud streaming slowly past the close glowing peaks",
+              "loop": "boomerang",
+              "box": [
+                0.6295,
+                0,
+                0.9204,
+                0.3265
+              ]
+            },
+            {
+              "video": "boss/cine_peaks_close_c5.mp4",
+              "seed": 301858201,
+              "prompt": "thin cloud streaming slowly past the close glowing peaks",
+              "loop": "boomerang",
+              "box": [
+                0.6295,
+                0,
+                0.9204,
+                0.3265
+              ]
+            }
           ]
         },
         {
@@ -1446,7 +2867,14 @@
           "direction": "forward",
           "to": "vault"
         }
-      ]
+      ],
+      "sfx": {
+        "src": "audio/forest_bed.mp3",
+        "volume": 0.6,
+        "mode": "loop",
+        "crossfade": 4
+      },
+      "debrief": "The boulder asked the same question as the third station — which ground truly grows a tree best? — but demanded the honest answer. Group by zone and species first, summarise, then ungroup and regroup by zone alone, and the winner flips from Cragside to Sunspire Heights. The shortcut's grand mean had been dragged around by whichever species happened to crowd each zone; balancing the species first is what a fair comparison of grounds actually takes. That regroup was the capstone the whole ladder was built to earn."
     },
     {
       "key": "vault",
@@ -1566,6 +2994,68 @@
             0.1091,
             0.1781,
             0.6591
+          ],
+          "cinemagraphCandidates": [
+            {
+              "video": "vault/cine_sunset_vista_c1.mp4",
+              "seed": null,
+              "prompt": "sunset cloud drifting slowly across the vast glowing vista of canopy and distant peaks",
+              "loop": "crossfade",
+              "box": [
+                0.0181,
+                0.1091,
+                0.1781,
+                0.6591
+              ]
+            },
+            {
+              "video": "vault/cine_sunset_vista_c2.mp4",
+              "seed": null,
+              "prompt": "sunset cloud drifting slowly across the vast glowing vista of canopy and distant peaks",
+              "loop": "crossfade",
+              "box": [
+                0.0181,
+                0.1091,
+                0.1781,
+                0.6591
+              ]
+            },
+            {
+              "video": "vault/cine_sunset_vista_c3.mp4",
+              "seed": null,
+              "prompt": "sunset cloud drifting slowly across the vast glowing vista of canopy and distant peaks",
+              "loop": "crossfade",
+              "box": [
+                0.0181,
+                0.1091,
+                0.1781,
+                0.6591
+              ]
+            },
+            {
+              "video": "vault/cine_sunset_vista_c4.mp4",
+              "seed": null,
+              "prompt": "sunset cloud drifting slowly across the vast glowing vista of canopy and distant peaks",
+              "loop": "crossfade",
+              "box": [
+                0.0181,
+                0.1091,
+                0.1781,
+                0.6591
+              ]
+            },
+            {
+              "video": "vault/cine_sunset_vista_c5.mp4",
+              "seed": null,
+              "prompt": "sunset cloud drifting slowly across the vast glowing vista of canopy and distant peaks",
+              "loop": "crossfade",
+              "box": [
+                0.0181,
+                0.1091,
+                0.1781,
+                0.6591
+              ]
+            }
           ]
         },
         {
@@ -1577,6 +3067,68 @@
             0.1297,
             0.5625,
             0.6797
+          ],
+          "cinemagraphCandidates": [
+            {
+              "video": "vault/cine_gate_runes_c1.mp4",
+              "seed": 674582528,
+              "prompt": "the carved runes pulsing gently with a faint bioluminescent glow",
+              "loop": "boomerang",
+              "box": [
+                0.4025,
+                0.1297,
+                0.5625,
+                0.6797
+              ]
+            },
+            {
+              "video": "vault/cine_gate_runes_c2.mp4",
+              "seed": 1096499998,
+              "prompt": "the carved runes pulsing gently with a faint bioluminescent glow",
+              "loop": "boomerang",
+              "box": [
+                0.4025,
+                0.1297,
+                0.5625,
+                0.6797
+              ]
+            },
+            {
+              "video": "vault/cine_gate_runes_c3.mp4",
+              "seed": 1447022211,
+              "prompt": "the carved runes pulsing gently with a faint bioluminescent glow",
+              "loop": "boomerang",
+              "box": [
+                0.4025,
+                0.1297,
+                0.5625,
+                0.6797
+              ]
+            },
+            {
+              "video": "vault/cine_gate_runes_c4.mp4",
+              "seed": 1539915930,
+              "prompt": "the carved runes pulsing gently with a faint bioluminescent glow",
+              "loop": "boomerang",
+              "box": [
+                0.4025,
+                0.1297,
+                0.5625,
+                0.6797
+              ]
+            },
+            {
+              "video": "vault/cine_gate_runes_c5.mp4",
+              "seed": 792345689,
+              "prompt": "the carved runes pulsing gently with a faint bioluminescent glow",
+              "loop": "boomerang",
+              "box": [
+                0.4025,
+                0.1297,
+                0.5625,
+                0.6797
+              ]
+            }
           ]
         },
         {
@@ -1629,6 +3181,10 @@
             "correct": "The three marks settle into their sockets, and the ancient gate shudders open.",
             "wrong": "The gate holds fast. One or more lines are matched to the wrong quality — picture how each car's hoard was laid out.",
             "out": "The gate stays shut. Ride back down through the cars and look again at how each hoard is sorted."
+          },
+          "solveSfx": {
+            "src": "audio/gate_rumble.mp3",
+            "volume": 0.8
           }
         },
         {
@@ -1640,13 +3196,98 @@
             0.5395,
             0.8379,
             0.9175
+          ],
+          "cinemagraph": {
+            "box": [
+              0.7326,
+              0.5395,
+              0.8379,
+              0.9175
+            ],
+            "video": "vault/cine_cliff_lanterns_c4.mp4",
+            "prompt": "the hanging lanterns swaying in the cliff-top wind, their warm amber glow trembling against the sunset",
+            "loop": "boomerang",
+            "seed": null
+          },
+          "cinemagraphCandidates": [
+            {
+              "video": "vault/cine_cliff_lanterns_c1.mp4",
+              "seed": 528653089,
+              "prompt": "an oil lantern swaying back and forth on its hanging chain in a slow, gentle pendulum arc, the warm flame inside wavering as it swings, the cast shadows swinging along with it",
+              "loop": "boomerang",
+              "box": [
+                0.7326,
+                0.5395,
+                0.8379,
+                0.9175
+              ]
+            },
+            {
+              "video": "vault/cine_cliff_lanterns_c2.mp4",
+              "seed": 1451454237,
+              "prompt": "an oil lantern swaying back and forth on its hanging chain in a slow, gentle pendulum arc, the warm flame inside wavering as it swings, the cast shadows swinging along with it",
+              "loop": "boomerang",
+              "box": [
+                0.7326,
+                0.5395,
+                0.8379,
+                0.9175
+              ]
+            },
+            {
+              "video": "vault/cine_cliff_lanterns_c3.mp4",
+              "seed": 1284081455,
+              "prompt": "an oil lantern swaying back and forth on its hanging chain in a slow, gentle pendulum arc, the warm flame inside wavering as it swings, the cast shadows swinging along with it",
+              "loop": "boomerang",
+              "box": [
+                0.7326,
+                0.5395,
+                0.8379,
+                0.9175
+              ]
+            },
+            {
+              "video": "vault/cine_cliff_lanterns_c4.mp4",
+              "seed": 1928658301,
+              "prompt": "an oil lantern swaying back and forth on its hanging chain in a slow, gentle pendulum arc, the warm flame inside wavering as it swings, the cast shadows swinging along with it",
+              "loop": "boomerang",
+              "box": [
+                0.7326,
+                0.5395,
+                0.8379,
+                0.9175
+              ]
+            },
+            {
+              "video": "vault/cine_cliff_lanterns_c5.mp4",
+              "seed": 193043840,
+              "prompt": "an oil lantern swaying back and forth on its hanging chain in a slow, gentle pendulum arc, the warm flame inside wavering as it swings, the cast shadows swinging along with it",
+              "loop": "boomerang",
+              "box": [
+                0.7326,
+                0.5395,
+                0.8379,
+                0.9175
+              ]
+            }
           ]
         }
       ],
-      "phase": "escape"
+      "phase": "escape",
+      "sfx": {
+        "src": "audio/forest_bed.mp3",
+        "volume": 0.6,
+        "mode": "loop",
+        "crossfade": 4
+      },
+      "debrief": "No console, no code — just the gate and what you'd already seen. Three shapes down the columns, three traits across the rows, and one press per line to say how its car was sorted: □ colour, ○ size, △ shape. That is group_by with the labels stripped off — recognising which grouping produced a pile you were handed, instead of computing it. Match all three and the ancient gate swings wide: the skill you'd been coding all day, made into a lock."
     }
   ],
   "worldPlatePrompt": "This is a panorama. A sweeping 360-degree establishing view of an alien forest-canopy world: colossal alien trees with living-wood research platforms and railings, weathered brass-and-timber instruments, hanging lanterns of amber lichen strung along the rails, drifting bioluminescent spores in the air, and a monorail of small cable-cars running between the treetops. The misty canopy falls away into hidden depths below, and a distant ridge of pale mountain peaks breaks through the golden haze. Painterly, cinematic, cheerful and hopeful; the teal-and-amber house palette — warm gold light with soft teal shadows, gentle bioluminescent glow — in soft, even daylight (deliberately neither dawn nor sunset, so each room can set its own time of day). Subtle film grain. No people, no lettering, no text, no captions, no UI.",
   "worldPlate": "_world/plate.png",
-  "cover": "cover.png"
+  "cover": "cover.png",
+  "debrief": {
+    "title": "How this world worked",
+    "intro": "The whole day's round was one skill wearing a forest for a costume: group_by + summarise — sort many things into piles by a shared trait, then read one number off each pile. Every station binned the census a different way and read one summary from it; every cable car was a collection someone had already sorted, waiting only to be recognised; and the vault opened when you matched each line to the trait it was grouped by. Here is how each part embodied the wrangling."
+  }
 }

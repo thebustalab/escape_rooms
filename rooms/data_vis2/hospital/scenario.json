@@ -47,7 +47,54 @@
       "authoring": {
         "tag": "room1",
         "scenePrompt": "This is a panorama. A 360-degree view from the centre of a small hospital pharmacy on a bright summer afternoon, the room wrapping continuously all the way around so the left and right edges meet seamlessly. Warm and cheerful: golden summer sunlight pours through a big window onto pale mint walls and clean stainless surfaces, a sunlit green birch canopy and blue sky outside. Ahead, a steel repair bench with an opened piece of medical analytical equipment, tools laid out, and an open laptop glowing softly. To one side, tall glass-fronted cabinets of medicine bottles and a corkboard crowded with bright postcards from staff summer trips. Opposite, a stainless counter with a sink and a glass-door fridge covered in summer-trip postcards and magnets. Set into one wall, a CLOSED brushed-steel elevator door with a call panel beside it — the way onward. Around the rest of the room, a supply trolley, an IV pole, a wheeled stool, a potted plant and a jar of wildflowers. Painterly, cinematic, sunny and colourful. No people, no lettering, no readable text.",
-        "doorPrompt": "The closed brushed-steel elevator door slides fully OPEN, revealing the sunlit elevator interior within; everything else in the summery pharmacy is unchanged. Same warm daylight, painterly and colourful, no people, no lettering, no text."
+        "doorPrompt": "The closed brushed-steel elevator door slides fully OPEN, revealing the sunlit elevator interior within; everything else in the summery pharmacy is unchanged. Same warm daylight, painterly and colourful, no people, no lettering, no text.",
+        "sceneSpec": {
+          "room": "room1",
+          "setting": "the centre of a small hospital pharmacy on a bright summer afternoon",
+          "interior": true,
+          "seam": "a plain, continuous stretch of pale mint pharmacy wall, uniform and unbroken",
+          "elements": [
+            {
+              "id": "bg_window",
+              "at": "on the far left",
+              "desc": "a big window pouring golden summer sunlight onto pale mint walls, a sunlit green birch canopy and blue sky outside"
+            },
+            {
+              "id": "trip_postcard_2",
+              "at": "to the left",
+              "clue": true,
+              "desc": "a bright summer-trip postcard pinned to the crowded staff corkboard, beside tall glass-fronted cabinets of medicine bottles"
+            },
+            {
+              "id": "the_elevator_door",
+              "at": "left of centre",
+              "door": {
+                "direction": "forward",
+                "to": "room2"
+              },
+              "desc": "a closed brushed-steel elevator door with a call panel beside it, the way onward"
+            },
+            {
+              "id": "the_bench_laptop",
+              "at": "dead ahead in the centre",
+              "puzzle": true,
+              "desc": "a steel repair bench with an opened piece of medical analytical equipment, tools laid out, and an open laptop glowing softly"
+            },
+            {
+              "id": "trip_postcard_1",
+              "at": "to the right",
+              "clue": true,
+              "desc": "a bright summer-trip postcard on the stainless counter's glass-door fridge, covered in postcards and magnets"
+            },
+            {
+              "id": "bg_trolley",
+              "at": "on the far right",
+              "desc": "a supply trolley, an IV pole, a wheeled stool, a potted plant and a jar of wildflowers around the room"
+            }
+          ],
+          "atmosphere": "Painterly, cinematic, sunny and colourful",
+          "negatives": "no people, no lettering, no readable text"
+        }
       },
       "unlockedWhen": true,
       "onSolve": [
@@ -191,7 +238,58 @@
       "authoring": {
         "tag": "room2",
         "scenePrompt": "This is a panorama. A 360-degree view from the centre of a hospital elevator car on a bright summer afternoon, the space wrapping continuously all the way around so the left and right edges meet seamlessly. Warm and cheerful: soft warm light on brushed steel and mirrored panels, a bright friendly mood. Ahead, a CLOSED set of stainless elevator doors — the way onward — with a floor-indicator panel and a column of buttons. To one side, a smartphone in a wall clip and, taped up beside it, a couple of bright summer-trip postcards left by staff. Opposite, a long handrail and a small framed print of a sunny lake. Behind, an OPEN doorway giving back down toward the pharmacy. Around the car, quilted grey moving pads and a cheerful poster of summer wildflowers. Painterly, cinematic, warm and colourful. No people, no lettering, no readable text.",
-        "doorPrompt": "The closed elevator doors ahead slide OPEN onto a bright sunlit hospital corridor beyond; the open passage back toward the pharmacy is unchanged. Same warm daylight, painterly and colourful, no people, no lettering, no text."
+        "doorPrompt": "The closed elevator doors ahead slide OPEN onto a bright sunlit hospital corridor beyond; the open passage back toward the pharmacy is unchanged. Same warm daylight, painterly and colourful, no people, no lettering, no text.",
+        "sceneSpec": {
+          "room": "room2",
+          "setting": "the centre of a hospital elevator car on a bright summer afternoon",
+          "interior": true,
+          "seam": "a plain, continuous stretch of brushed-steel elevator wall, uniform and unbroken",
+          "elements": [
+            {
+              "id": "bg_handrail",
+              "at": "on the far left",
+              "desc": "a long handrail and quilted grey moving pads over brushed steel and mirrored panels, a small framed print of a sunny lake"
+            },
+            {
+              "id": "passage_back_to_the_pharmacy",
+              "at": "left of centre",
+              "door": {
+                "direction": "back",
+                "to": "room1"
+              },
+              "desc": "an open doorway giving back down toward the pharmacy"
+            },
+            {
+              "id": "the_elevator_doors",
+              "at": "dead ahead in the centre",
+              "door": {
+                "direction": "forward",
+                "to": "room3"
+              },
+              "desc": "a closed set of stainless elevator doors, the way onward, with a floor-indicator panel and a column of buttons"
+            },
+            {
+              "id": "the_phone_in_the_wall_clip",
+              "at": "right of centre",
+              "puzzle": true,
+              "desc": "a smartphone in a wall clip"
+            },
+            {
+              "id": "trip_postcard_3",
+              "at": "on the far right",
+              "clue": true,
+              "desc": "a bright summer-trip postcard taped up beside the wall phone"
+            },
+            {
+              "id": "trip_postcard_4",
+              "at": "on the far right",
+              "clue": true,
+              "desc": "a bright summer-trip postcard taped up beside the wall phone"
+            }
+          ],
+          "atmosphere": "Painterly, cinematic, warm and colourful",
+          "negatives": "no people, no lettering, no readable text"
+        }
       },
       "unlockedWhen": true,
       "onSolve": [
@@ -357,7 +455,64 @@
       "authoring": {
         "tag": "room3",
         "scenePrompt": "This is a panorama. A 360-degree view from the centre of a hospital corridor on a bright summer afternoon, the hallway wrapping continuously all the way around so the left and right edges meet seamlessly. Warm and cheerful: summer sunlight streams through tall windows onto pale mint walls and a polished floor, green birch leaves and blue sky outside. Ahead, a CLOSED door to the LABORATORY — the way onward — with a small wired-glass window and a card reader beside it. To one side, a noticeboard crowded with bright summer-trip postcards and a wall map dotted with parks. Opposite, a steel nurses' station counter with a laptop and a jar of wildflowers. Behind, an OPEN set of elevator doors giving back the way you came. Around the corridor, a gurney, a wheelchair, handrails, potted plants and cheerful sunlight. Painterly, cinematic, sunny and colourful. No people, no lettering, no readable text.",
-        "doorPrompt": "The closed laboratory door ahead swings OPEN onto a bright sunlit lab within; the open elevator doors behind and the postcards on the noticeboard are unchanged. Same warm daylight, painterly and colourful, no people, no lettering, no text."
+        "doorPrompt": "The closed laboratory door ahead swings OPEN onto a bright sunlit lab within; the open elevator doors behind and the postcards on the noticeboard are unchanged. Same warm daylight, painterly and colourful, no people, no lettering, no text.",
+        "sceneSpec": {
+          "room": "room3",
+          "setting": "the centre of a hospital corridor on a bright summer afternoon",
+          "interior": true,
+          "seam": "a plain, continuous stretch of pale mint corridor wall, uniform and unbroken",
+          "elements": [
+            {
+              "id": "the_nurses_station_laptop",
+              "at": "on the far left",
+              "puzzle": true,
+              "desc": "a steel nurses' station counter with a laptop and a jar of wildflowers"
+            },
+            {
+              "id": "passage_back_to_the_elevator",
+              "at": "to the left",
+              "door": {
+                "direction": "back",
+                "to": "room2"
+              },
+              "desc": "an open set of elevator doors giving back the way you came"
+            },
+            {
+              "id": "the_lab_door",
+              "at": "dead ahead in the centre",
+              "door": {
+                "direction": "forward",
+                "to": "boss"
+              },
+              "desc": "a closed door to the laboratory, the way onward, with a small wired-glass window and a card reader beside it"
+            },
+            {
+              "id": "trip_postcard_6",
+              "at": "right of centre",
+              "clue": true,
+              "desc": "a bright summer-trip postcard on the noticeboard crowded with summer-trip postcards, beside a wall map dotted with parks"
+            },
+            {
+              "id": "trip_postcard_7",
+              "at": "right of centre",
+              "clue": true,
+              "desc": "a bright summer-trip postcard on the crowded noticeboard"
+            },
+            {
+              "id": "trip_postcard_5",
+              "at": "right of centre",
+              "clue": true,
+              "desc": "a bright summer-trip postcard on the crowded noticeboard"
+            },
+            {
+              "id": "bg_gurney",
+              "at": "on the far right",
+              "desc": "a gurney, a wheelchair, handrails and potted plants in the sunlit hallway, tall windows streaming summer daylight onto a polished floor"
+            }
+          ],
+          "atmosphere": "Painterly, cinematic, sunny and colourful",
+          "negatives": "no people, no lettering, no readable text"
+        }
       },
       "unlockedWhen": true,
       "onSolve": [
@@ -546,7 +701,51 @@
       "authoring": {
         "tag": "boss",
         "scenePrompt": "This is a panorama. A 360-degree view from the centre of a hospital laboratory on a bright summer afternoon, the room wrapping continuously all the way around so the left and right edges meet seamlessly. Warm and cheerful: summer daylight floods through a big window onto stainless benches and glass, a green canopy and blue sky outside. Ahead, a lab workstation with an open laptop and a clipboard of printed lab results resting beside it. To one side, a bench of analytical instruments, racks of sample vials and a microscope, and a fridge covered in magnets and children's-ward crayon drawings. Opposite, an isolation window onto a sunlit recovery bay. Set into one wall, a CLOSED door — the way onward to the staff break room. Behind, an OPEN doorway giving back toward the corridor. Around the lab, a fume hood, a whiteboard, a centrifuge and a potted plant. Painterly, cinematic, sunny and colourful. No people, no lettering, no readable text.",
-        "doorPrompt": "The closed door ahead opens onto a bright sunlit staff break room beyond; the open passage back toward the corridor and the drawings on the fridge are unchanged. Same warm daylight, painterly and colourful, no people, no lettering, no text."
+        "doorPrompt": "The closed door ahead opens onto a bright sunlit staff break room beyond; the open passage back toward the corridor and the drawings on the fridge are unchanged. Same warm daylight, painterly and colourful, no people, no lettering, no text.",
+        "sceneSpec": {
+          "room": "boss",
+          "setting": "the centre of a hospital laboratory on a bright summer afternoon",
+          "interior": true,
+          "seam": "a plain, continuous stretch of pale laboratory wall, uniform and unbroken",
+          "elements": [
+            {
+              "id": "bg_instruments",
+              "at": "on the far left",
+              "desc": "a big window flooding summer daylight onto stainless benches and glass, a bench of analytical instruments, racks of sample vials and a microscope"
+            },
+            {
+              "id": "bg_fridge",
+              "at": "to the left",
+              "desc": "a fridge covered in magnets and children's-ward crayon drawings, beside an isolation window onto a sunlit recovery bay"
+            },
+            {
+              "id": "the_lab_workstation_laptop",
+              "at": "dead ahead in the centre",
+              "puzzle": true,
+              "desc": "a lab workstation with an open laptop and a clipboard of printed lab results resting beside it"
+            },
+            {
+              "id": "the_door_out_to_the_break_room",
+              "at": "right of centre",
+              "door": {
+                "direction": "forward",
+                "to": "escape1"
+              },
+              "desc": "a closed door, the way onward to the staff break room"
+            },
+            {
+              "id": "passage_back_to_the_corridor",
+              "at": "on the far right",
+              "door": {
+                "direction": "back",
+                "to": "room3"
+              },
+              "desc": "an open doorway giving back toward the corridor"
+            }
+          ],
+          "atmosphere": "Painterly, cinematic, sunny and colourful",
+          "negatives": "no people, no lettering, no readable text"
+        }
       },
       "unlockedWhen": {
         "allSolved": [
@@ -682,7 +881,74 @@
       "authoring": {
         "tag": "escape1",
         "scenePrompt": "This is a panorama. A 360-degree view from the centre of a bright, sunny hospital staff break room on a summer afternoon, the room wrapping continuously all the way around so the left and right edges meet seamlessly. Warm and inviting: golden late-afternoon sun pours through big windows onto a green birch canopy and blue sky, warm light across a laminate table and moulded plastic chairs. Ahead, the WAY OUT — a door with a numeric KEYPAD lock beside the handle, and pinned to the inner face of that door a part-finished magazine COLLAGE: a three-by-three grid layout board with a few postcards already tucked into its slots and the rest of the slots empty and waiting. To one side, a kitchenette and a steel fridge, and above the laminate table a large CORKBOARD covered in bright summer-trip postcards. On the table, an editor's marked-up proof pages and a couple of handwritten notes, a coffee mug and a closed laptop pushed to one side. Opposite, a bank of steel lockers and a vending machine. Behind, an OPEN doorway giving back toward the corridor. Around the room, a coat rack, a potted plant and a jar of wildflowers. Painterly, cinematic, sunny and colourful. No people, no readable text.",
-        "doorPrompt": "The keypad door ahead swings OPEN onto a sunny parking lot and warm summer evening beyond — the way out; the collage board on the door, the corkboard of postcards, the editor's notes on the table and the open passage back toward the corridor are unchanged. Same warm daylight, painterly and colourful, no people, no lettering, no text."
+        "doorPrompt": "The keypad door ahead swings OPEN onto a sunny parking lot and warm summer evening beyond — the way out; the collage board on the door, the corkboard of postcards, the editor's notes on the table and the open passage back toward the corridor are unchanged. Same warm daylight, painterly and colourful, no people, no lettering, no text.",
+        "sceneSpec": {
+          "room": "escape1",
+          "setting": "the centre of a bright, sunny hospital staff break room on a summer afternoon",
+          "interior": true,
+          "seam": "a plain, continuous stretch of pale break-room wall, uniform and unbroken",
+          "elements": [
+            {
+              "id": "bg_kitchenette",
+              "at": "on the far left",
+              "desc": "a kitchenette and a steel fridge, moulded plastic chairs around a laminate table in golden late-afternoon sun"
+            },
+            {
+              "id": "trip_postcard_8",
+              "at": "to the left",
+              "clue": true,
+              "desc": "a bright summer-trip postcard on the large corkboard above the laminate table"
+            },
+            {
+              "id": "trip_postcard_9",
+              "at": "to the left",
+              "clue": true,
+              "desc": "a bright summer-trip postcard on the corkboard of summer-trip postcards"
+            },
+            {
+              "id": "the_keypad_on_the_door",
+              "at": "dead ahead in the centre",
+              "lock": true,
+              "desc": "a numeric keypad lock beside the handle of the way-out door"
+            },
+            {
+              "id": "editor_s_note_a",
+              "at": "dead ahead in the centre",
+              "clue": true,
+              "desc": "an editor's marked-up proof pages and a handwritten note on the laminate table"
+            },
+            {
+              "id": "the_way_out",
+              "at": "dead ahead in the centre",
+              "door": {
+                "direction": "forward"
+              },
+              "desc": "the way out, a door with a numeric keypad lock beside the handle; opening it ends the escape"
+            },
+            {
+              "id": "the_started_collage_on_the_door",
+              "at": "dead ahead in the centre",
+              "clue": true,
+              "desc": "pinned to the inner face of the door, a part-finished magazine collage: a three-by-three grid layout board with a few postcards tucked into its slots and the rest empty and waiting"
+            },
+            {
+              "id": "passage_back_to_the_lab",
+              "at": "to the right",
+              "door": {
+                "direction": "back",
+                "to": "boss"
+              },
+              "desc": "an open doorway giving back toward the lab"
+            },
+            {
+              "id": "bg_lockers",
+              "at": "on the far right",
+              "desc": "a bank of steel lockers and a vending machine, a coat rack, a potted plant and a jar of wildflowers"
+            }
+          ],
+          "atmosphere": "Painterly, cinematic, sunny and colourful",
+          "negatives": "no people, no readable text"
+        }
       },
       "unlockedWhen": {
         "solved": "boss"

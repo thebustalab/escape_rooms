@@ -66,8 +66,12 @@
  *   the escape phase by walking through a door themselves (no auto hand-off — the code window is
  *   independent of room structure). See notes/two_phase_escape_design_notes.md.
  */
-import { WebRConsole } from "./webr-console.js";
-import { pickActiveVariants, activeDoorVariant } from "./variant_resolve.js";   // Phase 3: per-hotspot state variants; monorail switch-door nav
+// NB: keep the ?v= on these local imports in LOCKSTEP with the ?v= on pano-player.js in every play.html.
+// A bare `./variant_resolve.js` import is NOT refreshed by bumping the <script> tag's ?v, so a changed
+// helper module (e.g. a new export) leaves browsers on a stale cached copy → "doesn't provide an export
+// named X" SyntaxError → blank page (the 2026-08-05 airship regression). Bump all three together.
+import { WebRConsole } from "./webr-console.js?v=72";
+import { pickActiveVariants, activeDoorVariant } from "./variant_resolve.js?v=72";   // Phase 3: per-hotspot state variants; monorail switch-door nav
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 
@@ -2230,13 +2234,19 @@ async function runSubmitBlock(roomKey, ta, figWrap, stat, runBtn) {
 function openSubmitPrep() {
   $("#done").classList.remove("open");
   bootConsole();                                            // warm up WebR so the refine-consoles are ready
-  // x500 is collected HERE, not on the landing screen. Until it's entered, show only the x500 prompt;
-  // once confirmed (this session, or on a re-open) show the code + figures + PDF.
+  // x500 is collected HERE, inline at the TOP of the submission window — not on the landing screen and not
+  // as a separate gate screen shown before the window (2026-08-05, Lucas). The x500 field and the
+  // submission body live in ONE card: the field is always visible, and the code + figures + PDF fill in
+  // below it once the x500 is confirmed (until then a placeholder sits there, and the PDF button is hidden).
   const confirmed = !!window.__x500;
-  $("#subId").style.display = confirmed ? "none" : "";
-  $("#subBody").style.display = confirmed ? "" : "none";
+  $("#subId").style.display = "";
+  $("#subBody").style.display = "";
+  $("#subPdf").style.display = confirmed ? "" : "none";
   if (confirmed) buildSubmission();
-  else setTimeout(() => $("#subX500").focus(), 30);
+  else {
+    $("#subWork").innerHTML = '<div class="lbl" style="opacity:.7">Your code and figures will appear here once you enter your x500 above.</div>';
+    setTimeout(() => $("#subX500").focus(), 30);
+  }
   const host = $("#submitPrep .subintro");
   const old = host.querySelector(".particles"); if (old) old.remove();
   const amb = SCENARIO.ambient || "fireflies";
@@ -2260,8 +2270,10 @@ function confirmX500() {
   const id = $("#subX500").value.trim();
   if (!/\S/.test(id)) { $("#subX500").focus(); return; }
   window.__x500 = id;
-  $("#subId").style.display = "none";
+  // the x500 field stays visible at the top of the window (it's part of the submission card now); just
+  // reveal the PDF button and build the payload below it.
   $("#subBody").style.display = "";
+  $("#subPdf").style.display = "";
   buildSubmission();
 }
 // Fill the submission payload once the x500 is known: mint the (x500-keyed) code, personalise every

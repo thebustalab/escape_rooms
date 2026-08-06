@@ -95,7 +95,7 @@
     const arrToLines = a => (a || []).join("\n");
     const csvToArr = s => String(s || "").split(",").map(x => x.trim()).filter(Boolean);
     const arrToCsv = a => (a || []).join(", ");
-    const TYPES = ["puzzle", "clue", "door", "lock", "dial", "mapview", "ambient"];   // ambient = cinemagraph-only, no player marker
+    const TYPES = ["puzzle", "clue", "door", "lock", "grid", "dial", "mapview", "ambient"];   // ambient = cinemagraph-only, no player marker; grid = the matrix-select escape (content hand-authored in scenario.json)
     const checkSkel = () => ({ prompt:"", requires:[], expr:"", hint:"", maxAttempts:4, feedback:{ correct:"", wrong:[], reveal:"" } });
     const questionSkel = () => ({ prompt:"", options:[], correct:0, maxAttempts:4, feedback:{ correct:"", wrong:[], reveal:"" } });
 
@@ -391,6 +391,8 @@
         box.innerHTML = `<h2>Content · <span>${esc(s.id)}</span> (dial)</h2><div class="hint">A <b>world-state dial</b> — flipping it sets a <code>gameState</code> value that a <b>mapview</b> elsewhere reads. Its <code>key</code> + <code>states</code> are hand-authored in <code>scenario.json</code> for now (no editor yet). This tab owns the box, type &amp; label.</div>`;
       } else if (s.type === "mapview") {
         box.innerHTML = `<h2>Content · <span>${esc(s.id)}</span> (mapview)</h2><div class="hint">A <b>state-conditioned chart</b> — shows the image mapped to the current dial state. Its <code>key</code> + per-state <code>images</code> are hand-authored in <code>scenario.json</code> for now. This tab owns the box, type &amp; label.</div>`;
+      } else if (s.type === "grid") {
+        box.innerHTML = `<h2>Content · <span>${esc(s.id)}</span> (grid)</h2><div class="hint">A <b>matrix-select escape</b> — the player assigns each <code>item</code> (row) to one <code>bucket</code> (column), checked against <code>answer</code>. Its <code>items</code>/<code>buckets</code>/<code>answer</code>/<code>feedback</code> are hand-authored in <code>scenario.json</code> (no editor yet); ungraded, never in the submission code. This tab owns the box, type &amp; label — leave the type as <b>grid</b>.</div>`;
       } else {
         box.innerHTML = `<h2>Content · <span>${esc(s.id)}</span> (puzzle)</h2><div class="hint">Edit this puzzle's starter code, check / multiple-choice and feedback in the room's <b>Edit puzzle →</b> tab.</div>`;
       }

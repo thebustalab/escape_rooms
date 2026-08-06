@@ -317,7 +317,8 @@ def _launch_cinemagraph(base, room_key, hotspot_id, box, prompt, loop="boomerang
 
 
 def _remove_cinemagraph(room_key, hotspot_id, base=None):
-    """Drop a hotspot's `cinemagraph` (leaves the mp4 on disk, like a _scratch orphan)."""
+    """Hard-remove a hotspot's ACTIVE `cinemagraph` pointer (the ✕ on a standalone active tile). Leaves the
+    mp4 on disk and does NOT fold it into the pool — use `_uncommit_cinemagraph` for the ✓-off toggle."""
     with SAVE_LOCK:
         doc, _node, spot = _find_hotspot(base, room_key, hotspot_id)
         spot.pop("cinemagraph", None)
@@ -325,10 +326,31 @@ def _remove_cinemagraph(room_key, hotspot_id, base=None):
     return spot
 
 
+def _uncommit_cinemagraph(room_key, hotspot_id, base=None):
+    """Un-DEPLOY the active cinemagraph (the ✓ toggled OFF): the clip stops playing in-game but stays STORED
+    in the pool. If the active clip isn't already a pool candidate (a legacy single-committed clip, whose pool
+    the old pick deleted, or a fresh single-shot gen), fold it into the pool FIRST — so un-checking never
+    loses a clip (2026-08-06 bugfix: it used to vanish)."""
+    with SAVE_LOCK:
+        doc, _node, spot = _find_hotspot(base, room_key, hotspot_id)
+        active = spot.get("cinemagraph")
+        if isinstance(active, dict) and active.get("video"):
+            cands = spot.setdefault("cinemagraphCandidates", [])
+            if not any(c.get("video") == active.get("video") for c in cands):
+                cands.append({"video": active["video"], "seed": active.get("seed"),
+                              "prompt": active.get("prompt", ""), "loop": active.get("loop", "boomerang"),
+                              "box": active.get("box")})
+        spot.pop("cinemagraph", None)
+        _save_scenario(doc, base)
+    return spot
+
+
 def _pick_cinemagraph(room_key, hotspot_id, index, base=None):
-    """Promote candidate `index` (from a batch's `cinemagraphCandidates`) to the hotspot's `cinemagraph`,
-    then clear the candidate list. The unused candidate mp4s stay on disk (harmless orphans). Returns the
-    chosen cinemagraph."""
+    """Mark candidate `index` (from `cinemagraphCandidates`) as the ACTIVE cinemagraph (a copy → the
+    hotspot's `cinemagraph`, which is the only thing the player reads). KEEPS the candidate pool so the
+    choice is a toggle — a stored clip can be made live or un-made live without losing the others
+    (store-but-don't-deploy). Un-committing is `_remove_cinemagraph` (drops `cinemagraph`, keeps the pool).
+    Returns the chosen cinemagraph."""
     with SAVE_LOCK:
         doc, _node, spot = _find_hotspot(base, room_key, hotspot_id)
         cands = spot.get("cinemagraphCandidates") or []
@@ -337,9 +359,70 @@ def _pick_cinemagraph(room_key, hotspot_id, index, base=None):
         c = cands[index]
         spot["cinemagraph"] = {"box": c.get("box"), "video": c["video"], "prompt": c.get("prompt", ""),
                                "loop": c.get("loop", "boomerang"), "seed": c.get("seed")}
-        spot.pop("cinemagraphCandidates", None)
-        _save_scenario(doc, base)
+        _save_scenario(doc, base)   # candidates KEPT (was cleared here pre-2026-08-06)
     return spot["cinemagraph"]
+
+
+def _delete_cinemagraph_candidate(room_key, hotspot_id, index, base=None):
+    """Delete candidate `index` from the pool (the ✕ on a tile). If it was the ACTIVE clip, also drop
+    `cinemagraph` so nothing live points at a removed clip. Leaves the mp4 on disk (harmless orphan)."""
+    with SAVE_LOCK:
+        doc, _node, spot = _find_hotspot(base, room_key, hotspot_id)
+        cands = spot.get("cinemagraphCandidates") or []
+        if not (0 <= index < len(cands)):
+            raise ValueError("no candidate %s (have %d)" % (index, len(cands)))
+        vid = cands[index].get("video")
+        del cands[index]
+        if not cands:
+            spot.pop("cinemagraphCandidates", None)
+        if (spot.get("cinemagraph") or {}).get("video") == vid:
+            spot.pop("cinemagraph", None)   # the deleted candidate was the active one
+        _save_scenario(doc, base)
+    return spot
+
+
+def _reloop_video_file(base, video_rel, loop):
+    """Re-apply the loop (boomerang↔crossfade) to a clip IN PLACE — re-run only the ffmpeg loop, no GPU/model.
+    Prefer the kept raw clip (<stem>_raw.mp4, written by render_clip); else derive from the finished clip
+    (works, a hair less pristine — the raw is kept for every NEW clip). Overwrites video_rel; the harness UI
+    cache-busts video src with ?t so the new loop shows on refresh."""
+    if loop not in ("boomerang", "crossfade"):
+        raise ValueError("loop must be boomerang|crossfade")
+    if not os.path.isfile(CINE_GEN):
+        raise ValueError("cinemagraph generator not installed (~/ComfyUI/cinemagraph_gen.py)")
+    fin = os.path.join(base, video_rel)
+    if not os.path.isfile(fin):
+        raise ValueError("clip file missing: %s" % video_rel)
+    raw = os.path.splitext(fin)[0] + "_raw.mp4"
+    src = raw if os.path.isfile(raw) else fin
+    tmp = os.path.splitext(fin)[0] + ".reloop.mp4"
+    subprocess.run(["python3", CINE_GEN, "reloop", src, tmp, loop], check=True, capture_output=True, text=True)
+    os.replace(tmp, fin)
+
+
+def _reloop_cinemagraph(room_key, hotspot_id, which, index, loop, base=None):
+    """Switch a clip's loop after generation. `which` = "active" (the `cinemagraph`) | "candidate"
+    (`cinemagraphCandidates[index]`). Re-loops the file, updates the clip's `loop`, and — when a re-looped
+    candidate is also the active clip (same video) — syncs the active `loop` too. Returns {video, loop}."""
+    with SAVE_LOCK:
+        doc, _node, spot = _find_hotspot(base, room_key, hotspot_id)
+        if which == "active":
+            clip = spot.get("cinemagraph")
+        else:
+            cands = spot.get("cinemagraphCandidates") or []
+            if not (0 <= index < len(cands)):
+                raise ValueError("no candidate %s (have %d)" % (index, len(cands)))
+            clip = cands[index]
+        if not clip or not clip.get("video"):
+            raise ValueError("no clip to re-loop")
+        video_rel = clip["video"]
+        _reloop_video_file(base, video_rel, loop)       # ffmpeg re-loop in place (single-user harness; brief)
+        clip["loop"] = loop
+        active = spot.get("cinemagraph")
+        if isinstance(active, dict) and active.get("video") == video_rel:
+            active["loop"] = loop                        # keep the active clip's loop field in step
+        _save_scenario(doc, base)
+    return {"video": video_rel, "loop": loop}
 
 
 # --- Batch cinemagraph/door/variant queue (walk-away flow) -------------------------------------------------
@@ -678,6 +761,115 @@ def _set_puzzle_prompts(base, items):
     return {"updated": updated, "errors": errors}
 
 
+def _room_locked_messages(room):
+    """Every out-of-order / locked navigation message in a room, in authoring order, for the story flow.
+    These are the `lockedBody` strings shown when the player clicks a GATED element (a puzzle/door/lock/grid
+    carrying `availableWhen`) before its condition is met — e.g. the airship's "too queasy to climb the mast"
+    or "the bearing-rings are frozen". Committed hotspots are the live truth; a plannedHotspot is surfaced
+    only when no committed gate of the same (type, label-slug) exists yet. Each item carries (source, index)
+    so the editor writes it straight back — mirrors _room_puzzle_prompts."""
+    slug = lambda s: re.sub(r"[^a-z0-9]+", "-", str(s or "").lower()).strip("-")
+    GATED = ("puzzle", "door", "lock", "grid")
+    out, seen = [], set()
+    for i, h in enumerate(room.get("hotspots") or []):
+        if h.get("type") not in GATED or h.get("availableWhen") is None:
+            continue
+        out.append({"source": "hotspots", "index": i, "id": h.get("id"),
+                    "label": h.get("label") or h.get("id") or h.get("type"),
+                    "type": h.get("type"), "lockedBody": h.get("lockedBody") or ""})
+        seen.add((h.get("type"), slug(h.get("label"))))
+    for i, h in enumerate(room.get("plannedHotspots") or []):
+        if h.get("type") not in GATED or h.get("availableWhen") is None:
+            continue
+        if (h.get("type"), slug(h.get("label"))) in seen:
+            continue
+        out.append({"source": "plannedHotspots", "index": i, "id": h.get("id"),
+                    "label": h.get("label") or h.get("type"), "type": h.get("type"),
+                    "lockedBody": h.get("lockedBody") or "", "planned": True})
+    return out
+
+
+def _set_locked_messages(base, items):
+    """Bulk-write the `lockedBody` navigation messages edited in the build-world story flow. `items` is
+    [{roomKey, source, index, lockedBody}] — one load-modify-save so a multi-message save is atomic.
+    Locates each hotspot by (source array, index), matching what _room_locked_messages emitted. Mirrors
+    _set_puzzle_prompts."""
+    updated, errors = 0, []
+    with SAVE_LOCK:
+        doc = _load_scenario(base)
+        rooms = {r.get("key"): r for r in doc.get("rooms", [])}
+        for it in (items or []):
+            rk, src, idx = it.get("roomKey"), it.get("source"), it.get("index")
+            try:
+                if src not in ("hotspots", "plannedHotspots"):
+                    raise ValueError("bad source %r" % src)
+                node = rooms.get(rk)
+                if node is None:
+                    raise ValueError("no room %r" % rk)
+                arr = node.get(src) or []
+                if not isinstance(idx, int) or idx < 0 or idx >= len(arr):
+                    raise ValueError("index %r out of range" % idx)
+                arr[idx]["lockedBody"] = str(it.get("lockedBody") or "")
+                updated += 1
+            except Exception as e:  # noqa: BLE001 — collect per-item, keep going
+                errors.append({"roomKey": rk, "source": src, "index": idx, "error": str(e)})
+        if updated:
+            _save_scenario(doc, base)
+    return {"updated": updated, "errors": errors}
+
+
+def _room_clues(room):
+    """Every clue in a room, in authoring order, for the story flow. A clue hotspot's player-facing text is
+    its `body` (HTML). Committed hotspots are the live truth; a plannedHotspot clue is surfaced only when no
+    committed clue of the same label(slug) exists yet (an unbuilt room), so its authored body can be written
+    on the planned stub and attaches at commit. Each item carries (source, index) so the editor writes it
+    straight back — mirrors _room_puzzle_prompts. `note` is a design-only field and is never surfaced here."""
+    slug = lambda s: re.sub(r"[^a-z0-9]+", "-", str(s or "").lower()).strip("-")
+    out, seen = [], set()
+    for i, h in enumerate(room.get("hotspots") or []):
+        if h.get("type") != "clue":
+            continue
+        out.append({"source": "hotspots", "index": i, "id": h.get("id"),
+                    "label": h.get("label") or h.get("id") or "clue", "body": h.get("body") or ""})
+        seen.add(slug(h.get("label")))
+    for i, h in enumerate(room.get("plannedHotspots") or []):
+        if h.get("type") != "clue" or slug(h.get("label")) in seen:
+            continue
+        out.append({"source": "plannedHotspots", "index": i, "id": h.get("id"),
+                    "label": h.get("label") or "clue", "body": h.get("body") or "", "planned": True})
+    return out
+
+
+def _set_clues(base, items):
+    """Bulk-write the player-facing clue `body` strings edited in the build-world story flow. `items` is
+    [{roomKey, source, index, body}] — one load-modify-save so a multi-clue save is atomic. Locates each
+    hotspot by (source array, index), matching what _room_clues emitted. Mirrors _set_puzzle_prompts."""
+    updated, errors = 0, []
+    with SAVE_LOCK:
+        doc = _load_scenario(base)
+        rooms = {r.get("key"): r for r in doc.get("rooms", [])}
+        for it in (items or []):
+            rk, src, idx = it.get("roomKey"), it.get("source"), it.get("index")
+            try:
+                if src not in ("hotspots", "plannedHotspots"):
+                    raise ValueError("bad source %r" % src)
+                node = rooms.get(rk)
+                if node is None:
+                    raise ValueError("no room %r" % rk)
+                arr = node.get(src) or []
+                if not isinstance(idx, int) or idx < 0 or idx >= len(arr):
+                    raise ValueError("index %r out of range" % idx)
+                if arr[idx].get("type") != "clue":
+                    raise ValueError("hotspot %r is not a clue" % idx)
+                arr[idx]["body"] = str(it.get("body") or "")
+                updated += 1
+            except Exception as e:  # noqa: BLE001 — collect per-item, keep going
+                errors.append({"roomKey": rk, "source": src, "index": idx, "error": str(e)})
+        if updated:
+            _save_scenario(doc, base)
+    return {"updated": updated, "errors": errors}
+
+
 def _scenario_state(base):
     """Per-room pipeline status for the build-world console: spec loaded? art built? hotspots placed?
     cinemagraphs done vs candidates awaiting a pick? Plus the batch status + queue depth."""
@@ -704,6 +896,9 @@ def _scenario_state(base):
             "hotspots": len(hs),
             "entry": r.get("entry") or None,                             # per-room entry card {title,text} (spec story.entries)
             "puzzlePrompts": _room_puzzle_prompts(r),                     # editable puzzle prompts, in order, for the story flow
+            "clues": _room_clues(r),                                      # editable clue bodies, in order, for the story flow
+            "lockedMessages": _room_locked_messages(r),                   # editable out-of-order/locked nav messages (lockedBody) for the story flow
+            "debrief": r.get("debrief") or "",                           # "how this world worked" paragraph for this room
             "hotspotsReviewed": bool(auth.get("hotspotsReviewed")),      # you fine-tuned the placements (auto on Save & close; toggleable)
             "cinemagraphsVerified": bool(auth.get("cinemagraphsVerified")),  # you reviewed the cinemagraphs (manual toggle)
             "cinemagraphs": sum(1 for h in hs if h.get("cinemagraph")),
@@ -724,6 +919,7 @@ def _scenario_state(base):
             "subtitle": doc.get("subtitle", ""), "ambient": doc.get("ambient", ""),
             "openingStory": doc.get("story", ""), "enterLabel": doc.get("enterLabel", ""),   # scenario narrative (spec `story`)
             "analysisFinish": doc.get("done") or None, "escapeFinish": doc.get("escapeDone") or None,
+            "debrief": doc.get("debrief") or None,               # "how this world worked": {title?, intro?} scenario-level
             "status": doc.get("status", "in_development"),       # finish & publish step
             "audited": bool(doc.get("audited")), "published": bool(doc.get("published"))}
 
@@ -761,7 +957,9 @@ def _apply_spec(base, room_key):
     """Materialize the room's stored sceneSpec: create any MISSING hotspots (ambient/door/puzzle) with
     APPROXIMATE boxes from the layout, and queue a cinemagraph batch job for each animated element that
     doesn't already have a clip. Non-destructive — existing hotspots keep their (possibly hand-tuned) boxes
-    and wiring. Returns {created, queued, skipped}. The player nudges the rough boxes in the flat editor,
+    and wiring. Returns {created, queuedCine, queuedVar, skipped} — cinemagraph vs door-open-variant jobs are
+    counted separately, and an element that already has a cinemagraph clip OR unpicked candidates is NOT
+    re-queued. The player nudges the rough boxes in the flat editor,
     then hits Run all. (Auto-localization proved unreliable on stylised panoramas; this is the ROI-honest
     path for low-stakes ambience — the spec still auto-writes the prompt + every motion prompt.)"""
     with SAVE_LOCK:
@@ -794,7 +992,12 @@ def _apply_spec(base, room_key):
     # Prefer the hotspot's ACTUAL box on the node (a hand-tuned one, or the approx we just wrote) over a
     # freshly-recomputed approx, so an existing well-placed hotspot crops from its real box.
     node2 = next((r for r in _load_scenario(base).get("rooms", []) if r.get("key") == room_key), None)
-    have_cine = {h.get("id") for h in node2.get("hotspots", []) if h.get("cinemagraph")}
+    # Skip an element that ALREADY has cinemagraph art — either an activated clip (`cinemagraph`) OR a pool of
+    # candidates awaiting a pick (`cinemagraphCandidates`). A hotspot whose 5 candidates the author left all
+    # unpicked (didn't like any) must NOT get a fresh batch — re-generating is a deliberate per-hotspot action
+    # in the hub, not a side effect of re-running Place all hotspots.
+    have_cine = {h.get("id") for h in node2.get("hotspots", [])
+                 if h.get("cinemagraph") or (h.get("cinemagraphCandidates") or [])}
     node_boxes = {h["id"]: h["box"] for h in node2.get("hotspots", [])
                   if h.get("id") and isinstance(h.get("box"), list) and len(h["box"]) == 4}
     # a door that DECLARES multiple open-views (a monorail car whose world-state switch picks which station
@@ -806,7 +1009,9 @@ def _apply_spec(base, room_key):
     # then MERGES onto it (see _add_variant). Filtering on `panorama` keeps it idempotent after generation.
     have_var = {h.get("id"): {v.get("state") for v in (h.get("variants") or []) if v.get("panorama")}
                 for h in node2.get("hotspots", []) if h.get("variants")}
-    queued, skipped = [], []
+    # Cinemagraph jobs and door-open VARIANT jobs are counted separately so the caller can report each
+    # accurately (a door-open reveal is a variant, not a cinemagraph — see the build-world status line).
+    queued_cine, queued_var, skipped = [], [], []
     with BATCH_LOCK:
         jobs = _batch_read_queue(base)
         queued_ids = {j.get("hotspotId") for j in jobs if j.get("type") == "cinemagraph"}
@@ -817,20 +1022,20 @@ def _apply_spec(base, room_key):
                 skipped.append(hid); continue
             jobs.append({"type": "cinemagraph", "roomKey": room_key, "hotspotId": hid,
                          "box": box, "prompt": j["prompt"], "loop": j.get("loop", "boomerang")})
-            queued.append(hid)
-        queued_var = {(j.get("hotspotId"), j.get("state")) for j in jobs if j.get("type") == "variant"}
+            queued_cine.append(hid)
+        queued_var_keys = {(j.get("hotspotId"), j.get("state")) for j in jobs if j.get("type") == "variant"}
         for j in scene_spec.dooropen_jobs(spec_for_queue):
             hid, state = j["hotspotId"], j["state"]
             box = node_boxes.get(hid)
-            if not box or state in have_var.get(hid, set()) or (hid, state) in queued_var:
+            if not box or state in have_var.get(hid, set()) or (hid, state) in queued_var_keys:
                 skipped.append("%s:%s" % (hid, state)); continue
             vj = {"type": "variant", "roomKey": room_key, "hotspotId": hid,
                   "box": box, "prompt": j["prompt"], "state": state}
             if j.get("when") is not None:
                 vj["when"] = j["when"]
-            jobs.append(vj); queued.append("%s:%s" % (hid, state))
+            jobs.append(vj); queued_var.append("%s:%s" % (hid, state))
         _batch_write_queue(base, jobs)
-    return {"created": created, "queued": queued, "skipped": skipped}
+    return {"created": created, "queuedCine": queued_cine, "queuedVar": queued_var, "skipped": skipped}
 
 
 def _rebuild_inventory():
@@ -2414,7 +2619,7 @@ class H(http.server.SimpleHTTPRequestHandler):
                     return self._json({"ok": True, "status": json.load(open(sp))})
                 except Exception:  # noqa: BLE001
                     return self._json({"ok": True, "status": {"state": "unknown"}})
-            if route == "/api/delete-cinemagraph":
+            if route == "/api/delete-cinemagraph":       # un-commit: drop the ACTIVE clip, keep the pool
                 req = self._body()
                 try:
                     base = _scenario_base(req.get("chapter"), req.get("scenario"))
@@ -2423,6 +2628,37 @@ class H(http.server.SimpleHTTPRequestHandler):
                 except ValueError as ve:
                     return self._json({"ok": False, "error": str(ve)}, 400)
                 return self._json({"ok": True})
+            if route == "/api/uncommit-cinemagraph":     # ✓ toggled off: un-deploy but KEEP the clip in the pool
+                req = self._body()
+                try:
+                    base = _scenario_base(req.get("chapter"), req.get("scenario"))
+                    _uncommit_cinemagraph(re.sub(r"[^A-Za-z0-9_]", "", str(req.get("roomKey") or "")),
+                                          str(req.get("hotspotId") or "").strip(), base)
+                except ValueError as ve:
+                    return self._json({"ok": False, "error": str(ve)}, 400)
+                return self._json({"ok": True})
+            if route == "/api/delete-cinemagraph-candidate":   # ✕ on a tile: remove one clip from the pool
+                req = self._body()
+                try:
+                    base = _scenario_base(req.get("chapter"), req.get("scenario"))
+                    _delete_cinemagraph_candidate(re.sub(r"[^A-Za-z0-9_]", "", str(req.get("roomKey") or "")),
+                                                  str(req.get("hotspotId") or "").strip(), int(req.get("index")), base)
+                except (ValueError, TypeError) as ve:
+                    return self._json({"ok": False, "error": str(ve)}, 400)
+                return self._json({"ok": True})
+            if route == "/api/reloop-cinemagraph":        # switch boomerang↔crossfade AFTER generation
+                req = self._body()
+                try:
+                    base = _scenario_base(req.get("chapter"), req.get("scenario"))
+                    out = _reloop_cinemagraph(re.sub(r"[^A-Za-z0-9_]", "", str(req.get("roomKey") or "")),
+                                              str(req.get("hotspotId") or "").strip(),
+                                              str(req.get("which") or "candidate"),
+                                              int(req.get("index") or 0), str(req.get("loop") or ""), base)
+                    return self._json({"ok": True, **out})
+                except (ValueError, TypeError) as ve:
+                    return self._json({"ok": False, "error": str(ve)}, 400)
+                except Exception as e:  # noqa: BLE001 — surface ffmpeg trouble to the UI
+                    return self._json({"ok": False, "error": str(e)[-400:]}, 500)
             if route == "/api/batch-add":
                 req = self._body()
                 try:
@@ -2554,6 +2790,20 @@ class H(http.server.SimpleHTTPRequestHandler):
                 except ValueError as ve:
                     return self._json({"ok": False, "error": str(ve)}, 400)
                 return self._json({"ok": True, **_set_puzzle_prompts(base, req.get("prompts") or [])})
+            if route == "/api/set-clues":             # build-world story flow: bulk-save edited clue bodies
+                req = self._body()
+                try:
+                    base = _scenario_base(req.get("chapter"), req.get("scenario"))
+                except ValueError as ve:
+                    return self._json({"ok": False, "error": str(ve)}, 400)
+                return self._json({"ok": True, **_set_clues(base, req.get("clues") or [])})
+            if route == "/api/set-locked-messages":   # build-world story flow: bulk-save edited lockedBody nav messages
+                req = self._body()
+                try:
+                    base = _scenario_base(req.get("chapter"), req.get("scenario"))
+                except ValueError as ve:
+                    return self._json({"ok": False, "error": str(ve)}, 400)
+                return self._json({"ok": True, **_set_locked_messages(base, req.get("messages") or [])})
             if route == "/api/gen-world-plate":      # build-world: the scenario's shared continuity reference (first in step 2)
                 req = self._body()
                 try:

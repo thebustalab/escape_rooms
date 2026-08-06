@@ -1,5 +1,5 @@
 {
-  "status": "in_development",
+  "status": "ready",
   "chapter": "data_vis2",
   "scenario": "airship",
   "id": 9,
@@ -9,11 +9,11 @@
   "enterLabel": "Check the mark on your arm →",
   "done": {
     "title": "The cure!",
-    "body": "You've named it — the one solvent that won't mix with water, sits at middling polarity, and rides lighter than water. You program that answer into the console and that solvent bubbles up in the funnel on the front of the console. You put it on the wound, and see the lesion heal. Now all that's left to do is open the ship's bridge, and avert a crash."
+    "body": "You've named it — the one solvent that won't mix with water, sits at middling polarity, and rides lighter than water. You program that answer in and that solvent bubbles up in the funnel on the front of the console. You put it on the wound, and see the lesion begin to heal. Now all that's left to do is open the ship's bridge, and avert a crash."
   },
   "escapeDone": {
     "title": "Home by the stars",
-    "body": "Up in the crow's nest the captain's astrolabe turned under your hands — three plates for one sky — and only a single star holds its place in the homeward house through every one of those views. You set the wheel to its bearing. The Alembic answers, banking off the black crags and climbing into clean night!"
+    "body": "Up in the crow's nest the captain's astrolabe turned under your hands — three views of one sky — and only a single star holds its place in the Anchor through every one of those views. You set the wheel to its bearing. The Alembic answers, banking off the black crags and climbing into clean night!"
   },
   "packages": [
     "dplyr",
@@ -48,8 +48,66 @@
       "designNote": "TEACHING ROOM 1 — THE APOTHECARY BAY. Story: the player finds the cold alien lesion on their arm and a brass field TEST-KIT; the ship's medicine and its door-locks both run on the same solvent rack, so curing themselves and reaching the helm are one problem. This station reads the FIRST property of the cure (e.g. it must NOT mix with water — read miscible_with_water). Per the pre/post principle, pose it as a MULTI-VARIABLE MAPPING plot (map several solvent properties to aesthetics, read one off) — NOT a single-column filter — mirroring hospital's question style. Solving narrows the cure AND releases the door onward. ALSO the home of the brass mapping DIAL (obj_dial): flipping it sets gameState.mapping to a sigil (m1/m2/m3); its effect isn't explained or visible here — it drives the crow's-nest chart much later (Riven: a control changing a distant display). Exact MCQ/plot TBD in the teaching-room design pass. || DOOR LOCK (2026-07-31): the hatch DOWN to the cargo hold is now a LOCKED forward door gated on THIS room's puzzle — solving the apothecary reading unlatches it (the up-hatch to the deck stays open).",
       "authoring": {
         "tag": "room1",
-        "scenePrompt": "This is a panorama. A 360-degree view from the centre of the apothecary bay of a steampunk airship, the room wrapping continuously all the way around so the left and right edges meet seamlessly. Along one wall, brass racks of small glass solvent vials above a workbench with a copper distillation still and a BRASS FIELD TEST-KIT — a boxy analytical instrument with a small glowing glass screen showing a faint scatter-plot. On one side an open riveted companion-ladder climbs UP to a hatch onto the deep night sky of the weather deck; on the other, a heavy riveted floor-hatch, dogged shut with a brass latch-wheel, closed over the passage DOWN into the cargo hold. Around the rest of the bay: gauges, coiled copper pipes, hanging oil lanterns, a wooden apothecary chest, and portholes onto a dark, green-tinged night sky with the first stars out over floating islands. Steady warm brass lamplight against the night beyond the portholes, brass-and-verdigris palette, drifting steam, film grain, richly detailed. No people, no lettering, no captions, no text.",
-        "doorPrompt": "The heavy riveted floor-hatch in the deck now stands flung open, its brass latch-wheel undogged and the hatch-cover lifted back on its hinges, revealing the ladder dropping DOWN into the dim cargo hold below with faint lantern-light welling up; the companion-ladder UP to the weather deck and the brass solvent racks are unchanged. Same warm brass lamplight, brass-and-verdigris palette, drifting steam, film grain. No people, no lettering, no captions, no text."
+        "scenePrompt": "This is a seamless 360-degree panorama from the centre of the apothecary bay of a steampunk airship. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain, continuous stretch of riveted brass-and-verdigris bulkhead hung with gauges and coiled copper pipes, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. To the left, an open riveted companion-ladder climbing UP to a hatch onto the deep night sky of the weather deck; to the left of centre, a copper distillation still on the workbench, venting drifting steam; dead ahead in the centre, a BRASS FIELD TEST-KIT on the workbench — a boxy analytical instrument with a small glowing glass screen showing a faint scatter-plot — beside brass racks of small glass solvent vials and a wooden apothecary chest; just right of centre, a hanging oil lantern on a chain; to the right, a heavy riveted floor-hatch, dogged shut with a brass latch-wheel, closed over the passage DOWN into the cargo hold; on the far right, a porthole onto a dark, green-tinged night sky with the first stars out over floating islands. Steady warm brass lamplight against the night beyond the portholes, brass-and-verdigris palette, drifting steam, film grain, richly detailed. No people, no lettering, no captions, no text. Again: the extreme left and right edges must align perfectly into a plain, continuous stretch of riveted brass-and-verdigris bulkhead hung with gauges and coiled copper pipes, uniform and unbroken, with no visible seam, join, or repetition.",
+        "doorPrompt": "The heavy riveted floor-hatch in the deck now stands flung open, its brass latch-wheel undogged and the hatch-cover lifted back on its hinges, revealing the ladder dropping DOWN into the dim cargo hold below with faint lantern-light welling up; the companion-ladder UP to the weather deck and the brass solvent racks are unchanged. Same warm brass lamplight, brass-and-verdigris palette, drifting steam, film grain. No people, no lettering, no captions, no text.",
+        "sceneSpec": {
+          "room": "room1",
+          "setting": "the centre of the apothecary bay of a steampunk airship",
+          "interior": true,
+          "seam": "a plain, continuous stretch of riveted brass-and-verdigris bulkhead hung with gauges and coiled copper pipes, uniform and unbroken",
+          "elements": [
+            {
+              "id": "up_to_the_weather_deck",
+              "at": "to the left",
+              "desc": "an open riveted companion-ladder climbing UP to a hatch onto the deep night sky of the weather deck",
+              "door": {
+                "direction": "open",
+                "to": "room2"
+              }
+            },
+            {
+              "id": "steam",
+              "at": "to the left of centre",
+              "desc": "a copper distillation still on the workbench, venting drifting steam",
+              "animate": {
+                "motion": "steam waves back and forth as it is emitted from the still",
+                "loop": "crossfade"
+              }
+            },
+            {
+              "id": "the_field_test_kit",
+              "at": "dead ahead in the centre",
+              "desc": "a BRASS FIELD TEST-KIT on the workbench — a boxy analytical instrument with a small glowing glass screen showing a faint scatter-plot — beside brass racks of small glass solvent vials and a wooden apothecary chest",
+              "puzzle": true
+            },
+            {
+              "id": "lantern",
+              "at": "just right of centre",
+              "desc": "a hanging oil lantern on a chain",
+              "animate": {
+                "motion": "an oil lantern swaying back and forth on its hanging chain in a slow, gentle pendulum arc, the warm flame inside wavering as it swings, the cast shadows swinging along with it",
+                "loop": "boomerang"
+              }
+            },
+            {
+              "id": "down_to_the_cargo_hold",
+              "at": "to the right",
+              "desc": "a heavy riveted floor-hatch, dogged shut with a brass latch-wheel, closed over the passage DOWN into the cargo hold",
+              "door": {
+                "direction": "forward",
+                "to": "room3"
+              }
+            },
+            {
+              "id": "window",
+              "at": "on the far right",
+              "desc": "a porthole onto a dark, green-tinged night sky with the first stars out over floating islands"
+            }
+          ],
+          "atmosphere": "Steady warm brass lamplight against the night beyond the portholes, brass-and-verdigris palette, drifting steam, film grain, richly detailed",
+          "negatives": "No people, no lettering, no captions, no text",
+          "continuity": []
+        }
       },
       "hotspots": [
         {
@@ -63,30 +121,28 @@
             0.5647
           ],
           "starterCode": "solvents",
-          "question": {
-            "prompt": "This medical test stations asks about solvents that will <b>not</b> mix with water. How does whether a solvent mixes with water relate to its polarity — which statement is true?",
-            "options": [
-              "Solvents that mix with water tend to sit at LOWER relative polarity",
-              "Solvents that mix with water tend to sit at HIGHER relative polarity",
-              "Whether a solvent mixes with water is unrelated to its polarity",
-              "Every solvent that mixes with water is denser than water",
-              "Only chlorinated solvents mix with water",
-              "Solvents that mix with water tend to be less dense"
-            ],
-            "correct": 1,
-            "maxAttempts": 4,
-            "feedback": {
-              "correct": "Right — the water-mixers cluster toward higher polarity. So your cure, which won't mix with water, is one of the lower-polarity, water-shy solvents. The kit's first light goes green and the floor-hatch down to the cargo hold unlatches.",
-              "wrong": [
-                "Colour the points by <code>miscible_with_water</code> and compare where each colour sits along <code>relative_polarity</code>.",
-                "Look again — the water-mixing group sits toward the HIGHER-polarity end.",
-                "The polar solvents are the ones that dissolve into water."
-              ]
-            }
-          },
           "solveSfx": {
             "src": "audio/solve_room1_the_field_test_kit_1.mp3",
             "volume": 0.0874983775227436
+          },
+          "check": {
+            "prompt": "This medical test station asks about solvents that will NOT dissolve into water — prove how mixing with water relates to a solvent's polarity. Work it out from the data: assign the mean relative_polarity of the water-mixing solvents to <code>mixers</code>, and the mean relative_polarity of the non-mixing solvents to <code>nonmixers</code>.",
+            "requires": [
+              "mixers",
+              "nonmixers"
+            ],
+            "expr": "is.numeric(mixers) && is.numeric(nonmixers) && mixers > nonmixers && abs(mixers - 0.5358) < 0.02 && abs(nonmixers - 0.1865) < 0.02",
+            "maxAttempts": 4,
+            "hint": "Split the rack by <code>miscible_with_water</code> (a TRUE/FALSE column) and take the mean <code>relative_polarity</code> of each group: <code>solvents |&gt; group_by(miscible_with_water) |&gt; summarise(m = mean(relative_polarity))</code>. The TRUE group is your <code>mixers</code>, the FALSE group your <code>nonmixers</code>.",
+            "feedback": {
+              "correct": "Correct — noted in your field notebook: the water-mixers are far more polar (mean ~0.54) than the water-shy solvents (mean ~0.19). Your cure won't mix with water, so it lives among the low-polarity, water-shy solvents.",
+              "wrong": [
+                "Group the rack by whether it mixes with water and average the polarity of each group: <code>solvents |&gt; group_by(miscible_with_water) |&gt; summarise(m = mean(relative_polarity))</code>.",
+                "Read the two group means off that summary and assign them: the TRUE (mixes) group's mean to <code>mixers</code>, the FALSE group's mean to <code>nonmixers</code>.",
+                "The solvents that mix with water are the MORE polar group — your <code>mixers</code> mean should be the larger of the two."
+              ],
+              "reveal": ""
+            }
           }
         },
         {
@@ -217,31 +273,29 @@
           "type": "puzzle",
           "label": "The field test-kit",
           "starterCode": "solvents",
-          "question": {
-            "prompt": "Your test-kit's first panel reacts only to solvents that will <b>not</b> mix with water. How does whether a solvent mixes with water relate to its polarity — which statement is true?",
-            "options": [
-              "Solvents that mix with water tend to sit at LOWER relative polarity",
-              "Solvents that mix with water tend to sit at HIGHER relative polarity",
-              "Whether a solvent mixes with water is unrelated to its polarity",
-              "Every solvent that mixes with water is denser than water",
-              "Only chlorinated solvents mix with water",
-              "Solvents that mix with water tend to be less dense"
-            ],
-            "correct": 1,
-            "maxAttempts": 4,
-            "feedback": {
-              "correct": "Right — the water-mixers cluster toward higher polarity. So your cure, which won't mix with water, is one of the lower-polarity, water-shy solvents. The kit's first light goes green and the floor-hatch down to the cargo hold unlatches.",
-              "wrong": [
-                "Colour the points by <code>miscible_with_water</code> and compare where each colour sits along <code>relative_polarity</code>.",
-                "Look again — the water-mixing group sits toward the HIGHER-polarity end.",
-                "The polar solvents are the ones that dissolve into water."
-              ]
-            }
-          },
           "note": "PUZZLE (field test-kit) — RUNG 1: colour by miscible_with_water, read group separation → water-mixers sit at HIGHER polarity (0.536 vs 0.187). correct idx 1.",
           "solveSfx": {
             "src": "audio/solve_room1_the_field_test_kit_1.mp3",
             "volume": 0.0874983775227436
+          },
+          "check": {
+            "prompt": "Your kit only needs the solvents that will NOT dissolve into water — but first prove to yourself how mixing with water relates to a solvent's polarity. Work it out from the data: assign the mean relative_polarity of the water-mixing solvents to <code>mixers</code>, and the mean relative_polarity of the non-mixing solvents to <code>nonmixers</code>.",
+            "requires": [
+              "mixers",
+              "nonmixers"
+            ],
+            "expr": "is.numeric(mixers) && is.numeric(nonmixers) && mixers > nonmixers && abs(mixers - 0.5358) < 0.02 && abs(nonmixers - 0.1865) < 0.02",
+            "maxAttempts": 4,
+            "hint": "Split the rack by <code>miscible_with_water</code> (a TRUE/FALSE column) and take the mean <code>relative_polarity</code> of each group: <code>solvents |&gt; group_by(miscible_with_water) |&gt; summarise(m = mean(relative_polarity))</code>. The TRUE group is your <code>mixers</code>, the FALSE group your <code>nonmixers</code>.",
+            "feedback": {
+              "correct": "Correct — noted in your field notebook: the water-mixers are far more polar (mean ~0.54) than the water-shy solvents (mean ~0.19). Your cure won't mix with water, so it lives among the low-polarity, water-shy solvents.",
+              "wrong": [
+                "Group the rack by whether it mixes with water and average the polarity of each group: <code>solvents |&gt; group_by(miscible_with_water) |&gt; summarise(m = mean(relative_polarity))</code>.",
+                "Read the two group means off that summary and assign them: the TRUE (mixes) group's mean to <code>mixers</code>, the FALSE group's mean to <code>nonmixers</code>.",
+                "The solvents that mix with water are the MORE polar group — your <code>mixers</code> mean should be the larger of the two."
+              ],
+              "reveal": ""
+            }
           }
         },
         {
@@ -288,7 +342,8 @@
           "gapMax": 30
         }
       ],
-      "panoramaOpen": "room1/scene_open.png"
+      "panoramaOpen": "room1/scene_open.png",
+      "debrief": "You didn't guess it, you computed it: split the solvents into the ones that mix with water and the ones that don't, and took each group's mean relative polarity. The mixers came out markedly more polar (0.54 against 0.19). Reducing two groups to two numbers and letting them settle the claim is the plainest honest read there is — and the rule it hands you, 'polar mixes,' is exactly the one the cargo hold will complicate."
     },
     {
       "key": "room2",
@@ -300,8 +355,75 @@
       "designNote": "TEACHING ROOM 2 — OUT ON DECK. Story: the test-kit reads the SECOND property of the cure (e.g. relative_polarity near a value). Wind, rigging, the alien horizon. A MULTI-VARIABLE MAPPING plot (mirror hospital's style) that narrows the cure and opens the hatch down into the hold. Exact content TBD in the design pass. || DOORS (2026-07-31): the mast UP to the nest is gated on the CURE (boss solved) with a 'too queasy to climb' lockedBody; the deck holds the bridge-hatch bearing-keypad (answer SOLIRA, dead until cured); keying it opens the wheelhouse hatch and reveals the ship's WHEEL, which is the ESCAPE FINALE — the `take_the_wheel` door (forward, requires the keypad, no `to`, endsEscape) fires the escape-done screen. The separate bridge room was removed 2026-08-05.",
       "authoring": {
         "tag": "room2",
-        "scenePrompt": "This is a panorama. A 360-degree view from the centre of the open weather deck of a steampunk airship in flight, the scene wrapping continuously all the way around so the left and right edges meet seamlessly. Amidships, a brass binnacle holds a BRASS FIELD TEST-KIT with a small glowing glass screen. Forward, a short railed gangway ends at the sealed brass-and-glass door of the wheelhouse — the bridge — its hatch dogged shut, with a brass BEARING-KEYPAD of engraved rings mounted on the bulkhead beside it. Rising from the centre of the deck, the great mast climbs into rigging with a laddered ratline leading UP toward the crow's nest high above. Set into the deck, an open hatch with a companion-ladder leads down to the apothecary bay. Around: riveted deck plates, taut canvas gas-bag lines overhead, a ship's rail giving onto a vast night sky — deep indigo pricked with stars, a low green glow lingering at the horizon — over distant floating islands and slow airships, coiled ropes, oil deck-lamps. Constant deep night under a star-strewn sky with a low green horizon glow, wind-torn cloud, warm brass fittings, film grain, richly detailed. No people, no lettering, no captions, no text.",
-        "doorPrompt": "The sealed brass-and-glass door of the wheelhouse at the end of the gangway now stands swung open, its hatch undogged, revealing the dim lamplit interior of the bridge and the great ship's wheel beyond; the brass bearing-keypad on the bulkhead beside it and the ratline UP the mast to the crow's nest are unchanged. Same deep-night deck under a star-strewn sky with a low green horizon glow, warm brass fittings, film grain. No people, no lettering, no captions, no text."
+        "scenePrompt": "This is a seamless 360-degree panorama from the centre of the open weather deck of a steampunk airship in flight. Directly behind the viewer, split across the extreme left and extreme right edges, is an open, unbroken stretch of star-strewn night sky with a low green horizon glow over distant floating islands and a ship's rail: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, a distant airship drifting among the floating islands beyond the ship's rail; to the left of centre, an open hatch set into the deck with a companion-ladder leading DOWN to the apothecary bay; dead ahead in the centre, the great mast rising from the centre of the deck into rigging, a laddered ratline leading UP toward the crow's nest high above; dead ahead in the centre, a brass binnacle amidships holding a BRASS FIELD TEST-KIT with a small glowing glass screen; just right of centre, an oil deck-lamp on a bracket; to the right, a short railed gangway ending at the sealed brass-and-glass wheelhouse hatch; when the bearing-keypad is solved the hatch opens onto the ship's wheel beyond and clicking the wheel ends the escape; to the right, a brass BEARING-KEYPAD of engraved rings mounted on the bulkhead beside the sealed wheelhouse hatch. Constant deep night under a star-strewn sky with a low green horizon glow, wind-torn cloud, warm brass fittings, film grain, richly detailed. No people, no lettering, no captions, no text. Again: the extreme left and right edges must align perfectly into an open, unbroken stretch of star-strewn night sky with a low green horizon glow over distant floating islands and a ship's rail, with no visible seam, join, or repetition.",
+        "doorPrompt": "The sealed brass-and-glass door of the wheelhouse at the end of the gangway now stands swung open, its hatch undogged, revealing the dim lamplit interior of the bridge and the great ship's wheel beyond; the brass bearing-keypad on the bulkhead beside it and the ratline UP the mast to the crow's nest are unchanged. Same deep-night deck under a star-strewn sky with a low green horizon glow, warm brass fittings, film grain. No people, no lettering, no captions, no text.",
+        "sceneSpec": {
+          "room": "room2",
+          "setting": "the centre of the open weather deck of a steampunk airship in flight",
+          "interior": false,
+          "seam": "an open, unbroken stretch of star-strewn night sky with a low green horizon glow over distant floating islands and a ship's rail",
+          "elements": [
+            {
+              "id": "other_airship",
+              "at": "on the far left",
+              "desc": "a distant airship drifting among the floating islands beyond the ship's rail",
+              "animate": {
+                "motion": "the dirigible sways back and forth in the distance",
+                "loop": "boomerang"
+              }
+            },
+            {
+              "id": "down_to_the_apothecary_bay",
+              "at": "to the left of centre",
+              "desc": "an open hatch set into the deck with a companion-ladder leading DOWN to the apothecary bay",
+              "door": {
+                "direction": "open",
+                "to": "room1"
+              }
+            },
+            {
+              "id": "up_the_mast_to_the_crow_s_nest",
+              "at": "dead ahead in the centre",
+              "desc": "the great mast rising from the centre of the deck into rigging, a laddered ratline leading UP toward the crow's nest high above",
+              "door": {
+                "direction": "open",
+                "to": "nest"
+              }
+            },
+            {
+              "id": "the_field_test_kit",
+              "at": "dead ahead in the centre",
+              "desc": "a brass binnacle amidships holding a BRASS FIELD TEST-KIT with a small glowing glass screen",
+              "puzzle": true
+            },
+            {
+              "id": "lantern",
+              "at": "just right of centre",
+              "desc": "an oil deck-lamp on a bracket",
+              "animate": {
+                "motion": "a lantern that sways on its bracket",
+                "loop": "boomerang"
+              }
+            },
+            {
+              "id": "take_the_wheel",
+              "at": "to the right",
+              "desc": "a short railed gangway ending at the sealed brass-and-glass wheelhouse hatch; when the bearing-keypad is solved the hatch opens onto the ship's wheel beyond and clicking the wheel ends the escape",
+              "door": {
+                "direction": "forward"
+              }
+            },
+            {
+              "id": "the_bridge_hatch_keypad",
+              "at": "to the right",
+              "desc": "a brass BEARING-KEYPAD of engraved rings mounted on the bulkhead beside the sealed wheelhouse hatch",
+              "lock": true
+            }
+          ],
+          "atmosphere": "Constant deep night under a star-strewn sky with a low green horizon glow, wind-torn cloud, warm brass fittings, film grain, richly detailed",
+          "negatives": "No people, no lettering, no captions, no text",
+          "continuity": []
+        }
       },
       "hotspots": [
         {
@@ -316,7 +438,7 @@
           ],
           "starterCode": "solvents",
           "question": {
-            "prompt": "This medical test stations asks about solvents that float on the wound-wash, not sink — it asks about solvents that are <b>lighter than water</b>. Answer this: to which single category belong most of the solvents that are denser than water?",
+            "prompt": "This medical test station asks about solvents that float on the wound-wash, not sink — it asks about solvents that are <b>lighter than water</b>. Answer this: to which single category belong most of the solvents that are denser than water?",
             "options": [
               "alcohol",
               "oxygen_containing",
@@ -340,7 +462,7 @@
           "availableWhen": {
             "solved": "room1"
           },
-          "lockedBody": "The deck panel won't read yet — take your first reading at the apothecary still.",
+          "lockedBody": "The deck test station isn't active yet — take your first reading at the apothecary still.",
           "solveSfx": {
             "src": "audio/solve_room2_the_field_test_kit_1.mp3",
             "volume": 0.3971915494694403
@@ -374,7 +496,7 @@
           "availableWhen": {
             "solved": "boss"
           },
-          "lockedBody": "You're too weak and queasy to climb the mast — the star-sickness has you. Cure yourself at the engine first, then make the climb."
+          "lockedBody": "You're too weak and queasy to climb the mast — the sickness has you. Cure yourself first, then make the climb."
         },
         {
           "id": "take_the_wheel",
@@ -403,7 +525,7 @@
           "availableWhen": {
             "solved": "boss"
           },
-          "lockedBody": "The bearing-rings are frozen — the ship's control-locks won't release until the solvent-cure has cycled through the engine. Treat the infection first.",
+          "lockedBody": "Your infection is more urgent than unlocking the bridge. Treat your infection first.",
           "box": [
             0.6045,
             0.4212,
@@ -603,7 +725,8 @@
           "gapMin": 9,
           "gapMax": 20
         }
-      ]
+      ],
+      "debrief": "Density mapped up the page, chemical family mapped to colour — one plot carrying two aesthetics at once. The question was which family sends the most of its members below the water line, and reading the colour that clustered under it named the chlorinated solvents (four of the seven denser than water). Letting a category and a measurement share a single plot is how a whole group reveals itself."
     },
     {
       "key": "room3",
@@ -615,8 +738,63 @@
       "designNote": "TEACHING ROOM 3 — DEEP IN THE HOLD. THE TAUGHT TRAP (reworked 2026-07-22). Story: the test-kit now faces the cure's own family. Room 1 established the pooled rule — water-mixers are the more polar solvents. Here the player facets by category and looks inside the ALCOHOLS, where that rule collapses: 2-propanol mixes with water yet is LESS polar (0.546) than 1-butanol (0.586), which doesn't; polarity can't separate the alcohols, but density (chain length) does, cleanly. Load-bearing — the cure (1-butanol) is itself one of the polar-but-immiscible exceptions. Dark, cavernous hold; the plot lives on the laptop. Mirrors hospital's room-3 facet subversion. Verified vs solvents.csv; correct = idx 2. || DOOR LOCK (2026-07-31): the bulk-door DOWN to the engine room is now a LOCKED forward door gated on THIS room's puzzle — solving the hold reading unseals it.",
       "authoring": {
         "tag": "room3",
-        "scenePrompt": "This is a panorama. A 360-degree view from the centre of the cavernous cargo hold deep inside a steampunk airship, the space wrapping continuously all the way around so the left and right edges meet seamlessly. On a low bench, a BRASS FIELD TEST-KIT with a small glowing glass screen. On one side a brass ladder climbs UP through a hatch back to the apothecary bay; on the other, a low riveted bulk-door, sealed with a heavy latch-wheel, closed over the throbbing red-lit ladderway that leads DOWN to the engine room, a faint red glow leaking around its edges. Around: stacked wooden crates and brass ballast tanks lashed against the tilt, an iron catwalk, chains and pulleys, barrels of ship's solvent, condensation on riveted hull plates, a single caged work-lamp throwing long shadows. Constant deep gloom cut by one warm amber work-lamp, brass-and-verdigris palette, faint haze, film grain, quietly ominous, richly detailed. No people, no lettering, no captions, no text.",
-        "doorPrompt": "The low riveted bulk-door now stands swung wide open, its heavy latch-wheel released, revealing the throbbing red-lit hallway to the engine room beyond, red furnace-glow spilling through the open doorway; the ladder UP to the apothecary bay and the stacked crates and ballast tanks are unchanged. Same amber work-lamp gloom, brass-and-verdigris palette, faint haze, film grain. No people, no lettering, no captions, no text."
+        "scenePrompt": "This is a seamless 360-degree panorama from the centre of the cavernous cargo hold deep inside a steampunk airship. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain, continuous stretch of riveted, condensation-beaded hull plating, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. To the left of centre, a brass ladder climbing UP through a hatch back to the apothecary bay; dead ahead in the centre, a BRASS FIELD TEST-KIT with a small glowing glass screen on a low bench, amid stacked wooden crates and brass ballast tanks; dead ahead in the centre, a single caged work-lamp hanging on a chain, throwing long shadows; just right of centre, hanging chains and pulleys over an iron catwalk; to the right, a low riveted bulk-door, sealed with a heavy latch-wheel, closed over the throbbing red-lit ladderway that leads DOWN to the engine room, a faint red glow leaking around its edges; on the far right, coiled chains and pulleys and barrels of ship's solvent lashed against the hull. Constant deep gloom cut by one warm amber work-lamp, brass-and-verdigris palette, faint haze, film grain, quietly ominous, richly detailed. No people, no lettering, no captions, no text. Again: the extreme left and right edges must align perfectly into a plain, continuous stretch of riveted, condensation-beaded hull plating, uniform and unbroken, with no visible seam, join, or repetition.",
+        "doorPrompt": "The low riveted bulk-door now stands swung wide open, its heavy latch-wheel released, revealing the throbbing red-lit hallway to the engine room beyond, red furnace-glow spilling through the open doorway; the ladder UP to the apothecary bay and the stacked crates and ballast tanks are unchanged. Same amber work-lamp gloom, brass-and-verdigris palette, faint haze, film grain. No people, no lettering, no captions, no text.",
+        "hotspotsReviewed": true,
+        "sceneSpec": {
+          "room": "room3",
+          "setting": "the centre of the cavernous cargo hold deep inside a steampunk airship",
+          "interior": true,
+          "seam": "a plain, continuous stretch of riveted, condensation-beaded hull plating, uniform and unbroken",
+          "elements": [
+            {
+              "id": "up_to_the_apothecary_bay",
+              "at": "to the left of centre",
+              "desc": "a brass ladder climbing UP through a hatch back to the apothecary bay",
+              "door": {
+                "direction": "open",
+                "to": "room1"
+              }
+            },
+            {
+              "id": "the_field_test_kit",
+              "at": "dead ahead in the centre",
+              "desc": "a BRASS FIELD TEST-KIT with a small glowing glass screen on a low bench, amid stacked wooden crates and brass ballast tanks",
+              "puzzle": true
+            },
+            {
+              "id": "lantern",
+              "at": "dead ahead in the centre",
+              "desc": "a single caged work-lamp hanging on a chain, throwing long shadows",
+              "animate": {
+                "motion": "lantern swaying gently on its chain, warm light flickering",
+                "loop": "boomerang"
+              }
+            },
+            {
+              "id": "chains2",
+              "at": "just right of centre",
+              "desc": "hanging chains and pulleys over an iron catwalk"
+            },
+            {
+              "id": "deeper_to_the_engine_room",
+              "at": "to the right",
+              "desc": "a low riveted bulk-door, sealed with a heavy latch-wheel, closed over the throbbing red-lit ladderway that leads DOWN to the engine room, a faint red glow leaking around its edges",
+              "door": {
+                "direction": "forward",
+                "to": "boss"
+              }
+            },
+            {
+              "id": "chains1",
+              "at": "on the far right",
+              "desc": "coiled chains and pulleys and barrels of ship's solvent lashed against the hull"
+            }
+          ],
+          "atmosphere": "Constant deep gloom cut by one warm amber work-lamp, brass-and-verdigris palette, faint haze, film grain, quietly ominous, richly detailed",
+          "negatives": "No people, no lettering, no captions, no text",
+          "continuity": []
+        }
       },
       "hotspots": [
         {
@@ -631,7 +809,7 @@
           ],
           "starterCode": "solvents",
           "question": {
-            "prompt": "This medical test stations asks about solvents that mix with water, in other words, the more polar ones. Now look inside one family, the <b>alcohols</b>, coloured by whether they mix with water: what actually separates the alcohols that mix from those that don't?",
+            "prompt": "This medical test stations asks about solvents that mix with water, in other words, the more polar ones. Look inside one family, the <b>alcohol</b> family, coloured by whether they mix with water: what actually separates the alcohols that mix from those that don't?",
             "options": [
               "The same rule holds — the alcohols that mix are simply the more polar ones",
               "Nothing separates them — every alcohol mixes with water",
@@ -654,7 +832,7 @@
           "availableWhen": {
             "solved": "room2"
           },
-          "lockedBody": "Nothing to read here yet — the kit needs the weather-deck reading before it will run the hold panel.",
+          "lockedBody": "This test station isn't active yet — the weather deck reading needs to be completed first.",
           "solveSfx": {
             "src": "audio/solve_room3_the_field_test_kit_1.mp3",
             "volume": 0.07789328145536722
@@ -684,7 +862,23 @@
             0.7908
           ],
           "direction": "forward",
-          "to": "boss"
+          "to": "boss",
+          "variants": [
+            {
+              "state": "open",
+              "box": [
+                0.6431,
+                0.3386,
+                0.7611,
+                0.7908
+              ],
+              "prompt": "The low riveted bulk-door now stands swung wide open, its heavy latch-wheel released, revealing the throbbing red-lit hallway to the engine room beyond, red furnace-glow spilling through the open doorway; the ladder UP to the apothecary bay and the stacked crates and ballast tanks are unchanged. Same amber work-lamp gloom, brass-and-verdigris palette, faint haze, film grain. No people, no lettering, no captions, no text.",
+              "panorama": "room3/var_deeper_to_the_engine_room_open.png",
+              "when": {
+                "solved": "room3"
+              }
+            }
+          ]
         },
         {
           "id": "lantern",
@@ -768,18 +962,6 @@
               "wrong": [],
               "reveal": ""
             }
-          },
-          "cinemagraph": {
-            "box": [
-              0.5403,
-              0.1162,
-              0.5889,
-              0.8117
-            ],
-            "video": "room3/cine_chains2.mp4",
-            "prompt": "heavy chains swaying gently back and forth where they hang, the links glinting as they move, casting slow swinging shadows",
-            "loop": "boomerang",
-            "seed": 1021588300
           }
         }
       ],
@@ -864,7 +1046,8 @@
           "gapMin": 12,
           "gapMax": 26
         }
-      ]
+      ],
+      "debrief": "The trap, and the lesson. facet_wrap split the plot into one panel per family, and inside the alcohols the tidy 'polar ⇒ mixes' rule from the apothecary fell apart — 2-propanol mixes yet is less polar than 1-butanol, which doesn't. Faceted, you could see it was chain length, i.e. density, sorting them, not polarity. Splitting a plot by the right variable can overturn what the pooled picture seemed to say."
     },
     {
       "key": "boss",
@@ -881,8 +1064,82 @@
       "designNote": "BOSS (graded -> Canvas code) — THE ENGINE ROOM / DISPENSARY. Combining all three readings, the player names the ONE solvent that is immiscible with water, relative_polarity nearest 0.6, AND density below water (Data-Vis-II Q3). Verified answer: 1-BUTANOL. It is mixed and poured at the dispensary console, curing the lesion AND flooding the ship's lock-hydraulics so the seized helm frees. availableWhen {allSolved room1/room2/room3} gates the boss puzzle to this room. Ends the ANALYSIS objective + mints the code.",
       "authoring": {
         "tag": "boss",
-        "scenePrompt": "This is a panorama. A 360-degree view from the centre of the engine room at the heart of a steampunk airship — the ship's central still-works — the chamber wrapping continuously all the way around so the left and right edges meet seamlessly. Dominating the space, a towering brass distillation apparatus: a master solvent rack of glass reservoirs and copper coils where all the ship's fluid lines converge — medicine lines to one side, lock-hydraulic lines to the other — with a central DISPENSARY CONSOLE, a brass field test-kit writ large, its wide glass screen showing a density-versus-polarity scatter-plot above a single funnel where the chosen solvent is poured. To one side, a riveted bulk-door stands open onto a red-lit hallway leading back to the cargo hold. Around: thrumming pistons, pressure gauges and speaking-tubes, riveted boilers, glowing valve-wheels, jets of steam, tall glass sight-gauges of coloured solvent. Constant hot amber-and-red furnace glow with brass highlights, heavy haze and steam, film grain, grand and tense, richly detailed. No people, no lettering, no captions, no text.",
-        "doorPrompt": ""
+        "scenePrompt": "This is a seamless 360-degree panorama from the centre of the engine room at the heart of a steampunk airship — the ship's central still-works. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain, continuous stretch of riveted brass bulkhead, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, a bank of glowing valve-wheels and pinpoint indicator lights; to the left, a riveted boiler, its firebox door ajar; to the left of centre, a tall speaking-tube and pressure-pipe venting steam; dead ahead in the centre, tall glass sight-gauges of coloured solvent; dead ahead in the centre, a towering brass distillation apparatus of glass reservoirs and copper coils where all the ship's fluid lines converge, medicine lines to one side and lock-hydraulic lines to the other, with a central DISPENSARY CONSOLE — a brass field test-kit writ large, its wide glass screen showing a density-versus-polarity scatter-plot above a single funnel where the chosen solvent is poured; just right of centre, a cluster of brass pressure gauges and speaking-tubes; to the right, a riveted bulk-door standing open onto a red-lit hallway leading back to the cargo hold; to the far right, a second riveted boiler set into the wall; on the far right, a large glass vessel of thick coloured solvent. Constant hot amber-and-red furnace glow with brass highlights, heavy haze and steam, thrumming pistons all around, film grain, grand and tense, richly detailed. No people, no lettering, no captions, no text. Again: the extreme left and right edges must align perfectly into a plain, continuous stretch of riveted brass bulkhead, uniform and unbroken, with no visible seam, join, or repetition.",
+        "doorPrompt": "",
+        "sceneSpec": {
+          "room": "boss",
+          "setting": "the centre of the engine room at the heart of a steampunk airship — the ship's central still-works",
+          "interior": true,
+          "seam": "a plain, continuous stretch of riveted brass bulkhead, uniform and unbroken",
+          "elements": [
+            {
+              "id": "twinkles",
+              "at": "on the far left",
+              "desc": "a bank of glowing valve-wheels and pinpoint indicator lights"
+            },
+            {
+              "id": "boiler",
+              "at": "to the left",
+              "desc": "a riveted boiler, its firebox door ajar",
+              "animate": {
+                "motion": "boiler firebox glowing and flickering",
+                "loop": "boomerang"
+              }
+            },
+            {
+              "id": "steam",
+              "at": "to the left of centre",
+              "desc": "a tall speaking-tube and pressure-pipe venting steam",
+              "animate": {
+                "motion": "steam that waves back and forth as it is emitted",
+                "loop": "boomerang"
+              }
+            },
+            {
+              "id": "liquid",
+              "at": "dead ahead in the centre",
+              "desc": "tall glass sight-gauges of coloured solvent"
+            },
+            {
+              "id": "the_dispensary_console",
+              "at": "dead ahead in the centre",
+              "desc": "a towering brass distillation apparatus of glass reservoirs and copper coils where all the ship's fluid lines converge, medicine lines to one side and lock-hydraulic lines to the other, with a central DISPENSARY CONSOLE — a brass field test-kit writ large, its wide glass screen showing a density-versus-polarity scatter-plot above a single funnel where the chosen solvent is poured",
+              "puzzle": true
+            },
+            {
+              "id": "dials",
+              "at": "just right of centre",
+              "desc": "a cluster of brass pressure gauges and speaking-tubes"
+            },
+            {
+              "id": "back_up_to_the_cargo_hold",
+              "at": "to the right",
+              "desc": "a riveted bulk-door standing open onto a red-lit hallway leading back to the cargo hold",
+              "door": {
+                "direction": "open",
+                "to": "room3"
+              }
+            },
+            {
+              "id": "boiler_2",
+              "at": "to the far right",
+              "desc": "a second riveted boiler set into the wall",
+              "animate": {
+                "motion": "fire inside a boiler, flickering and moving",
+                "loop": "boomerang"
+              }
+            },
+            {
+              "id": "liquid2",
+              "at": "on the far right",
+              "desc": "a large glass vessel of thick coloured solvent"
+            }
+          ],
+          "atmosphere": "Constant hot amber-and-red furnace glow with brass highlights, heavy haze and steam, thrumming pistons all around, film grain, grand and tense, richly detailed",
+          "negatives": "No people, no lettering, no captions, no text",
+          "continuity": []
+        },
+        "hotspotsReviewed": true
       },
       "hotspots": [
         {
@@ -925,10 +1182,10 @@
               "room3"
             ]
           },
-          "lockedBody": "The dispensary won't cycle until all three readings are in — finish the apothecary, the weather deck, and the hold first.",
+          "lockedBody": "This test station isn't active yet — finish the apothecary, the weather deck, and the hold first.",
           "solveSfx": {
             "src": "audio/solve_boss_the_dispensary_console_1.mp3",
-            "volume": 0.07789328145536722
+            "volume": 0.26
           }
         },
         {
@@ -1073,6 +1330,18 @@
               "wrong": [],
               "reveal": ""
             }
+          },
+          "cinemagraph": {
+            "box": [
+              0.5814,
+              0.3525,
+              0.6664,
+              0.6618
+            ],
+            "video": "boss/cine_dials.mp4",
+            "prompt": "the needle in the dials spin, the lights in the dials flicker and blink",
+            "loop": "boomerang",
+            "seed": 963076982
           }
         },
         {
@@ -1146,18 +1415,20 @@
               "reveal": ""
             }
           },
-          "cinemagraph": {
-            "box": [
-              0.9417,
-              0.2206,
-              0.9857,
-              0.6412
-            ],
-            "video": "boss/cine_liquid2.mp4",
-            "prompt": "thick coloured liquid bubbling and churning gently inside the glass vessel, small bubbles forming at the bottom, rising to the surface and popping, the surface rippling continuously",
-            "loop": "crossfade",
-            "seed": 220661350
-          }
+          "cinemagraphCandidates": [
+            {
+              "video": "boss/cine_liquid2.mp4",
+              "seed": 220661350,
+              "prompt": "thick coloured liquid bubbling and churning gently inside the glass vessel, small bubbles forming at the bottom, rising to the surface and popping, the surface rippling continuously",
+              "loop": "crossfade",
+              "box": [
+                0.9417,
+                0.2206,
+                0.9857,
+                0.6412
+              ]
+            }
+          ]
         }
       ],
       "entry": null,
@@ -1238,7 +1509,8 @@
           "gapMin": 8,
           "gapMax": 16
         }
-      ]
+      ],
+      "debrief": "The assessed move, everything folded into one choice: name the single solvent that won't mix with water, rides lighter than water, and sits nearest middling polarity. Only 1-butanol meets all three at once (1-octanol the tempting near-miss). Poured at the dispensary it healed the lesion and freed the seized helm — the whole scenario's problem was one row of the table that satisfied every condition together."
     },
     {
       "key": "nest",
@@ -1250,8 +1522,52 @@
       "designNote": "ESCAPE part 1 — THE CROW'S NEST (deep night, high on the mast, 'see the whole', very Riven). STAR REDESIGN 2026-07-22 (was solvent charts). The captain's star-astrolabe (obj_chart, a mapview) shows a field of NAMED STARS under whichever plate the room-1 astrolabe plate-dial selects (m1/m2/m3) as a pre-rendered PNG. Each plate projects the same stars a different way; the Anchor (homeward house) is marked on every plate. Exactly one star — SOLIRA — holds the Anchor across all three plates; its NAME is the helm lock. The star-log clue (obj_starlog) names the Anchor + the method, not the answer. Fully data-free (no solvents). PNGs + answer from nest/make_starchart.py; equal-length star names keep the lock a fixed length. The plate-dial is co-located here beside the astrolabe (moved out of room1 so there's no cross-ship back-nav during the escape); the player turns it, reads each plate, takes the intersection → SOLIRA → helm.",
       "authoring": {
         "tag": "nest",
-        "scenePrompt": "This is a panorama. A 360-degree view from the centre of the crow's nest atop a steampunk airship, a small round railed platform high on the mast, the scene wrapping continuously so the left and right edges meet seamlessly. It is deep, clear night up here above the cloud. Ahead, the captain's great brass STAR-ASTROLABE on a swivel mount — a tall ringed instrument with a large engraved circular star-plate — and beside it a heavy BRASS PLATE-DIAL with three engraved marks and a needle for turning the astrolabe to a new plate; a chart table holds an open leather star-log and a spyglass. A railed ratline and ladder lead DOWN the mast to the weather deck below. All around, the railing gives onto an immense night sky blazing with stars over dark floating islands far below, rigging lines rising to the gas-bag above, a glowing signal lantern, a windsock snapping. Cold, constant starlight and warm brass highlights, wind-torn cloud, film grain, richly detailed. No people, no lettering, no captions, no text.",
-        "doorPrompt": ""
+        "scenePrompt": "This is a seamless 360-degree panorama from the centre of the crow's nest atop a steampunk airship, a small round railed platform high on the mast. Directly behind the viewer, split across the extreme left and extreme right edges, is an open, unbroken stretch of star-blazing night sky over dark floating islands far below, rigging lines rising to the gas-bag above: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. To the left of centre, the captain's great brass STAR-ASTROLABE on a swivel mount — a tall ringed instrument with a large engraved circular star-plate showing the current plate of named stars; to the left of centre, a heavy BRASS PLATE-DIAL with three engraved marks and a needle for turning the astrolabe to a new plate; dead ahead in the centre, a railed ratline and ladder leading DOWN the mast to the weather deck below; just right of centre, a chart table holding an open leather star-log naming the homeward house, and a spyglass; to the right, a glowing signal lantern and a windsock snapping at the rail. Cold, constant starlight and warm brass highlights, wind-torn cloud, film grain, richly detailed. No people, no lettering, no captions, no text. Again: the extreme left and right edges must align perfectly into an open, unbroken stretch of star-blazing night sky over dark floating islands far below, rigging lines rising to the gas-bag above, with no visible seam, join, or repetition.",
+        "doorPrompt": "",
+        "hotspotsReviewed": true,
+        "sceneSpec": {
+          "room": "nest",
+          "setting": "the centre of the crow's nest atop a steampunk airship, a small round railed platform high on the mast",
+          "interior": false,
+          "seam": "an open, unbroken stretch of star-blazing night sky over dark floating islands far below, rigging lines rising to the gas-bag above",
+          "elements": [
+            {
+              "id": "the_captain_s_star_astrolabe",
+              "at": "to the left of centre",
+              "desc": "the captain's great brass STAR-ASTROLABE on a swivel mount — a tall ringed instrument with a large engraved circular star-plate showing the current plate of named stars",
+              "clue": true
+            },
+            {
+              "id": "the_astrolabe_plate_dial",
+              "at": "to the left of centre",
+              "desc": "a heavy BRASS PLATE-DIAL with three engraved marks and a needle for turning the astrolabe to a new plate",
+              "switch": true
+            },
+            {
+              "id": "down_the_mast_to_the_weather_deck",
+              "at": "dead ahead in the centre",
+              "desc": "a railed ratline and ladder leading DOWN the mast to the weather deck below",
+              "door": {
+                "direction": "open",
+                "to": "room2"
+              }
+            },
+            {
+              "id": "the_captain_s_star_log",
+              "at": "just right of centre",
+              "desc": "a chart table holding an open leather star-log naming the homeward house, and a spyglass",
+              "clue": true
+            },
+            {
+              "id": "obj_6",
+              "at": "to the right",
+              "desc": "a glowing signal lantern and a windsock snapping at the rail"
+            }
+          ],
+          "atmosphere": "Cold, constant starlight and warm brass highlights, wind-torn cloud, film grain, richly detailed",
+          "negatives": "No people, no lettering, no captions, no text",
+          "continuity": []
+        }
       },
       "hotspots": [
         {
@@ -1259,10 +1575,10 @@
           "type": "dial",
           "label": "The astrolabe plate-dial",
           "box": [
-            0.3629,
-            0.6544,
-            0.4254,
-            0.8107
+            0.3864,
+            0.6368,
+            0.4489,
+            0.7931
           ],
           "key": "mapping",
           "hint": "Three plate-marks engraved around a brass ring — ◈ ⬢ ✶ — and a heavy needle, set beside the astrolabe. Turn it and the astrolabe swings to a new plate of the sky.",
@@ -1286,10 +1602,10 @@
           "type": "door",
           "label": "Down the mast to the weather deck",
           "box": [
-            0.4944,
-            0.7501,
-            0.566,
-            0.9044
+            0.5179,
+            0.623,
+            0.5895,
+            0.7773
           ],
           "direction": "open",
           "to": "room2"
@@ -1299,10 +1615,10 @@
           "type": "mapview",
           "label": "The captain's star-astrolabe",
           "box": [
-            0.2809,
-            0.2931,
-            0.3701,
-            0.5548
+            0.3056,
+            0.3143,
+            0.3948,
+            0.576
           ],
           "key": "mapping",
           "caption": "The astrolabe's plate turns and the star field redraws — the same sky under a different projection each time, the Anchor marked on every face. Stars drift from plate to plate; the one that holds the Anchor through all three faces is your bearing home.",
@@ -1318,12 +1634,12 @@
           "type": "clue",
           "label": "The captain's star-log",
           "box": [
-            0.637,
-            0.7384,
-            0.7301,
-            0.8497
+            0.6141,
+            0.7066,
+            0.7072,
+            0.8179
           ],
-          "body": "Open to a marked page, the captain's hand: “Steer always by the Anchor — the house high to the north-east that every plate of the astrolabe shares. Stars wander from face to face, but one alone keeps the Anchor through all three. That star is our bearing home; the bridge will open only to its name.”"
+          "body": "Open to a marked page, the captain's hand: “I have found that the most reliable way to steer this ship is via the Anchor — the collection of stars that sits in the north-east region of the sky. Stars wander depending on how we view the sky, but one star alone stays in the Anchor through all views. That star is our key guiding beacon.”"
         },
         {
           "id": "obj_6",
@@ -1348,18 +1664,20 @@
               "reveal": ""
             }
           },
-          "cinemagraph": {
-            "box": [
-              0.6402,
-              0.1409,
-              0.8876,
-              0.5973
-            ],
-            "video": "nest/cine_obj_6.mp4",
-            "prompt": "a flag flaps back and forth in the wind",
-            "loop": "crossfade",
-            "seed": 1824771143
-          }
+          "cinemagraphCandidates": [
+            {
+              "video": "nest/cine_obj_6.mp4",
+              "seed": 1824771143,
+              "prompt": "a flag flaps back and forth in the wind",
+              "loop": "crossfade",
+              "box": [
+                0.6402,
+                0.1409,
+                0.8876,
+                0.5973
+              ]
+            }
+          ]
         }
       ],
       "entry": null,
@@ -1441,7 +1759,8 @@
           "gapMin": 22,
           "gapMax": 45
         }
-      ]
+      ],
+      "debrief": "No solvents, no console — the boss's move made into stars. The captain's astrolabe showed one sky under three projections, and the star-log named the homeward house without naming the star. Exactly one star — SOLIRA — sat inside that house across all three plates, the same 'in-region under every mapping' reasoning that had picked 1-butanol out of the rack. Its bearing keyed the deck hatch, the wheel appeared, and the Alembic climbed for home."
     }
   ],
   "music": "audio/kora_passage.mp3",
@@ -1456,5 +1775,9 @@
     "clearOn": "cure",
     "maxDim": 0.55
   },
-  "worldPlate": "_world/plate.png"
+  "worldPlate": "_world/plate.png",
+  "debrief": {
+    "title": "How this world worked",
+    "intro": "The whole flight was one skill dressed as a rescue: reading a many-variabled plot the right way — a relationship, a group that crosses a line, a within-group split — to pull one honest answer out of a crowded table. Each medical station drilled a different way of looking; the engine room made you name the single solvent that satisfied every mapping at once; and the escape put the same move in the night sky, hunting the one star that keeps its place through every projection. Here is how each part taught the reading."
+  }
 }

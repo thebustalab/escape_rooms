@@ -4,11 +4,15 @@
 // dropdown defaults to none), and the fallback — which skips non-`built` rooms and assumes linear array
 // order — sent players to the START instead of room2.
 //
-// RULE: every door in a BUILT room must name its target `to`, EXCEPT the single legitimate terminal case
-// — a FORWARD door in the LAST built room of the scenario (the finish door, which routes via the engine's
-// `goThrough()` fallback, e.g. alaska escape1's "helicopter hatch"). A `back` door must ALWAYS name its
-// target; a non-terminal forward door must too. Runs on every shipped scenario.json. (comparing_means/spa
-// was converted from the all-`to:null` fallback pattern to explicit targets on 2026-07-28 to satisfy this.)
+// RULE: every door in a BUILT room must name its target `to`, EXCEPT two legitimate terminal cases:
+//   (1) a FORWARD door in the LAST built room of the scenario (the finish door, which routes via the
+//       engine's `goThrough()` fallback, e.g. alaska escape1's "helicopter hatch"); and
+//   (2) an `endsEscape:true` door in ANY room — it fires `showEscapeDone()` in `handleDoor` BEFORE the
+//       `to`/positional fallback, so it never mis-routes (e.g. airship's weather-deck "take the wheel"
+//       door, 2026-08-05, once the bridge room was removed and the escape ended on the deck).
+// A `back` door must ALWAYS name its target; a non-terminal forward door must too. Runs on every shipped
+// scenario.json. (comparing_means/spa was converted from the all-`to:null` fallback pattern to explicit
+// targets on 2026-07-28 to satisfy this.)
 const { test } = require("node:test");
 const assert = require("node:assert");
 const fs = require("node:fs");
@@ -41,7 +45,9 @@ for (const file of scenarioFiles(ROOMS_DIR)) {
         if (h.type !== "door") continue;
         if (h.to) continue;                                   // explicit target → fine
         const dir = h.direction || "forward";
-        const terminalFinish = dir === "forward" && i === lastBuiltIdx;   // the one allowed to be `to:null`
+        // legitimately target-less: the last room's forward finish door, OR any `endsEscape` door
+        // (handleDoor fires showEscapeDone() before the positional fallback, so it can't mis-route).
+        const terminalFinish = (dir === "forward" && i === lastBuiltIdx) || h.endsEscape === true;
         if (!terminalFinish) {
           offenders.push(`${r.key}: "${h.label || h.id}" (${dir}) has no \`to\` — falls back to positional routing`);
         }

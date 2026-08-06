@@ -366,6 +366,22 @@ WRANGLING_TREES_KEY <- list(
   }
 )
 
+# comparing_means / spa (scenario id 12): comparing means. Four GRADED MCQ rooms in room order —
+# cold_plunge (0), saltwater (2), warm_baths (1), springs (3). The `entry` room is an ungraded intro
+# (no puzzle), excluded from the codec. correct = c(0, 2, 1, 3). Added 2026-08-06 (the key was missing —
+# scenario built but never wired into the decoder; flagged by validate_keys.py).
+COMPARING_MEANS_SPA_KEY <- list(
+  scenario_id = 12,
+  correct = c(0, 2, 1, 3),
+  score_step = function(correct, answer, attempts) {
+    if (answer != correct) return(0)
+    if (attempts <= 1) return(10)
+    if (attempts == 2) return(7)
+    if (attempts == 3) return(5)
+    3
+  }
+)
+
 # Vectorised over a data frame of submissions.
 grade_submissions <- function(df, key, id_col = "x500", code_col = "code",
                               secret = SECRET) {
@@ -530,5 +546,23 @@ if (identical(environment(), globalenv()) && sys.nframe() == 0) {
   cat("Pano trees grade — points:", tg15$points, "|", tg15$detail, "\n")
   if (!isTRUE(tg15$valid && tg15$points == 40)) {
     stop("REGRESSION: pano trees grade wrong — expected 40 pts for an all-first-try solve")
+  }
+
+  # Regression: pano scenario id 12 (comparing_means/spa) — 4 graded MCQ rooms. A full-marks solve answers
+  # each room's correct option first try (c(0, 2, 1, 3)), so all four bytes carry the correct index.
+  ssteps12 <- list(list(answer = 0, attempts = 1),
+                   list(answer = 2, attempts = 1),
+                   list(answer = 1, attempts = 1),
+                   list(answer = 3, attempts = 1))
+  scode12 <- encode_code(version = 1, scenario_id = 12, steps = ssteps12, student_id = "spa_test")
+  sd12 <- decode_code(scode12, "spa_test")
+  sok12 <- sd12$valid && sd12$scenario_id == 12 &&
+    identical(sd12$answers, c(0L, 2L, 1L, 3L)) && identical(sd12$attempts, c(1L, 1L, 1L, 1L))
+  cat("Pano round-trip OK id 12 (should be TRUE):", sok12, "\n")
+  if (!sok12) stop("REGRESSION: pano round-trip failed (id 12 spa)")
+  sg12 <- grade_one(scode12, "spa_test", COMPARING_MEANS_SPA_KEY)
+  cat("Pano spa grade — points:", sg12$points, "|", sg12$detail, "\n")
+  if (!isTRUE(sg12$valid && sg12$points == 40)) {
+    stop("REGRESSION: pano spa grade wrong — expected 40 pts for an all-first-try solve")
   }
 }

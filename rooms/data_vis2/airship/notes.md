@@ -464,3 +464,49 @@ archive if wanted. (2) In the harness, re-place the `take_the_wheel` box onto th
 view if its current position (inherited from the old hatch door) isn't on the wheel. (3) Browser playtest
 the escape: cure at the engine → climb the mast → read the astrolabe → key SOLIRA on the deck → click the
 wheel → escape-done.
+
+---
+
+## Apothecary puzzle → code-check + engine/harness batch (2026-08-06, Lucas)
+
+Batch of five changes this session (airship-driven, most are scenario-agnostic engine/harness work):
+
+- **Room 1 (apothecary) MCQ → CODE-CHECK.** The "which solvents won't mix with water / how does it relate to
+  polarity" MCQ was guessable from basic chemistry, so it's now a `check`: the student computes the mean
+  `relative_polarity` of the water-mixers (`mixers`) and non-mixers (`nonmixers`) on the live R session; `expr`
+  pins **mixers 0.5358 > nonmixers 0.1865** (verified against `solvents.csv`). Applied to `hotspots` +
+  `plannedHotspots`. A solved check encodes index 1 → `DATA_VIS2_AIRSHIP_KEY = c(1,3,2,4)` unchanged.
+  `test_airship.py` updated (room1 now asserts the check + the pinned means, not an MCQ index); all green.
+  Backup `_scratch/scenario.json.pre_room1check_20260806_*.bak`.
+- **Submission window x500 (engine, `shared/pano-player.js`).** The x500 entry is now inline at the top of the
+  submission window (was a separate gate screen shown first); figures/code/PDF fill in below once entered, PDF
+  hidden until then. Cache bumped `pano-player.js v=71→72` across all 7 play.html + `shared/test_play.html`.
+- **Door-graph test generalised.** Removing the bridge earlier moved the terminal `endsEscape` "take the wheel"
+  door out of the last room; `tests/door_graph.test.js` now treats any `endsEscape` door as legitimately
+  target-less (it fires `showEscapeDone()` before any positional fallback). Node suite 54/54 green.
+
+The remaining three are **build-world harness** additions (scenario-agnostic — see `authoring_v2/AGENTS.md`):
+a **Puzzle details** card (opens `puzzle_edit.html` for all rooms), a **How this world worked** debrief editor
+(scenario intro + per-room paragraph, saved via scenario-patch/room-patch), and **locked/out-of-order
+navigation messages** (the `lockedBody` strings like "too queasy to climb the mast") now editable in the Story
+flow. New server endpoint `/api/set-locked-messages` + state fields `lockedMessages`/`debrief`. Harness UI
+needs a hard-refresh (build_world.html isn't cache-busted); server + JS syntax verified, browser render not yet.
+
+---
+
+## Scene-spec backfill for build_world (2026-08-06)
+
+Airship was built with the OLDER harness — the rooms had `authoring.scenePrompt` but no `authoring.sceneSpec`,
+so the v2 build_world harness's spec bundle / art-regen pipeline started empty for it. Backfilled a
+reconstructed `authoring.sceneSpec` for all 5 built rooms (from each `scenePrompt` + committed hotspots;
+`at` from box x-centre, roles from hotspot type). Verified: `to_hotspots(spec)` covers every interactive
+hotspot id, `render_prompt(spec)` round-trips, and the file is **byte-identical to the pre-backfill backup
+except the added sceneSpec keys** (no hotspots/wrap/gameplay touched). Validators unchanged (test 0 fail,
+validate_assets PASS, decoder c(1,3,2,4)). Backup: `_scratch/scenario.json.pre_scenespec_20260806_*.bak`.
+
+**Caveat — nest dial/mapview:** `scene_spec.py` has no `dial`/`mapview` role, so in the SPEC the nest's
+plate-dial is represented as `switch` and the star-astrolabe mapview as `clue` (nearest roles that emit a
+stub). The COMMITTED hotspots keep their real `dial`/`mapview` types (untouched). Consequence: if you ever
+**re-place the nest hotspots from the spec** in the harness, those two would come back as `switch`/`clue`
+stubs and need re-typing + re-wiring. Everything else re-places cleanly. (A proper fix would add `dial`/
+`mapview` roles to `scene_spec.py` — a harness follow-up, not done here.)

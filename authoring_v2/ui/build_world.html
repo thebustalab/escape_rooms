@@ -36,10 +36,11 @@
   .panothumb { height:40px; border-radius:4px; border:1px solid var(--line); vertical-align:middle; }
   #roomTbl tr.built td { background:rgba(123,216,140,0.07); }
   #roomTbl button.done { border-color:var(--green); color:var(--green); }
-  /* Merged room table: two column-groups with a vertical divider each — ② Panorama (blue) and ③ Hotspots
-     & cinemagraphs (amber) — so it's clear which columns are which step's material. */
+  /* Room table column-groups, each with a left divider: ② Panorama (blue), ③ Hotspots (amber),
+     ④ Cinemagraphs (green) — so it's clear which columns belong to which step. */
   #roomTbl th.g2, #roomTbl td.c-cands { border-left:2px solid rgba(127,209,255,0.55); }
-  #roomTbl th.g3, #roomTbl td.c-spec  { border-left:2px solid rgba(255,216,140,0.55); }
+  #roomTbl th.g3, #roomTbl td.c-edit  { border-left:2px solid rgba(255,216,140,0.55); }
+  #roomTbl th.g4, #roomTbl td.c-pick  { border-left:2px solid rgba(123,216,140,0.55); }
   /* Clickable ✓ review flags (placed / verified) — like the built badge, but you toggle them. */
   .flagbtn { background:none; border:1px solid var(--line); border-radius:5px; padding:1px 9px; font-size:13px; color:var(--dim); cursor:pointer; }
   .flagbtn.on { color:var(--green); border-color:var(--green); }
@@ -47,6 +48,7 @@
   #roomTbl .grouphd th { border-top:0; font-size:11px; font-weight:700; padding-bottom:3px; }
   #roomTbl .grouphd th.g2 { color:var(--blue); }
   #roomTbl .grouphd th.g3 { color:var(--amber); text-align:left; }
+  #roomTbl .grouphd th.g4 { color:var(--green); text-align:left; }
   .g2hd { color:var(--blue); font-weight:700; }
   /* Column 1 shrinks to fit the room name + caption (so the blue ② divider sits as far left as it can). */
   #roomTbl td.c-room, #roomTbl thead th:first-child { width:1%; white-space:nowrap; }
@@ -56,7 +58,8 @@
   .candrow { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
   .genrow { display:flex; flex-direction:row; gap:6px; align-items:center; }
   #roomTbl td.c-art { white-space:nowrap; }   /* the "✓ built" indicator, right side of the ② Panorama group */
-  /* ③ actions (Place all hotspots · Generate all cinemagraphs and variants) live in the group header, above the columns. */
+  /* Group-header batch actions (③ Place all hotspots · ④ Generate all cinemagraphs and variants) live in each
+     group's header, above its columns. .g3acts is the shared header-action layout for both ③ and ④. */
   .g3acts { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
   .g3acts button { font-size:12px; }
   .g3acts .status { margin-left:0; }
@@ -91,6 +94,9 @@
   textarea.storyfld.puzfld { min-height:56px; }
   .storyblk.puz { border-left-color:var(--amber); }
   .storyblk.puz .storylbl { color:var(--amber); }
+  .storyblk.clue { border-left-color:var(--blue); }
+  .storyblk.clue .storylbl { color:var(--blue); }
+  textarea.storyfld.cluefld { min-height:56px; }
   #storySave { background:#123020; border-color:var(--green); color:var(--green); }
   #storySave:hover { border-color:var(--green); filter:brightness(1.2); }
 </style>
@@ -119,7 +125,7 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
     <div style="display:flex; gap:16px; align-items:flex-start; flex-wrap:wrap">
       <div style="flex:1 1 340px; min-width:300px">
         <textarea id="specsJson" placeholder='{ "worldPlate":"…", "cover":{"prompt":"…","title":"…","ambient":"fireflies"}, "room1": { … } }'></textarea>
-        <div style="margin-top:6px"><button id="loadSpecs">Write spec to disk</button> <button id="fromDisk">↻ load from disk</button> <span class="status" id="specsStat"></span></div>
+        <div style="margin-top:6px"><button id="fromDisk">↻ load from disk</button> <span class="status" id="specsStat"></span></div>
       </div>
       <div style="flex:1 1 300px; min-width:280px; display:flex; flex-direction:column; gap:10px">
         <div id="platePanel" style="display:none; padding:8px 10px; background:#12222f; border:1px solid var(--line); border-radius:8px; align-items:center; gap:10px; flex-wrap:wrap;">
@@ -148,18 +154,23 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
 
   <div class="stage">
     <h2>Rooms</h2>
-    <div class="hint"><span class="g2hd">②</span> generate up to three candidate panos per room — <span style="color:var(--blue)">⤢</span> open the wrap/seam editor (commit the room from there, capturing pitch/yaw/wrap) · <span style="color:#ff9c9c">✕</span> delete. The <b style="color:var(--amber)">③</b> actions live in the header above their columns.</div>
+    <div class="hint"><span class="g2hd">②</span> generate up to three candidate panos per room — <span style="color:var(--blue)">⤢</span> open the wrap/seam editor (commit the room from there, capturing pitch/yaw/wrap) · <span style="color:#ff9c9c">✕</span> delete. The <b style="color:var(--amber)">③</b> and <b style="color:var(--green)">④</b> batch actions (Place all hotspots · Generate all cinemagraphs) live in their group headers above the columns.</div>
     <table id="roomTbl">
       <thead>
         <tr class="grouphd">
           <th></th>
           <th class="g2" colspan="2">② Panorama</th>
-          <th class="g3" colspan="6">
+          <th class="g3" colspan="2">
             <div class="g3acts">
-              <span>③ Hotspots &amp; cinemagraphs</span>
+              <span>③ Hotspots</span>
               <button id="applyAll" title="Place each element's hotspot (approx box) + queue every animated one as a cinemagraph — do this after the art is committed">Place all hotspots</button>
               <span class="status" id="applyStat"></span>
-              <button id="runBatch" title="Run the queued cinemagraphs AND door-open state variants — cinemagraphs make 5 candidates to pick; door variants attach directly; voice is down while it runs">Generate all cinemagraphs and variants</button>
+            </div>
+          </th>
+          <th class="g4" colspan="2">
+            <div class="g3acts">
+              <span>④ Cinemagraphs</span>
+              <button id="runBatch" title="Run the queued cinemagraphs AND door-open state variants — each cinemagraph makes candidates to pick; door variants attach directly; voice is down while it runs">Generate all cinemagraphs and variants</button>
               <span class="status" id="batchStat"></span>
             </div>
           </th>
@@ -167,12 +178,25 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
         <tr>
           <th>room</th>
           <th class="g2">candidates (up to 3)</th><th>built</th>
-          <th class="g3">spec</th><th>hotspots</th><th></th><th>placed</th><th>cinemagraphs</th><th>verified</th>
+          <th class="g3"></th><th>placed</th>
+          <th class="g4"></th><th>verified</th>
         </tr>
       </thead>
       <tbody></tbody>
     </table>
-    <div class="hint" style="margin-top:6px">Work each room left → right: <b>Generate</b> a panorama and commit it (⤢), then <b>Place all hotspots</b>, nudge the rough boxes via <b>edit hotspots</b>, and <b>Generate all cinemagraphs and variants</b> (cinemagraphs make 5 candidates to pick; door-open state variants attach directly).</div>
+    <div class="hint" style="margin-top:6px">Work each room left → right: <b>Generate</b> a panorama and commit it (⤢); <b>③</b> <b>Place all hotspots</b> then nudge the rough boxes via <b>edit hotspots</b>; <b>④</b> <b>Generate all cinemagraphs and variants</b>, then <b>pick cinemagraphs</b> to choose a clip for each (door-open state variants attach directly; leave any candidate you don't want unpicked).</div>
+  </div>
+
+  <div class="stage">
+    <h2>Puzzle details</h2>
+    <div class="hint" style="margin-bottom:8px">Review and edit every puzzle in one place — prompts, options, correct answers, feedback, clues and locks — on the full puzzle editor.</div>
+    <button onclick="openPuzzleDetails()">Open puzzle details →</button>
+  </div>
+
+  <div class="stage">
+    <h2>How this world worked</h2>
+    <div class="hint" style="margin-bottom:8px">The exit debrief — pull back the curtain on how the world, its language, and its data embodied the technique. A scenario-level intro, then one paragraph per built room (shown beside that room's scene in the debrief gallery). Shows just before the audit.</div>
+    <div id="debriefEditor"></div>
   </div>
 
   <div class="stage">
@@ -258,6 +282,7 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
     renderPlate(st);
     renderCover(st);
     renderStory(st);
+    renderDebrief(st);
     renderFinish(st);
     renderRooms(rooms);
   }
@@ -269,6 +294,11 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
     $("#statusHint").innerHTML = `inventory status: <b>${esc(st.status || "in_development")}</b>`;
   }
   async function patchScenario(fields) { return post("/api/scenario-patch", { chapter: CH, scenario: SC, fields }); }
+  // Puzzle-details step: open the full puzzle editor (all rooms at once) for this scenario in a new tab.
+  function openPuzzleDetails() {
+    if (!CH || !SC) { alert("Pick a scenario first."); return; }
+    window.open(`puzzle_edit.html?chapter=${encodeURIComponent(CH)}&scenario=${encodeURIComponent(SC)}`, "_blank");
+  }
   // Select this scenario as the server's ACTIVE one — /api/generate (used by cover gen) writes to the
   // active scenario's _scratch, so we must select before generating (mirrors the reproject hub's flow).
   async function selectActive() {
@@ -327,30 +357,32 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
     $("#coverFlags").innerHTML = `prompt ${m(has(st.coverPrompt))} · cover set ${m(has(st.cover))} · title ${m(has(st.title))} · ambient ${m(has(st.ambient))}`;
   }
   // Story flow — the EDITABLE narrative under the network, in player order: opening → each room's entry card
-  // then that room's puzzle prompt(s) → the finish screens. Edit any field and hit "Save spec"; opening /
-  // entries / finishes persist through the spec bundle's `story` (save-scene-specs), and each puzzle prompt
-  // writes straight back into its hotspot (set-puzzle-prompts). Rebuilt only when the story's SHAPE changes
-  // (rooms / entries / puzzle set) so a poll tick never clobbers an in-progress edit.
+  // then that room's puzzle prompt(s) → clue(s) → locked message(s) → the finish screens. Edit any field and
+  // hit "Save spec"; opening / entries / finishes persist through the spec bundle's `story` (save-scene-specs),
+  // each puzzle prompt writes back into its hotspot (set-puzzle-prompts), and each clue body writes back into
+  // its clue hotspot (set-clues). Rebuilt only when the story's SHAPE changes (rooms / entries / puzzle / clue
+  // set) so a poll tick never clobbers an in-progress edit.
   const KINDLBL = { mcq: "puzzle prompt", check: "puzzle prompt · console check", pick: "pick-a-point instructions", map: "map instructions", instructions: "instructions" };
   let STORY_SIG = null;
   function storySig(st) {
     const rooms = st.rooms || [];
     return [CH, SC, !!st.analysisFinish, !!st.escapeFinish,
-      rooms.map(r => r.key + (r.entry ? "#e" : "") + "#" + (r.puzzlePrompts || []).map(p => p.source + p.index).join("+")).join(",")
+      rooms.map(r => r.key + (r.entry ? "#e" : "") + "#" + (r.puzzlePrompts || []).map(p => p.source + p.index).join("+") + "#C" + (r.clues || []).map(c => c.source + c.index).join("+") + "#L" + (r.lockedMessages || []).map(mg => mg.source + mg.index).join("+")).join(",")
     ].join("~");
   }
   function renderStory(st) {
     const host = $("#storyFlow"); if (!host) return;
     const rooms = st.rooms || [];
     const any = st.openingStory || st.enterLabel || st.analysisFinish || st.escapeFinish ||
-      rooms.some(r => r.entry || (r.puzzlePrompts || []).length);
+      rooms.some(r => r.entry || (r.puzzlePrompts || []).length || (r.clues || []).length) ||
+      ($("#specsJson").value || "").trim();   // also render (for the Save button) when only a spec bundle is present
     if (!any) { host.innerHTML = ""; host.dataset.built = ""; STORY_SIG = null; return; }
     const sig = storySig(st);
     if (host.dataset.built && sig === STORY_SIG) return;   // same shape → keep unsaved edits intact
     STORY_SIG = sig;
     const fld = (fldName, room, ph) =>
       `<textarea class="storyfld" data-fld="${fldName}"${room ? ` data-room="${esc(room)}"` : ""} placeholder="${esc(ph || "")}"></textarea>`;
-    let html = `<div class="storyhd">Story flow <span class="hint">— edit the narrative in player order, then Save</span></div>`;
+    let html = `<div class="storyhd">Story flow <span class="hint">— edit the narrative in player order, then Save (saves the whole Concept, spec &amp; world area)</span></div>`;
     // opening (landing screen) — scenario-level
     html += `<div class="storyblk"><div class="storylbl">Opening · landing screen</div>` +
       (st.title ? `<div class="storytitle">${esc(st.title)}</div>` : "") +
@@ -371,6 +403,18 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
           `<textarea class="storyfld puzfld" data-fld="puzzle" data-room="${esc(r.key)}" data-source="${esc(p.source)}" data-index="${p.index}" placeholder="the question the player reads"></textarea>` +
           `</div>`;
       });
+      // clues — the flavour text the player reads on a clue hotspot (its `body`, HTML allowed)
+      (r.clues || []).forEach(c => {
+        html += `<div class="storyblk clue"><div class="storylbl">Clue · ${esc(r.key)} · ${esc(c.label)}${c.planned ? ' <span class="warn">(planned)</span>' : ""}</div>` +
+          `<textarea class="storyfld cluefld" data-fld="clue" data-room="${esc(r.key)}" data-source="${esc(c.source)}" data-index="${c.index}" placeholder="what the player reads on this clue (HTML allowed)"></textarea>` +
+          `</div>`;
+      });
+      // out-of-order / locked navigation messages (lockedBody) — shown when the player tries a gated element early
+      (r.lockedMessages || []).forEach(mg => {
+        html += `<div class="storyblk"><div class="storylbl">Locked message · ${esc(r.key)} · ${esc(mg.label)} <span class="hint">(${esc(mg.type)})</span>${mg.planned ? ' <span class="warn">(planned)</span>' : ""}</div>` +
+          `<textarea class="storyfld" data-fld="locked" data-room="${esc(r.key)}" data-source="${esc(mg.source)}" data-index="${mg.index}" placeholder="shown when the player tries this before it's unlocked"></textarea>` +
+          `</div>`;
+      });
     });
     if (st.analysisFinish)
       html += `<div class="storyblk"><div class="storylbl">Analysis finish</div>` +
@@ -378,7 +422,7 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
     if (st.escapeFinish)
       html += `<div class="storyblk"><div class="storylbl">Escape finish</div>` +
         `<input class="storyfld" data-fld="efTitle" placeholder="You escaped!">` + fld("efBody", "", "You made it out.") + `</div>`;
-    html += `<div style="margin-top:10px"><button id="storySave">Save spec</button> <span class="status" id="storySaveStat"></span></div>`;
+    html += `<div style="margin-top:10px"><button id="storySave" title="Saves everything in ‘Concept, spec & world’: the spec bundle above (world plate · cover · room scene specs) plus this narrative — the story flow wins where they overlap">Save spec</button> <span class="status" id="storySaveStat"></span></div>`;
     host.innerHTML = html;
     host.dataset.built = "1";
     // set textarea/input VALUES via property (never through innerHTML — prompts/entries may contain markup)
@@ -392,16 +436,26 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
       }
       (r.puzzlePrompts || []).forEach(p =>
         setv(`textarea[data-fld="puzzle"][data-room="${r.key}"][data-source="${p.source}"][data-index="${p.index}"]`, p.prompt));
+      (r.clues || []).forEach(c =>
+        setv(`textarea[data-fld="clue"][data-room="${r.key}"][data-source="${c.source}"][data-index="${c.index}"]`, c.body));
+      (r.lockedMessages || []).forEach(mg =>
+        setv(`textarea[data-fld="locked"][data-room="${r.key}"][data-source="${mg.source}"][data-index="${mg.index}"]`, mg.lockedBody));
     });
     if (st.analysisFinish) { setv('[data-fld="afTitle"]', st.analysisFinish.title); setv('[data-fld="afBody"]', st.analysisFinish.body); }
     if (st.escapeFinish) { setv('[data-fld="efTitle"]', st.escapeFinish.title); setv('[data-fld="efBody"]', st.escapeFinish.body); }
     host.querySelector("#storySave").onclick = saveStory;
   }
+  // Save EVERYTHING in the "Concept, spec & world" stage from one button: the spec-bundle textarea
+  // (worldPlate / cover / room scene specs / any story it carries) MERGED with the story flow's narrative
+  // fields (opening/enter/entries/finishes) — the flow wins on `story` — in a single save-scene-specs call,
+  // then the puzzle prompts, clue bodies and locked messages via their own bulk endpoints. An empty textarea
+  // just saves the narrative + hotspot content; invalid JSON in the textarea aborts the whole save (no
+  // half-write). Named saveStory for history; it's the stage-1 Save button.
   async function saveStory() {
     const host = $("#storyFlow"), stat = $("#storySaveStat");
     stat.innerHTML = `<span class="warn">saving…</span>`;
     const val = sel => { const el = host.querySelector(sel); return el ? el.value : undefined; };
-    // 1) opening / enter / entries / finishes → the spec bundle's `story` (single clean path)
+    // 1) opening / enter / entries / finishes → the spec bundle's `story`
     const story = {};
     const op = val('[data-fld="opening"]'); if (op !== undefined) story.opening = op;
     const en = val('[data-fld="enterLabel"]'); if (en !== undefined) story.enterLabel = en;
@@ -416,20 +470,105 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
     // 2) puzzle prompts → each hotspot (bulk, one save)
     const prompts = [...host.querySelectorAll('textarea[data-fld="puzzle"]')].map(t =>
       ({ roomKey: t.dataset.room, source: t.dataset.source, index: Number(t.dataset.index), prompt: t.value }));
+    // 3) clue bodies → each clue hotspot's `body` (bulk, one save)
+    const clues = [...host.querySelectorAll('textarea[data-fld="clue"]')].map(t =>
+      ({ roomKey: t.dataset.room, source: t.dataset.source, index: Number(t.dataset.index), body: t.value }));
+    // 4) locked/out-of-order navigation messages → each hotspot's lockedBody (bulk, one save)
+    const locked = [...host.querySelectorAll('textarea[data-fld="locked"]')].map(t =>
+      ({ roomKey: t.dataset.room, source: t.dataset.source, index: Number(t.dataset.index), lockedBody: t.value }));
     let issues = [];
-    const rs = await post("/api/save-scene-specs", { chapter: CH, scenario: SC, specs: { story } });
-    if (!rs.ok || (rs.rooms && rs.rooms.story && rs.rooms.story.error)) issues.push("story: " + esc((rs.rooms && rs.rooms.story && rs.rooms.story.error) || rs.error || "failed"));
+    // Spec bundle from the textarea (world plate / cover / room scene specs / any story it carries) MERGED
+    // with the story-flow narrative above — one save-scene-specs call. Flow story wins field-by-field.
+    let specs = {};
+    const raw = ($("#specsJson").value || "").trim();
+    if (raw) {
+      try { specs = JSON.parse(raw); }
+      catch (e) { stat.innerHTML = `<span class="err">spec JSON invalid — nothing saved: ${esc(e.message)}</span>`; return; }
+    }
+    if (Object.keys(story).length) specs.story = { ...(specs.story || {}), ...story };
+    let sOk = 0;
+    if (Object.keys(specs).length) {
+      const rs = await post("/api/save-scene-specs", { chapter: CH, scenario: SC, specs });
+      if (!rs.ok) issues.push("spec: " + esc(rs.error || "failed"));
+      else { const rm = rs.rooms || {}; Object.keys(rm).forEach(k => { if (rm[k] && rm[k].error) issues.push(`${esc(k)}: ${esc(rm[k].error)}`); else sOk++; }); }
+    }
     let pOk = 0;
     if (prompts.length) {
       const rp = await post("/api/set-puzzle-prompts", { chapter: CH, scenario: SC, prompts });
       if (!rp.ok) issues.push("prompts: " + esc(rp.error || "failed"));
       else { pOk = rp.updated || 0; (rp.errors || []).forEach(e => issues.push(`${esc(e.roomKey)}: ${esc(e.error)}`)); }
     }
+    let cOk = 0;
+    if (clues.length) {
+      const rc = await post("/api/set-clues", { chapter: CH, scenario: SC, clues });
+      if (!rc.ok) issues.push("clues: " + esc(rc.error || "failed"));
+      else { cOk = rc.updated || 0; (rc.errors || []).forEach(e => issues.push(`${esc(e.roomKey)}: ${esc(e.error)}`)); }
+    }
+    let lOk = 0;
+    if (locked.length) {
+      const rl = await post("/api/set-locked-messages", { chapter: CH, scenario: SC, messages: locked });
+      if (!rl.ok) issues.push("locked: " + esc(rl.error || "failed"));
+      else { lOk = rl.updated || 0; (rl.errors || []).forEach(e => issues.push(`${esc(e.roomKey)}: ${esc(e.error)}`)); }
+    }
     stat.innerHTML = issues.length
       ? `<span class="err">saved with issues — ${issues.join("; ")}</span>`
-      : `<span class="ok">saved ✓ — opening, ${Object.keys(entries).length} entr${Object.keys(entries).length === 1 ? "y" : "ies"}, ${pOk} prompt${pOk === 1 ? "" : "s"}</span>`;
+      : `<span class="ok">saved ✓ — spec (${sOk} part${sOk === 1 ? "" : "s"}), ${Object.keys(entries).length} entr${Object.keys(entries).length === 1 ? "y" : "ies"}, ${pOk} prompt${pOk === 1 ? "" : "s"}, ${cOk} clue${cOk === 1 ? "" : "s"}, ${lOk} message${lOk === 1 ? "" : "s"}</span>`;
     STORY_SIG = null;                 // force a rebuild from the freshly-saved state
     refresh(); loadSpecsFromDisk();   // resync the network + the stage-1 JSON textarea
+  }
+  // How this world worked (exit debrief) — a scenario-level intro + one paragraph per BUILT room, shown
+  // just before the audit. Sig-guarded like the story flow so a poll tick never clobbers an in-progress
+  // edit. Saves scenario.debrief {title,intro} via scenario-patch and each room.debrief (string) via room-patch.
+  let DEBRIEF_SIG = null;
+  function debriefSig(st) {
+    return [CH, SC, (st.rooms || []).filter(r => r.built).map(r => r.key).join(",")].join("~");
+  }
+  function renderDebrief(st) {
+    const host = $("#debriefEditor"); if (!host) return;
+    const rooms = (st.rooms || []).filter(r => r.built);
+    const sig = debriefSig(st);
+    if (host.dataset.built && sig === DEBRIEF_SIG) return;   // same shape → keep unsaved edits intact
+    DEBRIEF_SIG = sig;
+    const db = st.debrief || {};
+    let html = `<div class="storyblk"><div class="storylbl">Intro · scenario-level</div>` +
+      `<input class="storyfld" data-dbg="title" placeholder="title · e.g. How the Alembic worked">` +
+      `<textarea class="storyfld" data-dbg="intro" placeholder="a short scene-setter for the debrief gallery…"></textarea></div>`;
+    rooms.forEach(r => {
+      html += `<div class="storyblk"><div class="storylbl">Debrief · ${esc(r.key)}${r.title ? " · " + esc(r.title) : ""}</div>` +
+        `<textarea class="storyfld" data-dbg-room="${esc(r.key)}" placeholder="how this room embodied the technique…"></textarea></div>`;
+    });
+    html += `<div style="margin-top:10px"><button id="debriefSave">Save debrief</button> <span class="status" id="debriefSaveStat"></span></div>`;
+    host.innerHTML = html;
+    host.dataset.built = "1";
+    const setv = (sel, v) => { const el = host.querySelector(sel); if (el) el.value = v == null ? "" : v; };
+    setv('[data-dbg="title"]', db.title);
+    setv('[data-dbg="intro"]', db.intro);
+    rooms.forEach(r => {
+      const d = r.debrief;
+      setv(`textarea[data-dbg-room="${r.key}"]`, (d && typeof d === "object") ? (d.body || "") : (d || ""));
+    });
+    host.querySelector("#debriefSave").onclick = saveDebrief;
+  }
+  async function saveDebrief() {
+    const host = $("#debriefEditor"), stat = $("#debriefSaveStat");
+    stat.innerHTML = `<span class="warn">saving…</span>`;
+    const val = sel => { const el = host.querySelector(sel); return el ? el.value : ""; };
+    const issues = [];
+    const title = val('[data-dbg="title"]'), intro = val('[data-dbg="intro"]');
+    if (title.trim() || intro.trim()) {
+      const rs = await patchScenario({ debrief: { title, intro } });
+      if (!rs.ok) issues.push("scenario: " + esc(rs.error || "failed"));
+    }
+    let rOk = 0;
+    for (const t of host.querySelectorAll('textarea[data-dbg-room]')) {
+      if (!t.value.trim()) continue;                        // don't write empty debriefs (keeps scenario.json clean)
+      const rr = await post("/api/room-patch", { chapter: CH, scenario: SC, roomKey: t.dataset.dbgRoom, fields: { debrief: t.value } });
+      if (!rr.ok) issues.push(`${esc(t.dataset.dbgRoom)}: ${esc(rr.error || "failed")}`); else rOk++;
+    }
+    stat.innerHTML = issues.length
+      ? `<span class="err">saved with issues — ${issues.join("; ")}</span>`
+      : `<span class="ok">saved ✓ — intro + ${rOk} room${rOk === 1 ? "" : "s"}</span>`;
+    DEBRIEF_SIG = null; refresh();
   }
   function viewCoverPrompt() {
     $("#promptTitle").textContent = "Cover art prompt";
@@ -485,6 +624,9 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
   const hubUrl = (key, img) => `reproject_test.html?room=${encodeURIComponent(key)}&chapter=${encodeURIComponent(CH)}&scenario=${encodeURIComponent(SC)}&img=${encodeURIComponent(img)}&level1=1`;
   // Open the hotspot-edit hub for a room (③ per-room entry — styled as a button, like Generate in ②).
   function openEdit(key) { window.open(`reproject_test.html?room=${encodeURIComponent(key)}&chapter=${encodeURIComponent(CH)}&scenario=${encodeURIComponent(SC)}&edit=hotspots`, "_blank"); }
+  // ④ Cinemagraphs — open the SAME hotspot hub but deep-linked (focus=cine) to the Spots spoke's Cinemagraph
+  // tab, landing on the first hotspot that still has candidates to pick.
+  function openPick(key) { window.open(`reproject_test.html?room=${encodeURIComponent(key)}&chapter=${encodeURIComponent(CH)}&scenario=${encodeURIComponent(SC)}&edit=hotspots&focus=cine`, "_blank"); }
   // Clickable ✓ review flag — "placed" (hotspotsReviewed, auto-set on Save & close) and "verified"
   // (cinemagraphsVerified). Click toggles it so you can track which rooms you've been through.
   const flagCell = (key, field, on) =>
@@ -493,10 +635,11 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
     const r = await post("/api/set-review-flag", { chapter: CH, scenario: SC, roomKey: key, field, value: val });
     if (r.ok) refresh();
   }
-  // The merged room table. LEFT group (②) = panorama candidates (Generate + ⤢/✕); RIGHT group (③) = the
-  // hotspot/cinemagraph checklist + edit-hotspots link. ALL rooms show (non-spec rooms can't Generate yet).
-  // Rows are rebuilt only when the room set changes (never wiping an in-flight Generate); the ③ checklist
-  // cells refresh every tick (no input state), the ② candidates cell refreshes unless a Generate is busy.
+  // The merged room table, four column-groups: ② Panorama (candidates: Generate + ⤢/✕ + built), ③ Hotspots
+  // (edit-hotspots button + placed ✓), ④ Cinemagraphs (pick-cinemagraphs button + verified ✓). ALL rooms show
+  // (non-spec rooms can't Generate yet). Rows are rebuilt only when the room set changes (never wiping an
+  // in-flight Generate); the ③/④ flag cells refresh every tick, the ② candidates cell refreshes unless a
+  // Generate is busy.
   function renderRooms(rooms) {
     const tb = $("#roomTbl tbody");
     rooms.forEach(rm => { if (rm.hasSpec) PROMPTS[rm.key] = rm.scenePrompt || ""; });   // prompt-modal source
@@ -512,22 +655,20 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
             <div class="cands"></div></div>
           <div class="panostat" style="margin:3px 0 0"></div></td>
         <td class="c-art"></td>
-        <td class="c-spec"></td><td class="c-hot"></td>
         <td class="c-edit"><button onclick="openEdit('${esc(rm.key)}')" title="Fine-tune this room's hotspots on the live 360">edit hotspots</button></td>
-        <td class="c-placed"></td><td class="c-cine"></td><td class="c-verified"></td>
+        <td class="c-placed"></td>
+        <td class="c-pick"><button onclick="openPick('${esc(rm.key)}')" title="Pick which generated clip each cinemagraph uses — opens the hotspot hub on the Cinemagraph tab; leave any you don't want unpicked">pick cinemagraphs</button></td>
+        <td class="c-verified"></td>
       </tr>`).join("");
     }
     rooms.forEach(rm => {
       const tr = tb.querySelector(`tr[data-key="${rm.key}"]`); if (!tr) return;
       tr.classList.toggle("built", !!rm.built);
-      // ③ checklist cells — safe to refresh every tick
-      tr.querySelector(".c-spec").innerHTML = rm.hasSpec ? `<span class="tick">✓</span> <span class="hint">${rm.animateCount} anim</span>` : `<span class="no">—</span>`;
+      // ②/③/④ checklist cells — safe to refresh every tick. ③ Hotspots = edit button (static) + placed ✓;
+      // ④ Cinemagraphs = pick button (static) + verified ✓. Per-room counts (spec/anim/hotspots/to-pick) are
+      // intentionally not shown (Lucas 2026-08-06) — he doesn't always pick every candidate.
       tr.querySelector(".c-art").innerHTML = rm.built ? `<span class="tick">✓ built</span>` : `<span class="no">—</span>`;
-      tr.querySelector(".c-hot").innerHTML = rm.hotspots || "—";
       tr.querySelector(".c-placed").innerHTML = flagCell(rm.key, "hotspotsReviewed", rm.hotspotsReviewed);
-      tr.querySelector(".c-cine").innerHTML = rm.candidatesPending
-        ? `<span class="warn">${rm.candidatesPending} to pick</span>`
-        : (rm.cinemagraphs ? `<span class="tick">${rm.cinemagraphs} ✓</span>` : `<span class="no">—</span>`);
       tr.querySelector(".c-verified").innerHTML = flagCell(rm.key, "cinemagraphsVerified", rm.cinemagraphsVerified);
       // ② candidates cell — don't disturb an in-flight Generate
       if (tr.dataset.busy) return;
@@ -621,25 +762,22 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
     if (r.ok) { render(r); if (!(r.batch && r.batch.state === "running")) { clearInterval(poll); poll = 0; } }
   }, 3000); }
 
-  $("#loadSpecs").onclick = async () => {
-    const stat = $("#specsStat");
-    let specs; try { specs = JSON.parse($("#specsJson").value); } catch (e) { stat.innerHTML = `<span class="err">not valid JSON: ${esc(e.message)}</span>`; return; }
-    stat.textContent = "loading…";
-    const r = await post("/api/save-scene-specs", { chapter: CH, scenario: SC, specs });
-    if (!r.ok) { stat.innerHTML = `<span class="err">${esc(r.error)}</span>`; return; }
-    const rooms = r.rooms || {}, ks = Object.keys(rooms);
-    const errs = ks.filter(k => rooms[k].error);
-    stat.innerHTML = `<span class="ok">${ks.length - errs.length} spec${ks.length - errs.length === 1 ? "" : "s"} written to disk ✓ — network below</span>${errs.length ? ` · <span class="err">${errs.length} failed: ${esc(errs.join(", "))}</span>` : ""}`;
-    refresh();
-  };
   $("#applyAll").onclick = async () => {
     const stat = $("#applyStat"); stat.textContent = "placing…";
     const r = await post("/api/apply-spec-all", { chapter: CH, scenario: SC });
     if (!r.ok) { stat.innerHTML = `<span class="err">${esc(r.error)}</span>`; return; }
     const rooms = r.rooms || {};
-    let created = 0, queued = 0; const errs = [];
-    Object.entries(rooms).forEach(([k, v]) => { created += (v.created || []).length; queued += (v.queued || []).length; if (v.error) errs.push(k); });
-    stat.innerHTML = `<span class="ok">✓ ${created} hotspot${created === 1 ? "" : "s"} placed · ${queued} cinemagraph${queued === 1 ? "" : "s"} queued</span>${errs.length ? ` · <span class="err">${errs.length} failed: ${esc(errs.join(", "))}</span>` : ""}`;
+    let created = 0, qCine = 0, qVar = 0; const errs = [];
+    Object.entries(rooms).forEach(([k, v]) => {
+      created += (v.created || []).length;
+      qCine += (v.queuedCine || []).length;
+      qVar += (v.queuedVar || []).length;
+      if (v.error) errs.push(k);
+    });
+    // Report cinemagraphs and door-open variants SEPARATELY (they're different job types); omit a zero.
+    const q = [`${qCine} cinemagraph${qCine === 1 ? "" : "s"}`];
+    if (qVar) q.push(`${qVar} door-open variant${qVar === 1 ? "" : "s"}`);
+    stat.innerHTML = `<span class="ok">✓ ${created} hotspot${created === 1 ? "" : "s"} placed · ${q.join(" · ")} queued</span>${errs.length ? ` · <span class="err">${errs.length} failed: ${esc(errs.join(", "))}</span>` : ""}`;
     refresh();
   };
   $("#runBatch").onclick = async () => {

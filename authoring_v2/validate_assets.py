@@ -106,8 +106,15 @@ def door_reciprocity(scen):
                 out.append(f"door '{r['key']}'->'{to}' targets a missing/unbuilt room")
                 continue
             tdoors = [x for x in tgt.get("hotspots", []) if x.get("type") == "door"]
-            has_return = any(x.get("to") == r["key"] for x in tdoors) or \
-                         any(x.get("direction") in ("back", "open") and not x.get("to") for x in tdoors)
+            # A door's effective targets = its base `to` PLUS every state-variant `to` (a monorail SWITCH-DOOR
+            # routes back OR forward by lever state — its back variant IS the return, even though the base `to`
+            # points onward). Without this a switch-door reads as one-way (false positive, 2026-08-05).
+            def _door_targets(x):
+                ts = {x.get("to")}
+                ts.update(v.get("to") for v in (x.get("variants") or []) if v.get("to"))
+                return ts
+            has_return = any(r["key"] in _door_targets(x) for x in tdoors) or \
+                         any(x.get("direction") in ("back", "open") and not x.get("to") and not x.get("variants") for x in tdoors)
             if not has_return:
                 out.append(f"one-way passage: '{r['key']}'->'{to}' has no return door back to '{r['key']}' in '{to}'")
     return out

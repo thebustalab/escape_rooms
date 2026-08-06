@@ -758,6 +758,63 @@ def test_variant_add_remove():
     _with_rooms_root(body)
 
 
+def test_cinemagraph_pool_pick_uncommit_delete():
+    """The cinemagraph POOL model (2026-08-06): picking marks a candidate ACTIVE but KEEPS the pool (store-
+    but-deploy is a toggle); un-committing drops only the active pointer; deleting a candidate removes it and,
+    if it was the active one, also clears `cinemagraph`. Regression for the old behaviour that deleted the
+    whole pool on pick."""
+    def body(tmp):
+        _write_scenario("data_vis", "x", {"rooms": [
+            {"key": "room1", "built": True, "hotspots": [
+                {"id": "lantern", "type": "ambient", "box": [0.1, 0.1, 0.2, 0.2], "cinemagraphCandidates": [
+                    {"video": "room1/a.mp4", "loop": "boomerang", "box": [0.1, 0.1, 0.2, 0.2]},
+                    {"video": "room1/b.mp4", "loop": "boomerang", "box": [0.1, 0.1, 0.2, 0.2]},
+                    {"video": "room1/c.mp4", "loop": "crossfade", "box": [0.1, 0.1, 0.2, 0.2]}]}]}]})
+        hs._select_scenario("data_vis", "x")
+        base = hs.COMMIT_BASE
+        spot = lambda: next(h for h in hs._load_scenario(base)["rooms"][0]["hotspots"] if h["id"] == "lantern")
+        # pick candidate 1 → active, POOL KEPT
+        hs._pick_cinemagraph("room1", "lantern", 1, base)
+        assert spot()["cinemagraph"]["video"] == "room1/b.mp4"
+        assert len(spot()["cinemagraphCandidates"]) == 3          # NOT cleared
+        # un-commit → active dropped, pool kept
+        hs._remove_cinemagraph("room1", "lantern", base)
+        assert "cinemagraph" not in spot() and len(spot()["cinemagraphCandidates"]) == 3
+        # delete a NON-active candidate → pool shrinks, no active affected
+        hs._pick_cinemagraph("room1", "lantern", 0, base)         # a.mp4 active
+        hs._delete_cinemagraph_candidate("room1", "lantern", 2, base)   # delete c.mp4 (not active)
+        assert len(spot()["cinemagraphCandidates"]) == 2 and spot()["cinemagraph"]["video"] == "room1/a.mp4"
+        # delete the ACTIVE candidate → it's removed AND the active pointer clears
+        hs._delete_cinemagraph_candidate("room1", "lantern", 0, base)   # a.mp4 was active
+        assert len(spot()["cinemagraphCandidates"]) == 1 and "cinemagraph" not in spot()
+    _with_rooms_root(body)
+
+
+def test_uncommit_folds_standalone_active_into_pool():
+    """Un-checking (✓ off) must NEVER lose a clip. A legacy single-committed clip lives ONLY in `cinemagraph`
+    with no pool entry; un-committing folds it into the pool first, then clears the active pointer — so it
+    stays visible as a stored candidate. Regression for the vanishing-cinemagraph bug (trees boss, 2026-08-06)."""
+    def body(tmp):
+        _write_scenario("data_vis", "x", {"rooms": [
+            {"key": "room1", "built": True, "hotspots": [
+                {"id": "motes", "type": "ambient", "box": [0.3, 0.3, 0.4, 0.4],
+                 "cinemagraph": {"video": "room1/motes.mp4", "loop": "boomerang", "box": [0.3, 0.3, 0.4, 0.4],
+                                 "prompt": "motes drifting", "seed": 42}}]}]})   # standalone active, NO pool
+        hs._select_scenario("data_vis", "x")
+        base = hs.COMMIT_BASE
+        spot = lambda: next(h for h in hs._load_scenario(base)["rooms"][0]["hotspots"] if h["id"] == "motes")
+        hs._uncommit_cinemagraph("room1", "motes", base)
+        s = spot()
+        assert "cinemagraph" not in s                                   # un-deployed
+        assert len(s.get("cinemagraphCandidates", [])) == 1             # but FOLDED into the pool, not lost
+        assert s["cinemagraphCandidates"][0]["video"] == "room1/motes.mp4"
+        assert s["cinemagraphCandidates"][0]["prompt"] == "motes drifting"   # metadata preserved
+        # re-deploy from the pool, then a plain hard-remove leaves the pool intact (that path is the ✕ on a standalone)
+        hs._pick_cinemagraph("room1", "motes", 0, base)
+        assert spot().get("cinemagraph", {}).get("video") == "room1/motes.mp4" and len(spot()["cinemagraphCandidates"]) == 1
+    _with_rooms_root(body)
+
+
 def test_add_variant_merges_onto_switch_door_nav():
     """_add_variant MERGES the generated door-open ART onto a hand-wired SWITCH-DOOR nav variant instead of
     replacing it — so a monorail car's `{state, when, to, direction}` (no art yet) KEEPS its to/direction/when
@@ -1077,6 +1134,81 @@ def test_story_flow_puzzle_prompts_surface_and_write_back():
         # a bad index is reported, not fatal, and doesn't corrupt the file
         bad = hs._set_puzzle_prompts(base, [{"roomKey": "r1", "source": "hotspots", "index": 9, "prompt": "z"}])
         assert bad["updated"] == 0 and bad["errors"][0]["error"]
+
+
+def test_story_flow_clues_surface_and_write_back():
+    """The build-world story flow surfaces every clue's player-facing `body` in room order (committed hotspots
+    are the truth; a plannedHotspot clue only shows when no committed clue of the same label exists yet), and a
+    bulk save writes each edit back into that clue's `body` without disturbing sibling fields. A non-clue index
+    is rejected per-item, not fatal. Regression for clues in the editable story flow (2026-08-06)."""
+    with tempfile.TemporaryDirectory() as base:
+        doc = {"rooms": [
+            {"key": "r1", "hotspots": [
+                {"id": "c1", "type": "clue", "label": "Field-card", "body": "the beetles", "pickup": True},
+                {"id": "p1", "type": "puzzle", "label": "Laptop", "question": {"prompt": "How many?"}},
+            ]},
+            {"key": "r2", "plannedHotspots": [   # unbuilt room — clue body authored on the planned stub
+                {"type": "clue", "label": "Compass", "note": "design-only", "body": "orthogonal headings"},
+            ]},
+        ]}
+        with open(os.path.join(base, "scenario.json"), "w") as f:
+            json.dump(doc, f)
+        st = hs._scenario_state(base)
+        cl = {r["key"]: r["clues"] for r in st["rooms"]}
+        assert [c["label"] for c in cl["r1"]] == ["Field-card"] and cl["r1"][0]["body"] == "the beetles"
+        assert cl["r2"][0]["source"] == "plannedHotspots" and cl["r2"][0]["planned"] and cl["r2"][0]["body"] == "orthogonal headings"
+        # bulk write-back: committed + planned
+        res = hs._set_clues(base, [
+            {"roomKey": "r1", "source": "hotspots", "index": 0, "body": "the gleam-beetles again"},
+            {"roomKey": "r2", "source": "plannedHotspots", "index": 0, "body": "two headings, 90° apart"},
+        ])
+        assert res["updated"] == 2 and not res["errors"]
+        disk = json.load(open(os.path.join(base, "scenario.json")))
+        rr = {r["key"]: r for r in disk["rooms"]}
+        assert rr["r1"]["hotspots"][0]["body"] == "the gleam-beetles again"
+        assert rr["r1"]["hotspots"][0]["pickup"] is True   # sibling field untouched
+        assert rr["r2"]["plannedHotspots"][0]["body"] == "two headings, 90° apart"
+        assert rr["r2"]["plannedHotspots"][0]["note"] == "design-only"   # design note untouched
+        # pointing at a non-clue hotspot is reported, not fatal
+        bad = hs._set_clues(base, [{"roomKey": "r1", "source": "hotspots", "index": 1, "body": "z"}])
+        assert bad["updated"] == 0 and "not a clue" in bad["errors"][0]["error"]
+
+
+def test_apply_spec_queue_accounting_and_candidate_skip():
+    """'Place all hotspots' (_apply_spec) counts cinemagraph vs door-open-VARIANT jobs separately, and does
+    NOT re-queue a cinemagraph for an element that already has an activated clip OR an unpicked candidate pool
+    (the author left all 5 candidates unpicked because none were liked — re-generating is a per-hotspot action,
+    not a side effect of re-running). Regression for the over-queue + mislabelled 'N cinemagraphs' count
+    (2026-08-06)."""
+    with tempfile.TemporaryDirectory() as base:
+        spec = {"room": "r1", "elements": [
+            {"id": "mist", "at": "on the left", "desc": "drifting mist",
+             "animate": {"motion": "mist drifting", "loop": "crossfade"}},
+            {"id": "lanterns", "at": "to the right", "desc": "swaying lanterns",
+             "animate": {"motion": "lanterns swaying", "loop": "boomerang"}},
+            {"id": "door1", "at": "dead ahead", "desc": "a sliding door",
+             "door": {"direction": "forward", "to": "r2",
+                      "opensOnto": [{"state": "open", "reveal": "the door slides open onto the room beyond"}]}},
+        ]}
+        doc = {"rooms": [{
+            "key": "r1", "panorama": "r1/scene.png",       # built → hotspots carry real boxes
+            "authoring": {"sceneSpec": spec},
+            # 'lanterns' already has a candidate POOL but no activated clip — must NOT be re-queued.
+            "hotspots": [{"id": "lanterns", "type": "ambient", "box": [0.7, 0.25, 0.86, 0.8],
+                          "cinemagraphCandidates": [{"video": "r1/l1.mp4"}, {"video": "r1/l2.mp4"}]}],
+        }]}
+        with open(os.path.join(base, "scenario.json"), "w") as f:
+            json.dump(doc, f)
+        res = hs._apply_spec(base, "r1")
+        assert res["queuedCine"] == ["mist"]           # new animated element with no clip/candidates → queued
+        assert "lanterns" in res["skipped"]            # has candidates → skipped, not re-queued
+        assert res["queuedVar"] == ["door1:open"]      # door-open reveal is a VARIANT, counted separately
+        q = hs._batch_read_queue(base)
+        assert sum(1 for j in q if j["type"] == "cinemagraph") == 1
+        assert sum(1 for j in q if j["type"] == "variant") == 1
+        # idempotent: a second run queues nothing (mist already queued, lanterns still has candidates)
+        res2 = hs._apply_spec(base, "r1")
+        assert res2["queuedCine"] == [] and res2["queuedVar"] == []
 
 
 def test_set_review_flag_whitelist_and_persist():

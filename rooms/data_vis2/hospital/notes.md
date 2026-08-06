@@ -719,3 +719,14 @@ metabolomics CSVs must be pushed live from the Mac (github.io URLs 404 otherwise
 the two decorative Alaska art residues (room2 lake print, room3 parks map) + the boss flight-recorder prop
 regen — all art-harness work. Not yet in the JS e2e `SCENARIOS` list (`tests/e2e/{smoke,full_playthrough}.spec.js`)
 — add when convenient so the Playwright playthrough covers it (needs the CSVs live first).
+
+---
+
+## Scene-spec backfill for build_world (2026-08-06)
+
+Hospital was built with the OLDER harness (scenePrompt, no sceneSpec). Backfilled a reconstructed
+`authoring.sceneSpec` for all 5 built rooms so it's editable/regenerable in the v2 build_world harness.
+Verified: `to_hotspots` covers every gameplay hotspot id, `render_prompt` round-trips, validators unchanged
+(test 0 fail, validate_assets PASS — status:ready holds, decoder c(3,1,4,0)). Older prompts had no explicit
+`seam` clause, so a plausible calm interior seam was supplied per room. Backup:
+`_scratch/scenario.json.pre_scenespec_20260806_*.bak`.

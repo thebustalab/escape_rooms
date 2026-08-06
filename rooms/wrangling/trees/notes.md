@@ -516,5 +516,11 @@ The WIRING pass is essentially done; only the sound pass + the state-view door A
   dial-only junction room as intentionally ungraded (and passes trees); `test_trees.py` added (pins the four
   answers + the flip + switch-door graph + grid mapping + decoder lockstep — ALL PASS); trees added to the e2e
   smoke list. The wiring regenerator is `_scratch/wire_puzzles.py` (re-runnable) with `_scratch/scenario.prewire.json` as the pre-wire backup.
-- **REMAINING:** (1) per-room **sfx** sourcing (ambience beds + solve stings) + `auto_balance.py`; (2) the
-  **door state-view art** (Lucas); (3) an optional e2e full-playthrough spec + browser playtest.
+- **REMAINING (open threads, 2026-08-06):** sfx are wired + balanced and the station/car/boss door art is
+  generated; what's left is (1) **regenerate the two black-hole car doors** — `car_ci`/`car_tr`, whose boxes
+  were pulled off the seam and whose reveals were rewritten bright (`_scratch/fix_door_art.py`); regenerate
+  them (Variants tab, per-tile Regenerate, on the restarted :8752 server) and eyeball; if still black, the car
+  panoramas themselves need re-gen so the door sits off the seam; (2) a **browser playtest** of the full
+  run + point/copy `tests/e2e/alaska_full.spec.js` to a `trees_full.spec.js` (trees is already in the e2e
+  `smoke` list). Restart :8752 first so it carries this session's server changes (switch-door merge,
+  cinemagraph pool, reloop, uncommit-fold).

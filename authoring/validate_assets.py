@@ -207,6 +207,30 @@ def main():
                 any_bad = True
         except Exception as e:
             print(f"(inventory check skipped: {e})")
+        # global: shared-engine cache tokens must be COHERENT. `pano-player.js` imports its local helper
+        # modules with a ?v= token; that token AND the ?v= on every play.html's <script src=pano-player.js>
+        # must all match. A drift leaves browsers on a STALE cached helper module → a "doesn't provide an
+        # export named X" SyntaxError → blank page. Also flags a BARE local import (never cache-busted).
+        # (The 2026-08-05 airship regression: a bumped pano-player.js imported variant_resolve.js bare, so
+        # browsers kept the pre-`activeDoorVariant` copy and the whole engine module failed to parse.)
+        try:
+            import re as _re
+            shared = os.path.join(HERE, "..", "shared")
+            eng = open(os.path.join(shared, "pano-player.js"), encoding="utf-8").read()
+            imp_tokens = set(_re.findall(r'from\s+"\./[\w-]+\.js\?v=(\d+)"', eng))
+            bare_imports = _re.findall(r'from\s+"(\./[\w-]+\.js)"', eng)          # local imports with NO ?v=
+            shells = glob.glob(os.path.join(ROOMS, "*", "*", "play.html")) + [os.path.join(shared, "test_play.html")]
+            tag_tokens = set()
+            for sh in shells:
+                tag_tokens |= set(_re.findall(r'pano-player\.js\?v=(\d+)', open(sh, encoding="utf-8").read()))
+            if bare_imports:
+                print(f"VBUMP  pano-player.js imports {bare_imports} with NO ?v= token (a bare local import is never cache-busted — add ?v=N in lockstep with the engine)")
+                any_bad = True
+            if len(imp_tokens | tag_tokens) > 1:
+                print(f"VBUMP  shared-engine cache tokens drift — pano-player.js imports {sorted(imp_tokens)} vs play.html <script> tags {sorted(tag_tokens)}; bump ALL to one ?v=N (stale-helper-module SyntaxError risk)")
+                any_bad = True
+        except Exception as e:
+            print(f"(engine-token check skipped: {e})")
     sys.exit(1 if any_bad else 0)
 
 if __name__ == "__main__":

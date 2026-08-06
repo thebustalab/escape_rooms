@@ -67,15 +67,26 @@ def main():
 
     print("== analysis answers vs data (each correct option is the verified answer) ==")
 
-    # room1 — solvents that mix with water sit at HIGHER relative polarity
+    # room1 — CODE-CHECK (not MCQ, 2026-08-06): the student must compute the mean relative_polarity of the
+    # water-mixers vs the non-mixers, proving the mixers are more polar (a bare MCQ was guessable from basic
+    # chem). A `check` encodes answer=1 when solved, and DATA_VIS2_AIRSHIP_KEY keeps room1 at 1 — decoder is
+    # unaffected (validate_keys treats a solved check as index 1).
     mix_pol = [r["_pol"] for r in rows if r["_mix"] and r["_pol"] is not None]
     non_pol = [r["_pol"] for r in rows if not r["_mix"] and r["_pol"] is not None]
     mean = lambda xs: sum(xs) / len(xs)
-    q1 = puzzle("room1")["question"]
     check(mean(mix_pol) > mean(non_pol) + 0.1,
           "water-mixers sit at higher polarity (%.3f vs %.3f)" % (mean(mix_pol), mean(non_pol)))
-    check(q1["correct"] == 1 and "HIGHER" in q1["options"][1].upper(),
-          "room1 correct = idx 1 (the HIGHER-polarity option)")
+    c1 = puzzle("room1").get("check")
+    check(isinstance(c1, dict) and "question" not in puzzle("room1"),
+          "room1 is a code-check, not an MCQ")
+    check(bool(c1) and set(c1.get("requires", [])) == {"mixers", "nonmixers"},
+          "room1 check requires both group means: %s" % (c1 and c1.get("requires"),))
+    # the check's expected values must match the data (the means the student has to reproduce)
+    check(bool(c1) and ("%.4f" % mean(mix_pol))[:5] in c1.get("expr", "")
+          and ("%.4f" % mean(non_pol))[:5] in c1.get("expr", ""),
+          "room1 check pins the data means (mixers %.4f / nonmixers %.4f) in expr" % (mean(mix_pol), mean(non_pol)))
+    check(bool(c1) and not c1.get("feedback", {}).get("reveal"),
+          "room1 check has no answer reveal")
 
     # room2 — most solvents denser than water are chlorinated
     dense = [r for r in rows if r["_den"] is not None and r["_den"] > 1]
@@ -121,10 +132,14 @@ def main():
     check(q4["correct"] == 4 and q4["options"][4].lower().replace(" ", "").startswith("1-butanol".replace(" ", "")),
           "boss correct = idx 4 = 1-Butanol")
 
-    print("== MCQ hygiene + decoder lockstep ==")
-    correct = [puzzle(rk)["question"]["correct"] for rk in ("room1", "room2", "room3", "boss")]
-    check(correct == [1, 3, 2, 4], "correct indices == DATA_VIS2_AIRSHIP_KEY c(1,3,2,4): %s" % correct)
-    for rk in ("room1", "room2", "room3", "boss"):
+    print("== puzzle hygiene + decoder lockstep ==")
+    # room1 is a code-check (encodes index 1 when solved); rooms 2-4 are MCQs (their `correct` index).
+    def encoded_index(rk):
+        p = puzzle(rk)
+        return 1 if p.get("check") else p["question"]["correct"]
+    correct = [encoded_index(rk) for rk in ("room1", "room2", "room3", "boss")]
+    check(correct == [1, 3, 2, 4], "encoded indices == DATA_VIS2_AIRSHIP_KEY c(1,3,2,4): %s" % correct)
+    for rk in ("room2", "room3", "boss"):   # MCQ hygiene (room1 is a code-check, guarded above)
         q = puzzle(rk)["question"]
         check(len(q["options"]) >= 6, "%s has >= 6 options (%d)" % (rk, len(q["options"])))
         check("reveal" not in q.get("feedback", {}), "%s has no feedback.reveal" % rk)
