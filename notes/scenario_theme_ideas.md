@@ -27,6 +27,35 @@ When one of these graduates into a real build, move it under the appropriate
 - **Rock islands out on water, connected by rope bridges** — a striking layout for moving
   between rooms/areas.
 
+### Subway-themed → **embeddings** (suggested; the `japan` partner)
+- Setting: an **underground subway / metro** — platforms, tunnels, trains, the map.
+- **Music/vibe: dub techno** (deep, spacious, hypnotic — suits the tunnels-and-neon mood).
+- Draw mechanic ideas from **the Iron Tangle** (Lucas's reference — pull specifics from it when this
+  graduates; not yet spelled out here).
+- **Suggested technique — embeddings (book ch.12/13; Lucas 2026-08-05, leaning not commitment).** A subway
+  map is the canonical embedding metaphor: it discards *geography* and preserves *connectivity/topology* —
+  exactly what an embedding does (near on the map = near in vector space, not near on the ground). Puzzle
+  writes itself as **nearest-neighbour retrieval** with a "false friend" trap (a station geographically
+  close but not actually connected / a different kind). Would be the **pre/post partner to
+  `embeddings/japan` (Wind Shrine)** on a different dataset — the pairing convention that chapter wants.
+  *Alternative home:* **Data Vis III (ch.5)** — a subway is literally a node-link **similarity network** /
+  a map, and ch.5 currently has NO scenario at all (the biggest single gap). Pick at graduation.
+- No dataset / ladder assigned yet.
+
+### Jewel-thief heist → **numerical modeling** (suggested; the `sailing` partner)
+- Setting: a **heist** — a jewel thief and a vault.
+- **Music/vibe: James Bond-style** spy score.
+- **Premise hook:** *beat the thief to the vault* — a race/clock framing (pairs with a timed or
+  against-the-clock structure).
+- **Suggested technique — numerical modeling / regression (book ch.11; Lucas 2026-08-05, leaning not
+  commitment).** Modeling *is* fit-a-pattern-then-**extrapolate-to-predict**, and "beat the thief to the
+  vault" is exactly that: take the thief's past jobs, fit their pattern/trajectory, extrapolate to predict
+  the next target and get there first. The clock is the payoff a good prediction buys. Ladder can climb
+  straight line → curve → multi-variable → boss (room for ch.11's random forest), same as `sailing`. Would
+  be the **pre/post partner to `modeling/sailing`** (navigator predicts safe passage) on a different
+  dataset — same technique, opposite skin.
+- No dataset / ladder assigned yet.
+
 ### England / henges → **PCA** — ⇒ GRADUATED to a build 2026-07-23
 > **Now in build.** PUZZLE phase complete: `rooms/dimensionality_reduction/henges/` (verified ladder +
 > engineered `druid_ingredients` dataset — see its `notes.md`). Kept here for the record. Next:
@@ -95,3 +124,7 @@ through arches — a lovely, distinct spatial idiom for the *same* PCA lesson.
   and reserved as the henges' PCA pre/post partner on a non-canyon interior.
 - England/henges → PCA added 2026-07-23 (Lucas, "ideas" session). This one *does* carry a technique
   (PCA) and detailed mechanic notes — further along than a bare setting.
+- Subway (dub techno, Iron Tangle mechanics) + jewel-thief heist (Bond music, "beat the thief to the
+  vault") added 2026-08-05 (Lucas). Technique leanings penciled in the same session: **subway → embeddings**
+  (the `japan` partner; or Data Vis III ch.5, the one empty chapter) and **heist → numerical modeling** (the
+  `sailing` partner). Leanings not commitments — settings still need a dataset + ladder before build.

@@ -34,3 +34,19 @@ export function pickActiveVariants(hotspots, evalCond) {
 export function roomHasVariants(hotspots) {
   return (hotspots || []).some(h => h && Array.isArray(h.variants) && h.variants.some(v => v && v.panorama));
 }
+
+// The active NAVIGATION variant of a single door (the monorail world-state switch, 2026-08-05). A door may
+// carry `variants:[{state, when, to, direction?, panorama?}]`; a world-state lever (a `dial`) flips which
+// one is live, so ONE door leads to different rooms — and shows a different open-view — per state. The
+// active variant is the LAST whose `when` holds (author order = priority), the same rule pickActiveVariants
+// uses for art. The KEY difference: a nav variant does NOT need `panorama` — it only has to say WHERE the
+// door goes, so the mechanic works before (or without) the state-specific door art existing; the art rides
+// in on the same variant via pickActiveVariants once generated. Returns the chosen variant, or null when the
+// door has no variants / none match (caller falls back to the door's own `to`/`direction`).
+export function activeDoorVariant(hotspot, evalCond) {
+  const vs = hotspot && Array.isArray(hotspot.variants) ? hotspot.variants : null;
+  if (!vs || !vs.length) return null;
+  let chosen = null;
+  for (const v of vs) { if (v && evalCond(v.when)) chosen = v; }
+  return chosen;
+}

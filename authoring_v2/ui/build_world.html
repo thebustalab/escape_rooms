@@ -56,7 +56,7 @@
   .candrow { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
   .genrow { display:flex; flex-direction:row; gap:6px; align-items:center; }
   #roomTbl td.c-art { white-space:nowrap; }   /* the "✓ built" indicator, right side of the ② Panorama group */
-  /* ③ actions (Place all hotspots · Generate all cinemagraphs) live in the group header, above the columns. */
+  /* ③ actions (Place all hotspots · Generate all cinemagraphs and variants) live in the group header, above the columns. */
   .g3acts { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
   .g3acts button { font-size:12px; }
   .g3acts .status { margin-left:0; }
@@ -85,6 +85,14 @@
   .storytitle { font-weight:700; }
   .storybody { font-size:12px; color:#cfe0ea; }
   .storybody b { color:var(--amber); }
+  /* Editable story flow: entry cards + puzzle prompts, in player order, saved together. */
+  .storyfld { width:100%; margin-top:3px; font-family:inherit; font-size:12px; }
+  textarea.storyfld { min-height:44px; }
+  textarea.storyfld.puzfld { min-height:56px; }
+  .storyblk.puz { border-left-color:var(--amber); }
+  .storyblk.puz .storylbl { color:var(--amber); }
+  #storySave { background:#123020; border-color:var(--green); color:var(--green); }
+  #storySave:hover { border-color:var(--green); filter:brightness(1.2); }
 </style>
 </head>
 <body>
@@ -151,7 +159,7 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
               <span>③ Hotspots &amp; cinemagraphs</span>
               <button id="applyAll" title="Place each element's hotspot (approx box) + queue every animated one as a cinemagraph — do this after the art is committed">Place all hotspots</button>
               <span class="status" id="applyStat"></span>
-              <button id="runBatch" title="Run the queued cinemagraphs — each makes 5 candidates to pick from; voice is down while it runs">Generate all cinemagraphs</button>
+              <button id="runBatch" title="Run the queued cinemagraphs AND door-open state variants — cinemagraphs make 5 candidates to pick; door variants attach directly; voice is down while it runs">Generate all cinemagraphs and variants</button>
               <span class="status" id="batchStat"></span>
             </div>
           </th>
@@ -164,7 +172,7 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
       </thead>
       <tbody></tbody>
     </table>
-    <div class="hint" style="margin-top:6px">Work each room left → right: <b>Generate</b> a panorama and commit it (⤢), then <b>Place all hotspots</b>, nudge the rough boxes via <b>edit hotspots</b>, and <b>Generate all cinemagraphs</b> (each makes 5 candidates to pick).</div>
+    <div class="hint" style="margin-top:6px">Work each room left → right: <b>Generate</b> a panorama and commit it (⤢), then <b>Place all hotspots</b>, nudge the rough boxes via <b>edit hotspots</b>, and <b>Generate all cinemagraphs and variants</b> (cinemagraphs make 5 candidates to pick; door-open state variants attach directly).</div>
   </div>
 
   <div class="stage">
@@ -236,7 +244,7 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
     const rooms = st.rooms || [];
     const b = st.batch, running = b && b.state === "running";
     $("#runBatch").disabled = running || !st.queued;
-    $("#runBatch").textContent = running ? "generating…" : `Generate all cinemagraphs${st.queued ? " (" + st.queued + " queued)" : ""}`;
+    $("#runBatch").textContent = running ? "generating…" : `Generate all cinemagraphs and variants${st.queued ? " (" + st.queued + " queued)" : ""}`;
     if (running) {
       const cur = b.current ? `${b.current.type} · ${esc(b.current.room)}/${esc(b.current.hotspot)}${b.current.step ? " · " + esc(b.current.step) : ""}` : "starting…";
       $("#batchStat").innerHTML = `<span class="warn">running ${b.done || 0}/${b.total || 0}</span> · ${cur} · voice is down`;
@@ -318,22 +326,110 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
     const has = v => !!(v && String(v).trim());
     $("#coverFlags").innerHTML = `prompt ${m(has(st.coverPrompt))} · cover set ${m(has(st.cover))} · title ${m(has(st.title))} · ambient ${m(has(st.ambient))}`;
   }
-  // Story flow — read-only narrative under the network, in room order, so you can read the storyline and see
-  // how it threads through the network. All authored in the spec bundle's `story` entry.
+  // Story flow — the EDITABLE narrative under the network, in player order: opening → each room's entry card
+  // then that room's puzzle prompt(s) → the finish screens. Edit any field and hit "Save spec"; opening /
+  // entries / finishes persist through the spec bundle's `story` (save-scene-specs), and each puzzle prompt
+  // writes straight back into its hotspot (set-puzzle-prompts). Rebuilt only when the story's SHAPE changes
+  // (rooms / entries / puzzle set) so a poll tick never clobbers an in-progress edit.
+  const KINDLBL = { mcq: "puzzle prompt", check: "puzzle prompt · console check", pick: "pick-a-point instructions", map: "map instructions", instructions: "instructions" };
+  let STORY_SIG = null;
+  function storySig(st) {
+    const rooms = st.rooms || [];
+    return [CH, SC, !!st.analysisFinish, !!st.escapeFinish,
+      rooms.map(r => r.key + (r.entry ? "#e" : "") + "#" + (r.puzzlePrompts || []).map(p => p.source + p.index).join("+")).join(",")
+    ].join("~");
+  }
   function renderStory(st) {
     const host = $("#storyFlow"); if (!host) return;
     const rooms = st.rooms || [];
-    const any = st.openingStory || st.enterLabel || st.analysisFinish || st.escapeFinish || rooms.some(r => r.entry);
-    if (!any) { host.innerHTML = ""; return; }
-    const blk = (label, title, body) =>
-      `<div class="storyblk"><div class="storylbl">${esc(label)}</div>${title ? `<div class="storytitle">${esc(title)}</div>` : ""}${body ? `<div class="storybody">${body}</div>` : ""}</div>`;
-    let html = `<div class="storyhd">Story flow <span class="hint">— read-only; authored in the spec bundle's <code>story</code></span></div>`;
-    if (st.openingStory || st.enterLabel)
-      html += blk("Opening" + (st.enterLabel ? ` · enter: “${esc(st.enterLabel)}”` : ""), st.title || "", esc(st.openingStory || ""));
-    rooms.forEach(r => { if (r.entry) html += blk("Entry · " + r.key, r.entry.title || "", r.entry.text || ""); });
-    if (st.analysisFinish) html += blk("Analysis finish", st.analysisFinish.title || "", st.analysisFinish.body || "");
-    if (st.escapeFinish) html += blk("Escape finish", st.escapeFinish.title || "", st.escapeFinish.body || "");
+    const any = st.openingStory || st.enterLabel || st.analysisFinish || st.escapeFinish ||
+      rooms.some(r => r.entry || (r.puzzlePrompts || []).length);
+    if (!any) { host.innerHTML = ""; host.dataset.built = ""; STORY_SIG = null; return; }
+    const sig = storySig(st);
+    if (host.dataset.built && sig === STORY_SIG) return;   // same shape → keep unsaved edits intact
+    STORY_SIG = sig;
+    const fld = (fldName, room, ph) =>
+      `<textarea class="storyfld" data-fld="${fldName}"${room ? ` data-room="${esc(room)}"` : ""} placeholder="${esc(ph || "")}"></textarea>`;
+    let html = `<div class="storyhd">Story flow <span class="hint">— edit the narrative in player order, then Save</span></div>`;
+    // opening (landing screen) — scenario-level
+    html += `<div class="storyblk"><div class="storylbl">Opening · landing screen</div>` +
+      (st.title ? `<div class="storytitle">${esc(st.title)}</div>` : "") +
+      fld("opening", "", "The opening the player reads on the landing screen…") +
+      `<div class="storylbl" style="margin-top:5px">enter button</div>` +
+      `<input class="storyfld" data-fld="enterLabel" placeholder="Enter →">` +
+      `</div>`;
+    // per room, in order: entry card (if any) then that room's puzzle prompt(s)
+    rooms.forEach(r => {
+      if (r.entry) {
+        html += `<div class="storyblk" data-room="${esc(r.key)}"><div class="storylbl">Entry card · ${esc(r.key)}</div>` +
+          `<input class="storyfld" data-fld="entryTitle" data-room="${esc(r.key)}" placeholder="card title · defaults to room title">` +
+          fld("entryText", r.key, "Shown as the player passes into this room…") +
+          `</div>`;
+      }
+      (r.puzzlePrompts || []).forEach(p => {
+        html += `<div class="storyblk puz"><div class="storylbl">${esc(KINDLBL[p.kind] || "puzzle prompt")} · ${esc(r.key)} · ${esc(p.label)}${p.planned ? ' <span class="warn">(planned)</span>' : ""}</div>` +
+          `<textarea class="storyfld puzfld" data-fld="puzzle" data-room="${esc(r.key)}" data-source="${esc(p.source)}" data-index="${p.index}" placeholder="the question the player reads"></textarea>` +
+          `</div>`;
+      });
+    });
+    if (st.analysisFinish)
+      html += `<div class="storyblk"><div class="storylbl">Analysis finish</div>` +
+        `<input class="storyfld" data-fld="afTitle" placeholder="Complete">` + fld("afBody", "", "Nice work — you've finished.") + `</div>`;
+    if (st.escapeFinish)
+      html += `<div class="storyblk"><div class="storylbl">Escape finish</div>` +
+        `<input class="storyfld" data-fld="efTitle" placeholder="You escaped!">` + fld("efBody", "", "You made it out.") + `</div>`;
+    html += `<div style="margin-top:10px"><button id="storySave">Save spec</button> <span class="status" id="storySaveStat"></span></div>`;
     host.innerHTML = html;
+    host.dataset.built = "1";
+    // set textarea/input VALUES via property (never through innerHTML — prompts/entries may contain markup)
+    const setv = (sel, v) => { const el = host.querySelector(sel); if (el) el.value = v == null ? "" : v; };
+    setv('[data-fld="opening"]', st.openingStory);
+    setv('[data-fld="enterLabel"]', st.enterLabel);
+    rooms.forEach(r => {
+      if (r.entry) {
+        setv(`input[data-fld="entryTitle"][data-room="${r.key}"]`, r.entry.title);
+        setv(`textarea[data-fld="entryText"][data-room="${r.key}"]`, r.entry.text);
+      }
+      (r.puzzlePrompts || []).forEach(p =>
+        setv(`textarea[data-fld="puzzle"][data-room="${r.key}"][data-source="${p.source}"][data-index="${p.index}"]`, p.prompt));
+    });
+    if (st.analysisFinish) { setv('[data-fld="afTitle"]', st.analysisFinish.title); setv('[data-fld="afBody"]', st.analysisFinish.body); }
+    if (st.escapeFinish) { setv('[data-fld="efTitle"]', st.escapeFinish.title); setv('[data-fld="efBody"]', st.escapeFinish.body); }
+    host.querySelector("#storySave").onclick = saveStory;
+  }
+  async function saveStory() {
+    const host = $("#storyFlow"), stat = $("#storySaveStat");
+    stat.innerHTML = `<span class="warn">saving…</span>`;
+    const val = sel => { const el = host.querySelector(sel); return el ? el.value : undefined; };
+    // 1) opening / enter / entries / finishes → the spec bundle's `story` (single clean path)
+    const story = {};
+    const op = val('[data-fld="opening"]'); if (op !== undefined) story.opening = op;
+    const en = val('[data-fld="enterLabel"]'); if (en !== undefined) story.enterLabel = en;
+    if (host.querySelector('[data-fld="afBody"]')) story.analysisFinish = { title: val('[data-fld="afTitle"]') || "", body: val('[data-fld="afBody"]') || "" };
+    if (host.querySelector('[data-fld="efBody"]')) story.escapeFinish = { title: val('[data-fld="efTitle"]') || "", body: val('[data-fld="efBody"]') || "" };
+    const entries = {};
+    host.querySelectorAll('input[data-fld="entryTitle"]').forEach(inp => {
+      const rk = inp.dataset.room, txt = host.querySelector(`textarea[data-fld="entryText"][data-room="${rk}"]`);
+      entries[rk] = { title: inp.value || "", text: txt ? txt.value : "" };
+    });
+    if (Object.keys(entries).length) story.entries = entries;
+    // 2) puzzle prompts → each hotspot (bulk, one save)
+    const prompts = [...host.querySelectorAll('textarea[data-fld="puzzle"]')].map(t =>
+      ({ roomKey: t.dataset.room, source: t.dataset.source, index: Number(t.dataset.index), prompt: t.value }));
+    let issues = [];
+    const rs = await post("/api/save-scene-specs", { chapter: CH, scenario: SC, specs: { story } });
+    if (!rs.ok || (rs.rooms && rs.rooms.story && rs.rooms.story.error)) issues.push("story: " + esc((rs.rooms && rs.rooms.story && rs.rooms.story.error) || rs.error || "failed"));
+    let pOk = 0;
+    if (prompts.length) {
+      const rp = await post("/api/set-puzzle-prompts", { chapter: CH, scenario: SC, prompts });
+      if (!rp.ok) issues.push("prompts: " + esc(rp.error || "failed"));
+      else { pOk = rp.updated || 0; (rp.errors || []).forEach(e => issues.push(`${esc(e.roomKey)}: ${esc(e.error)}`)); }
+    }
+    stat.innerHTML = issues.length
+      ? `<span class="err">saved with issues — ${issues.join("; ")}</span>`
+      : `<span class="ok">saved ✓ — opening, ${Object.keys(entries).length} entr${Object.keys(entries).length === 1 ? "y" : "ies"}, ${pOk} prompt${pOk === 1 ? "" : "s"}</span>`;
+    STORY_SIG = null;                 // force a rebuild from the freshly-saved state
+    refresh(); loadSpecsFromDisk();   // resync the network + the stage-1 JSON textarea
   }
   function viewCoverPrompt() {
     $("#promptTitle").textContent = "Cover art prompt";

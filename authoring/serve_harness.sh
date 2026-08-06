@@ -77,7 +77,7 @@ if [ "$FORCE_RESTART" != 1 ] && answers "http://127.0.0.1:8055/escape_rooms/shar
   echo "playtest :8055  already up"
 else
   [ "$FORCE_RESTART" = 1 ] && echo "playtest :8055  force-restarting (fresh) in tmux 'playtest'…" || echo "playtest :8055  (re)starting in tmux 'playtest'…"
-  restart_in playtest "cd '$SITE' && python3 -m http.server 8055 --bind 0.0.0.0"
+  restart_in playtest "cd '$SITE' && python3 '$SITE/escape_rooms/authoring/playtest_server.py' 8055"
 fi
 
 # --- settle + report ---

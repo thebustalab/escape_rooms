@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cinemagraph runtime spike</title>
+  <!-- Phase 0 de-risk for ambient cinemagraph loops (see notes/cinemagraph_plan.md). SELF-CONTAINED:
+       no scenario, no shared/pano-player.js change, no generated video. It draws a synthetic 360°
+       equirectangular scene onto an offscreen CANVAS, animates only the SKY band each frame, and feeds
+       that live canvas to Pannellum with `dynamic:true` — the exact runtime approach a real cinemagraph
+       would use (compositeVariants promoted to per-frame). Two hotspots sit on drawn objects to prove
+       projection still tracks the pan; the Rebuild button exercises the known dynamic-rebuild bug
+       (pannellum #686/#836/#856). If this pans smoothly, hotspots stay glued to their objects, and a
+       rebuild doesn't hang — the whole plan's runtime is de-risked. -->
+  <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css" />
+  <style>
+    html, body { margin:0; height:100%; background:#06111a; color:#e8eef2; font:14px/1.5 system-ui, sans-serif; }
+    #pano { position:absolute; inset:0 0 56px 0; }
+    #bar { position:absolute; left:0; right:0; bottom:0; height:56px; display:flex; align-items:center; gap:10px;
+           padding:0 14px; background:#0b1b28; border-top:1px solid rgba(255,255,255,.14); }
+    button { background:#ffd88c; color:#10202a; border:0; border-radius:8px; padding:7px 13px; font:inherit; font-weight:600; cursor:pointer; }
+    button.ghost { background:transparent; color:#e8eef2; border:1px solid rgba(255,255,255,.2); font-weight:400; }
+    #stat { font-size:12px; opacity:.85; margin-left:auto; white-space:nowrap; }
+    .ok2 { color:#9fe6b5; } .err { color:#ff9b9b; }
+    b.k { color:#ffd88c; }
+  </style>
+</head>
+<body>
+  <div id="pano"></div>
+  <div id="bar">
+    <button id="toggle">Pause motion</button>
+    <button id="rebuild" class="ghost">Rebuild viewer</button>
+    <button id="video" class="ghost">Try &lt;video&gt; source</button>
+    <span class="ok2" style="font-size:12px">Pan with the on-screen arrows / drag. Hotspots should stay glued to the lantern &amp; the console.</span>
+    <span id="stat">booting…</span>
+  </div>
+
+  <script>
+    const W = 2048, H = 1024;                          // equirect 2:1 offscreen canvas
+    const HAOV = 360, VAOV = 90, VOFFSET = 0;          // match the game's typical wrap
+    // two objects, at canvas fractions [cx,cy]; hotspots are placed at the matching yaw/pitch so we can
+    // SEE whether projection tracks the animating texture.
+    const OBJECTS = [
+      { id: "lantern", cx: 0.30, cy: 0.60, w: 0.05, h: 0.10, color: "#ffcf7a", label: "lantern" },
+      { id: "console", cx: 0.68, cy: 0.56, w: 0.09, h: 0.07, color: "#7fd1ff", label: "console" },
+    ];
+    const yawOf = f => (f - 0.5) * HAOV;               // canvas x-fraction → yaw
+    const pitchOf = f => (0.5 - f) * VAOV + VOFFSET;   // canvas y-fraction → pitch
+
+    const base = document.createElement("canvas"); base.width = W; base.height = H;   // static parts, drawn once
+    const live = document.createElement("canvas"); live.width = W; live.height = H;   // per-frame texture for pannellum
+    const bx = base.getContext("2d"), lx = live.getContext("2d");
+
+    // ---- draw the STATIC scene once (sky gradient base, ground, horizon, the two objects) ----
+    function drawBase() {
+      const sky = bx.createLinearGradient(0, 0, 0, H * 0.62);
+      sky.addColorStop(0, "#0b2a4a"); sky.addColorStop(1, "#123b63");
+      bx.fillStyle = sky; bx.fillRect(0, 0, W, H * 0.62);
+      const gnd = bx.createLinearGradient(0, H * 0.62, 0, H);
+      gnd.addColorStop(0, "#14202a"); gnd.addColorStop(1, "#0a1017");
+      bx.fillStyle = gnd; bx.fillRect(0, H * 0.62, W, H * 0.38);
+      bx.fillStyle = "rgba(120,180,220,.25)"; bx.fillRect(0, H * 0.62 - 2, W, 4);   // horizon line
+      OBJECTS.forEach(o => {
+        bx.fillStyle = o.color;
+        bx.fillRect((o.cx - o.w / 2) * W, (o.cy - o.h / 2) * H, o.w * W, o.h * H);
+        bx.fillStyle = "rgba(0,0,0,.55)"; bx.font = "bold 20px system-ui";
+        bx.fillText(o.label, (o.cx - o.w / 2) * W, (o.cy - o.h / 2) * H - 6);
+      });
+    }
+
+    // ---- per-frame: copy base, then animate ONLY the sky band (drifting clouds) ----
+    let useVideo = false, vid = null;
+    function drawFrame(t) {
+      lx.drawImage(base, 0, 0);
+      if (useVideo && vid && vid.readyState >= 2) {
+        // prove the <video>-as-source path too: draw the video across the sky band only
+        lx.globalAlpha = 0.85;
+        lx.drawImage(vid, 0, 0, vid.videoWidth, vid.videoHeight, 0, 0, W, H * 0.6);
+        lx.globalAlpha = 1;
+        return;
+      }
+      // procedural drifting clouds: soft moving blobs, wrap-safe (they slide continuously around 360°)
+      const bandH = H * 0.5;
+      lx.save();
+      lx.globalCompositeOperation = "screen";
+      for (let i = 0; i < 7; i++) {
+        const phase = t / 9000 + i * 0.9;
+        const x = ((phase % 1) * (W + 400)) - 200;      // drift left→right, wrapping
+        const y = 40 + (i * bandH) / 7 + Math.sin(t / 2600 + i) * 14;
+        const r = 150 + i * 26;
+        const g = lx.createRadialGradient(x, y, 0, x, y, r);
+        g.addColorStop(0, "rgba(180,205,235,.16)"); g.addColorStop(1, "rgba(180,205,235,0)");
+        lx.fillStyle = g; lx.beginPath(); lx.arc(x, y, r, 0, 6.29); lx.fill();
+        // wrap copy so a cloud leaving the right edge re-enters on the left (seam-safe)
+        lx.beginPath(); lx.arc(x - W, y, r, 0, 6.29); lx.fill();
+        lx.beginPath(); lx.arc(x + W, y, r, 0, 6.29); lx.fill();
+      }
+      lx.restore();
+    }
+
+    let viewer = null, running = true, rafId = 0, frames = 0, fpsT = 0, fps = 0;
+    const stat = document.getElementById("stat");
+
+    function makeViewer() {
+      drawBase();
+      drawFrame(0);
+      viewer = pannellum.viewer("pano", {
+        type: "equirectangular",
+        panorama: live,                 // the LIVE canvas is the texture
+        dynamic: true,                  // → pannellum re-uploads the texture each render
+        haov: HAOV, vaov: VAOV, vOffset: VOFFSET, hfov: 110, pitch: 0, yaw: 0,
+        autoLoad: true, showControls: true, draggable: true, mouseZoom: false,
+        hotSpots: OBJECTS.map(o => ({ id: o.id, yaw: yawOf(o.cx), pitch: pitchOf(o.cy), text: o.label })),
+        backgroundColor: [0.02, 0.05, 0.09],
+      });
+    }
+
+    function loop(t) {
+      if (!running) return;
+      if (t - fpsT > 500) { fps = Math.round(frames * 1000 / (t - fpsT)); frames = 0; fpsT = t; }
+      frames++;
+      drawFrame(t);
+      try { viewer && viewer.setUpdate && viewer.setUpdate(true); }   // tell pannellum the texture changed
+      catch (e) { stat.innerHTML = `<span class="err">setUpdate failed: ${e.message}</span>`; }
+      stat.innerHTML = `dynamic texture · <b class="k">${fps} fps</b> · ${useVideo ? "&lt;video&gt; source" : "procedural clouds"}`;
+      rafId = requestAnimationFrame(loop);
+    }
+
+    document.getElementById("toggle").onclick = e => {
+      running = !running;
+      e.target.textContent = running ? "Pause motion" : "Resume motion";
+      if (running) { fpsT = performance.now(); rafId = requestAnimationFrame(loop); }
+      else { cancelAnimationFrame(rafId); try { viewer.setUpdate(false); } catch (_) {} stat.textContent = "paused (texture frozen)"; }
+    };
+    document.getElementById("rebuild").onclick = () => {
+      // the #686/#836/#856 risk: does destroying + recreating a dynamic viewer hang on "loading"?
+      cancelAnimationFrame(rafId);
+      try { viewer && viewer.destroy(); } catch (_) {}
+      makeViewer();
+      running = true; fpsT = performance.now(); rafId = requestAnimationFrame(loop);
+      stat.innerHTML = `<span class="ok2">rebuilt ✓ — did it come back (not stuck loading)?</span>`;
+    };
+    document.getElementById("video").onclick = e => {
+      // optional: prove a real decoded <video> works as the animated source. Loads ?vid=<url> if given.
+      const url = new URLSearchParams(location.search).get("vid");
+      if (!url) { stat.innerHTML = `<span class="err">no ?vid=&lt;url&gt; given — procedural mode proves the same texture path</span>`; return; }
+      if (!vid) {
+        vid = document.createElement("video");
+        vid.src = url; vid.loop = true; vid.muted = true; vid.playsInline = true;
+        vid.play().catch(err => { stat.innerHTML = `<span class="err">video play blocked: ${err.message}</span>`; });
+      }
+      useVideo = !useVideo;
+      e.target.textContent = useVideo ? "Use procedural" : "Try <video> source";
+    };
+
+    makeViewer();
+    rafId = requestAnimationFrame(loop);
+  </script>
+</body>
+</html>

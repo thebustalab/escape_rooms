@@ -734,7 +734,7 @@ def test_variant_add_remove():
              "panorama": "room1/var_lever_thrown.png"}
         hs._add_variant("room1", "lever", v, base)
         assert spot_of()["variants"][0]["state"] == "thrown"
-        hs._add_variant("room1", "lever", {**v, "prompt": "changed"}, base)      # same state → replace
+        hs._add_variant("room1", "lever", {**v, "prompt": "changed"}, base)      # same state → merge new fields
         assert len(spot_of()["variants"]) == 1 and spot_of()["variants"][0]["prompt"] == "changed"
         hs._add_variant("room1", "lever", {**v, "state": "broken",
                                            "panorama": "room1/var_lever_broken.png"}, base)  # new state → append
@@ -755,6 +755,36 @@ def test_variant_add_remove():
             raise AssertionError("should reject a missing hotspot")
         except ValueError:
             pass
+    _with_rooms_root(body)
+
+
+def test_add_variant_merges_onto_switch_door_nav():
+    """_add_variant MERGES the generated door-open ART onto a hand-wired SWITCH-DOOR nav variant instead of
+    replacing it — so a monorail car's `{state, when, to, direction}` (no art yet) KEEPS its to/direction/when
+    when the art step paints the reveal in and adds panorama/box/prompt for the same state. Regression for the
+    art-clobbers-nav bug (2026-08-05): without the merge, generating the door view would drop where the door
+    leads. Order-independent (nav first here; the reverse composes the same way)."""
+    def body(tmp):
+        _write_scenario("wrangling", "trees", {"rooms": [
+            {"key": "car_sq", "built": True, "hotspots": [
+                {"id": "square_door", "type": "door", "box": [0.7, 0.1, 0.8, 0.9], "direction": "open",
+                 "to": "station2", "variants": [
+                     {"state": "to_station2", "when": {"eq": ["car_sq_dir", "forward"]}, "to": "station2", "direction": "open"},
+                     {"state": "to_station1", "when": {"eq": ["car_sq_dir", "back"]}, "to": "station1", "direction": "back"}]}]}]})
+        hs._select_scenario("wrangling", "trees")
+        base = hs.COMMIT_BASE
+        # the art step attaches a state-tagged reveal (what _run_variant builds) for the SAME state
+        hs._add_variant("car_sq", "square_door",
+                        {"state": "to_station2", "box": [0.7, 0.1, 0.8, 0.9],
+                         "prompt": "open onto station two", "panorama": "car_sq/var_square_door_to_station2.png"}, base)
+        door = next(h for h in hs._load_scenario(base)["rooms"][0]["hotspots"] if h["id"] == "square_door")
+        fv = next(v for v in door["variants"] if v["state"] == "to_station2")
+        assert fv["to"] == "station2" and fv["direction"] == "open"          # nav SURVIVED the art attach
+        assert fv["when"] == {"eq": ["car_sq_dir", "forward"]}               # gating survived
+        assert fv["panorama"] == "car_sq/var_square_door_to_station2.png"    # art added
+        assert len(door["variants"]) == 2                                    # no duplicate; the back variant untouched
+        bv = next(v for v in door["variants"] if v["state"] == "to_station1")
+        assert bv["to"] == "station1" and "panorama" not in bv              # the un-generated state is left alone
     _with_rooms_root(body)
 
 
@@ -999,6 +1029,54 @@ def test_story_spec_bundle_roundtrips():
         bundle = hs._scene_specs(base)
         assert bundle["story"]["opening"] == "You wake in a vault."
         assert bundle["story"]["entries"]["r2"]["text"] == "onward"
+
+
+def test_story_flow_puzzle_prompts_surface_and_write_back():
+    """The build-world story flow surfaces every editable puzzle prompt in room order (committed hotspots are
+    the truth; a plannedHotspot only shows when no committed puzzle of the same label exists), and a bulk save
+    writes each edit back into its own nested field — question.prompt / check.prompt / pick.instructions —
+    without disturbing the rest of the hotspot. Regression for the editable story flow (2026-08-05)."""
+    with tempfile.TemporaryDirectory() as base:
+        doc = {"rooms": [
+            {"key": "r1", "hotspots": [
+                {"id": "p1", "type": "puzzle", "label": "Laptop", "question": {"prompt": "How many?", "options": ["a", "b"], "correct": 0}},
+                {"id": "c1", "type": "clue", "label": "note", "body": "x"},
+            ]},
+            {"key": "r2", "hotspots": [
+                {"id": "p2", "type": "puzzle", "label": "Console", "check": {"prompt": "Filter it.", "expr": "nrow(x)"}},
+                {"id": "pk", "type": "puzzle", "label": "Basin", "pick": {"prompt": "Click your lake.", "answer": "L", "plotCode": "p"}},
+            ]},
+            {"key": "r3", "plannedHotspots": [   # unbuilt room — prompt lives on the planned stub
+                {"type": "puzzle", "label": "Beacon", "question": {"prompt": "Which is warmest?"}},
+            ]},
+        ]}
+        with open(os.path.join(base, "scenario.json"), "w") as f:
+            json.dump(doc, f)
+        st = hs._scenario_state(base)
+        pp = {r["key"]: r["puzzlePrompts"] for r in st["rooms"]}
+        assert [x["kind"] for x in pp["r1"]] == ["mcq"] and pp["r1"][0]["prompt"] == "How many?"
+        assert [x["kind"] for x in pp["r2"]] == ["check", "pick"]
+        assert pp["r3"][0]["source"] == "plannedHotspots" and pp["r3"][0]["prompt"] == "Which is warmest?"
+        # bulk write-back: one edit per kind + the planned one
+        res = hs._set_puzzle_prompts(base, [
+            {"roomKey": "r1", "source": "hotspots", "index": 0, "prompt": "How many now?"},
+            {"roomKey": "r2", "source": "hotspots", "index": 0, "prompt": "Filter it better."},
+            {"roomKey": "r2", "source": "hotspots", "index": 1, "prompt": "Click your NEW lake."},
+            {"roomKey": "r3", "source": "plannedHotspots", "index": 0, "prompt": "Which is coldest?"},
+        ])
+        assert res["updated"] == 4 and not res["errors"]
+        disk = json.load(open(os.path.join(base, "scenario.json")))
+        rr = {r["key"]: r for r in disk["rooms"]}
+        assert rr["r1"]["hotspots"][0]["question"]["prompt"] == "How many now?"
+        assert rr["r1"]["hotspots"][0]["question"]["options"] == ["a", "b"]   # siblings untouched
+        assert rr["r2"]["hotspots"][0]["check"]["prompt"] == "Filter it better."
+        assert rr["r2"]["hotspots"][0]["check"]["expr"] == "nrow(x)"
+        assert rr["r2"]["hotspots"][1]["pick"]["prompt"] == "Click your NEW lake."
+        assert rr["r2"]["hotspots"][1]["pick"]["plotCode"] == "p"   # pick siblings untouched
+        assert rr["r3"]["plannedHotspots"][0]["question"]["prompt"] == "Which is coldest?"
+        # a bad index is reported, not fatal, and doesn't corrupt the file
+        bad = hs._set_puzzle_prompts(base, [{"roomKey": "r1", "source": "hotspots", "index": 9, "prompt": "z"}])
+        assert bad["updated"] == 0 and bad["errors"][0]["error"]
 
 
 def test_set_review_flag_whitelist_and_persist():

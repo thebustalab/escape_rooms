@@ -67,7 +67,7 @@
  *   independent of room structure). See notes/two_phase_escape_design_notes.md.
  */
 import { WebRConsole } from "./webr-console.js";
-import { pickActiveVariants } from "./variant_resolve.js";   // Phase 3: per-hotspot state variants
+import { pickActiveVariants, activeDoorVariant } from "./variant_resolve.js";   // Phase 3: per-hotspot state variants; monorail switch-door nav
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 
@@ -265,7 +265,9 @@ function init(data) {
     analysisFinished = false; escapeFinished = false;                // fresh objective state
     startTime = Date.now();                                           // per-phase timing: game starts now
     analysisFinishedTime = null; escapeFinishedTime = null;           // fresh timing state
-    caseFile.length = 0; pickedClues.clear(); updateNotebookChip();   // fresh field notebook
+    caseFile.length = 0; pickedClues.clear();                         // fresh field notebook
+    if (SCENARIO.story) logToNotebook("Your assignment", SCENARIO.story);  // the opening premise stays re-readable once per-room entry cards are dropped
+    updateNotebookChip();
     $("#notebookChip").style.display = "";                            // persistent chip, in-room only
     $("#debriefChip").style.display = "none";                        // appears only once analysis completes
     $("#skipChip").style.display = "none";                           // appears once analysis is done + an escape remains
@@ -725,10 +727,24 @@ function isPrimarySolved(r) {
   const g = primaryGate(r);
   return g ? solvedGates.has(gateKey(r.key, g.id)) : false;
 }
+// A door's EFFECTIVE navigation, honouring an active state variant (the monorail switch). A switch-door
+// carries variants that each name a `to` + `direction`; a world-state lever picks which is live, so the one
+// door leads back OR forward per state. With no variants (every ordinary door) this is just the door's own
+// fields. `direction` defaults to "forward"; `to` falls back to the door's base `to` (a sane default the
+// door_graph test also reads). See activeDoorVariant in variant_resolve.js.
+function doorNav(h) {
+  const av = activeDoorVariant(h, condOK);
+  return {
+    direction: (av && av.direction) || h.direction || "forward",
+    to: (av && av.to) || h.to || null,
+    variant: av,
+  };
+}
 function doorIsOpen(h, r) {
   if (h.availableWhen != null && !condOK(h.availableWhen)) return false;  // cross-room door gate (e.g. cured) — 2026-07-31
-  if (h.direction === "open") return true;                     // maze passage: always walkable (entry on first visit)
-  if ((h.direction || "forward") === "back") return true;      // back doors always live
+  const dir = doorNav(h).direction;                            // effective direction (a switch-door's active variant may override)
+  if (dir === "open") return true;                             // maze passage: always walkable (entry on first visit)
+  if (dir === "back") return true;                             // back doors always live
   if (h.requires != null) {                                    // gate on specific gate(s) in THIS room
     const ids = Array.isArray(h.requires) ? h.requires : [h.requires];
     return ids.every(id => solvedGates.has(gateKey(r.key, id)));
@@ -774,6 +790,16 @@ function startRoom(i) {
   buildViewer(img, doorYaw(room));   // face the forward (closed) door on entry
   startRoomSfx(room);                // start this room's sound effect(s) (+ optional music duck)
   updateEnvironment();               // progressive heel/sickness reflect current state (persist across rooms)
+}
+
+// Re-render the current room's viewer in place (same room, no sfx churn, no entry card) — used when a
+// world-state lever flips a switch-door so its composited state view updates live. Preserves the current
+// yaw so the view doesn't jump.
+function rerenderCurrentRoom() {
+  if (!room) return;
+  let yaw = doorYaw(room);
+  try { if (viewer && typeof viewer.getYaw === "function") yaw = viewer.getYaw(); } catch (e) {}
+  buildViewer(basePanorama(room, portalUnlocked(room)), yaw);
 }
 
 // Ambient particles behind the card on an entry screen, chosen by scenario.ambient
@@ -1006,7 +1032,8 @@ function activeVariants(r) {
 // room keeps the closed base and composites each open door (activeVariants). Guards the two mechanisms from
 // double-opening if a room ever carries both.
 function basePanorama(room, openState) {
-  const perDoor = (room.hotspots || []).some(h => h && h.type === "door" && h.openImage);
+  const perDoor = (room.hotspots || []).some(h => h && h.type === "door" &&
+    (h.openImage || (Array.isArray(h.variants) && h.variants.some(v => v && v.panorama))));  // per-door open art OR a switch-door's state views
   return (openState && room.panoramaOpen && !perDoor) ? room.panoramaOpen : room.panorama;
 }
 function _loadImg(src) {
@@ -1196,7 +1223,8 @@ function onHotspot(evt, h) {   // Pannellum calls clickHandlerFunc(event, clickH
 // target `to:"<roomKey>"`. forward is gated on the room being solved and shows the target's entry;
 // back is always live and shows no entry. Absent direction/to ⇒ the legacy linear fallback.
 function handleDoor(h) {
-  if ((h.direction || "forward") === "back") {
+  const nav = doorNav(h);                                      // effective direction/to (a switch-door follows its active variant)
+  if (nav.direction === "back") {
     return navigateTo(resolveDoorTarget(h, "back"), false);   // back: no gate, no entry
   }
   if (!doorIsOpen(h, room)) {
@@ -1211,18 +1239,19 @@ function handleDoor(h) {
       : "The door won't budge — solve the puzzle first.");
   }
   if (h.endsEscape) return showEscapeDone();                  // a terminal escape exit inside any room
-  if (h.to) {                                                  // explicit forward target
-    const idx = SCENARIO.rooms.findIndex(r => r.key === h.to && isBuilt(r));
+  if (nav.to) {                                               // explicit forward target (or the active variant's)
+    const idx = SCENARIO.rooms.findIndex(r => r.key === nav.to && isBuilt(r));
     if (idx >= 0) return navigateTo(idx, true);
   }
   return goThrough();                                          // linear fallback (also boss → finish)
 }
 
-// Resolve a door's destination room index: explicit `to` first; for a back door, fall back to the
-// nearest earlier built room.
+// Resolve a door's destination room index: its effective `to` (an active variant's, else its own) first;
+// for a back door, fall back to the nearest earlier built room.
 function resolveDoorTarget(h, dir) {
-  if (h.to) {
-    const idx = SCENARIO.rooms.findIndex(r => r.key === h.to && isBuilt(r));
+  const to = doorNav(h).to;
+  if (to) {
+    const idx = SCENARIO.rooms.findIndex(r => r.key === to && isBuilt(r));
     if (idx >= 0) return idx;
   }
   if (dir === "back") {
@@ -1396,7 +1425,16 @@ function openDial(h) {
   states.forEach(s => {
     const b = document.createElement("button"); b.className = "ghost"; b.dataset.v = s.value;
     b.textContent = s.label || s.value;
-    b.onclick = () => { gameState[key] = s.value; toast("The dial clicks to " + (s.label || s.value) + "."); refresh(); };
+    b.onclick = () => {
+      gameState[key] = s.value; toast("The dial clicks to " + (s.label || s.value) + "."); refresh();
+      // A dial may carry `sfx` (path string or {src,volume}) — the lever/valve throw sound (a monorail
+      // switch-door's clunk). One-shot on each throw. Absent ⇒ silent, so every existing dial is unchanged.
+      if (h.sfx) playOneShot(typeof h.sfx === "string" ? h.sfx : h.sfx.src, (typeof h.sfx === "object") ? h.sfx.volume : undefined);
+      // If a door in THIS room shows a state view (a monorail switch-door), re-render so its art + where it
+      // leads follow the lever immediately. Guarded so ordinary dial rooms (mapview only) are untouched.
+      if ((room.hotspots || []).some(h2 => h2 && h2.type === "door" && Array.isArray(h2.variants) && h2.variants.length))
+        rerenderCurrentRoom();
+    };
     row.appendChild(b);
   });
   wrap.appendChild(face); wrap.appendChild(row); wrap.appendChild(caption);

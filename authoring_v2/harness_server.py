@@ -239,9 +239,13 @@ def _find_hotspot(base, room_key, hotspot_id):
 
 
 def _add_variant(room_key, hotspot_id, variant, base=None):
-    """Add/replace a per-hotspot state VARIANT (Phase 3) on hotspot `hotspot_id`, keyed by `state`:
-    regenerating the same state replaces its entry (idempotent), else it's appended. Writes nested
-    into hotspots[].variants[] (the shallow _room_patch can't reach that depth)."""
+    """Add/MERGE a per-hotspot state VARIANT (Phase 3) on hotspot `hotspot_id`, keyed by `state`:
+    regenerating the same state MERGES the new fields over the existing entry (idempotent for the art
+    fields), else it's appended. Writes nested into hotspots[].variants[] (the shallow _room_patch can't
+    reach that depth). MERGE, not replace, so a hand-wired SWITCH-DOOR nav variant (`{state, when, to,
+    direction}` — the monorail mechanic, no art yet) KEEPS its `to`/`direction`/`when` when the art step
+    later paints the door-open reveal in and adds `panorama`/`box`/`prompt` for the SAME state. Order-
+    independent: wire nav then generate art, or the reverse (2026-08-05)."""
     if not isinstance(variant, dict) or not variant.get("state"):
         raise ValueError("variant needs a state")
     with SAVE_LOCK:
@@ -252,7 +256,7 @@ def _add_variant(room_key, hotspot_id, variant, base=None):
             spot["variants"] = variants
         for i, v in enumerate(variants):
             if v.get("state") == variant["state"]:
-                variants[i] = variant
+                variants[i] = {**v, **variant}      # merge: new fields overlay; existing nav fields survive
                 break
         else:
             variants.append(variant)
@@ -580,6 +584,100 @@ def _set_review_flag(base, room_key, field, value):
     return {"room": room_key, "field": field, "value": bool(value)}
 
 
+def _puzzle_prompt_loc(h):
+    """Where a puzzle hotspot's single player-facing prompt lives, as (kind, container, field) — the live
+    sub-dict of `h` plus the key holding the text — or (None, None, None) for a bare stub. Get and set both
+    go through this so they stay in lockstep on whichever field the puzzle kind uses: MCQ → question.prompt;
+    live-R check → check.prompt; pick-a-point / map → their own prompt (older data: instructions)."""
+    if not isinstance(h, dict):
+        return (None, None, None)
+    q = h.get("question")
+    if isinstance(q, dict) and isinstance(q.get("prompt"), str):
+        return ("mcq", q, "prompt")
+    c = h.get("check")
+    if isinstance(c, dict) and isinstance(c.get("prompt"), str):
+        return ("check", c, "prompt")
+    for k in ("pick", "map"):
+        o = h.get(k)
+        if isinstance(o, dict):
+            for fld in ("prompt", "instructions"):
+                if isinstance(o.get(fld), str):
+                    return (k, o, fld)
+    if isinstance(h.get("instructions"), str):
+        return ("instructions", h, "instructions")
+    return (None, None, None)
+
+
+def _puzzle_prompt_get(h):
+    """(kind, text) of a puzzle hotspot's player-facing prompt, or (None, None) for a bare stub."""
+    kind, cont, fld = _puzzle_prompt_loc(h)
+    return (kind, cont[fld] if kind else None)
+
+
+def _puzzle_prompt_set(spot, text):
+    """Write `text` back into the exact field _puzzle_prompt_get read from (in-place). Raises for a stub."""
+    kind, cont, fld = _puzzle_prompt_loc(spot)
+    if kind is None:
+        raise ValueError("hotspot has no editable prompt")
+    cont[fld] = text if isinstance(text, str) else ""
+    return kind
+
+
+def _room_puzzle_prompts(room):
+    """Every editable puzzle prompt in a room, in authoring order, for the story flow. Committed hotspots are
+    the live truth; a plannedHotspot is only surfaced when no committed puzzle of the same label(slug) exists
+    yet (an unbuilt room). Each item carries (source, index) so the editor can write it straight back."""
+    slug = lambda s: re.sub(r"[^a-z0-9]+", "-", str(s or "").lower()).strip("-")
+    out, seen = [], set()
+    for i, h in enumerate(room.get("hotspots") or []):
+        if h.get("type") != "puzzle":
+            continue
+        kind, text = _puzzle_prompt_get(h)
+        if kind is None:
+            continue
+        out.append({"source": "hotspots", "index": i, "id": h.get("id"),
+                    "label": h.get("label") or h.get("id") or "puzzle", "kind": kind, "prompt": text})
+        seen.add(slug(h.get("label")))
+    for i, h in enumerate(room.get("plannedHotspots") or []):
+        if h.get("type") != "puzzle" or slug(h.get("label")) in seen:
+            continue
+        kind, text = _puzzle_prompt_get(h)
+        if kind is None:
+            continue
+        out.append({"source": "plannedHotspots", "index": i, "id": h.get("id"),
+                    "label": h.get("label") or "puzzle", "kind": kind, "prompt": text, "planned": True})
+    return out
+
+
+def _set_puzzle_prompts(base, items):
+    """Bulk-write player-facing puzzle prompts (the build-world story flow's Save). `items` is
+    [{roomKey, source, index, prompt}] — one load-modify-save so a multi-prompt save is atomic. Returns
+    {updated, errors:[{...,error}]}. Locates each hotspot by (source array, index), matching what
+    _room_puzzle_prompts emitted."""
+    updated, errors = 0, []
+    with SAVE_LOCK:
+        doc = _load_scenario(base)
+        rooms = {r.get("key"): r for r in doc.get("rooms", [])}
+        for it in (items or []):
+            rk, src, idx = it.get("roomKey"), it.get("source"), it.get("index")
+            try:
+                if src not in ("hotspots", "plannedHotspots"):
+                    raise ValueError("bad source %r" % src)
+                node = rooms.get(rk)
+                if node is None:
+                    raise ValueError("no room %r" % rk)
+                arr = node.get(src) or []
+                if not isinstance(idx, int) or idx < 0 or idx >= len(arr):
+                    raise ValueError("index %r out of range" % idx)
+                _puzzle_prompt_set(arr[idx], it.get("prompt"))
+                updated += 1
+            except Exception as e:  # noqa: BLE001 — collect per-item, keep going
+                errors.append({"roomKey": rk, "source": src, "index": idx, "error": str(e)})
+        if updated:
+            _save_scenario(doc, base)
+    return {"updated": updated, "errors": errors}
+
+
 def _scenario_state(base):
     """Per-room pipeline status for the build-world console: spec loaded? art built? hotspots placed?
     cinemagraphs done vs candidates awaiting a pick? Plus the batch status + queue depth."""
@@ -605,6 +703,7 @@ def _scenario_state(base):
             "builtFrom": r.get("builtFrom"),                          # which candidate was committed (flag it live)
             "hotspots": len(hs),
             "entry": r.get("entry") or None,                             # per-room entry card {title,text} (spec story.entries)
+            "puzzlePrompts": _room_puzzle_prompts(r),                     # editable puzzle prompts, in order, for the story flow
             "hotspotsReviewed": bool(auth.get("hotspotsReviewed")),      # you fine-tuned the placements (auto on Save & close; toggleable)
             "cinemagraphsVerified": bool(auth.get("cinemagraphsVerified")),  # you reviewed the cinemagraphs (manual toggle)
             "cinemagraphs": sum(1 for h in hs if h.get("cinemagraph")),
@@ -701,8 +800,11 @@ def _apply_spec(base, room_key):
     # a door that DECLARES multiple open-views (a monorail car whose world-state switch picks which station
     # it looks out on) needs one masked door-open gen per view, all produced in this art step; each is a
     # state-tagged variant on the door hotspot (box = the door's own box; runtime pick-by-state is later
-    # wiring). Skip a view already generated (on the node's variants[]) or already queued.
-    have_var = {h.get("id"): {v.get("state") for v in (h.get("variants") or [])}
+    # wiring). Skip a view whose ART already exists (a variant carrying a `panorama`) or is already queued —
+    # NOT merely one whose state is present: a hand-wired SWITCH-DOOR nav variant (`{state, when, to,
+    # direction}`, no `panorama` yet) occupies the state but still NEEDS its door-open art generated, which
+    # then MERGES onto it (see _add_variant). Filtering on `panorama` keeps it idempotent after generation.
+    have_var = {h.get("id"): {v.get("state") for v in (h.get("variants") or []) if v.get("panorama")}
                 for h in node2.get("hotspots", []) if h.get("variants")}
     queued, skipped = [], []
     with BATCH_LOCK:
@@ -2445,6 +2547,13 @@ class H(http.server.SimpleHTTPRequestHandler):
                 except ValueError as ve:
                     return self._json({"ok": False, "error": str(ve)}, 400)
                 return self._json({"ok": True, "specs": _scene_specs(base)})
+            if route == "/api/set-puzzle-prompts":    # build-world story flow: bulk-save edited puzzle prompts
+                req = self._body()
+                try:
+                    base = _scenario_base(req.get("chapter"), req.get("scenario"))
+                except ValueError as ve:
+                    return self._json({"ok": False, "error": str(ve)}, 400)
+                return self._json({"ok": True, **_set_puzzle_prompts(base, req.get("prompts") or [])})
             if route == "/api/gen-world-plate":      # build-world: the scenario's shared continuity reference (first in step 2)
                 req = self._body()
                 try:

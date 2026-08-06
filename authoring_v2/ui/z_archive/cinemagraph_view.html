@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cinemagraph — first LTX loop (airship deck)</title>
+  <!-- Plays the FIRST real LTX-2.3 cinemagraph as a 360° dynamic texture: the whole generated loop is the
+       equirect panorama, fed to Pannellum with dynamic:true + a per-frame setUpdate so it re-uploads each
+       video frame. Pan with the arrows/drag — the deck stays still, the night sky drifts. This is the
+       actual runtime approach (whole-frame video variant) with a REAL generated asset. -->
+  <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css" />
+  <style>
+    html,body{margin:0;height:100%;background:#06111a;color:#e8eef2;font:14px/1.5 system-ui,sans-serif;}
+    #pano{position:absolute;inset:0 0 46px 0;}
+    #bar{position:absolute;left:0;right:0;bottom:0;height:46px;display:flex;align-items:center;gap:12px;padding:0 14px;background:#0b1b28;border-top:1px solid rgba(255,255,255,.14);}
+    .ok2{color:#9fe6b5;} #stat{margin-left:auto;font-size:12px;opacity:.85;}
+    b.k{color:#ffd88c;}
+  </style>
+</head>
+<body>
+  <div id="pano"></div>
+  <div id="bar">
+    <span class="ok2">First LTX cinemagraph — <b class="k">airship weather deck</b>. Pan with the arrows/drag; the sky drifts while the deck stays still.</span>
+    <span id="stat">loading…</span>
+  </div>
+  <video id="v" src="cinemagraph_demo.mp4" muted loop playsinline crossorigin="anonymous" style="display:none"></video>
+  <script>
+    const v = document.getElementById("v"), stat = document.getElementById("stat");
+    let viewer = null, frames = 0, fpsT = 0, fps = 0;
+    // airship room2 wrap (matches how the game shows this scene)
+    const WRAP = { haov: 360, vaov: 90, hfov: 120, vOffset: -7, pitch: -7 };
+    function start() {
+      viewer = pannellum.viewer("pano", {
+        type: "equirectangular", panorama: v, dynamic: true,
+        haov: WRAP.haov, vaov: WRAP.vaov, vOffset: WRAP.vOffset, hfov: WRAP.hfov, pitch: WRAP.pitch, yaw: 0,
+        autoLoad: true, showControls: true, draggable: true, mouseZoom: false, backgroundColor: [0.02, 0.05, 0.09],
+      });
+      const loop = t => {
+        if (t - fpsT > 500) { fps = Math.round(frames * 1000 / (t - fpsT)); frames = 0; fpsT = t; }
+        frames++;
+        try { viewer.setUpdate(true); } catch (e) {}
+        stat.innerHTML = `playing · <b class="k">${fps} fps</b> · ${v.videoWidth}×${v.videoHeight} loop`;
+        requestAnimationFrame(loop);
+      };
+      requestAnimationFrame(loop);
+    }
+    v.addEventListener("loadeddata", () => { v.play().catch(() => {}); start(); });
+    v.addEventListener("error", () => stat.innerHTML = `<span style="color:#ff9b9b">video failed to load</span>`);
+    v.play().catch(() => {});   // kick autoplay (muted → allowed)
+  </script>
+</body>
+</html>

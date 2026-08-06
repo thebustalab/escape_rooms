@@ -10,6 +10,7 @@ const { test, expect } = require("@playwright/test");
 const SCENARIOS = [
   { name: "alaska", path: "/escape_rooms/rooms/data_vis/alaska/play.html" },
   { name: "hawaii", path: "/escape_rooms/rooms/data_vis/hawaii/play.html" },
+  { name: "trees", path: "/escape_rooms/rooms/wrangling/trees/play.html" },
 ];
 
 for (const sc of SCENARIOS) {

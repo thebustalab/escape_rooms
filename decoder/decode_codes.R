@@ -347,6 +347,25 @@ DATA_VIS_HENGES_KEY <- list(
   }
 )
 
+# wrangling / trees "The Collector's Vault" (scenario id 15): data wrangling (group_by + summarise). Four
+# GRADED rooms in room order — station1 (girth -> Bloomspire), station2 (glow -> Radiant), station3
+# (vitality shortcut -> Cragside), boss (species-balanced regroup -> Sunspire Heights). All console-check
+# puzzles, so each solved room encodes answer = 1 -> correct = c(1, 1, 1, 1). The three monorail cars are
+# ungraded junction rooms (a drive-lever `dial` + a switch-door, no graded puzzle) and the cliff-top vault
+# is the ungraded escape (`phase:"escape"`, a 3x3 grid) — all excluded from the codec (mintCode skips rooms
+# with no roomResult), so only these four bytes appear.
+WRANGLING_TREES_KEY <- list(
+  scenario_id = 15,
+  correct = c(1, 1, 1, 1),
+  score_step = function(correct, answer, attempts) {
+    if (answer != correct) return(0)
+    if (attempts <= 1) return(10)
+    if (attempts == 2) return(7)
+    if (attempts == 3) return(5)
+    3
+  }
+)
+
 # Vectorised over a data frame of submissions.
 grade_submissions <- function(df, key, id_col = "x500", code_col = "code",
                               secret = SECRET) {
@@ -493,5 +512,23 @@ if (identical(environment(), globalenv()) && sys.nframe() == 0) {
   cat("Pano henges grade — points:", gg11$points, "|", gg11$detail, "\n")
   if (!isTRUE(gg11$valid && gg11$points == 40)) {
     stop("REGRESSION: pano henges grade wrong — expected 40 pts for an all-first-try solve")
+  }
+
+  # Regression: pano scenario id 15 (wrangling/trees) — 4 graded console-check rooms, each solved -> answer 1.
+  # The three monorail cars (dial junctions) and the escape vault (grid) are excluded, so only four bytes appear.
+  tsteps15 <- list(list(answer = 1, attempts = 1),
+                   list(answer = 1, attempts = 1),
+                   list(answer = 1, attempts = 1),
+                   list(answer = 1, attempts = 1))
+  tcode15 <- encode_code(version = 1, scenario_id = 15, steps = tsteps15, student_id = "trees_test")
+  td15 <- decode_code(tcode15, "trees_test")
+  tok15 <- td15$valid && td15$scenario_id == 15 &&
+    identical(td15$answers, c(1L, 1L, 1L, 1L)) && identical(td15$attempts, c(1L, 1L, 1L, 1L))
+  cat("Pano round-trip OK id 15 (should be TRUE):", tok15, "\n")
+  if (!tok15) stop("REGRESSION: pano round-trip failed (id 15 trees)")
+  tg15 <- grade_one(tcode15, "trees_test", WRANGLING_TREES_KEY)
+  cat("Pano trees grade — points:", tg15$points, "|", tg15$detail, "\n")
+  if (!isTRUE(tg15$valid && tg15$points == 40)) {
+    stop("REGRESSION: pano trees grade wrong — expected 40 pts for an all-first-try solve")
   }
 }

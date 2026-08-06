@@ -5,7 +5,7 @@
 
 import test from "node:test";
 import assert from "node:assert/strict";
-import { pickActiveVariants, roomHasVariants } from "../shared/variant_resolve.js";
+import { pickActiveVariants, roomHasVariants, activeDoorVariant } from "../shared/variant_resolve.js";
 
 const box = [0.1, 0.1, 0.2, 0.2];
 const box2 = [0.5, 0.5, 0.7, 0.7];
@@ -70,4 +70,36 @@ test("variant with an explicit box overrides the hotspot box; imageless/boxless 
   const got = pickActiveVariants(hs, makeEval());
   assert.equal(got.length, 1);
   assert.deepEqual(got[0].box, box2);           // explicit variant box used
+});
+
+// --- activeDoorVariant: the monorail switch-door NAV selection (2026-08-05) ------------------------
+// Unlike pickActiveVariants (art), the nav variant picks WHERE a door goes and does NOT need `panorama`,
+// so the mechanic routes correctly before the state-specific door art exists.
+const switchDoor = () => ({ id: "car_door", type: "door", box, direction: "open", to: "station2", variants: [
+  { state: "forward", when: { eq: ["car_dir", "forward"] }, to: "station2", direction: "open" },
+  { state: "back", when: { eq: ["car_dir", "back"] }, to: "station1", direction: "back" },
+] });
+
+test("switch-door: the lever state picks which room the door leads to", () => {
+  const d = switchDoor();
+  const fwd = activeDoorVariant(d, makeEval(new Set(), { car_dir: "forward" }));
+  assert.equal(fwd.to, "station2");
+  const back = activeDoorVariant(d, makeEval(new Set(), { car_dir: "back" }));
+  assert.equal(back.to, "station1");
+  assert.equal(back.direction, "back");
+});
+
+test("switch-door: nav variant selects WITHOUT a panorama (art can arrive later)", () => {
+  const d = switchDoor();
+  assert.equal(activeDoorVariant(d, makeEval(new Set(), { car_dir: "back" })).to, "station1");
+  // and it stays out of the ART set until a variant carries a panorama
+  assert.deepEqual(pickActiveVariants([d], makeEval(new Set(), { car_dir: "back" })), []);
+});
+
+test("switch-door: no matching state → null (caller falls back to the door's own to/direction)", () => {
+  assert.equal(activeDoorVariant(switchDoor(), makeEval(new Set(), { car_dir: "sideways" })), null);
+});
+
+test("activeDoorVariant: a door with no variants → null", () => {
+  assert.equal(activeDoorVariant({ id: "d", type: "door", box, to: "x" }, makeEval()), null);
 });

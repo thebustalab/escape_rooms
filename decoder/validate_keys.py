@@ -51,11 +51,14 @@ def scenario_expected(doc):
             continue
         puzzles = [h for h in r.get("hotspots", []) if h.get("type") == "puzzle"]
         if not puzzles:
-            # An intentional ungraded room — a pre-awakened orientation room with only a lock (e.g.
-            # henges/beach) — takes no codec slot (mintCode skips rooms with no roomResult), so skip it
-            # here too. A built non-escape room with neither a puzzle NOR a lock is a real mistake.
+            # An intentional ungraded room takes no codec slot (mintCode skips rooms with no roomResult),
+            # so skip it here too: a pre-awakened orientation room with only a lock (henges/beach), OR a
+            # pure JUNCTION room whose only control is a world-state `dial` — a monorail car with a
+            # drive-lever switch-door (wrangling/trees, 2026-08-05), which routes but never grades. A built
+            # non-escape room with a puzzle, a lock, a dial, or preAwakened set is fine; none of those is a mistake.
             has_lock = any(h.get("type") == "lock" for h in r.get("hotspots", []))
-            if r.get("preAwakened") or has_lock:
+            has_dial = any(h.get("type") == "dial" for h in r.get("hotspots", []))
+            if r.get("preAwakened") or has_lock or has_dial:
                 continue
             notes.append(f"built room '{r.get('key')}' has no puzzle hotspot")
             vec.append(None)

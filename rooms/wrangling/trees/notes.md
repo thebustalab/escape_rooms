@@ -476,3 +476,45 @@ via build-world step 2's level-1 pano stage on `:8752`). Trees-specific decision
 - **STILL DEFERRED to the WIRING pass** (`escape_room_wiring`, not blocking art): the world-state switch
   runtime (lever → state → door view/target + freeze/hum sfx), the `grid-select` puzzle type, the ride-beat,
   `WRANGLING_TREES_KEY` decoder lockstep + `test_trees.py`, ambience/sfx, and `design_notes.md` (step-0 record).
+
+## WIRED — content + engine (2026-08-05, session "ideas")
+
+The WIRING pass is essentially done; only the sound pass + the state-view door ART remain.
+
+- **World-state SWITCH-DOOR mechanic BUILT (engine, reusable).** The deferred "lever → state → door
+  view/target" is now a real engine feature, not a trees hack: a `door` carries
+  `variants:[{state,when,to,direction?,panorama?}]` and a `dial` (the drive-lever) flips which is live, so one
+  door routes back OR forward by state. Nav needs only `to`+`when` (the state-specific door ART can arrive
+  later — the door shows its closed base until then and still routes correctly). `activeDoorVariant` in
+  `shared/variant_resolve.js`; `doorNav`/`rerenderCurrentRoom` + the door-nav rewrite in `shared/pano-player.js`;
+  schema in the hub AGENTS.md door bullet; unit tests in `tests/variant_resolve.test.mjs`. Cache tokens bumped
+  (pano-player.js v=69 / test_play v=64). Each car dial also carries an `sfx` (lever-throw clunk) via a new
+  openDial hook. **Door state-view ART is now TURNKEY** — the car doors' sceneSpecs already declare
+  `opensOnto` (states `to_station1/2/3`, `to_boss` with reveal prompts), and the nav variants are aligned to
+  those exact state names + a `when` gating on the lever, so the harness art MERGES onto the nav wiring. Two
+  harness fixes made this compose (2026-08-05): `_add_variant` now MERGES (art fields overlay, nav
+  to/direction/when survive — regression `test_add_variant_merges_onto_switch_door_nav`), and the door-view
+  queue skips only states that already have a `panorama` (a nav-only state still generates). **Lucas's step:**
+  in build-world, per car, **Place all hotspots** (queues the 2 door-open views) → **Generate all
+  cinemagraphs** (runs them); each reveal paints into the door box and attaches as that state's `panorama`.
+- **Puzzles = console `check` (not MCQ).** Only 4 categories on the vigour/zone axes → too few for a fair
+  ≥6-option MCQ, and `check` is truer to a real `group_by`/`summarise` (proven through the codec by henges).
+  Each assigns the winning group NAME to `answer`; graded by a case/space/underscore-normalised string compare.
+  Re-verified vs `data/forest_census.csv` at wiring time: S1 girth→**Bloomspire**, S2 glow→**Radiant**,
+  S3 shortcut→**Cragside**, boss regroup→**Sunspire Heights** — and the Simpson's **flip fires** (S3≠boss).
+- **Cars = ungraded dial + switch-door junctions** (default lever = onward; throw it to go back). The vault
+  `lock` became a **`phase:"escape"` 3×3 `grid`** (`endsEscape`), mapping □→colour / ○→size / △→shape.
+- **Entry cards DROPPED** (Lucas 2026-08-05): every per-room `entry` deleted; only the opening scenario
+  `story` survives, and the engine now logs it to the field notebook at start ("Your assignment") so it stays
+  re-readable. This is a **general** simplification Lucas wants across scenarios, not trees-only.
+- **Station clues = pure collector's-notes flavour** on the three hoards (beetles/cones/shells), one per
+  station, naming no sorting trait and pointing nowhere — the player must notice the notes draw the eye; the
+  car tray ART carries the actual grouping. Boss clue flags the species-mix confound *conceptually* (no method,
+  no answer).
+- **Decoder + tests GREEN.** `WRANGLING_TREES_KEY` (id 15, `correct=c(1,1,1,1)`) + a self-test added to
+  `decoder/decode_codes.R` (Rscript self-test passes, trees grades 40); `validate_keys.py` extended to treat a
+  dial-only junction room as intentionally ungraded (and passes trees); `test_trees.py` added (pins the four
+  answers + the flip + switch-door graph + grid mapping + decoder lockstep — ALL PASS); trees added to the e2e
+  smoke list. The wiring regenerator is `_scratch/wire_puzzles.py` (re-runnable) with `_scratch/scenario.prewire.json` as the pre-wire backup.
+- **REMAINING:** (1) per-room **sfx** sourcing (ambience beds + solve stings) + `auto_balance.py`; (2) the
+  **door state-view art** (Lucas); (3) an optional e2e full-playthrough spec + browser playtest.

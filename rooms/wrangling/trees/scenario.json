@@ -5,7 +5,7 @@
   "id": 15,
   "title": "The Collector's Vault",
   "subtitle": "Data Wrangling Assignment · group_by + summarise",
-  "story": "You are a forest ecologist on an alien world — and, if you’re honest, a collector first. Your days are spent high in the canopy, riding the monorail between research stations, measuring impossibly tall trees and cataloguing what you find. But every evening ends the same way: the long climb to the cliff, and the sealed alien gate you have never once managed to open. They say a true artifact waits inside. Today you’ll make your rounds one more time — and try the vault again. Golden morning mist still hangs in the crowns as you reach the first station, deep in the canopy, where your instrument is already humming with fresh measurements.",
+  "story": "You are a forest ecologist on an alien world — and, if you’re honest, an avid collector that might spend more time on their collections than on their ecology. Your days are spent high in the canopy, riding the cable cars between research stations, measuring impossibly tall trees and cataloguing what you find. But every evening ends the same way: you make the long climb to the cliff, and attempt to open the sealed alien gate you have never once managed to unlock. They say a true artifact waits inside. Today you’ll make your rounds one more time — and try the vault again.",
   "enterLabel": "Begin the day’s rounds →",
   "done": {
     "title": "The way is clear!",
@@ -34,7 +34,10 @@
   ],
   "setup": "suppressMessages({library(dplyr); library(ggplot2)})",
   "state": {
-    "rooms_solved": 0
+    "rooms_solved": 0,
+    "car_sq_dir": "forward",
+    "car_ci_dir": "forward",
+    "car_tr_dir": "forward"
   },
   "ambient": "fireflies",
   "coverPrompt": "Minimalist stylised thumbnail poster of a lone alien cliff-side vault gate glowing with a single warm amber light at sunset, set into a rocky mountain precipice above an endless sea of misty tree canopy. Designed to read clearly as a small thumbnail: one bold, simple, high-contrast silhouette, iconic and uncluttered, minimal fine detail. Flat, limited palette: deep teal, icy blue, and one warm amber glow. Soft film grain, painterly but clean with simple geometric shapes. Strong negative space, single centred focal subject. No people, no text, no lettering, no logos. Square composition.",
@@ -161,24 +164,44 @@
         {
           "id": "field_card",
           "type": "clue",
-          "label": "a weathered field card pinned to the living-wood railing",
+          "label": "A pinned field-card",
           "box": [
             0.2595,
             0.5567,
             0.3397,
             0.8247
-          ]
+          ],
+          "body": "<em>Field-card, pinned above the bench.</em><br>The gleam-beetles again — I can never work a transect without pocketing a few. No two the same: some no bigger than a seed, some broad as a thumbnail, and every one throws the canopy-light back a little differently. Back home I lay them out and just look at them for a while. There's an order in a good collection, if you sit with it long enough."
         },
         {
           "id": "field_instrument",
           "type": "puzzle",
-          "label": "a weathered field instrument of brass and timber with an ope",
+          "label": "The bark-calipers",
           "box": [
             0.421,
             0.3918,
             0.5206,
             0.6942
-          ]
+          ],
+          "starterCode": "forest_census",
+          "check": {
+            "prompt": "The long distance bark calipers have logged the trunk girth of every tree in the grove. Taking all the trees of each kind together, which species grows the widest around? Assign that species' name to <code>answer</code>.",
+            "requires": [
+              "answer"
+            ],
+            "expr": "tolower(trimws(gsub(\"[_-]\", \" \", as.character(answer)))) == \"bloomspire\"",
+            "maxAttempts": 4,
+            "hint": "Group the trees by <code>species</code> and take the mean <code>trunk_girth_cm</code> of each.",
+            "feedback": {
+              "correct": "Correct — noted in your field notebook: Bloomspire grows the widest around, ~36 cm mean girth.",
+              "wrong": [
+                "Group by <code>species</code> and summarise the mean girth: <code>forest_census |&gt; group_by(species) |&gt; summarise(m = mean(trunk_girth_cm))</code>.",
+                "The widest kind is the group with the largest mean — <code>arrange(desc(m))</code> and read the top row's species.",
+                "You want the single widest species on average — not the widest individual tree, and not the commonest kind."
+              ],
+              "reveal": ""
+            }
+          }
         },
         {
           "id": "glow_shelves",
@@ -342,27 +365,63 @@
         },
         {
           "id": "drive_lever",
-          "type": "puzzle",
-          "label": "a heavy brass monorail drive lever mounted on the living-woo",
+          "type": "dial",
+          "label": "The drive lever",
           "box": [
             0.6203,
             0.2431,
             0.7074,
             0.7216
-          ]
+          ],
+          "key": "car_sq_dir",
+          "states": [
+            {
+              "value": "forward",
+              "label": "Up-line ▲"
+            },
+            {
+              "value": "back",
+              "label": "Down-line ▼"
+            }
+          ],
+          "hint": "Throw the lever to send the car up-line or down, then step through the door."
         },
         {
           "id": "square_door",
           "type": "door",
-          "label": "a single sliding cable-car door bearing a bold square motif",
+          "label": "The car door",
           "box": [
             0.7266,
             0.1572,
             0.8288,
             0.9175
           ],
-          "direction": "forward",
-          "to": "station2"
+          "direction": "open",
+          "to": "station2",
+          "variants": [
+            {
+              "state": "to_station2",
+              "when": {
+                "eq": [
+                  "car_sq_dir",
+                  "forward"
+                ]
+              },
+              "to": "station2",
+              "direction": "open"
+            },
+            {
+              "state": "to_station1",
+              "when": {
+                "eq": [
+                  "car_sq_dir",
+                  "back"
+                ]
+              },
+              "to": "station1",
+              "direction": "back"
+            }
+          ]
         }
       ]
     },
@@ -448,11 +507,6 @@
           "inc": "rooms_solved"
         }
       ],
-      "entry": {
-        "title": "Station two",
-        "text": "Your first reading is logged — <b>Bloomspire</b> is the broadest-trunked tree in the canopy. The square car climbs to a higher platform, the mist thinning below, and a fresh instrument waits.",
-        "button": "Step onto the platform →"
-      },
       "plannedHotspots": [
         {
           "type": "puzzle",
@@ -504,24 +558,44 @@
         {
           "id": "field_card",
           "type": "clue",
-          "label": "a weathered field card pinned to the living-wood railing",
+          "label": "A pinned field-card",
           "box": [
             0.3522,
             0.6014,
             0.3832,
             0.7725
-          ]
+          ],
+          "body": "<em>Field-card, pinned by the glow-meter.</em><br>Cones and seed-pods from the upper crowns — my favourite shelf. They come in every proportion, from little stub-cones to great heavy pods you need two hands for, and the ridging on them is a wonder. A collection only sings when it's laid out with some sense to it; a jumbled drawer tells you nothing."
         },
         {
           "id": "field_instrument",
           "type": "puzzle",
-          "label": "a weathered field instrument of brass and timber with an ope",
+          "label": "The glow-meter",
           "box": [
             0.4509,
             0.5292,
             0.5035,
             0.6564
-          ]
+          ],
+          "starterCode": "forest_census",
+          "check": {
+            "prompt": "Every tree gives a bark-glow reading when assessed by the spectrometer — the light the living wood puts out. Sorting the trees by their vigour class, which class glows the brightest on average? Assign that vigour class's name to <code>answer</code>.",
+            "requires": [
+              "answer"
+            ],
+            "expr": "tolower(trimws(gsub(\"[_-]\", \" \", as.character(answer)))) == \"radiant\"",
+            "maxAttempts": 4,
+            "hint": "Group the trees by <code>vigor</code> and take the mean <code>bark_glow</code> of each class.",
+            "feedback": {
+              "correct": "Correct — noted in your field notebook: the Radiant class burns brightest, ~80 on the glow scale.",
+              "wrong": [
+                "Group by <code>vigor</code> and summarise the mean glow: <code>group_by(vigor) |&gt; summarise(m = mean(bark_glow))</code>.",
+                "The brightest class has the largest mean glow — <code>arrange(desc(m))</code>, read the top <code>vigor</code>.",
+                "It's the vigour CLASS you're after, not a species and not one unusually bright tree."
+              ],
+              "reveal": ""
+            }
+          }
         },
         {
           "id": "glow_shelves",
@@ -685,27 +759,63 @@
         },
         {
           "id": "drive_lever",
-          "type": "puzzle",
-          "label": "a heavy brass monorail drive lever mounted on the living-woo",
+          "type": "dial",
+          "label": "The drive lever",
           "box": [
             0.704,
             0.3187,
             0.7704,
             0.7457
-          ]
+          ],
+          "key": "car_ci_dir",
+          "states": [
+            {
+              "value": "forward",
+              "label": "Up-line ▲"
+            },
+            {
+              "value": "back",
+              "label": "Down-line ▼"
+            }
+          ],
+          "hint": "Throw the lever to send the car up-line or down, then step through the door."
         },
         {
           "id": "circle_door",
           "type": "door",
-          "label": "a single sliding cable-car door bearing a bold circle motif",
+          "label": "The car door",
           "box": [
             0.8171,
             0.1366,
             0.9674,
             0.9759
           ],
-          "direction": "forward",
-          "to": "station3"
+          "direction": "open",
+          "to": "station3",
+          "variants": [
+            {
+              "state": "to_station3",
+              "when": {
+                "eq": [
+                  "car_ci_dir",
+                  "forward"
+                ]
+              },
+              "to": "station3",
+              "direction": "open"
+            },
+            {
+              "state": "to_station2",
+              "when": {
+                "eq": [
+                  "car_ci_dir",
+                  "back"
+                ]
+              },
+              "to": "station2",
+              "direction": "back"
+            }
+          ]
         }
       ]
     },
@@ -790,11 +900,6 @@
           "inc": "rooms_solved"
         }
       ],
-      "entry": {
-        "title": "Station three",
-        "text": "Logged again — <b>Goldfan Ginko</b> reaches highest into the canopy. The circle car has carried you higher still; midday now, the mist gone and mountains clear across the horizon. One more station before the climb.",
-        "button": "Step onto the platform →"
-      },
       "plannedHotspots": [
         {
           "type": "puzzle",
@@ -846,24 +951,44 @@
         {
           "id": "field_card",
           "type": "clue",
-          "label": "a weathered field card pinned to the living-wood railing",
+          "label": "A pinned field-card",
           "box": [
             0.3121,
             0.6392,
             0.35,
             0.7519
-          ]
+          ],
+          "body": "<em>Field-card, pinned by the gauge.</em><br>The shells — washed up from the mist-pools and carried home by the armful. Spirals, fans, long horns, little curled knots: I've never tired of turning them over. Half the pleasure is in the arranging. Put like beside like and the whole tray suddenly makes sense at a glance."
         },
         {
           "id": "field_instrument",
           "type": "puzzle",
-          "label": "a weathered field instrument of brass and timber with an ope",
+          "label": "The vitality gauge",
           "box": [
             0.4612,
             0.4948,
             0.5309,
             0.666
-          ]
+          ],
+          "starterCode": "forest_census",
+          "check": {
+            "prompt": "Each tree carries a vitality reading. Taking the four groves exactly as they stand today, which grove's trees are the most vigorous on average, right now? Assign that grove's name to <code>answer</code>.",
+            "requires": [
+              "answer"
+            ],
+            "expr": "tolower(trimws(gsub(\"[_-]\", \" \", as.character(answer)))) == \"cragside\"",
+            "maxAttempts": 4,
+            "hint": "Group the trees by <code>canopy_zone</code> and take the mean <code>vitality_index</code> of each grove.",
+            "feedback": {
+              "correct": "Correct — noted in your field notebook: as the groves stand, Cragside reads most vigorous (~66).",
+              "wrong": [
+                "Group by <code>canopy_zone</code> and summarise the mean vitality: <code>group_by(canopy_zone) |&gt; summarise(m = mean(vitality_index))</code>.",
+                "The most vigorous grove as it stands has the largest mean — <code>arrange(desc(m))</code>, read the top zone.",
+                "Take the groves just as they are — every tree in each grove counted once."
+              ],
+              "reveal": ""
+            }
+          }
         },
         {
           "id": "glow_shelves",
@@ -1027,27 +1152,63 @@
         },
         {
           "id": "drive_lever",
-          "type": "puzzle",
-          "label": "a heavy brass monorail drive lever mounted on the living-woo",
+          "type": "dial",
+          "label": "The drive lever",
           "box": [
             0.7165,
             0.3015,
             0.8139,
             0.7938
-          ]
+          ],
+          "key": "car_tr_dir",
+          "states": [
+            {
+              "value": "forward",
+              "label": "Up-line ▲"
+            },
+            {
+              "value": "back",
+              "label": "Down-line ▼"
+            }
+          ],
+          "hint": "Throw the lever to send the car up-line or down, then step through the door."
         },
         {
           "id": "triangle_door",
           "type": "door",
-          "label": "a single sliding cable-car door bearing a bold triangle moti",
+          "label": "The car door",
           "box": [
             0.832,
             0.0404,
             0.9868,
             0.9863
           ],
-          "direction": "forward",
-          "to": "boss"
+          "direction": "open",
+          "to": "boss",
+          "variants": [
+            {
+              "state": "to_boss",
+              "when": {
+                "eq": [
+                  "car_tr_dir",
+                  "forward"
+                ]
+              },
+              "to": "boss",
+              "direction": "open"
+            },
+            {
+              "state": "to_station3",
+              "when": {
+                "eq": [
+                  "car_tr_dir",
+                  "back"
+                ]
+              },
+              "to": "station3",
+              "direction": "back"
+            }
+          ]
         }
       ]
     },
@@ -1149,11 +1310,6 @@
         "type": "figure",
         "submitCodec": true
       },
-      "entry": {
-        "title": "The climb",
-        "text": "Instruments packed, the day’s rounds done. The triangle car leaves the trees behind and sets you on a ledge high on the mountain — and a boulder blocks the cleft. Golden hour, the peaks close now. One more attempt at the vault, if you can clear the way.",
-        "button": "Approach the boulder →"
-      },
       "plannedHotspots": [
         {
           "type": "puzzle",
@@ -1216,24 +1372,44 @@
         {
           "id": "field_note",
           "type": "clue",
-          "label": "a weathered field note pinned under a stone on the rock",
+          "label": "The collector's field-note",
           "box": [
             0.2548,
             0.6873,
             0.382,
             0.9168
-          ]
+          ],
+          "body": "<em>Field-note, tucked in the survey log.</em><br>Rank the groves by the vigour of whatever's standing in them and the same grove keeps winning. But that grove is thick with the hardy kinds — trees that read strong wherever they root. That tells me it's <em>stocked</em> with strong trees, not that the ground itself grows them strong. To judge the ground fairly I'd have to give every kind of tree an equal say, not let the common ones drown out the rest."
         },
         {
           "id": "survey_console",
           "type": "puzzle",
-          "label": "a weathered brass-and-timber survey console set on a flat ro",
+          "label": "The survey console",
           "box": [
             0.4807,
             0.3162,
             0.6203,
             0.7347
-          ]
+          ],
+          "starterCode": "forest_census",
+          "check": {
+            "prompt": "The vault won't answer to a careless tally. It asks not which grove happens to hold the strongest trees, but which ground truly grows a tree best — giving every kind of tree an equal say, whatever grows there. Which grove is the finest ground to grow in? Assign its name to <code>answer</code>.",
+            "requires": [
+              "answer"
+            ],
+            "expr": "tolower(trimws(gsub(\"[_-]\", \" \", as.character(answer)))) == \"sunspire heights\"",
+            "maxAttempts": 4,
+            "hint": "A raw grove average is swayed by which species happen to grow there. Give every species an equal say first.",
+            "feedback": {
+              "correct": "Correct — noted: giving every species an equal say, Sunspire Heights is the finest ground to grow in (~64) — the quick tally's answer was a mirage.",
+              "wrong": [
+                "First take each species' mean vitality WITHIN each grove: <code>group_by(canopy_zone, species) |&gt; summarise(m = mean(vitality_index))</code>.",
+                "Then average those per-species figures up to the grove, so no common species dominates: <code>group_by(canopy_zone) |&gt; summarise(mm = mean(m)) |&gt; arrange(desc(mm))</code>.",
+                "If you land on the same grove the quick tally gave, the common species are still voting twice — balance by species first."
+              ],
+              "reveal": ""
+            }
+          }
         },
         {
           "id": "golden_motes",
@@ -1344,11 +1520,6 @@
           "set": "vault_solved"
         }
       ],
-      "entry": {
-        "title": "The cliff-top",
-        "text": "The boulder is behind you. You crest the scramble to the highest point of all as the sun touches the horizon and the mist finally lifts — the whole canopy and every peak ablaze in gold. And there it is: the gate you’ve never opened, and beside it a panel of nine blank buttons.",
-        "button": "Approach the gate →"
-      },
       "plannedHotspots": [
         {
           "type": "lock",
@@ -1410,14 +1581,55 @@
         },
         {
           "id": "gate_panel",
-          "type": "lock",
-          "label": "the ancient alien gate set into the cliff face, and beside i",
+          "type": "grid",
+          "label": "The gate panel",
           "box": [
             0.5701,
             0.4021,
             0.6169,
             0.5533
-          ]
+          ],
+          "endsEscape": true,
+          "prompt": "Three sockets, one for each line that runs the canopy. For each line, set the quality by which that car keeps its hoard.",
+          "items": [
+            {
+              "key": "square",
+              "label": "◻ Square line"
+            },
+            {
+              "key": "circle",
+              "label": "◯ Circle line"
+            },
+            {
+              "key": "triangle",
+              "label": "△ Triangle line"
+            }
+          ],
+          "buckets": [
+            {
+              "key": "colour",
+              "label": "By colour"
+            },
+            {
+              "key": "size",
+              "label": "By size"
+            },
+            {
+              "key": "shape",
+              "label": "By shape"
+            }
+          ],
+          "answer": {
+            "square": "colour",
+            "circle": "size",
+            "triangle": "shape"
+          },
+          "maxAttempts": 5,
+          "feedback": {
+            "correct": "The three marks settle into their sockets, and the ancient gate shudders open.",
+            "wrong": "The gate holds fast. One or more lines are matched to the wrong quality — picture how each car's hoard was laid out.",
+            "out": "The gate stays shut. Ride back down through the cars and look again at how each hoard is sorted."
+          }
         },
         {
           "id": "cliff_lanterns",
@@ -1430,7 +1642,8 @@
             0.9175
           ]
         }
-      ]
+      ],
+      "phase": "escape"
     }
   ],
   "worldPlatePrompt": "This is a panorama. A sweeping 360-degree establishing view of an alien forest-canopy world: colossal alien trees with living-wood research platforms and railings, weathered brass-and-timber instruments, hanging lanterns of amber lichen strung along the rails, drifting bioluminescent spores in the air, and a monorail of small cable-cars running between the treetops. The misty canopy falls away into hidden depths below, and a distant ridge of pale mountain peaks breaks through the golden haze. Painterly, cinematic, cheerful and hopeful; the teal-and-amber house palette — warm gold light with soft teal shadows, gentle bioluminescent glow — in soft, even daylight (deliberately neither dawn nor sunset, so each room can set its own time of day). Subtle film grain. No people, no lettering, no text, no captions, no UI.",
