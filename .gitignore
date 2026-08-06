@@ -13,4 +13,27 @@ tests/playwright-report/
 # re-generating; the player never needs them, so don't push them to the public site.
 **/*_raw.mp4
 **/*.reloop.mp4
+# pre-edit cinemagraph originals (the picked/played clip keeps the plain name)
+**/*_orig.mp4
+
+# --- Keep the public repo to PLAY-REQUIRED assets only (2026-08-06) ---
+# Rule: only files the player fetches at runtime (scenario.json, play.html, referenced
+# panoramas/cinemagraphs/audio/images, data CSVs, shared engine, decoder) belong on the
+# public site. Authoring records, build caches, backups, and history-tier dirs do not.
+# NOTE: .gitignore does NOT untrack already-committed files — after this syncs to the Mac,
+# run once in the escape_rooms repo:  git rm -r --cached . && git add . && git commit
+# (re-applies these rules; disk files are untouched, git just stops tracking the ignored ones.)
+
+# Design records + authoring docs (root/**/AGENTS.md already ignored above)
+**/notes.md
+**/wiring_checklist.md
+# All backup / pre-edit snapshots (broadens the scenario.json.bak line above)
+**/*.bak
+**/scenario.json.pre_*
+# Python build/test caches
+**/__pycache__/
+**/*.pyc
+# ALL history-tier archive dirs (the z_ convention), not just z_history/
+z_*/
+**/z_*/
 
