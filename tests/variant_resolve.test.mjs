@@ -103,3 +103,32 @@ test("switch-door: no matching state → null (caller falls back to the door's o
 test("activeDoorVariant: a door with no variants → null", () => {
   assert.equal(activeDoorVariant({ id: "d", type: "door", box, to: "x" }, makeEval()), null);
 });
+
+// The three-position monorail lever (trees, 2026-08-06): the drive lever rests in NEUTRAL on entry (car
+// still, door shut → no variant → base closed art); only Up-line (forward) / Down-line (back) open the door
+// onto the corresponding station. Mirrors the wired car door — variants carry a panorama so the open view
+// composites, and each names its own to/direction. (The neutral GATE itself is condOK's `ne`, engine-side.)
+const monorailDoor = () => ({ id: "square_door", type: "door", box, direction: "open", to: "station2",
+  availableWhen: { ne: ["car_sq_dir", "neutral"] }, variants: [
+  { state: "to_station1", when: { eq: ["car_sq_dir", "back"] }, to: "station1", direction: "back", panorama: "car_sq/var_square_door_to_station1.png" },
+  { state: "to_station2", when: { eq: ["car_sq_dir", "forward"] }, to: "station2", direction: "open", panorama: "car_sq/var_square_door_to_station2.png" },
+] });
+
+test("three-position lever: neutral shows NO variant (base closed) — up/down open onto their station", () => {
+  const d = monorailDoor();
+  // neutral: no variant fires → the door shows the base (closed) scene; no active nav variant either
+  assert.deepEqual(pickActiveVariants([d], makeEval(new Set(), { car_sq_dir: "neutral" })), []);
+  assert.equal(activeDoorVariant(d, makeEval(new Set(), { car_sq_dir: "neutral" })), null);
+  // up-line (forward): the "open onto station2" art composites; the door leads forward to station2
+  const up = pickActiveVariants([d], makeEval(new Set(), { car_sq_dir: "forward" }));
+  assert.equal(up.length, 1);
+  assert.equal(up[0].state, "to_station2");
+  const upNav = activeDoorVariant(d, makeEval(new Set(), { car_sq_dir: "forward" }));
+  assert.equal(upNav.to, "station2"); assert.equal(upNav.direction, "open");
+  // down-line (back): the "open back onto station1" art composites; the door leads back to station1
+  const dn = pickActiveVariants([d], makeEval(new Set(), { car_sq_dir: "back" }));
+  assert.equal(dn.length, 1);
+  assert.equal(dn[0].state, "to_station1");
+  const dnNav = activeDoorVariant(d, makeEval(new Set(), { car_sq_dir: "back" }));
+  assert.equal(dnNav.to, "station1"); assert.equal(dnNav.direction, "back");
+});

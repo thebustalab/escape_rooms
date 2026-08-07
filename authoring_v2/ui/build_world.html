@@ -63,6 +63,12 @@
   .g3acts { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
   .g3acts button { font-size:12px; }
   .g3acts .status { margin-left:0; }
+  /* ① the pre-art prompt validation gate — the cheapest step in the whole pipeline, so it reads first. */
+  .prechk { font-size:12px; line-height:1.55; color:#dfe9f0; background:rgba(255,216,140,0.07);
+            border:1px solid rgba(255,216,140,0.35); border-left:3px solid var(--amber);
+            border-radius:8px; padding:8px 11px; margin-bottom:9px; }
+  .prechk b { color:var(--amber); }
+  .prechk code { background:rgba(0,0,0,0.3); border-radius:4px; padding:0 4px; font-size:11px; }
   /* Level-1 candidate tiles: up to 3 per room, each with corner action icons. */
   .cands { display:flex; gap:10px; flex-wrap:wrap; align-items:flex-start; }
   .cand { position:relative; width:132px; height:44px; border-radius:5px; border:1px solid var(--line); overflow:hidden; background:#0a141d; }
@@ -154,6 +160,15 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
 
   <div class="stage">
     <h2>Rooms</h2>
+    <div class="prechk"><b>① First — validate the prompts, before you spend a single gen.</b> Run the
+      <code>escape_room_scene_validator</code> skill in Claude over this scenario. It catches what is
+      expensive to find after the art exists: a hotspot with nothing to draw a box on (and the reverse — a
+      lever in the prompt that isn't a hotspot), a passage whose two ends disagree, a gateless room whose
+      forward door would lock forever, a grid-select escape emitted as a <code>lock</code> or a player-turned
+      control left as an inert <code>switch</code>, a missing <code>label</code> (the modal title the player
+      reads), a variant whose subject isn't actually visible in its base scene, and the seam/animation rules.
+      The harness can't launch Claude, so run it there and come back. Its mechanical half runs here:
+      <code>python3 authoring_v2/validate_scenes.py &lt;chapter&gt;/&lt;scenario&gt;</code> — green before you generate.</div>
     <div class="hint"><span class="g2hd">②</span> generate up to three candidate panos per room — <span style="color:var(--blue)">⤢</span> open the wrap/seam editor (commit the room from there, capturing pitch/yaw/wrap) · <span style="color:#ff9c9c">✕</span> delete. The <b style="color:var(--amber)">③</b> and <b style="color:var(--green)">④</b> batch actions (Place all hotspots · Generate all cinemagraphs) live in their group headers above the columns.</div>
     <table id="roomTbl">
       <thead>
@@ -621,7 +636,12 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
   const PROMPTS = {};   // per-room scenePrompt, source for the view-prompt modal
   let GENV = 0;
   const candSrc = img => `/sfile/_scratch/${encodeURIComponent(img)}?chapter=${encodeURIComponent(CH)}&scenario=${encodeURIComponent(SC)}&v=${GENV}`;
-  const hubUrl = (key, img) => `reproject_test.html?room=${encodeURIComponent(key)}&chapter=${encodeURIComponent(CH)}&scenario=${encodeURIComponent(SC)}&img=${encodeURIComponent(img)}&level1=1`;
+  // ⤢ opens the wrap/seam hub on a candidate. If that candidate is ALREADY the committed one, open the
+  // room as COMMITTED instead (no `img=`) — otherwise the hub reopens the live room as a draft and asks you
+  // to commit it again, which is the loop Lucas hit (2026-08-07).
+  const hubUrl = (key, img, live) =>
+    `reproject_test.html?room=${encodeURIComponent(key)}&chapter=${encodeURIComponent(CH)}&scenario=${encodeURIComponent(SC)}`
+    + (live ? "" : `&img=${encodeURIComponent(img)}&level1=1`);
   // Open the hotspot-edit hub for a room (③ per-room entry — styled as a button, like Generate in ②).
   function openEdit(key) { window.open(`reproject_test.html?room=${encodeURIComponent(key)}&chapter=${encodeURIComponent(CH)}&scenario=${encodeURIComponent(SC)}&edit=hotspots`, "_blank"); }
   // ④ Cinemagraphs — open the SAME hotspot hub but deep-linked (focus=cine) to the Spots spoke's Cinemagraph
@@ -678,10 +698,10 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
       const cands = rm.panoCandidates || [], full = cands.length >= MAX_CANDS;
       tr.querySelector("button[data-act='gen']").title = full ? `${MAX_CANDS} candidates already — delete one to generate more` : "Generate a candidate pano (~1 min)";
       cell.innerHTML = cands.length ? cands.map(img => {
-        const live = rm.builtFrom && img === rm.builtFrom;
+        const live = !!(rm.built && rm.builtFrom && img === rm.builtFrom);
         return `<div class="cand${live ? " committed" : ""}" data-img="${esc(img)}">
           <img src="${candSrc(img)}" onerror="this.style.opacity=0.2">
-          <a class="ic seam" title="Open the wrap/seam editor — commit the room from there (captures pitch, yaw + wrap)" href="${hubUrl(rm.key, img)}" target="_blank">⤢</a>
+          <a class="ic seam" title="${live ? "Open this room — it's already live, so it opens committed (Wrap · Spots)" : "Open the wrap/seam editor for this candidate — Wrap · Spots · Commit room"}" href="${hubUrl(rm.key, img, live)}" target="_blank">⤢</a>
           <button class="ic del" title="Delete this candidate" onclick="delCand('${esc(rm.key)}','${esc(img)}')">✕</button>
           ${live ? '<span class="badge">live</span>' : ""}</div>`;
       }).join("") : `<span class="candempty">no candidates yet — Generate one</span>`;

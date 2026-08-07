@@ -290,9 +290,44 @@ def cmd_seamfix(a):
     ImageDraw.Draw(mask).rectangle([x0, 0, x1, h], fill=(0, 0, 0, 0))   # transparent = editable strip
     mb = io.BytesIO(); mask.save(mb, "PNG"); mb.seek(0)
     ib = io.BytesIO(); rolled.save(ib, "PNG"); ib.seek(0)
-    prompt = a.prompt or ("Seamlessly blend the vertical band through the centre so the scene is continuous "
-                          "left-to-right with no visible seam, join, or repetition; keep identical style, "
-                          "lighting, and content on both sides; no people, no lettering, no text.")
+    if a.occluder:
+        prompt = (f"Standing exactly in the centre of this view, {a.occluder}. It runs the full height of "
+                  "the frame and visually separates the left and right halves, so they do not need to "
+                  "match. Keep the existing scene, style, lighting, and palette on both sides completely "
+                  "unchanged; no people, no lettering, no text.")
+    else:
+        prompt = a.prompt or ("Seamlessly blend the vertical band through the centre so the scene is continuous "
+                              "left-to-right with no visible seam, join, or repetition; keep identical style, "
+                              "lighting, and content on both sides; no people, no lettering, no text.")
+    # CROP-INPAINT. Sending the WHOLE pano makes the model re-render everything, so a composite keeps a
+    # strip cut from a different render — the mismatch Lucas hit. Sending only a crop AROUND the seam
+    # confines the model's drift to that crop; every column outside it stays pixel-identical original art.
+    crop_frac = a.crop if a.crop and a.crop > 0 else (0.34 if a.occluder else 0.0)
+    if crop_frac > 0:
+        cw = max(strip + 64, int(w * min(0.9, crop_frac)))
+        cw -= cw % 16                                   # the API wants each edge a multiple of 16
+        cx0 = max(0, w // 2 - cw // 2)
+        cx1 = min(w, cx0 + cw)
+        sub = rolled.crop((cx0, 0, cx1, h))
+        sub_mask = mask.crop((cx0, 0, cx1, h))
+        sb = io.BytesIO(); sub.save(sb, "PNG"); sb.seek(0)
+        smb = io.BytesIO(); sub_mask.save(smb, "PNG"); smb.seek(0)
+        rc = requests.post(
+            API + "/images/edits",
+            headers={"Authorization": "Bearer " + _key()},
+            files={"image": ("s.png", sb, "image/png"), "mask": ("m.png", smb, "image/png")},
+            data={"model": a.model, "prompt": prompt, "size": f"{cx1 - cx0}x{h}", "quality": a.quality},
+            timeout=300,
+        )
+        if rc.status_code != 200:
+            sys.exit(f"seamfix (crop) failed {rc.status_code}: {rc.text[:400]}")
+        patch = Image.open(io.BytesIO(base64.b64decode(rc.json()["data"][0]["b64_json"]))).convert("RGB")
+        if patch.size != (cx1 - cx0, h):
+            patch = patch.resize((cx1 - cx0, h))
+        res = rolled.copy()
+        res.paste(patch, (cx0, 0))                      # only the crop is model output; the rest is untouched
+        _finish_seamfix(a, res, rolled, w, h, x0, x1, strip, dx)
+        return
     r = requests.post(
         API + "/images/edits",
         headers={"Authorization": "Bearer " + _key()},
@@ -305,6 +340,13 @@ def cmd_seamfix(a):
     res = Image.open(io.BytesIO(base64.b64decode(r.json()["data"][0]["b64_json"]))).convert("RGB")
     if res.size != (w, h):
         res = res.resize((w, h))
+    _finish_seamfix(a, res, rolled, w, h, x0, x1, strip, dx)
+
+
+def _finish_seamfix(a, res, rolled, w, h, x0, x1, strip, dx):
+    """Composite (or not) the model's output back over the rolled original, then roll back and save.
+    Shared by the whole-image path and the crop-inpaint path."""
+    from PIL import Image, ImageDraw, ImageFilter
     if a.full:
         # Full-output mode: keep the model's ENTIRE returned image, no composite. The strip and its
         # surroundings then come from ONE generation, so they're self-consistent — no cross-fade of two
@@ -380,6 +422,8 @@ def main():
     sf.add_argument("--feather", type=float, default=-1.0, help="composite feather radius as a fraction of width; <0 = auto (strip/8), 0 = OFF (hard edge), >0 = explicit")
     sf.add_argument("--full", action="store_true", help="use the model's whole returned image (no composite) — self-consistent seam, no ghosting; re-renders the scene, so use pre-commit")
     sf.add_argument("--pos", type=float, default=1.0, help="seam location as a fraction of width (1.0 = L/R wrap edge; ~0.5 = middle) — where to centre the fix")
+    sf.add_argument("--crop", type=float, default=0.0, help="CROP-INPAINT: send only this fraction of width around the seam to the model instead of the whole pano (0 = off/legacy). Keeps the rest of the art pixel-identical — no AI-image-of-an-AI-image outside the band.")
+    sf.add_argument("--occluder", default="", help="OCCLUDER mode: what to stand ON the seam (e.g. 'a plain stone pillar, floor to ceiling'). The two sides then never have to agree. Implies a crop-inpaint.")
     sf.add_argument("--prompt", default="")
     sf.add_argument("--quality", default="medium")
     sf.add_argument("--model", default="gpt-image-2")

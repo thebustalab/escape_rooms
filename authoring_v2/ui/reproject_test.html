@@ -191,20 +191,45 @@
     <button id="save">Save params for this image</button>
     <button id="fixSeam" style="display:none">Fix seam…</button>
     <div id="seamStages" style="display:none; margin-top:6px">
+      <div id="seamReadout" class="hint" style="margin-bottom:6px"></div>
       <div class="seamstage">
-        <div class="ssttl">Stage 1 · wrap seam</div>
-        <label class="ssblend"><input type="checkbox" id="s1blend" checked /> blend whole image</label>
-        <div class="ssbtns"><button id="s1apply">Apply stage 1</button> <button id="s1undo" disabled title="Undo stage 1 → back to the original">Undo</button></div>
+        <div class="ssttl">① Gradient <span class="hint">— no AI · instant · recommended first</span></div>
+        <div class="hint" style="margin-bottom:4px">Dissolves the seam's tonal step into both sides. Nothing is re-rendered and no structure moves.</div>
+        <div class="ssbtns"><button data-seam="gradient">Apply</button> <button class="seamundo" disabled>Undo</button></div>
       </div>
       <div class="seamstage">
-        <div class="ssttl">Stage 2 · far seam <span class="hint">— drag the band onto it</span></div>
-        <label class="ssblend"><input type="checkbox" id="s2blend" /> blend whole image</label>
-        <div class="ssbtns"><button id="s2apply">Apply stage 2</button> <button id="s2undo" disabled title="Undo stage 2 → back to the stage-1 result">Undo</button></div>
+        <div class="ssttl">② Roll the seam <span class="hint">— no AI · instant · lossless</span></div>
+        <div class="hint" style="margin-bottom:4px">Doesn't repair — <i>moves</i> the wrap to the quietest part of the scene, where a join costs least. Follow with ①.</div>
+        <div class="ssbtns"><button data-seam="roll">Apply</button> <button class="seamundo" disabled>Undo</button></div>
+      </div>
+      <div class="seamstage">
+        <div class="ssttl">③ Crop &amp; rescale <span class="hint">— no AI · instant</span></div>
+        <div class="hint" style="margin-bottom:4px">Drops the mismatched sliver at the wrap and stretches back to full width. Costs ~2% of the scene, invents nothing.</div>
+        <div class="ssbtns"><button data-seam="crop">Apply</button> <button class="seamundo" disabled>Undo</button></div>
+      </div>
+      <div class="seamstage">
+        <div class="ssttl">④ Patch the band <span class="hint">— AI, crop only</span></div>
+        <div class="hint" style="margin-bottom:4px">Sends <b>only a band around the seam</b> to the model, not the whole pano — everything outside stays your original art.</div>
+        <div class="ssbtns"><button data-seam="patch">Apply</button> <button class="seamundo" disabled>Undo</button></div>
+      </div>
+      <div class="seamstage">
+        <div class="ssttl">⑤ Plant an occluder <span class="hint">— AI, crop only</span></div>
+        <div class="hint" style="margin-bottom:4px">Stands something <i>on</i> the seam so the two sides never have to agree — for when the scene genuinely can't reconcile.</div>
+        <input type="text" id="seamOccluder" placeholder="a plain stone pillar, floor to ceiling" style="width:100%; margin-bottom:4px" />
+        <div class="ssbtns"><button data-seam="occluder">Apply</button> <button class="seamundo" disabled>Undo</button></div>
+      </div>
+      <div class="seamstage">
+        <div class="ssttl">⑥ Re-render whole scene <span class="hint">— AI · last resort</span></div>
+        <div class="hint" style="margin-bottom:4px">Regenerates the <b>entire</b> panorama, so the seam is self-consistent — but it is an AI image of an AI image, and it pushes a new seam to the far meridian. Pre-commit only.</div>
+        <div class="ssbtns"><button data-seam="full">Apply</button> <button class="seamundo" disabled>Undo</button></div>
       </div>
     </div>
     <div id="seamFeatherRow" style="display:none; margin-top:6px">
-      <label style="font-size:12px; display:block; margin-bottom:2px">Feather <b id="seamFeatherV">0</b>% <span style="opacity:.6">(edge blend · 0 = off / hard edge · composite only)</span></label>
+      <label class="ssblend" style="font-size:12px"><input type="checkbox" id="seamFeatherAuto" />
+        auto feather <span style="opacity:.6">(strip/8 — recommended for a composite stage)</span></label>
+      <label style="font-size:12px; display:block; margin:2px 0">Feather <b id="seamFeatherV">0</b>% <span style="opacity:.6">(edge blend · 0 = off / hard edge)</span></label>
       <input type="range" id="seamFeather" min="0" max="6" step="0.2" value="0" style="width:100%" />
+      <div id="seamFeatherNote" class="hint" style="margin-top:2px"></div>
     </div>
     <button id="seamCancel" style="display:none">Close</button>
     <span class="hint" id="seamStat" style="display:block;margin-top:4px"></span>
@@ -238,7 +263,12 @@
     let SPOKE = "wrap", SPOTS = [], SEL = -1;   // Phase 2a: Spots spoke — hotspots on the live 360 (FULL objects)
     // Seam-fix band: when SEAM_MODE is on the flat editor shows a draggable band straddling the seam;
     // SEAM_L / SEAM_R are the band's extent on each side (fraction of image width; default symmetric 0.12).
-    let SEAM_MODE = false, SEAM_L = 0.06, SEAM_R = 0.06, SEAM_FEATHER = 0;   // default feather OFF (Lucas: seams read best hard, 2026-08)
+    let SEAM_MODE = false, SEAM_L = 0.06, SEAM_R = 0.06, SEAM_FEATHER = 0;
+// SEAM_FEATHER: 0 = OFF / hard edge (the DEFAULT — Lucas, 2026-08-07: seams read best hard); a number =
+// explicit fraction of width; null = AUTO (sent as -1, so generate_scene uses strip/8). Feather only ever
+// applies where a band is COMPOSITED back — options ④ patch and ⑤ occluder. The three no-AI repairs don't
+// composite at all, and ⑥ keeps the model's whole frame, so on those the setting is inert. Tick "auto
+// feather" if a patched band's edges read too hard against the original art.
     let SEAM_POS = 1.0;      // seam location the band straddles, fraction of width: 1.0 = L/R wrap edge (default); drag the band onto a mid-image seam to fix it
     let HUB_TAB = "content", hubCinePoll = 0, ROOM_KEYS = [];   // Phase 2b: per-hotspot content panel
     let batchPoll = 0;   // walk-away batch: status poll handle while a run is in flight
@@ -328,7 +358,9 @@
     const IMGS_FALLBACK = ["gpt_gen_5.png","gpt_room1_2.png","gpt_room2_2.png","gpt_room3_2.png","gpt_room4_2.png"];
     const params = new URLSearchParams(location.search);
     const startImg = params.get("img");
-    const DRAFT_IMG = startImg;   // a candidate filename ⇒ draft mode. MODULE-level so top-level render/save fns can read it.
+    let DRAFT_IMG = startImg;   // a candidate filename ⇒ draft mode. MODULE-level so top-level render/save fns
+                                // can read it, and LET (not const) because a successful commit clears it and
+                                // the hub becomes the committed room in place — no reopen round-trip.
     const ROOM_KEY = params.get("room");   // Phase 8: IDE mode — edit this room node's wrap, save to scenario.json
     const CH = params.get("chapter"), SC = params.get("scenario");   // Finding 2: target THIS scenario, not active
     const LEVEL1 = params.get("level1") === "1";   // build-world level 1: wrap + seam + commit only (no hotspots/plate/door)
@@ -709,11 +741,13 @@
       // The band IS the mask (its blue border = the strip that gets regenerated). The fill fades over the
       // feather width at each edge, so it reads as the actual soft-edged composite the seam-fix produces.
       const sol = "rgba(127,209,255,0.30)", clr = "rgba(127,209,255,0)";
-      const edge = total > 0 ? Math.min(48, (SEAM_FEATHER / total) * 100) : 0;   // feather as % of band width
+      // AUTO (null) previews as the script's strip/8; an explicit number previews as itself.
+      const fEff = SEAM_FEATHER === null ? total / 8 : SEAM_FEATHER;
+      const edge = total > 0 ? Math.min(48, (fEff / total) * 100) : 0;   // feather as % of band width
       band.style.background = `linear-gradient(to right, ${clr} 0%, ${sol} ${edge}%, ${sol} ${100 - edge}%, ${clr} 100%)`;
       const deg = v => Math.round(v * 360);   // full width spans 360°, so a fraction → degrees of pan
       const lbl = band.querySelector(".seamlbl");
-      const fLbl = SEAM_FEATHER > 0 ? `feather ${(SEAM_FEATHER * 100).toFixed(1)}%` : "feather off";
+      const fLbl = SEAM_FEATHER === null ? `feather auto` : (SEAM_FEATHER > 0 ? `feather ${(SEAM_FEATHER * 100).toFixed(1)}%` : "feather off");
       const pLbl = SEAM_POS >= 0.995 ? "wrap seam" : `seam @ ${Math.round(SEAM_POS * 100)}%`;
       if (lbl) lbl.textContent = `${pLbl}  ·  ${deg(total)}°  ·  L ${deg(SEAM_L)}° / R ${deg(SEAM_R)}°  ·  ${fLbl}`;
     }
@@ -745,24 +779,39 @@
       $("#flatEdit").classList.add("seammode");
       $("#fixSeam").style.display = "none";
       $("#seamStages").style.display = ""; $("#seamCancel").style.display = "";
-      $("#s1apply").onclick = () => { SEAM_POS = 1.0; renderSeamBand(); runSeamFix($("#s1blend").checked, 1.0); };
-      $("#s2apply").onclick = () => runSeamFix($("#s2blend").checked, SEAM_POS);
-      $("#s1undo").onclick = runSeamUndo;
-      $("#s2undo").onclick = runSeamUndo;
+      // The repairs are PARALLEL options, not stages — try whichever suits the scene. They all push onto the
+      // SAME undo stack, so every card's Undo steps back one repair whatever mix you tried.
+      document.querySelectorAll("[data-seam]").forEach(b => { b.onclick = () => runSeamRepair(b.dataset.seam); });
+      document.querySelectorAll(".seamundo").forEach(b => { b.onclick = runSeamUndo; });
       $("#seamCancel").onclick = exitSeamMode;
       // Feather slider (shared; composite-mode only). Live-updates the band.
       $("#seamFeatherRow").style.display = "";
-      const fs = $("#seamFeather");
-      fs.value = (SEAM_FEATHER * 100).toFixed(1);
-      $("#seamFeatherV").textContent = fs.value;
-      fs.oninput = () => { SEAM_FEATHER = (+fs.value) / 100; $("#seamFeatherV").textContent = (+fs.value).toFixed(1); renderSeamBand(); };
+      const fs = $("#seamFeather"), fa = $("#seamFeatherAuto");
+      fa.checked = (SEAM_FEATHER === null);
+      fs.disabled = fa.checked;
+      fs.value = (SEAM_FEATHER === null ? 0 : SEAM_FEATHER * 100).toFixed(1);
+      $("#seamFeatherV").textContent = fa.checked ? "auto" : fs.value;
+      const syncFeather = () => {
+        SEAM_FEATHER = fa.checked ? null : (+fs.value) / 100;
+        fs.disabled = fa.checked;
+        $("#seamFeatherV").textContent = fa.checked ? "auto" : (+fs.value).toFixed(1);
+        renderSeamBand();
+      };
+      fa.onchange = syncFeather;
+      fs.oninput = syncFeather;
+      // Say plainly which stage the feather actually affects, so a full stage's inert slider isn't mistaken
+      // for a setting that did something.
+      const n = $("#seamFeatherNote");
+      if (n) n.innerHTML = `Feather softens where a <b>patched</b> band meets the original — it applies to ④ and ⑤ only ` +
+        `(the no-AI repairs don't composite, and ⑥ keeps the model's whole frame).`;
       const fh = document.querySelector("#flatEdit .fhead");
       if (fh) { fh.dataset.orig = fh.dataset.orig || fh.textContent;
-                fh.textContent = "Seam-fix — Stage 1 fixes the L/R wrap seam (blend whole image on). That leaves a new seam mid-image; for Stage 2 drag the band's BODY onto it and Apply (blend off = composite, no new seam). Undo steps back one stage at a time."; }
+                fh.textContent = "Seam repair — the band shows WHERE a repair lands; drag its body onto a mid-image seam, or leave it at the wrap. The options below are independent: the first three are pure pixel work (instant, no model, your art untouched), the last three use the model. Undo steps back one repair."; }
       renderFlatBoxes();   // clears any hotspot boxes (guarded by SEAM_MODE)
       renderSeamBand();
-      refreshSeamDepth();  // set the per-stage Undo enable states
-      $("#seamStat").innerHTML = `<span class="hint">Stage 1 for the wrap seam, then Stage 2 for the one it leaves behind.</span>`;
+      refreshSeamDepth();  // set the Undo enable state (one shared stack)
+      refreshSeamMeasure();
+      $("#seamStat").innerHTML = `<span class="hint">Parallel options — try the cheapest that works. Drag the band onto a mid-image seam first if it isn't at the wrap.</span>`;
     }
     function exitSeamMode() {
       SEAM_MODE = false; SEAM_CTX = null;
@@ -779,13 +828,16 @@
     // Per-stage Undo enable by stack depth: Stage 1 undo pops to the original (depth 1); Stage 2 undo pops the
     // most recent fix (depth ≥ 2). Only the top-of-stack undo is live, so undos run in LIFO (stage 2 then 1).
     function updateStageUndo() {
-      const s1 = $("#s1undo"), s2 = $("#s2undo"); if (!s1 || !s2) return;
-      s1.disabled = SEAM_DEPTH !== 1;
-      s2.disabled = SEAM_DEPTH < 2;
+      // One shared LIFO stack across every repair type, so each card's Undo is live whenever anything
+      // has been applied, and steps back exactly one repair.
+      document.querySelectorAll(".seamundo").forEach(b => {
+        b.disabled = SEAM_DEPTH < 1;
+        b.title = SEAM_DEPTH ? `Undo the last repair (${SEAM_DEPTH} on the stack)` : "Nothing to undo";
+      });
     }
     function setStageBusy(busy) {
-      ["s1apply", "s2apply", "s1undo", "s2undo"].forEach(id => { const b = $("#" + id); if (b) b.disabled = busy; });
-      if (!busy) updateStageUndo();   // restore the correct undo-enable state
+      document.querySelectorAll("[data-seam], .seamundo").forEach(b => { b.disabled = busy; });
+      if (!busy) updateStageUndo();
     }
     async function refreshSeamDepth() {
       const body = SEAM_CTX === "room" ? { chapter: CH, scenario: SC, roomKey: ROOM_KEY } : { chapter: CH, scenario: SC, image: DRAFT_IMG };
@@ -804,26 +856,57 @@
     }
     // Apply one seam-fix stage (full = blend-whole-image; pos = seam location). Stays in seam mode so you can
     // run the next stage; the band + feather persist. On done, refreshes the undo depth (lights up Undo).
-    async function runSeamFix(full, pos) {
-      const st = $("#seamStat"); setStageBusy(true);
-      st.textContent = "seam-fixing… (~20s)";
+    // AUTO feather rides the script's own sentinel: a NEGATIVE feather means "auto = strip/8"
+    // (_seam_bounds keeps an explicit 0 = OFF, and maps <0 to None = auto).
+    const featherParam = () => (SEAM_FEATHER === null ? -1 : SEAM_FEATHER);
+    // Apply ONE repair by mode. The no-AI ops come back instantly with a report; the AI ones run as a job.
+    const SEAM_LABEL = { gradient: "gradient", roll: "roll", crop: "crop & rescale",
+                         patch: "patch the band", occluder: "occluder", full: "re-render" };
+    async function runSeamRepair(mode) {
+      const st = $("#seamStat");
+      if (mode === "occluder" && !($("#seamOccluder").value || "").trim()) {
+        st.innerHTML = `<span class="err">say what should stand on the seam first</span>`; return;
+      }
+      setStageBusy(true);
+      st.textContent = (mode === "gradient" || mode === "roll" || mode === "crop")
+        ? "repairing…" : "seam-fixing… (~20s)";
       const body = SEAM_CTX === "room"
-        ? { chapter: CH, scenario: SC, roomKey: ROOM_KEY, left: SEAM_L, right: SEAM_R, feather: SEAM_FEATHER, full, pos }
-        : { chapter: CH, scenario: SC, image: DRAFT_IMG, left: SEAM_L, right: SEAM_R, feather: SEAM_FEATHER, full, pos };
+        ? { chapter: CH, scenario: SC, roomKey: ROOM_KEY }
+        : { chapter: CH, scenario: SC, image: DRAFT_IMG };
+      Object.assign(body, { mode, pos: SEAM_POS, left: SEAM_L, right: SEAM_R, feather: featherParam(),
+                            occluder: ($("#seamOccluder").value || "").trim() });
       const r = await postJSON(SEAM_CTX === "room" ? "/api/seamfix-room" : "/api/seamfix-scratch", body);
-      if (!r.ok) { st.innerHTML = `<span class="err">${escHtml(r.error || "failed")}</span>`; setStageBusy(false); return; }
+      if (!r || !r.ok) { st.innerHTML = `<span class="err">${escHtml((r && r.error) || "failed")}</span>`; setStageBusy(false); return; }
+      if (r.instant) {                                   // no model involved — the file is already changed
+        await reloadSeamImage(); await refreshSeamDepth(); await refreshSeamMeasure(); setStageBusy(false);
+        const rep = r.report || {};
+        const detail = rep.seamBefore !== undefined ? ` <span class="hint">(seam ${rep.seamBefore} → ${rep.seamAfter}${rep.natural !== undefined ? `, scene detail ${rep.natural}` : ""})</span>`
+                     : (rep.column !== undefined ? ` <span class="hint">(wrap moved to x=${rep.column})</span>` : "");
+        st.innerHTML = `<span class="ok2">${SEAM_LABEL[mode]} applied ✓</span>${detail}`;
+        return;
+      }
       const poll = setInterval(async () => {
         const j = await getJSON("/api/status?slot=seam");
         if (!j) return;
         if (j.error) { st.innerHTML = `<span class="err">${escHtml(j.error)}</span>`; clearInterval(poll); setStageBusy(false); return; }
         if (!j.active) {
           clearInterval(poll);
-          await reloadSeamImage();
-          await refreshSeamDepth();
-          setStageBusy(false);
-          st.innerHTML = `<span class="ok2">seam fixed ✓ <span class="hint">(Undo steps back one stage)</span></span>`;
+          await reloadSeamImage(); await refreshSeamDepth(); await refreshSeamMeasure(); setStageBusy(false);
+          st.innerHTML = `<span class="ok2">${SEAM_LABEL[mode]} applied ✓ <span class="hint">(Undo steps back one repair)</span></span>`;
         }
       }, 1500);
+    }
+    // How bad is the seam right now, against the scene's own detail? Shown above the options so it's clear
+    // whether a repair is even needed — and whether the one you just ran actually helped.
+    async function refreshSeamMeasure() {
+      const el = $("#seamReadout"); if (!el) return;
+      const body = SEAM_CTX === "room" ? { chapter: CH, scenario: SC, roomKey: ROOM_KEY, pos: SEAM_POS }
+                                       : { chapter: CH, scenario: SC, image: DRAFT_IMG, pos: SEAM_POS };
+      const m = await postJSON("/api/seam-measure", body);
+      if (!m || !m.ok) { el.textContent = ""; return; }
+      el.innerHTML = m.visible
+        ? `Seam here is <b style="color:#ffd88c">${m.seam}</b> vs the scene's own detail ${m.natural} — <b>${m.ratio}× — visible</b>.`
+        : `Seam here is <b style="color:#9fe6b5">${m.seam}</b> vs the scene's own detail ${m.natural} — already below it.`;
     }
     // Undo the most recent stage (LIFO): pops one snapshot, reloads, refreshes depth.
     async function runSeamUndo() {
@@ -1293,6 +1376,28 @@
         else $("#status").innerHTML = `<span class="err">${r.error || "save failed"}</span>`;
       };
 
+      // A committed candidate stops being a draft: drop DRAFT_IMG, reload the node, point at the committed
+      // scene, and open Spots. Without this the hub stayed in draft mode and could only offer "reopen as
+      // committed" — so committing looped instead of progressing (Lucas 2026-08-07).
+      async function becomeCommitted() {
+        DRAFT_IMG = null;
+        await refreshNode();
+        IMG_URL = NODE && NODE.panorama
+          ? "/sfile/" + NODE.panorama + "?t=" + Date.now() + (SCQ ? "&" + SCQ : "")
+          : IMG_URL;
+        setFlatImg(IMG_URL);
+        await RoomEditCore.Cinemagraph.init(NODE, IMG_URL, SCQ);
+        $("#hubActs").style.display = "none";        // Commit/Plate/Door are candidate-stage only
+        $("#hubSep").style.display = "none";
+        $("#saveClose").style.display = "";
+        $("#saveClose").onclick = saveCloseHotspots;
+        const sb = $("#hubbar .spoke[data-spoke='spots']");
+        if (sb) { sb.disabled = false; sb.title = "See + edit this room's hotspots on the live 360"; }
+        const fx = $("#fixSeam"); if (fx) { fx.style.display = ""; fx.onclick = () => enterSeamMode("room"); }
+        build();
+        setSpoke("spots");
+      }
+
       // --- Hub toolbar (Phase 1) ---------------------------------------------------------------------
       // The 360 view is the hub; Wrap is the first spoke (this panel). The candidate-stage actions
       // (Commit, World plate) only make sense in DRAFT mode, so they show only when editing a candidate.
@@ -1303,8 +1408,9 @@
         $("#saveClose").onclick = saveCloseHotspots;
         $("#hubStatus").innerHTML = `<span class="hint">Look around to check the dots, then <b>Spots</b> to fine-tune. <b>Save &amp; close</b> when done. Wrap &amp; seam are set in step 2.</span>`;
       }
-      if (LEVEL1) {   // build-world level 1: wrap + seam + commit ONLY — one commit button, no spoke tabs
-        document.querySelectorAll("#hubbar .spoke").forEach(b => b.style.display = "none");   // already in wrap; no tabs
+      if (LEVEL1) {   // build-world level 1: framing a candidate. The spoke tabs STAY — you get
+        // Wrap · Spots · Commit room in one row (Lucas 2026-08-07), so committing is a button in the
+        // menu you are already in rather than a separate mode you have to leave and come back to.
         ["plateBtn", "doorBtn", "seamBtn"].forEach(id => { const b = $("#" + id); if (b) b.style.display = "none"; });
         const sv = $("#save"); if (sv) sv.style.display = "none";   // redundant — Commit room saves the wrap on commit
       }
@@ -1346,9 +1452,9 @@
             vOffset: VOFF, pitch: +(viewer ? viewer.getPitch() : 0).toFixed(1) };
           await RoomEditCore.saveDraft(CH, SC, ROOM_KEY, DRAFT_IMG, { wrap });
           const r = await postJSON("/api/commit-room", { chapter: CH, scenario: SC, roomKey: ROOM_KEY, image: DRAFT_IMG });
-          hst.innerHTML = r.ok
-            ? `committed ✓ → ${r.dest || ""} · <a href="?room=${encodeURIComponent(ROOM_KEY)}${SCQ ? "&" + SCQ : ""}" style="color:#ffd88c">reopen as committed</a>`
-            : `<span class="err">${r.error || "commit failed"}</span>`;
+          if (!r.ok) { hst.innerHTML = `<span class="err">${r.error || "commit failed"}</span>`; return; }
+          await becomeCommitted();          // the room IS live now — turn this hub into the committed one
+          hst.innerHTML = `<span class="ok2">committed ✓</span> <span class="hint">now live — Spots is open</span>`;
         };
         $("#plateBtn").onclick = async () => {
           hst.textContent = "setting world plate…";

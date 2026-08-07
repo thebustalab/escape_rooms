@@ -35,9 +35,9 @@
   "setup": "suppressMessages({library(dplyr); library(ggplot2)})",
   "state": {
     "rooms_solved": 0,
-    "car_sq_dir": "forward",
-    "car_ci_dir": "forward",
-    "car_tr_dir": "forward"
+    "car_sq_dir": "neutral",
+    "car_ci_dir": "neutral",
+    "car_tr_dir": "neutral"
   },
   "ambient": "fireflies",
   "coverPrompt": "Minimalist stylised thumbnail poster of a lone alien cliff-side vault gate glowing with a single warm amber light at sunset, set into a rocky mountain precipice above an endless sea of misty tree canopy. Designed to read clearly as a small thumbnail: one bold, simple, high-contrast silhouette, iconic and uncluttered, minimal fine detail. Flat, limited palette: deep teal, icy blue, and one warm amber glow. Soft film grain, painterly but clean with simple geometric shapes. Strong negative space, single centred focal subject. No people, no text, no lettering, no logos. Square composition.",
@@ -50,7 +50,7 @@
       "built": true,
       "authoring": {
         "tag": "station1",
-        "scenePrompt": "This is a panorama. A 360-degree view from a large research platform DEEP in the shadowy lower reaches of a colossal alien tree — the lowest and deepest station of the climb, ground and sky both hidden, mist rising from below and sinking from above, immense dark trunks vanishing into the haze all around, only a few faint rays of light filtering down through the gloom, with the horizon wrapping continuously all the way around so the left and right edges meet seamlessly. On the far left, immense alien tree-trunks close and enclosing, rising up into drifting mist above and plunging down into drifting mist below — the deep shadowy view that wraps unbroken around behind you; to the left, hanging lanterns of amber lichen strung along the living-wood railing, a warm point of light in the gloom; left of centre, a weathered field card pinned to the living-wood railing; dead ahead in the centre, a weathered field instrument of brass and timber with an open console screen showing a faint bar chart, its pale glow one of the few points of light in the dark; just right of centre, oversized softly-glowing fungal shelves clustered on a dark living-wood trunk, bioluminescent in the gloom; to the right, a small alien monorail gondola docked at the platform edge, boarded directly through its own sliding door — a bold square motif on the door — the gondola's cables rising straight up and vanishing into the dark misty trunks overhead; on the far right, more immense dark trunks and drifting mist above and below, matching the view on the far left where they meet cleanly at the seam directly behind you. Deep, dim and mysterious but never sinister; cool teal-blue shadow and heavy drifting mist both above and below, pierced by only a few faint god-rays, with the warm amber glow of lichen-lanterns and drifting bioluminescent spores the only points of warmth; painterly, cinematic, subtle film grain — the darkest, most enclosed scene of the whole climb. No people, no lettering, no text, no captions, no UI; no mountains, no open sky or distant vista, no bright sunshine.",
+        "scenePrompt": "This is a seamless 360-degree panorama from a large research platform DEEP in the shadowy lower reaches of a colossal alien tree — the lowest and deepest station of the climb, ground and sky both hidden, mist rising from below and sinking from above, immense dark trunks vanishing into the haze all around, only a few faint rays of light filtering down through the gloom. Directly behind the viewer, split across the extreme left and extreme right edges, is an open, unbroken stretch of sky and distant horizon: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, immense alien tree-trunks close and enclosing, rising up into drifting mist above and plunging down into drifting mist below — the deep shadowy view that wraps unbroken around behind you; to the left, hanging lanterns of amber lichen strung along the living-wood railing, a warm point of light in the gloom; left of centre, a weathered field card pinned to the living-wood railing; dead ahead in the centre, a weathered field instrument of brass and timber with an open console screen showing a faint bar chart, its pale glow one of the few points of light in the dark; just right of centre, oversized softly-glowing fungal shelves clustered on a dark living-wood trunk, bioluminescent in the gloom; to the right, a small alien monorail gondola docked at the platform edge, boarded directly through its own sliding door — a bold square motif on the door — the gondola's cables rising straight up and vanishing into the dark misty trunks overhead; on the far right, more immense dark trunks and drifting mist above and below, matching the view on the far left where they meet cleanly at the seam directly behind you. Deep, dim and mysterious but never sinister; cool teal-blue shadow and heavy drifting mist both above and below, pierced by only a few faint god-rays, with the warm amber glow of lichen-lanterns and drifting bioluminescent spores the only points of warmth; painterly, cinematic, subtle film grain — the darkest, most enclosed scene of the whole climb. No people, no lettering, no text, no captions, no UI; no mountains, no open sky or distant vista, no bright sunshine. Again: the extreme left and right edges must align perfectly into an open, unbroken stretch of sky and distant horizon, with no visible seam, join, or repetition.",
         "doorPrompt": "The SQUARE monorail door now stands open, revealing the waiting cable-car and the misty golden canopy beyond; everything else unchanged. Same warm dawn light, same painterly style, no people, no lettering, no text.",
         "sceneSpec": {
           "room": "station1",
@@ -75,13 +75,15 @@
               "id": "field_card",
               "at": "left of centre",
               "desc": "a weathered field card pinned to the living-wood railing",
-              "clue": true
+              "clue": true,
+              "label": "A pinned field-card"
             },
             {
               "id": "field_instrument",
               "at": "dead ahead in the centre",
               "desc": "a weathered field instrument of brass and timber with an open console screen showing a faint bar chart, its pale glow one of the few points of light in the dark",
-              "puzzle": true
+              "puzzle": true,
+              "label": "The bark-calipers"
             },
             {
               "id": "glow_shelves",
@@ -108,7 +110,8 @@
                     "reveal": "the sliding square-marked door drawn fully open onto the cable-car cabin interior beyond: warm brass fittings and a glowing lantern, a tall glass cabinet of jewel-bright collected BEETLES, a polished timber floor — cosy, warm and clearly lit, the cabin interior filling the open doorway."
                   }
                 ]
-              }
+              },
+              "label": "The square-line gondola"
             },
             {
               "id": "trunks_right",
@@ -256,7 +259,7 @@
           ],
           "starterCode": "forest_census",
           "check": {
-            "prompt": "The long distance bark calipers have logged the trunk girth of every tree in the grove. Taking all the trees of each kind together, which species grows the widest around? Assign that species' name to <code>answer</code>.",
+            "prompt": "The long distance bark calipers have logged the trunk girth of every tree in the grove. Considering all the trees of each species together, which species grows the widest around on average? Assign that species' name to <code>answer</code>.",
             "requires": [
               "answer"
             ],
@@ -397,7 +400,7 @@
       "built": true,
       "authoring": {
         "tag": "car_sq",
-        "scenePrompt": "This is a panorama. A 360-degree view from inside a large alien monorail cable-car deep in the shadowy lower trees — the deepest, dimmest point of the journey, mist pressing close above and below, immense dark trunks sliding slowly past the windows, no sky and no ground in sight, with the space wrapping continuously all the way around so the left and right edges meet seamlessly. On the far left, a wide window onto close drifting mist and immense dark alien trunks sliding slowly past, mist rising from below and sinking from above; to the left, brass cabin fittings and a hanging lantern of amber lichen-glow, warm against the dim cabin; dead ahead in the centre, opposite the door, a glass-fronted specimen cabinet of the collector's iridescent alien beetles, lit by the lichen-glow in the gloom, arranged in neat trays sorted BY COLOUR, the cabinet marked with a bold square motif, the beetles deliberately varied in size and shape within each colour tray so the sorting reads unmistakably as colour; to the right, on the cabin wall beside the boarding door, a heavy brass monorail drive lever mounted on the living-wood cabin wall, its polished handle seated in a slotted quadrant marked with a bold square motif, a small station dial above it; on the far right, a single sliding cable-car door bearing a bold square motif. Dim, misty and enclosed, mysterious but warm-hearted; cool teal shadow and close drifting mist, the cabin lit by the amber glow of lichen and lantern, dark trunks sliding past outside; painterly, cinematic, subtle film grain — the deepest, dimmest leg of the journey. No people, no lettering, no text, no captions, no UI; no open sky, no mountains, no bright sunshine.",
+        "scenePrompt": "This is a seamless 360-degree panorama from inside a large alien monorail cable-car deep in the shadowy lower trees — the deepest, dimmest point of the journey, mist pressing close above and below, immense dark trunks sliding slowly past the windows, no sky and no ground in sight. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain, continuous stretch of wall, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, a wide window onto close drifting mist and immense dark alien trunks sliding slowly past, mist rising from below and sinking from above; to the left, brass cabin fittings and a hanging lantern of amber lichen-glow, warm against the dim cabin; dead ahead in the centre, opposite the door, a glass-fronted specimen cabinet of the collector's iridescent alien beetles, lit by the lichen-glow in the gloom, arranged in neat trays sorted BY COLOUR, the cabinet marked with a bold square motif, the beetles deliberately varied in size and shape within each colour tray so the sorting reads unmistakably as colour; to the right, on the cabin wall beside the boarding door, a heavy brass monorail drive lever mounted on the living-wood cabin wall, its polished handle seated in a slotted quadrant marked with a bold square motif, a small station dial above it; on the far right, a single sliding cable-car door bearing a bold square motif. Dim, misty and enclosed, mysterious but warm-hearted; cool teal shadow and close drifting mist, the cabin lit by the amber glow of lichen and lantern, dark trunks sliding past outside; painterly, cinematic, subtle film grain — the deepest, dimmest leg of the journey. No people, no lettering, no text, no captions, no UI; no open sky, no mountains, no bright sunshine. Again: the extreme left and right edges must align perfectly into a plain, continuous stretch of wall, uniform and unbroken, with no visible seam, join, or repetition.",
         "doorPrompt": "The SQUARE cable-car door now slides open onto the next canopy platform amid drifting golden mist; everything else in the cabin unchanged. Same warm light, same painterly style, no people, no lettering, no text.",
         "sceneSpec": {
           "room": "car_sq",
@@ -435,14 +438,15 @@
               "id": "drive_lever",
               "at": "to the right, on the cabin wall beside the boarding door",
               "desc": "a heavy brass monorail drive lever mounted on the living-wood cabin wall, its polished handle seated in a slotted quadrant marked with a bold square motif, a small station dial above it",
-              "switch": true
+              "dial": true,
+              "label": "The drive lever"
             },
             {
               "id": "square_door",
               "at": "on the far right",
               "desc": "a single sliding cable-car door bearing a bold square motif",
               "door": {
-                "direction": "forward",
+                "direction": "open",
                 "to": "station2",
                 "opensOnto": [
                   {
@@ -454,7 +458,8 @@
                     "reveal": "the sliding square-marked door drawn fully open FORWARD onto the higher STATION-TWO platform where the mist is beginning to thin and the first pale light breaks through, brighter and more open than the depths below"
                   }
                 ]
-              }
+              },
+              "label": "The car door"
             }
           ],
           "atmosphere": "Dim, misty and enclosed, mysterious but warm-hearted; cool teal shadow and close drifting mist, the cabin lit by the amber glow of lichen and lantern, dark trunks sliding past outside; painterly, cinematic, subtle film grain — the deepest, dimmest leg of the journey",
@@ -470,7 +475,8 @@
         {
           "type": "clue",
           "label": "The collector's framed note",
-          "note": "framed handwritten note describing the beetle collection; verbiage draws attention + cues it matters for the vault; the collection itself is GROUPED BY COLOUR (read from the scene art). NOT a pickup — re-inspection is by backtracking."
+          "note": "framed handwritten note describing the beetle collection; verbiage draws attention + cues it matters for the vault; the collection itself is GROUPED BY COLOUR (read from the scene art). NOT a pickup — re-inspection is by backtracking.",
+          "body": ""
         },
         {
           "type": "door",
@@ -738,15 +744,21 @@
               "label": "Up-line ▲"
             },
             {
+              "value": "neutral",
+              "label": "Neutral ●"
+            },
+            {
               "value": "back",
               "label": "Down-line ▼"
             }
           ],
-          "hint": "Throw the lever to send the car up-line or down, then step through the door.",
+          "hint": "The car holds still in neutral, its door shut. Throw the lever up-line or down-line and the door slides open onto the platform you've chosen — then step through.",
           "sfx": {
             "src": "audio/lever.mp3",
             "volume": 0.7
-          }
+          },
+          "default": "neutral",
+          "resetOnEnter": true
         },
         {
           "id": "square_door",
@@ -799,7 +811,14 @@
                 ]
               }
             }
-          ]
+          ],
+          "availableWhen": {
+            "ne": [
+              "car_sq_dir",
+              "neutral"
+            ]
+          },
+          "lockedBody": "The car door is shut. Throw the drive lever up-line or down-line to move the car to a station, then step through the open door."
         }
       ],
       "sfx": {
@@ -837,19 +856,22 @@
               "door": {
                 "direction": "back",
                 "to": "car_sq"
-              }
+              },
+              "label": "The gondola you rode in"
             },
             {
               "id": "field_card",
               "at": "left of centre",
               "desc": "a weathered field card pinned to the living-wood railing",
-              "clue": true
+              "clue": true,
+              "label": "A pinned field-card"
             },
             {
               "id": "field_instrument",
               "at": "dead ahead in the centre",
               "desc": "a weathered field instrument of brass and timber with an open console screen showing a faint bar chart",
-              "puzzle": true
+              "puzzle": true,
+              "label": "The glow-meter"
             },
             {
               "id": "glow_shelves",
@@ -876,7 +898,8 @@
                     "reveal": "the sliding circle-marked door drawn fully open onto the cable-car cabin interior beyond: warm brass fittings and a glowing lantern, a glass cabinet of collected CONES and seed-pods, a timber floor — cosy, warm and clearly lit, the cabin interior filling the open doorway."
                   }
                 ]
-              }
+              },
+              "label": "The circle-line gondola"
             },
             {
               "id": "canopy_right",
@@ -910,7 +933,8 @@
         {
           "type": "clue",
           "label": "A field card",
-          "note": "science: crown height vs girth are different measures; NOT the answer"
+          "note": "science: crown height vs girth are different measures; NOT the answer",
+          "body": ""
         },
         {
           "type": "door",
@@ -973,7 +997,7 @@
           ],
           "starterCode": "forest_census",
           "check": {
-            "prompt": "Every tree gives a bark-glow reading when assessed by the spectrometer — the light the living wood puts out. Sorting the trees by their vigour class, which class glows the brightest on average? Assign that vigour class's name to <code>answer</code>.",
+            "prompt": "Every tree gives a bark glow reading when assessed by the spectrometer — the light the living wood puts out. Grouping the trees by their vigor, which class glows the brightest on average? Assign that vigor class's name to <code>answer</code>.",
             "requires": [
               "answer"
             ],
@@ -1212,7 +1236,7 @@
       "built": true,
       "authoring": {
         "tag": "car_ci",
-        "scenePrompt": "This is a panorama. A 360-degree view from inside a large alien monorail cable-car climbing steadily higher, up out of the treetops through bright late-morning haze, with a ridge of pale mountain peaks rising into view, with the space wrapping continuously all the way around so the left and right edges meet seamlessly. On the far left, a wide window onto thinning golden haze, the canopy falling away far below and a ridge of pale mountain peaks rising into view; to the left, brass cabin fittings and a hanging lantern of amber lichen-glow; dead ahead in the centre, opposite the door, a glass-fronted specimen cabinet of the collector's alien cones and seed-pods, arranged in neat trays SORTED SMALL TO LARGE BY SIZE. The cabinet is marked with a bold circle motif, with SMALL OBJECTS ON THE BOTTOMSHELF MEDIUM SIZED OBJECTS ON THE MIDDLE SHELF AND LARGE OBJECTS ON THE TOP SHELF. The cones deliberately varied in colour and shape within each size tray so the sorting reads unmistakably as size; to the right, on the cabin wall beside the boarding door, a heavy brass monorail drive lever mounted on the living-wood cabin wall, its polished handle seated in a slotted quadrant marked with a bold circle motif, a small station dial above it; on the far right, a single sliding cable-car door bearing a bold circle motif. Painterly, cinematic, cheerful and hopeful; warm golden light climbing brighter and clearer as the car rises, soft teal shadows, gentle bioluminescent amber lichen-glow, drifting spores, subtle film grain. No people, no lettering, no text, no captions, no UI.",
+        "scenePrompt": "This is a seamless 360-degree panorama from inside a large alien monorail cable-car climbing steadily higher, up out of the treetops through bright late-morning haze, with a ridge of pale mountain peaks rising into view. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain, continuous stretch of wall, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, a wide window onto thinning golden haze, the canopy falling away far below and a ridge of pale mountain peaks rising into view; to the left, brass cabin fittings and a hanging lantern of amber lichen-glow; dead ahead in the centre, opposite the door, a glass-fronted specimen cabinet of the collector's alien cones and seed-pods, arranged in neat trays SORTED SMALL TO LARGE BY SIZE. The cabinet is marked with a bold circle motif, with SMALL OBJECTS ON THE BOTTOMSHELF MEDIUM SIZED OBJECTS ON THE MIDDLE SHELF AND LARGE OBJECTS ON THE TOP SHELF. The cones deliberately varied in colour and shape within each size tray so the sorting reads unmistakably as size; to the right, on the cabin wall beside the boarding door, a heavy brass monorail drive lever mounted on the living-wood cabin wall, its polished handle seated in a slotted quadrant marked with a bold circle motif, a small station dial above it; on the far right, a single sliding cable-car door bearing a bold circle motif. Painterly, cinematic, cheerful and hopeful; warm golden light climbing brighter and clearer as the car rises, soft teal shadows, gentle bioluminescent amber lichen-glow, drifting spores, subtle film grain. No people, no lettering, no text, no captions, no UI. Again: the extreme left and right edges must align perfectly into a plain, continuous stretch of wall, uniform and unbroken, with no visible seam, join, or repetition.",
         "doorPrompt": "The CIRCLE cable-car door now slides open onto the next canopy platform in golden light; the cabin is otherwise unchanged. Same painterly style, no people, no lettering, no text.",
         "sceneSpec": {
           "room": "car_ci",
@@ -1250,14 +1274,15 @@
               "id": "drive_lever",
               "at": "to the right, on the cabin wall beside the boarding door",
               "desc": "a heavy brass monorail drive lever mounted on the living-wood cabin wall, its polished handle seated in a slotted quadrant marked with a bold circle motif, a small station dial above it",
-              "switch": true
+              "dial": true,
+              "label": "The drive lever"
             },
             {
               "id": "circle_door",
               "at": "on the far right",
               "desc": "a single sliding cable-car door bearing a bold circle motif",
               "door": {
-                "direction": "forward",
+                "direction": "open",
                 "to": "station3",
                 "opensOnto": [
                   {
@@ -1269,7 +1294,8 @@
                     "reveal": "the sliding circle-marked door drawn fully open, revealing the STATION-THREE canopy platform beyond — high above the treetops in bright, clear midday light: living-wood decking and brass railings, a far ridge of sunlit mountain peaks across the horizon, a sea of mist far below. The bright daylit view fills the entire open doorway; no dark void."
                   }
                 ]
-              }
+              },
+              "label": "The car door"
             }
           ],
           "atmosphere": "Painterly, cinematic, cheerful and hopeful; warm golden light climbing brighter and clearer as the car rises, soft teal shadows, gentle bioluminescent amber lichen-glow, drifting spores, subtle film grain",
@@ -1285,7 +1311,8 @@
         {
           "type": "clue",
           "label": "The collector's framed note",
-          "note": "framed handwritten note describing the cone/pod collection; verbiage draws attention + cues it matters for the vault; the collection itself is GROUPED BY SIZE (read from the scene art). NOT a pickup — re-inspection is by backtracking."
+          "note": "framed handwritten note describing the cone/pod collection; verbiage draws attention + cues it matters for the vault; the collection itself is GROUPED BY SIZE (read from the scene art). NOT a pickup — re-inspection is by backtracking.",
+          "body": ""
         },
         {
           "type": "door",
@@ -1354,18 +1381,6 @@
             },
             {
               "video": "car_ci/cine_window_view_c3.mp4",
-              "seed": null,
-              "prompt": "haze drifting past the window and cloud sliding slowly across the distant rising peaks as the car climbs",
-              "loop": "crossfade",
-              "box": [
-                0.0103,
-                0.4012,
-                0.2308,
-                0.6735
-              ]
-            },
-            {
-              "video": "car_ci/cine_window_view_c4.mp4",
               "seed": null,
               "prompt": "haze drifting past the window and cloud sliding slowly across the distant rising peaks as the car climbs",
               "loop": "crossfade",
@@ -1565,50 +1580,79 @@
               "label": "Up-line ▲"
             },
             {
+              "value": "neutral",
+              "label": "Neutral ●"
+            },
+            {
               "value": "back",
               "label": "Down-line ▼"
             }
           ],
-          "hint": "Throw the lever to send the car up-line or down, then step through the door.",
+          "hint": "The car holds still in neutral, its door shut. Throw the lever up-line or down-line and the door slides open onto the platform you've chosen — then step through.",
           "sfx": {
             "src": "audio/lever.mp3",
             "volume": 0.7
-          }
+          },
+          "default": "neutral",
+          "resetOnEnter": true
         },
         {
           "id": "circle_door",
           "type": "door",
           "label": "The car door",
           "box": [
-            0.817,
-            0.137,
-            0.95,
-            0.976
+            0.823,
+            0.108,
+            0.9757,
+            0.9541
           ],
           "direction": "open",
           "to": "station3",
+          "availableWhen": {
+            "ne": [
+              "car_ci_dir",
+              "neutral"
+            ]
+          },
+          "lockedBody": "The car door is shut. Throw the drive lever up-line or down-line to move the car to a station, then step through the open door.",
           "variants": [
             {
               "state": "to_station2",
               "box": [
-                0.817,
-                0.137,
-                0.95,
-                0.976
+                0.823,
+                0.108,
+                0.9757,
+                0.9541
               ],
-              "prompt": "the sliding circle-marked door drawn fully open, revealing the STATION-TWO canopy platform beyond — among the treetops in soft late-morning light: living-wood decking and brass railings, thinning mist, a low ridge of peaks just emerging. The daylit view fills the entire open doorway; nothing dark.",
-              "panorama": "car_ci/var_circle_door_to_station2.png"
+              "prompt": "the door is FULLY OPEN, revealing the canopy platform beyond — among the treetops in soft late-morning light: living-wood decking and brass railings, thinning mist, a low ridge of peaks just emerging. The daylit view fills the entire open doorway; nothing dark.",
+              "panorama": "car_ci/var_circle_door_to_station2.png",
+              "when": {
+                "eq": [
+                  "car_ci_dir",
+                  "back"
+                ]
+              },
+              "to": "station2",
+              "direction": "back"
             },
             {
               "state": "to_station3",
               "box": [
-                0.817,
-                0.137,
-                0.95,
-                0.976
+                0.823,
+                0.108,
+                0.9757,
+                0.9541
               ],
-              "prompt": "the sliding circle-marked door drawn fully open, revealing the STATION-THREE canopy platform beyond — high above the treetops in bright, clear midday light: living-wood decking and brass railings, a far ridge of sunlit mountain peaks across the horizon, a sea of mist far below. The bright daylit view fills the entire open doorway; no dark void.",
-              "panorama": "car_ci/var_circle_door_to_station3.png"
+              "prompt": "the door is FULLY OPEN, revealing the  canopy platform beyond — high above the treetops in bright, clear midday light: living-wood decking and brass railings, a far ridge of sunlit mountain peaks across the horizon, a sea of mist far below. The bright daylit view fills the entire open doorway; no dark void.",
+              "panorama": "car_ci/var_circle_door_to_station3.png",
+              "when": {
+                "eq": [
+                  "car_ci_dir",
+                  "forward"
+                ]
+              },
+              "to": "station3",
+              "direction": "open"
             }
           ]
         }
@@ -1629,7 +1673,7 @@
       "built": true,
       "authoring": {
         "tag": "station3",
-        "scenePrompt": "This is a panorama. A 360-degree view from an open research platform on the highest treetop, above the canopy now with the mist all gone and a ridge of mountain peaks standing clear across the horizon, bright midday, with the horizon wrapping continuously all the way around so the left and right edges meet seamlessly. On the far left, the open sky high above the canopy, a sharp ridge of mountain peaks clear across the bright horizon — the open view that wraps unbroken around behind you; to the left, the circle-line gondola you rode in, docked at the platform, boarded through its own sliding door which stands open — a bold circle motif on the door — its cables rising up into the clear sky; left of centre, a weathered field card pinned to the living-wood railing; dead ahead in the centre, a weathered field instrument of brass and timber with an open console screen showing a faint bar chart; just right of centre, oversized softly-glowing fungal shelves clustered on a living-wood trunk; to the right, the onward triangle-line gondola docked at the platform edge, boarded through its own closed sliding door — a bold triangle motif on the door — its cables rising straight up into the clear sky overhead; on the far right, more open sky and the same clear ridge of peaks, matching the view on the far left where they meet cleanly at the seam directly behind you. Painterly, cinematic, cheerful and hopeful; bright clear midday light, warm gold with crisp teal shadows, gentle bioluminescent amber lichen-glow, drifting spores, subtle film grain. No people, no lettering, no text, no captions, no UI.",
+        "scenePrompt": "This is a seamless 360-degree panorama from an open research platform on the highest treetop, above the canopy now with the mist all gone and a ridge of mountain peaks standing clear across the horizon, bright midday. Directly behind the viewer, split across the extreme left and extreme right edges, is an open, unbroken stretch of sky and distant horizon: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the open sky high above the canopy, a sharp ridge of mountain peaks clear across the bright horizon — the open view that wraps unbroken around behind you; to the left, the circle-line gondola you rode in, docked at the platform, boarded through its own sliding door which stands open — a bold circle motif on the door — its cables rising up into the clear sky; left of centre, a weathered field card pinned to the living-wood railing; dead ahead in the centre, a weathered field instrument of brass and timber with an open console screen showing a faint bar chart; just right of centre, oversized softly-glowing fungal shelves clustered on a living-wood trunk; to the right, the onward triangle-line gondola docked at the platform edge, boarded through its own closed sliding door — a bold triangle motif on the door — its cables rising straight up into the clear sky overhead; on the far right, more open sky and the same clear ridge of peaks, matching the view on the far left where they meet cleanly at the seam directly behind you. Painterly, cinematic, cheerful and hopeful; bright clear midday light, warm gold with crisp teal shadows, gentle bioluminescent amber lichen-glow, drifting spores, subtle film grain. No people, no lettering, no text, no captions, no UI. Again: the extreme left and right edges must align perfectly into an open, unbroken stretch of sky and distant horizon, with no visible seam, join, or repetition.",
         "doorPrompt": "The TRIANGLE monorail door now stands open onto its cable-car; the open circle passage back is unchanged. Same bright midday light, same painterly style, no people, no lettering, no text.",
         "sceneSpec": {
           "room": "station3",
@@ -1648,19 +1692,22 @@
               "door": {
                 "direction": "back",
                 "to": "car_ci"
-              }
+              },
+              "label": "The gondola you rode in"
             },
             {
               "id": "field_card",
               "at": "left of centre",
               "desc": "a weathered field card pinned to the living-wood railing",
-              "clue": true
+              "clue": true,
+              "label": "A pinned field-card"
             },
             {
               "id": "field_instrument",
               "at": "dead ahead in the centre",
               "desc": "a weathered field instrument of brass and timber with an open console screen showing a faint bar chart",
-              "puzzle": true
+              "puzzle": true,
+              "label": "The vitality gauge"
             },
             {
               "id": "glow_shelves",
@@ -1687,7 +1734,8 @@
                     "reveal": "the sliding triangle-marked door drawn fully open onto the cable-car cabin interior beyond: warm brass fittings and a glowing lantern, a glass cabinet of collected SHELLS, a timber floor — cosy, warm and clearly lit, the cabin interior filling the open doorway."
                   }
                 ]
-              }
+              },
+              "label": "The triangle-line gondola"
             },
             {
               "id": "canopy_right",
@@ -1715,12 +1763,13 @@
         {
           "type": "puzzle",
           "label": "The survey instrument",
-          "note": "SHORTCUT: group_by(canopy_zone)|>summarise(mean(vitality_index)) -> Cragside (count-weighted)"
+          "note": "SHORTCUT: group_by(grove)|>summarise(mean(vitality_index)) -> Cragside (count-weighted)"
         },
         {
           "type": "clue",
           "label": "A field card",
-          "note": "science: what the vitality index sums up; grove names; NOT the answer"
+          "note": "science: what the vitality index sums up; grove names; NOT the answer",
+          "body": ""
         },
         {
           "type": "door",
@@ -1735,7 +1784,7 @@
           "note": "return passage; build-time -> car_ci down node"
         }
       ],
-      "designNote": "STATION 3 — THE SHORTCUT (single group_by on zone). Deliberately hands the player the NAIVE grand-mean answer that the BOSS then subverts. TASK: group_by(canopy_zone) |> summarise(v = mean(vitality_index)); bar chart; highest grove. ANSWER: Cragside (66.5; next Sunspire Heights 56.2). starterCode = `forest_census`. PROMPT (draft): 'Your instruments logged a vitality reading for every tree. Across the four groves, which grove’s trees are the most vigorous AS THEY STAND today?' OPTIONS (>=6): the 4 groves Cragside[correct], Sunspire Heights, Mistfen Reach, Hollowdeep + 2 wrong-method distractors (Bloomspire = grouped by species by mistake; Radiant = grouped by vigor by mistake). KEY SETUP for the boss: SAME column the boss re-asks; the player recognises they already computed this the easy way. ART: HIGHEST platform — above the canopy, mountains clear; bright midday, no mist; CLOSED triangle door + OPEN circle passage back.",
+      "designNote": "STATION 3 — THE SHORTCUT (single group_by on grove). Deliberately hands the player the NAIVE grand-mean answer that the BOSS then subverts. TASK: group_by(grove) |> summarise(v = mean(vitality_index)); bar chart; highest grove. ANSWER: Cragside (66.5; next Sunspire Heights 56.2). starterCode = `forest_census`. PROMPT (draft): 'Your instruments logged a vitality reading for every tree. Across the four groves, which grove’s trees are the most vigorous AS THEY STAND today?' OPTIONS (>=6): the 4 groves Cragside[correct], Sunspire Heights, Mistfen Reach, Hollowdeep + 2 wrong-method distractors (Bloomspire = grouped by species by mistake; Radiant = grouped by vigor by mistake). KEY SETUP for the boss: SAME column the boss re-asks; the player recognises they already computed this the easy way. ART: HIGHEST platform — above the canopy, mountains clear; bright midday, no mist; CLOSED triangle door + OPEN circle passage back.",
       "panorama": "station3/scene.png",
       "builtFrom": "l1_station3_3.png",
       "wrap": {
@@ -1783,18 +1832,18 @@
           ],
           "starterCode": "forest_census",
           "check": {
-            "prompt": "Each tree carries a vitality reading. Taking the four groves exactly as they stand today, which grove's trees are the most vigorous on average, right now? Assign that grove's name to <code>answer</code>.",
+            "prompt": "Each tree carries a vitality reading. Taking the four groves exactly as they stand today, which one's trees have the highest vitality index on average? Assign that grove's name to <code>answer</code>.",
             "requires": [
               "answer"
             ],
             "expr": "tolower(trimws(gsub(\"[_-]\", \" \", as.character(answer)))) == \"cragside\"",
             "maxAttempts": 4,
-            "hint": "Group the trees by <code>canopy_zone</code> and take the mean <code>vitality_index</code> of each grove.",
+            "hint": "Group the trees by <code>grove</code> and take the mean <code>vitality_index</code> of each.",
             "feedback": {
               "correct": "Correct — noted in your field notebook: as the groves stand, Cragside reads most vigorous (~66).",
               "wrong": [
-                "Group by <code>canopy_zone</code> and summarise the mean vitality: <code>group_by(canopy_zone) |&gt; summarise(m = mean(vitality_index))</code>.",
-                "The most vigorous grove as it stands has the largest mean — <code>arrange(desc(m))</code>, read the top zone.",
+                "Group by <code>grove</code> and summarise the mean vitality: <code>group_by(grove) |&gt; summarise(m = mean(vitality_index))</code>.",
+                "The most vigorous grove as it stands has the largest mean — <code>arrange(desc(m))</code>, read the top grove.",
                 "Take the groves just as they are — every tree in each grove counted once."
               ],
               "reveal": ""
@@ -2012,7 +2061,7 @@
         "mode": "loop",
         "crossfade": 4
       },
-      "debrief": "Bin by canopy zone, read the mean vitality off each pile, and the grove that stands healthiest is Cragside. It felt like the same easy move as the first two stations — and it was, which is exactly the trap the boulder was about to spring. A grand mean over all the trees quietly lets the most crowded zones vote hardest."
+      "debrief": "Bin by grove, read the mean vitality off each pile, and the grove that stands healthiest is Cragside. It felt like the same easy move as the first two stations — and it was, which is exactly the trap the boulder was about to spring. A grand mean over all the trees quietly lets the most crowded groves vote hardest."
     },
     {
       "key": "car_tr",
@@ -2022,7 +2071,7 @@
       "built": true,
       "authoring": {
         "tag": "car_tr",
-        "scenePrompt": "This is a panorama. A 360-degree view from inside a small alien monorail cable-car on the last line, leaving the treetops behind and climbing toward a bare mountain shoulder in warm afternoon light, the peaks close now and the canopy far below, with the space wrapping continuously all the way around so the left and right edges meet seamlessly. On the far left, a wide window onto warm afternoon sky, the last treetops falling away below and the bare mountain peaks standing close and clear ahead; to the left, brass cabin fittings and a hanging lantern of amber lichen-glow; dead ahead in the centre, opposite the door, a glass-fronted specimen cabinet of the collector's alien shells, arranged in neat trays sorted BY SHAPE — spiral, fan, conical and domed — the cabinet marked with a bold triangle motif, the shells deliberately varied in size and colour within each shape tray so the sorting reads unmistakably as shape; to the right, on the cabin wall beside the boarding door, a heavy brass monorail drive lever mounted on the living-wood cabin wall, its polished handle seated in a slotted quadrant marked with a bold triangle motif, a small station dial above it; on the far right, a single sliding cable-car door bearing a bold triangle motif. Painterly, cinematic, cheerful and hopeful; warm golden light climbing brighter and clearer as the car rises, soft teal shadows, gentle bioluminescent amber lichen-glow, drifting spores, subtle film grain. No people, no lettering, no text, no captions, no UI.",
+        "scenePrompt": "This is a seamless 360-degree panorama from inside a small alien monorail cable-car on the last line, leaving the treetops behind and climbing toward a bare mountain shoulder in warm afternoon light, the peaks close now and the canopy far below. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain, continuous stretch of wall, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, a wide window onto warm afternoon sky, the last treetops falling away below and the bare mountain peaks standing close and clear ahead; to the left, brass cabin fittings and a hanging lantern of amber lichen-glow; dead ahead in the centre, opposite the door, a glass-fronted specimen cabinet of the collector's alien shells, arranged in neat trays sorted BY SHAPE — spiral, fan, conical and domed — the cabinet marked with a bold triangle motif, the shells deliberately varied in size and colour within each shape tray so the sorting reads unmistakably as shape; to the right, on the cabin wall beside the boarding door, a heavy brass monorail drive lever mounted on the living-wood cabin wall, its polished handle seated in a slotted quadrant marked with a bold triangle motif, a small station dial above it; on the far right, a single sliding cable-car door bearing a bold triangle motif. Painterly, cinematic, cheerful and hopeful; warm golden light climbing brighter and clearer as the car rises, soft teal shadows, gentle bioluminescent amber lichen-glow, drifting spores, subtle film grain. No people, no lettering, no text, no captions, no UI. Again: the extreme left and right edges must align perfectly into a plain, continuous stretch of wall, uniform and unbroken, with no visible seam, join, or repetition.",
         "doorPrompt": "The TRIANGLE cable-car door now slides open onto a rocky ledge at the foot of the climb, warm afternoon light and mountain rock beyond; the cabin is otherwise unchanged. Same painterly style, no people, no lettering, no text.",
         "sceneSpec": {
           "room": "car_tr",
@@ -2060,14 +2109,15 @@
               "id": "drive_lever",
               "at": "to the right, on the cabin wall beside the boarding door",
               "desc": "a heavy brass monorail drive lever mounted on the living-wood cabin wall, its polished handle seated in a slotted quadrant marked with a bold triangle motif, a small station dial above it",
-              "switch": true
+              "dial": true,
+              "label": "The drive lever"
             },
             {
               "id": "triangle_door",
               "at": "on the far right",
               "desc": "a single sliding cable-car door bearing a bold triangle motif",
               "door": {
-                "direction": "forward",
+                "direction": "open",
                 "to": "boss",
                 "opensOnto": [
                   {
@@ -2079,7 +2129,8 @@
                     "reveal": "the sliding triangle-marked door drawn fully open, revealing a high mountain trail beyond — out above the trees in warm golden-hour sunlight: a winding rocky ledge with a great boulder on the path, close sunlit peaks, and a sea of canopy far below. The bright golden view fills the entire open doorway, brightly lit; no dark void."
                   }
                 ]
-              }
+              },
+              "label": "The car door"
             }
           ],
           "atmosphere": "Painterly, cinematic, cheerful and hopeful; warm golden light climbing brighter and clearer as the car rises, soft teal shadows, gentle bioluminescent amber lichen-glow, drifting spores, subtle film grain",
@@ -2095,7 +2146,8 @@
         {
           "type": "clue",
           "label": "The collector's framed note",
-          "note": "framed handwritten note describing the shell collection; verbiage draws attention + cues it matters for the vault; the collection itself is GROUPED BY SHAPE (read from the scene art). NOT a pickup — re-inspection is by backtracking."
+          "note": "framed handwritten note describing the shell collection; verbiage draws attention + cues it matters for the vault; the collection itself is GROUPED BY SHAPE (read from the scene art). NOT a pickup — re-inspection is by backtracking.",
+          "body": ""
         },
         {
           "type": "door",
@@ -2375,15 +2427,21 @@
               "label": "Up-line ▲"
             },
             {
+              "value": "neutral",
+              "label": "Neutral ●"
+            },
+            {
               "value": "back",
               "label": "Down-line ▼"
             }
           ],
-          "hint": "Throw the lever to send the car up-line or down, then step through the door.",
+          "hint": "The car holds still in neutral, its door shut. Throw the lever up-line or down-line and the door slides open onto the platform you've chosen — then step through.",
           "sfx": {
             "src": "audio/lever.mp3",
             "volume": 0.7
-          }
+          },
+          "default": "neutral",
+          "resetOnEnter": true
         },
         {
           "id": "triangle_door",
@@ -2407,7 +2465,15 @@
                 0.986
               ],
               "prompt": "the sliding triangle-marked door drawn fully open, revealing the STATION-THREE canopy platform beyond — high above the treetops in bright midday light: living-wood decking and brass railings, sunlit peaks across the horizon, mist far below. The bright daylit view fills the entire open doorway; no dark void.",
-              "panorama": "car_tr/var_triangle_door_to_station3.png"
+              "panorama": "car_tr/var_triangle_door_to_station3.png",
+              "when": {
+                "eq": [
+                  "car_tr_dir",
+                  "back"
+                ]
+              },
+              "to": "station3",
+              "direction": "back"
             },
             {
               "state": "to_boss",
@@ -2418,9 +2484,24 @@
                 0.986
               ],
               "prompt": "the sliding triangle-marked door drawn fully open, revealing a high mountain trail beyond — out above the trees in warm golden-hour sunlight: a winding rocky ledge with a great boulder on the path, close sunlit peaks, and a sea of canopy far below. The bright golden view fills the entire open doorway, brightly lit; no dark void.",
-              "panorama": "car_tr/var_triangle_door_to_boss.png"
+              "panorama": "car_tr/var_triangle_door_to_boss.png",
+              "when": {
+                "eq": [
+                  "car_tr_dir",
+                  "forward"
+                ]
+              },
+              "to": "boss",
+              "direction": "open"
             }
-          ]
+          ],
+          "availableWhen": {
+            "ne": [
+              "car_tr_dir",
+              "neutral"
+            ]
+          },
+          "lockedBody": "The car door is shut. Throw the drive lever up-line or down-line to move the car to a station, then step through the open door."
         }
       ],
       "sfx": {
@@ -2440,7 +2521,7 @@
       "isBoss": true,
       "authoring": {
         "tag": "boss",
-        "scenePrompt": "This is a panorama. A 360-degree view from a rocky ledge high on the mountain, the trees left far below, in golden-hour evening light — a steep boulder-strewn scramble to a cleft in the rock, the whole canopy spread far beneath and the peaks close and glowing, with the horizon wrapping continuously all the way around so the left and right edges meet seamlessly. On the far left, an open trail winding back down off the ledge toward the waiting cable-car below, which has a big triangle on its door; to the left, the vast canopy spread far below the ledge, glowing in the low golden light with drifting cloud between the ledge and the trees; left of centre, a weathered field note pinned under a stone on the rock; dead ahead in the centre, a weathered brass-and-timber survey console set on a flat rock, its open screen showing a faint bar chart; just right of centre, drifting motes of pollen and spore catching the low golden-hour sun over the rock; to the right, the close mountain peaks standing sharp against the golden evening sky; on the far right, a great boulder wedged directly in a cleft in the rock, blocking the final climb. Painterly, cinematic, warm and triumphant; rich golden-hour evening light, long amber shadows on the rock, gentle bioluminescent spore-glow, subtle film grain; hopeful, never grim. No people, no lettering, no text, no captions, no UI.",
+        "scenePrompt": "This is a seamless 360-degree panorama from a rocky ledge high on the mountain, the trees left far below, in golden-hour evening light — a steep boulder-strewn scramble to a cleft in the rock, the whole canopy spread far beneath and the peaks close and glowing. Directly behind the viewer, split across the extreme left and extreme right edges, is an open, unbroken stretch of sky and distant horizon: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, an open trail winding back down off the ledge toward the waiting cable-car below, which has a big triangle on its door; to the left, the vast canopy spread far below the ledge, glowing in the low golden light with drifting cloud between the ledge and the trees; left of centre, a weathered field note pinned under a stone on the rock; dead ahead in the centre, a weathered brass-and-timber survey console set on a flat rock, its open screen showing a faint bar chart; just right of centre, drifting motes of pollen and spore catching the low golden-hour sun over the rock; to the right, the close mountain peaks standing sharp against the golden evening sky; on the far right, a great boulder wedged directly in a cleft in the rock, blocking the final climb. Painterly, cinematic, warm and triumphant; rich golden-hour evening light, long amber shadows on the rock, gentle bioluminescent spore-glow, subtle film grain; hopeful, never grim. No people, no lettering, no text, no captions, no UI. Again: the extreme left and right edges must align perfectly into an open, unbroken stretch of sky and distant horizon, with no visible seam, join, or repetition.",
         "doorPrompt": "The great BOULDER has rolled aside, opening the narrow cleft onto the final stretch of trail climbing toward the cliff-top at sunset; the open passage back down is unchanged. Same golden light, same painterly style, no people, no lettering, no text.",
         "sceneSpec": {
           "room": "boss",
@@ -2454,7 +2535,8 @@
               "door": {
                 "direction": "back",
                 "to": "car_tr"
-              }
+              },
+              "label": "The trail back down"
             },
             {
               "id": "canopy_below",
@@ -2469,13 +2551,15 @@
               "id": "field_note",
               "at": "left of centre",
               "desc": "a weathered field note pinned under a stone on the rock",
-              "clue": true
+              "clue": true,
+              "label": "The collector's field-note"
             },
             {
               "id": "survey_console",
               "at": "dead ahead in the centre",
               "desc": "a weathered brass-and-timber survey console set on a flat rock, its open screen showing a faint bar chart",
-              "puzzle": true
+              "puzzle": true,
+              "label": "The survey console"
             },
             {
               "id": "golden_motes",
@@ -2502,7 +2586,8 @@
               "door": {
                 "direction": "forward",
                 "to": "vault"
-              }
+              },
+              "label": "The blocked cleft"
             }
           ],
           "atmosphere": "Painterly, cinematic, warm and triumphant; rich golden-hour evening light, long amber shadows on the rock, gentle bioluminescent spore-glow, subtle film grain; hopeful, never grim",
@@ -2533,12 +2618,13 @@
         {
           "type": "puzzle",
           "label": "The survey console",
-          "note": "REGROUP: group_by(zone,species)|>summarise(mean) then ungroup, group_by(zone)|>summarise(mean) -> Sunspire Heights (species-balanced)"
+          "note": "REGROUP: group_by(grove,species)|>summarise(mean) then ungroup, group_by(grove)|>summarise(mean) -> Sunspire Heights (species-balanced)"
         },
         {
           "type": "clue",
           "label": "The pinned field note",
-          "note": "the collector's note flags the SPECIES-MIX CONFOUND (why the raw average misleads); points at regrouping WITHOUT naming Sunspire"
+          "note": "the collector's note flags the SPECIES-MIX CONFOUND (why the raw average misleads); points at regrouping WITHOUT naming Sunspire",
+          "body": ""
         },
         {
           "type": "door",
@@ -2553,7 +2639,7 @@
           "note": "return; build-time -> car_tr down node"
         }
       ],
-      "designNote": "BOSS — THE REGROUP (puzzleType 2, isBoss, deliverable figure+codec). Re-asks S3's zone question the CAREFUL way; the engineered Simpson flip makes the answer a DIFFERENT grove. TASK: group_by(canopy_zone, species) |> summarise(m = mean(vitality_index)); ungroup; group_by(canopy_zone) |> summarise(mean(m)); bar chart. ANSWER: Sunspire Heights (64.2 species-balanced; Cragside 58.5). PROMPT (draft): 'The vault won’t answer to a careless count. Not where the strong trees happen to stand, but which GROUND truly grows a tree best — giving every kind of tree an equal say. Which grove is the finest ground to grow in?' OPTIONS (>=6): Sunspire Heights[correct], Cragside (THE SHORTCUT TRAP — must be present), Mistfen Reach, Hollowdeep + 2 (e.g. 'No real difference'; Bloomspire = grouped by species by mistake). CLUE (draft field note): 'Rank the groves by the vigour of the trees standing in them and Cragside always wins. But Cragside is thick with Bloomspire and Ironcrown — hardy stock that reads strong wherever it roots. That tells me the grove is full of strong trees, not that it grows them strong. To judge the ground itself I must give every kind of tree an equal say — take each species’ vigour grove by grove first, then compare the groves.' feedback.correct NAMES the answer (field-notebook / meta): 'Sunspire Heights is the true best ground.' ART: HIGH on the mountain, golden hour; BOULDER blocks the way; console on a rock; pinned note; canopy far below, peaks close; open passage back down.",
+      "designNote": "BOSS — THE REGROUP (puzzleType 2, isBoss, deliverable figure+codec). Re-asks S3's grove question the CAREFUL way; the engineered Simpson flip makes the answer a DIFFERENT grove. TASK: group_by(grove, species) |> summarise(m = mean(vitality_index)); ungroup; group_by(grove) |> summarise(mean(m)); bar chart. ANSWER: Sunspire Heights (64.2 species-balanced; Cragside 58.5). PROMPT (draft): 'The vault won’t answer to a careless count. Not where the strong trees happen to stand, but which GROUND truly grows a tree best — giving every kind of tree an equal say. Which grove is the finest ground to grow in?' OPTIONS (>=6): Sunspire Heights[correct], Cragside (THE SHORTCUT TRAP — must be present), Mistfen Reach, Hollowdeep + 2 (e.g. 'No real difference'; Bloomspire = grouped by species by mistake). CLUE (draft field note): 'Rank the groves by the vigour of the trees standing in them and Cragside always wins. But Cragside is thick with Bloomspire and Ironcrown — hardy stock that reads strong wherever it roots. That tells me the grove is full of strong trees, not that it grows them strong. To judge the ground itself I must give every kind of tree an equal say — take each species’ vigour grove by grove first, then compare the groves.' feedback.correct NAMES the answer (field-notebook / meta): 'Sunspire Heights is the true best ground.' ART: HIGH on the mountain, golden hour; BOULDER blocks the way; console on a rock; pinned note; canopy far below, peaks close; open passage back down.",
       "panorama": "boss/scene.png",
       "builtFrom": "l1_boss_3.png",
       "wrap": {
@@ -2686,7 +2772,7 @@
           ],
           "starterCode": "forest_census",
           "check": {
-            "prompt": "The vault won't answer to a careless tally. It asks not which grove happens to hold the strongest trees, but which ground truly grows a tree best — giving every kind of tree an equal say, whatever grows there. Which grove is the finest ground to grow in? Assign its name to <code>answer</code>.",
+            "prompt": "Here, the question is not which grove happens to hold the strongest trees (highest vitality index), but which ground truly grows a tree best — giving every kind of tree an equal say, whatever grows there. Which grove is the finest ground to grow in? Assign its name to <code>answer</code>.",
             "requires": [
               "answer"
             ],
@@ -2696,8 +2782,8 @@
             "feedback": {
               "correct": "Correct — noted: giving every species an equal say, Sunspire Heights is the finest ground to grow in (~64) — the quick tally's answer was a mirage.",
               "wrong": [
-                "First take each species' mean vitality WITHIN each grove: <code>group_by(canopy_zone, species) |&gt; summarise(m = mean(vitality_index))</code>.",
-                "Then average those per-species figures up to the grove, so no common species dominates: <code>group_by(canopy_zone) |&gt; summarise(mm = mean(m)) |&gt; arrange(desc(mm))</code>.",
+                "First take each species' mean vitality WITHIN each grove: <code>group_by(grove, species) |&gt; summarise(m = mean(vitality_index))</code>.",
+                "Then average those per-species figures up to the grove, so no common species dominates: <code>group_by(grove) |&gt; summarise(mm = mean(m)) |&gt; arrange(desc(mm))</code>.",
                 "If you land on the same grove the quick tally gave, the common species are still voting twice — balance by species first."
               ],
               "reveal": ""
@@ -2886,7 +2972,7 @@
         "mode": "loop",
         "crossfade": 4
       },
-      "debrief": "The boulder asked the same question as the third station — which ground truly grows a tree best? — but demanded the honest answer. Group by zone and species first, summarise, then ungroup and regroup by zone alone, and the winner flips from Cragside to Sunspire Heights. The shortcut's grand mean had been dragged around by whichever species happened to crowd each zone; balancing the species first is what a fair comparison of grounds actually takes. That regroup was the capstone the whole ladder was built to earn."
+      "debrief": "The boulder asked the same question as the third station — which ground truly grows a tree best? — but demanded the honest answer. Group by grove and species first, summarise, then ungroup and regroup by grove alone, and the winner flips from Cragside to Sunspire Heights. The shortcut's grand mean had been dragged around by whichever species happened to crowd each grove; balancing the species first is what a fair comparison of grounds actually takes. That regroup was the capstone the whole ladder was built to earn."
     },
     {
       "key": "vault",
@@ -2910,7 +2996,8 @@
               "door": {
                 "direction": "back",
                 "to": "boss"
-              }
+              },
+              "label": "The trail back down"
             },
             {
               "id": "sunset_vista",
@@ -2934,7 +3021,8 @@
               "id": "gate_panel",
               "at": "dead ahead in the centre",
               "desc": "the ancient alien gate set into the cliff face, and beside it a blank three-by-three grid of unlit stone buttons awaiting the correct pattern",
-              "lock": true
+              "grid": true,
+              "label": "The gate panel"
             },
             {
               "id": "cliff_lanterns",

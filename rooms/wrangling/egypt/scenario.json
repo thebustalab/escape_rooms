@@ -1,0 +1,1442 @@
+{
+  "status": "in_development",
+  "chapter": "wrangling",
+  "scenario": "egypt",
+  "id": 17,
+  "title": "The Manifest",
+  "subtitle": "Data Wrangling Assignment · group_by + summarise",
+  "story": "Your wine ship arrives in Alexandria at first light, Pharos Lighthouse still burning gold above the harbor. You came in with a cargo — a hold of amphorae from the Aegean islands — and by the law of the port no ship may leave until two things are done: the cargo must be <b>registered</b> with the city, every amphora grouped by origin and accurately tallied; and the great <b>Pharos light turned upon the ship</b> to clear it for the open sea. The tide turns at dusk. Reconcile the manifest room by room, climb to the lantern, and swing the light onto your ship before the water leaves without you.",
+  "enterLabel": "Go ashore →",
+  "done": {
+    "title": "The manifest is reconciled!",
+    "body": "Weigh every grape alike and it is Thasos, not Chios, that gives the truest wine — the correction goes down in the register and the tally is stamped true. Copy the code sealed into the manifest; it is your proof the cargo was judged fairly."
+  },
+  "escapeDone": {
+    "title": "The light is yours!",
+    "body": "The last seals fall into their piles, the three tallies match, and the door gives. You set both hands to the dial and turn the great beam down across the water until it finds your ship at her mooring — cleared. The tide has turned and she rides high on it; sails fill, and the Pharos light holds you all the way out of the harbour, the manifest true behind you."
+  },
+  "music": "audio/glass_beams_mahal.mp3",
+  "musicVolume": 0.15,
+  "musicCredit": {
+    "text": "Glass Beams — Mahal (live)",
+    "url": "https://youtu.be/hGQu4_fan8Q"
+  },
+  "packages": [
+    "dplyr",
+    "ggplot2",
+    "readr"
+  ],
+  "datasets": [
+    {
+      "name": "wine_cargo",
+      "url": "https://thebustalab.github.io/escape_rooms/rooms/wrangling/egypt/data/wine_cargo.csv"
+    }
+  ],
+  "setup": "suppressMessages({library(dplyr); library(ggplot2)})",
+  "state": {
+    "rooms_solved": 0
+  },
+  "ambient": "embers",
+  "coverPrompt": "Minimalist stylised thumbnail poster of the Pharos lighthouse of Alexandria at dusk, a single warm amber flame burning at its crown above a dark harbour, one small wine ship silhouetted on the water below. Designed to read clearly as a small thumbnail: one bold, simple, high-contrast silhouette, iconic and uncluttered, minimal fine detail. Flat, limited palette: deep teal, night blue, and one warm amber flame. Soft film grain, painterly but clean with simple geometric shapes. Strong negative space, single centred focal subject. No people, no text, no lettering, no logos. Square composition.",
+  "worldPlatePrompt": "This is a panorama. A sweeping 360-degree establishing view of Hellenistic Alexandria from its Great Harbour: the tiered Pharos lighthouse rising on its mole, pale marble colonnades and porticoed warehouses along a stone quay, moored wooden wine ships with furled sails, great stacks of sealed clay amphorae bedded in straw, striped market awnings and dyed cloth beyond, and the columned front of the Great Library on the rise above the city. Painterly, cinematic, warm and inviting; the teal-and-amber house palette — warm gold stone and lamplight against deep teal harbour water and cool shadow — in soft, even daylight (deliberately neither dawn nor sunset, so each room can set its own time of day). Subtle film grain. No people, no lettering, no text, no captions, no UI.",
+  "rooms": [
+    {
+      "key": "deck",
+      "title": "The ship's deck",
+      "technique": "group_by + summarise (single grouping)",
+      "puzzleType": 1,
+      "built": true,
+      "authoring": {
+        "tag": "deck",
+        "scenePrompt": "This is a seamless 360-degree panorama from the open deck of a moored Hellenistic wine ship at Alexandria at first light — her square sail furled on the yard above and a lamp still burning at the stern — the Great Harbour flat and pale all around, the Pharos lighthouse standing across the water. Directly behind the viewer, split across the extreme left and extreme right edges, is the open dawn sky over the Great Harbour meeting the flat pale sea, empty and cloudless, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the open dawn harbour stretching away — flat pale water under an empty rose-and-blue sky, the far shore a low line, the view that meets its other half cleanly at the seam directly behind you; to the left, the great Pharos lighthouse standing tall across the water, its crown-fire still burning gold against the paling sky, tiers of pale stone rising above the harbour; to the left of centre, a scribe's count-board propped against the rail — a tally-stick and a slate of cut notch-marks running in rows, each notch one amphora counted, a small tally sigil cut deep at its head; dead ahead in the centre, the customs writing-desk on the open deck: crates of amphorae standing open in their straw beside it, an unrolled manifest weighted flat with a bronze weight, a stylus and inkpot, and a brass measuring apparatus of small pans and vials for testing the wine; just right of centre, the open deck hatch, its timber cover thrown back, a ladder-stair dropping into the lamplit dark of the hold below; to the right, the ship's gangplank running down from the rail onto the pale stone of the quay, the harbour steps and the city beyond it; on the far right, a single clay amphora seal lying loose on the deck boards by the rail where it has been struck from a jar — a flat stamped clay token, coloured and marked with a merchant's numeral. Cool rose-and-gold dawn light, long soft shadows across wet deck boards, pale sea haze, teal water and warm amber lamplight; painterly, cinematic, calm and expectant, subtle film grain. No people, no lettering, no captions, no text. Again: the extreme left and right edges must align perfectly into the open dawn sky over the Great Harbour meeting the flat pale sea, empty and cloudless, uniform and unbroken, with no visible seam, join, or repetition.",
+        "doorPrompt": "",
+        "sceneSpec": {
+          "room": "deck",
+          "setting": "the open deck of a moored Hellenistic wine ship at Alexandria at first light — her square sail furled on the yard above and a lamp still burning at the stern — the Great Harbour flat and pale all around, the Pharos lighthouse standing across the water",
+          "interior": false,
+          "seam": "the open dawn sky over the Great Harbour meeting the flat pale sea, empty and cloudless, uniform and unbroken",
+          "elements": [
+            {
+              "id": "harbour_dawn",
+              "at": "on the far left",
+              "desc": "the open dawn harbour stretching away — flat pale water under an empty rose-and-blue sky, the far shore a low line, the view that meets its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "pharos_dawn",
+              "at": "to the left",
+              "desc": "the great Pharos lighthouse standing tall across the water, its crown-fire still burning gold against the paling sky, tiers of pale stone rising above the harbour",
+              "animate": {
+                "motion": "the lighthouse crown-fire flickering and guttering, its gold light trembling on the water below",
+                "loop": "boomerang"
+              },
+              "label": "The Pharos across the water"
+            },
+            {
+              "id": "count_board",
+              "at": "to the left of centre",
+              "desc": "a scribe's count-board propped against the rail — a tally-stick and a slate of cut notch-marks running in rows, each notch one amphora counted, a small tally sigil cut deep at its head",
+              "clue": true,
+              "label": "The count-board"
+            },
+            {
+              "id": "manifest_desk",
+              "at": "dead ahead in the centre",
+              "desc": "the customs writing-desk on the open deck: crates of amphorae standing open in their straw beside it, an unrolled manifest weighted flat with a bronze weight, a stylus and inkpot, and a brass measuring apparatus of small pans and vials for testing the wine",
+              "puzzle": true,
+              "label": "The customs writing-desk"
+            },
+            {
+              "id": "hold_hatch",
+              "at": "just right of centre",
+              "desc": "the open deck hatch, its timber cover thrown back, a ladder-stair dropping into the lamplit dark of the hold below",
+              "door": {
+                "direction": "open",
+                "to": "hold"
+              },
+              "label": "The deck hatch"
+            },
+            {
+              "id": "gangplank",
+              "at": "to the right",
+              "desc": "the ship's gangplank running down from the rail onto the pale stone of the quay, the harbour steps and the city beyond it",
+              "door": {
+                "direction": "forward",
+                "to": "quay"
+              },
+              "label": "The gangplank ashore"
+            },
+            {
+              "id": "seal_1",
+              "at": "on the far right",
+              "desc": "a single clay amphora seal lying loose on the deck boards by the rail where it has been struck from a jar — a flat stamped clay token, coloured and marked with a merchant's numeral",
+              "clue": true,
+              "label": "A seal on the deck boards"
+            }
+          ],
+          "atmosphere": "Cool rose-and-gold dawn light, long soft shadows across wet deck boards, pale sea haze, teal water and warm amber lamplight; painterly, cinematic, calm and expectant, subtle film grain",
+          "negatives": "No people, no lettering, no captions, no text",
+          "continuity": []
+        }
+      },
+      "unlockedWhen": true,
+      "designNote": "S1 · COMPUTE-THE-KEY (Type 1). group_by(type) |> summarise(mean(sulphates)) -> 'red' (0.661 vs white 0.489, +35.1%). VERIFIED against data/wine_cargo.csv 2026-08-07. Literally the class wrangling exercise — the easiest rung. Distractors: wrong-method values (global mean 0.557, count-instead-of-mean, grouped by vintage -> no difference) + 'white'. Puzzle object = the manifest desk. DOORS: hold is 'open' (your own ship, free to enter); the GANGPLANK to the quay is 'forward', so it gates on S1 — signing the first manifest line is what lets you go ashore. CLUE count_board teaches the n() / tally sigil. CLUE seal_1 is a PICKUP (amphora seal 1 of 9) — first seal in the first room, to teach the pickup habit.",
+      "onSolve": [
+        {
+          "set": "deck_solved"
+        },
+        {
+          "inc": "rooms_solved"
+        }
+      ],
+      "plannedHotspots": [
+        {
+          "type": "clue",
+          "label": "The count-board",
+          "body": "Every amphora that comes off the ship is notched here, one cut for one jar. It is the plainest operation in the port and the first sigil a clerk learns: <b>⦀ the tally</b> — <em>how many are in this pile?</em> Nothing about the wine, only the count.<br><br>The manifest itself is the ship's register of the cargo: one line per amphora, each carrying its island and its grape alongside the measurements taken at the press. More is written down than any single question needs, so the trick is choosing the right column.<br><br>Here is what <code>str(wine_cargo)</code> shows — the shape of the register:<pre style=\"white-space:pre;overflow-x:auto;font:12px/1.45 ui-monospace,Menlo,Consolas,monospace;background:#08131c;color:#cfe6d8;padding:8px 10px;border-radius:6px;margin:8px 0 0\">tibble [4,000 × 13] (S3: tbl_df/tbl/data.frame)\n $ amphora_id      : chr [1:4000] \"AMPH-0000\" \"AMPH-0001\" \"AMPH-0002\" \"AMPH-0003\" ...\n $ type            : chr [1:4000] \"white\" \"red\" \"red\" \"white\" ...\n $ region          : chr [1:4000] \"Kos\" \"Chios\" \"Kos\" \"Chios\" ...\n $ varietal        : chr [1:4000] \"Helvola\" \"Eugenia\" \"Eugenia\" \"Apian\" ...\n $ vintage         : num [1:4000] -245 -246 -245 -245 ...\n $ fixed_acidity   : num [1:4000] 6.925 8.018 9.207 6.942 ...\n $ volatile_acidity: num [1:4000] 0.367 0.469 0.544 0.411 ...\n $ residual_sugar  : num [1:4000] 6.99 1.19 0.6 4.99 ...\n $ chlorides       : num [1:4000] 0.046 0.098 0.09 0.054 ...\n $ pH              : num [1:4000] 3.09 3.45 3.28 3.39 ...\n $ sulphates       : num [1:4000] 0.452 0.626 0.502 0.429 ...\n $ alcohol         : num [1:4000] 11.21 10.65 10.55 11.13 ...\n $ quality_score   : num [1:4000] 5.3 7.08 7.92 6.85 ...</pre>"
+        },
+        {
+          "type": "puzzle",
+          "label": "The customs writing-desk",
+          "starterCode": "wine_cargo",
+          "question": {
+            "prompt": "The register's first line is the plain one. Reds and whites are taxed separately, and your ship must declare which of the two it carries is more heavily cured for the long crossing — the sulfur is what keeps a wine sound at sea. Which type, red or white wine, does your hold carry more heavily sulfured, and what is the average sulfur level of the more heavily sulfured one?",
+            "options": [
+              "white — averaging 0.49",
+              "red — averaging 0.66",
+              "red — averaging 0.56",
+              "white — averaging 0.56",
+              "red — averaging 0.17",
+              "red — 1,571 amphorae",
+              "neither — both average about 0.56"
+            ],
+            "correct": 1,
+            "maxAttempts": 4,
+            "feedback": {
+              "correct": "Correct — noted in your field notebook: red is the more heavily sulphured cargo, averaging 0.66 against white's 0.49.",
+              "wrong": [
+                "Split the cargo into its two types and take the average of the sulphates column within each — not one average across the whole hold.",
+                "Compare the two group averages themselves. Not how many amphorae are in each group, and not the gap between the two figures.",
+                "Two groups, one mean sulphates figure each. Report the larger of the two, and the type it belongs to."
+              ]
+            }
+          },
+          "solveSfx": {
+            "src": "audio/solve_deck_manifest_desk_1.mp3",
+            "volume": 0.7
+          }
+        },
+        {
+          "type": "clue",
+          "label": "A seal on the deck boards",
+          "body": "A merchant's amphora seal, lying loose on the deck boards by the rail. The clay is <b>red</b>, its form <b>round</b> and <b>small</b>, and a tally numeral <b>1</b> is pressed into the face. Seals like this are struck at the press and travel with the jar; a harbour clerk reads a tray of them the way a scribe reads a shelf — by sorting them into piles and counting the total in each pile.<br><br><em>Take it with you — press <b>Add to notebook</b> below, or it stays where it lies.</em>",
+          "pickup": "Seal 1 — red · round · small · numeral 1"
+        }
+      ],
+      "sfx": [
+        {
+          "src": "audio/deck_bed_harbour_calm.mp3",
+          "mode": "loop",
+          "volume": 0.5
+        },
+        {
+          "src": "audio/deck_gull_call.mp3",
+          "mode": "interval",
+          "volume": 0.3,
+          "gapMin": 14,
+          "gapMax": 34
+        }
+      ],
+      "panorama": "deck/scene.png",
+      "builtFrom": "l1_deck_2.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5.1
+      }
+    },
+    {
+      "key": "hold",
+      "title": "The hold",
+      "technique": "",
+      "puzzleType": 0,
+      "built": true,
+      "authoring": {
+        "tag": "hold",
+        "scenePrompt": "This is a seamless 360-degree panorama from deep in the lamplit hold of the wine ship below the waterline, stacked to the beams with amphorae bedded in straw. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain continuous run of dark tarred hull planking and curved rib-timbers, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the dark tarred hull planking curving away into shadow, heavy rib-timbers rising to the deck beams, the plain surface that meets its other half cleanly at the seam directly behind you; to the left, the ladder-stair climbing back up through the open hatch to the deck, a shaft of pale dawn light falling down it; to the left of centre, a clay amphora seal resting on a crate lid where it was set down — a flat stamped clay token, coloured and cut with a merchant's numeral; dead ahead in the centre, a bronze oil lamp hanging from a chain over the central gangway between the great stacks of sealed amphorae, rank upon rank of them bedded in straw to the beams; just right of centre, a second clay amphora seal tucked into the straw between two jars, catching the lamplight — a flat stamped clay token with a numeral cut into it; to the right, the stacks running away aft into deep shadow, coils of heavy rope and folded sailcloth lashed against the timbers, the ship's ribs closing in toward the stern; on the far right, more dark tarred planking and rib-timbers running away into the shadowed stern of the hold, the plain surface that meets the seam directly behind you. Deep warm lamplight against near-black timber, dust and straw-chaff hanging in the still air, glints on wet clay jars, close and hushed; painterly, cinematic, rich shadow, subtle film grain. No people, no lettering, no captions, no text. Again: the extreme left and right edges must align perfectly into a plain continuous run of dark tarred hull planking and curved rib-timbers, uniform and unbroken, with no visible seam, join, or repetition.",
+        "doorPrompt": "",
+        "sceneSpec": {
+          "room": "hold",
+          "setting": "deep in the lamplit hold of the wine ship below the waterline, stacked to the beams with amphorae bedded in straw",
+          "interior": true,
+          "seam": "a plain continuous run of dark tarred hull planking and curved rib-timbers, uniform and unbroken",
+          "elements": [
+            {
+              "id": "hull_left",
+              "at": "on the far left",
+              "desc": "the dark tarred hull planking curving away into shadow, heavy rib-timbers rising to the deck beams, the plain surface that meets its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "companion_up",
+              "at": "to the left",
+              "desc": "the ladder-stair climbing back up through the open hatch to the deck, a shaft of pale dawn light falling down it",
+              "door": {
+                "direction": "back",
+                "to": "deck"
+              },
+              "label": "The companionway"
+            },
+            {
+              "id": "seal_2",
+              "at": "to the left of centre",
+              "desc": "a clay amphora seal resting on a crate lid where it was set down — a flat stamped clay token, coloured and cut with a merchant's numeral",
+              "clue": true,
+              "label": "A seal on a crate lid"
+            },
+            {
+              "id": "hold_lamp",
+              "at": "dead ahead in the centre",
+              "desc": "a bronze oil lamp hanging from a chain over the central gangway between the great stacks of sealed amphorae, rank upon rank of them bedded in straw to the beams",
+              "animate": {
+                "motion": "the hanging oil lamp swaying slowly on its chain, its warm flame guttering and the shadows of the amphora stacks swinging with it",
+                "loop": "boomerang"
+              },
+              "label": "The hanging lamp"
+            },
+            {
+              "id": "seal_3",
+              "at": "just right of centre",
+              "desc": "a second clay amphora seal tucked into the straw between two jars, catching the lamplight — a flat stamped clay token with a numeral cut into it",
+              "clue": true,
+              "label": "A seal in the straw"
+            },
+            {
+              "id": "hold_stern",
+              "at": "to the right",
+              "desc": "the stacks running away aft into deep shadow, coils of heavy rope and folded sailcloth lashed against the timbers, the ship's ribs closing in toward the stern"
+            },
+            {
+              "id": "hull_right",
+              "at": "on the far right",
+              "desc": "more dark tarred planking and rib-timbers running away into the shadowed stern of the hold, the plain surface that meets the seam directly behind you"
+            }
+          ],
+          "atmosphere": "Deep warm lamplight against near-black timber, dust and straw-chaff hanging in the still air, glints on wet clay jars, close and hushed; painterly, cinematic, rich shadow, subtle film grain",
+          "negatives": "No people, no lettering, no captions, no text",
+          "continuity": []
+        }
+      },
+      "unlockedWhen": true,
+      "designNote": "Atmosphere + pickup room, NO graded puzzle. DEAD-END side room off the deck — its only door is the 'back' companionway to deck. Seals 2 and 3 (PICKUPS).",
+      "plannedHotspots": [
+        {
+          "type": "clue",
+          "label": "A seal on a crate lid",
+          "body": "A merchant's amphora seal, resting on a crate lid in the hold. The clay is <b>red</b>, its form <b>round</b> and <b>medium</b>, and a tally numeral <b>2</b> is pressed into the face. Seals like this are struck at the press and travel with the jar; a harbour clerk reads a tray of them the way a scribe reads a shelf — by sorting them into piles and counting what each pile comes to.<br><br><em>Take it with you — press <b>Add to notebook</b> below, or it stays where it lies.</em>",
+          "pickup": "Seal 2 — red · round · medium · numeral 2"
+        },
+        {
+          "type": "clue",
+          "label": "A seal in the straw",
+          "body": "A merchant's amphora seal, tucked into the straw between two jars. The clay is <b>red</b>, its form <b>tall</b> and <b>large</b>, and a tally numeral <b>3</b> is pressed into the face. Seals like this are struck at the press and travel with the jar; a harbour clerk reads a tray of them the way a scribe reads a shelf — by sorting them into piles and counting what each pile comes to.<br><br><em>Take it with you — press <b>Add to notebook</b> below, or it stays where it lies.</em>",
+          "pickup": "Seal 3 — red · tall · large · numeral 3"
+        }
+      ],
+      "entry": {
+        "title": "Below decks",
+        "text": "You lift the hatch cover and go down the ladder into the smell of straw and wet clay. The whole voyage is stacked around you in the half-dark, rank upon rank of it, waiting to be counted."
+      },
+      "sfx": [
+        {
+          "src": "audio/hold_bed_belowdeck.mp3",
+          "mode": "loop",
+          "volume": 0.5
+        },
+        {
+          "src": "audio/hold_timber_creak.mp3",
+          "mode": "interval",
+          "volume": 0.25,
+          "gapMin": 16,
+          "gapMax": 38
+        }
+      ],
+      "panorama": "hold/scene.png",
+      "builtFrom": "l1_hold_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -4.9
+      }
+    },
+    {
+      "key": "quay",
+      "title": "The harbour steps",
+      "technique": "",
+      "puzzleType": 0,
+      "built": true,
+      "authoring": {
+        "tag": "quay",
+        "scenePrompt": "This is a seamless 360-degree panorama from the harbour steps on the great stone quay of Alexandria in the early morning, the wine ship moored close by and the whole Great Harbour opening out beyond. Directly behind the viewer, split across the extreme left and extreme right edges, is the open morning sky over the Great Harbour meeting the flat pale water, empty and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the harbour opening away west along the mole under an open morning sky, moored hulls small in the distance, the view that meets its other half cleanly at the seam directly behind you; to the left, the gangplank running back up onto the deck of your own moored wine ship — a single-masted wine ship with her square sail furled on the yard, dark hull, one lamp burning at her stern — riding at the quay wall; to the left of centre, a row of small fishing boats moored along the quay wall, their masts and rigging crowded together, pennants and drying nets strung between them; dead ahead in the centre, the Pharos lighthouse standing across the water on its mole — tiers of pale stone climbing to the great lamp at its crown, unlit and pale in the morning light, the whole harbour between you and it; just right of centre, a small harbour skiff tied at the foot of the water-steps, an oar shipped along its thwart and a lamp at its bow, low enough to step down into over the gunwale; to the right, a tall stone archway in the harbour wall giving onto the colonnaded warehouse front, cargo stacked deep in its shade; on the far right, a clay amphora seal caught between the cobbles at the head of the water-steps — a flat stamped token, coloured, a numeral cut into its face. Clear early-morning light off the water, long shadows across wet pale stone, gulls and sea-haze, teal harbour and warm sandstone; painterly, cinematic, open and busy, subtle film grain. No people, no lettering, no captions, no text. Again: the extreme left and right edges must align perfectly into the open morning sky over the Great Harbour meeting the flat pale water, empty and unbroken, with no visible seam, join, or repetition.",
+        "doorPrompt": "",
+        "sceneSpec": {
+          "room": "quay",
+          "setting": "the harbour steps on the great stone quay of Alexandria in the early morning, the wine ship moored close by and the whole Great Harbour opening out beyond",
+          "interior": false,
+          "seam": "the open morning sky over the Great Harbour meeting the flat pale water, empty and unbroken",
+          "elements": [
+            {
+              "id": "harbour_left",
+              "at": "on the far left",
+              "desc": "the harbour opening away west along the mole under an open morning sky, moored hulls small in the distance, the view that meets its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "ship_gangplank",
+              "at": "to the left",
+              "desc": "the gangplank running back up onto the deck of your own moored wine ship — a single-masted wine ship with her square sail furled on the yard, dark hull, one lamp burning at her stern — riding at the quay wall",
+              "door": {
+                "direction": "back",
+                "to": "deck"
+              },
+              "label": "The gangplank to your ship"
+            },
+            {
+              "id": "moored_boats",
+              "at": "to the left of centre",
+              "desc": "a row of small fishing boats moored along the quay wall, their masts and rigging crowded together, pennants and drying nets strung between them",
+              "animate": {
+                "motion": "the moored boats rocking gently at their lines, masts swaying and the strung pennants and nets lifting in the harbour breeze",
+                "loop": "boomerang"
+              },
+              "label": "The moored fishing boats"
+            },
+            {
+              "id": "pharos_across",
+              "at": "dead ahead in the centre",
+              "desc": "the Pharos lighthouse standing across the water on its mole — tiers of pale stone climbing to the great lamp at its crown, unlit and pale in the morning light, the whole harbour between you and it"
+            },
+            {
+              "id": "skiff_steps",
+              "at": "just right of centre",
+              "desc": "a small harbour skiff tied at the foot of the water-steps, an oar shipped along its thwart and a lamp at its bow, low enough to step down into over the gunwale",
+              "door": {
+                "direction": "open",
+                "to": "boat"
+              },
+              "label": "The harbour skiff"
+            },
+            {
+              "id": "emporion_arch",
+              "at": "to the right",
+              "desc": "a tall stone archway in the harbour wall giving onto the colonnaded warehouse front, cargo stacked deep in its shade",
+              "door": {
+                "direction": "open",
+                "to": "emporion"
+              },
+              "label": "The archway to the emporion"
+            },
+            {
+              "id": "seal_4",
+              "at": "on the far right",
+              "desc": "a clay amphora seal caught between the cobbles at the head of the water-steps — a flat stamped token, coloured, a numeral cut into its face",
+              "clue": true,
+              "label": "A seal at the water-steps"
+            }
+          ],
+          "atmosphere": "Clear early-morning light off the water, long shadows across wet pale stone, gulls and sea-haze, teal harbour and warm sandstone; painterly, cinematic, open and busy, subtle film grain",
+          "negatives": "No people, no lettering, no captions, no text",
+          "continuity": []
+        }
+      },
+      "unlockedWhen": true,
+      "designNote": "Atmosphere + pickup room, NO graded puzzle. THE HUB — three doors: 'back' to deck (the gangplank), 'open' to emporion (the city chain), and 'open' to boat (the skiff at the water-steps). WIRING: the SKIFF door must carry availableWhen {solved:'library'} + a diegetic lockedBody (the crossing only makes sense once the manifest is registered) — `_apply_spec` copies only direction/to from the spec, so add the gate by hand at wiring. Seal 4 (PICKUP).",
+      "plannedHotspots": [
+        {
+          "type": "clue",
+          "label": "A seal at the water-steps",
+          "body": "A merchant's amphora seal, caught between the cobbles at the water-steps. The clay is <b>red</b>, its form <b>squat</b> and <b>small</b>, and a tally numeral <b>4</b> is pressed into the face. Seals like this are struck at the press and travel with the jar; a harbour clerk reads a tray of them the way a scribe reads a shelf — by sorting them into piles and counting what each pile comes to.<br><br><em>Take it with you — press <b>Add to notebook</b> below, or it stays where it lies.</em>",
+          "pickup": "Seal 4 — red · squat · small · numeral 4"
+        },
+        {
+          "type": "door",
+          "label": "The harbour skiff",
+          "availableWhen": {
+            "solved": "library"
+          },
+          "lockedBody": "The skiff sits low at the steps with its oar shipped, but there is nothing across the water for you yet — the manifest is not registered, and the light is not yours to turn."
+        }
+      ],
+      "entry": {
+        "title": "Ashore",
+        "text": "The first line of the register is signed: it is the reds that were cured heaviest for the crossing, at 0.66 against white's 0.49. That much the harbour will accept. You walk the plank down onto Alexandrian stone, and the city is already loud."
+      },
+      "sfx": [
+        {
+          "src": "audio/quay_bed_harbour_village.mp3",
+          "mode": "loop",
+          "volume": 0.5
+        },
+        {
+          "src": "audio/quay_gull_call.mp3",
+          "mode": "interval",
+          "volume": 0.3,
+          "gapMin": 12,
+          "gapMax": 30
+        }
+      ],
+      "panorama": "quay/scene.png",
+      "builtFrom": "l1_quay_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -4.9
+      }
+    },
+    {
+      "key": "emporion",
+      "title": "The emporion",
+      "technique": "",
+      "puzzleType": 0,
+      "built": true,
+      "authoring": {
+        "tag": "emporion",
+        "scenePrompt": "This is a seamless 360-degree panorama from the quayside emporion — the colonnaded warehouse front along the harbour wall in the mid-morning, stacked high with cargo newly landed. Directly behind the viewer, split across the extreme left and extreme right edges, is the open morning sky over the harbour above a plain run of pale dressed-stone quay wall, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the pale stone quay running away along the water under an open sky, moored hulls beyond it and the Pharos small and pale on the far mole, the view that meets its other half cleanly at the seam directly behind you; to the left, the stone archway back through the harbour wall to the water-steps and the moored ships; to the left of centre, a clay amphora seal dropped among the cobbles at the foot of a cargo stack — a flat stamped clay token, coloured, a numeral cut into its face; dead ahead in the centre, the great columned portico of the warehouse, its wide striped awning stretched on ropes above towering stacks of sealed amphorae and corded bales; just right of centre, a clay amphora seal set on the lip of a stone water-trough — a flat stamped token, coloured, cut with a merchant's numeral; to the right, a tall arch at the head of the warehouse row, the dust and colour and noise of the wine market beyond it, the way up into the city; on the far right, the warehouse colonnade and the quay continuing away under the same open morning sky, meeting the seam directly behind you. Bright mid-morning light, long shadows across pale stone, dust in the air, teal harbour water and warm sandstone; painterly, cinematic, busy and bright, subtle film grain. No people, no lettering, no captions, no text. Again: the extreme left and right edges must align perfectly into the open morning sky over the harbour above a plain run of pale dressed-stone quay wall, uniform and unbroken, with no visible seam, join, or repetition.",
+        "doorPrompt": "",
+        "sceneSpec": {
+          "room": "emporion",
+          "setting": "the quayside emporion — the colonnaded warehouse front along the harbour wall in the mid-morning, stacked high with cargo newly landed",
+          "interior": false,
+          "seam": "the open morning sky over the harbour above a plain run of pale dressed-stone quay wall, uniform and unbroken",
+          "elements": [
+            {
+              "id": "quay_left",
+              "at": "on the far left",
+              "desc": "the pale stone quay running away along the water under an open sky, moored hulls beyond it and the Pharos small and pale on the far mole, the view that meets its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "quay_back",
+              "at": "to the left",
+              "desc": "the stone archway back through the harbour wall to the water-steps and the moored ships",
+              "door": {
+                "direction": "back",
+                "to": "quay"
+              },
+              "label": "The archway back to the quay"
+            },
+            {
+              "id": "seal_5",
+              "at": "to the left of centre",
+              "desc": "a clay amphora seal dropped among the cobbles at the foot of a cargo stack — a flat stamped clay token, coloured, a numeral cut into its face",
+              "clue": true,
+              "label": "A seal among the cobbles"
+            },
+            {
+              "id": "warehouse_awning",
+              "at": "dead ahead in the centre",
+              "desc": "the great columned portico of the warehouse, its wide striped awning stretched on ropes above towering stacks of sealed amphorae and corded bales",
+              "animate": {
+                "motion": "the great striped awning billowing and rippling in the harbour breeze, its shadow sliding back and forth across the stacked amphorae below",
+                "loop": "boomerang"
+              },
+              "label": "The warehouse awning"
+            },
+            {
+              "id": "seal_6",
+              "at": "just right of centre",
+              "desc": "a clay amphora seal set on the lip of a stone water-trough — a flat stamped token, coloured, cut with a merchant's numeral",
+              "clue": true,
+              "label": "A seal on the water-trough"
+            },
+            {
+              "id": "market_arch",
+              "at": "to the right",
+              "desc": "a tall arch at the head of the warehouse row, the dust and colour and noise of the wine market beyond it, the way up into the city",
+              "door": {
+                "direction": "open",
+                "to": "market_price"
+              },
+              "label": "The arch to the market"
+            },
+            {
+              "id": "quay_right",
+              "at": "on the far right",
+              "desc": "the warehouse colonnade and the quay continuing away under the same open morning sky, meeting the seam directly behind you"
+            }
+          ],
+          "atmosphere": "Bright mid-morning light, long shadows across pale stone, dust in the air, teal harbour water and warm sandstone; painterly, cinematic, busy and bright, subtle film grain",
+          "negatives": "No people, no lettering, no captions, no text",
+          "continuity": []
+        }
+      },
+      "unlockedWhen": true,
+      "designNote": "Atmosphere + pickup room, NO graded puzzle. 'back' to quay, 'open' on to the market. Seals 5 and 6 (PICKUPS).",
+      "plannedHotspots": [
+        {
+          "type": "clue",
+          "label": "A seal among the cobbles",
+          "body": "A merchant's amphora seal, dropped among the cobbles at the foot of a cargo stack. The clay is <b>blue</b>, its form <b>round</b> and <b>medium</b>, and a tally numeral <b>5</b> is pressed into the face. Seals like this are struck at the press and travel with the jar; a harbour clerk reads a tray of them the way a scribe reads a shelf — by sorting them into piles and counting what each pile comes to.<br><br><em>Take it with you — press <b>Add to notebook</b> below, or it stays where it lies.</em>",
+          "pickup": "Seal 5 — blue · round · medium · numeral 5"
+        },
+        {
+          "type": "clue",
+          "label": "A seal on the water-trough",
+          "body": "A merchant's amphora seal, set on the lip of a stone water-trough. The clay is <b>blue</b>, its form <b>round</b> and <b>large</b>, and a tally numeral <b>6</b> is pressed into the face. Seals like this are struck at the press and travel with the jar; a harbour clerk reads a tray of them the way a scribe reads a shelf — by sorting them into piles and counting what each pile comes to.<br><br><em>Take it with you — press <b>Add to notebook</b> below, or it stays where it lies.</em>",
+          "pickup": "Seal 6 — blue · round · large · numeral 6"
+        }
+      ],
+      "entry": {
+        "title": "The emporion",
+        "text": "Through the arch in the harbour wall the warehouses run away in a long colonnade, every portico stacked to its beams with somebody's cargo. Yours is only one manifest among hundreds here."
+      },
+      "sfx": [
+        {
+          "src": "audio/emporion_bed_market_far.mp3",
+          "mode": "loop",
+          "volume": 0.3448190563896021
+        },
+        {
+          "src": "audio/emporion_gull.mp3",
+          "mode": "interval",
+          "volume": 0.06217148760569088,
+          "gapMin": 16,
+          "gapMax": 36
+        }
+      ],
+      "panorama": "emporion/scene.png",
+      "builtFrom": "l1_emporion_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -8.5
+      }
+    },
+    {
+      "key": "market_price",
+      "title": "The wine market",
+      "technique": "group_by + summarise (single grouping, 6 levels — pick-the-point)",
+      "puzzleType": 4,
+      "built": true,
+      "authoring": {
+        "tag": "market_price",
+        "scenePrompt": "This is a seamless 360-degree panorama from the wine market at midday under a hard white sun, stalls and awnings crowded along a sun-bleached street. Directly behind the viewer, split across the extreme left and extreme right edges, is the flat white midday sky above a plain run of sun-bleached plaster wall, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the market street running away between sun-bleached walls under a flat white sky, awnings dwindling into the glare, the view that meets its other half cleanly at the seam directly behind you; to the left, the arch back down to the warehouse colonnade and the harbour beyond; to the left of centre, a tall chalked price-board standing at the head of the stalls, the day's lots listed with the dearest chalked highest of all and a bold up-chevron sigil cut beside it; dead ahead in the centre, the assayer's table under its awning — bronze measuring vessels and a row of small tasting bowls set out on the boards, an open ledger beside them, and a great slate propped behind the table ruled into a plotted chart of marks; just right of centre, lengths of dyed cloth and hanging bunches of dried herbs strung on lines between the stall posts; to the right, the street continuing on between the stalls toward a knot of raised voices further along; on the far right, a clay amphora seal lying in the dust at the foot of a stall post — a flat stamped token, coloured, a numeral cut into it. Hard bleaching midday sun, sharp black shadows under the awnings, dust and heat-shimmer, bleached sandstone and bright dyed cloth against deep shade; painterly, cinematic, hot and crowded, subtle film grain. No people, no lettering, no captions, no text. Again: the extreme left and right edges must align perfectly into the flat white midday sky above a plain run of sun-bleached plaster wall, uniform and unbroken, with no visible seam, join, or repetition.",
+        "doorPrompt": "",
+        "sceneSpec": {
+          "room": "market_price",
+          "setting": "the wine market at midday under a hard white sun, stalls and awnings crowded along a sun-bleached street",
+          "interior": false,
+          "seam": "the flat white midday sky above a plain run of sun-bleached plaster wall, uniform and unbroken",
+          "elements": [
+            {
+              "id": "market_left",
+              "at": "on the far left",
+              "desc": "the market street running away between sun-bleached walls under a flat white sky, awnings dwindling into the glare, the view that meets its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "emporion_back",
+              "at": "to the left",
+              "desc": "the arch back down to the warehouse colonnade and the harbour beyond",
+              "door": {
+                "direction": "back",
+                "to": "emporion"
+              },
+              "label": "The arch back to the warehouses"
+            },
+            {
+              "id": "price_board",
+              "at": "to the left of centre",
+              "desc": "a tall chalked price-board standing at the head of the stalls, the day's lots listed with the dearest chalked highest of all and a bold up-chevron sigil cut beside it",
+              "clue": true,
+              "label": "The price-board"
+            },
+            {
+              "id": "assay_table",
+              "at": "dead ahead in the centre",
+              "desc": "the assayer's table under its awning — bronze measuring vessels and a row of small tasting bowls set out on the boards, an open ledger beside them, and a great slate propped behind the table ruled into a plotted chart of marks",
+              "puzzle": true,
+              "label": "The assayer's table"
+            },
+            {
+              "id": "hanging_cloths",
+              "at": "just right of centre",
+              "desc": "lengths of dyed cloth and hanging bunches of dried herbs strung on lines between the stall posts",
+              "animate": {
+                "motion": "the hanging dyed cloths lifting and stirring in the hot breeze, the dried herb bunches turning slowly on their strings",
+                "loop": "boomerang"
+              },
+              "label": "The hanging cloths"
+            },
+            {
+              "id": "market_on",
+              "at": "to the right",
+              "desc": "the street continuing on between the stalls toward a knot of raised voices further along",
+              "door": {
+                "direction": "forward",
+                "to": "market_boast"
+              },
+              "label": "The street on through the market"
+            },
+            {
+              "id": "seal_7",
+              "at": "on the far right",
+              "desc": "a clay amphora seal lying in the dust at the foot of a stall post — a flat stamped token, coloured, a numeral cut into it",
+              "clue": true,
+              "label": "A seal in the dust"
+            }
+          ],
+          "atmosphere": "Hard bleaching midday sun, sharp black shadows under the awnings, dust and heat-shimmer, bleached sandstone and bright dyed cloth against deep shade; painterly, cinematic, hot and crowded, subtle film grain",
+          "negatives": "No people, no lettering, no captions, no text",
+          "continuity": []
+        }
+      },
+      "unlockedWhen": true,
+      "designNote": "S2 · PICK-THE-POINT (Type 4). group_by(varietal) |> summarise(mean(alcohol)) -> 'Argitis' (13.79 vs Aminean 12.30, +12.1%). VERIFIED 2026-08-07. 6 varietals = too many to eyeball, so the student plots mean alcohol per varietal and CLICKS the winning grape on the live ggiraph plot (idColumn = varietal). Puzzle object = the assay table + its slate chart. CLUE price_board teaches the max() / up-chevron sigil. CLUE seal_7 is a PICKUP.",
+      "onSolve": [
+        {
+          "set": "market_price_solved"
+        },
+        {
+          "inc": "rooms_solved"
+        }
+      ],
+      "plannedHotspots": [
+        {
+          "type": "clue",
+          "label": "The price-board",
+          "body": "The day's lots are chalked up in order of what they will fetch, the dearest riding highest on the board. That is the second sigil: <b>▲ the greatest</b> — <em>of these piles, which comes to the most?</em><br><br>Wine is priced by the grape here rather than by the island, because the grape is what decides how strong the pressing runs, and strength is what the buyers are paying for. The register carries the grape of every amphora alongside its measured strength."
+        },
+        {
+          "type": "puzzle",
+          "label": "The assayer's table",
+          "starterCode": "wine_cargo",
+          "pick": {
+            "prompt": "The market prices wine by the grape, and the strongest pressings fetch the most — so the cargo's whole value hangs on one question. Which grape in the hold yields the most potent wine? Click it on the board.",
+            "plotCode": "p <- ggplot(dplyr::summarise(dplyr::group_by(wine_cargo, varietal),\n                             mean_alcohol = mean(alcohol)),\n            aes(reorder(varietal, mean_alcohol), mean_alcohol)) +\n     ggiraph::geom_col_interactive(aes(data_id = varietal, tooltip = varietal)) +\n     coord_flip() +\n     labs(x = NULL, y = \"Mean alcohol (%)\")",
+            "answer": "Argitis",
+            "idColumn": "varietal",
+            "idNoun": "grape",
+            "width": 6,
+            "height": 5.5,
+            "maxAttempts": 4,
+            "hint": "One grape stands clear of the rest — that is the one the price-board would chalk highest.",
+            "feedback": {
+              "correct": "Correct — noted in your field notebook: Argitis pours the strongest wine, averaging 13.8% alcohol against Aminean's 12.3%.",
+              "wrong": [
+                "Group the cargo by its grape and take the mean alcohol within each, then draw one bar per grape.",
+                "That is not the strongest. Look for the single largest average — not the grape that appears most often in the hold."
+              ]
+            }
+          },
+          "solveSfx": {
+            "src": "audio/solve_market_price_assay_table_1.mp3",
+            "volume": 0.7
+          }
+        },
+        {
+          "type": "clue",
+          "label": "A seal in the dust",
+          "body": "A merchant's amphora seal, lying in the dust at the foot of a stall post. The clay is <b>blue</b>, its form <b>tall</b> and <b>small</b>, and a tally numeral <b>7</b> is pressed into the face. Seals like this are struck at the press and travel with the jar; a harbour clerk reads a tray of them the way a scribe reads a shelf — by sorting them into piles and counting what each pile comes to.<br><br><em>Take it with you — press <b>Add to notebook</b> below, or it stays where it lies.</em>",
+          "pickup": "Seal 7 — blue · tall · small · numeral 7"
+        }
+      ],
+      "entry": {
+        "title": "The wine market",
+        "text": "Past the warehouses the street opens into the wine market, all dust and haggling under a hard white sun. Here cargo is priced by the grape rather than the island — so the value of your hold hangs on which grape pours the strongest wine."
+      },
+      "sfx": [
+        {
+          "src": "audio/market_price_bed_bazaar_souq.mp3",
+          "mode": "loop",
+          "volume": 0.376782964726437
+        },
+        {
+          "src": "audio/market_price_gull.mp3",
+          "mode": "interval",
+          "volume": 0.09164130373583582,
+          "gapMin": 18,
+          "gapMax": 40
+        }
+      ],
+      "panorama": "market_price/scene.png",
+      "builtFrom": "l1_market_price_2.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -8
+      }
+    },
+    {
+      "key": "market_boast",
+      "title": "The merchant's stall",
+      "technique": "group_by + summarise (count-weighted shortcut)",
+      "puzzleType": 1,
+      "built": false,
+      "authoring": {
+        "tag": "market_boast",
+        "scenePrompt": "This is a seamless 360-degree panorama from further along the wine market in the early afternoon, at the loud stall of a Chian merchant piled with his own amphorae. Directly behind the viewer, split across the extreme left and extreme right edges, is the flat pale afternoon sky above a plain run of sun-bleached plaster wall, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the market street running back the way you came under a pale afternoon sky, awnings and stall-posts dwindling away, the view that meets its other half cleanly at the seam directly behind you; to the left, the street back toward the assayer's table and the harbour arch beyond it; to the left of centre, a reject-slate hung on the wall beside the stalls, the poorest lots of the day struck through and chalked at the very bottom of the list, a bold down-chevron sigil cut beside it; dead ahead in the centre, the loud merchant's stall — his Chian amphorae stacked in a great pyramid behind the counter with their island stamps turned out to the street, a tally-ledger open on the boards and a painted boast-board propped above the lot naming his wine the finest in the harbour; just right of centre, a low bronze brazier at the corner of the stall, coals banked under a hanging pot; to the right, a broad archway out of the market onto the great colonnaded avenue climbing away toward the upper city; on the far right, a clay amphora seal wedged between the cobbles beside the stall — a flat stamped clay token, coloured, cut with a numeral. High hot afternoon light, hard shadow under the awnings, dust and smoke hanging in the air, bleached stone and dark stacked clay; painterly, cinematic, loud and close, subtle film grain. No people, no lettering, no captions, no text. Again: the extreme left and right edges must align perfectly into the flat pale afternoon sky above a plain run of sun-bleached plaster wall, uniform and unbroken, with no visible seam, join, or repetition.",
+        "doorPrompt": "",
+        "sceneSpec": {
+          "room": "market_boast",
+          "setting": "further along the wine market in the early afternoon, at the loud stall of a Chian merchant piled with his own amphorae",
+          "interior": false,
+          "seam": "the flat pale afternoon sky above a plain run of sun-bleached plaster wall, uniform and unbroken",
+          "elements": [
+            {
+              "id": "market2_left",
+              "at": "on the far left",
+              "desc": "the market street running back the way you came under a pale afternoon sky, awnings and stall-posts dwindling away, the view that meets its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "back_arch",
+              "at": "to the left",
+              "desc": "the street back toward the assayer's table and the harbour arch beyond it",
+              "door": {
+                "direction": "back",
+                "to": "market_price"
+              },
+              "label": "The street back to the assayer"
+            },
+            {
+              "id": "reject_slate",
+              "at": "to the left of centre",
+              "desc": "a reject-slate hung on the wall beside the stalls, the poorest lots of the day struck through and chalked at the very bottom of the list, a bold down-chevron sigil cut beside it",
+              "clue": true,
+              "label": "The reject-slate"
+            },
+            {
+              "id": "boast_stall",
+              "at": "dead ahead in the centre",
+              "desc": "the loud merchant's stall — his Chian amphorae stacked in a great pyramid behind the counter with their island stamps turned out to the street, a tally-ledger open on the boards and a painted boast-board propped above the lot naming his wine the finest in the harbour",
+              "puzzle": true,
+              "label": "The merchant's stall"
+            },
+            {
+              "id": "stall_brazier",
+              "at": "just right of centre",
+              "desc": "a low bronze brazier at the corner of the stall, coals banked under a hanging pot",
+              "animate": {
+                "motion": "the brazier coals glowing and pulsing, a thin line of smoke rising and curling away from the hanging pot",
+                "loop": "crossfade"
+              },
+              "label": "The stall brazier"
+            },
+            {
+              "id": "library_way",
+              "at": "to the right",
+              "desc": "a broad archway out of the market onto the great colonnaded avenue climbing away toward the upper city",
+              "door": {
+                "direction": "forward",
+                "to": "canopic"
+              },
+              "label": "The way up to the Canopic Way"
+            },
+            {
+              "id": "seal_8",
+              "at": "on the far right",
+              "desc": "a clay amphora seal wedged between the cobbles beside the stall — a flat stamped clay token, coloured, cut with a numeral",
+              "clue": true,
+              "label": "A seal by the stall"
+            }
+          ],
+          "atmosphere": "High hot afternoon light, hard shadow under the awnings, dust and smoke hanging in the air, bleached stone and dark stacked clay; painterly, cinematic, loud and close, subtle film grain",
+          "negatives": "No people, no lettering, no captions, no text",
+          "continuity": []
+        }
+      },
+      "unlockedWhen": true,
+      "designNote": "S3 · COMPUTE-THE-KEY (Type 1) — the SHORTCUT that sets the boss trap. group_by(region) |> summarise(mean(quality_score)) phrased 'which region's cargo is finest AS IT STANDS?' -> 'Chios' (7.28 vs Kos 6.78, +7.4%). VERIFIED 2026-08-07. Keep it a console compute so the count-weighted shortcut is felt in code. The merchant's boast is text-only flavour (no person in the art) and makes Chios the tempting answer the boss overturns. CLUE reject_slate teaches the min() / down-chevron sigil. CLUE seal_8 is a PICKUP.",
+      "onSolve": [
+        {
+          "set": "market_boast_solved"
+        },
+        {
+          "inc": "rooms_solved"
+        }
+      ],
+      "plannedHotspots": [
+        {
+          "type": "clue",
+          "label": "The reject-slate",
+          "body": "The poorest lots of the day are struck through and chalked at the very bottom, so no one wastes breath on them. That is the third sigil: <b>▼ the least</b> — <em>of these piles, which comes to the smallest?</em><br><br>Three sigils, then, and a clerk uses all three on the same tray of goods: the tally, the greatest, the least. What changes the answer is not the sigil but <em>how you chose to make the piles</em>."
+        },
+        {
+          "type": "puzzle",
+          "label": "The merchant's stall",
+          "starterCode": "wine_cargo",
+          "question": {
+            "prompt": "The merchant is loud over his stall, swearing his Chian amphorae are the finest cargo afloat and that the tally will bear him out. Settle it the way the manifest would, taking the cargo exactly as it stands in the hold: which island's wine scores highest?",
+            "options": [
+              "Kos — 6.78",
+              "Rhodes — 6.47",
+              "Thasos — 6.44",
+              "Chios — 7.28",
+              "Chios — 6.26",
+              "all four alike — about 6.75",
+              "Chios — 1,010 amphorae"
+            ],
+            "correct": 3,
+            "maxAttempts": 4,
+            "feedback": {
+              "correct": "Correct — noted in your field notebook: taken as it stands, Chios scores highest at 7.28, ahead of Kos at 6.78.",
+              "wrong": [
+                "Group the cargo by its island and take the mean quality score within each, every amphora in the hold counting once.",
+                "Compare the four island averages. Not how many jars each island sent, and not one figure for the whole cargo.",
+                "Four islands, one mean quality score each, exactly as the cargo stands. Report the highest."
+              ]
+            }
+          },
+          "solveSfx": {
+            "src": "audio/solve_market_boast_boast_stall_1.mp3",
+            "volume": 0.7
+          }
+        },
+        {
+          "type": "clue",
+          "label": "A seal by the stall",
+          "body": "A merchant's amphora seal, wedged between the cobbles beside the stall. The clay is <b>amber</b>, its form <b>round</b> and <b>large</b>, and a tally numeral <b>8</b> is pressed into the face. Seals like this are struck at the press and travel with the jar; a harbour clerk reads a tray of them the way a scribe reads a shelf — by sorting them into piles and counting what each pile comes to.<br><br><em>Take it with you — press <b>Add to notebook</b> below, or it stays where it lies.</em>",
+          "pickup": "Seal 8 — amber · round · large · numeral 8"
+        }
+      ],
+      "entry": {
+        "title": "The merchant's stall",
+        "text": "Argitis it is, at 13.8% against Aminean's 12.3% — the strongest pressing in the hold, and the figure the assayer marks on your record. Two stalls on, a merchant is loud over his amphorae, and the name he keeps shouting is Chios."
+      },
+      "sfx": [
+        {
+          "src": "audio/market_boast_bed_bazaar_souq.mp3",
+          "mode": "loop",
+          "volume": 0.376782964726437
+        },
+        {
+          "src": "audio/market_boast_gull.mp3",
+          "mode": "interval",
+          "volume": 0.06217148760569088,
+          "gapMin": 18,
+          "gapMax": 40
+        }
+      ]
+    },
+    {
+      "key": "canopic",
+      "title": "The Canopic Way",
+      "technique": "",
+      "puzzleType": 0,
+      "built": true,
+      "authoring": {
+        "tag": "canopic",
+        "scenePrompt": "This is a seamless 360-degree panorama from the Canopic Way in the late afternoon — the great colonnaded avenue of Alexandria climbing gently from the market toward the Library, its marble columns throwing long gold shadows. Directly behind the viewer, split across the extreme left and extreme right edges, is the open late-afternoon sky above a plain continuous run of pale marble colonnade, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the great colonnade marching away down the avenue toward the distant glitter of the harbour, columns and long shadows dwindling, the view that meets its other half cleanly at the seam directly behind you; to the left, the archway back down into the noise and awnings of the wine market; to the left of centre, a clay amphora seal lying on the step of a column base where someone set it down — a flat stamped token, coloured, a numeral cut into its face; dead ahead in the centre, a broad marble fountain basin at the centre of the avenue, water spilling from a bronze lion-mouth into the pool and brimming over the lip; just right of centre, a small stone street-shrine set against the colonnade, oil lamps and offerings of fruit arranged in its niche; to the right, the broad marble stair climbing to the porticoed front of the Great Library, its bronze doors standing open on a deep cool dark; on the far right, the colonnade and the avenue running on toward the upper city under the same late-afternoon sky, meeting the seam directly behind you. Low gold late-afternoon light raking down the colonnade, long violet shadows between the columns, warm marble and dust hanging in the air; painterly, cinematic, grand and golden, subtle film grain. No people, no lettering, no captions, no text. Again: the extreme left and right edges must align perfectly into the open late-afternoon sky above a plain continuous run of pale marble colonnade, uniform and unbroken, with no visible seam, join, or repetition.",
+        "doorPrompt": "",
+        "sceneSpec": {
+          "room": "canopic",
+          "interior": false,
+          "setting": "the Canopic Way in the late afternoon — the great colonnaded avenue of Alexandria climbing gently from the market toward the Library, its marble columns throwing long gold shadows",
+          "seam": "the open late-afternoon sky above a plain continuous run of pale marble colonnade, uniform and unbroken",
+          "elements": [
+            {
+              "id": "colonnade_left",
+              "at": "on the far left",
+              "desc": "the great colonnade marching away down the avenue toward the distant glitter of the harbour, columns and long shadows dwindling, the view that meets its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "back_market",
+              "at": "to the left",
+              "label": "The way back to the market",
+              "desc": "the archway back down into the noise and awnings of the wine market",
+              "door": {
+                "direction": "back",
+                "to": "market_boast"
+              }
+            },
+            {
+              "id": "seal_9",
+              "at": "to the left of centre",
+              "label": "A seal on a column base",
+              "desc": "a clay amphora seal lying on the step of a column base where someone set it down — a flat stamped token, coloured, a numeral cut into its face",
+              "clue": true
+            },
+            {
+              "id": "way_fountain",
+              "at": "dead ahead in the centre",
+              "label": "The avenue fountain",
+              "desc": "a broad marble fountain basin at the centre of the avenue, water spilling from a bronze lion-mouth into the pool and brimming over the lip",
+              "animate": {
+                "motion": "water spilling steadily from the bronze lion-mouth into the basin, the pool surface rippling and the overflow running down the marble",
+                "loop": "crossfade"
+              }
+            },
+            {
+              "id": "street_shrine",
+              "at": "just right of centre",
+              "label": "The street shrine",
+              "desc": "a small stone street-shrine set against the colonnade, oil lamps and offerings of fruit arranged in its niche",
+              "animate": {
+                "motion": "the shrine's oil lamps guttering and flickering in their niche, the shadows of the offerings shifting on the stone behind them",
+                "loop": "boomerang"
+              }
+            },
+            {
+              "id": "library_steps",
+              "at": "to the right",
+              "label": "The Library steps",
+              "desc": "the broad marble stair climbing to the porticoed front of the Great Library, its bronze doors standing open on a deep cool dark",
+              "door": {
+                "direction": "open",
+                "to": "library"
+              }
+            },
+            {
+              "id": "colonnade_right",
+              "at": "on the far right",
+              "desc": "the colonnade and the avenue running on toward the upper city under the same late-afternoon sky, meeting the seam directly behind you"
+            }
+          ],
+          "atmosphere": "Low gold late-afternoon light raking down the colonnade, long violet shadows between the columns, warm marble and dust hanging in the air; painterly, cinematic, grand and golden, subtle film grain",
+          "negatives": "No people, no lettering, no captions, no text",
+          "continuity": []
+        }
+      },
+      "unlockedWhen": true,
+      "designNote": "Atmosphere + pickup room, NO graded puzzle — the colonnaded climb from the market to the Library, restored to the linear chain 2026-08-07 (Lucas). 'back' to market_boast, 'open' on to library. Carries seal 9 (PICKUP), the last of the nine — so the player holds all nine BEFORE the boss.",
+      "entry": {
+        "title": "The Canopic Way",
+        "text": "As the cargo stands, the merchant is right: Chios scores 7.28, ahead of Kos at 6.78. It is written down now — and the dispute leaves the market with you. The great colonnade climbs away from the stalls in the late gold light, and the Library stands at the top of it."
+      },
+      "plannedHotspots": [
+        {
+          "type": "clue",
+          "label": "A seal on a column base",
+          "body": "A merchant's amphora seal, lying on the step of a column base where someone set it down. The clay is <b>amber</b>, its form <b>tall</b> and <b>medium</b>, and a tally numeral <b>9</b> is pressed into the face. Seals like this are struck at the press and travel with the jar; a harbour clerk reads a tray of them the way a scribe reads a shelf — by sorting them into piles and counting what each pile comes to.<br><br><em>Take it with you — press <b>Add to notebook</b> below, or it stays where it lies.</em>",
+          "pickup": "Seal 9 — amber · tall · medium · numeral 9"
+        }
+      ],
+      "sfx": [
+        {
+          "src": "audio/canopic_bed_fountain_basin.mp3",
+          "mode": "loop",
+          "volume": 0.4351021798039731
+        },
+        {
+          "src": "audio/canopic_gull.mp3",
+          "mode": "interval",
+          "volume": 0.25,
+          "gapMin": 16,
+          "gapMax": 36
+        }
+      ],
+      "panorama": "canopic/scene.png",
+      "builtFrom": "l1_canopic_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5.1
+      }
+    },
+    {
+      "key": "library",
+      "title": "The Great Library",
+      "technique": "group_by(region, varietal) → ungroup → regroup (Simpson's paradox repair)",
+      "puzzleType": 3,
+      "built": true,
+      "authoring": {
+        "tag": "library",
+        "scenePrompt": "This is a seamless 360-degree panorama from deep inside the Great Library of Alexandria at dusk — a high hall of scroll-niches and reading-desks, the last gold light falling in shafts from the clerestory windows. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain continuous wall of stacked scroll-niches in dressed stone, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, rank upon rank of scroll-niches climbing the wall into shadow, each pigeonhole packed with rolled papyri, the plain stacked surface that meets its other half cleanly at the seam directly behind you; to the left, the tall bronze doors standing open at the head of the entrance stair, the gold of the colonnaded avenue falling away beyond them; to the left of centre, a lectern holding an open shipping-ledger, its facing pages ruled into a table of islands against grape varieties — the counts wildly uneven down every column, one island's entries heaped under the noble grapes and another's under the common ones; dead ahead in the centre, the archivist's great reading-desk at the centre of the hall — the master vintage ledgers laid open across it, an abacus and a rack of styli, a half-finished tally sheet weighted flat, and a tall slate frame behind ruled for a bar chart; just right of centre, a high clerestory window throwing a broad shaft of last gold light down through the hall onto the stone floor, dust turning slowly in the beam; to the right, a row of empty reading-desks receding along the hall into the gloom, their surfaces bare and unlit, the working end of the hall long since tidied; on the far right, more scroll-racks and niches running away down the hall into warm gloom, meeting the seam directly behind you. Deep cool shadow cut by shafts of last gold dusk light, dust turning in the beams, warm papyrus and pale stone against near-black recesses, hushed and vast; painterly, cinematic, reverent, subtle film grain. No people, no lettering, no captions, no text. Again: the extreme left and right edges must align perfectly into a plain continuous wall of stacked scroll-niches in dressed stone, uniform and unbroken, with no visible seam, join, or repetition.",
+        "doorPrompt": "",
+        "sceneSpec": {
+          "room": "library",
+          "setting": "deep inside the Great Library of Alexandria at dusk — a high hall of scroll-niches and reading-desks, the last gold light falling in shafts from the clerestory windows",
+          "interior": true,
+          "seam": "a plain continuous wall of stacked scroll-niches in dressed stone, uniform and unbroken",
+          "elements": [
+            {
+              "id": "niches_left",
+              "at": "on the far left",
+              "desc": "rank upon rank of scroll-niches climbing the wall into shadow, each pigeonhole packed with rolled papyri, the plain stacked surface that meets its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "back_steps",
+              "at": "to the left",
+              "desc": "the tall bronze doors standing open at the head of the entrance stair, the gold of the colonnaded avenue falling away beyond them",
+              "door": {
+                "direction": "back",
+                "to": "canopic"
+              },
+              "label": "The bronze doors"
+            },
+            {
+              "id": "mix_ledger",
+              "at": "to the left of centre",
+              "desc": "a lectern holding an open shipping-ledger, its facing pages ruled into a table of islands against grape varieties — the counts wildly uneven down every column, one island's entries heaped under the noble grapes and another's under the common ones",
+              "clue": true,
+              "label": "The shipping-ledger"
+            },
+            {
+              "id": "great_ledger",
+              "at": "dead ahead in the centre",
+              "desc": "the archivist's great reading-desk at the centre of the hall — the master vintage ledgers laid open across it, an abacus and a rack of styli, a half-finished tally sheet weighted flat, and a tall slate frame behind ruled for a bar chart",
+              "puzzle": true,
+              "label": "The great reading-desk"
+            },
+            {
+              "id": "dusk_shaft",
+              "at": "just right of centre",
+              "desc": "a high clerestory window throwing a broad shaft of last gold light down through the hall onto the stone floor, dust turning slowly in the beam",
+              "animate": {
+                "motion": "dust motes drifting and turning slowly upward through the shaft of gold window-light",
+                "loop": "crossfade"
+              },
+              "label": "The clerestory light"
+            },
+            {
+              "id": "reading_desks",
+              "at": "to the right",
+              "desc": "a row of empty reading-desks receding along the hall into the gloom, their surfaces bare and unlit, the working end of the hall long since tidied"
+            },
+            {
+              "id": "scroll_racks",
+              "at": "on the far right",
+              "desc": "more scroll-racks and niches running away down the hall into warm gloom, meeting the seam directly behind you"
+            }
+          ],
+          "atmosphere": "Deep cool shadow cut by shafts of last gold dusk light, dust turning in the beams, warm papyrus and pale stone against near-black recesses, hushed and vast; painterly, cinematic, reverent, subtle film grain",
+          "negatives": "No people, no lettering, no captions, no text",
+          "continuity": []
+        }
+      },
+      "unlockedWhen": true,
+      "designNote": "BOSS · REPAIR-THE-PIPELINE (Type 3). Hand the student the NAIVE pipeline they wrote at S3 (group_by(region) |> summarise(mean(quality_score)) -> Chios) and make them repair it into the varietal-balanced regroup: group_by(region, varietal) |> summarise(m = mean(quality_score)) |> ungroup() |> group_by(region) |> summarise(mean(m)) -> 'Thasos' (7.43 vs Kos 6.83, +8.7%; CHIOS FALLS TO LAST at 6.26). VERIFIED 2026-08-07 — the flip fires. MISDIRECTION: Chios. FAIRNESS: the boss wording must explicitly ask the equal-weighting question and CLUE mix_ledger must call out the varietal-mix confound (Chios ships ~90% premium grapes, Thasos ~90% common) — not a hidden gotcha. MINTS THE CANVAS CODE. TOPOLOGY: this room is a LEAF (only a 'back' door to the merchant) — solving the boss does not open a door here, it unlocks the SKIFF back at the quay. No seal here — seal 9 moved to canopic (2026-08-07), so all nine are held before the boss.",
+      "onSolve": [
+        {
+          "set": "library_solved"
+        },
+        {
+          "inc": "rooms_solved"
+        }
+      ],
+      "plannedHotspots": [
+        {
+          "type": "clue",
+          "label": "The shipping-ledger",
+          "body": "The Library keeps what the harbour does not: a record of <em>what each island actually ships</em>. Read down the columns and the trouble is plain — the islands do not send the same grapes in the same proportions at all. One fills nine jars in ten with its noble varieties; another fills nine in ten with its common ones.<br><br>This matters because a grape carries its own quality with it wherever it is grown. So if you simply average an island's cargo as it stands, you are not measuring the island — you are measuring <em>the mix it happened to pack</em>. An island that ships mostly noble grapes will look splendid even if its ground is ordinary, and an island that ships mostly common ones will look poor even if its ground is the best in the Aegean.<br><br>To judge the ground itself you must stop letting the commoner grapes be outnumbered — give every grape an equal voice in each island's figure."
+        },
+        {
+          "type": "puzzle",
+          "label": "The great reading-desk",
+          "starterCode": "# The tally as the merchant would have it — the naive average, island by island.\nwine_cargo |>\n  group_by(region) |>\n  summarise(mean_quality = mean(quality_score)) |>\n  arrange(desc(mean_quality))",
+          "question": {
+            "prompt": "The ledgers set the trouble down plainly: the islands do not ship the same grapes. Chios sends mostly its noble varieties and Thasos mostly its common ones, so a plain average flatters the famous name and tells you about the packing, not the ground.<br><br>The tally on the desk is the merchant's version, and it is the one you wrote in the market. <b>Repair it so that every grape has an equal say in each island's figure</b> — then say which island truly makes the better wine.",
+            "options": [
+              "Chios — 6.26",
+              "Kos — 6.83",
+              "Thasos — 7.43",
+              "Rhodes — 6.52",
+              "Chios — 7.28",
+              "Aminean — 7.81",
+              "no change — Chios still leads"
+            ],
+            "correct": 2,
+            "maxAttempts": 4,
+            "feedback": {
+              "correct": "Correct — noted in your field notebook: give every grape an equal say and Thasos leads at 7.43, with Chios falling to last at 6.26.",
+              "wrong": [
+                "Work it in two stages. Take one average for each island-and-grape pairing first, so a common grape and a noble one each contribute a single figure.",
+                "Then release the grouping and average those per-pairing figures within each island — every grape now counts once, however many jars of it were packed.",
+                "Two summarise steps: mean quality per island-and-grape, then the mean of those per island. The leader is not the island that led in the market."
+              ]
+            }
+          },
+          "solveSfx": {
+            "src": "audio/solve_library_great_ledger_1.mp3",
+            "volume": 0.7
+          }
+        }
+      ],
+      "deliverable": {
+        "type": "figure",
+        "submitCodec": true
+      },
+      "regionKey": "Thasos (varietal-balanced regroup); Chios is the count-weighted decoy",
+      "entry": {
+        "title": "The Great Library",
+        "text": "The colonnade brings you to the top of the rise and the bronze doors stand open on a deep cool dark. Chios leads the tally as the cargo stands — which is precisely why the dispute has climbed this far, to the one place that keeps a record of what each island actually ships."
+      },
+      "sfx": [
+        {
+          "src": "audio/library_bed_great_hall.mp3",
+          "mode": "loop",
+          "volume": 0.11030399932131008
+        },
+        {
+          "src": "audio/library_parchment.mp3",
+          "mode": "interval",
+          "volume": 0.25,
+          "gapMin": 20,
+          "gapMax": 44
+        }
+      ],
+      "panorama": "library/scene.png",
+      "builtFrom": "l1_library_2.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -21.4
+      }
+    },
+    {
+      "key": "boat",
+      "title": "The harbour skiff",
+      "technique": "",
+      "puzzleType": 0,
+      "built": true,
+      "authoring": {
+        "tag": "boat",
+        "scenePrompt": "This is a seamless 360-degree panorama from aboard a small harbour skiff out on the Great Harbour at nightfall, halfway across the black water, the Pharos lighthouse looming ahead in full fire. Directly behind the viewer, split across the extreme left and extreme right edges, is the deep blue-violet night sky over the open water meeting the flat dark sea, empty and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the open black water stretching away under a deep blue-violet sky, the first stars out, the view that meets its other half cleanly at the seam directly behind you; to the left, the city of Alexandria receding astern — the low dark line of the quay and its warehouses, lamps kindling one by one along the harbour wall, the Library's portico lit high above them, and at the quay wall your own ship left behind: a single-masted wine ship with her square sail furled on the yard, dark hull, one lamp burning at her stern; to the left of centre, the skiff's bow lamp hung on a short iron staff at the prow, its flame the only near light; dead ahead in the centre, the Pharos lighthouse rising huge ahead across the last of the water — tier upon tier of pale stone, the great crown-fire blazing at its top and laying a long broken road of gold light over the sea toward the boat; just right of centre, the stern of the skiff, its long oar shipped along the thwart and the tiller loose — the way back across the water to the harbour steps; to the right, the lighthouse island's landing close ahead now, worn sea-steps climbing out of the black water to the foot of the tower, an iron ring set in the stone for a line; on the far right, more open black water running away toward the harbour mouth under the same night sky, meeting the seam directly behind you. Nightfall on open water — deep blue-violet sky and near-black sea, one warm lamp close at the bow and the huge gold blaze of the lighthouse ahead, cold spray and reflected fire; painterly, cinematic, hushed and expectant, subtle film grain. No people, no lettering, no captions, no text. Again: the extreme left and right edges must align perfectly into the deep blue-violet night sky over the open water meeting the flat dark sea, empty and unbroken, with no visible seam, join, or repetition.",
+        "doorPrompt": "",
+        "sceneSpec": {
+          "room": "boat",
+          "setting": "aboard a small harbour skiff out on the Great Harbour at nightfall, halfway across the black water, the Pharos lighthouse looming ahead in full fire",
+          "interior": false,
+          "seam": "the deep blue-violet night sky over the open water meeting the flat dark sea, empty and unbroken",
+          "elements": [
+            {
+              "id": "water_left",
+              "at": "on the far left",
+              "desc": "the open black water stretching away under a deep blue-violet sky, the first stars out, the view that meets its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "city_astern",
+              "at": "to the left",
+              "desc": "the city of Alexandria receding astern — the low dark line of the quay and its warehouses, lamps kindling one by one along the harbour wall, the Library's portico lit high above them, and at the quay wall your own ship left behind: a single-masted wine ship with her square sail furled on the yard, dark hull, one lamp burning at her stern"
+            },
+            {
+              "id": "bow_lamp",
+              "at": "to the left of centre",
+              "desc": "the skiff's bow lamp hung on a short iron staff at the prow, its flame the only near light",
+              "animate": {
+                "motion": "the bow lamp swinging on its staff with the roll of the boat, its flame guttering and its reflection breaking on the black water alongside",
+                "loop": "boomerang"
+              },
+              "label": "The bow lamp"
+            },
+            {
+              "id": "pharos_ahead",
+              "at": "dead ahead in the centre",
+              "desc": "the Pharos lighthouse rising huge ahead across the last of the water — tier upon tier of pale stone, the great crown-fire blazing at its top and laying a long broken road of gold light over the sea toward the boat",
+              "animate": {
+                "motion": "the great crown-fire leaping and streaming at the top of the tower, the long road of gold light shivering and breaking across the black water",
+                "loop": "boomerang"
+              },
+              "label": "The Pharos ahead"
+            },
+            {
+              "id": "stern_oar",
+              "at": "just right of centre",
+              "desc": "the stern of the skiff, its long oar shipped along the thwart and the tiller loose — the way back across the water to the harbour steps",
+              "door": {
+                "direction": "back",
+                "to": "quay"
+              },
+              "label": "The oar and tiller"
+            },
+            {
+              "id": "landing_steps",
+              "at": "to the right",
+              "desc": "the lighthouse island's landing close ahead now, worn sea-steps climbing out of the black water to the foot of the tower, an iron ring set in the stone for a line",
+              "door": {
+                "direction": "open",
+                "to": "pharos"
+              },
+              "label": "The landing steps"
+            },
+            {
+              "id": "water_right",
+              "at": "on the far right",
+              "desc": "more open black water running away toward the harbour mouth under the same night sky, meeting the seam directly behind you"
+            }
+          ],
+          "atmosphere": "Nightfall on open water — deep blue-violet sky and near-black sea, one warm lamp close at the bow and the huge gold blaze of the lighthouse ahead, cold spray and reflected fire; painterly, cinematic, hushed and expectant, subtle film grain",
+          "negatives": "No people, no lettering, no captions, no text",
+          "continuity": []
+        }
+      },
+      "unlockedWhen": true,
+      "designNote": "Transition scene, NO graded puzzle — the skiff crossing the Great Harbour at nightfall, reached from the quay once the boss is solved. 'back' to quay (the shipped oar / tiller), 'open' on to pharos (the landing steps). This scene carries the dusk->night turn of the light arc. No seals here: all nine are collectable before boarding.",
+      "entry": {
+        "title": "Across the harbour",
+        "text": "The manifest is registered and stamped true: weigh every grape alike and it is Thasos at 7.43, with Chios last of the four. Dusk now, and the tide on the turn. You take the skiff from the water-steps and pull out across the black harbour toward the fire on the tower."
+      },
+      "sfx": [
+        {
+          "src": "audio/boat_bed_rowboat.mp3",
+          "mode": "loop",
+          "volume": 0.5
+        },
+        {
+          "src": "audio/boat_oar_creak.mp3",
+          "mode": "interval",
+          "volume": 0.28,
+          "gapMin": 10,
+          "gapMax": 24
+        }
+      ],
+      "panorama": "boat/scene.png",
+      "builtFrom": "l1_boat_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -7.4
+      }
+    },
+    {
+      "key": "pharos",
+      "title": "The Pharos lantern",
+      "technique": "",
+      "puzzleType": 0,
+      "built": false,
+      "authoring": {
+        "tag": "pharos",
+        "scenePrompt": "This is a seamless 360-degree panorama from the lantern chamber at the very top of the Pharos lighthouse at night — an open colonnaded platform around the great fire-lamp, the whole dark harbour spread far below. Directly behind the viewer, split across the extreme left and extreme right edges, is the open night sky over the open sea, deep blue-black and cloudless above a plain parapet rail, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the open black sea far below stretching to a barely-there horizon under a deep night sky scattered with stars, the view that meets its other half cleanly at the seam directly behind you; to the left, a tall iron fire-basket standing at the parapet across the platform from the lamp, heaped with burning wood, its flames streaming sideways in the sea wind; to the left of centre, a bronze tally-board fixed to the wall beside the door, three worn sigils struck into it one under the next in a fixed order, each with a number cut deep beside it; dead ahead in the centre, a heavy bronze door barring the way onto the lamp platform, and set into its face a three-by-three grid of empty square sockets, each socket sized to take a flat clay seal; just right of centre, beyond the barred door, the great fire-lamp itself in its polished bronze mirror-shell, mounted on a massive geared turning-dial with a long bronze handle at its rim; to the right, the whole dark harbour far below — the curve of the mole, the lamps of the city scattered beyond, and directly below on the near stone quay the moored ships along the wall, among them ONE clearly picked out: a single-masted wine ship with her square sail furled on the yard, dark hull, one lamp burning at her stern, lying dark at her mooring with the black water all around her, under the same night sky meeting the seam directly behind you; on the far right, the head of the great spiral stair dropping away down into the dark of the tower toward the landing and the moored skiff far below, a lamp burning at the turn. Night, lit almost entirely by the great fire — hot amber and white firelight raking the bronze and pale stone, deep blue-black sky and sea beyond, sparks on the wind, high and windswept; painterly, cinematic, triumphant, subtle film grain. No people, no lettering, no captions, no text. Again: the extreme left and right edges must align perfectly into the open night sky over the open sea, deep blue-black and cloudless above a plain parapet rail, uniform and unbroken, with no visible seam, join, or repetition.",
+        "doorPrompt": "",
+        "sceneSpec": {
+          "room": "pharos",
+          "setting": "the lantern chamber at the very top of the Pharos lighthouse at night — an open colonnaded platform around the great fire-lamp, the whole dark harbour spread far below",
+          "interior": false,
+          "seam": "the open night sky over the open sea, deep blue-black and cloudless above a plain parapet rail, uniform and unbroken",
+          "elements": [
+            {
+              "id": "night_sea",
+              "at": "on the far left",
+              "desc": "the open black sea far below stretching to a barely-there horizon under a deep night sky scattered with stars, the view that meets its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "fire_basket",
+              "at": "to the left",
+              "desc": "a tall iron fire-basket standing at the parapet across the platform from the lamp, heaped with burning wood, its flames streaming sideways in the sea wind",
+              "animate": {
+                "motion": "the fire-basket flames leaping and streaming sideways in the sea wind, sparks tearing off and whirling away into the dark",
+                "loop": "boomerang"
+              },
+              "label": "The fire-basket"
+            },
+            {
+              "id": "queue_board",
+              "at": "to the left of centre",
+              "desc": "a bronze tally-board fixed to the wall beside the door, three worn sigils struck into it one under the next in a fixed order, each with a number cut deep beside it",
+              "clue": true,
+              "label": "The bronze tally-board"
+            },
+            {
+              "id": "lantern_door",
+              "at": "dead ahead in the centre",
+              "desc": "a heavy bronze door barring the way onto the lamp platform, and set into its face a three-by-three grid of empty square sockets, each socket sized to take a flat clay seal",
+              "label": "The bronze door",
+              "grid": true
+            },
+            {
+              "id": "lamp_dial",
+              "at": "just right of centre",
+              "desc": "beyond the barred door, the great fire-lamp itself in its polished bronze mirror-shell, mounted on a massive geared turning-dial with a long bronze handle at its rim",
+              "label": "The lamp dial",
+              "dial": true
+            },
+            {
+              "id": "harbour_below",
+              "at": "to the right",
+              "desc": "the whole dark harbour far below — the curve of the mole, the lamps of the city scattered beyond, and directly below on the near stone quay the moored ships along the wall, among them ONE clearly picked out: a single-masted wine ship with her square sail furled on the yard, dark hull, one lamp burning at her stern, lying dark at her mooring with the black water all around her, under the same night sky meeting the seam directly behind you",
+              "label": "The harbour far below",
+              "animate": {
+                "motion": "the scattered lamps of the moored ships and the city shivering and glinting far below, the black water breathing under them",
+                "loop": "boomerang"
+              },
+              "variants": [
+                {
+                  "state": "beam_on_ship",
+                  "when": {
+                    "eq": [
+                      "pharos_beam",
+                      "ship"
+                    ]
+                  },
+                  "reveal": "identical to the base view — same night, same viewpoint, same framing, same harbour, mole, city lamps and moored ships in exactly the same places — EXCEPT that the great lighthouse beam has swung down onto the quay and now holds steady on the ONE single-masted wine ship with her furled square sail: a hard bar of gold light lying across the black water and lighting her hull and rigging brilliantly, every other vessel left dark around her; no people, no lettering, no text"
+                }
+              ]
+            },
+            {
+              "id": "stair_down",
+              "at": "on the far right",
+              "desc": "the head of the great spiral stair dropping away down into the dark of the tower toward the landing and the moored skiff far below, a lamp burning at the turn",
+              "door": {
+                "direction": "back",
+                "to": "boat"
+              },
+              "label": "The spiral stair"
+            }
+          ],
+          "atmosphere": "Night, lit almost entirely by the great fire — hot amber and white firelight raking the bronze and pale stone, deep blue-black sky and sea beyond, sparks on the wind, high and windswept; painterly, cinematic, triumphant, subtle film grain",
+          "negatives": "No people, no lettering, no captions, no text",
+          "continuity": []
+        }
+      },
+      "unlockedWhen": true,
+      "designNote": "ESCAPE · grid-select (mechanic #15), DATA-FREE — no CSV, no console. The lock hotspot (lantern_door) gets type 'grid' + endsEscape:true. VERIFIED KEY [size, shape, colour]. Cards = the 9 amphora seals collected all day (id·colour·shape·size·numeral): 1 Red/Round/Small/1, 2 Red/Round/Medium/2, 3 Red/Tall/Large/3, 4 Red/Squat/Small/4, 5 Blue/Round/Medium/5, 6 Blue/Round/Large/6, 7 Blue/Tall/Small/7, 8 Amber/Round/Large/8, 9 Amber/Tall/Medium/9. VERB SEMANTICS (each = group_by(trait) then reduce): n = COUNT of the largest pile; max = greatest pile TOTAL of numerals; min = least pile TOTAL. RESULT TABLE rows verb x cols trait: n -> colour 4, shape 5, size 3; max -> colour 18, shape 22, size 17; min -> colour 10, shape 4, size 12. THE QUEUE (on clue queue_board, in order): (1) max -> 17 = group by SIZE; (2) n -> 5 = group by SHAPE; (3) min -> 10 = group by COLOUR. grid items = the 3 queued steps (columns), buckets = the 3 traits colour/shape/size (rows), answer = {step1:size, step2:shape, step3:colour}. PAYOFF: solving opens the door and lights lamp_dial — a switch/dial the PLAYER turns to swing the beam onto their ship. ONE dial, ONE target, ONE motion — payoff, never a second puzzle. PICKUP RELIABILITY (Lucas 2026-08-07: NO auto-pickup): every seal clue body must end with an explicit 'add it to your notebook' instruction, every room is reachable in reverse via back doors, and the lock's wrong/locked feedback should state how many seals are in hand so a short player knows to go back.",
+      "plannedHotspots": [
+        {
+          "type": "clue",
+          "label": "The bronze tally-board",
+          "body": "Three marks are struck into the bronze, one under the next, each with a number cut beside it:<br><br><b>▲ 17</b><br><b>⦀ 5</b><br><b>▼ 10</b><br><br>Below them the metal is worn smooth, as though generations of hands have rested there while working something out."
+        },
+        {
+          "type": "grid",
+          "label": "The bronze door",
+          "availableWhen": {
+            "solved": "library"
+          },
+          "lockedBody": "The sockets are cold and the door will not stir. Whatever opens it, it is not force — and not yet.",
+          "items": [
+            {
+              "key": "step1",
+              "label": "▲ 17"
+            },
+            {
+              "key": "step2",
+              "label": "⦀ 5"
+            },
+            {
+              "key": "step3",
+              "label": "▼ 10"
+            }
+          ],
+          "buckets": [
+            {
+              "key": "colour",
+              "label": "By colour"
+            },
+            {
+              "key": "shape",
+              "label": "By shape"
+            },
+            {
+              "key": "size",
+              "label": "By size"
+            }
+          ],
+          "answer": {
+            "step1": "size",
+            "step2": "shape",
+            "step3": "colour"
+          },
+          "maxAttempts": 5,
+          "feedback": {
+            "correct": "The seals settle into their sockets, the bolt turns over with a sound like a struck bell, and the bronze door swings back onto the lamp — the great dial standing waiting beyond it.",
+            "wrong": "The sockets stay dark and the door holds. ",
+            "out": "The door holds fast. "
+          },
+          "solveSfx": {
+            "src": "audio/solve_pharos_lantern_door_1.mp3",
+            "volume": 0.7
+          }
+        },
+        {
+          "type": "dial",
+          "label": "The lamp dial",
+          "key": "pharos_beam",
+          "states": [
+            {
+              "value": "ship",
+              "label": "Swing the beam onto your ship"
+            }
+          ],
+          "hint": "The great lamp rides on its geared dial, the whole weight of it turning on a single bronze handle. Below, your ship lies dark at her mooring on the turning tide.",
+          "endsEscape": true,
+          "availableWhen": {
+            "solved": "pharos"
+          },
+          "lockedBody": "The lamp turns on its dial beyond the bronze door, out of reach — the door is still shut between you and it.",
+          "sfx": {
+            "src": "audio/pharos_lamp_dial_throw.mp3",
+            "volume": 0.8
+          }
+        }
+      ],
+      "phase": "escape",
+      "entry": {
+        "title": "The lantern",
+        "text": "The skiff grinds against the sea-steps and you make her fast. Above you the tower goes up and up, and the climb is long — flight after flight in the dark, with the fire roaring somewhere over your head and the whole harbour dropping away below."
+      },
+      "onSolve": [
+        {
+          "set": "lantern_open",
+          "to": "yes"
+        }
+      ],
+      "sfx": [
+        {
+          "src": "audio/pharos_bed_tower_wind.mp3",
+          "mode": "loop",
+          "volume": 0.5
+        },
+        {
+          "src": "audio/pharos_fire_crackle.mp3",
+          "mode": "interval",
+          "volume": 0.3,
+          "gapMin": 8,
+          "gapMax": 18
+        }
+      ]
+    }
+  ],
+  "worldPlate": "_world/plate.png",
+  "cover": "cover.png"
+}

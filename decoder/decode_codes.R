@@ -366,6 +366,27 @@ WRANGLING_TREES_KEY <- list(
   }
 )
 
+# wrangling / egypt (scenario id 17): "The Manifest" — the Alexandria wine-cargo pre/post PAIR to trees.
+# Four graded rooms in room order — deck, market_price, market_boast, library:
+#   deck         = MCQ, mean sulphates by type -> "red - averaging 0.66"   (correct option index 1)
+#   market_price = Type 4 pick-the-point, strongest grape -> Argitis       (solved -> encodes answer 1)
+#   market_boast = MCQ, naive mean quality by region -> "Chios - 7.28"     (correct option index 3)
+#   library      = MCQ, varietal-balanced regroup -> "Thasos - 7.43"       (correct option index 2)
+# So correct = c(1, 1, 3, 2) — deliberately varied positions (the trees/henges all-index-1 tell).
+# Rooms are still art-stubs (built:false), so validate_keys SKIPs the scenario until panoramas land;
+# keep this in lockstep with scenario.json. Wired 2026-08-07.
+WRANGLING_EGYPT_KEY <- list(
+  scenario_id = 17,
+  correct = c(1, 1, 3, 2),
+  score_step = function(correct, answer, attempts) {
+    if (answer != correct) return(0)
+    if (attempts <= 1) return(10)
+    if (attempts == 2) return(7)
+    if (attempts == 3) return(5)
+    3
+  }
+)
+
 # comparing_means / spa (scenario id 12): comparing means. Four GRADED MCQ rooms in room order —
 # cold_plunge (0), saltwater (2), warm_baths (1), springs (3). The `entry` room is an ungraded intro
 # (no puzzle), excluded from the codec. correct = c(0, 2, 1, 3). Added 2026-08-06 (the key was missing —

@@ -1238,3 +1238,105 @@ if __name__ == "__main__":
         t()
         print(f"  ok  {t.__name__}")
     print(f"all tests passed ({len(tests)})")
+
+
+def test_scene_spec_explicit_label_wins_over_desc_truncation():
+    """A spec element may name its in-world `label`; to_hotspots uses it verbatim. That label is the play-time
+    MODAL TITLE and the key `_attach_planned_content` slug-matches on, so a truncated art prompt (the fallback)
+    would both read as chopped prose and make pre-art content attachment fragile. Elements with no explicit
+    label keep the legacy desc[:60] fallback. Regression for the Egypt wiring pass (2026-08-07)."""
+    import scene_spec as ss
+    spec = {"room": "r", "elements": [
+        {"id": "desk", "at": "dead ahead in the centre", "label": "The customs writing-desk",
+         "desc": "the customs writing-desk on the open deck: crates of amphorae standing open in their straw",
+         "puzzle": True},
+        {"id": "plain", "at": "to the left",
+         "desc": "a weathered field card pinned to the living-wood railing beside the bench", "clue": True},
+    ]}
+    hs = {h["id"]: h for h in ss.to_hotspots(spec)}
+    assert hs["desk"]["label"] == "The customs writing-desk"          # explicit label used verbatim
+    assert hs["desk"]["type"] == "puzzle"
+    assert hs["plain"]["label"] == "a weathered field card pinned to the living-wood railing bes"   # desc[:60]
+    assert len(hs["plain"]["label"]) == 60
+
+
+def test_scene_spec_grid_role_emits_grid_type():
+    """An escape gate may be a KEYPAD (`lock:true` -> type 'lock') or a MATRIX-SELECT (`grid:true` -> type
+    'grid', mechanic #15). The engine dispatches on the hotspot type (`openGrid` vs `openLock`), so a
+    grid-select escape emitted as a 'lock' silently fails to open — and pre-art content, which attaches by
+    (type, slug(label)), would not match either. Regression for the Egypt escape (2026-08-07)."""
+    import scene_spec as ss
+    spec = {"room": "r", "elements": [
+        {"id": "door", "at": "dead ahead in the centre", "label": "The bronze door",
+         "desc": "a heavy bronze door with a three-by-three grid of empty sockets", "grid": True},
+        {"id": "pad", "at": "to the left", "label": "The keypad",
+         "desc": "a brass keypad beside the hatch", "lock": True},
+    ]}
+    hs = {h["id"]: h for h in ss.to_hotspots(spec)}
+    assert hs["door"]["type"] == "grid" and hs["door"]["label"] == "The bronze door"
+    assert hs["pad"]["type"] == "lock"
+
+
+def test_scene_spec_dial_role_and_variant_jobs():
+    """Two art-pipeline gaps the Egypt finale needed (2026-08-07):
+    (1) `dial:true` emits type 'dial' — the engine's ONLY world-state control. `switch` has no engine
+        handler at all, so a switch hotspot is inert until hand-reclassified (every trees drive-lever was).
+    (2) `variants:[{state, when, reveal}]` on ANY element emits a state-tagged variant job, so alternate-look
+        art (the Pharos beam swung onto the player's ship) is produced in the normal art batch instead of a
+        forgettable hand-gen. It is the general case of the door-only `opensOnto` shorthand; a variant with
+        no `reveal` is skipped, exactly as dooropen_jobs skips one."""
+    import scene_spec as ss
+    spec = {"room": "pharos", "elements": [
+        {"id": "lamp", "at": "just right of centre", "label": "The lamp dial",
+         "desc": "the great fire-lamp on its geared turning-dial", "dial": True},
+        {"id": "lever", "at": "to the left", "label": "A lever",
+         "desc": "a brass lever in its slot", "switch": True},
+        {"id": "harbour", "at": "on the far right", "label": "The harbour far below",
+         "desc": "the dark harbour far below", "animate": {"motion": "lamps glinting", "loop": "boomerang"},
+         "variants": [
+            {"state": "beam_on_ship", "when": {"eq": ["pharos_beam", "ship"]},
+             "reveal": "the beam swung down onto one moored ship"},
+            {"state": "no_art_yet"},          # no reveal -> skipped
+         ]},
+    ]}
+    hs = {h["id"]: h for h in ss.to_hotspots(spec)}
+    assert hs["lamp"]["type"] == "dial" and hs["lamp"]["label"] == "The lamp dial"
+    assert hs["lever"]["type"] == "switch"           # unchanged, still the generic control
+    assert hs["harbour"]["type"] == "ambient"        # animated decor carries the variant art, no player marker
+    jobs = ss.variant_jobs(spec)
+    assert len(jobs) == 1, jobs                       # the reveal-less variant is skipped
+    assert jobs[0] == {"type": "variant", "hotspotId": "harbour", "state": "beam_on_ship",
+                       "prompt": "the beam swung down onto one moored ship",
+                       "when": {"eq": ["pharos_beam", "ship"]}}
+    assert ss.variant_jobs({"elements": [{"id": "x", "desc": "d"}]}) == []   # no variants -> no jobs
+
+
+def test_apply_balance_covers_pre_art_planned_stings():
+    """A `solveSfx` wired PRE-ART lives on `plannedHotspots` (content is authored there before any art and
+    attaches to the placed box at commit). _apply_balance previously walked only committed `hotspots`, so a
+    pre-art sting was silently never measured — it would ship louder than the music until someone re-ran the
+    balance after commit. Regression for the Egypt sound pass (2026-08-07)."""
+    def body(tmp):
+        d = _write_scenario("wrangling", "y", {
+            "music": "audio/m.mp3", "musicVolume": 0.5,
+            "rooms": [{"key": "pharos", "built": False,
+                       "plannedHotspots": [
+                           {"type": "grid", "label": "The bronze door", "solveSfx": "audio/loudsting.mp3"},
+                           {"type": "dial", "label": "The lamp dial",
+                            "solveSfx": {"src": "audio/quietsting.mp3", "volume": 0.2}},
+                       ]}],
+        })
+        # music −14 @ 0.5 → played −20.0. loudsting −6 plays OVER it; quietsting −40 sits well under.
+        loud = {"audio/m.mp3": -14.0, "audio/loudsting.mp3": -6.0, "audio/quietsting.mp3": -40.0}
+        orig = hs._audio_loudness
+        hs._audio_loudness = _stub_loudness(loud)
+        try:
+            out = hs._apply_balance(d, apply=True)
+        finally:
+            hs._audio_loudness = orig
+        assert out["nChanged"] == 1 and "error" not in out
+        planned = json.load(open(os.path.join(d, "scenario.json")))["rooms"][0]["plannedHotspots"]
+        sting = planned[0]["solveSfx"]                       # bare string promoted to {src, volume}
+        assert sting["src"] == "audio/loudsting.mp3" and abs(sting["volume"] - 0.199) < 0.002
+        assert planned[1]["solveSfx"]["volume"] == 0.2       # already under the music → untouched
+    _with_rooms_root(body)

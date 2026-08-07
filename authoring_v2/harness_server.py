@@ -1024,7 +1024,9 @@ def _apply_spec(base, room_key):
                          "box": box, "prompt": j["prompt"], "loop": j.get("loop", "boomerang")})
             queued_cine.append(hid)
         queued_var_keys = {(j.get("hotspotId"), j.get("state")) for j in jobs if j.get("type") == "variant"}
-        for j in scene_spec.dooropen_jobs(spec_for_queue):
+        # door open-views (`door.opensOnto`) PLUS any element's general state-variants (`variants:[…]`,
+        # e.g. the Pharos lamp with its beam swung onto the ship) — both are state-tagged variant jobs.
+        for j in scene_spec.dooropen_jobs(spec_for_queue) + scene_spec.variant_jobs(spec_for_queue):
             hid, state = j["hotspotId"], j["state"]
             box = node_boxes.get(hid)
             if not box or state in have_var.get(hid, set()) or (hid, state) in queued_var_keys:
@@ -1289,8 +1291,12 @@ def _apply_balance(base=None, apply=True):
                 v = layer.get("volume")
                 cur = _clamp01(v) if v is not None else _SFX_DEFAULT_VOL
                 consider("layer", rk, layer["src"], cur, layer_setter(layer))
-            # solve/door stings that this room (its gate hotspots or the room itself) DEFINES
-            for holder in [h for h in (room.get("hotspots") or []) if isinstance(h, dict)] + [room]:
+            # Solve/door stings this room DEFINES — on its committed gate hotspots, on its PRE-ART
+            # `plannedHotspots` (content is authored there before any art exists and attaches at commit,
+            # so a sting wired pre-art must be balanced too, not silently skipped), or on the room itself.
+            for holder in ([h for h in (room.get("hotspots") or []) if isinstance(h, dict)]
+                           + [h for h in (room.get("plannedHotspots") or []) if isinstance(h, dict)]
+                           + [room]):
                 src, cur = _solve_src_vol(holder)
                 if src:
                     consider("solve", rk, src, cur, solve_setter(holder))
@@ -1797,7 +1803,8 @@ def _run_dooropen(slot, image, box, prompt):
         JOBS[slot]["active"] = False
 
 
-def _seamfix_argv(inp, out, left=None, right=None, feather=None, full=False, pos=None):
+def _seamfix_argv(inp, out, left=None, right=None, feather=None, full=False, pos=None,
+                  crop=None, occluder=None):
     """Build the seamfix argv, appending --left/--right (band extent each side of the seam), --feather
     (composite blend radius), --full (use the whole model output, no composite), and --pos (seam location as
     a fraction of width; 1.0 = wrap edge) only when the caller supplied them. Absent, generate_scene falls
@@ -1814,6 +1821,10 @@ def _seamfix_argv(inp, out, left=None, right=None, feather=None, full=False, pos
         argv += ["--full"]
     if pos is not None:
         argv += ["--pos", str(pos)]
+    if crop:                                    # CROP-INPAINT: only a band around the seam is sent
+        argv += ["--crop", str(crop)]
+    if occluder:                                # OCCLUDER: stand an object ON the seam
+        argv += ["--occluder", str(occluder)]
     return argv
 
 
@@ -1894,6 +1905,40 @@ def _seam_depth(dir_, stem):
     return len(_seam_snaps(dir_, stem))
 
 
+# The repair MENU (2026-08-07). These are PARALLEL options, not stages: pick the cheapest one that works
+# for the scene in front of you. The three `seam_ops` ones are pure pixel work — instant, free, and they
+# never re-render your art through the model; the two AI ones confine the model to a crop around the seam
+# instead of the whole frame. Every one pushes the SAME undo snapshot, so one Undo steps back through
+# whatever mix you tried.
+_SEAM_LOCAL_OPS = {"gradient", "crop", "roll"}          # handled in-process by seam_ops (no API, no job)
+_SEAM_AI_MODES = {"patch", "occluder", "full"}          # go through generate_scene seamfix
+
+
+def _seam_local(path, mode, req):
+    """Run a non-AI repair in place, pushing an undo snapshot first. Returns the op's report dict."""
+    import seam_ops
+    d, base_name = os.path.dirname(path), os.path.basename(path)
+    stem = os.path.splitext(base_name)[0]
+    tmp = os.path.join(d, stem + "_seamtmp.png")
+    kw = {}
+    if mode == "gradient":
+        kw = {"pos": float(req.get("pos") or 1.0), "span": int(req.get("span") or 64)}
+    elif mode == "crop":
+        kw = {"frac": float(req.get("frac") or 0.02)}
+    elif mode == "roll":
+        kw = {"window": int(req.get("window") or 33)}
+    report = seam_ops.run(mode, path, tmp, **kw)
+    _seam_push(d, stem, path)                          # same stack the AI repairs use -> shared Undo
+    shutil.move(tmp, path)
+    return report
+
+
+def _seam_measure(path, pos=1.0):
+    """How big is the seam, against the scene's own detail? Drives the panel's 'is it worth it' readout."""
+    import seam_ops
+    return seam_ops.measure(path, pos)
+
+
 def _run_seamfix(slot, image, left=None, right=None, feather=None, full=False, pos=None):
     """Seam-safe 360 wrap for a _scratch candidate: produces a new <stem>_seam.png candidate whose L/R
     edges meet cleanly (generate_scene.py seamfix). Non-destructive — the original stays; the fixed
@@ -1914,7 +1959,8 @@ def _run_seamfix(slot, image, left=None, right=None, feather=None, full=False, p
         JOBS[slot]["active"] = False
 
 
-def _run_seamfix_scratch(slot, base, image, left=None, right=None, feather=None, full=False, pos=None):
+def _run_seamfix_scratch(slot, base, image, left=None, right=None, feather=None, full=False, pos=None,
+                         crop=None, occluder=None):
     """Seam-fix a build-world LEVEL-1 pano IN PLACE in <base>/_scratch (generate_scene.py seamfix), pushing the
     pre-fix state onto the <stem>_undoN stack first (per-stage undo). Keyed off an EXPLICIT base — unlike `_run_seamfix`, which
     reads the server-global active scenario (SCENE) — so the console fixes the seam on the scenario it loaded,
@@ -1926,7 +1972,7 @@ def _run_seamfix_scratch(slot, base, image, left=None, right=None, feather=None,
     try:
         if not os.path.isfile(img):
             raise RuntimeError("no scratch pano %s — Generate first" % os.path.basename(image))
-        subprocess.run(_seamfix_argv(img, tmp, left, right, feather, full, pos),
+        subprocess.run(_seamfix_argv(img, tmp, left, right, feather, full, pos, crop, occluder),
                        check=True, capture_output=True, text=True)
         _seam_push(scratch, stem, img)   # push the pre-fix state onto the undo stack (one snapshot per stage)
         shutil.move(tmp, img)
@@ -1966,7 +2012,8 @@ def _undo_seam_room(base, room_key):
     return {"room": room_key, "depth": depth}
 
 
-def _run_seamfix_room(slot, base, room_key, left=None, right=None, feather=None, full=False, pos=None):
+def _run_seamfix_room(slot, base, room_key, left=None, right=None, feather=None, full=False, pos=None,
+                      crop=None, occluder=None):
     """Seam-fix a COMMITTED room IN PLACE: seam-safe the L/R wrap edges of scene.png (generate_scene.py
     seamfix), replacing scene.png (pushes the pre-fix scene onto the `scene_undoN` stack first — per-stage undo).
     The per-candidate `_run_seamfix` makes a new candidate; this is the post-commit repair for the committed scene.
@@ -1975,7 +2022,7 @@ def _run_seamfix_room(slot, base, room_key, left=None, right=None, feather=None,
     scene = os.path.join(base, room_key, "scene.png")
     tmp = os.path.join(base, room_key, "scene_seam.png")
     try:
-        subprocess.run(_seamfix_argv(scene, tmp, left, right, feather, full, pos),
+        subprocess.run(_seamfix_argv(scene, tmp, left, right, feather, full, pos, crop, occluder),
                        check=True, capture_output=True, text=True)
         _seam_push(os.path.join(base, room_key), "scene", scene)   # push pre-fix scene onto the undo stack
         shutil.move(tmp, scene)
@@ -2440,7 +2487,21 @@ class H(http.server.SimpleHTTPRequestHandler):
                 if not os.path.isfile(os.path.join(base, rk, "scene.png")):
                     return self._json({"ok": False, "error": "room %s has no committed scene.png" % rk}, 400)
                 lf, rf, ff, full, pos = _seam_bounds(req)
-                if not _start("seam", "seamfix", lambda: _run_seamfix_room("seam", base, rk, lf, rf, ff, full, pos), 1):
+                mode = str(req.get("mode") or ("full" if full else "patch"))
+                scene_p = os.path.join(base, rk, "scene.png")
+                if mode in _SEAM_LOCAL_OPS:      # instant, in-process, no model — still pushes an undo snapshot
+                    try:
+                        return self._json({"ok": True, "instant": True, "report": _seam_local(scene_p, mode, req)})
+                    except Exception as e:  # noqa: BLE001
+                        return self._json({"ok": False, "error": str(e)}, 400)
+                if mode not in _SEAM_AI_MODES:
+                    return self._json({"ok": False, "error": "unknown seam mode %r" % mode}, 400)
+                crop = req.get("crop") or (0.34 if mode in ("patch", "occluder") else None)
+                occl = req.get("occluder") if mode == "occluder" else None
+                if mode == "occluder" and not str(occl or "").strip():
+                    return self._json({"ok": False, "error": "occluder mode needs a description of what stands on the seam"}, 400)
+                full = (mode == "full")
+                if not _start("seam", "seamfix", lambda: _run_seamfix_room("seam", base, rk, lf, rf, ff, full, pos, crop, occl), 1):
                     return self._json({"ok": False, "error": "a seamfix job is already running"}, 409)
                 return self._json({"ok": True, "slot": "seam"})
             if route == "/api/select-scenario":
@@ -2857,9 +2918,40 @@ class H(http.server.SimpleHTTPRequestHandler):
                 if not image.endswith(".png"):
                     return self._json({"ok": False, "error": "need image (a _scratch .png)"}, 400)
                 lf, rf, ff, full, pos = _seam_bounds(req)
-                if not _start("seam", "seamfix", lambda: _run_seamfix_scratch("seam", base, image, lf, rf, ff, full, pos), 1):
+                mode = str(req.get("mode") or ("full" if full else "patch"))
+                img_p = os.path.join(base, "_scratch", image)
+                if mode in _SEAM_LOCAL_OPS:
+                    if not os.path.isfile(img_p):
+                        return self._json({"ok": False, "error": "no scratch pano %s" % image}, 400)
+                    try:
+                        return self._json({"ok": True, "instant": True, "report": _seam_local(img_p, mode, req)})
+                    except Exception as e:  # noqa: BLE001
+                        return self._json({"ok": False, "error": str(e)}, 400)
+                if mode not in _SEAM_AI_MODES:
+                    return self._json({"ok": False, "error": "unknown seam mode %r" % mode}, 400)
+                crop = req.get("crop") or (0.34 if mode in ("patch", "occluder") else None)
+                occl = req.get("occluder") if mode == "occluder" else None
+                if mode == "occluder" and not str(occl or "").strip():
+                    return self._json({"ok": False, "error": "occluder mode needs a description of what stands on the seam"}, 400)
+                full = (mode == "full")
+                if not _start("seam", "seamfix", lambda: _run_seamfix_scratch("seam", base, image, lf, rf, ff, full, pos, crop, occl), 1):
                     return self._json({"ok": False, "error": "a seamfix job is already running"}, 409)
                 return self._json({"ok": True, "slot": "seam"})
+            if route == "/api/seam-measure":       # how big is the seam vs the scene's own detail?
+                req = self._body()
+                try:
+                    base = _scenario_base(req.get("chapter"), req.get("scenario"))
+                except ValueError as ve:
+                    return self._json({"ok": False, "error": str(ve)}, 400)
+                rk = req.get("roomKey")
+                p = (os.path.join(base, str(rk), "scene.png") if rk
+                     else os.path.join(base, "_scratch", os.path.basename(str(req.get("image") or ""))))
+                if not os.path.isfile(p):
+                    return self._json({"ok": False, "error": "no image to measure"}, 400)
+                try:
+                    return self._json({"ok": True, **_seam_measure(p, float(req.get("pos") or 1.0))})
+                except Exception as e:  # noqa: BLE001
+                    return self._json({"ok": False, "error": str(e)}, 400)
             if route == "/api/seam-undo-scratch":     # build-world level 1: undo the most recent scratch seam-fix STAGE
                 req = self._body()
                 try:

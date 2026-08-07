@@ -141,18 +141,56 @@ def dooropen_jobs(spec):
     return jobs
 
 
+def variant_jobs(spec):
+    """State-tagged ALTERNATE LOOKS any element declares via `variants:[{state, when?, reveal}]` — the
+    general case of `door.opensOnto` (which stays the door-specific shorthand). Each becomes a `variant`
+    batch job painted into that element's own box, so the art is produced in the same art step as the
+    cinemagraphs instead of being a forgettable hand-gen in the hub's Variants tab.
+
+    Use it for anything whose look changes with world state: the Pharos lamp swinging its beam onto the
+    player's ship when they turn the dial, a furnace lit, a sluice opened. `when` rides through onto the
+    variant so `pickActiveVariants` can select it at play time (author it as the dial's `{eq:[key,value]}`).
+    An element carrying no `reveal` for a state is skipped, exactly as dooropen_jobs skips one."""
+    jobs = []
+    for e in spec.get("elements", []):
+        for i, v in enumerate(e.get("variants") or []):
+            if not isinstance(v, dict):
+                continue
+            reveal = (v.get("reveal") or "").strip()
+            if not reveal:
+                continue
+            job = {"type": "variant", "hotspotId": e["id"],
+                   "state": (v.get("state") or "state%d" % (i + 1)), "prompt": reveal}
+            if v.get("when") is not None:
+                job["when"] = v["when"]
+            jobs.append(job)
+    return jobs
+
+
 def to_hotspots(spec):
     """The hotspot stubs the spec implies: ambient for animated decor, plus puzzle/door/clue for gameplay.
-    Boxes are filled by the post-gen localizer; gameplay grading/wiring is authored separately as today."""
+    Boxes are filled by the post-gen localizer; gameplay grading/wiring is authored separately as today.
+
+    An element may carry an explicit **`label`** — the in-world name (`"The customs writing-desk"`). Use it
+    for anything the player opens: a hotspot's label is the MODAL TITLE at play time, and it is also the key
+    `_attach_planned_content` matches on (type, slug(label)) when pre-art `plannedHotspots` content attaches
+    at commit. Without one we fall back to the first 60 characters of the art `desc`, which reads as chopped
+    prompt text (cf. the trees station door, "a small alien monorail gondola docked at the platform edge, ")."""
     out = []
     for e in spec.get("elements", []):
-        base = {"id": e["id"], "label": e.get("desc", e["id"])[:60]}
+        base = {"id": e["id"], "label": e.get("label") or e.get("desc", e["id"])[:60]}
         if e.get("puzzle"):
             out.append({**base, "type": "puzzle"})
+        elif e.get("dial"):
+            out.append({**base, "type": "dial"})     # world-state control, the ENGINE's own mechanic (openDial)
         elif e.get("switch"):
-            out.append({**base, "type": "switch"})   # world-state control; reclassified to its real mechanic in wiring
+            out.append({**base, "type": "switch"})   # generic world-state control; NOTE the engine has no
+            # `switch` handler — a switch hotspot is inert until it is reclassified (every trees drive-lever
+            # had to be hand-changed to `dial` post-commit). Prefer `dial:true` when the control IS a dial.
+        elif e.get("grid"):
+            out.append({**base, "type": "grid"})     # ungraded escape gate, MATRIX-SELECT flavour (mechanic #15)
         elif e.get("lock"):
-            out.append({**base, "type": "lock"})     # ungraded escape gate (keypad / grid-select); wired separately
+            out.append({**base, "type": "lock"})     # ungraded escape gate, KEYPAD flavour; wired separately
         elif e.get("door"):
             out.append({**base, "type": "door", **{k: v for k, v in e["door"].items()}})
         elif e.get("clue"):

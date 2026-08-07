@@ -47,11 +47,11 @@ def main():
     # ---- answers derived straight from the data ----
     s1 = winner(group_mean(rows, "species", "trunk_girth_cm"))            # widest species
     s2 = winner(group_mean(rows, "vigor", "bark_glow"))                   # brightest vigour class
-    s3 = winner(group_mean(rows, "canopy_zone", "vitality_index"))        # SHORTCUT: grand mean per zone
-    # BOSS regroup: mean over (zone, species) means -> species-balanced zone
+    s3 = winner(group_mean(rows, "grove", "vitality_index"))        # SHORTCUT: grand mean per grove
+    # BOSS regroup: mean over (grove, species) means -> species-balanced grove
     zs = defaultdict(list)
     for r in rows:
-        zs[(r["canopy_zone"], r["species"])].append(float(r["vitality_index"]))
+        zs[(r["grove"], r["species"])].append(float(r["vitality_index"]))
     zsp = defaultdict(list)
     for (z, sp), v in zs.items():
         zsp[z].append(mean(v))
@@ -103,9 +103,21 @@ def main():
         oo_states = {ov["state"] for ov in spec_door["door"].get("opensOnto", [])}
         var_states = {v["state"] for v in door[0].get("variants", [])}
         check(var_states == oo_states, f"{carkey}: variant states {var_states} == opensOnto states {oo_states}")
-    # each state key defaults to onward
-    for statekey in ("car_sq_dir", "car_ci_dir", "car_tr_dir"):
-        check(scen.get("state", {}).get(statekey) == "forward", f"state default {statekey} == forward")
+    # THREE-POSITION lever (Lucas 2026-08-07): the car holds still in NEUTRAL with its door shut, and only
+    # up-line/down-line open it onto a station. So each key defaults to "neutral" (re-asserted on every
+    # entry via the dial's resetOnEnter), the dial offers exactly the three positions, and the door is
+    # SEALED while the lever is neutral — that gate is what makes the closed base art correct.
+    for carkey, (statekey, _fwd, _back) in cars.items():
+        check(scen.get("state", {}).get(statekey) == "neutral", f"state default {statekey} == neutral")
+        dial = next(h for h in R[carkey]["hotspots"] if h["type"] == "dial")
+        vals = [s_["value"] for s_ in dial.get("states", [])]
+        check(vals == ["forward", "neutral", "back"], f"{carkey}: lever positions == up/neutral/down (got {vals})")
+        check(dial.get("default") == "neutral" and dial.get("resetOnEnter") is True,
+              f"{carkey}: lever defaults to neutral and resets on entry")
+        door = next(h for h in R[carkey]["hotspots"] if h["type"] == "door")
+        check(door.get("availableWhen") == {"ne": [statekey, "neutral"]},
+              f"{carkey}: door is sealed while the lever sits in neutral")
+        check(bool(door.get("lockedBody")), f"{carkey}: the sealed door has a diegetic lockedBody")
 
     # ---- vault escape: a phase:escape 3x3 grid mapping each shape-line to its hoard's sorting trait ----
     check(R["vault"].get("phase") == "escape", "vault is the escape phase")

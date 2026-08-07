@@ -70,8 +70,8 @@
 // A bare `./variant_resolve.js` import is NOT refreshed by bumping the <script> tag's ?v, so a changed
 // helper module (e.g. a new export) leaves browsers on a stale cached copy → "doesn't provide an export
 // named X" SyntaxError → blank page (the 2026-08-05 airship regression). Bump all three together.
-import { WebRConsole } from "./webr-console.js?v=72";
-import { pickActiveVariants, activeDoorVariant } from "./variant_resolve.js?v=72";   // Phase 3: per-hotspot state variants; monorail switch-door nav
+import { WebRConsole } from "./webr-console.js?v=75";
+import { pickActiveVariants, activeDoorVariant } from "./variant_resolve.js?v=75";   // Phase 3: per-hotspot state variants; monorail switch-door nav
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 
@@ -269,7 +269,7 @@ function init(data) {
     analysisFinished = false; escapeFinished = false;                // fresh objective state
     startTime = Date.now();                                           // per-phase timing: game starts now
     analysisFinishedTime = null; escapeFinishedTime = null;           // fresh timing state
-    caseFile.length = 0; pickedClues.clear();                         // fresh field notebook
+    caseFile.length = 0; pickedClues.clear(); scratchPad = "";        // fresh field notebook + scratch pad
     if (SCENARIO.story) logToNotebook("Your assignment", SCENARIO.story);  // the opening premise stays re-readable once per-room entry cards are dropped
     updateNotebookChip();
     $("#notebookChip").style.display = "";                            // persistent chip, in-room only
@@ -528,6 +528,11 @@ window.PanoMixer = {
 // code = the initials of each room's logged answer), so it stops us punishing weaker working memory
 // rather than weaker analysis.
 const caseFile = [];              // [{ source, text, image, overlay, pos }] in the order they were logged
+// The SCRATCH PAD — free text the player types into the notebook themselves (2026-08-07). The case file
+// is everything the game gives you; this is the only place you can write your own working — a jotted
+// intermediate value, a tally of the piles you've sorted, a candidate answer to come back to. Session
+// state, exactly like `caseFile`: cleared on Enter, not persisted across a reload.
+let scratchPad = "";
                                   // overlay: render the board tile semi-transparent (mask-overlay puzzles);
                                   // pos: {col,row} on the collage board, set lazily + updated on drag (session)
 const pickedClues = new Set();    // room|hotspotId of clues already taken (guards double-add)
@@ -572,10 +577,34 @@ let nbTopZ = 10;       // z-index high-water mark so a dragged tile lifts above 
 // the hospital facet-collage escape (read a row of postcards as a code) and Alaska's Secret-of-the-Unicorn
 // overlay (three translucent masks stacked on one cell). Board positions live on the caseFile entries, so
 // an arrangement survives closing + reopening the notebook within a session.
+// The player's own working space, appended to the bottom of the notebook. Kept deliberately plain: a
+// labelled textarea bound straight to `scratchPad`, so whatever is typed survives closing and reopening
+// the notebook (and moving between rooms) within the session. No global key handlers exist in the engine,
+// so typing here can't trigger a shortcut; `stopPropagation` guards against any modal-level handler a
+// future change might add closing the notebook mid-sentence.
+function nbScratchSection() {
+  const sec = document.createElement("div");
+  sec.style.cssText = "margin-top:14px";
+  sec.innerHTML = `<div style="font:600 12px system-ui;opacity:.6;margin:0 0 6px">Scratch pad — your own notes</div>`;
+  const ta = document.createElement("textarea");
+  ta.id = "nbScratch";
+  ta.placeholder = "Jot anything here — a running tally, a value to come back to, a hunch…";
+  ta.value = scratchPad;
+  ta.rows = 5;
+  ta.style.cssText = "width:100%;box-sizing:border-box;resize:vertical;min-height:84px;" +
+    "background:rgba(0,0,0,.28);color:inherit;border:1px solid rgba(255,255,255,.18);border-radius:8px;" +
+    "padding:8px 10px;font:13px/1.5 system-ui;outline:none";
+  ta.addEventListener("input", () => { scratchPad = ta.value; });
+  ta.addEventListener("keydown", e => e.stopPropagation());
+  sec.appendChild(ta);
+  return sec;
+}
+
 function openNotebook() {
   const d = document.createElement("div");
   if (!caseFile.length) {
     d.innerHTML = `<p style="opacity:.75">Your notebook is empty. Solve a room's puzzle and its answer is noted here automatically; pick up a clue to add it yourself.</p>`;
+    d.appendChild(nbScratchSection());   // the pad is available from the very start, empty case file or not
     openModal("🗒 Field notebook", d);
     return;
   }
@@ -646,6 +675,7 @@ function openNotebook() {
          </div>`).join("");
     d.appendChild(sec);
   }
+  d.appendChild(nbScratchSection());
   openModal("🗒 Field notebook", d);
 }
 
@@ -697,6 +727,7 @@ function condOK(cond) {
     if ("allSolved" in cond) return (cond.allSolved || []).every(k => solvedRooms.has(k));
     if ("gte" in cond) { const g = cond.gte || []; return (Number(gameState[g[0]]) || 0) >= Number(g[1]); }
     if ("eq" in cond) { const e = cond.eq || []; return String(gameState[e[0]]) === String(e[1]); }  // dial/state equality (variants)
+    if ("ne" in cond) { const e = cond.ne || []; return String(gameState[e[0]]) !== String(e[1]); }  // state inequality — e.g. a monorail door available while the lever is NOT "neutral"
   }
   console.warn("pano-player: unsupported unlockedWhen (treating as locked):", cond);
   return false;
@@ -784,6 +815,13 @@ function startRoom(i) {
   stopRoomSfx();                     // stop the previous room's ambience + restore music volume
   roomIdx = i; room = SCENARIO.rooms[i];
   if (room && room.key) visitedRooms.add(room.key);   // mark entered (so a puzzle-less junction's entry card won't re-show)
+  // A `dial` may declare `resetOnEnter` (+ its `default` value): entering the room returns the lever to that
+  // default so the space always starts in a known state — the monorail drive-lever snaps back to "neutral"
+  // (car still, door shut) every time you board. Dials WITHOUT the flag (the cross-referencing mapview dials)
+  // keep persisting across rooms as before. Must run before basePanorama/doorYaw so the door reads shut.
+  (room && room.hotspots || []).forEach(h => {
+    if (h && h.type === "dial" && h.resetOnEnter) gameState[h.key || h.id] = h.default;
+  });
   applyFx();                         // setting-matched environment overlays (scenario.fx + room.fx)
   // Re-entry: a room already solved (reached again via a back door) opens in its solved state —
   // open panorama, forward door live, puzzle short-circuits as done.
@@ -1197,7 +1235,13 @@ $("#next").onclick = () => viewer && viewer.setYaw(viewer.getYaw() + TURN, 600);
 function onHotspot(evt, h) {   // Pannellum calls clickHandlerFunc(event, clickHandlerArgs)
   try {
     if (h.type === "clue") return openClue(h);
-    if (h.type === "dial") return openDial(h);
+    if (h.type === "dial") {
+      // A dial may be GATED like a puzzle/lock (`availableWhen` + diegetic `lockedBody`) — the Pharos lamp
+      // dial only becomes turnable once the lantern door's grid is solved. Undefined ⇒ always open, so
+      // every existing mapview/mapping dial is unchanged.
+      if (!condOK(h.availableWhen)) return openLocked(h);
+      return openDial(h);
+    }
     if (h.type === "mapview") return openMapview(h);
     if (h.type === "puzzle") {
       if (solvedGates.has(gateKey(room.key, h.id))) return toast("You've already solved this one.");
@@ -1434,10 +1478,18 @@ function openDial(h) {
       // A dial may carry `sfx` (path string or {src,volume}) — the lever/valve throw sound (a monorail
       // switch-door's clunk). One-shot on each throw. Absent ⇒ silent, so every existing dial is unchanged.
       if (h.sfx) playOneShot(typeof h.sfx === "string" ? h.sfx : h.sfx.src, (typeof h.sfx === "object") ? h.sfx.volume : undefined);
-      // If a door in THIS room shows a state view (a monorail switch-door), re-render so its art + where it
-      // leads follow the lever immediately. Guarded so ordinary dial rooms (mapview only) are untouched.
-      if ((room.hotspots || []).some(h2 => h2 && h2.type === "door" && Array.isArray(h2.variants) && h2.variants.length))
-        rerenderCurrentRoom();
+      // If ANYTHING in this room shows a state view, re-render so the art (and, for a switch-door, where it
+      // leads) follows the lever immediately: a monorail door's open-view, or the Pharos lamp's beam swinging
+      // onto the player's ship. Guarded so ordinary dial rooms (mapview only) are untouched.
+      const hasVariantArt = (room.hotspots || []).some(h2 => h2 && Array.isArray(h2.variants) && h2.variants.length);
+      if (hasVariantArt) rerenderCurrentRoom();
+      // A dial flagged `endsEscape` IS the finale — the player's own hand performing the last gesture (the
+      // Pharos beam). Let the sound land and the new state-variant actually render, THEN show the escape
+      // finish; jumping straight there would hide the very image the gesture produces.
+      if (h.endsEscape) {
+        closeModal();
+        setTimeout(showEscapeDone, hasVariantArt ? 1600 : 900);
+      }
     };
     row.appendChild(b);
   });
@@ -2354,7 +2406,11 @@ const hasEscapePhase = () => (SCENARIO.rooms || []).some(r => isBuilt(r) && phas
 // (The lock should carry `availableWhen` so it can't be keyed before it's meant to — same as an escape
 // DOOR being gated by `requires`; onHotspot enforces that. See handleDoor's endsEscape door path.)
 const hasPendingEscape = () => (SCENARIO.rooms || []).some(r => isBuilt(r) &&
-  (r.hotspots || []).some(h => h.type === "lock" && h.endsEscape && !solvedGates.has(gateKey(r.key, h.id))));
+  (r.hotspots || []).some(h => h.endsEscape && (
+    // a gate (lock / grid) is pending until it is SOLVED…
+    (h.type !== "dial" && !solvedGates.has(gateKey(r.key, h.id))) ||
+    // …a terminal DIAL is pending until it has actually been TURNED (its world-state key is still unset).
+    (h.type === "dial" && gameState[h.key || h.id] == null))));
 
 // Reveal the in-room "reveal how this world worked" chip. Called once the analysis objective finishes.
 // No-op unless the scenario carries debrief text — the feature is opt-in per scenario.

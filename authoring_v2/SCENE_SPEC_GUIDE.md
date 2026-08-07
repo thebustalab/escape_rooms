@@ -31,7 +31,10 @@ network and a description of vibes, Claude drafts **one spec per room** followin
   "elements": [           // ORDERED left → right as they sweep around the 360
     { "id": "boiler", "at": "on the far left", "desc": "a riveted boiler, its firebox door ajar",
       "animate": { "motion": "the firebox glowing and flickering", "loop": "boomerang" } }
-    // one role per element: animate | puzzle:true | switch:true | door:{direction,to[,opensOnto]} | clue:true | lock:true
+    // one role per element: animate | puzzle:true | switch:true | door:{direction,to[,opensOnto]} | clue:true | lock:true | grid:true | dial:true
+    // label           = the IN-WORLD name ("The customs writing-desk"). Set it on anything the player opens:
+    //                   it is the play-time MODAL TITLE, and the key pre-art `plannedHotspots` content
+    //                   slug-matches on when it attaches at commit. Omitted ⇒ falls back to desc[:60].
     // switch:true      = a world-state CONTROL (lever/dial/valve): placed + boxed like a puzzle but NOT graded; wiring sets its state effect.
     // door.opensOnto   = [{state,reveal},…] a door with >1 open-view (a monorail car whose switch picks which station it looks out on):
     //                    each view -> a state-tagged door-open variant on the ONE door hotspot; runtime pick-by-state is deferred wiring.
@@ -84,8 +87,20 @@ network and a description of vibes, Claude drafts **one spec per room** followin
    box in the flat editor (the engine rolls + splits).
 6. **Gameplay elements** — `puzzle:true` (the graded object; grading is wired separately in the harness),
    `switch:true` (a world-state control — lever/dial/valve; placed + boxed now, its state effect wired later —
-   kept distinct from `puzzle` so real graded puzzles aren't confused with switches), `clue:true`, `lock:true`
-   (an ungraded escape gate — keypad or `grid-select`; placed as a stub, wired later). One role flag per element.
+   kept distinct from `puzzle` so real graded puzzles aren't confused with switches), `clue:true`, and the two
+   ungraded escape gates — **`lock:true`** (keypad flavour) or **`grid:true`** (the matrix-select flavour,
+   mechanic #15). Pick the one the escape actually uses: the engine dispatches on the hotspot `type`, so a
+   grid-select escape emitted as a `lock` silently fails to open. One role flag per element.
+   Also set **`label`** on every gameplay element — see the schema note above.
+   **`dial:true`** emits type `dial`, the engine's own world-state control (`openDial`). Prefer it over
+   `switch:true` whenever the control IS a dial/lever the player turns: the engine has **no `switch`
+   handler**, so a `switch` hotspot is inert until someone hand-reclassifies it (every trees drive-lever had
+   to be).
+8. **State-variants — `variants:[{state, when?, reveal}]` on ANY element.** The general case of a door's
+   `opensOnto`: an alternate look that shows when `when` holds (`pickActiveVariants`). Each one with a
+   `reveal` is queued as a variant job by *Place all hotspots* and rendered in the normal art batch, so
+   payoff art (the Pharos lamp swinging its beam onto the player's ship) can't be forgotten. Put it on an
+   `animate` element when it should carry art but no player marker — an `ambient` hotspot is exactly that.
 7. **Atmosphere** — a vivid closing line: light, mood, materials, haze/grain. **Negatives** — default
    "No people, no lettering, no captions, no text".
 
