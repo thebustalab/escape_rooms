@@ -18,8 +18,12 @@ What it checks, per rooms/<chapter>/<scenario>/scenario.json:
     slot while still matching the decoder number — the hawaii room2 bug, 2026-07-22);
   - exactly one decoder key matches the scenario id (else: missing / ambiguous).
 
-Soft (non-failing) WARN: a scenario whose built rooms all key to the same option index
+Soft (non-failing) WARN: a scenario whose built MCQ rooms all key to the same option index
 (e.g. all 0) — an "always the same slot" tell; vary the correct position across rooms.
+Counted over MCQ rooms ONLY. A console-`check` or pick-the-point room encodes answer=1 by
+construction — there is no option list and nothing for a student to notice — so an all-console
+scenario (wrangling/trees, dimensionality_reduction/henges) legitimately keys to c(1,1,1,1) and
+used to trip this warning every run. A tell needs a chooser; only MCQs have one.
 
 Non-failing SKIP: a freshly-scaffolded scenario with no built graded rooms yet (all stubs) has
 no decoder key — that's added at wiring time — so it's skipped rather than failed.
@@ -38,9 +42,61 @@ DECODER = HERE / "decode_codes.R"
 ROOMS_GLOB = "rooms/*/*/scenario.json"
 
 
+def _is_mcq(q):
+    """True for a payload the student answers by PICKING AN OPTION — the only kind whose correct
+    index is a position a student could learn to exploit. A `check`/`pick` room encodes 1 because it
+    was solved, not because anyone chose slot 1, so it can't carry a positional tell."""
+    return "question" in q
+
+
+def _graded_index(q, where, notes, vec):
+    """Append the correct-index one graded puzzle payload `q` will encode.
+
+    Used by the dynamic-queue path. The room path below keeps its own inline copy of these rules
+    deliberately: it is the long-standing, well-tested path and was left byte-identical so this
+    change cannot alter any existing scenario's key. If the two ever drift, reconcile them here."""
+    if "question" in q:                       # MCQ: encoded answer = chosen index
+        opts, c = q["question"].get("options", []), q["question"].get("correct")
+        # Duplicate options are always a bug: the codec records the *index*, so if two options carry
+        # the same text the correct index can silently resolve to the wrong (or a duplicated) slot —
+        # exactly the hawaii room2 failure (2026-07-22), which passed the index-vs-key check because
+        # scenario.json and the decoder agreed on the number while that slot held the wrong text.
+        dupes = sorted({o for o in opts if opts.count(o) > 1})
+        if dupes:
+            notes.append(f"{where} has duplicate MCQ option(s): {', '.join(dupes)} "
+                         f"— the correct index may resolve to the wrong text")
+        if not isinstance(c, int) or not (0 <= c < len(opts)):
+            notes.append(f"{where} correct index {c} out of range (0..{len(opts)-1})")
+            vec.append(None)
+        elif dupes:
+            vec.append(None)                  # structural fail already noted; skip the vector compare
+        else:
+            vec.append(c)
+    elif "check" in q:                        # console-check: solved encodes answer = 1
+        vec.append(1)
+    elif "pick" in q:                         # Type 4 pick-the-point: solved encodes answer = 1
+        vec.append(1)
+    else:
+        notes.append(f"{where} has neither a question, a check nor a pick")
+        vec.append(None)
+
+
 def scenario_expected(doc):
     """Ordered correct-index vector the codec will encode for this scenario's BUILT rooms."""
-    vec, notes = [], []
+    # DYNAMIC PUZZLE QUEUE (shared/puzzle_queue.js): when a scenario authors `puzzleQueue`, the
+    # codec emits one step per LADDER RUNG in QUEUE order, not one per room in room order — because
+    # the room that serves rung k differs between students, so a room-ordered key cannot grade
+    # anything. Derive the key from the queue instead, and ignore the rooms entirely.
+    queue = doc.get("puzzleQueue")
+    if isinstance(queue, list) and queue:
+        vec, notes = [], []
+        n_mcq = 0
+        for i, q in enumerate(queue):
+            _graded_index(q, f"puzzleQueue[{i}]", notes, vec)
+            n_mcq += _is_mcq(q)
+        return vec, notes, n_mcq
+
+    vec, notes, n_mcq = [], [], 0
     for r in doc.get("rooms", []):
         if not r.get("built"):
             continue
@@ -64,6 +120,7 @@ def scenario_expected(doc):
             vec.append(None)
             continue
         q = puzzles[0]
+        n_mcq += _is_mcq(q)                       # only MCQ slots can carry a positional tell
         if "question" in q:                       # MCQ: encoded answer = chosen index
             opts, c = q["question"].get("options", []), q["question"].get("correct")
             # Duplicate options are always a bug: the codec records the *index*, so if two options carry
@@ -88,7 +145,7 @@ def scenario_expected(doc):
         else:
             notes.append(f"room '{r.get('key')}' puzzle has neither question, check, nor pick")
             vec.append(None)
-    return vec, notes
+    return vec, notes, n_mcq
 
 
 def decoder_keys(text):
@@ -120,7 +177,7 @@ def main():
         rel = path.relative_to(ROOT)
         doc = json.loads(path.read_text())
         sid = doc.get("id")
-        exp, notes = scenario_expected(doc)
+        exp, notes, n_mcq = scenario_expected(doc)
 
         for n in notes:
             print(f"FAIL  {rel}: {n}")
@@ -153,8 +210,10 @@ def main():
             failures += 1
             continue
 
-        if exp and len(set(exp)) == 1 and len(exp) > 1:
-            print(f"WARN  {rel}: all built rooms key to index {exp[0]} — vary the correct position (tell)")
+        # Only an MCQ scenario can have an "always the same slot" tell — see _is_mcq. A console/pick
+        # scenario keys to all-1s structurally, so warning on it is pure noise (2026-08-27).
+        if exp and len(set(exp)) == 1 and len(exp) > 1 and n_mcq > 1:
+            print(f"WARN  {rel}: all {n_mcq} built MCQ rooms key to index {exp[0]} — vary the correct position (tell)")
             warnings += 1
         print(f"PASS  {rel}: id {sid}, {key_name} correct = c({', '.join(map(str, exp))})")
 

@@ -203,25 +203,18 @@
         <div class="ssbtns"><button data-seam="roll">Apply</button> <button class="seamundo" disabled>Undo</button></div>
       </div>
       <div class="seamstage">
-        <div class="ssttl">③ Crop &amp; rescale <span class="hint">— no AI · instant</span></div>
-        <div class="hint" style="margin-bottom:4px">Drops the mismatched sliver at the wrap and stretches back to full width. Costs ~2% of the scene, invents nothing.</div>
-        <div class="ssbtns"><button data-seam="crop">Apply</button> <button class="seamundo" disabled>Undo</button></div>
-      </div>
-      <div class="seamstage">
-        <div class="ssttl">④ Patch the band <span class="hint">— AI, crop only</span></div>
+        <div class="ssttl">③ Patch the band <span class="hint">— AI, crop only</span></div>
         <div class="hint" style="margin-bottom:4px">Sends <b>only a band around the seam</b> to the model, not the whole pano — everything outside stays your original art.</div>
         <div class="ssbtns"><button data-seam="patch">Apply</button> <button class="seamundo" disabled>Undo</button></div>
       </div>
       <div class="seamstage">
-        <div class="ssttl">⑤ Plant an occluder <span class="hint">— AI, crop only</span></div>
+        <div class="ssttl">④ Plant an occluder <span class="hint">— AI, crop only</span></div>
         <div class="hint" style="margin-bottom:4px">Stands something <i>on</i> the seam so the two sides never have to agree — for when the scene genuinely can't reconcile.</div>
         <input type="text" id="seamOccluder" placeholder="a plain stone pillar, floor to ceiling" style="width:100%; margin-bottom:4px" />
+        <label style="font-size:12px; display:block; margin-bottom:4px">Editable middle <b id="seamEditFracV">33</b>%
+          <span style="opacity:.6">— the model sees the whole band for context but only this centre is redrawn, so the edges can't mismatch</span>
+          <input type="range" id="seamEditFrac" min="15" max="70" step="1" value="33" style="width:100%" /></label>
         <div class="ssbtns"><button data-seam="occluder">Apply</button> <button class="seamundo" disabled>Undo</button></div>
-      </div>
-      <div class="seamstage">
-        <div class="ssttl">⑥ Re-render whole scene <span class="hint">— AI · last resort</span></div>
-        <div class="hint" style="margin-bottom:4px">Regenerates the <b>entire</b> panorama, so the seam is self-consistent — but it is an AI image of an AI image, and it pushes a new seam to the far meridian. Pre-commit only.</div>
-        <div class="ssbtns"><button data-seam="full">Apply</button> <button class="seamundo" disabled>Undo</button></div>
       </div>
     </div>
     <div id="seamFeatherRow" style="display:none; margin-top:6px">
@@ -266,9 +259,9 @@
     let SEAM_MODE = false, SEAM_L = 0.06, SEAM_R = 0.06, SEAM_FEATHER = 0;
 // SEAM_FEATHER: 0 = OFF / hard edge (the DEFAULT — Lucas, 2026-08-07: seams read best hard); a number =
 // explicit fraction of width; null = AUTO (sent as -1, so generate_scene uses strip/8). Feather only ever
-// applies where a band is COMPOSITED back — options ④ patch and ⑤ occluder. The three no-AI repairs don't
-// composite at all, and ⑥ keeps the model's whole frame, so on those the setting is inert. Tick "auto
-// feather" if a patched band's edges read too hard against the original art.
+// applies where a band is COMPOSITED back — options ③ patch and ④ occluder. The two no-AI repairs don't
+// composite at all, so on those the setting is inert. Tick "auto feather" if a patched band's edges read
+// too hard against the original art.
     let SEAM_POS = 1.0;      // seam location the band straddles, fraction of width: 1.0 = L/R wrap edge (default); drag the band onto a mid-image seam to fix it
     let HUB_TAB = "content", hubCinePoll = 0, ROOM_KEYS = [];   // Phase 2b: per-hotspot content panel
     let batchPoll = 0;   // walk-away batch: status poll handle while a run is in flight
@@ -362,6 +355,14 @@
                                 // can read it, and LET (not const) because a successful commit clears it and
                                 // the hub becomes the committed room in place — no reopen round-trip.
     const ROOM_KEY = params.get("room");   // Phase 8: IDE mode — edit this room node's wrap, save to scenario.json
+    // VARIANT mode (2026-08-13): point the wrap/seam tools at a state variant PNG in the room dir instead
+    // of scene.png. An unmasked night/weather edit can perfectly well break a seam the base had already
+    // repaired, and there was no way to fix it. WRAP IS DELIBERATELY STILL THE ROOM'S — the engine composites
+    // a variant under the room's single wrap, and one set of fractional hotspot boxes is shared by every
+    // state, so a per-variant wrap would silently misalign every box after dark. Seam is per-image; wrap is
+    // shared and shown here so it can be CHECKED against the variant.
+    const VAR_FILE = params.get("file");   // e.g. "scene_night.png"
+    const VAR_STATE = params.get("state") || "";
     const CH = params.get("chapter"), SC = params.get("scenario");   // Finding 2: target THIS scenario, not active
     const LEVEL1 = params.get("level1") === "1";   // build-world level 1: wrap + seam + commit only (no hotspots/plate/door)
     const HS_EDIT = params.get("edit") === "hotspots";   // build-world Rooms list: HOTSPOT-EDIT hub — Wrap spoke is a
@@ -759,15 +760,39 @@
         const up = () => { window.removeEventListener("mousemove", onMove); window.removeEventListener("mouseup", up); };
         window.addEventListener("mousemove", onMove); window.addEventListener("mouseup", up);
       };
-      // Edge handles set the band's extent on each side of the seam (relative to SEAM_POS, wherever it is).
-      const startL = drag(ev => { SEAM_L = Math.max(0.01, Math.min(0.45, SEAM_POS - fracOf(ev))); renderSeamBand(); });
-      const rmax = () => (SEAM_POS >= 0.995 ? FLAT_MARGIN : 0.45);   // at the wrap edge, right only reaches into the margin
-      const startR = drag(ev => { SEAM_R = Math.max(0.01, Math.min(rmax(), fracOf(ev) - SEAM_POS)); renderSeamBand(); });
+      // Edge handles set the band's extent on each side of the anchor (SEAM_POS, wherever it is).
+      //
+      // THE HANDLES USED TO HIT A WALL (fixed 2026-08-07, Lucas: "if I try to move the right boundary far
+      // left, it stops"). Each side was clamped to stay on its own side of the anchor and to at most 0.45
+      // of the width, and the right side was additionally pinned inside the thin wrap margin whenever the
+      // anchor sat at the seam. Between them the band could never be dragged clear of the anchor, so a
+      // region anywhere else in the frame was simply unreachable — which matters because for ③ patch and
+      // ④ occluder this band is a REGION selector, not only a seam straddle.
+      //
+      // Now a handle may cross the anchor and the anchor COMES WITH IT, so either edge can be dragged
+      // anywhere across the frame and the band stays valid (the anchor is always inside it, which is what
+      // the pos/left/right wire format needs). Sides reach 0.9 of the width; the server cap was raised to
+      // match in `_seamfix_argv`'s `_seam_bounds`.
+      const MINW = 0.01;                                     // keep a sliver of band so the handles stay grabbable
+      const xOf = ev => Math.max(0, Math.min(1 + FLAT_MARGIN, fracOf(ev)));
+      const startL = drag(ev => {
+        const x = xOf(ev);
+        if (x > SEAM_POS - MINW) SEAM_POS = Math.min(1, x + MINW);   // dragged past the anchor → carry it right
+        SEAM_L = Math.max(MINW, Math.min(0.9, SEAM_POS - x));
+        renderSeamBand();
+      });
+      const startR = drag(ev => {
+        const x = xOf(ev);
+        if (x < SEAM_POS + MINW) SEAM_POS = Math.max(0, x - MINW);   // dragged past the anchor → carry it left
+        SEAM_R = Math.max(MINW, Math.min(0.9, x - SEAM_POS));
+        renderSeamBand();
+      });
       band.querySelector(".seamh.l").addEventListener("mousedown", startL);
       band.querySelector(".seamh.r").addEventListener("mousedown", startR);
-      // Dragging the band BODY moves the seam location (SEAM_POS) — slide it onto a mid-image seam to fix it.
+      // Dragging the band BODY moves the anchor (SEAM_POS) — slide it onto a mid-image seam to fix it.
+      // Full 0→1 range now (was floored at 0.1, which walled off the leftmost tenth of the frame).
       // (Pressing an edge handle stopPropagation's, so this body-drag only starts off the handles.)
-      band.addEventListener("mousedown", drag(ev => { SEAM_POS = Math.max(0.1, Math.min(1.0, fracOf(ev))); renderSeamBand(); }));
+      band.addEventListener("mousedown", drag(ev => { SEAM_POS = Math.max(0, Math.min(1.0, fracOf(ev))); renderSeamBand(); }));
     })();
     // --- Seam-fix: two-stage panel (Stage 1 wrap / Stage 2 far seam) with a per-stage undo STACK ----------
     let SEAM_CTX = null;    // "scratch" (pre-commit candidate) | "room" (committed scene)
@@ -799,14 +824,14 @@
       };
       fa.onchange = syncFeather;
       fs.oninput = syncFeather;
-      // Say plainly which stage the feather actually affects, so a full stage's inert slider isn't mistaken
-      // for a setting that did something.
+      // Say plainly which stage the feather actually affects, so an inert slider isn't mistaken for a
+      // setting that did something.
       const n = $("#seamFeatherNote");
-      if (n) n.innerHTML = `Feather softens where a <b>patched</b> band meets the original — it applies to ④ and ⑤ only ` +
-        `(the no-AI repairs don't composite, and ⑥ keeps the model's whole frame).`;
+      if (n) n.innerHTML = `Feather softens where a <b>patched</b> band meets the original — it applies to ③ and ④ only ` +
+        `(the no-AI repairs don't composite at all).`;
       const fh = document.querySelector("#flatEdit .fhead");
       if (fh) { fh.dataset.orig = fh.dataset.orig || fh.textContent;
-                fh.textContent = "Seam repair — the band shows WHERE a repair lands; drag its body onto a mid-image seam, or leave it at the wrap. The options below are independent: the first three are pure pixel work (instant, no model, your art untouched), the last three use the model. Undo steps back one repair."; }
+                fh.textContent = "Seam repair — the band shows WHERE a repair lands; drag its body onto a mid-image seam, or leave it at the wrap. The options below are independent: the first two are pure pixel work (instant, no model, your art untouched), the last two use the model on a crop around the seam only. Undo steps back one repair."; }
       renderFlatBoxes();   // clears any hotspot boxes (guarded by SEAM_MODE)
       renderSeamBand();
       refreshSeamDepth();  // set the Undo enable state (one shared stack)
@@ -840,7 +865,7 @@
       if (!busy) updateStageUndo();
     }
     async function refreshSeamDepth() {
-      const body = SEAM_CTX === "room" ? { chapter: CH, scenario: SC, roomKey: ROOM_KEY } : { chapter: CH, scenario: SC, image: DRAFT_IMG };
+      const body = SEAM_CTX === "room" ? { chapter: CH, scenario: SC, roomKey: ROOM_KEY, file: VAR_FILE || undefined } : { chapter: CH, scenario: SC, image: DRAFT_IMG };
       const s = await postJSON("/api/seam-status", body);
       SEAM_DEPTH = (s && s.ok) ? (s.undoDepth || 0) : 0;
       updateStageUndo();
@@ -848,7 +873,8 @@
     // Reload the changed image into the flat editor + 360 (post-fix / post-undo, in place).
     async function reloadSeamImage() {
       IMG_URL = SEAM_CTX === "room"
-        ? "/sfile/" + NODE.panorama + "?t=" + Date.now() + (SCQ ? "&" + SCQ : "")
+        ? ((VAR_FILE ? "/sfile/" + ROOM_KEY + "/" + encodeURIComponent(VAR_FILE)
+                     : "/sfile/" + NODE.panorama) + "?t=" + Date.now() + (SCQ ? "&" + SCQ : ""))
         : "/sfile/_scratch/" + encodeURIComponent(DRAFT_IMG) + "?t=" + Date.now() + (SCQ ? "&" + SCQ : "");
       setFlatImg(IMG_URL);
       if (SEAM_CTX === "room") await RoomEditCore.Cinemagraph.init(NODE, IMG_URL, SCQ);
@@ -860,21 +886,22 @@
     // (_seam_bounds keeps an explicit 0 = OFF, and maps <0 to None = auto).
     const featherParam = () => (SEAM_FEATHER === null ? -1 : SEAM_FEATHER);
     // Apply ONE repair by mode. The no-AI ops come back instantly with a report; the AI ones run as a job.
-    const SEAM_LABEL = { gradient: "gradient", roll: "roll", crop: "crop & rescale",
-                         patch: "patch the band", occluder: "occluder", full: "re-render" };
+    const SEAM_LABEL = { gradient: "gradient", roll: "roll",
+                         patch: "patch the band", occluder: "occluder" };
     async function runSeamRepair(mode) {
       const st = $("#seamStat");
       if (mode === "occluder" && !($("#seamOccluder").value || "").trim()) {
         st.innerHTML = `<span class="err">say what should stand on the seam first</span>`; return;
       }
       setStageBusy(true);
-      st.textContent = (mode === "gradient" || mode === "roll" || mode === "crop")
+      st.textContent = (mode === "gradient" || mode === "roll")
         ? "repairing…" : "seam-fixing… (~20s)";
       const body = SEAM_CTX === "room"
-        ? { chapter: CH, scenario: SC, roomKey: ROOM_KEY }
+        ? { chapter: CH, scenario: SC, roomKey: ROOM_KEY, file: VAR_FILE || undefined }
         : { chapter: CH, scenario: SC, image: DRAFT_IMG };
       Object.assign(body, { mode, pos: SEAM_POS, left: SEAM_L, right: SEAM_R, feather: featherParam(),
-                            occluder: ($("#seamOccluder").value || "").trim() });
+                            occluder: ($("#seamOccluder").value || "").trim(),
+                            editFrac: (+$("#seamEditFrac").value || 33) / 100 });
       const r = await postJSON(SEAM_CTX === "room" ? "/api/seamfix-room" : "/api/seamfix-scratch", body);
       if (!r || !r.ok) { st.innerHTML = `<span class="err">${escHtml((r && r.error) || "failed")}</span>`; setStageBusy(false); return; }
       if (r.instant) {                                   // no model involved — the file is already changed
@@ -900,7 +927,7 @@
     // whether a repair is even needed — and whether the one you just ran actually helped.
     async function refreshSeamMeasure() {
       const el = $("#seamReadout"); if (!el) return;
-      const body = SEAM_CTX === "room" ? { chapter: CH, scenario: SC, roomKey: ROOM_KEY, pos: SEAM_POS }
+      const body = SEAM_CTX === "room" ? { chapter: CH, scenario: SC, roomKey: ROOM_KEY, pos: SEAM_POS, file: VAR_FILE || undefined }
                                        : { chapter: CH, scenario: SC, image: DRAFT_IMG, pos: SEAM_POS };
       const m = await postJSON("/api/seam-measure", body);
       if (!m || !m.ok) { el.textContent = ""; return; }
@@ -912,7 +939,7 @@
     async function runSeamUndo() {
       const st = $("#seamStat"); setStageBusy(true);
       st.textContent = "undoing…";
-      const body = SEAM_CTX === "room" ? { chapter: CH, scenario: SC, roomKey: ROOM_KEY } : { chapter: CH, scenario: SC, image: DRAFT_IMG };
+      const body = SEAM_CTX === "room" ? { chapter: CH, scenario: SC, roomKey: ROOM_KEY, file: VAR_FILE || undefined } : { chapter: CH, scenario: SC, image: DRAFT_IMG };
       const r = await postJSON(SEAM_CTX === "room" ? "/api/seam-undo-room" : "/api/seam-undo-scratch", body);
       if (!r.ok) { st.innerHTML = `<span class="err">${escHtml(r.error || "failed")}</span>`; setStageBusy(false); return; }
       SEAM_DEPTH = r.depth || 0;
@@ -1341,6 +1368,8 @@
       const draft = DRAFT_IMG ? await RoomEditCore.loadDraft(ROOM_KEY, SCQ) : null;
       if (DRAFT_IMG) {
         IMG_URL = "/sfile/_scratch/" + encodeURIComponent(DRAFT_IMG) + "?t=" + Date.now() + (SCQ ? "&" + SCQ : "");
+      } else if (VAR_FILE) {
+        IMG_URL = "/sfile/" + ROOM_KEY + "/" + encodeURIComponent(VAR_FILE) + "?t=" + Date.now() + (SCQ ? "&" + SCQ : "");
       } else if (node && node.panorama) {
         IMG_URL = "/sfile/" + node.panorama + "?t=" + Date.now() + (SCQ ? "&" + SCQ : "");
       } else {
@@ -1348,7 +1377,18 @@
         return;
       }
       sel.closest(".row").style.display = "none";     // single fixed image in room mode
-      $("#panel h1").textContent = "Wrap · " + ROOM_KEY + (DRAFT_IMG ? " (draft)" : "");
+      $("#panel h1").textContent = "Wrap · " + ROOM_KEY +
+        (DRAFT_IMG ? " (draft)" : (VAR_FILE ? " · " + (VAR_STATE || VAR_FILE) : ""));
+      if (VAR_FILE) {
+        const n = document.createElement("div");
+        n.className = "hint";
+        n.style.cssText = "margin:6px 0 0";
+        n.innerHTML = "Editing the <b>" + (VAR_STATE || VAR_FILE) + "</b> variant. <b>Seam fixes apply to " +
+          "this image only</b>, with their own undo stack. <b>Wrap is the room's and is shared with every " +
+          "state</b> — one set of hotspot boxes serves them all, so changing it here changes the base too; " +
+          "it is shown so you can check the variant sits correctly under it.";
+        $("#panel h1").after(n);
+      }
       // per-candidate draft wins (draft.imgs[thisImage].wrap), then legacy top-level, then the node's
       const per = draft && draft.imgs && draft.imgs[DRAFT_IMG];
       const wi = (per && per.wrap) || (draft && draft.wrap) || (node && node.wrap);

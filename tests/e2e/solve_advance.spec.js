@@ -54,12 +54,16 @@ test("alaska room 1: correct MCQ logs the answer, swaps the door, and advances",
   await expect(opts).toHaveCount(info.nopts);
 
   // answer correctly and submit
+  const nbBefore = parseInt((/\((\d+)\)/.exec(
+    (await page.locator("#notebookCount").textContent()) || "") || [0, "0"])[1], 10);
   await opts.nth(info.correct).check();
   await page.locator("#modal .qsubmit").click();
   await expect(page.locator("#modal .qfeedback.ok")).toBeVisible({ timeout: 10_000 });
 
-  // the solve pipeline ran end-to-end: the confirmed answer auto-logged to the field notebook
-  await expect(page.locator("#notebookCount")).toHaveText(/\(1\)/, { timeout: 10_000 });
+  // the solve pipeline ran end-to-end: the confirmed answer auto-logged to the field notebook.
+  // Assert the DELTA, not an absolute — the engine auto-logs the opening `story` as "Your assignment" on
+  // entry, so the notebook is already non-empty before the first solve (which broke the old `(1)` here).
+  await expect(page.locator("#notebookCount")).toHaveText(new RegExp(`\\(${nbBefore + 1}\\)`), { timeout: 10_000 });
 
   // and the forward door swapped to its OPEN state (present in the DOM; may be rotated out of view)
   await expect(page.locator(".hsmark.door.open")).not.toHaveCount(0, { timeout: 10_000 });

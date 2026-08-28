@@ -6,7 +6,8 @@ authority: intent
 
 A living catalogue of **travel mechanics** for the CHEM 5725 escape rooms — *how the player moves between
 rooms and areas*, as distinct from the puzzles they solve once there. Sibling of `puzzle_inventory.md`
-(what you solve), `candidate_locations.md` (where you are), and `scenario_theme_ideas.md` (the premise).
+(what you solve), `candidate_locations.md` (where you are), `scenario_theme_ideas.md` (the premise), and
+`vibe_inventory.md` (what it looks like).
 Started 2026-07-25 (Lucas, session "Canyon"), because travel had been reinvented per-scenario and never
 collected in one place.
 
@@ -42,13 +43,31 @@ travel topology to match the setting's scale.
 | T2 | **Open maze (traversal ≠ progression)** | Every passage open from the start; the *ordering* is enforced on the puzzle hotspot (`availableWhen` + diegetic `lockedBody`), not the doors. Free Myst-style roaming. | squirrel (first intended consumer) | Yes, fully | **To build** — `availableWhen`/`lockedBody` on puzzle hotspots (`open_world_and_temporal_arc.md` item 1) |
 | T3 | **Hub-and-spoke arches** | A central hub; each arch is a doorway into a different area; you always return to the hub. | henges (arch hub into each henge) | Yes (via hub) | **Have** — door graph shape (hub node with N doors) |
 | T4 | **Teleport nodes** | Step through a portal / standing stone and you're elsewhere with no physical corridor between. Reads as magic; also the shape for a **single teleport-in room** in a big uniform setting. | henges (stone-to-stone); salt-flat / sea-of-cloud single rooms | Depends on graph | **Have** — cosmetically a door with no shared wall; single-room = a 1-node graph |
-| T5 | **Rail / car between stations** | A vehicle carries you station to station along a fixed line; naturally couples to an **elevation** climb. | trees (monorail, climbing the canopy) | Yes if line is bidirectional | **Have** — door reskin + the elevation arc in the scene prompts |
+| T5 | **Rail / car between stations** | A vehicle carries you station to station along a fixed line; naturally couples to an **elevation** climb. | **trees — SHIPPED 2026-08-27** (monorail, climbing the canopy; `status: "ready"`) · **subway (2026-08-12)**, proposed — see the distinctness note below | Yes if line is bidirectional | **Have** — door reskin + the elevation arc in the scene prompts. Shipped shape: one door + a three-position `dial` (up / **neutral** / down) that `resetOnEnter`s to neutral, so the car boards with its door shut; the door carries `availableWhen {ne:[key,"neutral"]}` and a state variant per direction. e2e-covered by the junction support in `tests/e2e/lib/playthrough.js` |
 | T6 | **Drift / vessel between islands** | A craft moves you across open space between discrete nodes (floating islands, rock islands). | airship (between floating islands); japan theme idea (rope bridges between rock islands) | Yes | **Have** — door reskin |
 | T7 | **Flight / vertical hops** | You move as a flying creature, tree-to-tree / ledge-to-ledge; movement is felt as *vertical* and free. | squirrel (the jay flitting; feeds the height-recognition escape) | Yes | **Have** — door reskin; pairs with T8 |
 | T8 | **Elevation-transition beat** | A short interstitial *before* each jump showing up / down / same-level, cumulatively teaching the relative heights of the places visited — the travel layer that *is* the escape's data source. | squirrel (heights → CLD grid escape) | Consistent by design (cumulative, not per-room) | **To build** — an `entry`-card variant with an up/down/level glyph (`puzzle_inventory.md` #18) |
-| T9 | **One-directional flow** *(proposed)* | A current / conveyance carries you *downstream only*; going back means a deliberate portage. Creates real tension with backtracking — the flow embodies an irreversible process. | *none yet* — candidate for canyon (river float) | Asymmetric (forward free, back costly) | **To build if wanted** — door graph where back-doors are gated/absent, or a portage sub-move |
+| T9 | **One-directional flow** *(proposed)* | A current / conveyance carries you *downstream only*; going back means a deliberate portage. Creates real tension with backtracking — the flow embodies an irreversible process. | *none yet* — candidate for canyon (river float); **first real candidate consumer: the canal boat** (2026-08-27) — see T13 | Asymmetric (forward free, back costly) | **To build if wanted** — door graph where back-doors are gated/absent, or a portage sub-move |
+| T13 | **Vessel-as-moving-hub, gated by level-locks** *(proposed 2026-08-27)* | The boat is your **persistent home** and the world scrolls past it; between stretches sits a **lock** — a chamber that raises or lowers you to the next level before the far gate will open. **A lock is the thing that DEFEATS T9**: it is how you go *uphill* against a one-directional flow, so the two mechanics are designed against each other rather than being variants. | *none yet* — **canal boat**, `modeling` scenario 1 (`scenario_theme_ideas.md`) | Yes — a lock works both ways, which is the point | **Mostly have** — the lock is a door reskin plus a **state-gated** far door; the lift/drop is T8's elevation beat. New work is only the level bookkeeping if the water budget is diegetic |
 | T10 | **Surprise scripted launch** *(proposed)* | The puzzles *prepare* a vehicle (fuel / align / arm a rocket); solving the last one TRIGGERS an **unannounced** one-way launch — a scripted, animated transition (the atmosphere zooming past the window, then space) rather than a door the player chooses to walk through. The reveal *is* the payoff. | *none yet* — rocket-prep concept (session "ideas", 2026-08-05) | No (one-way launch) | **To build** — an animated launch interstitial, NOT a door reskin: a scene-over-scene zoom/parallax transition fired on the final solve |
 | T11 | **Keyed vehicle unlock (inventory-gated route)** *(proposed)* | The player picks up a **key** early (a field-notebook item), then later finds a vehicle — a dirtbike or similar — whose route is sealed until that key is in inventory; turn the key, ride out somewhere new (a desert vista, a place off the map). Ties travel to the meta-inventory. | *none yet* — dirtbike/key concept (session "ideas", 2026-08-05) | Yes | **Mostly have** — a `clue` with `pickup`+`onPickup` sets a state flag; a door with `availableWhen` reads it (+ a `lockedBody` "locked — you need a key"). Reward scene is a door reskin |
+| T12 | **Vantage & instrument — observe instead of traverse** | You never travel an edge. You climb to **vantages** on foot and *sight* the network through an instrument (spyglass); what you can see from a post IS the data. In a sightline network **height determines degree**, so gaining elevation is data collection, not just transport. | beacons *(proposed 2026-08-12)* | Yes — vantages are plain walkable rooms | **Have** — walking is the plain door primitive; the instrument is a `clue`/puzzle hotspot. No new engine work |
+
+## T13 vs T6/T8 — the distinctness note (2026-08-27)
+
+Following the precedent set by the two forests in `candidate_locations.md` and by the **T5 two-user note**
+below, the separation is **stated deliberately rather than left to be noticed later**, because T13 borrows
+from two existing mechanics:
+
+- **vs T6 (drift / vessel between islands, `airship`).** T6's craft crosses **open, unstructured space**
+  between discrete nodes, and the crossing is a transition you sit through. T13's vessel travels a
+  **channel with a fixed topology** and is stopped at every level change by a gate that must be *worked*.
+  The airship also never changes level as a **gameplay** fact; the canal boat's whole progression is levels.
+- **vs T8 (elevation-transition beat, `squirrel`).** T8 is an **interstitial card** that quietly teaches
+  cumulative relative heights, and in `squirrel` those heights **are the escape's data source**. T13's lock
+  is a **place you stand in** while the level changes around you. If a canal scenario ever wants the
+  cumulative-height reading too, that is T8 *layered on* T13 — but it must not reuse squirrel's
+  heights-to-grid escape, or the two become the same puzzle.
 
 ## Backtrack-safe clock as a travel-shaped mechanic
 
@@ -125,6 +144,27 @@ Two travel mechanics riffed, not yet attached to a technique or scenario. Both a
   unlock pattern as the boss/escape meta-puzzles, but the payoff is *going somewhere* rather than *keying a
   code*. Mostly buildable today with `availableWhen` + `lockedBody` on the door reading the collected-key
   flag; the reward area is a plain scene reskin.
+
+
+## T5 has TWO users now — the distinctness note (2026-08-12)
+
+`trees` and `networks/subway` are both **rail between stations**, which is the closest the corpus comes to
+repeating a travel mechanic. Following the precedent `candidate_locations.md` set for the two forests
+(squirrel's real deciduous wood vs trees' alien canopy), the separation is stated deliberately rather than
+left to be noticed later:
+
+- **`trees`** — an **aerial** monorail through an alien glowing canopy. You ride *up*; the arc is elevation.
+  The car is transport: it takes you where the next puzzle is.
+- **`subway`** — **underground heavy goods rail** in a dead Victorian dye district. You ride *along*; there is
+  no elevation arc, because there is no sky. Three things make it a different mechanic in play, not just a
+  reskin:
+  1. **You must earn the right to DRIVE.** The engineer's compartment is locked; the puzzle opens it. Nearest
+     neighbour is T11 (keyed vehicle unlock), but the gate is a *graded puzzle*, not a carried key, and it
+     repeats once per line.
+  2. **A destination selector**, not a fixed route — a `dial` plus door `variants` (the monorail switch-door
+     primitive) lets one car go anywhere on its line.
+  3. **The ride itself carries the escape.** Two reused transit clips, one with a half-second sighting; the
+     act of travelling *is* the data collection, which is not true of any other T5 use.
 
 ## Notes
 - A travel mechanic graduates OUT of "proposed" when a scenario ships it — record the scenario + date in the

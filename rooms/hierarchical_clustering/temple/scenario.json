@@ -1,0 +1,1995 @@
+{
+  "status": "in_development",
+  "chapter": "hierarchical_clustering",
+  "scenario": "temple",
+  "id": 18,
+  "title": "The Register of the Gods",
+  "subtitle": "Hierarchical Clustering · hclust + cutree + summarise",
+  "story": "You are an apprentice to the keeper at the Temple of the Gods. The keeper died of a fever last month and with him were lost two important registers: which offering each shrine takes, and which god each shrine serves. According to custom, a temple whose keeper dies is closed forever — its fires never relit — unless the registers exist. You have until midday, when the sun is at its zenith and the shafts of light through the roof stand straight and touch the altar, to rebuild them. The evidence is still here — the residues in every vessel, the figures standing in every niche. Rebuild both registers, light the ring of fires at the altar so the temple is seen to be kept, and then cross the canopy bridge to the temple beyond and tell them the registers are in hand.",
+  "enterLabel": "Begin before midday →",
+  "done": {
+    "title": "The practical register is whole",
+    "body": "Every shrine, every offering, in your own hand — and two of them filed against the stone in the inner vault, because the vessels said so and the stone was only recording where things happen to stand. It is the smaller of the two books and the easier one. Outside, the shadow under the parapet has pulled in almost to nothing."
+  },
+  "escapeDone": {
+    "title": "Not closed",
+    "body": "Three groups, and the last one closes. Whatever the figures in those niches have been saying to each other for four hundred years, you have finally heard it. You tip the one flame you carried up out of the dark into the channel and it runs the whole ring, basin to basin, with the sun standing straight overhead and the whole green roof of the forest flat below. He taught you after all — he just did it by leaving everything exactly where it was."
+  },
+  "packages": [
+    "dplyr",
+    "ggplot2",
+    "readr"
+  ],
+  "setup": "suppressMessages({library(dplyr); library(ggplot2)})",
+  "state": {},
+  "datasets": [
+    {
+      "name": "temple_votive_residues",
+      "url": "data/temple_votive_residues.csv"
+    },
+    {
+      "name": "unknown_shrine",
+      "url": "data/unknown_shrine.csv"
+    }
+  ],
+  "ambient": "rays",
+  "music": "audio/eagle_feather_soul_of_the_earth.mp3",
+  "musicVolume": 0.15,
+  "fx": [],
+  "worldPlatePrompt": "A world-bible establishing plate for a LIVING, KEPT jungle temple, deep in rainforest, at harsh equatorial midday. This sanctuary was tended every day until a month ago, when its keeper died: it is swept, maintained and in use — NOT a ruin. Nothing has collapsed, there is no rubble, nothing is growing through the floor, and the forest is cut hard back and stops at the wall. One frame holding the whole world's vocabulary: massive warm honey-and-ochre limestone masonry, close-jointed and clean, its carved faces still crisp and still holding traces of painted plaster; a gallery of shallow shrine niches cut along the wall, each hung with a single banner of strong flat colour; small carved stone and clay votive figures standing in tidy rows on wiped niche ledges; lamps with trimmed wicks and shallow offering bowls set square before them, recently used and now cold; stoppered resin jars stacked in order along the floor; a low rough service crawl-way cut behind the wall at floor level — the one unfinished thing, its dust worn into a smooth path by daily passing; and hard white shafts of sunlight falling straight down through openings in the canopy far above, striking the floor in sharp bright pools. LIGHT: harsh, flat and OVERHEAD, high noon, hard-edged shafts and short shadows. Deliberately NOT golden hour, NOT dusk, NOT dawn, NOT lamplit — no warm amber wash anywhere, no firelight, no brass glow. PALETTE: RICH AND LUMINOUS, not grey and not washed-out — warm honey stone, deep wet greens in the forest beyond, real blue in the sky and in the shadows, clear water. The nine banners are the only PURE, fully saturated colour in the frame and nothing else competes with them for chroma, but everything else is still full of colour and light. Humid air, drifting spore and dust in the light shafts, water beading on stone. Painterly, cinematic, subtle film grain. No people, no lettering, no captions, no text, no readable writing, no signage, no UI.",
+  "coverPrompt": "Minimalist stylised thumbnail poster of a single shrine niche cut in a clean-jointed wall in green-grey stone: one strongly coloured banner above it, three small carved votive figures standing in a row on its ledge, a hard white bar of overhead sun falling across them, everything else desaturated green-grey and flat. No people, no lettering, no captions, no text, no readable writing, no signage, no UI.",
+  "debrief": {
+    "title": "",
+    "intro": ""
+  },
+  "rooms": [
+    {
+      "key": "gate_stair",
+      "title": "The outer stair",
+      "technique": "",
+      "puzzleType": 0,
+      "built": true,
+      "unlockedWhen": true,
+      "designNote": "",
+      "plannedHotspots": [
+        {
+          "type": "clue",
+          "label": "The unlabelled stores",
+          "note": "The season's offerings, every jar unlabelled — this is WHY rung 1 matters (the keeper drew for sister shrines from one jar). Flavour + motivation; no answer here.",
+          "body": "Jars to the roof, and not one label on any of them. What each shrine actually took is still crusted inside its own vessels, though, and every one has been scraped and measured — six substances, shrine by shrine.<br><br>That is the whole of the practical register: shrines that took the same offering leave the same residues, so shrines that belong together are the ones whose six numbers sit close together.<br><br>Here is what <code>str(temple_votive_residues)</code> shows — the shape of the record:<pre style=\"white-space:pre;overflow-x:auto;font:12px/1.45 ui-monospace,Menlo,Consolas,monospace;background:#08131c;color:#cfe6d8;padding:8px 10px;border-radius:6px;margin:8px 0 0\">tibble [9 x 8] (S3: tbl_df/tbl/data.frame)\n $ shrine      : chr [1:9] \"Ninestep\" \"Longshadow\" \"Brokenarch\" \"Deepwell\" ...\n $ wing        : chr [1:9] \"East\" \"East\" \"East\" \"West\" ...\n $ copal       : num [1:9] 38 36 42 34 6 5 7 5 6\n $ rubber_latex: num [1:9] 30 32 26 34 5 6 4 6 5\n $ cacao       : num [1:9] 6 5 7 6 7 6 8 46 43\n $ agave       : num [1:9] 5 6 4 5 4 5 5 30 33\n $ beeswax     : num [1:9] 12 12 11 12 45 42 47 7 7\n $ seed_oil    : num [1:9] 9 9 10 9 33 36 29 6 6</pre>"
+        },
+        {
+          "type": "door",
+          "label": "The way up into the gallery",
+          "to": "sun_gallery"
+        },
+        {
+          "type": "door",
+          "label": "The keepers' hatch",
+          "to": "root_crawl"
+        }
+      ],
+      "authoring": {
+        "sceneSpec": {
+          "room": "gate_stair",
+          "interior": false,
+          "seam": "a plain unbroken wall of wet green-grey masonry in flat forest shade, uniform and unlit",
+          "seamOccluder": "a plain square stone pier of the stair front, floor to canopy, clean-jointed and swept",
+          "setting": "the foot of the temple's outer stair on the rainforest floor — the viewer stands on broad root-split stone treads at the base of a stepped mass of green-grey masonry, dense wet forest pressing in on every side, a ragged hole in the canopy far above letting one hard column of noon sun down onto the stair",
+          "elements": [
+            {
+              "id": "gate_stair_wall_l",
+              "at": "on the far left",
+              "desc": "a plain unbroken wall of wet green-grey masonry in flat forest shade, uniform and unlit, the half of that one wall that meets its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "canopy_gap",
+              "at": "to the left",
+              "desc": "the ragged gap in the canopy overhead and the single hard white shaft of sun coming straight down through it onto the wet stone, thick with drifting spore",
+              "animate": {
+                "motion": "the low slanted sun-bars raking down through the canopy gap with the last of the night mist drifting slowly across them, thinning and gathering",
+                "loop": "crossfade"
+              }
+            },
+            {
+              "id": "offering_jars",
+              "at": "dead ahead in the centre",
+              "clue": true,
+              "label": "The unlabelled stores",
+              "desc": "the season's offering stores stacked against the wall — squat stoppered jars of resin and sealed gourds, ranked in rows, every one of them unlabelled"
+            },
+            {
+              "id": "gallery_door",
+              "at": "just right of centre",
+              "door": {
+                "direction": "open",
+                "to": "sun_gallery"
+              },
+              "label": "The way up into the gallery",
+              "desc": "a tall corbelled doorway at the head of the stair, opening inward, bright bars of sun falling across the floor somewhere beyond it"
+            },
+            {
+              "id": "crawl_hatch",
+              "at": "to the right",
+              "door": {
+                "direction": "open",
+                "to": "root_crawl"
+              },
+              "label": "The keepers' hatch",
+              "desc": "a low square hatch cut through the wall at tread level, its lintel worn smooth by generations of shoulders, roots hanging across the dark mouth of it"
+            },
+            {
+              "id": "gate_stair_wall_r",
+              "at": "on the far right",
+              "desc": "the same plain unbroken wall of wet green-grey masonry in flat forest shade, uniform and unlit, the other half of that one wall, joining cleanly at the seam directly behind you"
+            }
+          ],
+          "atmosphere": "EARLY MORNING. Low slanted shafts rake in through the canopy at a steep angle, long soft bars across the stair; cool blue shade everywhere they do not reach; the last of the night mist still burning off the forest floor in ragged drifts. Swept treads with only the morning's own leaf-fall just beginning to gather at the edges, a stack of fresh-cut thatch laid ready along the wall, two full water jars standing stoppered and upright, the forest cut hard back from the stair with the cut ends still green. Painterly, cinematic, subtle film grain. The nine shrine banners are the only PURE, fully saturated colour anywhere — nothing else competes with them for chroma — but the world around them is RICH AND ALIVE, not grey: warm honey-and-ochre limestone, deep wet greens in the forest, real blue in the sky and in the shadows, clear water, painted plaster still holding its colour. Colourful and luminous, never garish, and never washed-out. THE TEMPLE IS KEPT: in daily use until a month ago, swept and tended, nothing ruined, nothing collapsed, no rubble, no plants growing through the floor — the forest presses hard on the outside and stops at the wall. NO golden-hour orange wash, no amber lamplight bath, no firelight glow",
+          "negatives": "No people, no lettering, no captions, no text, no readable writing, no signage, no UI"
+        },
+        "scenePrompt": "This is a seamless 360-degree panorama from the foot of the temple's outer stair on the rainforest floor — the viewer stands on broad root-split stone treads at the base of a stepped mass of green-grey masonry, dense wet forest pressing in on every side, a ragged hole in the canopy far above letting one hard column of noon sun down onto the stair. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain unbroken wall of wet green-grey masonry in flat forest shade, uniform and unlit: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, a plain unbroken wall of wet green-grey masonry in flat forest shade, uniform and unlit, the half of that one wall that meets its other half cleanly at the seam directly behind you; to the left, the ragged gap in the canopy overhead and the single hard white shaft of sun coming straight down through it onto the wet stone, thick with drifting spore; dead ahead in the centre, the season's offering stores stacked against the wall — squat stoppered jars of resin and sealed gourds, ranked in rows, every one of them unlabelled; just right of centre, a tall corbelled doorway at the head of the stair, opening inward, bright bars of sun falling across the floor somewhere beyond it; to the right, a low square hatch cut through the wall at tread level, its lintel worn smooth by generations of shoulders, roots hanging across the dark mouth of it; on the far right, the same plain unbroken wall of wet green-grey masonry in flat forest shade, uniform and unlit, the other half of that one wall, joining cleanly at the seam directly behind you. EARLY MORNING. Low slanted shafts rake in through the canopy at a steep angle, long soft bars across the stair; cool blue shade everywhere they do not reach; the last of the night mist still burning off the forest floor in ragged drifts. Swept treads with only the morning's own leaf-fall just beginning to gather at the edges, a stack of fresh-cut thatch laid ready along the wall, two full water jars standing stoppered and upright, the forest cut hard back from the stair with the cut ends still green. Painterly, cinematic, subtle film grain. The nine shrine banners are the only PURE, fully saturated colour anywhere — nothing else competes with them for chroma — but the world around them is RICH AND ALIVE, not grey: warm honey-and-ochre limestone, deep wet greens in the forest, real blue in the sky and in the shadows, clear water, painted plaster still holding its colour. Colourful and luminous, never garish, and never washed-out. THE TEMPLE IS KEPT: in daily use until a month ago, swept and tended, nothing ruined, nothing collapsed, no rubble, no plants growing through the floor — the forest presses hard on the outside and stops at the wall. NO golden-hour orange wash, no amber lamplight bath, no firelight glow. No people, no lettering, no captions, no text, no readable writing, no signage, no UI. Again: the extreme left and right edges must align perfectly into a plain unbroken wall of wet green-grey masonry in flat forest shade, uniform and unlit, with no visible seam, join, or repetition.",
+        "hotspotsReviewed": true
+      },
+      "panorama": "gate_stair/scene.png",
+      "builtFrom": "l1_gate_stair_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "hotspots": [
+        {
+          "id": "canopy_gap",
+          "type": "ambient",
+          "label": "the ragged gap in the canopy overhead and the single hard wh",
+          "box": [
+            0.1047,
+            0,
+            0.3394,
+            0.7276
+          ]
+        },
+        {
+          "id": "offering_jars",
+          "type": "clue",
+          "label": "The unlabelled stores",
+          "box": [
+            0.2923,
+            0.3436,
+            0.5333,
+            0.6885
+          ],
+          "body": "Jars upon jars, but not one label on any of them. What each shrine actually required is only indicated by what is crusted inside its own vessels. Every one has been scraped and measured — six substances, shrine by shrine.<br><br>That is the whole of the practical register: shrines that took the same offering leave the same residues, so shrines that belong together are the ones whose six numbers sit close together.<br><br>Here is what <code>str(temple_votive_residues)</code> shows — the shape of the record:<pre style=\"white-space:pre;overflow-x:auto;font:12px/1.45 ui-monospace,Menlo,Consolas,monospace;background:#08131c;color:#cfe6d8;padding:8px 10px;border-radius:6px;margin:8px 0 0\">tibble [9 x 8] (S3: tbl_df/tbl/data.frame) $ shrine : chr [1:9] \"Ninestep\" \"Longshadow\" \"Brokenarch\" \"Deepwell\" ... $ wing : chr [1:9] \"East\" \"East\" \"East\" \"West\" ... $ copal : num [1:9] 38 36 42 34 6 5 7 5 6 $ rubber_latex: num [1:9] 30 32 26 34 5 6 4 6 5 $ cacao : num [1:9] 6 5 7 6 7 6 8 46 43 $ agave : num [1:9] 5 6 4 5 4 5 5 30 33 $ beeswax : num [1:9] 12 12 11 12 45 42 47 7 7 $ seed_oil : num [1:9] 9 9 10 9 33 36 29 6 6</pre>"
+        },
+        {
+          "id": "gallery_door",
+          "type": "door",
+          "label": "The way up into the gallery",
+          "box": [
+            0.5632,
+            0.3505,
+            0.6061,
+            0.6337
+          ],
+          "direction": "open",
+          "to": "sun_gallery"
+        },
+        {
+          "id": "crawl_hatch",
+          "type": "door",
+          "label": "The keepers' hatch",
+          "box": [
+            0.6972,
+            0.5989,
+            0.7425,
+            0.7507
+          ],
+          "direction": "open",
+          "to": "root_crawl"
+        }
+      ],
+      "sfx": [
+        {
+          "src": "audio/gate_stair_jungle_floor.mp3",
+          "volume": 0.22,
+          "mode": "loop"
+        },
+        {
+          "src": "audio/gate_stair_bird.mp3",
+          "volume": 0.16,
+          "mode": "interval",
+          "gapMin": 14,
+          "gapMax": 32
+        }
+      ]
+    },
+    {
+      "key": "sun_gallery",
+      "title": "The sun gallery",
+      "technique": "",
+      "puzzleType": 0,
+      "built": true,
+      "unlockedWhen": true,
+      "designNote": "",
+      "plannedHotspots": [
+        {
+          "type": "puzzle",
+          "label": "The gallery reading-table",
+          "note": "RUNG 1 — nearest relative of Ninestep -> Longshadow (d 3.16; runner-up Deepwell 79% further). Distractors: Deepwell, Brokenarch, Redsill, Highgate, Palewall, Quietfloor, Lastcourt."
+        },
+        {
+          "type": "clue",
+          "label": "The crimson niche",
+          "note": "Ninestep — frog, shell, rain-jar. LEDGER evidence; no chemistry here.",
+          "image": "figures/ninestep.png",
+          "body": "Three votive figures on the ledge under the crimson banner, and nothing anywhere in the niche to say which god they stood for.<br><br><em>Take the plate with you. One niche on its own says nothing; they only mean something set beside each other.</em>"
+        },
+        {
+          "type": "clue",
+          "label": "The orange niche",
+          "note": "Longshadow — brazier, maize-cake, spindle-whorl. LEDGER evidence.",
+          "image": "figures/longshadow.png",
+          "body": "Three votive figures on the ledge under the orange banner, and nothing anywhere in the niche to say which god they stood for."
+        },
+        {
+          "type": "door",
+          "label": "The way back down the stair",
+          "to": "gate_stair"
+        },
+        {
+          "type": "door",
+          "label": "The gallery running on",
+          "to": "long_gallery"
+        }
+      ],
+      "authoring": {
+        "sceneSpec": {
+          "room": "sun_gallery",
+          "interior": true,
+          "seam": "a plain unbroken stretch of green-grey stone wall in flat shade, uniform, unlit and featureless",
+          "seamOccluder": "a plain square stone pier, floor to ceiling, clean-jointed and swept",
+          "setting": "a long gallery inside the temple, its roof pierced by a row of open light-holes — the viewer stands on a stone floor striped with hard bars of overhead sun falling through the holes, EXACTLY TWO shrine niches cut into the inner wall and NO OTHERS — the rest of the wall is blank stone, with no further niches, banners or alcoves anywhere in the room The room is still ROOFED overhead — heavy stone slabs and beams span the ceiling and are clearly visible above; the daylight comes in through breaks and holes in that roof, not from an open sky. This is an interior, not a courtyard.",
+          "elements": [
+            {
+              "id": "sun_gallery_wall_l",
+              "at": "on the far left",
+              "desc": "a plain unbroken stretch of green-grey stone wall in flat shade, featureless and unlit, the half of that one wall that meets its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "niche_ninestep",
+              "at": "to the left",
+              "clue": true,
+              "label": "The crimson niche",
+              "desc": "a shallow shrine niche cut into the wall, hung with a crimson banner, holding a stone frog, a spiral shell, and a stoppered rain-jar standing in a row on its ledge, with a soot-blackened lamp and a shallow libation bowl set before them"
+            },
+            {
+              "id": "niche_longshadow",
+              "at": "to the left of centre",
+              "clue": true,
+              "label": "The orange niche",
+              "desc": "a shallow shrine niche cut into the wall, hung with a orange banner, holding a clay brazier, a moulded maize-cake, and a spindle-whorl standing in a row on its ledge, with a soot-blackened lamp and a shallow libation bowl set before them",
+              "animate": {
+                "motion": "the banner lifting and settling slowly in the draught coming down through the roof-holes",
+                "loop": "boomerang"
+              }
+            },
+            {
+              "id": "table_sun",
+              "at": "dead ahead in the centre",
+              "puzzle": true,
+              "label": "The gallery reading-table",
+              "desc": "a low stone work-table standing in one of the bright bars of sun, set with a pane of glowing glass, potsherds and scrapings laid out on it in a careful row"
+            },
+            {
+              "id": "back_stair",
+              "at": "just right of centre",
+              "door": {
+                "direction": "back",
+                "to": "gate_stair"
+              },
+              "label": "The way back down the stair",
+              "desc": "the corbelled doorway back out to the head of the stair, green forest light in it"
+            },
+            {
+              "id": "on_gallery",
+              "at": "to the right",
+              "door": {
+                "direction": "open",
+                "to": "long_gallery"
+              },
+              "label": "The gallery running on",
+              "desc": "the gallery continuing away into flat green shade, more niches faintly visible along it"
+            },
+            {
+              "id": "sun_gallery_wall_r",
+              "at": "on the far right",
+              "desc": "the same plain unbroken stretch of green-grey stone wall in flat shade, featureless and unlit, the other half of that one wall, joining cleanly at the seam directly behind you"
+            }
+          ],
+          "atmosphere": "MID-MORNING. Bright hard-edged bars of sun stand at a slant through the roof holes and lie in sharp lozenges across the floor; the room reads clearly corner to corner. The floor swept clean and still faintly damp from it, the ledges wiped, a broom stood where someone set it down, cut flowers going over in a bowl of water at one end. Painterly, cinematic, subtle film grain. The nine shrine banners are the only PURE, fully saturated colour anywhere — nothing else competes with them for chroma — but the world around them is RICH AND ALIVE, not grey: warm honey-and-ochre limestone, deep wet greens in the forest, real blue in the sky and in the shadows, clear water, painted plaster still holding its colour. Colourful and luminous, never garish, and never washed-out. THE TEMPLE IS KEPT: in daily use until a month ago, swept and tended, nothing ruined, nothing collapsed, no rubble, no plants growing through the floor — the forest presses hard on the outside and stops at the wall. NO golden-hour orange wash, no amber lamplight bath, no firelight glow",
+          "negatives": "No people, no lettering, no captions, no text, no readable writing, no signage, no UI"
+        },
+        "scenePrompt": "This is a seamless 360-degree panorama from a long gallery inside the temple, its roof pierced by a row of open light-holes — the viewer stands on a stone floor striped with hard bars of overhead sun falling through the holes, EXACTLY TWO shrine niches cut into the inner wall and NO OTHERS — the rest of the wall is blank stone, with no further niches, banners or alcoves anywhere in the room The room is still ROOFED overhead — heavy stone slabs and beams span the ceiling and are clearly visible above; the daylight comes in through breaks and holes in that roof, not from an open sky. This is an interior, not a courtyard.. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain unbroken stretch of green-grey stone wall in flat shade, uniform, unlit and featureless: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, a plain unbroken stretch of green-grey stone wall in flat shade, featureless and unlit, the half of that one wall that meets its other half cleanly at the seam directly behind you; to the left, a shallow shrine niche cut into the wall, hung with a crimson banner, holding a stone frog, a spiral shell, and a stoppered rain-jar standing in a row on its ledge, with a soot-blackened lamp and a shallow libation bowl set before them; to the left of centre, a shallow shrine niche cut into the wall, hung with a orange banner, holding a clay brazier, a moulded maize-cake, and a spindle-whorl standing in a row on its ledge, with a soot-blackened lamp and a shallow libation bowl set before them; dead ahead in the centre, a low stone work-table standing in one of the bright bars of sun, set with a pane of glowing glass, potsherds and scrapings laid out on it in a careful row; just right of centre, the corbelled doorway back out to the head of the stair, green forest light in it; to the right, the gallery continuing away into flat green shade, more niches faintly visible along it; on the far right, the same plain unbroken stretch of green-grey stone wall in flat shade, featureless and unlit, the other half of that one wall, joining cleanly at the seam directly behind you. MID-MORNING. Bright hard-edged bars of sun stand at a slant through the roof holes and lie in sharp lozenges across the floor; the room reads clearly corner to corner. The floor swept clean and still faintly damp from it, the ledges wiped, a broom stood where someone set it down, cut flowers going over in a bowl of water at one end. Painterly, cinematic, subtle film grain. The nine shrine banners are the only PURE, fully saturated colour anywhere — nothing else competes with them for chroma — but the world around them is RICH AND ALIVE, not grey: warm honey-and-ochre limestone, deep wet greens in the forest, real blue in the sky and in the shadows, clear water, painted plaster still holding its colour. Colourful and luminous, never garish, and never washed-out. THE TEMPLE IS KEPT: in daily use until a month ago, swept and tended, nothing ruined, nothing collapsed, no rubble, no plants growing through the floor — the forest presses hard on the outside and stops at the wall. NO golden-hour orange wash, no amber lamplight bath, no firelight glow. No people, no lettering, no captions, no text, no readable writing, no signage, no UI. Again: the extreme left and right edges must align perfectly into a plain unbroken stretch of green-grey stone wall in flat shade, uniform, unlit and featureless, with no visible seam, join, or repetition.",
+        "hotspotsReviewed": true
+      },
+      "panorama": "sun_gallery/scene.png",
+      "builtFrom": "l1_sun_gallery_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -4.9
+      },
+      "hotspots": [
+        {
+          "id": "niche_ninestep",
+          "type": "clue",
+          "label": "The crimson niche",
+          "box": [
+            0.2036,
+            0.2816,
+            0.2888,
+            0.6505
+          ],
+          "image": "figures/ninestep.png",
+          "body": "Three votive figures on the ledge under the crimson banner, and nothing anywhere in the niche to say which god they stood for.<br><br><em>Take the plate with you. One niche on its own says nothing; they only mean something set beside each other.</em>",
+          "pickup": "The crimson niche: see the plate."
+        },
+        {
+          "id": "niche_longshadow",
+          "type": "clue",
+          "label": "The orange niche",
+          "box": [
+            0.3413,
+            0.2681,
+            0.428,
+            0.7023
+          ],
+          "image": "figures/longshadow.png",
+          "body": "Three votive figures on the ledge under the orange banner, and nothing anywhere in the niche to say which god they stood for.",
+          "pickup": "The orange niche: see the plate."
+        },
+        {
+          "id": "table_sun",
+          "type": "puzzle",
+          "label": "The gallery reading-table",
+          "box": [
+            0.4662,
+            0.5032,
+            0.5401,
+            0.776
+          ],
+          "starterCode": "temple_votive_residues",
+          "question": {
+            "prompt": "He drew for sister shrines from a single jar, so the offering laid down at Ninestep is kin to the offering at exactly one other shrine. Which shrine is it?",
+            "options": [
+              "Deepwell",
+              "Brokenarch",
+              "Longshadow",
+              "Palewall",
+              "Highgate",
+              "Redsill",
+              "Lastcourt",
+              "Quietfloor"
+            ],
+            "correct": 2,
+            "maxAttempts": 4,
+            "feedback": {
+              "correct": "Correct — noted: Ninestep's nearest kin is Longshadow.",
+              "wrong": [
+                "Every shrine is six numbers. Two shrines are kin when those six sets of numbers sit closest together — so measure the distance from Ninestep to each of the others.",
+                "`dist()` on the six residue columns gives you every pairwise distance at once; read the row for Ninestep and take its smallest entry.",
+                "Three shrines sit close to Ninestep and five sit far away. Among the close three, one is clearly nearer than the rest — that is the sister, not merely a near neighbour."
+              ]
+            }
+          },
+          "solveSfx": {
+            "src": "audio/solve_sun_gallery.mp3",
+            "volume": 0
+          }
+        },
+        {
+          "id": "back_stair",
+          "type": "door",
+          "label": "The way back down the stair",
+          "box": [
+            0.5842,
+            0.2502,
+            0.6781,
+            0.7472
+          ],
+          "direction": "back",
+          "to": "gate_stair"
+        },
+        {
+          "id": "on_gallery",
+          "type": "door",
+          "label": "The gallery running on",
+          "box": [
+            0.7557,
+            0.297,
+            0.8369,
+            0.7205
+          ],
+          "direction": "open",
+          "to": "long_gallery"
+        }
+      ],
+      "sfx": [
+        {
+          "src": "audio/sun_gallery_jungle_muffled.mp3",
+          "volume": 0.06,
+          "mode": "loop",
+          "needsReplacement": true
+        }
+      ],
+      "entry": {
+        "title": "The one shrine you know",
+        "text": ""
+      }
+    },
+    {
+      "key": "long_gallery",
+      "title": "The far gallery",
+      "technique": "",
+      "puzzleType": 0,
+      "built": true,
+      "unlockedWhen": true,
+      "designNote": "",
+      "plannedHotspots": [
+        {
+          "type": "clue",
+          "label": "The magenta niche",
+          "note": "Brokenarch — seed-pod, monkey, macaw. LEDGER evidence.",
+          "image": "figures/brokenarch.png",
+          "body": "Three votive figures on the ledge under the magenta banner, and nothing anywhere in the niche to say which god they stood for."
+        },
+        {
+          "type": "clue",
+          "label": "The violet niche",
+          "note": "Palewall — seed-pod, macaw, bee. LEDGER evidence.",
+          "image": "figures/palewall.png",
+          "body": "Three votive figures on the ledge under the violet banner, and nothing anywhere in the niche to say which god they stood for."
+        },
+        {
+          "type": "door",
+          "label": "The gallery back to the sun",
+          "to": "sun_gallery"
+        }
+      ],
+      "authoring": {
+        "sceneSpec": {
+          "room": "long_gallery",
+          "interior": true,
+          "seam": "a plain unbroken stretch of green-grey stone wall in flat shade, uniform, unlit and featureless",
+          "seamOccluder": "a plain square stone pier, floor to ceiling, clean-jointed and swept",
+          "setting": "the far end of the long gallery, where the roof is still whole — the viewer stands on damp stone in flat green shade with no shaft reaching this deep, EXACTLY TWO shrine niches and no others. The room is still ROOFED overhead — heavy stone slabs and beams span the ceiling and are clearly visible above; the daylight comes in through breaks and holes in that roof, not from an open sky. This is an interior, not a courtyard.",
+          "elements": [
+            {
+              "id": "long_gallery_wall_l",
+              "at": "on the far left",
+              "desc": "a plain unbroken stretch of green-grey stone wall in flat shade, featureless and unlit, the half of that one wall that meets its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "niche_brokenarch",
+              "at": "to the left",
+              "clue": true,
+              "label": "The magenta niche",
+              "desc": "a shallow shrine niche cut into the wall, hung with a magenta banner, holding a carved seed-pod, a small monkey, and a macaw standing in a row on its ledge, with a soot-blackened lamp and a shallow libation bowl set before them"
+            },
+            {
+              "id": "root_curtain",
+              "at": "to the left of centre",
+              "desc": "a curtain of fine pale roots hanging down through a crack in the ceiling slabs, trembling in the draught from the gallery",
+              "animate": {
+                "motion": "the hanging curtain of fine roots swaying slowly in the draught",
+                "loop": "boomerang"
+              }
+            },
+            {
+              "id": "niche_palewall",
+              "at": "dead ahead in the centre",
+              "clue": true,
+              "label": "The violet niche",
+              "desc": "a shallow shrine niche cut into the wall, hung with a violet banner, holding a carved seed-pod, a macaw, and a clay bee standing in a row on its ledge, with a soot-blackened lamp and a shallow libation bowl set before them"
+            },
+            {
+              "id": "back_gallery",
+              "at": "to the right",
+              "door": {
+                "direction": "back",
+                "to": "sun_gallery"
+              },
+              "label": "The gallery back to the sun",
+              "desc": "the gallery running back the way you came, bright bars of sun at the far end of it"
+            },
+            {
+              "id": "long_gallery_wall_r",
+              "at": "on the far right",
+              "desc": "the same plain unbroken stretch of green-grey stone wall in flat shade, featureless and unlit, the other half of that one wall, joining cleanly at the seam directly behind you"
+            }
+          ],
+          "atmosphere": "DEEP INSIDE, no shaft reaches here. Everything is lit by GREEN light bounced off the foliage outside — cool, even, underwater-ish, perfectly readable but sunless. The flags swept and dark with damp, wall joints clear, a folded cloth and a bowl of clean water left on a bench exactly where the last wiping stopped a month ago. Painterly, cinematic, subtle film grain. The nine shrine banners are the only PURE, fully saturated colour anywhere — nothing else competes with them for chroma — but the world around them is RICH AND ALIVE, not grey: warm honey-and-ochre limestone, deep wet greens in the forest, real blue in the sky and in the shadows, clear water, painted plaster still holding its colour. Colourful and luminous, never garish, and never washed-out. THE TEMPLE IS KEPT: in daily use until a month ago, swept and tended, nothing ruined, nothing collapsed, no rubble, no plants growing through the floor — the forest presses hard on the outside and stops at the wall. NO golden-hour orange wash, no amber lamplight bath, no firelight glow",
+          "negatives": "No people, no lettering, no captions, no text, no readable writing, no signage, no UI"
+        },
+        "scenePrompt": "This is a seamless 360-degree panorama from the far end of the long gallery, where the roof is still whole — the viewer stands on damp stone in flat green shade with no shaft reaching this deep, EXACTLY TWO shrine niches and no others. The room is still ROOFED overhead — heavy stone slabs and beams span the ceiling and are clearly visible above; the daylight comes in through breaks and holes in that roof, not from an open sky. This is an interior, not a courtyard.. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain unbroken stretch of green-grey stone wall in flat shade, uniform, unlit and featureless: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, a plain unbroken stretch of green-grey stone wall in flat shade, featureless and unlit, the half of that one wall that meets its other half cleanly at the seam directly behind you; to the left, a shallow shrine niche cut into the wall, hung with a magenta banner, holding a carved seed-pod, a small monkey, and a macaw standing in a row on its ledge, with a soot-blackened lamp and a shallow libation bowl set before them; to the left of centre, a curtain of fine pale roots hanging down through a crack in the ceiling slabs, trembling in the draught from the gallery; dead ahead in the centre, a shallow shrine niche cut into the wall, hung with a violet banner, holding a carved seed-pod, a macaw, and a clay bee standing in a row on its ledge, with a soot-blackened lamp and a shallow libation bowl set before them; to the right, the gallery running back the way you came, bright bars of sun at the far end of it; on the far right, the same plain unbroken stretch of green-grey stone wall in flat shade, featureless and unlit, the other half of that one wall, joining cleanly at the seam directly behind you. DEEP INSIDE, no shaft reaches here. Everything is lit by GREEN light bounced off the foliage outside — cool, even, underwater-ish, perfectly readable but sunless. The flags swept and dark with damp, wall joints clear, a folded cloth and a bowl of clean water left on a bench exactly where the last wiping stopped a month ago. Painterly, cinematic, subtle film grain. The nine shrine banners are the only PURE, fully saturated colour anywhere — nothing else competes with them for chroma — but the world around them is RICH AND ALIVE, not grey: warm honey-and-ochre limestone, deep wet greens in the forest, real blue in the sky and in the shadows, clear water, painted plaster still holding its colour. Colourful and luminous, never garish, and never washed-out. THE TEMPLE IS KEPT: in daily use until a month ago, swept and tended, nothing ruined, nothing collapsed, no rubble, no plants growing through the floor — the forest presses hard on the outside and stops at the wall. NO golden-hour orange wash, no amber lamplight bath, no firelight glow. No people, no lettering, no captions, no text, no readable writing, no signage, no UI. Again: the extreme left and right edges must align perfectly into a plain unbroken stretch of green-grey stone wall in flat shade, uniform, unlit and featureless, with no visible seam, join, or repetition.",
+        "hotspotsReviewed": true
+      },
+      "panorama": "long_gallery/scene.png",
+      "builtFrom": "l1_long_gallery_2.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "hotspots": [
+        {
+          "id": "niche_brokenarch",
+          "type": "clue",
+          "label": "The magenta niche",
+          "box": [
+            0.1882,
+            0.2572,
+            0.299,
+            0.7055
+          ],
+          "image": "figures/brokenarch.png",
+          "body": "Three votive figures on the ledge under the magenta banner, and nothing anywhere in the niche to say which god they stood for.",
+          "pickup": "The magenta niche: see the plate."
+        },
+        {
+          "id": "root_curtain",
+          "type": "ambient",
+          "label": "a curtain of fine pale roots hanging down through a crack in",
+          "box": [
+            0.337,
+            0.1575,
+            0.4973,
+            0.8035
+          ]
+        },
+        {
+          "id": "niche_palewall",
+          "type": "clue",
+          "label": "The violet niche",
+          "box": [
+            0.5461,
+            0.2696,
+            0.644,
+            0.6985
+          ],
+          "image": "figures/palewall.png",
+          "body": "Three votive figures on the ledge under the violet banner, and nothing anywhere in the niche to say which god they stood for.",
+          "pickup": "The violet niche: see the plate."
+        },
+        {
+          "id": "back_gallery",
+          "type": "door",
+          "label": "The gallery back to the sun",
+          "box": [
+            0.7058,
+            0.2553,
+            0.8142,
+            0.7089
+          ],
+          "direction": "back",
+          "to": "sun_gallery"
+        }
+      ],
+      "sfx": [
+        {
+          "src": "audio/long_gallery_stone_tone.mp3",
+          "volume": 0.18,
+          "mode": "loop"
+        },
+        {
+          "src": "audio/long_gallery_insects.mp3",
+          "volume": 0.12,
+          "mode": "interval",
+          "gapMin": 18,
+          "gapMax": 40
+        }
+      ],
+      "entry": {
+        "title": "The far gallery",
+        "text": ""
+      }
+    },
+    {
+      "key": "root_crawl",
+      "title": "The keepers' crawl",
+      "technique": "",
+      "puzzleType": 0,
+      "built": true,
+      "unlockedWhen": true,
+      "designNote": "",
+      "plannedHotspots": [
+        {
+          "type": "door",
+          "label": "The hatch back to the stair",
+          "to": "gate_stair"
+        },
+        {
+          "type": "door",
+          "label": "The hatch to the lamp hall",
+          "to": "lamp_hall"
+        },
+        {
+          "type": "door",
+          "label": "The hatch to the cistern",
+          "to": "cistern_stair"
+        },
+        {
+          "type": "door",
+          "label": "The hatch to the inner vault",
+          "to": "inner_vault"
+        }
+      ],
+      "authoring": {
+        "sceneSpec": {
+          "room": "root_crawl",
+          "interior": true,
+          "seam": "a plain unbroken stretch of green-grey stone wall in flat shade, uniform, unlit and featureless",
+          "seamOccluder": "a plain square stone pier, floor to ceiling, clean-jointed and swept",
+          "setting": "inside the temple's service crawl-way — the viewer is down at floor level in a low passage cut behind the walls, barely tall enough to kneel in, dressed stone above and worn smooth below, pale roots forced through the joints, hatches opening off it in several directions",
+          "elements": [
+            {
+              "id": "root_crawl_wall_l",
+              "at": "on the far left",
+              "desc": "a plain unbroken stretch of green-grey stone wall in flat shade, featureless and unlit, the half of that one wall that meets its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "crack_shaft",
+              "at": "to the left",
+              "desc": "a single thin blade of white sun coming through a crack in the slabs overhead and lying across the passage floor, everything either side of it in near-dark",
+              "animate": {
+                "motion": "dust turning slowly through the thin blade of light",
+                "loop": "crossfade"
+              }
+            },
+            {
+              "id": "hatch_stair",
+              "at": "to the left of centre",
+              "door": {
+                "direction": "back",
+                "to": "gate_stair"
+              },
+              "label": "The hatch back to the stair",
+              "desc": "a low hatch with green forest light in it"
+            },
+            {
+              "id": "hatch_lamps",
+              "at": "dead ahead in the centre",
+              "door": {
+                "direction": "open",
+                "to": "lamp_hall"
+              },
+              "label": "The hatch to the lamp hall",
+              "desc": "a low hatch ahead, a wide pale glow of daylight beyond it"
+            },
+            {
+              "id": "hatch_cistern",
+              "at": "just right of centre",
+              "door": {
+                "direction": "open",
+                "to": "cistern_stair"
+              },
+              "label": "The hatch to the cistern",
+              "desc": "a low hatch with cool damp air coming through it and wet steps beyond"
+            },
+            {
+              "id": "hatch_vault",
+              "at": "to the right",
+              "door": {
+                "direction": "open",
+                "to": "inner_vault"
+              },
+              "label": "The hatch to the inner vault",
+              "desc": "a low hatch, older than the others and cut with far more care, its lintel carved"
+            },
+            {
+              "id": "root_crawl_wall_r",
+              "at": "on the far right",
+              "desc": "the same plain unbroken stretch of green-grey stone wall in flat shade, featureless and unlit, the other half of that one wall, joining cleanly at the seam directly behind you"
+            }
+          ],
+          "atmosphere": "NEARLY DARK. One thin blade of white sun through a crack overhead, and the faint grey glow of the hatches; everything else in deep close shadow. A working service way, never dressed for anyone: bare rough-cut stone, pale roots forced through the joints overhead, and the floor dust smoothed into a shallow worn path straight down the middle by years of the keeper's own passing. Painterly, cinematic, subtle film grain. The nine shrine banners are the only PURE, fully saturated colour anywhere — nothing else competes with them for chroma — but the world around them is RICH AND ALIVE, not grey: warm honey-and-ochre limestone, deep wet greens in the forest, real blue in the sky and in the shadows, clear water, painted plaster still holding its colour. Colourful and luminous, never garish, and never washed-out. THE TEMPLE IS KEPT, but this crawl-way is the one place never dressed for anyone: rough cut stone and pale roots through the joints overhead are RIGHT here, and it is worn and used, not derelict — no rubble, nothing collapsed. Same warm stone, richly lit by what little light reaches it, never grey or washed-out. NO golden-hour orange wash, no amber lamplight bath, no firelight glow",
+          "negatives": "No people, no lettering, no captions, no text, no readable writing, no signage, no UI"
+        },
+        "scenePrompt": "This is a seamless 360-degree panorama from inside the temple's service crawl-way — the viewer is down at floor level in a low passage cut behind the walls, barely tall enough to kneel in, dressed stone above and worn smooth below, pale roots forced through the joints, hatches opening off it in several directions. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain unbroken stretch of green-grey stone wall in flat shade, uniform, unlit and featureless: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, a plain unbroken stretch of green-grey stone wall in flat shade, featureless and unlit, the half of that one wall that meets its other half cleanly at the seam directly behind you; to the left, a single thin blade of white sun coming through a crack in the slabs overhead and lying across the passage floor, everything either side of it in near-dark; to the left of centre, a low hatch with green forest light in it; dead ahead in the centre, a low hatch ahead, a wide pale glow of daylight beyond it; just right of centre, a low hatch with cool damp air coming through it and wet steps beyond; to the right, a low hatch, older than the others and cut with far more care, its lintel carved; on the far right, the same plain unbroken stretch of green-grey stone wall in flat shade, featureless and unlit, the other half of that one wall, joining cleanly at the seam directly behind you. NEARLY DARK. One thin blade of white sun through a crack overhead, and the faint grey glow of the hatches; everything else in deep close shadow. A working service way, never dressed for anyone: bare rough-cut stone, pale roots forced through the joints overhead, and the floor dust smoothed into a shallow worn path straight down the middle by years of the keeper's own passing. Painterly, cinematic, subtle film grain. The nine shrine banners are the only PURE, fully saturated colour anywhere — nothing else competes with them for chroma — but the world around them is RICH AND ALIVE, not grey: warm honey-and-ochre limestone, deep wet greens in the forest, real blue in the sky and in the shadows, clear water, painted plaster still holding its colour. Colourful and luminous, never garish, and never washed-out. THE TEMPLE IS KEPT, but this crawl-way is the one place never dressed for anyone: rough cut stone and pale roots through the joints overhead are RIGHT here, and it is worn and used, not derelict — no rubble, nothing collapsed. Same warm stone, richly lit by what little light reaches it, never grey or washed-out. NO golden-hour orange wash, no amber lamplight bath, no firelight glow. No people, no lettering, no captions, no text, no readable writing, no signage, no UI. Again: the extreme left and right edges must align perfectly into a plain unbroken stretch of green-grey stone wall in flat shade, uniform, unlit and featureless, with no visible seam, join, or repetition.",
+        "hotspotsReviewed": true
+      },
+      "panorama": "root_crawl/scene.png",
+      "builtFrom": "l1_root_crawl_2.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": 3,
+        "pitch": 2.3
+      },
+      "hotspots": [
+        {
+          "id": "crack_shaft",
+          "type": "ambient",
+          "label": "a single thin blade of white sun coming through a crack in t",
+          "box": [
+            0.179,
+            0.0838,
+            0.3394,
+            0.9652
+          ]
+        },
+        {
+          "id": "hatch_stair",
+          "type": "door",
+          "label": "The hatch back to the stair",
+          "box": [
+            0.2519,
+            0.477,
+            0.3118,
+            0.6657
+          ],
+          "direction": "back",
+          "to": "gate_stair"
+        },
+        {
+          "id": "hatch_lamps",
+          "type": "door",
+          "label": "The hatch to the lamp hall",
+          "box": [
+            0.4564,
+            0.4705,
+            0.5374,
+            0.6728
+          ],
+          "direction": "open",
+          "to": "lamp_hall"
+        },
+        {
+          "id": "hatch_cistern",
+          "type": "door",
+          "label": "The hatch to the cistern",
+          "box": [
+            0.5664,
+            0.4353,
+            0.6533,
+            0.6923
+          ],
+          "direction": "open",
+          "to": "cistern_stair"
+        },
+        {
+          "id": "hatch_vault",
+          "type": "door",
+          "label": "The hatch to the inner vault",
+          "box": [
+            0.6951,
+            0.4192,
+            0.7865,
+            0.6938
+          ],
+          "direction": "open",
+          "to": "inner_vault"
+        }
+      ],
+      "sfx": [
+        {
+          "src": "audio/root_crawl_close_tone.mp3",
+          "volume": 0.2,
+          "mode": "loop"
+        }
+      ],
+      "entry": {
+        "title": "The keepers' crawl",
+        "text": ""
+      }
+    },
+    {
+      "key": "lamp_hall",
+      "title": "The lamp hall",
+      "technique": "",
+      "puzzleType": 0,
+      "built": true,
+      "unlockedWhen": true,
+      "designNote": "",
+      "plannedHotspots": [
+        {
+          "type": "puzzle",
+          "label": "The wax bench",
+          "note": "RUNG 3 — cut k=3, highest mean beeswax -> the BALM family (Redsill, Highgate, Palewall), 44.7 vs 11.8 / 7.0. Distractors: the smoke family, the drink family, 'the single highest shrine (Palewall)', 'the largest family', 'the East wing', 'no real difference'."
+        },
+        {
+          "type": "clue",
+          "label": "The yellow niche",
+          "note": "Deepwell — seed-pod, monkey, bee. LEDGER evidence.",
+          "image": "figures/deepwell.png",
+          "body": "Three votive figures on the ledge under the yellow banner, and nothing anywhere in the niche to say which god they stood for."
+        },
+        {
+          "type": "clue",
+          "label": "The white niche",
+          "note": "Redsill — frog, shell, paddle. LEDGER evidence.",
+          "image": "figures/redsill.png",
+          "body": "Three votive figures on the ledge under the white banner, and nothing anywhere in the niche to say which god they stood for."
+        },
+        {
+          "type": "clue",
+          "label": "The deep blue niche",
+          "note": "Highgate — maize-cake, spindle-whorl, censer. LEDGER evidence.",
+          "image": "figures/highgate.png",
+          "body": "Three votive figures on the ledge under the deep blue banner, and nothing anywhere in the niche to say which god they stood for."
+        },
+        {
+          "type": "door",
+          "label": "The hatch back to the crawl",
+          "to": "root_crawl"
+        }
+      ],
+      "authoring": {
+        "sceneSpec": {
+          "room": "lamp_hall",
+          "interior": true,
+          "seam": "a plain unbroken stretch of green-grey stone wall in flat shade, uniform, unlit and featureless",
+          "seamOccluder": "a plain square stone pier, floor to ceiling, clean-jointed and swept",
+          "setting": "the lamp hall — the viewer stands in a wide low room whose walls carry rank on rank of small stone lamps, every one of them cold and unlit; a run of tall square window-slots down one wall floods the room with flat bright daylight from end to end, EXACTLY THREE shrine niches and no others, cut between the lamp ranks. The room is still ROOFED overhead — heavy stone slabs and beams span the ceiling and are clearly visible above; the daylight comes in through breaks and holes in that roof, not from an open sky. This is an interior, not a courtyard.",
+          "elements": [
+            {
+              "id": "lamp_hall_wall_l",
+              "at": "on the far left",
+              "desc": "a plain unbroken stretch of green-grey stone wall in flat shade, featureless and unlit, the half of that one wall that meets its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "niche_deepwell",
+              "at": "to the left",
+              "clue": true,
+              "label": "The yellow niche",
+              "desc": "a shallow shrine niche cut into the wall, hung with a yellow banner, holding a carved seed-pod, a small monkey, and a clay bee standing in a row on its ledge, with a soot-blackened lamp and a shallow libation bowl set before them",
+              "animate": {
+                "motion": "the banner stirring gently in the draught from the window-slots, its shadow moving on the wall",
+                "loop": "boomerang"
+              }
+            },
+            {
+              "id": "niche_redsill",
+              "at": "to the left of centre",
+              "clue": true,
+              "label": "The white niche",
+              "desc": "a shallow shrine niche cut into the wall, hung with a white banner, holding a stone frog, a spiral shell, and a carved paddle standing in a row on its ledge, with a soot-blackened lamp and a shallow libation bowl set before them"
+            },
+            {
+              "id": "wax_bench",
+              "at": "dead ahead in the centre",
+              "puzzle": true,
+              "label": "The wax bench",
+              "desc": "a stone work bench with a pane of glowing glass set into it, a single pale block of beeswax on a board beside a knife, and a row of empty lamp reservoirs waiting"
+            },
+            {
+              "id": "niche_highgate",
+              "at": "just right of centre",
+              "clue": true,
+              "label": "The deep blue niche",
+              "desc": "a shallow shrine niche cut into the wall, hung with a deep blue banner, holding a moulded maize-cake, a spindle-whorl, and a perforated censer standing in a row on its ledge, with a soot-blackened lamp and a shallow libation bowl set before them"
+            },
+            {
+              "id": "back_crawl_lamps",
+              "at": "to the right",
+              "door": {
+                "direction": "back",
+                "to": "root_crawl"
+              },
+              "label": "The hatch back to the crawl",
+              "desc": "the low service hatch back into the passage, black inside"
+            },
+            {
+              "id": "lamp_hall_wall_r",
+              "at": "on the far right",
+              "desc": "the same plain unbroken stretch of green-grey stone wall in flat shade, featureless and unlit, the other half of that one wall, joining cleanly at the seam directly behind you"
+            }
+          ],
+          "atmosphere": "LATE MORNING, the brightest interior. Sun floods in through a run of tall square window-slots down one wall and bounces off the pale floor, filling the whole room with flat open daylight. Every lamp wiped and set square in its niche with its wick trimmed, a stoppered oil jar and a folded cloth squared on the bench; a month of fine settled dust is the only thing out of place. Painterly, cinematic, subtle film grain. The nine shrine banners are the only PURE, fully saturated colour anywhere — nothing else competes with them for chroma — but the world around them is RICH AND ALIVE, not grey: warm honey-and-ochre limestone, deep wet greens in the forest, real blue in the sky and in the shadows, clear water, painted plaster still holding its colour. Colourful and luminous, never garish, and never washed-out. THE TEMPLE IS KEPT: in daily use until a month ago, swept and tended, nothing ruined, nothing collapsed, no rubble, no plants growing through the floor — the forest presses hard on the outside and stops at the wall. NO golden-hour orange wash, no amber lamplight bath, no firelight glow",
+          "negatives": "No people, no lettering, no captions, no text, no readable writing, no signage, no UI"
+        },
+        "scenePrompt": "This is a seamless 360-degree panorama from the lamp hall — the viewer stands in a wide low room whose walls carry rank on rank of small stone lamps, every one of them cold and unlit; a run of tall square window-slots down one wall floods the room with flat bright daylight from end to end, EXACTLY THREE shrine niches and no others, cut between the lamp ranks. The room is still ROOFED overhead — heavy stone slabs and beams span the ceiling and are clearly visible above; the daylight comes in through breaks and holes in that roof, not from an open sky. This is an interior, not a courtyard.. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain unbroken stretch of green-grey stone wall in flat shade, uniform, unlit and featureless: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, a plain unbroken stretch of green-grey stone wall in flat shade, featureless and unlit, the half of that one wall that meets its other half cleanly at the seam directly behind you; to the left, a shallow shrine niche cut into the wall, hung with a yellow banner, holding a carved seed-pod, a small monkey, and a clay bee standing in a row on its ledge, with a soot-blackened lamp and a shallow libation bowl set before them; to the left of centre, a shallow shrine niche cut into the wall, hung with a white banner, holding a stone frog, a spiral shell, and a carved paddle standing in a row on its ledge, with a soot-blackened lamp and a shallow libation bowl set before them; dead ahead in the centre, a stone work bench with a pane of glowing glass set into it, a single pale block of beeswax on a board beside a knife, and a row of empty lamp reservoirs waiting; just right of centre, a shallow shrine niche cut into the wall, hung with a deep blue banner, holding a moulded maize-cake, a spindle-whorl, and a perforated censer standing in a row on its ledge, with a soot-blackened lamp and a shallow libation bowl set before them; to the right, the low service hatch back into the passage, black inside; on the far right, the same plain unbroken stretch of green-grey stone wall in flat shade, featureless and unlit, the other half of that one wall, joining cleanly at the seam directly behind you. LATE MORNING, the brightest interior. Sun floods in through a run of tall square window-slots down one wall and bounces off the pale floor, filling the whole room with flat open daylight. Every lamp wiped and set square in its niche with its wick trimmed, a stoppered oil jar and a folded cloth squared on the bench; a month of fine settled dust is the only thing out of place. Painterly, cinematic, subtle film grain. The nine shrine banners are the only PURE, fully saturated colour anywhere — nothing else competes with them for chroma — but the world around them is RICH AND ALIVE, not grey: warm honey-and-ochre limestone, deep wet greens in the forest, real blue in the sky and in the shadows, clear water, painted plaster still holding its colour. Colourful and luminous, never garish, and never washed-out. THE TEMPLE IS KEPT: in daily use until a month ago, swept and tended, nothing ruined, nothing collapsed, no rubble, no plants growing through the floor — the forest presses hard on the outside and stops at the wall. NO golden-hour orange wash, no amber lamplight bath, no firelight glow. No people, no lettering, no captions, no text, no readable writing, no signage, no UI. Again: the extreme left and right edges must align perfectly into a plain unbroken stretch of green-grey stone wall in flat shade, uniform, unlit and featureless, with no visible seam, join, or repetition.",
+        "hotspotsReviewed": true
+      },
+      "panorama": "lamp_hall/scene.png",
+      "builtFrom": "l1_lamp_hall_2.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -4.8
+      },
+      "hotspots": [
+        {
+          "id": "niche_deepwell",
+          "type": "clue",
+          "label": "The yellow niche",
+          "box": [
+            0.0953,
+            0.3266,
+            0.1739,
+            0.6602
+          ],
+          "image": "figures/deepwell.png",
+          "body": "Three votive figures on the ledge under the yellow banner, and nothing anywhere in the niche to say which god they stood for.",
+          "pickup": "The yellow niche: see the plate."
+        },
+        {
+          "id": "niche_redsill",
+          "type": "clue",
+          "label": "The white niche",
+          "box": [
+            0.1891,
+            0.3528,
+            0.2382,
+            0.6685
+          ],
+          "image": "figures/redsill.png",
+          "body": "Three votive figures on the ledge under the white banner, and nothing anywhere in the niche to say which god they stood for.",
+          "pickup": "The white niche: see the plate."
+        },
+        {
+          "id": "wax_bench",
+          "type": "puzzle",
+          "label": "The wax bench",
+          "box": [
+            0.3721,
+            0.6933,
+            0.6162,
+            0.9051
+          ],
+          "starterCode": "temple_votive_residues",
+          "question": {
+            "prompt": "One block of beeswax is left and nine shrines want it. It cannot go everywhere. Which family of shrines actually burns the stuff?",
+            "options": [
+              "the family of Ninestep, Longshadow, Brokenarch and Deepwell",
+              "the family of Quietfloor and Lastcourt",
+              "Palewall alone — it holds the most of any single shrine",
+              "the family of Redsill, Highgate and Palewall",
+              "the largest family, whichever it is",
+              "the East wing",
+              "no family burns meaningfully more than another"
+            ],
+            "correct": 3,
+            "maxAttempts": 4,
+            "feedback": {
+              "correct": "Correct — noted: the beeswax belongs to Redsill, Highgate and Palewall.",
+              "wrong": [
+                "Cut the nine shrines into their three families first, then ask one number of each family rather than of each shrine.",
+                "`cutree()` the clustering into 3 gives you a family label per shrine; group by that label and take the mean of the beeswax column.",
+                "One family's average is several times either of the others — it is not a close call, so if two look similar you have probably grouped by something other than the residues."
+              ]
+            }
+          },
+          "solveSfx": {
+            "src": "audio/solve_lamp_hall.mp3",
+            "volume": 0.5
+          }
+        },
+        {
+          "id": "niche_highgate",
+          "type": "clue",
+          "label": "The deep blue niche",
+          "box": [
+            0.7624,
+            0.3735,
+            0.8213,
+            0.6275
+          ],
+          "image": "figures/highgate.png",
+          "body": "Three votive figures on the ledge under the deep blue banner, and nothing anywhere in the niche to say which god they stood for.",
+          "pickup": "The deep blue niche: see the plate."
+        },
+        {
+          "id": "back_crawl_lamps",
+          "type": "door",
+          "label": "The hatch back to the crawl",
+          "box": [
+            0.8344,
+            0.5101,
+            0.8947,
+            0.7388
+          ],
+          "direction": "back",
+          "to": "root_crawl"
+        }
+      ],
+      "sfx": [
+        {
+          "src": "audio/lamp_hall_jungle_through_wall.mp3",
+          "volume": 0.03,
+          "mode": "loop"
+        }
+      ],
+      "entry": {
+        "title": "The lamp hall",
+        "text": ""
+      }
+    },
+    {
+      "key": "cistern_stair",
+      "title": "The cistern stair",
+      "technique": "",
+      "puzzleType": 0,
+      "built": true,
+      "unlockedWhen": true,
+      "designNote": "",
+      "plannedHotspots": [
+        {
+          "type": "clue",
+          "label": "The black niche",
+          "note": "Quietfloor — brazier, spindle-whorl, censer. LEDGER evidence.",
+          "image": "figures/quietfloor.png",
+          "body": "Three votive figures on the ledge under the black banner, and nothing anywhere in the niche to say which god they stood for."
+        },
+        {
+          "type": "clue",
+          "label": "The turquoise niche",
+          "note": "Lastcourt — monkey, macaw, bee. LEDGER evidence. NB the colour is a red herring: turquoise is a water colour on a CANOPY shrine.",
+          "image": "figures/lastcourt.png",
+          "body": "Three votive figures on the ledge under the turquoise banner, and nothing anywhere in the niche to say which god they stood for."
+        },
+        {
+          "type": "door",
+          "label": "The hatch back from the cistern",
+          "to": "root_crawl"
+        },
+        {
+          "type": "door",
+          "label": "The stair down into the rock",
+          "to": "sealed_cell"
+        }
+      ],
+      "authoring": {
+        "sceneSpec": {
+          "room": "cistern_stair",
+          "interior": true,
+          "seam": "a plain unbroken stretch of green-grey stone wall in flat shade, uniform, unlit and featureless",
+          "seamOccluder": "a plain square stone pier, floor to ceiling, clean-jointed and swept",
+          "setting": "the head of the cistern stair — the viewer stands on a wet stone landing at the lip of a square shaft that drops away into the rock, a clean column of noon sun falling straight down the shaft to the black water far below, EXACTLY TWO shrine niches and no others cut into the wall beside it",
+          "elements": [
+            {
+              "id": "cistern_stair_wall_l",
+              "at": "on the far left",
+              "desc": "a plain unbroken stretch of green-grey stone wall in flat shade, featureless and unlit, the half of that one wall that meets its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "niche_quietfloor",
+              "at": "to the left",
+              "clue": true,
+              "label": "The black niche",
+              "desc": "a shallow shrine niche cut into the wall, hung with a black banner, holding a clay brazier, a spindle-whorl, and a perforated censer standing in a row on its ledge, with a soot-blackened lamp and a shallow libation bowl set before them"
+            },
+            {
+              "id": "shaft_column",
+              "at": "to the left of centre",
+              "desc": "the square well of the cistern with one clean column of white sun standing straight down it, striking the black water far below and throwing a slow net of reflected light up the wet walls",
+              "animate": {
+                "motion": "the net of reflected light rippling slowly up the wet shaft walls",
+                "loop": "boomerang"
+              }
+            },
+            {
+              "id": "niche_lastcourt",
+              "at": "dead ahead in the centre",
+              "clue": true,
+              "label": "The turquoise niche",
+              "desc": "a shallow shrine niche cut into the wall, hung with a turquoise banner, holding a small monkey, a macaw, and a clay bee standing in a row on its ledge, with a soot-blackened lamp and a shallow libation bowl set before them"
+            },
+            {
+              "id": "back_crawl_cistern",
+              "at": "just right of centre",
+              "door": {
+                "direction": "back",
+                "to": "root_crawl"
+              },
+              "label": "The hatch back from the cistern",
+              "desc": "the low service hatch back into the passage"
+            },
+            {
+              "id": "down_stair",
+              "at": "to the right",
+              "door": {
+                "direction": "open",
+                "to": "sealed_cell"
+              },
+              "label": "The stair down into the rock",
+              "desc": "wet worn steps winding away down beside the shaft, no light at the bottom of them"
+            },
+            {
+              "id": "cistern_stair_wall_r",
+              "at": "on the far right",
+              "desc": "the same plain unbroken stretch of green-grey stone wall in flat shade, featureless and unlit, the other half of that one wall, joining cleanly at the seam directly behind you"
+            }
+          ],
+          "atmosphere": "A single clean COLUMN of white sun drops straight down the shaft to the water, and the whole room is lit in cold blue-green by light bouncing back up off it, rippling on the walls. The steps swept and wet, a sound rope and a clean wooden bucket coiled ready on the landing, the water clear enough to see the bottom; only the waterline itself is dark with age. Painterly, cinematic, subtle film grain. The nine shrine banners are the only PURE, fully saturated colour anywhere — nothing else competes with them for chroma — but the world around them is RICH AND ALIVE, not grey: warm honey-and-ochre limestone, deep wet greens in the forest, real blue in the sky and in the shadows, clear water, painted plaster still holding its colour. Colourful and luminous, never garish, and never washed-out. THE TEMPLE IS KEPT: in daily use until a month ago, swept and tended, nothing ruined, nothing collapsed, no rubble, no plants growing through the floor — the forest presses hard on the outside and stops at the wall. NO golden-hour orange wash, no amber lamplight bath, no firelight glow",
+          "negatives": "No people, no lettering, no captions, no text, no readable writing, no signage, no UI"
+        },
+        "scenePrompt": "This is a seamless 360-degree panorama from the head of the cistern stair — the viewer stands on a wet stone landing at the lip of a square shaft that drops away into the rock, a clean column of noon sun falling straight down the shaft to the black water far below, EXACTLY TWO shrine niches and no others cut into the wall beside it. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain unbroken stretch of green-grey stone wall in flat shade, uniform, unlit and featureless: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, a plain unbroken stretch of green-grey stone wall in flat shade, featureless and unlit, the half of that one wall that meets its other half cleanly at the seam directly behind you; to the left, a shallow shrine niche cut into the wall, hung with a black banner, holding a clay brazier, a spindle-whorl, and a perforated censer standing in a row on its ledge, with a soot-blackened lamp and a shallow libation bowl set before them; to the left of centre, the square well of the cistern with one clean column of white sun standing straight down it, striking the black water far below and throwing a slow net of reflected light up the wet walls; dead ahead in the centre, a shallow shrine niche cut into the wall, hung with a turquoise banner, holding a small monkey, a macaw, and a clay bee standing in a row on its ledge, with a soot-blackened lamp and a shallow libation bowl set before them; just right of centre, the low service hatch back into the passage; to the right, wet worn steps winding away down beside the shaft, no light at the bottom of them; on the far right, the same plain unbroken stretch of green-grey stone wall in flat shade, featureless and unlit, the other half of that one wall, joining cleanly at the seam directly behind you. A single clean COLUMN of white sun drops straight down the shaft to the water, and the whole room is lit in cold blue-green by light bouncing back up off it, rippling on the walls. The steps swept and wet, a sound rope and a clean wooden bucket coiled ready on the landing, the water clear enough to see the bottom; only the waterline itself is dark with age. Painterly, cinematic, subtle film grain. The nine shrine banners are the only PURE, fully saturated colour anywhere — nothing else competes with them for chroma — but the world around them is RICH AND ALIVE, not grey: warm honey-and-ochre limestone, deep wet greens in the forest, real blue in the sky and in the shadows, clear water, painted plaster still holding its colour. Colourful and luminous, never garish, and never washed-out. THE TEMPLE IS KEPT: in daily use until a month ago, swept and tended, nothing ruined, nothing collapsed, no rubble, no plants growing through the floor — the forest presses hard on the outside and stops at the wall. NO golden-hour orange wash, no amber lamplight bath, no firelight glow. No people, no lettering, no captions, no text, no readable writing, no signage, no UI. Again: the extreme left and right edges must align perfectly into a plain unbroken stretch of green-grey stone wall in flat shade, uniform, unlit and featureless, with no visible seam, join, or repetition.",
+        "hotspotsReviewed": true
+      },
+      "panorama": "cistern_stair/scene.png",
+      "builtFrom": "l1_cistern_stair_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5.6
+      },
+      "hotspots": [
+        {
+          "id": "niche_quietfloor",
+          "type": "clue",
+          "label": "The black niche",
+          "box": [
+            0.2616,
+            0.1288,
+            0.3449,
+            0.5242
+          ],
+          "image": "figures/quietfloor.png",
+          "body": "Three votive figures on the ledge under the black banner, and nothing anywhere in the niche to say which god they stood for.",
+          "pickup": "The black niche: see the plate."
+        },
+        {
+          "id": "shaft_column",
+          "type": "ambient",
+          "label": "the square well of the cistern with one clean column of whit",
+          "box": [
+            0.3365,
+            0.5265,
+            0.5991,
+            0.9517
+          ]
+        },
+        {
+          "id": "niche_lastcourt",
+          "type": "clue",
+          "label": "The turquoise niche",
+          "box": [
+            0.5715,
+            0.1942,
+            0.6222,
+            0.4686
+          ],
+          "image": "figures/lastcourt.png",
+          "body": "Three votive figures on the ledge under the turquoise banner, and nothing anywhere in the niche to say which god they stood for.",
+          "pickup": "The turquoise niche: see the plate."
+        },
+        {
+          "id": "back_crawl_cistern",
+          "type": "door",
+          "label": "The hatch back from the cistern",
+          "box": [
+            0.6706,
+            0.1047,
+            0.7208,
+            0.2936
+          ],
+          "direction": "back",
+          "to": "root_crawl"
+        },
+        {
+          "id": "down_stair",
+          "type": "door",
+          "label": "The stair down into the rock",
+          "box": [
+            0.6726,
+            0.4563,
+            0.708,
+            0.5999
+          ],
+          "direction": "open",
+          "to": "sealed_cell"
+        }
+      ],
+      "sfx": [
+        {
+          "src": "audio/cistern_stair_water_drip.mp3",
+          "volume": 0.87,
+          "mode": "loop"
+        },
+        {
+          "src": "audio/cistern_stair_drop.mp3",
+          "volume": 0.08,
+          "mode": "interval",
+          "gapMin": 9,
+          "gapMax": 22
+        }
+      ],
+      "entry": {
+        "title": "The cistern",
+        "text": ""
+      }
+    },
+    {
+      "key": "sealed_cell",
+      "title": "The sealed cell",
+      "technique": "",
+      "puzzleType": 0,
+      "built": true,
+      "unlockedWhen": true,
+      "designNote": "",
+      "plannedHotspots": [
+        {
+          "type": "puzzle",
+          "label": "The cell's sampling-table",
+          "note": "RUNG 2 — classify the unknown: the Unmarked Cell joins the DRINK family (Quietfloor + Lastcourt); nearest single shrine Quietfloor d 2.45, next family 25x further. Distractors: the smoke family, the balm family, 'its own new family', 'closest to Ninestep', 'closest to Palewall', 'cannot tell from the residues'."
+        },
+        {
+          "type": "clue",
+          "label": "The nameless niche",
+          "note": "The forgotten shrine itself — no banner, no figures, a cold lamp and a bowl of hardened residue. The thing rung 2 samples. Deliberately carries NO ledger evidence: with no figures it cannot be placed in the Register of the Gods, which is the point of it.",
+          "body": "No banner over it, no figures on the ledge, and a lamp nobody has fed in living memory. Only the bowl is still thick with what was last poured into it, so this shrine can be scraped like any other — one row, the same six substances as the rest, on the bench as <code>unknown_shrine</code>."
+        },
+        {
+          "type": "door",
+          "label": "The steps back up",
+          "to": "cistern_stair"
+        }
+      ],
+      "authoring": {
+        "sceneSpec": {
+          "room": "sealed_cell",
+          "interior": true,
+          "seam": "a plain unbroken stretch of green-grey stone wall in flat shade, uniform, unlit and featureless",
+          "seamOccluder": "a plain square stone pier, floor to ceiling, clean-jointed and swept",
+          "setting": "a small forgotten chamber under the temple, opened today for the first time in living memory — the viewer stands on rock-cut floor in a bare cell well below any daylight, a fallen slab leaning against one wall where it was pushed aside, an empty niche opposite with no banner and no figures",
+          "elements": [
+            {
+              "id": "sealed_cell_wall_l",
+              "at": "on the far left",
+              "desc": "a plain unbroken stretch of green-grey stone wall in flat shade, featureless and unlit, the half of that one wall that meets its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "disturbed_dust",
+              "at": "to the left",
+              "desc": "a slow steady fall of fine dust from the ceiling, shaken loose when the slab came aside and drifting down through the lamp light in a thin curtain — the first thing to move in this room in four hundred years",
+              "animate": {
+                "motion": "fine dust falling slowly and continuously through the lamp light",
+                "loop": "crossfade"
+              }
+            },
+            {
+              "id": "cell_lamp",
+              "at": "to the left of centre",
+              "desc": "your own small lamp set down on the rock floor — the only flame anywhere in the temple today, and the only light in this room",
+              "animate": {
+                "motion": "the small flame standing almost still and then shivering",
+                "loop": "boomerang"
+              }
+            },
+            {
+              "id": "table_cell",
+              "at": "dead ahead in the centre",
+              "puzzle": true,
+              "label": "The cell's sampling-table",
+              "desc": "a flat-topped stone with a pane of glowing glass balanced on it, a scraping taken from the cold lamp laid out on a sherd beside it"
+            },
+            {
+              "id": "empty_niche",
+              "at": "just right of centre",
+              "clue": true,
+              "label": "The nameless niche",
+              "desc": "a shallow niche cut in the far wall with no banner above it and no figures in it at all, only a lamp long gone cold and a bowl thick with hardened residue"
+            },
+            {
+              "id": "back_cistern",
+              "at": "to the right",
+              "door": {
+                "direction": "back",
+                "to": "cistern_stair"
+              },
+              "label": "The steps back up",
+              "desc": "the wet worn steps climbing back up out of the rock toward a far scrap of daylight"
+            },
+            {
+              "id": "sealed_cell_wall_r",
+              "at": "on the far right",
+              "desc": "the same plain unbroken stretch of green-grey stone wall in flat shade, featureless and unlit, the other half of that one wall, joining cleanly at the seam directly behind you"
+            }
+          ],
+          "atmosphere": "NO DAYLIGHT AT ALL — the one unlit room in the temple. A single small flame on the floor, warm and close, and pitch black beyond its reach. Dust lying undisturbed and inches deep, cobwebs hung heavy and grey, small animal bones in a corner, the floor scuffed only where the slab was dragged aside — the ONE place in this temple nobody has kept, and it should look four hundred years older than every other room. Painterly, cinematic, subtle film grain. The nine shrine banners are the only PURE, fully saturated colour anywhere — nothing else competes with them for chroma — but the world around them is RICH AND ALIVE, not grey: warm honey-and-ochre limestone, deep wet greens in the forest, real blue in the sky and in the shadows, clear water, painted plaster still holding its colour. Colourful and luminous, never garish, and never washed-out. THIS ONE ROOM IS THE EXCEPTION: the rest of the temple is swept and kept, but this cell was walled up four hundred years ago and nobody has been inside since — undisturbed dust, heavy grey cobwebs, absolute stillness. It must look centuries older than every other room, while still being the same warm honey stone under the lamp, richly lit and never grey or washed-out. NO golden-hour orange wash, no amber lamplight bath, no firelight glow",
+          "negatives": "No people, no lettering, no captions, no text, no readable writing, no signage, no UI"
+        },
+        "scenePrompt": "This is a seamless 360-degree panorama from a small forgotten chamber under the temple, opened today for the first time in living memory — the viewer stands on rock-cut floor in a bare cell well below any daylight, a fallen slab leaning against one wall where it was pushed aside, an empty niche opposite with no banner and no figures. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain unbroken stretch of green-grey stone wall in flat shade, uniform, unlit and featureless: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, a plain unbroken stretch of green-grey stone wall in flat shade, featureless and unlit, the half of that one wall that meets its other half cleanly at the seam directly behind you; to the left, a slow steady fall of fine dust from the ceiling, shaken loose when the slab came aside and drifting down through the lamp light in a thin curtain — the first thing to move in this room in four hundred years; to the left of centre, your own small lamp set down on the rock floor — the only flame anywhere in the temple today, and the only light in this room; dead ahead in the centre, a flat-topped stone with a pane of glowing glass balanced on it, a scraping taken from the cold lamp laid out on a sherd beside it; just right of centre, a shallow niche cut in the far wall with no banner above it and no figures in it at all, only a lamp long gone cold and a bowl thick with hardened residue; to the right, the wet worn steps climbing back up out of the rock toward a far scrap of daylight; on the far right, the same plain unbroken stretch of green-grey stone wall in flat shade, featureless and unlit, the other half of that one wall, joining cleanly at the seam directly behind you. NO DAYLIGHT AT ALL — the one unlit room in the temple. A single small flame on the floor, warm and close, and pitch black beyond its reach. Dust lying undisturbed and inches deep, cobwebs hung heavy and grey, small animal bones in a corner, the floor scuffed only where the slab was dragged aside — the ONE place in this temple nobody has kept, and it should look four hundred years older than every other room. Painterly, cinematic, subtle film grain. The nine shrine banners are the only PURE, fully saturated colour anywhere — nothing else competes with them for chroma — but the world around them is RICH AND ALIVE, not grey: warm honey-and-ochre limestone, deep wet greens in the forest, real blue in the sky and in the shadows, clear water, painted plaster still holding its colour. Colourful and luminous, never garish, and never washed-out. THIS ONE ROOM IS THE EXCEPTION: the rest of the temple is swept and kept, but this cell was walled up four hundred years ago and nobody has been inside since — undisturbed dust, heavy grey cobwebs, absolute stillness. It must look centuries older than every other room, while still being the same warm honey stone under the lamp, richly lit and never grey or washed-out. NO golden-hour orange wash, no amber lamplight bath, no firelight glow. No people, no lettering, no captions, no text, no readable writing, no signage, no UI. Again: the extreme left and right edges must align perfectly into a plain unbroken stretch of green-grey stone wall in flat shade, uniform, unlit and featureless, with no visible seam, join, or repetition.",
+        "hotspotsReviewed": true
+      },
+      "panorama": "sealed_cell/scene.png",
+      "builtFrom": "l1_sealed_cell_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5.4
+      },
+      "hotspots": [
+        {
+          "id": "cell_lamp",
+          "type": "ambient",
+          "label": "your own small lamp set down on the rock floor — the only fl",
+          "box": [
+            0.2587,
+            0.6833,
+            0.3378,
+            0.9596
+          ]
+        },
+        {
+          "id": "disturbed_dust",
+          "type": "ambient",
+          "label": "the slow fall of dust shaken loose when the slab came aside",
+          "box": [
+            0.155,
+            0.03,
+            0.285,
+            0.75
+          ]
+        },
+        {
+          "id": "table_cell",
+          "type": "puzzle",
+          "label": "The cell's sampling-table",
+          "box": [
+            0.431,
+            0.6157,
+            0.522,
+            0.8409
+          ],
+          "starterCode": "temple_votive_residues\nunknown_shrine",
+          "question": {
+            "prompt": "The cell behind the slab has a lamp nobody has fed in living memory, and a bowl thick with what was last poured into it. No register can be called whole while a shrine is missing from it. Which family of shrines does this one belong with?",
+            "options": [
+              "the family of Quietfloor and Lastcourt",
+              "the family of Ninestep, Longshadow, Brokenarch and Deepwell",
+              "the family of Redsill, Highgate and Palewall",
+              "a family of its own — it matches nothing here",
+              "closest to Ninestep",
+              "closest to Palewall",
+              "there is not enough left in the bowl to say"
+            ],
+            "correct": 0,
+            "maxAttempts": 4,
+            "feedback": {
+              "correct": "Correct — noted: the nameless cell belongs with Quietfloor and Lastcourt.",
+              "wrong": [
+                "Put the unknown into the same table as the nine and cluster the lot together — it will fall inside one of the existing groups.",
+                "`rbind()` the unknown row onto the nine, then run the same distance-and-clustering you used before and see which shrines it lands beside.",
+                "Its nearest single shrine and the family that shrine belongs to are the same answer here — the next-nearest family is many times further away."
+              ]
+            }
+          },
+          "solveSfx": {
+            "src": "audio/solve_sealed_cell.mp3",
+            "volume": 0.5
+          }
+        },
+        {
+          "id": "empty_niche",
+          "type": "clue",
+          "label": "The nameless niche",
+          "box": [
+            0.4368,
+            0.1934,
+            0.5382,
+            0.5959
+          ],
+          "body": "No banner over it, no figures on the ledge, and a lamp nobody has fed in living memory. Only the bowl is still thick with what was last poured into it, so this shrine can be scraped like any other — one row, the same six substances as the rest, on the bench as <code>unknown_shrine</code>."
+        },
+        {
+          "id": "back_cistern",
+          "type": "door",
+          "label": "The steps back up",
+          "box": [
+            0.7476,
+            0.0816,
+            0.8467,
+            0.5934
+          ],
+          "direction": "back",
+          "to": "cistern_stair"
+        }
+      ],
+      "sfx": [
+        {
+          "src": "audio/sealed_cell_dead_air.mp3",
+          "volume": 0.14,
+          "mode": "loop"
+        }
+      ],
+      "entry": {
+        "title": "The sealed cell",
+        "text": ""
+      }
+    },
+    {
+      "key": "inner_vault",
+      "title": "The inner vault",
+      "technique": "",
+      "puzzleType": 0,
+      "built": true,
+      "unlockedWhen": {
+        "allSolved": [
+          "sun_gallery",
+          "lamp_hall",
+          "sealed_cell"
+        ]
+      },
+      "designNote": "",
+      "plannedHotspots": [
+        {
+          "type": "puzzle",
+          "label": "The vault reading-table",
+          "note": "BOSS — which shrines sit in a wing that disagrees with their chemistry -> Deepwell (smoke chemistry, West wing) AND Palewall (balm chemistry, East wing). 7 of 9 DO agree, which is the trap. Distractors: only Deepwell; only Palewall; Deepwell + Brokenarch; Palewall + Redsill; Quietfloor + Lastcourt; a within-wing pair; 'none — the wings are right'. Deliverable figure + submitCodec."
+        },
+        {
+          "type": "clue",
+          "label": "The keeper's wing-register",
+          "note": "THE MISDIRECTION. Lists the shrines by wing, formally and authoritatively. Say what it IS and how old it is; never that it is wrong.",
+          "body": "Not his: cut into the wall four centuries before him, deep and formal, and never once corrected. It files every shrine in the temple under the wing it stands in — <b>East:</b> Ninestep, Longshadow, Brokenarch, Palewall. <b>West:</b> Deepwell, Redsill, Highgate. <b>North:</b> Quietfloor, Lastcourt. The same three letters are cut beside every shrine's name in the storeroom ledgers, which is why nobody has ever had cause to doubt it."
+        },
+        {
+          "type": "door",
+          "label": "The hatch back from the vault",
+          "to": "root_crawl"
+        },
+        {
+          "type": "door",
+          "label": "The stair up to the altar",
+          "to": "sun_altar",
+          "availableWhen": {
+            "allSolved": [
+              "sun_gallery",
+              "lamp_hall",
+              "sealed_cell",
+              "inner_vault"
+            ]
+          },
+          "lockedBody": "A slab of temple stone stands across the head of the stair, and it does not move. The altar is for a keeper who comes up with his registers in his hands — not for an apprentice carrying half a book."
+        }
+      ],
+      "authoring": {
+        "sceneSpec": {
+          "room": "inner_vault",
+          "interior": true,
+          "seam": "a plain unbroken stretch of green-grey stone wall in flat shade, uniform, unlit and featureless",
+          "seamOccluder": "a plain square stone pier, floor to ceiling, clean-jointed and swept",
+          "setting": "the innermost vault of the temple — the viewer stands on old stone in a small, high, plain corbelled chamber that a keeper's apprentice has no business entering, a single narrow light-slot cut high in one wall laying one hard bar of sun across the far face",
+          "elements": [
+            {
+              "id": "inner_vault_wall_l",
+              "at": "on the far left",
+              "desc": "a plain unbroken stretch of green-grey stone wall in flat shade, featureless and unlit, the half of that one wall that meets its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "wing_register",
+              "at": "to the left",
+              "clue": true,
+              "label": "The keeper's wing-register",
+              "desc": "a great register cut deep into the wall in three formal columns, each column a list of shrines marked by their banner colours, the marks cut square and official and worn shallow by four hundred years of hands, the light-slot's bar of sun lying right across it"
+            },
+            {
+              "id": "vault_motes",
+              "at": "to the left of centre",
+              "desc": "the hard bar of sun from the light-slot, standing thick with slow motes in the dead-still air of the vault",
+              "animate": {
+                "motion": "motes turning slowly through the hard bar of light",
+                "loop": "crossfade"
+              }
+            },
+            {
+              "id": "table_vault",
+              "at": "dead ahead in the centre",
+              "puzzle": true,
+              "label": "The vault reading-table",
+              "desc": "a plain stone table with a pane of glowing glass, your own sherds and scrapings laid out across it, all nine of them together for the first time"
+            },
+            {
+              "id": "back_crawl_vault",
+              "at": "just right of centre",
+              "door": {
+                "direction": "back",
+                "to": "root_crawl"
+              },
+              "label": "The hatch back from the vault",
+              "desc": "the carved low hatch you came in by"
+            },
+            {
+              "id": "to_altar",
+              "at": "to the right",
+              "door": {
+                "direction": "open",
+                "to": "sun_altar"
+              },
+              "label": "The stair up to the altar",
+              "desc": "a narrow stair climbing steeply out of the vault, its head SEALED by a single plain slab of the same green-grey stone set flush in the opening, so no daylight reaches the steps",
+              "variants": [
+                {
+                  "state": "open",
+                  "when": {
+                    "allSolved": [
+                      "sun_gallery",
+                      "lamp_hall",
+                      "sealed_cell",
+                      "inner_vault"
+                    ]
+                  },
+                  "delta": "the slab is drawn back out of the opening and the stair runs up into open white sky, hard daylight falling down the steps"
+                }
+              ]
+            },
+            {
+              "id": "inner_vault_wall_r",
+              "at": "on the far right",
+              "desc": "the same plain unbroken stretch of green-grey stone wall in flat shade, featureless and unlit, the other half of that one wall, joining cleanly at the seam directly behind you"
+            }
+          ],
+          "atmosphere": "ONE hard narrow bar of sun from a light-slot high in the wall, laid across the far face like a blade; deep dry shadow everywhere else, dust turning in the beam. Swept dry stone, the register-face clean enough to read at a glance, a stool and a shaded lamp set ready beside it; nothing fallen and nothing growing — only a month of still dust turning in the beam. Painterly, cinematic, subtle film grain. The nine shrine banners are the only PURE, fully saturated colour anywhere — nothing else competes with them for chroma — but the world around them is RICH AND ALIVE, not grey: warm honey-and-ochre limestone, deep wet greens in the forest, real blue in the sky and in the shadows, clear water, painted plaster still holding its colour. Colourful and luminous, never garish, and never washed-out. THE TEMPLE IS KEPT: in daily use until a month ago, swept and tended, nothing ruined, nothing collapsed, no rubble, no plants growing through the floor — the forest presses hard on the outside and stops at the wall. NO golden-hour orange wash, no amber lamplight bath, no firelight glow",
+          "negatives": "No people, no lettering, no captions, no text, no readable writing, no signage, no UI"
+        },
+        "scenePrompt": "This is a seamless 360-degree panorama from the innermost vault of the temple — the viewer stands on old stone in a small, high, plain corbelled chamber that a keeper's apprentice has no business entering, a single narrow light-slot cut high in one wall laying one hard bar of sun across the far face. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain unbroken stretch of green-grey stone wall in flat shade, uniform, unlit and featureless: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, a plain unbroken stretch of green-grey stone wall in flat shade, featureless and unlit, the half of that one wall that meets its other half cleanly at the seam directly behind you; to the left, a great register cut deep into the wall in three formal columns, each column a list of shrines marked by their banner colours, the marks cut square and official and worn shallow by four hundred years of hands, the light-slot's bar of sun lying right across it; to the left of centre, the hard bar of sun from the light-slot, standing thick with slow motes in the dead-still air of the vault; dead ahead in the centre, a plain stone table with a pane of glowing glass, your own sherds and scrapings laid out across it, all nine of them together for the first time; just right of centre, the carved low hatch you came in by; to the right, a narrow stair climbing steeply out of the vault, its head SEALED by a single plain slab of the same green-grey stone set flush in the opening, so no daylight reaches the steps; on the far right, the same plain unbroken stretch of green-grey stone wall in flat shade, featureless and unlit, the other half of that one wall, joining cleanly at the seam directly behind you. ONE hard narrow bar of sun from a light-slot high in the wall, laid across the far face like a blade; deep dry shadow everywhere else, dust turning in the beam. Swept dry stone, the register-face clean enough to read at a glance, a stool and a shaded lamp set ready beside it; nothing fallen and nothing growing — only a month of still dust turning in the beam. Painterly, cinematic, subtle film grain. The nine shrine banners are the only PURE, fully saturated colour anywhere — nothing else competes with them for chroma — but the world around them is RICH AND ALIVE, not grey: warm honey-and-ochre limestone, deep wet greens in the forest, real blue in the sky and in the shadows, clear water, painted plaster still holding its colour. Colourful and luminous, never garish, and never washed-out. THE TEMPLE IS KEPT: in daily use until a month ago, swept and tended, nothing ruined, nothing collapsed, no rubble, no plants growing through the floor — the forest presses hard on the outside and stops at the wall. NO golden-hour orange wash, no amber lamplight bath, no firelight glow. No people, no lettering, no captions, no text, no readable writing, no signage, no UI. Again: the extreme left and right edges must align perfectly into a plain unbroken stretch of green-grey stone wall in flat shade, uniform, unlit and featureless, with no visible seam, join, or repetition.",
+        "hotspotsReviewed": true
+      },
+      "panorama": "inner_vault/scene.png",
+      "builtFrom": "l1_inner_vault_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5.2
+      },
+      "hotspots": [
+        {
+          "id": "wing_register",
+          "type": "clue",
+          "label": "The keeper's wing-register",
+          "box": [
+            0.1803,
+            0.2038,
+            0.3403,
+            0.7538
+          ],
+          "body": "Not his: cut into the wall four centuries before him, deep and formal, and never once corrected. It files every shrine in the temple under the wing it stands in — <b>East:</b> Ninestep, Longshadow, Brokenarch, Palewall. <b>West:</b> Deepwell, Redsill, Highgate. <b>North:</b> Quietfloor, Lastcourt. The same three letters are cut beside every shrine's name in the storeroom ledgers, which is why nobody has ever had cause to doubt it."
+        },
+        {
+          "id": "vault_motes",
+          "type": "ambient",
+          "label": "the hard bar of sun from the light-slot, standing thick with",
+          "box": [
+            0.3622,
+            0.0714,
+            0.522,
+            0.6909
+          ]
+        },
+        {
+          "id": "table_vault",
+          "type": "puzzle",
+          "label": "The vault reading-table",
+          "box": [
+            0.4138,
+            0.6348,
+            0.58,
+            0.8
+          ],
+          "starterCode": "temple_votive_residues",
+          "question": {
+            "prompt": "The register cut into this wall files every shrine under its wing, and it has stood here four hundred years. Your vessels tell a different story about some of them. Which shrines does the stone put in the wrong company?",
+            "options": [
+              "Deepwell alone",
+              "Deepwell and Palewall",
+              "Palewall alone",
+              "Deepwell and Brokenarch",
+              "Palewall and Redsill",
+              "Quietfloor and Lastcourt",
+              "none — the wings are right"
+            ],
+            "correct": 1,
+            "maxAttempts": 4,
+            "feedback": {
+              "correct": "Correct — noted: Deepwell and Palewall are filed against their own residues.",
+              "wrong": [
+                "Work out each shrine's family from the residues, then set that beside the wing the stone gives it, and look for the disagreements.",
+                "`cutree()` into 3 for the chemical family, then compare that label against the `wing` column shrine by shrine.",
+                "Most shrines agree with their wing, which is exactly why the stone is tempting. You are looking for the few that do not — and there is more than one."
+              ]
+            }
+          },
+          "deliverable": {
+            "type": "figure",
+            "submitCodec": true
+          },
+          "solveSfx": {
+            "src": "audio/solve_inner_vault.mp3",
+            "volume": 0.5
+          }
+        },
+        {
+          "id": "back_crawl_vault",
+          "type": "door",
+          "label": "The hatch back from the vault",
+          "box": [
+            0.5868,
+            0.5414,
+            0.6344,
+            0.7133
+          ],
+          "direction": "back",
+          "to": "root_crawl"
+        },
+        {
+          "id": "to_altar",
+          "type": "door",
+          "label": "The stair up to the altar",
+          "box": [
+            0.6884,
+            0.1807,
+            0.7728,
+            0.6449
+          ],
+          "direction": "open",
+          "to": "sun_altar",
+          "availableWhen": {
+            "allSolved": [
+              "sun_gallery",
+              "lamp_hall",
+              "sealed_cell",
+              "inner_vault"
+            ]
+          },
+          "lockedBody": "A slab of temple stone stands across the head of the stair, and it does not move. The altar is for a keeper who comes up with his registers in his hands — not for an apprentice carrying half a book.",
+          "variants": [
+            {
+              "state": "open",
+              "when": {
+                "allSolved": [
+                  "sun_gallery",
+                  "lamp_hall",
+                  "sealed_cell",
+                  "inner_vault"
+                ]
+              },
+              "box": [
+                0.6782,
+                0.1532,
+                0.785,
+                0.673
+              ],
+              "panorama": "inner_vault/scene_open.png"
+            }
+          ]
+        }
+      ],
+      "sfx": [
+        {
+          "src": "audio/inner_vault_still_tone.mp3",
+          "volume": 0.15,
+          "mode": "loop"
+        }
+      ],
+      "entry": {
+        "title": "The inner vault",
+        "text": ""
+      }
+    },
+    {
+      "key": "sun_altar",
+      "title": "The altar",
+      "technique": "",
+      "puzzleType": 0,
+      "built": true,
+      "unlockedWhen": {
+        "solved": "inner_vault"
+      },
+      "designNote": "",
+      "plannedHotspots": [
+        {
+          "type": "ledger",
+          "label": "The Register of the Gods",
+          "note": "ESCAPE (data-free). Rows = the nine banner colours; options = the three gods. Groups: Rain {crimson, white} · Ember {orange, deep blue, black} · Canopy {magenta, yellow, violet, turquoise}. VERIFIED unique in _scratch/verify_temple_escape.py. Confirmation is per GROUP; wrong-feedback must name no row."
+        },
+        {
+          "type": "dial",
+          "label": "The carried flame",
+          "key": "temple_fires",
+          "note": "Ceremonial release AFTER the ledger closes — one control, one motion. Not a puzzle. It is the same flame the player lit in the sealed cell, the one lit thing in the run."
+        },
+        {
+          "type": "door",
+          "label": "The stair back down",
+          "to": "inner_vault"
+        }
+      ],
+      "authoring": {
+        "sceneSpec": {
+          "room": "sun_altar",
+          "interior": false,
+          "seam": "a plain unbroken stretch of the altar's low parapet against open white sky, uniform and featureless",
+          "seamOccluder": "a plain square stone pier of the altar parapet, floor to sky",
+          "setting": "the roofless altar platform at the very top of the temple, high above the forest canopy, at the sun's zenith — the viewer stands on the altar's own paving inside a low parapet, a shallow channel running in a full ring around the floor with nine cold offering-basins set along it. THE SKY IS THE VIEW AND IT MUST BE FULL OF WEATHER: enormous towering white cumulus stacked up over the forest, their undersides flat and grey, a distant curtain of rain trailing from one of them far off on the left horizon, high wisps of cirrus above; birds circling in the middle distance below the cloudbase. The rainforest runs away green and unbroken in every direction, going hazy blue toward a horizon hundreds of miles off, with the pale tops of two smaller temples, one long abandoned to the trees and one still kept, breaking the canopy in the far distance. NOT a plain or empty sky, NOT a blank white void — a real, deep, weather-filled tropical sky",
+          "elements": [
+            {
+              "id": "sun_altar_wall_l",
+              "at": "on the far left",
+              "desc": "a plain unbroken stretch of the altar's low parapet with nothing beyond it but open white sky, uniform and featureless, the half of that one surface that meets its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "basin_ring",
+              "at": "to the left",
+              "desc": "the shallow stone channel running in a ring around the altar floor, nine cold offering-basins set along it, the overhead sun standing the shadow of the parapet almost exactly under itself",
+              "animate": {
+                "motion": "heat shimmer rising off the hot pale paving between the cold basins",
+                "loop": "crossfade"
+              },
+              "variants": [
+                {
+                  "state": "lit",
+                  "when": {
+                    "eq": [
+                      "temple_fires",
+                      "lit"
+                    ]
+                  },
+                  "reveal": "identical to the base view — same altar, same viewpoint, same framing, same parapet, same nine basins in the same places, same blazing overhead noon light and the same flat green canopy below — EXCEPT that the shallow channel is now running with fire the whole way round the ring and every one of the nine basins is alight, low bright flames standing almost straight up in the still air, the pale paving lit from below between them; no people, no lettering, no text",
+                  "art": "sun_altar/scene_lit.png"
+                }
+              ]
+            },
+            {
+              "id": "register_gods",
+              "at": "dead ahead in the centre",
+              "ledger": true,
+              "label": "The Register of the Gods",
+              "desc": "the second register-stone standing at the altar's edge, still blank, with nine small enamelled plaques laid out in a row along its sill, each plaque a different strong colour and each with an empty slot cut beside it"
+            },
+            {
+              "id": "flame_dial",
+              "at": "to the left of centre",
+              "dial": true,
+              "key": "temple_fires",
+              "label": "The carried flame",
+              "desc": "the one flame you brought up out of the cell, burning in a stone cup on a pivoted arm at the head of the channel, the arm free to be tipped so the fire runs into the ring",
+              "states": [
+                {
+                  "value": "lit",
+                  "label": "Tip the flame into the channel"
+                }
+              ]
+            },
+            {
+              "id": "back_vault",
+              "at": "just right of centre",
+              "door": {
+                "direction": "back",
+                "to": "inner_vault"
+              },
+              "label": "The stair back down",
+              "desc": "the narrow stair dropping back down into the dark of the vault"
+            },
+            {
+              "id": "temple_gate",
+              "at": "to the right",
+              "label": "The canopy bridge — across to the temple beyond",
+              "desc": "a slung bridge of rope and slats leaving the parapet and running away from the viewer out over the canopy to a DEFINITE DESTINATION — the flat top of a second, smaller temple standing clear of the trees a few hundred yards off, kept and swept like this one, its far end plainly anchored there. Its near end is lashed shut across a gap in the parapet stones. It must clearly GO SOMEWHERE — never trail off or fade into empty distance",
+              "door": {
+                "direction": "forward",
+                "endsEscape": true,
+                "availableWhen": {
+                  "eq": [
+                    "temple_fires",
+                    "lit"
+                  ]
+                }
+              }
+            },
+            {
+              "id": "sun_altar_wall_r",
+              "at": "on the far right",
+              "desc": "the same plain unbroken stretch of low parapet against open white sky, uniform and featureless, the other half of that one surface, joining cleanly at the seam directly behind you"
+            }
+          ],
+          "atmosphere": "HIGH NOON at the zenith, out above the canopy. Blazing overhead sun, shadows almost directly underfoot, heat coming off the pale paving. The paving swept and hot underfoot, the nine stone basins scrubbed pale and standing clean, dry and cold; a stack of unlit tapers and a stoppered oil jar set ready at the head of the channel, waiting for a hand that never came. Painterly, cinematic, subtle film grain. The nine shrine banners are the only PURE, fully saturated colour anywhere — nothing else competes with them for chroma — but the world around them is RICH AND ALIVE, not grey: warm honey-and-ochre limestone, deep wet greens in the forest, real blue in the sky and in the shadows, clear water, painted plaster still holding its colour. Colourful and luminous, never garish, and never washed-out. THE TEMPLE IS KEPT: in daily use until a month ago, swept and tended, nothing ruined, nothing collapsed, no rubble, no plants growing through the floor — the forest presses hard on the outside and stops at the wall. NO golden-hour orange wash, no amber lamplight bath, no firelight glow",
+          "negatives": "No people, no lettering, no captions, no text, no readable writing, no signage, no UI"
+        },
+        "scenePrompt": "This is a seamless 360-degree panorama from the roofless altar platform at the very top of the temple, high above the forest canopy, at the sun's zenith — the viewer stands on the altar's own paving inside a low parapet, a shallow channel running in a full ring around the floor with nine cold offering-basins set along it. THE SKY IS THE VIEW AND IT MUST BE FULL OF WEATHER: enormous towering white cumulus stacked up over the forest, their undersides flat and grey, a distant curtain of rain trailing from one of them far off on the left horizon, high wisps of cirrus above; birds circling in the middle distance below the cloudbase. The rainforest runs away green and unbroken in every direction, going hazy blue toward a horizon hundreds of miles off, with the pale tops of two smaller temples, one long abandoned to the trees and one still kept, breaking the canopy in the far distance. NOT a plain or empty sky, NOT a blank white void — a real, deep, weather-filled tropical sky. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain unbroken stretch of the altar's low parapet against open white sky, uniform and featureless: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, a plain unbroken stretch of the altar's low parapet with nothing beyond it but open white sky, uniform and featureless, the half of that one surface that meets its other half cleanly at the seam directly behind you; to the left, the shallow stone channel running in a ring around the altar floor, nine cold offering-basins set along it, the overhead sun standing the shadow of the parapet almost exactly under itself; dead ahead in the centre, the second register-stone standing at the altar's edge, still blank, with nine small enamelled plaques laid out in a row along its sill, each plaque a different strong colour and each with an empty slot cut beside it; to the left of centre, the one flame you brought up out of the cell, burning in a stone cup on a pivoted arm at the head of the channel, the arm free to be tipped so the fire runs into the ring; just right of centre, the narrow stair dropping back down into the dark of the vault; to the right, a slung bridge of rope and slats leaving the parapet and running away from the viewer out over the canopy to a DEFINITE DESTINATION — the flat top of a second, smaller temple standing clear of the trees a few hundred yards off, kept and swept like this one, its far end plainly anchored there. Its near end is lashed shut across a gap in the parapet stones. It must clearly GO SOMEWHERE — never trail off or fade into empty distance; on the far right, the same plain unbroken stretch of low parapet against open white sky, uniform and featureless, the other half of that one surface, joining cleanly at the seam directly behind you. HIGH NOON at the zenith, out above the canopy. Blazing overhead sun, shadows almost directly underfoot, heat coming off the pale paving. The paving swept and hot underfoot, the nine stone basins scrubbed pale and standing clean, dry and cold; a stack of unlit tapers and a stoppered oil jar set ready at the head of the channel, waiting for a hand that never came. Painterly, cinematic, subtle film grain. The nine shrine banners are the only PURE, fully saturated colour anywhere — nothing else competes with them for chroma — but the world around them is RICH AND ALIVE, not grey: warm honey-and-ochre limestone, deep wet greens in the forest, real blue in the sky and in the shadows, clear water, painted plaster still holding its colour. Colourful and luminous, never garish, and never washed-out. THE TEMPLE IS KEPT: in daily use until a month ago, swept and tended, nothing ruined, nothing collapsed, no rubble, no plants growing through the floor — the forest presses hard on the outside and stops at the wall. NO golden-hour orange wash, no amber lamplight bath, no firelight glow. No people, no lettering, no captions, no text, no readable writing, no signage, no UI. Again: the extreme left and right edges must align perfectly into a plain unbroken stretch of the altar's low parapet against open white sky, uniform and featureless, with no visible seam, join, or repetition.",
+        "hotspotsReviewed": true
+      },
+      "panorama": "sun_altar/scene.png",
+      "builtFrom": "l1_sun_altar_2.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5.1
+      },
+      "hotspots": [
+        {
+          "id": "basin_ring",
+          "type": "ambient",
+          "label": "the shallow stone channel running in a ring around the altar",
+          "box": [
+            0.0565,
+            0.5025,
+            0.2961,
+            0.9306
+          ],
+          "variants": [
+            {
+              "state": "lit",
+              "when": {
+                "eq": [
+                  "temple_fires",
+                  "lit"
+                ]
+              },
+              "box": [
+                0,
+                0,
+                1,
+                1
+              ],
+              "panorama": "sun_altar/scene_lit.png"
+            }
+          ]
+        },
+        {
+          "id": "register_gods",
+          "type": "ledger",
+          "label": "The Register of the Gods",
+          "box": [
+            0.42,
+            0.2868,
+            0.58,
+            0.8368
+          ],
+          "prompt": "Nine plaques, one for each shrine's banner. Set each beside the god that shrine served. A group is only confirmed when every shrine in it is right — and nothing else is claiming to be one of them.",
+          "options": [
+            "the Rain",
+            "the Ember",
+            "the Canopy"
+          ],
+          "rows": [
+            {
+              "id": "crimson",
+              "label": "The crimson banner",
+              "answer": "the Rain"
+            },
+            {
+              "id": "white",
+              "label": "The white banner",
+              "answer": "the Rain"
+            },
+            {
+              "id": "orange",
+              "label": "The orange banner",
+              "answer": "the Ember"
+            },
+            {
+              "id": "deep_blue",
+              "label": "The deep blue banner",
+              "answer": "the Ember"
+            },
+            {
+              "id": "black",
+              "label": "The black banner",
+              "answer": "the Ember"
+            },
+            {
+              "id": "magenta",
+              "label": "The magenta banner",
+              "answer": "the Canopy"
+            },
+            {
+              "id": "yellow",
+              "label": "The yellow banner",
+              "answer": "the Canopy"
+            },
+            {
+              "id": "violet",
+              "label": "The violet banner",
+              "answer": "the Canopy"
+            },
+            {
+              "id": "turquoise",
+              "label": "The turquoise banner",
+              "answer": "the Canopy"
+            }
+          ],
+          "feedback": {
+            "correct": "Every group closes. The register is whole — and the channel around you is still dry, with the flame you carried up out of the cell still burning in your hand.",
+            "partial": "That group holds together. The others do not — yet.",
+            "wrong": "Nothing closes. A god's shrines share most of their figures with each other, and share almost nothing with any other god's. One figure in common means nothing."
+          }
+        },
+        {
+          "id": "flame_dial",
+          "type": "dial",
+          "label": "The carried flame",
+          "box": [
+            0.2496,
+            0.454,
+            0.3269,
+            0.6792
+          ],
+          "key": "temple_fires",
+          "availableWhen": {
+            "solved": "sun_altar"
+          },
+          "lockedBody": "Not yet. A keeper lights the ring when both registers are whole, and the sacred one is still blank.",
+          "hint": "The flame you carried up out of the sealed cell, burning in a stone cup on a pivoted arm at the head of the channel. The arm is free. Tip it, and the fire runs into the ring.",
+          "states": [
+            {
+              "value": "lit",
+              "label": "Tip the flame into the channel"
+            }
+          ]
+        },
+        {
+          "id": "back_vault",
+          "type": "door",
+          "label": "The stair back down",
+          "box": [
+            0.5815,
+            0.603,
+            0.6594,
+            0.7947
+          ],
+          "direction": "back",
+          "to": "inner_vault"
+        },
+        {
+          "id": "temple_gate",
+          "type": "door",
+          "direction": "forward",
+          "label": "The canopy bridge — across to the temple beyond",
+          "box": [
+            0.691,
+            0.4778,
+            0.7501,
+            0.7735
+          ],
+          "availableWhen": {
+            "eq": [
+              "temple_fires",
+              "lit"
+            ]
+          },
+          "lockedBody": "The near end is still lashed shut across the gap in the parapet. You do not carry this news across with the ring cold behind you.",
+          "endsEscape": true
+        }
+      ],
+      "sfx": [
+        {
+          "src": "audio/sun_altar_high_wind.mp3",
+          "volume": 1.0,
+          "mode": "loop"
+        },
+        {
+          "src": "audio/sun_altar_distant_thunder.mp3",
+          "volume": 0.38,
+          "mode": "interval",
+          "gapMin": 25,
+          "gapMax": 60
+        }
+      ],
+      "entry": {
+        "title": "The altar, at the zenith",
+        "text": ""
+      }
+    }
+  ],
+  "cover": "cover.png",
+  "worldPlate": "_world/plate.png"
+}

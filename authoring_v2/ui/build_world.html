@@ -9,12 +9,21 @@
   * { box-sizing: border-box; }
   body { margin:0; background:var(--bg); color:#dfe9f0; font:14px/1.5 system-ui,sans-serif; padding:16px 18px 60px; }
   h1 { font-size:18px; margin:0 0 2px; }
+  /* Persistent controls (2026-08-07, Lucas): the scenario picker, refresh, Save spec, Test play / Play and
+     the Mac push command ride along as you scroll — the page is long and these are needed at any point in
+     it. Sticky (not fixed) so it still sits in normal flow and never overlaps the h1 above it. The negative
+     margins + padding let its background span the body's side padding, so content scrolls UNDER it cleanly
+     rather than appearing beside it. */
+  #topbar { position:sticky; top:0; z-index:60; background:var(--bg);
+            margin:0 -18px 4px; padding:6px 18px 8px; border-bottom:1px solid var(--line); }
+  #topbar .tbrow { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  #topbar .tbrow + .tbrow { margin-top:6px; }
   .sub { color:var(--dim); font-size:12px; margin-bottom:14px; }
   select, button, textarea { font:inherit; color:inherit; background:#12222f; border:1px solid var(--line); border-radius:7px; padding:6px 9px; }
   button { cursor:pointer; } button:hover { border-color:var(--blue); } button:disabled { opacity:.5; cursor:default; }
   a { color:var(--blue); }
   .stage { background:var(--panel); border:1px solid var(--line); border-radius:11px; padding:12px 14px; margin-top:12px; }
-  .stage h2 { font-size:14px; margin:0 0 6px; } .stage h2 .n { color:var(--amber); margin-right:6px; }
+  .stage h2 { font-size:14px; margin:0 0 6px; }
   .hint { color:var(--dim); font-size:12px; }
   .status { font-size:12px; margin-left:8px; } .ok { color:var(--green); } .err { color:#ff9c9c; }
   textarea { width:100%; min-height:120px; font-family:ui-monospace,monospace; font-size:11px; }
@@ -87,7 +96,7 @@
   .covcand img { width:100%; height:100%; object-fit:cover; display:block; }
   .covcand:hover { border-color:var(--blue); }
   #coverThumb { object-fit:cover; }
-  /* Story flow — read-only narrative under the network, in room order, so it reads as the storyline. */
+  /* Story flow — the narrative, in player order, so it reads as the storyline (its own stage card). */
   .storyhd { font-weight:700; color:var(--amber); font-size:13px; margin-bottom:6px; }
   .storyblk { border-left:2px solid var(--line); padding:1px 0 1px 10px; margin:7px 0; }
   .storylbl { font-size:10px; text-transform:uppercase; letter-spacing:.04em; color:var(--dim); }
@@ -103,36 +112,42 @@
   .storyblk.clue { border-left-color:var(--blue); }
   .storyblk.clue .storylbl { color:var(--blue); }
   textarea.storyfld.cluefld { min-height:56px; }
-  #storySave { background:#123020; border-color:var(--green); color:var(--green); }
-  #storySave:hover { border-color:var(--green); filter:brightness(1.2); }
+  /* The landing card sits in the lead slot of the Concept card (where the spec JSON used to be), so give the opening
+     room to breathe — it's the longest single piece of prose in the scenario. */
+  #landingCard textarea.storyfld[data-fld="opening"] { min-height:150px; }
+  #topSave { background:#123020; border-color:var(--green); color:var(--green); }
+  #topSave:hover { border-color:var(--green); filter:brightness(1.2); }
 </style>
 </head>
 <body>
   <h1>Build world</h1>
-  <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap">
-    <label>scenario <select id="scenPick"></select></label>
-    <button id="refresh">↻ refresh</button>
-    <span style="margin-left:auto"></span>
-    <button id="testPlay" title="Open this scenario in the test player (:8055) — sound mixer + in-place text editing; needs the playtest tmux server running on :8055">▶ Test play</button>
-    <button id="play" title="Open this scenario in NORMAL play mode (a student's view — no test tools) over the :8055 playtest server">▶ Play</button>
-    <span class="status" id="topStat"></span>
-  </div>
-  <div style="display:flex; align-items:center; gap:10px; margin-top:8px">
-    <span class="hint" style="white-space:nowrap">push changes (Mac terminal):</span>
-    <pre id="pushCmds" style="margin:0; flex:1; min-width:0; font:12px/1.5 ui-monospace,Menlo,Consolas,monospace; background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:6px 10px; white-space:pre; overflow:auto">cd ~/Documents/Tools/websites/thebustalab.github.io/escape_rooms
+  <div id="topbar">
+    <div class="tbrow">
+      <label>scenario <select id="scenPick"></select></label>
+      <button id="refresh">↻ refresh</button>
+      <button id="topSave" title="Saves EVERYTHING in the harness: the spec bundle (world plate · cover · room scene specs), the story flow (opening · entries · finishes), every puzzle prompt, clue body and locked message, and the exit debrief. One button — there is no separate debrief save.">Save spec</button>
+      <span class="status" id="storySaveStat"></span>
+      <span style="margin-left:auto"></span>
+      <button id="testPlay" title="Open this scenario in the test player (:8055) — sound mixer + in-place text editing; needs the playtest tmux server running on :8055">▶ Test play</button>
+      <button id="play" title="Open this scenario in NORMAL play mode (a student's view — no test tools) over the :8055 playtest server">▶ Play</button>
+      <span class="status" id="topStat"></span>
+    </div>
+    <div class="tbrow">
+      <span class="hint" style="white-space:nowrap">push changes (Mac terminal):</span>
+      <pre id="pushCmds" style="margin:0; flex:1; min-width:0; font:12px/1.5 ui-monospace,Menlo,Consolas,monospace; background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:6px 10px; white-space:pre; overflow:auto">cd ~/Documents/Tools/websites/thebustalab.github.io/escape_rooms
 git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
-    <button id="copyPush" title="Copy these commands"
-      onclick="navigator.clipboard&&navigator.clipboard.writeText(document.getElementById('pushCmds').textContent);this.textContent='Copied ✓';setTimeout(()=>this.textContent='Copy',1200)">Copy</button>
+      <button id="copyPush" title="Copy these commands"
+        onclick="navigator.clipboard&&navigator.clipboard.writeText(document.getElementById('pushCmds').textContent);this.textContent='Copied ✓';setTimeout(()=>this.textContent='Copy',1200)">Copy</button>
+    </div>
   </div>
 
   <div class="stage">
-    <h2><span class="n">1</span>Concept, spec &amp; world</h2>
-    <div class="hint" style="margin-bottom:8px">Dream up the real-world version of the technique and how it leads to an escape. Run the <b>escape</b> skill (new — coming), the <b>puzzle-phase</b> skill, and the <b>story-phase</b> skill, and write it all into <code>design_notes.md</code>. Then build the spec for the entire scenario. Scenario-level entries in the bundle: <code>worldPlate</code> (prompt string) and <code>cover</code> (<code>{prompt, title, ambient}</code>).</div>
+    <h2>Concept, landing &amp; world</h2>
+    <div class="hint" style="margin-bottom:8px">Dream up the real-world version of the technique and how it leads to an escape. Run the <b>escape</b> skill (new — coming), the <b>puzzle-phase</b> skill, and the <b>story-phase</b> skill, and write it all into <code>design_notes.md</code>. The first thing the player meets — the landing card — is edited here; the rest of the narrative is in the story flow below.</div>
     <div style="display:flex; gap:16px; align-items:flex-start; flex-wrap:wrap">
-      <div style="flex:1 1 340px; min-width:300px">
-        <textarea id="specsJson" placeholder='{ "worldPlate":"…", "cover":{"prompt":"…","title":"…","ambient":"fireflies"}, "room1": { … } }'></textarea>
-        <div style="margin-top:6px"><button id="fromDisk">↻ load from disk</button> <span class="status" id="specsStat"></span></div>
-      </div>
+      <!-- Landing card (the player's first screen) sits in the stage's lead slot — the spec bundle used to
+           live here but is machine-facing, so it's hidden below the fold (Lucas, 2026-08-27). -->
+      <div style="flex:1 1 340px; min-width:300px" id="landingCard"></div>
       <div style="flex:1 1 300px; min-width:280px; display:flex; flex-direction:column; gap:10px">
         <div id="platePanel" style="display:none; padding:8px 10px; background:#12222f; border:1px solid var(--line); border-radius:8px; align-items:center; gap:10px; flex-wrap:wrap;">
           <b>World plate</b>
@@ -155,7 +170,41 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
       </div>
     </div>
     <div id="netWrap" style="display:none; margin-top:10px"><svg id="netSvg"></svg><div id="netTip"></div></div>
-    <div id="storyFlow" style="margin-top:12px"></div>
+    <!-- The raw spec bundle. Still loaded from disk and still saved by "Save spec" exactly as before — it's
+         just collapsed, because it's the machine-facing form of what the panels above already show. Kept
+         reachable (not deleted) because the world-plate / cover "view prompt" modals point the reader here. -->
+    <details style="margin-top:12px">
+      <summary class="hint" style="cursor:pointer">Spec bundle (JSON) — worldPlate · cover · room scene specs</summary>
+      <div style="margin-top:8px">
+        <textarea id="specsJson" placeholder='{ "worldPlate":"…", "cover":{"prompt":"…","title":"…","ambient":"fireflies"}, "room1": { … } }'></textarea>
+        <div style="margin-top:6px"><button id="fromDisk">↻ load from disk</button> <span class="status" id="specsStat"></span></div>
+      </div>
+    </details>
+  </div>
+
+  <!-- Story — everything the player READS after the landing card, in player order. Its own stage card
+       (Lucas, 2026-08-27); it still saves through the sticky bar's one "Save spec" button. -->
+  <div class="stage">
+    <h2>Story</h2>
+    <div class="hint" style="margin-bottom:8px">The narrative in player order — each room's entry card, then its puzzle prompts, clues and locked messages, then the finish screens. The landing card that opens it all is in <b>Concept, landing &amp; world</b> above. Edit anything here and hit <b>Save spec</b>.</div>
+    <div id="storyFlow"></div>
+    <!-- LAST action of this stage. The landing card is settled upstairs; this checks everything written
+         here against it. Exists because a hand sweep for orphaned terms missed one living in a nested
+         `question.prompt` (temple, 2026-08-27) — the machine enumerates every field, the human does not. -->
+    <div class="prechk" style="margin-top:14px">
+      <b>⑵ Last — check every line against the vetted landing card.</b>
+      <div class="hint" style="margin:4px 0 6px">The opening is the only place a term gets established.
+        Rewrite it and any room text that leaned on the old wording is left pointing at nothing — valid
+        JSON, happy validators, broken prose. This walks <i>every</i> player-facing string, including the
+        nested <code>question.prompt</code> and <code>feedback.wrong[]</code> a manual pass forgets.
+        <b>Accept</b> snapshots the landing card as the vetted reference; <b>Check</b> diffs against it.</div>
+      <div class="ssbtns">
+        <button onclick="storyCheck(false)">Check text vs landing</button>
+        <button onclick="storyCheck(true)">Accept landing as vetted</button>
+        <span class="status" id="storyChkStat"></span>
+      </div>
+      <pre id="storyChkOut" class="hint" style="display:none; white-space:pre-wrap; margin-top:8px; max-height:320px; overflow:auto"></pre>
+    </div>
   </div>
 
   <div class="stage">
@@ -203,6 +252,28 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
   </div>
 
   <div class="stage">
+    <h2>Environmental variants</h2>
+    <div class="hint" style="margin-bottom:8px">
+      Every state variant in this scenario — the night/weather re-lights and the door-open reveals — shown
+      <b>beside the base scene it was made from</b>, because the rooms table above only ever shows the base
+      and a variant could otherwise be generated, recorded and never once looked at.
+      <b>Regenerate always works from <code>scene.png</code>, never from the variant</b>: these are AI edits of
+      an AI image, and one pass reads correctly while a second compounds the artefacts. Edit the prompt and
+      regenerate as many times as you like — each attempt starts from the original.
+      Each room's <code>scene_open.png</code> door-open partner is listed too, marked <b>view only</b> — it is
+      committed alongside its base rather than generated from a prompt, so there's nothing here to re-fire.
+      Cinemagraphs aren't here; they're clips, picked in the rooms table above.
+      <span style="opacity:.75">A variant only appears in play when its condition is met, so a room will keep
+      showing its base art until then.</span>
+    </div>
+    <div style="display:flex; gap:8px; align-items:center; margin-bottom:8px">
+      <button onclick="refreshVariants()">Reload variants</button>
+      <span class="status" id="varStat"></span>
+    </div>
+    <div id="varGrid"></div>
+  </div>
+
+  <div class="stage">
     <h2>Puzzle details</h2>
     <div class="hint" style="margin-bottom:8px">Review and edit every puzzle in one place — prompts, options, correct answers, feedback, clues and locks — on the full puzzle editor.</div>
     <button onclick="openPuzzleDetails()">Open puzzle details →</button>
@@ -215,7 +286,7 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
   </div>
 
   <div class="stage">
-    <h2><span class="n">5</span>Finish &amp; publish</h2>
+    <h2>Finish &amp; publish</h2>
     <div class="hint" style="margin-bottom:8px">Close it out: audit the built scenario, mark it complete in the inventory, and publish it in the Integrated Bioanalytics book.</div>
     <div style="display:flex; flex-direction:column; gap:10px">
       <label style="display:flex; align-items:flex-start; gap:8px; cursor:pointer">
@@ -272,6 +343,120 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
     loadSpecsFromDisk();   // survive a restart: repopulate the specs textarea from disk
     refresh();
     refreshCoverGrid();    // list any existing cover candidates for this scenario
+    refreshVariants();     // the Environmental-variants gallery
+  }
+
+  // ---- Story vs landing-card consistency (the Story stage's closing gate) --------------------------
+  async function storyCheck(accept) {
+    const st = $("#storyChkStat"), out = $("#storyChkOut");
+    st.textContent = accept ? "snapshotting…" : "checking…";
+    const r = await post("/api/validate-story", { chapter: CH, scenario: SC, accept: !!accept });
+    if (!r.ok) { st.innerHTML = `<span class="err">${esc(r.error)}</span>`; return; }
+    out.style.display = "block";
+    out.textContent = r.output || "(no output)";
+    st.innerHTML = r.failed ? `<span class="err">${r.failed} to fix</span>`
+                            : '<span style="color:#8fe3a8">clean</span>';
+  }
+
+  // ---- Environmental variants ---------------------------------------------------------------------
+  // The gallery that was missing (2026-08-13): a generated night pass had no home in this console, so it
+  // could be made and recorded without anyone seeing it. Shows base vs variant side by side and lets the
+  // prompt be edited and re-fired — always from the base scene, never from the variant.
+  let VARV = Date.now();   // cache-buster: a regenerate rewrites the SAME path, so the browser must be told
+  const sfile = p => `/sfile/${String(p).split("/").map(encodeURIComponent).join("/")}` +
+    `?chapter=${encodeURIComponent(CH)}&scenario=${encodeURIComponent(SC)}&v=${VARV}`;
+  const whenText = (w, lbl) => lbl ? esc(lbl) : (!w ? "always" :
+    (w.solved ? `once <b>${esc(w.solved)}</b> is solved` :
+      (w.eq ? `when <b>${esc(w.eq[0])}</b> = <b>${esc(w.eq[1])}</b>` : esc(JSON.stringify(w)))));
+
+  async function refreshVariants() {
+    if (!CH || !SC) return;
+    const g = $("#varGrid");
+    const r = await getj(`/api/variants?chapter=${encodeURIComponent(CH)}&scenario=${encodeURIComponent(SC)}`);
+    if (!r.ok) { g.innerHTML = `<span class="err">${esc(r.error)}</span>`; return; }
+    const vs = r.variants || [];
+    $("#varStat").textContent = vs.length ? `${vs.length} variant${vs.length === 1 ? "" : "s"}` : "";
+    if (!vs.length) { g.innerHTML = `<div class="hint">No state variants in this scenario yet.</div>`; return; }
+    VARV = Date.now();
+    g.innerHTML = vs.map((v, i) => `
+      <div class="stage" style="margin:0 0 10px; padding:10px">
+        <div style="display:flex; align-items:baseline; gap:8px; flex-wrap:wrap">
+          <b>${esc(v.room)}</b>
+          <span style="opacity:.7">${esc(v.roomTitle || "")}</span>
+          <span style="color:var(--amber)">${esc(v.state)}</span>
+          <span style="opacity:.6; font-size:12px">${v.fullScene ? "full scene" : "boxed"} ·
+            ${v.hotspot ? `carrier <code>${esc(v.hotspot)}</code>` : "committed with the base"} ·
+            ${whenText(v.when, v.whenLabel)}</span>
+          ${v.readOnly ? `<span class="hint">view only</span>` : ""}
+          ${v.exists ? "" : `<span class="err">art file missing</span>`}
+        </div>
+        <div style="display:flex; gap:10px; margin:8px 0">
+          <div style="flex:1">
+            <div class="hint" style="margin-bottom:4px">base — <code>${esc(v.base)}</code></div>
+            <a href="${sfile(v.base)}" target="_blank" rel="noopener">
+              <img src="${sfile(v.base)}" style="width:100%; border-radius:6px; display:block"></a>
+          </div>
+          <div style="flex:1">
+            <div class="hint" style="margin-bottom:4px">${esc(v.state)} — <code>${esc(v.panorama || "—")}</code></div>
+            ${v.exists ? `<a href="${sfile(v.panorama)}" target="_blank" rel="noopener">
+              <img src="${sfile(v.panorama)}" style="width:100%; border-radius:6px; display:block"></a>`
+        : `<div class="hint">nothing generated yet</div>`}
+          </div>
+        </div>
+        ${v.readOnly ? "" : `
+        <textarea id="vp${i}" rows="3" style="width:100%"
+          placeholder="the variant prompt — describe the CHANGE, and pin the composition so the hotspot boxes still land"
+          >${esc(v.prompt || "")}</textarea>
+        <div style="display:flex; gap:8px; align-items:center; margin-top:6px">
+          <button onclick='regenVariant(${JSON.stringify(v).replace(/'/g, "&#39;")}, ${i})'>Regenerate from base</button>
+          ${v.exists && v.fullScene ? `<button onclick='wrapSeamVariant(${JSON.stringify(v).replace(/'/g, "&#39;")})'
+            title="Open the wrap/seam editor on THIS image — the re-light can break a seam the base had already repaired">Wrap &amp; seam →</button>` : ""}
+          <button onclick='dropVariant(${JSON.stringify(v).replace(/'/g, "&#39;")})' style="color:#ff9c9c">Delete</button>
+          <span class="status" id="vs${i}"></span>
+        </div>`}
+      </div>`).join("");
+  }
+
+  async function regenVariant(v, i) {
+    const prompt = ($(`#vp${i}`).value || "").trim();
+    if (!prompt) { $(`#vs${i}`).innerHTML = `<span class="err">needs a prompt</span>`; return; }
+    $(`#vs${i}`).textContent = "generating…";
+    // full-scene variants re-light the WHOLE panorama (no mask); boxed ones edit inside the hotspot's box
+    const r = v.fullScene
+      ? await post("/api/gen-fullscene-variant", {
+        chapter: CH, scenario: SC, roomKey: v.room, state: v.state,
+        prompt, when: v.when, carrier: v.hotspot })
+      : await post("/api/gen-variant-room", {
+        chapter: CH, scenario: SC, roomKey: v.room, hotspotId: v.hotspot, state: v.state,
+        box: [0, 0, 1, 1], prompt, when: v.when });
+    if (!r.ok) { $(`#vs${i}`).innerHTML = `<span class="err">${esc(r.error)}</span>`; return; }
+    const tick = setInterval(async () => {
+      const st = await getj("/api/status?slot=variant");
+      if (st.active) return;
+      clearInterval(tick);
+      $(`#vs${i}`).innerHTML = st.error ? `<span class="err">${esc(st.error)}</span>` : "done";
+      refreshVariants();
+    }, 2500);
+  }
+
+  // Open the wrap/seam hub ON THE VARIANT. The unmasked re-light can break a wrap seam the base scene
+  // had already had repaired, and until now seam repair could only ever touch scene.png. Seam fixes there
+  // apply to the variant alone and keep their own undo stack; the WRAP shown is the room's, shared by
+  // every state — see the note the hub prints.
+  function wrapSeamVariant(v) {
+    const file = String(v.panorama || "").split("/").pop();
+    if (!file) return;
+    window.open(`/reproject_test.html?room=${encodeURIComponent(v.room)}` +
+      `&chapter=${encodeURIComponent(CH)}&scenario=${encodeURIComponent(SC)}` +
+      `&file=${encodeURIComponent(file)}&state=${encodeURIComponent(v.state || "")}`, "_blank");
+  }
+
+  async function dropVariant(v) {
+    if (!confirm(`Delete the "${v.state}" variant on ${v.room}? The PNG stays on disk; only the wiring goes.`)) return;
+    const r = await post("/api/delete-variant",
+      { chapter: CH, scenario: SC, roomKey: v.room, hotspotId: v.hotspot, state: v.state });
+    if (!r.ok) { $("#varStat").innerHTML = `<span class="err">${esc(r.error)}</span>`; return; }
+    refreshVariants();
   }
   async function refresh() {
     if (!CH || !SC) return;
@@ -333,11 +518,11 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
     const thumb = $("#plateThumb");
     if (st.worldPlate) { thumb.style.display = ""; if (!thumb.src || !PLATEV) { PLATEV = PLATEV || 1; thumb.src = plateSrc(); } }
   }
-  // The world-plate prompt lives in the spec bundle (the `worldPlate` entry, stage 1) — read-only here.
+  // The world-plate prompt lives in the spec bundle (the `worldPlate` entry, Concept card) — read-only here.
   function viewWorldPrompt() {
     $("#promptTitle").textContent = "World plate prompt";
     const t = $("#promptText"); t.value = WORLDPROMPT || ""; t.readOnly = true;
-    $("#promptHint").innerHTML = "Read-only — it's the <b>worldPlate</b> entry in the spec (stage 1); edit it there, then re-render.";
+    $("#promptHint").innerHTML = "Read-only — it's the <b>worldPlate</b> entry in the spec bundle (Concept card, under <b>Spec bundle (JSON)</b>); edit it there, then re-render.";
     $("#promptModal").style.display = "flex";
   }
   async function genPlate() {
@@ -371,7 +556,7 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
     const has = v => !!(v && String(v).trim());
     $("#coverFlags").innerHTML = `prompt ${m(has(st.coverPrompt))} · cover set ${m(has(st.cover))} · title ${m(has(st.title))} · ambient ${m(has(st.ambient))}`;
   }
-  // Story flow — the EDITABLE narrative under the network, in player order: opening → each room's entry card
+  // Story flow — the EDITABLE narrative, in player order: the landing card (Concept card) → each room's entry card
   // then that room's puzzle prompt(s) → clue(s) → locked message(s) → the finish screens. Edit any field and
   // hit "Save spec"; opening / entries / finishes persist through the spec bundle's `story` (save-scene-specs),
   // each puzzle prompt writes back into its hotspot (set-puzzle-prompts), and each clue body writes back into
@@ -387,24 +572,32 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
   }
   function renderStory(st) {
     const host = $("#storyFlow"); if (!host) return;
+    const lhost = $("#landingCard");   // the opening/landing card renders into the stage's lead slot, not here
     const rooms = st.rooms || [];
     const any = st.openingStory || st.enterLabel || st.analysisFinish || st.escapeFinish ||
       rooms.some(r => r.entry || (r.puzzlePrompts || []).length || (r.clues || []).length) ||
       ($("#specsJson").value || "").trim();   // also render (for the Save button) when only a spec bundle is present
-    if (!any) { host.innerHTML = ""; host.dataset.built = ""; STORY_SIG = null; return; }
+    if (!any) {
+      host.innerHTML = ""; host.dataset.built = "";
+      if (lhost) { lhost.innerHTML = ""; lhost.dataset.built = ""; }
+      STORY_SIG = null; return;
+    }
     const sig = storySig(st);
     if (host.dataset.built && sig === STORY_SIG) return;   // same shape → keep unsaved edits intact
     STORY_SIG = sig;
     const fld = (fldName, room, ph) =>
       `<textarea class="storyfld" data-fld="${fldName}"${room ? ` data-room="${esc(room)}"` : ""} placeholder="${esc(ph || "")}"></textarea>`;
-    let html = `<div class="storyhd">Story flow <span class="hint">— edit the narrative in player order, then Save (saves the whole Concept, spec &amp; world area)</span></div>`;
-    // opening (landing screen) — scenario-level
-    html += `<div class="storyblk"><div class="storylbl">Opening · landing screen</div>` +
+    // opening (landing screen) — scenario-level. Rendered into the STAGE'S LEAD SLOT (#landingCard), because
+    // it's the first thing the player meets and so should be the first thing the author meets too.
+    const landingHtml =
+      `<div class="storyhd">Landing card <span class="hint">— the player's first screen; edit and hit Save</span></div>` +
+      `<div class="storyblk"><div class="storylbl">Opening · landing screen</div>` +
       (st.title ? `<div class="storytitle">${esc(st.title)}</div>` : "") +
       fld("opening", "", "The opening the player reads on the landing screen…") +
       `<div class="storylbl" style="margin-top:5px">enter button</div>` +
       `<input class="storyfld" data-fld="enterLabel" placeholder="Enter →">` +
       `</div>`;
+    let html = "";   // no heading here — the Story stage card supplies its own
     // per room, in order: entry card (if any) then that room's puzzle prompt(s)
     rooms.forEach(r => {
       if (r.entry) {
@@ -437,11 +630,16 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
     if (st.escapeFinish)
       html += `<div class="storyblk"><div class="storylbl">Escape finish</div>` +
         `<input class="storyfld" data-fld="efTitle" placeholder="You escaped!">` + fld("efBody", "", "You made it out.") + `</div>`;
-    html += `<div style="margin-top:10px"><button id="storySave" title="Saves everything in ‘Concept, spec & world’: the spec bundle above (world plate · cover · room scene specs) plus this narrative — the story flow wins where they overlap">Save spec</button> <span class="status" id="storySaveStat"></span></div>`;
+    // No Save button here — the single persistent "Save spec" in the sticky top bar saves this stage too.
     host.innerHTML = html;
     host.dataset.built = "1";
-    // set textarea/input VALUES via property (never through innerHTML — prompts/entries may contain markup)
-    const setv = (sel, v) => { const el = host.querySelector(sel); if (el) el.value = v == null ? "" : v; };
+    if (lhost) { lhost.innerHTML = landingHtml; lhost.dataset.built = "1"; }
+    // set textarea/input VALUES via property (never through innerHTML — prompts/entries may contain markup).
+    // Look in the landing slot as well as the flow, since the opening fields now live up there.
+    const setv = (sel, v) => {
+      const el = host.querySelector(sel) || (lhost && lhost.querySelector(sel));
+      if (el) el.value = v == null ? "" : v;
+    };
     setv('[data-fld="opening"]', st.openingStory);
     setv('[data-fld="enterLabel"]', st.enterLabel);
     rooms.forEach(r => {
@@ -458,38 +656,44 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
     });
     if (st.analysisFinish) { setv('[data-fld="afTitle"]', st.analysisFinish.title); setv('[data-fld="afBody"]', st.analysisFinish.body); }
     if (st.escapeFinish) { setv('[data-fld="efTitle"]', st.escapeFinish.title); setv('[data-fld="efBody"]', st.escapeFinish.body); }
-    host.querySelector("#storySave").onclick = saveStory;
   }
-  // Save EVERYTHING in the "Concept, spec & world" stage from one button: the spec-bundle textarea
+  // Save EVERYTHING in the Concept/landing/world AND Story stages from one button: the spec-bundle textarea
   // (worldPlate / cover / room scene specs / any story it carries) MERGED with the story flow's narrative
   // fields (opening/enter/entries/finishes) — the flow wins on `story` — in a single save-scene-specs call,
   // then the puzzle prompts, clue bodies and locked messages via their own bulk endpoints. An empty textarea
   // just saves the narrative + hotspot content; invalid JSON in the textarea aborts the whole save (no
-  // half-write). Named saveStory for history; it's the stage-1 Save button.
+  // half-write). Named saveStory for history; it's the sticky bar's one Save button.
   async function saveStory() {
     const host = $("#storyFlow"), stat = $("#storySaveStat");
     stat.innerHTML = `<span class="warn">saving…</span>`;
-    const val = sel => { const el = host.querySelector(sel); return el ? el.value : undefined; };
+    // The story flow may not have rendered yet (fresh page, no built rooms). Saving must still work — the
+    // spec textarea and the debrief are independent of it — so every flow lookup degrades to "nothing here".
+    // Two hosts now: the landing card in the stage's lead slot and the story flow below it. Both are built
+    // together by renderStory, and every lookup spans the pair so the opening/enter fields still save.
+    const lhost = $("#landingCard");
+    const hosts = [lhost, host].filter(h => h && h.dataset.built);
+    const q = sel => hosts.flatMap(h => [...h.querySelectorAll(sel)]);
+    const val = sel => { for (const h of hosts) { const el = h.querySelector(sel); if (el) return el.value; } return undefined; };
     // 1) opening / enter / entries / finishes → the spec bundle's `story`
     const story = {};
     const op = val('[data-fld="opening"]'); if (op !== undefined) story.opening = op;
     const en = val('[data-fld="enterLabel"]'); if (en !== undefined) story.enterLabel = en;
-    if (host.querySelector('[data-fld="afBody"]')) story.analysisFinish = { title: val('[data-fld="afTitle"]') || "", body: val('[data-fld="afBody"]') || "" };
-    if (host.querySelector('[data-fld="efBody"]')) story.escapeFinish = { title: val('[data-fld="efTitle"]') || "", body: val('[data-fld="efBody"]') || "" };
+    if (val('[data-fld="afBody"]') !== undefined) story.analysisFinish = { title: val('[data-fld="afTitle"]') || "", body: val('[data-fld="afBody"]') || "" };
+    if (val('[data-fld="efBody"]') !== undefined) story.escapeFinish = { title: val('[data-fld="efTitle"]') || "", body: val('[data-fld="efBody"]') || "" };
     const entries = {};
-    host.querySelectorAll('input[data-fld="entryTitle"]').forEach(inp => {
+    q('input[data-fld="entryTitle"]').forEach(inp => {
       const rk = inp.dataset.room, txt = host.querySelector(`textarea[data-fld="entryText"][data-room="${rk}"]`);
       entries[rk] = { title: inp.value || "", text: txt ? txt.value : "" };
     });
     if (Object.keys(entries).length) story.entries = entries;
     // 2) puzzle prompts → each hotspot (bulk, one save)
-    const prompts = [...host.querySelectorAll('textarea[data-fld="puzzle"]')].map(t =>
+    const prompts = [...q('textarea[data-fld="puzzle"]')].map(t =>
       ({ roomKey: t.dataset.room, source: t.dataset.source, index: Number(t.dataset.index), prompt: t.value }));
     // 3) clue bodies → each clue hotspot's `body` (bulk, one save)
-    const clues = [...host.querySelectorAll('textarea[data-fld="clue"]')].map(t =>
+    const clues = [...q('textarea[data-fld="clue"]')].map(t =>
       ({ roomKey: t.dataset.room, source: t.dataset.source, index: Number(t.dataset.index), body: t.value }));
     // 4) locked/out-of-order navigation messages → each hotspot's lockedBody (bulk, one save)
-    const locked = [...host.querySelectorAll('textarea[data-fld="locked"]')].map(t =>
+    const locked = [...q('textarea[data-fld="locked"]')].map(t =>
       ({ roomKey: t.dataset.room, source: t.dataset.source, index: Number(t.dataset.index), lockedBody: t.value }));
     let issues = [];
     // Spec bundle from the textarea (world plate / cover / room scene specs / any story it carries) MERGED
@@ -525,11 +729,14 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
       if (!rl.ok) issues.push("locked: " + esc(rl.error || "failed"));
       else { lOk = rl.updated || 0; (rl.errors || []).forEach(e => issues.push(`${esc(e.roomKey)}: ${esc(e.error)}`)); }
     }
+    // 5) the exit debrief — same button, no separate save (Lucas, 2026-08-07)
+    const db = await saveDebriefPart();
+    issues = issues.concat(db.issues);
     stat.innerHTML = issues.length
       ? `<span class="err">saved with issues — ${issues.join("; ")}</span>`
-      : `<span class="ok">saved ✓ — spec (${sOk} part${sOk === 1 ? "" : "s"}), ${Object.keys(entries).length} entr${Object.keys(entries).length === 1 ? "y" : "ies"}, ${pOk} prompt${pOk === 1 ? "" : "s"}, ${cOk} clue${cOk === 1 ? "" : "s"}, ${lOk} message${lOk === 1 ? "" : "s"}</span>`;
-    STORY_SIG = null;                 // force a rebuild from the freshly-saved state
-    refresh(); loadSpecsFromDisk();   // resync the network + the stage-1 JSON textarea
+      : `<span class="ok">saved ✓ — spec (${sOk} part${sOk === 1 ? "" : "s"}), ${Object.keys(entries).length} entr${Object.keys(entries).length === 1 ? "y" : "ies"}, ${pOk} prompt${pOk === 1 ? "" : "s"}, ${cOk} clue${cOk === 1 ? "" : "s"}, ${lOk} message${lOk === 1 ? "" : "s"}, ${db.rooms} debrief${db.rooms === 1 ? "" : "s"}</span>`;
+    STORY_SIG = null; DEBRIEF_SIG = null;   // force both editors to rebuild from the freshly-saved state
+    refresh(); loadSpecsFromDisk();         // resync the network + the Concept card's JSON textarea
   }
   // How this world worked (exit debrief) — a scenario-level intro + one paragraph per BUILT room, shown
   // just before the audit. Sig-guarded like the story flow so a poll tick never clobbers an in-progress
@@ -552,7 +759,8 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
       html += `<div class="storyblk"><div class="storylbl">Debrief · ${esc(r.key)}${r.title ? " · " + esc(r.title) : ""}</div>` +
         `<textarea class="storyfld" data-dbg-room="${esc(r.key)}" placeholder="how this room embodied the technique…"></textarea></div>`;
     });
-    html += `<div style="margin-top:10px"><button id="debriefSave">Save debrief</button> <span class="status" id="debriefSaveStat"></span></div>`;
+    // No Save button here either — the debrief rides the sticky bar's "Save spec" (Lucas, 2026-08-07:
+    // "everything in the harness should be saved when I hit save spec").
     host.innerHTML = html;
     host.dataset.built = "1";
     const setv = (sel, v) => { const el = host.querySelector(sel); if (el) el.value = v == null ? "" : v; };
@@ -562,17 +770,18 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
       const d = r.debrief;
       setv(`textarea[data-dbg-room="${r.key}"]`, (d && typeof d === "object") ? (d.body || "") : (d || ""));
     });
-    host.querySelector("#debriefSave").onclick = saveDebrief;
   }
-  async function saveDebrief() {
-    const host = $("#debriefEditor"), stat = $("#debriefSaveStat");
-    stat.innerHTML = `<span class="warn">saving…</span>`;
+  // Save the exit debrief. No button of its own — called by saveStory (the sticky bar's one Save spec).
+  // Returns {issues, rooms} so the caller can fold it into the single status line. A no-op when the
+  // debrief editor hasn't rendered yet (no built rooms), so saving early is still safe.
+  async function saveDebriefPart() {
+    const host = $("#debriefEditor"), issues = [];
+    if (!host || !host.dataset.built) return { issues, rooms: 0 };
     const val = sel => { const el = host.querySelector(sel); return el ? el.value : ""; };
-    const issues = [];
     const title = val('[data-dbg="title"]'), intro = val('[data-dbg="intro"]');
     if (title.trim() || intro.trim()) {
       const rs = await patchScenario({ debrief: { title, intro } });
-      if (!rs.ok) issues.push("scenario: " + esc(rs.error || "failed"));
+      if (!rs.ok) issues.push("debrief: " + esc(rs.error || "failed"));
     }
     let rOk = 0;
     for (const t of host.querySelectorAll('textarea[data-dbg-room]')) {
@@ -580,15 +789,12 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
       const rr = await post("/api/room-patch", { chapter: CH, scenario: SC, roomKey: t.dataset.dbgRoom, fields: { debrief: t.value } });
       if (!rr.ok) issues.push(`${esc(t.dataset.dbgRoom)}: ${esc(rr.error || "failed")}`); else rOk++;
     }
-    stat.innerHTML = issues.length
-      ? `<span class="err">saved with issues — ${issues.join("; ")}</span>`
-      : `<span class="ok">saved ✓ — intro + ${rOk} room${rOk === 1 ? "" : "s"}</span>`;
-    DEBRIEF_SIG = null; refresh();
+    return { issues, rooms: rOk };
   }
   function viewCoverPrompt() {
     $("#promptTitle").textContent = "Cover art prompt";
     const t = $("#promptText"); t.value = COVERPROMPT || ""; t.readOnly = true;
-    $("#promptHint").innerHTML = "Read-only — it's the <b>cover.prompt</b> entry in the spec bundle (stage 1); edit it there, then re-render.";
+    $("#promptHint").innerHTML = "Read-only — it's the <b>cover.prompt</b> entry in the spec bundle (Concept card); edit it there, then re-render.";
     $("#promptModal").style.display = "flex";
   }
   async function genCover() {
@@ -738,7 +944,7 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
   function viewPrompt(key) {
     $("#promptTitle").textContent = "Prompt — " + key;
     const t = $("#promptText"); t.value = PROMPTS[key] || ""; t.readOnly = true;
-    $("#promptHint").innerHTML = "Read-only — edit the room's <b>spec</b> (stage 1) to change the prompt.";
+    $("#promptHint").innerHTML = "Read-only — edit the room's <b>spec</b> (Concept card, under <b>Spec bundle (JSON)</b>) to change the prompt.";
     $("#promptModal").style.display = "flex";
   }
   function closePrompt() { $("#promptModal").style.display = "none"; }
@@ -807,6 +1013,7 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
     startPoll(); refresh();
   };
   $("#refresh").onclick = () => { GENV = Date.now(); refresh(); };   // bump so a hub seam-edit (in-place) reloads thumbs
+  $("#topSave").onclick = saveStory;    // the ONE save: spec bundle + story flow + prompts/clues/locked + debrief
   $("#fromDisk").onclick = loadSpecsFromDisk;
   $("#scenPick").onchange = onScenario;
   // ▶ Test play (mixer + in-place editing) and ▶ Play (student view), both over the :8055 playtest server.

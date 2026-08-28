@@ -1,5 +1,5 @@
 {
-  "status": "in_development",
+  "status": "ready",
   "chapter": "wrangling",
   "scenario": "trees",
   "id": 15,
@@ -957,7 +957,7 @@
         "vaov": 90,
         "hfov": 110,
         "vOffset": 0,
-        "pitch": -8.6
+        "pitch": -5.5
       },
       "hotspots": [
         {
@@ -2459,12 +2459,12 @@
             {
               "state": "to_station3",
               "box": [
-                0.832,
-                0.04,
-                0.955,
+                0.8296,
+                0.0267,
+                0.9856,
                 0.986
               ],
-              "prompt": "the sliding triangle-marked door drawn fully open, revealing the STATION-THREE canopy platform beyond — high above the treetops in bright midday light: living-wood decking and brass railings, sunlit peaks across the horizon, mist far below. The bright daylit view fills the entire open doorway; no dark void.",
+              "prompt": "the sliding triangle-marked door drawn FULLY OPEN onto an EMPTY DOORWAY — an unobstructed view straight out of the car onto the STATION-THREE CANOPY PLATFORM beyond: living-wood decking and brass railings high above the treetops, a far ridge of sunlit mountain peaks across the horizon, a sea of mist far below, in bright clear midday light. The open doorway is a HOLE THROUGH THE WALL onto open air and daylight — absolutely NO cabinet, NO shelves, NO display case, NO specimens, NO glass front in the doorway. The bright daylit outdoor view fills the entire opening; no dark void. Same car wall, same brass fittings, same painterly cinematic style; nothing outside the doorway changes. No people, no lettering, no text.",
               "panorama": "car_tr/var_triangle_door_to_station3.png",
               "when": {
                 "eq": [
@@ -2479,11 +2479,11 @@
               "state": "to_boss",
               "box": [
                 0.832,
-                0.04,
-                0.955,
+                0.0085,
+                0.9812,
                 0.986
               ],
-              "prompt": "the sliding triangle-marked door drawn fully open, revealing a high mountain trail beyond — out above the trees in warm golden-hour sunlight: a winding rocky ledge with a great boulder on the path, close sunlit peaks, and a sea of canopy far below. The bright golden view fills the entire open doorway, brightly lit; no dark void.",
+              "prompt": "the sliding triangle-marked door drawn fully open, REVEALING A HIGH MOUNTAIN TRAIL BEYOND — out above the trees in warm golden-hour sunlight: a winding rocky ledge with a great boulder on the path, close sunlit peaks, and a sea of canopy far below. The bright golden view fills the entire open doorway, brightly lit; no dark void.",
               "panorama": "car_tr/var_triangle_door_to_boss.png",
               "when": {
                 "eq": [
@@ -2957,13 +2957,29 @@
           "type": "door",
           "label": "a great boulder wedged directly in a cleft in the rock, bloc",
           "box": [
-            0.8377,
-            0.1572,
-            0.9433,
-            0.6701
+            0.8091,
+            0.0861,
+            0.9682,
+            0.741
           ],
           "direction": "forward",
-          "to": "vault"
+          "to": "vault",
+          "variants": [
+            {
+              "state": "open",
+              "box": [
+                0.8091,
+                0.0861,
+                0.9682,
+                0.741
+              ],
+              "prompt": "the great boulder is removed to reveal a path through the now open cleft. The opening is BRIGHT and lit end to end — no dark slot, no black void. Same ledge, same rock, same golden-hour evening light and long amber shadows, same painterly cinematic style; nothing outside the cleft changes. No people, no lettering, no text.",
+              "panorama": "boss/var_boulder_cleft_open.png",
+              "when": {
+                "solved": "boss"
+              }
+            }
+          ]
         }
       ],
       "sfx": {
@@ -2982,8 +2998,8 @@
       "built": true,
       "authoring": {
         "tag": "vault",
-        "scenePrompt": "This is a seamless 360-degree panorama from the windswept cliff-top at the very highest point, at sunset, the mist wholly lifted to reveal a full vista of the alien canopy and the far ridge of peaks — an ancient alien gate set into the rock face, a blank three-by-three button panel beside it. Directly behind the viewer, split across the extreme left and extreme right edges, is the open sunset sky over the vast distant sea of alien tree-canopy and the far ridge of peaks — one unbroken, glowing band of gold, rose and teal cloud meeting the faraway horizon: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the trail leading back down off the cliff-top toward the boss ledge and the cars below; to the left, the full sunset vista off the cliff — the whole alien canopy and a far ridge of peaks glowing under drifting sunset cloud, the mist entirely gone; left of centre, carved alien runes ringing the great stone gate, faintly bioluminescent in the fading light; dead ahead in the centre, the ancient alien gate set into the cliff face, and beside it a blank three-by-three grid of unlit stone buttons awaiting the correct pattern; to the right, hanging lanterns of amber lichen strung along a weathered rail at the cliff edge, swaying in the wind. Painterly, cinematic, awe-struck and triumphant; rich sunset light — gold, rose and deep teal — over a vast clear vista, gentle bioluminescent amber and rune-glow, subtle film grain; the payoff moment, warm and wondrous. No people, no lettering, no text, no captions, no UI. Again: the extreme left and right edges must align perfectly into the open sunset sky over the vast distant sea of alien tree-canopy and the far ridge of peaks — one unbroken, glowing band of gold, rose and teal cloud meeting the faraway horizon, with no visible seam, join, or repetition.",
-        "doorPrompt": "The ancient GATE has swung open, a warm amber light spilling out from the vault chamber within where a single artifact rests on a plinth; the sunset vista and the trail back are unchanged. Same golden light, same painterly style, no people, no lettering, no text.",
+        "scenePrompt": "This is a seamless 360-degree panorama from the windswept cliff-top at the very highest point, at sunset, the mist wholly lifted to reveal a full vista of the alien canopy and the far ridge of peaks — an ancient alien gate set into the rock face, a blank three-by-three button panel beside it. Directly behind the viewer, split across the extreme left and extreme right edges, is the open sunset sky over the vast distant sea of alien tree-canopy and the far ridge of peaks — one unbroken, glowing band of gold, rose and teal cloud meeting the faraway horizon: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the trail leading back down off the cliff-top toward the boss ledge and the cars below; to the left, the full sunset vista off the cliff — the whole alien canopy and a far ridge of peaks glowing under drifting sunset cloud, the mist entirely gone; left of centre, carved alien runes ringing the great stone gate, faintly bioluminescent in the fading light; dead ahead in the centre, the ancient alien gate itself, a great round-panelled stone door set deep into the cliff face; just right of centre, a blank three-by-three grid of unlit stone buttons set into the rock beside the gate, awaiting the correct pattern; to the right, hanging lanterns of amber lichen strung along a weathered rail at the cliff edge, swaying in the wind. Painterly, cinematic, awe-struck and triumphant; rich sunset light — gold, rose and deep teal — over a vast clear vista, gentle bioluminescent amber and rune-glow, subtle film grain; the payoff moment, warm and wondrous. No people, no lettering, no text, no captions, no UI. Again: the extreme left and right edges must align perfectly into the open sunset sky over the vast distant sea of alien tree-canopy and the far ridge of peaks — one unbroken, glowing band of gold, rose and teal cloud meeting the faraway horizon, with no visible seam, join, or repetition.",
+        "doorPrompt": "the great stone gate standing wide open, the vault chamber beyond it BRIGHT and warmly lit end to end — a low stone plinth just inside holding the artifact, its facets throwing gold light out across the threshold, shelves of ancient collected specimens ranged behind it in the amber glow. The lit chamber fills the entire open doorway; no dark slot, no black void. Same cliff face, same carved rune arch, same golden-hour sunset light and painterly cinematic style; nothing outside the doorway changes. No people, no lettering, no text.",
         "sceneSpec": {
           "room": "vault",
           "interior": false,
@@ -3018,9 +3034,24 @@
               }
             },
             {
-              "id": "gate_panel",
+              "id": "vault_gate",
               "at": "dead ahead in the centre",
-              "desc": "the ancient alien gate set into the cliff face, and beside it a blank three-by-three grid of unlit stone buttons awaiting the correct pattern",
+              "desc": "the ancient alien gate itself, a great round-panelled stone door set deep into the cliff face",
+              "door": {
+                "direction": "forward",
+                "opensOnto": [
+                  {
+                    "state": "open",
+                    "reveal": "the great stone gate standing wide open, the vault chamber beyond it BRIGHT and warmly lit end to end — a low stone plinth just inside holding the artifact, its facets throwing gold light out across the threshold, shelves of ancient collected specimens ranged behind it in the amber glow. The lit chamber fills the entire open doorway; no dark slot, no black void. Same cliff face, same carved rune arch, same golden-hour sunset light and painterly cinematic style; nothing outside the doorway changes. No people, no lettering, no text."
+                  }
+                ]
+              },
+              "label": "The ancient gate"
+            },
+            {
+              "id": "gate_panel",
+              "at": "just right of centre",
+              "desc": "a blank three-by-three grid of unlit stone buttons set into the rock beside the gate, awaiting the correct pattern",
               "grid": true,
               "label": "The gate panel"
             },
@@ -3050,9 +3081,15 @@
       ],
       "plannedHotspots": [
         {
-          "type": "lock",
+          "type": "grid",
           "label": "The vault gate panel",
-          "note": "NEW 'grid-select' puzzle type (3x3): COLUMNS = the three car shapes (square/circle/triangle), ROWS = the three traits (colour/size/shape). Pick, per column, the trait that line's collection was sorted by. Beetles=colour, cones=size, shells=shape. Ungraded escape gate (out of codec)."
+          "note": "'grid-select' puzzle (3x3): COLUMNS = the three car shapes (square/circle/triangle), ROWS = the three traits (colour/size/shape). Pick, per column, the trait that line's collection was sorted by. Beetles=colour, cones=size, shells=shape. Ungraded (out of codec). Solving OPENS the gate; it does NOT end the escape."
+        },
+        {
+          "type": "door",
+          "label": "The ancient gate",
+          "direction": "forward",
+          "note": "terminal escape exit: requires the gate_panel grid, endsEscape, no `to`. The player must click through the OPEN gate to finish — the grid only unseals it."
         },
         {
           "type": "door",
@@ -3061,7 +3098,7 @@
           "note": "return to the boss ledge (and on down the cars to re-inspect the collections)"
         }
       ],
-      "designNote": "VAULT / ESCAPE (ungraded, no codec). The 3x3 grid gate: COLUMNS keyed by DOOR SHAPE (square / circle / triangle), ROWS the three traits (COLOUR / SIZE / SHAPE). Correct mapping: square=COLOUR (beetles), circle=SIZE (cones), triangle=SHAPE (shells). One selection per column; correct vector fires solveRoom -> escapeDone. NO notebook pickups (Lucas: force backtracking) — the player must remember, or ride back DOWN through the cars to re-read the trays (the framed collector's notes flagged each on the way up). => the single-door shared-node BACK-NAV is load-bearing here. NEW ENGINE WORK: build the 'grid-select' puzzle type (sibling of lock/ledger; see notes/puzzle_inventory.md) and the ride-beat. ART: HIGHEST point, sunset cliff-top, mist LIFTED to a full canopy+peaks vista, the alien gate + a blank 3x3 button panel; artifact revealed on solve. PLAYTEST WATCH: with forced backtracking + single-door cars, re-inspecting from the vault is a long ride down-and-up — the framed notes must make each collection memorable enough that most players don't need the trek. [UPDATE 2026-08-04: re-inspection is by riding back down via the single-door world-state SWITCH / multi-view door (not shared 'down' nodes); the cars carry NO framed note — the player re-reads the tray ART (grouping + shape motif on the case).]",
+      "designNote": "VAULT / ESCAPE (ungraded, no codec). The 3x3 grid gate: COLUMNS keyed by DOOR SHAPE (square / circle / triangle), ROWS the three traits (COLOUR / SIZE / SHAPE). Correct mapping: square=COLOUR (beetles), circle=SIZE (cones), triangle=SHAPE (shells). One selection per column; correct vector fires solveRoom -> escapeDone. NO notebook pickups (Lucas: force backtracking) — the player must remember, or ride back DOWN through the cars to re-read the trays (the framed collector's notes flagged each on the way up). => the single-door shared-node BACK-NAV is load-bearing here. NEW ENGINE WORK: build the 'grid-select' puzzle type (sibling of lock/ledger; see notes/puzzle_inventory.md) and the ride-beat. ART: HIGHEST point, sunset cliff-top, mist LIFTED to a full canopy+peaks vista, the alien gate + a blank 3x3 button panel; artifact revealed on solve. PLAYTEST WATCH: with forced backtracking + single-door cars, re-inspecting from the vault is a long ride down-and-up — the framed notes must make each collection memorable enough that most players don't need the trek. [UPDATE 2026-08-04: re-inspection is by riding back down via the single-door world-state SWITCH / multi-view door (not shared 'down' nodes); the cars carry NO framed note — the player re-reads the tray ART (grouping + shape motif on the case).]  [UPDATE 2026-08-27: the grid no longer fires escapeDone directly. Solving it opens the gate (state variant vault/var_vault_gate_open.png on the new `vault_gate` door hotspot); the player must then CLICK THROUGH the open gate, which carries requires:gate_panel + endsEscape. The last gesture is the player's own — same shape as egypt's lamp dial and henges' way-home arch. The stray var_trail_back_open.png variant hung on trail_back was a mis-targeted generation (it erased the trail steps and showed no open door) and has been moved to _scratch/. The real open-gate art was generated the same day via authoring_v2/art_cli.py (masked variant job on vault_gate) and composites seamlessly. Note gate_runes' cinemagraph candidates were framed on a box that COVERS the gate leaves — do not commit one, or it will paint the closed gate back over the open art.]",
       "panorama": "vault/scene.png",
       "builtFrom": "l1_vault_2.png",
       "wrap": {
@@ -3232,6 +3269,36 @@
           ]
         },
         {
+          "id": "vault_gate",
+          "type": "door",
+          "label": "The ancient gate",
+          "box": [
+            0.4419,
+            0.13,
+            0.556,
+            0.66
+          ],
+          "direction": "forward",
+          "requires": "gate_panel",
+          "endsEscape": true,
+          "variants": [
+            {
+              "state": "open",
+              "box": [
+                0.4419,
+                0.13,
+                0.556,
+                0.66
+              ],
+              "prompt": "the great stone gate standing wide open, the vault chamber beyond it BRIGHT and warmly lit end to end — a low stone plinth just inside holding the artifact, its facets throwing gold light out across the threshold, shelves of ancient collected specimens ranged behind it in the amber glow. The lit chamber fills the entire open doorway; no dark slot, no black void. Same cliff face, same carved rune arch, same golden-hour sunset light and painterly cinematic style; nothing outside the doorway changes. No people, no lettering, no text.",
+              "panorama": "vault/var_vault_gate_open.png",
+              "when": {
+                "solved": "vault"
+              }
+            }
+          ]
+        },
+        {
           "id": "gate_panel",
           "type": "grid",
           "label": "The gate panel",
@@ -3241,7 +3308,6 @@
             0.6169,
             0.5533
           ],
-          "endsEscape": true,
           "items": [
             {
               "key": "square",
@@ -3277,7 +3343,7 @@
           },
           "maxAttempts": 5,
           "feedback": {
-            "correct": "The three marks settle into their sockets, and the ancient gate shudders open.",
+            "correct": "The three marks settle into their sockets, and the ancient gate shudders open — warm light spilling out across the threshold. Step through.",
             "wrong": "The gate holds fast. ",
             "out": "The gate stays shut. "
           },

@@ -986,6 +986,13 @@ def _apply_spec(base, room_key):
                 if k in st:
                     hs[k] = st[k]
             node["hotspots"].append(hs); existing[hid] = hs; created.append(hid)
+        # ATTACH THE PRE-ART CONTENT (2026-08-07). `_attach_planned_content` used to run only at commit —
+        # but the real workflow commits the ART first and places boxes later, so at commit time there were
+        # no boxes to attach to and nothing re-ran the attach afterwards. Result: every placed hotspot in
+        # Egypt rendered blank while all 22 authored puzzles/clues sat unused on `plannedHotspots`. Running
+        # it here too makes placement self-sufficient in either order. It is idempotent and preserves
+        # placement (box/id), so re-running Place all hotspots never disturbs tuned boxes.
+        node["hotspots"] = _attach_planned_content(node["hotspots"], node.get("plannedHotspots") or [])
         _save_scenario(doc, base)
         spec_for_queue = spec
     # queue cinemagraphs (separate lock; skip elements that already have a clip or are already queued).
@@ -1064,12 +1071,101 @@ def _clamp01(v):
     return max(0.0, min(1.0, float(v)))
 
 
+def _iter_sound_slots(doc):
+    """Yield (room_key, kind, src, set_flag, get_flag) for EVERY authored sound in a scenario — each room
+    `sfx` layer, and every `solveSfx` at hotspot / plannedHotspot / room / scenario level (the same set
+    `_apply_balance` measures, including the pre-art planned ones). Used by the test-play mixer's
+    "needs replacement" flag, which marks a sound file as no good so it can be re-sourced at the Sounds
+    step. Flags key on `src`, so flagging a file marks it EVERYWHERE it is used — a bad recording is bad
+    in every room, and that is the behaviour an author expects."""
+    def _one_shot_slot(holder, field, rk):
+        """A one-shot sound held on `holder[field]` as either a bare src string or {src, volume, …}."""
+        ss = holder.get(field)
+        src = ss.get("src") if isinstance(ss, dict) else ss
+        if not src or not isinstance(src, str):
+            return None
+
+        def set_flag(on):
+            s = holder.get(field)
+            if not isinstance(s, dict):
+                s = {"src": s}                       # promote bare string → {src} so the flag has a home
+                holder[field] = s
+            if on:
+                s["needsReplacement"] = True
+            else:
+                s.pop("needsReplacement", None)
+
+        def get_flag():
+            s = holder.get(field)
+            return bool(isinstance(s, dict) and s.get("needsReplacement"))
+        return (rk, "solve", src, set_flag, get_flag)
+
+    def solve_slot(holder, rk):
+        return _one_shot_slot(holder, "solveSfx", rk)
+
+    for room in [r for r in doc.get("rooms", []) if isinstance(r, dict)]:
+        rk = room.get("key")
+        sfx = room.get("sfx")
+        layers = sfx if isinstance(sfx, list) else ([sfx] if isinstance(sfx, dict) else [])
+        for layer in layers:
+            if not isinstance(layer, dict) or not layer.get("src"):
+                continue
+            yield (rk, "layer", layer["src"],
+                   (lambda l: lambda on: (l.__setitem__("needsReplacement", True) if on
+                                          else l.pop("needsReplacement", None)))(layer),
+                   (lambda l: lambda: bool(l.get("needsReplacement")))(layer))
+        for holder in ([h for h in (room.get("hotspots") or []) if isinstance(h, dict)]
+                       + [h for h in (room.get("plannedHotspots") or []) if isinstance(h, dict)]
+                       + [room]):
+            slot = solve_slot(holder, rk)
+            if slot:
+                yield slot
+            # a DIAL's one-shot lives on `sfx`, not `solveSfx` (the lamp-dial lever throw, the deck
+            # cast-off) — an authored sound like any other, so it must be flaggable too. Room-level
+            # `sfx` is a LIST of ambience layers and is handled above; only a hotspot's is a one-shot.
+            if holder is not room and holder.get("type") == "dial" and holder.get("sfx"):
+                slot = _one_shot_slot(holder, "sfx", rk)
+                if slot:
+                    yield slot
+    slot = solve_slot(doc, None)
+    if slot:
+        yield slot
+
+
+def _audio_flags(base=None):
+    """Every sound currently flagged as needing replacement → {src: True}. Feeds the mixer on open so a
+    flag set in an earlier session shows up already lit."""
+    doc = _load_scenario(base)
+    return {src: True for _rk, _k, src, _s, get in _iter_sound_slots(doc) if get()}
+
+
+def _apply_audio_flags(base, flags):
+    """Set/clear the `needsReplacement` marker on every sound entry whose `src` appears in `flags`
+    ({src: bool}). Returns the number of ENTRIES touched (one file used in three rooms counts three)."""
+    if not isinstance(flags, dict) or not flags:
+        return 0
+    n = 0
+    with SAVE_LOCK:
+        doc = _load_scenario(base)
+        for _rk, _kind, src, set_flag, get_flag in _iter_sound_slots(doc):
+            if src not in flags:
+                continue
+            want = bool(flags[src])
+            if want != get_flag():
+                set_flag(want)
+                n += 1
+        if n:
+            _save_scenario(doc, base)
+    return n
+
+
 def _apply_mix(music_volume, room_vols, base=None, solve_vols=None):
     """Volume-ONLY writeback for the test-play sound mixer. `music_volume` (or None) sets the
     scenario-level `musicVolume`; `room_vols` is {roomKey: {src: volume}} setting each matching sfx
     layer's `volume` in place; `solve_vols` is {roomKey: {src: volume}} setting the volume of each
     matching solve / door-open sting (authored as `solveSfx` on a gate hotspot, the room, or the
-    scenario, as a bare path string or a {src, volume} object). Deliberately surgical — it reloads
+    scenario, as a bare path string or a {src, volume} object — or as a dial hotspot's one-shot `sfx`,
+    which the mixer lists in the same section). Deliberately surgical — it reloads
     scenario.json FRESH and touches only the volume field of items matched by src, so it can never
     clobber a layer the harness added/edited between test-play start and save (unlike sending a whole
     stale sfx array back). Every other field (mode/delay/duck/gap/crossfade) and every unmatched
@@ -1101,32 +1197,43 @@ def _apply_mix(music_volume, room_vols, base=None, solve_vols=None):
         # merely inherits the room/scenario sting is never given a spurious own copy.
         n_solves = 0
 
-        def _set_solve_vol(holder, src, vol):
+        def _set_solve_vol(holder, src, vol, allow_sfx=False):
+            """Set the volume of whichever field on `holder` carries `src`. `allow_sfx` also considers a
+            HOTSPOT's one-shot `sfx` — never a room's, whose `sfx` is the ambience-layer list handled
+            above."""
             nonlocal n_solves
             if not isinstance(holder, dict):
                 return
-            ss = holder.get("solveSfx")
-            cur_src = ss if isinstance(ss, str) else (ss.get("src") if isinstance(ss, dict) else None)
-            if not cur_src or cur_src != src:
+            for field in (("solveSfx", "sfx") if allow_sfx else ("solveSfx",)):
+                ss = holder.get(field)
+                cur_src = ss if isinstance(ss, str) else (ss.get("src") if isinstance(ss, dict) else None)
+                if not cur_src or cur_src != src:
+                    continue
+                if isinstance(ss, dict):
+                    ss["volume"] = _clamp01(vol)
+                else:                               # promote bare string → {src, volume}
+                    holder[field] = {"src": src, "volume": _clamp01(vol)}
+                n_solves += 1
                 return
-            if isinstance(ss, dict):
-                ss["volume"] = _clamp01(vol)
-            else:                                   # promote bare string → {src, volume}
-                holder["solveSfx"] = {"src": src, "volume": _clamp01(vol)}
-            n_solves += 1
 
         for key, vols in solve_vols.items():
             if not isinstance(vols, dict):
                 continue
             room = rooms.get(key)
+            # (holder, allow_sfx). A DIAL's one-shot throw lives on the hotspot's `sfx`, not `solveSfx`
+            # — pano-player's solveSounds() lists it in the mixer's "Solve / door sounds" section
+            # alongside the real stings, but this only ever looked at `solveSfx`, so moving that slider
+            # and hitting Save reported "saved ✓ nothing changed" and wrote nothing (2026-08-27, Lucas:
+            # Egypt's deck cast-off and Pharos lamp dial). Anything the mixer can SHOW it must be able
+            # to SAVE.
             holders = []
             if isinstance(room, dict):
-                holders.extend(h for h in (room.get("hotspots") or []) if isinstance(h, dict))
-                holders.append(room)
-            holders.append(doc)                     # scenario-level fallback sting
+                holders.extend((h, True) for h in (room.get("hotspots") or []) if isinstance(h, dict))
+                holders.append((room, False))
+            holders.append((doc, False))            # scenario-level fallback sting
             for src, vol in vols.items():
-                for h in holders:
-                    _set_solve_vol(h, src, vol)
+                for h, allow_sfx in holders:
+                    _set_solve_vol(h, src, vol, allow_sfx)
 
         if touched_music or n_layers or n_solves:
             _save_scenario(doc, base)
@@ -1212,9 +1319,10 @@ _SOLVE_DEFAULT_VOL = 0.9      # playOneShot's fallback for a solve/door sting
 _MUSIC_DEFAULT_VOL = 0.1      # SCENARIO.musicVolume default
 
 
-def _solve_src_vol(holder):
-    """(src, current volume) of a holder's `solveSfx` (string | {src, volume}), or (None, None)."""
-    ss = holder.get("solveSfx") if isinstance(holder, dict) else None
+def _solve_src_vol(holder, field="solveSfx"):
+    """(src, current volume) of a holder's one-shot sound (string | {src, volume}), or (None, None).
+    `field` is "solveSfx" for a gate's sting, "sfx" for a DIAL's lever throw."""
+    ss = holder.get(field) if isinstance(holder, dict) else None
     if not ss:
         return (None, None)
     if isinstance(ss, str):
@@ -1268,13 +1376,13 @@ def _apply_balance(base=None, apply=True):
                     "loudness": round(loud, 1), "oldVolume": round(cur_vol, 3),
                     "newVolume": round(new_v, 3)})
 
-        def solve_setter(holder):
+        def solve_setter(holder, field="solveSfx"):
             def setter(v):
-                ss = holder.get("solveSfx")
+                ss = holder.get(field)
                 if isinstance(ss, dict):
                     ss["volume"] = _clamp01(v)
                 else:                                   # promote bare string → {src, volume}
-                    holder["solveSfx"] = {"src": ss, "volume": _clamp01(v)}
+                    holder[field] = {"src": ss, "volume": _clamp01(v)}
             return setter
 
         def layer_setter(layer):
@@ -1300,6 +1408,13 @@ def _apply_balance(base=None, apply=True):
                 src, cur = _solve_src_vol(holder)
                 if src:
                     consider("solve", rk, src, cur, solve_setter(holder))
+                # a DIAL's one-shot lives on `sfx` (lever throw, cast-off) — same kind of authored sting,
+                # but it sat outside the balance pass entirely until 2026-08-07. Room-level `sfx` is the
+                # ambience LIST handled above; only a hotspot's is a one-shot.
+                if holder is not room and holder.get("type") == "dial":
+                    d_src, d_cur = _solve_src_vol(holder, "sfx")
+                    if d_src:
+                        consider("solve", rk, d_src, d_cur, solve_setter(holder, "sfx"))
         # scenario-level fallback sting
         s_src, s_cur = _solve_src_vol(doc)
         if s_src:
@@ -1804,7 +1919,7 @@ def _run_dooropen(slot, image, box, prompt):
 
 
 def _seamfix_argv(inp, out, left=None, right=None, feather=None, full=False, pos=None,
-                  crop=None, occluder=None):
+                  crop=None, occluder=None, edit_frac=None):
     """Build the seamfix argv, appending --left/--right (band extent each side of the seam), --feather
     (composite blend radius), --full (use the whole model output, no composite), and --pos (seam location as
     a fraction of width; 1.0 = wrap edge) only when the caller supplied them. Absent, generate_scene falls
@@ -1825,6 +1940,8 @@ def _seamfix_argv(inp, out, left=None, right=None, feather=None, full=False, pos
         argv += ["--crop", str(crop)]
     if occluder:                                # OCCLUDER: stand an object ON the seam
         argv += ["--occluder", str(occluder)]
+    if edit_frac:                               # how much of the crop is editable (middle band)
+        argv += ["--edit-frac", str(edit_frac)]
     return argv
 
 
@@ -1837,11 +1954,14 @@ def _seam_bounds(req):
     is the seam location as a fraction of width (1.0 = wrap edge; None → default). Returns
     (left, right, feather, full, pos). Guards against a bad drag or a hand-crafted request."""
     def side(k):
+        # Cap raised 0.45 -> 0.9 (Lucas, 2026-08-07: "make the area selector able to go everywhere"). The
+        # band is a REGION selector for patch/occluder as much as a seam straddle, so a side must be able
+        # to reach nearly the whole frame. Still bounded — a side of 1.0+ would wrap past itself.
         try:
             v = float(req.get(k))
         except (TypeError, ValueError):
             return None
-        return max(0.001, min(0.45, v)) if v > 0 else None
+        return max(0.001, min(0.9, v)) if v > 0 else None
 
     def feather(k):
         v = req.get(k)
@@ -1885,6 +2005,36 @@ def _seam_snaps(dir_, stem):
     return [n for _, n in sorted(hits)]
 
 
+def room_target(base, room_key, file=None):
+    """Resolve which PNG in a room dir the seam tools act on: the committed scene, or a state VARIANT.
+
+    Seam repair was scene.png-only, which left the night/weather variants with no way to fix a wrap
+    discontinuity the AI edit had introduced — the whole point of the edit route is that it re-lights the
+    scene, and it can perfectly well break a seam the base had already repaired (Lucas, 2026-08-13).
+
+    `file` must be a BARE FILENAME inside the room dir (e.g. "scene_night.png"). Anything carrying a path
+    separator or a `..` is REFUSED rather than basenamed: silently rewriting "../scene.png" into
+    "scene.png" cannot escape the room, but it would quietly seam-fix a different image than the caller
+    named, and a seam fix is a destructive in-place edit. Refuse, then re-check the resolved parent as a
+    belt-and-braces second gate. Returns (abs_path, undo_stem); the stem keys the per-image undo stack, so
+    a variant's undos never collide with the base scene's.
+    """
+    rd = os.path.join(base, room_key)
+    name = str(file or "scene.png") or "scene.png"
+    if "/" in name or "\\" in name or ".." in name:
+        raise ValueError("seam target must be a bare filename inside the room directory")
+    if not name.lower().endswith(".png"):
+        raise ValueError("seam target must be a .png")
+    if "_undo" in name or name.endswith("_seam.png"):
+        raise ValueError("refusing to seam-fix an undo snapshot or a working file")
+    p = os.path.abspath(os.path.join(rd, name))
+    if os.path.dirname(p) != os.path.abspath(rd):
+        raise ValueError("seam target must live in the room directory")
+    if not os.path.isfile(p):
+        raise ValueError("no such image in room %s: %s" % (room_key, name))
+    return p, os.path.splitext(name)[0]
+
+
 def _seam_push(dir_, stem, img):
     """Snapshot the current image as the next undo slot (called BEFORE a fix overwrites it). Returns depth."""
     d = len(_seam_snaps(dir_, stem))
@@ -1905,13 +2055,19 @@ def _seam_depth(dir_, stem):
     return len(_seam_snaps(dir_, stem))
 
 
-# The repair MENU (2026-08-07). These are PARALLEL options, not stages: pick the cheapest one that works
-# for the scene in front of you. The three `seam_ops` ones are pure pixel work — instant, free, and they
-# never re-render your art through the model; the two AI ones confine the model to a crop around the seam
-# instead of the whole frame. Every one pushes the SAME undo snapshot, so one Undo steps back through
-# whatever mix you tried.
-_SEAM_LOCAL_OPS = {"gradient", "crop", "roll"}          # handled in-process by seam_ops (no API, no job)
-_SEAM_AI_MODES = {"patch", "occluder", "full"}          # go through generate_scene seamfix
+# The repair MENU (2026-08-07; trimmed to four 2026-08-07). These are PARALLEL options, not stages: pick
+# the cheapest one that works for the scene in front of you. The two `seam_ops` ones are pure pixel work —
+# instant, free, and they never re-render your art through the model; the two AI ones confine the model to
+# a crop around the seam instead of the whole frame. Every one pushes the SAME undo snapshot, so one Undo
+# steps back through whatever mix you tried.
+#
+# DELIBERATELY NOT OFFERED (Lucas, 2026-08-07) — do not re-add:
+#   "crop"  — crop & rescale never actually solved the problem, it just paid ~2% of the scene to hide it.
+#   "full"  — whole-scene re-render is an AI image of an AI image; it also pushed a fresh seam to the far
+#             meridian, so it traded one seam for another. `seam_ops.crop` and `generate_scene seamfix
+#             --full` still exist as library/CLI paths; the harness just won't dispatch to them.
+_SEAM_LOCAL_OPS = {"gradient", "roll"}                  # handled in-process by seam_ops (no API, no job)
+_SEAM_AI_MODES = {"patch", "occluder"}                  # go through generate_scene seamfix
 
 
 def _seam_local(path, mode, req):
@@ -1923,8 +2079,6 @@ def _seam_local(path, mode, req):
     kw = {}
     if mode == "gradient":
         kw = {"pos": float(req.get("pos") or 1.0), "span": int(req.get("span") or 64)}
-    elif mode == "crop":
-        kw = {"frac": float(req.get("frac") or 0.02)}
     elif mode == "roll":
         kw = {"window": int(req.get("window") or 33)}
     report = seam_ops.run(mode, path, tmp, **kw)
@@ -1960,7 +2114,7 @@ def _run_seamfix(slot, image, left=None, right=None, feather=None, full=False, p
 
 
 def _run_seamfix_scratch(slot, base, image, left=None, right=None, feather=None, full=False, pos=None,
-                         crop=None, occluder=None):
+                         crop=None, occluder=None, edit_frac=None):
     """Seam-fix a build-world LEVEL-1 pano IN PLACE in <base>/_scratch (generate_scene.py seamfix), pushing the
     pre-fix state onto the <stem>_undoN stack first (per-stage undo). Keyed off an EXPLICIT base — unlike `_run_seamfix`, which
     reads the server-global active scenario (SCENE) — so the console fixes the seam on the scenario it loaded,
@@ -1972,7 +2126,7 @@ def _run_seamfix_scratch(slot, base, image, left=None, right=None, feather=None,
     try:
         if not os.path.isfile(img):
             raise RuntimeError("no scratch pano %s — Generate first" % os.path.basename(image))
-        subprocess.run(_seamfix_argv(img, tmp, left, right, feather, full, pos, crop, occluder),
+        subprocess.run(_seamfix_argv(img, tmp, left, right, feather, full, pos, crop, occluder, edit_frac),
                        check=True, capture_output=True, text=True)
         _seam_push(scratch, stem, img)   # push the pre-fix state onto the undo stack (one snapshot per stage)
         shutil.move(tmp, img)
@@ -2003,31 +2157,33 @@ def _undo_seam_scratch(base, image):
     return {"image": name, "depth": depth}
 
 
-def _undo_seam_room(base, room_key):
-    """Undo the most recent committed-room seam-fix STAGE: pop the top undo snapshot back over scene.png.
+def _undo_seam_room(base, room_key, file=None):
+    """Undo the most recent committed-room seam-fix STAGE: pop the top undo snapshot back over the target.
     Note: cinemagraph/variant/open-door baked AFTER a fix still reflect the fixed pixels — undo is a scene
-    step, best used before those exist."""
+    step, best used before those exist. `file` selects a state VARIANT instead of scene.png; each image
+    keeps its OWN undo stack (keyed by stem), so undoing a night fix can never restore a day scene."""
     d = os.path.join(base, room_key)
-    depth = _seam_pop(d, "scene", os.path.join(d, "scene.png"))
-    return {"room": room_key, "depth": depth}
+    target, stem = room_target(base, room_key, file)
+    depth = _seam_pop(d, stem, target)
+    return {"room": room_key, "file": os.path.basename(target), "depth": depth}
 
 
 def _run_seamfix_room(slot, base, room_key, left=None, right=None, feather=None, full=False, pos=None,
-                      crop=None, occluder=None):
+                      crop=None, occluder=None, edit_frac=None, file=None):
     """Seam-fix a COMMITTED room IN PLACE: seam-safe the L/R wrap edges of scene.png (generate_scene.py
     seamfix), replacing scene.png (pushes the pre-fix scene onto the `scene_undoN` stack first — per-stage undo).
     The per-candidate `_run_seamfix` makes a new candidate; this is the post-commit repair for the committed scene.
     Interior hotspots (fractional boxes) are unaffected — the seam is at the ±180° edges; regenerate any
     cinemagraph/variant/open-door whose box sits near the seam, so do this BEFORE those scene-baked assets."""
-    scene = os.path.join(base, room_key, "scene.png")
-    tmp = os.path.join(base, room_key, "scene_seam.png")
+    scene, stem = room_target(base, room_key, file)      # scene.png, or a state variant (scene_night.png…)
+    tmp = os.path.join(base, room_key, "%s_seam.png" % stem)
     try:
-        subprocess.run(_seamfix_argv(scene, tmp, left, right, feather, full, pos, crop, occluder),
+        subprocess.run(_seamfix_argv(scene, tmp, left, right, feather, full, pos, crop, occluder, edit_frac),
                        check=True, capture_output=True, text=True)
-        _seam_push(os.path.join(base, room_key), "scene", scene)   # push pre-fix scene onto the undo stack
+        _seam_push(os.path.join(base, room_key), stem, scene)   # per-image undo stack, keyed by stem
         shutil.move(tmp, scene)
         with LOCK:
-            JOBS[slot]["outputs"].append("scene.png (seam-fixed)")
+            JOBS[slot]["outputs"].append("%s.png (seam-fixed)" % stem)
             JOBS[slot]["done"] = 1
     except subprocess.CalledProcessError as e:
         with LOCK:
@@ -2109,14 +2265,217 @@ def _run_variant(slot, base, room_key, hotspot_id, state, box, prompt, when=None
         JOBS[slot]["active"] = False
 
 
+def gen_env():
+    """Environment for a generation subprocess, guaranteed to carry OPENAI_API_KEY if it exists at all.
+
+    `~/.bashrc` exports the key BELOW the standard "if not running interactively, return" guard, so it
+    reaches an interactive terminal and nothing else. Anything launched by a long-running daemon — the
+    observer, a cron job, this server if it was started from a script — inherits an environment without
+    it, and the failure is a flat "OPENAI_API_KEY not set" after the user has already walked away.
+    (Diagnosed 2026-08-13 when the first observer-fired Egypt night run failed on all six rooms.)
+
+    So resolve it at call time from a login+INTERACTIVE bash — `-i` is the part that reads `~/.bashrc`.
+    Runtime environment only, never a file read, and the value is never printed or logged.
+    """
+    env = os.environ.copy()
+    if env.get("OPENAI_API_KEY"):
+        return env
+    try:
+        r = subprocess.run(["bash", "-lic", 'printf %s "${OPENAI_API_KEY:-}"'],
+                           capture_output=True, text=True, timeout=20)
+        key = (r.stdout or "").strip()
+    except Exception:  # noqa: BLE001
+        key = ""
+    if key:
+        env["OPENAI_API_KEY"] = key
+    return env
+
+
+def ensure_variant_carrier(base, room_key, carrier_id, label="Nightfall"):
+    """Ensure a room has the marker-less FULL-SCENE variant carrier, and return its id.
+
+    A variant's box defaults to its hotspot's box and `ambient` hotspots are filtered out of rendering,
+    so an ambient at [0,0,1,1] swaps the WHOLE panorama on a world-state condition with no engine change
+    (see AGENTS.md → *Full-scene state variants*; worked example: wrangling/egypt `quay` → `night_wash`).
+    Idempotent — a re-run after a failed generation finds the existing carrier and leaves it alone.
+    """
+    with SAVE_LOCK:
+        doc = _load_scenario(base)
+        node = next((r for r in doc.get("rooms") or [] if r.get("key") == room_key), None)
+        if node is None:
+            raise ValueError("no room with key %r" % room_key)
+        hs = node.get("hotspots")
+        if not isinstance(hs, list):
+            raise ValueError("room %r has no hotspots (commit it first)" % room_key)
+        if any(h.get("id") == carrier_id for h in hs):
+            return carrier_id
+        hs.append({"id": carrier_id, "type": "ambient", "label": label, "box": [0, 0, 1, 1],
+                   "note": "Full-scene state variant. `ambient` is filtered out of rendering, so this "
+                           "carrier shows no marker and intercepts no clicks; it exists only to hold "
+                           "the variant art."})
+        _save_scenario(doc, base)
+    return carrier_id
+
+
+def restretch_to(path, size):
+    """Stretch an edit reply back to the base panorama's exact size, in place. Returns True if it moved.
+
+    The image-edit endpoint will not return 3:1 — it hands back 1536x1024. The model preserves the
+    horizontal layout INSIDE that squashed frame, so a plain resize restores both the proportions and
+    the hotspot alignment. Skipped when the reply already matches.
+    """
+    from PIL import Image
+    with Image.open(path) as im:
+        if im.size == size:
+            return False
+        im.convert("RGB").resize(size, Image.LANCZOS).save(path)
+    return True
+
+
+def run_fullscene_variant(base, room_key, state, prompt, when=None, carrier=None, label="Nightfall"):
+    """FULL-SCENE state variant (the night-arc route) — the whole panorama re-lit, composition held.
+
+    Unlike `_run_variant`, which masks a box and edits inside it, this posts the committed day panorama
+    itself to the image-EDIT endpoint with NO mask, so the model sees the whole scene: it holds the
+    layout to within a couple of percent AND *adds* light a deterministic grade cannot (a blazing
+    lighthouse, lit windows, a moon). Then restretch, ensure the carrier, record the variant.
+
+    ⚠️ It works exactly ONCE. This is an AI edit of an AI image; one pass reads correctly, a second
+    compounds the artefacts. Always regenerate FROM `scene.png`, never from a previous variant — which
+    is why this function always reads the base scene and never the existing variant file.
+
+    Returns the variant dict that was recorded.
+    """
+    from PIL import Image
+    day = os.path.join(base, room_key, "scene.png")
+    if not os.path.isfile(day):
+        raise ValueError("room %s has no committed scene.png (commit the room first)" % room_key)
+    safe_state = re.sub(r"[^A-Za-z0-9_]+", "_", str(state or "")).strip("_") or "state"
+    carrier = re.sub(r"[^A-Za-z0-9_]+", "_", str(carrier or "")).strip("_") or "%s_wash" % safe_state
+    rel = "%s/scene_%s.png" % (room_key, safe_state)
+    out = os.path.join(base, room_key, "scene_%s.png" % safe_state)
+    with Image.open(day) as im:
+        target = im.size
+    subprocess.run(["python3", GEN, "edit", "--input", day, "--prompt", prompt, "--out", out],
+                   check=True, capture_output=True, text=True, env=gen_env())
+    restretch_to(out, target)
+    ensure_variant_carrier(base, room_key, carrier, label)
+    variant = {"state": safe_state, "box": [0, 0, 1, 1], "prompt": prompt, "panorama": rel}
+    if when is not None:
+        variant["when"] = when
+    _add_variant(room_key, carrier, variant, base)
+    return variant
+
+
+def _run_fullscene(slot, base, room_key, state, prompt, when=None, carrier=None):
+    """Thread body for /api/gen-fullscene-variant — same JOBS/slot contract as _run_variant."""
+    try:
+        v = run_fullscene_variant(base, room_key, state, prompt, when, carrier)
+        with LOCK:
+            JOBS[slot]["outputs"].append(v["panorama"])
+            JOBS[slot]["done"] = 1
+    except subprocess.CalledProcessError as e:
+        with LOCK:
+            JOBS[slot]["error"] = (e.stderr or e.stdout or str(e)).strip()[-500:]
+    except Exception as e:  # noqa: BLE001
+        with LOCK:
+            JOBS[slot]["error"] = str(e)[-500:]
+    with LOCK:
+        JOBS[slot]["active"] = False
+
+
+def collect_variants(base):
+    """Every state variant in the scenario, flattened for review: which room, which carrier, what art.
+
+    The build_world console had no way to LOOK at a generated variant — the rooms table shows the base
+    panorama only, so a night pass could be generated, recorded, and never once seen before a student
+    hit it (2026-08-13, Lucas). This backs the console's Environmental-variants gallery.
+
+    TWO sources, because a room's alternate art can arrive by two different routes:
+      * hotspot `variants[]` — the generated re-lights and reveals; editable (regenerate / delete).
+      * the room-level `panoramaOpen` (scene_open.png) — the door-open partner COMMITTED ALONGSIDE the
+        base from the candidate pool, never declared as a variant, and so invisible here until now
+        (2026-08-27, Lucas: "all variants displayed"). Marked readOnly: it isn't regenerated from a
+        prompt, it's re-committed with its base, so the gallery only shows it.
+    Cinemagraphs are deliberately NOT included — they're clips, picked in the rooms table.
+    """
+    doc = _load_scenario(base)
+    out = []
+    for r in doc.get("rooms") or []:
+        rk = r.get("key")
+        room_base = r.get("panorama") or ("%s/scene.png" % rk)
+        declared = set()
+        for h in (r.get("hotspots") or []):
+            for v in (h.get("variants") or []):
+                pano = v.get("panorama")
+                if pano:
+                    declared.add(pano)
+                out.append({
+                    "room": rk,
+                    "roomTitle": r.get("title"),
+                    "hotspot": h.get("id"),
+                    "hotspotType": h.get("type"),
+                    "state": v.get("state"),
+                    "when": v.get("when"),
+                    "prompt": v.get("prompt"),
+                    "panorama": pano,
+                    "base": room_base,
+                    "fullScene": v.get("box") == [0, 0, 1, 1] or h.get("box") == [0, 0, 1, 1],
+                    "readOnly": False,
+                    "exists": bool(pano) and os.path.isfile(os.path.join(base, pano)),
+                })
+        # The door-open partner. Skipped when a hotspot variant already points at the same file, so a
+        # room that declares its open state properly isn't listed twice.
+        op = r.get("panoramaOpen")
+        if op and op not in declared:
+            out.append({
+                "room": rk,
+                "roomTitle": r.get("title"),
+                "hotspot": None,
+                "hotspotType": None,
+                "state": "open",
+                "when": None,
+                "whenLabel": "when this room's door opens",
+                "prompt": None,
+                "panorama": op,
+                "base": room_base,
+                "fullScene": True,
+                "readOnly": True,
+                "exists": os.path.isfile(os.path.join(base, op)),
+            })
+    return out
+
+
 def _start(slot, kind, target, total, tag=None):
+    """Claim `slot` and run `target()` on a daemon thread. Returns False if the slot is already busy.
+
+    The thread body is GUARDED: a job whose body raises before its own `active = False` would otherwise
+    leave the slot claimed forever, and since JOBS lives in memory the only cure is restarting the server
+    — every later job on that slot is refused with "already running" in the meantime. That is exactly what
+    the `/api/gen-fullscene-variant` arg-shift did on 2026-08-26 (its lambda dropped the leading `slot`,
+    so the except handler indexed JOBS by a filesystem path, raised KeyError, and killed the thread).
+    The lambda is fixed; this makes the whole class impossible, on every slot, whatever the body does.
+    """
     with LOCK:
         j = JOBS.get(slot)
         if j and j["active"]:
             return False
         JOBS[slot] = {"active": True, "kind": kind, "done": 0, "total": total,
                       "outputs": [], "error": None, "tag": tag}
-    threading.Thread(target=target, daemon=True).start()
+
+    def _guarded():
+        try:
+            target()
+        except BaseException as e:  # noqa: BLE001 — the slot must be released no matter what died
+            with LOCK:
+                if slot in JOBS and not JOBS[slot].get("error"):
+                    JOBS[slot]["error"] = "job crashed: %s" % str(e)[-300:]
+        finally:
+            with LOCK:
+                if slot in JOBS:
+                    JOBS[slot]["active"] = False
+
+    threading.Thread(target=_guarded, daemon=True).start()
     return True
 
 
@@ -2367,6 +2726,13 @@ class H(http.server.SimpleHTTPRequestHandler):
             files = sorted(os.path.basename(p) for p in
                            glob.glob(os.path.join(base, "_scratch", prefix + "*.png")))
             return self._json({"files": files})
+        if route == "/api/variants":         # ?chapter&scenario — every state variant, for the review gallery
+            q = urllib.parse.parse_qs(self.path.split("?", 1)[1] if "?" in self.path else "")
+            try:
+                base = _scenario_base((q.get("chapter") or [None])[0], (q.get("scenario") or [None])[0])
+            except ValueError as ve:
+                return self._json({"ok": False, "error": str(ve)}, 400)
+            return self._json({"ok": True, "variants": collect_variants(base)})
         if route == "/api/scenarios":
             return self._json({"scenarios": _list_scenarios(), "active": dict(ACTIVE)})
         if route == "/api/scenario-config":
@@ -2484,11 +2850,12 @@ class H(http.server.SimpleHTTPRequestHandler):
                     base = _scenario_base(req.get("chapter"), req.get("scenario"))
                 except ValueError as ve:
                     return self._json({"ok": False, "error": str(ve)}, 400)
-                if not os.path.isfile(os.path.join(base, rk, "scene.png")):
-                    return self._json({"ok": False, "error": "room %s has no committed scene.png" % rk}, 400)
-                lf, rf, ff, full, pos = _seam_bounds(req)
-                mode = str(req.get("mode") or ("full" if full else "patch"))
-                scene_p = os.path.join(base, rk, "scene.png")
+                try:
+                    scene_p, _stem = room_target(base, rk, req.get("file"))
+                except ValueError as ve:
+                    return self._json({"ok": False, "error": str(ve)}, 400)
+                lf, rf, ff, _full, pos = _seam_bounds(req)
+                mode = str(req.get("mode") or "patch")   # no whole-frame mode any more; legacy full=1 ignored
                 if mode in _SEAM_LOCAL_OPS:      # instant, in-process, no model — still pushes an undo snapshot
                     try:
                         return self._json({"ok": True, "instant": True, "report": _seam_local(scene_p, mode, req)})
@@ -2500,8 +2867,10 @@ class H(http.server.SimpleHTTPRequestHandler):
                 occl = req.get("occluder") if mode == "occluder" else None
                 if mode == "occluder" and not str(occl or "").strip():
                     return self._json({"ok": False, "error": "occluder mode needs a description of what stands on the seam"}, 400)
-                full = (mode == "full")
-                if not _start("seam", "seamfix", lambda: _run_seamfix_room("seam", base, rk, lf, rf, ff, full, pos, crop, occl), 1):
+                full = False                             # both remaining AI modes composite a crop
+                ef = req.get("editFrac")
+                if not _start("seam", "seamfix", lambda: _run_seamfix_room("seam", base, rk, lf, rf, ff, full, pos, crop, occl, ef,
+                                                        req.get("file")), 1):
                     return self._json({"ok": False, "error": "a seamfix job is already running"}, 409)
                 return self._json({"ok": True, "slot": "seam"})
             if route == "/api/select-scenario":
@@ -2541,9 +2910,19 @@ class H(http.server.SimpleHTTPRequestHandler):
                     summary = _apply_mix(mv if mv is not None else None,
                                          req.get("rooms") or {}, base,
                                          solve_vols=req.get("solves") or {})
+                    # "needs replacement" flags ride the same Save (no second button in the mixer)
+                    summary["flagged"] = _apply_audio_flags(base, req.get("flags") or {})
                 except (ValueError, TypeError) as ve:
                     return self._json({"ok": False, "error": str(ve)}, 400)
                 return self._json({"ok": True, **summary})
+            if route == "/api/audio-flags":
+                # current needs-replacement flags, so the mixer opens with earlier flags already lit
+                req = self._body()
+                try:
+                    base = _scenario_base(req.get("chapter"), req.get("scenario"))
+                except ValueError as ve:
+                    return self._json({"ok": False, "error": str(ve)}, 400)
+                return self._json({"ok": True, "flags": _audio_flags(base)})
             if route == "/api/auto-balance":
                 # perceived-loudness (LUFS) auto-balance: lower every effect that would play louder
                 # than the music. apply=true writes scenario.json (the agent's wire-time pass);
@@ -2618,6 +2997,31 @@ class H(http.server.SimpleHTTPRequestHandler):
                     return self._json({"ok": False, "error": "a batch is running — wait for it to finish before firing a single gen"}, 409)
                 if not _start("variant", "variant",
                               lambda: _run_variant("variant", base, rk, hid, state, box, prompt, when), 1):
+                    return self._json({"ok": False, "error": "a variant job is already running"}, 409)
+                return self._json({"ok": True, "slot": "variant"})
+            if route == "/api/gen-fullscene-variant":
+                # The whole-panorama re-light (night arc). Distinct from /api/gen-variant-room, which
+                # masks a box: this one holds the composition and ADDS light, and it is the route the
+                # console's Environmental-variants panel regenerates through.
+                req = self._body()
+                rk = re.sub(r"[^A-Za-z0-9_]", "", str(req.get("roomKey") or ""))
+                state = (req.get("state") or "").strip()
+                prompt = (req.get("prompt") or "").strip()
+                if not rk or not state:
+                    return self._json({"ok": False, "error": "need roomKey and state"}, 400)
+                if not prompt:
+                    return self._json({"ok": False, "error": "empty variant prompt"}, 400)
+                try:
+                    base = _scenario_base(req.get("chapter"), req.get("scenario"))
+                except ValueError as ve:
+                    return self._json({"ok": False, "error": str(ve)}, 400)
+                if not os.path.isfile(os.path.join(base, rk, "scene.png")):
+                    return self._json({"ok": False, "error": "room %s has no committed scene.png" % rk}, 400)
+                if _batch_running(base):
+                    return self._json({"ok": False, "error": "a batch is running — wait for it to finish"}, 409)
+                if not _start("variant", "variant",
+                              lambda: _run_fullscene("variant", base, rk, state, prompt,
+                                                     req.get("when"), req.get("carrier")), 1):
                     return self._json({"ok": False, "error": "a variant job is already running"}, 409)
                 return self._json({"ok": True, "slot": "variant"})
             if route == "/api/patch-variant":
@@ -2917,8 +3321,8 @@ class H(http.server.SimpleHTTPRequestHandler):
                 image = os.path.basename(str(req.get("image") or ""))
                 if not image.endswith(".png"):
                     return self._json({"ok": False, "error": "need image (a _scratch .png)"}, 400)
-                lf, rf, ff, full, pos = _seam_bounds(req)
-                mode = str(req.get("mode") or ("full" if full else "patch"))
+                lf, rf, ff, _full, pos = _seam_bounds(req)
+                mode = str(req.get("mode") or "patch")   # no whole-frame mode any more; legacy full=1 ignored
                 img_p = os.path.join(base, "_scratch", image)
                 if mode in _SEAM_LOCAL_OPS:
                     if not os.path.isfile(img_p):
@@ -2933,8 +3337,9 @@ class H(http.server.SimpleHTTPRequestHandler):
                 occl = req.get("occluder") if mode == "occluder" else None
                 if mode == "occluder" and not str(occl or "").strip():
                     return self._json({"ok": False, "error": "occluder mode needs a description of what stands on the seam"}, 400)
-                full = (mode == "full")
-                if not _start("seam", "seamfix", lambda: _run_seamfix_scratch("seam", base, image, lf, rf, ff, full, pos, crop, occl), 1):
+                full = False                             # both remaining AI modes composite a crop
+                ef = req.get("editFrac")
+                if not _start("seam", "seamfix", lambda: _run_seamfix_scratch("seam", base, image, lf, rf, ff, full, pos, crop, occl, ef), 1):
                     return self._json({"ok": False, "error": "a seamfix job is already running"}, 409)
                 return self._json({"ok": True, "slot": "seam"})
             if route == "/api/seam-measure":       # how big is the seam vs the scene's own detail?
@@ -2944,8 +3349,13 @@ class H(http.server.SimpleHTTPRequestHandler):
                 except ValueError as ve:
                     return self._json({"ok": False, "error": str(ve)}, 400)
                 rk = req.get("roomKey")
-                p = (os.path.join(base, str(rk), "scene.png") if rk
-                     else os.path.join(base, "_scratch", os.path.basename(str(req.get("image") or ""))))
+                if rk:
+                    try:
+                        p, _ = room_target(base, re.sub(r"[^A-Za-z0-9_]", "", str(rk)), req.get("file"))
+                    except ValueError as ve:
+                        return self._json({"ok": False, "error": str(ve)}, 400)
+                else:
+                    p = os.path.join(base, "_scratch", os.path.basename(str(req.get("image") or "")))
                 if not os.path.isfile(p):
                     return self._json({"ok": False, "error": "no image to measure"}, 400)
                 try:
@@ -2966,7 +3376,7 @@ class H(http.server.SimpleHTTPRequestHandler):
                     return self._json({"ok": False, "error": "need roomKey"}, 400)
                 try:
                     base = _scenario_base(req.get("chapter"), req.get("scenario"))
-                    return self._json({"ok": True, **_undo_seam_room(base, rk)})
+                    return self._json({"ok": True, **_undo_seam_room(base, rk, req.get("file"))})
                 except ValueError as ve:
                     return self._json({"ok": False, "error": str(ve)}, 400)
             if route == "/api/seam-status":            # undo-stack DEPTH for this candidate / committed room (drives per-stage Undo)
@@ -2980,7 +3390,9 @@ class H(http.server.SimpleHTTPRequestHandler):
                 if name.endswith(".png") and not _UNDO_RE.search(name):
                     depth = _seam_depth(os.path.join(base, "_scratch"), os.path.splitext(name)[0])
                 elif rk:
-                    depth = _seam_depth(os.path.join(base, rk), "scene")
+                    # a state variant keeps its own undo stack, keyed by its stem (scene_night, …)
+                    stem = os.path.splitext(os.path.basename(str(req.get("file") or "scene.png")))[0]
+                    depth = _seam_depth(os.path.join(base, rk), stem or "scene")
                 else:
                     depth = 0
                 return self._json({"ok": True, "undoDepth": depth})
@@ -3010,6 +3422,23 @@ class H(http.server.SimpleHTTPRequestHandler):
                     return self._json({"ok": True, **_delete_room_pano(base, rk, req.get("image"))})
                 except ValueError as ve:
                     return self._json({"ok": False, "error": str(ve)}, 400)
+            if route == "/api/validate-story":
+                # The Story stage's closing gate — see authoring_v2/validate_story.py. `accept` snapshots
+                # the current landing card as the vetted reference; otherwise diff the rest of the text
+                # against that snapshot.
+                req = self._body()
+                try:
+                    base = _scenario_base(req.get("chapter"), req.get("scenario"))
+                except ValueError as ve:
+                    return self._json({"ok": False, "error": str(ve)}, 400)
+                rel = os.path.relpath(base, os.path.join(os.path.dirname(HERE), "rooms"))
+                argv = ["python3", os.path.join(HERE, "validate_story.py"), rel]
+                if req.get("accept"):
+                    argv.append("--accept")
+                r = subprocess.run(argv, capture_output=True, text=True)
+                out = (r.stdout or "") + (r.stderr or "")
+                return self._json({"ok": True, "output": out.strip(),
+                                   "failed": sum(1 for l in out.splitlines() if l.startswith("FAIL"))})
             if route == "/api/save-scene-specs":
                 req = self._body()
                 try:

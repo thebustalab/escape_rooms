@@ -30,7 +30,8 @@ button.ghost { background:transparent; color:var(--ink); border:1px solid var(--
 #loading.open { opacity:1; visibility:visible; }
 #loading .loadcard { max-width:560px; padding:32px; position:relative; z-index:1; }
 
-/* ambient particles behind the card on the entry screens (scenario.ambient: fireflies | snow | none) */
+/* ambient particles behind the card on the entry/submission screens
+   (scenario.ambient: fireflies | snow | embers | leaves | dust | rays | none) */
 .particles { position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:0; }
 /* fireflies — warm, drifting, pulsing */
 .firefly { position:absolute; border-radius:50%;
@@ -61,6 +62,31 @@ button.ghost { background:transparent; color:var(--ink); border:1px solid var(--
 @keyframes leafBlow2 { 0%{transform:translate(-18vw,-4vh) rotate(0deg)} 33%{transform:translate(18vw,28vh) rotate(-120deg)} 66%{transform:translate(52vw,40vh) rotate(-230deg)} 100%{transform:translate(96vw,78vh) rotate(-350deg)} }
 @keyframes leafBlow3 { 0%{transform:translate(-14vw,-10vh) rotate(0deg)} 33%{transform:translate(26vw,10vh) rotate(180deg)} 66%{transform:translate(60vw,44vh) rotate(300deg)} 100%{transform:translate(100vw,66vh) rotate(470deg)} }
 @media (prefers-reduced-motion: reduce){ .leaf { animation:none !important; opacity:.4; } }
+/* dust — fine motes SUSPENDED in still air, turning slowly as they catch a lamp (interiors, underground,
+   dry lofts). Deliberately unlike the others: no fall (snow), no rise (embers), no crossing wind (leaves) —
+   it hangs and wanders, which is what dust in a closed space actually does. Kept desaturated warm-grey so
+   it reads as dust rather than as a scenario's reserved colour. First consumer: networks/subway. */
+.dustmote { position:absolute; border-radius:50%;
+  background:radial-gradient(circle, rgba(240,228,205,.85) 0%, rgba(206,184,148,.45) 50%, rgba(206,184,148,0) 74%);
+  will-change:transform, opacity; }
+@keyframes dustGlint { 0%,100%{ opacity:.14; } 50%{ opacity:.58; } }
+@keyframes dustDrift  { 0%{transform:translate(0,0)} 30%{transform:translate(11px,7px)} 60%{transform:translate(-6px,15px)} 100%{transform:translate(0,0)} }
+@keyframes dustDrift2 { 0%{transform:translate(0,0)} 30%{transform:translate(-13px,5px)} 60%{transform:translate(5px,-9px)} 100%{transform:translate(0,0)} }
+@keyframes dustDrift3 { 0%{transform:translate(0,0)} 30%{transform:translate(7px,-6px)} 60%{transform:translate(15px,9px)} 100%{transform:translate(0,0)} }
+@media (prefers-reduced-motion: reduce){ .dustmote { animation:none !important; opacity:.3; } }
+/* rays — shafts of sunlight raking across the frame (daylight scenarios: cloud-tops, ridges, windows).
+   Structurally unlike the other kinds: not points but long soft blurred bars, and they are PARALLEL —
+   real sun shafts don't fan out from a point in frame, so every ray shares one base tilt with only a few
+   degrees of jitter. The tilt is held in a `--tilt` custom property because both keyframes animate
+   `transform`, which would otherwise clobber a static rotate set on the element. */
+.sunray { position:absolute; top:-25%; height:150%; transform-origin:top center; mix-blend-mode:screen;
+  background:linear-gradient(to bottom, rgba(255,242,206,.62) 0%, rgba(255,236,190,.20) 55%, rgba(255,236,190,0) 100%);
+  filter:blur(7px); will-change:transform, opacity; }
+@keyframes rayBreathe { 0%,100%{ opacity:.10; } 50%{ opacity:.34; } }
+@keyframes rayDrift  { 0%,100%{ transform:rotate(var(--tilt)) translateX(0); } 50%{ transform:rotate(var(--tilt)) translateX(16px); } }
+@keyframes rayDrift2 { 0%,100%{ transform:rotate(var(--tilt)) translateX(0); } 50%{ transform:rotate(var(--tilt)) translateX(-13px); } }
+@keyframes rayDrift3 { 0%,100%{ transform:rotate(var(--tilt)) translateX(-7px); } 50%{ transform:rotate(var(--tilt)) translateX(11px); } }
+@media (prefers-reduced-motion: reduce){ .sunray { animation:none !important; opacity:.22; } }
 
 /* horizon heel — a slow nautical roll of the whole view (opt-in: scenario.heel). The roll oscillates
    ±1.3° around a BASE list angle `--heel-base` (default 0). For a PROGRESSIVE heel the player script
@@ -303,6 +329,16 @@ code { background:#0a1620; padding:1px 5px; border-radius:4px; }
   border:1px solid var(--line); box-shadow:0 3px 10px rgba(0,0,0,.4); background:#08131c;
   cursor:grab; user-select:none; -webkit-user-drag:none; touch-action:none; }
 .nbtile.dragging { cursor:grabbing; box-shadow:0 8px 22px rgba(0,0,0,.55); }
+/* A board tile is a 120px SQUARE with object-fit:cover, so a non-square image is CENTRE-CROPPED — a wide
+   plate would show only its middle. Two things follow, and both are load-bearing: pickup art should be
+   authored square (every shipped set is: egypt 400x400, hospital 800x800, temple 900x900), and a tile
+   opens full-size on click (below) so detail that can't survive 120px is still readable. */
+.nblightbox { position:fixed; inset:0; z-index:26; display:flex; align-items:center; justify-content:center;
+  background:rgba(3,8,13,.92); padding:20px; cursor:zoom-out; }
+.nblightbox img { max-width:min(96vw,1100px); max-height:88vh; border-radius:10px;
+  box-shadow:0 10px 40px rgba(0,0,0,.6); background:#08131c; }
+.nblightbox .nbcap { position:absolute; left:0; right:0; bottom:16px; text-align:center; font:13px system-ui;
+  color:var(--ink); opacity:.75; padding:0 20px; }
 .nbtile.overlay { opacity:.82; background:transparent; box-shadow:none; }
   /* mask-overlay puzzles (Alaska): coloured-glass filters, opaque enough that a single stacked filter
      clearly covers a cell — the one cell left as a clear window through ALL of them is the answer (see
@@ -364,3 +400,45 @@ code { background:#0a1620; padding:1px 5px; border-radius:4px; }
 #subWork .swbtnrow { display: flex; align-items: center; gap: 10px; margin: 8px 0 10px; }
 #subWork .swrun { margin: 0; }
 #subWork .swstat { font-size: 12px; opacity: .8; }
+
+/* ---- Deduction ledger (#9) — the classification escape -------------------------------------------- */
+/* A locked group goes read-only and green: the ONLY feedback the ledger ever gives is at group level. */
+.ledger { border-collapse:separate; border-spacing:4px 5px; margin:6px auto 4px; width:100%; }
+.ledger th.rowlab { text-align:right; white-space:nowrap; color:#e8eef2; font-weight:600; font-size:14px; padding-right:4px; }
+.ledger select.verdict { background:rgba(0,0,0,.35); color:#e8eef2; border:1px solid rgba(255,216,140,.4);
+  border-radius:7px; padding:4px 8px; font:inherit; font-size:14px; min-width:150px; }
+.ledger select.verdict:hover:not(:disabled) { border-color:var(--amber); }
+.ledger select.verdict:disabled { opacity:1; }
+.ledger tr.locked th.rowlab { color:#8fe3a8; }
+.ledger tr.locked select.verdict { border-color:#5aa87a; background:rgba(60,140,90,.22); color:#cdebd6; }
+.ledgerprog { text-align:center; font-size:13px; color:var(--amber); margin:6px 0 2px; letter-spacing:.02em; }
+
+/* ---- Elevation map — the draggable transcription surface ------------------------------------------ */
+.elevplot { position:relative; margin:10px 0 4px; border-radius:8px; background:rgba(0,0,0,.28);
+  border:1px solid rgba(255,216,140,.18); overflow:hidden; }
+.elevaxis { position:absolute; inset:0; pointer-events:none; }
+.elevtick { position:absolute; left:0; right:0; border-top:1px dashed rgba(255,216,140,.16); }
+.elevtick span { position:absolute; left:4px; top:-8px; font-size:11px; color:rgba(255,216,140,.55); }
+/* A real width, and touch-action:none. `width:0` gave the node NO HIT AREA — the dot rendered but a
+   pointer drag never landed on it, which no unit test could see (browser pass, 2026-08-26). */
+.elevnode { position:absolute; transform:translate(-50%,-50%); text-align:center; width:34px;
+  height:34px; display:flex; align-items:center; justify-content:center; touch-action:none; }
+.elevnode .ndot { display:block; width:14px; height:14px; margin:0 auto; border-radius:50%;
+  background:rgba(255,216,140,.85); border:2px solid rgba(0,0,0,.5); }
+.elevnode.draggable { cursor:ns-resize; }
+.elevnode.draggable:focus-visible { outline:2px solid var(--amber); outline-offset:6px; border-radius:8px; }
+.elevnode.unread .ndot { background:transparent; border-style:dashed; border-color:rgba(255,216,140,.4); }
+.elevnode.dragging .ndot { background:#fff; }
+.elevnode.onmark .ndot { background:#8fe3a8; }
+.elevnode .nlab { position:absolute; left:50%; transform:translateX(-50%); top:16px; white-space:nowrap;
+  font-size:11px; color:#e8eef2; }
+.elevnode .nval { position:absolute; left:50%; transform:translateX(-50%); top:-20px; white-space:nowrap;
+  font-size:11px; color:var(--amber); }
+.waterline { position:absolute; left:0; right:0; height:0; border-top:2px solid rgba(120,200,255,.75);
+  cursor:ns-resize; touch-action:none; }
+/* Same hit-area problem as the node, but the line must STAY 2px: give it an invisible 18px grab band. */
+.waterline::after { content:""; position:absolute; left:0; right:0; top:-9px; height:18px; }
+.waterline:focus-visible { outline:2px solid rgba(120,200,255,.9); outline-offset:3px; }
+.waterline .wlab { position:absolute; right:6px; top:-18px; font-size:11px; color:rgba(160,215,255,.95);
+  background:rgba(0,0,0,.45); padding:1px 6px; border-radius:6px; white-space:nowrap; }
+.elevfoot { display:flex; justify-content:space-between; font-size:12px; color:var(--amber); padding:0 2px; }

@@ -361,6 +361,35 @@ def test_apply_mix_solve_volume_by_src_across_levels():
     _with_rooms_root(body)
 
 
+# FAILURE MODE UNDER TEST — a DIAL's one-shot throw lives on the hotspot's `sfx`, not `solveSfx`, but
+# pano-player's solveSounds() lists it in the mixer's "Solve / door sounds" section with a slider like
+# any other sting. _apply_mix only ever looked at `solveSfx`, so moving that slider and hitting Save
+# matched nothing, wrote nothing, and reported "saved ✓ nothing changed" — a silent no-op on a control
+# the mixer had offered (2026-08-27, Lucas, on Egypt's deck cast-off / Pharos lamp dial). A room's own
+# `sfx` must stay out of it: that's the ambience-layer list, handled by the `rooms` path.
+
+def test_apply_mix_saves_a_dial_one_shot_which_lives_on_sfx_not_solvesfx():
+    def body(tmp):
+        d = _write_scenario("data_vis", "x", {"rooms": [
+            {"key": "room1", "sfx": [{"src": "room1/hum.mp3", "volume": 0.5}], "hotspots": [
+                {"id": "lever", "type": "dial", "sfx": {"src": "room1/throw.mp3", "volume": 0.8}},
+                {"id": "bell", "type": "dial", "sfx": "room1/bell.mp3"},          # bare string form
+            ]},
+        ]})
+        hs._select_scenario("data_vis", "x")
+        out = hs._apply_mix(None, {}, solve_vols={
+            "room1": {"room1/throw.mp3": 0.3, "room1/bell.mp3": 0.6,
+                      "room1/hum.mp3": 0.1},        # the ROOM's ambience layer — must NOT count here
+        })
+        assert out == {"music": False, "layers": 0, "solves": 2}
+        disk = json.load(open(os.path.join(d, "scenario.json")))
+        hs_ = disk["rooms"][0]["hotspots"]
+        assert hs_[0]["sfx"] == {"src": "room1/throw.mp3", "volume": 0.3}
+        assert hs_[1]["sfx"] == {"src": "room1/bell.mp3", "volume": 0.6}   # string promoted
+        assert disk["rooms"][0]["sfx"] == [{"src": "room1/hum.mp3", "volume": 0.5}]   # untouched
+    _with_rooms_root(body)
+
+
 # --- perceived-loudness auto-balance (_apply_balance) --------------------------------------------
 # FAILURE MODE UNDER TEST — an effect that PLAYS louder than the music slips through. _apply_balance
 # must lower ONLY effects whose played loudness (LUFS + 20log10(volume)) exceeds the music's played

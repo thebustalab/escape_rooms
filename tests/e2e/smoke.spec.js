@@ -11,6 +11,11 @@ const SCENARIOS = [
   { name: "alaska", path: "/escape_rooms/rooms/data_vis/alaska/play.html" },
   { name: "hawaii", path: "/escape_rooms/rooms/data_vis/hawaii/play.html" },
   { name: "trees", path: "/escape_rooms/rooms/wrangling/trees/play.html" },
+  { name: "temple", path: "/escape_rooms/rooms/hierarchical_clustering/temple/play.html" },
+  // hospital + airship are PUBLISHED (status: ready) and were going into a live course uncovered here
+  // (2026-08-28). Every `ready` scenario belongs in this list — that is the point of the smoke.
+  { name: "hospital", path: "/escape_rooms/rooms/data_vis2/hospital/play.html" },
+  { name: "airship", path: "/escape_rooms/rooms/data_vis2/airship/play.html" },
 ];
 
 for (const sc of SCENARIOS) {
@@ -44,3 +49,22 @@ for (const sc of SCENARIOS) {
     expect(errors, `no uncaught page errors:\n${errors.join("\n")}`).toEqual([]);
   });
 }
+
+// The submission code exists ONLY inside the downloaded PDF, so a CDN outage for jsPDF means a student
+// simply cannot submit — there is no other route to the code. jsPDF is therefore vendored (2026-08-28).
+// This pins that: with every CDN hard-blocked at the network layer, jsPDF must still load and produce a
+// real PDF. If someone ever points a shell back at a CDN, this fails.
+test("jsPDF is vendored: a PDF still generates with every CDN blocked", async ({ page }) => {
+  await page.route("**://*/**", route =>
+    /cdn\.jsdelivr\.net|unpkg\.com|cdnjs/.test(route.request().url()) ? route.abort() : route.continue());
+  await page.goto("/escape_rooms/rooms/data_vis/alaska/play.html");
+  const out = await page.evaluate(() => {
+    const J = window.jspdf && window.jspdf.jsPDF;
+    if (!J) return null;
+    const doc = new J({ unit: "pt", format: "a4" });
+    doc.text("submission smoke test", 40, 40);
+    return doc.output("datauristring").slice(0, 30);
+  });
+  expect(out, "jsPDF did not load with CDNs blocked — is a shell still pointing at one?").toBeTruthy();
+  expect(out.startsWith("data:application/pdf")).toBe(true);
+});

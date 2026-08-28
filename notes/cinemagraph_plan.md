@@ -219,3 +219,75 @@ the marker list now `.filter(h => h.type !== "ambient")`. `activeCinemagraphs` s
 Cinemagraph tab" hint and draws ambient markers/boxes **ghosted (dashed)** in authoring (still selectable — you
 edit them; only the *player* hides them). 41 node tests green after the pano-player change; e2e (Playwright)
 not run (needs browser+servers) — worth an in-game check that an ambient hotspot animates with no ring.
+
+---
+
+## The GV100 was never the machine for this — settings to change on the DGX (2026-08-27)
+
+Egypt's first HONEST full batch ran tonight: 15/15 hotspots, 5 candidates each, zero failures. Everything
+below came out of diagnosing why it nearly didn't, and it all points the same way — the settings this
+pipeline runs are the ones a 32 GB card forced on it, not the ones we'd choose.
+
+### What actually happened, in order
+
+**The whole batch OOM'd first (all 75 candidates).** ComfyUI's own history API had it plainly:
+`SamplerCustomAdvanced` → `model_patcher.partially_load` → `torch.OutOfMemoryError: Allocation on device`,
+with the allocator reserving 29 GB and peaking at 32 — the entire card. The transformer alone
+(`ltx-2.3-22b-distilled-1.1_transformer_only_fp8_scaled`) is **24 GB**, plus a 12.6 GB Gemma text encoder
+and a 1.4 GB VAE, on a 31.7 GB GV100. It only ever fitted by a hair.
+
+The hair was **2.9 GB held by the ESM2 protein server** (`remote_lm_server`, uvicorn :8000, tmux session
+`esm2`) — a GPU tenant the batch knows nothing about. The batch stops `lm_server` for its duration and
+restarts it afterwards, correctly; nobody ever taught it about ESM2. **Stopping ESM2 + restarting ComfyUI
+(26 days up, allocator fragmented) was what made the run go.** Both are manual, and both are pre-flight
+steps for any future run on this box.
+
+**A reporting bug hid all of it** (fixed 2026-08-27 in `~/ComfyUI/cinemagraph_gen.py`, `.bak_20260827`
+beside it). `poll()` returned True the moment the prompt id appeared in ComfyUI's `/history` — but ComfyUI
+files ERRORED executions there exactly as it does successful ones. So a card-filling OOM surfaced as
+`pick_fresh_clip`'s "reported success but wrote no new clip", a message about *staleness*, sending the
+diagnosis after entirely the wrong bug on all 75 candidates. `poll()` now reads the entry's status,
+returns False for an OOM (so the res-ladder steps down as designed) and RAISES with ComfyUI's own words
+for anything else. The OOM marker list also gained `"allocation on device"` — torch's actual phrasing,
+which the old two-marker list didn't have, so half the OOMs weren't even recognised as OOMs.
+
+**The "it used to work at 768x896" memory is false.** That was the 2026-08-10 stale-clip run (see *The
+generator must identify its clip by DIFFERENCE*): the log printed the resolution it ASKED for while
+staging an older, smaller file. Measured on disk, the last GENUINE renders (2026-08-06) are **512x320**;
+tonight's are **384x448** — slightly MORE pixels. The 20-second "successes" in that log are the giveaway;
+a real render at a smaller size takes over a minute. **Nothing regressed. This card has always produced
+clips this small.** Do not chase a phantom regression.
+
+### The three settings to change once the DGX is up
+
+All three want VRAM headroom, and all three push the same way — they are the fix for the frame-wide drift
+Lucas reported (the whole image moving, not just the flame/lamp/fire).
+
+1. **Guidance — the big one.** `CFGGuider.cfg` is **1.0**, and at cfg 1 the maths collapses to the
+   positive conditioning alone: **the negative prompt is discarded entirely**. It is correctly wired
+   (`[5] CLIPTextEncode → [7] → [8] → [11].negative`) and it already lists exactly the symptom — *camera
+   movement, pan, tilt, zoom, parallax, whole image moving, background sliding* — and none of it has ever
+   had any effect. Raise cfg (start ~2–3) and that suppression comes alive. Cost: the sampler must also
+   run the unconditional pass, so ≈2× memory and ≈2× time per clip. Impossible on the GV100, which is why
+   it sits at 1. NOTE the model is guidance-DISTILLED (hence cfg 1 and the 8-point `ManualSigmas`), so
+   raising cfg may soften or over-cook it — **A/B one hotspot before committing a batch.**
+2. **LoRA strength 0.9 → 1.0.** `LoraLoaderModelOnly.strength_model` on
+   `ltx-2.3-22b-lora-cinemagraph-0.9`. The cinemagraph LoRA is what actually holds the camera still;
+   there's no reason to run it short on a box with room.
+3. **Stay at the top of the res-ladder.** `res_ladder` starts at 896 and tonight every candidate fell to
+   the bottom rung (384). Low resolution is itself a drift cause — less spatial structure to anchor to, so
+   the model reinterprets the frame instead of animating one object. On the DGX the top rungs should hold.
+
+If the DGX still can't hold cfg>1 at 73 frames, the pre-existing alt from 2026-08-01 is the lever to pull:
+**~49 frames played at ~16fps** (keeps resolution, gentler pace) — needs the workflow's `CreateVideo.fps`
+and `LTXVConditioning.frame_rate` patched to match, not just `--length`.
+
+### Practical notes for the move
+
+- The harness never passes `--length`, so clips take `cinemagraph_gen.py`'s default (**73**). Change the
+  default there, not in the harness, unless the harness learns the flag.
+- `cinemagraph_gen.py` re-reads `cinemagraph_i2v_api.json` **for every single render**, so editing the
+  workflow mid-batch changes clips halfway through. Only edit between runs.
+- `~/ComfyUI/` is outside this repo's git history; `.bak_<date>` beside the file is the whole audit trail.
+- Egypt's 15 hotspots × 5 candidates are generated and unpicked — they can simply be regenerated on the
+  DGX once the settings above are in, before anyone spends time picking softer clips.

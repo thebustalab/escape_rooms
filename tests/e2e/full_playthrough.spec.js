@@ -33,11 +33,24 @@ const CONSOLE_ANSWERS = {
     // room3 is a console-check: expr is toupper(trimws(as.character(answer))) == "KEEI_B" → assign it.
     room3: 'answer <- "KEEI_B"',
   },
+  // trees: four console-`check` rooms. The first three are single group_by/summarise; the boss is the
+  // species-balanced REGROUP whose answer must DIFFER from station3's (the engineered Simpson flip) —
+  // typing the real pipeline, not the bare string, so the grader sees the analysis actually run.
+  trees: {
+    station1: 'answer <- forest_census |> group_by(species) |> summarise(m = mean(trunk_girth_cm)) |> arrange(desc(m)) |> slice(1) |> pull(species)\nanswer',
+    station2: 'answer <- forest_census |> group_by(vigor) |> summarise(m = mean(bark_glow)) |> arrange(desc(m)) |> slice(1) |> pull(vigor)\nanswer',
+    station3: 'answer <- forest_census |> group_by(grove) |> summarise(m = mean(vitality_index)) |> arrange(desc(m)) |> slice(1) |> pull(grove)\nanswer',
+    boss: 'answer <- forest_census |> group_by(grove, species) |> summarise(m = mean(vitality_index), .groups = "drop") |> group_by(grove) |> summarise(mm = mean(m)) |> arrange(desc(mm)) |> slice(1) |> pull(grove)\nanswer',
+  },
 };
 
 const SCENARIOS = [
   { name: "alaska", path: "/escape_rooms/rooms/data_vis/alaska/play.html" },
   { name: "hawaii", path: "/escape_rooms/rooms/data_vis/hawaii/play.html" },
+  // trees exercises the two shapes nothing else did: MONORAIL JUNCTION rooms between the graded stations
+  // (a `dial` must be thrown before the car door opens) and a two-beat escape — the 3x3 grid UNSEALS the
+  // vault gate, and the player must then walk THROUGH that open gate (the `endsEscape` door) to finish.
+  { name: "trees", path: "/escape_rooms/rooms/wrangling/trees/play.html" },
 ];
 
 for (const sc of SCENARIOS) {

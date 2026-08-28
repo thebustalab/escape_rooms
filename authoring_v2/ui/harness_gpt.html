@@ -506,7 +506,7 @@ git add -A && git commit -m "whatever changed" && git push</pre>
       rooms.forEach(r => [...(Array.isArray(r.hotspots) ? r.hotspots : []), ...(Array.isArray(r.plannedHotspots) ? r.plannedHotspots : [])].forEach(h => {
         if (h && h.type === "door" && h.to && byKey[h.to] && h.to !== r.key) {
           const [ka, kb] = [r.key, h.to].sort();
-          const dl = doorLinks[ka + " " + kb] || (doorLinks[ka + " " + kb] = { a: ka, b: kb, ab: false, ba: false });
+          const dl = doorLinks[ka + "\u0000" + kb] || (doorLinks[ka + "\u0000" + kb] = { a: ka, b: kb, ab: false, ba: false });
           if (r.key === ka) dl.ab = true; else dl.ba = true;   // ab = a→b door exists, ba = b→a door exists
         }
       }));

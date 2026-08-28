@@ -61,6 +61,18 @@ async function readScenarioPlan(page) {
             pickAnswer: pk ? pk.answer : null,
             checkRequires: ck ? (ck.requires || []) : null,
           } : null,
+          // A JUNCTION room (trees' monorail cars): a `dial` sets a world-state key, and the room's single
+          // door is a switch-door whose variants pick where it opens per state. The onward value is the
+          // one on the variant that is NOT the `back` view. Null for every ordinary room.
+          junction: (() => {
+            const dial = hs.find((h) => h.type === "dial");
+            if (!dial) return null;
+            const sw = doors.find((h) => (h.variants || []).some((v) => v && v.when && v.when.eq));
+            if (!sw) return null;
+            const on = (sw.variants || []).find((v) => v && v.when && v.when.eq && v.direction !== "back");
+            if (!on) return null;
+            return { dialId: dial.id, value: String(on.when.eq[1]), to: on.to || sw.to || null };
+          })(),
           locks: hs.filter((h) => h.type === "lock").map((l) => ({
             id: l.id, answer: l.answer || "", mode: l.mode || null, endsEscape: !!l.endsEscape,
           })),
@@ -207,6 +219,38 @@ class Playthrough {
     }
   }
 
+  // ---- monorail junctions -----------------------------------------------------
+  // A junction room has no puzzle: its door is sealed until the player throws the DIAL. Throw it to the
+  // onward value, then ride the now-open door. No-op for every scenario without a junction room.
+  async rideJunction(rp) {
+    const page = this.page;
+    await expect(page.locator(".hsmark.dial")).not.toHaveCount(0, { timeout: 10_000 });
+    await page.locator(".hsmark.dial").first().dispatchEvent("click");
+    await expect(page.locator("#modal.open")).toBeVisible();
+    await page.locator(`#modal button.ghost[data-v="${rp.junction.value}"]`).click();
+    await page.locator("#mback").click();
+    await expect(page.locator("#modal.open")).toBeHidden({ timeout: 10_000 });
+    await expect(page.locator(".hsmark.door.open")).not.toHaveCount(0, { timeout: 10_000 });
+    await page.locator(".hsmark.door.open").first().dispatchEvent("click");
+  }
+
+  // Walk forward and keep going through any junction rooms until `targetTitle` is on the HUD. For a
+  // scenario with no junctions this is exactly walkForward (the first assert already passes).
+  async advanceTo(rp, targetTitle) {
+    await this.walkForward(rp);
+    for (let hop = 0; hop < 4; hop++) {
+      const cur = await this.currentRoom();
+      if (!cur || cur.title === targetTitle) return;
+      if (!cur.junction) throw new Error(`advanceTo stuck in "${cur.key}" — not a junction, target "${targetTitle}"`);
+      await this.rideJunction(cur);
+      if (cur.junction.to) {
+        const t = this.room(cur.junction.to);
+        if (t && t.title) await expect(this.page.locator("#hudroom")).toHaveText(t.title, { timeout: 10_000 });
+      }
+    }
+    throw new Error(`advanceTo never reached "${targetTitle}"`);
+  }
+
   async _escapeDoneShown() {
     if (!(await this.page.locator("#done.open").count())) return false;
     const t = (await this.page.locator("#doneTitle").textContent() || "").trim();
@@ -240,7 +284,7 @@ class Playthrough {
         // engine's ~650ms settle on top of the ~900ms solve).
         await expect(page.locator("#done.open, #submitPrep.open")).toBeVisible({ timeout: 15_000 });
       } else {
-        await this.walkForward(rp);
+        await this.advanceTo(rp, analysisRooms[i + 1].title);
       }
     }
   }
@@ -272,6 +316,11 @@ class Playthrough {
         const grid = (rp && rp.grids[0]) || { answer: {}, endsEscape: false };
         await this.solveGrid(grid);
         if (grid.endsEscape) { await this._awaitEscapeDone(); return; }
+        continue;
+      }
+      // 2b) a junction room on the way to the escape: throw its dial and ride on
+      if (rp && rp.junction && !(await page.locator(".hsmark.door.open").count())) {
+        await this.rideJunction(rp);
         continue;
       }
       // 3) walk an open forward door (into the next escape room, or through the terminal hatch)

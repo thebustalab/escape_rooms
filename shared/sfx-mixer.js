@@ -34,6 +34,11 @@ if (window.SFX_MIXER && window.PanoMixer) (function () {
     #sfxMixer .save:disabled{opacity:.5;cursor:default}
     #sfxMixer .savemsg{font-size:11px;min-height:14px;margin-top:2px;text-align:center}
     #sfxMixer .savemsg.ok{color:#8fe6a8}#sfxMixer .savemsg.err{color:#ff9a9a}
+    #sfxMixer .flag{display:block;width:100%;margin-top:3px;font-size:10px;padding:2px 6px;cursor:pointer;
+      background:#1a2530;color:#9fb3c2;border:1px solid rgba(255,255,255,.16);border-radius:6px}
+    #sfxMixer .flag:hover{border-color:#ffb4b4;color:#ffd0d0}
+    #sfxMixer .flag.on{background:#4a1c1c;color:#ffd0d0;border-color:#ff9a9a}
+    #sfxMixer .mrow.flagged label{color:#ff9a9a}
     #sfxMixer .balance{display:block;width:100%;text-align:center;margin:12px 0 2px;background:#12232f;color:#ffd88c;
       border:1px solid rgba(255,216,140,.4);border-radius:8px;padding:9px;font:600 12px/1.2 system-ui,sans-serif;cursor:pointer}
     #sfxMixer .balance:hover{background:#1a3040;border-color:#ffd88c}
@@ -89,7 +94,7 @@ if (window.SFX_MIXER && window.PanoMixer) (function () {
 
   // Volumes the user has actually moved — {music: v|null, rooms: {roomKey: {src: v}}}. We send ONLY
   // these (not every layer) so a room the player never touched is never rewritten from a stale value.
-  const touched = { music: null, rooms: {}, solve: {} };
+  const touched = { music: null, rooms: {}, solve: {}, flags: {} };
   const markMusic = v => { touched.music = v; refreshSave(); };
   const markLayer = (src, v) => {
     const key = M.current(); if (!key || !src) return;
@@ -100,6 +105,7 @@ if (window.SFX_MIXER && window.PanoMixer) (function () {
     (touched.solve[key] = touched.solve[key] || {})[src] = v; refreshSave();
   };
   const nTouched = () => (touched.music != null ? 1 : 0) +
+    Object.keys(touched.flags).length +
     Object.values(touched.rooms).reduce((a, o) => a + Object.keys(o).length, 0) +
     Object.values(touched.solve).reduce((a, o) => a + Object.keys(o).length, 0);
   function refreshSave() {
@@ -115,13 +121,15 @@ if (window.SFX_MIXER && window.PanoMixer) (function () {
       const r = await fetch(HARNESS.replace(/\/$/, "") + "/api/save-mix", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ chapter: CHAPTER, scenario: SCENARIO,
-          musicVolume: touched.music, rooms: touched.rooms, solves: touched.solve })
+          musicVolume: touched.music, rooms: touched.rooms, solves: touched.solve,
+          flags: touched.flags })
       });
       const j = await r.json();
       if (!j.ok) throw new Error(j.error || "save failed");
       saveMsg.className = "savemsg ok";
       const bits = [];
       if (j.layers) bits.push(`${j.layers} layer${j.layers === 1 ? "" : "s"}`);
+      if (j.flagged) bits.push(`${j.flagged} flag${j.flagged === 1 ? "" : "s"}`);
       if (j.solves) bits.push(`${j.solves} solve${j.solves === 1 ? "" : "s"}`);
       if (j.music) bits.push("music");
       saveMsg.textContent = "saved ✓ " + (bits.join(" + ") || "nothing changed");
@@ -140,6 +148,35 @@ if (window.SFX_MIXER && window.PanoMixer) (function () {
     const val = wrap.querySelector(".val"), inp = wrap.querySelector("input");
     inp.oninput = () => { const v = parseFloat(inp.value); val.textContent = Math.round(v * 100) + "%"; oninput(v); };
     return wrap;
+  }
+
+  // ---- "needs replacement" flag (2026-08-07, Lucas) -------------------------------------------------
+  // Balancing a sound and JUDGING a sound are different jobs: some clips are simply wrong for the room at
+  // any volume. A ⚑ per row marks the file for re-sourcing at the Sounds step. It rides the SAME Save
+  // button as the volumes (no second control), and persists as `needsReplacement` on the sound entry in
+  // scenario.json. Flags key on `src`, so flagging a file marks it in every room that uses it — a bad
+  // recording is bad everywhere.
+  let FLAGS = {};                              // src -> true, seeded from the harness on open
+  function flagButton(src, row) {
+    if (!src) return;
+    const b = document.createElement("button");
+    b.className = "flag";
+    const paint = () => {
+      const on = !!FLAGS[src];
+      b.classList.toggle("on", on);
+      b.textContent = on ? "⚑ needs replacing" : "⚑ flag";
+      b.title = on ? `${src} — flagged for replacement; click to clear`
+                   : `${src} — flag this sound as no good, to be re-sourced`;
+      row.classList.toggle("flagged", on);
+    };
+    b.onclick = () => {
+      FLAGS[src] = !FLAGS[src];
+      if (!FLAGS[src]) delete FLAGS[src];
+      touched.flags[src] = !!FLAGS[src];       // send the CLEAR too, so unflagging persists
+      paint(); refreshSave();
+    };
+    paint();
+    row.appendChild(b);
   }
 
   // ---- perceived-loudness auto-balance -------------------------------------------------------------
@@ -207,6 +244,7 @@ if (window.SFX_MIXER && window.PanoMixer) (function () {
       layers.forEach(l => {
         const row = slider(l.label, l.mode, l.vol, v => { M.setLayerVolume(l.i, v); markLayer(l.src, v); });
         if (l.src) BAL.push({ src: l.src, inp: row.querySelector("input") });
+        flagButton(l.src, row);
         if (l.mode === "interval") {          // interval one-shots: a test button (like the solve/door sounds)
           const b = document.createElement("button"); b.className = "fire"; b.title = l.src;
           b.textContent = "▶ test " + l.label;
@@ -230,6 +268,7 @@ if (window.SFX_MIXER && window.PanoMixer) (function () {
         let live = vol0;
         const row = slider(s.label, "one-shot", vol0, v => { live = v; markSolve(s.src, v); });
         if (s.src) BAL.push({ src: s.src, inp: row.querySelector("input") });
+        flagButton(s.src, row);
         const b = document.createElement("button"); b.className = "fire"; b.title = s.src;
         b.textContent = "▶ test " + s.label;
         b.onclick = () => M.fireSolve(s.src, live);          // preview at the current slider value
@@ -238,6 +277,15 @@ if (window.SFX_MIXER && window.PanoMixer) (function () {
       });
     }
     balBtn.disabled = !(HARNESS && BAL.length);   // needs the harness link (server measures) + ≥1 effect
+  }
+
+  // seed the needs-replacement flags from scenario.json so earlier sessions' flags show up already lit
+  if (HARNESS) {
+    fetch(HARNESS.replace(/\/$/, "") + "/api/audio-flags", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chapter: CHAPTER, scenario: SCENARIO })
+    }).then(r => r.json()).then(j => { if (j && j.ok) { FLAGS = j.flags || {}; render(); } })
+      .catch(() => {});
   }
 
   M.onChange(render);

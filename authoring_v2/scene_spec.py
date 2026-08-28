@@ -110,7 +110,9 @@ def cinemagraph_jobs(spec):
     jobs = []
     for e in spec.get("elements", []):
         a = e.get("animate")
-        if a and a.get("motion"):
+        if not isinstance(a, dict):     # a malformed field must not take down the whole scenario load
+            continue
+        if a.get("motion"):
             jobs.append({"type": "cinemagraph", "hotspotId": e["id"], "prompt": a["motion"],
                          "loop": a.get("loop", "boomerang")})
     return jobs
@@ -129,7 +131,12 @@ def dooropen_jobs(spec):
         d = e.get("door")
         if not isinstance(d, dict):
             continue
-        for i, ov in enumerate(d.get("opensOnto") or []):
+        oo = d.get("opensOnto")
+        if isinstance(oo, (str, dict)):
+            oo = [oo]                   # tolerate a single view written unwrapped
+        for i, ov in enumerate(oo or []):
+            if not isinstance(ov, dict):
+                continue                # a malformed view must not take down the whole scenario load
             reveal = (ov.get("reveal") or "").strip()
             if not reveal:
                 continue
@@ -189,6 +196,14 @@ def to_hotspots(spec):
             # had to be hand-changed to `dial` post-commit). Prefer `dial:true` when the control IS a dial.
         elif e.get("grid"):
             out.append({**base, "type": "grid"})     # ungraded escape gate, MATRIX-SELECT flavour (mechanic #15)
+        elif e.get("ledger"):
+            out.append({**base, "type": "ledger"})   # ungraded escape gate, DEDUCTION-LEDGER flavour (#9):
+            # rows + a verdict each, confirmed a GROUP at a time. Needs >=2 groups or it degrades to
+            # all-or-nothing. Engine: openLedger + shared/ledger_rule.js
+        elif e.get("elevmap"):
+            out.append({**base, "type": "elevmap"})  # TRANSCRIPTION TOOL, never a gate: drag nodes up a
+            # scaled axis to record readings taken in the world; writes a count into gameState for an
+            # ordinary condOK gate to read. Engine: openElevmap + shared/elev_scale.js
         elif e.get("lock"):
             out.append({**base, "type": "lock"})     # ungraded escape gate, KEYPAD flavour; wired separately
         elif e.get("door"):

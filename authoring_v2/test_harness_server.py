@@ -87,9 +87,48 @@ def test_start_busy_reject_and_concurrent_slots():
     assert hs.JOBS["t2"]["active"] is True
     gate.set()
     time.sleep(0.05)
-    # bare block() target doesn't clear active (only _run_* do); tidy up for isolation
     for s in ("t1", "t2"):
         hs.JOBS.pop(s, None)
+
+
+# FAILURE MODE UNDER TEST — a job slot wedged FOREVER by a thread body that dies before clearing it.
+# JOBS lives in memory, so a claimed-and-never-released slot refuses every later job on it ("a variant
+# job is already running") until the server is restarted, while /api/status reports active with no error
+# and nothing is actually running. Hit for real on 2026-08-26: /api/gen-fullscene-variant's lambda
+# dropped the leading `slot` arg, so every parameter shifted one place left, the body raised on a
+# nonsense path, and its except handler then indexed JOBS by a filesystem path -> KeyError -> the
+# thread died before `active = False`. Both halves are pinned: the lambda passes its slot, and _start
+# releases the slot in a `finally` whatever the body does.
+
+def test_start_releases_slot_when_body_raises():
+    hs.JOBS.pop("t3", None)
+
+    def boom():
+        raise KeyError("/some/path/that/is/not/a/slot")
+
+    assert hs._start("t3", "test", boom, 1) is True
+    for _ in range(100):                       # the guard runs on the job thread
+        if not hs.JOBS["t3"]["active"]:
+            break
+        time.sleep(0.01)
+    assert hs.JOBS["t3"]["active"] is False, "a crashed job body must not wedge its slot"
+    assert "crashed" in (hs.JOBS["t3"]["error"] or ""), "the crash must be reported, not silent"
+    assert hs._start("t3", "test", lambda: None, 1) is True, "the slot must be re-claimable"
+    time.sleep(0.05)
+    hs.JOBS.pop("t3", None)
+
+
+def test_fullscene_variant_lambda_passes_its_slot():
+    """The dispatch lambda must hand _run_fullscene its slot name first, or every arg shifts left."""
+    import inspect, re as _re
+    src = inspect.getsource(hs)
+    m = _re.search(r"lambda: _run_fullscene\(([^)]*)\)", src)
+    assert m, "the /api/gen-fullscene-variant dispatch lambda is gone — retarget this guard"
+    assert m.group(1).lstrip().startswith('"variant"'), \
+        "_run_fullscene(slot, base, room_key, state, prompt, ...) — slot must be passed first"
+    # and the call must satisfy the real signature positionally
+    sig = inspect.signature(hs._run_fullscene)
+    sig.bind("variant", "base", "rk", "state", "prompt", None, None)
 
 
 def test_status_idle_default_shape():
@@ -374,6 +413,35 @@ def test_apply_mix_solve_volume_by_src_across_levels():
         assert r1["solveSfx"] == {"src": "room1/door.mp3", "volume": 0.2}                  # string promoted
         assert "solveSfx" not in r1["hotspots"][1]                                         # inheritor untouched
         assert disk["solveSfx"] == {"src": "shared/chime.mp3", "volume": 0.3}              # scenario level set
+    _with_rooms_root(body)
+
+
+# FAILURE MODE UNDER TEST — a DIAL's one-shot throw lives on the hotspot's `sfx`, not `solveSfx`, but
+# pano-player's solveSounds() lists it in the mixer's "Solve / door sounds" section with a slider like
+# any other sting. _apply_mix only ever looked at `solveSfx`, so moving that slider and hitting Save
+# matched nothing, wrote nothing, and reported "saved ✓ nothing changed" — a silent no-op on a control
+# the mixer had offered (2026-08-27, Lucas, on Egypt's deck cast-off / Pharos lamp dial). A room's own
+# `sfx` must stay out of it: that's the ambience-layer list, handled by the `rooms` path.
+
+def test_apply_mix_saves_a_dial_one_shot_which_lives_on_sfx_not_solvesfx():
+    def body(tmp):
+        d = _write_scenario("data_vis", "x", {"rooms": [
+            {"key": "room1", "sfx": [{"src": "room1/hum.mp3", "volume": 0.5}], "hotspots": [
+                {"id": "lever", "type": "dial", "sfx": {"src": "room1/throw.mp3", "volume": 0.8}},
+                {"id": "bell", "type": "dial", "sfx": "room1/bell.mp3"},          # bare string form
+            ]},
+        ]})
+        hs._select_scenario("data_vis", "x")
+        out = hs._apply_mix(None, {}, solve_vols={
+            "room1": {"room1/throw.mp3": 0.3, "room1/bell.mp3": 0.6,
+                      "room1/hum.mp3": 0.1},        # the ROOM's ambience layer — must NOT count here
+        })
+        assert out == {"music": False, "layers": 0, "solves": 2}
+        disk = json.load(open(os.path.join(d, "scenario.json")))
+        hs_ = disk["rooms"][0]["hotspots"]
+        assert hs_[0]["sfx"] == {"src": "room1/throw.mp3", "volume": 0.3}
+        assert hs_[1]["sfx"] == {"src": "room1/bell.mp3", "volume": 0.6}   # string promoted
+        assert disk["rooms"][0]["sfx"] == [{"src": "room1/hum.mp3", "volume": 0.5}]   # untouched
     _with_rooms_root(body)
 
 
@@ -986,7 +1054,10 @@ def test_seam_bounds_clamps_and_filters():
     """Band params are clamped (left/right to 0.45, feather to 0.1); junk / non-positive values drop to
     None so the run uses the symmetric/auto fallback rather than a broken strip."""
     assert hs._seam_bounds({"left": 0.06, "right": 0.06}) == (0.06, 0.06, None, False, None)
-    assert hs._seam_bounds({"left": 9.0, "right": 0.0, "feather": 5}) == (0.45, None, 0.1, False, None)   # over-caps clamped; side 0 → None
+    assert hs._seam_bounds({"left": 9.0, "right": 0.0, "feather": 5}) == (0.9, None, 0.1, False, None)   # over-caps clamped; side 0 → None
+    # The side cap is 0.9, not 0.45 (raised 2026-08-07 so the band reaches the whole frame — it doubles as
+    # the region selector for patch/occluder). A 0.45 here again means the UI's reach was silently halved.
+    assert hs._seam_bounds({"left": 0.8, "right": 0.75}) == (0.8, 0.75, None, False, None)
     assert hs._seam_bounds({"feather": 0.02}) == (None, None, 0.02, False, None)    # feather alone is fine
     assert hs._seam_bounds({"feather": 0}) == (None, None, 0.0, False, None)        # feather 0 KEPT (OFF), not dropped to auto
     assert hs._seam_bounds({"feather": -1}) == (None, None, None, False, None)      # negative feather → None (auto)
@@ -1232,6 +1303,79 @@ def test_set_review_flag_whitelist_and_persist():
                 pass
 
 
+# ---- seam targeting: scene.png, or a state VARIANT (2026-08-13) -----------------------------------
+# Seam repair used to be hard-wired to scene.png, so a night/weather variant whose unmasked re-light had
+# broken the wrap seam could not be fixed at all. `room_target` is the resolver that opened that up — and
+# because `file` arrives from a query string, it is also the guard.
+
+def _room_with(files):
+    """Run a body with a temp rooms tree holding rooms/ch/sc/r1/<files>; yields the scenario base dir."""
+    out = {}
+
+    def body(tmp):
+        d = _write_scenario("ch", "sc", {"title": "T", "rooms": [{"key": "r1"}]})
+        os.makedirs(os.path.join(d, "r1"), exist_ok=True)
+        for f in files:
+            _png(os.path.join(d, "r1", f))
+        out["base"] = d
+        out["result"] = out["fn"](d)
+    return body, out
+
+
+def _run_room_target_case(files, fn):
+    body, out = _room_with(files)
+    out["fn"] = fn
+    _with_rooms_root(body)
+    return out.get("result")
+
+
+def test_room_target_defaults_to_the_committed_scene():
+    """Seam tools with no `file` must behave exactly as before — scene.png, undo stem "scene"."""
+    p, stem = _run_room_target_case(["scene.png"], lambda base: hs.room_target(base, "r1", None))
+    assert os.path.basename(p) == "scene.png", p
+    assert stem == "scene", stem
+
+
+def test_room_target_selects_a_state_variant_with_its_own_undo_stem():
+    """A variant keeps a SEPARATE undo stack — otherwise undoing a night fix could restore the day scene
+    over the night art, which is unrecoverable without regenerating."""
+    p, stem = _run_room_target_case(["scene.png", "scene_night.png"],
+                                    lambda base: hs.room_target(base, "r1", "scene_night.png"))
+    assert os.path.basename(p) == "scene_night.png", p
+    assert stem == "scene_night", stem
+
+
+def _refuses(files, bad):
+    def fn(base):
+        try:
+            hs.room_target(base, "r1", bad)
+        except ValueError:
+            return True
+        return False
+    return _run_room_target_case(files, fn)
+
+
+def test_room_target_refuses_to_escape_the_room_directory():
+    """`file` comes off a query string: basename it, then re-check the resolved parent."""
+    for bad in ("../../../etc/passwd", "/etc/hosts", "../scene.png"):
+        assert _refuses(["scene.png"], bad), "accepted a traversal target: %r" % bad
+
+
+def test_room_target_refuses_undo_snapshots_and_working_files():
+    """Seam-fixing an undo snapshot corrupts the stack; seam-fixing *_seam.png races the running job."""
+    for bad in ("scene_undo0.png", "scene_seam.png"):
+        assert _refuses(["scene.png", "scene_undo0.png", "scene_seam.png"], bad), \
+            "accepted a protected target: %r" % bad
+
+
+def test_room_target_rejects_a_missing_file_rather_than_inventing_one():
+    assert _refuses(["scene.png"], "scene_fog.png")
+
+
+def test_room_target_rejects_a_non_png():
+    assert _refuses(["scene.png"], "notes.txt")
+
+
 if __name__ == "__main__":
     tests = [v for k, v in sorted(globals().items()) if k.startswith("test_") and callable(v)]
     for t in tests:
@@ -1339,4 +1483,101 @@ def test_apply_balance_covers_pre_art_planned_stings():
         sting = planned[0]["solveSfx"]                       # bare string promoted to {src, volume}
         assert sting["src"] == "audio/loudsting.mp3" and abs(sting["volume"] - 0.199) < 0.002
         assert planned[1]["solveSfx"]["volume"] == 0.2       # already under the music → untouched
+    _with_rooms_root(body)
+
+
+# --- seam repair menu: the retired options stay retired -------------------------------------------
+# Lucas cut "crop & rescale" and "re-render whole scene" on 2026-08-07: crop paid ~2% of the scene to
+# HIDE the seam rather than fix it, and the whole-frame re-render made an AI image of an AI image AND
+# pushed a fresh seam to the far meridian — trading one seam for another. Both were removed from the
+# UI *and* from the server dispatch, so a stale browser tab (or a hand-rolled POST) can't reach them
+# either. The failure this guards: someone re-adds "crop"/"full" to a dispatch set and the two options
+# quietly come back to life with no UI card explaining them.
+def test_retired_seam_modes_are_not_dispatchable():
+    assert "crop" not in hs._SEAM_LOCAL_OPS, "crop & rescale was retired — do not re-add"
+    assert "full" not in hs._SEAM_AI_MODES, "whole-scene re-render was retired — do not re-add"
+    assert hs._SEAM_LOCAL_OPS == {"gradient", "roll"}
+    assert hs._SEAM_AI_MODES == {"patch", "occluder"}
+    # _seam_local must not silently accept a retired op either (seam_ops still HAS crop as a library fn).
+    for retired in ("crop", "full"):
+        assert retired not in hs._SEAM_LOCAL_OPS and retired not in hs._SEAM_AI_MODES
+
+
+# --- test-play mixer: "needs replacement" sound flags ----------------------------------------------
+# 2026-08-07 (Lucas): balancing a sound and JUDGING it are different jobs — some clips are simply wrong
+# for the room at any volume. The mixer's ⚑ marks a file for re-sourcing; it persists as
+# `needsReplacement` on the sound entry and rides the same Save as the volumes. Flags key on `src`, so a
+# file used in several rooms is flagged in all of them (a bad recording is bad everywhere). The failure
+# this guards: a flag that doesn't survive a reload, or an unflag that never clears.
+def test_audio_flags_round_trip_across_layers_and_stings():
+    def body(_tmp):
+        d = _write_scenario("data_vis", "flags", {"rooms": [
+            {"key": "r1", "built": True,
+             "sfx": [{"src": "audio/bed.mp3", "volume": 0.4}, {"src": "audio/gull.mp3", "volume": 0.3}],
+             "hotspots": [{"id": "h1", "type": "puzzle", "solveSfx": "audio/sting.mp3"}]},
+            {"key": "r2", "built": True, "sfx": [{"src": "audio/bed.mp3", "volume": 0.5}]},
+        ]})
+        assert hs._audio_flags(d) == {}, "nothing flagged to begin with"
+
+        # flag a shared bed + a bare-string sting -> the sting is promoted to {src,...} to hold the flag
+        n = hs._apply_audio_flags(d, {"audio/bed.mp3": True, "audio/sting.mp3": True})
+        assert n == 3, f"two bed entries + one sting = 3 touched, got {n}"
+        assert hs._audio_flags(d) == {"audio/bed.mp3": True, "audio/sting.mp3": True}
+        doc = json.load(open(os.path.join(d, "scenario.json")))
+        sting = doc["rooms"][0]["hotspots"][0]["solveSfx"]
+        assert sting["src"] == "audio/sting.mp3" and sting["needsReplacement"] is True
+        assert doc["rooms"][1]["sfx"][0]["needsReplacement"] is True, "flagged in EVERY room that uses it"
+        assert "needsReplacement" not in doc["rooms"][0]["sfx"][1], "an unflagged sibling is untouched"
+
+        # …and unflagging clears it everywhere, leaving no stray key behind
+        n = hs._apply_audio_flags(d, {"audio/bed.mp3": False})
+        assert n == 2 and hs._audio_flags(d) == {"audio/sting.mp3": True}
+        doc = json.load(open(os.path.join(d, "scenario.json")))
+        assert "needsReplacement" not in doc["rooms"][1]["sfx"][0]
+        assert doc["rooms"][1]["sfx"][0]["volume"] == 0.5, "clearing a flag must not disturb the volume"
+    _with_rooms_root(body)
+
+
+# --- planned content must attach when the BOXES are placed, not only at commit ----------------------
+# 2026-08-07: every hotspot in Egypt came back EMPTY after "Place all hotspots". `_attach_planned_content`
+# only ran at commit, but the real workflow commits the art FIRST and places boxes later — so at commit
+# there were no boxes to attach to, and at place-time nothing re-ran the attach. All 22 authored puzzles
+# and clues sat unused on plannedHotspots while the placed boxes rendered blank.
+def test_attach_planned_content_fills_placed_boxes():
+    placed = [{"id": "obj_1", "type": "clue", "label": "The count-board", "box": [0, 0, 1, 1]},
+              {"id": "obj_2", "type": "puzzle", "label": "The desk", "box": [0, 0, 1, 1]},
+              {"id": "obj_3", "type": "door", "label": "The hatch", "to": "hold", "direction": "open"}]
+    planned = [{"type": "clue", "label": "The count-board", "body": "three notches"},
+               {"type": "puzzle", "label": "The desk", "question": "which type?", "answer": 1}]
+    out = hs._attach_planned_content(json.loads(json.dumps(placed)), planned)
+    assert out[0]["body"] == "three notches"
+    assert out[1]["question"] == "which type?" and out[1]["answer"] == 1
+    assert out[0]["box"] == [0, 0, 1, 1] and out[0]["id"] == "obj_1", "placement is preserved"
+    assert out[2]["to"] == "hold", "a hotspot with no planned twin is left alone"
+
+
+# --- a DIAL's one-shot `sfx` is an authored sound like any other -----------------------------------
+# 2026-08-07: the Pharos lamp-dial lever throw and the deck cast-off live on `sfx`, not `solveSfx`, so
+# they fell outside solveSounds() (no mixer row → unbalanceable, unflaggable) AND outside _apply_balance.
+# A sound the author can neither hear-test, level, nor flag is effectively unmaintainable. Room-level
+# `sfx` is the ambience LIST and must stay out of the one-shot path — only a HOTSPOT's `sfx` is a sting.
+def test_dial_one_shot_sfx_is_flaggable_and_balanceable():
+    def body(_tmp):
+        d = _write_scenario("data_vis", "dialsfx", {"rooms": [
+            {"key": "r1", "built": True,
+             "sfx": [{"src": "audio/bed.mp3", "volume": 0.4}],          # ambience list — NOT a one-shot
+             "hotspots": [{"id": "d1", "type": "dial", "label": "The lever",
+                           "sfx": {"src": "audio/lever.mp3", "volume": 0.8}},
+                          {"id": "d2", "type": "dial", "label": "Bare", "sfx": "audio/bare.mp3"}]}]})
+        srcs = {src for _rk, _k, src, _s, _g in hs._iter_sound_slots(json.load(open(os.path.join(d, "scenario.json"))))}
+        assert "audio/lever.mp3" in srcs and "audio/bare.mp3" in srcs, srcs
+        assert "audio/bed.mp3" in srcs, "the room's ambience layer is still reachable"
+
+        assert hs._apply_audio_flags(d, {"audio/lever.mp3": True, "audio/bare.mp3": True}) == 2
+        assert hs._audio_flags(d) == {"audio/lever.mp3": True, "audio/bare.mp3": True}
+        doc = json.load(open(os.path.join(d, "scenario.json")))
+        hots = doc["rooms"][0]["hotspots"]
+        assert hots[0]["sfx"]["volume"] == 0.8, "flagging must not disturb the volume"
+        assert hots[1]["sfx"] == {"src": "audio/bare.mp3", "needsReplacement": True}, "bare string promoted"
+        assert isinstance(doc["rooms"][0]["sfx"], list), "the ambience list must not be rewritten as a one-shot"
     _with_rooms_root(body)

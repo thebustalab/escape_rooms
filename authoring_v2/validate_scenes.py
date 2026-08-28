@@ -63,8 +63,8 @@ import scene_spec  # noqa: E402  (sibling module; no side effects on import)
 
 # Hotspot types the runtime player actually dispatches on (shared/pano-player.js `onHotspot`).
 # `switch` is deliberately absent — that is the whole point of the check.
-ENGINE_TYPES = {"puzzle", "clue", "door", "lock", "grid", "dial", "mapview", "ambient"}
-GAMEPLAY = {"puzzle", "clue", "door", "lock", "grid", "dial", "switch", "mapview"}
+ENGINE_TYPES = {"puzzle", "clue", "door", "lock", "grid", "ledger", "elevmap", "dial", "mapview", "ambient"}
+GAMEPLAY = {"puzzle", "clue", "door", "lock", "grid", "ledger", "elevmap", "dial", "switch", "mapview"}
 LOOPS = {"boomerang", "crossfade"}
 EDGE_X = (0.08, 0.92)   # the far-left / far-right slots — the ±180° wrap seam
 
@@ -93,7 +93,7 @@ def check_scenario(path):
         boxes = scene_spec.approx_boxes(spec)
         # A room's PRIMARY GATE is its first puzzle, else its first lock/grid (pano-player `primaryGate`),
         # so an escape room whose only gate is a keypad still has one — a `forward` door there is fine.
-        has_gate = any(e.get("puzzle") or e.get("lock") or e.get("grid") for e in els)
+        has_gate = any(e.get("puzzle") or e.get("lock") or e.get("grid") or e.get("ledger") for e in els)   # elevmap is a TOOL, not a gate
         dials = {e.get("dial") and (e.get("key") or e["id"]) for e in els if e.get("dial")}
         # a dial's world-state key is authored in plannedHotspots (the spec carries only the role)
         planned = {slug(h.get("label")): h for h in (r.get("plannedHotspots") or []) if isinstance(h, dict)}
@@ -109,6 +109,25 @@ def check_scenario(path):
             for f in ("id", "at", "desc"):
                 if not str(e.get(f) or "").strip():
                     fails.append(f"{rk}/{eid}: element has no `{f}`")
+
+            # ---- SHAPE of the art-job fields ----------------------------------------------------------
+            # These feed cinemagraph_jobs / dooropen_jobs / variant_jobs. A field written with the wrong
+            # SHAPE (2026-08-07: `opensOnto` authored as a bare reveal string instead of a list of
+            # {state,reveal}) used to sail through this validator and then crash `_scenario_state` with a
+            # bare "'str' object has no attribute 'get'" — naming neither the room nor the field, so the
+            # whole scenario simply refused to load in the harness. The builders now skip a malformed
+            # entry rather than raising; this says WHICH element is wrong so it gets fixed rather than
+            # silently dropping its art.
+            if "animate" in e and not isinstance(e.get("animate"), dict):
+                fails.append(f"{rk}/{eid}: `animate` must be an object {{motion, loop}}, got "
+                             f"{type(e.get('animate')).__name__} — its cinemagraph would be skipped")
+            if "variants" in e and not isinstance(e.get("variants"), list):
+                fails.append(f"{rk}/{eid}: `variants` must be a LIST of {{state, when?, reveal}}, got "
+                             f"{type(e.get('variants')).__name__}")
+            _d = e.get("door")
+            if isinstance(_d, dict) and "opensOnto" in _d and not isinstance(_d.get("opensOnto"), list):
+                fails.append(f"{rk}/{eid}: `door.opensOnto` must be a LIST of {{state, when?, reveal}}, got "
+                             f"{type(_d.get('opensOnto')).__name__} — its open-door art would be skipped")
             h = hotspots.get(eid)
             typ = h.get("type") if h else None
 
@@ -143,7 +162,7 @@ def check_scenario(path):
 
             # ---- animation / seam ----
             a = e.get("animate")
-            if a:
+            if isinstance(a, dict):     # a non-dict is already reported above; don't crash reading it
                 if not str(a.get("motion") or "").strip():
                     fails.append(f"{rk}/{eid}: `animate` with no motion")
                 if a.get("loop") and a["loop"] not in LOOPS:

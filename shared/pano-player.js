@@ -50,7 +50,7 @@
  * Nav is ‹ › arrows (yaw only). WebR boots once and mounts into the puzzle modal.
  *
  * scenario.json (the window.SCENARIO shape): { chapter, scenario, id, title, subtitle,
- *   story, enterLabel?, ambient?:"fireflies"|"snow"|"embers"|"leaves"|"none", cover?, coverPrompt?, done?:{title,body},
+ *   story, enterLabel?, ambient?:"fireflies"|"snow"|"embers"|"leaves"|"dust"|"rays"|"none", cover?, coverPrompt?, done?:{title,body},
  *   packages, datasets:[{name,url}], setup,
  *   state?, rooms:[…], boss? }. Phase 4: the LINEAR graph fields are now EVALUATED — a room's
  *   `unlockedWhen` (`true` | {solved:key} | {allSolved:[keys]}) gates advancement and `onSolve`
@@ -70,8 +70,11 @@
 // A bare `./variant_resolve.js` import is NOT refreshed by bumping the <script> tag's ?v, so a changed
 // helper module (e.g. a new export) leaves browsers on a stale cached copy → "doesn't provide an export
 // named X" SyntaxError → blank page (the 2026-08-05 airship regression). Bump all three together.
-import { WebRConsole } from "./webr-console.js?v=75";
-import { pickActiveVariants, activeDoorVariant } from "./variant_resolve.js?v=75";   // Phase 3: per-hotspot state variants; monorail switch-door nav
+import { WebRConsole } from "./webr-console.js?v=83";
+import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs } from "./variant_resolve.js?v=83";   // Phase 3: per-hotspot state variants; monorail switch-door nav
+import * as PQ from "./puzzle_queue.js?v=83";   // dynamic puzzle queue: location-independent puzzle serving
+import { particleCount } from "./particles.js?v=83";   // ambient-particle vocabulary + per-kind field density
+import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=83";   // ledger + elevation-map card DOM
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 
@@ -204,7 +207,13 @@ const solvedGates = new Set();
 // Per-room result for the submission codec (Phase 5): key -> { answer, attempts }.
 // MCQ rooms store the chosen option index; console-check rooms store answer=1 (solved).
 const roomResults = new Map();
-let mintedCode = null;                 // the submission code, minted at analysis finish; shown on the submit-prep screen
+// DYNAMIC PUZZLE QUEUE state (inert unless SCENARIO.puzzleQueue is authored). Results are keyed by
+// QUEUE INDEX, not room, because under a queue the puzzle served at a given room differs between
+// students — see the codec note in puzzle_queue.js.
+const queueSolved = new Set();         // queue indices already answered
+const queueResults = new Map();        // queue index -> { answer, attempts }
+const queueAssign = new Map();         // slotKey -> queue index (keeps a slot's puzzle stable)
+let mintedCode = null;               // the submission code, minted at analysis finish; shown on the submit-prep screen
 const submissionWork = new Map();      // room.key -> { title, code, figure(dataURL|null) } captured at solve, for the PDF
 function escHtml(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
 // Attempts per puzzle hotspot, persisted across modal close/reopen within a session (hotspot id ->
@@ -224,10 +233,10 @@ let sfxOn = true;   // global sound-effects on/off (per-room ambience layers + s
 function init(data) {
   SCENARIO = data;
   document.title = SCENARIO.title || "Escape room";
-  const ambient = SCENARIO.ambient || "fireflies";   // "fireflies" | "snow" | "embers" | "leaves" | "none"
+  const ambient = SCENARIO.ambient || "fireflies";   // fireflies | snow | embers | leaves | dust | rays | none
   if (ambient !== "none") {
-    spawnParticles($("#screen1"), ambient, ambient === "snow" ? 40 : 18);   // landing screen
-    spawnParticles($("#loading"), ambient, ambient === "snow" ? 32 : 14);   // inter-room interstitial
+    spawnParticles($("#screen1"), ambient, particleCount(ambient, true));   // landing screen
+    spawnParticles($("#loading"), ambient, particleCount(ambient, false));   // inter-room interstitial
   }
   $("#s1title").textContent = SCENARIO.title || "";
   $("#s1story").textContent = SCENARIO.story || "";
@@ -266,6 +275,7 @@ function init(data) {
     solvedRooms.clear();
     solvedGates.clear();
     attemptCounts.clear();
+    queueSolved.clear(); queueResults.clear(); queueAssign.clear();   // dynamic puzzle queue
     analysisFinished = false; escapeFinished = false;                // fresh objective state
     startTime = Date.now();                                           // per-phase timing: game starts now
     analysisFinishedTime = null; escapeFinishedTime = null;           // fresh timing state
@@ -496,7 +506,7 @@ window.PanoMixer = {
   // the puzzle. Empty until a room is entered.
   solveSounds: () => {
     if (!room) return [];
-    const gates = (room.hotspots || []).filter(h => h.type === "puzzle" || h.type === "lock" || h.type === "grid");
+    const gates = (room.hotspots || []).filter(h => h.type === "puzzle" || h.type === "lock" || h.type === "grid" || h.type === "ledger");
     const out = [], seen = new Set();
     const add = (label, ss) => {
       if (!ss) return;
@@ -507,6 +517,12 @@ window.PanoMixer = {
       out.push({ label, src, volume: vol });
     };
     gates.forEach(h => add(h.label || h.id || "gate", (h && h.solveSfx) || room.solveSfx || SCENARIO.solveSfx));
+    // A DIAL's one-shot `sfx` is an authored sound too (the Pharos lamp dial's lever throw, the deck
+    // cast-off). It lives on `sfx`, not `solveSfx`, so it used to fall outside solveSounds() entirely —
+    // invisible in the test-play mixer, and therefore unbalanceable and unflaggable. List it here so it
+    // gets a slider, a ▶ test button and a ⚑ flag like every other sting (2026-08-07).
+    (room.hotspots || []).filter(h => h.type === "dial" && h.sfx)
+      .forEach(h => add(h.label || h.id || "dial", h.sfx));
     if (!out.length) add("solve", room.solveSfx || SCENARIO.solveSfx);   // room with no gate-level sting
     return out;
   },
@@ -556,6 +572,29 @@ function updateNotebookChip() {
   const cnt = $("#notebookCount"); if (cnt) cnt.textContent = caseFile.length ? "(" + caseFile.length + ")" : "";
 }
 
+// A board tile is a 120px SQUARE painted with object-fit:cover, so anything that isn't square is
+// CENTRE-CROPPED on the board — temple's 900x360 figure plates showed only their middle figure
+// (2026-08-27). Pickup art should be authored square; this is the other half of the fix, and it is worth
+// having anyway: nine plates at 120px are arrangeable but not READABLE, and the comparison the escape
+// asks for needs the detail. Click a tile (as opposed to dragging it) and it opens full size.
+function openTileLightbox(src, caption) {
+  const box = document.createElement("div");
+  box.className = "nblightbox";
+  const img = document.createElement("img");
+  img.src = src; img.alt = caption || "";
+  box.appendChild(img);
+  if (caption) {
+    const cap = document.createElement("div"); cap.className = "nbcap"; cap.textContent = caption;
+    box.appendChild(cap);
+  }
+  const close = () => { box.remove(); document.removeEventListener("keydown", onKey); };
+  const onKey = e => { if (e.key === "Escape") { e.stopPropagation(); close(); } };
+  box.addEventListener("pointerdown", close);          // click anywhere (including the image) dismisses
+  document.addEventListener("keydown", onKey);
+  document.body.appendChild(box);
+  return box;
+}
+
 // ---- collage board: pure grid helpers (a draggable snap-grid of collected image fragments) ----
 // index -> {col,row} in raster order (left-to-right, top-to-bottom) for the auto-layout on collection.
 function nbRasterCell(i, cols) { return { col: i % cols, row: Math.floor(i / cols) }; }
@@ -576,7 +615,8 @@ let nbTopZ = 10;       // z-index high-water mark so a dragged tile lifts above 
 // arrangement, snapping to the grid, and MAY stack several in one cell. This is the shared engine behind
 // the hospital facet-collage escape (read a row of postcards as a code) and Alaska's Secret-of-the-Unicorn
 // overlay (three translucent masks stacked on one cell). Board positions live on the caseFile entries, so
-// an arrangement survives closing + reopening the notebook within a session.
+// an arrangement survives closing + reopening the notebook within a session. A tile CLICKED rather
+// than dragged opens full size (openTileLightbox) — the board is for arranging, not for reading.
 // The player's own working space, appended to the bottom of the notebook. Kept deliberately plain: a
 // labelled textarea bound straight to `scratchPad`, so whatever is typed survives closing and reopening
 // the notebook (and moving between rooms) within the session. No global key handlers exist in the engine,
@@ -652,6 +692,14 @@ function openNotebook() {
           t.removeEventListener("pointermove", move);
           t.removeEventListener("pointerup", up);
           t.classList.remove("dragging");
+          // A press that never really moved is a CLICK, not a drag — open the tile full size. The 5px
+          // slop matters: a pointer almost always jitters a pixel or two, so an exact-zero test would
+          // make the lightbox unreachable on a trackpad or a touchscreen.
+          if (Math.abs(ev2.clientX - sx) < 5 && Math.abs(ev2.clientY - sy) < 5) {
+            place();
+            openTileLightbox(e.image, nbStrip(e.text) || e.source || "");
+            return;
+          }
           e.pos = nbSnap(ol + ev2.clientX - sx, ot + ev2.clientY - sy, NB_CELL, gridCols, gridRows() - 1);
           place(); sizeBoard();
         };
@@ -701,6 +749,10 @@ const phaseOf = r => (r && r.phase) || "analysis";
 // the objective. Returns false if there are no graded analysis rooms (an all-escape scenario never
 // "finishes analysis").
 function analysisComplete() {
+  // DYNAMIC QUEUE: the objective is the LADDER, not the rooms. Which rooms served which rung
+  // varies per student, and a queue scenario may leave puzzle-bearing slots unvisited entirely
+  // once the ladder runs out — so room-completion is the wrong question to ask.
+  if (PQ.usesQueue(SCENARIO)) return PQ.queueComplete(SCENARIO.puzzleQueue, queueSolved);
   const need = (SCENARIO.rooms || []).filter(r =>
     isBuilt(r) && phaseOf(r) === "analysis" && (r.hotspots || []).some(h => h.type === "puzzle"));
   return need.length > 0 && need.every(r => solvedRooms.has(r.key));
@@ -755,7 +807,7 @@ function applyEffects(effects) {
 // so it resolves against that room's key.
 const gateKey = (roomKey, id) => roomKey + "|" + id;
 function primaryGate(r) {
-  const gates = (r.hotspots || []).filter(h => h.type === "puzzle" || h.type === "lock" || h.type === "grid");
+  const gates = (r.hotspots || []).filter(h => h.type === "puzzle" || h.type === "lock" || h.type === "grid" || h.type === "ledger");
   return gates.find(h => h.type === "puzzle") || gates[0] || null;
 }
 function isPrimarySolved(r) {
@@ -845,8 +897,11 @@ function rerenderCurrentRoom() {
 }
 
 // Ambient particles behind the card on an entry screen, chosen by scenario.ambient
-// ("fireflies" | "snow" | "embers" | "leaves" | "none"). Each particle gets a random position/size/timing (negative
-// animation-delay starts it mid-cycle) so the field moves organically. Decorative; GitHub-Pages-safe.
+// ("fireflies" | "snow" | "embers" | "leaves" | "dust" | "rays" | "none"); ANY other value falls through to fireflies.
+// Each particle gets a random position/size/timing (negative animation-delay starts it mid-cycle) so the field
+// moves organically. Decorative; GitHub-Pages-safe.
+// NB: these render ONLY on the landing screen, the per-room `entry` interstitial and the submission screen —
+// never over the panorama. So `ambient` is entry/bookend dressing; in-room atmosphere lives in the scene art.
 function spawnParticles(parent, kind, n) {
   if (!parent || parent.querySelector(".particles")) return;   // once per screen
   const layer = document.createElement("div"); layer.className = "particles";
@@ -871,6 +926,31 @@ function spawnParticles(parent, kind, n) {
       f.style.width = f.style.height = size + "px";
       f.style.opacity = (0.55 + Math.random() * 0.4).toFixed(2);
       f.style.animation = `${drifts[i % drifts.length]} ${fd.toFixed(1)}s linear ${(-Math.random() * fd).toFixed(1)}s infinite`;
+    } else if (kind === "dust") {
+      const drifts = ["dustDrift", "dustDrift2", "dustDrift3"];
+      const size = (1.5 + Math.random() * 2.5).toFixed(1);    // 1.5–4px motes — finer than every other kind
+      const fd = 20 + Math.random() * 18;                      // wander 20–38s: suspended, not falling
+      const gd = 4 + Math.random() * 5;                        // glint 4–9s as it turns in the light
+      f.className = "dustmote";
+      f.style.left = (Math.random() * 100).toFixed(2) + "%";
+      f.style.top = (Math.random() * 100).toFixed(2) + "%";    // hangs throughout the field, no source edge
+      f.style.width = f.style.height = size + "px";
+      f.style.animation =
+        `${drifts[i % drifts.length]} ${fd.toFixed(1)}s ease-in-out ${(-Math.random() * fd).toFixed(1)}s infinite, ` +
+        `dustGlint ${gd.toFixed(1)}s ease-in-out ${(-Math.random() * gd).toFixed(1)}s infinite`;
+    } else if (kind === "rays") {
+      const drifts = ["rayDrift", "rayDrift2", "rayDrift3"];
+      const tilt = (14 + Math.random() * 6).toFixed(1);       // 14–20deg: PARALLEL shafts, only a few deg apart
+      const w = (34 + Math.random() * 78).toFixed(0);         // 34–112px wide bars
+      const fd = 14 + Math.random() * 12;                      // slow sway 14–26s
+      const bd = 8 + Math.random() * 7;                        // breathe 8–15s as cloud passes over
+      f.className = "sunray";
+      f.style.setProperty("--tilt", tilt + "deg");             // keyframes read this; see the CSS note
+      f.style.left = (-10 + Math.random() * 115).toFixed(2) + "%";
+      f.style.width = w + "px";
+      f.style.animation =
+        `${drifts[i % drifts.length]} ${fd.toFixed(1)}s ease-in-out ${(-Math.random() * fd).toFixed(1)}s infinite, ` +
+        `rayBreathe ${bd.toFixed(1)}s ease-in-out ${(-Math.random() * bd).toFixed(1)}s infinite`;
     } else if (kind === "embers") {
       const drifts = ["ffFloat", "ffFloat2", "ffFloat3"];
       const size = (2 + Math.random() * 3).toFixed(1);        // 2–5px sparks
@@ -995,7 +1075,7 @@ function showInterstitial(r, onContinue) {
   // per-room ambient override on this interstitial (e.g. jungle fireflies vs. an underground room's none)
   const amb = r.ambient || SCENARIO.ambient || "fireflies";
   const load = $("#loading"); const oldP = load.querySelector(".particles"); if (oldP) oldP.remove();
-  if (amb !== "none") spawnParticles(load, amb, amb === "snow" ? 32 : 14);
+  if (amb !== "none") spawnParticles(load, amb, particleCount(amb, false));
   $("#loadTitle").textContent = title;
   // normal play renders the entry's HTML; test-play shows the raw source so edits round-trip (not flattened)
   if (isTestPlay()) $("#loadText").textContent = text; else $("#loadText").innerHTML = text;
@@ -1106,10 +1186,12 @@ function compositeVariants(baseUrl, active, cb) {
 // dynamic:true so it re-uploads each frame. Everything else — pan, hotspots, doors, variants — is
 // unchanged. Inert for every room without a `cinemagraph` field (the vast majority).
 let _cineStop = null;   // tears down the current room's cinemagraph rAF + <video>s (set by startCinemagraph)
+// Only the clips belonging to the backdrop actually on screen. A full-scene variant (Egypt's `night`
+// wash) replaces the whole image, and a clip generated from the day scene would stamp day-lit motion
+// onto it — so clips are matched to the state they were generated from (absent = the base scene). See
+// variant_resolve.js → *Which cinemagraphs belong to the backdrop currently on screen*.
 function activeCinemagraphs(r) {
-  return (r.hotspots || [])
-    .filter(h => h && h.cinemagraph && h.cinemagraph.video && Array.isArray(h.cinemagraph.box))
-    .map(h => h.cinemagraph);
+  return pickCinemagraphs(r.hotspots, fullSceneState(activeVariants(r)));
 }
 function startCinemagraph(baseUrl, cines, yaw) {
   _loadImg(baseUrl).then(baseImg => {
@@ -1196,9 +1278,13 @@ function _renderViewer(img, yaw = 0, dynamic = false) {
   // independent of markers) but get NO player marker/ring and aren't clickable. Every other type gets a marker.
   const hotSpots = (room.hotspots || []).filter(h => h.type !== "ambient").map(h => {
     const { yaw, pitch } = boxToYP(h.box, c);
-    let cssClass = "hsmark " + h.type;
+    // Every marker also carries `hs-<id>`, so a hotspot is addressable by WHICH ONE IT IS rather than by
+    // its position among its siblings. Pannellum puts no id on the div, so a test/stylesheet otherwise has
+    // to count markers — and an nth() index silently means a different door the moment a room is
+    // re-authored or the viewer rebuilds mid-composite (cost a debugging round, 2026-08-27).
+    let cssClass = "hsmark " + h.type + (h.id ? " hs-" + String(h.id).replace(/[^\w-]/g, "_") : "");
     if (h.type === "door") { cssClass += doorIsOpen(h, room) ? " open" : " locked"; if ((h.direction || "forward") === "forward" && portalAwakened(room)) cssClass += " awakened"; }
-    if ((h.type === "puzzle" || h.type === "lock" || h.type === "grid") && solvedGates.has(gateKey(room.key, h.id))) cssClass += " done";
+    if ((h.type === "puzzle" || h.type === "lock" || h.type === "grid" || h.type === "ledger") && solvedGates.has(gateKey(room.key, h.id))) cssClass += " done";
     return { id: h.id, yaw, pitch, cssClass, clickHandlerFunc: onHotspot, clickHandlerArgs: h };
   });
   // (Awakened starfield is now baked into the texture by compositeAwakened — no DOM overlay hotspot.)
@@ -1246,6 +1332,14 @@ function onHotspot(evt, h) {   // Pannellum calls clickHandlerFunc(event, clickH
     if (h.type === "puzzle") {
       if (solvedGates.has(gateKey(room.key, h.id))) return toast("You've already solved this one.");
       if (!condOK(h.availableWhen)) return openLocked(h);   // maze: puzzle gated by availableWhen (undefined ⇒ open)
+      // DYNAMIC QUEUE: a slot serves the NEXT unsolved rung of the ladder rather than a fixed
+      // puzzle, so order comes from the queue and not from where the player happens to be.
+      if (h.queue && PQ.usesQueue(SCENARIO)) {
+        const got = PQ.resolveSlot(SCENARIO.puzzleQueue, queueSolved, queueAssign,
+                                   PQ.slotKey(room.key, h.id));
+        if (!got) return toast(h.queueEmptyBody || "Nothing left to run here.");
+        return openPuzzle(PQ.mergeSlot(h, got.puzzle), got.index);
+      }
       return openPuzzle(h);
     }
     if (h.type === "lock") {
@@ -1263,6 +1357,12 @@ function onHotspot(evt, h) {   // Pannellum calls clickHandlerFunc(event, clickH
       if (!condOK(h.availableWhen)) return openLocked(h);
       return openGrid(h);
     }
+    if (h.type === "ledger") {                        // deduction ledger (#9) — the classification escape
+      if (solvedGates.has(gateKey(room.key, h.id))) return toast("The ledger is already closed.");
+      if (!condOK(h.availableWhen)) return openLocked(h);
+      return openLedger(h);
+    }
+    if (h.type === "elevmap") return openElevmap(h);   // transcription TOOL, never a gate
     if (h.type === "door") return handleDoor(h);
   } catch (e) { console.error("hotspot handler error", e); }  // Pannellum swallows handler throws
 }
@@ -1367,7 +1467,7 @@ function correctResult(h) {
 }
 // The test-play dev-solve action for a puzzle/lock hotspot: mirror the card's own success path
 // (close the modal, then solveRoom with the correct result) with no answering required.
-const devSolveThunk = h => () => { closeModal(); solveRoom(correctResult(h), h); };
+const devSolveThunk = (h, qIndex) => () => { closeModal(); solveRoom(correctResult(h), h, qIndex); };
 
 function openModal(title, node, onDevSolve) {
   $("#mtitle").textContent = title;
@@ -1463,7 +1563,10 @@ function openDial(h) {
     needle.style.transform = "translateX(-50%) rotate(" + (idx < 0 ? 0 : angleFor(idx)) + "deg)";
     caption.textContent = (cur != null)
       ? ("The dial rests on " + dialLabel(h, cur) + ".")
-      : (h.hint || "Turn the dial — somewhere in the ship, something answers.");
+      // The fallback must be WORLD-NEUTRAL. It used to say "somewhere in the ship" — written for airship,
+      // and then shown verbatim in a jungle temple, which read as a bug to the player (2026-08-27).
+      // Author a `hint` per dial; this is only the safety net.
+      : (h.hint || "Turn the dial — somewhere, something answers.");
     row.querySelectorAll("button").forEach(b => {
       const on = b.dataset.v === cur;
       b.style.outline = on ? "2px solid #ffd88c" : "";
@@ -1525,9 +1628,9 @@ function openMapview(h) {
 //   answer:"<lake>", instructions?, feedback?:{correct, wrong} }. The plot is deliberately UNLABELLED
 // (built from the real data), so the player recreates it with geom_text to find their lake, then clicks
 // its point. Ungraded (escape phase) — clicking the correct point's box solves the room.
-function openMapPuzzle(h) {
+function openMapPuzzle(h, qIndex) {
   if (viewer) resumeYaw = viewer.getYaw();
-  openModal(h.label || "The survey chart", buildMapCard(h.map, (result) => { closeModal(); solveRoom(result, h); }), devSolveThunk(h));
+  openModal(h.label || "The survey chart", buildMapCard(h.map, (result) => { closeModal(); solveRoom(result, h, qIndex); }), devSolveThunk(h, qIndex));
 }
 function buildMapCard(map, onSolved) {
   const card = document.createElement("div"); card.className = "mapcard";
@@ -1563,9 +1666,12 @@ function buildMapCard(map, onSolved) {
   return card;
 }
 
-function openPuzzle(h) {
-  if (h.map) return openMapPuzzle(h);         // pick-a-point-on-the-plot puzzle (static image, no console)
-  if (h.pick) return openPickPuzzle(h);       // Type 4: make-the-plot, click the tagged point (live console + picker)
+// `qIndex` (optional) = the dynamic-queue index this opening is serving, threaded through to
+// solveRoom so the result is recorded against the QUEUE rung rather than the room. Undefined for
+// every normal fixed-puzzle scenario.
+function openPuzzle(h, qIndex) {
+  if (h.map) return openMapPuzzle(h, qIndex);   // pick-a-point-on-the-plot puzzle (static image, no console)
+  if (h.pick) return openPickPuzzle(h, qIndex); // Type 4: make-the-plot, click the tagged point (live console + picker)
   if (viewer) resumeYaw = viewer.getYaw();   // remember where we're facing, to restore after the door opens
   // Set code/output while the console block is still in the document — querying
   // #code-input after moving it into a detached div would return null.
@@ -1576,12 +1682,12 @@ function openPuzzle(h) {
   const left = document.createElement("div");   // console pane
   const right = document.createElement("div");   // question pane
   left.appendChild(cb);                          // move the live console in
-  const onSolved = (result) => { closeModal(); solveRoom(result, h); };
+  const onSolved = (result) => { closeModal(); solveRoom(result, h, qIndex); };
   // A puzzle grades EITHER on the live R session (`check`) OR by multiple choice (`question`).
   const pid = gateKey(room.key, h.id);   // per-room attempt-count key (ids repeat across rooms)
   right.appendChild(h.check ? buildCheckCard(h.check, onSolved, pid) : buildQuestion(h.question, onSolved, pid));
   grid.appendChild(left); grid.appendChild(right);
-  openModal(h.label || "Puzzle", grid, devSolveThunk(h));
+  openModal(h.label || "Puzzle", grid, devSolveThunk(h, qIndex));
 }
 
 // multiple-choice card — gate is the *product* of running the analysis
@@ -1766,7 +1872,7 @@ print(.er_p); grDevices::dev.off()
 paste(readLines(.er_f), collapse = "\\n") }`;
   return webR.evalRString(rcode);
 }
-function openPickPuzzle(h) {
+function openPickPuzzle(h, qIndex) {
   if (viewer) resumeYaw = viewer.getYaw();
   // Seed the console while it's still in the document (querying #code-input after the move returns null).
   $("#code-input").value = h.starterCode || "";
@@ -1779,11 +1885,11 @@ function openPickPuzzle(h) {
   const left = document.createElement("div");    // live console pane
   const right = document.createElement("div");    // prompt + interactive picker
   left.appendChild(cb);
-  const onSolved = (result) => { closeModal(); solveRoom(result, h); };
+  const onSolved = (result) => { closeModal(); solveRoom(result, h, qIndex); };
   const pid = gateKey(room.key, h.id);            // per-room attempt-count key (ids repeat across rooms)
   right.appendChild(buildPickCard(h.pick, onSolved, pid));
   grid.appendChild(left); grid.appendChild(right);
-  openModal(h.label || "Puzzle", grid, devSolveThunk(h));
+  openModal(h.label || "Puzzle", grid, devSolveThunk(h, qIndex));
 }
 function buildPickCard(pick, onSolved, pid) {
   const maxA = pick.maxAttempts || 4; let attempts = attemptCounts.get(pid) || 0;
@@ -2052,12 +2158,67 @@ function buildGridCard(h, onSolved) {
   return card;
 }
 
+// ---- Deduction ledger (#9) — the CLASSIFICATION escape ---------------------------------------------
+// Root: Return of the Obra Dinn's crew book. Rows are entities, each with a <select> naming the group
+// you assign it to. THE SOUL IS THE CONFIRMATION RULE: the ledger never confirms a single row. It
+// confirms a whole GROUP, and only when the set of rows currently assigned to that group EXACTLY equals
+// its true membership — right members AND no false positives. So you cannot fish cell by cell for a
+// green tick; you reason until a whole cluster hangs together, which is how confidence in a clustering
+// actually works. Groups are DERIVED from the answers (the group for verdict V = every row whose
+// `answer` is V), so there is no separate group config to drift out of sync.
+//
+// Authoring: { id, type:"ledger", label, box, prompt, options:[…], rows:[{id,label,answer}],
+//              feedback:{correct, progress, wrong, partial}, maxAttempts? }
+// `options` may be plain strings or {key,label}. A blank "—" is always offered so a row can be left
+// unassigned (Obra Dinn does this) — unassigned rows simply never satisfy a group.
+//
+// Progress SURVIVES closing the modal (locked groups live in `ledgerLocks`, keyed by gate), so stepping
+// out to the console and back does not wipe the deductions you had already confirmed.
+const ledgerLocks = new Map();          // gateKey -> Set(locked verdict keys)
+
+function openLedger(h) {
+  if (viewer) resumeYaw = viewer.getYaw();
+  openModal(h.label || "Ledger",
+            buildLedgerCard(h, (result) => { closeModal(); solveRoom(result, h); },
+                            { pid: gateKey(room.key, h.id), attemptCounts, locks: ledgerLocks }),
+            devSolveThunk(h));
+}
+
+// ---- Elevation map — the draggable transcription surface -------------------------------------------
+// Canyon's inventory map, generalised. The map shows a branching plan with a node per junction and the
+// heights left BLANK; as the player reads a benchmark out in the world they drag that node up the
+// elevation axis to its reading. Because the axis is properly SCALED, doing this IS plotting the
+// dendrogram by hand — and the optional draggable waterline then lets them read a cut straight off it,
+// which is the escape's real question.
+//
+// It is a TOOL, not a gate: it never calls solveRoom, and it is deliberately absent from the gate lists.
+// What it does is write to `gameState`, so ordinary `condOK` gates can depend on it — e.g. the canyon
+// escape panel opens on {gte:["heights_placed", 7]}.
+//
+// Authoring: { id, type:"elevmap", label, key, prompt,
+//              axis:{min, max, step?, unit?, label?},
+//              nodes:[{id, label, x (0..1), answer, tol?, requires?}],
+//              waterline?:{enabled:true, start?, label?}, countKey?, feedback?:{placed} }
+// `node.requires` is a gameState key that must be truthy before that node can be dragged (set it from
+// the benchmark clue's `onPickup`); omit it and the node is always draggable. `answer`+`tol` are only
+// used to tell the player when a node is sitting where their reading says — the map grades nothing.
+function openElevmap(h) {
+  if (viewer) resumeYaw = viewer.getYaw();
+  openModal(h.label || "The map", buildElevmapCard(h, { gameState }));
+}
+
 // A GATE (puzzle/lock hotspot `h`) was solved. Mark the gate. If it's the room's PRIMARY gate, advance
 // the room: record the codec result (graded gates only — locks never), add to solvedRooms + run onSolve
 // once. Non-primary gates (e.g. an escape lock beside a graded puzzle) just open their own `requires`
 // door. Re-render with the open image once the primary gate is solved; keep facing where you were.
-function solveRoom(result, h) {
+function solveRoom(result, h, qIndex) {
   if (h && h.id) solvedGates.add(gateKey(room.key, h.id));
+  // DYNAMIC QUEUE: record against the ladder rung, not the room. Do this BEFORE the completion
+  // check below, which asks the queue whether the objective is finished.
+  if (qIndex != null && PQ.usesQueue(SCENARIO) && !queueSolved.has(qIndex)) {
+    queueSolved.add(qIndex);
+    queueResults.set(qIndex, result || { answer: 1, attempts: 1 });
+  }
   // Optional solve / door-open sting: per-puzzle `solveSfx`, falling back to room then scenario level.
   const ss = (h && h.solveSfx) || room.solveSfx || SCENARIO.solveSfx;
   if (ss) playOneShot(typeof ss === "string" ? ss : ss.src, (typeof ss === "object") ? ss.volume : undefined);
@@ -2256,7 +2417,10 @@ function renderSubmitWork() {
     const stat = document.createElement("span"); stat.className = "swstat";
     rowEl.appendChild(runBtn); rowEl.appendChild(stat); div.appendChild(rowEl);
     const figWrap = document.createElement("div"); figWrap.className = "swfig";
-    figWrap.innerHTML = w.figure ? `<img src="${w.figure}" alt="figure">` : `<div class="swnone">No figure yet — edit the code and Run.</div>`;
+    // RAW until the x500 is confirmed and the stamp goes on — the work is shown from the moment the card
+    // opens, so an unstamped capture must still render (else it reads as "No figure yet", which is false).
+    const fig = w.figure || w.figureRaw;
+    figWrap.innerHTML = fig ? `<img src="${fig}" alt="figure">` : `<div class="swnone">No figure yet — edit the code and Run.</div>`;
     div.appendChild(figWrap);
     runBtn.onclick = () => runSubmitBlock(r.key, ta, figWrap, stat, runBtn);
     host.appendChild(div);
@@ -2277,8 +2441,12 @@ async function runSubmitBlock(roomKey, ta, figWrap, stat, runBtn) {
     const src = plots[plots.length - 1];
     if (src) {
       w.figureRaw = src.toDataURL("image/png");                 // keep raw as the re-stampable source of truth
-      w.figure = stampedFigureDataURL(src); submissionWork.set(roomKey, w);   // x500 is known on this screen
-      figWrap.innerHTML = `<img src="${w.figure}" alt="figure">`; stat.textContent = "figure updated ✓";
+      // Only stamp once the x500 is actually known — a student may refine a block BEFORE confirming, and
+      // stamping then would burn the "anon" fallback into what they see. stampAllFigures re-derives every
+      // figure from `figureRaw` on confirm, so nothing is lost by waiting.
+      w.figure = window.__x500 ? stampedFigureDataURL(src) : null;
+      submissionWork.set(roomKey, w);
+      figWrap.innerHTML = `<img src="${w.figure || w.figureRaw}" alt="figure">`; stat.textContent = "figure updated ✓";
     } else stat.textContent = "ran — but no figure was drawn";
   } catch (e) { stat.textContent = "error: " + (e && e.message ? e.message : e); }
   finally { runBtn.disabled = false; setTimeout(() => { if (/updated|no figure/.test(stat.textContent)) stat.textContent = ""; }, 3500); }
@@ -2293,16 +2461,20 @@ function openSubmitPrep() {
   const confirmed = !!window.__x500;
   $("#subId").style.display = "";
   $("#subBody").style.display = "";
-  $("#subPdf").style.display = confirmed ? "" : "none";
+  setPdfEnabled(confirmed);
   if (confirmed) buildSubmission();
   else {
-    $("#subWork").innerHTML = '<div class="lbl" style="opacity:.7">Your code and figures will appear here once you enter your x500 above.</div>';
+    // Show the captured work IMMEDIATELY (2026-08-28, Lucas). It used to sit behind a placeholder line
+    // until the x500 was confirmed, which left the card holding nothing but the x500 field — so a screen
+    // that IS the submission screen read as a separate x500 gate shown before it, and the 2026-08-05
+    // unification looked like it had been reverted. Only the download button waits on the x500 now.
+    renderSubmitWork();
     setTimeout(() => $("#subX500").focus(), 30);
   }
   const host = $("#submitPrep .subintro");
   const old = host.querySelector(".particles"); if (old) old.remove();
   const amb = SCENARIO.ambient || "fireflies";
-  if (amb !== "none") spawnParticles(host, amb, amb === "snow" ? 40 : 18);
+  if (amb !== "none") spawnParticles(host, amb, particleCount(amb, true));
   $("#subTabDebrief").style.display = SCENARIO.debrief ? "" : "none";   // "how this world worked" tab only if authored
   switchSubTab("prep");                                                 // always open on the prepare-submission tab
   $("#submitPrep").classList.add("open");
@@ -2322,11 +2494,22 @@ function confirmX500() {
   const id = $("#subX500").value.trim();
   if (!/\S/.test(id)) { $("#subX500").focus(); return; }
   window.__x500 = id;
-  // the x500 field stays visible at the top of the window (it's part of the submission card now); just
-  // reveal the PDF button and build the payload below it.
+  // the x500 field stays visible at the top of the window (it's part of the submission card now); the work
+  // below it is already on screen, so confirming only stamps it and un-dims the download.
   $("#subBody").style.display = "";
-  $("#subPdf").style.display = "";
+  setPdfEnabled(true);
   buildSubmission();
+}
+// The PDF button is present from the moment the card opens but DIMMED until the x500 is confirmed — the
+// figures and code are visible throughout, so the card reads as the submission screen it is, while the
+// one thing that genuinely needs the x500 (a PDF stamped with it) stays plainly out of reach until then.
+function setPdfEnabled(on) {
+  const b = $("#subPdf"); if (!b) return;
+  b.style.display = "";
+  b.disabled = !on;
+  b.style.opacity = on ? "" : ".45";
+  b.style.cursor = on ? "" : "not-allowed";
+  b.title = on ? "" : "Enter your x500 above to enable the download";
 }
 // Fill the submission payload once the x500 is known: mint the (x500-keyed) code, personalise every
 // figure captured during play with the x500 stamp + watermark, then render the refine blocks.
@@ -2474,10 +2657,15 @@ function mintCode(phase) {
   // One step per BUILT, graded room of this phase, in room order. `roomResults.has` excludes ungraded
   // rooms (e.g. a pre-awakened orientation room with only a lock, no graded puzzle) so they take no
   // codec slot — keeping the code in lockstep with the decoder key (which lists graded rooms only).
-  const steps = SCENARIO.rooms.filter(r => isBuilt(r) && phaseOf(r) === phase && roomResults.has(r.key)).map(r => {
-    const res = roomResults.get(r.key);
-    return { answer: res.answer, attempts: res.attempts };
-  });
+  // DYNAMIC QUEUE: emit one step per LADDER RUNG in queue order. Room order is meaningless here —
+  // the room that served rung k differs between students — so a room-keyed code could not be
+  // graded. Queue order is identical for everyone, which is what keeps the decoder key valid.
+  const steps = (PQ.usesQueue(SCENARIO) && phase === "analysis")
+    ? PQ.queueSteps(SCENARIO.puzzleQueue, queueResults)
+    : SCENARIO.rooms.filter(r => isBuilt(r) && phaseOf(r) === phase && roomResults.has(r.key)).map(r => {
+        const res = roomResults.get(r.key);
+        return { answer: res.answer, attempts: res.attempts };
+      });
   try {
     mintedCode = window.EscapeCodec.encode({
       version: 1, scenarioId: SCENARIO.id, steps,

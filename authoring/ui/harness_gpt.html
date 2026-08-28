@@ -233,9 +233,9 @@ git add -A && git commit -m "whatever changed" && git push</pre>
           <div class="row" style="gap:16px;align-items:flex-start">
             <div style="flex:1;min-width:180px">
               <label class="collbl">title</label><input type="text" id="ldTitle" style="width:100%">
-              <label class="collbl">ambient particles <span style="opacity:.55">· entry screens</span></label>
+              <label class="collbl">ambient particles <span style="opacity:.55">· landing + entry + submission screens</span></label>
               <select id="ldAmbient" style="width:100%">
-                <option value="fireflies">fireflies</option><option value="snow">snow</option><option value="embers">embers</option><option value="leaves">leaves</option><option value="none">none</option>
+                <option value="fireflies">fireflies — warm, drifting, pulsing</option><option value="snow">snow — pale flakes falling</option><option value="embers">embers — warm sparks rising</option><option value="leaves">leaves — blown across on the wind</option><option value="dust">dust — fine motes suspended in still air</option><option value="rays">rays — parallel shafts of sunlight</option><option value="none">none</option>
               </select>
               <button class="step commit ready" id="ldSave" style="width:auto;margin-top:10px">Save landing screen</button>
               <div class="status" id="ldStatus"></div>
@@ -454,7 +454,7 @@ git add -A && git commit -m "whatever changed" && git push</pre>
       rooms.forEach(r => [...(Array.isArray(r.hotspots) ? r.hotspots : []), ...(Array.isArray(r.plannedHotspots) ? r.plannedHotspots : [])].forEach(h => {
         if (h && h.type === "door" && h.to && byKey[h.to] && h.to !== r.key) {
           const [ka, kb] = [r.key, h.to].sort();
-          const dl = doorLinks[ka + " " + kb] || (doorLinks[ka + " " + kb] = { a: ka, b: kb, ab: false, ba: false });
+          const dl = doorLinks[ka + "\u0000" + kb] || (doorLinks[ka + "\u0000" + kb] = { a: ka, b: kb, ab: false, ba: false });
           if (r.key === ka) dl.ab = true; else dl.ba = true;   // ab = a→b door exists, ba = b→a door exists
         }
       }));

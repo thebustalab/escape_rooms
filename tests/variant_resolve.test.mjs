@@ -5,7 +5,7 @@
 
 import test from "node:test";
 import assert from "node:assert/strict";
-import { pickActiveVariants, roomHasVariants, activeDoorVariant } from "../shared/variant_resolve.js";
+import { pickActiveVariants, roomHasVariants, activeDoorVariant, fullSceneState, pickCinemagraphs } from "../shared/variant_resolve.js";
 
 const box = [0.1, 0.1, 0.2, 0.2];
 const box2 = [0.5, 0.5, 0.7, 0.7];
@@ -131,4 +131,57 @@ test("three-position lever: neutral shows NO variant (base closed) — up/down o
   assert.equal(dn[0].state, "to_station1");
   const dnNav = activeDoorVariant(d, makeEval(new Set(), { car_sq_dir: "back" }));
   assert.equal(dnNav.to, "station1"); assert.equal(dnNav.direction, "back");
+});
+
+// --- cinemagraph ↔ backdrop matching (2026-08-27) --------------------------------------------------
+// FAILURE MODE UNDER TEST — Egypt's harbour goes dark once the library is solved (a full-scene `night`
+// variant), but its cinemagraphs were generated from the DAY scene, so sunlit boats kept rocking on a
+// night quay. A clip may only play while the image it was generated from is the one showing.
+
+test("base scene showing → only untagged clips play", () => {
+  const hs = [
+    { id: "boats", type: "ambient", cinemagraph: { video: "quay/boats.mp4", box } },
+    { id: "lamps", type: "ambient", cinemagraph: { video: "quay/lamps.mp4", box: box2, state: "night" } },
+  ];
+  const clips = pickCinemagraphs(hs, fullSceneState([]));
+  assert.deepEqual(clips.map(c => c.video), ["quay/boats.mp4"]);
+});
+
+test("full-scene night wash showing → only the night clips play", () => {
+  const hs = [
+    { id: "boats", type: "ambient", cinemagraph: { video: "quay/boats.mp4", box } },
+    { id: "lamps", type: "ambient", cinemagraph: { video: "quay/lamps.mp4", box: box2, state: "night" } },
+  ];
+  const active = [{ panorama: "quay/scene_night.png", box: [0, 0, 1, 1], state: "night" }];
+  assert.equal(fullSceneState(active), "night");
+  assert.deepEqual(pickCinemagraphs(hs, "night").map(c => c.video), ["quay/lamps.mp4"]);
+});
+
+test("a night wash with no night clips authored yet leaves the scene still, not wrongly lit", () => {
+  const hs = [{ id: "boats", type: "ambient", cinemagraph: { video: "quay/boats.mp4", box } }];
+  assert.deepEqual(pickCinemagraphs(hs, "night"), []);
+});
+
+test("a PARTIAL-box variant does not gate clips — it changes a region, not the backdrop", () => {
+  const hs = [{ id: "boats", type: "ambient", cinemagraph: { video: "quay/boats.mp4", box } }];
+  const doorOpen = [{ panorama: "quay/var_door_open.png", box: box2, state: "open" }];
+  assert.equal(fullSceneState(doorOpen), null);
+  assert.deepEqual(pickCinemagraphs(hs, fullSceneState(doorOpen)).map(c => c.video), ["quay/boats.mp4"]);
+});
+
+test("full-scene detection survives the hotspot-box fallback in pickActiveVariants", () => {
+  const hs = [{ id: "night_wash", type: "ambient", box: [0, 0, 1, 1],
+                variants: [{ state: "night", when: { solved: "library" }, panorama: "quay/scene_night.png" }] }];
+  const active = pickActiveVariants(hs, makeEval(new Set(["library"])));
+  assert.equal(active.length, 1);
+  assert.equal(fullSceneState(active), "night", "variant carried no box of its own — the hotspot's applies");
+});
+
+test("clips with no video or no box are ignored whatever the state", () => {
+  const hs = [
+    { id: "a", type: "ambient", cinemagraph: { box } },                    // no video
+    { id: "b", type: "ambient", cinemagraph: { video: "x.mp4" } },         // no box
+    { id: "c", type: "ambient" },
+  ];
+  assert.deepEqual(pickCinemagraphs(hs, null), []);
 });

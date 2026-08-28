@@ -222,7 +222,8 @@ def _apply_mix(music_volume, room_vols, base=None, solve_vols=None):
     scenario-level `musicVolume`; `room_vols` is {roomKey: {src: volume}} setting each matching sfx
     layer's `volume` in place; `solve_vols` is {roomKey: {src: volume}} setting the volume of each
     matching solve / door-open sting (authored as `solveSfx` on a gate hotspot, the room, or the
-    scenario, as a bare path string or a {src, volume} object). Deliberately surgical — it reloads
+    scenario, as a bare path string or a {src, volume} object — or as a dial hotspot's one-shot `sfx`,
+    which the mixer lists in the same section). Deliberately surgical — it reloads
     scenario.json FRESH and touches only the volume field of items matched by src, so it can never
     clobber a layer the harness added/edited between test-play start and save (unlike sending a whole
     stale sfx array back). Every other field (mode/delay/duck/gap/crossfade) and every unmatched
@@ -254,32 +255,43 @@ def _apply_mix(music_volume, room_vols, base=None, solve_vols=None):
         # merely inherits the room/scenario sting is never given a spurious own copy.
         n_solves = 0
 
-        def _set_solve_vol(holder, src, vol):
+        def _set_solve_vol(holder, src, vol, allow_sfx=False):
+            """Set the volume of whichever field on `holder` carries `src`. `allow_sfx` also considers a
+            HOTSPOT's one-shot `sfx` — never a room's, whose `sfx` is the ambience-layer list handled
+            above."""
             nonlocal n_solves
             if not isinstance(holder, dict):
                 return
-            ss = holder.get("solveSfx")
-            cur_src = ss if isinstance(ss, str) else (ss.get("src") if isinstance(ss, dict) else None)
-            if not cur_src or cur_src != src:
+            for field in (("solveSfx", "sfx") if allow_sfx else ("solveSfx",)):
+                ss = holder.get(field)
+                cur_src = ss if isinstance(ss, str) else (ss.get("src") if isinstance(ss, dict) else None)
+                if not cur_src or cur_src != src:
+                    continue
+                if isinstance(ss, dict):
+                    ss["volume"] = _clamp01(vol)
+                else:                               # promote bare string → {src, volume}
+                    holder[field] = {"src": src, "volume": _clamp01(vol)}
+                n_solves += 1
                 return
-            if isinstance(ss, dict):
-                ss["volume"] = _clamp01(vol)
-            else:                                   # promote bare string → {src, volume}
-                holder["solveSfx"] = {"src": src, "volume": _clamp01(vol)}
-            n_solves += 1
 
         for key, vols in solve_vols.items():
             if not isinstance(vols, dict):
                 continue
             room = rooms.get(key)
+            # (holder, allow_sfx). A DIAL's one-shot throw lives on the hotspot's `sfx`, not `solveSfx`
+            # — pano-player's solveSounds() lists it in the mixer's "Solve / door sounds" section
+            # alongside the real stings, but this only ever looked at `solveSfx`, so moving that slider
+            # and hitting Save reported "saved ✓ nothing changed" and wrote nothing (2026-08-27, Lucas:
+            # Egypt's deck cast-off and Pharos lamp dial). Anything the mixer can SHOW it must be able
+            # to SAVE. Kept in lockstep with authoring_v2/harness_server.py.
             holders = []
             if isinstance(room, dict):
-                holders.extend(h for h in (room.get("hotspots") or []) if isinstance(h, dict))
-                holders.append(room)
-            holders.append(doc)                     # scenario-level fallback sting
+                holders.extend((h, True) for h in (room.get("hotspots") or []) if isinstance(h, dict))
+                holders.append((room, False))
+            holders.append((doc, False))            # scenario-level fallback sting
             for src, vol in vols.items():
-                for h in holders:
-                    _set_solve_vol(h, src, vol)
+                for h, allow_sfx in holders:
+                    _set_solve_vol(h, src, vol, allow_sfx)
 
         if touched_music or n_layers or n_solves:
             _save_scenario(doc, base)

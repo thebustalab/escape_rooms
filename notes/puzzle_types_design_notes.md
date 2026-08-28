@@ -83,8 +83,8 @@ conjunction in `expr` (the corpus's "class + count", "strain + significance").
 ```
 
 **Reuse:** every chapter's Q1/Q3.
-- PCA (ch 8): `which.max(abs(loadings[,"PC1"]))` name == biomarker.
-- Comparing means (ch 10): a computed difference-in-means + significance flag.
+- PCA (ch 9): `which.max(abs(loadings[,"PC1"]))` name == biomarker.
+- Comparing means (ch 11): a computed difference-in-means + significance flag.
 - Data-vis (ch 3–5): the outlier only visible once faceted/log-transformed.
 
 ---
@@ -101,7 +101,7 @@ patient) and *is* the escape-room narrative — there's always an unknown.
 the reference, projects the unknown, assigns a verdict variable. `oneShot: true`
 → `maxAttempts: 1`.
 
-**Worked example — hierarchical clustering (ch 7), `wood_smoke` + `unknown_smoke`**
+**Worked example — hierarchical clustering (ch 8), `wood_smoke` + `unknown_smoke`**
 (real Q1):
 
 ```js
@@ -116,8 +116,8 @@ the reference, projects the unknown, assigns a verdict variable. `oneShot: true`
 }
 ```
 
-**Reuse:** ch 7 dendrogram membership · ch 8 nearest in PCA space · ch 9 which
-k-means/dbscan cluster · ch 11 model `predict()` class · embeddings nearest
+**Reuse:** ch 8 dendrogram membership · ch 9 nearest in PCA space · ch 10 which
+k-means/dbscan cluster · ch 12 model `predict()` class · embeddings nearest
 neighbour by cosine. Same node shape; swap the technique that produces the
 placement. Engine needs only the `check` primitive (two-dataset load already
 works).
@@ -136,7 +136,7 @@ corrected output passes. The **error message itself teaches** — this is where 
 live console earns its keep. (An MCQ "which edit fixes it" flavour exists but is
 more guessable; console-checked is recommended.)
 
-**Worked example — comparing means (ch 10), `algae_data`** (formula reversed):
+**Worked example — comparing means (ch 11), `algae_data`** (formula reversed):
 
 ```js
 {
@@ -240,6 +240,16 @@ for the first Type 4 scenario; reuse it as the pattern for the next.
 data-vis outliers, the PCA biomarker point, the off-trend sample, a cluster's centroid. First intended
 consumer: the **alaska** redesign (force a plot for the "most nitrogen / warmest lake" rooms; boss =
 pick the warmest lake on the plot, subverting the primed high-chloride decoy).
+
+**The click-the-elbow use, and how to make it DIEGETIC (2026-08-27).** `flat_clustering/waterfalls` S2
+uses Type 4 for the k-means **elbow** — a deliberate choice, because *k* ∈ 1..6 leaves only five possible
+wrong MCQ options, which is below the ≥6 data-derived distractor bar. So **pick-the-point is the default
+engine type for any choose-*k* rung**, not a stylistic preference. The improvement worth copying is to
+make the elbow's *k* mean something **in the world**: in the period-city **heist** designated as
+waterfalls' partner (`scenario_theme_ideas.md`), the elbow plot's *k* is literally **how many thieves are
+at work** — the question an investigator would actually ask out loud. When a scenario can arrange for *k*
+to name a thing the player already cares about, the rung stops reading as a statistics exercise. Test it
+by asking whether the room can pose the question **without using the word "cluster"**.
 
 ---
 

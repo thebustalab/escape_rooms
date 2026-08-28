@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>widget fixture — ledger + elevmap</title>
+<!-- Drives the REAL card builders from shared/widgets.js in a real browser, without booting a scenario.
+     The engine state they need (gate key, attempt counter, lock table, world-state bag) is injected as
+     `ctx`, so this page passes plain objects where pano-player passes its own. -->
+<link rel="stylesheet" href="../../shared/pano-player.css" />
+<style>body { background:#0b1013; color:#e8eef2; font:15px/1.45 system-ui, sans-serif; padding:16px; }
+  :root { --amber:#ffd88c; } .slot { max-width:560px; margin-bottom:24px; }</style>
+</head>
+<body>
+<div class="slot" id="ledgerSlot"></div>
+<div class="slot" id="elevSlot"></div>
+<script type="module">
+import { buildLedgerCard, buildElevmapCard } from "../../shared/widgets.js";
+
+// --- ledger: temple's nine shrines, three statue groups (2 / 3 / 4) ---------------------------------
+const ROWS = [
+  { id: "s1", label: "Red banner",    answer: "Sea" },
+  { id: "s2", label: "Yellow banner", answer: "Sea" },
+  { id: "s3", label: "Green banner",  answer: "Hearth" },
+  { id: "s4", label: "Blue banner",   answer: "Hearth" },
+  { id: "s5", label: "White banner",  answer: "Hearth" },
+  { id: "s6", label: "Black banner",  answer: "Grove" },
+  { id: "s7", label: "Grey banner",   answer: "Grove" },
+  { id: "s8", label: "Purple banner", answer: "Grove" },
+  { id: "s9", label: "Amber banner",  answer: "Grove" },
+];
+window.__solved = null;
+const locks = new Map();
+document.getElementById("ledgerSlot").appendChild(
+  buildLedgerCard(
+    { id: "ledger", label: "The ledger", prompt: "Assign each shrine.",
+      options: ["Sea", "Hearth", "Grove"], rows: ROWS,
+      feedback: { correct: "ALL CONFIRMED", partial: "GROUP CONFIRMED", wrong: "NOTHING CLOSES" } },
+    (result) => { window.__solved = result; },
+    { pid: "temple/ledger", attemptCounts: new Map(), locks }));
+
+// --- elevmap: canyon's seven confluences ------------------------------------------------------------
+window.__gameState = { c1_read: true, c3_read: true, c7_read: true };   // three benchmarks read so far
+document.getElementById("elevSlot").appendChild(
+  buildElevmapCard(
+    { id: "map", label: "The map", key: "canyon_heights", countKey: "heights_placed",
+      axis: { min: 800, max: 1500, step: 25, unit: "m", label: "elevation" },
+      waterline: { enabled: true, start: 1125, label: "flood height" },
+      feedback: { placed: "{n} of {m} junction heights marked" },
+      nodes: [
+        { id: "c1", label: "c1", x: 0.125, answer: 1400, requires: "c1_read" },
+        { id: "c3", label: "c3", x: 0.25,  answer: 1050, requires: "c3_read" },
+        { id: "c2", label: "c2", x: 0.375, answer: 1380, requires: "c2_read" },
+        { id: "c7", label: "c7", x: 0.5,   answer: 850,  requires: "c7_read" },
+        { id: "c4", label: "c4", x: 0.625, answer: 1420, requires: "c4_read" },
+        { id: "c6", label: "c6", x: 0.75,  answer: 1200, requires: "c6_read" },
+        { id: "c5", label: "c5", x: 0.875, answer: 1390, requires: "c5_read" },
+      ] },
+    { gameState: window.__gameState }));
+</script>
+</body>
+</html>

@@ -17,9 +17,23 @@ Failure modes it guards:
   - a gateless room's onward door reverts to `forward` (it would lock forever — no primary gate), or a
     room loses the back door that makes an opt-in seal pickup retrievable (Lucas: NO auto-pickup);
   - the skiff loses its `availableWhen` gate and the lighthouse becomes reachable before the boss;
+  - the skiff's TWO doors swap destinations again (found by Lucas, 2026-08-26). The generated boat
+    panorama put the CITY on the right, not the lighthouse island the scene prompt asked for — so the
+    box drawn on the "landing steps" sits on Alexandria's own harbour steps (your moored ship is right
+    behind them) while the box on the shipped oar sits amidships. The wiring had been authored off the
+    PROMPT rather than the picture, so the steps back to the city carried you ONWARD to the Pharos and
+    the oar carried you BACK, and the lighthouse dead ahead had no door on it at all. The hotspot boxes
+    are correct; only the targets were crossed. This pins oar -> pharos (onward, `open`) and
+    steps -> quay (`back`) in BOTH the sceneSpec element and the committed hotspot, which must agree;
   - a `reveal` sneaks back in, or a starter leaks the solution (the boss starter is deliberately buggy);
-  - the Pharos finale regresses: the grid re-takes `endsEscape` from the dial, the dial reverts to an inert
-    `switch`, loses its gate, or its beam-on-ship variant stops matching the state the dial actually sets;
+  - the THREE-BEAT Pharos finale collapses back into one room (restructured 2026-08-07, Lucas). It is
+    deliberately spread across three: the gallery holds the grid puzzle, the sealed lamp chamber holds ONLY
+    the ceremonial lever, and the escape ends back on your own DECK by loosing the sail — you sail out under
+    the light you just turned. So this guards that `endsEscape` sits on the deck's cast-off and NOWHERE else
+    (exactly one in the scenario), that the lamp dial stays a real `dial` and does NOT end the escape, that
+    the cast-off can't fire until the beam is actually on the ship, that the beam-on-ship variant still
+    matches the state the dial sets, and that the FLAME stays inside the chamber rather than drifting back
+    out to the gallery (the gallery is lit only by light leaking round the bronze door);
   - the decoder key WRANGLING_EGYPT_KEY drifts out of lockstep with the four graded rooms.
 """
 import csv, itertools, json, os, re, sys
@@ -120,6 +134,38 @@ def main():
         check(bool(m), f"seal pickup line parses: {s.get('pickup')!r}")
         if m:
             cards.append((m.group(2), m.group(3), m.group(4), int(m.group(5))))
+    # The seals must be IMAGES, not text. A text pickup lands in the notebook's flat Clues list, which
+    # cannot be rearranged; an image pickup lands on the draggable collected-items board, so the player
+    # regroups the tray by hand — which IS the puzzle. The 2026-08-13 playtest failed on exactly this
+    # (text seals => eighteen reductions held in the head). Tiles are rendered by `make_seals.py`, which
+    # parses these same pickup lines, so the art cannot drift from the verified key.
+    for s in seals:
+        m = re.match(r"Seal (\d+) — ", str(s.get("pickup", "")))
+        n = m.group(1) if m else "?"
+        check(s.get("image") == f"seals/seal_{n}.png",
+              f"seal {n} carries its board tile (got {s.get('image')!r})")
+        check(os.path.isfile(os.path.join(HERE, s.get("image") or "")),
+              f"seal {n}'s tile file exists on disk")
+    check(doc.get("boardCols") == 3,
+          f"the notebook board tiles 3 across — one column per trait level (got {doc.get('boardCols')})")
+
+    # The three sigils are taught in three different rooms, and each teaching clue must say what the
+    # reduction actually IS — the tally reads the FULLEST pile, and the greatest/least are pile TOTALS of
+    # the numerals, read ACROSS piles. Without that the tower's 17 / 5 / 10 are three unexplained numbers
+    # (2026-08-13 playtest). These assert the load-bearing words survive future prose edits.
+    def clue_body(rk, needle):
+        m = [h for h in planned[rk] if h["type"] == "clue" and needle in (h.get("body") or "")]
+        return m[0]["body"] if m else ""
+    tally = clue_body("deck", "⦀")
+    check("fullest" in tally, "the tally sigil says it is read off the FULLEST pile")
+    great = clue_body("market_price", "▲")
+    check("added together" in great, "the greatest sigil says a pile's worth is its numbers ADDED")
+    least = clue_body("market_boast", "▼")
+    check("lightest pile" in least, "the least sigil names the lightest pile's total")
+    queue = clue_body("pharos", "▲ 17")
+    check("which way the seals were piled" in queue,
+          "the tower's queue-board states the question: which way were the seals piled")
+
     TRAIT = {"colour": 0, "shape": 1, "size": 2}
     def piles(t):
         d = defaultdict(list)
@@ -138,19 +184,34 @@ def main():
     check(sols == [("size", "shape", "colour")], f"the queue has the UNIQUE solution [size, shape, colour] (got {sols})")
     check(grid["answer"] == {"step1": "size", "step2": "shape", "step3": "colour"},
           "the wired grid answer matches that derivation")
-    check("endsEscape" not in grid, "the grid does NOT end the escape — it opens the door (the dial is the finale)")
+    check("endsEscape" not in grid, "the grid does NOT end the escape — it opens the bronze door")
     check(grid.get("availableWhen") == {"solved": "library"}, "the grid can't be keyed before the boss")
-    # the ceremonial finale: the player's own hand turns the beam onto their ship
-    dial = one("pharos", "dial")
+    # THE THREE-BEAT FINALE (restructured 2026-08-07, Lucas). The gallery holds the puzzle; the lamp chamber
+    # holds ONLY the ceremonial lever; the escape ends back on your own deck, sailing out under your own
+    # light. Each beat lives in a DIFFERENT room, so a regression that collapses two of them back together
+    # (endsEscape drifting onto the lamp dial again, or the lamp moving out to the gallery) is caught here.
+    dial = one("lantern", "dial")
     check(bool(dial), "the lamp dial is a real engine `dial` (not an inert `switch`)")
-    check(dial.get("endsEscape") is True, "the DIAL ends the escape")
-    check(dial.get("availableWhen") == {"solved": "pharos"},
-          "the dial is gated until the lantern door's grid is solved")
-    check(bool(dial.get("lockedBody")), "the gated dial has a diegetic lockedBody")
+    check(dial.get("key") == "pharos_beam", "the lamp dial swings the beam by setting pharos_beam")
+    check("endsEscape" not in dial, "the lamp dial does NOT end the escape — you still have to sail out")
     check(bool(dial.get("sfx")), "turning the dial plays a sound")
     check(len(dial.get("states") or []) == 1, "one dial, ONE target, one motion — never a second puzzle")
+    # …and the escape ENDS on the deck, where the whole thing began.
+    cast = one("deck", "dial")
+    check(bool(cast), "the deck carries the cast-off control")
+    check(cast.get("endsEscape") is True, "casting off from the deck is what ends the escape")
+    check(cast.get("availableWhen") == {"eq": [dial.get("key"), dial["states"][0]["value"]]},
+          "you can't sail until the beam is actually on your ship")
+    check(bool(cast.get("lockedBody")), "the gated cast-off has a diegetic lockedBody")
+    ends = [h for rk in rooms for h in planned.get(rk, []) if h.get("endsEscape")]
+    check(len(ends) == 1, f"exactly ONE thing ends the escape (found {len(ends)})")
     check(rooms["pharos"].get("onSolve") == [{"set": "lantern_open", "to": "yes"}],
           "solving the grid records that the lantern door is open")
+    # the flame lives INSIDE (Lucas): the gallery must not carry the fire, the chamber must.
+    ln_desc = " ".join(e["desc"] for e in rooms["lantern"]["authoring"]["sceneSpec"]["elements"])
+    ph_desc = " ".join(e["desc"] for e in rooms["pharos"]["authoring"]["sceneSpec"]["elements"])
+    check("fire" in ln_desc and "mirror" in ln_desc, "the lamp chamber holds the fire and its mirror")
+    check("fire-basket" not in ph_desc, "the gallery has no fire of its own — the flame is inside")
     # the payoff ART: a state-variant that fires on the dial's own key
     ph_els = {e["id"]: e for e in rooms["pharos"]["authoring"]["sceneSpec"]["elements"]}
     beam = (ph_els.get("harbour_below") or {}).get("variants") or []
@@ -165,7 +226,8 @@ def main():
     print("== room + door graph ==")
     WANT = {("deck", "hold"), ("deck", "quay"), ("quay", "deck"), ("quay", "boat"), ("boat", "pharos"),
             ("quay", "emporion"), ("emporion", "market_price"), ("market_price", "market_boast"),
-            ("market_boast", "canopic"), ("canopic", "library")}
+            ("market_boast", "canopic"), ("canopic", "library"),
+            ("pharos", "lantern"), ("lantern", "pharos")}
     doors = defaultdict(list)
     for rk, r in rooms.items():
         for e in r["authoring"]["sceneSpec"]["elements"]:
@@ -174,9 +236,12 @@ def main():
     have = {(a, to) for a, ds in doors.items() for to, _ in ds}
     for a, b in sorted(WANT):
         check((a, b) in have, f"door {a} -> {b} exists")
-    graded = {"deck", "market_price", "market_boast", "library"}
+    # A `forward` door gates on the room's PRIMARY gate, so only a room that HAS one may use it. That's the
+    # four graded rooms plus the gallery, whose grid counts as a primary gate (primaryGate() takes
+    # puzzle|lock|grid) — which is exactly what lets the bronze door open onto the lamp chamber.
+    gated = {"deck", "market_price", "market_boast", "library", "pharos"}
     for rk, ds in doors.items():
-        if rk in graded:
+        if rk in gated:
             continue
         for to, d in ds:
             check(d != "forward",
@@ -186,6 +251,21 @@ def main():
             continue
         check(any(d == "back" for _, d in doors[rk]),
               f"{rk} has a back door (an opt-in seal must stay retrievable)")
+    # The skiff's two doors, pinned by hotspot id (see the docstring's swap failure mode). The oar is the
+    # way ONWARD to the lighthouse; the steps depicted at the right of the panorama are Alexandria's own
+    # harbour steps, so they go BACK to the quay. Both records must agree — the sceneSpec element feeds any
+    # future re-gen, the committed hotspot is what the player actually clicks.
+    WANT_BOAT = {"stern_oar": ("pharos", "open"), "landing_steps": ("quay", "back")}
+    spec_boat = {e["id"]: e["door"] for e in rooms["boat"]["authoring"]["sceneSpec"]["elements"] if e.get("door")}
+    live_boat = {h["id"]: h for h in rooms["boat"]["hotspots"] if h["type"] == "door"}
+    for hid, (to, d) in WANT_BOAT.items():
+        check(spec_boat.get(hid, {}).get("to") == to and spec_boat.get(hid, {}).get("direction") == d,
+              f"boat sceneSpec {hid} -> {to} ({d}) (got {spec_boat.get(hid)})")
+        check(live_boat.get(hid, {}).get("to") == to and live_boat.get(hid, {}).get("direction") == d,
+              f"boat hotspot {hid} -> {to} ({d}) "
+              f"(got {live_boat.get(hid, {}).get('to')} / {live_boat.get(hid, {}).get('direction')})")
+    check(("boat", "quay") in have, "the skiff keeps a way back to the quay")
+
     skiff = [h for h in planned["quay"] if h["type"] == "door"]
     check(bool(skiff) and skiff[0].get("availableWhen") == {"solved": "library"},
           "the skiff is gated on the boss")

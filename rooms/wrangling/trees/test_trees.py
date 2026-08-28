@@ -122,7 +122,17 @@ def main():
     # ---- vault escape: a phase:escape 3x3 grid mapping each shape-line to its hoard's sorting trait ----
     check(R["vault"].get("phase") == "escape", "vault is the escape phase")
     grid = [h for h in R["vault"]["hotspots"] if h["type"] == "grid"][0]
-    check(grid.get("endsEscape") is True, "vault grid ends the escape")
+    # The grid UNSEALS the gate; it must NOT fire escapeDone itself. The escape ends only when the player
+    # clicks through the now-open gate (2026-08-27) — the last gesture is the player's own, as in egypt's
+    # lamp dial and henges' way-home arch. A grid that regains `endsEscape` would skip that beat entirely.
+    check(grid.get("endsEscape") is not True, "vault grid opens the gate but does NOT end the escape")
+    gate = [h for h in R["vault"]["hotspots"] if h.get("id") == "vault_gate"][0]
+    check(gate.get("type") == "door", "the vault gate is a door hotspot")
+    check(gate.get("endsEscape") is True, "clicking through the open gate ends the escape")
+    check(gate.get("requires") == grid["id"], "the gate is gated on the grid, so it cannot be walked early")
+    check(gate.get("to") is None, "the gate is terminal — no onward room")
+    check(any(v.get("when") == {"solved": "vault"} and v.get("panorama")
+              for v in (gate.get("variants") or [])), "the gate carries open-door art keyed to the solve")
     check(grid.get("answer") == {"square": "colour", "circle": "size", "triangle": "shape"},
           "grid answer maps square->colour, circle->size, triangle->shape")
     check({i["key"] for i in grid["items"]} == {"square", "circle", "triangle"}, "grid items are the three shape-lines")

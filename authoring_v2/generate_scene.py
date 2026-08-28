@@ -291,10 +291,17 @@ def cmd_seamfix(a):
     mb = io.BytesIO(); mask.save(mb, "PNG"); mb.seek(0)
     ib = io.BytesIO(); rolled.save(ib, "PNG"); ib.seek(0)
     if a.occluder:
-        prompt = (f"Standing exactly in the centre of this view, {a.occluder}. It runs the full height of "
-                  "the frame and visually separates the left and right halves, so they do not need to "
-                  "match. Keep the existing scene, style, lighting, and palette on both sides completely "
-                  "unchanged; no people, no lettering, no text.")
+        # Say the spatial constraint OUT LOUD as well as masking it. gpt-image-2 re-renders rather than
+        # truly inpainting, so the mask alone doesn't stop it drifting; naming "only the central third,
+        # outer thirds untouched" measurably keeps the object off the edges, where any mismatch with the
+        # original would show (Lucas, 2026-08-07).
+        prompt = (f"Change ONLY the central third of this image. Standing there, exactly in the middle of "
+                  f"the frame, {a.occluder}. It runs the full height of the frame and visually separates "
+                  "the left and right halves, so the two sides do not need to match each other. It must "
+                  "NOT touch or overlap the left or right edges of the image — leave clear margins of the "
+                  "original scene on both sides. The outer left third and the outer right third must stay "
+                  "EXACTLY as they are, pixel for pixel: same objects, same lighting, same palette, "
+                  "nothing shifted. No people, no lettering, no text.")
     else:
         prompt = a.prompt or ("Seamlessly blend the vertical band through the centre so the scene is continuous "
                               "left-to-right with no visible seam, join, or repetition; keep identical style, "
@@ -308,6 +315,17 @@ def cmd_seamfix(a):
         cw -= cw % 16                                   # the API wants each edge a multiple of 16
         cx0 = max(0, w // 2 - cw // 2)
         cx1 = min(w, cx0 + cw)
+        # EDITABLE MIDDLE. The model sees the whole crop (context on both sides) but only this centred
+        # band is masked-in — and, below, only this band is composited back. Everything from the band's
+        # edge out to the crop's edge therefore stays the ORIGINAL art, so the generated object can never
+        # disagree with its surroundings there. Default: the middle third of the crop.
+        ef = a.edit_frac if getattr(a, "edit_frac", 0) and a.edit_frac > 0 else 0.34
+        ew = max(16, int(cw * min(0.9, ef)))
+        x0 = max(cx0, w // 2 - ew // 2)
+        x1 = min(cx1, x0 + ew)
+        strip = x1 - x0
+        mask = Image.new("RGBA", (w, h), (0, 0, 0, 255))
+        ImageDraw.Draw(mask).rectangle([x0, 0, x1, h], fill=(0, 0, 0, 0))   # transparent = editable
         sub = rolled.crop((cx0, 0, cx1, h))
         sub_mask = mask.crop((cx0, 0, cx1, h))
         sb = io.BytesIO(); sub.save(sb, "PNG"); sb.seek(0)
@@ -424,6 +442,7 @@ def main():
     sf.add_argument("--pos", type=float, default=1.0, help="seam location as a fraction of width (1.0 = L/R wrap edge; ~0.5 = middle) — where to centre the fix")
     sf.add_argument("--crop", type=float, default=0.0, help="CROP-INPAINT: send only this fraction of width around the seam to the model instead of the whole pano (0 = off/legacy). Keeps the rest of the art pixel-identical — no AI-image-of-an-AI-image outside the band.")
     sf.add_argument("--occluder", default="", help="OCCLUDER mode: what to stand ON the seam (e.g. 'a plain stone pillar, floor to ceiling'). The two sides then never have to agree. Implies a crop-inpaint.")
+    sf.add_argument("--edit-frac", type=float, default=0.34, help="CROP-INPAINT: the fraction of the CROP that is editable, centred on the seam (default 0.34 = the middle third). The model still SEES the whole crop for context, but only this middle band is masked-in and only this band is composited back — so the outer thirds stay byte-identical and can't mismatch.")
     sf.add_argument("--prompt", default="")
     sf.add_argument("--quality", default="medium")
     sf.add_argument("--model", default="gpt-image-2")

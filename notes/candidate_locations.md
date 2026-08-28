@@ -4,7 +4,8 @@ authority: intent
 
 # Candidate locations (cross-scenario pool)
 
-Sibling of `puzzle_inventory.md` (mechanics) and `scenario_theme_ideas.md` (themes / premises). This is the
+Sibling of `puzzle_inventory.md` (mechanics), `scenario_theme_ideas.md` (themes / premises) and
+`vibe_inventory.md` (light / palette / mood). This is the
 **pool of landscape settings** a future scenario or room could sit in — evocative places worth visiting —
 plus a roster of **settings already in use**, so new picks don't double up. Started **2026-07-24** (Lucas,
 during the henges room-3 hunt). A location graduates OUT of here when a scenario claims it (note which +
@@ -17,23 +18,75 @@ date under `## Claimed`).
 - **airship / The Alembic** (data_vis2) — brass-and-canvas airship adrift over floating islands, green evening sky.
 - **trees / The Collector's Vault** (wrangling) — alien **FOREST** canopy; monorail between stations; cliff-top vault.
 - **egypt** (wrangling) — Hellenistic Alexandria; port / market / Pharos lighthouse / Library.
-- **temple** (hierarchical_clustering) — ancient Greek / Trojan stone temple; tunnels, trapdoors, interior ruins.
+- **temple / The Register of the Gods** (hierarchical_clustering) — a **ruined jungle temple** deep in
+  rainforest at harsh noon; galleries, a service crawl, a cistern shaft, a roofless altar above the
+  canopy. *Re-skinned 2026-08-26 from an ancient Greek temple, which turned out to share a civilisation
+  with `egypt` (Hellenistic Alexandria) rather than merely a mood. Kept distinct from `hawaii`'s
+  tropical jungle by LIGHT, not biome: hawaii is a warm lamplit interior at night with the forest beyond
+  the glass; this is flat overhead noon, near-monochrome green-grey, the forest all around. Same move
+  that keeps `squirrel`'s real wood distinct from `trees`' alien canopy.*
 - **japan** (embeddings) — Japanese **wind shrine** (Shinto).
 - **spa** (comparing_means) — a spa; **thermal baths** / wellness facets; interior.
 - **squirrel/forest** (comparing_means, 2nd scenario) — a **real temperate mixed-deciduous wood** in late
   autumn→first snow; a **jay** flitting tree-to-tree (vertical hops); the Mother Oak roost. *Deliberately
   earthy/real to stay distinct from `trees`' alien glowing canopy + monorail* — the two forests don't
   double up (real deciduous + flight vs alien + rail).
+- **subway / The Faintest Line** (networks) — a disused **Victorian underground railway**, dye-district
+  goods lines repurposed as a lichen farm; brick, glazed tile, standing water. *The corpus's first true
+  industrial interior; nearest neighbour is `temple`'s crawl-ways, which are ancient stone ruin (and,
+  since the 2026-08-26 re-skin, root-choked jungle ruin), not a working plant.*
+- **beacons / (networks, partner to subway)** — a **signal-beacon chain along a mountain range**; ridge
+  posts, smoke by day, moving weather. *Homage to the Beacons of Gondor but its own range and names.*
+  Kept **military-administrative** (rosters, fuel accounts, a survey ledger) to stay distinct from
+  `temple`'s stone ruin and `henges`' druidic stones. **NB** beacons also holds the *high-altitude* and
+  *high-key daylight* registers — which is why temple's re-skin went to jungle rather than a mountain
+  monastery (Lucas, 2026-08-26).
 - **henges** (dimensionality_reduction) — teleport-linked standing stones: night beach → black mountaintop →
   fireflies plain → **[room 3 TBD]** → great henge at dawn.
 
 ## Claimed
+- **Ruined jungle temple** → `hierarchical_clustering/temple` (2026-08-26, Lucas). Claims three
+  registers `vibe_inventory.md` listed as free — **harsh flat overhead noon**, **sun shafts (`rays`)**,
+  and **near-monochrome with one colour reserved for meaning**. The last is functional: the nine banner
+  colours are the ledger escape's row identifiers.
+- **Mountain-ridge beacon chain** → `networks/beacons` (2026-08-12, Lucas). Partner scenario to
+  `networks/subway`; grades the chapter's relational half. Chosen because **an edge means "I can see
+  you"** — the most legible edge available — and weather *deletes* edges without moving a node.
+  Claims three unused registers: high-key daylight, storm/cloud, and smoke rather than fire.
+  Draft: `rooms/networks/beacons/notes.md`.
 - **Salt flat / mirror playa** → `dimensionality_reduction/henges` **room 3** (2026-07-24). Chosen for its
   ethereal, otherworldly, druid-magic feel. Expansive/uniform → a **single teleport-in room**, not a
   room-chain (see the scale principle below).
 - **Red-rock slot canyon** → `hierarchical_clustering/canyon` ("The Confluence", 2026-07-25). The dendritic
   drainage network = a dendrogram; descent + rising flood = agglomerative clustering + the cut. Whole
   continuous scenario. Draft in `rooms/hierarchical_clustering/canyon/notes.md`.
+- **Inland canal + lock flight** → `modeling` **scenario 1** (2026-08-27, Lucas, session "Canal boat").
+  Theme-stage designation — no folder, no build yet; carries its technique. Structured/linear, so
+  **whole continuous scenario** per the scale principle below. Vessel-as-moving-hub: the boat is the
+  persistent home and the world scrolls past it. **Displaces `modeling/sailing` to scenario 2.**
+  *Distinctness, stated deliberately (cf. the two forests below):*
+  - **vs `canyon`** — the closest rub, and it is about **water levels**, not harbours. Canyon owns the
+    gate-and-water vocabulary (drowned floodworks, sluice-cuts, sluice-wheel, flood-gate heights) and its
+    **rising flood is the clock chasing you**. A canal lock is **engineered stepped water on level
+    ground**, raised and lowered deliberately by a person — the opposite relationship to the water.
+  - **vs `egypt`** — Egypt's boat is a **framing device** (moor on page one, then walk inland: deck →
+    quay → market → Library → Pharos); it is a **city** scenario and the vessel never moves. But avoid
+    Egypt's **premise shape** — *"you captain a cargo boat and officialdom won't let you leave"* is its
+    logline. Passage and levels, **not** cargo, manifests or toll-house gauging.
+  - **vs `waterfalls`** — its escape is a **stream-diverter routing maze**; the canal must not divert or
+    route water.
+  - **vs `sailing`** — inland **stepped freshwater working boat** vs **open salt sea**.
+  - **vs `subway`** — subway claims **true industrial interior**, so **not** the grimy Victorian brick
+    canal. Go **pastoral working-boat**: green, brown, misty. Unclaimed ground.
+  - **Prior art: none.** Swept 2026-08-27 — zero corpus hits for towpath / narrowboat / barge / aqueduct /
+    weir; "canal" appeared twice, both as `sailing` scenery. Draft: `scenario_theme_ideas.md`.
+- **Period city heist — gallery / vault / townhouse** → `flat_clustering` **scenario 2** (partner to
+  `waterfalls`; 2026-08-27, Lucas, session "Canal boat"). Theme-stage designation — no folder, no build
+  yet. **Claims two registers nothing else holds: URBAN and MODERN** (no scenario in the corpus is
+  either), plus **clinical / white / scrubbed**, the last register `vibe_inventory.md` listed as free —
+  a gallery or vault interior is exactly that. *Distinctness:* keep it **measure-and-compare**, not
+  **count-and-tally** — case files and ledgers drift toward `egypt`'s manifest and `temple`'s ledger
+  escape. Draft: `scenario_theme_ideas.md`.
 
 ## Candidate locations
 Distinctness noted against the roster above. Light band skews **pre-dawn** (this list was seeded by the

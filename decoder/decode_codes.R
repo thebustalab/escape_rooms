@@ -375,6 +375,23 @@ WRANGLING_TREES_KEY <- list(
 # So correct = c(1, 1, 3, 2) — deliberately varied positions (the trees/henges all-index-1 tell).
 # Rooms are still art-stubs (built:false), so validate_keys SKIPs the scenario until panoramas land;
 # keep this in lockstep with scenario.json. Wired 2026-08-07.
+# temple — "The Register of the Gods" (hierarchical clustering, id 18). Four graded rooms in room order:
+# sun_gallery (nearest kin -> Longshadow), lamp_hall (cut + summarise -> the balm family), sealed_cell
+# (classify the unknown -> the drink family), inner_vault (BOSS, wing vs chemistry -> Deepwell + Palewall).
+# 1-BASED here; scenario.json holds the same picks 0-based. The altar's `ledger` is the ungraded ESCAPE
+# and is deliberately NOT in this vector (the engine only records type=="puzzle").
+HIERARCHICAL_CLUSTERING_TEMPLE_KEY <- list(
+  scenario_id = 18,
+  correct = c(3, 4, 1, 2),
+  score_step = function(correct, answer, attempts) {
+    if (answer != correct) return(0)
+    if (attempts <= 1) return(10)
+    if (attempts == 2) return(7)
+    if (attempts == 3) return(4)
+    return(2)
+  }
+)
+
 WRANGLING_EGYPT_KEY <- list(
   scenario_id = 17,
   correct = c(1, 1, 3, 2),

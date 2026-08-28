@@ -50,3 +50,42 @@ export function activeDoorVariant(hotspot, evalCond) {
   for (const v of vs) { if (v && evalCond(v.when)) chosen = v; }
   return chosen;
 }
+
+// --- Which cinemagraphs belong to the backdrop currently on screen (2026-08-27) ---------------------
+//
+// A cinemagraph is generated FROM one specific still image — almost always the room's day-lit
+// `scene.png` — and its every frame carries that image's lighting. A full-scene variant (box
+// [0,0,1,1], e.g. Egypt's `night` wash) REPLACES the whole backdrop, so a clip made from the day image
+// then stamps day-lit motion onto a night scene and glows wrongly: Lucas saw the quay's boats and the
+// emporion awning still sunlit after the harbour went dark. The fix is the general rule rather than a
+// night special case — **a clip only plays while the image it was generated from is the one showing.**
+//
+// A clip declares its source with `cinemagraph.state`, matching the variant state it was generated
+// from; ABSENT means the base scene, which is what every clip authored before this carried, so old
+// scenarios are unaffected until a room actually goes into a full-scene state.
+//
+// Partial-box variants (a door swinging open, a lamp lit in its own box) deliberately do NOT gate
+// anything: they change a region, not the backdrop, so the rest of the scene — and its clips — is
+// still the image it was generated from.
+
+// The state of the whole-scene backdrop currently painted, or null when the base scene is showing.
+// Takes the ALREADY-RESOLVED active variant list from pickActiveVariants (whose boxes have had the
+// hotspot-box fallback applied), so full-scene detection sees the box the compositor will really use.
+export function fullSceneState(activeVariants) {
+  let state = null;
+  (activeVariants || []).forEach(v => {
+    const b = v && v.box;
+    if (Array.isArray(b) && b.length === 4 && b[0] === 0 && b[1] === 0 && b[2] === 1 && b[3] === 1) {
+      state = v.state || null;                  // last full-scene variant wins, as everywhere else
+    }
+  });
+  return state;
+}
+
+// The cinemagraphs that may play over a backdrop in `sceneState` (null = the base scene).
+export function pickCinemagraphs(hotspots, sceneState) {
+  return (hotspots || [])
+    .filter(h => h && h.cinemagraph && h.cinemagraph.video && Array.isArray(h.cinemagraph.box))
+    .map(h => h.cinemagraph)
+    .filter(c => (c.state || null) === (sceneState || null));
+}

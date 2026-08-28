@@ -142,10 +142,15 @@ test("alaska: full analysis + notebook image-stack + keypad escape", async ({ pa
   await expect(page.locator("#hudroom")).toHaveText(room("room1").title, { timeout: 30_000 });
 
   // --- room 1: solve, pick up the RED template, advance ----------------------
+  // Count notebook entries as DELTAS, never absolutes. The engine auto-logs the opening `story` as
+  // "Your assignment" the moment you enter (the premise stays re-readable now that entry cards are
+  // dropped), so the notebook is already at 1 before anything is solved — which silently broke the old
+  // `(1)` / `(2)` assertions here. A delta survives any future baseline entry.
+  const nbStart = await notebookCount();
   await answerMCQ(room("room1"));
-  await expect(page.locator("#notebookCount")).toHaveText(/\(1\)/, { timeout: 10_000 }); // answer auto-logged
+  await expect(page.locator("#notebookCount")).toHaveText(new RegExp(`\\(${nbStart + 1}\\)`), { timeout: 10_000 }); // answer auto-logged
   expect(await pickupClues()).toBe(1);                                                   // Claire's red template
-  await expect(page.locator("#notebookCount")).toHaveText(/\(2\)/);
+  await expect(page.locator("#notebookCount")).toHaveText(new RegExp(`\\(${nbStart + 2}\\)`));
   await walkForward(room("room1"));
 
   // --- room 2: solve, pick up GREEN, advance ---------------------------------
@@ -178,9 +183,17 @@ test("alaska: full analysis + notebook image-stack + keypad escape", async ({ pa
   const nbBeforeCode = await notebookCount();
   await page.locator("#skipChip").click();                                              // → submission-prep screen
   await expect(page.locator("#submitPrep.open")).toBeVisible({ timeout: 10_000 });
+  // The card must ALREADY show the captured work before any x500 is entered (2026-08-28, Lucas): when the
+  // body sat behind a placeholder, a screen that IS the submission screen read as a separate x500 gate in
+  // front of it, and the 2026-08-05 single-screen unification looked reverted. Only the download waits on
+  // the x500 — present but dimmed and disabled, so the reason it's out of reach is visible.
+  await expect(page.locator("#subWork .swroom")).not.toHaveCount(0, { timeout: 20_000 });
+  await expect(page.locator("#subPdf")).toBeVisible();
+  await expect(page.locator("#subPdf")).toBeDisabled();
   // x500 is entered HERE; confirming it mints the (x500-keyed) code and renders the per-room refine blocks.
   await page.fill("#subX500", "test0001");
   await page.locator("#subX500Go").click();
+  await expect(page.locator("#subPdf")).toBeEnabled();
   await expect(page.locator("#subWork .swroom")).not.toHaveCount(0, { timeout: 20_000 });
   await expect(async () => {                                                            // code minted → logged to the notebook
     expect(await notebookCount()).toBe(nbBeforeCode + 1);
@@ -206,6 +219,36 @@ test("alaska: full analysis + notebook image-stack + keypad escape", async ({ pa
   await page.mouse.up();
   const after = await tiles.first().evaluate((el) => el.style.left);
   expect(after).not.toBe(before);   // the tile snapped to a new cell
+
+  // A tile CLICKED rather than dragged opens full size. Regression home for the 2026-08-27 finding that a
+  // board tile is a 120px square painted `object-fit:cover`, so a non-square plate is centre-cropped and
+  // its outer content never reaches the board (temple's 900x360 figure plates showed one of three
+  // figures). Pickup art is authored square now — `validate_assets.py` sweeps for it — and this is the
+  // other half: the board is for ARRANGING, and detail that can't survive 120px is read here.
+  // The 5px click/drag threshold is what's actually under test: a press that jitters must still count as
+  // a click, and a real drag must NOT open the lightbox.
+  const bb2 = await tiles.first().boundingBox();
+  await page.mouse.move(bb2.x + bb2.width / 2, bb2.y + bb2.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(bb2.x + bb2.width / 2 + 2, bb2.y + bb2.height / 2 + 1);   // jitter, not a drag
+  await page.mouse.up();
+  const lightbox = page.locator(".nblightbox");
+  await expect(lightbox).toBeVisible();
+  await expect(lightbox.locator("img")).toHaveAttribute("src", await tiles.first().getAttribute("src"));
+  // it shows the WHOLE image — no square crop — so a wide plate survives here even if the tile crops it
+  expect(await lightbox.locator("img").evaluate(el => getComputedStyle(el).objectFit)).not.toBe("cover");
+  await lightbox.click({ position: { x: 5, y: 5 } });
+  await expect(lightbox).toBeHidden();
+  // negative control: the drag above must NOT have opened it (else this assertion is vacuous)
+  const beforeDrag = await tiles.first().evaluate((el) => el.style.left);
+  const bb3 = await tiles.first().boundingBox();
+  await page.mouse.move(bb3.x + bb3.width / 2, bb3.y + bb3.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(bb3.x + bb3.width / 2 + 132, bb3.y + bb3.height / 2, { steps: 6 });
+  await page.mouse.up();
+  await expect(page.locator(".nblightbox")).toHaveCount(0);
+  expect(await tiles.first().evaluate((el) => el.style.left)).not.toBe(beforeDrag);
+
   await page.locator("#mback").click();
   await expect(page.locator("#modal.open")).toBeHidden();
 

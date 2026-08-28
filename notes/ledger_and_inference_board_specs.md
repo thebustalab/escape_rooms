@@ -14,7 +14,12 @@ evidence into one conclusion — multi-condition / diagnostic scenarios).
 
 ---
 
-## Type 4 — Deduction Ledger (`type:"ledger"`)
+## Type 4 — Deduction Ledger (`type:"ledger"`) — **BUILT 2026-08-26**
+
+> Shipped in `shared/pano-player.js` (`openLedger`/`buildLedgerCard`) with the confirmation rule
+> extracted to `shared/ledger_rule.js` and tested in `tests/ledger_rule.test.mjs`. Engine reference:
+> `shared/AGENTS.md` → *Two new hotspot types*. The draft below is kept as the design rationale.
+
 
 **Root:** *Return of the Obra Dinn*'s crew book — assign a verdict to every entity in a grid.
 

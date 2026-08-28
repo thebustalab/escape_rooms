@@ -25,6 +25,13 @@ Per rooms/<chapter>/<scenario>/scenario.json, for every BUILT room:
 
   CONTENT / TESTS (per scenario — generic conventions, promoted from the per-scenario tests 2026-07-29)
   - MISS  a clue hotspot renders blank — no body, no committed image, no pickup (opens an empty modal)
+  - MISS  a `dial` with no `states` — the card renders a gauge and NO buttons, so the control is inert and
+          falls back to the generic hint. temple's flame dial and all five of spa's bell-cords shipped this
+          way (2026-08-27); the temple one was the scenario's whole finale.
+  - MISS  a PICKUP clue's image is not square — the field notebook's collage board paints each tile as a
+          120px square with `object-fit:cover`, so a wide image is CENTRE-CROPPED and the edges of the
+          evidence never reach the board (temple's 900x360 figure plates showed their middle figure only,
+          2026-08-27). Square art is the convention every other set already follows.
   - MISS  a graded engine (question/check/pick/map) hands the answer away via feedback.reveal
   - MISS  an MCQ has fewer than 6 options (need >=6 data-derived distractors)
   - MISS  a `ready` scenario has no test_<name>.py (pins each room's answer to the CSV + decoder lockstep)
@@ -41,7 +48,7 @@ try to ship it. Referenced paths are checked with any `?v=` cache-buster / `#fra
 
 Usage: validate_assets.py [chapter/scenario ...]   (no args = every scenario)
 """
-import json, os, sys, glob
+import json, os, struct, sys, glob
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOMS = os.path.join(HERE, "..", "rooms")
@@ -84,6 +91,75 @@ def image_refs(scen):
                 for st, p in (mv.get("images") or {}).items():
                     if p:
                         yield (f"{r['key']}/{h.get('id')} mapview[{st}]", p)
+
+def _png_jpeg_size(path):
+    """(w, h) for a PNG or JPEG, header-only — no Pillow on this box, and none is needed. Returns None
+    for anything it can't read, so an exotic format is skipped rather than mis-flagged."""
+    try:
+        with open(path, "rb") as f:
+            head = f.read(2)
+            if head == b"\xff\xd8":                       # JPEG: walk the segment chain to a SOFn
+                while True:
+                    b = f.read(1)
+                    if not b:
+                        return None
+                    if b != b"\xff":
+                        continue
+                    marker = f.read(1)
+                    while marker == b"\xff":
+                        marker = f.read(1)
+                    if marker in (b"\xc0", b"\xc1", b"\xc2", b"\xc3"):
+                        f.read(3)
+                        h, w = struct.unpack(">HH", f.read(4))
+                        return (w, h)
+                    ln = struct.unpack(">H", f.read(2))[0]
+                    f.seek(ln - 2, 1)
+            f.seek(0)
+            sig = f.read(24)
+            if sig[:8] == b"\x89PNG\r\n\x1a\n":
+                return struct.unpack(">II", sig[16:24])
+    except Exception:
+        return None
+    return None
+
+
+# A pickup clue's image lands on the notebook's collage BOARD, whose tiles are square and cropped with
+# `object-fit:cover` — so anything much wider or taller than square loses its edges exactly where the
+# player is meant to compare the whole set. 1.25 is deliberately loose: it passes a plate that is a little
+# off-square and catches the strip/banner shapes that actually hide content.
+SQUARE_TOL = 1.25
+
+
+def pickup_tile_shape(scen, d):
+    out = []
+    for r in scen.get("rooms", []):
+        for h in (r.get("hotspots") or []):
+            if not isinstance(h, dict) or not h.get("pickup") or not h.get("image"):
+                continue
+            fp = h["image"].split("?")[0].split("#")[0]
+            size = _png_jpeg_size(os.path.join(d, fp))
+            if not size or not size[1]:
+                continue
+            ar = size[0] / size[1]
+            if ar > SQUARE_TOL or ar < 1 / SQUARE_TOL:
+                out.append("pickup clue '%s/%s' image is %dx%d (%.2f:1) — the notebook board crops tiles "
+                           "SQUARE, so this loses its edges on the board; author pickup art square"
+                           % (r["key"], h.get("id"), size[0], size[1], ar))
+    return out
+
+
+def dials_without_states(scen):
+    """A `dial` writes a world-state key by clicking one of its `states`. With no states there is nothing to
+    click: the modal shows a decorative gauge, no buttons, and the engine's generic fallback hint — an inert
+    control the player can't tell from a bug."""
+    out = []
+    for r in scen.get("rooms", []):
+        for h in (r.get("hotspots") or []):
+            if isinstance(h, dict) and h.get("type") == "dial" and not (h.get("states") or []):
+                out.append("dial '%s/%s' has no `states` — nothing to click, so it is inert"
+                           % (r["key"], h.get("id")))
+    return out
+
 
 def door_reciprocity(scen):
     """The scriptable half of the scene-validator's bidirectional-passage check: a door A->B (forward or an
@@ -159,6 +235,8 @@ def check_scenario(path):
     if ready and not glob.glob(os.path.join(d, "test_*.py")):
         misses.append("no test_<name>.py (pins answers to the CSV + decoder lockstep — a ready scenario needs one)")
     misses.extend(door_reciprocity(scen))                # topology: every passage has a return door
+    misses.extend(dials_without_states(scen))            # a stateless dial is an inert control
+    misses.extend(pickup_tile_shape(scen, d))            # notebook board tiles are square-cropped
     # integrity (FAIL) — every referenced file must exist. Strip a ?v= cache-buster / #frag first: some
     # refs carry one (e.g. alaska's clue images "escape_grids/mask_room1.png?v=4") — the file on disk has
     # no query, the browser strips it, so must we.

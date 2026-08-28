@@ -102,7 +102,8 @@ class SeamfixGeometryTest(unittest.TestCase):
         try:
             generate_scene.cmd_seamfix(types.SimpleNamespace(
                 input=src, out=out, left=left, right=right, feather=feather, full=full, pos=pos,
-                width=0.12, model="m", quality="high", prompt=None, crop=crop, occluder=occluder))
+                width=0.12, model="m", quality="high", prompt=None, crop=crop, occluder=occluder,
+                edit_frac=0.34))
         finally:
             requests.post, generate_scene._key = saved_post, saved_key
         px = Image.open(out).convert("RGB").load()
@@ -177,7 +178,8 @@ class SeamfixGeometryTest(unittest.TestCase):
         try:
             generate_scene.cmd_seamfix(types.SimpleNamespace(
                 input=src, out=out, left=0.04, right=0.04, feather=0.0, full=False, pos=0.5,
-                width=0.12, model="m", quality="high", prompt=None, crop=0.34, occluder=""))
+                width=0.12, model="m", quality="high", prompt=None, crop=0.34, occluder="",
+                edit_frac=0.34))
         finally:
             requests.post, generate_scene._key = saved_post, saved_key
         got = np.asarray(Image.open(out).convert("RGB"))
@@ -212,13 +214,59 @@ class SeamfixGeometryTest(unittest.TestCase):
         try:
             generate_scene.cmd_seamfix(types.SimpleNamespace(
                 input=src, out=out, left=0.04, right=0.04, feather=0.0, full=False, pos=1.0,
-                width=0.12, model="m", quality="high", prompt=None, crop=0.0,
+                width=0.12, model="m", quality="high", prompt=None, crop=0.0, edit_frac=0.34,
                 occluder="a plain stone pillar, floor to ceiling"))
         finally:
             requests.post, generate_scene._key = saved_post, saved_key
         self.assertIn("a plain stone pillar, floor to ceiling", seen["prompt"])
         self.assertIn("do not need to", seen["prompt"])          # the two sides needn't match
         self.assertNotEqual(seen["size"], f"{self.W}x{self.H}", "occluder should imply a CROP, not the whole pano")
+        self.assertIn("central third", seen["prompt"])          # the spatial constraint is stated, not just masked
+        self.assertIn("must stay", seen["prompt"])              # ...and the outer thirds are pinned
+
+    def test_occluder_edits_only_the_middle_of_the_crop(self):
+        """The model SEES the whole crop for context, but only a centred band is masked-in AND composited
+        back — so the outer part of the crop stays original art and the generated object can never disagree
+        with its surroundings there. Regression for Lucas's edge-mismatch report (2026-08-07)."""
+        import tempfile, os as _os, base64, io, types, requests
+        from PIL import Image
+        import numpy as np
+        d = tempfile.mkdtemp()
+        src, out = _os.path.join(d, "in.png"), _os.path.join(d, "out.png")
+        rng = np.random.default_rng(3)
+        a = rng.integers(0, 255, (self.H, self.W, 3), dtype=np.uint8)
+        Image.fromarray(a, "RGB").save(src)
+        sizes = {}
+        class _Resp:
+            status_code = 200
+            def __init__(self, size): self.size = size
+            def json(self):
+                red = Image.new("RGB", self.size, (255, 0, 0))     # the model "changes" its WHOLE crop
+                b = io.BytesIO(); red.save(b, "PNG")
+                return {"data": [{"b64_json": base64.b64encode(b.getvalue()).decode()}]}
+        def fake_post(*args, **kw):
+            wh = kw["data"]["size"].split("x"); sizes["crop_w"] = int(wh[0])
+            return _Resp((int(wh[0]), int(wh[1])))
+        saved_post, saved_key = requests.post, generate_scene._key
+        requests.post = fake_post
+        generate_scene._key = lambda: "k"
+        try:
+            generate_scene.cmd_seamfix(types.SimpleNamespace(
+                input=src, out=out, left=0.06, right=0.06, feather=0.0, full=False, pos=0.5,
+                width=0.12, model="m", quality="high", prompt=None, crop=0.34, edit_frac=1/3,
+                occluder="a plain stone pillar"))
+        finally:
+            requests.post, generate_scene._key = saved_post, saved_key
+        got = np.asarray(Image.open(out).convert("RGB"))
+        changed = {x for x in range(self.W) if tuple(got[self.H // 2, x]) == (255, 0, 0)}
+        self.assertTrue(changed, "the middle band should be edited")
+        # the edited band must be MUCH narrower than the crop the model was shown
+        self.assertLess(len(changed), sizes["crop_w"] * 0.55,
+                        "only the middle of the crop may be written back")
+        # and everything outside it — including the rest of the crop — is untouched original art
+        outside = [x for x in range(self.W) if x not in changed]
+        self.assertTrue(np.array_equal(got[:, outside, :], a[:, outside, :]),
+                        "outside the edited band, every pixel must be the original")
 
 
 if __name__ == "__main__":

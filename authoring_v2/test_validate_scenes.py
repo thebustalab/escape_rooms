@@ -148,3 +148,40 @@ class T(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+
+
+# --- malformed art-job fields are NAMED, not fatal -------------------------------------------------
+# 2026-08-07: `door.opensOnto` was authored as a bare reveal string instead of a list of {state,reveal}.
+# validate_scenes PASSED it, and the harness then died loading the scenario with a bare
+# "'str' object has no attribute 'get'" from dooropen_jobs — no room, no field, no clue. Two halves to
+# the fix: the job builders skip a malformed entry instead of raising (test_scene_spec covers that), and
+# the validator FAILS with the element named so the art isn't silently dropped instead.
+def _spec_with(el):
+    return {"rooms": [{"key": "r1", "authoring": {"sceneSpec": {
+        "room": "r1", "setting": "a room", "seam": "a plain wall",
+        "elements": [{"id": "e1", "at": "dead ahead in the centre", "desc": "a thing", **el}]}}}]}
+
+
+def test_malformed_opensonto_is_a_named_fail(tmp_path):
+    p = tmp_path / "scenario.json"
+    p.write_text(json.dumps(_spec_with({"door": {"direction": "forward", "to": "r2",
+                                                 "opensOnto": "the door standing open"}})))
+    fails, _warns, _ready, _ok = vs.check_scenario(str(p))
+    assert any("opensOnto" in f and "r1/e1" in f for f in fails), fails
+
+
+def test_malformed_animate_and_variants_are_named_fails(tmp_path):
+    for field, bad in (("animate", "the fire flickering"), ("variants", {"state": "lit"})):
+        p = tmp_path / f"{field}.json"
+        p.write_text(json.dumps(_spec_with({field: bad})))
+        fails, _w, _r, _o = vs.check_scenario(str(p))
+        assert any(field in f and "r1/e1" in f for f in fails), (field, fails)
+
+
+def test_well_formed_art_fields_still_pass(tmp_path):
+    p = tmp_path / "ok.json"
+    p.write_text(json.dumps(_spec_with({
+        "animate": {"motion": "the fire surging", "loop": "boomerang"},
+        "variants": [{"state": "lit", "when": {"eq": ["k", "v"]}, "reveal": "identical but lit"}]})))
+    fails, _w, _r, _o = vs.check_scenario(str(p))
+    assert not [f for f in fails if "animate" in f or "variants" in f], fails
