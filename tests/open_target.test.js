@@ -1,11 +1,11 @@
 "use strict";
-// Tests for authoring/ui/open_target.js — which hotspot box the "Make open door" edit masks.
+// Tests for authoring_v2/ui/open_target.js — which hotspot box the "Make open door" edit masks.
 // Regression home for the 2026-07-20 Hawai'i-boss fix: the tool masked the ladder (a back door)
 // instead of the valve keypad (a lock). Run: node --test  (from escape_rooms/tests/).
 
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { pickOpenMaskHotspot, hasOpenTarget } = require("../authoring/ui/open_target.js");
+const { pickOpenMaskHotspot, hasOpenTarget } = require("../authoring_v2/ui/open_target.js");
 
 const box = [0.1, 0.1, 0.2, 0.2];
 const fwd  = (label = "fwd")  => ({ type: "door", label, direction: "forward", box });

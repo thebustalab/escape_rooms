@@ -15,6 +15,14 @@ tests/playwright-report/
 **/*.reloop.mp4
 # pre-edit cinemagraph originals (the picked/played clip keeps the plain name)
 **/*_orig.mp4
+# seam-repair undo snapshots — every gradient/AI seam fix drops one beside the image it repaired, and
+# they MUST stay on disk (that is what the hub's Undo reads). The player never fetches them. 19 of these
+# were sitting in Egypt alone at its audit (2026-08-28).
+**/*_undo*.png
+# the world plate — the shared continuity REFERENCE the art pipeline feeds to gpt-image, shown in the
+# console's World-plate panel. Authoring-only: it is never fetched at play time, but it must stay on disk
+# (moving it breaks both the panel and the generation reference), so ignore it rather than archiving it.
+**/_world/
 
 # --- Keep the public repo to PLAY-REQUIRED assets only (2026-08-06) ---
 # Rule: only files the player fetches at runtime (scenario.json, play.html, referenced

@@ -29,11 +29,11 @@ module.exports = defineConfig({
       timeout: 30_000,
     },
     {
-      // The authoring harness (harness_gpt.html + /api/* + /scene/*) on :8751, for the harness-UI
-      // spec. Reuses the running tmux `harness_ui` server if it's up, else launches a fresh one. The
+      // The authoring harness (harness_gpt.html + /api/* + /scene/*) on :8752, for the harness-UI
+      // spec. Reuses the running tmux `harness_v2` server if it's up, else launches a fresh one. The
       // read/pick paths this test drives need no OPENAI key (that's only read at art-generation time).
-      command: `python3 ${path.resolve(__dirname, "../authoring/harness_server.py")}`,
-      url: "http://localhost:8751/harness_gpt.html",
+      command: `python3 ${path.resolve(__dirname, "../authoring_v2/harness_server.py")}`,
+      url: "http://localhost:8752/harness_gpt.html",
       reuseExistingServer: true,
       timeout: 30_000,
     },

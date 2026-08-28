@@ -94,9 +94,9 @@ def scenario_expected(doc):
         for i, q in enumerate(queue):
             _graded_index(q, f"puzzleQueue[{i}]", notes, vec)
             n_mcq += _is_mcq(q)
-        return vec, notes, n_mcq
+        return vec, notes, n_mcq, []
 
-    vec, notes, n_mcq = [], [], 0
+    vec, notes, n_mcq, ungraded = [], [], 0, []
     for r in doc.get("rooms", []):
         if not r.get("built"):
             continue
@@ -107,17 +107,26 @@ def scenario_expected(doc):
             continue
         puzzles = [h for h in r.get("hotspots", []) if h.get("type") == "puzzle"]
         if not puzzles:
-            # An intentional ungraded room takes no codec slot (mintCode skips rooms with no roomResult),
-            # so skip it here too: a pre-awakened orientation room with only a lock (henges/beach), OR a
-            # pure JUNCTION room whose only control is a world-state `dial` — a monorail car with a
-            # drive-lever switch-door (wrangling/trees, 2026-08-05), which routes but never grades. A built
-            # non-escape room with a puzzle, a lock, a dial, or preAwakened set is fine; none of those is a mistake.
-            has_lock = any(h.get("type") == "lock" for h in r.get("hotspots", []))
-            has_dial = any(h.get("type") == "dial" for h in r.get("hotspots", []))
-            if r.get("preAwakened") or has_lock or has_dial:
+            # An intentional ungraded room takes no codec slot (mintCode keys its steps off `roomResults`,
+            # so a room the student never solves in simply never contributes), which means such a room can
+            # NEVER put the code out of lockstep with the key. Examples that are all deliberate: a
+            # pre-awakened orientation room with only a lock (henges/beach); a pure JUNCTION whose only
+            # control is a world-state `dial` (a trees monorail car); a CLUE room carrying evidence the
+            # player needs later (Egypt's nine seal rooms, temple's galleries); and a plain PASSAGE with
+            # nothing but doors (Egypt's `boat` crossing, temple's `root_crawl`).
+            #
+            # This used to FAIL and append None — which was wrong twice over (2026-08-28). It cannot
+            # mis-grade, so failing overstated it; and the None then hit `if None in exp: continue` below,
+            # which SKIPPED THE KEY COMPARISON FOR THE WHOLE SCENARIO. Egypt and temple were flagged this
+            # way, so their decoder keys were never actually checked — the guard was silently not guarding.
+            # Now: skip the slot (matching the codec), and WARN only for a room with no authored content at
+            # all, which is the one case that really might be a forgotten puzzle.
+            kinds = {h.get("type") for h in r.get("hotspots", [])}
+            if r.get("preAwakened") or kinds & {"lock", "dial", "clue", "grid", "ledger"}:
                 continue
-            notes.append(f"built room '{r.get('key')}' has no puzzle hotspot")
-            vec.append(None)
+            ungraded.append(f"built room '{r.get('key')}' has no puzzle and no authored content "
+                            f"(only {', '.join(sorted(k for k in kinds if k)) or 'nothing'}) — "
+                            f"intentional passage, or a forgotten puzzle?")
             continue
         q = puzzles[0]
         n_mcq += _is_mcq(q)                       # only MCQ slots can carry a positional tell
@@ -145,7 +154,7 @@ def scenario_expected(doc):
         else:
             notes.append(f"room '{r.get('key')}' puzzle has neither question, check, nor pick")
             vec.append(None)
-    return vec, notes, n_mcq
+    return vec, notes, n_mcq, ungraded
 
 
 def decoder_keys(text):
@@ -168,6 +177,18 @@ def decoder_keys(text):
 def main():
     keys = decoder_keys(DECODER.read_text())
     scenarios = sorted(ROOT.glob(ROOMS_GLOB))
+    # Optional `chapter/scenario` filters (2026-08-28). Default is UNCHANGED — every scenario, exit 1 on
+    # any failure — because that is the pre-push guard the canon tells you to run. The filter exists so a
+    # go/no-go check can ask the narrower question "are the scenarios students will actually open sound?"
+    # without an in-development scenario's known-acceptable state holding the verdict permanently red.
+    wanted = [a for a in sys.argv[1:] if not a.startswith("-")]
+    if wanted:
+        keep = {w.strip("/") for w in wanted}
+        scenarios = [p for p in scenarios
+                     if "%s/%s" % (p.parent.parent.name, p.parent.name) in keep]
+        if not scenarios:
+            print("no scenario.json matched:", ", ".join(sorted(keep)))
+            return 1
     if not scenarios:
         print("no scenario.json found under", ROOMS_GLOB)
         return 1
@@ -177,11 +198,14 @@ def main():
         rel = path.relative_to(ROOT)
         doc = json.loads(path.read_text())
         sid = doc.get("id")
-        exp, notes, n_mcq = scenario_expected(doc)
+        exp, notes, n_mcq, ungraded = scenario_expected(doc)
 
         for n in notes:
             print(f"FAIL  {rel}: {n}")
             failures += 1
+        for n in ungraded:                        # cannot mis-grade — advisory, and never gates
+            print(f"WARN  {rel}: {n}")
+            warnings += 1
 
         # A freshly-scaffolded scenario (all rooms still stubs) has no built graded rooms yet, so it
         # legitimately has no decoder key — the key is added at wiring time (see the design skill). Skip

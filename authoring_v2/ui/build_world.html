@@ -130,7 +130,13 @@
       <span style="margin-left:auto"></span>
       <button id="testPlay" title="Open this scenario in the test player (:8055) — sound mixer + in-place text editing; needs the playtest tmux server running on :8055">▶ Test play</button>
       <button id="play" title="Open this scenario in NORMAL play mode (a student's view — no test tools) over the :8055 playtest server">▶ Play</button>
+      <button id="runTests" title="Run EVERY escape-room test suite — grading-key guards, asset validators, the python/node unit suites, each scenario's own suite, the R codec self-test, and the Playwright browser run — and report one go/no-go. Do this before you push.">✓ Run all tests</button>
+      <span class="status" id="testStat"></span>
       <span class="status" id="topStat"></span>
+    </div>
+    <div id="testPanel" style="display:none; margin-top:6px; border:1px solid var(--line); border-radius:8px; background:var(--panel); padding:8px 10px; max-height:300px; overflow:auto">
+      <div id="testVerdict" style="font-weight:700; margin-bottom:6px"></div>
+      <div id="testRows" style="font:12px/1.7 ui-monospace,Menlo,Consolas,monospace"></div>
     </div>
     <div class="tbrow">
       <span class="hint" style="white-space:nowrap">push changes (Mac terminal):</span>
@@ -1019,6 +1025,64 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
   // ▶ Test play (mixer + in-place editing) and ▶ Play (student view), both over the :8055 playtest server.
   $("#testPlay").onclick = () => { if (CH && SC) window.open(`http://localhost:8055/escape_rooms/shared/test_play.html?chapter=${encodeURIComponent(CH)}&scenario=${encodeURIComponent(SC)}&harness=${encodeURIComponent(location.origin)}`, "_blank"); };
   $("#play").onclick = () => { if (CH && SC) window.open(`http://localhost:8055/escape_rooms/rooms/${encodeURIComponent(CH)}/${encodeURIComponent(SC)}/play.html`, "_blank"); };
+
+  // ---- Run all tests: one go/no-go over every escape-room suite -------------------------------------
+  // Scenario-independent (it checks the WHOLE tree, not the loaded scenario), which is why it lives in
+  // the sticky bar rather than in a stage. Streams each suite's result as it lands — a three-minute run
+  // with a silent spinner is a run nobody waits for. Shift-click for a fast pass that skips the browser
+  // suites (~20 s): useful while iterating, NOT enough to clear a push, and the panel says so.
+  const TESTMARK = { pass: '<span style="color:var(--green)">ok  </span>',
+                     fail: '<span style="color:#ff9c9c">FAIL</span>',
+                     warn: '<span style="color:var(--amber)">warn</span>',
+                     skip: '<span style="opacity:.6">skip</span>' };
+  function testRow(r) {
+    const secs = r.seconds != null ? ` <span style="opacity:.5">${r.seconds}s</span>` : "";
+    return `<div>${TESTMARK[r.status] || r.status} ${esc(r.name)}${secs} — <span style="opacity:.75">${esc(r.detail || "")}</span></div>`;
+  }
+  $("#runTests").onclick = async (ev) => {
+    const fast = ev.shiftKey;
+    const btn = $("#runTests"), stat = $("#testStat");
+    btn.disabled = true;
+    $("#testPanel").style.display = "";
+    $("#testVerdict").innerHTML = `<span class="warn">running${fast ? " (fast — no browser suites)" : ""}…</span>`;
+    $("#testRows").innerHTML = "";
+    const r = await post("/api/run-tests", { fast });
+    if (!r.ok) {
+      $("#testVerdict").innerHTML = `<span class="err">${esc(r.error)}</span>`; btn.disabled = false; return;
+    }
+    stat.innerHTML = `<span class="warn">0/${r.total}</span>`;
+    let shown = 0;
+    const tick = setInterval(async () => {
+      const s = await getj("/api/status?slot=tests");
+      const outs = s.outputs || [];
+      for (; shown < outs.length; shown++) $("#testRows").insertAdjacentHTML("beforeend", testRow(outs[shown]));
+      stat.innerHTML = `<span class="warn">${outs.length}/${r.total}</span>`;
+      if (s.active) return;
+      clearInterval(tick); btn.disabled = false;
+      const sum = s.tag;
+      if (s.error || !sum) {
+        $("#testVerdict").innerHTML = `<span class="err">test run failed: ${esc(s.error || "no summary")}</span>`;
+        stat.innerHTML = `<span class="err">error</span>`; return;
+      }
+      const counts = `${sum.passed} passed · ${sum.failed} failed · ${sum.warned} warned · ${sum.skipped} skipped · ${Math.round(sum.seconds)}s`;
+      // A skipped suite is NOT a pass — a missing runner must never read as a green light.
+      const verdict = sum.verdict === "go"
+        ? `<span style="color:var(--green)">GO — safe to push</span>`
+        : sum.verdict === "go-with-skips"
+          ? `<span style="color:var(--amber)">GO, but a suite did not run — check the skips before pushing</span>`
+          : `<span style="color:#ff9c9c">NO-GO — ${sum.failed} suite${sum.failed === 1 ? "" : "s"} failing</span>`;
+      const caveat = sum.fast ? ` <span style="opacity:.7; font-weight:400">(fast pass — the browser suites were skipped, so this is not a push clearance)</span>` : "";
+      $("#testVerdict").innerHTML = `${verdict}${caveat} <span style="font-weight:400; opacity:.75">— ${counts}</span>`;
+      stat.innerHTML = sum.verdict === "no-go" ? `<span class="err">NO-GO</span>` : `<span class="ok">GO</span>`;
+      // failures + warnings get their captured tail, so you can diagnose without leaving the console
+      (sum.results || []).filter(x => x.status === "fail" || x.status === "warn").forEach(x => {
+        if (!x.output) return;
+        $("#testRows").insertAdjacentHTML("beforeend",
+          `<details style="margin:4px 0 4px 18px"><summary style="cursor:pointer; opacity:.8">${esc(x.name)} — output</summary>` +
+          `<pre style="white-space:pre-wrap; font-size:11px; opacity:.85; margin:4px 0">${esc(x.output)}</pre></details>`);
+      });
+    }, 1200);
+  };
   // Finish & publish (step 5) wiring.
   $("#fAudited").onchange = e => patchScenario({ audited: e.target.checked });
   $("#fPublished").onchange = e => patchScenario({ published: e.target.checked });

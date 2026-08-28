@@ -8,10 +8,10 @@
 // The clean signature of the fix: after selecting a scenario that HAS staged cover candidates, the
 // #coverGrid holds candidate cards WITHOUT anyone clicking Generate. Under the bug the grid stayed empty.
 //
-// Drives the live authoring harness on :8751 (see playwright.config.js — reuses the tmux server if up).
+// Drives the live authoring harness on :8752 (see playwright.config.js — reuses the tmux server if up).
 const { test, expect } = require("@playwright/test");
 
-const HARNESS = "http://127.0.0.1:8751/harness_gpt.html";
+const HARNESS = "http://127.0.0.1:8752/harness_gpt.html";
 const SCENARIO = "data_vis/alaska";                 // has gpt_cover_* candidates staged in _scratch
 
 test("harness: cover candidates list on load, not only after Generate", async ({ page }) => {

@@ -1,12 +1,12 @@
 "use strict";
-// Tests for authoring/ui/cand_state.js — the four build-step chip states (wrap · spots · door · save)
+// Tests for authoring_v2/ui/cand_state.js — the four build-step chip states (wrap · spots · door · save)
 // for one candidate image in the harness "build rooms" step. Regression home for the 2026-07-21 fix:
 // after Save, commit-room clears the room's _scratch draft, so wrap/spots must fall back to the node —
 // otherwise the chips wrongly drop back to grey the moment the room is saved. Run: node --test.
 
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { compute } = require("../authoring/ui/cand_state.js");
+const { compute } = require("../authoring_v2/ui/cand_state.js");
 
 const FILE = "gpt_room1_3.png";
 const OPEN = "gpt_room1_3_open.png";

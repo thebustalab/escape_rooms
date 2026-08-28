@@ -378,11 +378,16 @@ WRANGLING_TREES_KEY <- list(
 # temple — "The Register of the Gods" (hierarchical clustering, id 18). Four graded rooms in room order:
 # sun_gallery (nearest kin -> Longshadow), lamp_hall (cut + summarise -> the balm family), sealed_cell
 # (classify the unknown -> the drink family), inner_vault (BOSS, wing vs chemistry -> Deepwell + Palewall).
-# 1-BASED here; scenario.json holds the same picks 0-based. The altar's `ledger` is the ungraded ESCAPE
-# and is deliberately NOT in this vector (the engine only records type=="puzzle").
+# 0-BASED, like every other key here: `grade_one` compares this straight against the decoded answer,
+# which IS the codec's 0-based selected index. This key was written 1-BASED by mistake (c(3,4,1,2)) and
+# graded EVERY answer wrong; fixed to c(2,3,0,1) on 2026-08-28 to match scenario.json. It went unnoticed
+# because validate_keys was skipping the comparison for this scenario entirely — see validate_keys.py's
+# note on the `None` slot. temple is still in_development, so nobody was graded with it.
+# The altar's `ledger` is the ungraded ESCAPE and is deliberately NOT in this vector (the engine only
+# records type=="puzzle").
 HIERARCHICAL_CLUSTERING_TEMPLE_KEY <- list(
   scenario_id = 18,
-  correct = c(3, 4, 1, 2),
+  correct = c(2, 3, 0, 1),
   score_step = function(correct, answer, attempts) {
     if (answer != correct) return(0)
     if (attempts <= 1) return(10)

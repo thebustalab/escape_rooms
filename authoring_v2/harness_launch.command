@@ -4,12 +4,13 @@
 # Run in Terminal (or double-click in Finder once it's executable: `chmod +x harness_launch.command`).
 # It:
 #   1. SSHes into host2 (the Linux desktop) and runs serve_harness.sh with HARNESS_RESTART=1 to
-#      (re)start BOTH servers FRESH (harness API :8751 + playtest :8055) — so every launch picks up the
+#      (re)start BOTH servers FRESH (build_world harness :8752 + playtest :8055) — so every launch picks up the
 #      latest code (server changes like the no-cache headers only take effect on a fresh process).
-#   2. Opens ONE SSH tunnel mapping the Mac's own localhost:8751 and :8055 to host2's, so the Mac sees
+#   2. Opens ONE SSH tunnel mapping the Mac's own localhost:8752 and :8055 to host2's, so the Mac sees
 #      both servers exactly where host2 does. That keeps the test-play flow's origins consistent
-#      (the mixer on localhost:8055 posts volumes to the harness on localhost:8751 — same as on host2).
-#   3. Opens the harness in the default browser.
+#      (the mixer on localhost:8055 posts volumes to the harness on localhost:8752 — same as on host2).
+#   3. Opens the build_world console in the default browser. The old v1 harness (:8751,
+#      harness_gpt.html) is obsolete and is no longer started (2026-08-28, Lucas).
 #   4. HOLDS THE TERMINAL. Press Ctrl+C (or close the window) to TEAR THE WHOLE THING DOWN — the SSH
 #      tunnel AND both host2 servers — so nothing is left running. The next launch then spins it all up
 #      fresh. (Set KEEP_SERVERS=1 to leave the servers running on exit, the old behaviour.)
@@ -19,16 +20,16 @@
 # ── CONFIG ─────────────────────────────────────────────────────────────────────────────────────────
 HOST2="${HARNESS_HOST:-bustalab@131.212.57.217}"      # override: HARNESS_HOST=bustalab@… ./harness_launch.command
 SSH_OPTS="${HARNESS_SSH_OPTS:-}"                       # e.g. HARNESS_SSH_OPTS='-J host1'  if you must hop via host1
-REMOTE_ENSURE="/home/bustalab/Documents/Tools/websites/thebustalab.github.io/escape_rooms/authoring/serve_harness.sh"
-URL="http://localhost:8751/harness_gpt.html"
+REMOTE_ENSURE="/home/bustalab/Documents/Tools/websites/thebustalab.github.io/escape_rooms/authoring_v2/serve_harness.sh"
+URL="http://localhost:8752/build_world.html"
 # Dedicated control socket for OUR tunnel — kept separate from your ~/.ssh/config multiplexing so the
 # tunnel can never silently attach to some other master connection (that was the "no tunnel" bug).
 CTRL="$HOME/.ssh/cm-harness.sock"
 # ────────────────────────────────────────────────────────────────────────────────────────────────────
 set -u
 
-# does the Mac's localhost:8751 actually reach the harness API? (the real end-to-end tunnel test)
-tunnel_up() { curl -s -o /dev/null -m 2 "http://localhost:8751/api/scenarios"; }
+# does the Mac's localhost:8752 actually reach the harness API? (the real end-to-end tunnel test)
+tunnel_up() { curl -s -o /dev/null -m 2 "http://localhost:8752/api/scenarios"; }
 
 echo "▶ escape-room harness launcher"
 echo "  host2: $HOST2   ${SSH_OPTS:+(ssh opts: $SSH_OPTS)}"
@@ -48,23 +49,23 @@ fi
 #    WE_OPENED tracks whether THIS run created the tunnel, so cleanup only tears down what it owns.
 WE_OPENED=0
 if tunnel_up; then
-  echo "② tunnel already up (localhost:8751 reaches the harness) — reusing (won't be torn down on exit)"
+  echo "② tunnel already up (localhost:8752 reaches the harness) — reusing (won't be torn down on exit)"
 else
   ssh $SSH_OPTS -S "$CTRL" -O exit "$HOST2" 2>/dev/null  # clear any stale/dead master on our socket
-  echo "② opening SSH tunnel  localhost:8751→host2 + localhost:8055→host2 …"
+  echo "② opening SSH tunnel  localhost:8752→host2 + localhost:8055→host2 …"
   ssh $SSH_OPTS -M -S "$CTRL" -f -N \
-      -L 8751:localhost:8751 \
+      -L 8752:localhost:8752 \
       -L 8055:localhost:8055 \
       -o ExitOnForwardFailure=yes -o ServerAliveInterval=30 "$HOST2"
   rc=$?
   if [ $rc -ne 0 ]; then
-    echo "✗ tunnel command exited $rc — most likely local :8751 or :8055 is already bound by something else."
-    echo "  Inspect:  lsof -nP -iTCP:8751 -sTCP:LISTEN ;  lsof -nP -iTCP:8055 -sTCP:LISTEN"
+    echo "✗ tunnel command exited $rc — most likely local :8752 or :8055 is already bound by something else."
+    echo "  Inspect:  lsof -nP -iTCP:8752 -sTCP:LISTEN ;  lsof -nP -iTCP:8055 -sTCP:LISTEN"
     exit 1
   fi
   for _ in 1 2 3 4 5; do tunnel_up && break; sleep 1; done
   if ! tunnel_up; then
-    echo "✗ tunnel opened but localhost:8751 still can't reach the harness."
+    echo "✗ tunnel opened but localhost:8752 still can't reach the harness."
     echo "  Check the master:  ssh -S '$CTRL' -O check '$HOST2'"
     exit 1
   fi
@@ -93,7 +94,7 @@ cleanup() {
   else
     echo "⏹ stopping host2 servers…"
     ssh $SSH_OPTS -o ControlMaster=no -o ConnectTimeout=8 "$HOST2" \
-        "tmux send-keys -t harness_ui C-c 2>/dev/null; tmux send-keys -t playtest C-c 2>/dev/null" \
+        "tmux kill-session -t harness_v2 2>/dev/null; tmux kill-session -t playtest 2>/dev/null; true" \
         && echo "   servers stopped ✓" || echo "   (couldn't reach host2 to stop servers)"
   fi
   echo "bye."
@@ -105,7 +106,7 @@ trap cleanup EXIT
 echo "③ opening $URL"
 open "$URL" 2>/dev/null || echo "  (open the URL manually: $URL)"
 
-echo "✓ ready. Harness: $URL   ·   test-play server: http://localhost:8055/"
+echo "✓ ready. build_world: $URL   ·   test-play server: http://localhost:8055/"
 echo "  Holding the tunnel open. Press Ctrl+C (or close this window) to close it and exit."
 
 # 4) HOLD — keep the terminal (and the tunnel) alive until Ctrl+C. If the tunnel drops on its own

@@ -16,6 +16,7 @@ const SCENARIOS = [
   // (2026-08-28). Every `ready` scenario belongs in this list — that is the point of the smoke.
   { name: "hospital", path: "/escape_rooms/rooms/data_vis2/hospital/play.html" },
   { name: "airship", path: "/escape_rooms/rooms/data_vis2/airship/play.html" },
+  { name: "egypt", path: "/escape_rooms/rooms/wrangling/egypt/play.html" },
 ];
 
 for (const sc of SCENARIOS) {

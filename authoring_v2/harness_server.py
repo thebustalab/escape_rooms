@@ -2923,6 +2923,34 @@ class H(http.server.SimpleHTTPRequestHandler):
                 except ValueError as ve:
                     return self._json({"ok": False, "error": str(ve)}, 400)
                 return self._json({"ok": True, "flags": _audio_flags(base)})
+            if route == "/api/run-tests":
+                # One go/no-go over every escape-room suite, for the console's top-bar button. Runs on a
+                # job slot like any other long task: each suite's result is appended to `outputs` as it
+                # finishes, so the UI shows progress rather than a three-minute dead spinner. `fast:true`
+                # skips the Playwright browser suites (~20 s vs ~3-4 min) — the browser ones are the only
+                # thing that proves a student's real path works, so `fast` is for iterating, not for
+                # clearing a push.
+                req = self._body()
+                fast = bool(req.get("fast"))
+                import run_all_tests                                   # local, stdlib-only, cheap import
+                suites = run_all_tests._suites(fast)
+
+                def _go():
+                    def _event(rec):
+                        with LOCK:
+                            j = JOBS.get("tests")
+                            if j is not None:
+                                j["outputs"].append(rec)
+                                j["done"] = rec["index"]
+                    summary = run_all_tests.run(fast=fast, on_event=_event)
+                    with LOCK:
+                        j = JOBS.get("tests")
+                        if j is not None:
+                            j["tag"] = summary                          # verdict + counts, read by the UI
+
+                if not _start("tests", "tests", _go, len(suites)):
+                    return self._json({"ok": False, "error": "a test run is already going"}, 409)
+                return self._json({"ok": True, "slot": "tests", "total": len(suites), "fast": fast})
             if route == "/api/auto-balance":
                 # perceived-loudness (LUFS) auto-balance: lower every effect that would play louder
                 # than the music. apply=true writes scenario.json (the agent's wire-time pass);
