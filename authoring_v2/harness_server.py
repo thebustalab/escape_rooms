@@ -79,7 +79,10 @@ BATCH_GEN = os.path.expanduser("~/ComfyUI/cinemagraph_batch.py")
 # Batched cinemagraphs render this many candidates per hotspot (different random seeds) for the editor to
 # pick from — the motion analogue of generating multiple art scenes. The immediate single "Generate" stays 1.
 # Local model → no API cost, so we generate a generous spread to pick from (walk-away batch; just slower).
-CINE_CANDIDATES = 5
+# Raised 5 -> 8 (2026-08-28). At the new ladder top (512) a clip renders in ~11 s, and seed-to-seed
+# variation was measured as large as resolution's effect — live motion ran 8-27% across seeds at one
+# resolution — so candidates, not pixels, are what buy a usable clip. Best-of-8 costs ~90 s.
+CINE_CANDIDATES = 8
 
 # Active scenario (Phase 3): which rooms/<chapter>/<scenario>/ the harness authors into.
 # SCENE (the candidate `_scratch` pool the pages read/write via the /scene/ route) and

@@ -208,6 +208,10 @@ def to_hotspots(spec):
             out.append({**base, "type": "lock"})     # ungraded escape gate, KEYPAD flavour; wired separately
         elif e.get("door"):
             out.append({**base, "type": "door", **{k: v for k, v in e["door"].items()}})
+        elif e.get("mapview"):
+            out.append({**base, "type": "mapview"})  # read-only map/chart surface the player opens; never a
+            # gate. Added 2026-08-29 — airship's star-astrolabe had to be specced as `clue` for want of this
+            # role, so a re-place would have downgraded it (notes.md "Caveat — nest dial/mapview").
         elif e.get("clue"):
             out.append({**base, "type": "clue"})
         elif e.get("animate"):

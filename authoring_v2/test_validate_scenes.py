@@ -156,6 +156,46 @@ if __name__ == "__main__":
 # "'str' object has no attribute 'get'" from dooropen_jobs — no room, no field, no clue. Two halves to
 # the fix: the job builders skip a malformed entry instead of raising (test_scene_spec covers that), and
 # the validator FAILS with the element named so the art isn't silently dropped instead.
+class TestSweepOrder(unittest.TestCase):
+    """Regression: elements must run in left→right sweep order.
+
+    canyon/undercroft (2026-08-28) carried [far left, left, dead ahead, left of centre, right,
+    just right of centre, far right] — the control panel described before the map table that sits to
+    its left, and the trunk arch before the ladder inboard of it. `render_prompt` joins elements in
+    FILE order, so the prompt told gpt-image to sweep the panorama and then jump backwards, twice.
+    Nothing caught it: the boxes derive from the `at` phrase rather than the order, so every
+    downstream check passed and the only symptom would have been worse art, discovered after the gens
+    were paid for. Two elements swapped to fix; the check is what makes it not recur.
+    """
+
+    def test_out_of_order_elements_warn(self):
+        f, w, _ = _run(_scen([_room("r1", [
+            {"id": "a", "at": "on the far left", "desc": "a wall"},
+            {"id": "panel", "at": "dead ahead in the centre", "desc": "a panel"},
+            {"id": "table", "at": "to the left of centre", "desc": "a table"},
+            {"id": "z", "at": "on the far right", "desc": "a wall"}])]))
+        self.assertTrue(any("left→right order" in x for x in w), w)
+        # names BOTH sides of the inversion, in the order they appear — "A before B" reads as the fix
+        self.assertTrue(any("panel before table" in x for x in w), w)
+        self.assertEqual(f, [])                            # a warning, not a gate
+
+    def test_in_order_elements_are_clean(self):
+        _, w, _ = _run(_scen([_room("r1", [
+            {"id": "a", "at": "on the far left", "desc": "a wall"},
+            {"id": "table", "at": "to the left of centre", "desc": "a table"},
+            {"id": "panel", "at": "dead ahead in the centre", "desc": "a panel"},
+            {"id": "z", "at": "on the far right", "desc": "a wall"}])]))
+        self.assertFalse(any("left→right order" in x for x in w), w)
+
+    def test_phrases_sharing_one_x_are_not_an_ordering_violation(self):
+        # "just right of centre" and "to the centre-right" both resolve to x=0.64; equal rank, so
+        # either order is legal (they collide on position, which is a DIFFERENT, existing warning).
+        _, w, _ = _run(_scen([_room("r1", [
+            {"id": "a", "at": "to the centre-right", "desc": "a stair"},
+            {"id": "b", "at": "just right of centre", "desc": "a stone"}])]))
+        self.assertFalse(any("left→right order" in x for x in w), w)
+
+
 def _spec_with(el):
     return {"rooms": [{"key": "r1", "authoring": {"sceneSpec": {
         "room": "r1", "setting": "a room", "seam": "a plain wall",

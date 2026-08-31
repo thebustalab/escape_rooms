@@ -15,6 +15,16 @@ verified key — change a seal's traits and the tile changes with it.
 Deterministic: same scenario.json -> same PNGs. Square 400x400 (the board renders them at 120px with
 object-fit:cover, so a square source is required).
 
+SIZE NEEDS THE WORD, NOT JUST THE GEOMETRY (2026-08-29). Size and shape share ONE visual channel —
+`SHAPE_A` multiplies `SIZE_R` — so at 120 px they interfere. Measured on the original constants, a
+medium TALL seal rendered 78 px against a large ROUND seal's 77 px: seal 9 looked bigger than seals 6
+and 8, so the ordering was inverted, not merely subtle. No choice of radii fixes it while the aspect
+is free to multiply them, which is why `size` is now printed in the caption beside `colour`. The radii
+and aspects were also retuned so the geometry at least agrees with the word (worst-case gaps went
++1/-2 px to +9/+6 px). It reveals nothing: each seal's clue body already states its size in words.
+**Verify by MEASURING the rendered PNGs, not by reading the constants** — the aspect makes the
+constants misleading, and the largest tall seal sits close enough to the border to clip.
+
 Run:  python3 make_seals.py        (needs matplotlib)
 Then: python3 test_egypt.py        (asserts every seal carries an existing image)
 """
@@ -40,12 +50,19 @@ CLAY = {
 }
 PAPYRUS, EDGE = "#e9dcbe", "#c3b18a"
 
-# half-extents as a fraction of the tile, before the shape's aspect is applied
-SIZE_R = {"small": 0.185, "medium": 0.250, "large": 0.315}
-# (x, y) aspect multipliers — round is the reference; tall is drawn up, squat is drawn wide
-SHAPE_A = {"round": (1.00, 1.00), "tall": (0.72, 1.30), "squat": (1.32, 0.70)}
+# Half-extents as a fraction of the tile, before the shape's aspect is applied.
+# Widened 2026-08-29 (was .185/.250/.315). The old steps were too close ONCE the shape aspect was
+# applied on top: a medium TALL seal read 78 px on the 120 px board tile against a large ROUND seal's
+# 77 px, so seal 9 measured bigger than seals 6 and 8 — the size ordering was not merely subtle,
+# it was inverted. Verified by measuring the rendered PNGs, not the constants (see check_sizes below).
+SIZE_R = {"small": 0.145, "medium": 0.225, "large": 0.300}
+# (x, y) aspect multipliers — round is the reference; tall is drawn up, squat is drawn wide.
+# Eased 2026-08-29 (tall was 0.72/1.30, squat 1.32/0.70). The aspect MULTIPLIES the size radius, so
+# the two attributes compete for one channel: at the old 1.30 a medium tall seal out-measured a large
+# round one. Eased just far enough that size ordering holds, and no further — shape must stay obvious.
+SHAPE_A = {"round": (1.00, 1.00), "tall": (0.80, 1.22), "squat": (1.28, 0.78)}
 
-CX, CY = 0.50, 0.575          # seal centre; the lower band is left for the colour word
+CX, CY = 0.50, 0.560          # seal centre; the lower band is left for the colour+size caption
 WORD_Y = 0.075
 
 
@@ -87,9 +104,13 @@ def seal_tile(n, colour, shape, size, numeral, path):
     ax.text(CX, CY - 0.004, str(numeral), ha="center", va="center",
             fontsize=fs, fontweight="bold", color="#f7edd6", zorder=5)
 
-    # the colour word — the non-visual cue, and the only reliable one on a phone (no hover tooltip)
-    ax.text(CX, WORD_Y, colour.upper(), ha="center", va="center",
-            fontsize=21, fontweight="bold", color=c["dark"], family="DejaVu Sans")
+    # The caption — the non-visual cue, and the only reliable one on a phone (no hover tooltip).
+    # SIZE joined the colour word here 2026-08-29: size shares the geometric channel with SHAPE
+    # (the aspect multiplies the radius), so no choice of radii separates the three size classes by
+    # more than a few pixels at the 120 px board size. Geometry alone cannot carry it; the word can.
+    # This reveals nothing — each seal's own clue body already states its size in words.
+    ax.text(CX, WORD_Y, f"{colour.upper()} · {size.upper()}", ha="center", va="center",
+            fontsize=17, fontweight="bold", color=c["dark"], family="DejaVu Sans")
 
     fig.savefig(path, facecolor=PAPYRUS)
     plt.close(fig)

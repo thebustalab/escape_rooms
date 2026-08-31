@@ -47,3 +47,22 @@ tests/playwright-report/
 z_*/
 **/z_*/
 
+
+# --- Cinemagraph R&D bench — authoring-only, and it broke a push (2026-08-31) ---
+# authoring_v2/ui/cine360/ is the 360-cinemagraph parameter-sweep bench (cine360_test.html and
+# friends): ~325 experiment clips, 2.1 GB, several individual files over GitHub's hard 100 MB
+# per-file limit. Nothing the player fetches lives here — no scenario.json references it. A
+# blanket stage-everything commit on 2026-08-31 swept the whole folder in and the push was
+# rejected outright by the pre-receive hook. Ignore the media AND the bench pages; keep local.
+authoring_v2/ui/cine360/
+authoring_v2/ui/cine360_*.html
+
+# Timestamped / suffixed backups — `**/*.bak` above does NOT match `*.bak_20260830_0748`,
+# `*.bak_flash_1022`, `*.bak_20260828` etc., which is how four cine360_test snapshots and a
+# scenario.json backup reached the same commit.
+**/*.bak_*
+**/*.pre_*
+
+# Authoring records + scratch (canon: only play-required files reach public GitHub)
+notes/
+temp/

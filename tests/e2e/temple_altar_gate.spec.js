@@ -21,6 +21,21 @@
 // something (the dial had no `states` at all, so it rendered a gauge with no buttons and the engine's
 // generic fallback hint; nothing carried `endsEscape`, so `escapeDone` could never fire). The bridge is
 // LAST on purpose: the player crosses it looking at the fires they just lit.
+//
+// IT ALSO PINS THE ESCAPE'S HOTSPOT `type`, WHICH IS THE SUBTLEST WAY THIS FILE CAN BREAK (2026-08-29).
+// Lucas reported the Register of the Gods was unclickable. `register_gods` had been silently rewritten
+// from `type:"ledger"` to `type:"puzzle"` — not by hand, but by the box editor: `authoring_v2/ui/
+// hotspots_edit.html` kept a TYPES whitelist and coerced anything absent from it to "puzzle" on load, and
+// `ledger` was absent. A cinemagraph pass on 2026-08-27 re-opened the altar and ate the type.
+//
+// WHY IT PRESENTED AS A DEAD CLICK RATHER THAN AN ERROR: as a `puzzle` with no `question` and no `check`,
+// `openPuzzle` fell through to `buildQuestion(undefined, ...)`, which threw on `q.maxAttempts` — and
+// Pannellum swallows handler throws (see the try/catch in `onHotspotClick`). No toast, no console error
+// the player would see, nothing. The one-line forward rule lives in `authoring_v2/AGENTS.md`; the
+// corpus-wide guard is `validate_scenes.py`'s ROLE -> ENGINE TYPE check.
+//
+// The assertions below key on `.ledgercard` rendering and on reading the `ledger`-typed hotspot out of
+// scenario.json, so either half of the regression turns this spec red. Mutation-checked both ways.
 const { test, expect } = require("@playwright/test");
 
 const URL = "/escape_rooms/rooms/hierarchical_clustering/temple/play.html";

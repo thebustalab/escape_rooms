@@ -50,7 +50,7 @@
       "unlockedWhen": true,
       "authoring": {
         "tag": "undercroft",
-        "scenePrompt": "This is a seamless 360-degree panorama from the middle of a vast underground hall hewn from red sandstone — the drowned floodworks of a vanished people; the viewer stands on a broad flagged stone floor at its centre, surrounded by carved piers and walls channelled with old sluice-cuts, still black water lying across the sunken half of the floor, a squat bronze lamp hanging on a long chain above it, and a tall iron sluice-wheel green with age fixed beside a sealed tunnel mouth whose heavy stone door is shut fast. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain unbroken stretch of wet red-sandstone wall in deep shadow, near-black and featureless, uniform and unlit: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, a plain unbroken stretch of wet red-sandstone wall in deep shadow, near-black and featureless, the half of that one wall that meets its other half cleanly at the seam directly behind you; to the left, still black floodwater lying flat across the sunken half of the floor, glassy and dark, the lamplight lying broken on it; dead ahead in the centre, a great engraved control panel set into the rock face — a grid of empty square stone cells above a row of dark bronze dials, unlit, its purpose not apparent; to the left of centre, a low stone table where a rolled hide map lies half open, the canyon's branching channels drawn on it in fine incised lines with every height left blank; to the right, a low carved arch in the wall opening onto the drowned trunk passage, dark water sliding away through it; just right of centre, a rough dark-timber ladder set against the rock, climbing up through a shaft in the ceiling toward a far, pale scrap of daylight; on the far right, the same plain unbroken stretch of wet red-sandstone wall in deep shadow, near-black and featureless, the other half of that one wall, joining cleanly at the seam directly behind you. wet red sandstone and black still water, warm amber lamplight pooling against cold blue-green dark, heavy air, painterly, cinematic, subtle film grain, hushed and expectant. No people, no lettering, no captions, no text, no readable writing, no signage, no UI. Again: the extreme left and right edges must align perfectly into a plain unbroken stretch of wet red-sandstone wall in deep shadow, near-black and featureless, uniform and unlit, with no visible seam, join, or repetition.",
+        "scenePrompt": "This is a seamless 360-degree panorama from the middle of a vast underground hall hewn from red sandstone — the drowned floodworks of a vanished people; the viewer stands on a broad flagged stone floor at its centre, surrounded by carved piers and walls channelled with old sluice-cuts, still black water lying across the sunken half of the floor, a squat bronze lamp hanging on a long chain above it, and a tall iron sluice-wheel green with age fixed beside a sealed tunnel mouth whose heavy stone door is shut fast. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain unbroken stretch of wet red-sandstone wall in deep shadow, near-black and featureless, uniform and unlit: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, a plain unbroken stretch of wet red-sandstone wall in deep shadow, near-black and featureless, the half of that one wall that meets its other half cleanly at the seam directly behind you; to the left, still black floodwater lying flat across the sunken half of the floor, glassy and dark, the lamplight lying broken on it; to the left of centre, a low stone table where a rolled hide map lies half open, the canyon's branching channels drawn on it in fine incised lines with every height left blank; dead ahead in the centre, a great engraved control panel set into the rock face — a grid of empty square stone cells above a row of dark bronze dials, unlit, its purpose not apparent; just right of centre, a rough dark-timber ladder set against the rock, climbing up through a shaft in the ceiling toward a far, pale scrap of daylight; to the right, a low carved arch in the wall opening onto the drowned trunk passage, dark water sliding away through it; on the far right, the same plain unbroken stretch of wet red-sandstone wall in deep shadow, near-black and featureless, the other half of that one wall, joining cleanly at the seam directly behind you. wet red sandstone and black still water, warm amber lamplight pooling against cold blue-green dark, heavy air, painterly, cinematic, subtle film grain, hushed and expectant. No people, no lettering, no captions, no text, no readable writing, no signage, no UI. Again: the extreme left and right edges must align perfectly into a plain unbroken stretch of wet red-sandstone wall in deep shadow, near-black and featureless, uniform and unlit, with no visible seam, join, or repetition.",
         "doorPrompt": "The same hall with the ladder-shaft up into the canyon brightening with cool daylight from above; the sealed tunnel and panel unchanged.",
         "sceneSpec": {
           "room": "undercroft",
@@ -73,13 +73,6 @@
               }
             },
             {
-              "id": "control_panel",
-              "at": "dead ahead in the centre",
-              "clue": true,
-              "label": "The engraved control panel",
-              "desc": "a great engraved control panel set into the rock face — a grid of empty square stone cells above a row of dark bronze dials, unlit, its purpose not apparent"
-            },
-            {
               "id": "map_table",
               "at": "to the left of centre",
               "label": "The rolled canyon map",
@@ -87,14 +80,11 @@
               "elevmap": true
             },
             {
-              "id": "trunk_arch",
-              "at": "to the right",
-              "door": {
-                "direction": "open",
-                "to": "j_c7"
-              },
-              "label": "The trunk arch",
-              "desc": "a low carved arch in the wall opening onto the drowned trunk passage, dark water sliding away through it"
+              "id": "control_panel",
+              "at": "dead ahead in the centre",
+              "clue": true,
+              "label": "The engraved control panel",
+              "desc": "a great engraved control panel set into the rock face — a grid of empty square stone cells above a row of dark bronze dials, unlit, its purpose not apparent"
             },
             {
               "id": "hall_ladder",
@@ -105,6 +95,16 @@
               },
               "label": "The ladder to the high springs",
               "desc": "a rough dark-timber ladder set against the rock, climbing up through a shaft in the ceiling toward a far, pale scrap of daylight"
+            },
+            {
+              "id": "trunk_arch",
+              "at": "to the right",
+              "door": {
+                "direction": "open",
+                "to": "j_c7"
+              },
+              "label": "The trunk arch",
+              "desc": "a low carved arch in the wall opening onto the drowned trunk passage, dark water sliding away through it"
             },
             {
               "id": "seam_wall_right",
@@ -978,7 +978,7 @@
         "title": "The trunk — the carved map",
         "body": "All the canyon's waters meet here, beneath a wall the makers cut with every spring's name, sorted by the fork it rises in. But two names sit wrong: their water swears a different kin than the stone says. Trust the carving, or trust the water — and be right."
       },
-      "designNote": "BOSS PUZZLE (misdirection: adjacency vs data). Sited at the trunk (root of the tree). CODE: m<-canyon_water_chem; m$cluster<-cutree(hclust(dist(m[,3:8]),method='ward.D2'),4); m %>% arrange(cluster) # compare cluster vs fork. TEMPTING(wrong)=trust the carved map / group by fork. CORRECT: Bitterwell (West->sulfate) AND Saltglass (North->saline). DELIVERABLE figure + submitCodec. HINT CLUE = the carved wall-map (two names sit wrong). DISTRACTORS: only Bitterwell; only Saltglass; Bitterwell+Brimstone; Saltglass+Brineseep; a within-fork pair; 'none, the map is right'. unlockedWhen allSolved [j_c1,j_c2,j_c4]. Benchmark height 850. NEW ART.",
+      "designNote": "BOSS PUZZLE (misdirection: adjacency vs data). Sited at the trunk (root of the tree). CODE: m<-canyon_water_chem; m$cluster<-cutree(hclust(dist(m[,3:8]),method='ward.D2'),4); m %>% arrange(cluster) # compare cluster vs fork. TEMPTING(wrong)=trust the carved map / group by fork. CORRECT: Bitterwell (West->sulfate) AND Saltglass (North->saline). DELIVERABLE figure + submitCodec. HINT CLUE = the carved wall-map (two names sit wrong) — NOT removable and NOT foldable into the wrong-hints: the distractor \"none, the map is right\" refers to it, and a taught trap has to be tempting BEFORE the answer, not revealed after it. Distinct from the escape's reading surface, which is the `elevmap` in `works`. DISTRACTORS: only Bitterwell; only Saltglass; Bitterwell+Brimstone; Saltglass+Brineseep; a within-fork pair; 'none, the map is right'. unlockedWhen allSolved [j_c1,j_c2,j_c4]. Benchmark height 850. NEW ART.",
       "plannedHotspots": [
         {
           "type": "puzzle",
@@ -1101,7 +1101,7 @@
         "title": "The floodworks",
         "body": "Rain roars down the slots and the first surge chases you to the stair. In the drowned hall the panel glows, two rows lit and one dark. Your map is a tree of heights now; the tunnel is one true reading away."
       },
-      "designNote": "ESCAPE (data-free meta-echo; the cut). MECHANIC (current engine): a LOCK whose code is the panel's missing row, read off the wall MAP (a clue showing the confluence tree + the heights the player gathered: c1 1400, c2 1380, c4 1420, c5 1390, LEFT-mid c3 1050, RIGHT-mid c6 1200, trunk c7 850). The panel gives three flood-heights x cluster sizes; two rows lit, one dark: HIGH 1300 -> 2,2,2,2 (lit); LOW 950 -> 4,4 (lit); MIDDLE 1125 -> ? (dark). Player draws the 1125 waterline: above c3(1050), below c6(1200) -> the RIGHT half stays whole (4) while the LEFT splits (2,2) => 2,2,4. LOCK ANSWER = '224' (left-to-right across the canyon). Verified: _scratch/verify_escape_topology.py. NO data/CSV — heights are world props. EXIT tunnel requires the lock; ALSO gate on MAP-COMPLETENESS (all 7 junction heights read) — engine. REUSES 'undercroft' scene (water higher, panel lit). MAZE MODEL (engine work Lucas will build): every passage is OPEN from the start (roam freely, backtrack anytime); a puzzle at a junction is served next-in-queue via availableWhen (a diegetic 'not yet' if out of order); the survey is DRY so nothing seals off; the escape panel refuses an INCOMPLETE map, so the player goes back for any junction whose height is still blank. Scene shows OPEN fork-passages (no closed-door art needed on maze passages) — only the escape tunnel is a gated closed->open door. FUTURE UPGRADE: replace the lock with the draggable-node map + live matrix-grid panel (puzzle_inventory #19).",
+      "designNote": "ESCAPE (data-free meta-echo; the cut). MECHANIC (current engine): a LOCK whose code is the panel's missing row, read off THE LIT CANYON MAP — this room's own `elevmap`, NOT j_c7's carved wall-map, which is the boss's taught trap and has nothing to do with the escape — showing the confluence tree + the heights the player gathered: c1 1400, c2 1380, c4 1420, c5 1390, LEFT-mid c3 1050, RIGHT-mid c6 1200, trunk c7 850). The panel gives three flood-heights x cluster sizes; two rows lit, one dark: HIGH 1300 -> 2,2,2,2 (lit); LOW 950 -> 4,4 (lit); MIDDLE 1125 -> ? (dark). Player draws the 1125 waterline: above c3(1050), below c6(1200) -> the RIGHT half stays whole (4) while the LEFT splits (2,2) => 2,2,4. LOCK ANSWER = '224' (left-to-right across the canyon). Verified: _scratch/verify_escape_topology.py. NO data/CSV — heights are world props. EXIT tunnel requires the lock; ALSO gate on MAP-COMPLETENESS (all 7 junction heights read) — engine. REUSES 'undercroft' scene (water higher, panel lit). MAZE MODEL (engine work Lucas will build): every passage is OPEN from the start (roam freely, backtrack anytime); a puzzle at a junction is served next-in-queue via availableWhen (a diegetic 'not yet' if out of order); the survey is DRY so nothing seals off; the escape panel refuses an INCOMPLETE map, so the player goes back for any junction whose height is still blank. Scene shows OPEN fork-passages (no closed-door art needed on maze passages) — only the escape tunnel is a gated closed->open door. FUTURE UPGRADE: replace the lock with the draggable-node map + live matrix-grid panel (puzzle_inventory #19).",
       "plannedHotspots": [
         {
           "type": "elevmap",
@@ -1211,5 +1211,12 @@
       ]
     }
   ],
-  "worldPlatePrompt": "A world-bible establishing plate for a red slot-canyon system engineered long ago by a vanished people. One frame holding the whole world's vocabulary: banded red-sandstone walls rising sheer and narrow, a dendritic network of slot canyons forking and merging, clear pale water running in carved channels, weathered stone survey benchmarks incised with simple geometric marks, low carved arches and rough ladders of dark timber, a squat carved stone reading-table set with a pane of glowing glass, and iron sluice machinery green with age. Soft even daylight, neither dawn nor sunset, flat and neutral. Palette: banded red and ochre sandstone, cool teal shadow, warm amber lamplight, pale blue-green water. Painterly, cinematic, subtle film grain. No people, no lettering, no captions, no text, no readable writing, no signage, no UI."
+  "worldPlatePrompt": "A world-bible establishing plate for a red slot-canyon system engineered long ago by a vanished people. One frame holding the whole world's vocabulary: banded red-sandstone walls rising sheer and narrow, a dendritic network of slot canyons forking and merging, clear pale water running in carved channels, weathered stone survey benchmarks incised with simple geometric marks, low carved arches and rough ladders of dark timber, a squat carved stone reading-table set with a pane of glowing glass, and iron sluice machinery green with age. Soft even daylight, neither dawn nor sunset, flat and neutral. Palette: banded red and ochre sandstone, cool teal shadow, warm amber lamplight, pale blue-green water. Painterly, cinematic, subtle film grain. No people, no lettering, no captions, no text, no readable writing, no signage, no UI.",
+  "worldPlate": "_world/plate.png",
+  "music": "audio/ben_harper_winter_is_for_lovers.mp3",
+  "musicVolume": 0.15,
+  "musicCredit": {
+    "text": "Ben Harper — ‘Winter Is For Lovers’ (Live)",
+    "url": "https://www.youtube.com/watch?v=o-4yRmtIHbs"
+  }
 }

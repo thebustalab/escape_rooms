@@ -11,7 +11,10 @@ Per rooms/<chapter>/<scenario>/scenario.json, for every BUILT room:
 
   AUDIO
   - MISS  a built room has no ambience `sfx`
-  - MISS  a graded gate (`puzzle` or escape `lock`) has no `solveSfx`
+  - MISS  a graded gate (`puzzle`/`lock`/`grid`/`ledger`) has no `solveSfx`
+  - MISS  a `clue` renders a BLANK modal (no body, no committed image, no pickup CAPTION —
+          note `pickup:true` is not a caption)
+  - VBUMP shared-engine `?v=` cache tokens drift, or pano-player.js has a bare local import
   - FAIL  a referenced audio file (`music`, room `sfx[].src`, gate `solveSfx`) is missing on disk
 
   IMAGES
@@ -212,14 +215,25 @@ def check_scenario(path):
         if not r.get("panorama"):
             misses.append(f"room '{r['key']}' (built) has no panorama image")
         for h in r.get("hotspots", []):
-            if h.get("type") in ("puzzle", "lock") and not h.get("solveSfx"):
+            # ALL FOUR gate types, matching pano-player's `gates` filter — a ledger or grid escape is
+            # as much a solve as a puzzle. The narrower ("puzzle","lock") test silently stopped applying
+            # to temple's sun_altar the moment its escape was corrected from `puzzle` to its real
+            # `ledger` type (2026-08-28): the room went from flagged to clean without gaining a sound.
+            if h.get("type") in ("puzzle", "lock", "grid", "ledger") and not h.get("solveSfx"):
                 misses.append(f"gate '{r['key']}/{h.get('id')}' ({h.get('type')}) has no solveSfx")
-            # a clue with no body, no committed image, and no pickup opens an EMPTY modal (imagePrompt
-            # alone doesn't render — the image must be generated). This shipped blank modals before.
+            # a clue with no body, no committed image, and no pickup CAPTION opens an EMPTY modal
+            # (imagePrompt alone doesn't render — the image must be generated). This shipped blank modals
+            # before. NOTE: only a STRING pickup supplies display content (the notebook caption); a boolean
+            # `pickup:true` with an empty body + no image still renders a blank modal AND logs a contentless
+            # notebook entry (this shipped in hospital's Editor's note B — pickup:true masked the empty body).
+            pickup = h.get("pickup")
+            pickup_caption = pickup.strip() if isinstance(pickup, str) else ""
             if h.get("type") == "clue" and not (h.get("body", "") or "").strip() \
-               and not h.get("image") and not h.get("pickup"):
+               and not h.get("image") and not pickup_caption:
                 extra = " (imagePrompt set but no committed image)" if h.get("imagePrompt") else ""
-                misses.append(f"clue '{r['key']}/{h.get('id')}' renders blank — no body, image, or pickup{extra}")
+                if pickup is True:
+                    extra += " (pickup:true but empty body + no image → blank modal, contentless notebook entry)"
+                misses.append(f"clue '{r['key']}/{h.get('id')}' renders blank — no body, image, or pickup caption{extra}")
             # GENERIC content conventions (all scenarios, promoted from the per-scenario tests 2026-07-29):
             # no graded engine may hand the answer away via feedback.reveal, and every MCQ needs >=6 options.
             for eng in ("question", "check", "pick", "map"):
@@ -285,6 +299,33 @@ def main():
                 any_bad = True
         except Exception as e:
             print(f"(inventory check skipped: {e})")
+
+        # global: shared-engine cache tokens must be COHERENT. `pano-player.js` imports its local helper
+        # modules with a ?v= token; that token AND the ?v= on every play.html's <script src=pano-player.js>
+        # must all match. A drift leaves browsers on a STALE cached helper module → a "doesn't provide an
+        # export named X" SyntaxError → blank page. Also flags a BARE local import (never cache-busted).
+        # (The 2026-08-05 airship regression: a bumped pano-player.js imported variant_resolve.js bare, so
+        # browsers kept the pre-`activeDoorVariant` copy and the whole engine module failed to parse.)
+        # Ported from the retired v1 copy 2026-08-29 — it was the only place this check lived, and that
+        # copy is now unrunnable under `z_authoring_v1/` (its relative ROOMS path no longer resolves).
+        try:
+            import re as _re
+            shared = os.path.join(HERE, "..", "shared")
+            eng = open(os.path.join(shared, "pano-player.js"), encoding="utf-8").read()
+            imp_tokens = set(_re.findall(r'from\s+"\./[\w-]+\.js\?v=(\d+)"', eng))
+            bare_imports = _re.findall(r'from\s+"(\./[\w-]+\.js)"', eng)          # local imports with NO ?v=
+            shells = glob.glob(os.path.join(ROOMS, "*", "*", "play.html")) + [os.path.join(shared, "test_play.html")]
+            tag_tokens = set()
+            for sh in shells:
+                tag_tokens |= set(_re.findall(r'pano-player\.js\?v=(\d+)', open(sh, encoding="utf-8").read()))
+            if bare_imports:
+                print(f"VBUMP  pano-player.js imports {bare_imports} with NO ?v= token (a bare local import is never cache-busted — add ?v=N in lockstep with the engine)")
+                any_bad = True
+            if len(imp_tokens | tag_tokens) > 1:
+                print(f"VBUMP  shared-engine cache tokens drift — pano-player.js imports {sorted(imp_tokens)} vs play.html <script> tags {sorted(tag_tokens)}; bump ALL to one ?v=N (stale-helper-module SyntaxError risk)")
+                any_bad = True
+        except Exception as e:
+            print(f"(engine-token check skipped: {e})")
     sys.exit(1 if any_bad else 0)
 
 if __name__ == "__main__":

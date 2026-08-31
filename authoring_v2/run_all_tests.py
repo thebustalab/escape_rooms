@@ -61,6 +61,18 @@ def _suites(fast=False):
     add("key-guard's own regression suite", "guards", [sys.executable, "decoder/test_validate_keys.py"])
     for sc in ready:
         add("assets: %s" % sc, "guards", [sys.executable, "authoring_v2/validate_assets.py", sc])
+    # ALSO run it with NO scenario filter. `validate_assets` guards its cross-scenario checks behind
+    # `if not want:` — inventory freshness, duplicate codec ids, and the shared-engine `?v=` cache-token
+    # coherence check — so a per-scenario loop alone NEVER runs them (found 2026-08-29). Advisory: an
+    # in-development scenario can legitimately trip the per-room misses this full sweep also reports.
+    add("assets: full sweep + cross-scenario checks (advisory)", "guards",
+        [sys.executable, "authoring_v2/validate_assets.py"], advisory=True)
+    # Scene/spec sweep — ADVISORY, because several built scenarios carry known spec drift it reports.
+    # It is here at all because its ROLE -> ENGINE TYPE check is the only corpus-wide guard against a
+    # dead escape: temple's `ledger` was silently rewritten to `puzzle` by the box editor on 2026-08-27
+    # and the escape became unclickable in play, with the check that would have caught it never run.
+    add("scenes/specs ↔ committed hotspots (advisory)", "guards",
+        [sys.executable, "authoring_v2/validate_scenes.py"], advisory=True)
 
     # --- unit: python ------------------------------------------------------------------------------
     # authoring_v2 only — the v1 harness was retired to z_authoring_v1/ on 2026-08-28 (its three suites

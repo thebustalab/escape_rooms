@@ -36,6 +36,9 @@ Checks (all against each room's `authoring.sceneSpec`; rooms without one are ski
     - a declared variant needs a CARRIER: its element must have a role, or it gets no hotspot to hang on
     - a variant `when` of the form {eq:[key, val]} must match a `dial` in the SAME room that sets that key
     - every variant declares a `reveal` (else no art is ever queued for it)
+  LAYOUT
+    - elements run in left→right sweep order (the prompt is rendered in FILE order, so an out-of-order
+      spec describes the panorama as jumping backwards)
   ANIMATION / SEAM
     - `seam` is set on every room
     - an `animate` element is not parked at the extreme wrap edges (needs a hand-drawn wrap box)
@@ -63,6 +66,13 @@ import scene_spec  # noqa: E402  (sibling module; no side effects on import)
 
 # Hotspot types the runtime player actually dispatches on (shared/pano-player.js `onHotspot`).
 # `switch` is deliberately absent — that is the whole point of the check.
+# Canonical left→right spatial phrases (SCENE_SPEC_GUIDE rule 1), in sweep order. Ranked by the same
+# x the box mapper uses, so two phrases that resolve to one position (e.g. "just right of centre" and
+# "to the centre-right", both 0.64) are treated as equal rather than as an ordering violation.
+def _x_rank(at):
+    return scene_spec._x_from_at(at)
+
+
 ENGINE_TYPES = {"puzzle", "clue", "door", "lock", "grid", "ledger", "elevmap", "dial", "mapview", "ambient"}
 GAMEPLAY = {"puzzle", "clue", "door", "lock", "grid", "ledger", "elevmap", "dial", "switch", "mapview"}
 LOOPS = {"boomerang", "crossfade"}
@@ -102,6 +112,22 @@ def check_scenario(path):
 
         if not str(spec.get("seam") or "").strip():
             warns.append(f"{rk}: no `seam` set — the L/R wrap has no named backdrop to join on")
+
+        # ---- left→right sweep order (rule 1) ----
+        # `render_prompt` joins elements in FILE order, so a spec whose `at` phrases run out of sequence
+        # emits a prompt that sweeps across the panorama and then jumps backwards. The boxes are fine
+        # (those come from the phrase, not the order), so nothing downstream complains — the only symptom
+        # is worse art. Pure reorder to fix; no content changes.
+        placed = [e for e in els if _x_rank(e.get("at")) is not None]
+        ranks = [_x_rank(e.get("at")) for e in placed]
+        # Report each ADJACENT INVERSION as an ordered pair. Naming one side alone is ambiguous — either
+        # element could be the one that moved — so say "A before B", which reads the same way the fix does.
+        inversions = [f"{placed[i].get('id') or '?'} before {placed[i + 1].get('id') or '?'}"
+                      for i in range(len(ranks) - 1) if ranks[i] > ranks[i + 1]]
+        if inversions:
+            warns.append(f"{rk}: elements are not in left→right order ({'; '.join(inversions)}) — "
+                         f"`render_prompt` joins them in file order, so the prompt sweeps backwards; "
+                         f"reorder to match their own `at` phrases")
 
         seen_slugs, seen_x = {}, {}
         for e in els:

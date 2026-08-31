@@ -79,6 +79,11 @@
     .cinetile .ct-del { right: 3px; color: #ff9c9c; }
     .cinetile .ct-lbl { position: absolute; bottom: 2px; left: 3px; font-size: 9px; background: rgba(10,20,29,0.85); border-radius: 4px; padding: 0 4px; color: #8fa3b0; }
     .cinetile.active .ct-lbl { color: #7bd88c; }
+    /* Seam score: motion at the clip's border, which is where it meets the untouched still. */
+    .cinetile .ct-score { position: absolute; bottom: 2px; right: 3px; font-size: 9px; background: rgba(10,20,29,0.85);
+                          border-radius: 4px; padding: 0 4px; color: #8fa3b0; font-variant-numeric: tabular-nums; }
+    .cinetile .ct-score.bad { color: #ff9c9c; }
+    .cinetile .ct-score.dead { color: #d0a0ff; }
     .hdel { background: transparent; color: #ff9b9b; border: 1px solid rgba(255,155,155,0.4); border-radius: 6px; padding: 2px 8px; font-size: 11px; font-weight: 400; margin-top: 6px; }
     #spotContent textarea, #spotContent input, #spotContent select { width: 100%; background: #0a1620; color: inherit; border: 1px solid rgba(255,255,255,0.16); border-radius: 6px; padding: 4px 6px; font: inherit; }
     #spotContent textarea { resize: vertical; }
@@ -265,7 +270,9 @@
     let SEAM_POS = 1.0;      // seam location the band straddles, fraction of width: 1.0 = L/R wrap edge (default); drag the band onto a mid-image seam to fix it
     let HUB_TAB = "content", hubCinePoll = 0, ROOM_KEYS = [];   // Phase 2b: per-hotspot content panel
     let batchPoll = 0;   // walk-away batch: status poll handle while a run is in flight
-    const TYPES = ["puzzle", "clue", "door", "lock", "grid", "dial", "mapview", "ambient"];   // ambient = cinemagraph-only, no player marker; grid = the matrix-select escape (content hand-authored in scenario.json)
+    // EVERY type the player engine dispatches on (shared/pano-player.js `onHotspotClick`), plus `ambient`.
+    // MUST stay in lockstep with hotspots_edit.html's copy — pinned by tests/editor_types.test.js.
+    const TYPES = ["puzzle", "clue", "door", "lock", "grid", "ledger", "elevmap", "dial", "mapview", "ambient"];   // ambient = cinemagraph-only, no player marker; grid = the matrix-select escape, ledger = the deduction escape, elevmap = the transcription tool (content hand-authored in scenario.json)
     // Cinemagraph preset prompts — rich, model-tuned motion descriptions for the things we animate most.
     // Picking one fills the motion box (still editable) AND sets the right loop (crossfade = one-way/rising,
     // boomerang = oscillating). LTX+Gemma wants prose, not keywords; these are written long on purpose.
@@ -1051,8 +1058,21 @@
       const grid = tiles.length ? `
         <div class="cinegrid">${tiles.map(t => {
           const xf = (t.c.loop === "crossfade");
+          // Seam score, shown so the sort order is legible: edge% is motion at the clip's border —
+          // where it meets the untouched still, and the only place drift is visible in-game. live% is
+          // there so "nothing moved" can't read as a perfect score. Advisory: the measure over-reads
+          // bright flicker, so a flagged fire clip may still be the right pick. Absent on older clips.
+          const sc = (t.c.edge == null) ? "" : (() => {
+            const dead = (t.c.live != null && t.c.live < 8);
+            const cls = dead ? "dead" : (t.c.reject ? "bad" : "");
+            const tip = dead ? "barely moves — live " + t.c.live + "%"
+                            : (t.c.reject ? "flagged: moving edges would shimmer against the still"
+                                          : "clean edges");
+            return `<span class="ct-score ${cls}" title="${tip} · edge ${t.c.edge}% / live ${t.c.live}%">`
+                 + `${dead ? "still" : t.c.edge + "%"}</span>`;
+          })();
           return `<div class="cinetile${t.active ? " active" : ""}" data-i="${t.i}" data-loop="${xf ? "crossfade" : "boomerang"}">
-            <video src="/sfile/${escHtml(t.c.video)}${vv}" muted loop autoplay playsinline></video>
+            <video src="/sfile/${escHtml(t.c.video)}${vv}" muted loop autoplay playsinline></video>${sc}
             <button class="ct ct-check${t.active ? " on" : ""}" title="${t.active ? "deployed — click to store but NOT deploy" : "deploy: make this the live clip"}">✓</button>
             <button class="ct ct-loop" title="switch to ${xf ? "boomerang" : "crossfade"} (re-loops this clip)">${xf ? "⇄" : "↔"}</button>
             <button class="ct ct-del" title="delete this clip from the pool">✕</button>
@@ -1397,7 +1417,12 @@
       // Keep the FULL objects (deep-cloned) so editing/saving never drops door/puzzle/clue content.
       SPOTS = (((per && per.hotspots) || (draft && draft.hotspots) || (node && node.hotspots) || [])
         .filter(h => h && Array.isArray(h.box) && h.box.length === 4)
-        .map(h => { const s = JSON.parse(JSON.stringify(h)); s.type = TYPES.includes(s.type) ? s.type : "puzzle"; s.label = s.label || s.id; s.box = s.box.slice(); s._origId = s.id; return s; }));
+        .map(h => { const s = JSON.parse(JSON.stringify(h));
+                    // NEVER silently rewrite an authored type — a coercion to "puzzle" kills the hotspot in
+                    // play with no visible error, and also breaks _attach_planned_content's (type,label) match.
+                    if (s.type && !TYPES.includes(s.type)) console.warn("reproject_test: unknown hotspot type", s.type, "on", s.id, "— preserved, not coerced");
+                    s.type = s.type || "puzzle";
+                    s.label = s.label || s.id; s.box = s.box.slice(); s._origId = s.id; return s; }));
       seq = SPOTS.length;                        // keep new-box ids clear of the existing ones
       PLANNED = (node && node.plannedHotspots) || [];   // the design manifest (what this room SHOULD have)
       RETAINED = (node && node.hotspots) || [];          // last-committed wiring, re-attached by label on redraw

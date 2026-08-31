@@ -95,7 +95,11 @@
     const arrToLines = a => (a || []).join("\n");
     const csvToArr = s => String(s || "").split(",").map(x => x.trim()).filter(Boolean);
     const arrToCsv = a => (a || []).join(", ");
-    const TYPES = ["puzzle", "clue", "door", "lock", "grid", "dial", "mapview", "ambient"];   // ambient = cinemagraph-only, no player marker; grid = the matrix-select escape (content hand-authored in scenario.json)
+    // EVERY type the player engine dispatches on (shared/pano-player.js `onHotspotClick`), plus `ambient`.
+    // If a type the engine handles is missing here it is silently REWRITTEN to "puzzle" on load (below) and
+    // the hotspot goes dead in play — that is how temple's `ledger` escape lost its type during a cinemagraph
+    // pass on 2026-08-27 (clicking it threw inside buildQuestion and Pannellum swallowed the error).
+    const TYPES = ["puzzle", "clue", "door", "lock", "grid", "ledger", "elevmap", "dial", "mapview", "ambient"];   // ambient = cinemagraph-only, no player marker; grid = the matrix-select escape, ledger = the deduction escape, elevmap = the transcription tool (content hand-authored in scenario.json)
     const checkSkel = () => ({ prompt:"", requires:[], expr:"", hint:"", maxAttempts:4, feedback:{ correct:"", wrong:[], reveal:"" } });
     const questionSkel = () => ({ prompt:"", options:[], correct:0, maxAttempts:4, feedback:{ correct:"", wrong:[], reveal:"" } });
 
@@ -247,7 +251,8 @@
       SPOTS = src.map(h => {
         const s = JSON.parse(JSON.stringify(h));
         s.id = s.id || ("h" + (++seq));
-        s.type = TYPES.includes(s.type) ? s.type : "puzzle";
+        if (s.type && !TYPES.includes(s.type)) console.warn("hotspots_edit: unknown hotspot type", s.type, "on", s.id, "— preserved, not coerced");
+        s.type = s.type || "puzzle";   // never silently REWRITE an authored type: an unknown one is preserved (see TYPES)
         s.label = s.label || s.id;
         s.box = (s.box || [0, 0, 0, 0]).slice();
         return s;
