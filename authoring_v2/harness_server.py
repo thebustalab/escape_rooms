@@ -65,6 +65,7 @@ ROOT = os.path.join(HERE, "ui")  # served web root: the authoring pages (harness
 ROOMS_ROOT = os.path.join(ESCAPE_ROOT, "rooms")          # rooms/<chapter>/<scenario>/
 GEN = os.path.join(HERE, "generate_scene.py")
 MAX_PANO_CANDIDATES = 3    # build-world level 1: up to this many candidate panos per room in _scratch (l1_<room>_<n>.png)
+MAX_PLATE_CANDIDATES = 8   # world-plate candidates per generate call (the plate fixes every room's look — worth choosing)
 # V2 harness (authoring_v2/) runs on :8752 so it can sit alongside the production :8751 harness while
 # the image-pipeline V2 upgrades are built (see notes/image_pipeline_v2.md). Both share the same rooms/
 # tree (ESCAPE_ROOT/..), so run only one at a time when authoring the SAME scenario.
@@ -1814,23 +1815,53 @@ def _run_gen_room_pano(slot, base, room_key, prompt, size, quality, idx):
         JOBS[slot]["active"] = False
 
 
-def _run_gen_world_plate(slot, base, prompt, size, quality):
-    """Build-world: generate the scenario's WORLD PLATE — one establishing panorama packing the key world
-    elements + palette, generated FIRST in step 2. Auto-promoted to <scenario>/_world/plate.png (the canonical
-    reference), so every subsequent room Generate carries it (at LOW fidelity — world/palette, not lighting, so
-    each room keeps its own time of day). Regenerating replaces the plate."""
+def _plate_candidates(base):
+    """The scenario's world-plate candidates in _scratch: indexed `world_plate_<n>.png` by n, then a
+    legacy un-indexed `world_plate.png` if present (from before the multi-candidate model, so an older
+    scenario's plate isn't orphaned). Mirrors `_pano_candidates`."""
+    scratch = os.path.join(base, "_scratch")
+    indexed, legacy = [], []
+    for p in glob.glob(os.path.join(scratch, "world_plate*.png")):
+        name = os.path.basename(p)
+        m = re.match(r"^world_plate_(\d+)\.png$", name)
+        if m:
+            indexed.append((int(m.group(1)), name))
+        elif name == "world_plate.png":
+            legacy.append(name)
+    return [n for _i, n in sorted(indexed)] + legacy
+
+
+def _run_gen_world_plate(slot, base, prompt, size, quality, n=1):
+    """Build-world: generate N candidate WORLD PLATES — establishing panoramas packing the key world
+    elements + palette, generated FIRST in step 2, into <base>/_scratch/world_plate_<n>.png.
+
+    THE PLATE IS NOT AUTO-PROMOTED (changed 2026-08-31, Lucas). It used to generate exactly one and commit
+    it straight to _world/plate.png with no choice offered — but the plate is the single most consequential
+    image in a scenario: once committed, EVERY room's Generate routes through it as the continuity reference
+    (see `_run_gen_room_pano` -> `--ref`), so it fixes the house look for every room at once. Picking that
+    from a sample of one was backwards. Now it follows the same generate-N-then-pick contract as clue
+    artwork and room panos: candidates land in _scratch, the author picks, and /api/set-world-plate promotes
+    the chosen one.
+
+    Nothing breaks while no plate is committed — `_world_plate_abs` returns None and room gen simply runs
+    with no reference (`ref_args` is empty), which is the pre-existing fallback."""
     scratch = os.path.join(base, "_scratch")
     os.makedirs(scratch, exist_ok=True)
-    out = os.path.join(scratch, "world_plate.png")
     ptmp = os.path.join(scratch, ".worldplate.txt")
     with open(ptmp, "w", encoding="utf-8") as f:
         f.write(prompt)
+    used = {int(m.group(1)) for m in
+            (re.match(r"^world_plate_(\d+)\.png$", f) for f in _plate_candidates(base)) if m}
+    nxt = (max(used) + 1) if used else 1
     try:
-        subprocess.run(["python3", GEN, "gen", "--prompt-file", ptmp, "--out", out,
-                        "--quality", quality, "--size", size], check=True, capture_output=True, text=True)
-        _set_world_plate("world_plate.png", base)   # -> _world/plate.png + records scenario.worldPlate
-        with LOCK:
-            JOBS[slot]["outputs"].append("world_plate.png"); JOBS[slot]["done"] = 1
+        for i in range(max(1, int(n))):
+            name = "world_plate_%d.png" % (nxt + i)
+            subprocess.run(["python3", GEN, "gen", "--prompt-file", ptmp,
+                            "--out", os.path.join(scratch, name),
+                            "--quality", quality, "--size", size],
+                           check=True, capture_output=True, text=True)
+            with LOCK:
+                JOBS[slot]["outputs"].append(name); JOBS[slot]["done"] += 1
     except subprocess.CalledProcessError as e:
         with LOCK:
             JOBS[slot]["error"] = (e.stderr or e.stdout or str(e)).strip()[-500:]
@@ -2716,6 +2747,14 @@ class H(http.server.SimpleHTTPRequestHandler):
             d = os.path.join(base, "_scratch", "audio")
             files = sorted(os.path.basename(p) for p in glob.glob(os.path.join(d, "*.mp3")))
             return self._json({"files": files})
+        if route == "/api/plate-candidates":  # world-plate candidates in _scratch + which one is committed
+            try:
+                base = self._query_base()
+            except ValueError:
+                return self._json({"error": "bad scenario"}, 400)
+            return self._json({"files": _plate_candidates(base),
+                               "committed": bool(_world_plate_abs(base)),
+                               "worldPlate": (_load_scenario(base).get("worldPlate") or "")})
         if route == "/api/clue-candidates":   # generated artwork candidates for one clue hotspot
             try:
                 base = self._query_base()
@@ -3313,9 +3352,16 @@ class H(http.server.SimpleHTTPRequestHandler):
                 ok_size, size_err = _valid_size(size)
                 if not ok_size:
                     return self._json({"ok": False, "error": size_err}, 400)
-                if not _start("worldplate", "genplate", lambda: _run_gen_world_plate("worldplate", base, prompt, size, "high"), 1):
+                # N candidates to choose between (default 4). The plate fixes the look of EVERY room,
+                # so it is the one asset most worth picking rather than accepting.
+                try:
+                    n = max(1, min(int(req.get("n", 4)), MAX_PLATE_CANDIDATES))
+                except (TypeError, ValueError):
+                    n = 4
+                if not _start("worldplate", "genplate",
+                              lambda: _run_gen_world_plate("worldplate", base, prompt, size, "high", n), n):
                     return self._json({"ok": False, "error": "already generating the world plate"}, 409)
-                return self._json({"ok": True, "slot": "worldplate"})
+                return self._json({"ok": True, "slot": "worldplate", "n": n})
             if route == "/api/gen-room-pano":        # build-world level 1: one hi-res pano for a room
                 req = self._body()
                 try:
@@ -3598,6 +3644,22 @@ class H(http.server.SimpleHTTPRequestHandler):
                 except ValueError as ve:
                     return self._json({"ok": False, "error": str(ve)}, 400)
                 return self._json({"ok": True, "worldPlate": plate})
+            if route == "/api/delete-plate-candidate":
+                # drop a world-plate candidate the author does not want. Only ever removes a _scratch
+                # candidate — never the committed _world/plate.png, which is a pushable asset.
+                req = self._body()
+                try:
+                    base = _scenario_base(req.get("chapter"), req.get("scenario"))
+                except ValueError as ve:
+                    return self._json({"ok": False, "error": str(ve)}, 400)
+                fn = os.path.basename(str(req.get("file") or ""))
+                if not re.match(r"^world_plate(_\d+)?\.png$", fn):
+                    return self._json({"ok": False, "error": "not a plate candidate: %s" % fn}, 400)
+                fp = os.path.join(base, "_scratch", fn)
+                if not os.path.isfile(fp):
+                    return self._json({"ok": False, "error": "no such candidate: %s" % fn}, 400)
+                os.remove(fp)
+                return self._json({"ok": True, "removed": fn})
             if route == "/api/delete-scene":
                 # remove a _scratch candidate the author no longer wants (+ its _open partner + state)
                 req = self._body()

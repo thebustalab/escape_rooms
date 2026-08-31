@@ -119,7 +119,7 @@
       },
       "entry": {
         "title": "The drowned hall",
-        "body": "A stair takes you down out of the rising wind into a hall no living hand tends. An engraved panel you cannot read. A blank map you roll and pocket. A sealed tunnel that will not open. And a ladder, climbing up into the canyon. Start by climbing — and mark every junction's height as you go."
+        "text": "You came down into the red canyon to map its waters and have found a drowned hall left by the long-gone builders of an old floodworks. Climb out into the canyon to roam and survey its waters, but watch out! There are reports that flood season may come early this year."
       },
       "designNote": "FRAME ROOM (no graded puzzle). Cold open: seed the mystery — the PANEL (clue, unreadable now; pays off at 'works') and the blank MAP (clue, pickup; the escape's reading surface). Passages: a LADDER up to j_c1 (the high springs) and a TRUNK arch to j_c7. Both UNGATED. NEW ART; the escape room 'works' REUSES this scene (water higher, panel lit). MAZE MODEL (engine work Lucas will build): every passage is OPEN from the start (roam freely, backtrack anytime); a puzzle at a junction is served next-in-queue via availableWhen (a diegetic 'not yet' if out of order); the survey is DRY so nothing seals off; the escape panel refuses an INCOMPLETE map, so the player goes back for any junction whose height is still blank. Scene shows OPEN fork-passages (no closed-door art needed on maze passages) — only the escape tunnel is a gated closed->open door.",
       "plannedHotspots": [
@@ -303,10 +303,7 @@
           "seamOccluder": "a tall fin of banded sandstone standing from the canyon floor to the sky, plain and unlit"
         }
       },
-      "entry": {
-        "title": "The high confluence",
-        "body": "The ladder lets you out at the highest place two waters meet. Here is the makers' first instrument — a way to weigh one spring against another. Which of these waters is kin to which? And mark this junction's height before you go on."
-      },
+      "entry": null,
       "designNote": "PUZZLE (Read-the-tree / nearest relative). CODE (WebR-safe base R, NO ggtree): m<-canyon_water_chem; hc<-hclust(dist(m[,3:8]),method='ward.D2'); plot(hc,labels=m$spring). Q: 'Which spring is most chemically similar to Dripstone?' ANSWER: Lime_Hollow (d 2.45; runner-up Chalkseep 2.83; 15%% margin). DISTRACTORS(>=6): Chalkseep, Palegate, Brimstone_Font, Glasswater, Brineseep, Bitterwell. Benchmark height 1400. NEW ART.",
       "plannedHotspots": [
         {
@@ -421,10 +418,7 @@
           "seamOccluder": "a tall fin of banded sandstone standing from the canyon floor to the sky, plain and unlit"
         }
       },
-      "entry": {
-        "title": "The orphan junction",
-        "body": "A spring the makers never named joins the canyon here — no mark, no family carved beside it. Whose kin is this orphan water? Place it — and mark this junction's height."
-      },
+      "entry": null,
       "designNote": "PUZZLE (Classify-the-Unknown; wood_smoke style). CODE: all<-rbind(canyon_water_chem,unknown_spring); hc<-hclust(dist(all[,3:8]),method='ward.D2'); plot(hc,labels=all$spring). Q: 'Which family does Unmarked_Spring join?' ANSWER: the SILICA / North_Branch family (Glasswater/Flintrun/Obsidian_Weep/Silverglass). DISTRACTORS: carbonate/West, sulfate/East, saline/South, 'its own new group', 'closest to Bitterwell', 'cannot tell'. Benchmark height 1380. NEW ART.",
       "plannedHotspots": [
         {
@@ -527,10 +521,7 @@
           "seamOccluder": "a tall fin of banded sandstone standing from the canyon floor to the sky, plain and unlit"
         }
       },
-      "entry": {
-        "title": "The left fork",
-        "body": "Where the left canyon's two slots come together. No spring to read here — only the junction itself. Mark its height and read on."
-      },
+      "entry": null,
       "designNote": "PLAIN JUNCTION (no chemistry puzzle) — exists so the player reads confluence height 1050 for the escape map, and to branch the maze (up to j_c1/j_c2, down to j_c7). Benchmark height 1050. NEW ART.",
       "plannedHotspots": [
         {
@@ -642,10 +633,7 @@
           "seamOccluder": "a tall fin of banded sandstone standing from the canyon floor to the sky, plain and unlit"
         }
       },
-      "entry": {
-        "title": "The bitter confluence",
-        "body": "The air goes bitter and the rock weeps yellow. A family of foul water runs somewhere in the canyon and the makers keyed their works to it. Cut the canyon into its families and find which runs most sour — and mark this junction's height."
-      },
+      "entry": null,
       "designNote": "PUZZLE (Cut + summarise — the chapter expansion). CODE: m<-canyon_water_chem; m$cluster<-cutree(hclust(dist(m[,3:8]),method='ward.D2'),4); m %>% group_by(cluster) %>% summarise(meanSO4=mean(sulfate)). Q: 'Cut into 4 families; which has the highest average sulfate?' ANSWER: the SULFATE family (East + Bitterwell), mean SO4 61.0 vs 8.0/8.0/7.8 — dominant. DISTRACTORS: carbonate, silica, saline families, 'the single highest sample', 'the largest cluster', 'the chloride family'. Benchmark height 1420. NEW ART.",
       "plannedHotspots": [
         {
@@ -742,10 +730,7 @@
           "seamOccluder": "a tall fin of banded sandstone standing from the canyon floor to the sky, plain and unlit"
         }
       },
-      "entry": {
-        "title": "The still pool",
-        "body": "A quiet junction, two clear waters meeting at a mirror pool. No spring to read — only the height. Mark it and read on."
-      },
+      "entry": null,
       "designNote": "PLAIN JUNCTION (no chemistry puzzle) — the player reads confluence height 1390 here for the escape map. Benchmark height 1390. NEW ART.",
       "plannedHotspots": [
         {
@@ -843,10 +828,7 @@
           "seamOccluder": "a tall fin of banded sandstone standing from the canyon floor to the sky, plain and unlit"
         }
       },
-      "entry": {
-        "title": "The right fork",
-        "body": "Where the right canyon's two slots come together. Only the junction to read — mark its height and go on."
-      },
+      "entry": null,
       "designNote": "PLAIN JUNCTION (no chemistry puzzle) — confluence height 1200 for the escape map, and the right-branch fork (up to j_c4/j_c5, down to j_c7). Benchmark height 1200. NEW ART.",
       "plannedHotspots": [
         {
@@ -974,10 +956,7 @@
           "seamOccluder": "a massive column of banded rock rising from the floor into the darkness above"
         }
       },
-      "entry": {
-        "title": "The trunk — the carved map",
-        "body": "All the canyon's waters meet here, beneath a wall the makers cut with every spring's name, sorted by the fork it rises in. But two names sit wrong: their water swears a different kin than the stone says. Trust the carving, or trust the water — and be right."
-      },
+      "entry": null,
       "designNote": "BOSS PUZZLE (misdirection: adjacency vs data). Sited at the trunk (root of the tree). CODE: m<-canyon_water_chem; m$cluster<-cutree(hclust(dist(m[,3:8]),method='ward.D2'),4); m %>% arrange(cluster) # compare cluster vs fork. TEMPTING(wrong)=trust the carved map / group by fork. CORRECT: Bitterwell (West->sulfate) AND Saltglass (North->saline). DELIVERABLE figure + submitCodec. HINT CLUE = the carved wall-map (two names sit wrong) — NOT removable and NOT foldable into the wrong-hints: the distractor \"none, the map is right\" refers to it, and a taught trap has to be tempting BEFORE the answer, not revealed after it. Distinct from the escape's reading surface, which is the `elevmap` in `works`. DISTRACTORS: only Bitterwell; only Saltglass; Bitterwell+Brimstone; Saltglass+Brineseep; a within-fork pair; 'none, the map is right'. unlockedWhen allSolved [j_c1,j_c2,j_c4]. Benchmark height 850. NEW ART.",
       "plannedHotspots": [
         {
@@ -1097,10 +1076,7 @@
           "seamOccluder": "a broad carved stone pier, floor to ceiling, plain and unlit"
         }
       },
-      "entry": {
-        "title": "The floodworks",
-        "body": "Rain roars down the slots and the first surge chases you to the stair. In the drowned hall the panel glows, two rows lit and one dark. Your map is a tree of heights now; the tunnel is one true reading away."
-      },
+      "entry": null,
       "designNote": "ESCAPE (data-free meta-echo; the cut). MECHANIC (current engine): a LOCK whose code is the panel's missing row, read off THE LIT CANYON MAP — this room's own `elevmap`, NOT j_c7's carved wall-map, which is the boss's taught trap and has nothing to do with the escape — showing the confluence tree + the heights the player gathered: c1 1400, c2 1380, c4 1420, c5 1390, LEFT-mid c3 1050, RIGHT-mid c6 1200, trunk c7 850). The panel gives three flood-heights x cluster sizes; two rows lit, one dark: HIGH 1300 -> 2,2,2,2 (lit); LOW 950 -> 4,4 (lit); MIDDLE 1125 -> ? (dark). Player draws the 1125 waterline: above c3(1050), below c6(1200) -> the RIGHT half stays whole (4) while the LEFT splits (2,2) => 2,2,4. LOCK ANSWER = '224' (left-to-right across the canyon). Verified: _scratch/verify_escape_topology.py. NO data/CSV — heights are world props. EXIT tunnel requires the lock; ALSO gate on MAP-COMPLETENESS (all 7 junction heights read) — engine. REUSES 'undercroft' scene (water higher, panel lit). MAZE MODEL (engine work Lucas will build): every passage is OPEN from the start (roam freely, backtrack anytime); a puzzle at a junction is served next-in-queue via availableWhen (a diegetic 'not yet' if out of order); the survey is DRY so nothing seals off; the escape panel refuses an INCOMPLETE map, so the player goes back for any junction whose height is still blank. Scene shows OPEN fork-passages (no closed-door art needed on maze passages) — only the escape tunnel is a gated closed->open door. FUTURE UPGRADE: replace the lock with the draggable-node map + live matrix-grid panel (puzzle_inventory #19).",
       "plannedHotspots": [
         {
@@ -1218,5 +1194,6 @@
   "musicCredit": {
     "text": "Ben Harper — ‘Winter Is For Lovers’ (Live)",
     "url": "https://www.youtube.com/watch?v=o-4yRmtIHbs"
-  }
+  },
+  "fitWrap": true
 }

@@ -70,11 +70,11 @@
 // A bare `./variant_resolve.js` import is NOT refreshed by bumping the <script> tag's ?v, so a changed
 // helper module (e.g. a new export) leaves browsers on a stale cached copy → "doesn't provide an export
 // named X" SyntaxError → blank page (the 2026-08-05 airship regression). Bump all three together.
-import { WebRConsole } from "./webr-console.js?v=83";
-import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs } from "./variant_resolve.js?v=83";   // Phase 3: per-hotspot state variants; monorail switch-door nav
-import * as PQ from "./puzzle_queue.js?v=83";   // dynamic puzzle queue: location-independent puzzle serving
-import { particleCount } from "./particles.js?v=83";   // ambient-particle vocabulary + per-kind field density
-import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=83";   // ledger + elevation-map card DOM
+import { WebRConsole } from "./webr-console.js?v=85";
+import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs } from "./variant_resolve.js?v=85";   // Phase 3: per-hotspot state variants; monorail switch-door nav
+import * as PQ from "./puzzle_queue.js?v=85";   // dynamic puzzle queue: location-independent puzzle serving
+import { particleCount } from "./particles.js?v=85";   // ambient-particle vocabulary + per-kind field density
+import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=85";   // ledger + elevation-map card DOM
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 
@@ -727,6 +727,55 @@ function openNotebook() {
   openModal("🗒 Field notebook", d);
 }
 
+// ---- DYNAMIC WRAP FIT (2026-08-31) -------------------------------------------------------------
+// The panorama fills the whole window (`#pano { position:fixed; inset:0 }`), so the viewer's VERTICAL
+// field of view is not a setting — it falls out of hfov and the window's shape:
+//     vFOV = 2*atan( tan(hfov/2) / (W/H) )
+// `vaov` is how many degrees of sphere the image band occupies. Therefore:
+//     vFOV > vaov  ->  BLACK bands above/below the band
+//     vFOV < vaov  ->  the image is CROPPED (you cannot see it all without tilting)
+// Both are avoided only when vFOV === vaov exactly. That is a knife edge, not a range — and because
+// vFOV depends on the viewer's window, NO single authored constant can satisfy it for everyone.
+//
+// Measured at the house hfov of 120: vFOV is 88.5 deg on 16:9 but 94.5 deg on a 16:10 laptop and
+// 104.8 deg on 4:3. The authored house value of vaov 90 is therefore very slightly cropped on 16:9
+// (fine) but shows ~4.5 deg of BLACK on a 16:10 screen and ~15 deg on 4:3 — the "I'm always cutting
+// off the view / seeing black" problem, which no amount of dragging can fix because it is the wrong
+// constant for that window.
+//
+// So compute it per viewport instead. The ceiling is the image's TRUE angular height: a 3:1 panorama
+// at haov 360 spans 360*(H/W) = 120 deg, and going beyond that would stretch it. The floor stops an
+// ultra-wide window squashing the scene to nothing. Hotspots are stored as image FRACTIONS and are
+// projected through boxToYP with this same effective wrap, so they track it automatically.
+//
+// DEFAULT ON since 2026-08-31 (validated by Lucas on three screens). Opt OUT per scenario with
+// `SCENARIO.fitWrap: false`, or per URL with `?fitwrap=0`; `?fitwrap=1` forces it on. The authored
+// `wrap.vaov` is then only a fallback for the opted-out case — every other room fits its viewport.
+const WRAP_FIT_MIN = 60, WRAP_FIT_MAX = 120;
+function wrapFitOn() {
+  try {
+    const q = new URLSearchParams(location.search).get("fitwrap");
+    if (q === "1") return true;
+    if (q === "0") return false;
+  } catch (e) {}
+  // default ON: only an explicit `fitWrap: false` turns it off
+  return !(window.SCENARIO && SCENARIO.fitWrap === false);
+}
+function viewportVFov(hfov) {
+  const W = window.innerWidth || 1, H = window.innerHeight || 1;
+  const half = Math.tan((hfov * Math.PI / 180) / 2) / (W / H);
+  return 2 * Math.atan(half) * 180 / Math.PI;
+}
+// The effective wrap actually handed to pannellum AND to boxToYP. Keeping them on one function is the
+// point: if the viewer and the hotspot projection ever used different vaov values, every marker would
+// sit at the wrong height.
+function fitWrap(c) {
+  if (!c || !wrapFitOn()) return c;
+  const ceiling = c.vaovMax || WRAP_FIT_MAX;
+  const v = Math.max(WRAP_FIT_MIN, Math.min(ceiling, viewportVFov(c.hfov || 110)));
+  return { ...c, vaov: v };
+}
+
 // box [x0,y0,x1,y1] fractions -> yaw/pitch across the room's wrap coverage
 function boxToYP(box, c) {
   const cx = (box[0] + box[2]) / 2, cy = (box[1] + box[3]) / 2;
@@ -895,6 +944,21 @@ function rerenderCurrentRoom() {
   try { if (viewer && typeof viewer.getYaw === "function") yaw = viewer.getYaw(); } catch (e) {}
   buildViewer(basePanorama(room, portalUnlocked(room)), yaw);
 }
+
+// Re-fit on resize / screen change. vaov cannot be changed on a live pannellum viewer, so the room is
+// re-rendered — but only when the aspect actually moved enough to matter (>2%), and debounced, so
+// dragging a window edge doesn't rebuild the scene on every pixel.
+let _lastAspect = (window.innerWidth || 1) / (window.innerHeight || 1), _fitTimer = null;
+window.addEventListener("resize", () => {
+  if (!wrapFitOn()) return;
+  clearTimeout(_fitTimer);
+  _fitTimer = setTimeout(() => {
+    const a = (window.innerWidth || 1) / (window.innerHeight || 1);
+    if (Math.abs(a - _lastAspect) / _lastAspect < 0.02) return;
+    _lastAspect = a;
+    if (room && viewer) rerenderCurrentRoom();
+  }, 250);
+});
 
 // Ambient particles behind the card on an entry screen, chosen by scenario.ambient
 // ("fireflies" | "snow" | "embers" | "leaves" | "dust" | "rays" | "none"); ANY other value falls through to fireflies.
@@ -1270,7 +1334,7 @@ function _renderViewer(img, yaw = 0, dynamic = false) {
   // A built room should carry a tuned `wrap`, but a room committed before its wrap was
   // saved (harness "Send to room" with no wrap.json) is built:true + panorama with NO wrap.
   // Guard so that case degrades to a sane pseudo-360 instead of a TypeError on `c.pitch`.
-  const c = room.wrap || { haov: 360, vaov: 90 };
+  const c = fitWrap(room.wrap || { haov: 360, vaov: 90 });
   const p = c.pitch || 0, f = c.hfov || 110;
   // Build hotspots up front and pass them in the config (the reliable path on a
   // static, non-draggable viewer — addHotSpot-after-load leaves them unpositioned).

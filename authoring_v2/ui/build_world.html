@@ -159,8 +159,11 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
           <b>World plate</b>
           <img id="plateThumb" class="panothumb" style="display:none">
           <button onclick="viewWorldPrompt()">view prompt</button>
-          <button onclick="genPlate()">Generate plate</button>
+          <button onclick="genPlate()">Generate plates ×4</button>
           <span class="status" id="plateStat"></span>
+          <!-- Candidate grid. The plate is the ONE asset every room's art is generated through, so it is
+               chosen, never auto-committed (2026-08-31). Click a candidate to commit it; the corner button discards it. -->
+          <div id="plateGrid" style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; width:100%"></div>
         </div>
         <div id="coverPanel" style="display:none; padding:8px 10px; background:#12222f; border:1px solid var(--line); border-radius:8px;">
           <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap">
@@ -523,6 +526,8 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
     WORLDPROMPT = st.worldPlatePrompt || "";
     const thumb = $("#plateThumb");
     if (st.worldPlate) { thumb.style.display = ""; if (!thumb.src || !PLATEV) { PLATEV = PLATEV || 1; thumb.src = plateSrc(); } }
+    const pg = $("#plateGrid");
+    if (pg && !pg.dataset.built) { pg.dataset.built = "1"; PLATEV = PLATEV || 1; refreshPlateGrid(); }
   }
   // The world-plate prompt lives in the spec bundle (the `worldPlate` entry, Concept card) — read-only here.
   function viewWorldPrompt() {
@@ -532,18 +537,53 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
     $("#promptModal").style.display = "flex";
   }
   async function genPlate() {
-    const st = $("#plateStat"); st.innerHTML = `<span class="warn">generating plate… (~1 min)</span>`;
-    const r = await post("/api/gen-world-plate", { chapter: CH, scenario: SC });
+    const st = $("#plateStat"); st.innerHTML = `<span class="warn">generating 4 plates\u2026 (~4 min)</span>`;
+    const r = await post("/api/gen-world-plate", { chapter: CH, scenario: SC, n: 4 });
     if (!r.ok) { st.innerHTML = `<span class="err">${esc(r.error)}</span>`; return; }
     const poll = setInterval(async () => {
-      const s = await getj(`/api/status?slot=${encodeURIComponent(r.slot)}`);
-      if (s.active) return;
+      const s2 = await getj(`/api/status?slot=${encodeURIComponent(r.slot)}`);
+      refreshPlateGrid();                       // show each candidate as it lands, don't wait for all 4
+      if (s2.active) { st.innerHTML = `<span class="warn">generating plates\u2026 ${s2.done || 0}/${r.n || 4}</span>`; return; }
       clearInterval(poll);
-      if (s.error) { st.innerHTML = `<span class="err">${esc(s.error)}</span>`; return; }
-      PLATEV = Date.now();
-      const thumb = $("#plateThumb"); thumb.style.display = ""; thumb.src = plateSrc();
-      st.innerHTML = `<span class="ok">plate set ✓ — now generate the rooms</span>`;
+      if (s2.error) { st.innerHTML = `<span class="err">${esc(s2.error)}</span>`; return; }
+      st.innerHTML = `<span class="ok">candidates ready \u2014 click one to commit it as the world plate</span>`;
+      refreshPlateGrid();
     }, 2500);
+  }
+  // The plate is NOT auto-committed: it is the shared continuity reference every room Generate routes
+  // through, so committing one fixes the look of the whole scenario. Pick deliberately.
+  const plateCandSrc = f => `/sfile/_scratch/${encodeURIComponent(f)}?chapter=${encodeURIComponent(CH)}&scenario=${encodeURIComponent(SC)}&v=${PLATEV}`;
+  async function refreshPlateGrid() {
+    const grid = $("#plateGrid"); if (!grid) return;
+    const j = await getj(`/api/plate-candidates?chapter=${encodeURIComponent(CH)}&scenario=${encodeURIComponent(SC)}`);
+    const files = j.files || [];
+    grid.innerHTML = "";
+    files.forEach(f => {
+      const d = document.createElement("div"); d.className = "covcand";
+      d.style.position = "relative"; d.title = "commit as the world plate";
+      d.innerHTML = `<img src="${plateCandSrc(f)}" style="height:56px" onerror="this.style.opacity=0.2">`;
+      d.onclick = () => setPlate(f);
+      const x = document.createElement("button");
+      x.textContent = "\u2715"; x.title = "discard this candidate";
+      x.style.cssText = "position:absolute; top:2px; right:2px; padding:0 4px; line-height:1.2";
+      x.onclick = ev => { ev.stopPropagation(); delPlateCand(f); };
+      d.appendChild(x);
+      grid.appendChild(d);
+    });
+    if (!files.length) grid.innerHTML = `<span class="hint">no candidates yet \u2014 hit Generate</span>`;
+  }
+  async function setPlate(f) {
+    const st = $("#plateStat"); st.textContent = "committing plate\u2026";
+    const r = await post("/api/set-world-plate", { chapter: CH, scenario: SC, image: f });
+    if (!r.ok) { st.innerHTML = `<span class="err">${esc(r.error)}</span>`; return; }
+    PLATEV = Date.now();
+    const thumb = $("#plateThumb"); thumb.style.display = ""; thumb.src = plateSrc();
+    st.innerHTML = `<span class="ok">plate committed \u2713 \u2014 now generate the rooms</span>`;
+  }
+  async function delPlateCand(f) {
+    const r = await post("/api/delete-plate-candidate", { chapter: CH, scenario: SC, file: f });
+    if (!r.ok) { $("#plateStat").innerHTML = `<span class="err">${esc(r.error)}</span>`; return; }
+    refreshPlateGrid();
   }
 
   // Cover art — the scenario's poster (book exercises page + landing). Prompt/title/ambient live in the spec

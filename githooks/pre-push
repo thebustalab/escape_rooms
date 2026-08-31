@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+#
+# pre-push — refuse to push blobs GitHub will reject.
+#
+# Why this exists (2026-08-31): a stage-everything commit swept in
+# authoring_v2/ui/cine360/ — the 360-cinemagraph parameter-sweep bench, 2.1 GB of
+# experiment clips, three of them over 150 MB. GitHub's pre-receive hook rejected the
+# WHOLE push, so ~500 legitimate room files were blocked behind three R&D artefacts,
+# after a 1.85 GB upload had already gone over the wire. This catches that locally in
+# about a second.
+#
+# It inspects the actual objects being pushed, not the working tree, so it also catches
+# an oversize file that was committed and then deleted in a later unpushed commit —
+# still in history, still fatal, and invisible to `git ls-files`.
+#
+# Install (Mac, from the repo root):
+#     ln -sf ../../githooks/pre-push .git/hooks/pre-push
+#
+# Override for a one-off push you have thought about:
+#     SKIP_SIZE_CHECK=1 git push
+
+set -uo pipefail
+
+if [ "${SKIP_SIZE_CHECK:-}" = "1" ]; then
+    # Drain the ref list git is feeding us before leaving, or the writer takes a
+    # SIGPIPE (exit 141) instead of a clean 0.
+    cat >/dev/null 2>&1 || true
+    echo "pre-push: size check skipped (SKIP_SIZE_CHECK=1)" >&2
+    exit 0
+fi
+
+HARD_LIMIT=$((100 * 1024 * 1024))   # GitHub rejects outright
+WARN_LIMIT=$((50 * 1024 * 1024))    # GitHub warns
+ZERO=0000000000000000000000000000000000000000
+
+oversize=""
+warnings=""
+
+while read -r local_ref local_sha remote_ref remote_sha; do
+    [ -z "${local_sha:-}" ] && continue
+    [ "$local_sha" = "$ZERO" ] && continue          # deleting a ref
+
+    if [ "${remote_sha:-$ZERO}" = "$ZERO" ]; then
+        # new branch — everything not already on some remote-tracking ref
+        range=("$local_sha" --not --remotes)
+    else
+        range=("$remote_sha..$local_sha")
+    fi
+
+    while read -r type sha size path; do
+        [ "$type" = "blob" ] || continue
+        [ -z "${path:-}" ] && continue
+        line=$(awk -v s="$size" -v p="$path" 'BEGIN{printf "  %6.1f MB  %s\n", s/1048576, p}')
+        if [ "$size" -ge "$HARD_LIMIT" ]; then
+            oversize+="$line"
+        elif [ "$size" -ge "$WARN_LIMIT" ]; then
+            warnings+="$line"
+        fi
+    done < <(git rev-list --objects "${range[@]}" 2>/dev/null \
+             | git cat-file --batch-check='%(objecttype) %(objectname) %(objectsize) %(rest)' 2>/dev/null)
+done
+
+if [ -n "$warnings" ]; then
+    echo "" >&2
+    echo "pre-push: files over 50 MB (GitHub warns, push still works):" >&2
+    printf '%s' "$warnings" >&2
+fi
+
+if [ -n "$oversize" ]; then
+    echo "" >&2
+    echo "pre-push: BLOCKED — these exceed GitHub's 100 MB hard limit:" >&2
+    printf '%s' "$oversize" >&2
+    echo "" >&2
+    echo "GitHub rejects the ENTIRE push for these, not just the offending files." >&2
+    echo "Fix: add the folder to .gitignore (experiment benches never belong on the" >&2
+    echo "public site), then undo the commit keeping files on disk with" >&2
+    echo "'git reset --mixed origin/<branch>', re-stage with the ignore rules applied," >&2
+    echo "and re-commit. See AGENTS.md -> 'Publish footprint'." >&2
+    echo "" >&2
+    exit 1
+fi
+
+exit 0
