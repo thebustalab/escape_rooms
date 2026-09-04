@@ -16,7 +16,13 @@ What it checks, per rooms/<chapter>/<scenario>/scenario.json:
   - every correct index is within its options list;
   - no MCQ has duplicate option text (a duplicated option lets the correct index resolve to the wrong
     slot while still matching the decoder number — the hawaii room2 bug, 2026-07-22);
-  - exactly one decoder key matches the scenario id (else: missing / ambiguous).
+  - exactly one decoder key matches the scenario id (else: missing / ambiguous);
+  - every LEDGER whose rows each hold a DIFFERENT answer sets `allOrNothing` (one-member groups make the
+    default confirmation rule leak the answer a row at a time);
+  - the scenario id FITS THE CODEC. Codec v2 (2026-09-02) gives the id its own header byte, so the
+    range is 1..255. Under v1 it was 1..15, and ids above that were silently truncated to `id & 15`,
+    which made every submission grade "invalid/mismatched code" — egypt (17) and temple (18) shipped
+    BUILT and ungradeable. Keep this check: an id the header cannot carry must fail loudly.
 
 Soft (non-failing) WARN: a scenario whose built MCQ rooms all key to the same option index
 (e.g. all 0) — an "always the same slot" tell; vary the correct position across rooms.
@@ -206,6 +212,43 @@ def main():
         for n in ungraded:                        # cannot mis-grade — advisory, and never gates
             print(f"WARN  {rel}: {n}")
             warnings += 1
+
+        # ---- THE CODEC CAN ONLY CARRY IDS 1..15 -------------------------------------------------
+        # The submission code's header is ONE byte: version in the high nibble, scenario id in the low
+        # nibble (shared/codec.js `opts.scenarioId & 0x0f`; decode_codes.R `bitwAnd(header, 15L)`). An id
+        # above 15 is silently TRUNCATED on encode, so the code decodes as `id & 15`, never matches its
+        # own key, and every submission grades as "invalid/mismatched code" with points NA — or, worse,
+        # collides with whichever scenario really owns `id & 15`.
+        #
+        # This shipped undetected because this validator only ever compared scenario.json's id to the
+        # decoder key's id (17 == 17, fine) and never asked whether the id FITS. Found 2026-09-02 while
+        # adding networks/beacons (id 19 -> 3, colliding with the id-3 key); temple (18 -> 2) and egypt
+        # (17 -> 1) were already broken and BUILT. Proven with real R: a minted temple code grades
+        # valid=FALSE, points=NA.
+        if not isinstance(sid, int) or not (1 <= sid <= 255):
+            print(f"FAIL  {rel}: scenario id {sid} is outside the codec's 1..255 range (v2 header). "
+                  f"An id the header cannot carry is silently truncated and never grades.")
+            failures += 1
+            continue
+
+        # ---- LEDGER MODE, SWEPT CORPUS-WIDE ------------------------------------------------------
+        # A `ledger` confirms a whole GROUP at a time, which is unfishable only while groups hold several
+        # members. When every row has a DIFFERENT answer each group has one member, so a single correct
+        # dropdown locks its own row and the widget hands over the answer a row at a time. That shape must
+        # set `allOrNothing`. Swept here rather than per-scenario because the invariant applies to every
+        # ledger anyone ever authors, and the failure is invisible in review — the puzzle still "works",
+        # it is just solvable without doing the analysis. (networks/beacons, 2026-09-02.)
+        for room in doc.get("rooms", []):
+            for hs in (room.get("hotspots") or []) + (room.get("plannedHotspots") or []):
+                if hs.get("type") != "ledger":
+                    continue
+                lrows = hs.get("rows") or []
+                if lrows and len({r.get("answer") for r in lrows}) == len(lrows) \
+                        and not hs.get("allOrNothing"):
+                    print(f"FAIL  {rel}: room '{room.get('key')}' ledger '{hs.get('label', hs.get('id'))}' "
+                          f"has {len(lrows)} rows with {len(lrows)} distinct answers but no "
+                          f"allOrNothing — solvable one dropdown at a time")
+                    failures += 1
 
         # A freshly-scaffolded scenario (all rooms still stubs) has no built graded rooms yet, so it
         # legitimately has no decoder key — the key is added at wiring time (see the design skill). Skip

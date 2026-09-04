@@ -214,12 +214,31 @@ def to_hotspots(spec):
             # role, so a re-place would have downgraded it (notes.md "Caveat — nest dial/mapview").
         elif e.get("clue"):
             out.append({**base, "type": "clue"})
-        elif e.get("animate"):
-            out.append({**base, "type": "ambient"})   # decoration-only: no player marker, just the cinemagraph
+        # `animate` NO LONGER EMITS A HOTSPOT (2026-09-02, Lucas: "we don't need to be placing ambient
+        # hotspots anymore other than full scene ones because we are animating the whole thing — not box
+        # cinemagraphs"). Motion is now baked per (room, world-state) over the WHOLE panorama by
+        # cinemagraph_tools/cine_scenario.py from an authored `authoring.motionSpec`, so a per-object box
+        # is not needed and an `ambient` carrier for one is dead weight — it shows no marker, intercepts
+        # no clicks, and exists only to hold a clip nothing generates any more. The element's `animate`
+        # text is still read (see cinemagraph_jobs) as the source for that motion spec.
+        # The FULL-SCENE carrier is unaffected: it is created by harness_server.ensure_variant_carrier at
+        # box [0,0,1,1], never here.
+        # ONE EXCEPTION, and it is not about motion: an `animate` element that ALSO declares `variants`
+        # still needs an `ambient` carrier, because a BOXED state variant (the Pharos lamp swinging its
+        # beam onto the player's ship) has nowhere to hang otherwise — `variant_jobs` emits the art and
+        # `pickActiveVariants` composites it into that hotspot's box. So the carrier survives for
+        # VARIANT ART, never for a cinemagraph.
+        elif e.get("animate") and e.get("variants"):
+            out.append({**base, "type": "ambient"})
     return out
 
 
 # Spatial phrase -> approximate x-centre (fraction). Longer phrases first so "left of centre" beats "left".
+# SEVEN positions, and the guide now names exactly one phrase each. The aliases below stay so already-
+# authored specs keep resolving (60 rooms use them, "to the centre-right" among them) — but the canonical
+# names are the ones in SCENE_SPEC_GUIDE.md rule 1. Do not add an eighth position: the default approx box
+# is 0.16 wide and these sit 0.12–0.16 apart, so neighbours already abut and a finer split separates
+# nothing (2026-09-03).
 _POS = [
     ("far left", 0.08), ("far-left", 0.08),
     ("left of centre", 0.36), ("left of center", 0.36), ("centre-left", 0.36), ("center-left", 0.36),

@@ -67,6 +67,18 @@ def _suites(fast=False):
     # in-development scenario can legitimately trip the per-room misses this full sweep also reports.
     add("assets: full sweep + cross-scenario checks (advisory)", "guards",
         [sys.executable, "authoring_v2/validate_assets.py"], advisory=True)
+    # SEAM STAGE — every committed still's 360 wrap join, for the scenarios students open. This is here
+    # because the seam was the one art property with no gate at all: it was documented as a technique in
+    # three files, required by none, and beacons duly shipped twelve stills nobody had checked (2026-09-02).
+    # A room is only clean once a HUMAN has accepted it — the metric screens, it cannot certify — so the
+    # check asserts on the recorded `authoring.seam.accepted`, not on a score. Scoped to `ready` for the
+    # same reason as the key guard: an in-development scenario legitimately has unaccepted rooms.
+    for sc in ready:
+        add("seams accepted: %s" % sc, "guards",
+            [sys.executable, "authoring_v2/seam_check.py", "--chapter", sc.split("/")[0],
+             "--scenario", sc.split("/")[1], "--require-accepted"])
+    add("seams: full sweep (advisory)", "guards",
+        [sys.executable, "authoring_v2/seam_check.py", "--all"], advisory=True)
     # Scene/spec sweep — ADVISORY, because several built scenarios carry known spec drift it reports.
     # It is here at all because its ROLE -> ENGINE TYPE check is the only corpus-wide guard against a
     # dead escape: temple's `ledger` was silently rewritten to `puzzle` by the box editor on 2026-08-27

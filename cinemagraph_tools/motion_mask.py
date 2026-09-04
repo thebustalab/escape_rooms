@@ -53,12 +53,14 @@ def sample_frames(mp4, n=16):
     return np.stack(ims)
 
 
-def motion_mask(mp4, lo=3.0, hi=12.0, dilate=9, blur=21, floor=0.0):
-    """lo/hi: temporal-std values mapping to fully still / fully moving.
-    dilate+blur: grow and soften, so the boundary never cuts a hard edge through moving water.
-    floor: minimum alpha everywhere (0 = pure still outside motion; try 0.15 for a subtle base)."""
-    st = sample_frames(mp4)
-    tstd = st.std(axis=0).mean(axis=2)                      # H,W  per-pixel temporal variation
+def mask_from_tstd(tstd, lo=3.0, hi=12.0, dilate=9, blur=21, floor=0.0):
+    """The mask itself, from an ALREADY-COMPUTED temporal-std map.
+
+    Split out from `motion_mask` so a caller that already has the tstd — the harness, serving live
+    threshold previews — runs the exact same ramp, dilate and blur as a bake would, instead of an
+    approximation. A preview that merely resembles the bake is worse than none: thresholds get chosen
+    against it. An in-browser emulation was tried first and reported ~1/3 of the real coverage
+    (2026-08-31), which is precisely the kind of number you would trust and be misled by."""
     a = np.clip((tstd - lo) / max(1e-6, hi - lo), 0, 1)     # soft ramp, not a hard threshold
     m = Image.fromarray((a * 255).astype(np.uint8), "L")
     if dilate > 1:
@@ -70,6 +72,16 @@ def motion_mask(mp4, lo=3.0, hi=12.0, dilate=9, blur=21, floor=0.0):
         arr = floor + (1 - floor) * arr
         m = Image.fromarray((arr * 255).astype(np.uint8), "L")
     cov = float((np.asarray(m, dtype=np.float32) / 255.0).mean() * 100)
+    return m, cov
+
+
+def motion_mask(mp4, lo=3.0, hi=12.0, dilate=9, blur=21, floor=0.0):
+    """lo/hi: temporal-std values mapping to fully still / fully moving.
+    dilate+blur: grow and soften, so the boundary never cuts a hard edge through moving water.
+    floor: minimum alpha everywhere (0 = pure still outside motion; try 0.15 for a subtle base)."""
+    st = sample_frames(mp4)
+    tstd = st.std(axis=0).mean(axis=2)                      # H,W  per-pixel temporal variation
+    m, cov = mask_from_tstd(tstd, lo, hi, dilate, blur, floor)
     return m, cov, tstd
 
 

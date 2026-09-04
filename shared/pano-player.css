@@ -31,7 +31,7 @@ button.ghost { background:transparent; color:var(--ink); border:1px solid var(--
 #loading .loadcard { max-width:560px; padding:32px; position:relative; z-index:1; }
 
 /* ambient particles behind the card on the entry/submission screens
-   (scenario.ambient: fireflies | snow | embers | leaves | dust | rays | none) */
+   (scenario.ambient: fireflies | snow | embers | leaves | dust | rain | rays | none) */
 .particles { position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:0; }
 /* fireflies — warm, drifting, pulsing */
 .firefly { position:absolute; border-radius:50%;
@@ -62,6 +62,19 @@ button.ghost { background:transparent; color:var(--ink); border:1px solid var(--
 @keyframes leafBlow2 { 0%{transform:translate(-18vw,-4vh) rotate(0deg)} 33%{transform:translate(18vw,28vh) rotate(-120deg)} 66%{transform:translate(52vw,40vh) rotate(-230deg)} 100%{transform:translate(96vw,78vh) rotate(-350deg)} }
 @keyframes leafBlow3 { 0%{transform:translate(-14vw,-10vh) rotate(0deg)} 33%{transform:translate(26vw,10vh) rotate(180deg)} 66%{transform:translate(60vw,44vh) rotate(300deg)} 100%{transform:translate(100vw,66vh) rotate(470deg)} }
 @media (prefers-reduced-motion: reduce){ .leaf { animation:none !important; opacity:.4; } }
+/* rain — thin fast streaks, tilted a few degrees for wind. The one kind that is a LINE rather than a
+   point, so it gets a gradient (fading at both ends) instead of a border-radius: a hard-ended 1px bar
+   reads as a scratch on the screen. Tuned as a SLOW DRIZZLE: these only draw on the landing / entry / submission screens, which
+   carry text, so it has to be weather you read through. The heavy in-room rain is `.fx-rain`.
+   First consumer: hierarchical_clustering/canyon, a slot canyon with a storm coming. */
+.raindrop { position:absolute; top:0; width:1px;
+            background:linear-gradient(to bottom, rgba(190,215,235,0), rgba(190,215,235,.85), rgba(190,215,235,0)); }
+/* Drizzle falls nearly straight — the tilt and the sideways travel are both small, because a drop that
+   slants hard reads as driving rain however slowly it moves. */
+@keyframes rainFall  { 0%{transform:translate(0,-12vh) rotate(2deg)}  100%{transform:translate(-1.2vw,112vh) rotate(2deg)} }
+@keyframes rainFall2 { 0%{transform:translate(0,-12vh) rotate(3deg)}  100%{transform:translate(-1.8vw,112vh) rotate(3deg)} }
+@keyframes rainFall3 { 0%{transform:translate(0,-12vh) rotate(1deg)}  100%{transform:translate(-0.6vw,112vh) rotate(1deg)} }
+@media (prefers-reduced-motion: reduce){ .raindrop { animation:none !important; opacity:.25; } }
 /* dust — fine motes SUSPENDED in still air, turning slowly as they catch a lamp (interiors, underground,
    dry lofts). Deliberately unlike the others: no fall (snow), no rise (embers), no crossing wind (leaves) —
    it hangs and wanders, which is what dust in a closed space actually does. Kept desaturated warm-grey so
@@ -442,3 +455,20 @@ code { background:#0a1620; padding:1px 5px; border-radius:4px; }
 .waterline .wlab { position:absolute; right:6px; top:-18px; font-size:11px; color:rgba(160,215,255,.95);
   background:rgba(0,0,0,.45); padding:1px 6px; border-radius:6px; white-space:nowrap; }
 .elevfoot { display:flex; justify-content:space-between; font-size:12px; color:var(--amber); padding:0 2px; }
+
+/* ── test-play authoring (never present in a student run: gated on isTestPlay) ──────────────────── */
+/* The player-facing strings that are normally invisible — wrong-answer hints appear one at a time by
+   attempt, a lockedBody only while a gate is shut — laid out so they can all be read and corrected in
+   one place instead of by provoking each state in turn. */
+.tpauthor { margin-top:14px; padding:10px 12px; border:1px dashed rgba(255,216,140,.45); border-radius:8px;
+            background:rgba(255,216,140,.05); font-size:13px; }
+.tpauthor-h { font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:rgba(255,216,140,.85);
+              margin-bottom:8px; font-weight:700; }
+.tpauthor-l { font-size:11px; color:rgba(223,233,240,.62); margin-top:9px; }
+.tpauthor-v { margin-top:2px; padding:5px 7px; border-radius:6px; background:rgba(0,0,0,.28);
+              border:1px solid rgba(255,255,255,.12); white-space:pre-wrap; line-height:1.45; }
+.tpauthor-note { font-size:11px; color:rgba(223,233,240,.55); font-style:italic; line-height:1.5; }
+/* the keyed option, so the author can see which one grades correct without opening scenario.json */
+.qopt.tpcorrect { outline:1px dashed rgba(123,216,140,.75); outline-offset:3px; border-radius:5px; }
+/* a hotspot being dragged in test play */
+.hsmark.tpdragging { opacity:.55; cursor:grabbing; }

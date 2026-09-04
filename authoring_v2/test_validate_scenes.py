@@ -225,3 +225,49 @@ def test_well_formed_art_fields_still_pass(tmp_path):
         "variants": [{"state": "lit", "when": {"eq": ["k", "v"]}, "reveal": "identical but lit"}]})))
     fails, _w, _r, _o = vs.check_scenario(str(p))
     assert not [f for f in fails if "animate" in f or "variants" in f], fails
+
+
+# ---- x-collision warning is ROLE-AWARE (2026-09-03) --------------------------------------------
+# `approx_boxes` boxes EVERY element, so warning on any shared x flagged two bits of backdrop as if
+# their (never-drawn) boxes would fight. That fired on a third of all authored rooms and pushed authors
+# toward an eighth spatial position, which does not exist — there are seven. Only an element that needs
+# a real box can contend: a gameplay role, or an `animate` motion subject.
+
+def _two_at(el_a, el_b, hotspots=None):
+    room = {"key": "r1", "authoring": {"sceneSpec": {
+        "room": "r1", "setting": "a room", "seam": "a plain wall",
+        "elements": [{"id": "a", "at": "dead ahead in the centre", "desc": "a thing", **el_a},
+                     {"id": "b", "at": "dead ahead in the centre", "desc": "another thing", **el_b}]}}}
+    if hotspots:
+        room["hotspots"] = hotspots
+    return {"rooms": [room]}
+
+
+def _collisions(tmp_path, doc, name):
+    p = tmp_path / name
+    p.write_text(json.dumps(doc))
+    _f, warns, _r, _o = vs.check_scenario(str(p))
+    return [w for w in warns if "same approximate position" in w]
+
+
+def test_two_scenery_elements_sharing_an_x_do_not_warn(tmp_path):
+    """Neither will ever carry a box, so nothing can overlap."""
+    assert _collisions(tmp_path, _two_at({}, {}), "scenery.json") == []
+
+
+def test_two_animate_elements_sharing_an_x_do_warn(tmp_path):
+    """Both become measured motion subjects — a real conflict."""
+    m = {"animate": {"motion": "it stirs", "loop": "boomerang"}}
+    assert len(_collisions(tmp_path, _two_at(m, m), "animate.json")) == 1
+
+
+def test_an_animate_element_colliding_with_pure_scenery_does_not_warn(tmp_path):
+    """Only ONE side needs a box, so there is nothing for it to fight with."""
+    m = {"animate": {"motion": "it stirs", "loop": "boomerang"}}
+    assert _collisions(tmp_path, _two_at(m, {}), "mixed.json") == []
+
+
+def test_two_gameplay_hotspots_sharing_an_x_do_warn(tmp_path):
+    doc = _two_at({"puzzle": True}, {"clue": True},
+                  hotspots=[{"id": "a", "type": "puzzle"}, {"id": "b", "type": "clue"}])
+    assert len(_collisions(tmp_path, doc, "roles.json")) == 1

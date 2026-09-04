@@ -80,6 +80,22 @@ def measure(path, pos=1.0):
             "visible": bool(n and d > n)}
 
 
+def gradient_arr(a, pos=1.0, span=64):
+    """The gradient op on an ARRAY, so a caller already holding decoded frames (the cinemagraph loop
+    bake) can repair each one without a round-trip through PNG. Returns (repaired, info)."""
+    r, dx, col = _roll_to_wrap(a, pos)
+    before = _wrap_delta(r)
+    w = r.shape[1]
+    span = int(min(span, w // 2))
+    step = (r[:, 0, :] - r[:, -1, :]) / 2.0            # half the discontinuity, diffused each way
+    ramp = np.linspace(1.0, 0.0, span, dtype=np.float32)[None, :, None]
+    r[:, :span, :] -= step[:, None, :] * ramp
+    r[:, -span:, :] += step[:, None, :] * ramp[:, ::-1, :]
+    out = np.roll(r, -dx, axis=1) if dx else r
+    return out, {"seamBefore": round(float(before), 2), "seamAfter": round(_wrap_delta(r), 2),
+                 "seamColumn": int(col), "span": span}
+
+
 def gradient(inp, out, pos=1.0, span=64):
     """Diffuse the seam's step into both sides (a 1-D Poisson solve per row). `span` columns each side."""
     a = _load(inp)

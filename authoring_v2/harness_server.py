@@ -50,10 +50,12 @@ import json
 import glob
 import math
 import shutil
+import sys
 import time
 import threading
 import subprocess
 import scene_spec   # the scene-spec model: render_prompt / cinemagraph_jobs / to_hotspots (art-pipeline P1)
+import scene_states  # (room, state) -> panorama; the ONE resolver for which art a world state uses
 import localizer    # vision box-finder for spec elements (art-pipeline P2); reuses OPENAI_API_KEY
 import http.server
 import urllib.parse
@@ -582,6 +584,32 @@ def _save_scene_spec(base, room_key, spec):
     return prompt
 
 
+def _preflight_guard(base):
+    """Refuse to spend a generation on a scenario that has not passed the pre-art gate.
+
+    The gate is `authoring_v2/preflight.py`. It stamps `.preflight_ok` with a hash of scenario.json
+    (which carries every room's sceneSpec) plus the datasets, so editing either re-arms it. This is
+    deliberately a HARD block rather than a warning: the art phase used to sit between two skills
+    gated by nothing, which is how twelve unchecked seams once shipped, and how heist nearly
+    generated a blown vault door for a crew whose whole signature is that they were let in.
+
+    Escape hatch: PREFLIGHT_OVERRIDE=1 in the server's environment. Overrides are recorded in the
+    stamp, so they are never invisible.
+    Returns None when clear, or an error string.
+    """
+    if os.environ.get("PREFLIGHT_OVERRIDE") == "1":
+        return None
+    try:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        import preflight
+        ok, why = preflight.stamp_is_fresh(base)
+        if ok:
+            return None
+        return ("%s. Run:  python3 authoring_v2/preflight.py <chapter>/<scenario>" % why)
+    except Exception as e:                      # never let the guard itself break the harness
+        return None
+
+
 def _save_scene_specs(base, specs):
     """Bulk store many rooms' scene specs + render each prompt in ONE load-modify-save. `specs` is
     {roomKey: spec}. The spec-author (Claude) drafts a whole scenario at once; this loads them all. Returns
@@ -888,6 +916,7 @@ def _scenario_state(base):
         def _xc(pid):
             b = boxes.get(pid)
             return round((b[0] + b[2]) / 2, 4) if b else None    # panorama x-centre (0..1) -> ring angle in the console
+        _cands = _pano_candidates(base, r.get("key"))
         rooms.append({
             "key": r.get("key"), "title": r.get("title", ""),
             "hasSpec": bool(spec),
@@ -895,7 +924,13 @@ def _scenario_state(base):
             "animateCount": len(scene_spec.cinemagraph_jobs(spec)) if spec else 0,
             "doorViewCount": len(scene_spec.dooropen_jobs(spec)) if spec else 0,
             "built": bool(r.get("built") or r.get("panorama")),
-            "panoCandidates": _pano_candidates(base, r.get("key")),   # level-1 candidates in _scratch (up to MAX)
+            "panoCandidates": _cands,                                 # level-1 candidates in _scratch (up to MAX)
+            # ...and which of those are NOT the committed scene.png (a regen reuses the filename, so the
+            # name alone can't tell you). The gallery shows these as pending art to accept or veto.
+            "panoUncommitted": _pano_uncommitted(base, r.get("key"), _cands),
+            "clips": _room_clips(base, r.get("key"), doc),            # baked cinemagraphs on disk
+            "wrap": r.get("wrap"),                    # so a viewer can frame the room as the player sees it
+            "sfx": r.get("sfx"),                      # ambience layers, so a 360 preview can sound like play
             "builtFrom": r.get("builtFrom"),                          # which candidate was committed (flag it live)
             "hotspots": len(hs),
             "entry": r.get("entry") or None,                             # per-room entry card {title,text} (spec story.entries)
@@ -964,7 +999,10 @@ def _apply_spec(base, room_key):
     and wiring. Returns {created, queuedCine, queuedVar, skipped} — cinemagraph vs door-open-variant jobs are
     counted separately, and an element that already has a cinemagraph clip OR unpicked candidates is NOT
     re-queued. The player nudges the rough boxes in the flat editor,
-    then hits Run all. (Auto-localization proved unreliable on stylised panoramas; this is the ROI-honest
+    then hits Run all. (These are the spec's LAYOUT guesses — the fallback for a room no localizer has
+    run on. They are NOT evidence that localization fails: `localizer.py` + gpt-4o places boxes well
+    (grid-on-image + the generation prompt for ordering); Grounding DINO was the engine that collapsed,
+    and it was removed 2026-08-31. See AGENTS.md -> *Hotspot placement*. This is the ROI-honest
     path for low-stakes ambience — the spec still auto-writes the prompt + every motion prompt.)"""
     with SAVE_LOCK:
         doc = _load_scenario(base)
@@ -1025,22 +1063,31 @@ def _apply_spec(base, room_key):
     queued_cine, queued_var, skipped = [], [], []
     with BATCH_LOCK:
         jobs = _batch_read_queue(base)
-        queued_ids = {j.get("hotspotId") for j in jobs if j.get("type") == "cinemagraph"}
+        # KEY ON (room, hotspot) — the queue spans the WHOLE scenario, and a hotspot id is only unique
+        # WITHIN a room. Keyed on the id alone, the first room to queue `valley_view` made every other
+        # room's `valley_view` look already-queued, and it was dropped in silence: beacons declared 20
+        # cinemagraphs across 12 rooms, and exactly 8 — one per DISTINCT id — reached the queue
+        # (2026-09-02). Scenarios whose ids happen to be unique per room never saw it, which is why it
+        # survived; a spec generator that reuses element ids across rooms (the natural thing to write,
+        # since ids are namespaced by room everywhere else) hits it immediately.
+        queued_ids = {(j.get("roomKey"), j.get("hotspotId")) for j in jobs if j.get("type") == "cinemagraph"}
+        # BOX CINEMAGRAPHS ARE RETIRED (2026-09-02). Motion is baked over the WHOLE panorama per
+        # (room, world-state) by cinemagraph_tools/cine_scenario.py from an authored `motionSpec`, so
+        # placing a box job per animated object is work with no consumer. Nothing is queued here any
+        # more; `cinemagraph_jobs(spec)` is still read elsewhere as the SOURCE of the motion text, and
+        # already-baked clips on existing scenarios keep playing (the runtime reads hotspot.cinemagraph).
+        # Door-open and state variants below are unaffected — those are boxed reveals, not motion.
         for j in scene_spec.cinemagraph_jobs(spec_for_queue):
-            hid = j["hotspotId"]
-            box = node_boxes.get(hid)
-            if hid in have_cine or hid in queued_ids or not box:
-                skipped.append(hid); continue
-            jobs.append({"type": "cinemagraph", "roomKey": room_key, "hotspotId": hid,
-                         "box": box, "prompt": j["prompt"], "loop": j.get("loop", "boomerang")})
-            queued_cine.append(hid)
-        queued_var_keys = {(j.get("hotspotId"), j.get("state")) for j in jobs if j.get("type") == "variant"}
+            skipped.append(j["hotspotId"])
+        # Same collision, same fix: the variant queue is scenario-wide, so its key needs the room too.
+        queued_var_keys = {(j.get("roomKey"), j.get("hotspotId"), j.get("state"))
+                           for j in jobs if j.get("type") == "variant"}
         # door open-views (`door.opensOnto`) PLUS any element's general state-variants (`variants:[…]`,
         # e.g. the Pharos lamp with its beam swung onto the ship) — both are state-tagged variant jobs.
         for j in scene_spec.dooropen_jobs(spec_for_queue) + scene_spec.variant_jobs(spec_for_queue):
             hid, state = j["hotspotId"], j["state"]
             box = node_boxes.get(hid)
-            if not box or state in have_var.get(hid, set()) or (hid, state) in queued_var_keys:
+            if not box or state in have_var.get(hid, set()) or (room_key, hid, state) in queued_var_keys:
                 skipped.append("%s:%s" % (hid, state)); continue
             vj = {"type": "variant", "roomKey": room_key, "hotspotId": hid,
                   "box": box, "prompt": j["prompt"], "state": state}
@@ -1481,6 +1528,67 @@ def _attach_planned_content(placed, planned):
     return placed
 
 
+# The house wrap (root escape_rooms/AGENTS.md): ALL 57 rooms carrying a wrap use 360/90/120, and only
+# vOffset/pitch vary — both -5. This is the fallback a freshly committed room adopts when its candidate
+# carried no tuned wrap. It used to be `hfov 110, vOffset 0, pitch 0`, which is not any room's framing and
+# had to be hand-patched across nine canyon rooms after a commit seeded it (2026-08-30).
+HOUSE_WRAP = {"haov": 360, "vaov": 90, "hfov": 120, "vOffset": -5, "pitch": -5}
+
+
+def _commit_planned_hotspots(room_key, base):
+    """Promote a room's `plannedHotspots` into its live `hotspots`, keeping each planned BOX.
+
+    The pre-existing promotion path is "Place all hotspots", which builds the placed list from the SCENE
+    SPEC and gives each one `scene_spec.approx_boxes` — a rough guess. That is the right thing when the
+    boxes have never been placed. It is the wrong thing for a scenario whose planned boxes are already
+    better than a guess: canyon's 34 were drafted by the localizer and 16 of them hand-corrected, and
+    routing them through approx_boxes would throw that placement away. So this promotes the planned
+    entries THEMSELVES, box included.
+
+    Content is copied by `_attach_planned_content`, the same function every other commit path uses, so a
+    hotspot promoted here is assembled by exactly the same rules as one promoted anywhere else.
+
+    Matching is on (type, slug(label)) — the harness's own planned->placed key, and unique within every
+    room in the corpus. A planned entry whose key is ALREADY committed is left alone: the committed
+    array is the live truth, and silently rewriting a box someone tuned in the flat editor would be a
+    regression disguised as a promotion.
+
+    Returns (created, already, boxless) — three lists of labels, so the caller can say what it did AND
+    what it did not do. A boxless entry is never invented a box: it is reported and skipped."""
+    with SAVE_LOCK:
+        doc = _load_scenario(base)
+        node = next((r for r in doc.get("rooms", []) if r.get("key") == room_key), None)
+        if not node:
+            raise ValueError("no room %s" % room_key)
+        planned = [p for p in (node.get("plannedHotspots") or []) if isinstance(p, dict)]
+        if not planned:
+            raise ValueError("room %s has no plannedHotspots" % room_key)
+        placed = node.setdefault("hotspots", [])
+        have = {(h.get("type"), _slug(h.get("label"))) for h in placed if isinstance(h, dict)}
+        used_ids = {h.get("id") for h in placed if isinstance(h, dict)}
+        created, already, boxless = [], [], []
+        for p in planned:
+            key = (p.get("type"), _slug(p.get("label")))
+            if key in have:
+                already.append(p.get("label") or key[1]); continue
+            box = p.get("box")
+            if not (isinstance(box, list) and len(box) == 4):
+                boxless.append(p.get("label") or key[1]); continue
+            hid = p.get("id") or _slug(p.get("label"))
+            base_id, n = hid, 2
+            while hid in used_ids:                      # ids must stay unique within the room
+                hid = "%s_%d" % (base_id, n); n += 1
+            hs = {"id": hid, "type": p.get("type") or "ambient",
+                  "label": p.get("label") or hid, "box": [float(v) for v in box]}
+            placed.append(hs); used_ids.add(hid); have.add(key)
+            created.append(hs["label"])
+        # Re-run over the WHOLE array, not just the new entries: it is idempotent, and a re-commit is
+        # how re-authored planned content reaches hotspots placed on an earlier pass.
+        node["hotspots"] = _attach_planned_content(placed, planned)
+        _save_scenario(doc, base)
+    return created, already, boxless
+
+
 def _commit_node(room_key, written, seed_wrap=None, base=None, draft=None, image=None):
     """After 'Send to room' copies scene.png(+_open) into rooms/<ch>/<sc>/<key>/, point the room
     node at them (`panorama`/`panoramaOpen`), mark it built, record which candidate it was built
@@ -1503,7 +1611,7 @@ def _commit_node(room_key, written, seed_wrap=None, base=None, draft=None, image
     if d_wrap:
         fields["wrap"] = d_wrap
     elif node is not None and not node.get("wrap"):
-        fields["wrap"] = seed_wrap or {"haov": 360, "vaov": 90, "hfov": 110, "vOffset": 0, "pitch": 0}
+        fields["wrap"] = seed_wrap or dict(HOUSE_WRAP)
     if d_hotspots is not None:
         # attach any content authored on the node's plannedHotspots onto the freshly-placed boxes,
         # so content authored BEFORE art lands at commit (deepcopy: don't mutate the draft blob)
@@ -1773,6 +1881,347 @@ def _pano_candidates(base, room_key):
     return [n for _i, n in sorted(indexed)] + sorted(legacy)
 
 
+def _same_bytes(a, b, chunk=1 << 20):
+    """Do two files hold the same bytes? Read them — deliberately NOT `filecmp.cmp`, which caches its
+    verdict against an (size, mtime) signature and so can answer "unchanged" for a file that was rewritten
+    with same-size content. That is exactly the regeneration case this is used for."""
+    with open(a, "rb") as fa, open(b, "rb") as fb:
+        while True:
+            ba, bb = fa.read(chunk), fb.read(chunk)
+            if ba != bb:
+                return False
+            if not ba:
+                return True
+
+
+CLIP_INTERMEDIATE_SUFFIXES = ("_raw", "_src")   # see _room_clips: siblings, never states
+
+
+MOTION_MAP_PCT = 99.5      # the percentile of a clip's own variation that is drawn as white
+MOTION_MAP_FLOOR = 6.0     # ...but never stretch a nearly-static clip until its noise looks like motion
+
+
+def _motion_tstd(clip, cache_dir):
+    """The clip's per-pixel temporal std, cached as .npy against its mtime.
+
+    Sampling and decoding 16 frames of a 3072x1024 clip is the expensive part; the mask itself is a
+    couple of array ops. Caching the tstd is what lets a threshold slider be interactive while still
+    running the REAL `mask_from_tstd` rather than a browser approximation of it."""
+    import numpy as _np
+    sys.path.insert(0, os.path.join(ESCAPE_ROOT, "cinemagraph_tools"))
+    from motion_mask import sample_frames  # noqa: WPS433
+    os.makedirs(cache_dir, exist_ok=True)
+    npy = os.path.join(cache_dir, "%s_%d.npy" % (os.path.basename(clip)[:-4], int(os.path.getmtime(clip))))
+    if os.path.isfile(npy):
+        return _np.load(npy)
+    tstd = sample_frames(clip, n=16).std(axis=0).mean(axis=2)
+    _np.save(npy, tstd)
+    return tstd
+
+
+GRID_SCALE = 4          # the (threshold x region) surface is computed at 1/4 linear resolution
+GRID_PCTS = list(range(50, 100, 3))                     # p50..p98, the ladder the slider walks
+GRID_REGION_POS = list(range(0, 101, 10))               # slider positions; 0 = no cut
+
+
+def _grid_ppm(pos):
+    """Slider position -> region cut in parts-per-million of the frame. Mirrors `regPpm` in the UI.
+
+    Log-mapped on purpose: linear pixels would spend nine tenths of the travel in region sizes nobody
+    ever wants. 0 = off, 25 -> 10ppm, 50 -> 100, 75 -> 1000, 100 -> 10000 (1% of the frame)."""
+    return 0.0 if pos <= 0 else 10.0 ** (pos / 25.0)
+
+
+def _mask_grid(tstd, scale=GRID_SCALE):
+    """Coverage (fraction of frame that stays VIDEO) over the whole threshold x region plane.
+
+    Structured so the expensive parts are paid once per THRESHOLD, not once per cell: at a given
+    percentile the closing and the connected-component labelling are done a single time, and each region
+    cut is then a lookup over the component sizes. That is what makes ~190 cells a few seconds instead
+    of a few minutes.
+
+    The feather is skipped deliberately — a normalised Gaussian preserves the mean, so it cannot move a
+    coverage figure, and it is the slowest step in the chain."""
+    import numpy as _np
+    from scipy import ndimage as _nd
+    H, W = tstd.shape
+    h, w = H // scale, W // scale
+    ds = tstd[:h * scale, :w * scale].reshape(h, scale, w, scale).mean(axis=(1, 3))
+    cr = max(1, int(round(4.0 / scale)))                 # close radius scales with the resolution
+    cov = []
+    for ppm in [_grid_ppm(p) for p in GRID_REGION_POS]:
+        cov.append([0.0] * len(GRID_PCTS))
+    for j, pct in enumerate(GRID_PCTS):
+        thr = float(_np.percentile(ds, pct))
+        b = _nd.binary_closing(ds > thr, structure=_np.ones((cr, cr)))
+        lab, n = _nd.label(b)
+        sizes = _nd.sum(b, lab, range(1, n + 1)) if n else _np.zeros(0)
+        for i, pos in enumerate(GRID_REGION_POS):
+            min_px = _grid_ppm(pos) * ds.size / 1e6
+            if min_px <= 0 or n == 0:
+                keep = b
+            else:
+                sel = _np.zeros(n + 1, dtype=bool)
+                sel[1:] = sizes >= min_px
+                keep = sel[lab]
+            cov[i][j] = round(float(_nd.binary_fill_holes(keep).mean()), 4)
+    return {"pcts": GRID_PCTS, "regionPos": GRID_REGION_POS,
+            "regionPpm": [round(_grid_ppm(p), 2) for p in GRID_REGION_POS],
+            "cov": cov, "scale": scale, "shape": [H, W],
+            "note": "indicative, computed at 1/%d resolution without the feather" % scale}
+
+
+def _motion_scale_of(png):
+    """The auto scale a cached map was drawn at, recovered by re-deriving it is NOT possible from the PNG
+    alone — so it is stored in a tiny sidecar next to the map when it is written."""
+    side = png + ".scale"
+    try:
+        return open(side, encoding="utf-8").read().strip()
+    except OSError:
+        return "auto"
+
+
+def _render_motion_map(clip, out_png, n=16, scale=None):
+    """Per-pixel temporal standard deviation of a clip, as a greyscale PNG: white = moving.
+
+    AUTO-SCALED to the clip's OWN distribution, and that matters more than it sounds. The map was first
+    drawn with the sweep tooling's fixed `scale=40` — 40 grey levels of variation renders as white — and
+    on these clips that hides nearly everything we work with: the median pixel varies by ~1.5 and the 90th
+    percentile by 4-10, which at scale 40 draw as grey 10 and 25-61 out of 255. So a frame that is moving
+    all over reads as an almost-empty map, while the clip visibly wiggles outside the few bright patches.
+    Lucas spotted exactly that contradiction (2026-08-31) and it is a defect in the MAP, not the clip.
+
+    The liveness thresholds live at 4.5 (dead) and 8.0 (alive), so a map has to make the 4-10 band legible
+    or it cannot answer the question it is drawn for. Mapping the clip's own p99.5 to white does that. The
+    floor stops a genuinely still clip from being stretched until its compression noise looks alive.
+
+    Returns (path, scale) so the caller can tell the viewer what white means — an unlabelled auto-scaled
+    map invites exactly the misreading of comparing two clips whose whites mean different things."""
+    import numpy as _np
+    from PIL import Image as _Image
+    sys.path.insert(0, os.path.join(ESCAPE_ROOT, "cinemagraph_tools"))
+    from motion_mask import sample_frames  # noqa: WPS433
+    fr = sample_frames(clip, n=n)
+    tstd = fr.std(axis=0).mean(axis=2)
+    if scale is None:
+        scale = max(MOTION_MAP_FLOOR, float(_np.percentile(tstd, MOTION_MAP_PCT)))
+    _Image.fromarray((_np.clip(tstd / scale, 0, 1) * 255).astype("uint8"), "L").save(out_png)
+    scale = round(float(scale), 2)
+    with open(out_png + ".scale", "w", encoding="utf-8") as f:
+        f.write(str(scale))
+    return out_png, scale
+
+
+def _state_still_rel(base, room_key, state, doc=None):
+    """The panorama a (room, state) is drawn from, relative to the scenario dir, for /sfile.
+
+    Mirrors `cine_scenario.state_still` — the gallery must show the reviewer the SAME image the bake
+    composites the clip onto, or the thing being judged is not the thing that ships."""
+    if state == "base":
+        return "%s/scene.png" % room_key
+    try:
+        if doc is None:
+            doc = json.load(open(os.path.join(base, "scenario.json"), encoding="utf-8"))
+        for st in scene_states.scene_states(doc, base):
+            if st["room"] == room_key and st["state"] == state and st.get("panorama"):
+                return st["panorama"]
+    except Exception:  # noqa: BLE001
+        pass
+    return "%s/scene.png" % room_key
+
+
+def _room_clips(base, room_key, doc=None):
+    """The baked cinemagraphs sitting in a room directory, as {state, file} in state order.
+
+    Named `cine_<state>.mp4` by `cinemagraph_tools/cine_scenario.py` — one per full-scene world state,
+    so `cine_base.mp4` is the room's own art animated and `cine_night.mp4` (etc.) would be its variant.
+    These are the BAKED merge: the full-frame render with any tile repairs already composited in, which
+    is the thing that ships, so it is what the gallery should play. Filesystem-derived on purpose —
+    a clip is not wired into scenario.json until someone has looked at it."""
+    d = os.path.join(base, room_key)
+    out = []
+    for f in sorted(glob.glob(os.path.join(d, "cine_*.mp4"))):
+        name = os.path.basename(f)
+        state = name[len("cine_"):-len(".mp4")]
+        # INTERMEDIATES ARE NOT STATES. Two files live beside each clip under the same `cine_` prefix:
+        #   `cine_<state>_raw.mp4`  the pre-bake render (loop treatment can change without re-rendering)
+        #   `cine_<state>_src.mp4`  the un-patched render (a dropped repair patch rebuilds from it)
+        # Both are gitignored and neither is a world state. Listing them showed every room twice, then
+        # three times — the same bug twice, which is why it is now a named tuple and a test rather than
+        # one more `endswith` bolted on at the point of failure.
+        if state.endswith(CLIP_INTERMEDIATE_SUFFIXES):
+            continue
+        # `cine_<state>.patches.json` records any repair TILE composited into this clip: what was pasted
+        # and where. It is written by the pipeline at bake time, and the gallery outlines those regions —
+        # a pasted tile is the one part of a clip that can carry its own artefacts, so it is the part you
+        # want to be able to find on purpose rather than by chance (Lucas, 2026-08-31).
+        patches = []
+        pj = os.path.join(d, "cine_%s.patches.json" % state)
+        if os.path.isfile(pj):
+            try:
+                patches = json.load(open(pj, encoding="utf-8"))
+            except Exception:  # noqa: BLE001
+                patches = []
+        # The COMMITTED mask choice, so the gallery's sliders open where the shipped clip actually
+        # sits instead of at "no mask". They previously always opened at the off position, which said
+        # "all video" about clips that had been baked masked since the day they were rendered.
+        mask = {}
+        mj = os.path.join(d, "cine_%s.mask.json" % state)
+        if os.path.isfile(mj):
+            try:
+                mask = json.load(open(mj, encoding="utf-8"))
+            except Exception:  # noqa: BLE001
+                mask = {}
+        # THE STILL FOR **THIS** STATE. A variant clip sits over the variant's own panorama, not over
+        # `scene.png`: showing the base art underneath a night clip makes the reviewer judge a composite
+        # that will never exist. Resolved through `scene_states`, the same way the bake resolves it.
+        out.append({"state": state, "file": "%s/%s" % (room_key, name),
+                    "patches": patches, "mask": mask,
+                    "still": _state_still_rel(base, room_key, state, doc)})
+    out.sort(key=lambda c: (c["state"] != "base", c["state"]))   # base first, then variants
+    # SERVED — is this clip actually wired for play, or only sitting on disk? Baked-but-unwired is the
+    # invisible state that let nine reviewed canyon clips never reach a player (2026-09-01), so it is
+    # reported beside every clip rather than being something you have to go and check.
+    # Load the doc if the caller did not pass one. Reading `served` off `doc or {}` made this function
+    # answer "nothing is served" for every clip whenever it was called without a doc — a silent wrong
+    # answer, and the exact shape of the bug it exists to expose.
+    try:
+        sdoc = doc if doc is not None else _load_scenario(base)
+    except Exception:  # noqa: BLE001 — no scenario to read (a clips-only fixture): nothing can be served
+        sdoc = {}
+    node = next((r for r in ((sdoc or {}).get("rooms") or []) if r.get("key") == room_key), None)
+    live = {}
+    for h in ((node or {}).get("hotspots") or []):
+        c = h.get("cinemagraph") or {}
+        if c.get("video") and c.get("box") == [0, 0, 1, 1]:
+            live[c.get("state") or "base"] = c["video"]
+    for c in out:
+        c["served"] = live.get(c["state"]) == c["file"]
+    return out
+
+
+# ---- serving a room's BAKED clips in play --------------------------------------------------------
+# `_room_clips` is filesystem-derived on purpose — "a clip is not wired into scenario.json until someone
+# has looked at it". That review gate is deliberate and stays. But nothing implemented the step AFTER the
+# look, so a reviewed clip never reached the player: canyon had nine baked full-scene clips on disk, none
+# referenced anywhere in its scenario, and test play served the stills (Lucas, 2026-09-01).
+#
+# The engine already has the path. `pano-player.js` gives a cinemagraph whose box is [0,0,1,1] its own
+# full-scene branch — drawn straight over the base, no feather (there is no surrounding still to blend
+# into) and no per-frame temp canvas. So wiring is a scenario edit, not an engine change.
+#
+# WHERE THE CLIP HANGS. On a marker-less `ambient` carrier hotspot at [0,0,1,1] — the same trick
+# `ensure_variant_carrier` uses for full-scene state variants: `ambient` is filtered out of rendering, so
+# the carrier shows no marker and intercepts no clicks. One carrier PER STATE, because a hotspot holds
+# exactly one `cinemagraph` and `pickCinemagraphs` selects on `state`.
+CLIP_CARRIER_PREFIX = "clip_"
+
+
+def _clip_carrier_id(state):
+    return CLIP_CARRIER_PREFIX + _slug(state)
+
+
+def _serve_room_clips(room_key, base):
+    """Wire every baked clip in a room onto a carrier hotspot so the player actually plays it.
+
+    `cine_base.mp4` carries NO `state` field — `pickCinemagraphs` matches base as absent, and writing
+    `state: "base"` would make it match nothing and silently play the still. Any other state is written
+    through verbatim.
+
+    Idempotent, and safe to re-run after a re-bake: an existing carrier has its `cinemagraph` refreshed
+    rather than being duplicated. Returns (wired, unchanged) — lists of state names."""
+    with SAVE_LOCK:
+        doc = _load_scenario(base)
+        node = next((r for r in doc.get("rooms") or [] if r.get("key") == room_key), None)
+        if node is None:
+            raise ValueError("no room with key %r" % room_key)
+        hs = node.get("hotspots")
+        if not isinstance(hs, list):
+            raise ValueError("room %r has no hotspots (commit it first)" % room_key)
+        clips = _room_clips(base, room_key, doc)
+        if not clips:
+            raise ValueError("room %r has no baked clips" % room_key)
+        wired, unchanged = [], []
+        for c in clips:
+            state = c["state"]
+            cine = {"box": [0, 0, 1, 1], "video": c["file"]}
+            if state != "base":
+                cine["state"] = state
+            cid = _clip_carrier_id(state)
+            spot = next((h for h in hs if h.get("id") == cid), None)
+            if spot is None:
+                spot = {"id": cid, "type": "ambient",
+                        "label": "Scene motion (%s)" % state,
+                        "box": [0, 0, 1, 1],
+                        "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is "
+                                "filtered out of rendering, so it shows no marker and intercepts no "
+                                "clicks; it exists only to hold the clip. Written by /api/serve-clips."}
+                hs.append(spot)
+            if spot.get("cinemagraph") == cine:
+                unchanged.append(state); continue
+            spot["cinemagraph"] = cine
+            wired.append(state)
+        if wired:
+            _save_scenario(doc, base)
+    return wired, unchanged
+
+
+def _scratch_uncommitted(base, cands, committed):
+    """Of a list of `_scratch` candidate filenames, the ones that are NOT the file already committed.
+
+    Every commit in this harness is a COPY out of `_scratch` to a stable name (scene.png, cover.png,
+    _world/plate.png) that records no back-pointer to its source, and the generators reuse candidate
+    filenames across runs — so neither the scenario node nor the filename can answer "is this one
+    already the committed art". Compare bytes, cheaply: sizes differ in almost every case, and only a
+    size match costs a read.
+
+    `committed` is an absolute path or None (nothing committed → every candidate is pending)."""
+    if not committed or not os.path.isfile(committed):
+        return list(cands)
+    try:
+        csz = os.path.getsize(committed)
+    except OSError:
+        return list(cands)
+    out = []
+    for f in cands:
+        p = os.path.join(base, "_scratch", f)
+        try:
+            if os.path.getsize(p) != csz or not _same_bytes(p, committed):
+                out.append(f)
+        except OSError:
+            continue                          # candidate vanished mid-listing — not pending
+    return out
+
+
+def _pano_uncommitted(base, room_key, cands):
+    """Of a room's _scratch candidates, the ones that are NOT the art currently committed as scene.png.
+
+    `builtFrom` cannot answer this on its own. Single-candidate generation always writes
+    `l1_<room>_1.png`, so a REGENERATION reuses the filename of the candidate the room was built from —
+    the node still says builtFrom "l1_j_c2_1.png" while that file on disk is now different art nobody has
+    looked at yet. Filtering by name would hide exactly the thing that needs reviewing.
+
+    Used by the gallery (build_world_v2.html) to show pending art at full width, base above candidate."""
+    return _scratch_uncommitted(base, cands, os.path.join(base, room_key, "scene.png"))
+
+
+def _cover_candidates(base):
+    """The scenario's COVER candidates in _scratch: `gpt_cover_*.png`, newest first.
+
+    `_open`/`_x2` are excluded — those are derived files (an upscale, a variant), not fresh candidates,
+    and offering them as choices means committing an upscale as if it were an original. This is the same
+    filter the gallery used to apply client-side over /api/scenes; it lives here now so the committed
+    cover can be byte-matched out of the list without shipping the bytes to the browser."""
+    scratch = os.path.join(base, "_scratch")
+    out = []
+    for p in glob.glob(os.path.join(scratch, "gpt_cover_*.png")):
+        name = os.path.basename(p)
+        if "_open" in name or "_x2" in name:
+            continue
+        out.append((os.path.getmtime(p), name))
+    return [n for _m, n in sorted(out, reverse=True)]
+
+
 def _next_pano_idx(base, room_key):
     """Lowest free candidate index in 1..MAX for a room (fills a gap left by a delete), or None if full."""
     scratch = os.path.join(base, "_scratch")
@@ -1868,6 +2317,65 @@ def _run_gen_world_plate(slot, base, prompt, size, quality, n=1):
     except Exception as e:  # noqa: BLE001
         with LOCK:
             JOBS[slot]["error"] = str(e)[-500:]
+    with LOCK:
+        JOBS[slot]["active"] = False
+
+
+def _run_mask_rebuild(slot, base, room, state, pct, enabled, region=0.0):
+    """Set a clip's mask threshold (or turn masking off) and REBUILD it, so the file matches the choice.
+
+    The threshold is an authored decision — it decides how much of the shipped frame is generated video
+    versus the crisp original still — so it is recorded in `cine_<state>.mask.json` and re-applied by
+    every later re-bake instead of quietly reverting to auto."""
+    try:
+        sj = os.path.join(base, room, "cine_%s.mask.json" % state)
+        cfg = {}
+        if os.path.isfile(sj):
+            try:
+                cfg = json.load(open(sj, encoding="utf-8"))
+            except Exception:  # noqa: BLE001
+                cfg = {}
+        cfg["pct"] = pct
+        cfg["region"] = float(region)      # ppm of the frame; see auto_mask.drop_small
+        cfg["enabled"] = bool(enabled)
+        json.dump(cfg, open(sj, "w", encoding="utf-8"), indent=1)
+        sys.path.insert(0, os.path.join(ESCAPE_ROOT, "cinemagraph_tools"))
+        import cine_scenario as _cs  # noqa: WPS433
+        _cs.rebuild_clip(base, room, state, log=lambda m: None)
+        with LOCK:
+            JOBS[slot]["done"] = 1
+    except Exception as e:  # noqa: BLE001
+        with LOCK:
+            JOBS[slot]["error"] = str(e)[-400:]
+    with LOCK:
+        JOBS[slot]["active"] = False
+
+
+def _run_patch_rebuild(slot, base, room, state, name, enabled):
+    """Flip one repair patch on/off and REBUILD the clip so the file matches the flag.
+
+    A patch is composited into the video, so this cannot be a display toggle: turning it off has to
+    produce a new clip built from the unpatched render. The sidecar is written first, then the rebuild
+    reads it — so the record and the file can only disagree while the job is mid-flight, never after."""
+    try:
+        pj = os.path.join(base, room, "cine_%s.patches.json" % state)
+        patches = json.load(open(pj, encoding="utf-8")) if os.path.isfile(pj) else []
+        hit = False
+        for p in patches:
+            if p.get("name") == name:
+                p["enabled"] = bool(enabled)
+                hit = True
+        if not hit:
+            raise ValueError("no patch %r on %s/%s" % (name, room, state))
+        json.dump(patches, open(pj, "w", encoding="utf-8"), indent=1)
+        sys.path.insert(0, os.path.join(ESCAPE_ROOT, "cinemagraph_tools"))
+        import cine_scenario as _cs  # noqa: WPS433
+        _cs.rebuild_clip(base, room, state, log=lambda m: None)
+        with LOCK:
+            JOBS[slot]["done"] = 1
+    except Exception as e:  # noqa: BLE001
+        with LOCK:
+            JOBS[slot]["error"] = str(e)[-400:]
     with LOCK:
         JOBS[slot]["active"] = False
 
@@ -2135,8 +2643,13 @@ def _run_seamfix(slot, image, left=None, right=None, feather=None, full=False, p
     stem = os.path.splitext(os.path.basename(image))[0]
     out = os.path.join(SCENE, stem + "_seam.png")
     try:
+        # env=gen_env() (2026-09-02): seam repair calls the image API, so it needs OPENAI_API_KEY resolved
+        # the same way generation does. It inherited os.environ, which only carries the key when the SERVER
+        # itself was started from an interactive shell — exactly the latent failure `gen_env` was written
+        # for. It surfaced when the occluder pass was driven from a script instead of the console: every
+        # room failed instantly with "OPENAI_API_KEY not set". Same fix on all three seamfix call sites.
         subprocess.run(_seamfix_argv(inp, out, left, right, feather, full, pos),
-                       check=True, capture_output=True, text=True)
+                       check=True, capture_output=True, text=True, env=gen_env())
         with LOCK:
             JOBS[slot]["outputs"].append(os.path.basename(out))
             JOBS[slot]["done"] = 1
@@ -2161,7 +2674,7 @@ def _run_seamfix_scratch(slot, base, image, left=None, right=None, feather=None,
         if not os.path.isfile(img):
             raise RuntimeError("no scratch pano %s — Generate first" % os.path.basename(image))
         subprocess.run(_seamfix_argv(img, tmp, left, right, feather, full, pos, crop, occluder, edit_frac),
-                       check=True, capture_output=True, text=True)
+                       check=True, capture_output=True, text=True, env=gen_env())
         _seam_push(scratch, stem, img)   # push the pre-fix state onto the undo stack (one snapshot per stage)
         shutil.move(tmp, img)
         with LOCK:
@@ -2213,7 +2726,7 @@ def _run_seamfix_room(slot, base, room_key, left=None, right=None, feather=None,
     tmp = os.path.join(base, room_key, "%s_seam.png" % stem)
     try:
         subprocess.run(_seamfix_argv(scene, tmp, left, right, feather, full, pos, crop, occluder, edit_frac),
-                       check=True, capture_output=True, text=True)
+                       check=True, capture_output=True, text=True, env=gen_env())
         _seam_push(os.path.join(base, room_key), stem, scene)   # per-image undo stack, keyed by stem
         shutil.move(tmp, scene)
         with LOCK:
@@ -2354,9 +2867,14 @@ def ensure_variant_carrier(base, room_key, carrier_id, label="Nightfall"):
 def restretch_to(path, size):
     """Stretch an edit reply back to the base panorama's exact size, in place. Returns True if it moved.
 
-    The image-edit endpoint will not return 3:1 — it hands back 1536x1024. The model preserves the
-    horizontal layout INSIDE that squashed frame, so a plain resize restores both the proportions and
-    the hotspot alignment. Skipped when the reply already matches.
+    SAFETY NET ONLY as of 2026-09-02 — callers must ASK for the base's native size, and then this is a
+    no-op. The old docstring claimed "the image-edit endpoint will not return 3:1 — it hands back
+    1536x1024", and the fullscene caller relied on that: it let `--size` default to 1536x1024 and
+    stretched the 1.5:1 reply out to 3:1 here. That is a **2x horizontal stretch**, and the premise it
+    rested on — that the model lays the scene out inside the squashed frame, so a resize restores it —
+    only holds for structure COPIED from the input. Anything the model re-draws it draws at natural
+    proportions, and those objects came out twice as wide (egypt's night variants). /images/edits does
+    return 3072x1024 when asked; verified against the live API. Skipped when the reply already matches.
     """
     from PIL import Image
     with Image.open(path) as im:
@@ -2390,7 +2908,15 @@ def run_fullscene_variant(base, room_key, state, prompt, when=None, carrier=None
     out = os.path.join(base, room_key, "scene_%s.png" % safe_state)
     with Image.open(day) as im:
         target = im.size
-    subprocess.run(["python3", GEN, "edit", "--input", day, "--prompt", prompt, "--out", out],
+    # ASK FOR THE BASE'S NATIVE SIZE (2026-09-02). `generate_scene.py edit` defaults `--size` to
+    # 1536x1024 and this call never overrode it, so every night variant was generated at 1.5:1 and then
+    # stretched to the 3:1 base by `restretch_to` — a 2x horizontal stretch. Structure the model copied
+    # from the input survived it, but anything it RE-DREW came back at natural proportions inside the
+    # squashed frame and was left twice as wide (Lucas, on egypt's nights: "stretched weirdly"). Verified
+    # 2026-09-02 that /images/edits returns 3072x1024 when asked, so the stretch was never necessary.
+    # `restretch_to` stays as a no-op safety net for a reply that ignores the requested size.
+    subprocess.run(["python3", GEN, "edit", "--input", day, "--prompt", prompt, "--out", out,
+                    "--size", "%dx%d" % target],
                    check=True, capture_output=True, text=True, env=gen_env())
     restretch_to(out, target)
     ensure_variant_carrier(base, room_key, carrier, label)
@@ -2747,14 +3273,179 @@ class H(http.server.SimpleHTTPRequestHandler):
             d = os.path.join(base, "_scratch", "audio")
             files = sorted(os.path.basename(p) for p in glob.glob(os.path.join(d, "*.mp3")))
             return self._json({"files": files})
+        if route == "/api/motion-map":        # where a baked clip actually moves, as a PNG the UI overlays
+            # Rendered on demand and cached beside the clip in _scratch (gitignored), keyed on the clip's
+            # mtime so a re-bake invalidates it — a stale map describes a video that no longer exists,
+            # which is the exact bug add_to_viewer's motion_map() had to grow a freshness check for.
+            try:
+                base = self._query_base()
+            except ValueError:
+                return self._json({"error": "bad scenario"}, 400)
+            q = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+            room = re.sub(r"[^A-Za-z0-9_]", "", (q.get("room") or [""])[0])
+            state = re.sub(r"[^A-Za-z0-9_]", "", (q.get("state") or ["base"])[0])
+            clip = os.path.join(base, room, "cine_%s.mp4" % state)
+            if not room or not os.path.isfile(clip):
+                return self._json({"error": "no such clip"}, 404)
+            cache_dir = os.path.join(base, "_scratch", "motion")
+            os.makedirs(cache_dir, exist_ok=True)
+            try:
+                scale = float((q.get("scale") or ["0"])[0]) or None
+            except ValueError:
+                scale = None
+            tag = ("%g" % scale) if scale else "auto"
+            out = os.path.join(cache_dir, "%s_%s_%s_%d.png"
+                               % (room, state, tag, int(os.path.getmtime(clip))))
+            used = None
+            if not os.path.isfile(out):
+                try:
+                    _, used = _render_motion_map(clip, out, scale=scale)
+                except Exception as e:  # noqa: BLE001
+                    return self._json({"error": "motion map failed: %s" % str(e)[:200]}, 500)
+            # What white MEANS, so the viewer can label it and nobody compares two differently-scaled maps.
+            if used is None:                      # cache hit: recover the scale from the cached name
+                used = tag if tag != "auto" else _motion_scale_of(out)
+            return self._serve_file(base, os.path.relpath(out, base),
+                                    headers={"X-Motion-Scale": used,
+                                             "Access-Control-Expose-Headers": "X-Motion-Scale"})
+        if route == "/api/mask-grid":         # coverage over the whole (threshold x region) plane
+            # THE MAP FOR THE 2D PAD. The two mask axes interact — a region cut can only bite once the
+            # threshold is tight enough to break the frame into separate regions, so at a loose threshold
+            # the whole frame is ONE component and the cut does nothing at all. That is invisible from
+            # two independent sliders and obvious from a surface, which is what this serves.
+            #
+            # Computed at 1/GRID_SCALE resolution, with close radius and the region cut scaled with it,
+            # and WITHOUT the final feather (a normalised blur preserves the mean, so it cannot move a
+            # coverage number). It is a NAVIGATION AID and is labelled as one: the number the reviewer
+            # acts on always comes from /api/motion-mask at full resolution. Do not let a caller quote
+            # these figures as the mask's coverage — that is the browser-emulation trap in another hat.
+            try:
+                base = self._query_base()
+            except ValueError:
+                return self._json({"error": "bad scenario"}, 400)
+            q = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+            room = re.sub(r"[^A-Za-z0-9_]", "", (q.get("room") or [""])[0])
+            state = re.sub(r"[^A-Za-z0-9_]", "", (q.get("state") or ["base"])[0])
+            clip = os.path.join(base, room, "cine_%s.mp4" % state)
+            if not room or not os.path.isfile(clip):
+                return self._json({"error": "no such clip"}, 404)
+            cache_dir = os.path.join(base, "_scratch", "motion")
+            os.makedirs(cache_dir, exist_ok=True)
+            out = os.path.join(cache_dir, "grid_%s_%s_%d.json" % (room, state, int(os.path.getmtime(clip))))
+            if os.path.isfile(out):
+                try:
+                    return self._json(json.load(open(out, encoding="utf-8")))
+                except Exception:  # noqa: BLE001
+                    pass
+            try:
+                grid = _mask_grid(_motion_tstd(clip, cache_dir))
+            except Exception as e:  # noqa: BLE001
+                return self._json({"error": "grid failed: %s" % str(e)[:200]}, 500)
+            with open(out, "w", encoding="utf-8") as f:
+                json.dump(grid, f)
+            return self._json(grid)
+        if route == "/api/motion-mask":       # the cinemagraph mask, at auto or a chosen percentile
+            # White/opaque = show the VIDEO, black/transparent = show the STILL. Built by `auto_mask`,
+            # which is the mechanism Lucas confirmed ("auto threshold on the mask is working well") and
+            # which had never been called from anywhere: a percentile ladder over the clip's OWN motion,
+            # scored by object SOLIDITY, then closed, hole-filled and feathered. Percentiles because the
+            # absolute temporal-std numbers differ per scene.
+            try:
+                base = self._query_base()
+            except ValueError:
+                return self._json({"error": "bad scenario"}, 400)
+            q = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+            room = re.sub(r"[^A-Za-z0-9_]", "", (q.get("room") or [""])[0])
+            state = re.sub(r"[^A-Za-z0-9_]", "", (q.get("state") or ["base"])[0])
+            clip = os.path.join(base, room, "cine_%s.mp4" % state)
+            if not room or not os.path.isfile(clip):
+                return self._json({"error": "no such clip"}, 404)
+            pct_raw = (q.get("pct") or ["auto"])[0]
+            # THE REGION CUT, the second and independent axis (`auto_mask.drop_small`). Carried as
+            # parts-per-million of the frame rather than raw pixels, so one slider position means the
+            # same thing on a 3072x1024 panorama and on a cropped tile. 0 = off.
+            try:
+                region_ppm = max(0.0, float((q.get("region") or ["0"])[0]))
+            except ValueError:
+                region_ppm = 0.0
+            # RGBA when the caller is CSS. `mask-image` reads the ALPHA channel, so a greyscale PNG is
+            # opaque everywhere and masks NOTHING — the video played in full while the coverage number
+            # said 0.7%, which is exactly the contradiction Lucas reported (2026-08-31).
+            want_alpha = (q.get("alpha") or ["0"])[0] in ("1", "true")
+            cache_dir = os.path.join(base, "_scratch", "motion")
+            # The region cut is part of the cache KEY. Leaving it out served the previous cut's PNG for
+            # a new slider position — a preview that silently disagrees with its own label is the whole
+            # failure mode this endpoint exists to avoid.
+            out = os.path.join(cache_dir, "mask_%s_%s_%s_r%g%s_%d.png"
+                               % (room, state, pct_raw, region_ppm, "_a" if want_alpha else "",
+                                  int(os.path.getmtime(clip))))
+            meta = None
+            if not os.path.isfile(out):
+                try:
+                    import numpy as _np
+                    from PIL import Image as _Image
+                    sys.path.insert(0, os.path.join(ESCAPE_ROOT, "cinemagraph_tools"))
+                    from auto_mask import auto_mask, mask_at_percentile  # noqa: WPS433
+                    tstd = _motion_tstd(clip, cache_dir)
+                    min_px = int(region_ppm * tstd.size / 1e6)
+                    if pct_raw == "auto":
+                        m, thr, rep = auto_mask(tstd, min_px=min_px)
+                        meta = {"pct": "auto", "thr": thr, "cov": float(m.mean()),
+                                "region": region_ppm, "minPx": min_px,
+                                "kept": rep.get("kept"), "dropped": rep.get("dropped")}
+                    else:
+                        pct = max(1.0, min(99.9, float(pct_raw)))
+                        m, thr, cov, reg = mask_at_percentile(tstd, pct, min_px=min_px)
+                        meta = {"pct": pct, "thr": thr, "cov": cov, "region": region_ppm,
+                                "minPx": min_px, "kept": reg["kept"], "dropped": reg["dropped"]}
+                    g = (_np.clip(m, 0, 1) * 255).astype("uint8")
+                    if want_alpha:
+                        rgba = _np.zeros(g.shape + (4,), dtype="uint8")
+                        rgba[..., :3] = 255
+                        rgba[..., 3] = g
+                        _Image.fromarray(rgba, "RGBA").save(out)
+                    else:
+                        _Image.fromarray(g, "L").save(out)
+                    with open(out + ".meta", "w", encoding="utf-8") as f:
+                        json.dump(meta, f)
+                except Exception as e:  # noqa: BLE001
+                    return self._json({"error": "mask failed: %s" % str(e)[:200]}, 500)
+            if meta is None:
+                try:
+                    meta = json.load(open(out + ".meta", encoding="utf-8"))
+                except Exception:  # noqa: BLE001
+                    meta = {"pct": pct_raw, "thr": 0, "cov": 0}
+            return self._serve_file(base, os.path.relpath(out, base), headers={
+                "X-Mask-Coverage": "%.1f" % (100 * meta["cov"]),
+                "X-Mask-Threshold": "%.2f" % meta["thr"],
+                "X-Mask-Pct": str(meta["pct"]),
+                "X-Mask-Min-Px": str(meta.get("minPx", 0)),
+                "X-Mask-Regions": str(meta.get("kept") if meta.get("kept") is not None else ""),
+                "X-Mask-Dropped": str(meta.get("dropped") if meta.get("dropped") is not None else ""),
+                "Access-Control-Expose-Headers":
+                    "X-Mask-Coverage,X-Mask-Threshold,X-Mask-Pct,X-Mask-Min-Px,X-Mask-Regions,X-Mask-Dropped"})
         if route == "/api/plate-candidates":  # world-plate candidates in _scratch + which one is committed
             try:
                 base = self._query_base()
             except ValueError:
                 return self._json({"error": "bad scenario"}, 400)
-            return self._json({"files": _plate_candidates(base),
+            _pfiles = _plate_candidates(base)
+            return self._json({"files": _pfiles,
+                               # the committed plate is shown once, at the top of its card — so the
+                               # candidate it was promoted from must drop out of the list below it.
+                               "uncommitted": _scratch_uncommitted(base, _pfiles, _world_plate_abs(base)),
                                "committed": bool(_world_plate_abs(base)),
                                "worldPlate": (_load_scenario(base).get("worldPlate") or "")})
+        if route == "/api/cover-candidates":  # scenario cover candidates in _scratch + which is committed
+            try:
+                base = self._query_base()
+            except ValueError:
+                return self._json({"error": "bad scenario"}, 400)
+            _cfiles = _cover_candidates(base)
+            _cabs = os.path.join(base, "cover.png")
+            return self._json({"files": _cfiles,
+                               "uncommitted": _scratch_uncommitted(base, _cfiles, _cabs),
+                               "cover": (_load_scenario(base).get("cover") or "")})
         if route == "/api/clue-candidates":   # generated artwork candidates for one clue hotspot
             try:
                 base = self._query_base()
@@ -2807,9 +3498,13 @@ class H(http.server.SimpleHTTPRequestHandler):
         qs = urllib.parse.parse_qs(self.path.split("?", 1)[1] if "?" in self.path else "")
         return _scenario_base(qs.get("chapter", [""])[0], qs.get("scenario", [""])[0])
 
-    def _serve_file(self, base, rel):
+    def _serve_file(self, base, rel, headers=None):
         """Serve a file from under `base` (SCENE or the scenario dir), which live outside the
-        served ROOT. Path-confined to `base`."""
+        served ROOT. Path-confined to `base`.
+
+        `headers` adds response headers — used by the motion map to report the scale it auto-picked,
+        so the viewer can say what white means instead of leaving two differently-scaled maps looking
+        directly comparable."""
         rel = urllib.parse.unquote(rel).lstrip("/")
         p = os.path.abspath(os.path.join(base, rel))
         if not p.startswith(os.path.abspath(base) + os.sep) or not os.path.isfile(p):
@@ -2825,6 +3520,8 @@ class H(http.server.SimpleHTTPRequestHandler):
         self.send_response(200)
         self.send_header("Content-Type", ctype)
         self.send_header("Content-Length", str(len(b)))
+        for k, v in (headers or {}).items():
+            self.send_header(k, str(v))
         self.end_headers()
         self.wfile.write(b)
 
@@ -2922,6 +3619,28 @@ class H(http.server.SimpleHTTPRequestHandler):
                 except ValueError as ve:
                     return self._json({"ok": False, "error": str(ve)}, 400)
                 return self._json({"ok": True, "active": dict(ACTIVE), "config": _scenario_config()})
+            if route == "/api/serve-clips":
+                # Wire ONE room's baked clips onto carriers so play stops serving the still. Per room,
+                # next to the clip it affects — the same shape as every other Commit in this harness.
+                req = self._body()
+                try:
+                    base = _scenario_base(req.get("chapter"), req.get("scenario"))
+                    wired, unchanged = _serve_room_clips(req.get("roomKey"), base)
+                except ValueError as ve:
+                    return self._json({"ok": False, "error": str(ve)}, 400)
+                return self._json({"ok": True, "wired": wired, "unchanged": unchanged})
+            if route == "/api/commit-planned":
+                # Promote ONE room's plannedHotspots into its live hotspots, boxes and all. Per room, not
+                # per scenario: the gallery offers it next to the room it affects, the same shape as the
+                # per-candidate Commit on the art and cinemagraph tabs.
+                req = self._body()
+                try:
+                    base = _scenario_base(req.get("chapter"), req.get("scenario"))
+                    created, already, boxless = _commit_planned_hotspots(req.get("roomKey"), base)
+                except ValueError as ve:
+                    return self._json({"ok": False, "error": str(ve)}, 400)
+                return self._json({"ok": True, "created": created, "already": already,
+                                   "boxless": boxless})
             if route == "/api/room-patch":
                 req = self._body()
                 try:
@@ -3345,6 +4064,9 @@ class H(http.server.SimpleHTTPRequestHandler):
                     base = _scenario_base(req.get("chapter"), req.get("scenario"))
                 except ValueError as ve:
                     return self._json({"ok": False, "error": str(ve)}, 400)
+                blocked = _preflight_guard(base)
+                if blocked:
+                    return self._json({"ok": False, "error": blocked}, 409)
                 prompt = (_load_scenario(base).get("worldPlatePrompt") or "").strip()
                 if not prompt:
                     return self._json({"ok": False, "error": "no worldPlatePrompt in the spec — add one first"}, 400)
@@ -3352,12 +4074,13 @@ class H(http.server.SimpleHTTPRequestHandler):
                 ok_size, size_err = _valid_size(size)
                 if not ok_size:
                     return self._json({"ok": False, "error": size_err}, 400)
-                # N candidates to choose between (default 4). The plate fixes the look of EVERY room,
-                # so it is the one asset most worth picking rather than accepting.
+                # N candidates to choose between (default 2, Lucas 2026-09-01 — four was more than he
+                # wanted to look at and cost ~4 min a call). The ceiling stays at MAX_PLATE_CANDIDATES:
+                # this is the default, not a limit, so a caller that wants a wider pool still can.
                 try:
-                    n = max(1, min(int(req.get("n", 4)), MAX_PLATE_CANDIDATES))
+                    n = max(1, min(int(req.get("n", 2)), MAX_PLATE_CANDIDATES))
                 except (TypeError, ValueError):
-                    n = 4
+                    n = 2
                 if not _start("worldplate", "genplate",
                               lambda: _run_gen_world_plate("worldplate", base, prompt, size, "high", n), n):
                     return self._json({"ok": False, "error": "already generating the world plate"}, 409)
@@ -3368,6 +4091,9 @@ class H(http.server.SimpleHTTPRequestHandler):
                     base = _scenario_base(req.get("chapter"), req.get("scenario"))
                 except ValueError as ve:
                     return self._json({"ok": False, "error": str(ve)}, 400)
+                blocked = _preflight_guard(base)
+                if blocked:
+                    return self._json({"ok": False, "error": blocked}, 409)
                 rk = re.sub(r"[^A-Za-z0-9_]", "", str(req.get("roomKey") or ""))
                 if not rk:
                     return self._json({"ok": False, "error": "need roomKey"}, 400)
@@ -3574,7 +4300,7 @@ class H(http.server.SimpleHTTPRequestHandler):
                     return self._json({"ok": False, "error": "no scene spec or hotspots to localize"}, 400)
                 try:
                     boxes = localizer.localize(scene, targets, prompt,
-                                               engine=str(req.get("engine") or "gdino"))
+                                               engine=str(req.get("engine") or "gpt4o"))
                 except Exception as e:  # noqa: BLE001
                     return self._json({"ok": False, "error": "localize failed: %s" % e}, 502)
                 return self._json({"ok": True, "boxes": boxes})
@@ -3628,6 +4354,49 @@ class H(http.server.SimpleHTTPRequestHandler):
                     except ValueError:
                         node = None   # roomKey isn't a node (e.g. an ad-hoc roomDir) — images still committed
                 return self._json({"ok": True, "dest": rd, "written": written, "room": node})
+            if route == "/api/mask-set":         # set a clip's mask threshold, then rebuild it
+                req = self._body()
+                try:
+                    base = _scenario_base(req.get("chapter"), req.get("scenario"))
+                except ValueError as ve:
+                    return self._json({"ok": False, "error": str(ve)}, 400)
+                room = re.sub(r"[^A-Za-z0-9_]", "", str(req.get("room") or ""))
+                state = re.sub(r"[^A-Za-z0-9_]", "", str(req.get("state") or "base"))
+                pct = req.get("pct", "auto")
+                if pct != "auto":
+                    try:
+                        pct = max(1.0, min(99.9, float(pct)))
+                    except (TypeError, ValueError):
+                        pct = "auto"
+                try:
+                    region = max(0.0, float(req.get("region") or 0))
+                except (TypeError, ValueError):
+                    region = 0.0
+                if not room:
+                    return self._json({"ok": False, "error": "need a room"}, 400)
+                slot = "mask_%s_%s" % (room, state)
+                if not _start(slot, "maskrebuild",
+                              lambda: _run_mask_rebuild(slot, base, room, state, pct,
+                                                        req.get("enabled", True), region), 1):
+                    return self._json({"ok": False, "error": "this clip is already rebuilding"}, 409)
+                return self._json({"ok": True, "slot": slot})
+            if route == "/api/patch-set":        # enable/disable a repair patch, then rebuild the clip
+                req = self._body()
+                try:
+                    base = _scenario_base(req.get("chapter"), req.get("scenario"))
+                except ValueError as ve:
+                    return self._json({"ok": False, "error": str(ve)}, 400)
+                room = re.sub(r"[^A-Za-z0-9_]", "", str(req.get("room") or ""))
+                state = re.sub(r"[^A-Za-z0-9_]", "", str(req.get("state") or "base"))
+                name = re.sub(r"[^A-Za-z0-9_]", "", str(req.get("name") or ""))
+                enabled = bool(req.get("enabled"))
+                if not room or not name:
+                    return self._json({"ok": False, "error": "need room + patch name"}, 400)
+                slot = "patch_%s_%s" % (room, state)
+                if not _start(slot, "patchrebuild",
+                              lambda: _run_patch_rebuild(slot, base, room, state, name, enabled), 1):
+                    return self._json({"ok": False, "error": "this clip is already rebuilding"}, 409)
+                return self._json({"ok": True, "slot": slot})
             if route == "/api/set-cover":
                 req = self._body()
                 try:

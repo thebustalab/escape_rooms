@@ -74,7 +74,8 @@ import { WebRConsole } from "./webr-console.js?v=85";
 import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs } from "./variant_resolve.js?v=85";   // Phase 3: per-hotspot state variants; monorail switch-door nav
 import * as PQ from "./puzzle_queue.js?v=85";   // dynamic puzzle queue: location-independent puzzle serving
 import { particleCount } from "./particles.js?v=85";   // ambient-particle vocabulary + per-kind field density
-import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=85";   // ledger + elevation-map card DOM
+import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=86";
+import { condHolds } from "./cond.js?v=1";   // ledger + elevation-map card DOM
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 
@@ -246,6 +247,19 @@ function init(data) {
   if (SCENARIO.cover) { s1cover.src = SCENARIO.cover; s1cover.style.display = "block"; }
   else s1cover.style.display = "none";
   $("#enter").textContent = SCENARIO.enterLabel || "Begin →";
+  // Editable, but NOT by contenteditable: this is a <button>, and typing inside one that also starts the
+  // game means every keystroke risks firing it. Alt-click opens a prompt instead.
+  if (isTestPlay()) {
+    $("#enter").title = "Test play: alt-click to edit this label";
+    $("#enter").addEventListener("click", async e => {
+      if (!e.altKey) return;
+      e.preventDefault(); e.stopImmediatePropagation();
+      const v = window.prompt("Enter-button label", SCENARIO.enterLabel || "Begin →");
+      if (v == null) return;
+      SCENARIO.enterLabel = v; $("#enter").textContent = v;
+      await tpPersist("/api/scenario-patch", { fields: { enterLabel: v } });
+    }, true);
+  }
   $("#doneTitle").textContent = (SCENARIO.done && SCENARIO.done.title) || ((SCENARIO.title || "Scenario") + " — complete");
   $("#doneBody").textContent = (SCENARIO.done && SCENARIO.done.body) || "Nice work — you've finished this scenario.";
   $("#replay").onclick = () => location.reload();
@@ -821,17 +835,15 @@ function analysisComplete() {
 // Playwright (headless Chromium): a synthetic maze exercised open-door nav, availableWhen+lockedBody on
 // puzzle AND lock, onPickup→counter, and the {gte} gate — 8/8; alaska+henges still boot clean (no regression).
 function condOK(cond) {
-  if (cond === undefined || cond === true) return true;
-  if (cond === false) return false;
-  if (cond && typeof cond === "object") {
-    if ("solved" in cond) return solvedRooms.has(cond.solved);
-    if ("allSolved" in cond) return (cond.allSolved || []).every(k => solvedRooms.has(k));
-    if ("gte" in cond) { const g = cond.gte || []; return (Number(gameState[g[0]]) || 0) >= Number(g[1]); }
-    if ("eq" in cond) { const e = cond.eq || []; return String(gameState[e[0]]) === String(e[1]); }  // dial/state equality (variants)
-    if ("ne" in cond) { const e = cond.ne || []; return String(gameState[e[0]]) !== String(e[1]); }  // state inequality — e.g. a monorail door available while the lever is NOT "neutral"
+  // Thin wrapper over the pure evaluator in shared/cond.js — the grammar (and why `all`/`any` exist)
+  // is documented there, and tests/cond.test.mjs pins it. Kept as a wrapper so every existing call
+  // site stays unchanged.
+  const ok = condHolds(cond, { solved: solvedRooms, state: gameState });
+  if (!ok && cond && typeof cond === "object"
+      && !["solved", "allSolved", "gte", "eq", "ne", "all", "any"].some(k => k in cond)) {
+    console.warn("pano-player: unsupported unlockedWhen (treating as locked):", cond);
   }
-  console.warn("pano-player: unsupported unlockedWhen (treating as locked):", cond);
-  return false;
+  return ok;
 }
 // record a room's onSolve effects into the world-state bag (data-only for now; a future
 // counter-gate evaluator reads these back)
@@ -928,6 +940,8 @@ function startRoom(i) {
   // open panorama, forward door live, puzzle short-circuits as done.
   solved = !!(room.key && solvedRooms.has(room.key));
   $("#hudroom").textContent = room.title || "";
+  tpEditable($("#hudroom"), () => room.title || "",
+             v => { room.title = v; return tpPersist("/api/room-patch", { roomKey: room.key, fields: { title: v } }); });
   const openState = portalUnlocked(room);   // open panorama once the room's FORWARD door is actually open (its gate solved) — generalised from `solved` 2026-07-31 so a door gated on a SECONDARY lock (airship room2's bridge hatch) opens the art at the right moment; a no-op where the forward door gates on the primary
   const img = basePanorama(room, openState);
   buildViewer(img, doorYaw(room));   // face the forward (closed) door on entry
@@ -1002,6 +1016,22 @@ function spawnParticles(parent, kind, n) {
       f.style.animation =
         `${drifts[i % drifts.length]} ${fd.toFixed(1)}s ease-in-out ${(-Math.random() * fd).toFixed(1)}s infinite, ` +
         `dustGlint ${gd.toFixed(1)}s ease-in-out ${(-Math.random() * gd).toFixed(1)}s infinite`;
+    } else if (kind === "rain") {
+      // A SLOW DRIZZLE, not a downpour. These particles only ever draw on the landing, the entry card and
+      // the submission screen — quiet screens with text on them — so the brief here is weather you read
+      // THROUGH, not weather that competes with the words. The heavy version of this rain is the in-room
+      // `fx-rain` overlay, which is a separate effect with its own CSS.
+      // Still deliberately unlike snow, the only other kind that falls: snow is round and drifts sideways,
+      // drizzle is a short 1px line falling almost straight, and the tilt stays narrow across the field so
+      // it reads as ONE weather rather than as spray going in all directions.
+      const drifts = ["rainFall", "rainFall2", "rainFall3"];
+      const len = (6 + Math.random() * 8).toFixed(1);           // 6-14px — short strokes, not streaks
+      const fd = 1.8 + Math.random() * 1.6;                      // 1.8-3.4s — unhurried; was 0.6-1.3s
+      f.className = "raindrop";
+      f.style.left = (Math.random() * 100).toFixed(2) + "%";
+      f.style.height = len + "px";
+      f.style.opacity = (0.16 + Math.random() * 0.26).toFixed(2);
+      f.style.animation = `${drifts[i % drifts.length]} ${fd.toFixed(2)}s linear ${(-Math.random() * fd).toFixed(2)}s infinite`;
     } else if (kind === "rays") {
       const drifts = ["rayDrift", "rayDrift2", "rayDrift3"];
       const tilt = (14 + Math.random() * 6).toFixed(1);       // 14–20deg: PARALLEL shafts, only a few deg apart
@@ -1082,7 +1112,14 @@ function healMotif() {
 function applyFx() {
   const layer = $("#fxLayer"); if (!layer) return;
   layer.innerHTML = "";
-  const names = [...new Set((SCENARIO.fx || []).concat((room && room.fx) || []))];
+  // An entry is EITHER a bare name (always on — the original form, unchanged) OR {fx, when}, whose `when`
+  // runs through the same `condOK` grammar as door and puzzle gating. That is what lets weather arrive on
+  // a story beat rather than being a constant: canyon's rain starts when the storm does, after the second
+  // survey, and only in the rooms that are open to the sky.
+  const entries = (SCENARIO.fx || []).concat((room && room.fx) || []);
+  const names = [...new Set(entries
+    .map(e => (typeof e === "string" ? e : (e && condOK(e.when) ? e.fx : null)))
+    .filter(Boolean))];
   names.forEach(n => { const d = document.createElement("div"); d.className = "fx-" + n; layer.appendChild(d); });
 }
 
@@ -1278,6 +1315,14 @@ function startCinemagraph(baseUrl, cines, yaw) {
         // A WRAP box (x0 > x1) straddles the L/R seam: region [x0..1] ∪ [0..x1]. The clip was generated from a
         // rolled, contiguous crop (see cinemagraph_gen), so we feather the whole thing then draw it in TWO
         // slices — left part onto the right edge, right part onto the left edge. Normal boxes are one draw.
+        // FULL-SCENE clip (box [0,0,1,1]) — the whole panorama animates, which is what the LTX pipeline
+        // now renders (cine_scenario.py). Two reasons it needs its own path rather than falling through
+        // the boxed one: the radial feather below fades a clip's EDGES into the still, which on a
+        // full-frame clip means a soft oval of motion ringed by frozen corners; and the boxed path
+        // allocates a temp canvas every clip every frame, which at 3072x1024 is an allocation storm.
+        // Draw it straight over the base — no feather to hide (there is no surrounding still to blend
+        // into) and no intermediate surface.
+        if (x0 === 0 && y0 === 0 && x1 === 1 && y1 === 1) { ctx.drawImage(v, 0, 0, W, H); return; }
         const wrap = x0 > x1;
         const wfrac = wrap ? (1 - x0) + x1 : (x1 - x0), bh = (y1 - y0) * H, bw = wfrac * W;
         if (bw < 1 || bh < 1) return;
@@ -1335,6 +1380,7 @@ function _renderViewer(img, yaw = 0, dynamic = false) {
   // saved (harness "Send to room" with no wrap.json) is built:true + panorama with NO wrap.
   // Guard so that case degrades to a sane pseudo-360 instead of a TypeError on `c.pitch`.
   const c = fitWrap(room.wrap || { haov: 360, vaov: 90 });
+  tpWrapCfg = c;                      // test-play hotspot drag needs the same projection the markers used
   const p = c.pitch || 0, f = c.hfov || 110;
   // Build hotspots up front and pass them in the config (the reliable path on a
   // static, non-draggable viewer — addHotSpot-after-load leaves them unpositioned).
@@ -1368,6 +1414,7 @@ function _renderViewer(img, yaw = 0, dynamic = false) {
   });
   const reveal = () => {
     stage.style.opacity = "1";               // fade up from black once the panorama is in
+    tpEnableHotspotDrag();                   // markers only exist once pannellum has rendered them
     // If rebuilding the viewer interrupted the music (paused it, or reset it toward the start) while
     // it should be playing, resume from where it was — so the loop is continuous across a scene swap.
     if (music && musicOn && musicPos >= 0 && (music.paused || music.currentTime < musicPos - 1)) {
@@ -1487,6 +1534,67 @@ function navigateTo(idx, withEntry) {
 // (play.html) never does — so the "Solve" shortcut below is invisible to students.
 const isTestPlay = () => !!(window.TEST_PLAY || window.SFX_MIXER);
 
+// ---- test-play hotspot MOVE (drag the marker; size is never changed) --------------------------------
+// The inverse of boxToYP: a marker sits at the CENTRE of its box, so dragging it re-centres the box and
+// leaves width/height exactly as authored. Resizing deliberately stays in the harness — a box's size is a
+// click-target decision made against the full-resolution panorama, not something to nudge by eye at
+// playing distance, and the two would be easy to confuse in one gesture.
+let tpWrapCfg = null;
+function tpBoxAt(box, yaw, pitch, c) {
+  const w = box[2] - box[0], hh = box[3] - box[1];
+  let cx = (yaw + c.haov / 2) / c.haov;
+  let cy = (c.vaov / 2 + (c.vOffset || 0) - pitch) / c.vaov;
+  cx = Math.min(1 - w / 2, Math.max(w / 2, cx));          // keep the whole box on the panorama
+  cy = Math.min(1 - hh / 2, Math.max(hh / 2, cy));
+  return [+(cx - w / 2).toFixed(4), +(cy - hh / 2).toFixed(4),
+          +(cx + w / 2).toFixed(4), +(cy + hh / 2).toFixed(4)];
+}
+function tpEnableHotspotDrag() {
+  if (!isTestPlay() || !viewer || !tpWrapCfg) return;
+  const stage = $("#pano"); if (!stage) return;
+  stage.querySelectorAll(".hsmark").forEach(el => {
+    if (el.dataset.tpdrag) return;
+    el.dataset.tpdrag = "1";
+    el.style.cursor = "grab";
+    el.title = (el.title || "") + " — test play: drag to move";
+    const idCls = [...el.classList].find(k => k.startsWith("hs-"));
+    if (!idCls) return;
+    const h = (room.hotspots || []).find(x => "hs-" + String(x.id).replace(/[^\w-]/g, "_") === idCls);
+    if (!h || !Array.isArray(h.box)) return;
+    let sx = 0, sy = 0, moved = false;
+    el.addEventListener("pointerdown", e => {
+      sx = e.clientX; sy = e.clientY; moved = false;
+      el.setPointerCapture(e.pointerId);
+      e.stopPropagation();
+    });
+    el.addEventListener("pointermove", e => {
+      if (!el.hasPointerCapture || !el.hasPointerCapture(e.pointerId)) return;
+      if (!moved && Math.abs(e.clientX - sx) + Math.abs(e.clientY - sy) < 5) return;  // a click, not a drag
+      moved = true; el.classList.add("tpdragging");
+      el.style.transform = `translate(${e.clientX - sx}px, ${e.clientY - sy}px)`;
+      e.stopPropagation();
+    });
+    el.addEventListener("pointerup", async e => {
+      el.releasePointerCapture && el.releasePointerCapture(e.pointerId);
+      if (!moved) return;                                  // a plain click still opens the hotspot
+      e.stopPropagation();
+      el.classList.remove("tpdragging"); el.style.transform = "";
+      let coords = null;
+      try { coords = viewer.mouseEventToCoords(e); } catch (err) { coords = null; }
+      if (!coords) return;
+      h.box = tpBoxAt(h.box, coords[1], coords[0], tpWrapCfg);
+      h.boxSource = "moved:testplay";
+      await tpSaveRoom(room);
+      toast("Moved " + (h.label || h.id));
+      // Match line 959's call exactly: `basePanorama` takes the OPEN state, and dropping it would revert
+      // a solved room to its closed art the moment you nudged one of its hotspots.
+      buildViewer(basePanorama(room, portalUnlocked(room)), viewer.getYaw());
+    });
+    // Swallow the click that follows a real drag, or letting go opens the puzzle you just moved.
+    el.addEventListener("click", e => { if (moved) { e.stopPropagation(); e.preventDefault(); moved = false; } }, true);
+  });
+}
+
 // ---- test-play inline text editing (gated on isTestPlay) --------------------------------------------
 // In the test player ONLY, key TEXT surfaces — the opening story, room entry cards, clue bodies, and the
 // finish screens — are click-to-edit; edits persist to the harness (scenario.json) via the same
@@ -1508,6 +1616,49 @@ async function tpPersist(route, body) {
 // Make a text element inline-editable in test-play. getVal() → current string; save(newText) → a promise
 // resolving to {ok}. A coloured outline shows saving/saved/error. No-op outside test-play. Idempotent —
 // re-binding a shared element (e.g. #doneTitle for done vs escapeDone) overwrites via the onblur property.
+// Persist a room's hotspots from test play — and MIRROR every edit onto `plannedHotspots`.
+// Re-committing a room's boxes in the harness REBUILDS its hotspots from the planned manifest, so
+// anything written only onto the placed hotspot is silently dropped by Lucas's next save. That has
+// already eaten a set of wired solve stings once. Matching is by `id`.
+function tpSaveRoom(r) {
+  const planned = r.plannedHotspots || [];
+  (r.hotspots || []).forEach(h => {
+    const p = planned.find(x => x && x.id === h.id);
+    if (!p) return;
+    ["question", "feedback", "body", "label", "lockedBody", "prompt", "box"].forEach(k => {
+      if (k in h) p[k] = JSON.parse(JSON.stringify(h[k]));
+    });
+  });
+  const fields = { hotspots: r.hotspots };
+  if (planned.length) fields.plannedHotspots = planned;
+  return tpPersist("/api/room-patch", { roomKey: r.key, fields });
+}
+
+// A test-play-only block of labelled, editable strings for text the player sees only in passing — the
+// wrong-answer hints appear one at a time by attempt number, the "not yet" body only when a gate is
+// shut, and the lock's messages only on a wrong code. Authoring them means seeing them all at once.
+// Nothing here is engine state: the correct-option INDEX is deliberately not editable, because it has
+// to stay in lockstep with decoder/decode_codes.R and a silent change there mis-scores every
+// submission. It is shown, so you can see which option is keyed, and marked read-only.
+function tpAuthorPanel(host, rows) {
+  if (!isTestPlay() || !host) return;
+  const box = document.createElement("div");
+  box.className = "tpauthor";
+  box.innerHTML = `<div class="tpauthor-h">Test-play authoring — everything the player can read</div>`;
+  rows.forEach(row => {
+    if (row.note) {
+      const n = document.createElement("div"); n.className = "tpauthor-note"; n.textContent = row.note;
+      box.appendChild(n); return;
+    }
+    const lab = document.createElement("div"); lab.className = "tpauthor-l"; lab.textContent = row.label;
+    const val = document.createElement("div"); val.className = "tpauthor-v";
+    val.textContent = row.get() || "";
+    box.appendChild(lab); box.appendChild(val);
+    tpEditable(val, row.get, row.set);
+  });
+  host.appendChild(box);
+}
+
 function tpEditable(el, getVal, save) {
   if (!el || !isTestPlay()) return;
   el.classList.add("tpedit"); el.setAttribute("contenteditable", "true"); el.spellcheck = false;
@@ -1533,8 +1684,12 @@ function correctResult(h) {
 // (close the modal, then solveRoom with the correct result) with no answering required.
 const devSolveThunk = (h, qIndex) => () => { closeModal(); solveRoom(correctResult(h), h, qIndex); };
 
-function openModal(title, node, onDevSolve) {
+function openModal(title, node, onDevSolve, tpLabelOf) {
   $("#mtitle").textContent = title;
+  // The modal title is the hotspot's `label` — player-facing on every single open, so it is editable
+  // too. `tpLabelOf` is the hotspot it came from; callers that pass none get a plain title.
+  if (tpLabelOf) tpEditable($("#mtitle"), () => tpLabelOf.label || "",
+                            v => { tpLabelOf.label = v; return tpSaveRoom(room); });
   const body = $("#mbody"); body.innerHTML = ""; body.appendChild(node);
   // Test-play only: a one-click "Solve" so the author can skip a puzzle while testing. Gated on the
   // test player's flag, so students never see it. Re-created per open (ids repeat across modals).
@@ -1561,8 +1716,12 @@ function unmountConsole() { $("#console-holder").appendChild($("#console-block")
 // message) instead of launching — the open-world ordering mechanic: roam freely, puzzles gate.
 function openLocked(h) {
   const d = document.createElement("div");
-  d.innerHTML = `<p>${h.lockedBody || "Not yet — something else must be done first."}</p>`;
-  openModal(h.label || "Not yet", d);
+  const p = document.createElement("p");
+  p.innerHTML = h.lockedBody || "Not yet — something else must be done first.";
+  d.appendChild(p);
+  if (isTestPlay()) p.textContent = h.lockedBody || "";       // raw source, so an HTML edit round-trips
+  tpEditable(p, () => h.lockedBody || "", v => { h.lockedBody = v; return tpSaveRoom(room); });
+  openModal(h.label || "Not yet", d, null, h);
 }
 
 function openClue(h) {
@@ -1575,7 +1734,10 @@ function openClue(h) {
   if (isTestPlay()) bodyEl.textContent = h.body || "";   // test-play: show the raw source so HTML edits round-trip
   else bodyEl.innerHTML = h.body || "";                  // normal play: render the clue's HTML properly
   if (h.body || isTestPlay()) d.appendChild(bodyEl);
-  tpEditable(bodyEl, () => h.body || "", v => { h.body = v; return tpPersist("/api/room-patch", { roomKey: room.key, fields: { hotspots: room.hotspots } }); });
+  tpEditable(bodyEl, () => h.body || "", v => { h.body = v; return tpSaveRoom(room); });
+  if (typeof h.pickup === "string") tpAuthorPanel(d, [
+    { label: "Logged to the field notebook when picked up", get: () => h.pickup,
+      set: v => { h.pickup = v; return tpSaveRoom(room); } }]);
   if (h.pickup) {
     const gk = gateKey(room.key, h.id || h.label || "");
     const btn = document.createElement("button"); btn.className = "qsubmit";
@@ -1595,7 +1757,7 @@ function openClue(h) {
     }
     d.appendChild(btn);
   }
-  openModal(h.label || "Clue", d);
+  openModal(h.label || "Clue", d, null, h);
 }
 
 // ---- dial (world-state control) + map-view (state-conditioned image) — the multiple-mappings
@@ -1661,7 +1823,7 @@ function openDial(h) {
     row.appendChild(b);
   });
   wrap.appendChild(face); wrap.appendChild(row); wrap.appendChild(caption);
-  openModal(h.label || "The dial", wrap);
+  openModal(h.label || "The dial", wrap, null, h);
   refresh();
 }
 function openMapview(h) {
@@ -1684,7 +1846,7 @@ function openMapview(h) {
     c.textContent = (state != null ? (dialLabel(h, state) + " — ") : "") + h.caption;
     d.appendChild(c);
   }
-  openModal(h.label || "The chart", d);
+  openModal(h.label || "The chart", d, null, h);
 }
 
 // Pick-a-point-on-the-plot puzzle (used by the escape "map on the wall"). `h.map` =
@@ -1694,7 +1856,7 @@ function openMapview(h) {
 // its point. Ungraded (escape phase) — clicking the correct point's box solves the room.
 function openMapPuzzle(h, qIndex) {
   if (viewer) resumeYaw = viewer.getYaw();
-  openModal(h.label || "The survey chart", buildMapCard(h.map, (result) => { closeModal(); solveRoom(result, h, qIndex); }), devSolveThunk(h, qIndex));
+  openModal(h.label || "The survey chart", buildMapCard(h.map, (result) => { closeModal(); solveRoom(result, h, qIndex); }), devSolveThunk(h, qIndex), h);
 }
 function buildMapCard(map, onSolved) {
   const card = document.createElement("div"); card.className = "mapcard";
@@ -1751,7 +1913,7 @@ function openPuzzle(h, qIndex) {
   const pid = gateKey(room.key, h.id);   // per-room attempt-count key (ids repeat across rooms)
   right.appendChild(h.check ? buildCheckCard(h.check, onSolved, pid) : buildQuestion(h.question, onSolved, pid));
   grid.appendChild(left); grid.appendChild(right);
-  openModal(h.label || "Puzzle", grid, devSolveThunk(h, qIndex));
+  openModal(h.label || "Puzzle", grid, devSolveThunk(h, qIndex), h);
 }
 
 // multiple-choice card — gate is the *product* of running the analysis
@@ -1763,12 +1925,32 @@ function buildQuestion(q, onSolved, pid) {
     `<div class="qprompt">${q.prompt}</div><div class="qopts"></div>
      <div class="qfeedback"></div><button class="qsubmit" disabled>Submit answer</button>`;
   const opts = card.querySelector(".qopts"), fb = card.querySelector(".qfeedback"), sub = card.querySelector(".qsubmit");
+  const save = () => tpSaveRoom(room);
+  tpEditable(card.querySelector(".qprompt"), () => q.prompt || "", v => { q.prompt = v; return save(); });
   q.options.forEach((o, i) => {
     const l = document.createElement("label"); l.className = "qopt";
-    l.innerHTML = `<input type="radio" name="${grp}"><span>${o}</span>`;
+    l.innerHTML = `<input type="radio" name="${grp}"><span></span>`;
+    const span = l.querySelector("span");
+    span.textContent = o;
+    if (isTestPlay() && i === q.correct) l.classList.add("tpcorrect");   // which option is keyed
     l.querySelector("input").addEventListener("change", () => { sel = i; sub.disabled = false; });
+    // Editing an option must not toggle its radio, or every correction silently answers the question.
+    tpEditable(span, () => q.options[i] || "", v => { q.options[i] = v; return save(); });
+    span.addEventListener("click", e => { if (isTestPlay()) e.preventDefault(); });
     opts.appendChild(l);
   });
+  // Everything the player can read that is NOT on screen right now.
+  tpAuthorPanel(card, [
+    { note: "Option " + (q.correct + 1) + " is the keyed answer (ringed above). The index is NOT editable "
+          + "here — it must stay in lockstep with decoder/decode_codes.R." },
+    { label: "On the correct answer (also the field-notebook entry)",
+      get: () => (q.feedback && q.feedback.correct) || "",
+      set: v => { q.feedback = q.feedback || {}; q.feedback.correct = v; return save(); } },
+    ...((q.feedback && q.feedback.wrong) || []).map((_, i) => ({
+      label: "Wrong-answer hint " + (i + 1) + " (shown on attempt " + (i + 1) + ")",
+      get: () => q.feedback.wrong[i] || "",
+      set: v => { q.feedback.wrong[i] = v; return save(); } })),
+  ]);
   sub.addEventListener("click", () => {
     if (sel < 0) return;
     attempts++; attemptCounts.set(pid, attempts);
@@ -1953,7 +2135,7 @@ function openPickPuzzle(h, qIndex) {
   const pid = gateKey(room.key, h.id);            // per-room attempt-count key (ids repeat across rooms)
   right.appendChild(buildPickCard(h.pick, onSolved, pid));
   grid.appendChild(left); grid.appendChild(right);
-  openModal(h.label || "Puzzle", grid, devSolveThunk(h, qIndex));
+  openModal(h.label || "Puzzle", grid, devSolveThunk(h, qIndex), h);
 }
 function buildPickCard(pick, onSolved, pid) {
   const maxA = pick.maxAttempts || 4; let attempts = attemptCounts.get(pid) || 0;
@@ -2066,7 +2248,7 @@ function buildPickCard(pick, onSolved, pid) {
 const normalizeCode = s => (s || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
 function openLock(h) {
   if (viewer) resumeYaw = viewer.getYaw();   // restore facing after the door swaps in on solve
-  openModal(h.label || "Keypad", buildLockCard(h, (result) => { closeModal(); solveRoom(result, h); }), devSolveThunk(h));
+  openModal(h.label || "Keypad", buildLockCard(h, (result) => { closeModal(); solveRoom(result, h); }), devSolveThunk(h), h);
 }
 function buildLockCard(h, onSolved) {
   if (h.mode === "stones") return buildStoneLockCard(h, onSolved);
@@ -2087,6 +2269,18 @@ function buildLockCard(h, onSolved) {
      <div class="qfeedback"></div>
      <button class="qsubmit">Enter</button>`;
   const input = card.querySelector("#lockInput"), fb = card.querySelector(".qfeedback"), sub = card.querySelector(".qsubmit");
+  tpAuthorPanel(card, [
+    { note: "The lock shows no prompt to the player — the absence of instructions IS the puzzle. "
+          + "The answer itself is not editable here; it is derived from the world and pinned by tests." },
+    { label: "On the correct code", get: () => (h.feedback && h.feedback.correct) || "",
+      set: v => { h.feedback = h.feedback || {}; h.feedback.correct = v; return tpSaveRoom(room); } },
+    { label: "On a wrong code", get: () => (h.feedback && h.feedback.wrong) || "",
+      set: v => { h.feedback = h.feedback || {}; h.feedback.wrong = v; return tpSaveRoom(room); } },
+    { label: "Out of attempts", get: () => (h.feedback && h.feedback.out) || "",
+      set: v => { h.feedback = h.feedback || {}; h.feedback.out = v; return tpSaveRoom(room); } },
+    { label: "Shown while the gate is still shut (lockedBody)", get: () => h.lockedBody || "",
+      set: v => { h.lockedBody = v; return tpSaveRoom(room); } },
+  ]);
   const tryCode = () => {
     const val = normalizeCode(input.value);
     if (!val) { input.focus(); return; }
@@ -2177,7 +2371,7 @@ function buildStoneLockCard(h, onSolved) {
 //   { type:"grid", box, label?, prompt?, items:[{key,label}], buckets:[{key,label}], answer:{}, maxAttempts?, feedback?:{correct,wrong,out} }
 function openGrid(h) {
   if (viewer) resumeYaw = viewer.getYaw();   // restore facing after the door swaps in on solve
-  openModal(h.label || "Panel", buildGridCard(h, (result) => { closeModal(); solveRoom(result, h); }), devSolveThunk(h));
+  openModal(h.label || "Panel", buildGridCard(h, (result) => { closeModal(); solveRoom(result, h); }), devSolveThunk(h), h);
 }
 function buildGridCard(h, onSolved) {
   const items = h.items || [], buckets = h.buckets || [], answer = h.answer || {};
@@ -2232,7 +2426,14 @@ function buildGridCard(h, onSolved) {
 // `answer` is V), so there is no separate group config to drift out of sync.
 //
 // Authoring: { id, type:"ledger", label, box, prompt, options:[…], rows:[{id,label,answer}],
-//              feedback:{correct, progress, wrong, partial}, maxAttempts? }
+//              feedback:{correct, progress, wrong, partial}, maxAttempts?, allOrNothing? }
+//
+// `allOrNothing:true` turns OFF per-group locking: nothing confirms until the whole ledger is right, and
+// the feedback says nothing about which rows landed. Use it whenever the rows each hold a DIFFERENT
+// answer, because then every group has one member and the group rule degenerates into per-row
+// confirmation — a player just probes one dropdown at a time. `networks/beacons` is that shape (four
+// fire slots, four different watchtowers) with unlimited attempts, where the leak is fatal. Multi-member
+// groups (temple's shrine families) should NOT set it: there the progressive lock is the whole point.
 // `options` may be plain strings or {key,label}. A blank "—" is always offered so a row can be left
 // unassigned (Obra Dinn does this) — unassigned rows simply never satisfy a group.
 //
@@ -2306,6 +2507,7 @@ function solveRoom(result, h, qIndex) {
   const openState = portalUnlocked(room);   // see startRoom: follow the forward door's actual open state (handles a door gated on a secondary lock)
   const img = basePanorama(room, openState);
   buildViewer(img, resumeYaw);                         // stay facing where you were, not snap to front
+  applyFx();                                           // a state-gated effect may have just turned on
   // An escape gate flagged `endsEscape` (e.g. a boss-room valve keypad) ends the ungraded escape when
   // solved — the in-room analogue of an endsEscape DOOR (handleDoor). Terminal: show the escape finish.
   if (h && h.endsEscape) return showEscapeDone();
@@ -2732,7 +2934,7 @@ function mintCode(phase) {
       });
   try {
     mintedCode = window.EscapeCodec.encode({
-      version: 1, scenarioId: SCENARIO.id, steps,
+      version: 2, scenarioId: SCENARIO.id, steps,   // v2 = two-byte header, ids 1..255 (see codec.js)
       secret: SECRET, studentId: window.__x500 || "anon",
     });
   } catch (e) { console.error("codec encode failed", e); }

@@ -17,15 +17,17 @@ import assert from "node:assert/strict";
 import { AMBIENT_KINDS, particleCount, isAmbientKind } from "../shared/particles.js";
 
 test("every supported kind is in the vocabulary, including none", () => {
-  for (const k of ["fireflies", "snow", "embers", "leaves", "dust", "rays", "none"]) {
+  for (const k of ["fireflies", "snow", "embers", "leaves", "dust", "rain", "rays", "none"]) {
     assert.ok(AMBIENT_KINDS.includes(k), `${k} missing from AMBIENT_KINDS`);
   }
-  assert.equal(AMBIENT_KINDS.length, 7, "a kind was added or removed without updating this test");
+  assert.equal(AMBIENT_KINDS.length, 8, "a kind was added or removed without updating this test");
 });
 
 test("isAmbientKind accepts real kinds and rejects typos", () => {
   assert.equal(isAmbientKind("dust"), true);
   assert.equal(isAmbientKind("rays"), true);
+  assert.equal(isAmbientKind("rain"), true);
+  assert.equal(isAmbientKind("rains"), false);
   assert.equal(isAmbientKind("none"), true, "'none' is a valid authored value, not an absence");
   assert.equal(isAmbientKind("dusts"), false);
   assert.equal(isAmbientKind("sunrays"), false);

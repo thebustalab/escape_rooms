@@ -159,7 +159,7 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
           <b>World plate</b>
           <img id="plateThumb" class="panothumb" style="display:none">
           <button onclick="viewWorldPrompt()">view prompt</button>
-          <button onclick="genPlate()">Generate plates ×4</button>
+          <button onclick="genPlate()">Generate plates ×2</button>
           <span class="status" id="plateStat"></span>
           <!-- Candidate grid. The plate is the ONE asset every room's art is generated through, so it is
                chosen, never auto-committed (2026-08-31). Click a candidate to commit it; the corner button discards it. -->
@@ -536,14 +536,19 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
     $("#promptHint").innerHTML = "Read-only — it's the <b>worldPlate</b> entry in the spec bundle (Concept card, under <b>Spec bundle (JSON)</b>); edit it there, then re-render.";
     $("#promptModal").style.display = "flex";
   }
+  // How many world-plate candidates a Generate makes. TWO (Lucas, 2026-09-01): four was more to
+  // look at than he wanted and cost ~4 minutes a call. The server's ceiling is unchanged, so this
+  // is the default rather than a limit. Named once so the button label, the progress line and the
+  // request cannot say three different numbers.
+  const PLATE_N = 2;
   async function genPlate() {
-    const st = $("#plateStat"); st.innerHTML = `<span class="warn">generating 4 plates\u2026 (~4 min)</span>`;
-    const r = await post("/api/gen-world-plate", { chapter: CH, scenario: SC, n: 4 });
+    const st = $("#plateStat"); st.innerHTML = `<span class="warn">generating 2 plates\u2026 (~2 min)</span>`;
+    const r = await post("/api/gen-world-plate", { chapter: CH, scenario: SC, n: PLATE_N });
     if (!r.ok) { st.innerHTML = `<span class="err">${esc(r.error)}</span>`; return; }
     const poll = setInterval(async () => {
       const s2 = await getj(`/api/status?slot=${encodeURIComponent(r.slot)}`);
       refreshPlateGrid();                       // show each candidate as it lands, don't wait for all 4
-      if (s2.active) { st.innerHTML = `<span class="warn">generating plates\u2026 ${s2.done || 0}/${r.n || 4}</span>`; return; }
+      if (s2.active) { st.innerHTML = `<span class="warn">generating plates\u2026 ${s2.done || 0}/${r.n || PLATE_N}</span>`; return; }
       clearInterval(poll);
       if (s2.error) { st.innerHTML = `<span class="err">${esc(s2.error)}</span>`; return; }
       st.innerHTML = `<span class="ok">candidates ready \u2014 click one to commit it as the world plate</span>`;

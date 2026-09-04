@@ -48,10 +48,75 @@ def _solidity(binary, min_px):
     return float(np.mean(scores)), len(big)
 
 
-def auto_mask(tstd, coverage_cap=0.55, close_radius=4, feather=6, min_frac=2e-4):
-    """tstd: per-pixel temporal std (H,W). Returns (mask float 0..1, chosen threshold, report)."""
+def drop_small(binary, min_px):
+    """Delete connected components smaller than `min_px`, keeping the large coherent ones.
+
+    THE REGION FILTER, and it answers a different question from the threshold. The percentile asks
+    "how hard is this pixel moving"; it has no idea whether the pixel has any company. So a lone bright
+    speckle on a wall survives p95 while a large, gently-moving banner falls out — which is the exact
+    inversion of what the composite wants, because an isolated freed pixel reads as noise and a big
+    moving object is the thing worth generating at all.
+
+    Applied AFTER closing (so a dashed line of nearly-touching pixels counts as one region) and BEFORE
+    hole-filling (so an object's own interior holes are not first filled and then measured as solid).
+
+    Returns (binary, kept, dropped). `min_px <= 0` is a no-op, which is the default everywhere: this
+    only bites when a clip's sidecar authored a region cut."""
+    if min_px <= 0:
+        return binary, None, 0
+    lab, n = ndimage.label(binary)
+    if n == 0:
+        return binary, 0, 0
+    sizes = ndimage.sum(binary, lab, range(1, n + 1))
+    keep = np.zeros(n + 1, dtype=bool)
+    keep[1:] = sizes >= min_px
+    return keep[lab], int(keep[1:].sum()), int(n - keep[1:].sum())
+
+
+def finish(binary, close_radius=4, feather=6, min_px=0):
+    """Close, DROP SMALL REGIONS, FILL HOLES, feather — the shaping every mask gets, whichever way its
+    threshold was picked. Returns (mask, {"kept", "dropped"}).
+
+    ONE chain, used by BOTH the auto threshold and a hand-chosen one, so they cannot drift apart: a
+    slider that skipped the hole-filling would preview a speckled object and a bake would ship a solid
+    one, or the reverse. The fill is the important step — it solidifies a moving object WITHOUT lowering
+    the threshold, which is what stops "complete objects" and "a tight threshold" being in conflict.
+
+    Order is load-bearing: close BEFORE the region cut (so a dashed line of nearly-touching pixels counts
+    as one region), and cut BEFORE the fill (so an object's own interior holes are not first filled and
+    then measured as if they were solid area)."""
+    b = ndimage.binary_closing(binary, structure=np.ones((close_radius, close_radius)))
+    b, kept, dropped = drop_small(b, min_px)
+    b = ndimage.binary_fill_holes(b)
+    m = np.clip(ndimage.gaussian_filter(b.astype(np.float32), feather), 0, 1)
+    return m, {"kept": kept, "dropped": dropped}
+
+
+def mask_at_percentile(tstd, pct, close_radius=4, feather=6, min_px=0):
+    """A mask at a HAND-CHOSEN percentile of the clip's own motion, shaped exactly like the auto one.
+
+    Percentiles, not absolute temporal-std values: the absolute numbers differ per scene, so a fixed
+    threshold that suits a canyon of white water is meaningless in a quiet interior. This is the same
+    ladder `auto_mask` searches — the slider just picks a rung on it by eye instead of by solidity.
+
+    `min_px` is the region cut (see `drop_small`) — the second, independent axis: the percentile says how
+    hard a pixel must move, the region cut says how much company it must keep."""
+    thr = float(np.percentile(tstd, pct))
+    m, reg = finish(tstd > thr, close_radius, feather, min_px)
+    return m, thr, float(m.mean()), reg
+
+
+def auto_mask(tstd, coverage_cap=0.55, close_radius=4, feather=6, min_frac=2e-4, min_px=0):
+    """tstd: per-pixel temporal std (H,W). Returns (mask float 0..1, chosen threshold, report).
+
+    TWO SIZE NUMBERS LIVE HERE AND THEY ARE NOT THE SAME THING — conflating them silently changes the
+    confirmed auto behaviour, so they have different names:
+      * `min_frac` -> `sol_px`, the floor for which components are "substantial" enough to be AVERAGED
+        INTO the solidity score. Scoring only. Nothing is removed from the mask by it.
+      * `min_px`, the caller's REGION CUT, which does remove components (`drop_small`). Default 0 =
+        off, so auto keeps behaving exactly as Lucas confirmed unless a sidecar authored a cut."""
     H, W = tstd.shape
-    min_px = max(64, int(min_frac * H * W))
+    sol_px = max(64, int(min_frac * H * W))
     # candidates spanning the clip's own distribution — absolute values differ per scene, so
     # percentiles are the only portable ladder
     cands = [float(np.percentile(tstd, p)) for p in range(50, 96, 5)]
@@ -63,7 +128,7 @@ def auto_mask(tstd, coverage_cap=0.55, close_radius=4, feather=6, min_frac=2e-4)
         if cov > coverage_cap:            # too much of the frame: static regions are getting in
             report.append((thr, cov, None)); continue
         b = ndimage.binary_closing(b, structure=np.ones((close_radius, close_radius)))
-        sol, ncomp = _solidity(b, min_px)
+        sol, ncomp = _solidity(b, sol_px)
         report.append((thr, cov, sol))
         # prefer solid objects; among similar solidity prefer MORE coverage, since a mask that is
         # solid only because it kept one blob is not what we want
@@ -75,10 +140,7 @@ def auto_mask(tstd, coverage_cap=0.55, close_radius=4, feather=6, min_frac=2e-4)
         best = (0.0, thr, 0.0, float((tstd > thr).mean()), 0)
 
     _, thr, sol, cov, ncomp = best
-    b = tstd > thr
-    b = ndimage.binary_closing(b, structure=np.ones((close_radius, close_radius)))
-    # fill interior holes so a moving object is not patterned with static speckles
-    b = ndimage.binary_fill_holes(b)
-    m = ndimage.gaussian_filter(b.astype(np.float32), feather)
-    return np.clip(m, 0, 1), thr, dict(threshold=thr, coverage=cov, solidity=sol,
-                                       components=ncomp, table=report)
+    m, reg = finish(tstd > thr, close_radius, feather, min_px)
+    return m, thr, dict(threshold=thr, coverage=cov, solidity=sol,
+                        components=ncomp, table=report,
+                        kept=reg["kept"], dropped=reg["dropped"])

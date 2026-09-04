@@ -1,0 +1,1797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Build world · gallery</title>
+<!--
+  build_world_v2.html — the LOOKING harness (Lucas, 2026-08-31).
+
+  build_world.html is the DOING console: seven stage cards, a rooms table, per-room buttons. That shape is
+  right for driving a build and wrong for judging one — the art ends up spread across a table cell, a
+  variants gallery and a wrap editor, so reviewing a whole scenario's look means hunting for it.
+
+  This page keeps the header and the concept/landing/world card (same intent: the scenario picker, the
+  landing text the player meets first, the world plate every room's art is generated through) and then
+  drops the machinery entirely. Below the card is one flat, scrollable column: every room's committed art
+  at full width, each variant directly beneath the base it was made from, in scenario order. Nothing to
+  click through — you scroll, and you see the world.
+
+  Full width matters. A 3072x1024 panorama shown at 340 px is exactly where the broken-ladder defects hid
+  (see art_qc.py); the column here is as wide as the window and every image links to its native file.
+
+  It is deliberately READ-MOSTLY. The world plate is still chosen here, because that choice is what all the
+  rest of the art hangs off. Everything else — prompts, story, hotspots, cinemagraphs — is edited in
+  build_world.html, one link away in the header.
+-->
+<style>
+  :root { --bg:#0a141d; --panel:#0e1c28; --line:rgba(255,255,255,0.14); --amber:#ffd88c; --blue:#7fd1ff; --green:#7bd88c; --dim:#8fa3b0; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:#dfe9f0; font:14px/1.5 system-ui,sans-serif; padding:16px 18px 80px; }
+  h1 { font-size:18px; margin:0 0 2px; }
+  #topbar { position:sticky; top:0; z-index:60; background:var(--bg);
+            margin:0 -18px 4px; padding:6px 18px 8px; border-bottom:1px solid var(--line); }
+  #topbar .tbrow { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  #topbar .tbrow + .tbrow { margin-top:6px; }
+  select, button, textarea, input { font:inherit; color:inherit; background:#12222f; border:1px solid var(--line); border-radius:7px; padding:6px 9px; }
+  button { cursor:pointer; } button:hover { border-color:var(--blue); } button:disabled { opacity:.5; cursor:default; }
+  a { color:var(--blue); }
+  .stage { background:var(--panel); border:1px solid var(--line); border-radius:11px; padding:12px 14px; margin-top:12px; }
+  .stage h2 { font-size:14px; margin:0 0 6px; }
+  .stage.bare { background:none; border:none; border-radius:0; padding:0; }
+  .hint { color:var(--dim); font-size:12px; }
+  .status { font-size:12px; margin-left:8px; } .ok { color:var(--green); } .err { color:#ff9c9c; }
+  /* The save button announces pending work by going amber. With no per-card Save left, the header is
+     the only place that can tell you an edit is still only in the browser. */
+  #saveAll.dirty { border-color:var(--amber); color:var(--amber); font-weight:600; }
+  .storytitle { font-size:16px; font-weight:700; color:var(--amber); margin-bottom:4px; }
+  .storylbl { color:var(--dim); font-size:11px; text-transform:uppercase; letter-spacing:.04em; margin-bottom:2px; }
+  .storyblk { border:1px solid var(--line); border-radius:8px; padding:8px 10px; background:#12222f;
+              box-sizing:border-box; height:100%; }
+  /* The two top cards, side by side. `1 1 0` gives them the SAME width whatever they contain (a px
+     basis would hand the extra space to whichever card asked for more); `stretch` + the height:100%
+     above gives them the same height. They only stack on a genuinely narrow window. */
+  .cardrow { display:flex; gap:16px; align-items:stretch; flex-wrap:wrap; }
+  .cardrow > div { flex:1 1 0; min-width:320px; }
+  .opening { white-space:pre-wrap; }
+  .panothumb { height:44px; border-radius:4px; border:1px solid var(--line); }
+  .covcand { border:1px solid var(--line); border-radius:6px; padding:2px; cursor:pointer; background:#0a141d; }
+  .covcand:hover { border-color:var(--blue); }
+  /* Editable player-facing text. The label sits above its field so a narrow column still reads as a
+     form, and the textarea is resizable because an opening paragraph is longer than any fixed height
+     you would pick for it. */
+  .edlbl { display:block; margin-top:8px; color:var(--dim); font-size:11px; text-transform:uppercase;
+           letter-spacing:.04em; }
+  .ed { display:block; width:100%; margin-top:3px; font:inherit; text-transform:none; letter-spacing:0;
+        color:#dfe9f0; background:#0a141d; border:1px solid var(--line); border-radius:6px; padding:6px 8px; }
+  textarea.ed { resize:vertical; line-height:1.5; }
+  .ed:focus { outline:none; border-color:var(--blue); }
+  /* The cover shown at the size it is actually SEEN at (Lucas, 2026-09-01): it is a poster tile on the
+     book's exercises page, so a small square here is judging it in situ — unlike the panoramas, whose
+     defects only show at full width. Capped rather than stretched: the card is half the tab wide and a
+     1024 square filling it dwarfed everything else on the tab. */
+  .coverbig { display:block; width:100%; max-width:220px; aspect-ratio:1/1; object-fit:cover;
+              border-radius:8px; border:1px solid var(--green); background:#050a0e; }
+  .covgrid { display:grid; grid-template-columns:repeat(auto-fill, minmax(86px, 1fr)); gap:8px; margin-top:8px; }
+  .covgrid img { width:100%; display:block; border-radius:4px; aspect-ratio:1/1; object-fit:cover; }
+  /* variant A/B: the two stills stacked in ONE frame so the blend slider can cross-fade them in place.
+     Same trick as the Baked tab's motion map — a delta is far easier to see as a fade than as two
+     pictures you have to look between. */
+  .vcmp { position:relative; }
+  .vcmp img { display:block; width:100%; border-radius:8px; border:1px solid var(--line); background:#050a0e; }
+  .vcmp img.top { position:absolute; inset:0; height:100%; }
+  .vcmp video.clip { position:absolute; display:none; object-fit:fill; border-radius:8px; z-index:3; }
+  .vmissing { padding:26px; text-align:center; border:1px dashed var(--line); border-radius:8px; color:var(--dim); }
+  /* The room network. Same builder and the same palette as the full console (net_graph.js), so the two
+     views of the same door graph cannot drift into looking like different maps. */
+  #netWrap { position:relative; margin-top:10px; overflow-x:auto; }
+  #netSvg { display:block; }
+  .rmcircle { fill:#12222f; stroke:var(--line); stroke-width:1.5; }
+  .rmlabel { fill:var(--amber); font-weight:700; font-size:11px; text-anchor:middle; }
+  .rmsub { fill:var(--dim); font-size:8.5px; text-anchor:middle; }
+  .hs { stroke:#0a141d; stroke-width:1; cursor:pointer; }
+  .hstype { font-size:7.5px; pointer-events:none; }
+  #netTip { position:absolute; z-index:5; max-width:230px; background:#0a141d; border:1px solid var(--blue);
+            border-radius:7px; padding:5px 8px; font-size:11px; line-height:1.35; color:#dfe9f0;
+            pointer-events:none; display:none; box-shadow:0 4px 14px rgba(0,0,0,.55); }
+  .legend { font-size:11px; color:var(--dim); margin-top:6px; display:flex; flex-wrap:wrap; gap:3px 14px; }
+  .legend b { font-weight:700; }
+  /* ── the gallery ──────────────────────────────────────────────────────────────────────────────── */
+  .shot { margin-top:18px; }
+  .shot img { width:100%; display:block; border-radius:8px; border:1px solid var(--line); background:#050a0e; }
+  /* ── the seam panel (Lucas, 2026-09-02) ───────────────────────────────────────────────────────────
+     A narrow window beside every still showing the ±180° WRAP JOIN — the far-right edge and the
+     far-left edge butted together, which is how the player actually meets them. beacons shipped twelve
+     stills whose seams nobody had looked at because nothing in this page ever showed them: the join is
+     the one part of a panorama that is never on screen here, since it sits at the two outer edges.
+     Built from the SAME <img> URL by CSS background-position, so there is no second file to generate,
+     no server round-trip, and the panel cannot drift out of sync with the still it sits next to.
+     `background-size: auto 100%` fits the panorama to the panel height, so the seam is shown at very
+     nearly the same scale as the still — this is an inspection window, not a magnifier; click it for
+     the native-resolution view. */
+  .shotrow { display:flex; gap:8px; align-items:stretch; }
+  .shotrow > .main { flex:1 1 0; min-width:0; display:block; }
+  .seampanel { flex:0 0 170px; position:relative; display:flex; cursor:zoom-in;
+               border-radius:8px; overflow:hidden; border:1px solid var(--line); background:#050a0e; }
+  .seampanel .sh { flex:1 1 0; background-repeat:no-repeat; background-size:auto 100%; }
+  .seampanel .sh.r { background-position:right center; }   /* the far-RIGHT edge of the panorama */
+  .seampanel .sh.l { background-position:left center; }    /* ...butted against the far-LEFT edge */
+  /* Mark the join itself. Without it the eye hunts for where the two halves meet and starts seeing
+     seams in ordinary terrain. */
+  .seampanel::after { content:""; position:absolute; left:50%; top:0; bottom:0; width:1px;
+                      background:rgba(255,180,80,.5); pointer-events:none; }
+  .seampanel .sl { position:absolute; left:0; right:0; bottom:0; font-size:9px; letter-spacing:.04em;
+                   text-align:center; color:var(--dim); background:rgba(0,0,0,.55); padding:1px 0;
+                   pointer-events:none; }
+  /* Native-resolution look, for when the inline panel says "something is off there". Canvas, not a
+     second image file: the panorama is already decoded in the page. */
+  #seamZoom { position:fixed; inset:0; z-index:200; background:rgba(0,0,0,.9); display:none;
+              overflow:auto; padding:24px; }
+  #seamZoom .zcap { color:var(--dim); font-size:12px; margin-bottom:10px; }
+  #seamZoom canvas { display:block; border:1px solid var(--line); border-radius:6px; }
+  .shotcap { display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; margin-bottom:5px; }
+  .shotcap b { color:var(--amber); }
+  .shotcap .who { font-size:12px; color:var(--dim); }
+  /* The room header rides just under the sticky topbar, so you always know which room you're scrolled
+     into — nine full-width panoramas is a long way between labels otherwise. */
+  .roomhd { position:sticky; top:var(--hdtop, 140px); z-index:20; background:var(--bg);
+            padding:14px 0 8px; margin-top:26px; border-top:1px solid var(--line); }
+  .roomhd .k { font-size:16px; font-weight:700; color:var(--blue); }
+  .pill { font-size:10px; font-weight:700; padding:1px 6px; border-radius:10px; border:1px solid var(--line); color:var(--dim); }
+  .pill.var { color:var(--amber); border-color:var(--amber); }
+  .missing { padding:22px; text-align:center; border:1px dashed var(--line); border-radius:8px; color:var(--dim); }
+  .cand img { border-color:var(--green); }   /* uncommitted art, framed so it can't be mistaken for the base */
+  /* ── the hotspot placement overlay ────────────────────────────────────────────────────────────
+     Boxes are absolutely positioned in PERCENTAGES over the still, so they track the image at whatever
+     width the window gives it — the panorama is never shown at its native 3072px, and a pixel-positioned
+     overlay would sit somewhere else at every window size. */
+  .hsframe { position:relative; display:block; line-height:0; touch-action:none; outline:none; }
+  /* Which room the arrow keys will nudge. Only shown once a box is selected, because a focused frame
+     with nothing selected does nothing and a ring around it would be a promise it can't keep. */
+  .hsframe:focus:has(.hsbox.sel) img { border-color:var(--blue); }
+  .hsframe img { width:100%; display:block; border-radius:8px; border:1px solid var(--line); background:#050a0e; }
+  .hsbox { position:absolute; border:2px solid var(--amber); background:rgba(255,216,140,.10);
+           box-shadow:0 0 0 1px rgba(0,0,0,.55); cursor:move; }
+  .hsbox.sel { box-shadow:0 0 0 2px #fff, 0 0 0 4px rgba(0,0,0,.5); background:rgba(255,255,255,.14); }
+  .hsbox .tag { position:absolute; top:-17px; left:-2px; font:700 10px/16px system-ui,sans-serif;
+                padding:0 5px; border-radius:4px 4px 0 0; white-space:nowrap; color:#08131b; }
+  .hsframe.nolabels .tag { display:none; }
+  /* The grip is a real corner, not an edge: one handle resizes both axes, which is all a placement pass
+     needs, and it cannot be confused with the drag-to-move body the way an edge handle can. */
+  .hsbox .grip { position:absolute; right:-5px; bottom:-5px; width:11px; height:11px; border-radius:3px;
+                 background:#fff; border:1px solid #08131b; cursor:nwse-resize; }
+  /* Three things must be readable at once and must not fight for the same property:
+       border-style — WHAT it is: solid = live (committed), dashed = planned (not yet promoted)
+       outline      — unsaved: you moved it and the header Save has not written it yet
+       box-shadow   — selected
+     Overloading dashed to mean both "planned" and "unsaved" made a planned box you had not touched
+     look identical to a live box you had. */
+  .hsbox.planned { border-style:dashed; }
+  .hsbox.planned .tag { background:none !important; border:1px solid; border-bottom:none; }
+  .hsbox.moved { outline:2px dashed #fff; outline-offset:2px; }
+  .hsrow { display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; margin-bottom:5px; }
+  .hsrow .who { font-size:12px; color:var(--dim); }
+  .hsrow code { font:11px/1.5 ui-monospace,Menlo,Consolas,monospace; color:var(--dim); }
+  /* Tabs. Four views of the SAME scenario at four pipeline stages, so switching must not reload or
+     re-fetch — each pane is rendered once per refresh and shown/hidden. */
+  #tabs { position:sticky; top:var(--tbh, 96px); z-index:50; background:var(--bg); display:flex; gap:6px;
+          margin:0 -18px; padding:8px 18px 0; border-bottom:1px solid var(--line); }
+  #tabs button { border-radius:8px 8px 0 0; border-bottom-color:transparent; padding:6px 14px; }
+  #tabs button.on { background:var(--panel); border-color:var(--line); border-bottom-color:var(--panel);
+                    color:var(--amber); font-weight:600; }
+  .pane { display:none; } .pane.on { display:block; }
+  .shot video { width:100%; display:block; border-radius:8px; border:1px solid var(--blue); background:#050a0e; }
+  .noclip { padding:18px; text-align:center; border:1px dashed var(--line); border-radius:8px; color:var(--dim); }
+  /* Loop blip: a black square that flashes at the wrap so you can SEE where the join is. Drawn over the
+     video by the review UI, never baked into the clip — the shipped file stays clean. */
+  .vwrap { position:relative; }
+  .vwrap .blip { position:absolute; left:10px; top:10px; width:44px; height:44px; background:#000;
+                 border:1px solid rgba(255,255,255,.35); opacity:0; transition:opacity .05s; pointer-events:none; }
+  .vwrap .blip.on { opacity:1; }
+  /* Motion map + patch outlines. The map is the per-pixel temporal std of the clip — white = moving —
+     laid over the video with `screen` so you read WHERE it moves against WHAT is there. A patch is a
+     repair tile composited into the clip; it is the one region that can carry its own artefacts, so it
+     gets a labelled outline rather than having to be hunted for. */
+  /* Plain alpha, NOT a blend mode: the slider is a straight mask-vs-clip crossfade, so 0 is the clip
+     untouched and 100 is the motion map alone with nothing of the video left in it. A `screen` blend
+     could never reach "just the mask", which is the reading Lucas asked for on the near-empty ones. */
+  .vwrap .mmap { position:absolute; inset:0; width:100%; height:100%; display:none;
+                 opacity:0; pointer-events:none; border-radius:8px; background:#000; }
+  .vwrap.mask .mmap { display:block; }
+  /* THREE LAYERS, bottom to top: the committed still, the cinemagraph, the motion map.
+     The still sits under the video so that when the video is masked back, what shows through is the
+     ORIGINAL panorama at full detail — which is the whole point of the classic cinemagraph
+     construction (motion_mask.py): pixels outside the moving region are never generated at all, so
+     they cannot soften, drift, or invent content. */
+  .vwrap .still { position:absolute; inset:0; width:100%; height:100%; border-radius:8px;
+                  pointer-events:none; }
+  .vwrap video { position:relative; z-index:1; }
+  .vwrap .mmap { z-index:2; }
+  .vwrap .patch { position:absolute; border:2px solid #ff9c9c; border-radius:3px; display:none;
+                  pointer-events:none; box-shadow:0 0 0 1px rgba(0,0,0,.6); }
+  /* A disabled patch stays VISIBLE and goes dashed+grey rather than disappearing: you need to see that
+     a region was patched and that you turned it off, or the decision is invisible a day later. */
+  .vwrap .patch.off { border-style:dashed; border-color:var(--dim); }
+  .vwrap .patch.off span { color:var(--dim); }
+  .vwrap .patch button { position:absolute; top:2px; right:2px; pointer-events:auto; padding:0 5px;
+                         font-size:11px; line-height:1.5; background:rgba(6,17,26,.9); }
+  .vwrap.mask .patch { display:block; }
+  /* The (threshold x region) plane. A surface, not two sliders, because the two axes INTERACT: a
+     region cut can only bite once the threshold is tight enough to break the frame into separate
+     regions, so at a loose threshold the whole frame is one component and the cut does nothing. That is
+     invisible from two independent sliders and obvious from the shape of this. */
+  .mpad { display:none; margin:6px 0 2px; }
+  .mpad.on { display:flex; gap:12px; align-items:flex-start; }
+  .mpad canvas { border:1px solid var(--line); border-radius:6px; cursor:crosshair; touch-action:none;
+                 background:#050a0e; }
+  .mpad .padnote { font-size:11px; color:var(--dim); max-width:430px; line-height:1.45; }
+  .segbtn { padding:1px 7px; font-size:11px; border-radius:6px; }
+  .segbtn.on { background:#12222f; border-color:var(--blue); color:var(--amber); font-weight:600; }
+  .vwrap .patch span { position:absolute; top:-17px; left:0; font-size:10px; font-weight:700;
+                       color:#ff9c9c; background:rgba(6,17,26,.85); padding:0 4px; border-radius:3px;
+                       white-space:nowrap; }
+</style>
+</head>
+<body>
+  <h1>Build world · gallery</h1>
+  <div id="topbar">
+    <div class="tbrow">
+      <label>scenario <select id="scenPick"></select></label>
+      <button id="refresh">↻ refresh</button>
+      <!-- ONE save for every editable string on Concept & world (Lucas, 2026-09-01). The landing text
+           and the cover prompt were two buttons patching the SAME endpoint with different subsets of
+           the same document, which is two ways to ask one question. Lives in the header because it is
+           sticky: the cover prompt is below the fold on a short window, and a save button you have to
+           scroll back to is a save button you forget to press. -->
+      <button id="saveAll" disabled title="Save the landing text and the cover prompt (⌘/Ctrl-S)">💾 Save</button>
+      <span class="status" id="saveAllStat"></span>
+      <a href="build_world.html" style="font-size:12px" title="the full authoring console — prompts, story, hotspots, cinemagraphs, tests">↗ full console</a>
+      <span style="margin-left:auto"></span>
+      <button id="testPlay" title="Open this scenario in the test player (:8055) — sound mixer + in-place text editing; needs the playtest tmux server running on :8055">▶ Test play</button>
+      <button id="play" title="Open this scenario in NORMAL play mode (a student's view — no test tools) over the :8055 playtest server">▶ Play</button>
+      <span class="status" id="topStat"></span>
+    </div>
+    <div class="tbrow">
+      <span class="hint" style="white-space:nowrap">push changes (Mac terminal):</span>
+      <pre id="pushCmds" style="margin:0; flex:1; min-width:0; font:12px/1.5 ui-monospace,Menlo,Consolas,monospace; background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:6px 10px; white-space:pre; overflow:auto">cd ~/Documents/Tools/websites/thebustalab.github.io/escape_rooms
+git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
+      <button id="copyPush" title="Copy these commands"
+        onclick="navigator.clipboard&&navigator.clipboard.writeText(document.getElementById('pushCmds').textContent);this.textContent='Copied ✓';setTimeout(()=>this.textContent='Copy',1200)">Copy</button>
+    </div>
+  </div>
+
+  <div id="tabs">
+    <!-- ORDER IS THE PIPELINE'S REAL DEPENDENCY ORDER, left to right (Lucas, 2026-09-02):
+         a BOXED variant's art is generated into a hotspot's box (the spec pipeline fills it from the door
+         hotspot at run time), so variants cannot be finished before hotspots are placed; and a cinemagraph
+         has its source still BAKED INTO IT, so it is downstream of every visual decision — re-roll a still
+         or move a box after its clip exists and the clip carries the old image. Hence: art, then boxes,
+         then the states that sit in those boxes, then the motion, last. -->
+    <button data-tab="concept" class="on">1. Concept &amp; world</button>
+    <button data-tab="art">2. Still art</button>
+    <button data-tab="hotspots">3. Hotspots</button>
+    <button data-tab="variants">4. Variants</button>
+    <button data-tab="baked">5. Cinemagraphs</button>
+  </div>
+
+  <div class="pane on" id="pane-concept">
+  <!-- `bare`: the four cards ARE the panels here, so the usual .stage frame around them would draw a
+       box inside a box. The heading and blurb this stage used to carry were removed with it. -->
+  <div class="stage bare">
+    <!-- Which skills fill this tab (Lucas, 2026-09-03). Everything on Concept & world comes from
+         exactly two skills, run in this order: the ladder + dataset first, then the world built on
+         top of it. Named here so the tab is self-documenting and you don't have to remember which
+         phase owns which card. -->
+    <div class="hint" style="margin:0 0 10px">
+      Filled by two skills, in order —
+      <b style="color:var(--fg)">escape_room_puzzles</b> (ladder + dataset)
+      →
+      <b style="color:var(--fg)">escape_room_concept</b> (world, rooms, landing, cover, plate, specs)
+      <br>Gate before tab 2 (the harness will not generate art without it):
+      <b style="color:var(--fg)">python3 authoring_v2/preflight.py &lt;chapter&gt;/&lt;scenario&gt;</b>
+    </div>
+    <!-- FOUR CARDS (Lucas, 2026-09-01): opening + cover side by side at equal width and height, then
+         the network full width, then the plate full width. `flex:1 1 0` — not a px basis — is what makes
+         the top two the SAME width rather than "whichever wants more space gets it"; `align-items:
+         stretch` plus `height:100%` on the .storyblk inside each is what makes them the same height. -->
+    <div class="cardrow">
+      <div id="landingCard"></div>
+      <div id="coverPanel"></div>
+    </div>
+    <!-- THE ROOM NETWORK. Each room is a top-down 360 minimap; hotspots sit on the ring at their real
+         panorama angle (ahead = top, the seam = bottom), and door lines run door-to-door. It belongs on
+         this tab because it is the same question the rest of the tab asks — what IS this world — and it
+         is the only view that answers it as a shape rather than as a list. Hover a dot for its hotspot. -->
+    <div id="netPanel" style="display:none; margin-top:14px"><div class="storyblk">
+      <div style="display:flex; align-items:baseline; gap:10px; flex-wrap:wrap">
+        <div class="storylbl" style="margin:0">Room network · the door graph</div>
+        <span class="hint" id="netStat"></span>
+      </div>
+      <div class="legend">
+        <span><b style="color:#7fd1ff">—</b> forward door</span>
+        <span><b style="color:#8fa3b0">- -</b> back</span>
+        <span><b style="color:#7bd88c">···</b> open passage</span>
+        <span><b style="color:#ffd88c">●</b> puzzle</span>
+        <span><b style="color:#7bd88c">●</b> clue</span>
+        <span><b style="color:#7fd1ff">●</b> door</span>
+        <span><b style="color:#c79cff">●</b> switch</span>
+        <span><b style="color:#8fa3b0">●</b> ambient</span>
+      </div>
+      <div id="netWrap"><svg id="netSvg"></svg><div id="netTip"></div></div>
+    </div></div>
+
+    <!-- The world plate at FULL WIDTH, like everything in the art tab. It is a 3072x1024 panorama and
+         the one asset every room's art is generated through, so judging it from a 44-px thumbnail was
+         backwards (Lucas, 2026-08-31). The committed plate sits on top, green-framed like a committed
+         still; the candidates follow at the same size, each click-to-commit. -->
+    <div id="platePanel" style="display:none; margin-top:12px"><div class="storyblk">
+      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap">
+        <div class="storylbl" style="margin:0">World plate · the shared backdrop</div>
+        <button onclick="viewWorldPrompt()">view prompt</button>
+        <button onclick="genPlate()">Generate plates ×2</button>
+        <span class="status" id="plateStat"></span>
+      </div>
+      <div id="plateShot"></div>
+      <div id="plateGrid"></div>
+    </div></div>
+  </div>
+
+  </div><!-- /pane-concept -->
+
+  <!-- STAGE 1 — the gpt-image-2 stills. Flat scroll: room by room, base art then its variants, then any
+       candidate not yet committed. -->
+  <div class="pane" id="pane-art">
+    <div style="margin-top:16px; display:flex; align-items:baseline; gap:12px; flex-wrap:wrap">
+      <h2 style="font-size:14px; margin:0">Stage 1 art — the stills, room by room</h2>
+      <span class="status" id="galStat"></span>
+      <label class="hint" style="cursor:pointer"><input type="checkbox" id="showCands" checked style="vertical-align:-2px"> show uncommitted candidates</label>
+    </div>
+    <div id="gallery"></div>
+  </div>
+
+  <!-- BAKED — the merged clips: full-frame render with its tile repairs composited in, which is what
+       ships. Same flat scroll, same order, so a room reads the same way in both tabs. -->
+  <div class="pane" id="pane-baked">
+    <div style="margin-top:16px; display:flex; align-items:baseline; gap:12px; flex-wrap:wrap">
+      <h2 style="font-size:14px; margin:0">Baked cinemagraphs — room by room</h2>
+      <span class="status" id="bakedStat"></span>
+      <label class="hint" style="cursor:pointer"><input type="checkbox" id="showBlip" checked style="vertical-align:-2px"> loop blip</label>
+      <span class="hint">each clip loads and plays only while it is on screen — nine 3072x1024 videos at once is not a thing a browser survives</span>
+    </div>
+    <div id="baked"></div>
+  </div>
+
+  <!-- HOTSPOTS — the committed still with its hotspot boxes drawn on it, room by room, in the same
+       order as tabs 2 and 3 so a room reads the same way in all three. PLACEMENT ONLY: drag to move,
+       corner to resize, arrows to nudge. Creating, deleting, retyping and all puzzle/clue CONTENT stay
+       in the per-room editor, which each room header links to — this tab exists because judging where a
+       box SITS is a whole-scenario, look-at-them-all job, and that is the one thing the per-room editor
+       (one room, at whatever zoom it happens to be) cannot show you.
+       Boxes are fractions of the BASE panorama, which is why the base still is what they are drawn on
+       even for a room whose world-state variants look different. -->
+  <!-- Native-resolution seam view, opened from any seam panel. One element for the whole page. -->
+  <div id="seamZoom" onclick="this.style.display='none'">
+    <div class="zcap"></div><canvas></canvas>
+  </div>
+
+  <div class="pane" id="pane-hotspots">
+    <div style="margin-top:16px; display:flex; align-items:baseline; gap:12px; flex-wrap:wrap">
+      <h2 style="font-size:14px; margin:0">Hotspots — placement, room by room</h2>
+      <span class="status" id="hsStat"></span>
+      <label class="hint" style="cursor:pointer"><input type="checkbox" id="hsLabels" checked style="vertical-align:-2px"> labels</label>
+      <span class="hint">drag a box to move it · corner to resize · arrow keys nudge the selected box (shift = ×5) · save from the header</span>
+    </div>
+    <div id="hotspots"></div>
+  </div>
+
+  <!-- VARIANTS — every alternate state of a room's art, each one paired with the base it was made FROM.
+       A variant is authored as a DELTA (a re-light, a reveal, a door opening), so the review question is
+       never "is this a good picture" but "did exactly the intended thing change and nothing else" — which
+       a variant shown on its own cannot answer. Hence the blend slider: one frame, base at 0, variant at
+       100, so anything that moved between them swims when you drag it.
+       Two sources, both listed (collect_variants): a carrier hotspot's `variants[]`, and the room-level
+       `panoramaOpen` door partner, which is marked read-only because it is re-committed with its base
+       rather than regenerated from a prompt. -->
+  <div class="pane" id="pane-variants">
+    <div style="margin-top:16px; display:flex; align-items:baseline; gap:12px; flex-wrap:wrap">
+      <h2 style="font-size:14px; margin:0">Variants — each alternate state against the base it came from</h2>
+      <span class="status" id="varStat"></span>
+      <span class="hint">drag the slider: 0 = the base, 100 = the variant. What moves is what the variant changed.</span>
+    </div>
+    <div id="variants"></div>
+  </div>
+
+  <!-- prompt modal (world plate) -->
+  <div id="promptModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:100; align-items:center; justify-content:center; padding:24px">
+    <div class="stage" style="max-width:820px; width:100%; margin:0">
+      <h2 id="promptTitle">Prompt</h2>
+      <div class="hint" id="promptHint" style="margin-bottom:6px"></div>
+      <textarea id="promptText" style="width:100%; min-height:260px; font-family:ui-monospace,monospace; font-size:11px"></textarea>
+      <div style="margin-top:8px"><button onclick="closePrompt()">Close</button></div>
+    </div>
+  </div>
+
+<script src="net_graph.js"></script>
+<script>
+  const $ = s => document.querySelector(s);
+  let CH = "", SC = "";
+  const getj = async u => (await fetch(u)).json();
+  const post = async (route, body) => (await fetch(route, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) })).json();
+  const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+  // ONE cache token for the whole page, bumped on every refresh. The art on disk changes underneath this
+  // page (a regen finishes while it's open) and a stale browser cache would quietly show yesterday's room.
+  let GV = 1;
+  const sfile = p => `/sfile/${String(p).split("/").map(encodeURIComponent).join("/")}` +
+    `?chapter=${encodeURIComponent(CH)}&scenario=${encodeURIComponent(SC)}&v=${GV}`;
+  const whenText = (w, lbl) => lbl ? esc(lbl) : (!w ? "always" :
+    (w.solved ? `once <b>${esc(w.solved)}</b> is solved` :
+      (w.eq ? `when <b>${esc(w.eq[0])}</b> = <b>${esc(w.eq[1])}</b>` : esc(JSON.stringify(w)))));
+
+  async function loadScenarios() {
+    const r = await getj("/api/scenarios");
+    const sel = $("#scenPick"); sel.innerHTML = "";
+    (r.scenarios || []).slice().sort((a, b) => (a.chapter + a.scenario).localeCompare(b.chapter + b.scenario)).forEach(s => {
+      const o = document.createElement("option");
+      o.value = s.chapter + "/" + s.scenario; o.textContent = s.chapter + " / " + s.scenario;
+      sel.appendChild(o);
+    });
+    const act = r.active || {};
+    sel.value = (act.chapter && act.scenario) ? act.chapter + "/" + act.scenario : (sel.options[0] && sel.options[0].value) || "";
+    LASTPICK = sel.value;        // what the picker reverts to if a switch is declined over unsaved edits
+    onScenario();
+  }
+  let ST = null;
+  function onScenario() {
+    const v = $("#scenPick").value || ""; [CH, SC] = v.split("/");
+    refresh();
+  }
+
+  async function refresh() {
+    if (!CH || !SC) return;
+    GV = Date.now();
+    $("#topStat").textContent = "loading…";
+    // The board state is a POST (/api/scenario-state); GET /api/status is the JOB-SLOT feed, which is
+    // what the plate poll below uses. Two different things behind similar names.
+    const st = await post("/api/scenario-state", { chapter: CH, scenario: SC });
+    if (!st.ok) { $("#topStat").innerHTML = `<span class="err">${esc(st.error)}</span>`; return; }
+    ST = st;                    // the on-disk baseline the header's Save diffs the two cards against
+    renderLanding(st);
+    await renderVariants(st);
+    renderNetwork(st.rooms || []);
+    renderPlate(st);
+    renderCover(st);
+    await renderGallery(st);
+    renderBaked(st);
+    await renderHotspots(st);
+    $("#topStat").textContent = "";
+  }
+
+  // ---- concept / landing / world -------------------------------------------------------------------
+  // ---- variants ---------------------------------------------------------------------------------
+  // Fetched rather than read off the room nodes, because a variant arrives by two different routes and
+  // only the server flattens both (`collect_variants`): a carrier hotspot's `variants[]`, and the
+  // room-level `panoramaOpen`. Reading the rooms array here would silently miss the door partners —
+  // which is exactly the gap that made a generated night pass shippable without anyone seeing it.
+  async function renderVariants(st) {
+    const host = $("#variants"); if (!host) return;
+    let vs = [], doc = { rooms: [] };
+    try { vs = (await getj(`/api/variants?chapter=${encodeURIComponent(CH)}&scenario=${encodeURIComponent(SC)}`)).variants || []; }
+    catch (e) { host.innerHTML = `<div class="hint" style="margin-top:12px">could not load variants</div>`; return; }
+    // The RAW scenario doc, not the board state: /api/scenario-state reports `hotspots` as a COUNT, so a
+    // room's cinemagraph carriers are not in it. This is the same file the player fetches, which is the
+    // point — the clip picking below then matches play exactly rather than approximating it.
+    try { doc = await getj(`/sfile/scenario.json?chapter=${encodeURIComponent(CH)}&scenario=${encodeURIComponent(SC)}&v=${GV}`); }
+    catch (e) { /* clip overlay simply stays unavailable */ }
+    const missing = vs.filter(v => !v.exists).length;
+    $("#varStat").innerHTML = vs.length
+      ? `${vs.length} variant${vs.length === 1 ? "" : "s"}` + (missing ? ` · <span class="err">${missing} with no art on disk</span>` : "")
+      : "none in this scenario";
+    if (!vs.length) {
+      host.innerHTML = `<div class="hint" style="margin-top:12px">This scenario has no alternate states —
+        no hotspot declares <code>variants[]</code> and no room carries a <code>panoramaOpen</code>.</div>`;
+      return;
+    }
+    host.innerHTML = vs.map((v, i) => {
+      const when = v.whenLabel || (v.when ? JSON.stringify(v.when) : "no condition recorded");
+      const carrier = v.hotspot ? `carried by <b>${esc(v.hotspot)}</b> (${esc(v.hotspotType || "?")})` : "room-level";
+      // What the player ACTUALLY sees: the panorama with this room's clips composited over it. A clip is
+      // chosen by the active full-scene STATE (variant_resolve.pickCinemagraphs), and a `panoramaOpen`
+      // partner is a ROOM-level field that never enters the variant list — so its state resolves to null
+      // and the room's stateless base clip is what plays. If that clip is full-scene it covers the whole
+      // frame, and the variant underneath is never seen. That is worth saying out loud, not just drawing.
+      const rm = (doc.rooms || []).find(r => r.key === v.room) || {};
+      const clips = (rm.hotspots || []).filter(h => h && h.cinemagraph && h.cinemagraph.video)
+                                       .map(h => h.cinemagraph);
+      const vState = v.readOnly ? null : (v.state || null);      // panoramaOpen resolves to the base state
+      const playing = clips.filter(c => (c.state || null) === vState);
+      // The warning is ONLY for the broken pairing: a variant whose backdrop shows but whose STATE the
+      // engine cannot see, so a full-scene clip generated from a DIFFERENT image plays over it. That is
+      // exactly the room-level `panoramaOpen` case (readOnly) — it carries no state, so the scene resolves
+      // to base and the base clip paints over it. A full-scene clip on a properly state-tagged variant is
+      // the CORRECT wiring, not a fault, and warning about it would train you to ignore the warning.
+      const fullScene = c => { const b = c.box || []; return b[0] === 0 && b[1] === 0 && b[2] === 1 && b[3] === 1; };
+      const covered = v.readOnly ? playing.filter(fullScene) : [];
+      const paired = !v.readOnly && playing.some(fullScene);
+      return `<div class="roomhd">
+          <span class="k">${esc(v.room)}</span>
+          <span style="opacity:.75">${esc(v.roomTitle || "")}</span>
+          <span class="pill var">${esc(v.state || "variant")}</span>
+          ${v.fullScene ? `<span class="pill">full scene</span>` : `<span class="pill">boxed</span>`}
+          ${v.readOnly ? `<span class="pill">read-only</span>` : ""}
+          ${v.exists ? "" : `<span class="pill" style="color:#ff9c9c; border-color:#ff9c9c">art missing</span>`}
+        </div>
+        <div class="shot">
+          <div class="shotcap">
+            <b>${esc(v.state || "variant")}</b>
+            <span class="who">${carrier} · ${esc(when)}</span>
+            <span class="who">base <code>${esc(v.base)}</code> → <code>${esc(v.panorama || "—")}</code></span>
+            ${v.exists ? `<a class="who" href="${sfile(v.panorama)}" target="_blank" rel="noopener">variant native ↗</a>
+                          <a class="who" href="${sfile(v.base)}" target="_blank" rel="noopener">base native ↗</a>` : ""}
+            ${v.prompt ? `<button class="segbtn" onclick="viewVariantPrompt(${i})">view prompt</button>` : ""}
+            ${v.exists && playing.length ? `<button class="segbtn vclip" data-i="${i}">▶ as played (with cinemagraph)</button>` : ""}
+            ${paired ? `<span class="who" style="color:var(--green)">✓ has its own full-scene clip
+                 (<code>${esc(playing.find(fullScene).video)}</code>) — the motion matches this backdrop</span>` : ""}
+            ${covered.length ? `<span class="who" style="color:#ff9c9c">⚠ a FULL-SCENE clip plays over this state
+                 (<code>${esc(covered[0].video)}</code>) — in play it covers the whole frame, so this variant is never seen</span>` : ""}
+            ${v.exists ? `<label class="who">base ⟷ variant
+                 <input type="range" class="vmix" data-i="${i}" min="0" max="100" value="100"
+                        style="width:150px; vertical-align:-4px"></label>
+               <span class="who vpct">variant</span>` : ""}
+          </div>
+          ${v.exists
+            ? `<div class="vcmp"><img src="${sfile(v.base)}" loading="lazy"><img class="top" src="${sfile(v.panorama)}" loading="lazy">`
+              + playing.map(c => `<video class="clip" data-box="${esc(JSON.stringify(c.box))}" muted loop playsinline
+                     preload="none" data-src="${sfile(c.video)}"></video>`).join("") + `</div>`
+            : `<div class="vmissing">declared, but <code>${esc(v.panorama || "—")}</code> is not on disk —
+                 the state exists in scenario.json and the player would hit a broken image</div>`}
+        </div>`;
+    }).join("");
+    VARIANTS = vs;
+    host.querySelectorAll(".vmix").forEach(sl => {
+      const cmp = sl.closest(".shot").querySelector(".vcmp");
+      const top = cmp && cmp.querySelector("img.top");
+      const lab = sl.closest(".shotcap").querySelector(".vpct");
+      const apply = () => {
+        const n = +sl.value;
+        if (top) top.style.opacity = n / 100;
+        lab.textContent = n === 0 ? "base" : n === 100 ? "variant" : `${n}% variant`;
+      };
+      sl.oninput = apply; apply();
+    });
+    // The clip layer is opt-in and lazily sourced: these are 3072x1024 videos and a scenario with four
+    // variants would otherwise mount four of them the moment the tab is opened.
+    host.querySelectorAll(".vclip").forEach(btn => {
+      const cmp = btn.closest(".shot").querySelector(".vcmp");
+      btn.onclick = () => {
+        const on = !btn.classList.contains("on");
+        btn.classList.toggle("on", on);
+        cmp.querySelectorAll("video.clip").forEach(vd => {
+          if (on) {
+            const b = JSON.parse(vd.dataset.box || "[0,0,1,1]");
+            Object.assign(vd.style, { display: "block", left: (b[0] * 100) + "%", top: (b[1] * 100) + "%",
+              width: ((b[2] - b[0]) * 100) + "%", height: ((b[3] - b[1]) * 100) + "%" });
+            if (!vd.src) vd.src = vd.dataset.src;
+            vd.play().catch(() => {});
+          } else {
+            vd.pause(); vd.removeAttribute("src"); vd.load(); vd.style.display = "none";
+          }
+        });
+      };
+    });
+  }
+  let VARIANTS = [];
+  function viewVariantPrompt(i) {
+    const v = VARIANTS[i]; if (!v) return;
+    $("#promptTitle").textContent = `${v.room} · ${v.state} — variant prompt`;
+    const t = $("#promptText"); t.value = v.prompt || ""; t.readOnly = true;
+    $("#promptHint").innerHTML = "Read-only here — this is the DELTA prompt the variant was generated from, "
+      + "not a whole scene. Edit it where the state is declared, then regenerate.";
+    $("#promptModal").style.display = "flex";
+  }
+
+  // ---- the room network -------------------------------------------------------------------------
+  // Built by net_graph.js — the SAME module and palette the full console uses, deliberately, so two
+  // views of one door graph cannot drift into disagreeing about it. It is a pure function of the rooms
+  // array (rooms -> {W,H,html}), and `/api/scenario-state` already carries everything it reads: `doors`,
+  // `planned` and `hasSpec`. Nothing new was needed on the server.
+  //
+  // Rooms without a scene spec are excluded, as in the console: a room with no spec has no ports to draw,
+  // so it would sit on the map as a bare circle implying it is unconnected rather than un-authored.
+  function renderNetwork(rooms) {
+    const spec = rooms.filter(r => r.hasSpec);
+    $("#netPanel").style.display = spec.length ? "" : "none";
+    const svg = $("#netSvg");
+    if (!spec.length) { svg.innerHTML = ""; return; }
+    const g = NetGraph.buildNetSvg(spec);
+    svg.setAttribute("width", g.W); svg.setAttribute("height", g.H);
+    svg.setAttribute("viewBox", `0 0 ${g.W} ${g.H}`);
+    svg.innerHTML = g.html;
+    const doors = spec.reduce((n, r) => n + (r.doors || []).length, 0);
+    const skipped = rooms.length - spec.length;
+    $("#netStat").textContent = `${spec.length} room${spec.length === 1 ? "" : "s"} · ${doors} door${doors === 1 ? "" : "s"}`
+      + (skipped ? ` · ${skipped} without a scene spec, not drawn` : "");
+  }
+  // Hover (desktop) and tap (touch) tooltips on a hotspot dot. Bound ONCE to the wrapper rather than per
+  // dot, because the SVG is replaced wholesale on every refresh and per-dot handlers would be lost with it.
+  (function bindNetTips() {
+    const wrap = $("#netWrap"), tip = $("#netTip");
+    const at = (el, cx, cy) => {
+      const info = el.getAttribute("data-info"); if (!info) return;
+      tip.innerHTML = info; tip.style.display = "block";
+      const w = wrap.getBoundingClientRect();
+      tip.style.left = Math.max(2, Math.min(cx - w.left + 12, wrap.clientWidth - tip.offsetWidth - 6)) + "px";
+      tip.style.top = (cy - w.top + 14) + "px";
+    };
+    const hide = () => { tip.style.display = "none"; };
+    const isDot = e => e.target.classList && e.target.classList.contains("hs");
+    wrap.addEventListener("mouseover", e => { if (isDot(e)) at(e.target, e.clientX, e.clientY); });
+    wrap.addEventListener("mousemove", e => { if (isDot(e)) at(e.target, e.clientX, e.clientY); });
+    wrap.addEventListener("mouseout", e => { if (isDot(e)) hide(); });
+    wrap.addEventListener("click", e => {
+      if (!isDot(e)) return hide();
+      const r = e.target.getBoundingClientRect(); at(e.target, r.left + r.width / 2, r.top);
+    });
+  })();
+
+  // ---- the landing screen, EDITABLE -----------------------------------------------------------
+  // Four player-facing strings, laid out the way the player meets them, and editable in place. They were
+  // read-only here with a pointer to the full console, which is the wrong way round: this is the screen
+  // the text appears on, so it is the screen to judge and fix it on.
+  //
+  // `openingStory` in the state payload is `story` in scenario.json — hence the two keys per field: the
+  // SAVE writes `doc`, never the display one. Saving itself lives in ONE save, in the header, below.
+  const LANDING_FIELDS = [
+    {k: "title",       doc: "title",       label: "title",        tag: "input"},
+    {k: "subtitle",    doc: "subtitle",    label: "subtitle",     tag: "input"},
+    {k: "openingStory", doc: "story",      label: "opening",      tag: "textarea"},
+    {k: "enterLabel",  doc: "enterLabel",  label: "enter button", tag: "input"},
+  ];
+  function renderLanding(st) {
+    $("#landingCard").innerHTML =
+      `<div class="storyblk">` +
+        `<div class="storylbl">Opening · landing screen</div>` +
+        LANDING_FIELDS.map(f => `<label class="edlbl">${f.label}` +
+          (f.tag === "textarea"
+            ? `<textarea class="ed" data-k="${f.k}" rows="7" placeholder="nothing written yet"></textarea>`
+            : `<input class="ed" data-k="${f.k}" placeholder="${f.k === "enterLabel" ? "Enter →" : ""}">`) +
+          `</label>`).join("") +
+      `</div>`;
+    // .value, not markup: an opening with a quote or an angle bracket in it must survive a round trip,
+    // and setting it as an attribute is how that gets mangled.
+    LANDING_FIELDS.forEach(f => { $(`#landingCard .ed[data-k="${f.k}"]`).value = st[f.k] || ""; });
+    $("#landingCard").querySelectorAll(".ed").forEach(e => { e.oninput = syncSave; });
+    syncSave();
+  }
+
+  // ---- ONE save, in the header ---------------------------------------------------------------
+  // The landing strings and the cover prompt are five fields of ONE scenario.json, and both cards were
+  // already patching the same endpoint — so they save together, from one button. `doc` is the key
+  // written to the file and `k` the key in the state payload; only these five are ever sent, because
+  // /api/scenario-patch is a shallow update with no whitelist and a mistyped key would silently plant
+  // a junk field in the scenario.
+  const EDIT_FIELDS = LANDING_FIELDS.concat(
+    [{k: "coverPrompt", doc: "coverPrompt", sel: "#coverPrompt"}]);
+  const editEl = f => f.sel ? $(f.sel) : $(`#landingCard .ed[data-k="${f.k}"]`);
+  function textDirty() {
+    if (!ST) return false;
+    return EDIT_FIELDS.some(f => { const el = editEl(f); return el && el.value !== (ST[f.k] || ""); });
+  }
+  // One Save, so one dirty check: the concept text AND any hotspot box moved on tab 4. They are different
+  // endpoints (scenario-patch vs room-patch, one call per room) but the same question to the author —
+  // "is there anything of mine not on disk" — and a second Save button for boxes would only make that
+  // question harder to answer.
+  const editDirty = () => textDirty() || hsDirtyRooms().length > 0;
+  function syncSave() {
+    const d = editDirty(), b = $("#saveAll"), nr = hsDirtyRooms().length;
+    b.disabled = !d; b.classList.toggle("dirty", d);
+    const what = [textDirty() ? "text" : "", nr ? `${nr} ${nr === 1 ? "room's" : "rooms'"} hotspots` : ""]
+      .filter(Boolean).join(" + ");
+    $("#saveAllStat").innerHTML = d ? `<span style="color:var(--amber)">unsaved: ${what}</span>` : "";
+  }
+  async function saveAll() {
+    if (!ST || !editDirty()) return true;
+    if (!(await saveHotspots())) { syncSave(); return false; }
+    if (!textDirty()) {                       // boxes only — nothing to patch at scenario level
+      $("#saveAll").disabled = true; $("#saveAll").classList.remove("dirty");
+      $("#saveAllStat").innerHTML = `<span class="ok">saved ✓</span>`;
+      return true;
+    }
+    const fields = {}, taken = {};
+    EDIT_FIELDS.forEach(f => { const el = editEl(f); if (el) { fields[f.doc] = el.value; taken[f.k] = el.value; } });
+    $("#saveAll").disabled = true;
+    $("#saveAllStat").textContent = "saving…";
+    const r = await post("/api/scenario-patch", { chapter: CH, scenario: SC, fields });
+    if (!r.ok) { $("#saveAllStat").innerHTML = `<span class="err">${esc(r.error)}</span>`;
+                 $("#saveAll").disabled = false; return false; }
+    // Move the in-memory baseline instead of calling refresh(). A full re-render rebuilds both cards and
+    // wipes the confirmation the instant it appears — a save with no visible confirmation reads as a
+    // save that did not happen. Nothing else on the page depends on these strings.
+    Object.assign(ST, taken);
+    $("#saveAll").disabled = true; $("#saveAll").classList.remove("dirty");
+    $("#saveAllStat").innerHTML = `<span class="ok">saved ✓</span>`;   // set AFTER, not via syncSave()
+    return true;
+  }
+  // There is no Revert any more, so the ways an edit can be silently thrown away have to be closed:
+  // a scenario switch, a manual refresh and a page close all rebuild these cards from disk. Tab
+  // switching does not — the panes are shown/hidden, never re-rendered — so it is safe and unguarded.
+  const okToDiscard = () => !editDirty()
+    || confirm("Unsaved changes on Concept & world will be lost. Discard them?");
+
+  let WORLDPROMPT = "";
+  const plateSrc = () => `/sfile/_world/plate.png?chapter=${encodeURIComponent(CH)}&scenario=${encodeURIComponent(SC)}&v=${GV}`;
+  function renderPlate(st) {
+    const has = !!st.worldPlatePrompt;
+    // BLOCK, not flex. The panel's children are a header row, the committed plate and the candidate
+    // list — stacked. As a flex ROW they became three side-by-side columns, which squeezed the buttons
+    // into a narrow strip and stood the full-width panoramas up in a gutter.
+    $("#platePanel").style.display = has ? "block" : "none";
+    if (!has) return;
+    WORLDPROMPT = st.worldPlatePrompt || "";
+    $("#plateShot").innerHTML = st.worldPlate
+      ? `<div class="shot cand"><div class="shotcap"><b style="color:var(--green)">committed plate</b>
+           <span class="who">_world/plate.png</span>
+           <a class="who" href="${plateSrc()}" target="_blank" rel="noopener">native ↗</a></div>
+         <a href="${plateSrc()}" target="_blank" rel="noopener"><img src="${plateSrc()}"></a></div>`
+      : `<div class="missing" style="margin-top:10px">no plate committed yet — generate, then click one below</div>`;
+    refreshPlateGrid();
+  }
+  // The plate prompt lives in the spec bundle's `worldPlate` entry — read-only here, edited in the console.
+  function viewWorldPrompt() {
+    $("#promptTitle").textContent = "World plate prompt";
+    const t = $("#promptText"); t.value = WORLDPROMPT || ""; t.readOnly = true;
+    $("#promptHint").innerHTML = "Read-only — it's the <b>worldPlate</b> entry in the spec bundle; edit it in the <a href='build_world.html'>full console</a>, then re-render.";
+    $("#promptModal").style.display = "flex";
+  }
+  function closePrompt() { $("#promptModal").style.display = "none"; }
+  // How many world-plate candidates a Generate makes. TWO (Lucas, 2026-09-01): four was more to look
+  // at than he wanted and cost ~4 minutes a call. The server's ceiling is unchanged, so this is the
+  // default rather than a limit. Named once so the button label, the progress line and the request
+  // cannot say three different numbers — which is exactly how the old code was written.
+  const PLATE_N = 2;
+  async function genPlate() {
+    const st = $("#plateStat"); st.innerHTML = `<span style="color:var(--amber)">generating 2 plates… (~2 min)</span>`;
+    const r = await post("/api/gen-world-plate", { chapter: CH, scenario: SC, n: PLATE_N });
+    if (!r.ok) { st.innerHTML = `<span class="err">${esc(r.error)}</span>`; return; }
+    const poll = setInterval(async () => {
+      const s2 = await getj(`/api/status?slot=${encodeURIComponent(r.slot)}`);
+      refreshPlateGrid();                       // show each candidate as it lands, don't wait for all of them
+      if (s2.active) { st.innerHTML = `<span style="color:var(--amber)">generating plates… ${s2.done || 0}/${r.n || PLATE_N}</span>`; return; }
+      clearInterval(poll);
+      if (s2.error) { st.innerHTML = `<span class="err">${esc(s2.error)}</span>`; return; }
+      st.innerHTML = `<span class="ok">candidates ready — click one to commit it</span>`;
+      refreshPlateGrid();
+    }, 2500);
+  }
+  const plateCandSrc = f => `/sfile/_scratch/${encodeURIComponent(f)}?chapter=${encodeURIComponent(CH)}&scenario=${encodeURIComponent(SC)}&v=${GV}`;
+  async function refreshPlateGrid() {
+    const grid = $("#plateGrid"); if (!grid) return;
+    const j = await getj(`/api/plate-candidates?chapter=${encodeURIComponent(CH)}&scenario=${encodeURIComponent(SC)}`);
+    // `uncommitted`, not `files`: the committed plate is already shown above, full width — the candidate
+    // it was promoted from must not appear again underneath it as something still to choose.
+    const files = j.uncommitted || [];
+    grid.innerHTML = files.length
+      ? files.map(f => `<div class="shot">
+          <div class="shotcap"><b>candidate</b><span class="who">${esc(f)}</span>
+            <a class="who" href="${plateCandSrc(f)}" target="_blank" rel="noopener">native ↗</a>
+            <button onclick="setPlate('${esc(f)}')" style="padding:2px 8px; font-size:12px">Commit as world plate</button>
+            <button onclick="delPlateCand('${esc(f)}')" style="padding:2px 8px; font-size:12px; color:#ff9c9c">Discard</button></div>
+          <a href="${plateCandSrc(f)}" target="_blank" rel="noopener"><img loading="lazy" src="${plateCandSrc(f)}"></a>
+        </div>`).join("")
+      : `<div class="hint" style="margin-top:8px">${(j.files || []).length
+            ? "every candidate is the plate committed above — hit Generate for more"
+            : "no candidates yet — hit Generate"}</div>`;
+  }
+  async function setPlate(f) {
+    if (!(await saveAll())) return;                    // same reason as setCover: this call re-renders
+    const st = $("#plateStat"); st.textContent = "committing plate…";
+    const r = await post("/api/set-world-plate", { chapter: CH, scenario: SC, image: f });
+    if (!r.ok) { st.innerHTML = `<span class="err">${esc(r.error)}</span>`; return; }
+    st.innerHTML = `<span class="ok">plate committed ✓</span>`;
+    refresh();                       // re-read state so the committed plate moves to the top slot
+  }
+  async function delPlateCand(f) {
+    const r = await post("/api/delete-plate-candidate", { chapter: CH, scenario: SC, file: f });
+    if (!r.ok) { $("#plateStat").innerHTML = `<span class="err">${esc(r.error)}</span>`; return; }
+    refreshPlateGrid();
+  }
+  // ---- cover art: prompt, generate, pick -------------------------------------------------------
+  // The cover is the scenario's poster on the book's exercises page. It was a 44-px thumbnail here with
+  // "generated in the full console" beside it. Shown at a size you can actually judge, with its prompt
+  // editable — generating from a prompt you cannot change is a dead end, and an empty `coverPrompt` is
+  // the only thing that makes the generate button fail.
+  //
+  // Candidates are square 1024s in the scenario's _scratch, named `gpt_cover_*`. `_open`/`_x2` variants
+  // are excluded: those are derived files, not fresh candidates, and offering them as choices means
+  // committing an upscale as if it were an original.
+  let COVERV = 0;
+  const coverCandSrc = f => `/sfile/_scratch/${encodeURIComponent(f)}?chapter=${encodeURIComponent(CH)}&scenario=${encodeURIComponent(SC)}&v=${COVERV}`;
+  function renderCover(st) {
+    COVERV = COVERV || GV;
+    $("#coverPanel").innerHTML =
+      `<div class="storyblk">` +
+        `<div class="storylbl">Cover art · the scenario's poster</div>` +
+        (st.cover
+          ? `<a href="${sfile(st.cover)}" target="_blank" rel="noopener"><img id="coverThumb" class="coverbig" src="${sfile(st.cover)}"></a>`
+          : `<div class="missing">no cover set yet — write a prompt and generate</div>`) +
+        `<label class="edlbl">prompt<textarea class="ed" id="coverPrompt" rows="4" ` +
+          `placeholder="what the poster shows — needed before you can generate"></textarea></label>` +
+        `<div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:8px">` +
+          `<button id="coverGen">Generate cover ×2</button>` +
+          `<span class="status" id="coverStat"></span></div>` +
+        `<div id="coverGrid" class="covgrid"></div>` +
+      `</div>`;
+    const ta = $("#coverPrompt");
+    ta.value = st.coverPrompt || "";
+    ta.oninput = syncSave;                     // the prompt saves with everything else, from the header
+    $("#coverGen").onclick = () => genCover(ta.value);
+    syncSave();
+    refreshCoverGrid();
+  }
+  async function genCover(prompt) {
+    const st = $("#coverStat");
+    if (!(prompt || "").trim()) { st.innerHTML = `<span class="err">write a prompt first</span>`; return; }
+    // /api/generate writes into the ACTIVE scenario's _scratch, and "active" is server-side state set by
+    // /api/select-scenario. Without this the candidates land in whichever scenario was selected last —
+    // which is silent, and wrong in exactly the way you would not check.
+    const sel = await post("/api/select-scenario", { chapter: CH, scenario: SC });
+    if (!sel.ok) { st.innerHTML = `<span class="err">could not select scenario</span>`; return; }
+    st.innerHTML = `<span style="color:var(--amber)">generating cover ×2… (~1 min)</span>`;
+    $("#coverGen").disabled = true;
+    const r = await post("/api/generate", { prompt, n: 2, quality: "high", size: "1024x1024",
+                                            slot: "cover", tag: "cover" });
+    if (!r.ok) { st.innerHTML = `<span class="err">${esc(r.error)}</span>`; $("#coverGen").disabled = false; return; }
+    const poll = setInterval(async () => {
+      const s2 = await getj(`/api/status?slot=cover`);
+      if (s2.active) { st.innerHTML = `<span style="color:var(--amber)">generating cover… ${s2.done || 0}/2</span>`; return; }
+      clearInterval(poll);
+      $("#coverGen").disabled = false;
+      if (s2.error) { st.innerHTML = `<span class="err">${esc(s2.error)}</span>`; return; }
+      COVERV = Date.now();
+      st.innerHTML = `<span class="ok">candidates ready — click one to set it</span>`;
+      refreshCoverGrid();
+    }, 2500);
+  }
+  // The candidate row shows only what is NOT already committed. The committed cover sits at the top of
+  // this card; leaving its source candidate in the row below shows the same picture twice and invites a
+  // click that commits what is already committed. The server byte-matches it out (`uncommitted`) —
+  // set-cover COPIES to cover.png and records no back-pointer, so the filename cannot answer this.
+  //
+  // /api/cover-candidates is scenario-scoped by query string. The old route was /api/scenes, which lists
+  // whichever scenario the server was last told is ACTIVE — so it needed a select-scenario call first or
+  // it silently offered another scenario's covers as this one's.
+  async function refreshCoverGrid() {
+    const grid = $("#coverGrid"); if (!grid) return;
+    let j = {};
+    try {
+      j = await getj(`/api/cover-candidates?chapter=${encodeURIComponent(CH)}&scenario=${encodeURIComponent(SC)}`);
+    } catch (e) { grid.innerHTML = ""; return; }
+    const covers = j.uncommitted || [];
+    grid.innerHTML = covers.map(f =>
+      `<div class="covcand" title="set as the cover" onclick="setCover('${esc(f)}')">` +
+        `<img loading="lazy" src="${coverCandSrc(f)}"></div>`).join("");
+  }
+  async function setCover(f) {
+    // Committing re-renders, which would drop an unsaved prompt edit. Save it rather than warn about it:
+    // typing a prompt, generating from it and picking the result is ONE action, and the prompt that
+    // produced the committed cover is the one worth keeping on disk.
+    if (!(await saveAll())) return;
+    const st = $("#coverStat"); st.textContent = "setting cover…";
+    const r = await post("/api/set-cover", { chapter: CH, scenario: SC, image: f });
+    if (!r.ok) { st.innerHTML = `<span class="err">${esc(r.error)}</span>`; return; }
+    st.innerHTML = `<span class="ok">cover set ✓</span>`;
+    refresh();
+  }
+
+  // ---- tab 4: hotspot PLACEMENT ---------------------------------------------------------------
+  // What this tab is for: seeing every box in the scenario at full width and nudging the ones that sit
+  // wrong. It deliberately does NOT create, delete, retype or author hotspots — that is hotspots_edit.html,
+  // one room at a time, and duplicating it here would be two editors that can disagree about one array.
+  //
+  // Boxes come from /api/scenario (the whole doc) rather than /api/scenario-state, which only carries a
+  // COUNT of a room's hotspots. One extra fetch per refresh, no server change.
+  //
+  // TWO ARRAYS, one picture. A room's `hotspots` is what the game plays; `plannedHotspots` is the
+  // pre-art staging where content and a first box are authored, promoted at commit. The gallery showed
+  // only the former, so canyon — 34 authored, boxed, never-promoted hotspots — read as an empty
+  // scenario (Lucas, 2026-09-01). Both are drawn now, told apart by border style, and both are
+  // draggable: the planned boxes are precisely the ones most in need of a nudge, since most arrive as
+  // localizer guesses.
+  //
+  // HSW[roomKey] is the working copy — {uid,kind,id,pkey,type,label,box}, box mutated in place by
+  // dragging. HSB[roomKey] maps uid -> the box as loaded, so "moved" is a comparison rather than a flag
+  // someone has to remember to set.
+  let HSW = {}, HSB = {}, HSSEL = null;                 // HSSEL: {room, uid} of the selected box
+  const HSCOL = () => (window.NetGraph && NetGraph.TYPE_COL) || {};
+  // MUST mirror harness_server.py `_slug` and hotspots_edit.html `slug`: (type, slug(label)) is the
+  // harness's planned->placed matching key, and it is what identifies a planned entry here, because
+  // 348 of the 385 planned entries in the corpus carry no `id` at all.
+  const slug = t => (String(t == null ? "" : t).toLowerCase().replace(/[^a-z0-9]+/g, "_")
+                     .replace(/^_+|_+$/g, "") || "obj");
+  const hsMoved = (room, h) => (HSB[room] || {})[h.uid] !== h.box.join(",");
+  const hsDirtyRooms = () => Object.keys(HSW).filter(k => (HSW[k] || []).some(h => hsMoved(k, h)));
+
+  async function renderHotspots(st) {
+    const host = $("#hotspots");
+    HSW = {}; HSB = {}; HSSEL = null;
+    let doc = null;
+    try { doc = await getj(`/api/scenario?chapter=${encodeURIComponent(CH)}&scenario=${encodeURIComponent(SC)}`); }
+    catch (e) { doc = null; }
+    const nodes = (doc && doc.rooms) || [];
+    const byKey = {}; nodes.forEach(n => (byKey[n.key] = n));
+
+    const rooms = (st.rooms || []).filter(r => r.built);   // no still, nothing to place a box on
+    HSROOMS = rooms.map(r => r.key);
+    host.innerHTML = rooms.map(r => {
+      const c = loadRoomBoxes(r.key, byKey[r.key] || {});
+      return `<div class="roomhd" data-room="${esc(r.key)}">
+          <span class="k">${esc(r.key)}</span>
+          <span style="opacity:.75">${esc(r.title || "")}</span>
+          <span class="hspills">${pillsHtml(c)}</span>
+        </div>
+        <div class="shot">
+          <div class="hsrow">
+            <span class="hscommit">${commitBtnHtml(r.key, c)}</span>
+            <a class="who" href="${hsEdit(r.key)}" target="_blank" rel="noopener">add / remove / author ↗</a>
+            <a class="who" href="${room360(r.key)}" target="_blank" rel="noopener">open in 360 ↗</a>
+            <span class="status" id="hscm-${esc(r.key)}"></span>
+            <span class="who" id="hssel-${esc(r.key)}"></span>
+          </div>
+          <div class="hsframe" data-room="${esc(r.key)}" tabindex="0">
+            <img loading="lazy" src="${sfile(r.key + "/scene.png")}">
+          </div>
+        </div>`;
+    }).join("");
+    if (!rooms.length) host.innerHTML = `<div class="hint" style="margin-top:12px">No built rooms yet — hotspots are drawn on committed art.</div>`;
+    rooms.forEach(r => drawBoxes(r.key));
+    bindCommitButtons();
+    hsLabelSync();
+    hsStatSync();
+    syncSave();
+  }
+  let HSROOMS = [];                       // built rooms, in order — what hsStatSync totals over
+
+  // Rebuild ONE room's working copy from its scenario node. Split out of the render so a room can be
+  // brought up to date after a commit without re-rendering the pane.
+  const boxed = h => Array.isArray(h.box) && h.box.length === 4;
+  function loadRoomBoxes(key, node) {
+    // Only boxed hotspots are drawn. One with no 4-number box is not "at 0,0" — it has not been placed
+    // at all, and drawing it in the corner would invent a placement nobody chose.
+    const live = (node.hotspots || []).filter(boxed);
+    const liveKeys = new Set((node.hotspots || []).map(h => h.type + "|" + slug(h.label)));
+    // A planned entry whose (type,label) is already live has been promoted — drawing it again would put
+    // two boxes on one object and invite you to drag the one the game does not read.
+    const planned = (node.plannedHotspots || [])
+      .filter(h => boxed(h) && !liveKeys.has(h.type + "|" + slug(h.label)));
+    const unplaced = (node.hotspots || []).length - live.length
+                   + (node.plannedHotspots || []).filter(h => !boxed(h)
+                       && !liveKeys.has(h.type + "|" + slug(h.label))).length;
+    HSW[key] = live.map(h => ({ uid: "live:" + h.id, kind: "live", id: h.id,
+                                type: h.type || "puzzle", label: h.label || h.id,
+                                box: h.box.map(Number) }))
+      .concat(planned.map(h => ({ uid: "plan:" + h.type + "|" + slug(h.label), kind: "planned",
+                                  pkey: h.type + "|" + slug(h.label),
+                                  type: h.type || "puzzle", label: h.label || slug(h.label),
+                                  src: h.boxSource || "", box: h.box.map(Number) })));
+    HSB[key] = Object.fromEntries(HSW[key].map(h => [h.uid, h.box.join(",")]));
+    return { live: live.length, planned: planned.length, unplaced };
+  }
+  const pillsHtml = c => `<span class="pill">${c.live} live</span>`
+    + (c.planned ? `<span class="pill var">${c.planned} planned</span>` : "")
+    + (c.unplaced ? `<span class="pill">${c.unplaced} unboxed</span>` : "");
+  const commitBtnHtml = (key, c) => c.planned
+    ? `<button data-commit="${esc(key)}" style="padding:2px 9px; font-size:12px">Commit ${c.planned} planned →</button>` : "";
+  function bindCommitButtons() {
+    $("#hotspots").querySelectorAll("[data-commit]").forEach(
+      b => { b.onclick = () => commitPlanned(b.dataset.commit); });
+  }
+  function hsStatSync() {
+    const all = HSROOMS.flatMap(k => HSW[k] || []);
+    const nLive = all.filter(h => h.kind === "live").length, nPlanned = all.length - nLive;
+    $("#hsStat").innerHTML = `${nLive} live` + (nPlanned
+      ? ` · <b style="color:var(--amber)">${nPlanned} planned</b>, not yet committed` : "")
+      + ` · ${HSROOMS.length} room${HSROOMS.length === 1 ? "" : "s"}`;
+  }
+
+  // Promote one room's planned hotspots into its live array, boxes and all. Per room, next to the room it
+  // affects — the same shape as Commit on an art candidate or a cinemagraph. Pending drags are SAVED
+  // first, not discarded: a nudge and the commit that follows it are one action, and committing the
+  // pre-nudge box would quietly undo the work you just did.
+  async function commitPlanned(room) {
+    const out = $(`#hscm-${cssq(room)}`);
+    if (!(await saveAll())) return;
+    out.textContent = "committing…";
+    const r = await post("/api/commit-planned", { chapter: CH, scenario: SC, roomKey: room });
+    if (!r.ok) { out.innerHTML = `<span class="err">${esc(r.error)}</span>`; return; }
+    const bits = [`${(r.created || []).length} committed ✓`];
+    if ((r.already || []).length) bits.push(`${r.already.length} already live`);
+    if ((r.boxless || []).length) bits.push(`${r.boxless.length} skipped (no box)`);
+    // Update THIS ROOM IN PLACE — do not call refresh(). A full refresh re-renders every pane and
+    // replaces every <img> in this one; a fresh lazy <img> has no height until it decodes, so the
+    // document collapses and the browser drops you back at the top of a nine-room scroll (Lucas,
+    // 2026-09-01). Nothing outside this tab displays committed-hotspot data, so nothing else is stale.
+    // The <img> is deliberately left alone: only the boxes over it, its pills and its button change.
+    let doc = null;
+    try { doc = await getj(`/api/scenario?chapter=${encodeURIComponent(CH)}&scenario=${encodeURIComponent(SC)}`); }
+    catch (e) { doc = null; }
+    const node = doc && (doc.rooms || []).find(x => x.key === room);
+    if (!node) { out.innerHTML = `<span class="err">committed, but could not re-read the room — hit ↻ refresh</span>`; return; }
+    const c = loadRoomBoxes(room, node);
+    drawBoxes(room);
+    const hd = document.querySelector(`.roomhd[data-room="${cssq(room)}"] .hspills`);
+    if (hd) hd.innerHTML = pillsHtml(c);
+    const cm = document.querySelector(`.hsframe[data-room="${cssq(room)}"]`)
+                 .closest(".shot").querySelector(".hscommit");
+    if (cm) { cm.innerHTML = commitBtnHtml(room, c); bindCommitButtons(); }
+    hsLabelSync(); hsStatSync(); syncSave();
+    out.innerHTML = `<span class="ok">${esc(bits.join(" · "))}</span>`;
+  }
+  const hsEdit = key => `hotspots_edit.html?room=${encodeURIComponent(key)}&chapter=${encodeURIComponent(CH)}&scenario=${encodeURIComponent(SC)}`;
+
+  function drawBoxes(room) {
+    const frame = document.querySelector(`.hsframe[data-room="${cssq(room)}"]`);
+    if (!frame) return;
+    frame.querySelectorAll(".hsbox").forEach(b => b.remove());
+    // Biggest first, so the SMALL boxes paint (and therefore hit-test) on top. Hotspots nest — a keypad
+    // inside a console, a lever on a wall panel — and in scenario order a big box drawn late swallows
+    // every click meant for the small one underneath it.
+    const order = (HSW[room] || []).slice().sort(
+      (a, c) => ((c.box[2]-c.box[0]) * (c.box[3]-c.box[1])) - ((a.box[2]-a.box[0]) * (a.box[3]-a.box[1])));
+    order.forEach(h => {
+      const [x0, y0, x1, y1] = h.box, col = HSCOL()[h.type] || "#ffd88c";
+      const d = document.createElement("div");
+      d.className = "hsbox" + (h.kind === "planned" ? " planned" : "")
+                            + (HSSEL && HSSEL.room === room && HSSEL.uid === h.uid ? " sel" : "")
+                            + (hsMoved(room, h) ? " moved" : "");
+      d.dataset.uid = h.uid;
+      Object.assign(d.style, { left: (x0 * 100) + "%", top: (y0 * 100) + "%",
+                               width: ((x1 - x0) * 100) + "%", height: ((y1 - y0) * 100) + "%",
+                               borderColor: col, background: "rgba(255,255,255,.06)" });
+      d.innerHTML = `<span class="tag" style="background:${col}; color:${h.kind === "planned" ? col : "#08131b"}">`
+                  + `${h.kind === "planned" ? "planned · " : ""}${esc(h.type)} · ${esc(h.label)}</span>`
+                  + `<span class="grip"></span>`;
+      frame.appendChild(d);
+    });
+    const sel = (HSW[room] || []).find(h => HSSEL && HSSEL.room === room && HSSEL.uid === h.uid);
+    const out = $(`#hssel-${cssq(room)}`);
+    if (out) out.innerHTML = sel
+      ? `<b style="color:var(--amber)">${esc(sel.id || sel.label)}</b>`
+        + (sel.kind === "planned" ? ` <span class="pill var">planned${sel.src ? " · " + esc(sel.src) : ""}</span>` : "")
+        + ` <code>[${sel.box.map(v => v.toFixed(4)).join(", ")}]</code>`
+      : "";
+  }
+
+  // ---- drag to move, corner to resize ---------------------------------------------------------
+  // Bound ONCE to the pane, not per box: the boxes are rebuilt on every drag frame, so per-box handlers
+  // would be torn out from under the gesture that is still running. Pointer events (not mouse) so a
+  // trackpad, a pen and a touchscreen all work, and setPointerCapture keeps the drag alive when the
+  // cursor leaves the box — which it does constantly when you are dragging a box to the edge of a room.
+  (function bindHotspotDrag() {
+    const pane = $("#pane-hotspots");
+    let drag = null;
+    const clamp = v => Math.max(0, Math.min(1, v));
+    pane.addEventListener("pointerdown", e => {
+      const boxEl = e.target.closest(".hsbox"); if (!boxEl) return;
+      const frame = boxEl.closest(".hsframe"), room = frame.dataset.room;
+      const h = (HSW[room] || []).find(x => x.uid === boxEl.dataset.uid); if (!h) return;
+      HSSEL = { room, uid: h.uid };
+      const r = frame.getBoundingClientRect();
+      drag = { room, h, frame, w: r.width, h0: r.height, x: e.clientX, y: e.clientY,
+               box: h.box.slice(), mode: e.target.classList.contains("grip") ? "size" : "move" };
+      boxEl.setPointerCapture(e.pointerId);
+      e.preventDefault();
+      frame.focus();          // preventDefault suppressed the focus this click would have given it, and
+                              // without focus the arrow-key nudge below never receives a key
+      drawBoxes(room);
+    });
+    pane.addEventListener("pointermove", e => {
+      if (!drag) return;
+      const dx = (e.clientX - drag.x) / drag.w, dy = (e.clientY - drag.y) / drag.h0;
+      const b = drag.box;
+      if (drag.mode === "move") {
+        // Move as a RIGID box — shift by the amount that keeps all four edges in frame, so dragging into
+        // an edge slides along it instead of squashing the box against it.
+        const ddx = Math.max(-b[0], Math.min(dx, 1 - b[2]));
+        const ddy = Math.max(-b[1], Math.min(dy, 1 - b[3]));
+        drag.h.box = [b[0] + ddx, b[1] + ddy, b[2] + ddx, b[3] + ddy];
+      } else {
+        // Resize from the top-left corner, with a floor so a box cannot be shrunk to nothing and lost.
+        const MIN = 0.004;
+        drag.h.box = [b[0], b[1], clamp(Math.max(b[0] + MIN, b[2] + dx)), clamp(Math.max(b[1] + MIN, b[3] + dy))];
+      }
+      drag.h.box = drag.h.box.map(v => +v.toFixed(4));
+      drawBoxes(drag.room);
+      syncSave();
+    });
+    const end = () => { if (drag) { drag = null; syncSave(); } };
+    pane.addEventListener("pointerup", end);
+    pane.addEventListener("pointercancel", end);
+    // Arrow keys on the focused frame: a drag gets you close, and a box that needs to line up with a door
+    // frame needs the last few pixels. Shift is the coarse step.
+    pane.addEventListener("keydown", e => {
+      if (!HSSEL || !e.key.startsWith("Arrow")) return;
+      const h = (HSW[HSSEL.room] || []).find(x => x.uid === HSSEL.uid); if (!h) return;
+      const step = (e.shiftKey ? 0.005 : 0.001);
+      const dx = (e.key === "ArrowRight" ? step : e.key === "ArrowLeft" ? -step : 0);
+      const dy = (e.key === "ArrowDown" ? step : e.key === "ArrowUp" ? -step : 0);
+      const b = h.box;
+      const ddx = Math.max(-b[0], Math.min(dx, 1 - b[2])), ddy = Math.max(-b[1], Math.min(dy, 1 - b[3]));
+      h.box = [b[0] + ddx, b[1] + ddy, b[2] + ddx, b[3] + ddy].map(v => +v.toFixed(4));
+      e.preventDefault();
+      drawBoxes(HSSEL.room); syncSave();
+    });
+  })();
+  const cssq = s => String(s).replace(/["\\]/g, "\\$&");
+  function hsLabelSync() {
+    const off = !$("#hsLabels").checked;
+    document.querySelectorAll(".hsframe").forEach(f => f.classList.toggle("nolabels", off));
+  }
+
+  // Writing moved boxes back. Re-reads the scenario FIRST and patches box-by-id into the node as it is on
+  // disk right now, rather than posting the array this tab loaded: /api/room-patch replaces `hotspots`
+  // wholesale, so posting a stale array would silently revert any puzzle, clue or cinemagraph authored in
+  // the full console while this tab sat open.
+  async function saveHotspots() {
+    const dirty = hsDirtyRooms();
+    if (!dirty.length) return true;
+    let doc = null;
+    try { doc = await getj(`/api/scenario?chapter=${encodeURIComponent(CH)}&scenario=${encodeURIComponent(SC)}`); }
+    catch (e) { doc = null; }
+    if (!doc || !Array.isArray(doc.rooms)) { $("#saveAllStat").innerHTML = `<span class="err">could not re-read the scenario — boxes not saved</span>`; return false; }
+    for (const key of dirty) {
+      const node = doc.rooms.find(r => r.key === key);
+      if (!node) continue;
+      const mine = HSW[key] || [], fields = {};
+      // LIVE boxes, matched by id.
+      const wantLive = Object.fromEntries(mine.filter(h => h.kind === "live").map(h => [h.id, h.box]));
+      if (Object.keys(wantLive).length && Array.isArray(node.hotspots)) {
+        fields.hotspots = node.hotspots.map(
+          h => (wantLive[h.id] ? Object.assign({}, h, { box: wantLive[h.id] }) : h));
+      }
+      // PLANNED boxes, matched by (type, slug(label)) — most planned entries have no id to match on.
+      // A moved one also records that YOU placed it: `boxSource` is how the test play tells a reviewed
+      // box from an unreviewed localizer guess, and leaving a hand-corrected box labelled
+      // `draft:localizer` would misreport your own work as a machine guess.
+      const wantPlan = Object.fromEntries(mine.filter(h => h.kind === "planned" && hsMoved(key, h))
+                                              .map(h => [h.pkey, h.box]));
+      if (Object.keys(wantPlan).length && Array.isArray(node.plannedHotspots)) {
+        fields.plannedHotspots = node.plannedHotspots.map(h => {
+          const b = wantPlan[h.type + "|" + slug(h.label)];
+          return b ? Object.assign({}, h, { box: b, boxSource: "review:lucas" }) : h;
+        });
+      }
+      if (!Object.keys(fields).length) continue;
+      const r = await post("/api/room-patch", { chapter: CH, scenario: SC, roomKey: key, fields });
+      if (!r.ok && r.error) { $("#saveAllStat").innerHTML = `<span class="err">${esc(key)}: ${esc(r.error)}</span>`; return false; }
+      HSB[key] = Object.fromEntries(mine.map(h => [h.uid, h.box.join(",")]));
+      drawBoxes(key);
+    }
+    return true;
+  }
+
+  // ---- the flat gallery ----------------------------------------------------------------------------
+  // Rooms in scenario order; under each, its variants. Variants come from /api/variants rather than being
+  // guessed from filenames, because a variant's art hangs off a carrier hotspot's `panorama` — the room
+  // node itself only names the base. Guessing from the room node is exactly what shipped a daytime
+  // panorama as the "night deck" (2026-08-29).
+  // `room360` is the wrap/seam hub, which is the only place a still is shown on the sphere at the
+  // room's OWN wrap — a panorama judged flat is judged at the wrong shape.
+  const room360 = key => `reproject_test.html?room=${encodeURIComponent(key)}&chapter=${encodeURIComponent(CH)}&scenario=${encodeURIComponent(SC)}`;
+  const clip360 = (key, state) => `cine360_clip.html?chapter=${encodeURIComponent(CH)}&scenario=${encodeURIComponent(SC)}&room=${encodeURIComponent(key)}&state=${encodeURIComponent(state)}`;
+
+  // The seam window that rides beside a still. `path` is the same image the still shows, so the two can
+  // never disagree. Rendered for every wrap-bearing image — base, variant AND candidate — because a
+  // variant is a fresh generation with its own seam, and repairing the base does not repair it.
+  function seamPanel(path) {
+    const u = sfile(path);
+    return `<div class="seampanel" title="the 360 wrap join: far-right edge | far-left edge — click for native resolution"
+                 onclick="openSeam('${esc(path)}')">
+      <div class="sh r" style="background-image:url('${u}')"></div>
+      <div class="sh l" style="background-image:url('${u}')"></div>
+      <div class="sl">seam</div>
+    </div>`;
+  }
+
+  function shot(label, who, path, exists, room) {
+    return `<div class="shot">
+      <div class="shotcap"><b>${esc(label)}</b><span class="who">${who}</span>
+        ${exists ? `<a class="who" href="${sfile(path)}" target="_blank" rel="noopener">native ↗</a>` : ""}
+        ${exists && room ? `<a class="who" href="${room360(room)}" target="_blank" rel="noopener">open in 360 ↗</a>` : ""}</div>
+      ${exists ? `<div class="shotrow">
+                    <a class="main" href="${sfile(path)}" target="_blank" rel="noopener"><img loading="lazy" src="${sfile(path)}"></a>
+                    ${seamPanel(path)}
+                  </div>`
+               : `<div class="missing">not generated yet</div>`}
+    </div>`;
+  }
+
+  // Native-resolution seam: roll the panorama so the join is dead centre and draw it 1:1. Same operation
+  // as seam_check.py's strip, done in the browser off the already-decoded image — the harness serves the
+  // PNG same-origin, so the canvas is not tainted.
+  function openSeam(path) {
+    const box = $("#seamZoom"), half = 640;
+    box.style.display = "block";
+    box.querySelector(".zcap").textContent = path + " — wrap join at centre, native resolution (click to close)";
+    const cv = box.querySelector("canvas"), im = new Image();
+    im.onload = () => {
+      const h = im.naturalHeight, w = im.naturalWidth, k = Math.min(half, Math.floor(w / 2));
+      cv.width = k * 2; cv.height = h;
+      const g = cv.getContext("2d");
+      g.drawImage(im, w - k, 0, k, h, 0, 0, k, h);     // far-right edge on the left...
+      g.drawImage(im, 0, 0, k, h, k, 0, k, h);         // ...butted against the far-left edge
+      g.strokeStyle = "rgba(255,180,80,.55)"; g.beginPath(); g.moveTo(k + .5, 0); g.lineTo(k + .5, h); g.stroke();
+    };
+    im.src = sfile(path);
+  }
+
+  // A candidate that hasn't been committed yet — shown at the SAME full width as the base, because that
+  // is the whole point of this page: a regenerated room is judged against the one it replaces, and a
+  // defect that is obvious at full width is invisible in a thumbnail row.
+  //
+  // Commit is safe on an already-built room: `_commit_node` only seeds a fallback wrap when the node has
+  // none, so swapping the art keeps this room's wrap and its hotspot boxes. A room with NO art yet gets
+  // the house wrap seeded — commit those from the wrap/seam editor in the full console instead.
+  function cand(room, file) {
+    const p = "_scratch/" + file;
+    return `<div class="shot cand">
+      <div class="shotcap"><b style="color:var(--green)">candidate</b>
+        <span class="who">${esc(file)} · not committed</span>
+        <a class="who" href="${sfile(p)}" target="_blank" rel="noopener">native ↗</a>
+        <button onclick="commitCand('${esc(room)}','${esc(file)}',this)" style="padding:2px 8px; font-size:12px">Commit as this room's art</button>
+        <button onclick="discardCand('${esc(room)}','${esc(file)}',this)" style="padding:2px 8px; font-size:12px; color:#ff9c9c">Discard</button>
+        <span class="status cstat"></span></div>
+      <div class="shotrow">
+        <a class="main" href="${sfile(p)}" target="_blank" rel="noopener"><img loading="lazy" src="${sfile(p)}"></a>
+        ${seamPanel(p)}
+      </div>
+    </div>`;
+  }
+  async function commitCand(room, file, btn) {
+    const st = btn.parentElement.querySelector(".cstat"); st.textContent = "committing…";
+    const r = await post("/api/commit-room", { chapter: CH, scenario: SC, roomKey: room, image: file });
+    if (!r.ok) { st.innerHTML = `<span class="err">${esc(r.error)}</span>`; return; }
+    st.innerHTML = `<span class="ok">committed ✓</span>`;
+    refresh();
+  }
+  async function discardCand(room, file, btn) {
+    const st = btn.parentElement.querySelector(".cstat"); st.textContent = "discarding…";
+    const r = await post("/api/delete-room-pano", { chapter: CH, scenario: SC, roomKey: room, image: file });
+    if (!r.ok) { st.innerHTML = `<span class="err">${esc(r.error)}</span>`; return; }
+    refresh();
+  }
+
+  async function renderGallery(st) {
+    const host = $("#gallery");
+    const rooms = st.rooms || [];
+    let vr = { variants: [] };
+    try { vr = await getj(`/api/variants?chapter=${encodeURIComponent(CH)}&scenario=${encodeURIComponent(SC)}`); } catch (e) { /* gallery still shows bases */ }
+    const byRoom = {};
+    (vr.variants || []).forEach(v => (byRoom[v.room] = byRoom[v.room] || []).push(v));
+    const showCands = $("#showCands").checked;
+
+    const built = rooms.filter(r => r.built).length;
+    const nvar = (vr.variants || []).length;
+    $("#galStat").innerHTML = `${built}/${rooms.length} rooms built · ${nvar} variant${nvar === 1 ? "" : "s"}`;
+
+    host.innerHTML = rooms.map(r => {
+      const vs = byRoom[r.key] || [];
+      // Pending art = candidates whose BYTES differ from the committed scene.png. The server decides
+      // this (`panoUncommitted`), because a name test gets it wrong: a regeneration reuses the filename
+      // the room was built from, so `builtFrom` still matches while the file is new art — which is the
+      // art most in need of a look. Three of canyon's nine rooms were in exactly that state (2026-08-31).
+      const cands = r.panoUncommitted || [];
+      return `<div class="roomhd">
+          <span class="k">${esc(r.key)}</span>
+          <span style="opacity:.75">${esc(r.title || "")}</span>
+          ${r.built ? "" : `<span class="pill">no art yet</span>`}
+          ${vs.length ? `<span class="pill var">${vs.length} variant${vs.length === 1 ? "" : "s"}</span>` : ""}
+          ${r.cinemagraphs ? `<span class="pill">${r.cinemagraphs} cinemagraph${r.cinemagraphs === 1 ? "" : "s"}</span>` : ""}
+        </div>` +
+        shot("base", `${esc(r.key)}/scene.png`, `${r.key}/scene.png`, !!r.built, r.key) +
+        vs.map(v => shot(v.state,
+                         `${esc(v.panorama || "—")} · ${v.fullScene ? "full scene" : "boxed"} · ${whenText(v.when, v.whenLabel)}`,
+                         v.panorama, !!v.exists, r.key)).join("") +
+        (showCands ? cands.map(f => cand(r.key, f)).join("") : "");
+    }).join("");
+    if (!rooms.length) host.innerHTML = `<div class="hint" style="margin-top:12px">This scenario has no rooms yet.</div>`;
+  }
+
+  // ---- baked cinemagraphs --------------------------------------------------------------------------
+  // The clips as they will ship: full-frame render with any tile repairs already composited in. Only the
+  // clip on screen is loaded and playing — a 3072x1024 video costs real decode, and nine of them mounted
+  // at once wedges the tab. IntersectionObserver attaches `src` on entry and tears it down on exit, so
+  // scrolling the column behaves like scrolling the stills.
+  let _cineObs = null;
+
+  // THE TWO MASK AXES, and they are not the same question.
+  //   `thresh` — HOW HARD a pixel must move. A percentile of this clip's own temporal std (absolute
+  //     std values are meaningless across scenes: a canyon of white water and a quiet interior share no
+  //     scale). 48 = mask off, 49 = auto (auto_mask's solidity-picked rung), 50-99 = that percentile.
+  //   `region` — HOW MUCH COMPANY it must keep. A percentile has no idea whether a pixel has neighbours,
+  //     so a lone bright speckle on a wall outlives p95 while a big, gently-moving banner falls out —
+  //     backwards, because isolated freed pixels read as noise and the large mover is the reason to
+  //     generate anything at all. This drops connected regions below the cut (auto_mask.drop_small).
+  // Carried in PARTS-PER-MILLION of the frame, not pixels, so one slider position means the same thing
+  // on a 3072x1024 panorama and on a crop. Log-mapped: 0 = off, 25 -> 10ppm, 50 -> 100ppm, 75 -> 1000ppm,
+  // 100 -> 10000ppm (1% of the frame). Linear px would spend 90% of the travel in sizes nobody wants.
+  // A 1x1 transparent PNG. An <img> with no `src` at all draws the broken-image glyph over the art;
+  // this is the "nothing to show" state for the top layer when the mask is off.
+  const BLANK = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
+  const regPpm = v => (v <= 0 ? 0 : Math.pow(10, v / 25));
+  const ppmPos = ppm => (!ppm || ppm <= 0 ? 0 : Math.max(0, Math.min(100, Math.round(25 * Math.log10(ppm)))));
+  // Both sliders OPEN ON THE COMMITTED CHOICE, read from `cine_<state>.mask.json`. They used to open at
+  // "no mask · all video" on every clip, which is a lie about any clip that was baked masked — and every
+  // one of them was, since the composite went into the bake.
+  const thrPos = c => { const m = c.mask || {};
+    if (m.enabled === false) return 48;
+    const p = m.pct;
+    return (p === undefined || p === null || p === "auto") ? 49 : Math.round(Math.max(50, Math.min(99, +p))); };
+  const regPos = c => ppmPos((c.mask || {}).region);
+  const committedMask = c => { const m = c.mask || {};
+    if (!m || m.pct === undefined) return "not yet baked with a mask";
+    if (m.enabled === false) return "committed: no mask";
+    const r = m.region ? ` + region ${Math.round(m.region)}ppm` : "";
+    const cov = m.coverage != null ? ` (${(100 * m.coverage).toFixed(1)}% video)` : "";
+    return `committed: ${m.pct === "auto" ? "auto" : "p" + m.pct}${r}${cov}`; };
+
+  // Wire this room's baked clips onto carriers so the player plays them instead of the still. Updates the
+  // badges IN PLACE for the same reason the hotspot commit does — this pane is a long scroll of decoding
+  // videos, and a page-wide refresh() would tear every one of them down and lose your place.
+  async function serveClips(room) {
+    const out = $(`#hssrv-${cssq(room)}`);
+    out.textContent = "wiring…";
+    const r = await post("/api/serve-clips", { chapter: CH, scenario: SC, roomKey: room });
+    if (!r.ok) { out.innerHTML = `<span class="err">${esc(r.error)}</span>`; return; }
+    const n = (r.wired || []).length;
+    out.innerHTML = `<span class="ok">${n} clip${n === 1 ? "" : "s"} now served ✓ — reload test play to see it</span>`;
+    // Re-read only this room's clip list and repaint its badges; the <video> elements stay put.
+    let stt = null;
+    try { stt = await post("/api/scenario-state", { chapter: CH, scenario: SC }); } catch (e) { stt = null; }
+    const rm = stt && (stt.rooms || []).find(x => x.key === room);
+    if (!rm) return;
+    const hd = document.querySelector(`#baked [data-serve="${cssq(room)}"]`);
+    const clips = rm.clips || [], unserved = clips.filter(c => !c.served).length;
+    if (hd && !unserved) {                       // button and warning pill have done their job
+      hd.previousElementSibling && hd.previousElementSibling.remove();
+      hd.replaceWith(Object.assign(document.createElement("span"),
+        { className: "pill", style: "color:var(--green); border-color:var(--green)", textContent: "served in play" }));
+    }
+    document.querySelectorAll(`#baked .vwrap[data-room="${cssq(room)}"]`).forEach(w => {
+      const c = clips.find(x => x.state === w.dataset.state); if (!c) return;
+      const badge = w.closest(".shot").querySelector(".shotcap .pill");
+      if (badge) { badge.textContent = c.served ? "served" : "not served";
+                   badge.style.cssText = c.served ? "color:var(--green); border-color:var(--green)"
+                                                  : "color:#ff9c9c; border-color:#ff9c9c"; }
+    });
+  }
+
+  function renderBaked(st) {
+    const host = $("#baked");
+    const rooms = st.rooms || [];
+    const total = rooms.reduce((n, r) => n + (r.clips || []).length, 0);
+    $("#bakedStat").innerHTML = total
+      ? `${total} clip${total === 1 ? "" : "s"} across ${rooms.filter(r => (r.clips || []).length).length} room(s)`
+      : `no clips baked yet`;
+    host.innerHTML = rooms.map(r => {
+      const clips = r.clips || [];
+      // SERVED vs merely BAKED. A clip on disk that no hotspot references is invisible to the player —
+      // test play falls back to the still and nothing says why (canyon: nine reviewed clips, none wired).
+      // The badge and the button make that state visible and fixable where the clip is reviewed.
+      const unserved = clips.filter(c => !c.served).length;
+      return `<div class="roomhd">
+          <span class="k">${esc(r.key)}</span>
+          <span style="opacity:.75">${esc(r.title || "")}</span>
+          ${clips.length ? `<span class="pill var">${clips.length} clip${clips.length === 1 ? "" : "s"}</span>`
+                         : `<span class="pill">not baked</span>`}
+          ${clips.length && !unserved ? `<span class="pill" style="color:var(--green); border-color:var(--green)">served in play</span>` : ""}
+          ${unserved ? `<span class="pill" style="color:#ff9c9c; border-color:#ff9c9c">${unserved} not served</span>
+                        <button data-serve="${esc(r.key)}" style="padding:2px 9px; font-size:12px">Serve ${unserved} in play →</button>
+                        <span class="status" id="hssrv-${esc(r.key)}"></span>` : ""}
+        </div>` +
+        (clips.length ? clips.map(c => `<div class="shot">
+            <div class="shotcap"><b>${esc(c.state)}</b>
+              <span class="pill" style="${c.served ? "color:var(--green); border-color:var(--green)" : "color:#ff9c9c; border-color:#ff9c9c"}">${c.served ? "served" : "not served"}</span>
+              <span class="who">${esc(c.file)}</span>
+              <a class="who" href="${clip360(r.key, c.state)}" target="_blank" rel="noopener">open in 360 ↗</a>
+              <a class="who" href="${sfile(c.file)}" target="_blank" rel="noopener">file ↗</a>
+              <label class="who">map <input type="range" class="maskmix" min="0" max="100" value="0"
+                     title="opacity of the top layer. At 100 you see that layer alone."
+                     style="width:96px; vertical-align:-4px"></label>
+              <button class="segbtn ovmask on" title="top layer = THE MASK you are about to ship: white = this pixel plays the clip, black = it stays the still. Follows the threshold and region controls live.">mask</button><button
+                      class="segbtn ovmotion" title="top layer = the raw motion map: per-pixel temporal variation, auto-scaled to this clip's own p99.5. What MOVED, before any threshold.">motion</button>
+              <span class="who maskpct">off</span>
+              <label class="who">thresh <input type="range" class="maskthr" min="48" max="99" value="${thrPos(c)}"
+                     title="HOW HARD a pixel must move. 48 = mask off (all video) · 49 = auto (solidity-picked) · 50-99 = percentile of this clip's own motion"
+                     style="width:96px; vertical-align:-4px"></label>
+              <label class="who">region <input type="range" class="maskreg" min="0" max="100" value="${regPos(c)}"
+                     title="HOW MUCH COMPANY a moving pixel must keep. Drops connected moving regions smaller than the cut, so one-off speckle goes still and only large coherent movers are generated. 0 = off."
+                     style="width:96px; vertical-align:-4px"></label>
+              <span class="who thrpct"></span>
+              <button class="segbtn padtoggle" title="the threshold x region plane, coloured by how much of the frame moves">⊞ plane</button>
+              <button class="maskcommit" style="padding:1px 7px; font-size:11px">commit mask + re-bake</button>
+              <span class="who maskcstat">${esc(committedMask(c))}</span>
+              <span class="who">${(c.patches || []).length ? (c.patches || []).length + " patch(es)" : "no patches"}</span>
+              <span class="who blipnote"></span></div>
+            <div class="mpad"><canvas width="300" height="170"></canvas><div class="padnote"></div></div>
+            <div class="vwrap" data-room="${esc(r.key)}" data-state="${esc(c.state)}">
+              <img class="still" src="${sfile(c.still || (r.key + "/scene.png"))}" loading="lazy">
+              <video data-src="${sfile(c.file)}" muted loop playsinline preload="none"></video>
+              <img class="mmap" data-src="/api/motion-map?chapter=${encodeURIComponent(CH)}&scenario=${encodeURIComponent(SC)}&room=${encodeURIComponent(r.key)}&state=${encodeURIComponent(c.state)}&v=${GV}">
+              ${(c.patches || []).map(p => {
+                const on = p.enabled !== false;
+                return `<div class="patch${on ? "" : " off"}" style="left:${p.box[0]*100}%; top:${p.box[1]*100}%; width:${(p.box[2]-p.box[0])*100}%; height:${(p.box[3]-p.box[1])*100}%">
+                  <span>patch · ${esc(p.name || "tile")}${on ? "" : " · OFF (not shipped)"}</span>
+                  <button onclick="setPatch('${esc(r.key)}','${esc(c.state)}','${esc(p.name)}',${!on},this)">${on ? "✕ drop" : "↺ keep"}</button>
+                </div>`; }).join("")}
+              <div class="blip"></div></div>
+          </div>`).join("")
+          : `<div class="noclip">no cinemagraph rendered for this room yet</div>`);
+    }).join("");
+    host.querySelectorAll("[data-serve]").forEach(b => { b.onclick = () => serveClips(b.dataset.serve); });
+    if (_cineObs) _cineObs.disconnect();
+    _cineObs = new IntersectionObserver(entries => {
+      entries.forEach(en => {
+        const v = en.target;
+        if (en.isIntersecting) {
+          if (!v.src) v.src = v.dataset.src;
+          if (v._applyMask && !v._maskDone) { v._maskDone = true; v._applyMask(); }
+          v.play().catch(() => {});
+        } else if (v.src) {
+          v.pause(); v.removeAttribute("src"); v.load();   // free the decoder, not just the playback
+        }
+      });
+    }, { rootMargin: "200px" });
+    host.querySelectorAll(".vwrap").forEach(wrap => {
+      const shot = wrap.closest(".shot");
+      const img = wrap.querySelector(".mmap");
+      const vid = wrap.querySelector("video");
+      const mix = shot.querySelector(".maskmix");
+      const thr = shot.querySelector(".maskthr");
+      const reg = shot.querySelector(".maskreg");
+      const pct = shot.querySelector(".maskpct");
+      const tpct = shot.querySelector(".thrpct");
+      const cbtn = shot.querySelector(".maskcommit");
+      const cstat = shot.querySelector(".maskcstat");
+      const bMask = shot.querySelector(".ovmask"), bMotion = shot.querySelector(".ovmotion");
+      const padWrap = shot.querySelector(".mpad"), padCv = padWrap.querySelector("canvas");
+      const padNote = padWrap.querySelector(".padnote"), padBtn = shot.querySelector(".padtoggle");
+      let ovMode = "mask";                 // what the `map` slider fades in: "mask" | "motion"
+
+      // ---- top layer: the motion map, faded in by the `map` slider -------------------------------
+      let mapLoad = null;
+      const loadMap = () => mapLoad || (mapLoad = (async () => {
+        const res = await fetch(img.dataset.src);
+        // A 404/500 here returns JSON, and assigning that blob to an <img> fails SILENTLY — the slider
+        // then moves an invisible layer forever. Clear the cached promise so the next drag retries.
+        if (!res.ok) { mapLoad = null; throw new Error("motion map: HTTP " + res.status); }
+        const sc = res.headers.get("X-Motion-Scale");
+        img.dataset.mapUrl = URL.createObjectURL(await res.blob());
+        if (sc) img.dataset.scale = (+sc).toFixed(2);
+      })());
+      const applyMap = v => {
+        wrap.classList.toggle("mask", v > 0);          // also reveals the patch outlines
+        img.style.opacity = v / 100;
+        if (ovMode === "motion") {
+          const sc = img.dataset.scale ? ` · white = ${img.dataset.scale}` : "";
+          pct.textContent = v == 0 ? "off" : (v == 100 ? "motion map only" + sc : v + "% motion map" + sc);
+        } else {
+          const on = curMask ? " · white = plays the clip" : " · mask is off";
+          pct.textContent = v == 0 ? "off" : (v == 100 ? "mask only" + on : v + "% mask" + on);
+        }
+      };
+      // THE TOP LAYER SHOWS THE MASK BY DEFAULT, and follows the threshold and region controls live —
+      // so at 100 you are looking at exactly the pixels that will play the clip, and dragging either
+      // control redraws them. `motion` swaps in the raw temporal-std map, which answers the earlier
+      // question (what moved AT ALL, before any threshold) and is what this layer used to be.
+      //
+      // No second request for it: the mask endpoint already serves RGBA that is white where the mask is
+      // on and TRANSPARENT where it is off, and `.mmap` sits on a black backdrop — so the same blob the
+      // video is masked with renders as a black-and-white map when it is the top layer.
+      const setOverlay = () => {
+        if (ovMode === "motion") { img.src = img.dataset.mapUrl || BLANK; return; }
+        img.src = curMask || BLANK;
+      };
+      const setMode = m => {
+        ovMode = m;
+        bMask.classList.toggle("on", m === "mask");
+        bMotion.classList.toggle("on", m === "motion");
+        (m === "motion" ? loadMap().catch(() => {}) : Promise.resolve()).then(() => {
+          setOverlay(); applyMap(+mix.value);
+        });
+      };
+      bMask.onclick = () => setMode("mask");
+      bMotion.onclick = () => setMode("motion");
+
+      // ---- middle layer: the cinemagraph, masked back to the still ---------------------------------
+      // THE MASK IS `auto_mask` — the mechanism Lucas confirmed and that nothing had ever called: a
+      // percentile ladder over this clip's own motion, scored by object solidity, then closed,
+      // HOLE-FILLED and feathered. The fill is the "infill of dense regions" — it solidifies a moving
+      // object so it is not patterned with static speckle, without having to drop the threshold.
+      // Requested with alpha=1: CSS `mask-image` reads the ALPHA channel, and the greyscale PNG served
+      // before was opaque everywhere, so it masked nothing while reporting a tiny coverage.
+      // `seq` guards against a STALE RESPONSE WINNING. `fetch` cannot be cancelled and a cold mask takes
+      // seconds (16-frame decode), so dragging the region slider past a slow rung let the earlier
+      // request land last and overwrite both the mask and its label — the tab then showed p85/1000ppm
+      // while the sliders read p85/6310ppm. Only the newest request may touch the DOM.
+      let thrTimer = 0, lastMask = null, seq = 0, curMask = null;
+      const maskUrl = (pctv, ppm) => `/api/motion-mask?chapter=${encodeURIComponent(CH)}&scenario=${encodeURIComponent(SC)}` +
+        `&room=${encodeURIComponent(wrap.dataset.room)}&state=${encodeURIComponent(wrap.dataset.state)}` +
+        `&pct=${encodeURIComponent(pctv)}&region=${encodeURIComponent(ppm)}&alpha=1&v=${GV}`;
+      // Read BOTH sliders together. They are two arguments to ONE server-side mask, so neither can be
+      // applied without the other — driving them from separate handlers served a mask built at the
+      // other slider's stale value and labelled it with the current one.
+      const maskArgs = () => { const t = +thr.value;
+        return { off: t <= 48, pct: t === 49 ? "auto" : String(t), ppm: regPpm(+reg.value) }; };
+      const maskLabel = a => (a.pct === "auto" ? "auto" : "p" + a.pct)
+                           + (a.ppm ? ` · region ≥${Math.round(a.ppm)}ppm` : " · no region cut");
+      const applyMask = () => {
+        const a = maskArgs();
+        drawPad();
+        if (a.off) {
+          vid.style.webkitMaskImage = vid.style.maskImage = "";
+          curMask = null; setOverlay(); applyMap(+mix.value);
+          if (lastMask) { URL.revokeObjectURL(lastMask); lastMask = null; }
+          tpct.textContent = "mask off · all video";
+          return;
+        }
+        tpct.textContent = `${maskLabel(a)} · …`;
+        clearTimeout(thrTimer);
+        const mine = ++seq;
+        thrTimer = setTimeout(async () => {
+          try {
+            const res = await fetch(maskUrl(a.pct, a.ppm));
+            if (mine !== seq) return;                  // superseded mid-flight: drop it on the floor
+            if (!res.ok) throw new Error("HTTP " + res.status);
+            const cov = res.headers.get("X-Mask-Coverage"), t = res.headers.get("X-Mask-Threshold");
+            const kept = res.headers.get("X-Mask-Regions"), drop = res.headers.get("X-Mask-Dropped");
+            const mpx = res.headers.get("X-Mask-Min-Px");
+            const url = URL.createObjectURL(await res.blob());
+            if (mine !== seq) { URL.revokeObjectURL(url); return; }
+            vid.style.webkitMaskImage = vid.style.maskImage = `url(${url})`;
+            vid.style.webkitMaskSize = vid.style.maskSize = "100% 100%";
+            // Revoke the PREVIOUS blob only once the new one is mounted. A drag across the ladder
+            // otherwise piles up a 3 MB RGBA PNG per step and the tab is wedged by the third clip.
+            // The overlay repoints at the SAME blob before the old one is revoked — the top layer and
+            // the video mask are the identical image, so what you see white is exactly what plays.
+            curMask = url; setOverlay(); applyMap(+mix.value);
+            if (lastMask) URL.revokeObjectURL(lastMask);
+            lastMask = url;
+            tpct.textContent = `${maskLabel(a)} · moves > ${t} · ${cov}% video, rest still`
+              + (a.ppm ? ` · ${kept || "?"} region(s) kept, ${drop || 0} dropped under ${mpx}px` : "");
+          } catch (e) { if (mine === seq) tpct.textContent = `${maskLabel(a)} · mask failed (${e.message})`; }
+        }, 220);                                       // debounce: a drag must not fire per pixel
+      };
+
+      // ---- the (threshold x region) plane ---------------------------------------------------------
+      // THE TWO AXES INTERACT, which is the reason this exists rather than two independent sliders. A
+      // region cut can only bite once the threshold is tight enough to break the frame into separate
+      // components; at a loose threshold the whole frame is ONE region and the cut removes nothing. On
+      // the surface that reads as a flat left edge, and you can see it in one look.
+      //
+      // The background is coverage — how much of the frame stays generated video — from /api/mask-grid.
+      // It is INDICATIVE: computed at quarter resolution without the feather, so it is a map for
+      // navigating, never a number to act on. The figure under the sliders is the real one, measured at
+      // full resolution by the same code that bakes.
+      const PAD = { l: 34, r: 8, t: 8, b: 22 };          // plot-area insets, room for the axis labels
+      const P0 = 50, P1 = 99;                            // the plane covers the percentile ladder only:
+      // 48 (off) and 49 (auto) are slider positions, not points on a surface, so they stay slider-only.
+      let padData = null, padLoad = null;
+      const padArea = () => ({ x: PAD.l, y: PAD.t,
+                               w: padCv.width - PAD.l - PAD.r, h: padCv.height - PAD.t - PAD.b });
+      // Coverage -> colour. sqrt because everything worth choosing between lives under 40%: linear
+      // spends most of the ramp on the near-solid end nobody picks.
+      const padColour = c => {
+        const t = Math.sqrt(Math.max(0, Math.min(1, c)));
+        const stops = [[8,18,28],[16,60,92],[24,120,130],[190,150,70],[255,225,180]];
+        const f = t * (stops.length - 1), i = Math.min(stops.length - 2, Math.floor(f)), k = f - i;
+        return stops[i].map((v, n) => Math.round(v + (stops[i + 1][n] - v) * k));
+      };
+      const loadPad = () => padLoad || (padLoad = (async () => {
+        const res = await fetch(`/api/mask-grid?chapter=${encodeURIComponent(CH)}&scenario=${encodeURIComponent(SC)}` +
+          `&room=${encodeURIComponent(wrap.dataset.room)}&state=${encodeURIComponent(wrap.dataset.state)}&v=${GV}`);
+        if (!res.ok) { padLoad = null; throw new Error("HTTP " + res.status); }
+        padData = await res.json();
+        if (padData.error) { padLoad = null; throw new Error(padData.error); }
+      })());
+      function drawPad() {
+        if (!padWrap.classList.contains("on")) return;
+        const g = padCv.getContext("2d"), a = padArea();
+        g.clearRect(0, 0, padCv.width, padCv.height);
+        if (padData) {
+          const np = padData.pcts.length, nr = padData.regionPos.length;
+          const off = document.createElement("canvas"); off.width = np; off.height = nr;
+          const og = off.getContext("2d"), im = og.createImageData(np, nr);
+          for (let i = 0; i < nr; i++) for (let j = 0; j < np; j++) {
+            // row 0 of the grid is region 0, and region grows UP the plot — so flip on write.
+            const c = padColour(padData.cov[nr - 1 - i][j]), o = 4 * (i * np + j);
+            im.data[o] = c[0]; im.data[o+1] = c[1]; im.data[o+2] = c[2]; im.data[o+3] = 255;
+          }
+          og.putImageData(im, 0, 0);
+          g.imageSmoothingEnabled = true;
+          g.drawImage(off, 0, 0, np, nr, a.x, a.y, a.w, a.h);
+        } else {
+          g.fillStyle = "#0e1c28"; g.fillRect(a.x, a.y, a.w, a.h);
+          g.fillStyle = "#8fa3b0"; g.font = "11px system-ui";
+          g.fillText("measuring…", a.x + a.w / 2 - 32, a.y + a.h / 2);
+        }
+        g.strokeStyle = "rgba(255,255,255,.18)"; g.strokeRect(a.x + .5, a.y + .5, a.w, a.h);
+        g.fillStyle = "#8fa3b0"; g.font = "9px system-ui";
+        g.fillText("p" + P0, a.x - 2, padCv.height - 12);
+        g.fillText("p" + P1, a.x + a.w - 14, padCv.height - 12);
+        g.fillText("threshold", a.x + a.w / 2 - 22, padCv.height - 2);
+        g.fillText("0", 18, a.y + a.h);
+        g.fillText("1%", 12, a.y + 8);
+        g.save(); g.translate(9, a.y + a.h / 2 + 18); g.rotate(-Math.PI / 2);
+        g.fillText("region", 0, 0); g.restore();
+        // The current point. Drawn even when the threshold is off the plane (at off/auto) — parked on
+        // the left edge and hollow, so it never claims to be somewhere it is not.
+        const v = +thr.value, onPlane = v >= P0;
+        const px = a.x + (Math.min(P1, Math.max(P0, v)) - P0) / (P1 - P0) * a.w;
+        const py = a.y + a.h - (+reg.value) / 100 * a.h;
+        g.beginPath(); g.arc(px, py, 5, 0, 7); g.lineWidth = 2;
+        g.strokeStyle = onPlane ? "#fff" : "#8fa3b0"; g.stroke();
+        if (onPlane) { g.beginPath(); g.arc(px, py, 1.6, 0, 7); g.fillStyle = "#fff"; g.fill(); }
+      }
+      const padAt = ev => {
+        const a = padArea(), r = padCv.getBoundingClientRect();
+        return { fx: Math.min(1, Math.max(0, ((ev.clientX - r.left) * padCv.width / r.width - a.x) / a.w)),
+                 fy: Math.min(1, Math.max(0, ((ev.clientY - r.top) * padCv.height / r.height - a.y) / a.h)) };
+      };
+      const padPick = ev => {
+        const f = padAt(ev);
+        thr.value = Math.round(P0 + f.fx * (P1 - P0));
+        reg.value = Math.round((1 - f.fy) * 100);
+        applyMask();                       // debounced inside, so a drag is one request at the end
+      };
+      // Hover readout. A colour surface with no numbers on it is a mood board — you can see that the
+      // corner is darker without being able to say by how much, which is the whole question.
+      const PAD_HELP = "brighter = more of the frame stays generated video. Drag the point. "
+        + "Where the colour stops changing along an axis, that axis has stopped doing anything — a region "
+        + "cut cannot remove what is already one connected blob, and the threshold stops mattering once "
+        + "only the big movers are left. Quarter-scale guide; the numbers under the sliders are the real ones.";
+      const padHover = ev => {
+        if (!padData) return;
+        const f = padAt(ev);
+        const pv = Math.round(P0 + f.fx * (P1 - P0)), rv = Math.round((1 - f.fy) * 100);
+        const j = Math.max(0, Math.min(padData.pcts.length - 1,
+                  Math.round(f.fx * (padData.pcts.length - 1))));
+        const i = Math.max(0, Math.min(padData.regionPos.length - 1,
+                  Math.round((1 - f.fy) * (padData.regionPos.length - 1))));
+        padNote.innerHTML = `<b style="color:var(--amber)">p${pv} · region ${rv === 0 ? "off"
+          : "≥" + Math.round(regPpm(rv)) + "ppm"} · ~${(100 * padData.cov[i][j]).toFixed(0)}% video</b>`
+          + `<br>${PAD_HELP}`;
+      };
+      padCv.onpointerdown = ev => { padCv.setPointerCapture(ev.pointerId); padPick(ev); };
+      padCv.onpointermove = ev => { padHover(ev); if (ev.buttons & 1) padPick(ev); };
+      padCv.onpointerleave = () => { if (padData) padNote.innerHTML = PAD_HELP; };
+      padBtn.onclick = async () => {
+        const on = !padWrap.classList.contains("on");
+        padWrap.classList.toggle("on", on);
+        padBtn.classList.toggle("on", on);
+        if (!on) return;
+        padNote.textContent = "measuring the plane…";
+        drawPad();
+        try { await loadPad(); } catch (e) { padNote.innerHTML = `<span class="err">plane failed: ${esc(e.message)}</span>`; return; }
+        padNote.innerHTML = PAD_HELP;
+        drawPad();
+      };
+
+      // COMMIT. Until this existed the sliders were a preview of a decision that could not be kept:
+      // `/api/mask-set` was written, documented in AGENTS.md as the Baked tab's commit path, and called
+      // from nowhere — the same "settled finding with no call site" that shipped nine unmasked canyon
+      // clips. It writes `cine_<state>.mask.json` and re-bakes, so the file matches the choice.
+      cbtn.onclick = async () => {
+        const a = maskArgs();
+        cbtn.disabled = true; cstat.textContent = "re-baking clip…";
+        const r = await post("/api/mask-set", { chapter: CH, scenario: SC, room: wrap.dataset.room,
+                                                state: wrap.dataset.state,
+                                                pct: a.off ? "auto" : a.pct, region: a.ppm,
+                                                enabled: !a.off });
+        if (!r.ok) { cstat.innerHTML = `<span class="err">${esc(r.error)}</span>`; cbtn.disabled = false; return; }
+        const poll = setInterval(async () => {
+          const s2 = await getj(`/api/status?slot=${encodeURIComponent(r.slot)}`);
+          if (s2.active) return;
+          clearInterval(poll);
+          if (s2.error) { cstat.innerHTML = `<span class="err">${esc(s2.error)}</span>`; cbtn.disabled = false; return; }
+          cstat.innerHTML = `<span class="ok">baked ✓</span>`;
+          refresh();                       // new clip on disk -> re-read state and re-point every video
+        }, 1500);
+      };
+
+      mix.oninput = async () => {
+        if (ovMode === "motion") {
+          try { await loadMap(); } catch (e) { pct.textContent = "motion map failed"; return; }
+          setOverlay();
+        }
+        applyMap(+mix.value);
+      };
+      thr.oninput = applyMask;
+      reg.oninput = applyMask;
+      applyMap(+mix.value);
+      // DEFERRED to first scroll-into-view, like the video src. Building a mask means decoding 16 frames
+      // of a 3072x1024 clip; the sliders now open on each clip's COMMITTED setting rather than at off,
+      // so applying them all at render fired nine concurrent ffmpeg extractions the moment the tab
+      // opened. The IntersectionObserver below runs this once, when the clip is actually being looked at.
+      vid._applyMask = applyMask;
+    });
+
+    host.querySelectorAll("video").forEach(v => {
+      _cineObs.observe(v);
+      // `loop` restarts the video without firing `ended`, so a backwards jump in currentTime is the only
+      // reliable wrap signal — and it is free. Flash the square, and count the laps in the caption.
+      let prev = 0, laps = 0;
+      const blip = v.parentElement.querySelector(".blip");
+      const note = v.closest(".shot").querySelector(".blipnote");
+      v.addEventListener("timeupdate", () => {
+        if (v.currentTime < prev) {
+          laps++;
+          if (note) note.textContent = `loop ${laps} · ${v.duration ? v.duration.toFixed(2) + "s" : ""}`;
+          if ($("#showBlip").checked) blip.classList.add("on");
+          setTimeout(() => blip.classList.remove("on"), 180);
+        }
+        prev = v.currentTime;
+      });
+    });
+  }
+
+  // Dropping a patch REBUILDS the clip from the unpatched render — it is not a display flag, because the
+  // tile is composited into the video. The button blocks while that runs, then the gallery refreshes.
+  async function setPatch(room, state, name, enabled, btn) {
+    const cap = btn.closest(".patch").querySelector("span");
+    const was = btn.textContent;
+    btn.disabled = true; btn.textContent = "…";
+    cap.textContent = `patch · ${name} · rebuilding clip…`;
+    const r = await post("/api/patch-set", { chapter: CH, scenario: SC, room, state, name, enabled });
+    if (!r.ok) { cap.textContent = `patch · ${name} · ${r.error}`; btn.disabled = false; btn.textContent = was; return; }
+    const poll = setInterval(async () => {
+      const s2 = await getj(`/api/status?slot=${encodeURIComponent(r.slot)}`);
+      if (s2.active) return;
+      clearInterval(poll);
+      if (s2.error) { cap.textContent = `patch · ${name} · ${s2.error}`; btn.disabled = false; btn.textContent = was; return; }
+      refresh();                          // new clip on disk -> re-read state and re-point every video
+    }, 1500);
+  }
+
+  // ---- wiring --------------------------------------------------------------------------------------
+  // Tabs are pure show/hide over already-rendered panes: switching never refetches, so flipping between
+  // the still and its baked clip is instant and they cannot drift out of sync with each other.
+  document.querySelectorAll("#tabs button").forEach(b => {
+    b.onclick = () => {
+      document.querySelectorAll("#tabs button").forEach(x => x.classList.toggle("on", x === b));
+      document.querySelectorAll(".pane").forEach(p => p.classList.toggle("on", p.id === "pane-" + b.dataset.tab));
+      fitSticky();
+    };
+  });
+  // Guarded, not raw: both rebuild the cards from disk, so an unsaved edit would vanish without a word.
+  // The picker is put back to the scenario you were on when you decline, or the label lies about what
+  // is displayed.
+  let LASTPICK = "";
+  $("#scenPick").onchange = () => {
+    if (!okToDiscard()) { $("#scenPick").value = LASTPICK; return; }
+    LASTPICK = $("#scenPick").value; onScenario();
+  };
+  $("#refresh").onclick = () => { if (okToDiscard()) refresh(); };
+  $("#saveAll").onclick = saveAll;
+  $("#hsLabels").onchange = hsLabelSync;
+  // ⌘/Ctrl-S. A save button in a sticky header invites the shortcut, and the browser's own Save-page
+  // dialog is never what is wanted on this screen.
+  addEventListener("keydown", e => {
+    if ((e.metaKey || e.ctrlKey) && (e.key === "s" || e.key === "S")) { e.preventDefault(); saveAll(); }
+  });
+  addEventListener("beforeunload", e => { if (editDirty()) { e.preventDefault(); e.returnValue = ""; } });
+  $("#showCands").onchange = refresh;
+  $("#testPlay").onclick = () => { if (CH && SC) window.open(`http://localhost:8055/escape_rooms/shared/test_play.html?chapter=${encodeURIComponent(CH)}&scenario=${encodeURIComponent(SC)}&harness=${encodeURIComponent(location.origin)}`, "_blank"); };
+  $("#play").onclick = () => { if (CH && SC) window.open(`http://localhost:8055/escape_rooms/rooms/${encodeURIComponent(CH)}/${encodeURIComponent(SC)}/play.html`, "_blank"); };
+  $("#promptModal").onclick = e => { if (e.target === $("#promptModal")) closePrompt(); };
+  // The room header sticks BELOW the topbar, whose height depends on how its two rows wrap — measure it
+  // rather than hard-coding, or a narrow window hides every room label behind the bar.
+  const fitSticky = () => {
+    const tb = $("#topbar").offsetHeight, tabs = $("#tabs").offsetHeight;
+    document.documentElement.style.setProperty("--tbh", tb + "px");
+    document.documentElement.style.setProperty("--hdtop", (tb + tabs) + "px");
+  };
+  addEventListener("resize", fitSticky); fitSticky();
+  loadScenarios();
+</script>
+</body>
+</html>

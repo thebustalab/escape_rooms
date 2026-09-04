@@ -17,11 +17,26 @@ changes how a variant is recorded, this CLI changes with it.
 THREE JOB TYPES
   • `night`       full-scene state variant. The night-arc route (`authoring_v2/AGENTS.md` → *Full-scene
                   state variants*): post the committed day panorama to the image-EDIT endpoint with a
-                  night prompt and no mask, **restretch the reply back to the base panorama's exact
-                  size** (the endpoint will not return 3:1 — it comes back 1536x1024, and the model
-                  preserves horizontal layout inside the squashed frame, so the stretch restores both
-                  proportions and alignment), then ensure a marker-less `ambient` carrier hotspot at
-                  box [0,0,1,1] holds the variant. Costs an API call per room.
+                  night prompt and no mask, **asking for the BASE'S OWN NATIVE SIZE**, then ensure a
+                  marker-less `ambient` carrier hotspot at box [0,0,1,1] holds the variant. Costs an
+                  API call per room.
+
+                  ⚠️ CORRECTED 2026-09-02 — DO NOT STRETCH. This entry used to say the endpoint "will
+                  not return 3:1 — it comes back 1536x1024" and must be restretched to the base's size.
+                  That is wrong, and following it stretched every night variant 2x horizontally:
+                  `generate_scene.py edit` merely DEFAULTS `--size` to 1536x1024 and the caller never
+                  overrode it. The premise — that the model lays the scene out inside the squashed frame,
+                  so a resize restores it — holds only for structure COPIED from the input; anything it
+                  RE-DRAWS it draws at natural proportions, and those objects came back twice as wide
+                  (Lucas, on egypt: "stretched weirdly"). Verified against the live API: /images/edits
+                  returns 3072x1024 when asked for it.
+
+                  The code has been right since that date — `_run_night` delegates to
+                  `harness_server.run_fullscene_variant`, which reads the base's size and passes it as
+                  `--size`, leaving `restretch_to` as a no-op safety net for a reply that ignores the
+                  request. Only this docstring lagged, which is its own lesson: a stale docstring above
+                  correct code is the shape that gets copied into the next caller. Egypt's seven night
+                  variants predate the fix and are still 2x-stretched — regenerate them.
   • `variant`     masked-box state variant on one hotspot — the `dooropen` primitive, i.e. the same thing
                   the console's "generate variant" button does. Costs an API call per job.
   • `cinemagraph` queued onto the scenario's batch and launched through `~/ComfyUI/cinemagraph_batch.py`

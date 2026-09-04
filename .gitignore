@@ -12,6 +12,9 @@ tests/playwright-report/
 # cinemagraph raw pre-loop clips — kept locally so a loop can be switched (boomerang↔crossfade) without
 # re-generating; the player never needs them, so don't push them to the public site.
 **/*_raw.mp4
+# the UNPATCHED render a clip is rebuilt from when a repair patch is toggled off in the gallery.
+# Local-only like the raws: the player fetches the baked cine_<state>.mp4 and nothing else.
+**/*_src.mp4
 **/*.reloop.mp4
 # pre-edit cinemagraph originals (the picked/played clip keeps the plain name)
 **/*_orig.mp4
@@ -64,3 +67,6 @@ authoring_v2/ui/cine360_*.html
 # Authoring records + scratch (canon: only play-required files reach public GitHub)
 notes/
 temp/
+
+# pre-art gate stamp — authoring artefact, never published
+.preflight_ok

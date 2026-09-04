@@ -1271,12 +1271,20 @@ def test_apply_spec_queue_accounting_and_candidate_skip():
         with open(os.path.join(base, "scenario.json"), "w") as f:
             json.dump(doc, f)
         res = hs._apply_spec(base, "r1")
-        assert res["queuedCine"] == ["mist"]           # new animated element with no clip/candidates → queued
-        assert "lanterns" in res["skipped"]            # has candidates → skipped, not re-queued
+        # BOX CINEMAGRAPHS RETIRED (2026-09-02): motion is baked whole-scene from `motionSpec`, so no
+        # per-object job is queued for an `animate` element and no `ambient` carrier is created for one.
+        # This test previously asserted `queuedCine == ["mist"]`; it now pins the retirement instead.
+        # The VARIANT half is untouched and still asserted — a door-open reveal is a boxed reveal, not
+        # motion, and it must keep being queued and counted separately.
+        assert res["queuedCine"] == [], res["queuedCine"]
+        assert "mist" in res["skipped"] and "lanterns" in res["skipped"]
         assert res["queuedVar"] == ["door1:open"]      # door-open reveal is a VARIANT, counted separately
         q = hs._batch_read_queue(base)
-        assert sum(1 for j in q if j["type"] == "cinemagraph") == 1
+        assert sum(1 for j in q if j["type"] == "cinemagraph") == 0
         assert sum(1 for j in q if j["type"] == "variant") == 1
+        node = next(r for r in json.load(open(os.path.join(base, "scenario.json"), encoding="utf-8"))["rooms"]
+                    if r["key"] == "r1")
+        assert not [h for h in node["hotspots"] if h.get("id") == "mist"], "animate must create no hotspot"
         # idempotent: a second run queues nothing (mist already queued, lanterns still has candidates)
         res2 = hs._apply_spec(base, "r1")
         assert res2["queuedCine"] == [] and res2["queuedVar"] == []
@@ -1376,12 +1384,6 @@ def test_room_target_rejects_a_non_png():
     assert _refuses(["scene.png"], "notes.txt")
 
 
-if __name__ == "__main__":
-    tests = [v for k, v in sorted(globals().items()) if k.startswith("test_") and callable(v)]
-    for t in tests:
-        t()
-        print(f"  ok  {t.__name__}")
-    print(f"all tests passed ({len(tests)})")
 
 
 def test_scene_spec_explicit_label_wins_over_desc_truncation():
@@ -1581,3 +1583,423 @@ def test_dial_one_shot_sfx_is_flaggable_and_balanceable():
         assert hots[1]["sfx"] == {"src": "audio/bare.mp3", "needsReplacement": True}, "bare string promoted"
         assert isinstance(doc["rooms"][0]["sfx"], list), "the ambience list must not be rewritten as a one-shot"
     _with_rooms_root(body)
+
+def test_pano_uncommitted_compares_bytes_not_names():
+    """Pending art is decided by BYTES, never by `builtFrom`.
+
+    Single-candidate generation always writes `l1_<room>_1.png`, so a regeneration overwrites the very
+    file the room was built from. A name-based test would then call the new art "already committed" and
+    hide it — which is the one image that needs looking at. Three of canyon's nine rooms were in exactly
+    that state on 2026-08-31, which is why this is a test and not a comment."""
+    with tempfile.TemporaryDirectory() as base:
+        scratch = os.path.join(base, "_scratch")
+        os.makedirs(scratch)
+        os.makedirs(os.path.join(base, "r1"))
+        scene = os.path.join(base, "r1", "scene.png")
+        open(scene, "wb").write(b"committed-art-bytes")
+
+        same = os.path.join(scratch, "l1_r1_1.png")      # byte-identical to scene.png
+        open(same, "wb").write(b"committed-art-bytes")
+        diff = os.path.join(scratch, "l1_r1_2.png")      # same LENGTH, different bytes — size alone can't tell
+        open(diff, "wb").write(b"regenerated-art!!!!")
+        assert os.path.getsize(same) == os.path.getsize(diff) == os.path.getsize(scene)
+
+        cands = ["l1_r1_1.png", "l1_r1_2.png"]
+        assert hs._pano_uncommitted(base, "r1", cands) == ["l1_r1_2.png"]
+
+        # the regen case: the built-from filename now holds different art -> it IS pending
+        open(same, "wb").write(b"regenerated-art-NEW")
+        assert hs._pano_uncommitted(base, "r1", cands) == cands
+
+        # no committed art at all -> everything is pending
+        os.remove(scene)
+        assert hs._pano_uncommitted(base, "r1", cands) == cands
+
+        # a candidate that vanished mid-listing is skipped, not raised
+        assert hs._pano_uncommitted(base, "r1", ["gone.png"]) == ["gone.png"]
+
+
+
+
+def test_room_clips_ignores_intermediates():
+    """`cine_<state>.mp4` is a state; its `_raw`/`_src` siblings are not.
+
+    Both live beside the clip under the same `cine_` prefix — the pre-bake render and the un-patched
+    render — and both are gitignored working files the player never fetches. Globbing `cine_*.mp4`
+    picked them up as world states called "base_raw" and "base_src", which showed every baked room
+    twice and then three times in the gallery. Caught by eye both times (2026-08-31); this is the
+    check that means there is no third time."""
+    with tempfile.TemporaryDirectory() as base:
+        d = os.path.join(base, "r1")
+        os.makedirs(d)
+        for name in ("cine_base.mp4", "cine_base_raw.mp4", "cine_base_src.mp4", "cine_night.mp4"):
+            open(os.path.join(d, name), "wb").write(b"\0")
+        states = [c["state"] for c in hs._room_clips(base, "r1")]
+        assert states == ["base", "night"], states
+        # base first, then variants — the order a gallery reads down the page
+        assert hs._room_clips(base, "r1")[0]["file"] == "r1/cine_base.mp4"
+
+
+def test_room_clips_carries_the_committed_mask():
+    """The gallery's sliders open on the COMMITTED choice, so the clip payload must carry it.
+
+    They previously always opened at "no mask · all video", which is a lie about any clip baked with a
+    mask — and every one of them was, since the composite went into the bake. A reviewer then read the
+    off position as the shipped state and re-litigated a decision that had already been made."""
+    with tempfile.TemporaryDirectory() as base:
+        d = os.path.join(base, "r1")
+        os.makedirs(d)
+        open(os.path.join(d, "cine_base.mp4"), "wb").write(b"\0")
+        open(os.path.join(d, "cine_night.mp4"), "wb").write(b"\0")
+        json.dump({"pct": 88.0, "region": 250.0, "enabled": True},
+                  open(os.path.join(d, "cine_base.mask.json"), "w"))
+        clips = {c["state"]: c for c in hs._room_clips(base, "r1")}
+        assert clips["base"]["mask"]["pct"] == 88.0
+        assert clips["base"]["mask"]["region"] == 250.0
+        assert clips["night"]["mask"] == {}          # no sidecar -> no claim, not a fabricated default
+
+
+def test_state_still_is_the_state_s_own_art():
+    """A variant clip sits over the VARIANT's panorama, never over the room's `scene.png`.
+
+    `scene.png` was hardcoded on both the bake side and the gallery side, so a night clip was
+    composited onto — and reviewed against — the DAY panorama: every pixel the mask held still showed
+    the wrong world state. Same rule that stopped a daytime panorama shipping as the "night deck"
+    (2026-08-29): resolve through `scene_states`, never guess from the room node."""
+    doc = {"rooms": [{"key": "r1", "panorama": "r1/scene.png", "built": True,
+                      "hotspots": [{"id": "h", "box": [0, 0, 1, 1],
+                                    "variants": [{"state": "night", "panorama": "r1/scene_night.png"}]}]}]}
+    with tempfile.TemporaryDirectory() as base:
+        os.makedirs(os.path.join(base, "r1"))
+        for f in ("scene.png", "scene_night.png"):
+            open(os.path.join(base, "r1", f), "wb").write(b"\0")
+        assert hs._state_still_rel(base, "r1", "base", doc) == "r1/scene.png"
+        assert hs._state_still_rel(base, "r1", "night", doc) == "r1/scene_night.png"
+        # an unknown state falls back to the base still rather than raising or serving nothing —
+        # the scene-spec pipeline files per-object clips (cine_lantern.mp4) that are not world states
+        assert hs._state_still_rel(base, "r1", "lantern", doc) == "r1/scene.png"
+
+
+def test_mask_grid_shape_and_monotonicity():
+    """The (threshold x region) surface behind the gallery's plane.
+
+    Two properties it must have, because the pad is unreadable if either fails: coverage falls as the
+    THRESHOLD rises (fewer pixels clear the bar) and falls as the REGION CUT rises (whole components go).
+    Neither may ever increase — a surface that dips and rises reads as noise, and the reviewer would be
+    navigating a picture of a bug."""
+    import numpy as np
+    rng = np.random.default_rng(0)
+    t = (rng.random((256, 512)) * 2).astype(np.float32)
+    t[80:160, 150:330] += 18                      # one large coherent mover
+    for _ in range(400):                          # and a scatter of one-off hot pixels
+        y, x = int(rng.integers(3, 250)), int(rng.integers(3, 500))
+        t[y:y + 2, x:x + 2] += 22
+    g = hs._mask_grid(t, scale=2)
+    assert len(g["cov"]) == len(g["regionPos"])
+    assert all(len(row) == len(g["pcts"]) for row in g["cov"])
+    assert g["regionPpm"][0] == 0.0                                  # row 0 is "no cut"
+    for row in g["cov"]:                                             # along the threshold axis
+        assert row == sorted(row, reverse=True), row
+    for j in range(len(g["pcts"])):                                  # and along the region axis
+        col = [row[j] for row in g["cov"]]
+        assert col == sorted(col, reverse=True), col
+    # and the cut must actually do something somewhere, or the axis is decorative
+    assert g["cov"][0][len(g["pcts"]) // 2] > g["cov"][-1][len(g["pcts"]) // 2]
+
+
+def test_grid_ppm_matches_the_ui_mapping():
+    """`_grid_ppm` and the UI's `regPpm` are the same curve. If they drift, the pad's axes label
+    positions the sliders do not actually reach, and every point read off it is off by a step."""
+    assert hs._grid_ppm(0) == 0.0
+    for pos, want in ((25, 10.0), (50, 100.0), (75, 1000.0), (100, 10000.0)):
+        assert abs(hs._grid_ppm(pos) - want) < 1e-6, (pos, hs._grid_ppm(pos))
+
+
+# ---- serving a room's BAKED clips in play --------------------------------------------------------
+# FAILURE MODE UNDER TEST — a clip that is baked, reviewed, and never played. `_room_clips` is
+# filesystem-derived by design ("not wired into scenario.json until someone has looked at it"), but
+# nothing implemented the step after the look: canyon carried nine baked full-scene clips that no hotspot
+# referenced, so test play served the stills and nothing said why (2026-09-01).
+
+
+def _clipdir(base, room, names):
+    os.makedirs(os.path.join(base, room), exist_ok=True)
+    for n in names:
+        open(os.path.join(base, room, n), "wb").write(b"x")
+
+
+def test_serve_clips_wires_carriers_and_leaves_base_stateless():
+    """The base clip must carry NO `state` key. `pickCinemagraphs` matches the base backdrop as state
+    ABSENT, so writing `state: "base"` matches nothing and silently plays the still — the exact bug this
+    whole path exists to end, reintroduced one field deeper."""
+    def body(tmp):
+        d = _write_scenario("c", "s", {"rooms": [{"key": "r1", "hotspots": [
+            {"id": "table", "type": "puzzle", "label": "Table", "box": [0.1, 0.1, 0.2, 0.2]}]}]})
+        _clipdir(d, "r1", ["cine_base.mp4", "cine_night.mp4",
+                           "cine_base_raw.mp4", "cine_base_src.mp4"])   # intermediates must be ignored
+        wired, unchanged = hs._serve_room_clips("r1", d)
+        assert wired == ["base", "night"] and unchanged == [], (wired, unchanged)
+        hsl = json.load(open(os.path.join(d, "scenario.json")))["rooms"][0]["hotspots"]
+        by = {h["id"]: h for h in hsl}
+        assert by["clip_base"]["cinemagraph"] == {"box": [0, 0, 1, 1], "video": "r1/cine_base.mp4"}
+        assert by["clip_night"]["cinemagraph"] == {"box": [0, 0, 1, 1], "video": "r1/cine_night.mp4",
+                                                   "state": "night"}
+        # carriers are marker-less and click-through, and the room's real hotspot is untouched
+        assert by["clip_base"]["type"] == "ambient" and by["clip_base"]["box"] == [0, 0, 1, 1]
+        assert "cinemagraph" not in by["table"]
+    _with_rooms_root(body)
+
+
+def test_serve_clips_is_idempotent_and_refreshes_a_rebake():
+    def body(tmp):
+        d = _write_scenario("c", "s", {"rooms": [{"key": "r1", "hotspots": []}]})
+        _clipdir(d, "r1", ["cine_base.mp4"])
+        hs._serve_room_clips("r1", d)
+        path = os.path.join(d, "scenario.json")
+        snap = open(path, "rb").read()
+        assert hs._serve_room_clips("r1", d) == ([], ["base"])
+        assert open(path, "rb").read() == snap            # no write, no duplicate carrier
+        # a re-bake that renamed the file must be picked back up, not left pointing at the old one
+        doc = json.load(open(path))
+        doc["rooms"][0]["hotspots"][0]["cinemagraph"]["video"] = "r1/cine_stale.mp4"
+        json.dump(doc, open(path, "w"))
+        wired, _ = hs._serve_room_clips("r1", d)
+        assert wired == ["base"], wired
+        carriers = [h for h in json.load(open(path))["rooms"][0]["hotspots"]
+                    if h["id"].startswith("clip_")]
+        assert len(carriers) == 1, carriers
+    _with_rooms_root(body)
+
+
+def test_room_clips_served_flag_needs_no_doc_from_the_caller():
+    """`served` was read off `doc or {}`, so calling _room_clips WITHOUT a doc reported every clip as
+    unserved — a silent wrong answer from the very field added to make unserved clips visible."""
+    def body(tmp):
+        d = _write_scenario("c", "s", {"rooms": [{"key": "r1", "hotspots": []}]})
+        _clipdir(d, "r1", ["cine_base.mp4"])
+        assert [c["served"] for c in hs._room_clips(d, "r1")] == [False]
+        hs._serve_room_clips("r1", d)
+        assert [c["served"] for c in hs._room_clips(d, "r1")] == [True]          # no doc passed
+        doc = json.load(open(os.path.join(d, "scenario.json")))
+        assert [c["served"] for c in hs._room_clips(d, "r1", doc)] == [True]     # doc passed
+        doc["rooms"][0]["hotspots"][0]["cinemagraph"]["video"] = "r1/cine_gone.mp4"
+        assert [c["served"] for c in hs._room_clips(d, "r1", doc)] == [False]    # stale reference
+    _with_rooms_root(body)
+
+
+def test_serve_clips_rejects_a_room_with_no_clips():
+    def body(tmp):
+        d = _write_scenario("c", "s", {"rooms": [{"key": "r1", "hotspots": []}]})
+        for bad in ("r1", "nope"):
+            try:
+                hs._serve_room_clips(bad, d)
+                raise AssertionError("should reject %r" % bad)
+            except ValueError:
+                pass
+    _with_rooms_root(body)
+
+
+# ---- promoting plannedHotspots into the live array (gallery tab 4) -------------------------------
+# FAILURE MODE UNDER TEST — a scenario whose hotspots are authored but never promoted reads as EMPTY.
+# canyon carried 34 authored, boxed hotspots on `plannedHotspots` and nothing in `hotspots`; every
+# harness view reads the latter, so nine built rooms showed zero hotspots and the work looked lost
+# (2026-09-01). `_commit_planned_hotspots` is the promotion, and the thing it must never do is reach for
+# `scene_spec.approx_boxes` the way "Place all hotspots" does — 16 of canyon's 34 boxes were hand-
+# corrected, and a rough re-guess would have silently thrown that placement away.
+
+
+def _canyonish():
+    """A room mid-pipeline: content + a reviewed box on plannedHotspots, nothing committed yet."""
+    return {"rooms": [{"key": "r1", "hotspots": [], "plannedHotspots": [
+        {"type": "clue", "label": "The engraved panel", "box": [0.4, 0.3, 0.6, 0.6],
+         "boxSource": "review:agent", "body": "<p>the calibration matrix</p>", "note": "design only"},
+        {"type": "puzzle", "label": "The high weir", "box": [0.1, 0.2, 0.2, 0.4],
+         "question": "which?", "starterCode": "data", "id": "weir"},
+        {"type": "ambient", "label": "No box here yet"},
+    ]}]}
+
+
+def test_commit_planned_keeps_the_planned_box_and_attaches_content():
+    def body(tmp):
+        d = _write_scenario("hierarchical_clustering", "canyon", _canyonish())
+        created, already, boxless = hs._commit_planned_hotspots("r1", d)
+        assert created == ["The engraved panel", "The high weir"], created
+        assert already == [] and boxless == ["No box here yet"], (already, boxless)
+        placed = json.load(open(os.path.join(d, "scenario.json")))["rooms"][0]["hotspots"]
+        by = {h["label"]: h for h in placed}
+        # THE box, not a re-guess.
+        assert by["The engraved panel"]["box"] == [0.4, 0.3, 0.6, 0.6]
+        assert by["The high weir"]["box"] == [0.1, 0.2, 0.2, 0.4]
+        # authored content came across; `note` is design-only and must not (see _PLANNED_SKIP)
+        assert by["The engraved panel"]["body"] == "<p>the calibration matrix</p>"
+        assert "note" not in by["The engraved panel"]
+        assert by["The high weir"]["question"] == "which?"
+        # an entry with no box is reported and skipped, never invented one
+        assert "No box here yet" not in by
+        # ids: the planned id wins, else the label slug
+        assert by["The high weir"]["id"] == "weir"
+        assert by["The engraved panel"]["id"] == "the_engraved_panel"
+    _with_rooms_root(body)
+
+
+def test_commit_planned_is_idempotent_and_never_rewrites_a_live_box():
+    """Re-committing must promote nothing and leave the file byte-identical — and a box already tuned in
+    the flat editor must survive, because the committed array is the live truth, not the planned one."""
+    def body(tmp):
+        d = _write_scenario("hierarchical_clustering", "canyon", _canyonish())
+        hs._commit_planned_hotspots("r1", d)
+        path = os.path.join(d, "scenario.json")
+        # simulate a later hand-tune of the committed box
+        doc = json.load(open(path))
+        doc["rooms"][0]["hotspots"][0]["box"] = [0.41, 0.31, 0.61, 0.61]
+        json.dump(doc, open(path, "w"), indent=2, ensure_ascii=False)
+        snap = open(path, "rb").read()
+        created, already, _ = hs._commit_planned_hotspots("r1", d)
+        assert created == [], created                     # nothing new to promote
+        assert len(already) == 2, already
+        assert open(path, "rb").read() == snap            # and the tuned box was NOT reverted
+    _with_rooms_root(body)
+
+
+def test_commit_planned_keeps_hotspot_ids_unique():
+    def body(tmp):
+        d = _write_scenario("c", "s", {"rooms": [{"key": "r1",
+            "hotspots": [{"id": "the_lever", "type": "door", "label": "Other thing",
+                          "box": [0, 0, 0.1, 0.1]}],
+            "plannedHotspots": [{"type": "puzzle", "label": "The lever", "box": [0.5, 0.5, 0.6, 0.6]}]}]})
+        hs._commit_planned_hotspots("r1", d)
+        placed = json.load(open(os.path.join(d, "scenario.json")))["rooms"][0]["hotspots"]
+        ids = [h["id"] for h in placed]
+        assert len(ids) == len(set(ids)), ids             # slug collided with a live id -> suffixed
+        assert "the_lever_2" in ids, ids
+    _with_rooms_root(body)
+
+
+def test_commit_planned_rejects_a_room_with_nothing_planned():
+    def body(tmp):
+        d = _write_scenario("c", "s", {"rooms": [{"key": "r1", "hotspots": []}]})
+        for bad in ("r1", "nope"):
+            try:
+                hs._commit_planned_hotspots(bad, d)
+                raise AssertionError("should reject %r" % bad)
+            except ValueError:
+                pass
+    _with_rooms_root(body)
+
+
+# ---- which _scratch candidates are NOT the committed art -----------------------------------------
+# FAILURE MODE UNDER TEST — the committed image shown TWICE: once at the top of its card as the
+# committed one, and again in the row below as something still to choose. Every commit here is a COPY
+# to a stable name (scene.png / cover.png / _world/plate.png) that records no back-pointer, and the
+# generators reuse candidate filenames, so only the BYTES can answer "is this one already committed".
+
+
+def test_scratch_uncommitted_matches_on_bytes_not_names():
+    def body(tmp):
+        d = _write_scenario("c", "s", {"rooms": []})
+        scratch = os.path.join(d, "_scratch"); os.makedirs(scratch)
+        open(os.path.join(scratch, "a.png"), "wb").write(b"AAAA")
+        open(os.path.join(scratch, "b.png"), "wb").write(b"BBBB")
+        open(os.path.join(scratch, "c.png"), "wb").write(b"AAAAA")     # same prefix, different length
+        committed = os.path.join(d, "cover.png")
+        open(committed, "wb").write(b"AAAA")
+        assert hs._scratch_uncommitted(d, ["a.png", "b.png", "c.png"], committed) == ["b.png", "c.png"]
+        # nothing committed yet -> every candidate is pending
+        assert hs._scratch_uncommitted(d, ["a.png"], os.path.join(d, "gone.png")) == ["a.png"]
+        assert hs._scratch_uncommitted(d, ["a.png"], None) == ["a.png"]
+        # a candidate that vanished mid-listing is skipped, not raised
+        assert hs._scratch_uncommitted(d, ["a.png", "ghost.png"], committed) == []
+    _with_rooms_root(body)
+
+
+def test_cover_candidates_excludes_derived_files():
+    """`_open`/`_x2` are an upscale and a variant, not fresh candidates — offering them means committing
+    a derived file as if it were an original."""
+    def body(tmp):
+        d = _write_scenario("c", "s", {"rooms": []})
+        scratch = os.path.join(d, "_scratch"); os.makedirs(scratch)
+        for n in ("gpt_cover_1.png", "gpt_cover_2.png", "gpt_cover_2_x2.png",
+                  "gpt_cover_3_open.png", "l1_room_1.png"):
+            open(os.path.join(scratch, n), "wb").write(b"x")
+        assert sorted(hs._cover_candidates(d)) == ["gpt_cover_1.png", "gpt_cover_2.png"]
+    _with_rooms_root(body)
+
+
+def test_cinemagraph_queue_keys_on_room_and_hotspot():
+    """A hotspot id is unique only WITHIN a room, but the cinemagraph queue spans the whole scenario.
+    Keyed on the id alone, the first room to queue `valley_view` made every OTHER room's `valley_view`
+    look already-queued and it was dropped in SILENCE — beacons declared 20 cinemagraphs across 12 rooms
+    and exactly 8 reached the queue, one per distinct id (2026-09-02). Exercises the real _apply_spec."""
+    def body(tmp):
+        base = os.path.join(hs.ROOMS_ROOT, "ch", "sc")
+        spec = lambda rk: {"room": rk, "interior": False, "seam": "open sky",
+                           "elements": [{"id": "valley_view", "at": "dead ahead in the centre",
+                                         "desc": "the valley below",
+                                         "animate": {"motion": "the channels sliding", "loop": "crossfade"}}]}
+        doc = {"id": 99, "rooms": [{"key": rk, "built": True, "hotspots": [],
+                                    "authoring": {"sceneSpec": spec(rk)}} for rk in ("alpha", "beta")]}
+        for rk in ("alpha", "beta"):
+            os.makedirs(os.path.join(base, rk), exist_ok=True)
+        os.makedirs(os.path.join(base, "_scratch"), exist_ok=True)
+        with open(os.path.join(base, "scenario.json"), "w", encoding="utf-8") as f:
+            json.dump(doc, f)
+        for rk in ("alpha", "beta"):
+            hs._apply_spec(base, rk)
+        # BOX CINEMAGRAPHS RETIRED 2026-09-02: an `animate` element now yields NO hotspot and NO queued
+        # job — motion is baked whole-scene from `motionSpec`. Both halves are asserted here because the
+        # (room, hotspot) queue key this test was written for is still the rule for VARIANT jobs, and a
+        # future re-introduction of per-object jobs must not silently reinstate the id-only collision.
+        q = hs._batch_read_queue(base)
+        assert [j for j in q if j["type"] == "cinemagraph"] == [], q
+        node = next(r for r in json.load(open(os.path.join(base, "scenario.json"), encoding="utf-8"))["rooms"]
+                    if r["key"] == "alpha")
+        assert [h for h in node["hotspots"] if h.get("type") == "ambient"] == [], node["hotspots"]
+        vkeys = {(j.get("roomKey"), j.get("hotspotId"), j.get("state"))
+                 for j in [{"type": "variant", "roomKey": "alpha", "hotspotId": "d", "state": "open"}]
+                 if j.get("type") == "variant"}
+        assert ("beta", "d", "open") not in vkeys, "variant dedupe must stay keyed on the room too"
+    _with_rooms_root(body)
+
+if __name__ == "__main__":
+    tests = [v for k, v in sorted(globals().items()) if k.startswith("test_") and callable(v)]
+    for t in tests:
+        t()
+        print(f"  ok  {t.__name__}")
+    print(f"all tests passed ({len(tests)})")
+
+
+# ---------------------------------------------------------------------------------------------
+# PRE-ART GATE (2026-09-03). The art phase used to sit between two skills gated by nothing, which
+# is how twelve unchecked seams shipped, and how heist nearly generated a blown vault door for a
+# crew whose entire signature is that they were let in. `preflight.py` stamps a HASH of
+# scenario.json + datasets, so passing once is not enough — editing either re-arms the gate.
+def test_preflight_stamp_goes_stale_when_the_scenario_changes(tmp_path):
+    import json as _json, sys as _sys, os as _os
+    _sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)))
+    import preflight
+
+    base = tmp_path / "sc"; (base / "data").mkdir(parents=True)
+    (base / "scenario.json").write_text(_json.dumps({"rooms": [{"key": "a", "built": False}]}))
+    (base / "data" / "d.csv").write_text("job\nx\n")
+
+    ok, why = preflight.stamp_is_fresh(str(base))
+    assert not ok and "no preflight stamp" in why, "an ungated scenario must be blocked"
+
+    (base / ".preflight_ok").write_text(_json.dumps({"hash": preflight._hash(str(base))}))
+    assert preflight.stamp_is_fresh(str(base))[0], "a fresh stamp must unlock"
+
+    (base / "scenario.json").write_text(_json.dumps({"rooms": [{"key": "a", "built": False}], "x": 1}))
+    ok, why = preflight.stamp_is_fresh(str(base))
+    assert not ok and "STALE" in why, "editing scenario.json must re-arm the gate"
+
+
+def test_preflight_grandfathers_a_scenario_that_already_has_art(tmp_path):
+    """Locking every existing scenario out of a re-generation would be a nasty surprise, and is not
+    the failure mode the gate protects. A scenario past its first generation is never blocked."""
+    import json as _json, sys as _sys, os as _os
+    _sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)))
+    import preflight
+    base = tmp_path / "built"; base.mkdir()
+    (base / "scenario.json").write_text(_json.dumps({"rooms": [{"key": "a", "built": True}]}))
+    ok, why = preflight.stamp_is_fresh(str(base))
+    assert ok and "grandfathered" in why, "a scenario with committed art must not be blocked"

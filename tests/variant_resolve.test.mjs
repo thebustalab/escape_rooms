@@ -185,3 +185,34 @@ test("clips with no video or no box are ignored whatever the state", () => {
   ];
   assert.deepEqual(pickCinemagraphs(hs, null), []);
 });
+
+// ---- the SERVER/PLAYER contract for a baked full-scene clip -------------------------------------
+// harness_server.py `_serve_room_clips` writes these records; pickCinemagraphs is what reads them. The
+// two must agree on one non-obvious point: the BASE backdrop is state ABSENT, not state "base". A
+// carrier written as {state: "base"} matches nothing, so the room silently plays its still and the only
+// symptom is "the cinemagraph isn't showing" — which is the bug the whole serve step exists to end
+// (canyon, 2026-09-01). Pinned here rather than only in Python, because the mistake is only visible
+// where the two sides meet.
+test("baked full-scene carrier: base clip plays on the base backdrop", () => {
+  const carriers = [
+    { id: "clip_base", type: "ambient", box: [0, 0, 1, 1],
+      cinemagraph: { box: [0, 0, 1, 1], video: "r1/cine_base.mp4" } },              // no `state` — base
+    { id: "clip_night", type: "ambient", box: [0, 0, 1, 1],
+      cinemagraph: { box: [0, 0, 1, 1], video: "r1/cine_night.mp4", state: "night" } },
+  ];
+  // base backdrop (no full-scene variant active) -> only the stateless clip
+  const onBase = pickCinemagraphs(carriers, null);
+  assert.equal(onBase.length, 1);
+  assert.equal(onBase[0].video, "r1/cine_base.mp4");
+  assert.deepEqual(onBase[0].box, [0, 0, 1, 1]);   // the full-scene branch in pano-player keys on this
+
+  // night backdrop -> only the night clip; the day-lit base clip must NOT stamp onto a night wash
+  const onNight = pickCinemagraphs(carriers, "night");
+  assert.equal(onNight.length, 1);
+  assert.equal(onNight[0].video, "r1/cine_night.mp4");
+
+  // the regression itself: a carrier mislabelled state:"base" plays on NOTHING
+  const wrong = [{ id: "clip_base", cinemagraph: { box: [0, 0, 1, 1], video: "v.mp4", state: "base" } }];
+  assert.equal(pickCinemagraphs(wrong, null).length, 0);
+});
+

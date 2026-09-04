@@ -35,6 +35,29 @@ export function assignedGroups(assignment) {
 }
 
 /**
+ * ALL-OR-NOTHING mode: is the whole ledger correct, right now?
+ *
+ * WHY THIS EXISTS. The group rule above is what makes the ledger unfishable *when groups have several
+ * members* — you cannot find a 4-of-12 subset by poking. But a ledger whose rows each hold a DIFFERENT
+ * answer degenerates: every group has exactly one member, so a single correct dropdown confirms and
+ * locks its own row, and the widget leaks the answer one row at a time. `networks/beacons` is exactly
+ * that shape (four fire slots, four different watchtowers) and has unlimited attempts, so without this
+ * it is solvable in ~36 submits with no survey done at all.
+ *
+ * So: when a hotspot sets `allOrNothing`, nothing locks and nothing is reported per group — the answer
+ * is right or it is not. Deliberately returns the SAME shape as confirmGroups so the caller does not
+ * branch on more than the flag.
+ */
+export function confirmAll(rows, assignment) {
+  const mine = (assignment instanceof Map)
+    ? Object.fromEntries(assignment.entries())
+    : (assignment || {});
+  const complete = (rows || []).length > 0
+    && (rows || []).every(r => mine[r.id] === r.answer);
+  return { locked: new Set(), newly: [], groupCount: trueGroups(rows).size, complete };
+}
+
+/**
  * Evaluate one press of "Check".
  * @param rows       [{id, label, answer}]
  * @param assignment rowId -> verdict (object or Map)

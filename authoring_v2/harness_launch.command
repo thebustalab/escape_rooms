@@ -9,8 +9,9 @@
 #   2. Opens ONE SSH tunnel mapping the Mac's own localhost:8752 and :8055 to host2's, so the Mac sees
 #      both servers exactly where host2 does. That keeps the test-play flow's origins consistent
 #      (the mixer on localhost:8055 posts volumes to the harness on localhost:8752 — same as on host2).
-#   3. Opens the build_world console in the default browser. The old v1 harness (:8751,
-#      harness_gpt.html) is obsolete and is no longer started (2026-08-28, Lucas).
+#   3. Opens the build_world GALLERY (build_world_v2.html) in the default browser — the flat, scrollable
+#      view of every room's art and variants; the full authoring console (build_world.html) is linked in
+#      its header. The old v1 harness (:8751, harness_gpt.html) is obsolete and is no longer started.
 #   4. HOLDS THE TERMINAL. Press Ctrl+C (or close the window) to TEAR THE WHOLE THING DOWN — the SSH
 #      tunnel AND both host2 servers — so nothing is left running. The next launch then spins it all up
 #      fresh. (Set KEEP_SERVERS=1 to leave the servers running on exit, the old behaviour.)
@@ -21,7 +22,9 @@
 HOST2="${HARNESS_HOST:-bustalab@131.212.57.217}"      # override: HARNESS_HOST=bustalab@… ./harness_launch.command
 SSH_OPTS="${HARNESS_SSH_OPTS:-}"                       # e.g. HARNESS_SSH_OPTS='-J host1'  if you must hop via host1
 REMOTE_ENSURE="/home/bustalab/Documents/Tools/websites/thebustalab.github.io/escape_rooms/authoring_v2/serve_harness.sh"
-URL="http://localhost:8752/build_world.html"
+URL="http://localhost:8752/build_world_v2.html"   # the gallery harness (2026-08-31): header + concept/landing/world
+                                                  # card, then every room's art and variants flat, for scrolling review.
+                                                  # The full authoring console is one link away in its header.
 # Dedicated control socket for OUR tunnel — kept separate from your ~/.ssh/config multiplexing so the
 # tunnel can never silently attach to some other master connection (that was the "no tunnel" bug).
 CTRL="$HOME/.ssh/cm-harness.sock"

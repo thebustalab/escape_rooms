@@ -95,3 +95,38 @@ test("every spec'd room becomes one circle", () => {
   const html = NG.buildNetSvg(ROOMS).html;
   assert.strictEqual((html.match(/rmcircle/g) || []).length, 3);
 });
+
+
+// ---------------------------------------------------------------------------------------------
+// DEAD SPACE TO THE LEFT (2026-09-03, Lucas). An `open` door is a BIDIRECTIONAL passage, but the
+// rank relaxation counted it as a forward edge — so every open pair was a 2-cycle and ranks climbed
+// until the pass cap. heist opened at rank 20 and beacons at 34, with nothing at rank 0, which drew
+// the graph thousands of px right of the viewBox origin: the panel opened on empty space and you had
+// to scroll to find the map.
+test("an all-open (bidirectional) world starts at rank 0 and does not inflate", () => {
+  const spec = ["a", "b", "c", "d"].map((k, i, arr) => ({
+    key: k, title: k,
+    doors: arr.filter(o => o !== k).map(o => ({ to: o, direction: "open", x: 0.5 })),
+    planned: [{ type: "door", label: k, x: 0.5 }],
+  }));
+  const L = NG.layoutRooms(spec);
+  const ranks = Object.values(L.rank);
+  assert.strictEqual(Math.min(...ranks), 0, "the leftmost column must be 0 — no dead space to the left");
+  assert.ok(Math.max(...ranks) < spec.length, "open doors must not inflate rank through 2-cycles");
+});
+
+test("a forward door still steps its target one column right", () => {
+  const spec = [
+    { key: "a", title: "a", doors: [{ to: "b", direction: "forward", x: 0.5 }], planned: [] },
+    { key: "b", title: "b", doors: [{ to: "a", direction: "back", x: 0.5 }], planned: [] },
+  ];
+  const L = NG.layoutRooms(spec);
+  assert.strictEqual(L.rank.a, 0);
+  assert.ok(L.rank.b > L.rank.a, "forward edges must still order the columns");
+});
+
+test("a legacy scenario whose doors carry no `to` lays out in scenario order, not one tall column", () => {
+  const spec = ["r1", "r2", "r3"].map(k => ({ key: k, title: k, doors: [{ direction: "forward", x: 0.5 }], planned: [] }));
+  const L = NG.layoutRooms(spec);
+  assert.deepStrictEqual([L.rank.r1, L.rank.r2, L.rank.r3], [0, 1, 2]);
+});

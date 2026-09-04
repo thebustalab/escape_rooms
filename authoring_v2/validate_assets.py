@@ -198,6 +198,49 @@ def door_reciprocity(scen):
                 out.append(f"one-way passage: '{r['key']}'->'{to}' has no return door back to '{r['key']}' in '{to}'")
     return out
 
+def clip_state_pairing(scen):
+    """Full-scene STATES whose motion does not match their backdrop. Returns (misses, fails).
+
+    A baked clip has its source still BAKED INTO IT — the motion mask means every static pixel shows the
+    image the clip was generated from. So a full-scene variant (box [0,0,1,1]) replaces the backdrop the
+    clip was made from, and the engine's rule (`variant_resolve.pickCinemagraphs`) is that a clip only
+    plays while the image it came from is the one showing. Two ways that goes wrong, and NEITHER is
+    visible in any other check:
+
+      * a full-scene state with NO clip tagged for it — the room goes completely STATIC in that state.
+        Egypt has seven night backdrops and no night clips, so the whole world freezes after dark.
+      * a clip tagged for a state no variant declares — ORPHANED, it will never play at all.
+
+    Boxed variants are deliberately not checked: they change a region, not the backdrop, so the base
+    clips keep playing over them and no per-state clip is owed. That is the cheap route, and the whole
+    reason a scenario should prefer boxed variants when it can.
+    """
+    misses, fails = [], []
+    for r in scen.get("rooms", []):
+        if not r.get("built"):
+            continue
+        hs = r.get("hotspots") or []
+        full = lambda b: isinstance(b, list) and b == [0, 0, 1, 1]
+        # declared full-scene variant states on this room
+        states = set()
+        for h in hs:
+            for v in (h.get("variants") or []):
+                if v.get("panorama") and full(v.get("box") if isinstance(v.get("box"), list) else h.get("box")):
+                    states.add(v.get("state"))
+        clips = [h["cinemagraph"] for h in hs if isinstance(h.get("cinemagraph"), dict) and h["cinemagraph"].get("video")]
+        has_full_base = any(full(c.get("box")) and not c.get("state") for c in clips)
+        clip_states = {c.get("state") for c in clips if c.get("state")}
+        for st in sorted(x for x in states if x):
+            if st not in clip_states and clips:
+                misses.append(f"room '{r['key']}' state '{st}' is a full-scene backdrop with NO clip tagged "
+                              f"for it — every clip stops in that state and the room goes static"
+                              + (" (its base clip is full-scene, so it cannot carry over)" if has_full_base else ""))
+        for st in sorted(clip_states - states):
+            fails.append(f"room '{r['key']}' clip is tagged state '{st}' but no full-scene variant declares "
+                         f"that state — it can never play")
+    return misses, fails
+
+
 def check_scenario(path):
     d = os.path.dirname(path)
     scen = json.load(open(path, encoding="utf-8"))
@@ -251,6 +294,8 @@ def check_scenario(path):
     misses.extend(door_reciprocity(scen))                # topology: every passage has a return door
     misses.extend(dials_without_states(scen))            # a stateless dial is an inert control
     misses.extend(pickup_tile_shape(scen, d))            # notebook board tiles are square-cropped
+    _cm, _cf = clip_state_pairing(scen)                  # a full-scene state whose motion doesn't match it
+    misses.extend(_cm); fails.extend(_cf)
     # integrity (FAIL) — every referenced file must exist. Strip a ?v= cache-buster / #frag first: some
     # refs carry one (e.g. alaska's clue images "escape_grids/mask_room1.png?v=4") — the file on disk has
     # no query, the browser strips it, so must we.

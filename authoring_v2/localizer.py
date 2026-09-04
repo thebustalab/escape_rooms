@@ -15,17 +15,21 @@ Returns {id: {"box":[x0,y0,x1,y1] fractions, "confidence":0..1}}. Boxes are clam
 to a client). The image is downscaled before upload (localization needs layout, not full resolution — keeps
 vision cost + latency down). CLI has a --truth mode that scores predictions against a room's real hotspot
 boxes (IoU + centre distance) so we can check accuracy before trusting it in the pipeline.
+
+GROUNDING DINO WAS REMOVED (2026-08-31, Lucas: "just remove Grounding DINO from this whole pipeline if
+it's not doing anything useful"). It had been the DEFAULT engine, and on the first real test —
+`hierarchical_clustering/canyon` `j_c1` — it returned FIVE of seven elements as the same box
+(~[0.61,0.39,0.71,0.89]), collapsing every object onto one salient blob. gpt-4o on the same room returned
+seven distinct boxes in the spec's own left-to-right order. A default that silently produces nonsense is
+worse than no default, so the engine, its torch-venv subprocess and `grounding_dino_detect.py` are gone.
+`place_hotspots.py` still refuses to write any run whose predictions collapse — that guard is engine-
+agnostic and stays.
 """
 import argparse, base64, io, json, os, subprocess, sys, urllib.request, urllib.error
 
 API = "https://api.openai.com/v1/chat/completions"
 
-# Grounding DINO (default engine) runs as a subprocess under a torch venv so the harness's conda-base python
-# never imports torch. See grounding_dino_detect.py.
 _HERE = os.path.dirname(os.path.abspath(__file__))
-GDINO_SCRIPT = os.path.join(_HERE, "grounding_dino_detect.py")
-GDINO_VENV = os.path.expanduser("~/ComfyUI/.venv/bin/python")
-GDINO_MODEL = "IDEA-Research/grounding-dino-tiny"
 
 SYSTEM = (
     "You are a precise object localizer for equirectangular 360° panorama images. You return only strict "
@@ -137,29 +141,96 @@ def _post_chat(payload, api_key):
         raise RuntimeError(f"OpenAI HTTP {e.code}: {body}") from None
 
 
-def _localize_gdino(image_path, targets, model=GDINO_MODEL):
-    """Grounding DINO engine (default): a real open-vocabulary detector. One query per object (its `desc`,
-    falling back to id), top-scoring box. Returns {id: {"box":[...], "confidence":score}}."""
-    payload = [{"id": t["id"], "query": (t.get("desc") or t["id"])} for t in targets if t.get("id")]
-    p = subprocess.run([GDINO_VENV, GDINO_SCRIPT, "--image", image_path,
-                        "--targets", json.dumps(payload), "--model", model],
-                       capture_output=True, text=True)
-    if p.returncode != 0:
-        raise RuntimeError("grounding_dino_detect failed: " + (p.stderr or p.stdout).strip()[-400:])
-    boxes = json.loads(p.stdout).get("boxes", {})
-    out = {}
-    for tid, d in boxes.items():
-        b = _clamp_box(d.get("box"))
-        if b:
-            out[tid] = {"box": b, "confidence": float(d.get("score", 0) or 0)}
-    return out
+# ── SECOND PASS: refine each box on a native-resolution CROP ───────────────────────────────────────
+# WHY THIS EXISTS (2026-09-04). The single pass reads a 0.1 grid burned onto a 1536-px downscale of a
+# 3072x1024 panorama, so one grid cell is ~154 source pixels and the model interpolates halves of it —
+# every coordinate it returned on `networks/beacons` was a multiple of 0.05. That is accurate enough to
+# name the REGION and not to hit the OBJECT: on sisters it put `spyglass` in the bare path beside the
+# spyglass and `reading_table` on the cairn above the slab. Distinct, ordered, in the right half of the
+# frame, and unusable — which is why the collapse guard passing is not evidence the boxes are good.
+#
+# It is the same lesson as `art_qc.py` and the state-variant content review, one stage later: JUDGE AT
+# NATIVE RESOLUTION. The fix is not a better prompt, it is a smaller picture — crop a window around the
+# first-pass guess, send it at full resolution with its own grid, and ask for the box in CROP
+# coordinates, then map back. The object is then a large fraction of what the model is looking at
+# instead of a handful of pixels.
+#
+# It cannot RECOVER from a first pass that landed on the wrong side of the room — the crop simply will
+# not contain the object — so it reports `null` and leaves the first-pass box rather than inventing one.
+REFINE_SYSTEM = (
+    "You are a precise object localizer. You are shown a CROP of a larger panorama, at full resolution, "
+    "with a faint coordinate grid burned onto it: labelled lines every 0.1 on both axes, in CROP "
+    "coordinates (0.0 = the crop's own left/top edge, 1.0 = its right/bottom edge). Return only strict "
+    "JSON. Draw the box TIGHTLY around the object's actual pixels — not around the region it sits in. "
+    "If the named object is not visible anywhere in this crop, return null; do NOT return the nearest "
+    "similar object and do NOT invent a position."
+)
 
 
-def localize(image_path, targets, prompt, model=None, engine="gdino", max_w=1536, api_key=None):
-    """Locate each target object. engine='gdino' (Grounding DINO, default, local) or 'gpt4o' (vision LLM
-    fallback — imprecise, kept for comparison). Returns {id: {"box":[...], "confidence":float}}."""
-    if engine == "gdino":
-        return _localize_gdino(image_path, targets, model=model or GDINO_MODEL)
+def _crop_window(box, pad=1.6, min_w=0.10, min_h=0.20):
+    """A window around `box`, `pad`x its size in each axis, clamped to the frame.
+
+    Padded rather than tight because the first-pass box is a guess: the object is usually NEAR it, not
+    inside it. Minimums stop a thin door slit from producing a crop too narrow to give the model any
+    context to recognise the object by.
+    """
+    x0, y0, x1, y1 = box
+    cx, cy = (x0 + x1) / 2.0, (y0 + y1) / 2.0
+    w = max(min_w, (x1 - x0) * pad)
+    h = max(min_h, (y1 - y0) * pad)
+    nx0, nx1 = max(0.0, cx - w / 2), min(1.0, cx + w / 2)
+    ny0, ny1 = max(0.0, cy - h / 2), min(1.0, cy + h / 2)
+    return [nx0, ny0, nx1, ny1]
+
+
+def refine_box(image_path, box, target, model="gpt-4o", api_key=None, max_w=1024):
+    """Refine ONE first-pass box against a native-resolution crop. Returns a full-image box, or None."""
+    from PIL import Image
+    api_key = api_key or os.environ.get("OPENAI_API_KEY")
+    if not api_key:
+        raise RuntimeError("OPENAI_API_KEY not set")
+    win = _crop_window(box)
+    with Image.open(image_path) as im:
+        W, H = im.size
+        px = (int(win[0] * W), int(win[1] * H), int(win[2] * W), int(win[3] * H))
+        crop = im.convert("RGB").crop(px)
+    if crop.width > max_w:
+        crop = crop.resize((max_w, max(1, round(crop.height * max_w / crop.width))))
+    crop = _draw_grid(crop)
+    buf = io.BytesIO()
+    crop.save(buf, format="PNG")
+    data_url = "data:image/png;base64," + base64.b64encode(buf.getvalue()).decode()
+
+    desc = target.get("desc") or target.get("label") or target.get("id")
+    user = ("Locate this ONE object in the crop:\n  id: %s\n  description: %s\n\n"
+            "First say briefly what you SEE and which grid lines it sits between, then give its tight "
+            "box in CROP coordinates. Return strict JSON: "
+            '{"seen":"...","box":[x0,y0,x1,y1] or null,"confidence":0.0-1.0}' % (target.get("id"), desc))
+    r = _post_chat({"model": model, "temperature": 0, "max_tokens": 400,
+                    "response_format": {"type": "json_object"},
+                    "messages": [{"role": "system", "content": REFINE_SYSTEM},
+                                 {"role": "user", "content": [
+                                     {"type": "text", "text": user},
+                                     {"type": "image_url",
+                                      "image_url": {"url": data_url, "detail": "high"}}]}]}, api_key)
+    try:
+        out = json.loads(r["choices"][0]["message"]["content"])
+    except Exception:  # noqa: BLE001
+        return None
+    cb = _clamp_box(out.get("box") or [])
+    if not cb:
+        return None
+    # crop fractions -> full-image fractions
+    ww, hh = win[2] - win[0], win[3] - win[1]
+    return [round(win[0] + cb[0] * ww, 4), round(win[1] + cb[1] * hh, 4),
+            round(win[0] + cb[2] * ww, 4), round(win[1] + cb[3] * hh, 4)]
+
+
+def localize(image_path, targets, prompt, model=None, engine="gpt4o", max_w=1536, api_key=None):
+    """Locate each target object. Only `gpt4o` remains — see the module docstring for why Grounding DINO
+    was removed. `engine` is kept as an argument so callers and the harness route do not have to change."""
+    if engine and engine != "gpt4o":
+        raise ValueError("unknown engine %r — only 'gpt4o' is supported (Grounding DINO was removed)" % engine)
     return _localize_gpt4o(image_path, targets, prompt, model=model or "gpt-4o", max_w=max_w, api_key=api_key)
 
 
@@ -210,7 +281,7 @@ def main():
     ap.add_argument("--spec", required=True, help="scene spec JSON (targets + prompt source)")
     ap.add_argument("--truth", help="scenario.json to score against (real hotspot boxes)")
     ap.add_argument("--room", help="room key in --truth")
-    ap.add_argument("--engine", default="gdino", choices=["gdino", "gpt4o"])
+    ap.add_argument("--engine", default="gpt4o", choices=["gpt4o"])
     ap.add_argument("--model", default=None, help="override the engine's default model")
     ap.add_argument("--max-w", type=int, default=1536)
     a = ap.parse_args()

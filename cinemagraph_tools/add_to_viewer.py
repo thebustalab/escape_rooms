@@ -21,8 +21,13 @@ EGY = "/home/bustalab/Documents/Tools/websites/thebustalab.github.io/escape_room
 MOTION_SCALE = 40.0
 
 
-def ensure_still(room, night=False):
-    src = f"{EGY}/{room}/{'scene_night.png' if night else 'scene.png'}"
+def ensure_still(room, night=False, src=None):
+    """Stage the clip's SOURCE still beside it in the viewer.
+
+    `src` names it outright — needed for any scenario that isn't Egypt, since the masked composite
+    blends the clip against this still and a mismatched pair silently shows two different scenes.
+    Without it, fall back to the Egypt room-key shorthand this script was born with."""
+    src = src or f"{EGY}/{room}/{'scene_night.png' if night else 'scene.png'}"
     dst_name = f"{room}{'_night' if night else ''}_source_still.png"
     dst = f"{UI}/cine360/{dst_name}"
     if not os.path.isfile(dst):
@@ -53,14 +58,18 @@ def main():
     ap.add_argument("--night", action="store_true")
     ap.add_argument("--page", default="cine360_test.html",
                     help="which viewer page to register in")
+    ap.add_argument("--still", default=None,
+                    help="explicit source still for these clips (any scenario); default is the "
+                         "Egypt room-key shorthand")
     a = ap.parse_args()
 
-    still = ensure_still(a.room, a.night)
+    still = ensure_still(a.room, a.night, a.still)
     page = f"{UI}/{a.page}"
     # Hold an exclusive lock across read-modify-write. Two writers to this file (the watcher and a
     # hand edit to the player) silently lost one side's changes: the wrap-flash marker and the
     # longer crossfade were both overwritten seconds after being added, because the watcher had
     # read the page before the edit and wrote it back after.
+    os.makedirs("/tmp/sweep", exist_ok=True)
     lock = open(f"/tmp/sweep/.viewer_{a.page}.lock", "w")
     fcntl.flock(lock, fcntl.LOCK_EX)
     s = open(page).read()

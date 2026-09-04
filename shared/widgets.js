@@ -3,11 +3,13 @@
 // the engine's own state — the gate key, the attempt counter, the lock table, the world-state bag — is
 // INJECTED as `ctx` rather than read from module scope. pano-player passes its real objects; the test
 // passes plain ones.
-import { confirmGroups } from "./ledger_rule.js?v=79";
+import { confirmGroups, confirmAll } from "./ledger_rule.js?v=80";
 import { makeScale, junctionsAbove, placedCount } from "./elev_scale.js?v=79";
 
 export function buildLedgerCard(h, onSolved, ctx) {
   const rows = h.rows || [];
+  // all-or-nothing: no per-group locking, no progress line — see confirmAll() for why beacons needs it
+  const allOrNothing = !!h.allOrNothing;
   const opts = (h.options || []).map(o => (typeof o === "string") ? { key: o, label: o } : o);
   const fbk = h.feedback || {};
   const maxA = h.maxAttempts || 0;                    // 0 = unlimited (the escape is ungraded)
@@ -44,7 +46,7 @@ export function buildLedgerCard(h, onSolved, ctx) {
   const sub = card.querySelector(".qsubmit");
   const sels = () => Array.from(card.querySelectorAll("select.verdict"));
 
-  const progText = () => (fbk.progress || "{n} of {m} groups confirmed")
+  const progText = () => allOrNothing ? "" : (fbk.progress || "{n} of {m} groups confirmed")
     .replace("{n}", String(locked.size)).replace("{m}", String(groupCount));
 
   // Re-lock the rows of any group already confirmed in an earlier visit, and paint them.
@@ -68,12 +70,12 @@ export function buildLedgerCard(h, onSolved, ctx) {
     // GROUPS closed on this press, which is the whole point.
     const verdict = {};
     sels().forEach(s => { if (s.value) verdict[s.dataset.row] = s.value; });
-    const res = confirmGroups(rows, verdict, locked);
+    const res = allOrNothing ? confirmAll(rows, verdict) : confirmGroups(rows, verdict, locked);
     const newly = res.newly;
     newly.forEach(v => locked.add(v));
-    paintLocks();
+    if (!allOrNothing) paintLocks();
 
-    if (locked.size === groupCount) {
+    if (allOrNothing ? res.complete : locked.size === groupCount) {
       fb.className = "qfeedback ok";
       fb.innerHTML = fbk.correct || "Every group confirmed.";
       card.querySelectorAll("select, button").forEach(b => b.disabled = true);

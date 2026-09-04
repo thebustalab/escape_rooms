@@ -50,6 +50,38 @@ class MotionSpecTest(unittest.TestCase):
                            "rigid": "The slate price-board and the lantern body"})
         self.assertIn("The slate price-board and the lantern body are rigid", p)
 
+    def test_a_shared_phrase_is_named_ONCE_however_many_boxes_carry_it(self):
+        """THE OVER-DRIVE BUG. Lantern subjects are per-LOCATION because each needs its own measurement
+        box (lights_1/2/3), but they share one phrase — and joining them naively wrote that phrase into
+        the prompt three times, tripling the weight of the most energetic sentence in the scheme. Every
+        canyon prompt said "a live, restless flame that gutters and flares ... pulsing" three times in a
+        row, in a set Lucas rejected twice for moving too fast (2026-08-31, 2026-09-01).
+
+        Name once, measure three times — the boxes are unaffected, which is the point."""
+        spec = {"subjects": [_sub("water", [0, 0, .1, .1], "the water rippling"),
+                             _sub("lights_1", [.2, .2, .3, .3], "a lantern flame"),
+                             _sub("lights_2", [.4, .4, .5, .5], "a lantern flame"),
+                             _sub("lights_3", [.6, .6, .7, .7], "a lantern flame")]}
+        p = render_prompt(spec)
+        self.assertEqual(p.count("a lantern flame"), 1)
+        self.assertEqual(p.count("the water rippling"), 1)
+        self.assertEqual(len(spec["subjects"]), 4)          # de-dup is prose-only; nothing is measured less
+
+    def test_dedup_keeps_the_first_occurrence_and_the_order(self):
+        """Order carries no meaning (stage AO: first/last/absent scored 4.14/4.14/4.13) but a reordering
+        would still be a silent change to every prompt, so it is pinned rather than left to chance."""
+        spec = {"subjects": [_sub("a", [0, 0, .1, .1], "alpha"), _sub("b", [.1, .1, .2, .2], "beta"),
+                             _sub("c", [.2, .2, .3, .3], "alpha"), _sub("d", [.3, .3, .4, .4], "gamma")]}
+        p = render_prompt(spec)
+        self.assertIn("alpha, beta, gamma", p)
+
+    def test_pinned_lines_do_not_produce_a_double_full_stop(self):
+        """A pinned line already ends in a full stop and the stabiliser tail opens with one, which was
+        writing ".." into every prompt that used pins — i.e. most of the canyon."""
+        p = render_prompt({"subjects": [_sub("a", [0, 0, .1, .1])],
+                           "pinned": ["The map is still."]})
+        self.assertNotIn("..", p)
+
     def test_pinned_phrases_are_appended(self):
         p = render_prompt({"subjects": [_sub("a", [0, 0, .1, .1])],
                            "pinned": ["The parchment lies completely flat and still."]})
@@ -109,6 +141,41 @@ class MotionSpecTest(unittest.TestCase):
     def test_still_violation_is_reported_separately(self):
         v = still_violations([_measured("mast", 39.0, still=True)])
         self.assertEqual([x["name"] for x in v], ["mast"])
+
+    # ---- `still` as an ENFORCEABLE pin (egypt/library, 2026-09-02) --------------------------------
+    # The flag used to be measured and reported and nothing else, and two halves of it were unusable:
+    # `validate` demanded a motion phrase for a subject you were trying to FREEZE, and `render_prompt`
+    # then joined that phrase into the positive mover list — so declaring something still was a way of
+    # asking for it to move. Both are fixed; these pin the fix.
+
+    def test_a_still_subject_needs_no_phrase(self):
+        """Demanding one is what made the flag unusable — see the note above."""
+        spec = {"subjects": [_sub("dust", [0, 0, .5, .5]),
+                             {"name": "codex", "box": [.6, .6, .7, .7], "still": True}]}
+        self.assertEqual(validate(spec), [])
+
+    def test_a_still_subjects_phrase_is_a_PIN_not_a_mover(self):
+        """The whole point. A pinned object's sentence must land after the movers, never inside the
+        comma-joined motion list where it reads as another thing to animate."""
+        spec = {"subjects": [_sub("dust", [0, 0, .5, .5], phrase="dust drifting"),
+                             {"name": "codex", "box": [.6, .6, .7, .7], "still": True,
+                              "phrase": "The codex lies dead still."}]}
+        p = render_prompt(spec)
+        self.assertIn("dust drifting", p)
+        self.assertIn("The codex lies dead still.", p)
+        # not in the mover list: the movers are what sits before the first pin/tail sentence
+        movers = p.split("dust drifting")[1].split(".")[0]
+        self.assertNotIn("codex", movers)
+
+    def test_a_still_subject_alone_still_counts_as_having_subjects(self):
+        """A spec of nothing but pins is degenerate but must not crash the validator."""
+        spec = {"subjects": [{"name": "codex", "box": [.6, .6, .7, .7], "still": True}]}
+        self.assertEqual(validate(spec), [])
+
+    def test_a_moving_subject_still_requires_a_phrase(self):
+        """The relaxation is for `still` ONLY — an unphrased mover is still the old silent bug."""
+        spec = {"subjects": [{"name": "dust", "box": [0, 0, .5, .5]}]}
+        self.assertTrue(any("no `phrase`" in e for e in validate(spec)))
 
 
 if __name__ == "__main__":

@@ -4,7 +4,17 @@
  * WHAT THE CODE CARRIES
  *   A short alphanumeric string (e.g. "7QF2-K93X") that encodes, for one
  *   student's run of one scenario:
- *     - a header byte: version (high nibble) + scenario id (low nibble)
+ *     - a HEADER, whose shape depends on the version:
+ *         v1: ONE byte  — version (high nibble) + scenario id (low nibble).  Ids 1..15 only.
+ *         v2: TWO bytes — [version << 4] then a whole byte of scenario id.   Ids 1..255.
+ *       Decoders read `version = byte0 >> 4` first and branch, so v1 codes stay readable forever.
+ *
+ *       WHY v2 EXISTS (2026-09-02). v1 packed the id into four bits, so the id space was 1..15 — and it
+ *       filled. The inventory generator kept issuing 16, 17, 18, 19 with no ceiling, and those ids were
+ *       SILENTLY TRUNCATED to `id & 15`: the code no longer matched its own decoder key, so every
+ *       submission graded "invalid/mismatched code" with points NA. Two BUILT scenarios (wrangling/egypt
+ *       id 17, hierarchical_clustering/temple id 18) were affected. Nobody had submitted yet, so v2 is a
+ *       clean cutover rather than a migration.
  *     - one byte per step/node: chosen answer index (low 5 bits, 0-31)
  *                          + attempts taken (high 3 bits, 0-7; 0 = not attempted)
  *     - a checksum byte over the payload
@@ -87,8 +97,22 @@
    */
   function encode(opts) {
     var version = opts.version & 0x0f;
-    var scenarioId = opts.scenarioId & 0x0f;
-    var payload = [(version << 4) | scenarioId];
+    var scenarioId = opts.scenarioId | 0;
+    var payload;
+    if (version >= 2) {
+      // v2 — a whole byte for the id. Range-check LOUDLY: silent truncation is the exact bug v2 exists
+      // to kill, so refuse rather than mint a code that cannot grade.
+      if (scenarioId < 1 || scenarioId > 255) {
+        throw new RangeError("EscapeCodec: scenarioId " + scenarioId + " out of range 1..255");
+      }
+      payload = [(version << 4), scenarioId];
+    } else {
+      if (scenarioId < 1 || scenarioId > 15) {
+        throw new RangeError("EscapeCodec: scenarioId " + scenarioId +
+                             " does not fit v1's 4-bit field (1..15) — use version 2");
+      }
+      payload = [(version << 4) | scenarioId];
+    }
     opts.steps.forEach(function (s) {
       var ans = s.answer & 0x1f;               // 5 bits
       // 3 bits; 0 = "not attempted" (a hub-and-spoke node the student skipped

@@ -24,7 +24,7 @@ older hotspot-crop clips (288x512 and similar) — see the note at the end.
 | `auto_register.py` | watches render folders and registers new clips as they land; skips renders that failed the frame-0 check |
 | `sync_viewer.py` | rebuilds `cine360_endguide.html` from `cine360_test.html`, keeping its own clip list, so player changes never have to be made twice |
 | `queue_drained.sh` | waits for ComfyUI's queue to be genuinely empty. Chaining on "the previous script exited" is wrong — a script that hits its poll timeout exits while its renders are still queued |
-| `auto_mask.py` | picks the post-processing mask threshold by OBJECT SOLIDITY, not by percentile. Also fills interior holes, which is what lets a high threshold and complete objects coexist |
+| `auto_mask.py` | picks the post-processing mask threshold by OBJECT SOLIDITY, not by percentile. Also fills interior holes, which is what lets a high threshold and complete objects coexist. `drop_small` is the SECOND axis — a region-size cut that removes isolated speckle a percentile can never see (default off) |
 | `paste_tile.py` | composites a repair tile back into a full-frame clip. Pastes the OBJECT (where the tile moved, intersected with `--region`), feathers, and colour-matches first |
 | `colour_normalise.py` | flattens a global colour drift. **NOT a default step** — it can introduce visible brightness pumping; judge by eye, never by the number it optimises |
 

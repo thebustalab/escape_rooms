@@ -12,7 +12,7 @@
 
 import test from "node:test";
 import assert from "node:assert/strict";
-import { trueGroups, assignedGroups, confirmGroups } from "../shared/ledger_rule.js";
+import { trueGroups, assignedGroups, confirmGroups, confirmAll } from "../shared/ledger_rule.js";
 
 // Nine shrines in three families — temple's shape (2 + 3 + 4).
 const ROWS = [
@@ -101,4 +101,51 @@ test("two groups minimum — a single-group ledger degrades to all-or-nothing (d
   const oneGroup = [{ id: "a", answer: "X" }, { id: "b", answer: "X" }];
   assert.equal(confirmGroups(oneGroup, { a: "X", b: "X" }, new Set()).groupCount, 1,
     "authors: >=2 groups, or partial confirmation can never guide the player");
+});
+
+// ---- ALL-OR-NOTHING mode (networks/beacons) -------------------------------------------------------
+// FAILURE MODE UNDER TEST. The group rule is unfishable only when groups have SEVERAL members. A ledger
+// whose rows each hold a different answer degenerates to one-member groups, so a single correct dropdown
+// locks its own row and the widget leaks the answer a row at a time. Beacons is that shape (four fire
+// slots, four different watchtowers) AND has unlimited attempts, so the leak is fatal: ~36 submits solve
+// it with no survey done. These tests pin the flag that closes it.
+
+const FIRES = [
+  { id: "f_south", label: "the southern fire", answer: "t3" },
+  { id: "f_mid", label: "the middle fire", answer: "t5" },
+  { id: "f_north", label: "the northern fire", answer: "t6" },
+  { id: "f_far", label: "the far fire", answer: "t7" },
+];
+const FIRES_RIGHT = Object.fromEntries(FIRES.map(r => [r.id, r.answer]));
+
+test("all-or-nothing: a fully correct ledger completes", () => {
+  const r = confirmAll(FIRES, FIRES_RIGHT);
+  assert.equal(r.complete, true);
+});
+
+test("THE POINT: three of four right confirms and locks NOTHING", () => {
+  const near = { ...FIRES_RIGHT, f_far: "t0" };
+  const r = confirmAll(FIRES, near);
+  assert.equal(r.complete, false);
+  assert.equal(r.newly.length, 0, "must not report which rows landed");
+  assert.equal(r.locked.size, 0, "must not lock a correct row");
+});
+
+test("all-or-nothing closes the row-at-a-time leak that confirmGroups has here", () => {
+  const oneRight = { f_south: "t3" };                     // probe a single dropdown
+  assert.equal(confirmGroups(FIRES, oneRight, new Set()).newly.length, 1,
+               "baseline: the group rule DOES leak on one-member groups");
+  assert.equal(confirmAll(FIRES, oneRight).newly.length, 0,
+               "all-or-nothing must not");
+});
+
+test("all-or-nothing: an unassigned row is never complete", () => {
+  const { f_far, ...rest } = FIRES_RIGHT;
+  assert.equal(confirmAll(FIRES, rest).complete, false);
+});
+
+test("all-or-nothing returns the same shape as confirmGroups", () => {
+  const r = confirmAll(FIRES, FIRES_RIGHT);
+  assert.deepEqual(Object.keys(r).sort(), ["complete", "groupCount", "locked", "newly"]);
+  assert.equal(r.groupCount, 4);
 });

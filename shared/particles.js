@@ -10,11 +10,14 @@
 // The supported values. Anything NOT in this set falls through to "fireflies" at render time — that is
 // deliberate (an unknown value still shows something rather than nothing), but it means a typo is silent,
 // which is why the harness authors this through a dropdown rather than free text.
-export const AMBIENT_KINDS = ["fireflies", "snow", "embers", "leaves", "dust", "rays", "none"];
+export const AMBIENT_KINDS = ["fireflies", "snow", "embers", "leaves", "dust", "rain", "rays", "none"];
 
 // Density is per-KIND, not one number, because the kinds are not the same size or shape:
 //   - dust  — the finest motes in the set; needs the most or it doesn't read as a haze at all
 //   - snow  — larger flakes, wants a real fall of them
+//   - rain  — thin fast streaks; a heavy field (just under dust) or it reads as drizzle. NOT denser
+//             than dust: a streak is 10-24px long and plainly visible on its own, where a dust
+//             mote is 1.5-4px and only reads in a crowd. Fineness sets the density, not speed.
 //   - rays  — long blurred bars, not points; a handful reads as light, a crowd reads as a curtain
 //   - rest  — drifting points (fireflies / embers / leaves)
 // `big` = the full-height screens (landing + submission); false = the smaller interstitial card.
@@ -22,6 +25,7 @@ export const AMBIENT_KINDS = ["fireflies", "snow", "embers", "leaves", "dust", "
 export function particleCount(kind, big) {
   if (kind === "snow") return big ? 40 : 32;
   if (kind === "dust") return big ? 46 : 34;
+  if (kind === "rain") return big ? 44 : 33;
   if (kind === "rays") return big ? 7 : 5;
   return big ? 18 : 14;
 }

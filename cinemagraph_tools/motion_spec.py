@@ -57,6 +57,14 @@ from PIL import Image
 
 DEAD_P95 = 4.5
 WEAK_P95 = 8.0
+# ...and a CEILING. The scale above had a floor and no top, so an over-driven subject read as excellent:
+# j_c7's `upslot_daylight` measured 47.53 — the highest number in the canyon set — and Lucas's verdict was
+# "too intense, clouds dominate with really fast motion, looks odd, full re-render I think" (2026-08-31).
+# Calibration is THIN and deliberately loose: braided_pool at 33.90 he called "not bad", undercroft's haze
+# at 38.98 was part of the scene he rejected, and 47.53 was plainly wrong. So the bar sits between them
+# and is REPORT-ONLY — it never triggers an action, because "too much motion" is a judgement about what
+# the thing IS (a slot-canyon sky should be near-still; a waterfall should not) and no threshold knows that.
+HOT_P95 = 35.0
 
 # The stabiliser. Unchanged from the validated night/day runs; the last sentence is THE demonstrated
 # prompt rule — a two-ended loop forbids net travel, because both ends are pinned to the same still.
@@ -90,7 +98,11 @@ def validate(spec):
         elif nm in seen:
             errs.append("duplicate subject name %r" % nm)
         seen.add(nm)
-        if not s.get("phrase"):
+        # A `still` subject is a thing declared NOT to move. It needs no motion phrase, and demanding one
+        # is how the flag stayed unusable: the only way to satisfy this check was to write a movement
+        # sentence for the very object you were trying to freeze, and `render_prompt` then joined it into
+        # the positive mover list. Its phrase, if given, is a PIN and is rendered as one.
+        if not s.get("phrase") and not s.get("still"):
             errs.append("%s: no `phrase` — it would be measured but never named in the prompt" % nm)
         b = s.get("box")
         if not (isinstance(b, (list, tuple)) and len(b) == 4):
@@ -108,12 +120,34 @@ def render_prompt(spec):
 
     Subject order is preserved but carries no meaning: stage AO tested naming an object first, last and
     not at all and got 4.14 / 4.14 / 4.13 — order is NOT a lever and must not be encoded as one."""
-    phrases = [s["phrase"] for s in (spec.get("subjects") or []) if s.get("phrase")]
+    # DE-DUPLICATED, first occurrence wins. Subjects are per-LOCATION because each needs its own box to
+    # be measured — a room with three lanterns carries lights_1/2/3 — but they share one phrase, and
+    # joining them naively wrote that phrase into the prompt three times. That is not a neutral repeat:
+    # it triples the weight of whatever it says, and j_c7's prompt therefore said "a live, restless flame
+    # that gutters and flares, their pools of amber light pulsing" three times in a row, in a clip Lucas
+    # rejected twice for being over-driven ("everything is moving too fast", 2026-09-01). Naming a thing
+    # once and measuring it in three boxes is the behaviour that was always intended.
+    seen, phrases, still_pins = set(), [], []
+    for s in (spec.get("subjects") or []):
+        ph = (s.get("phrase") or "").strip()
+        if not ph:
+            continue
+        # A `still` subject's phrase is a PIN, not a mover. Joining it into the positive list would ask
+        # the model to animate the exact object the flag exists to freeze.
+        if s.get("still"):
+            if ph not in still_pins:
+                still_pins.append(ph)
+            continue
+        if ph not in seen:
+            seen.add(ph)
+            phrases.append(ph)
     rigid = spec.get("rigid") or DEFAULT_RIGID
-    pinned = spec.get("pinned") or []          # things that must explicitly NOT move (documents, dials)
+    pinned = list(spec.get("pinned") or []) + still_pins   # things that must explicitly NOT move
     body = ", ".join(phrases)
     if pinned:
-        body += ". " + " ".join(pinned)
+        # rstrip the join: a pinned line already ends in a full stop and the tail opens with one, which
+        # was writing ".." into every prompt that used them.
+        body = (body + ". " + " ".join(pinned)).rstrip(". ")
     return STABILISER_HEAD + body + STABILISER_TAIL.format(rigid=rigid)
 
 
@@ -159,14 +193,29 @@ def measure_subjects(mp4, spec, frames=None):
             "luma": round(float(rl.mean()), 1),
             "verdict": "dead" if p95 < DEAD_P95 else ("weak" if p95 < WEAK_P95 else "alive"),
             "expect_still": bool(s.get("still")),
+            "force": bool(s.get("force_repair")),
+            "hot": bool(p95 >= HOT_P95),
         })
     return out
 
 
 def repair_list(measured):
     """Subjects the pipeline should tile-repair: named, boxed, and measured dead. A subject marked
-    `still` is excluded — it is a check that something did NOT move, not a target."""
-    return [m for m in measured if m["verdict"] == "dead" and not m["expect_still"]]
+    `still` is excluded — it is a check that something did NOT move, not a target.
+
+    `force_repair` on a subject adds it regardless of verdict. WEAK is deliberately not auto-repaired
+    (a modest real motion should reach a human, not get silently re-rolled), but a human who has LOOKED
+    and judged it too quiet needs a way to say so — Lucas on the canyon skies and lanterns, 2026-08-31.
+    Setting it in the authored spec keeps that judgement with the room instead of in a shell history."""
+    return [m for m in measured
+            if (m["verdict"] == "dead" or m.get("force")) and not m["expect_still"]]
+
+
+def hot_list(measured):
+    """Subjects moving hard enough to be worth a human look. Not a failure and not auto-actioned — see
+    HOT_P95. A high number means the region changed a lot, which is equally consistent with lively water
+    and with the scene coming apart, and only a person can tell those two apart."""
+    return [m for m in measured if m.get("hot")]
 
 
 def still_violations(measured):

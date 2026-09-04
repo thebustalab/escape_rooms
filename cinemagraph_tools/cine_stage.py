@@ -112,6 +112,11 @@ def run(spec, src_png, out_mp4, repair=True, dry_run=False, reuse=False, log=pri
     dead = MS.repair_list(measured)
     result = {"gate": g, "subjects": measured, "repaired": [], "status": "ok"}
 
+    for h in MS.hot_list(measured):
+        # Report-only. The scale used to have no ceiling, so "too intense" was invisible to it.
+        log("  ! %s is very hot (p95 %.2f) — look at it; over-driven and lively measure the same"
+            % (h["name"], h["p95"]))
+
     for v in MS.still_violations(measured):
         # Temporal variation cannot tell motion from illumination; the landmark test is the arbiter.
         log("  ? %s declared still but varies (p95 %.2f); landmark drift is %d px"

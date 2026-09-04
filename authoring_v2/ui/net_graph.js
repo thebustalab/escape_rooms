@@ -14,20 +14,47 @@
 
   function layoutRooms(rooms) {
     const byKey = {}; rooms.forEach(r => byKey[r.key] = r);
-    const fwd = k => (byKey[k].doors || []).filter(d => d.direction !== "back" && d.to && byKey[d.to]).map(d => d.to);
-    const incF = {}; rooms.forEach(r => fwd(r.key).forEach(t => incF[t] = (incF[t] || 0) + 1));
-    const rank = {}; rooms.forEach(r => rank[r.key] = 0);
-    for (let pass = 0; pass < rooms.length; pass++) {            // longest-path rank by relaxation (deterministic)
+    // Rank on DIRECTED edges only. An `open` door is a bidirectional passage, so counting it as a
+    // forward edge makes every open pair a 2-cycle — and the longest-path relaxation below then keeps
+    // pushing ranks up until it hits the pass cap. That is how heist reached rank 20 and beacons rank
+    // 34 with nothing at rank 0, leaving thousands of px of dead space to the LEFT of the first room
+    // (2026-09-03). Open-world scenarios have no forward doors at all, so they fall back to BFS depth.
+    const dir = k => (byKey[k].doors || []).filter(d => (d.direction || "forward") === "forward" && d.to && byKey[d.to]).map(d => d.to);
+    const undir = k => (byKey[k].doors || []).filter(d => d.to && byKey[d.to]).map(d => d.to);
+    // Layer by BFS depth from the entry room over the UNDIRECTED door graph — that is what gives an
+    // open world a left-to-right reading ("how far from the start") instead of collapsing every room
+    // into one very tall column. Then relax the genuinely DIRECTED (forward) edges on top, so a
+    // forward door always steps its target at least one column right.
+    // LEGACY scenarios (alaska, trees) predate `to` on doors — the engine advanced linearly, so the
+    // door graph has no edges at all and BFS would leave every room at depth 0, stacking them into one
+    // very tall column. Fall back to scenario.json order, which IS the linear route (2026-09-03).
+    const anyTo = rooms.some(r => (r.doors || []).some(d => d.to));
+    const rank = {};
+    if (!anyTo) { rooms.forEach((r, i) => rank[r.key] = i); }
+    else if (rooms.length) {
+      const seen = { [rooms[0].key]: 0 }; let frontier = [rooms[0].key];
+      while (frontier.length) {
+        const next = [];
+        frontier.forEach(k => undir(k).forEach(t => { if (!(t in seen)) { seen[t] = seen[k] + 1; next.push(t); } }));
+        frontier = next;
+      }
+      rooms.forEach(r => rank[r.key] = seen[r.key] == null ? 0 : seen[r.key]);
+    }
+    for (let pass = 0; pass < rooms.length; pass++) {            // deterministic; forward edges win ties
       let changed = false;
-      rooms.forEach(r => fwd(r.key).forEach(t => { if (rank[t] < rank[r.key] + 1) { rank[t] = rank[r.key] + 1; changed = true; } }));
+      rooms.forEach(r => dir(r.key).forEach(t => { if (rank[t] < rank[r.key] + 1) { rank[t] = rank[r.key] + 1; changed = true; } }));
       if (!changed) break;
     }
+    // Rebase so the leftmost column is 0. Without this the graph is drawn far to the right of the
+    // viewBox origin and the panel opens on empty space.
+    const minRank = Math.min(...rooms.map(r => rank[r.key]));
+    rooms.forEach(r => rank[r.key] -= minRank);
     const cols = {}; rooms.forEach(r => (cols[rank[r.key]] = cols[rank[r.key]] || []).push(r.key));
     const ranks = Object.keys(cols).map(Number).sort((a, b) => a - b);
     const row = {};
     ranks.forEach(rk => {
       const list = cols[rk];
-      const bary = k => { const ps = rooms.filter(r => fwd(r.key).includes(k)); return ps.length ? ps.reduce((s, p) => s + (row[p.key] || 0), 0) / ps.length : list.indexOf(k); };
+      const bary = k => { const ps = rooms.filter(r => dir(r.key).includes(k) || undir(r.key).includes(k)); return ps.length ? ps.reduce((s, p) => s + (row[p.key] || 0), 0) / ps.length : list.indexOf(k); };
       list.sort((a, b) => bary(a) - bary(b)).forEach((k, i) => row[k] = i);
     });
     return { rank, row, cols, ranks };

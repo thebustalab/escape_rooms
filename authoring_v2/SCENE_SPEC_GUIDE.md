@@ -58,10 +58,39 @@ network and a description of vibes, Claude drafts **one spec per room** followin
    is standing on top of the only one"). Reinforce it locally in whichever element keeps growing the thing
    (here the harbour sweep: "the harbour is low and flat, no tower standing anywhere in it"). Generalises to
    any *interior-of-a-landmark* scene — inside the airship, atop the henge, within the vault.
+0a. **Every claim about the SAME REGION must agree** (2026-08-07, the Pharos summit). Two elements each
+   described what lay below the tower — one said moored ships lay "directly below on the near stone quay",
+   the other wanted an island in open water — and the model resolved the contradiction by painting the
+   tower attached to the wharf, the opposite of the design. It does not arbitrate between conflicting
+   statements about one part of the frame; it blends them. Before generating, read the `elements` as a set
+   and check the ground, water, sky and horizon are each described **once, consistently**. A leftover
+   phrase from an earlier fix is the usual source.
+0b. **State what is NOT there, in `negatives`.** A positive description alone will not suppress something
+   the model's prior wants to draw. The tower reads as island-bound only once `negatives` explicitly bars
+   "a causeway, bridge, mole, jetty or any buildings at its foot", and the phantom second lighthouse goes
+   away only once "no tower or beacon anywhere in the view" is stated. Whenever you are relying on the
+   *absence* of something — a connection, a second copy of a landmark, people, lettering — name that
+   absence rather than hoping the positive description implies it.
+0c. **Clause ORDER decides what a subject attaches to.** gpt-image binds a subject to whatever was named
+   just before it, so "open water, with the ship at the quay" tends to put the ship in the open water,
+   while "the stone quay, with the ship moored alongside it" holds her at the quay. **Name the anchor
+   first, then the subject, then the open space** — never the other way round. This is the same failure
+   as 0a from the other side: 0a is two elements disagreeing about one region, 0c is one sentence
+   attaching a subject to the wrong half of itself.
 1. **Left-to-right sweep.** Order `elements` as they appear sweeping around the panorama. Each `at` is a
-   spatial phrase — `on the far left · to the left · to the left of centre · dead ahead in the centre ·
-   just right of centre · to the centre-right · to the right · on the far right`. These drive BOTH the
+   spatial phrase. **There are exactly SEVEN positions and seven phrases — one name each:**
+   `on the far left (0.08) · to the left (0.20) · just left of centre (0.36) · dead ahead in the centre
+   (0.50) · just right of centre (0.64) · to the right (0.80) · on the far right (0.92)`. These drive BOTH the
    prose order AND the approximate hotspot x-position, so spread them across the whole ring.
+   **Seven is the real ceiling, so plan the ring around what actually needs a BOX.** The default approx
+   box is 0.16 wide while adjacent positions sit 0.12–0.16 apart, so neighbouring boxes already abut —
+   an eighth position would not separate anything. This list used to name eight phrases for these seven
+   places ("to the centre-right" was a second name for 0.64, and there was no name for 0.36's left-hand
+   twin), which reads as an extra slot that does not exist and lands two elements on one x. Only elements
+   that need a box — a gameplay hotspot, or an `animate` motion subject — genuinely conflict; backdrop
+   and scenery may share a position freely, and `validate_scenes` only warns when both sides need a box.
+   A room wanting more than seven distinct places is usually one where a global architectural fact (side
+   arches, a gallery running right round) belongs in `setting` rather than in an element of its own.
 2. **Every room needs its door(s).** Add a `door` element per the network — `door:{direction:"forward"|
    "back"|"open", to:"<roomKey>"}`. The forward door gates on the room's puzzle; a gateless "reading" room
    uses a `back` door (engine mechanic — see `AGENTS.md`). **Multi-view door:** a single door that looks out
@@ -73,12 +102,50 @@ network and a description of vibes, Claude drafts **one spec per room** followin
    boarded through its own sliding door" — NOT "a boarding door, with a car waiting beyond it": the latter
    makes the model render the door and the vehicle as two separate objects (trees stations, 2026-08). One
    object: the vehicle, boarded through its own door.
-3. **Animatable objects — declare them up front, framed to move.** Flag `animate:{motion, loop}`. Frame the
+3. **Animatable objects — declare them up front, framed to move.** Flag `animate:{motion, loop}`.
+   **⚠️ `animate` NO LONGER CREATES A HOTSPOT (2026-09-02).** Motion is now baked over the WHOLE panorama,
+   per (room, world-state), by `cinemagraph_tools/cine_scenario.py` from an authored `authoring.motionSpec`
+   — not as a per-object box clip. So `animate` is now purely the SOURCE TEXT for that motion spec: keep
+   declaring what moves and how, but expect no `ambient` carrier and no queued job per object. The two
+   carriers that DO still exist are the full-scene variant carrier (box `[0,0,1,1]`, created by the
+   harness) and an `animate` element that also declares `variants` — that one keeps its carrier because a
+   BOXED state variant needs somewhere to hang.
+   Everything below about framing an object to move still applies: it is what the motion spec is written
+   from, and a thing framed so it cannot move still will not move. Frame the
    object so it CAN move: "a lantern **on a chain**" (not fixed to a post), "steam **venting**", "a flag",
    "bubbling liquid", "drifting embers". Name ONE physical motion + a pace. Prefer **movement over
    brightness** — "twinkling lights" barely moves; give it a carrier ("steam drifting past the indicator
    lights"). Good animatables: flame/fire, steam/smoke, water/liquid surface, bubbling vessels, hanging
    lantern/chains swaying, sail/flag, gauge needles, drifting cloud, embers, dust motes, turning dial/gears.
+3a. **ANGULAR SIZE decides whether a subject can animate — not what kind of thing it is** (2026-09-02,
+   measured across `networks/beacons`' 25 cinemagraph states). The "good animatables" list above is
+   necessary and *not* sufficient: the same subject lives or dies on how big it is in frame.
+   The measurements, all from one scenario and one pipeline:
+   - Village lamps scored **20.6 at Fenwatch and 22.1 at the Ladder (alive)** where they are near and large,
+     and **2.0–3.6 (DEAD)** at the Spindle, Ram's Head, Hood, Shears, Kiln and the Crown's payoff frame,
+     where they are distant points. Repair did not rescue a single one.
+   - Smoke: the Anvil's **fat near column, 14.4 alive**; Fenwatch's **thin far column, 2.4 dead**, still
+     dead after repair.
+   - What worked everywhere was big and soft: spindrift off a rock face (9–21), a braided river's channels
+     glinting (10–17), a hearth (8.5), a summit brazier (22.8).
+   **The rule:** a motion subject must occupy a substantial, contiguous, soft-edged region of the frame and
+   move as a continuous body. **Point-like, high-frequency, far-away detail cannot be animated by this
+   pipeline** — grass, foliage texture, animals, distant windows and lamps, thin distant smoke, crowds.
+   Declaring them costs a generation and a repair cycle and returns DEAD.
+   **If a scene's only life is far away, that is a FRAMING problem, not a motion-spec problem.** Fix it by
+   moving a large carrier into the near or middle field — the room's own fire lit, a lantern on the parapet,
+   cloud crossing in front of the viewer, water close enough to read — rather than by asking harder for the
+   distant thing to twinkle.
+3b. **Give each room a DIFFERENT hero motion.** One dominant, room-specific movement, chosen so no two
+   neighbours share it. Beacons authored the same two subjects — spindrift off a crag, river glint below —
+   into all eight ridge rooms; every one of them measured alive, and the scenario still read as static,
+   because identical motion everywhere is indistinguishable from a still world with a screensaver on it.
+   Motion is a differentiation channel; spend it (see *Cross-room differentiation*).
+   **A clear sky is a motion budget spent on nothing.** If the world's palette rules out overcast, the sky
+   can still carry the room: banner cloud streaming off a summit, stacked lenticulars, a cloud inversion
+   filling the valley *below* the viewer with peaks standing out of it. All are hard-sun, deep-blue-sky
+   phenomena, all are enormous and soft-edged, and all satisfy 3a.
+
 4. **Loop mode.** `boomerang` = oscillating (flame, water, flag, sway, needles). `crossfade` = directional /
    rising / one-way (steam, smoke, rising bubbles, embers, drifting cloud, a turning dial or gears).
 5a. **DEFAULT SEAM RECIPE — generate normally, then PLANT AN OCCLUDER as a second pass (2026-08-26, Lucas).**
@@ -140,11 +207,21 @@ network and a description of vibes, Claude drafts **one spec per room** followin
    prompt into `authoring.scenePrompt`.
 2. Per room (HUMAN, art is the expensive step): Generate art from the rendered prompt → pick a candidate →
    commit. (Continuity: use the world plate / room-reference for rooms that must match a seen landmark.)
+2a. **SEAM STAGE — `seam_stage.py` (screen → blur → occlude → accept).** Required, and required HERE:
+   variants, cinemagraphs and door-opens are all baked FROM `scene.png`, so a seam repaired afterwards
+   does not repair them. Blur before occluder, never after. Nothing is done until a human accepts; the
+   verdict is recorded on the room and `run_all_tests.py` gates on it. See `authoring_v2/AGENTS.md`.
+2b. **DRAFT THE BOXES — `place_hotspots.py` (gpt-4o localizer).** Grid-on-image + the generation prompt
+   for left-to-right ordering; refuses to write a run whose predictions collapse. Produces
+   `boxSource: draft:localizer`, which step 4 then corrects.
 3. `POST /api/apply-spec-all {chapter, scenario}` — materialises approximate hotspots + queues every animated
    element's cinemagraph **and every door open-view** (as a state-tagged door-open variant) across the scenario.
 4. Per room (HUMAN box-review — the deliberate human step): nudge/resize the rough boxes in the hub flat
    editor; draw wrap boxes for any seam object.
-5. Run the batch → each cinemagraph renders **5 candidates**; pick the liveliest per hotspot.
+5. Bake the motion: `cinemagraph_tools/cine_scenario.py` walks every (room, world-state) and renders the
+   WHOLE panorama from that state's `motionSpec` — including the night variants, which carry their own
+   motion. (The old per-hotspot 5-candidate box batch is retired; `wrangling/egypt` was the first scenario
+   with zero box clips, and `networks/beacons` was authored this way from the start.)
 
 ## Worked example
 `authoring_v2/scene_specs/airship_boss.json` — the airship engine room, built from its real prompt + ambient
@@ -175,3 +252,43 @@ the chroma range works; draining everything else just makes a grey scenario.
 ruined, no rubble" clause contradicts a room that is *supposed* to be four centuries untouched, and a
 contradictory prompt gets you neither. temple's sealed cell and service crawl carry their own condition
 sentence and inherit only the palette.
+
+## Cross-room differentiation — author the specs as a SET (2026-09-02, beacons)
+
+The world-plate section above is about what every room should **share**. This is its counterweight, and it
+is the failure the plate makes easy: **inheritance is for palette, light, condition and materials — never
+for landform, outlook, foreground or motion.**
+
+**What went wrong in `networks/beacons`.** Eight of the nine ridge posts were authored from one template.
+Identical `setting` sentence, word for word. Identical `seam`, identical `seamOccluder`, identical approach
+path ("arriving along the bare ridge crest from the south"), identical spyglass, identical cold fire
+basket. The one large element — the view down into the valley — was the same sentence in all of them,
+differing only in a **count of distant villages**: three, four, nine, a dozen. At render scale that is
+invisible. The player walks eight rooms that look like one room and cannot tell where they are.
+
+**The cover test.** Cover the small named object that gives each room its name. If two rooms are now
+indistinguishable, they are the same room, and the name is doing work the art should be doing.
+
+**Differentiate on the BIG things**, in roughly this order of visual weight: the landform the viewer stands
+on · what the ground does at their feet · what fills the middle distance · where the light comes from and
+which way the shadows fall · the hero motion (3b). A named crag off to one side is a label, not a place.
+
+**Never differentiate rooms by a countable quantity of small distant objects.** It fails twice over: it is
+unreadable at render scale, and where it *is* readable it leaks whatever data the count encodes.
+
+**For a "survey of places" scenario — where the rooms genuinely ARE different locations — decide the whole
+set of landforms FIRST, before any spec is written**, and check for repeats across the set. Writing specs
+one room at a time makes the template the path of least resistance every single time.
+
+**Check the approach direction against the map.** If the scenario has real coordinates, the path into each
+room should arrive from the bearing the player actually travelled. Beacons said "from the south" in every
+room; only three of its nine legs were southerly, and the legs ranged from under 4 km to 15 km with one
+1,490 m ascent. Approach direction and leg character are free differentiation that the topology has
+already decided for you. (`escape_room_scene_validator` checks passage *pairing*; bearing is on the
+spec-author.)
+
+**Art fidelity is not a puzzle-leak vector, and treating it as one is expensive** (Lucas, 2026-09-02).
+Beacons deliberately flattened its views so no player could read the coverage answer off a painting. That
+threat was never real — it needs a level of attention and of rendered fidelity that does not exist — and
+defending against it consumed the scenario's entire differentiation budget. **Puzzle data is protected by
+where it is wired, not by making the art vague.**

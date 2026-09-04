@@ -81,10 +81,27 @@ bitxor_byte <- function(a, b) bitwXor(as.integer(a), as.integer(b))
 # ---- encode (for testing / answer keys) ----
 
 # Arg order mirrors codec.js encode(): version first, then scenario_id.
+# HEADER SHAPE, BY VERSION (v2 added 2026-09-02)
+#   v1: ONE byte  — version in the high nibble, scenario id in the low nibble. Ids 1..15 ONLY.
+#   v2: TWO bytes — [version << 4], then a whole byte of scenario id. Ids 1..255.
+# Decoders read version = header >> 4 first, then branch, so v1 codes stay readable.
+#
+# WHY v2 EXISTS. v1's 4-bit id field filled up, and the inventory generator kept issuing 16, 17, 18, 19
+# with no ceiling. Those ids were SILENTLY TRUNCATED to id & 15, so a code never matched its own key and
+# every submission graded "invalid/mismatched code", points NA — including two BUILT scenarios
+# (wrangling/egypt id 17, hierarchical_clustering/temple id 18). No student had submitted, so v2 is a
+# clean cutover. Anything minting a code should pass version = 2.
 encode_code <- function(version, scenario_id, steps, student_id, secret = SECRET) {
   # steps: list of list(answer=, attempts=)
-  header <- bitwOr(bitwShiftL(bitwAnd(version, 15L), 4L), bitwAnd(scenario_id, 15L))
-  payload <- header
+  if (version >= 2L) {
+    if (scenario_id < 1L || scenario_id > 255L)
+      stop(sprintf("scenario_id %d out of range 1..255", scenario_id))
+    payload <- c(bitwShiftL(bitwAnd(version, 15L), 4L), bitwAnd(scenario_id, 255L))
+  } else {
+    if (scenario_id < 1L || scenario_id > 15L)
+      stop(sprintf("scenario_id %d does not fit v1's 4-bit field (1..15) - use version 2", scenario_id))
+    payload <- bitwOr(bitwShiftL(bitwAnd(version, 15L), 4L), bitwAnd(scenario_id, 15L))
+  }
   for (s in steps) {
     ans <- bitwAnd(as.integer(s$answer), 31L)
     # 0 = "not attempted" (a skipped hub-and-spoke node under an N-of-M gate);
@@ -112,8 +129,13 @@ decode_code <- function(code, student_id, secret = SECRET) {
   ok <- (hash_bytes(payload) %% 256) == chk
   header <- payload[1]
   version <- bitwShiftR(header, 4L)
-  scenario_id <- bitwAnd(header, 15L)
-  step_bytes <- payload[-1]
+  if (version >= 2L) {                 # v2: the id owns a whole second byte
+    scenario_id <- payload[2]
+    step_bytes <- payload[-(1:2)]
+  } else {                             # v1: id in the header's low nibble
+    scenario_id <- bitwAnd(header, 15L)
+    step_bytes <- payload[-1]
+  }
   answers  <- sapply(step_bytes, function(b) bitwAnd(b, 31L))
   attempts <- sapply(step_bytes, function(b) bitwShiftR(b, 5L))
   list(valid = ok, version = version, scenario_id = scenario_id,
@@ -397,6 +419,23 @@ HIERARCHICAL_CLUSTERING_TEMPLE_KEY <- list(
   }
 )
 
+# hierarchical_clustering / canyon (scenario id 14): "The Confluence", the temple's pre/post partner.
+# Four GRADED MCQ rooms in room order — j_c1 (3), j_c2 (2), j_c4 (1), j_c7 (0, the boss). The plain
+# junctions j_c3/j_c5/j_c6 carry a benchmark clue and a fork but no puzzle, and `works` is the ungraded
+# escape objective, so none of those four rooms takes a codec slot. Indices deliberately descend 3,2,1,0
+# rather than repeating a slot. Added 2026-09-01 at wiring.
+HIERARCHICAL_CLUSTERING_CANYON_KEY <- list(
+  scenario_id = 14,
+  correct = c(3, 2, 1, 0),
+  score_step = function(correct, answer, attempts) {
+    if (answer != correct) return(0)
+    if (attempts <= 1) return(10)
+    if (attempts == 2) return(7)
+    if (attempts == 3) return(4)
+    return(2)
+  }
+)
+
 WRANGLING_EGYPT_KEY <- list(
   scenario_id = 17,
   correct = c(1, 1, 3, 2),
@@ -607,5 +646,23 @@ if (identical(environment(), globalenv()) && sys.nframe() == 0) {
   cat("Pano spa grade — points:", sg12$points, "|", sg12$detail, "\n")
   if (!isTRUE(sg12$valid && sg12$points == 40)) {
     stop("REGRESSION: pano spa grade wrong — expected 40 pts for an all-first-try solve")
+  }
+
+  # Regression: pano scenario id 14 (hierarchical_clustering/canyon) — 4 graded MCQ rooms, correct
+  # indices c(3, 2, 1, 0). A full-marks solve answers each room's correct option on the first try.
+  csteps14 <- list(list(answer = 3, attempts = 1),
+                   list(answer = 2, attempts = 1),
+                   list(answer = 1, attempts = 1),
+                   list(answer = 0, attempts = 1))
+  ccode14 <- encode_code(version = 1, scenario_id = 14, steps = csteps14, student_id = "canyon_test")
+  cd14 <- decode_code(ccode14, "canyon_test")
+  cok14 <- cd14$valid && cd14$scenario_id == 14 &&
+    identical(cd14$answers, c(3L, 2L, 1L, 0L)) && identical(cd14$attempts, c(1L, 1L, 1L, 1L))
+  cat("Pano round-trip OK id 14 (should be TRUE):", cok14, "\n")
+  if (!cok14) stop("REGRESSION: pano round-trip failed (id 14 canyon)")
+  cg14 <- grade_one(ccode14, "canyon_test", HIERARCHICAL_CLUSTERING_CANYON_KEY)
+  cat("Pano canyon grade — points:", cg14$points, "|", cg14$detail, "\n")
+  if (!isTRUE(cg14$valid && cg14$points == 40)) {
+    stop("REGRESSION: pano canyon grade wrong — expected 40 pts for an all-first-try solve")
   }
 }

@@ -125,7 +125,147 @@
           "continuity": []
         },
         "hotspotsReviewed": true,
-        "cinemagraphsVerified": true
+        "cinemagraphsVerified": true,
+        "motionSpec": {
+          "rigid": "The hull, deck planking, mast, yard, rails, crates, amphorae, ladder and all cargo",
+          "has_document": true,
+          "pinned": [
+            "The written tablet and the open ledger on the deck table lie flat and still; their ruled lines and lettering do not move, lift, curl or change."
+          ],
+          "negatives": [
+            ", rising water, waves breaking over the deck, the ship sailing away, sails unfurling, fast moving clouds, time-lapse sky"
+          ],
+          "subjects": [
+            {
+              "name": "dawn_sky",
+              "box": [
+                0.0,
+                0.0,
+                1.0,
+                0.3
+              ],
+              "phrase": "the pale dawn sky above the harbour, its colour breathing almost imperceptibly from cool to warm and back"
+            },
+            {
+              "name": "harbour_water",
+              "box": [
+                0.0,
+                0.42,
+                0.34,
+                0.62
+              ],
+              "phrase": "the flat dawn harbour lying almost glassy, only the faintest slow swell moving across it and the light sliding on its skin"
+            },
+            {
+              "name": "pharos_flame",
+              "box": [
+                0.258,
+                0.1959,
+                0.2999,
+                0.3676
+              ],
+              "force_repair": true,
+              "phrase": "the signal fire burning at the head of the distant Pharos, a small hot point of gold flame guttering and flaring against the dawn"
+            },
+            {
+              "name": "furled_sail",
+              "box": [
+                0.34,
+                0.09,
+                0.63,
+                0.23
+              ],
+              "phrase": "the great furled sail lashed along its yard, its loose canvas edges stirring very slightly in the morning air"
+            },
+            {
+              "name": "deck_lamp",
+              "box": [
+                0.63,
+                0.8,
+                0.69,
+                0.93
+              ],
+              "phrase": "the lamp burning down in the open deck hatch, its flame small and live, the warm light wavering on the timbers around it"
+            }
+          ],
+          "room": "deck",
+          "state": "base",
+          "states": {
+            "night": {
+              "rigid": "The hull, deck planking, mast, yard, rails, crates, amphorae, ladder and all cargo",
+              "pinned": [
+                "The written tablet and the open ledger on the deck table lie flat and still; their ruled lines and lettering do not move, lift, curl or change."
+              ],
+              "negatives": [
+                ", rising water, waves breaking over the deck, the ship sailing away, sails unfurling, fast moving clouds, time-lapse sky"
+              ],
+              "has_document": true,
+              "subjects": [
+                {
+                  "name": "pharos_flame",
+                  "box": [
+                    0.272,
+                    0.17,
+                    0.318,
+                    0.29
+                  ],
+                  "force_repair": true,
+                  "phrase": "the signal fire burning at the head of the distant Pharos, a hot gold flame leaping and guttering against the black sky"
+                },
+                {
+                  "name": "flame_track",
+                  "box": [
+                    0.27,
+                    0.48,
+                    0.32,
+                    0.6
+                  ],
+                  "phrase": "the broken gold reflection of that fire lying on the dark harbour below it, shattering and re-forming as the water moves"
+                },
+                {
+                  "name": "moon_track",
+                  "box": [
+                    0.05,
+                    0.46,
+                    0.11,
+                    0.86
+                  ],
+                  "phrase": "the long silver track the moon lays across the water, breaking and closing again"
+                },
+                {
+                  "name": "deck_lamp",
+                  "box": [
+                    0.648,
+                    0.8,
+                    0.695,
+                    0.95
+                  ],
+                  "phrase": "the lamp burning in the open deck hatch, its flame live behind the horn, its warm light breathing over the timbers"
+                },
+                {
+                  "name": "city_lights",
+                  "box": [
+                    0.62,
+                    0.26,
+                    0.99,
+                    0.62
+                  ],
+                  "phrase": "the lit windows and quay lamps of the city along the shore, each small light breathing and steadying, their reflections trembling on the water beneath"
+                },
+                {
+                  "name": "night_sea",
+                  "box": [
+                    0.0,
+                    0.46,
+                    0.36,
+                    0.76
+                  ],
+                  "phrase": "the dark harbour lying almost still, only a slow swell moving under the reflections"
+                }
+              ]
+            }
+          }
+        }
       },
       "unlockedWhen": true,
       "designNote": "S1 · COMPUTE-THE-KEY (Type 1). group_by(type) |> summarise(mean(sulphates)) -> 'red' (0.661 vs white 0.489, +35.1%). VERIFIED against data/wine_cargo.csv 2026-08-07. Literally the class wrangling exercise — the easiest rung. Distractors: wrong-method values (global mean 0.557, count-instead-of-mean, grouped by vintage -> no difference) + 'white'. Puzzle object = the manifest desk. DOORS: hold is 'open' (your own ship, free to enter); the GANGPLANK to the quay is 'forward', so it gates on S1 — signing the first manifest line is what lets you go ashore. CLUE count_board teaches the n() / tally sigil. CLUE seal_1 is a PICKUP (amphora seal 1 of 9) — first seal in the first room, to teach the pickup habit.",
@@ -262,139 +402,6 @@
           }
         },
         {
-          "id": "pharos_dawn",
-          "type": "ambient",
-          "label": "The Pharos across the water",
-          "box": [
-            0.258,
-            0.1959,
-            0.2999,
-            0.3676
-          ],
-          "cinemagraphCandidates": [
-            {
-              "video": "deck/cine_pharos_dawn_c6.mp4",
-              "seed": 480594655,
-              "prompt": "the lighthouse crown-fire flickering and guttering, its gold light trembling on the water below",
-              "loop": "boomerang",
-              "box": [
-                0.258,
-                0.1959,
-                0.2999,
-                0.3676
-              ],
-              "edge": 4.6,
-              "live": 18.3,
-              "reject": false
-            },
-            {
-              "video": "deck/cine_pharos_dawn_c2.mp4",
-              "seed": 1684375997,
-              "prompt": "the lighthouse crown-fire flickering and guttering, its gold light trembling on the water below",
-              "loop": "boomerang",
-              "box": [
-                0.258,
-                0.1959,
-                0.2999,
-                0.3676
-              ],
-              "edge": 9.1,
-              "live": 13.3,
-              "reject": false
-            },
-            {
-              "video": "deck/cine_pharos_dawn_c1.mp4",
-              "seed": 549904699,
-              "prompt": "the lighthouse crown-fire flickering and guttering, its gold light trembling on the water below",
-              "loop": "boomerang",
-              "box": [
-                0.258,
-                0.1959,
-                0.2999,
-                0.3676
-              ],
-              "edge": 10.8,
-              "live": 20.1,
-              "reject": false
-            },
-            {
-              "video": "deck/cine_pharos_dawn_c4.mp4",
-              "seed": 516461079,
-              "prompt": "the lighthouse crown-fire flickering and guttering, its gold light trembling on the water below",
-              "loop": "boomerang",
-              "box": [
-                0.258,
-                0.1959,
-                0.2999,
-                0.3676
-              ],
-              "edge": 4,
-              "live": 3.4,
-              "reject": true
-            },
-            {
-              "video": "deck/cine_pharos_dawn_c3.mp4",
-              "seed": 1981021156,
-              "prompt": "the lighthouse crown-fire flickering and guttering, its gold light trembling on the water below",
-              "loop": "boomerang",
-              "box": [
-                0.258,
-                0.1959,
-                0.2999,
-                0.3676
-              ],
-              "edge": 13.2,
-              "live": 11.8,
-              "reject": true
-            },
-            {
-              "video": "deck/cine_pharos_dawn_c7.mp4",
-              "seed": 1482785427,
-              "prompt": "the lighthouse crown-fire flickering and guttering, its gold light trembling on the water below",
-              "loop": "boomerang",
-              "box": [
-                0.258,
-                0.1959,
-                0.2999,
-                0.3676
-              ],
-              "edge": 13.5,
-              "live": 12.1,
-              "reject": true
-            },
-            {
-              "video": "deck/cine_pharos_dawn_c5.mp4",
-              "seed": 501597209,
-              "prompt": "the lighthouse crown-fire flickering and guttering, its gold light trembling on the water below",
-              "loop": "boomerang",
-              "box": [
-                0.258,
-                0.1959,
-                0.2999,
-                0.3676
-              ],
-              "edge": 26,
-              "live": 41.9,
-              "reject": true
-            },
-            {
-              "video": "deck/cine_pharos_dawn_c8.mp4",
-              "seed": 1994356881,
-              "prompt": "the lighthouse crown-fire flickering and guttering, its gold light trembling on the water below",
-              "loop": "boomerang",
-              "box": [
-                0.258,
-                0.1959,
-                0.2999,
-                0.3676
-              ],
-              "edge": 92.8,
-              "live": 53,
-              "reject": true
-            }
-          ]
-        },
-        {
           "id": "count_board",
           "type": "clue",
           "label": "The count-board",
@@ -511,6 +518,27 @@
               "prompt": "Keep this exact scene and its exact composition: the same ship's deck from the same viewpoint, the same furled square sail on its yard, the same mast, the same open deck hatch, the same writing-desk and crates, the same count-board at the rail, the same gangplank running down to the quay, the same Pharos lighthouse in the same place across the water, the same horizon line — every object at the same position and the same scale. Change ONLY the time of day: it is now deep night. The rose-and-blue dawn sky becomes a dark blue-black night sky with stars and a low moon over the water. The harbour is black water holding long broken reflections. The stern lamp burns bright and warm, throwing a pool of light across the deck boards. The Pharos across the water is BLAZING — its crown fire brilliant, casting a long gold shaft over the harbour. The far shore of the city shows scattered lit windows and quayside lamps. Deck timbers and rigging are lit warmly near the lamp and fall into deep blue shadow away from it. No people, no lettering, no text."
             }
           ]
+        },
+        {
+          "id": "clip_base",
+          "type": "ambient",
+          "label": "Scene motion (base)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/serve-clips.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "deck/cine_base.mp4"
+          }
         }
       ],
       "debrief": "Your first analysis was the plainest one there is. Split the hold into its two types and take one mean sulphates figure within each — group_by(type) |> summarise — and red came out the more heavily cured cargo at 0.66, against white's 0.49. Two groups, one number each, and nothing cleverer than that. The count-board by the rail taught the first of the three sigils you would need at the top of the lighthouse: ⦀ the tally, how many pieces are in a pile. And the first of nine merchant's seals lay loose on the deck boards."
@@ -586,7 +614,47 @@
           "continuity": []
         },
         "hotspotsReviewed": true,
-        "cinemagraphsVerified": true
+        "cinemagraphsVerified": true,
+        "motionSpec": {
+          "rigid": "The hull, deck planking, mast, yard, rails, crates, amphorae, ladder and all cargo",
+          "negatives": [
+            ", the ship moving, cargo shifting, amphorae rolling, water entering the hold"
+          ],
+          "subjects": [
+            {
+              "name": "hold_lamp",
+              "box": [
+                0.4615,
+                0.0854,
+                0.5422,
+                0.4874
+              ],
+              "phrase": "the hanging oil lamp on its chain in the middle of the hold, its flame live and restless, the lamp itself swinging only the smallest amount and returning, its light breathing out across the stacked jars"
+            },
+            {
+              "name": "hatch_shaft",
+              "box": [
+                0.2,
+                0.06,
+                0.34,
+                0.34
+              ],
+              "phrase": "the pale shaft of daylight falling down the open hatch and the ladder, fine dust turning slowly through it"
+            },
+            {
+              "name": "hanging_ropes",
+              "box": [
+                0.18,
+                0.24,
+                0.26,
+                0.68
+              ],
+              "phrase": "the coiled ropes hanging against the hull, swaying by the smallest amount as the moored ship works"
+            }
+          ],
+          "room": "hold",
+          "state": "base"
+        }
       },
       "unlockedWhen": true,
       "designNote": "Atmosphere + pickup room, NO graded puzzle. DEAD-END side room off the deck — its only door is the 'back' companionway to deck. Seals 2 and 3 (PICKUPS).",
@@ -662,151 +730,6 @@
           "image": "seals/seal_2.png"
         },
         {
-          "id": "hold_lamp",
-          "type": "ambient",
-          "label": "The hanging lamp",
-          "box": [
-            0.4615,
-            0.0854,
-            0.5422,
-            0.4874
-          ],
-          "cinemagraph": {
-            "box": [
-              0.4615,
-              0.0854,
-              0.5422,
-              0.4874
-            ],
-            "video": "hold/cine_hold_lamp_c8.mp4",
-            "prompt": "an oil lantern swaying back and forth on its hanging chain in a slow, gentle pendulum arc, the warm flame inside wavering as it swings, the cast shadows swinging along with it",
-            "loop": "boomerang",
-            "seed": 1626951629
-          },
-          "cinemagraphCandidates": [
-            {
-              "video": "hold/cine_hold_lamp_c2.mp4",
-              "seed": 1755951272,
-              "prompt": "an oil lantern swaying back and forth on its hanging chain in a slow, gentle pendulum arc, the warm flame inside wavering as it swings, the cast shadows swinging along with it",
-              "loop": "boomerang",
-              "box": [
-                0.4615,
-                0.0854,
-                0.5422,
-                0.4874
-              ],
-              "edge": 0.8,
-              "live": 23.7,
-              "reject": false
-            },
-            {
-              "video": "hold/cine_hold_lamp_c7.mp4",
-              "seed": 1283982997,
-              "prompt": "an oil lantern swaying back and forth on its hanging chain in a slow, gentle pendulum arc, the warm flame inside wavering as it swings, the cast shadows swinging along with it",
-              "loop": "boomerang",
-              "box": [
-                0.4615,
-                0.0854,
-                0.5422,
-                0.4874
-              ],
-              "edge": 2.5,
-              "live": 33.6,
-              "reject": false
-            },
-            {
-              "video": "hold/cine_hold_lamp_c3.mp4",
-              "seed": 1848722690,
-              "prompt": "an oil lantern swaying back and forth on its hanging chain in a slow, gentle pendulum arc, the warm flame inside wavering as it swings, the cast shadows swinging along with it",
-              "loop": "boomerang",
-              "box": [
-                0.4615,
-                0.0854,
-                0.5422,
-                0.4874
-              ],
-              "edge": 0.8,
-              "live": 7.9,
-              "reject": true
-            },
-            {
-              "video": "hold/cine_hold_lamp_c8.mp4",
-              "seed": 1626951629,
-              "prompt": "an oil lantern swaying back and forth on its hanging chain in a slow, gentle pendulum arc, the warm flame inside wavering as it swings, the cast shadows swinging along with it",
-              "loop": "boomerang",
-              "box": [
-                0.4615,
-                0.0854,
-                0.5422,
-                0.4874
-              ],
-              "edge": 0.8,
-              "live": 3,
-              "reject": true
-            },
-            {
-              "video": "hold/cine_hold_lamp_c5.mp4",
-              "seed": 690108606,
-              "prompt": "an oil lantern swaying back and forth on its hanging chain in a slow, gentle pendulum arc, the warm flame inside wavering as it swings, the cast shadows swinging along with it",
-              "loop": "boomerang",
-              "box": [
-                0.4615,
-                0.0854,
-                0.5422,
-                0.4874
-              ],
-              "edge": 1,
-              "live": 6.5,
-              "reject": true
-            },
-            {
-              "video": "hold/cine_hold_lamp_c4.mp4",
-              "seed": 336187544,
-              "prompt": "an oil lantern swaying back and forth on its hanging chain in a slow, gentle pendulum arc, the warm flame inside wavering as it swings, the cast shadows swinging along with it",
-              "loop": "boomerang",
-              "box": [
-                0.4615,
-                0.0854,
-                0.5422,
-                0.4874
-              ],
-              "edge": 15.2,
-              "live": 18.8,
-              "reject": true
-            },
-            {
-              "video": "hold/cine_hold_lamp_c6.mp4",
-              "seed": 2038220233,
-              "prompt": "an oil lantern swaying back and forth on its hanging chain in a slow, gentle pendulum arc, the warm flame inside wavering as it swings, the cast shadows swinging along with it",
-              "loop": "boomerang",
-              "box": [
-                0.4615,
-                0.0854,
-                0.5422,
-                0.4874
-              ],
-              "edge": 15.9,
-              "live": 23.4,
-              "reject": true
-            },
-            {
-              "video": "hold/cine_hold_lamp_c1.mp4",
-              "seed": 1120664335,
-              "prompt": "an oil lantern swaying back and forth on its hanging chain in a slow, gentle pendulum arc, the warm flame inside wavering as it swings, the cast shadows swinging along with it",
-              "loop": "boomerang",
-              "box": [
-                0.4615,
-                0.0854,
-                0.5422,
-                0.4874
-              ],
-              "edge": 25.7,
-              "live": 48.8,
-              "reject": true
-            }
-          ]
-        },
-        {
           "id": "seal_3",
           "type": "clue",
           "label": "A seal in the straw",
@@ -819,6 +742,27 @@
           "body": "A merchant's amphora seal, tucked into the straw between two jars. The clay is <b>red</b>, its form <b>tall</b> and <b>large</b>, and a tally numeral <b>3</b> is pressed into the face.",
           "pickup": "Seal 3 — red · tall · large · numeral 3",
           "image": "seals/seal_3.png"
+        },
+        {
+          "id": "clip_base",
+          "type": "ambient",
+          "label": "Scene motion (base)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/serve-clips.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "hold/cine_base.mp4"
+          }
         }
       ],
       "debrief": "No analysis down here, this was the data itself, stacked in straw: every amphora the manifest was actually about. Two more seals were in the hold, one on a crate lid and one tucked between the jars. Scattering the nine across the whole port was deliberate. The lock at the end asks you to group a collection, and that lands differently when the collection is one you assembled yourself rather than one you were handed complete (i.e. the dataset)."
@@ -902,7 +846,140 @@
           "continuity": []
         },
         "hotspotsReviewed": true,
-        "cinemagraphsVerified": true
+        "cinemagraphsVerified": true,
+        "motionSpec": {
+          "rigid": "The quay stonework, steps, columns, arches, warehouse front, moored hulls, amphorae, barrels, baskets and the city across the water",
+          "negatives": [
+            ", boats sailing away, the ship departing, rising tide, waves breaking over the quay, fast moving clouds"
+          ],
+          "subjects": [
+            {
+              "name": "harbour_water",
+              "box": [
+                0.0,
+                0.44,
+                1.0,
+                0.66
+              ],
+              "phrase": "the pale green harbour water lapping along the quay stones and around the moored hulls, its surface wrinkling and settling in place"
+            },
+            {
+              "name": "moored_boats",
+              "box": [
+                0.1991,
+                0.377,
+                0.4023,
+                0.7097
+              ],
+              "phrase": "the row of small moored boats rocking gently at their lines, their masts leaning the smallest amount and coming back"
+            },
+            {
+              "name": "bunting",
+              "box": [
+                0.2,
+                0.36,
+                0.4,
+                0.46
+              ],
+              "phrase": "the strung bunting between the boats' masts lifting and falling on the morning air"
+            },
+            {
+              "name": "pharos_flame",
+              "box": [
+                0.485,
+                0.2,
+                0.515,
+                0.36
+              ],
+              "phrase": "the fire burning at the head of the Pharos out on its mole, a small point of gold flame against the morning sky"
+            },
+            {
+              "name": "morning_cloud",
+              "box": [
+                0.0,
+                0.0,
+                1.0,
+                0.26
+              ],
+              "phrase": "the high morning cloud over the harbour, turning over very slowly in place"
+            }
+          ],
+          "room": "quay",
+          "state": "base",
+          "states": {
+            "night": {
+              "rigid": "The quay stonework, steps, columns, arches, warehouse front, moored hulls, amphorae, barrels, baskets and the city across the water",
+              "pinned": null,
+              "negatives": [
+                ", boats sailing away, the ship departing, rising tide, waves breaking over the quay, fast moving clouds"
+              ],
+              "has_document": null,
+              "subjects": [
+                {
+                  "name": "pharos_flame",
+                  "box": [
+                    0.498,
+                    0.27,
+                    0.532,
+                    0.37
+                  ],
+                  "force_repair": true,
+                  "phrase": "the fire burning at the head of the Pharos out on its mole, a hot point of gold flame flaring and settling"
+                },
+                {
+                  "name": "flame_track",
+                  "box": [
+                    0.495,
+                    0.54,
+                    0.535,
+                    0.92
+                  ],
+                  "phrase": "the long gold reflection of that fire running towards the steps across the black water, breaking and re-forming"
+                },
+                {
+                  "name": "ship_lantern",
+                  "box": [
+                    0.158,
+                    0.58,
+                    0.196,
+                    0.7
+                  ],
+                  "phrase": "the lantern hung at the moored ship's rail, its flame live, its light swinging the smallest amount over the wet stone"
+                },
+                {
+                  "name": "quay_lamps",
+                  "box": [
+                    0.78,
+                    0.5,
+                    0.92,
+                    0.74
+                  ],
+                  "phrase": "the oil lamps burning under the great arch and along the quay, their pools of warm light breathing on the wet flagstones"
+                },
+                {
+                  "name": "harbour_water",
+                  "box": [
+                    0.0,
+                    0.52,
+                    1.0,
+                    0.74
+                  ],
+                  "phrase": "the black harbour water lapping along the quay stones, its surface wrinkling and settling and carrying every reflection with it"
+                },
+                {
+                  "name": "bunting",
+                  "box": [
+                    0.2,
+                    0.46,
+                    0.4,
+                    0.56
+                  ],
+                  "phrase": "the strung bunting between the boats' masts lifting and falling in the night air"
+                }
+              ]
+            }
+          }
+        }
       },
       "unlockedWhen": true,
       "designNote": "Atmosphere + pickup room, NO graded puzzle. THE HUB — three doors: 'back' to deck (the gangplank), 'open' to emporion (the city chain), and 'open' to boat (the skiff at the water-steps). WIRING: the SKIFF door must carry availableWhen {solved:'library'} + a diegetic lockedBody (the crossing only makes sense once the manifest is registered) — `_apply_spec` copies only direction/to from the spec, so add the gate by hand at wiring. Seal 4 (PICKUP).",
@@ -963,151 +1040,6 @@
           ],
           "direction": "back",
           "to": "deck"
-        },
-        {
-          "id": "moored_boats",
-          "type": "ambient",
-          "label": "The moored fishing boats",
-          "box": [
-            0.1991,
-            0.377,
-            0.4023,
-            0.7097
-          ],
-          "cinemagraph": {
-            "box": [
-              0.1991,
-              0.377,
-              0.4023,
-              0.7097
-            ],
-            "video": "quay/cine_moored_boats_c1.mp4",
-            "prompt": "the moored boats rocking gently at their lines, masts swaying and the strung pennants and nets lifting in the harbour breeze",
-            "loop": "boomerang",
-            "seed": 700390911
-          },
-          "cinemagraphCandidates": [
-            {
-              "video": "quay/cine_moored_boats_c2.mp4",
-              "seed": 143050435,
-              "prompt": "the moored boats rocking gently at their lines, masts swaying and the strung pennants and nets lifting in the harbour breeze",
-              "loop": "boomerang",
-              "box": [
-                0.1991,
-                0.377,
-                0.4023,
-                0.7097
-              ],
-              "edge": 12.2,
-              "live": 27.6,
-              "reject": true
-            },
-            {
-              "video": "quay/cine_moored_boats_c6.mp4",
-              "seed": 1468537000,
-              "prompt": "the moored boats rocking gently at their lines, masts swaying and the strung pennants and nets lifting in the harbour breeze",
-              "loop": "boomerang",
-              "box": [
-                0.1991,
-                0.377,
-                0.4023,
-                0.7097
-              ],
-              "edge": 12.8,
-              "live": 25.4,
-              "reject": true
-            },
-            {
-              "video": "quay/cine_moored_boats_c4.mp4",
-              "seed": 94878231,
-              "prompt": "the moored boats rocking gently at their lines, masts swaying and the strung pennants and nets lifting in the harbour breeze",
-              "loop": "boomerang",
-              "box": [
-                0.1991,
-                0.377,
-                0.4023,
-                0.7097
-              ],
-              "edge": 12.9,
-              "live": 29.5,
-              "reject": true
-            },
-            {
-              "video": "quay/cine_moored_boats_c5.mp4",
-              "seed": 1578564703,
-              "prompt": "the moored boats rocking gently at their lines, masts swaying and the strung pennants and nets lifting in the harbour breeze",
-              "loop": "boomerang",
-              "box": [
-                0.1991,
-                0.377,
-                0.4023,
-                0.7097
-              ],
-              "edge": 13,
-              "live": 19.2,
-              "reject": true
-            },
-            {
-              "video": "quay/cine_moored_boats_c1.mp4",
-              "seed": 700390911,
-              "prompt": "the moored boats rocking gently at their lines, masts swaying and the strung pennants and nets lifting in the harbour breeze",
-              "loop": "boomerang",
-              "box": [
-                0.1991,
-                0.377,
-                0.4023,
-                0.7097
-              ],
-              "edge": 13.6,
-              "live": 28.7,
-              "reject": true
-            },
-            {
-              "video": "quay/cine_moored_boats_c3.mp4",
-              "seed": 876913523,
-              "prompt": "the moored boats rocking gently at their lines, masts swaying and the strung pennants and nets lifting in the harbour breeze",
-              "loop": "boomerang",
-              "box": [
-                0.1991,
-                0.377,
-                0.4023,
-                0.7097
-              ],
-              "edge": 13.6,
-              "live": 30.3,
-              "reject": true
-            },
-            {
-              "video": "quay/cine_moored_boats_c8.mp4",
-              "seed": 1820460464,
-              "prompt": "the moored boats rocking gently at their lines, masts swaying and the strung pennants and nets lifting in the harbour breeze",
-              "loop": "boomerang",
-              "box": [
-                0.1991,
-                0.377,
-                0.4023,
-                0.7097
-              ],
-              "edge": 13.7,
-              "live": 28.7,
-              "reject": true
-            },
-            {
-              "video": "quay/cine_moored_boats_c7.mp4",
-              "seed": 1737983072,
-              "prompt": "the moored boats rocking gently at their lines, masts swaying and the strung pennants and nets lifting in the harbour breeze",
-              "loop": "boomerang",
-              "box": [
-                0.1991,
-                0.377,
-                0.4023,
-                0.7097
-              ],
-              "edge": 17.1,
-              "live": 32.3,
-              "reject": true
-            }
-          ]
         },
         {
           "id": "skiff_steps",
@@ -1176,9 +1108,31 @@
                 0,
                 1,
                 1
-              ]
+              ],
+              "prompt": "Keep this exact scene and its exact composition: the same harbour quay from the same viewpoint, the same moored wine ship with its furled sail, rigging and gangplank, the same row of small moored boats with their strung bunting, the same Pharos lighthouse out on its mole across the water, the same city rising along the far shore, the same great stone arch and its colonnade to the right, the same amphorae, coiled nets and mooring posts on the flagstones, the same rowing boat tied at the steps, the same horizon line — every object at the same position and the same scale. The open sky meeting the flat water directly behind the viewer stays one continuous unbroken surface, and the far-left and far-right edges remain identical to each other. Change ONLY the time of day: it is now deep night. The open morning sky becomes a dark blue-black night sky with stars and a moon, and the pale water becomes near-black and glassy, holding the reflections. The Pharos burns at its head, a hot gold flame throwing a long broken reflection across the harbour. Oil lamps burn aboard the ship and along the quay, and lamplight shows in the windows of the far city; warm pools fall on the wet flagstones and up the arch's stonework. Everything away from the lamps falls into deep blue shadow. No people, no lettering, no text."
             }
           ]
+        },
+        {
+          "id": "clip_base",
+          "type": "ambient",
+          "label": "Scene motion (base)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/serve-clips.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "quay/cine_base.mp4"
+          }
         }
       ],
       "debrief": "The fourth seal, caught between the cobbles at the water-steps. It was your first step ashore, with the cargo behind you and the city's clerks ahead."
@@ -1259,7 +1213,132 @@
           "continuity": []
         },
         "hotspotsReviewed": true,
-        "cinemagraphsVerified": true
+        "cinemagraphsVerified": true,
+        "motionSpec": {
+          "rigid": "The quay stonework, steps, columns, arches, warehouse front, moored hulls, amphorae, barrels, baskets and the city across the water",
+          "negatives": [
+            ", the awning tearing free, cargo moving, people, fast moving clouds, time-lapse sky"
+          ],
+          "subjects": [
+            {
+              "name": "striped_awning",
+              "box": [
+                0.308,
+                0.0699,
+                0.6806,
+                0.4031
+              ],
+              "force_repair": true,
+              "phrase": "the long striped awning stretched on its ropes over the warehouse front, its cloth lifting and sagging in the harbour breeze and its fringed edge stirring"
+            },
+            {
+              "name": "awning_rope",
+              "box": [
+                0.63,
+                0.22,
+                0.71,
+                0.58
+              ],
+              "phrase": "the slack rope hanging from the awning's corner, swinging slightly and settling"
+            },
+            {
+              "name": "harbour_water",
+              "box": [
+                0.0,
+                0.4,
+                0.22,
+                0.64
+              ],
+              "phrase": "the blue harbour water beyond the quay wall, its surface glittering and shifting in place"
+            },
+            {
+              "name": "trough_water",
+              "box": [
+                0.575,
+                0.7,
+                0.735,
+                0.86
+              ],
+              "phrase": "the water standing in the long stone trough, its surface trembling and settling"
+            },
+            {
+              "name": "morning_cloud",
+              "box": [
+                0.0,
+                0.0,
+                1.0,
+                0.3
+              ],
+              "phrase": "the bright morning cloud over the harbour, rolling and folding slowly in place"
+            }
+          ],
+          "room": "emporion",
+          "state": "base",
+          "states": {
+            "night": {
+              "rigid": "The quay stonework, steps, columns, arches, warehouse front, moored hulls, amphorae, barrels, baskets and the city across the water",
+              "pinned": null,
+              "negatives": [
+                ", the awning tearing free, cargo moving, people, fast moving clouds, time-lapse sky"
+              ],
+              "has_document": null,
+              "subjects": [
+                {
+                  "name": "portico_lamps",
+                  "box": [
+                    0.39,
+                    0.19,
+                    0.77,
+                    0.46
+                  ],
+                  "force_repair": true,
+                  "phrase": "the row of hanging oil lamps burning the length of the warehouse portico, each flame live and wavering, their warm pools breathing on the columns and the stacked jars"
+                },
+                {
+                  "name": "striped_awning",
+                  "box": [
+                    0.308,
+                    0.0699,
+                    0.6806,
+                    0.4031
+                  ],
+                  "force_repair": true,
+                  "phrase": "the long striped awning over the warehouse front, lit from beneath by the lamps, its cloth lifting and sagging and its fringed edge stirring"
+                },
+                {
+                  "name": "pharos_flame",
+                  "box": [
+                    0.115,
+                    0.3,
+                    0.15,
+                    0.5
+                  ],
+                  "phrase": "the fire at the head of the distant Pharos, flaring and settling, laying a broken gold line on the water below it"
+                },
+                {
+                  "name": "trough_water",
+                  "box": [
+                    0.575,
+                    0.7,
+                    0.735,
+                    0.86
+                  ],
+                  "phrase": "the water standing in the long stone trough, its surface trembling and settling, holding the lamplight"
+                },
+                {
+                  "name": "harbour_water",
+                  "box": [
+                    0.0,
+                    0.4,
+                    0.22,
+                    0.64
+                  ],
+                  "phrase": "the dark harbour beyond the quay wall, its surface moving slowly under the moon"
+                }
+              ]
+            }
+          }
+        }
       },
       "unlockedWhen": true,
       "designNote": "Atmosphere + pickup room, NO graded puzzle. 'back' to quay, 'open' on to the market. Seals 5 and 6 (PICKUPS).",
@@ -1335,151 +1414,6 @@
           "image": "seals/seal_5.png"
         },
         {
-          "id": "warehouse_awning",
-          "type": "ambient",
-          "label": "The warehouse awning",
-          "box": [
-            0.308,
-            0.0699,
-            0.6806,
-            0.4031
-          ],
-          "cinemagraph": {
-            "box": [
-              0.308,
-              0.0699,
-              0.6806,
-              0.4031
-            ],
-            "video": "emporion/cine_warehouse_awning_c7.mp4",
-            "prompt": "the great striped awning billowing and rippling in the harbour breeze, its shadow sliding back and forth across the stacked amphorae below",
-            "loop": "boomerang",
-            "seed": 1716483765
-          },
-          "cinemagraphCandidates": [
-            {
-              "video": "emporion/cine_warehouse_awning_c2.mp4",
-              "seed": 857704558,
-              "prompt": "the great striped awning billowing and rippling in the harbour breeze, its shadow sliding back and forth across the stacked amphorae below",
-              "loop": "boomerang",
-              "box": [
-                0.308,
-                0.0699,
-                0.6806,
-                0.4031
-              ],
-              "edge": 9.1,
-              "live": 29.6,
-              "reject": false
-            },
-            {
-              "video": "emporion/cine_warehouse_awning_c7.mp4",
-              "seed": 1716483765,
-              "prompt": "the great striped awning billowing and rippling in the harbour breeze, its shadow sliding back and forth across the stacked amphorae below",
-              "loop": "boomerang",
-              "box": [
-                0.308,
-                0.0699,
-                0.6806,
-                0.4031
-              ],
-              "edge": 10.5,
-              "live": 33.2,
-              "reject": false
-            },
-            {
-              "video": "emporion/cine_warehouse_awning_c8.mp4",
-              "seed": 2134811943,
-              "prompt": "the great striped awning billowing and rippling in the harbour breeze, its shadow sliding back and forth across the stacked amphorae below",
-              "loop": "boomerang",
-              "box": [
-                0.308,
-                0.0699,
-                0.6806,
-                0.4031
-              ],
-              "edge": 11.4,
-              "live": 34,
-              "reject": false
-            },
-            {
-              "video": "emporion/cine_warehouse_awning_c6.mp4",
-              "seed": 1849181777,
-              "prompt": "the great striped awning billowing and rippling in the harbour breeze, its shadow sliding back and forth across the stacked amphorae below",
-              "loop": "boomerang",
-              "box": [
-                0.308,
-                0.0699,
-                0.6806,
-                0.4031
-              ],
-              "edge": 17.1,
-              "live": 42.3,
-              "reject": true
-            },
-            {
-              "video": "emporion/cine_warehouse_awning_c4.mp4",
-              "seed": 287598133,
-              "prompt": "the great striped awning billowing and rippling in the harbour breeze, its shadow sliding back and forth across the stacked amphorae below",
-              "loop": "boomerang",
-              "box": [
-                0.308,
-                0.0699,
-                0.6806,
-                0.4031
-              ],
-              "edge": 69.7,
-              "live": 83.7,
-              "reject": true
-            },
-            {
-              "video": "emporion/cine_warehouse_awning_c3.mp4",
-              "seed": 1307010657,
-              "prompt": "the great striped awning billowing and rippling in the harbour breeze, its shadow sliding back and forth across the stacked amphorae below",
-              "loop": "boomerang",
-              "box": [
-                0.308,
-                0.0699,
-                0.6806,
-                0.4031
-              ],
-              "edge": 71.9,
-              "live": 83.2,
-              "reject": true
-            },
-            {
-              "video": "emporion/cine_warehouse_awning_c5.mp4",
-              "seed": 864172061,
-              "prompt": "the great striped awning billowing and rippling in the harbour breeze, its shadow sliding back and forth across the stacked amphorae below",
-              "loop": "boomerang",
-              "box": [
-                0.308,
-                0.0699,
-                0.6806,
-                0.4031
-              ],
-              "edge": 78.7,
-              "live": 86.4,
-              "reject": true
-            },
-            {
-              "video": "emporion/cine_warehouse_awning_c1.mp4",
-              "seed": 240027922,
-              "prompt": "the great striped awning billowing and rippling in the harbour breeze, its shadow sliding back and forth across the stacked amphorae below",
-              "loop": "boomerang",
-              "box": [
-                0.308,
-                0.0699,
-                0.6806,
-                0.4031
-              ],
-              "edge": 87.1,
-              "live": 89.5,
-              "reject": true
-            }
-          ]
-        },
-        {
           "id": "seal_6",
           "type": "clue",
           "label": "A seal on the water-trough",
@@ -1533,6 +1467,27 @@
               "prompt": "Keep this exact scene and its exact composition: the same quayside emporion from the same viewpoint, the same columned warehouse portico, the same striped awning on its ropes, the same stone archway back to the water-steps, the same tall arch at the head of the warehouse row, the same cargo stacks, the same water-trough, the same quay running away along the water, the same horizon line — every object at the same position and the same scale. Change ONLY the time of day: it is now deep night. The open morning sky becomes a dark blue-black night sky with stars and a moon. Oil lamps hang burning under the portico and along the colonnade, throwing warm pools onto the cobbles and up the column shafts; the striped awning glows where lamplight catches its underside. The archway to the water is a dark opening with black water and the far gold glow of the Pharos beyond it. Everything away from the lamps falls into deep blue shadow. No people, no lettering, no text."
             }
           ]
+        },
+        {
+          "id": "clip_base",
+          "type": "ambient",
+          "label": "Scene motion (base)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/serve-clips.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "emporion/cine_base.mp4"
+          }
         }
       ],
       "debrief": "Seals five and six, and the first blue clay you had seen. Up to here every seal had been red, which is to say the colour was not yet telling you anything. This is the point where it became a variable: a trait that actually varies is the only kind you can group by."
@@ -1615,7 +1570,136 @@
           "continuity": []
         },
         "hotspotsReviewed": true,
-        "cinemagraphsVerified": true
+        "cinemagraphsVerified": true,
+        "motionSpec": {
+          "rigid": "The paving, columns, colonnade, walls, stalls, counters, stacked amphorae, baskets and the buildings",
+          "has_document": true,
+          "pinned": [
+            "The tall chalked price-board, the dark board on the counter and the open ledger lie exactly as they are: their chalked columns, figures and lettering do not move, smudge, lift, curl or change."
+          ],
+          "negatives": [
+            ", people, fast moving clouds, time-lapse sky, the awning tearing, stalls collapsing"
+          ],
+          "subjects": [
+            {
+              "name": "hanging_cloths",
+              "box": [
+                0.7173,
+                0.0901,
+                0.8277,
+                0.9167
+              ],
+              "phrase": "the long dyed cloths hanging from the line, swaying and turning heavily on the hot air, their lower edges lifting and falling"
+            },
+            {
+              "name": "canopy_fringe",
+              "box": [
+                0.28,
+                0.1,
+                0.7,
+                0.36
+              ],
+              "phrase": "the great stall canopy overhead, its sun-bleached cloth breathing slightly and its knotted fringe swinging along the lower edge"
+            },
+            {
+              "name": "hanging_herbs",
+              "box": [
+                0.695,
+                0.09,
+                0.765,
+                0.31
+              ],
+              "phrase": "the bunches of dried herbs strung up beside the cloths, turning slowly where they hang"
+            },
+            {
+              "name": "harbour_water",
+              "box": [
+                0.3,
+                0.5,
+                0.56,
+                0.62
+              ],
+              "phrase": "the harbour water below the market, glittering hard under the midday sun and shifting in place"
+            },
+            {
+              "name": "side_awnings",
+              "box": [
+                0.03,
+                0.36,
+                0.21,
+                0.56
+              ],
+              "phrase": "the pale awnings over the stalls down the row, their cloth sagging and lifting gently"
+            }
+          ],
+          "room": "market_price",
+          "state": "base",
+          "states": {
+            "night": {
+              "rigid": "The paving, columns, colonnade, walls, stalls, counters, stacked amphorae, baskets and the buildings",
+              "pinned": [
+                "The tall chalked price-board, the dark board on the counter and the open ledger lie exactly as they are: their chalked columns, figures and lettering do not move, smudge, lift, curl or change."
+              ],
+              "negatives": [
+                ", people, fast moving clouds, time-lapse sky, the awning tearing, stalls collapsing"
+              ],
+              "has_document": true,
+              "subjects": [
+                {
+                  "name": "board_lantern",
+                  "box": [
+                    0.268,
+                    0.36,
+                    0.312,
+                    0.49
+                  ],
+                  "force_repair": true,
+                  "phrase": "the lantern hung beside the tall price-board, its flame live behind the glass, its light wavering across the chalked face without moving a single mark on it"
+                },
+                {
+                  "name": "row_lamps",
+                  "box": [
+                    0.03,
+                    0.39,
+                    0.22,
+                    0.58
+                  ],
+                  "phrase": "the small lamps burning at the stalls down the market row, each one breathing and steadying, their light lying on the wet paving"
+                },
+                {
+                  "name": "hanging_cloths",
+                  "box": [
+                    0.7173,
+                    0.0901,
+                    0.8277,
+                    0.9167
+                  ],
+                  "phrase": "the long dyed cloths hanging from the line, swaying and turning heavily in the night air, their lower edges lifting and falling"
+                },
+                {
+                  "name": "hanging_herbs",
+                  "box": [
+                    0.695,
+                    0.09,
+                    0.765,
+                    0.31
+                  ],
+                  "phrase": "the bunches of dried herbs strung beside the cloths, turning slowly where they hang"
+                },
+                {
+                  "name": "harbour_lights",
+                  "box": [
+                    0.3,
+                    0.48,
+                    0.72,
+                    0.66
+                  ],
+                  "phrase": "the lit windows along the far shore and their long reflections on the black harbour, trembling and re-forming"
+                }
+              ]
+            }
+          }
+        }
       },
       "unlockedWhen": true,
       "designNote": "S2 · PICK-THE-POINT (Type 4). group_by(varietal) |> summarise(mean(alcohol)) -> 'Argitis' (13.79 vs Aminean 12.30, +12.1%). VERIFIED 2026-08-07. 6 varietals = too many to eyeball, so the student plots mean alcohol per varietal and CLICKS the winning grape on the live ggiraph plot (idColumn = varietal). Puzzle object = the assay table + its slate chart. CLUE price_board teaches the max() / up-chevron sigil. CLUE seal_7 is a PICKUP.",
@@ -1756,151 +1840,6 @@
           }
         },
         {
-          "id": "hanging_cloths",
-          "type": "ambient",
-          "label": "The hanging cloths",
-          "box": [
-            0.7173,
-            0.0901,
-            0.8277,
-            0.9167
-          ],
-          "cinemagraph": {
-            "box": [
-              0.7173,
-              0.0901,
-              0.8277,
-              0.9167
-            ],
-            "video": "market_price/cine_hanging_cloths_c8.mp4",
-            "prompt": "the hanging dyed cloths lifting and stirring in the hot breeze, the dried herb bunches turning slowly on their strings",
-            "loop": "boomerang",
-            "seed": 1949339982
-          },
-          "cinemagraphCandidates": [
-            {
-              "video": "market_price/cine_hanging_cloths_c1.mp4",
-              "seed": 125530938,
-              "prompt": "the hanging dyed cloths lifting and stirring in the hot breeze, the dried herb bunches turning slowly on their strings",
-              "loop": "boomerang",
-              "box": [
-                0.7173,
-                0.0901,
-                0.8277,
-                0.9167
-              ],
-              "edge": 9.7,
-              "live": 12.7,
-              "reject": false
-            },
-            {
-              "video": "market_price/cine_hanging_cloths_c8.mp4",
-              "seed": 1949339982,
-              "prompt": "the hanging dyed cloths lifting and stirring in the hot breeze, the dried herb bunches turning slowly on their strings",
-              "loop": "boomerang",
-              "box": [
-                0.7173,
-                0.0901,
-                0.8277,
-                0.9167
-              ],
-              "edge": 10.3,
-              "live": 32.9,
-              "reject": false
-            },
-            {
-              "video": "market_price/cine_hanging_cloths_c5.mp4",
-              "seed": 1048185663,
-              "prompt": "the hanging dyed cloths lifting and stirring in the hot breeze, the dried herb bunches turning slowly on their strings",
-              "loop": "boomerang",
-              "box": [
-                0.7173,
-                0.0901,
-                0.8277,
-                0.9167
-              ],
-              "edge": 10.8,
-              "live": 14.2,
-              "reject": false
-            },
-            {
-              "video": "market_price/cine_hanging_cloths_c2.mp4",
-              "seed": 1266939160,
-              "prompt": "the hanging dyed cloths lifting and stirring in the hot breeze, the dried herb bunches turning slowly on their strings",
-              "loop": "boomerang",
-              "box": [
-                0.7173,
-                0.0901,
-                0.8277,
-                0.9167
-              ],
-              "edge": 11.1,
-              "live": 34.2,
-              "reject": false
-            },
-            {
-              "video": "market_price/cine_hanging_cloths_c4.mp4",
-              "seed": 550306367,
-              "prompt": "the hanging dyed cloths lifting and stirring in the hot breeze, the dried herb bunches turning slowly on their strings",
-              "loop": "boomerang",
-              "box": [
-                0.7173,
-                0.0901,
-                0.8277,
-                0.9167
-              ],
-              "edge": 11.2,
-              "live": 43,
-              "reject": false
-            },
-            {
-              "video": "market_price/cine_hanging_cloths_c6.mp4",
-              "seed": 1326648304,
-              "prompt": "the hanging dyed cloths lifting and stirring in the hot breeze, the dried herb bunches turning slowly on their strings",
-              "loop": "boomerang",
-              "box": [
-                0.7173,
-                0.0901,
-                0.8277,
-                0.9167
-              ],
-              "edge": 12.8,
-              "live": 40.5,
-              "reject": true
-            },
-            {
-              "video": "market_price/cine_hanging_cloths_c7.mp4",
-              "seed": 420035050,
-              "prompt": "the hanging dyed cloths lifting and stirring in the hot breeze, the dried herb bunches turning slowly on their strings",
-              "loop": "boomerang",
-              "box": [
-                0.7173,
-                0.0901,
-                0.8277,
-                0.9167
-              ],
-              "edge": 13.5,
-              "live": 41.7,
-              "reject": true
-            },
-            {
-              "video": "market_price/cine_hanging_cloths_c3.mp4",
-              "seed": 1289953432,
-              "prompt": "the hanging dyed cloths lifting and stirring in the hot breeze, the dried herb bunches turning slowly on their strings",
-              "loop": "boomerang",
-              "box": [
-                0.7173,
-                0.0901,
-                0.8277,
-                0.9167
-              ],
-              "edge": 33.6,
-              "live": 54.2,
-              "reject": true
-            }
-          ]
-        },
-        {
           "id": "market_on",
           "type": "door",
           "label": "The street on through the market",
@@ -2036,7 +1975,139 @@
           "continuity": []
         },
         "hotspotsReviewed": true,
-        "cinemagraphsVerified": true
+        "cinemagraphsVerified": true,
+        "motionSpec": {
+          "rigid": "The paving, columns, colonnade, walls, stalls, counters, stacked amphorae, baskets and the buildings, and the great pyramid of stacked amphorae behind the counter",
+          "has_document": true,
+          "pinned": [
+            "The hanging reject-slate and the open ledger on the counter lie exactly as they are: their chalked marks, ruled lines and lettering do not move, smudge, lift, curl or change.",
+            "The great pyramid of stacked amphorae is solid and fixed: no jar shifts, rocks, rolls or falls."
+          ],
+          "negatives": [
+            ", people, amphorae falling, the stack collapsing, fire spreading, the stall burning"
+          ],
+          "subjects": [
+            {
+              "name": "brazier_smoke",
+              "box": [
+                0.5475,
+                0.0162,
+                0.7394,
+                0.8441
+              ],
+              "force_repair": true,
+              "phrase": "the cauldron on its brazier beside the counter, a thin column of smoke rising off it and curling away, the coals beneath glowing and dimming"
+            },
+            {
+              "name": "hanging_drape",
+              "box": [
+                0.565,
+                0.0,
+                0.645,
+                0.32
+              ],
+              "phrase": "the heavy red drape hung at the end of the stall, stirring and settling against the post"
+            },
+            {
+              "name": "counter_cloths",
+              "box": [
+                0.32,
+                0.66,
+                0.53,
+                0.92
+              ],
+              "phrase": "the cloths thrown over the front of the counter, their loose ends lifting slightly in the afternoon air"
+            },
+            {
+              "name": "stall_canopy",
+              "box": [
+                0.08,
+                0.0,
+                0.6,
+                0.16
+              ],
+              "phrase": "the worn canopy overhead, its cloth breathing slowly between the poles"
+            },
+            {
+              "name": "sea_beyond",
+              "box": [
+                0.0,
+                0.44,
+                0.16,
+                0.64
+              ],
+              "phrase": "the sea beyond the parapet, its surface glittering and shifting in place"
+            }
+          ],
+          "room": "market_boast",
+          "state": "base",
+          "states": {
+            "night": {
+              "rigid": "The paving, columns, colonnade, walls, stalls, counters, stacked amphorae, baskets and the buildings, and the great pyramid of stacked amphorae behind the counter",
+              "pinned": [
+                "The hanging reject-slate and the open ledger on the counter lie exactly as they are: their chalked marks, ruled lines and lettering do not move, smudge, lift, curl or change.",
+                "The great pyramid of stacked amphorae is solid and fixed: no jar shifts, rocks, rolls or falls."
+              ],
+              "negatives": [
+                ", people, amphorae falling, the stack collapsing, fire spreading, the stall burning"
+              ],
+              "has_document": true,
+              "subjects": [
+                {
+                  "name": "brazier_coals",
+                  "box": [
+                    0.6,
+                    0.68,
+                    0.74,
+                    0.92
+                  ],
+                  "force_repair": true,
+                  "phrase": "the bed of coals under the cauldron, glowing hot and dimming and glowing again, throwing an unsteady orange light up the stall front"
+                },
+                {
+                  "name": "brazier_smoke",
+                  "box": [
+                    0.6,
+                    0.48,
+                    0.72,
+                    0.78
+                  ],
+                  "phrase": "the thin column of smoke lifting off the cauldron and curling away into the dark"
+                },
+                {
+                  "name": "counter_lantern",
+                  "box": [
+                    0.288,
+                    0.56,
+                    0.342,
+                    0.7
+                  ],
+                  "phrase": "the lantern standing on the counter beside the ledger, its flame live, its light breathing over the jars behind it"
+                },
+                {
+                  "name": "counter_lamp",
+                  "box": [
+                    0.518,
+                    0.6,
+                    0.582,
+                    0.7
+                  ],
+                  "phrase": "the small open lamp further along the counter, its flame wavering and settling"
+                },
+                {
+                  "name": "hanging_drape",
+                  "box": [
+                    0.585,
+                    0.0,
+                    0.665,
+                    0.32
+                  ],
+                  "phrase": "the heavy drape hung at the end of the stall, stirring and settling against the post"
+                }
+              ]
+            }
+          }
+        }
       },
       "unlockedWhen": true,
       "designNote": "S3 · COMPUTE-THE-KEY (Type 1) — the SHORTCUT that sets the boss trap. group_by(region) |> summarise(mean(quality_score)) phrased 'which region's cargo is finest AS IT STANDS?' -> 'Chios' (7.28 vs Kos 6.78, +7.4%). VERIFIED 2026-08-07. Keep it a console compute so the count-weighted shortcut is felt in code. The merchant's boast is text-only flavour (no person in the art) and makes Chios the tempting answer the boss overturns. CLUE reject_slate teaches the min() / down-chevron sigil. CLUE seal_8 is a PICKUP.",
@@ -2185,151 +2256,6 @@
           }
         },
         {
-          "id": "stall_brazier",
-          "type": "ambient",
-          "label": "The stall brazier",
-          "box": [
-            0.5475,
-            0.0162,
-            0.7394,
-            0.8441
-          ],
-          "cinemagraph": {
-            "box": [
-              0.5475,
-              0.0162,
-              0.7394,
-              0.8441
-            ],
-            "video": "market_boast/cine_stall_brazier_c6.mp4",
-            "prompt": "the brazier coals glowing and pulsing, a thin line of smoke rising and curling away from the hanging pot",
-            "loop": "crossfade",
-            "seed": 774817357
-          },
-          "cinemagraphCandidates": [
-            {
-              "video": "market_boast/cine_stall_brazier_c1.mp4",
-              "seed": 12655227,
-              "prompt": "the brazier coals glowing and pulsing, a thin line of smoke rising and curling away from the hanging pot",
-              "loop": "crossfade",
-              "box": [
-                0.5475,
-                0.0162,
-                0.7394,
-                0.8441
-              ],
-              "edge": 3.7,
-              "live": 19.5,
-              "reject": false
-            },
-            {
-              "video": "market_boast/cine_stall_brazier_c3.mp4",
-              "seed": 1451003291,
-              "prompt": "the brazier coals glowing and pulsing, a thin line of smoke rising and curling away from the hanging pot",
-              "loop": "crossfade",
-              "box": [
-                0.5475,
-                0.0162,
-                0.7394,
-                0.8441
-              ],
-              "edge": 4.4,
-              "live": 16.9,
-              "reject": false
-            },
-            {
-              "video": "market_boast/cine_stall_brazier_c5.mp4",
-              "seed": 130817327,
-              "prompt": "the brazier coals glowing and pulsing, a thin line of smoke rising and curling away from the hanging pot",
-              "loop": "crossfade",
-              "box": [
-                0.5475,
-                0.0162,
-                0.7394,
-                0.8441
-              ],
-              "edge": 5.1,
-              "live": 19.8,
-              "reject": false
-            },
-            {
-              "video": "market_boast/cine_stall_brazier_c6.mp4",
-              "seed": 774817357,
-              "prompt": "the brazier coals glowing and pulsing, a thin line of smoke rising and curling away from the hanging pot",
-              "loop": "crossfade",
-              "box": [
-                0.5475,
-                0.0162,
-                0.7394,
-                0.8441
-              ],
-              "edge": 5.2,
-              "live": 17.4,
-              "reject": false
-            },
-            {
-              "video": "market_boast/cine_stall_brazier_c4.mp4",
-              "seed": 390054056,
-              "prompt": "the brazier coals glowing and pulsing, a thin line of smoke rising and curling away from the hanging pot",
-              "loop": "crossfade",
-              "box": [
-                0.5475,
-                0.0162,
-                0.7394,
-                0.8441
-              ],
-              "edge": 5.5,
-              "live": 20.5,
-              "reject": false
-            },
-            {
-              "video": "market_boast/cine_stall_brazier_c7.mp4",
-              "seed": 1954564798,
-              "prompt": "the brazier coals glowing and pulsing, a thin line of smoke rising and curling away from the hanging pot",
-              "loop": "crossfade",
-              "box": [
-                0.5475,
-                0.0162,
-                0.7394,
-                0.8441
-              ],
-              "edge": 5.8,
-              "live": 15.7,
-              "reject": false
-            },
-            {
-              "video": "market_boast/cine_stall_brazier_c8.mp4",
-              "seed": 656930401,
-              "prompt": "the brazier coals glowing and pulsing, a thin line of smoke rising and curling away from the hanging pot",
-              "loop": "crossfade",
-              "box": [
-                0.5475,
-                0.0162,
-                0.7394,
-                0.8441
-              ],
-              "edge": 16.5,
-              "live": 33.1,
-              "reject": true
-            },
-            {
-              "video": "market_boast/cine_stall_brazier_c2.mp4",
-              "seed": 604513478,
-              "prompt": "the brazier coals glowing and pulsing, a thin line of smoke rising and curling away from the hanging pot",
-              "loop": "crossfade",
-              "box": [
-                0.5475,
-                0.0162,
-                0.7394,
-                0.8441
-              ],
-              "edge": 18.9,
-              "live": 26.1,
-              "reject": true
-            }
-          ]
-        },
-        {
           "id": "library_way",
           "type": "door",
           "label": "The way up to the Canopic Way",
@@ -2383,6 +2309,27 @@
               "prompt": "Keep this exact scene and its exact composition: the same merchant's stall from the same viewpoint, the same great pyramid of stacked amphorae behind the counter, the same reject-slate hung on the wall beside the stalls, the same low bronze brazier with its hanging pot at the corner of the stall, the same broad archway out onto the colonnaded avenue, the same street falling away behind, the same stall-posts and awnings — every object at the same position and the same scale. Change ONLY the time of day: the early-afternoon light is gone and it is now deep night. The sky becomes dark blue-black with stars. The brazier is the strongest light in the scene, its coals glowing hot orange and lighting the stacked amphorae and the underside of the hanging pot from below; oil lamps at the stall add smaller warm pools, and the reject-slate is lit by one of them. Beyond the stall the street runs away into deep blue darkness, and the archway shows the moonlit marble of the avenue climbing beyond it. No people, no lettering, no text."
             }
           ]
+        },
+        {
+          "id": "clip_base",
+          "type": "ambient",
+          "label": "Scene motion (base)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/serve-clips.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "market_boast/cine_base.mp4"
+          }
         }
       ],
       "debrief": "The merchant swore his Chian jars were the finest afloat, and taken exactly as the cargo stood he was right: group by island, mean quality score within each, and Chios leads at 7.28 with Kos behind at 6.78. Notice what that phrase was quietly doing — as it stands. Every amphora counted once, so an island that happened to pack more of its noble grapes scored well for its packing rather than for its ground. That answer was correct, and about to be overturned, which is exactly what it was there for. The reject-slate gave you the third sigil: ▼ the least, the total of the poorest pile. Seal eight was wedged in the cobbles beside the stall."
@@ -2466,7 +2413,114 @@
           "continuity": []
         },
         "hotspotsReviewed": true,
-        "cinemagraphsVerified": true
+        "cinemagraphsVerified": true,
+        "motionSpec": {
+          "rigid": "The paving, columns, colonnade, walls, stalls, counters, stacked amphorae, baskets and the buildings, the temple, the shrine and the colonnade, and the fountain itself — its carved lion, its stone rim, bowl, plinth and the paving around it",
+          "negatives": [
+            ", people, the fountain overflowing, water flooding the paving, fast moving clouds, time-lapse sky, the fountain rising or sinking, the basin swelling or shrinking, stonework heaving, breathing or bulging, the lion's head moving"
+          ],
+          "subjects": [
+            {
+              "name": "lion_spout",
+              "box": [
+                0.45,
+                0.428,
+                0.485,
+                0.605
+              ],
+              "force_repair": true,
+              "phrase": "the jet of water falling from the carved lion's mouth into the basin below, unbroken and glinting as it falls"
+            },
+            {
+              "name": "fountain_basin",
+              "box": [
+                0.372,
+                0.542,
+                0.578,
+                0.618
+              ],
+              "force_repair": true,
+              "phrase": "the water surface in the fountain basin, breaking into small rings where the jet lands and settling flat again"
+            }
+          ],
+          "room": "canopic",
+          "state": "base",
+          "states": {
+            "night": {
+              "rigid": "The paving, columns, colonnade, walls, stalls, counters, stacked amphorae, baskets and the buildings, the temple, the shrine and the colonnade, and the fountain itself — its carved lion, its stone rim, bowl, plinth and the paving around it",
+              "pinned": null,
+              "negatives": [
+                ", people, the fountain overflowing, water flooding the paving, fast moving clouds, time-lapse sky, the fountain rising or sinking, the basin swelling or shrinking, stonework heaving, breathing or bulging, the lion's head moving"
+              ],
+              "has_document": null,
+              "subjects": [
+                {
+                  "name": "lion_spout",
+                  "box": [
+                    0.45,
+                    0.428,
+                    0.485,
+                    0.605
+                  ],
+                  "force_repair": true,
+                  "phrase": "the jet of water falling from the carved lion's mouth into the basin below, unbroken and catching the lamplight as it falls"
+                },
+                {
+                  "name": "fountain_basin",
+                  "box": [
+                    0.372,
+                    0.542,
+                    0.578,
+                    0.618
+                  ],
+                  "force_repair": true,
+                  "phrase": "the water surface in the fountain basin, breaking into small rings where the jet lands and settling flat again"
+                },
+                {
+                  "name": "basin_spill",
+                  "box": [
+                    0.39,
+                    0.64,
+                    0.63,
+                    0.84
+                  ],
+                  "force_repair": true,
+                  "phrase": "the thin films of water running down the outside of the basin wall, wet stone glistening as they go"
+                },
+                {
+                  "name": "colonnade_lamps",
+                  "box": [
+                    0.0,
+                    0.42,
+                    0.32,
+                    0.56
+                  ],
+                  "phrase": "the small lamps burning along the colonnade, each flame live, their pools of light breathing on the columns and the wet paving"
+                },
+                {
+                  "name": "shrine_candles",
+                  "box": [
+                    0.645,
+                    0.48,
+                    0.745,
+                    0.62
+                  ],
+                  "phrase": "the candles standing at the foot of the street shrine, their flames guttering and steadying before the statue"
+                },
+                {
+                  "name": "temple_glow",
+                  "box": [
+                    0.72,
+                    0.26,
+                    0.92,
+                    0.58
+                  ],
+                  "phrase": "the warm lamplight standing between the temple columns, breathing slowly"
+                }
+              ]
+            }
+          }
+        }
       },
       "unlockedWhen": true,
       "designNote": "Atmosphere + pickup room, NO graded puzzle — the colonnaded climb from the market to the Library, restored to the linear chain 2026-08-07 (Lucas). 'back' to market_boast, 'open' on to library. Carries seal 9 (PICKUP), the last of the nine — so the player holds all nine BEFORE the boss.",
@@ -2512,10 +2566,10 @@
           "type": "door",
           "label": "The way back to the market",
           "box": [
-            0.9268,
-            0.3429,
-            0.9944,
-            0.6198
+            0.2474,
+            0.4467,
+            0.315,
+            0.7236
           ],
           "direction": "back",
           "to": "market_boast"
@@ -2533,284 +2587,6 @@
           "body": "A merchant's amphora seal, lying on the step of a column base where someone set it down. The clay is <b>amber</b>, its form <b>tall</b> and <b>medium</b>, and a tally numeral <b>9</b> is pressed into the face.",
           "pickup": "Seal 9 — amber · tall · medium · numeral 9",
           "image": "seals/seal_9.png"
-        },
-        {
-          "id": "way_fountain",
-          "type": "ambient",
-          "label": "The avenue fountain",
-          "box": [
-            0.3505,
-            0.1597,
-            0.6054,
-            0.8588
-          ],
-          "cinemagraph": {
-            "box": [
-              0.3505,
-              0.1597,
-              0.6054,
-              0.8588
-            ],
-            "video": "canopic/cine_way_fountain_c6.mp4",
-            "prompt": "water spilling steadily from the bronze lion-mouth into the basin, the pool surface rippling and the overflow running down the marble",
-            "loop": "crossfade",
-            "seed": 1811148081
-          },
-          "cinemagraphCandidates": [
-            {
-              "video": "canopic/cine_way_fountain_c6.mp4",
-              "seed": 1811148081,
-              "prompt": "water spilling steadily from the bronze lion-mouth into the basin, the pool surface rippling and the overflow running down the marble",
-              "loop": "crossfade",
-              "box": [
-                0.3505,
-                0.1597,
-                0.6054,
-                0.8588
-              ],
-              "edge": 2.9,
-              "live": 5.6,
-              "reject": true
-            },
-            {
-              "video": "canopic/cine_way_fountain_c3.mp4",
-              "seed": 378038188,
-              "prompt": "water spilling steadily from the bronze lion-mouth into the basin, the pool surface rippling and the overflow running down the marble",
-              "loop": "crossfade",
-              "box": [
-                0.3505,
-                0.1597,
-                0.6054,
-                0.8588
-              ],
-              "edge": 36.4,
-              "live": 28.9,
-              "reject": true
-            },
-            {
-              "video": "canopic/cine_way_fountain_c1.mp4",
-              "seed": 1176713929,
-              "prompt": "water spilling steadily from the bronze lion-mouth into the basin, the pool surface rippling and the overflow running down the marble",
-              "loop": "crossfade",
-              "box": [
-                0.3505,
-                0.1597,
-                0.6054,
-                0.8588
-              ],
-              "edge": 47.1,
-              "live": 37.5,
-              "reject": true
-            },
-            {
-              "video": "canopic/cine_way_fountain_c8.mp4",
-              "seed": 1696407499,
-              "prompt": "water spilling steadily from the bronze lion-mouth into the basin, the pool surface rippling and the overflow running down the marble",
-              "loop": "crossfade",
-              "box": [
-                0.3505,
-                0.1597,
-                0.6054,
-                0.8588
-              ],
-              "edge": 47.3,
-              "live": 37.8,
-              "reject": true
-            },
-            {
-              "video": "canopic/cine_way_fountain_c7.mp4",
-              "seed": 1225303976,
-              "prompt": "water spilling steadily from the bronze lion-mouth into the basin, the pool surface rippling and the overflow running down the marble",
-              "loop": "crossfade",
-              "box": [
-                0.3505,
-                0.1597,
-                0.6054,
-                0.8588
-              ],
-              "edge": 53.1,
-              "live": 43.5,
-              "reject": true
-            },
-            {
-              "video": "canopic/cine_way_fountain_c2.mp4",
-              "seed": 778446,
-              "prompt": "water spilling steadily from the bronze lion-mouth into the basin, the pool surface rippling and the overflow running down the marble",
-              "loop": "crossfade",
-              "box": [
-                0.3505,
-                0.1597,
-                0.6054,
-                0.8588
-              ],
-              "edge": 58,
-              "live": 48.1,
-              "reject": true
-            },
-            {
-              "video": "canopic/cine_way_fountain_c4.mp4",
-              "seed": 377181026,
-              "prompt": "water spilling steadily from the bronze lion-mouth into the basin, the pool surface rippling and the overflow running down the marble",
-              "loop": "crossfade",
-              "box": [
-                0.3505,
-                0.1597,
-                0.6054,
-                0.8588
-              ],
-              "edge": 58.9,
-              "live": 63.8,
-              "reject": true
-            },
-            {
-              "video": "canopic/cine_way_fountain_c5.mp4",
-              "seed": 1108636858,
-              "prompt": "water spilling steadily from the bronze lion-mouth into the basin, the pool surface rippling and the overflow running down the marble",
-              "loop": "crossfade",
-              "box": [
-                0.3505,
-                0.1597,
-                0.6054,
-                0.8588
-              ],
-              "edge": 71.4,
-              "live": 75.9,
-              "reject": true
-            }
-          ]
-        },
-        {
-          "id": "street_shrine",
-          "type": "ambient",
-          "label": "The street shrine",
-          "box": [
-            0.6129,
-            0.2746,
-            0.692,
-            0.6896
-          ],
-          "cinemagraphCandidates": [
-            {
-              "video": "canopic/cine_street_shrine_c7.mp4",
-              "seed": 166128403,
-              "prompt": "the shrine's oil lamps guttering and flickering in their niche, the shadows of the offerings shifting on the stone behind them",
-              "loop": "boomerang",
-              "box": [
-                0.6129,
-                0.2746,
-                0.692,
-                0.6896
-              ],
-              "edge": 54.2,
-              "live": 55,
-              "reject": true
-            },
-            {
-              "video": "canopic/cine_street_shrine_c5.mp4",
-              "seed": 766248458,
-              "prompt": "the shrine's oil lamps guttering and flickering in their niche, the shadows of the offerings shifting on the stone behind them",
-              "loop": "boomerang",
-              "box": [
-                0.6129,
-                0.2746,
-                0.692,
-                0.6896
-              ],
-              "edge": 59.5,
-              "live": 59.3,
-              "reject": true
-            },
-            {
-              "video": "canopic/cine_street_shrine_c8.mp4",
-              "seed": 866076123,
-              "prompt": "the shrine's oil lamps guttering and flickering in their niche, the shadows of the offerings shifting on the stone behind them",
-              "loop": "boomerang",
-              "box": [
-                0.6129,
-                0.2746,
-                0.692,
-                0.6896
-              ],
-              "edge": 67.2,
-              "live": 65.6,
-              "reject": true
-            },
-            {
-              "video": "canopic/cine_street_shrine_c3.mp4",
-              "seed": 1291131707,
-              "prompt": "the shrine's oil lamps guttering and flickering in their niche, the shadows of the offerings shifting on the stone behind them",
-              "loop": "boomerang",
-              "box": [
-                0.6129,
-                0.2746,
-                0.692,
-                0.6896
-              ],
-              "edge": 73.5,
-              "live": 78.5,
-              "reject": true
-            },
-            {
-              "video": "canopic/cine_street_shrine_c4.mp4",
-              "seed": 733593909,
-              "prompt": "the shrine's oil lamps guttering and flickering in their niche, the shadows of the offerings shifting on the stone behind them",
-              "loop": "boomerang",
-              "box": [
-                0.6129,
-                0.2746,
-                0.692,
-                0.6896
-              ],
-              "edge": 79.7,
-              "live": 81.7,
-              "reject": true
-            },
-            {
-              "video": "canopic/cine_street_shrine_c1.mp4",
-              "seed": 2146343979,
-              "prompt": "the shrine's oil lamps guttering and flickering in their niche, the shadows of the offerings shifting on the stone behind them",
-              "loop": "boomerang",
-              "box": [
-                0.6129,
-                0.2746,
-                0.692,
-                0.6896
-              ],
-              "edge": 83,
-              "live": 81.7,
-              "reject": true
-            },
-            {
-              "video": "canopic/cine_street_shrine_c6.mp4",
-              "seed": 451014121,
-              "prompt": "the shrine's oil lamps guttering and flickering in their niche, the shadows of the offerings shifting on the stone behind them",
-              "loop": "boomerang",
-              "box": [
-                0.6129,
-                0.2746,
-                0.692,
-                0.6896
-              ],
-              "edge": 90.8,
-              "live": 88.6,
-              "reject": true
-            },
-            {
-              "video": "canopic/cine_street_shrine_c2.mp4",
-              "seed": 82092999,
-              "prompt": "the shrine's oil lamps guttering and flickering in their niche, the shadows of the offerings shifting on the stone behind them",
-              "loop": "boomerang",
-              "box": [
-                0.6129,
-                0.2746,
-                0.692,
-                0.6896
-              ],
-              "edge": 99.2,
-              "live": 97.3,
-              "reject": true
-            }
-          ]
         },
         {
           "id": "library_steps",
@@ -2852,6 +2628,49 @@
               "prompt": "Keep this exact scene and its exact composition: the same Canopic Way from the same viewpoint, the same great marble colonnade marching away down the avenue, the same broad fountain basin with its bronze lion spout at the centre, the same small street-shrine set against the colonnade, the same archway back down into the market, the same broad marble stair climbing to the porticoed front of the Great Library with its bronze doors, the same column bases and the same avenue running on — every object at the same position and the same scale. Change ONLY the time of day: the late-afternoon gold and its long shadows are gone and it is now deep night. The sky becomes dark blue-black with stars and a high moon. Moonlight lies pale and cold along the marble colonnade and the wet lip of the fountain. The street-shrine's oil lamps burn bright, a warm orange pocket against the cold marble, and lamps burn at intervals along the colonnade and at the head of the Library stair, whose portico is lit warmly. Far down the avenue the harbour shows as a dark band with the Pharos burning gold above it. No people, no lettering, no text."
             }
           ]
+        },
+        {
+          "id": "clip_base",
+          "type": "ambient",
+          "label": "Scene motion (base)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/serve-clips.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "canopic/cine_base.mp4"
+          }
+        },
+        {
+          "id": "clip_night",
+          "type": "ambient",
+          "label": "Scene motion (night)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/serve-clips.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "canopic/cine_night.mp4",
+            "state": "night"
+          }
         }
       ],
       "debrief": "The ninth and last seal, left on a column base where someone had set it down. Nine pieces now, each carrying a colour, a form, a size and a tally numeral: four traits, which is to say four different ways the same little pile could be cut. You did not know yet which of them the door would ask for."
@@ -2864,18 +2683,19 @@
       "built": true,
       "authoring": {
         "tag": "library",
-        "scenePrompt": "This is a seamless 360-degree panorama from deep inside the Great Library of Alexandria at dusk — a high hall of scroll-niches and reading-desks, the last gold light falling in shafts from the clerestory windows. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain continuous wall of stacked scroll-niches in dressed stone, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, rank upon rank of scroll-niches climbing the wall into shadow, each pigeonhole packed with rolled papyri, the plain stacked surface that meets its other half cleanly at the seam directly behind you; to the left, the tall bronze doors standing open at the head of the entrance stair, the gold of the colonnaded avenue falling away beyond them; to the left of centre, a lectern holding an open shipping-ledger, its facing pages ruled into a table of islands against grape varieties — the counts wildly uneven down every column, one island's entries heaped under the noble grapes and another's under the common ones; dead ahead in the centre, the archivist's great reading-desk at the centre of the hall — the master vintage ledgers laid open across it, an abacus and a rack of styli, a half-finished tally sheet weighted flat, and a tall slate frame behind ruled for a bar chart; just right of centre, a high clerestory window throwing a broad shaft of last gold light down through the hall onto the stone floor, dust turning slowly in the beam; to the right, a row of empty reading-desks receding along the hall into the gloom, their surfaces bare and unlit, the working end of the hall long since tidied; on the far right, more scroll-racks and niches running away down the hall into warm gloom, meeting the seam directly behind you. Deep cool shadow cut by shafts of last gold dusk light, dust turning in the beams, warm papyrus and pale stone against near-black recesses, hushed and vast; painterly, cinematic, reverent, subtle film grain. No people, no lettering, no captions, no text. Again: the extreme left and right edges must align perfectly into a plain continuous wall of stacked scroll-niches in dressed stone, uniform and unbroken, with no visible seam, join, or repetition.",
+        "scenePrompt": "This is a seamless 360-degree panorama from the middle of the worn stone floor of a colossal scholarly reading-hall at dusk, the hall wrapping right around the viewer on every side — tier upon tier of scroll-niches curving away to left and right and continuing unbroken behind, narrow railed galleries running around all three levels, ladders leaning up to the higher tiers, the coffered ceiling arching overhead and lost in warm gloom, and colossal arched openings breaking the side walls at intervals, each giving into a further reading-hall of the same enormous kind that curves away and is swallowed by darkness long before any end of it can be seen. This is an EQUIRECTANGULAR 360-degree projection: the walls BEND and curve around the viewer, the ceiling arcs over and the floor splays outward, exactly as a spherical panorama unrolls — it is NOT a flat one-point-perspective view down a corridor. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain continuous wall of stacked scroll-niches in dressed sandstone, uniform, unbroken and low in detail: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, rank upon rank of scroll-niches climbing the wall into shadow, every pigeonhole crammed to bursting with rolled papyri and tagged with hanging bone labels, overflow scrolls stacked in leaning piles along the foot of the wall and roped bundles waiting to be shelved — the plain stacked surface that meets its other half cleanly at the seam directly behind you; to the left, the tall bronze doors standing open at the head of the entrance stair, the gold of the colonnaded avenue falling away beyond them; to the left of centre, a monumental bronze-and-stone water-clock standing on the hall floor close to the viewer and rising two storeys, twice the height of a person: a broad upper cistern spilling one narrow unbroken ribbon of water down into a TALL NARROW CYLINDRICAL TANK of dark bronze, the tank's face cut with a graduated scale of hour-marks and a carved float-pointer standing against it; mounted above the tank is a LARGE ROUND BRONZE CLOCK DIAL, an engraved disc the width of a cartwheel divided into hour segments with a single long pointer arm across it, unmistakably a clock and not a fountain; the whole machine stands on a square stepped plinth with its bronze gearing exposed at the side; dead ahead in the centre, the archivist's great reading-desk, buried in work — the master vintage ledgers laid open across it, an abacus and a rack of styli, a half-finished tally sheet weighted flat, drifts of loose scrolls and wax tablets pushed to its edges, three oil-lamps burning along it, and a tall slate frame behind ruled for a bar chart; just right of centre, one clerestory opening left unveiled high on the right-hand wall, throwing a single broad column of last gold light steeply down across the near foreground and onto the stone floor at the viewer's feet, wide as a doorway where it lands and thick with slowly turning dust; to the right, tall sheer linen sun-veils hung across the clerestory openings along the curving right-hand wall, hanging in long loose folds well down into the hall and stirring in the evening draught; beneath them a long row of reading-desks in heavy use and just abandoned mid-work — every surface heaped with half-unrolled scrolls weighted flat, stacked wax tablets, ink-pots and reed pens, oil-lamps still burning, wicker baskets of papyri overflowing underneath, sorting-trays and stools pushed back at angles; on the far right, more crammed scroll-niches and railed galleries curving away round the hall, sorting-tables piled with bundles below them, a laden shelving-cart standing part-unloaded, the whole run continuing into warm gloom and meeting the seam directly behind you. Vast, ancient and heavily used: deep cool shadow cut by one broad shaft of last gold dusk light, dust turning thickly in the beam, warm papyrus and pale sandstone against near-black recesses, every surface crowded with the work of scholars just stepped away, scattered oil-lamps glowing down the hall; painterly, cinematic, reverent, subtle film grain. No people, no lettering, no captions, no text, no writing or symbols on any page, scroll, slate or wall. NO END WALL and no far wall anywhere in view — the hall runs past the edges of the frame in both directions and is swallowed by darkness; nothing closes it off. No flat head-on wall facing the viewer, no symmetrical one-point perspective, no vanishing point down a central corridor. No exterior view of a library building and no city skyline except through the open bronze doors. The water-clock stands free on the hall floor: no pool, channel, stream or spilt water anywhere on the paving around it, and the hall floor is dry everywhere else. Again: the extreme left and right edges must align perfectly into a plain continuous wall of stacked scroll-niches in dressed sandstone, uniform, unbroken and low in detail, with no visible seam, join, or repetition.",
         "doorPrompt": "",
         "sceneSpec": {
           "room": "library",
-          "setting": "deep inside the Great Library of Alexandria at dusk — a high hall of scroll-niches and reading-desks, the last gold light falling in shafts from the clerestory windows",
+          "setting": "the middle of the worn stone floor of a colossal scholarly reading-hall at dusk, the hall wrapping right around the viewer on every side — tier upon tier of scroll-niches curving away to left and right and continuing unbroken behind, narrow railed galleries running around all three levels, ladders leaning up to the higher tiers, the coffered ceiling arching overhead and lost in warm gloom, and colossal arched openings breaking the side walls at intervals, each giving into a further reading-hall of the same enormous kind that curves away and is swallowed by darkness long before any end of it can be seen. This is an EQUIRECTANGULAR 360-degree projection: the walls BEND and curve around the viewer, the ceiling arcs over and the floor splays outward, exactly as a spherical panorama unrolls — it is NOT a flat one-point-perspective view down a corridor",
           "interior": true,
-          "seam": "a plain continuous wall of stacked scroll-niches in dressed stone, uniform and unbroken",
+          "seam": "a plain continuous wall of stacked scroll-niches in dressed sandstone, uniform, unbroken and low in detail",
+          "seamOccluder": "a plain sandstone pillar, floor to ceiling",
           "elements": [
             {
               "id": "niches_left",
               "at": "on the far left",
-              "desc": "rank upon rank of scroll-niches climbing the wall into shadow, each pigeonhole packed with rolled papyri, the plain stacked surface that meets its other half cleanly at the seam directly behind you"
+              "desc": "rank upon rank of scroll-niches climbing the wall into shadow, every pigeonhole crammed to bursting with rolled papyri and tagged with hanging bone labels, overflow scrolls stacked in leaning piles along the foot of the wall and roped bundles waiting to be shelved — the plain stacked surface that meets its other half cleanly at the seam directly behind you"
             },
             {
               "id": "back_steps",
@@ -2888,46 +2708,308 @@
               "label": "The bronze doors"
             },
             {
-              "id": "mix_ledger",
+              "id": "clepsydra",
               "at": "to the left of centre",
-              "desc": "a lectern holding an open shipping-ledger, its facing pages ruled into a table of islands against grape varieties — the counts wildly uneven down every column, one island's entries heaped under the noble grapes and another's under the common ones",
-              "clue": true,
-              "label": "The shipping-ledger"
+              "desc": "a monumental bronze-and-stone water-clock standing on the hall floor close to the viewer and rising two storeys, twice the height of a person: a broad upper cistern spilling one narrow unbroken ribbon of water down into a TALL NARROW CYLINDRICAL TANK of dark bronze, the tank's face cut with a graduated scale of hour-marks and a carved float-pointer standing against it; mounted above the tank is a LARGE ROUND BRONZE CLOCK DIAL, an engraved disc the width of a cartwheel divided into hour segments with a single long pointer arm across it, unmistakably a clock and not a fountain; the whole machine stands on a square stepped plinth with its bronze gearing exposed at the side",
+              "animate": {
+                "motion": "the narrow unbroken ribbon of water falling from the upper cistern into the tank below, and the water surface inside the open tank mouth trembling and settling where it lands",
+                "loop": "crossfade"
+              }
             },
             {
               "id": "great_ledger",
               "at": "dead ahead in the centre",
-              "desc": "the archivist's great reading-desk at the centre of the hall — the master vintage ledgers laid open across it, an abacus and a rack of styli, a half-finished tally sheet weighted flat, and a tall slate frame behind ruled for a bar chart",
+              "desc": "the archivist's great reading-desk, buried in work — the master vintage ledgers laid open across it, an abacus and a rack of styli, a half-finished tally sheet weighted flat, drifts of loose scrolls and wax tablets pushed to its edges, three oil-lamps burning along it, and a tall slate frame behind ruled for a bar chart",
               "puzzle": true,
               "label": "The great reading-desk"
             },
             {
               "id": "dusk_shaft",
               "at": "just right of centre",
-              "desc": "a high clerestory window throwing a broad shaft of last gold light down through the hall onto the stone floor, dust turning slowly in the beam",
+              "desc": "one clerestory opening left unveiled high on the right-hand wall, throwing a single broad column of last gold light steeply down across the near foreground and onto the stone floor at the viewer's feet, wide as a doorway where it lands and thick with slowly turning dust",
               "animate": {
-                "motion": "dust motes drifting and turning slowly upward through the shaft of gold window-light",
+                "motion": "dust hanging thick in the broad near column of gold light, turning and drifting slowly through it",
                 "loop": "crossfade"
               },
               "label": "The clerestory light"
             },
             {
-              "id": "reading_desks",
+              "id": "window_veils",
               "at": "to the right",
-              "desc": "a row of empty reading-desks receding along the hall into the gloom, their surfaces bare and unlit, the working end of the hall long since tidied"
+              "desc": "tall sheer linen sun-veils hung across the clerestory openings along the curving right-hand wall, hanging in long loose folds well down into the hall and stirring in the evening draught; beneath them a long row of reading-desks in heavy use and just abandoned mid-work — every surface heaped with half-unrolled scrolls weighted flat, stacked wax tablets, ink-pots and reed pens, oil-lamps still burning, wicker baskets of papyri overflowing underneath, sorting-trays and stools pushed back at angles",
+              "animate": {
+                "motion": "the long loose linen veils billowing gently in and out and settling again against the openings",
+                "loop": "boomerang"
+              }
             },
             {
               "id": "scroll_racks",
               "at": "on the far right",
-              "desc": "more scroll-racks and niches running away down the hall into warm gloom, meeting the seam directly behind you"
+              "desc": "more crammed scroll-niches and railed galleries curving away round the hall, sorting-tables piled with bundles below them, a laden shelving-cart standing part-unloaded, the whole run continuing into warm gloom and meeting the seam directly behind you"
             }
           ],
-          "atmosphere": "Deep cool shadow cut by shafts of last gold dusk light, dust turning in the beams, warm papyrus and pale stone against near-black recesses, hushed and vast; painterly, cinematic, reverent, subtle film grain",
-          "negatives": "No people, no lettering, no captions, no text",
+          "atmosphere": "Vast, ancient and heavily used: deep cool shadow cut by one broad shaft of last gold dusk light, dust turning thickly in the beam, warm papyrus and pale sandstone against near-black recesses, every surface crowded with the work of scholars just stepped away, scattered oil-lamps glowing down the hall; painterly, cinematic, reverent, subtle film grain",
+          "negatives": "No people, no lettering, no captions, no text, no writing or symbols on any page, scroll, slate or wall. NO END WALL and no far wall anywhere in view — the hall runs past the edges of the frame in both directions and is swallowed by darkness; nothing closes it off. No flat head-on wall facing the viewer, no symmetrical one-point perspective, no vanishing point down a central corridor. No exterior view of a library building and no city skyline except through the open bronze doors. The water-clock stands free on the hall floor: no pool, channel, stream or spilt water anywhere on the paving around it, and the hall floor is dry everywhere else.",
           "continuity": []
         },
         "hotspotsReviewed": true,
-        "cinemagraphsVerified": true
+        "cinemagraphsVerified": true,
+        "motionSpec": {
+          "rigid": "The hall walls, columns, vaulting, galleries, ladders, scroll-niches and their scrolls, the water-clock's dial, pointer, tank, gearing and plinth, the desks and the ledgers, scrolls, wax tablets and loose sheets lying on them, the baskets, carts and crates, and the floor",
+          "has_document": true,
+          "pinned": [
+            "Every open ledger, scroll, wax tablet and written sheet in the hall lies flat and dead still: no page turns, lifts, curls or changes, and no lettering moves.",
+            "The scrolls stacked in the wall-niches and piled on the floor do not move, shift, roll or fall."
+          ],
+          "negatives": [
+            ", people, pages turning, pages fluttering, pages lifting, books opening or closing, scrolls unrolling, scrolls rocking, the clock dial or its pointer turning, the clock swaying, fast moving clouds"
+          ],
+          "subjects": [
+            {
+              "name": "window_veils",
+              "box": [
+                0.735,
+                0.14,
+                0.888,
+                0.552
+              ],
+              "phrase": "the tall sheer linen veils hung down the right-hand wall, breathing slowly in and out in the draught and settling back against the shelving"
+            },
+            {
+              "name": "dusk_shaft",
+              "box": [
+                0.575,
+                0.075,
+                0.722,
+                0.555
+              ],
+              "force_repair": true,
+              "phrase": "fine dust hanging thick in the broad shaft of last gold light from the high arched window, turning and drifting slowly down through the beam"
+            },
+            {
+              "name": "clock_water",
+              "box": [
+                0.308,
+                0.33,
+                0.345,
+                0.432
+              ],
+              "force_repair": true,
+              "phrase": "the thin ribbon of water falling from the water-clock's upper cistern into the graduated tank below, and the water trembling where it lands"
+            },
+            {
+              "name": "clock_dial",
+              "box": [
+                0.29,
+                0.145,
+                0.362,
+                0.328
+              ],
+              "still": true,
+              "phrase": "The great bronze clock dial and its long pointer are motionless."
+            },
+            {
+              "name": "clock_tank",
+              "box": [
+                0.283,
+                0.432,
+                0.378,
+                0.872
+              ],
+              "still": true,
+              "phrase": "The clock's graduated tank, its gearing and its stone plinth are solid and completely still."
+            },
+            {
+              "name": "great_table_docs",
+              "box": [
+                0.45,
+                0.54,
+                0.57,
+                0.645
+              ],
+              "still": true,
+              "phrase": "The open ledgers heaped on the archivist's great desk lie flat and unmoving."
+            },
+            {
+              "name": "mid_right_desks",
+              "box": [
+                0.7,
+                0.56,
+                0.845,
+                0.74
+              ],
+              "still": true
+            },
+            {
+              "name": "right_desks",
+              "box": [
+                0.84,
+                0.585,
+                1.0,
+                0.88
+              ],
+              "still": true,
+              "phrase": "The scrolls, ledgers and tablets covering the near working desks are fixed where they lie."
+            },
+            {
+              "name": "left_scrolls",
+              "box": [
+                0.0,
+                0.6,
+                0.13,
+                0.87
+              ],
+              "still": true,
+              "phrase": "The bundles of rolled scrolls stacked along the foot of the wall are inert."
+            }
+          ],
+          "room": "library",
+          "state": "base",
+          "states": {
+            "night": {
+              "rigid": "The hall walls, columns, vaulting, galleries, ladders, scroll-niches and their scrolls, the water-clock's dial, pointer, tank, gearing and plinth, the desks and the ledgers, scrolls, wax tablets and loose sheets lying on them, the baskets, carts and crates, and the floor",
+              "pinned": [
+                "Every open ledger, scroll, wax tablet and written sheet in the hall lies flat and dead still: no page turns, lifts, curls or changes, and no lettering moves.",
+                "The scrolls stacked in the wall-niches and piled on the floor do not move, shift, roll or fall."
+              ],
+              "negatives": [
+                ", people, pages turning, pages fluttering, pages lifting, books opening or closing, scrolls unrolling, scrolls rocking, the clock dial or its pointer turning, the clock swaying, fast moving clouds"
+              ],
+              "has_document": true,
+              "subjects": [
+                {
+                  "name": "table_lamps",
+                  "box": [
+                    0.455,
+                    0.515,
+                    0.575,
+                    0.564
+                  ],
+                  "force_repair": true,
+                  "phrase": "the oil lamps standing among the ledgers on the archivist's great desk, each flame live and unsteady, throwing moving warm light without moving a single page"
+                },
+                {
+                  "name": "desk_lamps_near",
+                  "box": [
+                    0.864,
+                    0.568,
+                    0.898,
+                    0.62
+                  ],
+                  "force_repair": true,
+                  "phrase": "the lamp burning on the near working desk, its flame wavering and steadying and its pool of light breathing on the scrolls and the shelving behind"
+                },
+                {
+                  "name": "moon_shaft",
+                  "box": [
+                    0.575,
+                    0.075,
+                    0.722,
+                    0.555
+                  ],
+                  "force_repair": true,
+                  "phrase": "the pale cold shaft of moonlight falling from the high arched window, fine dust turning and drifting slowly down through it"
+                },
+                {
+                  "name": "window_veils",
+                  "box": [
+                    0.735,
+                    0.14,
+                    0.888,
+                    0.552
+                  ],
+                  "phrase": "the tall linen veils hanging pale in the moonlight down the right-hand wall, breathing slowly in and out in the night draught"
+                },
+                {
+                  "name": "clock_water",
+                  "box": [
+                    0.308,
+                    0.33,
+                    0.345,
+                    0.432
+                  ],
+                  "force_repair": true,
+                  "phrase": "the thin ribbon of water still falling from the water-clock's upper cistern into the graduated tank below, catching the lamplight as it goes"
+                },
+                {
+                  "name": "clock_dial",
+                  "box": [
+                    0.29,
+                    0.145,
+                    0.362,
+                    0.328
+                  ],
+                  "still": true,
+                  "phrase": "The great bronze clock dial and its long pointer are motionless."
+                },
+                {
+                  "name": "clock_tank",
+                  "box": [
+                    0.283,
+                    0.432,
+                    0.378,
+                    0.872
+                  ],
+                  "still": true,
+                  "phrase": "The clock's graduated tank, its gearing and its stone plinth are solid and completely still."
+                },
+                {
+                  "name": "great_table_docs",
+                  "box": [
+                    0.424,
+                    0.566,
+                    0.57,
+                    0.606
+                  ],
+                  "still": true,
+                  "phrase": "The open ledgers and scrolls spread across the archivist's great desk lie flat and dead still."
+                },
+                {
+                  "name": "right_ledger",
+                  "box": [
+                    0.82,
+                    0.598,
+                    0.862,
+                    0.652
+                  ],
+                  "still": true,
+                  "phrase": "The great open ledger on the near working desk does not move a page."
+                },
+                {
+                  "name": "right_cart_scrolls",
+                  "box": [
+                    0.858,
+                    0.648,
+                    0.946,
+                    0.885
+                  ],
+                  "still": true
+                },
+                {
+                  "name": "right_scroll_stacks",
+                  "box": [
+                    0.962,
+                    0.65,
+                    1.0,
+                    0.76
+                  ],
+                  "still": true
+                },
+                {
+                  "name": "left_scrolls",
+                  "box": [
+                    0.0,
+                    0.6,
+                    0.13,
+                    0.87
+                  ],
+                  "still": true,
+                  "phrase": "The bundles of rolled scrolls stacked along the foot of the wall are inert."
+                }
+              ]
+            }
+          }
+        }
       },
       "unlockedWhen": true,
       "designNote": "BOSS · REPAIR-THE-PIPELINE (Type 3). Hand the student the NAIVE pipeline they wrote at S3 (group_by(region) |> summarise(mean(quality_score)) -> Chios) and make them repair it into the varietal-balanced regroup: group_by(region, varietal) |> summarise(m = mean(quality_score)) |> ungroup() |> group_by(region) |> summarise(mean(m)) -> 'Thasos' (7.43 vs Kos 6.83, +8.7%; CHIOS FALLS TO LAST at 6.26). VERIFIED 2026-08-07 — the flip fires. MISDIRECTION: Chios. FAIRNESS: the boss wording must explicitly ask the equal-weighting question and CLUE mix_ledger must call out the varietal-mix confound (Chios ships ~90% premium grapes, Thasos ~90% common) — not a hidden gotcha. MINTS THE CANVAS CODE. TOPOLOGY: this room is a LEAF (only a 'back' door to the merchant) — solving the boss does not open a door here, it unlocks the SKIFF back at the quay. No seal here — seal 9 moved to canopic (2026-08-07), so all nine are held before the boss.",
@@ -2940,11 +3022,6 @@
         }
       ],
       "plannedHotspots": [
-        {
-          "type": "clue",
-          "label": "The shipping-ledger",
-          "body": "The Library keeps what the harbour does not: a record of <em>what each island actually ships</em>. Read down the columns and the trouble is plain — the islands do not send the same grapes in the same proportions at all. One fills nine jars in ten with its noble varieties; another fills nine in ten with its common ones.<br><br>This matters because a grape carries its own quality with it wherever it is grown. So if you simply average an island's cargo as it stands, you are not measuring the island — you are measuring <em>the mix it happened to pack</em>. An island that ships mostly noble grapes will look splendid even if its ground is ordinary, and an island that ships mostly common ones will look poor even if its ground is the best in the Aegean.<br><br>To judge the ground itself you must stop letting the commoner grapes be outnumbered — give every grape an equal voice in each island's figure."
-        },
         {
           "type": "puzzle",
           "label": "The great reading-desk",
@@ -3001,7 +3078,7 @@
         }
       ],
       "panorama": "library/scene.png",
-      "builtFrom": "l1_library_2.png",
+      "builtFrom": "l1_library_3.png",
       "wrap": {
         "haov": 360,
         "vaov": 90,
@@ -3022,18 +3099,6 @@
           ],
           "direction": "back",
           "to": "canopic"
-        },
-        {
-          "id": "mix_ledger",
-          "type": "clue",
-          "label": "The shipping-ledger",
-          "box": [
-            0.2693,
-            0.5636,
-            0.3388,
-            0.7318
-          ],
-          "body": "The Library keeps what the harbour does not: a record of <em>what each island actually ships</em>. Read down the columns and the trouble is plain — the islands do not send the same grapes in the same proportions at all. One fills nine jars in ten with its noble varieties; another fills nine in ten with its common ones.<br><br>This matters because a grape carries its own quality with it wherever it is grown. So if you simply average an island's cargo as it stands, you are not measuring the island — you are measuring <em>the mix it happened to pack</em>. An island that ships mostly noble grapes will look splendid even if its ground is ordinary, and an island that ships mostly common ones will look poor even if its soil is the best in the Aegean.<br><br>To judge the ground itself you must stop letting the commoner grapes be outnumbered — give every grape an equal voice in each island's figure."
         },
         {
           "id": "great_ledger",
@@ -3074,151 +3139,6 @@
           }
         },
         {
-          "id": "dusk_shaft",
-          "type": "ambient",
-          "label": "The clerestory light",
-          "box": [
-            0.6396,
-            0.1416,
-            0.7996,
-            0.6916
-          ],
-          "cinemagraph": {
-            "box": [
-              0.6396,
-              0.1416,
-              0.7996,
-              0.6916
-            ],
-            "video": "library/cine_dusk_shaft_c2.mp4",
-            "prompt": "dust motes drifting and turning slowly upward through the shaft of gold window-light",
-            "loop": "crossfade",
-            "seed": 2103997558
-          },
-          "cinemagraphCandidates": [
-            {
-              "video": "library/cine_dusk_shaft_c5.mp4",
-              "seed": 717360706,
-              "prompt": "dust motes drifting and turning slowly upward through the shaft of gold window-light",
-              "loop": "crossfade",
-              "box": [
-                0.6396,
-                0.1416,
-                0.7996,
-                0.6916
-              ],
-              "edge": 0.2,
-              "live": 0.6,
-              "reject": true
-            },
-            {
-              "video": "library/cine_dusk_shaft_c2.mp4",
-              "seed": 2103997558,
-              "prompt": "dust motes drifting and turning slowly upward through the shaft of gold window-light",
-              "loop": "crossfade",
-              "box": [
-                0.6396,
-                0.1416,
-                0.7996,
-                0.6916
-              ],
-              "edge": 0.3,
-              "live": 0.9,
-              "reject": true
-            },
-            {
-              "video": "library/cine_dusk_shaft_c3.mp4",
-              "seed": 1145578904,
-              "prompt": "dust motes drifting and turning slowly upward through the shaft of gold window-light",
-              "loop": "crossfade",
-              "box": [
-                0.6396,
-                0.1416,
-                0.7996,
-                0.6916
-              ],
-              "edge": 0.3,
-              "live": 0.2,
-              "reject": true
-            },
-            {
-              "video": "library/cine_dusk_shaft_c6.mp4",
-              "seed": 1144614190,
-              "prompt": "dust motes drifting and turning slowly upward through the shaft of gold window-light",
-              "loop": "crossfade",
-              "box": [
-                0.6396,
-                0.1416,
-                0.7996,
-                0.6916
-              ],
-              "edge": 12.5,
-              "live": 11.6,
-              "reject": true
-            },
-            {
-              "video": "library/cine_dusk_shaft_c8.mp4",
-              "seed": 2029162563,
-              "prompt": "dust motes drifting and turning slowly upward through the shaft of gold window-light",
-              "loop": "crossfade",
-              "box": [
-                0.6396,
-                0.1416,
-                0.7996,
-                0.6916
-              ],
-              "edge": 16.9,
-              "live": 14.6,
-              "reject": true
-            },
-            {
-              "video": "library/cine_dusk_shaft_c1.mp4",
-              "seed": 847538078,
-              "prompt": "dust motes drifting and turning slowly upward through the shaft of gold window-light",
-              "loop": "crossfade",
-              "box": [
-                0.6396,
-                0.1416,
-                0.7996,
-                0.6916
-              ],
-              "edge": 19.6,
-              "live": 12.8,
-              "reject": true
-            },
-            {
-              "video": "library/cine_dusk_shaft_c7.mp4",
-              "seed": 509233273,
-              "prompt": "dust motes drifting and turning slowly upward through the shaft of gold window-light",
-              "loop": "crossfade",
-              "box": [
-                0.6396,
-                0.1416,
-                0.7996,
-                0.6916
-              ],
-              "edge": 26.6,
-              "live": 16.7,
-              "reject": true
-            },
-            {
-              "video": "library/cine_dusk_shaft_c4.mp4",
-              "seed": 779692189,
-              "prompt": "dust motes drifting and turning slowly upward through the shaft of gold window-light",
-              "loop": "crossfade",
-              "box": [
-                0.6396,
-                0.1416,
-                0.7996,
-                0.6916
-              ],
-              "edge": 29.7,
-              "live": 18.7,
-              "reject": true
-            }
-          ]
-        },
-        {
           "id": "night_wash",
           "type": "ambient",
           "label": "Nightfall",
@@ -3242,7 +3162,7 @@
               "when": {
                 "solved": "library"
               },
-              "prompt": "Keep this exact scene and its exact composition: the same hall inside the Great Library from the same viewpoint, the same ranks of scroll-niches climbing the wall, the same tall bronze doors standing open at the head of the entrance stair, the same lectern holding the open shipping-ledger, the same archivist's great reading-desk at the centre with its ledgers, the same high clerestory window, the same row of empty reading-desks receding down the hall, the same scroll-racks running away — every object at the same position and the same scale. Change ONLY the time of day: the last gold dusk light is gone and it is now deep night. The broad shaft from the clerestory window becomes a pale cold shaft of MOONLIGHT falling through the same place onto the same floor. The hall is lit by burning oil lamps and standing lampstands set on and beside the reading-desks and the archivist's desk, throwing warm pools across the ledgers and up into the nearest scroll-niches. The upper niches and the far end of the hall fall away into deep warm-black shadow. Through the open bronze doors, the moonlit marble of the avenue outside. No people, no lettering, no text."
+              "prompt": "Keep this exact scene and its exact composition: the same vast reading-hall from the same viewpoint, the same equirectangular 360 wrap with the walls curving away on both sides and the vaulted ceiling arching overhead, the same tiered scroll-niches and railed galleries running right around, the same monumental bronze water-clock left of centre with its great round dial, its long pointer, its graduated cylindrical tank and its stepped plinth, the same tall bronze doors standing open on the left with the colonnade beyond, the same archivist's great reading-desk at the centre heaped with open ledgers, the same tall arched clerestory window high on the right, the same row of long linen veils hanging down the right-hand wall, the same crowded working desks, baskets, carts and stacked scrolls, the same arched opening giving into the further hall — every object at the same position, the same scale and the same shape. Change ONLY the time of day: the last gold dusk light is gone and it is now deep night. The broad shaft falling from the arched clerestory window becomes a pale COLD MOONLIGHT shaft, entering at the same angle and landing on the same place on the floor. The hall is now lit by its own burning oil lamps and standing lampstands along the desks and the shelf-edges, throwing warm pools across the open ledgers and up into the nearest niches, with the bronze of the water-clock catching that lamplight. The upper tiers, the vaulted ceiling and the far reaches of the hall fall away into deep warm-black shadow. The linen veils hang pale in the moonlight. Through the open bronze doors, the moonlit marble of the avenue outside. No people, no lettering, no captions, no text."
             }
           ]
         }
@@ -3326,7 +3246,68 @@
           "continuity": []
         },
         "hotspotsReviewed": true,
-        "cinemagraphsVerified": true
+        "cinemagraphsVerified": true,
+        "motionSpec": {
+          "rigid": "The skiff's hull, thwarts, gunwales and oars, the distant tower, the city and the moored ships",
+          "negatives": [
+            ", the boat moving forward, rowing, the boat sailing, a storm, waves breaking over the boat, rain"
+          ],
+          "subjects": [
+            {
+              "name": "pharos_flame",
+              "box": [
+                0.478,
+                0.01,
+                0.528,
+                0.17
+              ],
+              "force_repair": true,
+              "phrase": "the great signal fire burning at the summit of the Pharos, its flame leaping and guttering, throwing hard gold light down the tower's head"
+            },
+            {
+              "name": "flame_reflection",
+              "box": [
+                0.45,
+                0.42,
+                0.56,
+                0.68
+              ],
+              "phrase": "the long broken reflection of that fire lying across the black water, its gold shattering and re-forming as the surface moves"
+            },
+            {
+              "name": "open_sea",
+              "box": [
+                0.0,
+                0.44,
+                1.0,
+                0.76
+              ],
+              "phrase": "the open harbour at night, a real chop running across it, wave-tops rising and falling in place and catching the light"
+            },
+            {
+              "name": "bow_lamp",
+              "box": [
+                0.3603,
+                0.45,
+                0.4224,
+                0.7704
+              ],
+              "phrase": "the lantern hung at the skiff's bow, its flame live behind the glass, its light swinging the smallest amount over the wet timbers"
+            },
+            {
+              "name": "city_lights",
+              "box": [
+                0.6,
+                0.26,
+                0.99,
+                0.5
+              ],
+              "phrase": "the lit windows and quay lamps along the far shore, each one breathing and steadying, their reflections trembling on the water below"
+            }
+          ],
+          "room": "boat",
+          "state": "base"
+        }
       },
       "unlockedWhen": true,
       "designNote": "Transition scene, NO graded puzzle — the skiff crossing the Great Harbour at nightfall, reached from the quay once the boss is solved. 'back' to quay (the shipped oar / tiller), 'open' on to pharos (the landing steps). This scene carries the dusk->night turn of the light arc. No seals here: all nine are collectable before boarding.",
@@ -3359,175 +3340,14 @@
       },
       "hotspots": [
         {
-          "id": "bow_lamp",
-          "type": "ambient",
-          "label": "The bow lamp",
-          "box": [
-            0.3603,
-            0.45,
-            0.4224,
-            0.7704
-          ],
-          "cinemagraphCandidates": [
-            {
-              "video": "boat/cine_bow_lamp_c5.mp4",
-              "seed": 239494355,
-              "prompt": "the bow lamp swinging on its staff with the roll of the boat, its flame guttering and its reflection breaking on the black water alongside",
-              "loop": "boomerang",
-              "box": [
-                0.3603,
-                0.45,
-                0.4224,
-                0.7704
-              ],
-              "edge": 0.5,
-              "live": 1,
-              "reject": true
-            },
-            {
-              "video": "boat/cine_bow_lamp_c2.mp4",
-              "seed": 1378911893,
-              "prompt": "the bow lamp swinging on its staff with the roll of the boat, its flame guttering and its reflection breaking on the black water alongside",
-              "loop": "boomerang",
-              "box": [
-                0.3603,
-                0.45,
-                0.4224,
-                0.7704
-              ],
-              "edge": 14.3,
-              "live": 13.4,
-              "reject": true
-            },
-            {
-              "video": "boat/cine_bow_lamp_c3.mp4",
-              "seed": 431441111,
-              "prompt": "the bow lamp swinging on its staff with the roll of the boat, its flame guttering and its reflection breaking on the black water alongside",
-              "loop": "boomerang",
-              "box": [
-                0.3603,
-                0.45,
-                0.4224,
-                0.7704
-              ],
-              "edge": 15.5,
-              "live": 14.5,
-              "reject": true
-            },
-            {
-              "video": "boat/cine_bow_lamp_c6.mp4",
-              "seed": 1774431733,
-              "prompt": "the bow lamp swinging on its staff with the roll of the boat, its flame guttering and its reflection breaking on the black water alongside",
-              "loop": "boomerang",
-              "box": [
-                0.3603,
-                0.45,
-                0.4224,
-                0.7704
-              ],
-              "edge": 23.9,
-              "live": 30.1,
-              "reject": true
-            },
-            {
-              "video": "boat/cine_bow_lamp_c8.mp4",
-              "seed": 912063923,
-              "prompt": "the bow lamp swinging on its staff with the roll of the boat, its flame guttering and its reflection breaking on the black water alongside",
-              "loop": "boomerang",
-              "box": [
-                0.3603,
-                0.45,
-                0.4224,
-                0.7704
-              ],
-              "edge": 25.7,
-              "live": 21.3,
-              "reject": true
-            },
-            {
-              "video": "boat/cine_bow_lamp_c4.mp4",
-              "seed": 608743250,
-              "prompt": "the bow lamp swinging on its staff with the roll of the boat, its flame guttering and its reflection breaking on the black water alongside",
-              "loop": "boomerang",
-              "box": [
-                0.3603,
-                0.45,
-                0.4224,
-                0.7704
-              ],
-              "edge": 26.9,
-              "live": 25.7,
-              "reject": true
-            },
-            {
-              "video": "boat/cine_bow_lamp_c7.mp4",
-              "seed": 1300077508,
-              "prompt": "the bow lamp swinging on its staff with the roll of the boat, its flame guttering and its reflection breaking on the black water alongside",
-              "loop": "boomerang",
-              "box": [
-                0.3603,
-                0.45,
-                0.4224,
-                0.7704
-              ],
-              "edge": 28.7,
-              "live": 30.2,
-              "reject": true
-            },
-            {
-              "video": "boat/cine_bow_lamp_c1.mp4",
-              "seed": 1942865220,
-              "prompt": "the bow lamp swinging on its staff with the roll of the boat, its flame guttering and its reflection breaking on the black water alongside",
-              "loop": "boomerang",
-              "box": [
-                0.3603,
-                0.45,
-                0.4224,
-                0.7704
-              ],
-              "edge": 43,
-              "live": 28.5,
-              "reject": true
-            }
-          ]
-        },
-        {
-          "id": "pharos_ahead",
-          "type": "ambient",
-          "label": "The Pharos ahead",
-          "box": [
-            0.418,
-            0,
-            0.5795,
-            0.2698
-          ],
-          "cinemagraphCandidates": [
-            {
-              "video": "boat/cine_pharos_ahead_c2.mp4",
-              "seed": 867205543,
-              "prompt": "the great crown-fire leaping and streaming at the top of the tower, the long road of gold light shivering and breaking across the black water",
-              "loop": "boomerang",
-              "box": [
-                0.418,
-                0,
-                0.5795,
-                0.2698
-              ],
-              "edge": 6.5,
-              "live": 8.1,
-              "reject": false
-            }
-          ]
-        },
-        {
           "id": "stern_oar",
           "type": "door",
           "label": "The oar and tiller",
           "box": [
-            0.4947,
-            0.6259,
-            0.633,
-            1
+            0.4339,
+            0.2539,
+            0.5722,
+            0.628
           ],
           "direction": "open",
           "to": "pharos"
@@ -3640,7 +3460,73 @@
           ]
         },
         "hotspotsReviewed": true,
-        "cinemagraphsVerified": true
+        "cinemagraphsVerified": true,
+        "motionSpec": {
+          "rigid": "The tower stonework, columns, parapet, paving, bronze door, relief panel, machinery, firewood and the city across the water",
+          "has_document": true,
+          "pinned": [
+            "The bronze relief panel beside the door is fixed: its carved symbols and marks do not move, shift, glow in sequence or change.",
+            "The great bronze door stays SHUT and does not move, swing or open."
+          ],
+          "negatives": [
+            ", the door opening, the door swinging, people, rain, storm, lightning"
+          ],
+          "subjects": [
+            {
+              "name": "door_edge_glow",
+              "box": [
+                0.435,
+                0.1,
+                0.565,
+                0.82
+              ],
+              "force_repair": true,
+              "phrase": "the hot gold light escaping around all four edges of the sealed bronze door, its brightness surging and easing as the fire behind it works"
+            },
+            {
+              "name": "floor_rays",
+              "box": [
+                0.39,
+                0.7,
+                0.63,
+                1.0
+              ],
+              "phrase": "the long rays of that light thrown across the paving, brightening and dimming with it"
+            },
+            {
+              "name": "sea_and_rocks",
+              "box": [
+                0.84,
+                0.4,
+                1.0,
+                0.96
+              ],
+              "phrase": "the black sea working against the rocks below the parapet, white water rising and falling back in place"
+            },
+            {
+              "name": "city_lights",
+              "box": [
+                0.62,
+                0.3,
+                0.99,
+                0.44
+              ],
+              "phrase": "the lamps of the city along the far shore, each small light breathing and steadying"
+            },
+            {
+              "name": "stair_lamp",
+              "box": [
+                0.595,
+                0.73,
+                0.635,
+                0.84
+              ],
+              "phrase": "the small lamp burning at the head of the stair, its flame live and wavering"
+            }
+          ],
+          "room": "pharos",
+          "state": "base"
+        }
       },
       "unlockedWhen": true,
       "designNote": "ESCAPE · grid-select (mechanic #15), DATA-FREE — no CSV, no console. The lock hotspot (lantern_door) gets type 'grid' + endsEscape:true. VERIFIED KEY [size, shape, colour]. Cards = the 9 amphora seals collected all day (id·colour·shape·size·numeral): 1 Red/Round/Small/1, 2 Red/Round/Medium/2, 3 Red/Tall/Large/3, 4 Red/Squat/Small/4, 5 Blue/Round/Medium/5, 6 Blue/Round/Large/6, 7 Blue/Tall/Small/7, 8 Amber/Round/Large/8, 9 Amber/Tall/Medium/9. VERB SEMANTICS (each = group_by(trait) then reduce): n = COUNT of the largest pile; max = greatest pile TOTAL of numerals; min = least pile TOTAL. RESULT TABLE rows verb x cols trait: n -> colour 4, shape 5, size 3; max -> colour 18, shape 22, size 17; min -> colour 10, shape 4, size 12. THE QUEUE (on clue queue_board, in order): (1) max -> 17 = group by SIZE; (2) n -> 5 = group by SHAPE; (3) min -> 10 = group by COLOUR. grid items = the 3 queued steps (columns), buckets = the 3 traits colour/shape/size (rows), answer = {step1:size, step2:shape, step3:colour}. PAYOFF: solving opens the door and lights lamp_dial — a switch/dial the PLAYER turns to swing the beam onto their ship. ONE dial, ONE target, ONE motion — payoff, never a second puzzle. PICKUP RELIABILITY (Lucas 2026-08-07: NO auto-pickup): every seal clue body must end with an explicit 'add it to your notebook' instruction, every room is reachable in reverse via back doors, and the lock's wrong/locked feedback should state how many seals are in hand so a short player knows to go back.",
@@ -3864,128 +3750,6 @@
                 ]
               }
             }
-          ],
-          "cinemagraphCandidates": [
-            {
-              "video": "pharos/cine_harbour_below_c5.mp4",
-              "seed": 181963281,
-              "prompt": "the black water breathing far below, the scattered city lamps guttering, one lit ship's lantern swinging at her stern",
-              "loop": "crossfade",
-              "box": [
-                0.6356,
-                0.2951,
-                0.9147,
-                0.4491
-              ],
-              "edge": 19.6,
-              "live": 34.5,
-              "reject": true
-            },
-            {
-              "video": "pharos/cine_harbour_below_c6.mp4",
-              "seed": 1172885638,
-              "prompt": "the black water breathing far below, the scattered city lamps guttering, one lit ship's lantern swinging at her stern",
-              "loop": "crossfade",
-              "box": [
-                0.6356,
-                0.2951,
-                0.9147,
-                0.4491
-              ],
-              "edge": 29.2,
-              "live": 53.5,
-              "reject": true
-            },
-            {
-              "video": "pharos/cine_harbour_below_c8.mp4",
-              "seed": 1356029963,
-              "prompt": "the black water breathing far below, the scattered city lamps guttering, one lit ship's lantern swinging at her stern",
-              "loop": "crossfade",
-              "box": [
-                0.6356,
-                0.2951,
-                0.9147,
-                0.4491
-              ],
-              "edge": 32.6,
-              "live": 50.5,
-              "reject": true
-            },
-            {
-              "video": "pharos/cine_harbour_below_c2.mp4",
-              "seed": 606738576,
-              "prompt": "the black water breathing far below, the scattered city lamps guttering, one lit ship's lantern swinging at her stern",
-              "loop": "crossfade",
-              "box": [
-                0.6356,
-                0.2951,
-                0.9147,
-                0.4491
-              ],
-              "edge": 39.5,
-              "live": 53.3,
-              "reject": true
-            },
-            {
-              "video": "pharos/cine_harbour_below_c1.mp4",
-              "seed": 1846539511,
-              "prompt": "the black water breathing far below, the scattered city lamps guttering, one lit ship's lantern swinging at her stern",
-              "loop": "crossfade",
-              "box": [
-                0.6356,
-                0.2951,
-                0.9147,
-                0.4491
-              ],
-              "edge": 42.9,
-              "live": 57.6,
-              "reject": true
-            },
-            {
-              "video": "pharos/cine_harbour_below_c3.mp4",
-              "seed": 1562566177,
-              "prompt": "the black water breathing far below, the scattered city lamps guttering, one lit ship's lantern swinging at her stern",
-              "loop": "crossfade",
-              "box": [
-                0.6356,
-                0.2951,
-                0.9147,
-                0.4491
-              ],
-              "edge": 45.5,
-              "live": 56.5,
-              "reject": true
-            },
-            {
-              "video": "pharos/cine_harbour_below_c7.mp4",
-              "seed": 1988920683,
-              "prompt": "the black water breathing far below, the scattered city lamps guttering, one lit ship's lantern swinging at her stern",
-              "loop": "crossfade",
-              "box": [
-                0.6356,
-                0.2951,
-                0.9147,
-                0.4491
-              ],
-              "edge": 51,
-              "live": 66.2,
-              "reject": true
-            },
-            {
-              "video": "pharos/cine_harbour_below_c4.mp4",
-              "seed": 434879085,
-              "prompt": "the black water breathing far below, the scattered city lamps guttering, one lit ship's lantern swinging at her stern",
-              "loop": "crossfade",
-              "box": [
-                0.6356,
-                0.2951,
-                0.9147,
-                0.4491
-              ],
-              "edge": 53.1,
-              "live": 63.6,
-              "reject": true
-            }
           ]
         },
         {
@@ -4108,7 +3872,57 @@
         },
         "scenePrompt": "This is a seamless 360-degree panorama from inside the sealed lamp chamber at the very summit of the great Alexandrian sea-tower, the great fire-lamp burning in its polished bronze mirror-shell in the middle of the floor — the viewer is standing INSIDE the beacon itself, enclosed by its own stone piers and vault. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain run of soot-blackened stone wall between two piers, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, a plain run of soot-blackened stone wall between two heavy piers, lit only by the fire's amber fringe, the surface that meets its other half cleanly at the seam directly behind you; to the left, the massive geared turning-dial the whole lamp rides on — a bronze ring cut with teeth, a train of heavy cogs at its edge, and one long bronze handle standing up at hand height, worn bright where it is gripped; to the left of centre, the open bronze door back out onto the night gallery, cold blue starlight beyond it against all this heat; dead ahead in the centre, the great fire-lamp itself — a fire the size of a cart roaring in a wide iron basket at the centre of the chamber, wrapped behind by a towering shell of polished bronze curved to gather the light and throw it forward; just right of centre, the polished bronze mirror-shell standing behind the fire, its curved face burning white with gathered light and every hammer-mark on it picked out, throwing one hard bar of brilliance out through the seaward arch; to the right, the great seaward arch cut through the chamber wall, the beam pouring out through it into the night, and beyond it open black water stretching away on every side from the island far below, the city's lamps only a thin distant scatter along the shoreline across the harbour; on the far right, the fuel store banked against the wall — split resinous logs stacked to the ceiling and baskets of black pitch-lumps, with smoke curling off the topmost logs where the heat is already working on them. Night, lit ENTIRELY by the great fire — roaring white-gold at its heart falling to deep amber at the edges, raking every curve of the polished bronze, hard black shadows thrown out behind the piers, sparks streaming up into the dark of the vault and smoke dragging out through the seaward arch; blistering, loud, alive; painterly, cinematic, triumphant, subtle film grain. No people, no lettering, no captions, no text. CRITICALLY: no lighthouse, tower, beacon or lit crown anywhere in the view — not on the horizon, not on the mole, not across the water, not in the distance. The viewer is standing on top of the ONLY lighthouse in this world, so it cannot also appear in front of them. The tower is ISLAND-BOUND: no causeway, bridge, mole, jetty or spit of land joining it to the shore, no buildings or streets at its foot — nothing but bare rock and then open water in every direction. The harbour water is EMPTY — no ship, boat or sail anywhere out on the open water, none under way, none at anchor offshore, none between the island and the shore. Every vessel in the scene is tied up alongside the distant wharf, except the one small skiff made fast at the island's own sea-steps. Again: the extreme left and right edges must align perfectly into a plain run of soot-blackened stone wall between two piers, uniform and unbroken, with no visible seam, join, or repetition.",
         "hotspotsReviewed": true,
-        "cinemagraphsVerified": true
+        "cinemagraphsVerified": true,
+        "motionSpec": {
+          "rigid": "The tower stonework, columns, parapet, paving, bronze door, relief panel, machinery, firewood and the city across the water, and the iron fire-basket, the bronze mirror-shell and the gearing",
+          "negatives": [
+            ", the fire going out, the fire spreading, the basket tipping, people, rain, the mirror turning, the gears turning"
+          ],
+          "subjects": [
+            {
+              "name": "signal_fire",
+              "box": [
+                0.38,
+                0.03,
+                0.6,
+                0.68
+              ],
+              "phrase": "the great signal fire standing in its iron basket, flames climbing and falling back, sparks rising off the top and dying, the whole light of the room pulsing with it"
+            },
+            {
+              "name": "mirror_flare",
+              "box": [
+                0.4603,
+                0.0071,
+                0.6151,
+                0.7141
+              ],
+              "phrase": "the huge bronze mirror-shell behind the fire, the hot reflected flare sliding and flickering across its beaten surface as the flames move"
+            },
+            {
+              "name": "chamber_smoke",
+              "box": [
+                0.73,
+                0.18,
+                0.88,
+                0.68
+              ],
+              "phrase": "the smoke lifting off the fire and drifting out through the seaward arch, curling and thinning as it goes"
+            },
+            {
+              "name": "sea_beam",
+              "box": [
+                0.6477,
+                0.1717,
+                0.8077,
+                0.7217
+              ],
+              "phrase": "the beam of light reaching away over the black water beyond the arch, its edge trembling, the distant city lights breathing below it"
+            }
+          ],
+          "room": "lantern",
+          "state": "base"
+        }
       },
       "panorama": "lantern/scene.png",
       "builtFrom": "l1_lantern_1.png",
@@ -4157,415 +3971,25 @@
           "to": "pharos"
         },
         {
-          "id": "great_lamp",
+          "id": "clip_base",
           "type": "ambient",
-          "label": "The great fire-lamp",
+          "label": "Scene motion (base)",
           "box": [
-            0.3263,
             0,
-            0.6398,
-            0.8045
+            0,
+            1,
+            1
           ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/serve-clips.",
           "cinemagraph": {
             "box": [
-              0.3263,
               0,
-              0.6398,
-              0.8045
+              0,
+              1,
+              1
             ],
-            "video": "lantern/cine_great_lamp_c5.mp4",
-            "prompt": "the great fire roaring and surging, flames leaning and streaming, sparks whirling up into the dark of the vault above",
-            "loop": "crossfade",
-            "seed": 617357778
-          },
-          "cinemagraphCandidates": [
-            {
-              "video": "lantern/cine_great_lamp_c5.mp4",
-              "seed": 617357778,
-              "prompt": "the great fire roaring and surging, flames leaning and streaming, sparks whirling up into the dark of the vault above",
-              "loop": "crossfade",
-              "box": [
-                0.3263,
-                0,
-                0.6398,
-                0.8045
-              ],
-              "edge": 4.7,
-              "live": 27.4,
-              "reject": false
-            },
-            {
-              "video": "lantern/cine_great_lamp_c7.mp4",
-              "seed": 2034295264,
-              "prompt": "the great fire roaring and surging, flames leaning and streaming, sparks whirling up into the dark of the vault above",
-              "loop": "crossfade",
-              "box": [
-                0.3263,
-                0,
-                0.6398,
-                0.8045
-              ],
-              "edge": 5,
-              "live": 18.4,
-              "reject": false
-            },
-            {
-              "video": "lantern/cine_great_lamp_c3.mp4",
-              "seed": 501533543,
-              "prompt": "the great fire roaring and surging, flames leaning and streaming, sparks whirling up into the dark of the vault above",
-              "loop": "crossfade",
-              "box": [
-                0.3263,
-                0,
-                0.6398,
-                0.8045
-              ],
-              "edge": 3.3,
-              "live": 4.6,
-              "reject": true
-            },
-            {
-              "video": "lantern/cine_great_lamp_c4.mp4",
-              "seed": 1645620215,
-              "prompt": "the great fire roaring and surging, flames leaning and streaming, sparks whirling up into the dark of the vault above",
-              "loop": "crossfade",
-              "box": [
-                0.3263,
-                0,
-                0.6398,
-                0.8045
-              ],
-              "edge": 3.3,
-              "live": 4.4,
-              "reject": true
-            },
-            {
-              "video": "lantern/cine_great_lamp_c2.mp4",
-              "seed": 1849625859,
-              "prompt": "the great fire roaring and surging, flames leaning and streaming, sparks whirling up into the dark of the vault above",
-              "loop": "crossfade",
-              "box": [
-                0.3263,
-                0,
-                0.6398,
-                0.8045
-              ],
-              "edge": 3.4,
-              "live": 4.5,
-              "reject": true
-            },
-            {
-              "video": "lantern/cine_great_lamp_c1.mp4",
-              "seed": 1590428288,
-              "prompt": "the great fire roaring and surging, flames leaning and streaming, sparks whirling up into the dark of the vault above",
-              "loop": "crossfade",
-              "box": [
-                0.3263,
-                0,
-                0.6398,
-                0.8045
-              ],
-              "edge": 3.7,
-              "live": 4.8,
-              "reject": true
-            },
-            {
-              "video": "lantern/cine_great_lamp_c6.mp4",
-              "seed": 168894935,
-              "prompt": "the great fire roaring and surging, flames leaning and streaming, sparks whirling up into the dark of the vault above",
-              "loop": "crossfade",
-              "box": [
-                0.3263,
-                0,
-                0.6398,
-                0.8045
-              ],
-              "edge": 4.2,
-              "live": 6.3,
-              "reject": true
-            },
-            {
-              "video": "lantern/cine_great_lamp_c8.mp4",
-              "seed": 1503204267,
-              "prompt": "the great fire roaring and surging, flames leaning and streaming, sparks whirling up into the dark of the vault above",
-              "loop": "crossfade",
-              "box": [
-                0.3263,
-                0,
-                0.6398,
-                0.8045
-              ],
-              "edge": 21.7,
-              "live": 32.9,
-              "reject": true
-            }
-          ]
-        },
-        {
-          "id": "mirror_shell",
-          "type": "ambient",
-          "label": "The bronze mirror-shell",
-          "box": [
-            0.4603,
-            0.0071,
-            0.6151,
-            0.7141
-          ],
-          "cinemagraphCandidates": [
-            {
-              "video": "lantern/cine_mirror_shell_c8.mp4",
-              "seed": 827536903,
-              "prompt": "the gathered light crawling and shimmering across the hammered bronze as the flames move behind it",
-              "loop": "crossfade",
-              "box": [
-                0.4603,
-                0.0071,
-                0.6151,
-                0.7141
-              ],
-              "edge": 6.6,
-              "live": 17.5,
-              "reject": false
-            },
-            {
-              "video": "lantern/cine_mirror_shell_c1.mp4",
-              "seed": 496867606,
-              "prompt": "the gathered light crawling and shimmering across the hammered bronze as the flames move behind it",
-              "loop": "crossfade",
-              "box": [
-                0.4603,
-                0.0071,
-                0.6151,
-                0.7141
-              ],
-              "edge": 12.9,
-              "live": 17.6,
-              "reject": true
-            },
-            {
-              "video": "lantern/cine_mirror_shell_c6.mp4",
-              "seed": 714815605,
-              "prompt": "the gathered light crawling and shimmering across the hammered bronze as the flames move behind it",
-              "loop": "crossfade",
-              "box": [
-                0.4603,
-                0.0071,
-                0.6151,
-                0.7141
-              ],
-              "edge": 14.4,
-              "live": 20.8,
-              "reject": true
-            },
-            {
-              "video": "lantern/cine_mirror_shell_c4.mp4",
-              "seed": 1370159450,
-              "prompt": "the gathered light crawling and shimmering across the hammered bronze as the flames move behind it",
-              "loop": "crossfade",
-              "box": [
-                0.4603,
-                0.0071,
-                0.6151,
-                0.7141
-              ],
-              "edge": 18.3,
-              "live": 26,
-              "reject": true
-            },
-            {
-              "video": "lantern/cine_mirror_shell_c5.mp4",
-              "seed": 1274818862,
-              "prompt": "the gathered light crawling and shimmering across the hammered bronze as the flames move behind it",
-              "loop": "crossfade",
-              "box": [
-                0.4603,
-                0.0071,
-                0.6151,
-                0.7141
-              ],
-              "edge": 20.8,
-              "live": 30.4,
-              "reject": true
-            },
-            {
-              "video": "lantern/cine_mirror_shell_c2.mp4",
-              "seed": 463575412,
-              "prompt": "the gathered light crawling and shimmering across the hammered bronze as the flames move behind it",
-              "loop": "crossfade",
-              "box": [
-                0.4603,
-                0.0071,
-                0.6151,
-                0.7141
-              ],
-              "edge": 28.2,
-              "live": 30.1,
-              "reject": true
-            },
-            {
-              "video": "lantern/cine_mirror_shell_c3.mp4",
-              "seed": 1134599281,
-              "prompt": "the gathered light crawling and shimmering across the hammered bronze as the flames move behind it",
-              "loop": "crossfade",
-              "box": [
-                0.4603,
-                0.0071,
-                0.6151,
-                0.7141
-              ],
-              "edge": 36.4,
-              "live": 43.7,
-              "reject": true
-            },
-            {
-              "video": "lantern/cine_mirror_shell_c7.mp4",
-              "seed": 1415361936,
-              "prompt": "the gathered light crawling and shimmering across the hammered bronze as the flames move behind it",
-              "loop": "crossfade",
-              "box": [
-                0.4603,
-                0.0071,
-                0.6151,
-                0.7141
-              ],
-              "edge": 37.2,
-              "live": 40.3,
-              "reject": true
-            }
-          ]
-        },
-        {
-          "id": "sea_arch",
-          "type": "ambient",
-          "label": "The seaward arch",
-          "box": [
-            0.6477,
-            0.1717,
-            0.8077,
-            0.7217
-          ],
-          "cinemagraphCandidates": [
-            {
-              "video": "lantern/cine_sea_arch_c1.mp4",
-              "seed": 1274980862,
-              "prompt": "the beam wavering very slightly as the fire behind it surges, dust and sparks drifting through the shaft of light",
-              "loop": "crossfade",
-              "box": [
-                0.6477,
-                0.1717,
-                0.8077,
-                0.7217
-              ],
-              "edge": 1.8,
-              "live": 2.3,
-              "reject": true
-            },
-            {
-              "video": "lantern/cine_sea_arch_c5.mp4",
-              "seed": 775770808,
-              "prompt": "the beam wavering very slightly as the fire behind it surges, dust and sparks drifting through the shaft of light",
-              "loop": "crossfade",
-              "box": [
-                0.6477,
-                0.1717,
-                0.8077,
-                0.7217
-              ],
-              "edge": 1.8,
-              "live": 2.3,
-              "reject": true
-            },
-            {
-              "video": "lantern/cine_sea_arch_c7.mp4",
-              "seed": 142553637,
-              "prompt": "the beam wavering very slightly as the fire behind it surges, dust and sparks drifting through the shaft of light",
-              "loop": "crossfade",
-              "box": [
-                0.6477,
-                0.1717,
-                0.8077,
-                0.7217
-              ],
-              "edge": 1.9,
-              "live": 2.4,
-              "reject": true
-            },
-            {
-              "video": "lantern/cine_sea_arch_c6.mp4",
-              "seed": 1651496752,
-              "prompt": "the beam wavering very slightly as the fire behind it surges, dust and sparks drifting through the shaft of light",
-              "loop": "crossfade",
-              "box": [
-                0.6477,
-                0.1717,
-                0.8077,
-                0.7217
-              ],
-              "edge": 2.6,
-              "live": 3.4,
-              "reject": true
-            },
-            {
-              "video": "lantern/cine_sea_arch_c4.mp4",
-              "seed": 154370054,
-              "prompt": "the beam wavering very slightly as the fire behind it surges, dust and sparks drifting through the shaft of light",
-              "loop": "crossfade",
-              "box": [
-                0.6477,
-                0.1717,
-                0.8077,
-                0.7217
-              ],
-              "edge": 15.9,
-              "live": 14,
-              "reject": true
-            },
-            {
-              "video": "lantern/cine_sea_arch_c3.mp4",
-              "seed": 1555535815,
-              "prompt": "the beam wavering very slightly as the fire behind it surges, dust and sparks drifting through the shaft of light",
-              "loop": "crossfade",
-              "box": [
-                0.6477,
-                0.1717,
-                0.8077,
-                0.7217
-              ],
-              "edge": 22.2,
-              "live": 18.1,
-              "reject": true
-            },
-            {
-              "video": "lantern/cine_sea_arch_c2.mp4",
-              "seed": 1149486953,
-              "prompt": "the beam wavering very slightly as the fire behind it surges, dust and sparks drifting through the shaft of light",
-              "loop": "crossfade",
-              "box": [
-                0.6477,
-                0.1717,
-                0.8077,
-                0.7217
-              ],
-              "edge": 23.4,
-              "live": 18.8,
-              "reject": true
-            },
-            {
-              "video": "lantern/cine_sea_arch_c8.mp4",
-              "seed": 96885426,
-              "prompt": "the beam wavering very slightly as the fire behind it surges, dust and sparks drifting through the shaft of light",
-              "loop": "crossfade",
-              "box": [
-                0.6477,
-                0.1717,
-                0.8077,
-                0.7217
-              ],
-              "edge": 26.4,
-              "live": 21.9,
-              "reject": true
-            }
-          ]
+            "video": "lantern/cine_base.mp4"
+          }
         }
       ],
       "sfx": [

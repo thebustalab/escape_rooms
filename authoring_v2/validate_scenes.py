@@ -164,10 +164,19 @@ def check_scenario(path):
             elif typ and typ not in ENGINE_TYPES:
                 fails.append(f"{rk}/{eid}: type '{typ}' is not dispatched by the engine")
             if typ == "lock":
+                # `answer` is NOT a grid tell — it is the lock's OWN core field (`answer`, `length`,
+                # `feedback`), so listing it here failed every correctly-wired lock the moment its answer
+                # was mirrored onto plannedHotspots, which the wiring skill requires. It only stayed
+                # hidden because canyon is the first scenario to have BOTH a spec `lock` role and a
+                # planned answer. What actually distinguishes the two mechanics is the SHAPE: a grid's
+                # answer maps items to buckets (a dict/list), a lock's is a scalar code.
                 p = planned.get(slug(e.get("label") or e.get("desc", "")[:60]))
-                if p and any(k in p for k in ("items", "buckets", "answer")):
+                gridish = p and (any(k in p for k in ("items", "buckets"))
+                                 or isinstance(p.get("answer"), (dict, list)))
+                if gridish:
                     fails.append(f"{rk}/{eid}: role `lock` but its content is GRID-shaped "
-                                 f"(items/buckets/answer) — use `grid:true`, `openLock` can't render it")
+                                 f"(items/buckets, or a non-scalar answer) — use `grid:true`, "
+                                 f"`openLock` can't render it")
             # Once a room is BUILT its committed hotspot is the truth — the spec having drifted from it means
             # a re-generation would silently recreate the wrong mechanic (trees' levers + vault gate, 2026-08).
             if typ and eid in committed and committed[eid].get("type") != typ:
@@ -199,13 +208,21 @@ def check_scenario(path):
                     if cx in EDGE_X:
                         warns.append(f"{rk}/{eid}: animated object sits at the wrap edge (x={cx}) — a "
                                      f"seam-crossing cinemagraph needs a hand-drawn wrap box; move it inboard")
-            # ---- x collisions ----
+            # ---- x collisions, ONLY between elements that actually need a box ----
+            # `approx_boxes` gives EVERY element a box, including pure backdrop, so warning on any shared
+            # x flagged 35% of all authored rooms — most of them two bits of scenery that will never carry
+            # a hotspot or a crop, and none of which can conflict with anything. That noise pushes authors
+            # to invent an eighth position (there are only seven — see SCENE_SPEC_GUIDE rule 1) or to split
+            # a room's ring for no reason. A box is only contended if BOTH sides need one: a gameplay role
+            # (it becomes a real hotspot) or `animate` (it becomes a measured motion subject). Scenery may
+            # share a position freely. (2026-09-03)
+            needs_box = bool(typ) or bool(e.get("animate"))
             bx = boxes.get(eid)
-            if bx:
+            if bx and needs_box:
                 cx = round((bx[0] + bx[2]) / 2, 3)
                 if cx in seen_x:
-                    warns.append(f"{rk}/{eid}: same approximate position (x={cx}) as {seen_x[cx]} — their "
-                                 f"boxes will overlap; vary the `at` phrase")
+                    warns.append(f"{rk}/{eid}: same approximate position (x={cx}) as {seen_x[cx]} — both "
+                                 f"need a box (hotspot or animate), so they will overlap; vary the `at` phrase")
                 seen_x[cx] = eid
 
             # ---- variants ----

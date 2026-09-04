@@ -8,7 +8,14 @@
 // course), so they stay stable across course rekeys. If one of these changes, the codec's byte scheme
 // changed — re-sync decode_codes.R and re-run its Rscript self-test before trusting the new output.
 // The two footguns these guard: base32 accumulator precision on long codes, and version/scenarioId
-// arg order.  Run: node --test  (from escape_rooms/tests/).
+// arg order.
+//
+// V2 (2026-09-02) widened the scenario id to its own byte. v1 packed it into four bits, so ids above 15
+// were SILENTLY TRUNCATED to id & 15 — a code then never matched its own decoder key and every
+// submission graded "invalid/mismatched code", points NA. Two BUILT scenarios were affected (egypt 17,
+// temple 18). The v2 vectors below were cross-checked byte-for-byte against decode_codes.R the same way
+// the v1 ones were; both paths are pinned because v1 codes must stay decodable.
+// Run: node --test  (from escape_rooms/tests/).
 
 const test = require("node:test");
 const assert = require("node:assert/strict");
@@ -73,4 +80,49 @@ test("long (>6 byte) codes do not overflow — the base32 precision footgun", ()
   const a = encode(opts), b = encode(opts);
   assert.equal(a, b);
   assert.match(a, /^[0-9A-HJKMNP-TV-Z-]+$/);
+});
+
+// ---- v2: the two-byte header -----------------------------------------------------------------------
+// Cross-checked against decode_codes.R on 2026-09-02 (identical strings for every id below).
+const V2_STEPS = [{ answer: 2, attempts: 1 }, { answer: 3, attempts: 1 },
+                  { answer: 0, attempts: 1 }, { answer: 1, attempts: 1 }];
+const V2_VECTORS = [
+  [6,   "JXTA-BHM2-9AMG"],
+  [15,  "JXYT-BHM2-98S0"],
+  [17,  "JXHT-BHM2-98Y0"],   // wrangling/egypt — ungradeable under v1
+  [18,  "JXGA-BHM2-9AYG"],   // hierarchical_clustering/temple — ungradeable under v1
+  [19,  "JXGT-BHM2-98Z0"],   // networks/beacons
+  [255, "JY6T-BHM2-98H0"],   // the top of the widened range
+];
+
+test("v2 golden vectors — must stay byte-identical to decode_codes.R", () => {
+  for (const [id, expected] of V2_VECTORS) {
+    assert.equal(encode({ version: 2, scenarioId: id, secret: "TEST_SECRET_v1",
+                          studentId: "xcheck", steps: V2_STEPS }), expected,
+                 `v2 scenarioId ${id}`);
+  }
+});
+
+test("THE POINT: ids above 15 are now DISTINCT, not aliased onto id & 15", () => {
+  const mint = (id) => encode({ version: 2, scenarioId: id, secret: "TEST_SECRET_v1",
+                                studentId: "xcheck", steps: V2_STEPS });
+  // under v1 these pairs collided (17&15==1, 18&15==2, 19&15==3); under v2 they must not
+  for (const [a, b] of [[17, 1], [18, 2], [19, 3], [16, 32]]) {
+    assert.notEqual(mint(a), mint(b), `${a} must not alias onto ${b}`);
+  }
+});
+
+test("out-of-range ids are REFUSED, never silently truncated", () => {
+  const mint = (v, id) => encode({ version: v, scenarioId: id, secret: "TEST_SECRET_v1",
+                                   studentId: "x", steps: V2_STEPS });
+  // NB: the codec is loaded in a `vm` realm, so the RangeError it throws is that realm's constructor
+  // and cross-realm `instanceof` is FALSE. Assert on the error's name, not its identity — passing
+  // `RangeError` here silently never matches and the test would pass for the wrong reason.
+  const refuses = (v, id, why) =>
+    assert.throws(() => mint(v, id), (e) => e.name === "RangeError" && /scenarioId/.test(e.message), why);
+  refuses(1, 19, "v1 must refuse an id it cannot represent");
+  refuses(2, 256, "v2 must refuse above its own range");
+  refuses(2, 0, "zero is not a valid scenario id");
+  // and the happy path still mints
+  assert.equal(typeof mint(2, 19), "string");
 });
