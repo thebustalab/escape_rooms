@@ -5,7 +5,7 @@
   "id": 17,
   "title": "The Manifest",
   "subtitle": "Data Wrangling Assignment · group_by + summarise",
-  "story": "Your wine ship arrives in Alexandria at first light, Pharos Lighthouse still burning gold above the harbor. You came in with a cargo — a hold of amphorae from the Aegean islands — and by the law of the port no ship may leave until two things are done: the cargo must be <b>registered</b> with the city, every amphora grouped by origin and accurately tallied; and the great <b>Pharos light turned upon the ship</b> to clear it for the open sea. The tide turns at dusk. Reconcile the manifest room by room, climb to the lantern, swing the light onto your ship, the set loose your sail to escape before the water leaves without you.",
+  "story": "Your wine ship arrives in Alexandria at first light, Pharos Lighthouse still burning gold above the harbor. You came in with a cargo — a hold of amphorae from the Aegean islands — and by the law of the port no ship may leave until two things are done: the cargo must be registered with the city, every amphora grouped by origin and accurately tallied; and the great Pharos light turned upon the ship to clear it for the open sea. The tide turns at dusk. Reconcile the manifest room by room, climb to the lantern, swing the light onto your ship, the set loose your sail to escape before the water leaves without you.",
   "enterLabel": "Go ashore →",
   "done": {
     "title": "The manifest is reconciled!",
@@ -2416,7 +2416,7 @@
               "Rhodes — 6.47",
               "Thasos — 6.44",
               "Chios — 7.28",
-              "Chios — 6.26",
+              "Chios — 8.26",
               "all four alike — about 6.75",
               "Chios — 1,010 amphorae"
             ],
@@ -5182,6 +5182,49 @@
               "prompt": "Keep this exact scene and its exact composition: the same vast reading-hall from the same viewpoint, the same equirectangular 360 wrap with the walls curving away on both sides and the vaulted ceiling arching overhead, the same tiered scroll-niches and railed galleries running right around, the same monumental bronze water-clock left of centre with its great round dial, its long pointer, its graduated cylindrical tank and its stepped plinth, the same tall bronze doors standing open on the left with the colonnade beyond, the same archivist's great reading-desk at the centre heaped with open ledgers, the same tall arched clerestory window high on the right, the same row of long linen veils hanging down the right-hand wall, the same crowded working desks, baskets, carts and stacked scrolls, the same arched opening giving into the further hall — every object at the same position, the same scale and the same shape. Change ONLY the time of day: the last gold dusk light is gone and it is now deep night. The broad shaft falling from the arched clerestory window becomes a pale COLD MOONLIGHT shaft, entering at the same angle and landing on the same place on the floor. The hall is now lit by its own burning oil lamps and standing lampstands along the desks and the shelf-edges, throwing warm pools across the open ledgers and up into the nearest niches, with the bronze of the water-clock catching that lamplight. The upper tiers, the vaulted ceiling and the far reaches of the hall fall away into deep warm-black shadow. The linen veils hang pale in the moonlight. Through the open bronze doors, the moonlit marble of the avenue outside. No people, no lettering, no captions, no text."
             }
           ]
+        },
+        {
+          "id": "clip_base",
+          "type": "ambient",
+          "label": "Scene motion (base)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/serve-clips.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "library/cine_base.mp4"
+          }
+        },
+        {
+          "id": "clip_night",
+          "type": "ambient",
+          "label": "Scene motion (night)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/serve-clips.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "library/cine_night.mp4",
+            "state": "night"
+          }
         }
       ],
       "debrief": "The capstone, and the one that overturns the day. The shipping-ledger made the trouble plain: the islands do not send the same grapes in the same proportions, so the market's average told you about the packing and not about the ground. The repair is two summarise steps instead of one. Take a mean for each island-and-grape pairing first, so a common grape and a noble one each contribute a single figure; then release that grouping and average those figures within each island — group_by(region, varietal) %>% summarise, then ungroup and regroup by region alone. Every grape now counts once however many jars of it were shipped, and the ranking turns over completely: Thasos leads at 7.43, and Chios, the loud favourite, falls to last at 6.26. Same data, same question, opposite answer. The only difference is whether the piles were built fairly."
@@ -5381,6 +5424,27 @@
           ],
           "direction": "back",
           "to": "quay"
+        },
+        {
+          "id": "clip_base",
+          "type": "ambient",
+          "label": "Scene motion (base)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/serve-clips.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "boat/cine_base.mp4"
+          }
         }
       ],
       "debrief": "No analysis, only the crossing — the stretch of water where the Pharos stopped being scenery on the skyline and became the thing you had to climb."
@@ -5486,31 +5550,61 @@
             "The great bronze door stays SHUT and does not move, swing or open."
           ],
           "negatives": [
-            ", the door opening, the door swinging, people, rain, storm, lightning, fast water, rushing water, churning surf, breaking waves, crashing spray, foam surging, rapid ripples, choppy water, boiling water, time-lapse water, the rocks moving, the cliff shifting, flashing, strobing, pulsing light, throbbing glow, flickering brightness, the scene brightening and darkening, exposure changing, the whole image getting lighter or darker"
+            ", the door opening, the door swinging, people, rain, storm, lightning, fast water, rushing water, churning surf, breaking waves, crashing spray, foam surging, rapid ripples, choppy water, boiling water, time-lapse water, waves at the shore, surf around the rocks, water slapping the boat, the rocks moving, the cliff shifting, flashing, strobing, pulsing light, throbbing glow, flickering brightness, the scene brightening and darkening, exposure changing, the whole image getting lighter or darker, light washing across the stone"
           ],
           "subjects": [
             {
-              "name": "door_edge_glow",
+              "name": "door_seam_1",
               "box": [
-                0.435,
-                0.1,
-                0.565,
-                0.82
+                0.436,
+                0.098,
+                0.454,
+                0.776
               ],
-              "phrase": "a steady seam of hot gold light around all four edges of the sealed bronze door, its brightness holding almost constant and lifting only very slightly, never flaring, pulsing or throbbing"
+              "phrase": "a steady seam of hot gold light around the edges of the sealed bronze door, holding almost perfectly constant and lifting only the very slightest amount, never flaring, pulsing, throbbing or washing out across the stone"
             },
             {
-              "name": "floor_rays",
+              "name": "door_seam_2",
               "box": [
-                0.39,
-                0.7,
-                0.63,
-                1.0
+                0.537,
+                0.098,
+                0.558,
+                0.776
               ],
-              "phrase": "the long rays of that light lying still across the paving, their soft edges breathing the smallest amount while their brightness barely changes at all"
+              "phrase": "a steady seam of hot gold light around the edges of the sealed bronze door, holding almost perfectly constant and lifting only the very slightest amount, never flaring, pulsing, throbbing or washing out across the stone"
             },
             {
-              "name": "open_sea",
+              "name": "door_seam_3",
+              "box": [
+                0.436,
+                0.09,
+                0.558,
+                0.126
+              ],
+              "phrase": "a steady seam of hot gold light around the edges of the sealed bronze door, holding almost perfectly constant and lifting only the very slightest amount, never flaring, pulsing, throbbing or washing out across the stone"
+            },
+            {
+              "name": "door_seam_4",
+              "box": [
+                0.44,
+                0.73,
+                0.546,
+                0.78
+              ],
+              "phrase": "a steady seam of hot gold light around the edges of the sealed bronze door, holding almost perfectly constant and lifting only the very slightest amount, never flaring, pulsing, throbbing or washing out across the stone"
+            },
+            {
+              "name": "door_seam_5",
+              "box": [
+                0.4189,
+                0.7715,
+                0.5882,
+                0.85
+              ],
+              "phrase": "a steady seam of hot gold light around the edges of the sealed bronze door, holding almost perfectly constant and lifting only the very slightest amount, never flaring, pulsing, throbbing or washing out across the stone"
+            },
+            {
+              "name": "open_water_1",
               "box": [
                 0.84,
                 0.4,
@@ -5520,7 +5614,7 @@
               "phrase": "the black sea far below lying heavy and almost flat, swelling and settling again in one long, slow rhythm, its surface barely creasing and never hurrying"
             },
             {
-              "name": "inner_water",
+              "name": "open_water_2",
               "box": [
                 0.898,
                 0.5,
@@ -5530,19 +5624,19 @@
               "phrase": "the black sea far below lying heavy and almost flat, swelling and settling again in one long, slow rhythm, its surface barely creasing and never hurrying"
             },
             {
-              "name": "rock_surf",
-              "box": [
-                0.86,
-                0.54,
-                0.906,
-                0.77
-              ],
-              "phrase": "a pale wash of foam at the foot of the rocks, gathering and thinning very slowly where it lies, without breaking, rushing or throwing spray"
-            },
-            {
-              "name": "city_lights",
+              "name": "city_lights_1",
               "box": [
                 0.62,
+                0.3,
+                0.752,
+                0.44
+              ],
+              "phrase": "the lamps of the city along the far shore, each small light breathing and steadying"
+            },
+            {
+              "name": "city_lights_2",
+              "box": [
+                0.782,
                 0.3,
                 0.99,
                 0.44
@@ -5558,6 +5652,197 @@
                 0.84
               ],
               "phrase": "the small lamp burning at the head of the stair, its flame alive and just perceptibly wavering inside its glass"
+            },
+            {
+              "name": "ph_hold_01",
+              "box": [
+                0.0,
+                0.0,
+                1.0,
+                0.0898
+              ],
+              "still": true,
+              "phrase": "The tower, its parapet and paving, the bronze door and its relief, the cliff, the rocks and the moored boat are stone, metal and timber: they do not move, and they do not brighten or darken as a whole."
+            },
+            {
+              "name": "ph_hold_02",
+              "box": [
+                0.0,
+                0.0898,
+                0.4355,
+                0.7695
+              ],
+              "still": true
+            },
+            {
+              "name": "ph_hold_03",
+              "box": [
+                0.5586,
+                0.0898,
+                1.0,
+                0.2969
+              ],
+              "still": true
+            },
+            {
+              "name": "ph_hold_04",
+              "box": [
+                0.4551,
+                0.1289,
+                0.5352,
+                0.7266
+              ],
+              "still": true
+            },
+            {
+              "name": "ph_hold_05",
+              "box": [
+                0.5586,
+                0.2969,
+                0.6191,
+                0.7266
+              ],
+              "still": true
+            },
+            {
+              "name": "ph_hold_06",
+              "box": [
+                0.7539,
+                0.2969,
+                0.7812,
+                1.0
+              ],
+              "still": true
+            },
+            {
+              "name": "ph_hold_07",
+              "box": [
+                0.9902,
+                0.2969,
+                1.0,
+                0.3984
+              ],
+              "still": true
+            },
+            {
+              "name": "ph_hold_08",
+              "box": [
+                0.6191,
+                0.4414,
+                0.7539,
+                0.7266
+              ],
+              "still": true
+            },
+            {
+              "name": "ph_hold_09",
+              "box": [
+                0.7812,
+                0.4414,
+                0.8398,
+                1.0
+              ],
+              "still": true
+            },
+            {
+              "name": "ph_hold_10",
+              "box": [
+                0.8398,
+                0.4805,
+                1.0,
+                0.5
+              ],
+              "still": true
+            },
+            {
+              "name": "ph_hold_11",
+              "box": [
+                0.8398,
+                0.5,
+                0.8965,
+                1.0
+              ],
+              "still": true
+            },
+            {
+              "name": "ph_hold_12",
+              "box": [
+                0.9766,
+                0.5,
+                1.0,
+                1.0
+              ],
+              "still": true
+            },
+            {
+              "name": "ph_hold_13",
+              "box": [
+                0.5586,
+                0.7266,
+                0.5938,
+                0.7695
+              ],
+              "still": true
+            },
+            {
+              "name": "ph_hold_14",
+              "box": [
+                0.6367,
+                0.7266,
+                0.7539,
+                1.0
+              ],
+              "still": true
+            },
+            {
+              "name": "ph_hold_15",
+              "box": [
+                0.0,
+                0.7695,
+                0.418,
+                1.0
+              ],
+              "still": true
+            },
+            {
+              "name": "ph_hold_16",
+              "box": [
+                0.5898,
+                0.7695,
+                0.5938,
+                1.0
+              ],
+              "still": true
+            },
+            {
+              "name": "ph_hold_17",
+              "box": [
+                0.5938,
+                0.8438,
+                0.6367,
+                1.0
+              ],
+              "still": true
+            },
+            {
+              "name": "ph_hold_18",
+              "box": [
+                0.418,
+                0.8516,
+                0.5898,
+                1.0
+              ],
+              "still": true
+            },
+            {
+              "name": "ph_hold_19",
+              "box": [
+                0.8965,
+                0.8711,
+                0.9766,
+                1.0
+              ],
+              "still": true
             }
           ],
           "room": "pharos",

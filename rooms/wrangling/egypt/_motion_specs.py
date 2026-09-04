@@ -243,6 +243,89 @@ LIB_LAMP_PHRASE = ("the little oil lamps and lanterns burning all round the hall
                    "wood beside it breathes with it")
 
 
+# ── pharos: the same inversion the Library needed, for the same reason ───────────────────────────
+# THIRD PASS, 2026-09-04. Lucas: "the water is still really fast and the light pulses too much. The
+# water issue is mainly right at the shore by the little boat and the rocks."
+#
+# THE SHORE WATER WAS NEVER A SUBJECT. open_sea, inner_water and rock_surf between them cover the
+# offshore water and the spur, and they DID slow down when their phrases were rewritten — the open sea
+# is nearly flat now. The stretch Lucas is pointing at, the foam around the rocks below the mooring
+# lamp and the little boat, sat outside all three boxes. Nothing named it, so nothing governed its
+# pace: "the scheme's blind spot is whatever you forgot to list". Two rounds of slowing the water were
+# slowing the wrong water. It is named now, and its phrase is the slowest in the room.
+#
+# THE PULSE IS CAPPED IN THE MASK, not just asked away. Tempering the phrases took the whole-frame
+# luminance swing from 37.8 to 6.7 — a real fix, and still an order of magnitude above the 0.3-1.6
+# every other clip in the scenario sits at, because the door glow lights the ENTIRE cliff and paving
+# and a prompt cannot promise how far a light spreads. So pharos now frees only the light ITSELF —
+# four thin seams around the door and a shallow band of the brightest paving at its threshold — plus
+# the water, the city lights and the stair lamp, and pins the rest. Stone that changes brightness is
+# the artefact; stone is the thing being pinned.
+# `floor_rays` is DROPPED as a subject: it was the phrase that tied the whole paving to the door's
+# pulse ("brightening and dimming WITH IT"), and the paving is in `rigid` anyway.
+PHAROS_SEAMS = [
+    [0.4360, 0.0980, 0.4540, 0.7760],   # left edge of the door
+    [0.5370, 0.0980, 0.5580, 0.7760],   # right edge
+    [0.4360, 0.0900, 0.5580, 0.1260],   # head
+    [0.4400, 0.7300, 0.5460, 0.7800],   # foot
+    [0.4189, 0.7715, 0.5882, 0.8500],   # the brightest paving at the threshold
+]
+PHAROS_WATER_OPEN = [[0.840, 0.400, 1.000, 0.478], [0.898, 0.500, 0.975, 0.870]]
+# THE SHORE WATER IS PINNED, after prompting was given two clear goes at it and did not take.
+# Naming it worked in the sense that matters — it went from unnamed to governed — but the foam among
+# the rocks still re-formed wholesale between consecutive frames at p95 19-29, and it brought a second
+# problem with it: the water was the only thing moving against newly-pinned rock, so the pin boundary
+# itself became visible, a straight edge across a pale wash. That is the rule this scenario keeps
+# re-learning — an edge is invisible where nothing moves and glaring where something does.
+# Pinning it fixes both at once and costs a re-bake, not a render. What it costs is a still shoreline;
+# at night, in a sheltered rocky inlet far below the parapet, that reads. The OPEN water keeps its
+# slow swell, so the room still has moving sea.
+# TO GIVE IT BACK: return this list to the `out +=` in `pharos_movers` and re-bake.
+PHAROS_WATER_SHORE = [[0.860, 0.540, 0.906, 0.770],     # the spur's foam
+                      [0.862, 0.845, 0.938, 0.912],     # AT THE BOAT — the stretch Lucas flagged twice
+                      [0.869, 0.912, 0.922, 0.975]]
+# The city band is SPLIT around the near column: as one rectangle it freed the column and the parapet
+# in front of the far shore, and freed stone is stone that can brighten — the exact artefact this pass
+# is capping.
+PHAROS_CITY = [[0.620, 0.300, 0.752, 0.440], [0.782, 0.300, 0.990, 0.440]]
+PHAROS_STAIR_LAMP = [0.595, 0.73, 0.635, 0.84]
+
+PHAROS_SEAM_PHRASE = ("a steady seam of hot gold light around the edges of the sealed bronze door, "
+                      "holding almost perfectly constant and lifting only the very slightest amount, "
+                      "never flaring, pulsing, throbbing or washing out across the stone")
+PHAROS_OPEN_PHRASE = ("the black sea far below lying heavy and almost flat, swelling and settling again "
+                      "in one long, slow rhythm, its surface barely creasing and never hurrying")
+PHAROS_SHORE_PHRASE = ("the pale foam among the rocks at the water's edge below the mooring lamp, "
+                       "easing in and thinning out again very slowly indeed, the slowest thing in the "
+                       "picture, never breaking, rushing, churning or throwing spray")
+
+
+def pharos_movers():
+    """The light, the water and the lamps — one subject per location, one phrase each."""
+    out = [{"name": "door_seam_%d" % n, "box": b, "phrase": PHAROS_SEAM_PHRASE}
+           for n, b in enumerate(PHAROS_SEAMS, 1)]
+    out += [{"name": "open_water_%d" % n, "box": b, "phrase": PHAROS_OPEN_PHRASE}
+            for n, b in enumerate(PHAROS_WATER_OPEN, 1)]
+    # PHAROS_WATER_SHORE is NOT here — it is pinned. See the note above `PHAROS_WATER_SHORE`.
+    out += [{"name": "city_lights_%d" % n, "box": b,
+             "phrase": "the lamps of the city along the far shore, each small light breathing and steadying"}
+            for n, b in enumerate(PHAROS_CITY, 1)]
+    out += [{"name": "stair_lamp", "box": PHAROS_STAIR_LAMP,
+             "phrase": "the small lamp burning at the head of the stair, its flame alive and just "
+                       "perceptibly wavering inside its glass"}]
+    return out
+
+
+def pharos_pins():
+    """Everything the movers do not claim — tower, paving, cliff, rocks, boat, and the shore water."""
+    subs = [{"name": "ph_hold_%02d" % n, "box": b, "still": True}
+            for n, b in enumerate(_pins([m["box"] for m in pharos_movers()]), 1)]
+    subs[0]["phrase"] = ("The tower, its parapet and paving, the bronze door and its relief, the cliff, "
+                         "the rocks and the moored boat are stone, metal and timber: they do not move, "
+                         "and they do not brighten or darken as a whole.")
+    return subs
+
+
 def library_movers(state):
     """The Library's movers: the cloth and the lights, one subject per LOCATION, one phrase each.
 
@@ -588,46 +671,13 @@ SPECS = {
         "negatives": [", the door opening, the door swinging, people, rain, storm, lightning, "
                       "fast water, rushing water, churning surf, breaking waves, crashing spray, "
                       "foam surging, rapid ripples, choppy water, boiling water, time-lapse water, "
+                      "waves at the shore, surf around the rocks, water slapping the boat, "
                       "the rocks moving, the cliff shifting, flashing, strobing, pulsing light, "
                       "throbbing glow, flickering brightness, the scene brightening and darkening, "
-                      "exposure changing, the whole image getting lighter or darker"],
-        "subjects": [
-            # THE ROOM WAS STROBING, and it took a whole-frame luminance measurement to see it. The
-            # door glow was authored "surging and easing as the fire behind it works" and the floor
-            # rays "brightening and dimming WITH IT" — two phrases that tie the largest light source
-            # in the frame to a pulse and then tie the whole paving to that pulse. The result swung
-            # mean frame luminance 32.4 -> 70.1, more than DOUBLE, against 0.3-1.6 for every other
-            # clip in the scenario. That is not a subject moving too fast, it is the exposure of the
-            # entire picture changing, and it lights the whole cliff from dark to gold and back.
-            # Both phrases now ask for a steady seam that barely changes, and the negatives name
-            # flashing directly. `force_repair` is dropped from the glow: it measured p95 72, so
-            # forcing a repair tile on it was spending GPU to make the hottest thing in the frame
-            # hotter (`force_repair` is for subjects that come back DEAD).
-            {"name": "door_edge_glow", "box": [0.435, 0.10, 0.565, 0.82],
-             "phrase": "a steady seam of hot gold light around all four edges of the sealed bronze "
-                       "door, its brightness holding almost constant and lifting only very slightly, "
-                       "never flaring, pulsing or throbbing"},
-            {"name": "floor_rays", "box": [0.39, 0.70, 0.63, 1.0],
-             "phrase": "the long rays of that light lying still across the paving, their soft edges "
-                       "breathing the smallest amount while their brightness barely changes at all"},
-            # The three water regions, each of them water and not cliff. They share one phrase, so
-            # `render_prompt` names it once (three copies of a motion sentence is how canyon's clips
-            # got over-driven).
-            {"name": "open_sea", "box": [0.840, 0.400, 1.000, 0.478],
-             "phrase": "the black sea far below lying heavy and almost flat, swelling and settling again "
-                       "in one long, slow rhythm, its surface barely creasing and never hurrying"},
-            {"name": "inner_water", "box": [0.898, 0.500, 0.975, 0.870],
-             "phrase": "the black sea far below lying heavy and almost flat, swelling and settling again "
-                       "in one long, slow rhythm, its surface barely creasing and never hurrying"},
-            {"name": "rock_surf", "box": [0.860, 0.540, 0.906, 0.770],
-             "phrase": "a pale wash of foam at the foot of the rocks, gathering and thinning very slowly "
-                       "where it lies, without breaking, rushing or throwing spray"},
-            {"name": "city_lights", "box": [0.62, 0.30, 0.99, 0.44],
-             "phrase": "the lamps of the city along the far shore, each small light breathing and steadying"},
-            {"name": "stair_lamp", "box": [0.595, 0.73, 0.635, 0.84],
-             "phrase": "the small lamp burning at the head of the stair, its flame alive and just "
-                       "perceptibly wavering inside its glass"},
-        ],
+                      "exposure changing, the whole image getting lighter or darker, "
+                      "light washing across the stone"],
+        # MOVERS then PINS, both generated from one list — see `pharos_movers` above.
+        "subjects": pharos_movers() + pharos_pins(),
     },
     # ── the lamp chamber: the fire itself, which is the whole point of the building ────────────────
     "lantern": {
