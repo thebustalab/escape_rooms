@@ -70,3 +70,31 @@ temp/
 
 # pre-art gate stamp — authoring artefact, never published
 .preflight_ok
+
+
+# --- Publish PLAY-REQUIRED only: the whole-directory pass (2026-09-04, Lucas) ---
+# The 2026-08-06 rule above ("only files the player fetches at runtime belong on the public site") was
+# applied to authoring RECORDS but never to the authoring TOOLING, so five directories were still being
+# published. Verified before ignoring: nothing in any `play.html`, `scenario.json` or `shared/*` fetches
+# these at runtime — the only references are prose comments and designNotes.
+#
+# KEPT (do not add here):
+#   rooms/    shared/    — what the player actually loads
+#   githooks/ — 8 KB of repo infrastructure, not play content, but a fresh clone needs it to install the
+#               oversize-blob pre-push guard (`ln -sf ../../githooks/pre-push .git/hooks/pre-push`).
+#               Untracking it would break that documented step.
+#
+# NOTE (same caveat as the rules above): .gitignore does NOT untrack already-committed files. These stay
+# published until you run ONCE on the Mac, in the escape_rooms repo:
+#     git rm -r --cached .     then re-stage the tree (git add .) and commit
+# Disk files are untouched; git just stops tracking the ignored ones. Adding the rules alone changes
+# nothing live, so this can sit here safely until you choose to run it.
+#
+# TRADEOFF, stated plainly: this repo is the ONLY git history for these paths (the Linux box has no git
+# here). Untracking stops FUTURE changes being versioned; past commits keep their history. Syncthing still
+# carries the files to both machines, so they are not at risk of loss, only of being unversioned.
+authoring_v2/
+cinemagraph_tools/
+consistency/
+decoder/
+tests/

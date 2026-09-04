@@ -52,6 +52,235 @@ TOWER_RIGID = ("The tower stonework, columns, parapet, paving, bronze door, reli
 LAMP = ("the hanging oil lamps burning with a small live flame that wavers and settles, their pools of "
         "warm light breathing on the stone around them")
 
+# ── the Library's pins are GENERATED, not listed ─────────────────────────────────────────────────
+# AUTHORED 2026-09-04. Lucas, on the rebuilt Library's clips: "still has all sorts of pages turning and
+# falling everywhere. All the paper needs to be still, focus on lights twinkling instead."
+#
+# The six day / seven night hand-drawn pins were WORKING — every one of them measured 0.31-1.37 in the
+# baked clips. There simply were not enough of them. The rebuilt hall is a ring of scroll-niches from
+# floor to vault, and the motion map showed the whole of that ring alight: left wall p95 15.3, right
+# wall 17.8, against the veils the room exists to show at 20.9. That is the case the threshold slider
+# cannot express — the paper moves as hard as the hero — and the region cut is worse still, because a
+# scroll rack is exactly the large coherent region it keeps. Only pins reach it, and a pin only reaches
+# what it is drawn over. Listing the remaining paper by hand would have meant hand-drawing most of a
+# 3072x1024 frame and being wrong about the corner nobody checked.
+#
+# So the rule is INVERTED here: name what may move, and pin the complement. `_pins()` grids the frame,
+# marks every cell touched by a free box, and emits the rest as merged rectangles. Adding a mover
+# automatically re-cuts the pins around it, which is the property the hand-drawn set did not have.
+#
+# THE LAMPS ARE THE HOLES, and they are why this is not simply "freeze everything but the veils". The
+# twinkle Lucas asked for lives in ~44 practical lights, measured photometrically off `scene_night.png`
+# (warm + bright + compact, the `find_lights.py` test) and merged into 14 holes. They are taken from the
+# NIGHT plate for BOTH states because the night variant preserves the day composition object for object,
+# and by day the sunlit floor outshines every lamp in the room — a photometric pass on `scene.png`
+# returns nothing but paving glints. Measure where the lights are on the plate that shows them.
+#
+# THE HOLE IS THE LAMP GLASS, NOT THE LIGHT POOL, and getting that wrong wasted a bake. The first
+# halo (0.009 x, 0.028 up) was drawn to take the flame AND the warmth it throws, on the assumption
+# that what moves around a lamp is its light. Frame-by-frame it is not: the lamp sits still and its
+# flame varies cleanly inside the glass, while the SCROLL STACK BEHIND IT churns from one frame to
+# the next — rolled ends becoming dark blobs and back. That churn is Lucas's "pages falling
+# everywhere" at close range, and a halo-sized hole hands it a rectangle to do it in, with a hard
+# black edge around it (measured envelope p99 143 inside the hole, 0 outside). So the halo is now
+# barely larger than the measured flame blob: the hole lands on the lamp's own outline, where the
+# picture already has an edge, and the light pool on the desk stays pinned with the paper it lies on.
+# The asymmetry is kept — a flame throws upward and the paper lies below it.
+LIB_LAMPS = [
+    [0.0977, 0.5039, 0.1035, 0.5215], [0.0954, 0.5156, 0.0970, 0.5244], [0.0924, 0.5156, 0.0951, 0.5205],
+    [0.0898, 0.5088, 0.0905, 0.5127], [0.2028, 0.5137, 0.2080, 0.5225], [0.2692, 0.5176, 0.2702, 0.5244],
+    [0.3252, 0.3965, 0.3262, 0.4131], [0.4642, 0.5615, 0.4674, 0.5693], [0.4665, 0.5674, 0.4701, 0.5732],
+    [0.4668, 0.5576, 0.4688, 0.5635], [0.4707, 0.5596, 0.4756, 0.5654], [0.4915, 0.5732, 0.4977, 0.5811],
+    [0.4967, 0.5508, 0.5013, 0.5605], [0.4990, 0.5732, 0.5088, 0.5859], [0.5000, 0.5605, 0.5029, 0.5654],
+    [0.4974, 0.5781, 0.4980, 0.5850], [0.5016, 0.5576, 0.5039, 0.5605], [0.5352, 0.5527, 0.5394, 0.5605],
+    [0.6325, 0.5674, 0.6465, 0.5713], [0.6367, 0.5674, 0.6436, 0.5693], [0.6436, 0.5645, 0.6465, 0.5674],
+    [0.6579, 0.4990, 0.6595, 0.5029], [0.7109, 0.5029, 0.7119, 0.5059], [0.7259, 0.5645, 0.7285, 0.5654],
+    [0.7474, 0.5723, 0.7536, 0.5791], [0.7542, 0.5732, 0.7562, 0.5752], [0.7809, 0.5801, 0.7819, 0.5830],
+    [0.7819, 0.6045, 0.7852, 0.6055], [0.8066, 0.5830, 0.8102, 0.5879], [0.8073, 0.6094, 0.8145, 0.6143],
+    [0.8099, 0.5986, 0.8158, 0.6045], [0.8102, 0.5850, 0.8161, 0.5889], [0.8115, 0.6133, 0.8154, 0.6172],
+    [0.8138, 0.5410, 0.8167, 0.5527], [0.8154, 0.5527, 0.8171, 0.5557], [0.8167, 0.5811, 0.8223, 0.5918],
+    [0.8177, 0.5420, 0.8213, 0.5596], [0.8200, 0.5654, 0.8213, 0.5703], [0.8223, 0.5352, 0.8229, 0.5430],
+    [0.8223, 0.5488, 0.8239, 0.5566], [0.8659, 0.6299, 0.8678, 0.6328], [0.8665, 0.6152, 0.8717, 0.6279],
+    [0.8717, 0.5898, 0.8770, 0.6035],
+]
+LIB_HALO = (0.002, 0.006, 0.004)         # (x, up, down) — see above; ~6x10 px on a 3072x1024 frame
+# THE VEILS WERE PINNED AND ARE NOW BACK — Lucas overturned it the same day: "can it just be the
+# fabric and the light/lanterns? Try prompting hard for gentle motion in fabric and lights/lanterns
+# and negative prompting on paper, scrolls, books." That is the RIGHT fix and pinning was the wrong
+# one: the churn is in the RENDER, and a pin only hides it by freezing whatever sits on top of it.
+# The history below is kept because it is what says a pin cannot save this room on its own.
+#
+# The cloth itself is not the problem: frame by frame the panels hang coherently, their folds shift,
+# and the envelope climbs smoothly down them (p95 13 at the top to 75 near the hems) exactly as
+# hanging linen should. The problem is that the veils are SHEER. The scroll shelving is visible
+# THROUGH them, and that shelving is what this render churns — scroll ends swelling into pale blobs
+# and back between consecutive frames. Three geometries were tried and measured, and the failure is
+# the same each time because it is not geometric:
+#   * one rectangle 0.735-0.888 — takes in the gaps BETWEEN panels, which churn worst;
+#   * six columns, one per panel (detected off the still as the runs of pale cloth in y 0.30-0.52,
+#     column-mean brightness above its 42nd percentile) — the churn stays, because it is BEHIND the
+#     cloth, not beside it;
+#   * cutting the columns short above the churn band — moves a hard pin edge onto lit cloth that is
+#     still moving at p95 65, which is the most visible place a pin edge can possibly land.
+# There is no box that contains the linen and excludes the shelving, because they occupy the same
+# pixels. Lucas: "All the paper needs to be still, focus on lights twinkling instead" — the veils are
+# how the paper was still getting in, so they go, and the lights carry the room.
+#
+# TO PUT THEM BACK: restore the six columns below and re-bake. No GPU, about four minutes.
+LIB_VEIL_COLS = [[0.7298, 0.7354], [0.7581, 0.7731], [0.7809, 0.7920],
+                 [0.7995, 0.8109], [0.8164, 0.8519], [0.8636, 0.8792]]
+LIB_VEILS = [[c[0] - 0.0025, 0.140, c[1] + 0.0025, 0.535] for c in LIB_VEIL_COLS]
+def _beam_bands(y_top, y_bot, step=0.014):
+    """The light shaft as a fine staircase between its two sloping edges.
+
+    The edges are MEASURED, not eyeballed: a brightness profile across the wall at twelve heights,
+    taking the widest run above the row's own median plus 45% of its range. Two earlier by-eye traces
+    were both badly wrong in the same direction — they had the beam leaning hard left and fanning to
+    0.116 wide at the floor, when it actually stays near-vertical and NARROWS, 0.065 wide at y 0.22
+    down to 0.039 at y 0.54. The wedge those traces freed took in the scroll shelving down its whole
+    left flank, which is the paper this pass exists to hold still.
+
+    Bands are ~14 px tall on a 1024-px frame, so each horizontal step is ~1 px: far finer than the
+    beam's own soft edge, and the boundary disappears into the light instead of drawing a staircase."""
+    L0, L1 = 0.629, 0.622          # left edge at y_top / y_bot (measured, +0.005 margin)
+    R0, R1 = 0.705, 0.686          # right edge at y_top / y_bot (measured, +0.005 margin)
+    out, y = [], y_top
+    while y < y_bot - 1e-9:
+        y2 = min(y + step, y_bot)
+        t0, t1 = (y - y_top) / (y_bot - y_top), (y2 - y_top) / (y_bot - y_top)
+        # each band takes the WIDEST extent it spans, so no sliver of beam falls between two bands
+        out.append([round(L0 + (L1 - L0) * t1, 4), round(y, 4),
+                    round(R0 + (R1 - R0) * t0, 4), round(y2, 4)])
+        y = y2
+    return out
+
+
+# THE SHAFT IS A DIAGONAL WEDGE, so it is freed as a staircase, not as one rectangle. The first pass
+# used the subject's own measurement box, [0.575, 0.075, 0.722, 0.560], and that rectangle is mostly
+# WALL — its corners sat on the scroll-niches either side of the light and freed them to animate, the
+# same diagonal-boundary fault as deck's night sea. The second pass fixed the geometry with six bands
+# and introduced a new artefact: six steps are visible AS steps. Hence `_beam_bands`.
+# THE BEAM IS FREED ONLY DOWN TO THE GALLERY RAIL (y 0.330), and that is a judgement call worth
+# stating plainly, because it gives up part of a mover the rebuilt room was designed around.
+# Below the rail the shaft crosses the great stone pier, and there is NO rectangle that separates the
+# airborne haze from the lit masonry behind it — they occupy the same pixels. Freeing that stretch
+# freed the pier, the arch mouldings, a ladder and a run of scroll shelving down its left flank, and
+# all of them crawled harder than the dust did (the day shaft's own hero motion measured 11.8 against
+# the veils at 20.9). Two traces of the beam's edges disagreed for exactly this reason: measured
+# photometrically it returns the LIT PIER, a near-vertical column; traced by eye it returns the
+# airborne haze, which fans left. Both are really there; only one of them should move.
+# So the free region stops at the gallery rail — a horizontal architectural line that already exists
+# in the picture, which is the only kind of place a pin edge can hide. What remains is the window and
+# the first throw of light out of it, which is the legible part anyway.
+LIB_SHAFT = [[0.646, 0.068, 0.710, 0.200]] + _beam_bands(0.200, 0.330)
+LIB_CLOCKWATER = [0.302, 0.326, 0.350, 0.436]
+# The floor's sun-pool is NOT freed, and the first pass was wrong to free it. The room's own `rigid` line
+# already ends "...and the floor" — stone paving that shimmers is the model animating masonry, not light,
+# and it measured p95 44, the hottest thing in the day frame. Freeing it also meant a hard-edged
+# RECTANGLE of moving paving in the middle of a still floor, which is the one artefact a still-pin can
+# introduce: an edge is invisible where nothing moves and glaring where something does.
+
+
+def _merge(boxes):
+    """Union overlapping boxes until nothing overlaps — so two lamps a few pixels apart make one hole."""
+    bs = [list(b) for b in boxes]
+    changed = True
+    while changed:
+        changed, out = False, []
+        while bs:
+            a = bs.pop()
+            for i, b in enumerate(out):
+                if a[0] < b[2] and b[0] < a[2] and a[1] < b[3] and b[1] < a[3]:
+                    out[i] = [min(a[0], b[0]), min(a[1], b[1]), max(a[2], b[2]), max(a[3], b[3])]
+                    changed = True
+                    break
+            else:
+                out.append(a)
+        bs = out
+    return bs
+
+
+def _pins(free, nx=512, ny=256):
+    """Every part of the frame NOT covered by a free box, as merged rectangles.
+
+    512x256 puts a cell at 6x4 px on a 3072x1024 panorama. That is finer than the beam staircase's own
+    14-px bands, which matters: at the first resolution the bands snapped to 8-px rows and the steps
+    re-appeared as steps. It is still coarse enough to keep the rectangle count in the dozens. Cells are grown right then down, greedily, so a plain wall comes back as one box."""
+    xs = [i / nx for i in range(nx + 1)]
+    ys = [j / ny for j in range(ny + 1)]
+    grid = [[False] * nx for _ in range(ny)]
+    for x0, y0, x1, y1 in free:
+        for j in range(max(0, int(y0 * ny)), min(ny, int(y1 * ny + 0.999))):
+            for i in range(max(0, int(x0 * nx)), min(nx, int(x1 * nx + 0.999))):
+                grid[j][i] = True
+    used = [[False] * nx for _ in range(ny)]
+    out = []
+    for j in range(ny):
+        i = 0
+        while i < nx:
+            if grid[j][i] or used[j][i]:
+                i += 1
+                continue
+            i2 = i
+            while i2 < nx and not grid[j][i2] and not used[j][i2]:
+                i2 += 1
+            j2 = j + 1
+            while j2 < ny and all(not grid[j2][k] and not used[j2][k] for k in range(i, i2)):
+                j2 += 1
+            for jj in range(j, j2):
+                for ii in range(i, i2):
+                    used[jj][ii] = True
+            out.append([round(xs[i], 4), round(ys[j], 4), round(xs[i2], 4), round(ys[j2], 4)])
+            i = i2
+    return out
+
+
+LIB_VEIL_PHRASE = ("the tall sheer linen veils hung down the right-hand wall, stirring very gently and "
+                   "settling again in the faintest draught, a slow soft breathing of cloth and nothing "
+                   "more")
+LIB_LAMP_PHRASE = ("the little oil lamps and lanterns burning all round the hall, each flame alive and "
+                   "unsteady inside its glass, gently swelling and sinking so the warm light on the "
+                   "wood beside it breathes with it")
+
+
+def library_movers(state):
+    """The Library's movers: the cloth and the lights, one subject per LOCATION, one phrase each.
+
+    Lucas, after the pinned bake: "can it just be the fabric and the light/lanterns?" So the mover list
+    is exactly that — six veil panels and every practical lamp in the room — plus the window shaft and
+    the clepsydra's falling ribbon, which are light and water rather than paper and were never part of
+    the complaint. Each veil and each lamp needs its own box to be measured, but they share one phrase
+    and `render_prompt` de-duplicates, so the composed prompt names cloth once and lamps once.
+
+    These are the SAME boxes `library_pins` frees, which is the property that matters: a mover the pins
+    overlap is a mover that cannot move, and that is only guaranteed if one list generates both."""
+    out = [{"name": "veil_%d" % n, "box": b, "phrase": LIB_VEIL_PHRASE}
+           for n, b in enumerate(LIB_VEILS, 1)]
+    out += [{"name": "lamp_%02d" % n, "box": b, "phrase": LIB_LAMP_PHRASE}
+            for n, b in enumerate(_lamp_holes(), 1)]
+    return out
+
+
+def _lamp_holes():
+    """The measured lamp blobs, dilated by LIB_HALO and unioned."""
+    mx, mu, md = LIB_HALO
+    return _merge([[max(0.0, b[0] - mx), max(0.0, b[1] - mu), min(1.0, b[2] + mx), min(1.0, b[3] + md)]
+                   for b in LIB_LAMPS])
+
+
+def library_pins(state):
+    """The Library's `still: True` subjects for one state — the complement of everything allowed to move."""
+    free = [LIB_CLOCKWATER] + LIB_SHAFT + [m["box"] for m in library_movers(state)]
+    subs = [{"name": "hold_%02d" % n, "box": b, "still": True}
+            for n, b in enumerate(_pins(free), 1)]
+    # One pin carries the sentence, so the composed prompt states the rule once instead of thirty times.
+    subs[0]["phrase"] = ("Every scroll, ledger, codex, wax tablet and loose sheet in the hall — on the "
+                         "desks, in the wall-niches, stacked on the floor and piled on the carts — lies "
+                         "absolutely dead still. No page turns, lifts, curls, falls or slips, no scroll "
+                         "unrolls, rocks or topples, and no lettering moves.")
+    return subs
+
+
 SPECS = {
     # ── first light on the moored ship: a glassy harbour and the Pharos still lit ──────────────────
     "deck": {
@@ -59,8 +288,10 @@ SPECS = {
         "has_document": True,
         "pinned": ["The written tablet and the open ledger on the deck table lie flat and still; their "
                    "ruled lines and lettering do not move, lift, curl or change."],
-        "negatives": [", rising water, waves breaking over the deck, the ship sailing away, sails "
-                      "unfurling, fast moving clouds, time-lapse sky"],
+        "negatives": [", rising water, waves breaking over the deck, a wave rolling in, a swell "
+                      "travelling across the water, water running up the hull or over the rail, the "
+                      "ship rocking, the ship sailing away, sails unfurling, fast moving clouds, "
+                      "time-lapse sky"],
         "subjects": [
             {"name": "dawn_sky", "box": [0.0, 0.0, 1.0, 0.30],
              "phrase": "the pale dawn sky above the harbour, its colour breathing almost imperceptibly "
@@ -161,18 +392,53 @@ SPECS = {
         ],
     },
     # ── the boast stall in the early afternoon: the brazier smokes ─────────────────────────────────
+    # ── the boast stall in early afternoon ────────────────────────────────────────────────────────
+    # RE-CUED 2026-09-04. Lucas on the base clip: "the kettle itself is moving, needs fixing." Same
+    # authored fault as canopic's fountain, and the same two halves of it:
+    #   * THE BOX. `brazier_smoke` was [0.5475, 0.0162, 0.7394, 0.8441] — nineteen percent of the frame,
+    #     top edge in the awning and bottom edge on the paving, containing the amphora stack, the stall
+    #     post, the wall and the whole bronze cauldron. Drawn on the STRUCTURE, not on the substance.
+    #   * THE PHRASE. It opened "the cauldron on its brazier beside the counter" — the cauldron NAMED as
+    #     the moving subject, in a box big enough to move it. The artefact was in the phrase again.
+    # The box is now the smoke COLUMN above the pot mouth and nothing else, and the phrase names smoke.
+    #
+    # THE PIN WAS THE WRONG INSTRUMENT AND IS GONE (second pass, same day). The first fix pinned the
+    # cauldron and its stand in the playback mask, which stopped the heaving by stopping the pot dead —
+    # and a dead pot is not what the room wants. Lucas: "the kettle in market boast was supposed to be
+    # ALIVE, just stationary." A pin cannot express that distinction. It is a per-pixel freeze, so it
+    # takes the coal glow and the firelight on the bronze along with the wobble.
+    # The pot is therefore held by the PROMPT instead — named in `rigid`, with an explicit "does not
+    # rise, sink, swell, rock, swing" line and matching negatives — while what is genuinely alive about
+    # a cooking pot is named as its own subject: the COALS breathing under it and the firelight moving
+    # on its belly. Both are light, the one category that can be lively without anything travelling.
+    # (The night state has carried a `brazier_coals` subject all along; the day state simply never did.)
+    # The repair TILE is dropped too. It was rendered for the old giant box, so it pasted the moving
+    # cauldron back in; and it made the smoke WEAKER, not stronger (p95 29.7 in the raw render, 16.4
+    # after the tile). The raw render's smoke needs no repair.
     "market_boast": {
-        "rigid": STREET_RIGID + ", and the great pyramid of stacked amphorae behind the counter",
+        "rigid": STREET_RIGID + ", and the great pyramid of stacked amphorae behind the counter, and the "
+                                "bronze cauldron, its hanging bail, its iron tripod and the brazier under it",
         "has_document": True,
         "pinned": ["The hanging reject-slate and the open ledger on the counter lie exactly as they are: "
                    "their chalked marks, ruled lines and lettering do not move, smudge, lift, curl or change.",
                    "The great pyramid of stacked amphorae is solid and fixed: no jar shifts, rocks, "
-                   "rolls or falls."],
-        "negatives": [", people, amphorae falling, the stack collapsing, fire spreading, the stall burning"],
+                   "rolls or falls.",
+                   "The bronze cauldron and the brazier beneath it are heavy metal standing on stone: "
+                   "they do not rise, sink, swell, rock, swing or breathe, and they do not change "
+                   "shape or size. Only the fire, the smoke and the light on them move."],
+        "negatives": [", people, amphorae falling, the stack collapsing, fire spreading, the stall burning, "
+                      "the cauldron rising or sinking, the pot swelling or shrinking, the cauldron rocking "
+                      "or swinging, the brazier moving, metal heaving or bulging"],
         "subjects": [
-            {"name": "brazier_smoke", "box": [0.5475, 0.0162, 0.7394, 0.8441], "force_repair": True,
-             "phrase": "the cauldron on its brazier beside the counter, a thin column of smoke rising off "
-                       "it and curling away, the coals beneath glowing and dimming"},
+            {"name": "brazier_smoke", "box": [0.608, 0.225, 0.732, 0.630],
+             "phrase": "a thin column of smoke standing above the mouth of the cauldron, thickening and "
+                       "thinning and curling over on itself in place"},
+            {"name": "brazier_coals", "box": [0.626, 0.786, 0.706, 0.884],
+             "phrase": "the bed of coals in the brazier under the pot, breathing from dull red to bright "
+                       "orange and back as the draught takes them"},
+            {"name": "cauldron_sheen", "box": [0.628, 0.646, 0.706, 0.792],
+             "phrase": "the firelight on the belly of the bronze cauldron, its highlights swelling and "
+                       "fading with the coals below while the metal itself never stirs"},
             {"name": "hanging_drape", "box": [0.565, 0.0, 0.645, 0.32],
              "phrase": "the heavy red drape hung at the end of the stall, stirring and settling against "
                        "the post"},
@@ -243,40 +509,36 @@ SPECS = {
                   "the ledgers, scrolls, wax tablets and loose sheets lying on them, the baskets, "
                   "carts and crates, and the floor"),
         "has_document": True,
-        "pinned": ["Every open ledger, scroll, wax tablet and written sheet in the hall lies flat and "
-                   "dead still: no page turns, lifts, curls or changes, and no lettering moves.",
-                   "The scrolls stacked in the wall-niches and piled on the floor do not move, shift, "
-                   "roll or fall."],
-        "negatives": [", people, pages turning, pages fluttering, pages lifting, books opening or "
-                      "closing, scrolls unrolling, scrolls rocking, the clock dial or its pointer "
-                      "turning, the clock swaying, fast moving clouds"],
+        # The two prose pins that used to sit here are gone: the generated pin sentence in
+        # `library_pins` says the same thing once, more completely, and saying it three times only
+        # weights the prompt without holding a single page (`cinemagraph_tools/AGENTS.md` — a fourth
+        # "please don't" is the move that does not work; the mask is what holds paper).
+        "pinned": [],
+        # HARD anti-paper negative, at Lucas's direction (2026-09-04): "negative prompting on paper,
+        # scrolls, books". `has_document` already appends NEG_PAPER (curling, page turning, text
+        # moving); this names the things NEG_PAPER does not — the rolled scroll ENDS packed in the
+        # niches, the stacks, the carts, the shelving itself — because those are what this hall is
+        # made of and what the render was actually churning.
+        "negatives": [", people, pages turning, pages fluttering, pages lifting, paper moving, "
+                      "sheets shifting, loose sheets sliding, books opening or closing, codices "
+                      "moving, ledgers moving, scrolls unrolling, scrolls rocking, scrolls rolling, "
+                      "scrolls falling, scroll ends swelling, scroll stacks shifting, scroll racks "
+                      "changing, shelving moving, the niches rearranging, the clock dial or its "
+                      "pointer turning, the clock swaying, fast moving clouds"],
         "subjects": [
-            {"name": "window_veils", "box": [0.735, 0.140, 0.888, 0.552],
-             "phrase": "the tall sheer linen veils hung down the right-hand wall, breathing slowly in "
-                       "and out in the draught and settling back against the shelving"},
-            {"name": "dusk_shaft", "box": [0.575, 0.075, 0.722, 0.555], "force_repair": True,
-             "phrase": "fine dust hanging thick in the broad shaft of last gold light from the high "
-                       "arched window, turning and drifting slowly down through the beam"},
+            # `window_veils` was the day room's strongest mover (p95 20.9) and is now PINNED with the
+            # rest of the paper — see LIB_VEILS above for why, and for how to put it back.
+
+            {"name": "dusk_shaft", "box": [0.646, 0.068, 0.710, 0.330], "force_repair": True,
+             "phrase": "the broad shaft of last gold light standing in the high arched window, its fine "
+                       "dust turning and settling very slowly inside the beam"},
             {"name": "clock_water", "box": [0.308, 0.330, 0.345, 0.432], "force_repair": True,
              "phrase": "the thin ribbon of water falling from the water-clock's upper cistern into the "
                        "graduated tank below, and the water trembling where it lands"},
-            # STILL PINS — enforced in the playback mask, not merely asked for. The hall is now full of
-            # open ledgers and stacked scrolls, so the paper risk is far larger than it was in the bare
-            # room; these are the largest and most legible written surfaces in the frame.
-            {"name": "clock_dial", "box": [0.290, 0.145, 0.362, 0.328], "still": True,
-             "phrase": "The great bronze clock dial and its long pointer are motionless."},
-            {"name": "clock_tank", "box": [0.283, 0.432, 0.378, 0.872], "still": True,
-             "phrase": "The clock's graduated tank, its gearing and its stone plinth are solid and "
-                       "completely still."},
-            {"name": "great_table_docs", "box": [0.450, 0.540, 0.570, 0.645], "still": True,
-             "phrase": "The open ledgers heaped on the archivist's great desk lie flat and unmoving."},
-            {"name": "mid_right_desks", "box": [0.700, 0.560, 0.845, 0.740], "still": True},
-            {"name": "right_desks", "box": [0.840, 0.585, 1.000, 0.880], "still": True,
-             "phrase": "The scrolls, ledgers and tablets covering the near working desks are fixed "
-                       "where they lie."},
-            {"name": "left_scrolls", "box": [0.000, 0.600, 0.130, 0.870], "still": True,
-             "phrase": "The bundles of rolled scrolls stacked along the foot of the wall are inert."},
-        ],
+            # MOVERS then PINS, both generated from one list — see `library_movers`. The movers are
+            # the cloth and the lights and nothing else; everything the movers do not claim plays its
+            # still, so the paper cannot move even if the render tries.
+        ] + library_movers("base") + library_pins("base"),
     },
     # ── the skiff at nightfall: open water, and the Pharos burning ─────────────────────────────────
     "boat": {
@@ -303,27 +565,68 @@ SPECS = {
         ],
     },
     # ── the lantern gallery: the sealed door, and the light getting out around it ──────────────────
+    # ── the lantern gallery's outer parapet ──────────────────────────────────────────────────────
+    # RE-CUED 2026-09-04. Lucas: "in the base for pharos, the water is moving too quickly." Two causes,
+    # and the box is again half the story:
+    #   * THE BOX. `sea_and_rocks` was [0.84, 0.40, 1.0, 0.96] — its own name admits it. Drawn on the
+    #     whole lower-right quarter, it is roughly half CLIFF: the rock spur, the boat, the mooring lamp
+    #     and the shelf the parapet stands on all sat inside a region the phrase called "the black sea".
+    #     Split into the three parts that are actually water.
+    #   * THE PHRASE. "the black sea WORKING AGAINST the rocks ... white water RISING and falling" is a
+    #     surf phrase, and the render answered with surf: whole foam patterns appearing and vanishing
+    #     between consecutive frames. Every water phrase here now asks for one long slow rhythm, and the
+    #     negatives name speed directly, which nothing in the scheme had done before.
+    # The rocks join `rigid` — TOWER_RIGID never mentioned them, so the biggest object in the frame's
+    # lower half was undeclared.
     "pharos": {
-        "rigid": TOWER_RIGID,
+        "rigid": TOWER_RIGID + ", and the cliff, the rock spur below the parapet, the mooring lamp and "
+                               "the moored boat",
         "has_document": True,
         "pinned": ["The bronze relief panel beside the door is fixed: its carved symbols and marks do not "
                    "move, shift, glow in sequence or change.",
                    "The great bronze door stays SHUT and does not move, swing or open."],
-        "negatives": [", the door opening, the door swinging, people, rain, storm, lightning"],
+        "negatives": [", the door opening, the door swinging, people, rain, storm, lightning, "
+                      "fast water, rushing water, churning surf, breaking waves, crashing spray, "
+                      "foam surging, rapid ripples, choppy water, boiling water, time-lapse water, "
+                      "the rocks moving, the cliff shifting, flashing, strobing, pulsing light, "
+                      "throbbing glow, flickering brightness, the scene brightening and darkening, "
+                      "exposure changing, the whole image getting lighter or darker"],
         "subjects": [
-            {"name": "door_edge_glow", "box": [0.435, 0.10, 0.565, 0.82], "force_repair": True,
-             "phrase": "the hot gold light escaping around all four edges of the sealed bronze door, its "
-                       "brightness surging and easing as the fire behind it works"},
+            # THE ROOM WAS STROBING, and it took a whole-frame luminance measurement to see it. The
+            # door glow was authored "surging and easing as the fire behind it works" and the floor
+            # rays "brightening and dimming WITH IT" — two phrases that tie the largest light source
+            # in the frame to a pulse and then tie the whole paving to that pulse. The result swung
+            # mean frame luminance 32.4 -> 70.1, more than DOUBLE, against 0.3-1.6 for every other
+            # clip in the scenario. That is not a subject moving too fast, it is the exposure of the
+            # entire picture changing, and it lights the whole cliff from dark to gold and back.
+            # Both phrases now ask for a steady seam that barely changes, and the negatives name
+            # flashing directly. `force_repair` is dropped from the glow: it measured p95 72, so
+            # forcing a repair tile on it was spending GPU to make the hottest thing in the frame
+            # hotter (`force_repair` is for subjects that come back DEAD).
+            {"name": "door_edge_glow", "box": [0.435, 0.10, 0.565, 0.82],
+             "phrase": "a steady seam of hot gold light around all four edges of the sealed bronze "
+                       "door, its brightness holding almost constant and lifting only very slightly, "
+                       "never flaring, pulsing or throbbing"},
             {"name": "floor_rays", "box": [0.39, 0.70, 0.63, 1.0],
-             "phrase": "the long rays of that light thrown across the paving, brightening and dimming "
-                       "with it"},
-            {"name": "sea_and_rocks", "box": [0.84, 0.40, 1.0, 0.96],
-             "phrase": "the black sea working against the rocks below the parapet, white water rising and "
-                       "falling back in place"},
+             "phrase": "the long rays of that light lying still across the paving, their soft edges "
+                       "breathing the smallest amount while their brightness barely changes at all"},
+            # The three water regions, each of them water and not cliff. They share one phrase, so
+            # `render_prompt` names it once (three copies of a motion sentence is how canyon's clips
+            # got over-driven).
+            {"name": "open_sea", "box": [0.840, 0.400, 1.000, 0.478],
+             "phrase": "the black sea far below lying heavy and almost flat, swelling and settling again "
+                       "in one long, slow rhythm, its surface barely creasing and never hurrying"},
+            {"name": "inner_water", "box": [0.898, 0.500, 0.975, 0.870],
+             "phrase": "the black sea far below lying heavy and almost flat, swelling and settling again "
+                       "in one long, slow rhythm, its surface barely creasing and never hurrying"},
+            {"name": "rock_surf", "box": [0.860, 0.540, 0.906, 0.770],
+             "phrase": "a pale wash of foam at the foot of the rocks, gathering and thinning very slowly "
+                       "where it lies, without breaking, rushing or throwing spray"},
             {"name": "city_lights", "box": [0.62, 0.30, 0.99, 0.44],
              "phrase": "the lamps of the city along the far shore, each small light breathing and steadying"},
             {"name": "stair_lamp", "box": [0.595, 0.73, 0.635, 0.84],
-             "phrase": "the small lamp burning at the head of the stair, its flame live and wavering"},
+             "phrase": "the small lamp burning at the head of the stair, its flame alive and just "
+                       "perceptibly wavering inside its glass"},
         ],
     },
     # ── the lamp chamber: the fire itself, which is the whole point of the building ────────────────
@@ -360,23 +663,57 @@ SPECS = {
 # The rigid lists, the document pins and the negatives carry over unchanged — a door that must not move
 # by day must not move by night either.
 NIGHT = {
+    # RE-CUED 2026-09-04. Lucas on the night clip: "shows a single wave going into the ship." Three
+    # authored faults, all of them geometry and wording, none of them the model:
+    #   * THE WATERLINE CROSSES THE BOX DIAGONALLY. `night_sea` was [0.0, 0.46, 0.36, 0.76] — one
+    #     rectangle over water whose lower boundary is the ship's own bulwark, and that rail RISES from
+    #     y=0.786 at the left edge to y=0.679 at x=0.36 as it comes toward the viewer. So the bottom of
+    #     that rectangle was hull and wet deck planking for most of its width, and the phrase called all
+    #     of it "the dark harbour". Identical to canyon/undercroft's floodwater over the walkway.
+    #     It is now THREE boxes that each stop clear above the rail where they sit.
+    #   * A TRAVEL WORD. "only a slow swell MOVING under the reflections" asks for net travel, which a
+    #     two-ended loop cannot express, and the fight reads as exactly one wave crossing the frame.
+    #     Every phrase here is now motion IN PLACE.
+    #   * `flame_track` WAS NOT ON THE WATER. [0.27, 0.48, 0.32, 0.60] sits on the Pharos mole itself —
+    #     the fort, its rocks and its masonry — while the phrase called that region a reflection lying
+    #     on the harbour. The gold reflections are below it, y 0.55-0.73. Named a moving water surface
+    #     over stone; the same mistake as calling a wet walkway floodwater.
+    # The hull, rail and deck are now PINNED as well, following the rail's slope in three steps. This is
+    # the belt to the braces: a wave cannot run into the ship if the ship plays its still.
     "deck": [
         {"name": "pharos_flame", "box": [0.272, 0.17, 0.318, 0.29], "force_repair": True,
          "phrase": "the signal fire burning at the head of the distant Pharos, a hot gold flame leaping "
                    "and guttering against the black sky"},
-        {"name": "flame_track", "box": [0.27, 0.48, 0.32, 0.60],
-         "phrase": "the broken gold reflection of that fire lying on the dark harbour below it, "
-                   "shattering and re-forming as the water moves"},
-        {"name": "moon_track", "box": [0.05, 0.46, 0.11, 0.86],
-         "phrase": "the long silver track the moon lays across the water, breaking and closing again"},
+        {"name": "flame_track", "box": [0.225, 0.548, 0.290, 0.694],
+         "phrase": "the broken gold reflections lying on the black water below the lit mole, glinting "
+                   "and re-forming where they lie without travelling"},
+        {"name": "flame_track_far", "box": [0.292, 0.548, 0.332, 0.668],
+         "phrase": "the broken gold reflections lying on the black water below the lit mole, glinting "
+                   "and re-forming where they lie without travelling"},
+        {"name": "moon_track", "box": [0.046, 0.516, 0.088, 0.694],
+         "phrase": "the silver track the moon lays on the water, its scales breaking and closing again "
+                   "in place"},
         {"name": "deck_lamp", "box": [0.648, 0.80, 0.695, 0.95],
          "phrase": "the lamp burning in the open deck hatch, its flame live behind the horn, its warm "
                    "light breathing over the timbers"},
         {"name": "city_lights", "box": [0.62, 0.26, 0.99, 0.62],
          "phrase": "the lit windows and quay lamps of the city along the shore, each small light "
                    "breathing and steadying, their reflections trembling on the water beneath"},
-        {"name": "night_sea", "box": [0.0, 0.46, 0.36, 0.76],
-         "phrase": "the dark harbour lying almost still, only a slow swell moving under the reflections"},
+        {"name": "night_sea_west", "box": [0.000, 0.520, 0.044, 0.694],
+         "phrase": "the dark harbour water wrinkling and settling where it lies, its surface never "
+                   "travelling and never rolling toward the ship, only trembling in place under the "
+                   "reflections"},
+        {"name": "night_sea_mid", "box": [0.090, 0.520, 0.222, 0.694],
+         "phrase": "the dark harbour water wrinkling and settling where it lies, its surface never "
+                   "travelling and never rolling toward the ship, only trembling in place under the "
+                   "reflections"},
+        # THE SHIP, pinned in the playback mask. The rail rises toward the viewer, so the pin follows it
+        # in three steps rather than as one rectangle — the same reason the water needed three.
+        {"name": "hull_west", "box": [0.000, 0.780, 0.150, 1.000], "still": True,
+         "phrase": "The ship's bulwark, rail and deck planking are solid timber and completely still: "
+                   "no water crosses them, breaks over them or runs up them."},
+        {"name": "hull_mid", "box": [0.150, 0.745, 0.300, 1.000], "still": True},
+        {"name": "hull_fore", "box": [0.300, 0.690, 0.470, 1.000], "still": True},
     ],
     "quay": [
         {"name": "pharos_flame", "box": [0.498, 0.27, 0.532, 0.37], "force_repair": True,
@@ -486,36 +823,19 @@ NIGHT = {
     # flames all sit ABOVE y=0.566, so the great-desk pin starts there; the near-right lamp sits to the
     # RIGHT of that desk's ledger at x>0.864, so the ledger pin stops at 0.862.
     "library": [
-        {"name": "table_lamps", "box": [0.455, 0.515, 0.575, 0.564], "force_repair": True,
-         "phrase": "the oil lamps standing among the ledgers on the archivist's great desk, each flame "
-                   "live and unsteady, throwing moving warm light without moving a single page"},
-        {"name": "desk_lamps_near", "box": [0.864, 0.568, 0.898, 0.620], "force_repair": True,
-         "phrase": "the lamp burning on the near working desk, its flame wavering and steadying and its "
-                   "pool of light breathing on the scrolls and the shelving behind"},
-        {"name": "moon_shaft", "box": [0.575, 0.075, 0.722, 0.555], "force_repair": True,
-         "phrase": "the pale cold shaft of moonlight falling from the high arched window, fine dust "
-                   "turning and drifting slowly down through it"},
-        {"name": "window_veils", "box": [0.735, 0.140, 0.888, 0.552],
-         "phrase": "the tall linen veils hanging pale in the moonlight down the right-hand wall, "
-                   "breathing slowly in and out in the night draught"},
+        {"name": "moon_shaft", "box": [0.646, 0.068, 0.710, 0.330], "force_repair": True,
+         "phrase": "the pale cold shaft of moonlight standing in the high arched window, its fine dust "
+                   "turning and settling very slowly inside the beam"},
+        # `window_veils` is pinned in both states — see LIB_VEILS. Night measured it at 7.8, so the
+        # night room loses less than the day room does.
+
         {"name": "clock_water", "box": [0.308, 0.330, 0.345, 0.432], "force_repair": True,
          "phrase": "the thin ribbon of water still falling from the water-clock's upper cistern into the "
                    "graduated tank below, catching the lamplight as it goes"},
-        {"name": "clock_dial", "box": [0.290, 0.145, 0.362, 0.328], "still": True,
-         "phrase": "The great bronze clock dial and its long pointer are motionless."},
-        {"name": "clock_tank", "box": [0.283, 0.432, 0.378, 0.872], "still": True,
-         "phrase": "The clock's graduated tank, its gearing and its stone plinth are solid and "
-                   "completely still."},
-        {"name": "great_table_docs", "box": [0.424, 0.566, 0.570, 0.606], "still": True,
-         "phrase": "The open ledgers and scrolls spread across the archivist's great desk lie flat and "
-                   "dead still."},
-        {"name": "right_ledger", "box": [0.820, 0.598, 0.862, 0.652], "still": True,
-         "phrase": "The great open ledger on the near working desk does not move a page."},
-        {"name": "right_cart_scrolls", "box": [0.858, 0.648, 0.946, 0.885], "still": True},
-        {"name": "right_scroll_stacks", "box": [0.962, 0.650, 1.000, 0.760], "still": True},
-        {"name": "left_scrolls", "box": [0.000, 0.600, 0.130, 0.870], "still": True,
-         "phrase": "The bundles of rolled scrolls stacked along the foot of the wall are inert."},
-    ],
+        # MOVERS then PINS, both generated — see `library_movers`. `table_lamps` and `desk_lamps_near`
+        # are dropped as separate subjects: every practical light in the hall is now a generated lamp
+        # mover, so the two desks no longer carry the whole night on their own.
+    ] + library_movers("night") + library_pins("night"),
 }
 
 def build(room):

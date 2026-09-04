@@ -356,18 +356,25 @@ def main():
         try:
             import re as _re
             shared = os.path.join(HERE, "..", "shared")
-            eng = open(os.path.join(shared, "pano-player.js"), encoding="utf-8").read()
-            imp_tokens = set(_re.findall(r'from\s+"\./[\w-]+\.js\?v=(\d+)"', eng))
-            bare_imports = _re.findall(r'from\s+"(\./[\w-]+\.js)"', eng)          # local imports with NO ?v=
+            # Scan EVERY module in shared/, not just pano-player.js (widened 2026-09-04). A helper that
+            # imports another helper is the same stale-module trap one level down, and the old
+            # pano-player-only scan could not see it: webr-console.js -> webr_view.js was invisible.
+            imp_tokens, bare_imports = set(), []
+            for mod in sorted(glob.glob(os.path.join(shared, "*.js"))):
+                src = open(mod, encoding="utf-8").read()
+                imp_tokens |= set(_re.findall(r'from\s+"\./[\w-]+\.js\?v=(\d+)"', src))
+                bare_imports += [(os.path.basename(mod), m)
+                                 for m in _re.findall(r'from\s+"(\./[\w-]+\.js)"', src)]
             shells = glob.glob(os.path.join(ROOMS, "*", "*", "play.html")) + [os.path.join(shared, "test_play.html")]
             tag_tokens = set()
             for sh in shells:
                 tag_tokens |= set(_re.findall(r'pano-player\.js\?v=(\d+)', open(sh, encoding="utf-8").read()))
             if bare_imports:
-                print(f"VBUMP  pano-player.js imports {bare_imports} with NO ?v= token (a bare local import is never cache-busted — add ?v=N in lockstep with the engine)")
+                for mod, imp in bare_imports:
+                    print(f"VBUMP  {mod} imports {imp} with NO ?v= token (a bare local import is never cache-busted — add ?v=N in lockstep with the engine)")
                 any_bad = True
             if len(imp_tokens | tag_tokens) > 1:
-                print(f"VBUMP  shared-engine cache tokens drift — pano-player.js imports {sorted(imp_tokens)} vs play.html <script> tags {sorted(tag_tokens)}; bump ALL to one ?v=N (stale-helper-module SyntaxError risk)")
+                print(f"VBUMP  shared-engine cache tokens drift — shared/*.js imports {sorted(imp_tokens)} vs play.html <script> tags {sorted(tag_tokens)}; bump ALL to one ?v=N (stale-helper-module SyntaxError risk)")
                 any_bad = True
         except Exception as e:
             print(f"(engine-token check skipped: {e})")

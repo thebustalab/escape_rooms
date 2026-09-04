@@ -70,12 +70,12 @@
 // A bare `./variant_resolve.js` import is NOT refreshed by bumping the <script> tag's ?v, so a changed
 // helper module (e.g. a new export) leaves browsers on a stale cached copy → "doesn't provide an export
 // named X" SyntaxError → blank page (the 2026-08-05 airship regression). Bump all three together.
-import { WebRConsole } from "./webr-console.js?v=85";
-import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs } from "./variant_resolve.js?v=85";   // Phase 3: per-hotspot state variants; monorail switch-door nav
-import * as PQ from "./puzzle_queue.js?v=85";   // dynamic puzzle queue: location-independent puzzle serving
-import { particleCount } from "./particles.js?v=85";   // ambient-particle vocabulary + per-kind field density
-import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=86";
-import { condHolds } from "./cond.js?v=1";   // ledger + elevation-map card DOM
+import { WebRConsole } from "./webr-console.js?v=88";
+import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs } from "./variant_resolve.js?v=88";   // Phase 3: per-hotspot state variants; monorail switch-door nav
+import * as PQ from "./puzzle_queue.js?v=88";   // dynamic puzzle queue: location-independent puzzle serving
+import { particleCount } from "./particles.js?v=88";   // ambient-particle vocabulary + per-kind field density
+import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=88";
+import { condHolds } from "./cond.js?v=88";   // ledger + elevation-map card DOM
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 
@@ -2702,6 +2702,8 @@ async function runSubmitBlock(roomKey, ta, figWrap, stat, runBtn) {
   if (!rconsole || !rconsole.ready) { stat.textContent = "R is still booting — try again in a moment."; return; }
   runBtn.disabled = true; stat.textContent = "running…";
   try {
+    // run(), NOT runFrom(): this regenerates the figure that goes into the student's GRADED PDF, so a
+    // stray selection must never shrink it to a partial plot. Always re-run the whole block.
     await rconsole.run(ta.value);
     const plots = $("#webr-output").querySelectorAll("canvas.webr-plot");
     const src = plots[plots.length - 1];
@@ -3023,7 +3025,9 @@ function bootConsole() {
   const runBtn = $("#run-btn");
   rconsole.init().then(() => { runBtn.disabled = false; })
     .catch(e => { $("#webr-status").textContent = "R failed to start: " + (e.message || e); });
-  runBtn.addEventListener("click", () => rconsole.run($("#code-input").value));
+  // runFrom, not run: executes the student's highlighted selection if there is one, else the whole
+  // editor. Matches the sandbox and the book cells (all three go through the shared console).
+  runBtn.addEventListener("click", () => rconsole.runFrom($("#code-input")));
   // Ctrl/⌘+Enter in the editor runs it, like the standalone WebR sandbox. #code-input is the single
   // persistent console textarea (moved into whichever puzzle modal is open), so this one listener
   // covers every puzzle modal that carries a console (MCQ, check, and pick).
