@@ -1,0 +1,15 @@
+I verified every load-bearing claim independently rather than trusting the write-up.
+
+**Did the worker look?** Yes. My own correlations reproduce theirs (frame 0 vs the three night stills: 0.210 / 0.193 / 0.181), and critically frame 0 vs frame 30 correlates at **0.849** — matching their 0.848. That single number overturns the judge's headline finding: this is **not** a noise render, it is a coherent clip of a render that no longer exists. Viewing frame 0 against `scene_night.png` confirms it — the clip shows an open braided valley with the office right-of-centre, while the current still has a dark ridge occluding the valley, the office centred, and a different mountain line.
+
+**The brazier claim is real.** Cropping the lean-to across frames: mean luma **14.6 → 33.6 → 35.8**, and the images show the basket dark in frame 0 and blazing in frame 30. That is the `background_swing` of 8.07, fully explained.
+
+**The box claims check out.** The old `river_glimmer` box [0.3,0.45,0.6,0.5] crops to almost pure slate roof and stone on the current still — it was measuring nothing. The proposed boxes land correctly: `office_glow` squarely on the lit window and desk lantern, `river_glimmer` on the braided channels, `sorting_bench` tightly around the bench that ignites. The cited corroboration is genuine too — `cine_base.judge.json` (re-rendered Sep 5 against current art, verdict *hold*) really does carry `river_glint` at [0.1,0.41,0.35,0.52].
+
+**The spec is mechanically sound.** `motion_spec.validate` returns no errors, and `render_prompt` emits the `still` subject's phrase into the pinned list, not the mover list — I read the code path at `motion_spec.py:137` and rendered the prompt to confirm.
+
+---
+
+Verified independently: frame0-vs-frame30 correlation 0.849 confirms internal coherence, so the judge's "noise render" reason is wrong and you were right to override it with evidence rather than defer. The lean-to crops confirm the ignition (mean luma 14.6→33.6 between frames 0 and 30), the old river box does crop to bare roof on the current still, `cine_base.judge.json` genuinely carries `river_glint` at [0.1,0.41,0.35,0.52], and the spec validates clean with the `still` phrase emitted as a pin. RERENDER is the correct and only sufficient tier — a rebake re-derives from the same orphaned render and could never fix a stale-lineage defect. The multi-subject rewrite would normally violate one-change-per-attempt, but it is attributable here because it is a single change ("re-author against the replacement still") on a first attempt with no prior night baseline to preserve comparability against, and retaining boxes that measure roof would be strictly worse. Two nits for the next cycle if this one still misses: `river_glimmer`'s x extends to 0.38 and catches drystone wall in its lower band (base uses 0.35), and `office_glow` [0.44,0.52,0.57,0.69] overlaps base's `desk_ledgers` [0.44,0.62,0.64,0.72], so page motion could register as glow liveliness despite the ledger pin.
+
+VERDICT: PASS

@@ -1960,6 +1960,96 @@ def test_cinemagraph_queue_keys_on_room_and_hotspot():
         assert ("beta", "d", "open") not in vkeys, "variant dedupe must stay keyed on the room too"
     _with_rooms_root(body)
 
+# --- the human accept on a still (_accept_still) ------------------------------------------------
+# The one flag no automation may write. seam_stage records the measurements and explicitly refuses
+# to set `accepted`; stills_iterate's verdict vocabulary has no accept value at all. Until
+# 2026-09-05 this field had no writer but a text editor, while run_all_tests.py gated the whole
+# scenario on it.
+
+def _mk_room_with_still(tmp, seam=None):
+    base = os.path.join(hs.ROOMS_ROOT, "ch", "sc")
+    os.makedirs(os.path.join(base, "hall"), exist_ok=True)
+    node = {"key": "hall", "title": "Hall", "authoring": {}}
+    if seam is not None:
+        node["authoring"]["seam"] = seam
+    json.dump({"rooms": [node]}, open(os.path.join(base, "scenario.json"), "w"))
+    open(os.path.join(base, "hall", "scene.png"), "wb").write(b"art")
+    return base
+
+
+def test_accept_still_sets_the_flag_and_stamps_who_and_when():
+    def body(tmp):
+        base = _mk_room_with_still(tmp, seam={"stage": "screened", "needsWork": False})
+        out = hs._accept_still(base, "hall", True, "")
+        assert out["accepted"] is True
+        doc = json.load(open(os.path.join(base, "scenario.json")))
+        rec = doc["rooms"][0]["authoring"]["seam"]
+        assert rec["accepted"] is True
+        assert rec["acceptedBy"].startswith("lucas "), rec
+        assert rec.get("at"), "the accept must be timestamped or staleness cannot be detected"
+    _with_rooms_root(body)
+
+
+def test_accepting_a_flagged_seam_requires_a_written_reason():
+    """Lucas's eye outranks the metric in BOTH directions — the blur can score a perfect 0.0 while
+    smearing the picture, and a huge ratio on a 2-level step in flat sky is invisible. So overriding
+    needsWork is legitimate; doing it silently is not. The standing rule is to write the trade-off
+    down so the choice is visible rather than buried."""
+    def body(tmp):
+        base = _mk_room_with_still(tmp, seam={"stage": "occluded", "needsWork": True})
+        try:
+            hs._accept_still(base, "hall", True, "")
+            assert False, "accepting a flagged seam with no note must be refused"
+        except ValueError as e:
+            assert "judgement call" in str(e), e
+        out = hs._accept_still(base, "hall", True, "step is 2 levels in flat sky, invisible")
+        assert out["accepted"] is True and out["overrodeFlag"] is True
+        rec = json.load(open(os.path.join(base, "scenario.json")))["rooms"][0]["authoring"]["seam"]
+        assert "flat sky" in rec["humanNote"]
+    _with_rooms_root(body)
+
+
+def test_accept_is_refused_when_there_is_no_image():
+    """An accept certifies an IMAGE. Accepting a room with no scene.png would create a verdict
+    attached to nothing, which is how a stale accept survives a regeneration."""
+    def body(tmp):
+        base = os.path.join(hs.ROOMS_ROOT, "ch", "sc")
+        os.makedirs(base, exist_ok=True)
+        json.dump({"rooms": [{"key": "hall", "authoring": {}}]},
+                  open(os.path.join(base, "scenario.json"), "w"))
+        try:
+            hs._accept_still(base, "hall", True, "")
+            assert False, "must refuse"
+        except ValueError as e:
+            assert "nothing to accept" in str(e), e
+    _with_rooms_root(body)
+
+
+def test_unaccepting_clears_the_signature():
+    """Clearing a stale accept is a first-class action: an accept certifies an image, and if the
+    still was replaced afterwards the verdict now describes something nobody saw."""
+    def body(tmp):
+        base = _mk_room_with_still(tmp, seam={"accepted": True, "acceptedBy": "lucas 2026-09-03"})
+        hs._accept_still(base, "hall", False, "")
+        rec = json.load(open(os.path.join(base, "scenario.json")))["rooms"][0]["authoring"]["seam"]
+        assert rec["accepted"] is False
+        assert "acceptedBy" not in rec, "a cleared accept must not keep a signature"
+    _with_rooms_root(body)
+
+
+def test_a_state_variant_accept_nests_under_its_own_state():
+    """A variant keeps its own stage record, its own undo stack and its own human accept — accepting
+    a night scene must never read as accepting the base."""
+    def body(tmp):
+        base = _mk_room_with_still(tmp, seam={"accepted": False})
+        open(os.path.join(base, "hall", "scene_night.png"), "wb").write(b"night")
+        hs._accept_still(base, "hall", True, "", state="night")
+        rec = json.load(open(os.path.join(base, "scenario.json")))["rooms"][0]["authoring"]["seam"]
+        assert rec["states"]["night"]["accepted"] is True
+        assert rec["accepted"] is False, "the base accept must be untouched"
+    _with_rooms_root(body)
+
+
 if __name__ == "__main__":
     tests = [v for k, v in sorted(globals().items()) if k.startswith("test_") and callable(v)]
     for t in tests:

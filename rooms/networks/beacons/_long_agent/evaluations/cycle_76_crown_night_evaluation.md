@@ -1,0 +1,13 @@
+I reproduced the worker's measurements and then controlled them.
+
+**What checks out:** the worker did look — extracting the 61 frames and the box (798,604→1044,706), I get water(>40 luma) temporal ptp mean 7.9 / p95 17.0 versus dark moraine 4.6 / p95 9.0, matching its numbers almost exactly.
+
+**What breaks:** the control is invalid. Comparing bright water to near-black rock measures brightness-scaled codec noise, not motion. Binning the *whole frame* by mean luma and excluding the subject boxes gives a rigid-background baseline of sd 2.50 (luma 25–40) and 2.86 (40–60); the tarn box sits **below** that at every bin — 1.72 and 2.09. The tarn is quieter per unit brightness than the parapet, ridgelines and snowfields it's supposed to be moving against.
+
+The two visual claims fail the same way. A 10-frame temporally-averaged difference map (which kills white noise) over the box shows uniform grain with no coherent structure on the water band — the band is if anything *smoother* than the surrounding rock. And measuring the lower-lip threshold crossing per column with per-frame gain normalisation gives sd 0.59 px / lowpass 0.49 px, statistically identical to two rigid control patches (valley 0.61/0.45; ridge 0.57/0.44). The "advancing and retreating lip" is what a static edge does under this codec.
+
+---
+
+Your numbers reproduce exactly, so you did read the frames — but the water-vs-rock comparison is not a control, because temporal noise scales with luma and your rock is at luma 11 against water at 52. Luma-matched against the rest of the frame, the tarn box is *below* the rigid-background baseline in every brightness bin (1.72 vs 2.50 at luma 25–40; 2.09 vs 2.86 at 40–60), i.e. it varies less than the parapet and snowfields that are supposed to be static. A 10-frame temporally-averaged diff map shows no coherent structure over the water band, and the lip's edge position (gain-normalised, sd 0.59 px) is indistinguishable from two rigid control patches at 0.61 and 0.57 px — so "the lip advances and retreats" and "the surface creases" are descriptions of amplified codec grain, not motion. The judge's "weak" is correct and its `human` tier stands: this needs either a RERENDER that actually strengthens the `glacier_tarn` phrase (it is the only subject to touch — leave river_glimmer and village_lamps alone) or a PARK, not a PASS. Re-run any future PASS-on-weak evidence against a luma-matched rigid region in the same clip before concluding the subject is alive.
+
+VERDICT: FAIL

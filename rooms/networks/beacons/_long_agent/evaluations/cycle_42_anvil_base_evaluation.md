@@ -1,0 +1,5 @@
+The backgrounded grep finished and corroborates the verdict rather than changing it. It confirms the exact stills wording in rooms/networks/beacons/scenario.json — "one fat grey column of woodsmoke standing straight up out of the benches, broad and solid and visible from anywhere on the range" — and shows that clause is one item buried in an extremely long scene prompt packed with competing negatives, which is consistent with the still rendering it as a thin thread instead of a solid column.
+
+It also surfaced that the loop already reached the same conclusion once before, in rooms/networks/beacons/_long_agent/outputs/cycle_42_anvil_base_decision.md, which quotes the same "broad and solid" phrase.
+
+Nothing here contradicts my measurements. The verdict stands: PASS on the worker's PARK, with the real fix being a stills-phase regeneration of that plume or dropping far_smoke as a named subject — Lucas's call.

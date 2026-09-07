@@ -1,0 +1,139 @@
+{
+ "verdict": "reject",
+ "fix_tier": "rerender",
+ "findings": [
+  {
+   "check": "frame0_corr",
+   "value": 0.951,
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  },
+  {
+   "check": "landmark_drift_px",
+   "value": 0,
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  },
+  {
+   "check": "loop_jump",
+   "value": 0.99,
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  },
+  {
+   "check": "background_swing",
+   "value": {
+    "swing": 0.3,
+    "step": 0.11,
+    "rigid_frac": 0.71,
+    "rel_pct": 1.6
+   },
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  },
+  {
+   "check": "dead_subjects",
+   "value": [
+    "sea_beam"
+   ],
+   "band": "reject",
+   "tier": "rerender",
+   "note": "named subject(s) not moving in the shipped clip: sea_beam p95 4.20"
+  },
+  {
+   "check": "weak_subjects",
+   "value": [
+    "chamber_smoke"
+   ],
+   "band": "warn",
+   "tier": "human",
+   "note": "modest but real motion: chamber_smoke p95 6.27"
+  },
+  {
+   "check": "hot_subjects",
+   "value": [
+    "signal_fire",
+    "mirror_flare"
+   ],
+   "band": "warn",
+   "tier": "human",
+   "note": "very hot: signal_fire p95 43.27, mirror_flare p95 43.95 \u2014 over-driven and lively measure the same"
+  }
+ ],
+ "subjects": [
+  {
+   "name": "signal_fire",
+   "box": [
+    0.38,
+    0.03,
+    0.6,
+    0.68
+   ],
+   "p95": 43.27,
+   "mean": 13.88,
+   "luma": 66.4,
+   "verdict": "alive",
+   "expect_still": false,
+   "force": false,
+   "hot": true
+  },
+  {
+   "name": "mirror_flare",
+   "box": [
+    0.4603,
+    0.0071,
+    0.6151,
+    0.7141
+   ],
+   "p95": 43.95,
+   "mean": 12.53,
+   "luma": 71.0,
+   "verdict": "alive",
+   "expect_still": false,
+   "force": false,
+   "hot": true
+  },
+  {
+   "name": "chamber_smoke",
+   "box": [
+    0.73,
+    0.18,
+    0.88,
+    0.68
+   ],
+   "p95": 6.27,
+   "mean": 1.18,
+   "luma": 38.0,
+   "verdict": "weak",
+   "expect_still": false,
+   "force": false,
+   "hot": false
+  },
+  {
+   "name": "sea_beam",
+   "box": [
+    0.6477,
+    0.1717,
+    0.8077,
+    0.7217
+   ],
+   "p95": 4.2,
+   "mean": 0.67,
+   "luma": 44.3,
+   "verdict": "dead",
+   "expect_still": false,
+   "force": false,
+   "hot": false
+  }
+ ],
+ "reasons": [
+  "named subject(s) not moving in the shipped clip: sea_beam p95 4.20"
+ ],
+ "room": "lantern",
+ "state": "base",
+ "clip_mtime": 1788401370.116084
+}

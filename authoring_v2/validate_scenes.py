@@ -252,6 +252,19 @@ def check_scenario(path):
                 if to:
                     adj.setdefault(rk, set()).add(to)
                 views = d.get("opensOnto") or []
+                # A MULTI-VIEW DOOR'S ALTERNATE DESTINATIONS ARE REAL EDGES (2026-09-06).
+                # `to` names only the door's default target, so on a MESH network (networks/subway: five
+                # line-cars, each of which alights at two or three different stations) every station that
+                # is not some car's default read as UNREACHABLE. A view whose `state` — or explicit `to` —
+                # names a real room is a destination that door can actually deliver you to, so it counts.
+                # Conservative by construction: a state that is not a room key (trees' "open",
+                # "to_station1") adds nothing, so no existing scenario's graph changes.
+                for _v in views:
+                    if not isinstance(_v, dict):
+                        continue
+                    _t = _v.get("to") or _v.get("state")
+                    if _t in keys:
+                        adj.setdefault(rk, set()).add(_t)
                 cvars = (committed.get(eid) or {}).get("variants") or []
                 if len(views) > 1 or any(v.get("direction") == "back" for v in cvars if isinstance(v, dict)):
                     switch_door_back[rk] = True

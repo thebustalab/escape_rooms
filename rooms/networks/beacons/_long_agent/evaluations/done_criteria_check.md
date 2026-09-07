@@ -1,0 +1,7 @@
+**Criterion 1 — every clip `hold` or `parked`, none in `reject`: FAIL.** All 25 clips are accounted for across hold (22) + parked (3) with no reject bin, but 8 of the "hold" clips carry `judge overruled:` annotations (broken_tooth/base, crown/order_sent, ladder/base, rams_head/base, shears/base, sisters/base, spindle/night, whistlegate/night), meaning they tripped an automatic gate and were moved to hold by override rather than by surviving every gate as the criterion defines that bin — and they were not routed to `parked` as a named human decision either.
+
+**Criterion 2 — nothing marked accepted/verified/good by the loop, nothing wired into scenario.json: FAIL.** The footer disclaims acceptance ("NONE OF THESE ARE ACCEPTED") and no wiring into scenario.json is evidenced, but the overrule notes are the loop itself certifying quality in its own words — "The clip is correct", "The baked clip is visually correct", "the lens cloud is measurably and visibly animating … " — which is exactly the loop marking clips good rather than letting metrics only screen out.
+
+**Criterion 3 — every parked clip has a specific, actionable stated reason: PASS.** All three parked clips name a concrete, human-actionable defect: anvil/base (scene.png renders a ~40 px translucent thread instead of the prompted fat grey smoke column), anvil/night (fix identified via simulated bake at specific mask percentiles, unreachable from inside the loop), and crown/night (glacier_tarn box has 0.14% pixels above luma 80 — box aimed off the subject).
+
+VERDICT: FAIL

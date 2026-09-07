@@ -1,0 +1,147 @@
+{
+ "verdict": "reject",
+ "fix_tier": "rebake",
+ "findings": [
+  {
+   "check": "frame0_corr",
+   "value": 0.975,
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  },
+  {
+   "check": "landmark_drift_px",
+   "value": 0,
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  },
+  {
+   "check": "loop_jump",
+   "value": 1.36,
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  },
+  {
+   "check": "background_swing",
+   "value": {
+    "swing": 1.06,
+    "step": 0.25,
+    "rigid_frac": 0.73,
+    "rel_pct": 0.8
+   },
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  },
+  {
+   "check": "masked_out",
+   "value": [
+    "side_awnings"
+   ],
+   "band": "reject",
+   "tier": "rebake",
+   "note": "the mask is pinning subject(s) the spec says should move: side_awnings p95 0.00 on the bake but 9.83 on the render"
+  },
+  {
+   "check": "hot_subjects",
+   "value": [
+    "hanging_cloths",
+    "canopy_fringe",
+    "hanging_herbs"
+   ],
+   "band": "warn",
+   "tier": "human",
+   "note": "very hot: hanging_cloths p95 76.74, canopy_fringe p95 35.88, hanging_herbs p95 62.35 \u2014 over-driven and lively measure the same"
+  }
+ ],
+ "subjects": [
+  {
+   "name": "hanging_cloths",
+   "box": [
+    0.7173,
+    0.0901,
+    0.8277,
+    0.9167
+   ],
+   "p95": 76.74,
+   "mean": 30.26,
+   "luma": 119.7,
+   "verdict": "alive",
+   "expect_still": false,
+   "force": false,
+   "hot": true
+  },
+  {
+   "name": "canopy_fringe",
+   "box": [
+    0.28,
+    0.1,
+    0.7,
+    0.36
+   ],
+   "p95": 35.88,
+   "mean": 8.37,
+   "luma": 109.6,
+   "verdict": "alive",
+   "expect_still": false,
+   "force": false,
+   "hot": true
+  },
+  {
+   "name": "hanging_herbs",
+   "box": [
+    0.695,
+    0.09,
+    0.765,
+    0.31
+   ],
+   "p95": 62.35,
+   "mean": 11.21,
+   "luma": 196.3,
+   "verdict": "alive",
+   "expect_still": false,
+   "force": false,
+   "hot": true
+  },
+  {
+   "name": "harbour_water",
+   "box": [
+    0.3,
+    0.5,
+    0.56,
+    0.62
+   ],
+   "p95": 9.78,
+   "mean": 2.3,
+   "luma": 105.5,
+   "verdict": "alive",
+   "expect_still": false,
+   "force": false,
+   "hot": false
+  },
+  {
+   "name": "side_awnings",
+   "box": [
+    0.03,
+    0.36,
+    0.21,
+    0.56
+   ],
+   "p95": 0.0,
+   "mean": 0.01,
+   "luma": 150.4,
+   "verdict": "dead",
+   "expect_still": false,
+   "force": false,
+   "hot": false
+  }
+ ],
+ "reasons": [
+  "the mask is pinning subject(s) the spec says should move: side_awnings p95 0.00 on the bake but 9.83 on the render"
+ ],
+ "room": "market_price",
+ "state": "base",
+ "clip_mtime": 1788399713.7714055
+}

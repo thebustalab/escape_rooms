@@ -1,0 +1,243 @@
+{
+ "verdict": "hold",
+ "fix_tier": null,
+ "findings": [
+  {
+   "check": "frame0_corr",
+   "value": 0.921,
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  },
+  {
+   "check": "landmark_drift_px",
+   "value": 0,
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  },
+  {
+   "check": "loop_jump",
+   "value": 0.51,
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  },
+  {
+   "check": "background_swing",
+   "value": {
+    "swing": 1.79,
+    "step": 1.34,
+    "rigid_frac": 0.8,
+    "rel_pct": 9.0
+   },
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  },
+  {
+   "check": "weak_subjects",
+   "value": [
+    "pharos_flame",
+    "city_lights",
+    "night_sea_west",
+    "night_sea_mid"
+   ],
+   "band": "warn",
+   "tier": "human",
+   "note": "modest but real motion: pharos_flame p95 4.95, city_lights p95 6.43, night_sea_west p95 6.05, night_sea_mid p95 6.51"
+  },
+  {
+   "check": "hot_subjects",
+   "value": [
+    "flame_track_far",
+    "moon_track"
+   ],
+   "band": "warn",
+   "tier": "human",
+   "note": "very hot: flame_track_far p95 50.04, moon_track p95 66.63 \u2014 over-driven and lively measure the same"
+  }
+ ],
+ "subjects": [
+  {
+   "name": "pharos_flame",
+   "box": [
+    0.272,
+    0.17,
+    0.318,
+    0.29
+   ],
+   "p95": 4.95,
+   "mean": 1.95,
+   "luma": 68.5,
+   "verdict": "weak",
+   "expect_still": false,
+   "force": true,
+   "hot": false
+  },
+  {
+   "name": "flame_track",
+   "box": [
+    0.225,
+    0.548,
+    0.29,
+    0.694
+   ],
+   "p95": 31.81,
+   "mean": 7.07,
+   "luma": 20.1,
+   "verdict": "alive",
+   "expect_still": false,
+   "force": false,
+   "hot": false
+  },
+  {
+   "name": "flame_track_far",
+   "box": [
+    0.292,
+    0.548,
+    0.332,
+    0.668
+   ],
+   "p95": 50.04,
+   "mean": 14.04,
+   "luma": 34.8,
+   "verdict": "alive",
+   "expect_still": false,
+   "force": false,
+   "hot": true
+  },
+  {
+   "name": "moon_track",
+   "box": [
+    0.046,
+    0.516,
+    0.088,
+    0.694
+   ],
+   "p95": 66.63,
+   "mean": 20.83,
+   "luma": 64.1,
+   "verdict": "alive",
+   "expect_still": false,
+   "force": false,
+   "hot": true
+  },
+  {
+   "name": "deck_lamp",
+   "box": [
+    0.648,
+    0.8,
+    0.695,
+    0.95
+   ],
+   "p95": 32.32,
+   "mean": 15.23,
+   "luma": 54.2,
+   "verdict": "alive",
+   "expect_still": false,
+   "force": false,
+   "hot": false
+  },
+  {
+   "name": "city_lights",
+   "box": [
+    0.62,
+    0.26,
+    0.99,
+    0.62
+   ],
+   "p95": 6.43,
+   "mean": 1.83,
+   "luma": 25.0,
+   "verdict": "weak",
+   "expect_still": false,
+   "force": false,
+   "hot": false
+  },
+  {
+   "name": "night_sea_west",
+   "box": [
+    0.0,
+    0.52,
+    0.044,
+    0.694
+   ],
+   "p95": 6.05,
+   "mean": 2.66,
+   "luma": 21.8,
+   "verdict": "weak",
+   "expect_still": false,
+   "force": false,
+   "hot": false
+  },
+  {
+   "name": "night_sea_mid",
+   "box": [
+    0.09,
+    0.52,
+    0.222,
+    0.694
+   ],
+   "p95": 6.51,
+   "mean": 3.02,
+   "luma": 21.2,
+   "verdict": "weak",
+   "expect_still": false,
+   "force": false,
+   "hot": false
+  },
+  {
+   "name": "hull_west",
+   "box": [
+    0.0,
+    0.78,
+    0.15,
+    1.0
+   ],
+   "p95": 0.35,
+   "mean": 0.08,
+   "luma": 7.2,
+   "verdict": "dead",
+   "expect_still": true,
+   "force": false,
+   "hot": false
+  },
+  {
+   "name": "hull_mid",
+   "box": [
+    0.15,
+    0.745,
+    0.3,
+    1.0
+   ],
+   "p95": 0.22,
+   "mean": 0.04,
+   "luma": 15.8,
+   "verdict": "dead",
+   "expect_still": true,
+   "force": false,
+   "hot": false
+  },
+  {
+   "name": "hull_fore",
+   "box": [
+    0.3,
+    0.69,
+    0.47,
+    1.0
+   ],
+   "p95": 0.39,
+   "mean": 0.09,
+   "luma": 38.0,
+   "verdict": "dead",
+   "expect_still": true,
+   "force": false,
+   "hot": false
+  }
+ ],
+ "reasons": [],
+ "room": "deck",
+ "state": "night",
+ "clip_mtime": 1788547206.5886986
+}

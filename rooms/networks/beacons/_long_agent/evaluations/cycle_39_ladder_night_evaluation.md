@@ -1,0 +1,11 @@
+I verified both halves of the worker's diagnosis independently.
+
+**Box claim — confirmed.** Overlaying all four boxes on frame 0 (`/tmp/gk/overview.png`), the old `village_lamps` and `river_glimmer` boxes sit on black headwall rock left of the ladder; `motion_spec.measure_subjects` returns `unlit: True, lit_pct 0.04 / 0.00` for them and `alive, p95_lit 17.54 / 15.77` for the proposed boxes, and the native crops show the actual lamp string and braided channels inside them.
+
+**Flame claim — false.** The committed `scene_night.png` shows the fire-basket **cold and empty** (px>150 = 11 in that region); `cine_night_src.mp4` frame 0 matches it (9 px) and then ramps to 16 000 lit pixels by frame 40 — the renderer *hallucinated* a fire in violation of the existing pin, rather than the pin contradicting the art.
+
+---
+
+Your box re-aim is correct and I confirmed it independently — old boxes measure `unlit, lit_pct 0.04/0.00` on black rock, new boxes measure `alive, p95_lit 17.5/15.8` on the real lamps and channels. But your flame claim is wrong: `scene_night.png` has a **cold, empty basket** (px>150 = 11), and `cine_night_src.mp4` frame 0 matches it at 9 px before ramping to ~16 000 by frame 40 — so the fire is a render-time hallucination that broke the existing "COLD, empty and unlit" pin, not a flame in the committed art the pin failed to describe. Replacing that pin with "The small fire burns LOW and STEADY" legalizes the violation, bakes a lit signal-fire into a room whose accepted still is dark, and in a scenario called *beacons* a lit-vs-unlit fire-basket is plausibly load-bearing for the puzzle world-state; it will also worsen frame0 agreement with the still. Ship the box re-aim alone — that is the only confirmed defect and the only reject-tier finding (the swing is warn/human tier and needs no action this cycle) — and if you do address the flame, strengthen the pin and negatives against it or force the basket region rigid, never endorse it. Also note the re-aim needs `cine_night.patches.json`, which still carries the two stale boxes, updated alongside the spec.
+
+VERDICT: FAIL

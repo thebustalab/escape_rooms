@@ -1,0 +1,748 @@
+{
+  "status": "awaiting_review",
+  "retry_count": 0,
+  "started": "2026-09-05T04:00:13.219243+00:00",
+  "last_cycle": "2026-09-07T00:31:09.591062+00:00",
+  "cycles_completed": 79,
+  "pending_render": null,
+  "clips": {
+    "fenwatch/base": {
+      "verdict": "hold",
+      "attempts": 1,
+      "fix_tier": null,
+      "reasons": [],
+      "history": [
+        {
+          "attempt": 1,
+          "action": "RERENDER",
+          "why": "The spec is not at fault and is resubmitted unchanged — all four boxes were re-checked against the current `scene.png` and still land on the mist band, the chimney plume, the open channels and the ledgers — the single change is that the render must be driven from the current `scene.png` instead of the superseded Sep 2 art the existing clip and its raw intermediate were both built from.",
+          "result": "hold"
+        }
+      ],
+      "judged_mtime": 1788582409.8653584,
+      "warns": []
+    },
+    "fenwatch/night": {
+      "verdict": "hold",
+      "attempts": 2,
+      "fix_tier": null,
+      "reasons": [],
+      "history": [
+        {
+          "attempt": 1,
+          "action": "RERENDER",
+          "why": "The single change is re-rendering against the current `scene_night.png` — which replaced the render this clip was baked from — with the spec re-authored for that new composition, since its `rigid`/`pinned` lists named a beacon tower that isn't in this room (so nothing in frame was actually pinned, letting the lean-to brazier light up and swing the background) and its river box now sits on the ridge and roof rather than the water; boxes were re-measured on the current still (glow core at x 0.44–0.58 / y 0.53–0.69 by luminance scan, valley band at x 0.04–0.38, matching the base spec's `river_glint` at [0.1,0.41,0.35,0.52]), and the lean-to is added as a `still` subject so the gate can convict directly if it relights. Spec passes `motion_spec.validate` and `render_prompt` emits the still subject's line as a pin, not a mover.",
+          "result": "hold"
+        },
+        {
+          "attempt": 2,
+          "action": "RERENDER",
+          "why": "The single change is pinning the scene's actual varying light source — the ambient moonlight, which no line in the old spec constrained — as fixed and cloud-free with the snowfields, glacier, walls and yard held at identical brightness every frame, and correspondingly replacing the one subject phrase that licensed illumination to come and go (\"the wet gravel bars catching and losing the light\" → \"holding a faint, even, unchanging sheen\"); subject names and boxes are unchanged and the spec passes `motion_spec.validate` with no errors.",
+          "result": "hold"
+        }
+      ],
+      "judged_mtime": 1788717396.3021595,
+      "warns": [
+        "background_swing",
+        "hot_subjects"
+      ],
+      "triaged": true,
+      "triaged_mtime": 1788583522.5624561
+    },
+    "spindle/base": {
+      "verdict": "hold",
+      "attempts": 2,
+      "fix_tier": null,
+      "reasons": [],
+      "history": [
+        {
+          "attempt": 1,
+          "action": "RERENDER",
+          "why": "The spec is already correct for the current art and is left unchanged — the single change is re-rendering the clip against the recommitted `scene.png`, since the shipped clip was baked from the previous, discarded still and a rebake would only re-apply patches to that same stale render.",
+          "result": "hold"
+        },
+        {
+          "attempt": 2,
+          "action": "RERENDER",
+          "why": "The single change is naming the boiling architecture as `still` subjects — `platform_stone`, `fire_basket`, `spyglass_tripod`, `fuel_box` — so the mask freezes them to `scene.png` the way it already freezes `survey_sheet` to p95 0.87; a REBAKE cannot do this because `MASK_PCT` alone provably cannot separate the boil from the motion (at p90 the platform is still 69% animated while the river has already fallen to 45%) and only a RERENDER/AUTHOR decision writes a spec, and I checked the four new boxes against frame 0001 and against the baked temporal std — they cover only stone and iron, leaving `basin_river` at p95 14.9 and `ridge_grass` at 17.6, both comfortably alive.",
+          "result": "hold"
+        }
+      ],
+      "judged_mtime": 1788718716.998678,
+      "warns": [
+        "still_violations"
+      ],
+      "triaged": true,
+      "triaged_mtime": 1788584331.7946372
+    },
+    "spindle/night": {
+      "verdict": "hold",
+      "attempts": 2,
+      "fix_tier": "rerender",
+      "reasons": [
+        "judge overruled: Both \"dead\" subjects are visibly and measurably animating (p95 range 33 on their lit pixels, with the variance map falling exactly on the lamps and channels and nowhere else); the sub-4.5 whole-box p95 is an artefact of boxes that are ~97% unlit rock, and a third rerender would not add motion that is already present."
+      ],
+      "history": [
+        {
+          "attempt": 1,
+          "action": "RERENDER",
+          "why": "Rerender against the current scene_night.png (the shipped clip animates superseded art), with both subject boxes moved off the bare rock they now land on and onto where the lamps and braided channels actually sit in the regenerated still — without that box move the rerender would come back dead on the same two subjects.",
+          "result": "reject"
+        },
+        {
+          "attempt": 2,
+          "action": "RERENDER",
+          "why": "Stop the fire-basket igniting — the pin is rewritten from \"is cold/unlit\" (a state the model satisfied at frame 0 and then abandoned) to an explicit per-frame no-ignition clause backed by ignition vocabulary in the negatives and a constant-scene-brightness pin, which removes the light source that is both eating the render's motion budget and driving the 2.87 swing; `force_repair: true` on the two subjects is carried alongside because they are quiet-not-dead (4.19/4.29 against a 4.5 bar, 16.5/13.9 on their lit pixels) and tile repair is the sanctioned lever for that, not new adjectives. Boxes and names are unchanged — verified against `scene_night.png`, the warm lamps span x 0.471–0.627, y 0.553–0.693, which the current boxes already bound correctly.",
+          "result": "reject"
+        },
+        {
+          "attempt": 3,
+          "action": "PASS",
+          "why": "Both \"dead\" subjects are visibly and measurably animating (p95 range 33 on their lit pixels, with the variance map falling exactly on the lamps and channels and nowhere else); the sub-4.5 whole-box p95 is an artefact of boxes that are ~97% unlit rock, and a third rerender would not add motion that is already present.",
+          "result": "hold"
+        }
+      ],
+      "judged_mtime": 1788586652.954773,
+      "warns": []
+    },
+    "rams_head/base": {
+      "verdict": "hold",
+      "attempts": 1,
+      "fix_tier": null,
+      "reasons": [
+        "judge overruled: The swing is a sub-visual ~5% exposure breath over the last third of the loop with no light source cycling and no rigid-object motion — eight frames spanning the entire excursion are visually indistinguishable at native resolution, and every pinned element (fire-basket, goats, spyglass, ice lace, survey sheet) is verifiably static, so a rerender would spend ~10 GPU-minutes chasing something the eye cannot see."
+      ],
+      "history": [
+        {
+          "attempt": 1,
+          "action": "RERENDER",
+          "why": "The clip was rendered from superseded art and must simply be re-rendered against the current `scene.png`; the spec is carried over essentially unchanged, with `gap_grass` shifted right from x0 0.60→0.65 (and x1 0.73→0.74, y1 0.66→0.64) so the animated box no longer contains the rigid brass spyglass and tripod, plus two pinned lines added for the spyglass and the distant villages/needle that now sit beside that box in the new art.",
+          "result": "hold"
+        },
+        {
+          "attempt": 2,
+          "action": "PASS",
+          "why": "The swing is a sub-visual ~5% exposure breath over the last third of the loop with no light source cycling and no rigid-object motion — eight frames spanning the entire excursion are visually indistinguishable at native resolution, and every pinned element (fire-basket, goats, spyglass, ice lace, survey sheet) is verifiably static, so a rerender would spend ~10 GPU-minutes chasing something the eye cannot see.",
+          "result": "hold"
+        }
+      ],
+      "judged_mtime": 1788587818.2318761,
+      "warns": [
+        "still_violations"
+      ],
+      "triaged": true,
+      "triaged_mtime": 1788587818.2318761
+    },
+    "rams_head/night": {
+      "verdict": "hold",
+      "attempts": 3,
+      "fix_tier": null,
+      "reasons": [],
+      "history": [
+        {
+          "attempt": 1,
+          "action": "RERENDER",
+          "why": "The clip predates a replacement `scene_night.png` and animates the old, superseded panorama, so it must be re-rendered from the current still — with both subject boxes re-aimed onto where the lamps and the glimmering meltwater actually are in that new art (old boxes now cover only black tarn water), and `rigid`/`pinned` rewritten from river-and-lit-beacon to tarn-and-cold-basket.",
+          "result": "reject"
+        },
+        {
+          "attempt": 2,
+          "action": "RERENDER",
+          "why": "The far flats are released from `rigid` and the `village_lamps` mover is recast as thin cold haze drifting over them — a category the stabiliser tail explicitly permits, unlike bare lamplight — so the whole box carries motion instead of 0.8% of its pixels, which is the only thing that can move a p95 the pinprick lamps are geometrically unable to reach (names and boxes unchanged; validated clean by `motion_spec.validate`).",
+          "result": "hold"
+        },
+        {
+          "attempt": 3,
+          "action": "RERENDER",
+          "why": "The brightness-modulation clause is stripped out of the `village_lamps` phrase — the haze mechanic that made the box alive is kept intact, but the variation now comes from veils passing in front of lamps that are explicitly held at one constant brightness, so nothing in the prompt tells any light to brighten, backed by a hard pin on the basket and plain fire/flame/firelight negatives the list has never carried. (Validated clean by `motion_spec.validate`; names and boxes unchanged.)",
+          "result": "hold"
+        }
+      ],
+      "warns": [
+        "weak_subjects"
+      ],
+      "triaged": true,
+      "judged_mtime": 1788720068.5964677,
+      "triaged_mtime": 1788674174.205769
+    },
+    "sisters/base": {
+      "verdict": "hold",
+      "attempts": 1,
+      "fix_tier": null,
+      "reasons": [
+        "judge overruled: The pinned `slab_ledger` is visually and metrically frozen at native resolution across the whole loop with landmark drift at 0 px, so the report-only `still_violations` hit is the known false positive — sub-pixel texture crawl on a static object — and every other gate, subject and pinned constraint reads correct in frames 0001/0031/0061; the pre-existing embers in the fire-basket are baked into the committed source still and belong to the stills phase, not to this clip."
+      ],
+      "history": [
+        {
+          "attempt": 1,
+          "action": "RERENDER",
+          "why": "stale art (deterministic — no diagnosis needed)",
+          "result": "hold"
+        },
+        {
+          "attempt": 2,
+          "action": "PASS",
+          "why": "The pinned `slab_ledger` is visually and metrically frozen at native resolution across the whole loop with landmark drift at 0 px, so the report-only `still_violations` hit is the known false positive — sub-pixel texture crawl on a static object — and every other gate, subject and pinned constraint reads correct in frames 0001/0031/0061; the pre-existing embers in the fire-basket are baked into the committed source still and belong to the stills phase, not to this clip.",
+          "result": "hold"
+        }
+      ],
+      "warns": [
+        "still_violations"
+      ],
+      "triaged": true,
+      "stale_art": false,
+      "judged_mtime": 1788657176.275235,
+      "triaged_mtime": 1788657176.275235
+    },
+    "sisters/night": {
+      "verdict": "hold",
+      "attempts": 2,
+      "fix_tier": null,
+      "reasons": [],
+      "history": [
+        {
+          "attempt": 1,
+          "action": "RERENDER",
+          "why": "stale art (deterministic — no diagnosis needed)",
+          "result": "hold"
+        },
+        {
+          "attempt": 2,
+          "action": "RERENDER",
+          "why": "The single change is declaring the four fire-prone regions (fire-basket, both slate cairns, the seam cairn at both edges) as `still` subjects, which both writes an explicit unlit pin into the prompt and freezes those boxes to the cold source art at bake time so a repeat hallucination cannot ship — simulating that freeze on the current frames already drops the background swing from 4.7 to 2.29 and restores the still's dark basket and cairns; the two mover boxes are moved onto the lamps and river braids they were supposed to be measuring, since as authored they were measuring the invented flames instead.",
+          "result": "hold"
+        }
+      ],
+      "warns": [
+        "background_swing",
+        "weak_subjects"
+      ],
+      "triaged": true,
+      "stale_art": false,
+      "judged_mtime": 1788722048.798962,
+      "triaged_mtime": 1788657900.0904562
+    },
+    "hood/base": {
+      "verdict": "hold",
+      "attempts": 2,
+      "fix_tier": null,
+      "reasons": [],
+      "history": [
+        {
+          "attempt": 1,
+          "action": "RERENDER",
+          "why": "stale art (deterministic — no diagnosis needed)",
+          "result": "hold"
+        },
+        {
+          "attempt": 2,
+          "action": "RERENDER",
+          "why": "The single change is `force_repair: true` on cloud_sea — identical names, boxes, phrases, rigid, pinned and negatives — so the pipeline tile-repairs the static cloud body on its own instead of leaving it to lose the frame to ridge_grass and cloud_edge_right, which is the documented fix for a subject that renders dead through competition rather than wording (I verified the spec passes `motion_spec.validate` with no errors and that the flag puts cloud_sea on `repair_list` despite its \"weak\" verdict).",
+          "result": "hold"
+        }
+      ],
+      "warns": [
+        "still_violations"
+      ],
+      "triaged": true,
+      "stale_art": false,
+      "judged_mtime": 1788723858.4427469,
+      "triaged_mtime": 1788658835.7735622
+    },
+    "hood/night": {
+      "verdict": "hold",
+      "attempts": 2,
+      "fix_tier": null,
+      "reasons": [],
+      "history": [
+        {
+          "attempt": 1,
+          "action": "RERENDER",
+          "why": "stale art (deterministic — no diagnosis needed)",
+          "result": "reject"
+        },
+        {
+          "attempt": 2,
+          "action": "PASS",
+          "why": "The rejection is stale — it was written before the sparse-lit-pixel path landed, and re-judging the identical shipped `cine_night.mp4` with the current code returns HOLD with both subjects alive (`p95_lit` 10.98 / 39.36), with the variance heatmap confirming the motion is on the lamps and river braids and nowhere else; the boxes are genuinely mis-aimed and worth correcting to `village_lamps [0.32,0.56,0.63,0.72]` / `river_glimmer [0.31,0.55,0.69,0.77]` as spec hygiene, but that is not worth a GPU rerender since the clip passes either way.",
+          "result": "hold"
+        },
+        {
+          "attempt": 2,
+          "action": "REBAKE",
+          "why": "The sky was swarming in violation of the spec's star pin, so I added a `still: true` `star_field` box over the top 38% of the frame — the only mechanism that can remove an unwanted mover — and rebaked from the unpatched source, freezing the stars while both wanted subjects keep their motion.",
+          "result": "hold"
+        }
+      ],
+      "warns": [
+        "weak_subjects"
+      ],
+      "triaged": true,
+      "stale_art": false,
+      "judged_mtime": 1788725598.8742166,
+      "triaged_mtime": 1788725598.8742166
+    },
+    "ladder/base": {
+      "verdict": "hold",
+      "attempts": 1,
+      "fix_tier": null,
+      "reasons": [
+        "judge overruled: The only expect_still subject measures p95 0.77 (below the 8.0 trigger, so no still_violation is actually present in the current judge record), landmark drift is 0 px, and native-resolution crops confirm the survey sheet, fire-basket and all rigid architecture are motionless while every intended subject animates correctly."
+      ],
+      "history": [
+        {
+          "attempt": 1,
+          "action": "RERENDER",
+          "why": "stale art (deterministic — no diagnosis needed)",
+          "result": "hold"
+        },
+        {
+          "attempt": 2,
+          "action": "PASS",
+          "why": "The only expect_still subject measures p95 0.77 (below the 8.0 trigger, so no still_violation is actually present in the current judge record), landmark drift is 0 px, and native-resolution crops confirm the survey sheet, fire-basket and all rigid architecture are motionless while every intended subject animates correctly.",
+          "result": "hold"
+        }
+      ],
+      "warns": [
+        "still_violations"
+      ],
+      "triaged": true,
+      "stale_art": false,
+      "judged_mtime": 1788661093.9063952,
+      "triaged_mtime": 1788661093.9063952
+    },
+    "ladder/night": {
+      "verdict": "hold",
+      "attempts": 3,
+      "fix_tier": null,
+      "reasons": [],
+      "history": [
+        {
+          "attempt": 1,
+          "action": "RERENDER",
+          "why": "stale art (deterministic — no diagnosis needed)",
+          "result": "reject"
+        },
+        {
+          "attempt": 2,
+          "action": "RERENDER",
+          "why": "The single fix is re-aiming `village_lamps` and `river_glimmer` onto the lamps and channels that are actually in the trough (verified `alive` on the current shipped clip at the new boxes), carried on a rerender because the same render also ignites a forbidden fire in the basket — held with a `still` fire_basket witness and targeted ignition negatives rather than by legalising the flame.",
+          "result": "hold"
+        },
+        {
+          "attempt": 3,
+          "action": "RERENDER",
+          "why": "The one change is re-aiming `fire_basket` onto the fire bed it was missing ([0.02,0.52,0.22,1.0] instead of the empty rim air at [0.06,0.55,0.14,0.72]) and adding a second `still` box over the ladder head, so both forbidden lights are now inside still-pins that the bake forces out of the motion mask — a fix that holds even if the renderer ignites them again, which words alone failed to prevent on attempt 2.",
+          "result": "hold"
+        }
+      ],
+      "warns": [
+        "background_swing",
+        "weak_subjects"
+      ],
+      "triaged": true,
+      "stale_art": false,
+      "judged_mtime": 1788726827.6517465,
+      "triaged_mtime": 1788708422.4881604
+    },
+    "anvil/base": {
+      "verdict": "parked",
+      "attempts": 2,
+      "fix_tier": "rerender",
+      "reasons": [
+        "The base art is the defect — the scene prompt asks for \"one fat grey column of woodsmoke, broad and solid\" but `scene.png` renders a ~40 px translucent thread that stayed frozen even as the sole subject of a dedicated 320×288 tile at p95 2.05 against 2.08 for adjacent bare sky, so the fix is a stills-phase regeneration of that plume (or dropping far_smoke as a named subject), which is Lucas's call and not something this loop should spend a third rerender guessing at."
+      ],
+      "history": [
+        {
+          "attempt": 1,
+          "action": "RERENDER",
+          "why": "stale art (deterministic — no diagnosis needed)",
+          "result": "reject"
+        },
+        {
+          "attempt": 2,
+          "action": "RERENDER",
+          "why": "The fire-basket pin's \"no smoke rises from it\" clause is written verbatim into the positive prompt and suppresses the one subject that is smoke — removing that clause (the basket stays cold and unlit via the rest of the pin and the untouched fire negatives), dropping the static verb \"standing\" from the far_smoke phrase, and forcing the tile repair is the single change that should let the column actually climb. Spec validates clean (`motion_spec.validate` → `[]`); subject names and boxes are unchanged.",
+          "result": "reject"
+        },
+        {
+          "attempt": 3,
+          "action": "PARK",
+          "why": "The base art is the defect — the scene prompt asks for \"one fat grey column of woodsmoke, broad and solid\" but `scene.png` renders a ~40 px translucent thread that stayed frozen even as the sole subject of a dedicated 320×288 tile at p95 2.05 against 2.08 for adjacent bare sky, so the fix is a stills-phase regeneration of that plume (or dropping far_smoke as a named subject), which is Lucas's call and not something this loop should spend a third rerender guessing at.",
+          "result": "parked"
+        }
+      ],
+      "warns": [
+        "background_swing",
+        "still_violations"
+      ],
+      "triaged": false,
+      "stale_art": false,
+      "judged_mtime": 1788709640.4665003
+    },
+    "anvil/night": {
+      "verdict": "parked",
+      "attempts": 2,
+      "fix_tier": null,
+      "reasons": [
+        "The fix is known, verified and free but not reachable by any action available here — I simulated the bake at mask percentiles 46/60/75/85/90/93/96 and masking provably cannot remove this (the bright pavement's brightening arc carries a *larger* temporal std than the village lamps, so by p93 the pavement still swings 4.75 while `village_lamps` p95 has collapsed to 0.45, i.e. any mask tight enough to kill the swing kills the subjects first), while the repo's own `colour_normalise.py` — written for exactly this \"smooth bright arc… global per-frame shift… deliberately gain-based\" defect — takes the frame swing from 3.86 to **0.31** and the pavement swing from 11.03 to 2.61 with the subjects still fully alive (`village_lamps` 4.99→4.37, `river_glimmer` 7.63→6.60) in simulation, but it is orphaned: nothing in the bake chain calls it (`grep` finds no importer) and the REBAKE block exposes no knob for it; a third rerender would be a coin-flip on a model-level luminance drift after attempt 2 already spent the illumination-pin lever. This needs a one-line pipeline decision from Lucas — insert `colour_normalise` between the render and `bake_flat` — not another GPU hour."
+      ],
+      "history": [
+        {
+          "attempt": 1,
+          "action": "RERENDER",
+          "why": "stale art (deterministic — no diagnosis needed)",
+          "result": "reject"
+        },
+        {
+          "attempt": 2,
+          "action": "RERENDER",
+          "why": "The single change is polarity — every fire word moves out of the positive-side `pinned` prose into the negatives (the pin is now an affirmative \"the light never changes\"), which is what stops the beacon igniting and takes the background swing with it; the `river_glimmer` box is moved down onto the valley floor because the old one was pure sky (verified: the same shipped clip reads *alive* under the corrected box), and `fire_basket`/`spyglass` are added as `still` subjects — new names, explained here — so that a recurrence is caught by the gate instead of a human-tier warning.",
+          "result": "hold"
+        },
+        {
+          "attempt": 3,
+          "action": "PARK",
+          "why": "The fix is known, verified and free but not reachable by any action available here — I simulated the bake at mask percentiles 46/60/75/85/90/93/96 and masking provably cannot remove this (the bright pavement's brightening arc carries a *larger* temporal std than the village lamps, so by p93 the pavement still swings 4.75 while `village_lamps` p95 has collapsed to 0.45, i.e. any mask tight enough to kill the swing kills the subjects first), while the repo's own `colour_normalise.py` — written for exactly this \"smooth bright arc… global per-frame shift… deliberately gain-based\" defect — takes the frame swing from 3.86 to **0.31** and the pavement swing from 11.03 to 2.61 with the subjects still fully alive (`village_lamps` 4.99→4.37, `river_glimmer` 7.63→6.60) in simulation, but it is orphaned: nothing in the bake chain calls it (`grep` finds no importer) and the REBAKE block exposes no knob for it; a third rerender would be a coin-flip on a model-level luminance drift after attempt 2 already spent the illumination-pin lever. This needs a one-line pipeline decision from Lucas — insert `colour_normalise` between the render and `bake_flat` — not another GPU hour.",
+          "result": "parked"
+        }
+      ],
+      "warns": [
+        "background_swing",
+        "weak_subjects"
+      ],
+      "triaged": true,
+      "stale_art": false,
+      "judged_mtime": 1788711528.0169318,
+      "triaged_mtime": 1788711528.0169318
+    },
+    "shears/base": {
+      "verdict": "hold",
+      "attempts": 1,
+      "fix_tier": "rerender",
+      "reasons": [
+        "judge overruled: The lens cloud is measurably and visibly animating — rim feathering and underside light travel, 5.6% area breathing, ~50-level peak changes — while holding station to within 7 px as the spec requires; the p95 4.50 is an artifact of a box that is three-quarters empty sky, and the only way a rerender could raise that number is by making the cloud drift, which the spec's negatives explicitly forbid."
+      ],
+      "history": [
+        {
+          "attempt": 1,
+          "action": "RERENDER",
+          "why": "stale art (deterministic — no diagnosis needed)",
+          "result": "reject"
+        },
+        {
+          "attempt": 2,
+          "action": "PASS",
+          "why": "The lens cloud is demonstrably alive — its rim feathers and its underside light shifts across the loop with coherent lag-growing motion — and the \"dead\" verdict is an artifact of a box that is 85% featureless sky, so the p95 is diluted below threshold; a rerender chasing a higher number could only fix it by making the cloud drift, which the spec's negatives explicitly forbid.",
+          "result": "hold"
+        },
+        {
+          "attempt": 2,
+          "action": "PASS",
+          "why": "The lens cloud is measurably and visibly animating — rim feathering and underside light travel, 5.6% area breathing, ~50-level peak changes — while holding station to within 7 px as the spec requires; the p95 4.50 is an artifact of a box that is three-quarters empty sky, and the only way a rerender could raise that number is by making the cloud drift, which the spec's negatives explicitly forbid.",
+          "result": "hold"
+        }
+      ],
+      "warns": [
+        "still_violations"
+      ],
+      "triaged": true,
+      "stale_art": false,
+      "judged_mtime": 1788664820.9973118,
+      "triaged_mtime": 1788664820.9973118
+    },
+    "shears/night": {
+      "verdict": "hold",
+      "attempts": 3,
+      "fix_tier": null,
+      "reasons": [],
+      "history": [
+        {
+          "attempt": 1,
+          "action": "RERENDER",
+          "why": "stale art (deterministic — no diagnosis needed)",
+          "result": "reject"
+        },
+        {
+          "attempt": 2,
+          "action": "RERENDER",
+          "why": "Both subject boxes are re-aimed onto the lamps and river as they actually sit in the current art (they measure alive/near-alive on the existing clip, so the dead_subjects reject is a mis-aimed box, not absent motion), and the rerender is spent on the one real defect — the beacon fire the model invents in a basket the still shows cold — now pinned as an explicit `still` subject so the judge can see it if it recurs.",
+          "result": "hold"
+        },
+        {
+          "attempt": 3,
+          "action": "RERENDER",
+          "why": "The scene's illumination has never been pinned and the two subject phrases explicitly license it to change (\"flickering\", \"catching and losing the light\"), so this render fixes the moonlight level in `pinned` and rewrites both phrases to move highlights without modulating the light — the only lever left, since the mask threshold provably drops the lamps and river before it touches the foreground that is actually swinging.",
+          "result": "hold"
+        }
+      ],
+      "warns": [
+        "background_swing"
+      ],
+      "triaged": true,
+      "stale_art": false,
+      "judged_mtime": 1788728846.0406485,
+      "triaged_mtime": 1788712810.9070861
+    },
+    "whistlegate/base": {
+      "verdict": "hold",
+      "attempts": 2,
+      "fix_tier": null,
+      "reasons": [],
+      "history": [
+        {
+          "attempt": 1,
+          "action": "RERENDER",
+          "why": "stale art (deterministic — no diagnosis needed)",
+          "result": "hold"
+        },
+        {
+          "attempt": 2,
+          "action": "REBAKE",
+          "why": "The mask sidecar is enabled at auto and already pins `desk_ledger`, so re-baking from `cine_base_src.mp4` will pick up the newly authored `bench_scales` still box the same way and freeze the boiling brass stand for no GPU, leaving the fire, smoke and daylight — all currently passing — untouched.",
+          "result": "hold"
+        }
+      ],
+      "warns": [
+        "background_swing",
+        "still_violations"
+      ],
+      "triaged": true,
+      "stale_art": false,
+      "judged_mtime": 1788730041.174097,
+      "triaged_mtime": 1788730041.174097
+    },
+    "whistlegate/night": {
+      "verdict": "hold",
+      "attempts": 1,
+      "fix_tier": null,
+      "reasons": [
+        "judge overruled: The baked clip is visually correct — lamps gutter without extinguishing, the fire animates, everything pinned is still, and both warnings are artifacts of subject boxes parked off their subjects (the roster board and the stone left of the firebox) rather than any defect in the pixels; the boxes are worth correcting in the spec for future judging, but no re-render or re-bake would improve this clip."
+      ],
+      "history": [
+        {
+          "attempt": 1,
+          "action": "RERENDER",
+          "why": "stale art (deterministic — no diagnosis needed)",
+          "result": "hold"
+        },
+        {
+          "attempt": 2,
+          "action": "PASS",
+          "why": "The baked clip is visually correct — lamps gutter without extinguishing, the fire animates, everything pinned is still, and both warnings are artifacts of subject boxes parked off their subjects (the roster board and the stone left of the firebox) rather than any defect in the pixels; the boxes are worth correcting in the spec for future judging, but no re-render or re-bake would improve this clip.",
+          "result": "hold"
+        }
+      ],
+      "warns": [
+        "background_swing",
+        "weak_subjects"
+      ],
+      "triaged": true,
+      "stale_art": false,
+      "judged_mtime": 1788667289.166409,
+      "triaged_mtime": 1788667289.166409
+    },
+    "broken_tooth/base": {
+      "verdict": "hold",
+      "attempts": 1,
+      "fix_tier": null,
+      "reasons": [
+        "judge overruled: The plume is mandated by the room's own scene prompt and measurably billows in place without descending or spreading onto the shelf across all 61 frames, `gorge_haze`'s \"alive\" reading is codec/texture shimmer on static rock rather than motion, and `survey_sheet` is correctly dead — the report-only finding has no real defect behind it."
+      ],
+      "history": [
+        {
+          "attempt": 1,
+          "action": "RERENDER",
+          "why": "stale art (deterministic — no diagnosis needed)",
+          "result": "hold"
+        },
+        {
+          "attempt": 2,
+          "action": "PASS",
+          "why": "The plume is mandated by the room's own scene prompt and measurably billows in place without descending or spreading onto the shelf across all 61 frames, `gorge_haze`'s \"alive\" reading is codec/texture shimmer on static rock rather than motion, and `survey_sheet` is correctly dead — the report-only finding has no real defect behind it.",
+          "result": "hold"
+        }
+      ],
+      "warns": [
+        "weak_subjects",
+        "still_violations"
+      ],
+      "triaged": true,
+      "stale_art": false,
+      "judged_mtime": 1788668000.842166,
+      "triaged_mtime": 1788668000.842166
+    },
+    "broken_tooth/night": {
+      "verdict": "hold",
+      "attempts": 2,
+      "fix_tier": null,
+      "reasons": [],
+      "history": [
+        {
+          "attempt": 1,
+          "action": "RERENDER",
+          "why": "stale art (deterministic — no diagnosis needed)",
+          "result": "reject"
+        },
+        {
+          "attempt": 2,
+          "action": "RERENDER",
+          "why": "The single fix is relocating `village_lamps` onto the band where the lamps actually are ([0.35,0.425,0.77,0.50], where this very clip already measures p95 9.3 / lit-pixel 26.2); `river_glimmer` keeps its name and box but becomes `still: true` with a pin phrase, because this room's scene prompt forbids the valley river from being visible and its box in fact holds only rigid cliff and the cold basket, so it must be declared static rather than chased with more re-renders (spec validates clean against `motion_spec.validate`).",
+          "result": "hold"
+        }
+      ],
+      "warns": [],
+      "stale_art": false,
+      "judged_mtime": 1788713865.400692
+    },
+    "kiln/base": {
+      "verdict": "hold",
+      "attempts": 1,
+      "fix_tier": null,
+      "reasons": [],
+      "history": [
+        {
+          "attempt": 1,
+          "action": "RERENDER",
+          "why": "stale art (deterministic — no diagnosis needed)",
+          "result": "hold"
+        }
+      ],
+      "warns": [],
+      "stale_art": false,
+      "judged_mtime": 1788669402.8321187
+    },
+    "kiln/night": {
+      "verdict": "hold",
+      "attempts": 3,
+      "fix_tier": null,
+      "reasons": [],
+      "history": [
+        {
+          "attempt": 1,
+          "action": "RERENDER",
+          "why": "stale art (deterministic — no diagnosis needed)",
+          "result": "reject"
+        },
+        {
+          "attempt": 2,
+          "action": "RERENDER",
+          "why": "The only change is moving both boxes off bare dome rock and onto the villages and braided channels they name — the phrases, rigid, pinned and negatives are untouched, so with `cine_render`'s fixed SEED the footage reproduces and the corrected boxes read the motion that is already there (lit_p95 11.37 / 13.18), while the mis-aimed `village_lamps` repair tile currently pasted over the chimney is recomputed away; no `force_repair`, because a repair tile over already-animating content would only risk regressing it.",
+          "result": "hold"
+        },
+        {
+          "attempt": 3,
+          "action": "REBAKE",
+          "why": "I have written one `still: true` subject `sky_and_ridgelines` box [0.0,0.0,1.0,0.46] into the night spec (validated; `render_prompt` and `render_negative` are byte-identical, so the fixed-seed render is untouched) and `_mask_inputs` → `_still_boxes` will force that band black in the playback mask, freezing the drifting sky against the existing source for zero GPU.",
+          "result": "hold"
+        }
+      ],
+      "warns": [
+        "background_swing"
+      ],
+      "triaged": true,
+      "stale_art": false,
+      "judged_mtime": 1788737507.0304668,
+      "triaged_mtime": 1788737507.0304668
+    },
+    "crown/base": {
+      "verdict": "hold",
+      "attempts": 2,
+      "fix_tier": null,
+      "reasons": [],
+      "history": [
+        {
+          "attempt": 1,
+          "action": "RERENDER",
+          "why": "stale art (deterministic — no diagnosis needed)",
+          "result": "hold"
+        },
+        {
+          "attempt": 2,
+          "action": "RERENDER",
+          "why": "The single change is enlarging the `slab_sheet` still box from (0.53,0.74,0.63,0.96) to (0.545,0.50,0.685,1.00) so it covers the whole measured billow instead of clipping its corner — I verified the spec against `motion_spec.validate` (no errors) and confirmed the new left edge at x 0.545 sits on dry boulder slope, right of the last visible river channel, so no live water is frozen and no hard mask edge lands on moving water; the prompt-side pin and negatives are reinforcement only, since the box alone is deterministic at bake time.",
+          "result": "hold"
+        }
+      ],
+      "warns": [
+        "still_violations"
+      ],
+      "triaged": true,
+      "stale_art": false,
+      "judged_mtime": 1788739085.0924942,
+      "triaged_mtime": 1788670922.6596565
+    },
+    "crown/night": {
+      "verdict": "parked",
+      "attempts": 3,
+      "fix_tier": "rerender",
+      "reasons": [
+        "named subject(s) not moving in the shipped clip: glacier_tarn has no lit pixels in its box (0.14% above luma 80) — the box is aimed off the subject, or the subject is unlit; re-aim before re-rendering",
+        "attempt cap (3) spent without clearing the gates"
+      ],
+      "history": [
+        {
+          "attempt": 1,
+          "action": "RERENDER",
+          "why": "stale art (deterministic — no diagnosis needed)",
+          "result": "reject"
+        },
+        {
+          "attempt": 2,
+          "action": "REBAKE",
+          "why": "The reject was an artifact of three mis-aimed subject boxes (now corrected in the spec) and of a repair patch pasted into empty sky — rebaking from `cine_night_src.mp4` with that patch dropped re-judges as hold (alive/alive/weak) with no GPU work.",
+          "result": "hold"
+        },
+        {
+          "attempt": 3,
+          "action": "RERENDER",
+          "why": "The single change is to stop asking the tarn for the spreading, seeping, level-changing water the room's own pinned line and negatives explicitly forbid — re-specifying it as in-place surface creasing that the narrowed pin now expressly permits (\"only their surfaces move\"), with `force_repair` so it also gets its own tile where it isn't competing with the rest of the panorama; `rigid` gains only \"the moraine wall\" so the basin holding it stays fixed while its surface moves, and the two subjects the judge calls alive are untouched.",
+          "result": "reject"
+        }
+      ],
+      "warns": [
+        "weak_subjects"
+      ],
+      "triaged": true,
+      "stale_art": false,
+      "judged_mtime": 1788740564.8645785,
+      "triaged_mtime": 1788716033.9142833
+    },
+    "crown/order_sent": {
+      "verdict": "hold",
+      "attempts": 1,
+      "fix_tier": "rerender",
+      "reasons": [
+        "judge overruled: The clip is correct — the flame light legitimately beats on the rigid stone it illuminates while distant rigid geometry stays dead flat, no fire extinguishes anywhere in the loop, and the only convicting finding is a mis-placed `beacon_fires` box measuring blank night sky instead of the beacon, which does animate at native resolution."
+      ],
+      "history": [
+        {
+          "attempt": 1,
+          "action": "RERENDER",
+          "why": "stale art (deterministic — no diagnosis needed)",
+          "result": "reject"
+        },
+        {
+          "attempt": 2,
+          "action": "PASS",
+          "why": "The only convicting finding is a measurement artefact — `beacon_fires` is measured over a patch of pinned night sky rather than the flame, which sits at about `[0.148,0.415,0.176,0.483]` and measures p95 31; the spec box should be moved there so the check stops misfiring, but the shipped clip itself is correct and needs no render or bake.",
+          "result": "hold"
+        },
+        {
+          "attempt": 2,
+          "action": "PASS",
+          "why": "The clip is correct — the flame light legitimately beats on the rigid stone it illuminates while distant rigid geometry stays dead flat, no fire extinguishes anywhere in the loop, and the only convicting finding is a mis-placed `beacon_fires` box measuring blank night sky instead of the beacon, which does animate at native resolution.",
+          "result": "hold"
+        }
+      ],
+      "warns": [
+        "background_swing"
+      ],
+      "triaged": true,
+      "stale_art": false,
+      "judged_mtime": 1788672563.3155155,
+      "triaged_mtime": 1788672563.3155155
+    }
+  },
+  "last_eval": ""
+}

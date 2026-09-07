@@ -46,6 +46,7 @@ through a login shell so ~/.bashrc is sourced:
 import os
 import re
 import copy
+import datetime
 import json
 import glob
 import math
@@ -683,6 +684,63 @@ def _apply_spec_all(base):
 _REVIEW_FLAGS = {"hotspotsReviewed", "cinemagraphsVerified"}
 
 
+def _accept_still(base, room_key, accepted, note="", state=None):
+    """Set (or clear) the HUMAN accept on a room's still — `authoring.seam.accepted`.
+
+    This is the one flag no automation may write. `seam_stage.py` records stage/band/ratio/delta/
+    needsWork and explicitly refuses to set `accepted` ("a measurement cannot certify"), and
+    `stills_iterate`'s verdict vocabulary has no accept value at all. `run_all_tests.py` gates the
+    scenario on this field via `seam_check.py --require-accepted`, so it is a safety gate, not
+    bookkeeping — and until 2026-09-05 it had NO writer but a text editor, which is why beacons
+    carries a hand-typed acceptedBy string.
+
+    Two rules the endpoint enforces rather than trusting the caller with:
+
+    * ACCEPTING A FLAGGED SEAM REQUIRES A NOTE. Lucas's eye outranks the metric in both directions
+      — the blur can drive the number to a perfect 0.0 while smearing the picture, and a huge ratio
+      on a 2-level step in flat sky is invisible — so overriding `needsWork` is legitimate. But it
+      is a judgement call, and the standing rule is to write the trade-off down so the choice is
+      visible rather than buried.
+    * THE ACCEPT IS STAMPED WITH THE IMAGE IT CERTIFIES. An accept certifies AN IMAGE, not a room.
+      Ten of beacons' day scenes once carried a 09-02 accept for a 09-03 image. `at` is compared
+      against the file's mtime by `seam_stage.stage_is_stale`, so writing it here makes a later
+      regeneration invalidate the accept automatically instead of silently inheriting it.
+    """
+    fname = "scene.png" if not state else ("scene_%s.png" % re.sub(r"[^a-z0-9_]", "", str(state).lower()))
+    img = os.path.join(base, room_key, fname)
+    if not os.path.isfile(img):
+        raise ValueError("no %s for room %s — nothing to accept" % (fname, room_key))
+
+    with SAVE_LOCK:
+        doc = _load_scenario(base)
+        node = next((r for r in doc.get("rooms", []) if r.get("key") == room_key), None)
+        if not node:
+            raise ValueError("no room %s" % room_key)
+        seam = node.setdefault("authoring", {}).setdefault("seam", {})
+        rec = seam.setdefault("states", {}).setdefault(state, {}) if state else seam
+
+        note = (note or "").strip()
+        if accepted and rec.get("needsWork") and not note:
+            raise ValueError(
+                "%s is flagged needsWork by the seam stage. Accepting it anyway is a judgement "
+                "call — pass a note saying why, so the trade-off is written down." % room_key)
+
+        if accepted:
+            rec["accepted"] = True
+            rec["acceptedBy"] = "lucas %s" % datetime.date.today().isoformat()
+            if note:
+                rec["humanNote"] = note
+        else:
+            rec["accepted"] = False
+            rec.pop("acceptedBy", None)
+        rec["at"] = datetime.datetime.now().isoformat(timespec="seconds")
+        _save_scenario(doc, base)
+
+    return {"room": room_key, "state": state, "accepted": bool(accepted),
+            "acceptedBy": rec.get("acceptedBy", ""), "humanNote": rec.get("humanNote", ""),
+            "overrodeFlag": bool(accepted and rec.get("needsWork"))}
+
+
 def _set_review_flag(base, room_key, field, value):
     """Set a per-room review flag on the node's `authoring` — `hotspotsReviewed` (placements fine-tuned) or
     `cinemagraphsVerified` (cinemagraphs looked over). Drives the build-world Rooms table's ✓ columns so you
@@ -938,6 +996,11 @@ def _scenario_state(base):
             "clues": _room_clues(r),                                      # editable clue bodies, in order, for the story flow
             "lockedMessages": _room_locked_messages(r),                   # editable out-of-order/locked nav messages (lockedBody) for the story flow
             "debrief": r.get("debrief") or "",                           # "how this world worked" paragraph for this room
+            # The seam stage's verdict AND the human accept, so the stills tab can show both. Without
+            # this the gallery could show a seam panel but not whether anyone had signed it off, and
+            # `accepted` — which run_all_tests.py gates the whole scenario on — was invisible in every
+            # UI and editable only in a text editor.
+            "seam": (auth.get("seam") or {}),
             "hotspotsReviewed": bool(auth.get("hotspotsReviewed")),      # you fine-tuned the placements (auto on Save & close; toggleable)
             "cinemagraphsVerified": bool(auth.get("cinemagraphsVerified")),  # you reviewed the cinemagraphs (manual toggle)
             "cinemagraphs": sum(1 for h in hs if h.get("cinemagraph")),
@@ -4020,6 +4083,18 @@ class H(http.server.SimpleHTTPRequestHandler):
                 except ValueError as ve:
                     return self._json({"ok": False, "error": str(ve)}, 400)
                 return self._json({"ok": True, **_scenario_state(base)})
+            if route == "/api/accept-still":          # the HUMAN accept on a committed still
+                req = self._body()
+                rk = re.sub(r"[^A-Za-z0-9_]", "", str(req.get("roomKey") or ""))
+                if not rk:
+                    return self._json({"ok": False, "error": "need roomKey"}, 400)
+                try:
+                    base = _scenario_base(req.get("chapter"), req.get("scenario"))
+                    return self._json({"ok": True, **_accept_still(
+                        base, rk, bool(req.get("accepted", True)),
+                        req.get("note") or "", req.get("state") or None)})
+                except ValueError as ve:
+                    return self._json({"ok": False, "error": str(ve)}, 400)
             if route == "/api/set-review-flag":       # per-room review checkmark (hotspotsReviewed / cinemagraphsVerified)
                 req = self._body()
                 rk = re.sub(r"[^A-Za-z0-9_]", "", str(req.get("roomKey") or ""))

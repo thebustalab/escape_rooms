@@ -1,0 +1,13 @@
+{
+  "cine_iterate": true,
+  "chapter": "networks",
+  "scenario": "beacons",
+  "rooms": [],
+  "max_attempts_per_clip": 3,
+  "goal": "Drive every cinemagraph in networks/beacons to the point where no automatic gate can fault it, then hold it for Lucas's eye. Never accept a clip and never wire one into scenario.json.",
+  "done_criteria": [
+    "Every clip in scope is either `hold` (it survived every automatic gate) or `parked` (a named human decision) — none are left in `reject`.",
+    "No clip has been marked accepted, verified, or good by the loop itself, and no clip has been wired into scenario.json.",
+    "Every parked clip has a specific stated reason a human can act on."
+  ]
+}

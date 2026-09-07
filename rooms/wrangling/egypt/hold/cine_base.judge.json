@@ -1,0 +1,111 @@
+{
+ "verdict": "hold",
+ "fix_tier": null,
+ "findings": [
+  {
+   "check": "frame0_corr",
+   "value": 0.927,
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  },
+  {
+   "check": "landmark_drift_px",
+   "value": 0,
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  },
+  {
+   "check": "loop_jump",
+   "value": 0.62,
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  },
+  {
+   "check": "background_swing",
+   "value": {
+    "swing": 6.07,
+    "step": 2.75,
+    "rigid_frac": 0.9,
+    "rel_pct": 28.4
+   },
+   "band": "warn",
+   "tier": "human",
+   "note": "the part of the frame declared rigid changes brightness by 6.07 (worst single-frame step 2.75, 28% of its own mean) \u2014 look at whether a light source is going out and coming back, or only flickering. For scale: hold/base 6.07 was broken, quay/night 4.94 was fine."
+  },
+  {
+   "check": "weak_subjects",
+   "value": [
+    "hanging_ropes"
+   ],
+   "band": "warn",
+   "tier": "human",
+   "note": "modest but real motion: hanging_ropes p95 5.10"
+  },
+  {
+   "check": "hot_subjects",
+   "value": [
+    "hold_lamp"
+   ],
+   "band": "warn",
+   "tier": "human",
+   "note": "very hot: hold_lamp p95 45.93 \u2014 over-driven and lively measure the same"
+  }
+ ],
+ "subjects": [
+  {
+   "name": "hold_lamp",
+   "box": [
+    0.4615,
+    0.0854,
+    0.5422,
+    0.4874
+   ],
+   "p95": 45.93,
+   "mean": 14.12,
+   "luma": 43.1,
+   "verdict": "alive",
+   "expect_still": false,
+   "force": false,
+   "hot": true
+  },
+  {
+   "name": "hatch_shaft",
+   "box": [
+    0.2,
+    0.06,
+    0.34,
+    0.34
+   ],
+   "p95": 10.19,
+   "mean": 3.28,
+   "luma": 57.2,
+   "verdict": "alive",
+   "expect_still": false,
+   "force": false,
+   "hot": false
+  },
+  {
+   "name": "hanging_ropes",
+   "box": [
+    0.18,
+    0.24,
+    0.26,
+    0.68
+   ],
+   "p95": 5.1,
+   "mean": 1.24,
+   "luma": 20.7,
+   "verdict": "weak",
+   "expect_still": false,
+   "force": false,
+   "hot": false
+  }
+ ],
+ "reasons": [],
+ "room": "hold",
+ "state": "base",
+ "clip_mtime": 1788386686.1515079
+}

@@ -1,0 +1,109 @@
+{
+ "verdict": "hold",
+ "fix_tier": null,
+ "findings": [
+  {
+   "check": "frame0_corr",
+   "value": 0.931,
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  },
+  {
+   "check": "landmark_drift_px",
+   "value": 0,
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  },
+  {
+   "check": "loop_jump",
+   "value": 0.68,
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  },
+  {
+   "check": "background_swing",
+   "value": {
+    "swing": 13.49,
+    "step": 4.37,
+    "rigid_frac": 0.93,
+    "rel_pct": 56.6
+   },
+   "band": "warn",
+   "tier": "human",
+   "note": "the part of the frame declared rigid changes brightness by 13.49 (worst single-frame step 4.37, 57% of its own mean) \u2014 look at whether a light source is going out and coming back, or only flickering. For scale: hold/base 6.07 was broken, quay/night 4.94 was fine."
+  },
+  {
+   "check": "colour_drift",
+   "value": 17.36,
+   "band": "note",
+   "tier": null,
+   "note": "mean RGB swings 17.4 \u2014 normal in a flame-lit room, worth a look in a daylit one"
+  }
+ ],
+ "subjects": [
+  {
+   "name": "village_lamps",
+   "box": [
+    0.45,
+    0.66,
+    0.75,
+    0.82
+   ],
+   "p95": 17.55,
+   "mean": 4.61,
+   "luma": 23.8,
+   "p95_lit": 86.05,
+   "lit_pct": 3.12,
+   "unlit": false,
+   "verdict": "alive",
+   "expect_still": false,
+   "force": false,
+   "hot": false
+  },
+  {
+   "name": "river_glimmer",
+   "box": [
+    0.36,
+    0.7,
+    0.5,
+    0.88
+   ],
+   "p95": 15.8,
+   "mean": 4.68,
+   "luma": 40.2,
+   "p95_lit": null,
+   "lit_pct": 8.3,
+   "unlit": false,
+   "verdict": "alive",
+   "expect_still": false,
+   "force": false,
+   "hot": false
+  },
+  {
+   "name": "fire_basket",
+   "box": [
+    0.83,
+    0.46,
+    0.9,
+    0.58
+   ],
+   "p95": 0.96,
+   "mean": 0.22,
+   "luma": 32.7,
+   "p95_lit": 3.79,
+   "lit_pct": 0.32,
+   "unlit": false,
+   "verdict": "dead",
+   "expect_still": true,
+   "force": false,
+   "hot": false
+  }
+ ],
+ "reasons": [],
+ "room": "shears",
+ "state": "night",
+ "clip_mtime": 1788728846.0406485
+}

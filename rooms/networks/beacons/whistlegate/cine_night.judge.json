@@ -1,0 +1,94 @@
+{
+ "verdict": "hold",
+ "fix_tier": null,
+ "findings": [
+  {
+   "check": "frame0_corr",
+   "value": 0.932,
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  },
+  {
+   "check": "landmark_drift_px",
+   "value": 0,
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  },
+  {
+   "check": "loop_jump",
+   "value": 0.95,
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  },
+  {
+   "check": "background_swing",
+   "value": {
+    "swing": 3.22,
+    "step": 2.32,
+    "rigid_frac": 0.96,
+    "rel_pct": 25.8
+   },
+   "band": "warn",
+   "tier": "human",
+   "note": "the part of the frame declared rigid changes brightness by 3.22 (worst single-frame step 2.32, 26% of its own mean) \u2014 look at whether a light source is going out and coming back, or only flickering. For scale: hold/base 6.07 was broken, quay/night 4.94 was fine."
+  },
+  {
+   "check": "weak_subjects",
+   "value": [
+    "hearth",
+    "hanging_lamps"
+   ],
+   "band": "warn",
+   "tier": "human",
+   "note": "modest but real motion: hearth p95 6.93, hanging_lamps p95 7.84"
+  },
+  {
+   "check": "colour_drift",
+   "value": 2.67,
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  }
+ ],
+ "subjects": [
+  {
+   "name": "hearth",
+   "box": [
+    0.45,
+    0.5,
+    0.55,
+    0.7
+   ],
+   "p95": 6.93,
+   "mean": 2.46,
+   "luma": 11.9,
+   "verdict": "weak",
+   "expect_still": false,
+   "force": false,
+   "hot": false
+  },
+  {
+   "name": "hanging_lamps",
+   "box": [
+    0.4,
+    0.3,
+    0.5,
+    0.5
+   ],
+   "p95": 7.84,
+   "mean": 2.34,
+   "luma": 10.3,
+   "verdict": "weak",
+   "expect_still": false,
+   "force": false,
+   "hot": false
+  }
+ ],
+ "reasons": [],
+ "room": "whistlegate",
+ "state": "night",
+ "clip_mtime": 1788667289.166409
+}

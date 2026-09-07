@@ -1,0 +1,163 @@
+{
+ "verdict": "reject",
+ "fix_tier": "rerender",
+ "findings": [
+  {
+   "check": "frame0_corr",
+   "value": 0.914,
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  },
+  {
+   "check": "landmark_drift_px",
+   "value": 0,
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  },
+  {
+   "check": "loop_jump",
+   "value": 0.59,
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  },
+  {
+   "check": "background_swing",
+   "value": {
+    "swing": 0.51,
+    "step": 0.29,
+    "rigid_frac": 0.81,
+    "rel_pct": 2.9
+   },
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  },
+  {
+   "check": "dead_subjects",
+   "value": [
+    "temple_glow"
+   ],
+   "band": "reject",
+   "tier": "rerender",
+   "note": "named subject(s) not moving in the shipped clip: temple_glow p95 4.05"
+  },
+  {
+   "check": "weak_subjects",
+   "value": [
+    "basin_spill",
+    "colonnade_lamps",
+    "shrine_candles"
+   ],
+   "band": "warn",
+   "tier": "human",
+   "note": "modest but real motion: basin_spill p95 6.26, colonnade_lamps p95 5.88, shrine_candles p95 7.33"
+  }
+ ],
+ "subjects": [
+  {
+   "name": "lion_spout",
+   "box": [
+    0.45,
+    0.428,
+    0.485,
+    0.605
+   ],
+   "p95": 12.51,
+   "mean": 3.26,
+   "luma": 14.7,
+   "verdict": "alive",
+   "expect_still": false,
+   "force": true,
+   "hot": false
+  },
+  {
+   "name": "fountain_basin",
+   "box": [
+    0.372,
+    0.542,
+    0.578,
+    0.618
+   ],
+   "p95": 11.86,
+   "mean": 3.48,
+   "luma": 16.9,
+   "verdict": "alive",
+   "expect_still": false,
+   "force": true,
+   "hot": false
+  },
+  {
+   "name": "basin_spill",
+   "box": [
+    0.39,
+    0.64,
+    0.63,
+    0.84
+   ],
+   "p95": 6.26,
+   "mean": 1.7,
+   "luma": 10.9,
+   "verdict": "weak",
+   "expect_still": false,
+   "force": true,
+   "hot": false
+  },
+  {
+   "name": "colonnade_lamps",
+   "box": [
+    0.0,
+    0.42,
+    0.32,
+    0.56
+   ],
+   "p95": 5.88,
+   "mean": 2.21,
+   "luma": 26.2,
+   "verdict": "weak",
+   "expect_still": false,
+   "force": false,
+   "hot": false
+  },
+  {
+   "name": "shrine_candles",
+   "box": [
+    0.645,
+    0.48,
+    0.745,
+    0.62
+   ],
+   "p95": 7.33,
+   "mean": 2.91,
+   "luma": 34.9,
+   "verdict": "weak",
+   "expect_still": false,
+   "force": false,
+   "hot": false
+  },
+  {
+   "name": "temple_glow",
+   "box": [
+    0.72,
+    0.26,
+    0.92,
+    0.58
+   ],
+   "p95": 4.05,
+   "mean": 1.75,
+   "luma": 27.2,
+   "verdict": "dead",
+   "expect_still": false,
+   "force": false,
+   "hot": false
+  }
+ ],
+ "reasons": [
+  "named subject(s) not moving in the shipped clip: temple_glow p95 4.05"
+ ],
+ "room": "canopic",
+ "state": "night",
+ "clip_mtime": 1788401100.0851364
+}

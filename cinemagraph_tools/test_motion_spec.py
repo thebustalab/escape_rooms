@@ -180,3 +180,85 @@ class MotionSpecTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+# --- sparse lit subjects: the p95-is-blind class -------------------------------------------------
+# A box that is 99% dark hillside cannot report its lamps through a 95th percentile, because the lit
+# pixels sit above the 99th. These pin the arithmetic, the safety property (rescue only), and the
+# separation between "not moving" and "nothing lit in the box".
+
+import numpy as np                                                            # noqa: E402
+import motion_spec as MS                                                      # noqa: E402
+
+
+def _clip_stack(lit_frac, lit_tstd, bg_tstd, h=120, w=240, lit_luma=200.0, bg_luma=10.0, n=16):
+    """A synthetic frame stack: a dark static field with a bright moving minority."""
+    rng = np.random.default_rng(0)
+    n_lit = int(round(lit_frac * h * w))
+    flat = np.zeros((h * w,), dtype=bool)
+    flat[:n_lit] = True
+    rng.shuffle(flat)
+    mask = flat.reshape(h, w)
+    base = np.where(mask, lit_luma, bg_luma).astype(np.float32)
+    amp = np.where(mask, lit_tstd, bg_tstd).astype(np.float32)
+    # A deterministic +/- alternation gives each pixel a temporal std of exactly its amplitude.
+    frames = [base + amp * (1.0 if i % 2 else -1.0) for i in range(n)]
+    return np.stack([np.repeat(f[:, :, None], 3, axis=2) for f in frames])
+
+
+SPEC = {"subjects": [{"name": "village_lamps", "box": [0, 0, 1, 1], "phrase": "lamps flickering"}]}
+
+
+class SparseLitSubjectTest(unittest.TestCase):
+
+    def test_box_p95_is_blind_to_a_sparse_lit_subject(self):
+        """The bug, stated as a measurement: lamps at tstd 9 read as dead through the box p95."""
+        st = _clip_stack(lit_frac=0.008, lit_tstd=9.0, bg_tstd=2.5)
+        m = MS.measure_subjects(None, SPEC, frames=st)[0]
+        self.assertLess(m["p95"], MS.DEAD_P95)          # the box says dead...
+        self.assertGreater(m["p95_lit"], MS.DEAD_P95)   # ...the lamps themselves plainly are not
+        self.assertEqual(m["verdict"], "alive")
+
+    def test_a_sparse_subject_that_really_is_dead_stays_dead(self):
+        """The rescue must not become a blanket amnesty for unlit night boxes."""
+        st = _clip_stack(lit_frac=0.008, lit_tstd=0.4, bg_tstd=0.3)
+        m = MS.measure_subjects(None, SPEC, frames=st)[0]
+        self.assertEqual(m["verdict"], "dead")
+        self.assertFalse(m["unlit"])                    # there ARE lamps; they simply do not move
+
+    def test_no_lit_pixels_at_all_reports_unlit_not_a_motion_number(self):
+        """hood/night: the box was pure ridgeline and reported only 'p95 4.42'. Re-aim, don't re-render."""
+        st = _clip_stack(lit_frac=0.0, lit_tstd=0.0, bg_tstd=2.0)
+        m = MS.measure_subjects(None, SPEC, frames=st)[0]
+        self.assertTrue(m["unlit"])
+        self.assertIsNone(m["p95_lit"])
+        self.assertEqual(m["verdict"], "dead")
+
+    def test_a_bright_box_never_takes_the_sparse_path(self):
+        """The brightness-SCALED bar was tried and rejected on boat's crown-fire (bright box, p95 6.25).
+        The sparse path must not reintroduce it: above SPARSE_FRAC lit, nothing changes."""
+        st = _clip_stack(lit_frac=0.83, lit_tstd=6.25, bg_tstd=6.25)
+        m = MS.measure_subjects(None, SPEC, frames=st)[0]
+        self.assertIsNone(m["p95_lit"])
+        self.assertFalse(m["unlit"])
+        self.assertEqual(m["verdict"], "weak")          # exactly the pre-patch verdict for 6.25
+
+    def test_the_sparse_path_can_only_rescue_never_kill(self):
+        """`eff` is a MAX, so no subject that passed before can start failing."""
+        for lit_frac in (0.0, 0.005, 0.02, 0.2, 0.9):
+            for lit_tstd, bg_tstd in ((0.5, 0.5), (9.0, 2.5), (20.0, 12.0)):
+                st = _clip_stack(lit_frac=lit_frac, lit_tstd=lit_tstd, bg_tstd=bg_tstd)
+                m = MS.measure_subjects(None, SPEC, frames=st)[0]
+                old = "dead" if m["p95"] < MS.DEAD_P95 else (
+                    "weak" if m["p95"] < MS.WEAK_P95 else "alive")
+                rank = {"dead": 0, "weak": 1, "alive": 2}
+                self.assertGreaterEqual(rank[m["verdict"]], rank[old],
+                                        f"lit_frac={lit_frac} regressed {old} -> {m['verdict']}")
+
+    def test_still_pins_are_still_checked_against_the_raw_box_p95(self):
+        """`p95` must stay the raw box figure — the pins and every calibration note refer to it."""
+        st = _clip_stack(lit_frac=0.008, lit_tstd=9.0, bg_tstd=2.5)
+        spec = {"subjects": [dict(SPEC["subjects"][0], still=True)]}
+        m = MS.measure_subjects(None, spec, frames=st)[0]
+        self.assertLess(m["p95"], MS.WEAK_P95)
+        self.assertEqual(still_violations([m]), [])

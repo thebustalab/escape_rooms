@@ -1,0 +1,131 @@
+# Long-Running Agent Progress
+
+**Task:** cine_iterate  
+**Scenario:** networks/beacons  
+**Rooms:** all  
+**Created:** 2026-09-05T04:00:13.219359+00:00  
+
+---
+
+- **2026-09-05 04:02 UTC** — Judged 6 clip(s); more still stale.
+- **2026-09-05 04:06 UTC** — Judged 6 clip(s); more still stale.
+- **2026-09-05 04:09 UTC** — Judged 6 clip(s); more still stale.
+- **2026-09-05 04:12 UTC** — Judged 6 clip(s); more still stale.
+- **2026-09-05 04:17 UTC** — cycle_05_fenwatch_base: spec updated and render launched — The spec is not at fault and is resubmitted unchanged — all four boxes were re-checked against the current `scene.png` and still land on the
+- **2026-09-05 04:27 UTC** — Render landed for fenwatch/base after 605s — judge says hold
+- **2026-09-05 04:35 UTC** — cycle_06_fenwatch_night: spec updated and render launched — The single change is re-rendering against the current `scene_night.png` — which replaced the render this clip was baked from — with the spec
+- **2026-09-05 04:45 UTC** — Render landed for fenwatch/night after 606s — judge says hold
+- **2026-09-05 04:49 UTC** — cycle_07_spindle_base: spec updated and render launched — The spec is already correct for the current art and is left unchanged — the single change is re-rendering the clip against the recommitted `
+- **2026-09-05 04:59 UTC** — Render landed for spindle/base after 604s — judge says hold
+- **2026-09-05 05:04 UTC** — cycle_08_spindle_night: spec updated and render launched — Rerender against the current scene_night.png (the shipped clip animates superseded art), with both subject boxes moved off the bare rock the
+- **2026-09-05 05:15 UTC** — Render landed for spindle/night after 617s — judge says reject (named subject(s) not moving in the shipped clip: village_lamps p95 4.19, river_glimmer p95 4.29)
+- **2026-09-05 05:23 UTC** — cycle_09_spindle_night: spec updated and render launched — Stop the fire-basket igniting — the pin is rewritten from "is cold/unlit" (a state the model satisfied at frame 0 and then abandoned) to an 
+- **2026-09-05 05:38 UTC** — Render landed for spindle/night after 846s — judge says reject (named subject(s) not moving in the shipped clip: village_lamps p95 3.54, river_glimmer p95 3.76)
+- **2026-09-05 05:43 UTC** — cycle_10_spindle_night: judge overruled with evidence — holding for review. Both "dead" subjects are visibly and measurably animating (p95 range 33 on their lit pixels, with the variance map falling exactly on the lamps and channels and
+- **2026-09-05 05:47 UTC** — cycle_11_rams_head_base: spec updated and render launched — The clip was rendered from superseded art and must simply be re-rendered against the current `scene.png`; the spec is carried over essential
+- **2026-09-05 05:57 UTC** — Render landed for rams_head/base after 602s — judge says hold
+- **2026-09-05 06:03 UTC** — cycle_12_rams_head_night: spec updated and render launched — The clip predates a replacement `scene_night.png` and animates the old, superseded panorama, so it must be re-rendered from the current stil
+- **2026-09-06 00:57 UTC** — Render landed for rams_head/night after 740s — judge says reject (named subject(s) not moving in the shipped clip: village_lamps p95 2.79)
+- **2026-09-06 00:58 UTC** — Judged 6 clip(s); more still stale.
+- **2026-09-06 01:00 UTC** — Judged 6 clip(s); more still stale.
+- **2026-09-06 01:01 UTC** — Judged 6 clip(s); more still stale.
+- **2026-09-06 01:03 UTC** — sisters/base: art was recommitted over this clip — re-rendered directly against the current panorama (no diagnosis cycle spent).
+- **2026-09-06 01:14 UTC** — Render landed for sisters/base after 616s — judge says hold
+- **2026-09-06 01:15 UTC** — sisters/night: art was recommitted over this clip — re-rendered directly against the current panorama (no diagnosis cycle spent).
+- **2026-09-06 01:29 UTC** — Render landed for sisters/night after 612s — judge says hold
+- **2026-09-06 01:31 UTC** — hood/base: art was recommitted over this clip — re-rendered directly against the current panorama (no diagnosis cycle spent).
+- **2026-09-06 01:44 UTC** — Render landed for hood/base after 594s — judge says hold
+- **2026-09-06 01:48 UTC** — hood/night: art was recommitted over this clip — re-rendered directly against the current panorama (no diagnosis cycle spent).
+- **2026-09-06 02:03 UTC** — Render landed for hood/night after 850s — judge says reject (named subject(s) not moving in the shipped clip: village_lamps p95 4.42, river_glimmer p95 4.18)
+- **2026-09-06 02:08 UTC** — ladder/base: art was recommitted over this clip — re-rendered directly against the current panorama (no diagnosis cycle spent).
+- **2026-09-06 02:20 UTC** — Render landed for ladder/base after 615s — judge says hold
+- **2026-09-06 02:21 UTC** — ladder/night: art was recommitted over this clip — re-rendered directly against the current panorama (no diagnosis cycle spent).
+- **2026-09-06 02:37 UTC** — Render landed for ladder/night after 844s — judge says reject (named subject(s) not moving in the shipped clip: village_lamps p95 2.66, river_glimmer p95 1.62)
+- **2026-09-06 02:41 UTC** — anvil/base: art was recommitted over this clip — re-rendered directly against the current panorama (no diagnosis cycle spent).
+- **2026-09-06 02:54 UTC** — Render landed for anvil/base after 717s — judge says reject (named subject(s) not moving in the shipped clip: far_smoke p95 3.18)
+- **2026-09-06 02:55 UTC** — anvil/night: art was recommitted over this clip — re-rendered directly against the current panorama (no diagnosis cycle spent).
+- **2026-09-06 03:07 UTC** — Render landed for anvil/night after 705s — judge says reject (named subject(s) not moving in the shipped clip: river_glimmer p95 0.55)
+- **2026-09-06 03:08 UTC** — shears/base: art was recommitted over this clip — re-rendered directly against the current panorama (no diagnosis cycle spent).
+- **2026-09-06 03:21 UTC** — Render landed for shears/base after 716s — judge says reject (named subject(s) not moving in the shipped clip: lens_cloud p95 4.50)
+- **2026-09-06 03:22 UTC** — shears/night: art was recommitted over this clip — re-rendered directly against the current panorama (no diagnosis cycle spent).
+- **2026-09-06 03:36 UTC** — Render landed for shears/night after 848s — judge says reject (named subject(s) not moving in the shipped clip: village_lamps p95 1.11, river_glimmer p95 3.05)
+- **2026-09-06 03:37 UTC** — whistlegate/base: art was recommitted over this clip — re-rendered directly against the current panorama (no diagnosis cycle spent).
+- **2026-09-06 03:48 UTC** — Render landed for whistlegate/base after 613s — judge says hold
+- **2026-09-06 03:49 UTC** — whistlegate/night: art was recommitted over this clip — re-rendered directly against the current panorama (no diagnosis cycle spent).
+- **2026-09-06 04:02 UTC** — Render landed for whistlegate/night after 741s — judge says hold
+- **2026-09-06 04:03 UTC** — broken_tooth/base: art was recommitted over this clip — re-rendered directly against the current panorama (no diagnosis cycle spent).
+- **2026-09-06 04:13 UTC** — Render landed for broken_tooth/base after 599s — judge says hold
+- **2026-09-06 04:14 UTC** — broken_tooth/night: art was recommitted over this clip — re-rendered directly against the current panorama (no diagnosis cycle spent).
+- **2026-09-06 04:26 UTC** — Render landed for broken_tooth/night after 613s — judge says reject (named subject(s) not moving in the shipped clip: river_glimmer p95 4.49)
+- **2026-09-06 04:27 UTC** — kiln/base: art was recommitted over this clip — re-rendered directly against the current panorama (no diagnosis cycle spent).
+- **2026-09-06 04:37 UTC** — Render landed for kiln/base after 599s — judge says hold
+- **2026-09-06 04:38 UTC** — kiln/night: art was recommitted over this clip — re-rendered directly against the current panorama (no diagnosis cycle spent).
+- **2026-09-06 04:51 UTC** — Render landed for kiln/night after 752s — judge says reject (named subject(s) not moving in the shipped clip: village_lamps p95 2.77, river_glimmer p95 4.22)
+- **2026-09-06 04:52 UTC** — crown/base: art was recommitted over this clip — re-rendered directly against the current panorama (no diagnosis cycle spent).
+- **2026-09-06 05:02 UTC** — Render landed for crown/base after 594s — judge says hold
+- **2026-09-06 05:03 UTC** — crown/night: art was recommitted over this clip — re-rendered directly against the current panorama (no diagnosis cycle spent).
+- **2026-09-06 05:16 UTC** — Render landed for crown/night after 735s — judge says reject (named subject(s) not moving in the shipped clip: glacier_tarn p95 1.89)
+- **2026-09-06 05:17 UTC** — crown/order_sent: art was recommitted over this clip — re-rendered directly against the current panorama (no diagnosis cycle spent).
+- **2026-09-06 05:30 UTC** — Render landed for crown/order_sent after 717s — judge says reject (named subject(s) not moving in the shipped clip: beacon_fires p95 0.49)
+- **2026-09-06 05:39 UTC** — cycle_35_rams_head_night: evaluator FAIL on a REBAKE (retry 1/2).
+- **2026-09-06 05:46 UTC** — cycle_36_rams_head_night: spec updated and render launched — The far flats are released from `rigid` and the `village_lamps` mover is recast as thin cold haze drifting over them — a category the stabil
+- **2026-09-06 05:57 UTC** — Render landed for rams_head/night after 611s — judge says hold
+- **2026-09-06 06:06 UTC** — cycle_37_hood_night: evaluator FAIL on a RERENDER (retry 1/2).
+- **2026-09-06 15:02 UTC** — cycle_38_hood_night: judge overruled with evidence — holding for review. The rejection is stale — it was written before the sparse-lit-pixel path landed, and re-judging the identical shipped `cine_night.mp4` with the current code ret
+- **2026-09-06 15:10 UTC** — cycle_39_ladder_night: evaluator FAIL on a RERENDER (retry 1/2).
+- **2026-09-06 15:17 UTC** — cycle_40_ladder_night: spec updated and render launched — The single fix is re-aiming `village_lamps` and `river_glimmer` onto the lamps and channels that are actually in the trough (verified `alive
+- **2026-09-06 15:28 UTC** — Render landed for ladder/night after 616s — judge says hold
+- **2026-09-06 15:35 UTC** — cycle_41_anvil_base: spec updated and render launched — The fire-basket pin's "no smoke rises from it" clause is written verbatim into the positive prompt and suppresses the one subject that is sm
+- **2026-09-06 15:48 UTC** — Render landed for anvil/base after 711s — judge says reject (named subject(s) not moving in the shipped clip: far_smoke p95 3.22)
+- **2026-09-06 16:01 UTC** — cycle_42_anvil_base: parked for a human — The base art is the defect — the scene prompt asks for "one fat grey column of woodsmoke, broad and solid" but `scene.png` renders a ~40 px translucent thread t
+- **2026-09-06 16:09 UTC** — cycle_43_anvil_night: spec updated and render launched — The single change is polarity — every fire word moves out of the positive-side `pinned` prose into the negatives (the pin is now an affirmat
+- **2026-09-06 16:19 UTC** — Render landed for anvil/night after 599s — judge says hold
+- **2026-09-06 16:23 UTC** — cycle_44_shears_base: judge overruled with evidence — holding for review. The lens cloud is demonstrably alive — its rim feathers and its underside light shifts across the loop with coherent lag-growing motion — and the "dead" verdict
+- **2026-09-06 16:30 UTC** — cycle_45_shears_night: spec updated and render launched — Both subject boxes are re-aimed onto the lamps and river as they actually sit in the current art (they measure alive/near-alive on the exist
+- **2026-09-06 16:41 UTC** — Render landed for shears/night after 617s — judge says hold
+- **2026-09-06 16:48 UTC** — cycle_46_broken_tooth_night: spec updated and render launched — The single fix is relocating `village_lamps` onto the band where the lamps actually are ([0.35,0.425,0.77,0.50], where this very clip alread
+- **2026-09-06 16:58 UTC** — Render landed for broken_tooth/night after 600s — judge says hold
+- **2026-09-06 17:05 UTC** — cycle_47_kiln_night: spec updated and render launched — The only change is moving both boxes off bare dome rock and onto the villages and braided channels they name — the phrases, rigid, pinned an
+- **2026-09-06 17:16 UTC** — Render landed for kiln/night after 625s — judge says hold
+- **2026-09-06 17:23 UTC** — cycle_48_crown_night: evaluator FAIL on a RERENDER (retry 1/2).
+- **2026-09-06 17:34 UTC** — cycle_49_crown_night: rebaked (The reject was an artifact of three mis-aimed subject boxes (now corrected in the spec) and of a rep) → hold
+- **2026-09-06 17:40 UTC** — cycle_50_crown_order_sent: judge overruled with evidence — holding for review. The only convicting finding is a measurement artefact — `beacon_fires` is measured over a patch of pinned night sky rather than the flame, which sits at about `
+- **2026-09-06 17:46 UTC** — cycle_51_fenwatch_night: spec updated and render launched — The single change is pinning the scene's actual varying light source — the ambient moonlight, which no line in the old spec constrained — as
+- **2026-09-06 17:56 UTC** — Render landed for fenwatch/night after 608s — judge says hold
+- **2026-09-06 18:08 UTC** — cycle_52_spindle_base: spec updated and render launched — The single change is naming the boiling architecture as `still` subjects — `platform_stone`, `fire_basket`, `spyglass_tripod`, `fuel_box` — 
+- **2026-09-06 18:19 UTC** — Render landed for spindle/base after 600s — judge says hold
+- **2026-09-06 18:26 UTC** — cycle_53_rams_head_base: judge overruled with evidence — holding for review. The swing is a sub-visual ~5% exposure breath over the last third of the loop with no light source cycling and no rigid-object motion — eight frames spanning th
+- **2026-09-06 18:31 UTC** — cycle_54_rams_head_night: spec updated and render launched — The brightness-modulation clause is stripped out of the `village_lamps` phrase — the haze mechanic that made the box alive is kept intact, b
+- **2026-09-06 18:42 UTC** — Render landed for rams_head/night after 611s — judge says hold
+- **2026-09-06 18:48 UTC** — cycle_55_sisters_base: judge overruled with evidence — holding for review. The pinned `slab_ledger` is visually and metrically frozen at native resolution across the whole loop with landmark drift at 0 px, so the report-only `still_vio
+- **2026-09-06 18:54 UTC** — cycle_56_sisters_night: evaluator FAIL on a RERENDER (retry 1/2).
+- **2026-09-06 19:04 UTC** — cycle_57_sisters_night: spec updated and render launched — The single change is declaring the four fire-prone regions (fire-basket, both slate cairns, the seam cairn at both edges) as `still` subject
+- **2026-09-06 19:15 UTC** — Render landed for sisters/night after 622s — judge says hold
+- **2026-09-06 19:23 UTC** — cycle_58_hood_base: evaluator FAIL on a PASS (retry 1/2).
+- **2026-09-06 19:30 UTC** — cycle_59_hood_base: spec updated and render launched — The single change is `force_repair: true` on cloud_sea — identical names, boxes, phrases, rigid, pinned and negatives — so the pipeline tile
+- **2026-09-06 19:44 UTC** — Render landed for hood/base after 840s — judge says hold
+- **2026-09-06 19:56 UTC** — cycle_60_hood_night: evaluator FAIL on a RERENDER (retry 1/2).
+- **2026-09-06 20:13 UTC** — cycle_61_hood_night: rebaked (The sky was swarming in violation of the spec's star pin, so I added a `still: true` `star_field` bo) → hold
+- **2026-09-06 20:18 UTC** — cycle_62_ladder_base: judge overruled with evidence — holding for review. The only expect_still subject measures p95 0.77 (below the 8.0 trigger, so no still_violation is actually present in the current judge record), landmark drift i
+- **2026-09-06 20:23 UTC** — cycle_63_ladder_night: spec updated and render launched — The one change is re-aiming `fire_basket` onto the fire bed it was missing ([0.02,0.52,0.22,1.0] instead of the empty rim air at [0.06,0.55,
+- **2026-09-06 20:35 UTC** — Render landed for ladder/night after 614s — judge says hold
+- **2026-09-06 20:45 UTC** — cycle_64_anvil_night: parked for a human — The fix is known, verified and free but not reachable by any action available here — I simulated the bake at mask percentiles 46/60/75/85/90/93/96 and masking p
+- **2026-09-06 20:49 UTC** — cycle_65_shears_base: judge overruled with evidence — holding for review. The lens cloud is measurably and visibly animating — rim feathering and underside light travel, 5.6% area breathing, ~50-level peak changes — while holding stat
+- **2026-09-06 20:57 UTC** — cycle_66_shears_night: spec updated and render launched — The scene's illumination has never been pinned and the two subject phrases explicitly license it to change ("flickering", "catching and losi
+- **2026-09-06 21:07 UTC** — Render landed for shears/night after 600s — judge says hold
+- **2026-09-06 21:19 UTC** — cycle_67_whistlegate_base: evaluator FAIL on a RERENDER (retry 1/2).
+- **2026-09-06 21:27 UTC** — cycle_68_whistlegate_base: rebaked (The mask sidecar is enabled at auto and already pins `desk_ledger`, so re-baking from `cine_base_src) → hold
+- **2026-09-06 21:33 UTC** — cycle_69_whistlegate_night: judge overruled with evidence — holding for review. The baked clip is visually correct — lamps gutter without extinguishing, the fire animates, everything pinned is still, and both warnings are artifacts of subje
+- **2026-09-06 21:38 UTC** — cycle_70_broken_tooth_base: evaluator FAIL on a PASS (retry 1/2).
+- **2026-09-06 21:43 UTC** — cycle_71_broken_tooth_base: judge overruled with evidence — holding for review. The plume is mandated by the room's own scene prompt and measurably billows in place without descending or spreading onto the shelf across all 61 frames, `gorge
+- **2026-09-06 21:52 UTC** — cycle_72_kiln_night: evaluator FAIL on a RERENDER (retry 1/2).
+- **2026-09-06 23:32 UTC** — cycle_73_kiln_night: rebaked (I have written one `still: true` subject `sky_and_ridgelines` box [0.0,0.0,1.0,0.46] into the night ) → hold
+- **2026-09-06 23:41 UTC** — cycle_74_crown_base: evaluator FAIL on a RERENDER (retry 1/2).
+- **2026-09-06 23:48 UTC** — cycle_75_crown_base: spec updated and render launched — The single change is enlarging the `slab_sheet` still box from (0.53,0.74,0.63,0.96) to (0.545,0.50,0.685,1.00) so it covers the whole measu
+- **2026-09-06 23:58 UTC** — Render landed for crown/base after 583s — judge says hold
+- **2026-09-07 00:04 UTC** — cycle_76_crown_night: evaluator FAIL on a PASS (retry 1/2).
+- **2026-09-07 00:10 UTC** — cycle_77_crown_night: spec updated and render launched — The single change is to stop asking the tarn for the spreading, seeping, level-changing water the room's own pinned line and negatives expli
+- **2026-09-07 00:24 UTC** — Render landed for crown/night after 734s — judge says reject (named subject(s) not moving in the shipped clip: glacier_tarn has no lit pixels in its box (0.14% above luma 80) — the box is aimed off the subject, or the subj)
+- **2026-09-07 00:29 UTC** — cycle_78_crown_order_sent: judge overruled with evidence — holding for review. The clip is correct — the flame light legitimately beats on the rigid stone it illuminates while distant rigid geometry stays dead flat, no fire extinguishes an
+- **2026-09-07 00:30 UTC** — Nothing left to fix: 22 clip(s) hold for review, 3 parked.
+- **2026-09-07 00:31 UTC** — Output passed evaluation but did NOT meet all 3 declared done-criteria — held for review (see evaluations/done_criteria_check.md).

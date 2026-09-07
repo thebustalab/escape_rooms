@@ -1,0 +1,138 @@
+{
+ "verdict": "reject",
+ "fix_tier": "rebake",
+ "findings": [
+  {
+   "check": "frame0_corr",
+   "value": 0.97,
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  },
+  {
+   "check": "landmark_drift_px",
+   "value": 0,
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  },
+  {
+   "check": "loop_jump",
+   "value": 0.63,
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  },
+  {
+   "check": "background_swing",
+   "value": {
+    "swing": 0.58,
+    "step": 0.18,
+    "rigid_frac": 0.49,
+    "rel_pct": 0.5
+   },
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  },
+  {
+   "check": "masked_out",
+   "value": [
+    "bunting",
+    "pharos_flame",
+    "morning_cloud"
+   ],
+   "band": "reject",
+   "tier": "rebake",
+   "note": "the mask is pinning subject(s) the spec says should move: bunting p95 0.78 on the bake but 11.94 on the render, pharos_flame p95 0.17 on the bake but 8.85 on the render, morning_cloud p95 0.19 on the bake but 9.16 on the render"
+  }
+ ],
+ "subjects": [
+  {
+   "name": "harbour_water",
+   "box": [
+    0.0,
+    0.44,
+    1.0,
+    0.66
+   ],
+   "p95": 26.13,
+   "mean": 5.77,
+   "luma": 138.3,
+   "verdict": "alive",
+   "expect_still": false,
+   "force": false,
+   "hot": false
+  },
+  {
+   "name": "moored_boats",
+   "box": [
+    0.1991,
+    0.377,
+    0.4023,
+    0.7097
+   ],
+   "p95": 32.67,
+   "mean": 6.88,
+   "luma": 150.8,
+   "verdict": "alive",
+   "expect_still": false,
+   "force": false,
+   "hot": false
+  },
+  {
+   "name": "bunting",
+   "box": [
+    0.2,
+    0.36,
+    0.4,
+    0.46
+   ],
+   "p95": 0.78,
+   "mean": 0.62,
+   "luma": 211.1,
+   "verdict": "dead",
+   "expect_still": false,
+   "force": false,
+   "hot": false
+  },
+  {
+   "name": "pharos_flame",
+   "box": [
+    0.485,
+    0.2,
+    0.515,
+    0.36
+   ],
+   "p95": 0.17,
+   "mean": 0.02,
+   "luma": 190.8,
+   "verdict": "dead",
+   "expect_still": false,
+   "force": false,
+   "hot": false
+  },
+  {
+   "name": "morning_cloud",
+   "box": [
+    0.0,
+    0.0,
+    1.0,
+    0.26
+   ],
+   "p95": 0.19,
+   "mean": 0.25,
+   "luma": 177.7,
+   "verdict": "dead",
+   "expect_still": false,
+   "force": false,
+   "hot": false
+  }
+ ],
+ "reasons": [
+  "the mask is pinning subject(s) the spec says should move: bunting p95 0.78 on the bake but 11.94 on the render, pharos_flame p95 0.17 on the bake but 8.85 on the render, morning_cloud p95 0.19 on the bake but 9.16 on the render"
+ ],
+ "room": "quay",
+ "state": "base",
+ "clip_mtime": 1788388213.0694928
+}

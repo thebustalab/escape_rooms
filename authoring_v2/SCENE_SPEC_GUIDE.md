@@ -77,6 +77,47 @@ network and a description of vibes, Claude drafts **one spec per room** followin
    first, then the subject, then the open space** — never the other way round. This is the same failure
    as 0a from the other side: 0a is two elements disagreeing about one region, 0c is one sentence
    attaching a subject to the wrong half of itself.
+0d. **KEEP `setting` TO ONE SENTENCE — a long one flattens the projection** (2026-09-06,
+   `networks/subway` `car_woad`). `render_prompt` opens with *"This is a seamless 360-degree panorama
+   from {setting}"*, so everything in that field is read as a description of the VANTAGE. Grow it into
+   a paragraph — narrating which end of the room lies left, which lies right, what is behind the
+   viewer, plus a block of surface condition — and the model stops rendering a place and starts
+   rendering a **composition**: a flat, rectilinear elevation of one wall, parallel walls, no barrel
+   curvature, a corner returning at each frame edge. Three candidates were lost to this before the
+   cause was found. **The evidence:** `beacons/whistlegate`, the only interior in the corpus that has
+   ever wrapped correctly, has a **one-sentence** setting.
+   - **The geometry belongs in the elements' `at` positions, not in `setting`.** Stating it in both
+     places is what breaks it — the positions already place things left, right and behind.
+   - **Condition, materials, palette and clutter belong in `atmosphere`**, which is the field for them.
+   - Reinforce with a negative, because a positive description will not suppress the flat reading:
+     *"This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously
+     right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame,
+     and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing
+     angle rather than face-on. NOT a flat frontal elevation of one wall, no single-vanishing-point
+     composition, and never a view of the room from outside it."*
+   Interiors are the dangerous case: a small box of a room is where the model most wants to give you
+   one wall seen head-on.
+
+0e. **STATE A COUNT AS A NUMBER, or you will not get that many** (2026-09-06, `networks/subway`
+   `alum_wharf`; second instance — the first was `beacons` `crown/scene_order_sent`, which drew THREE
+   distant fires for a scenario whose escape turns on there being FOUR). Anything the player must be
+   able to count, or that the puzzle logic depends on, has to appear in the prompt as a numeral **and**
+   be fenced with a negative barring extras. Alum Wharf berths two lines and its four berth
+   elements — two doors on each of two trains — rendered as **three separate trains**, because each
+   element reads as its own object unless the frame is told how many objects there are. The fix that
+   worked: *"There are EXACTLY 2 trains in this station, one at each platform face and NO OTHERS — do
+   not add further trains, carriages or wagons anywhere in the frame or receding down any tunnel."*
+   Note that `beacons`' own notes had already concluded *"treat any exact count in a generated frame
+   as unreliable"*; this is the constructive half of that rule.
+
+0f. **A still bound for a cinemagraph must be explicitly SHARP.** Describing something as *sliding
+   past* or *running* invites the model to paint the motion INTO the still as motion blur and smeared
+   detail, which is the wrong input for the cinemagraph stage: the still should be crisp and the
+   movement should come from the clip. Cost the woad cab one candidate. Add to `negatives`: *"The image
+   is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere — everything in this
+   picture is standing still, and any movement described is what the cinemagraph will add later, never
+   something painted into the still."*
+
 1. **Left-to-right sweep.** Order `elements` as they appear sweeping around the panorama. Each `at` is a
    spatial phrase. **There are exactly SEVEN positions and seven phrases — one name each:**
    `on the far left (0.08) · to the left (0.20) · just left of centre (0.36) · dead ahead in the centre
@@ -205,8 +246,12 @@ network and a description of vibes, Claude drafts **one spec per room** followin
 ## Pipeline after authoring
 1. `POST /api/save-scene-specs {chapter, scenario, specs:{roomKey:spec}}` — stores every spec + renders every
    prompt into `authoring.scenePrompt`.
-2. Per room (HUMAN, art is the expensive step): Generate art from the rendered prompt → pick a candidate →
-   commit. (Continuity: use the world plate / room-reference for rooms that must match a seen landmark.)
+2. Per room — generate art from the rendered prompt → judge it → commit. Art is the expensive step, so
+   this is where the money goes. Two ways to run it, both owned by the `escape_room_stills` skill:
+   **by hand** (generate, review the candidates with `art_qc.py` at NATIVE resolution, commit), or
+   **unattended** via the `stills_iterate` long_agent loop, which does the same thing overnight for a
+   whole scenario and leaves an accept queue. Neither ever marks art accepted — that stays human.
+   (Continuity: use the world plate / room-reference for rooms that must match a seen landmark.)
 2a. **SEAM STAGE — `seam_stage.py` (screen → blur → occlude → accept).** Required, and required HERE:
    variants, cinemagraphs and door-opens are all baked FROM `scene.png`, so a seam repaired afterwards
    does not repair them. Blur before occluder, never after. Nothing is done until a human accepts; the

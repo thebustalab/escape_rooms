@@ -1,0 +1,13 @@
+I verified the worker's claims independently rather than accepting them.
+
+**Confirmed by my own inspection:**
+- Frame 0 is a clean, coherent night panorama — **not** a noise render, so the judge's `frame0_corr` interpretation was wrong about the cause.
+- The clip depicts superseded art: broad ridge, no edge snow-slopes, and a **lit, flaming** fire-basket at far right (I measured p95 = 206 there — a strongly animating fire), which the spec explicitly pins as cold and unlit. The current `scene_night.png` is a different picture entirely: knife-edge fin, snow-slopes filling both edges, cold centred basket. Mtimes back it up — clip baked Sep 2 15:13, still regenerated Sep 4 06:43.
+- Cropping the current still at the old `village_lamps` box [0.3,0.5,0.5,0.6] shows **bare rock and scree**, no lamps. The proposed boxes land on the valley floor with visible warm lamp points and braided channels.
+- Critically, measuring the clip in its *own* geography gives lamps p95 ≈ 6.0 and river ≈ 7.0 versus 3.0/4.0 in the misplaced boxes — the renderer *does* animate these subjects, so the "dead" finding is a measurement artifact of stale boxes, and a box move (not `force_repair`) is the right remedy.
+
+---
+
+The diagnosis is grounded in the frames, not a restatement of the judge's numbers: I confirmed the clip is a coherent render of superseded art (lit basket at p95 206 against a spec that pins it cold), that the old `village_lamps` box now sits on bare scree, and that both proposed boxes land on real lamps and braids. RERENDER is the correct tier — a rebake re-derives the mask from this same stale render and cannot re-target it at the new panorama. The multi-field spec edit looks broad but is attributable to a single root cause (the spec described art that no longer exists), and subject names and phrases are preserved, so the box move is the one behavioural change. My own measurement supports moving the boxes rather than reaching for `force_repair`: on-subject motion is roughly 4× what the misplaced boxes captured, so the existing wording already animates these subjects. One caution to carry into the next attempt: the two proposed boxes overlap heavily (lamps 0.46–0.62, river 0.49–0.66) and both crops contain both lamps and braids, so the two subjects will no longer measure distinct things — if only one comes back dead, tighten `river_glimmer` downstream of the lamps rather than re-moving both.
+
+VERDICT: PASS

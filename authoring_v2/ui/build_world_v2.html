@@ -144,6 +144,15 @@
   .shotcap { display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; margin-bottom:5px; }
   .shotcap b { color:var(--amber); }
   .shotcap .who { font-size:12px; color:var(--dim); }
+  /* The accept control. Deliberately quiet until it is ON: an unaccepted still is the NORMAL state
+     of fresh art, so a red "not accepted" everywhere would be noise. A seam the stage flagged is
+     amber, because accepting that one is a judgement call that has to be written down. */
+  .acceptbtn { font-size:11px; letter-spacing:.03em; padding:1px 7px; border-radius:10px;
+               border:1px solid var(--line); background:transparent; color:var(--dim);
+               cursor:pointer; margin-left:2px; }
+  .acceptbtn:hover { color:var(--fg); border-color:var(--fg); }
+  .acceptbtn.on { color:#7fd08a; border-color:#3f7a4a; }
+  .acceptbtn.flagged { color:#e0a458; border-color:#7a5a2a; }
   /* The room header rides just under the sticky topbar, so you always know which room you're scrolled
      into — nine full-width panoramas is a long way between labels otherwise. */
   .roomhd { position:sticky; top:var(--hdtop, 140px); z-index:20; background:var(--bg);
@@ -184,8 +193,9 @@
   .hsrow { display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; margin-bottom:5px; }
   .hsrow .who { font-size:12px; color:var(--dim); }
   .hsrow code { font:11px/1.5 ui-monospace,Menlo,Consolas,monospace; color:var(--dim); }
-  /* Tabs. Four views of the SAME scenario at four pipeline stages, so switching must not reload or
-     re-fetch — each pane is rendered once per refresh and shown/hidden. */
+  /* Tabs. FIVE views of the SAME scenario at five pipeline stages (Concept & world / Still art /
+     Hotspots / Variants / Cinemagraphs), so switching must not reload or re-fetch — each pane is
+     rendered once per refresh and shown/hidden. */
   #tabs { position:sticky; top:var(--tbh, 96px); z-index:50; background:var(--bg); display:flex; gap:6px;
           margin:0 -18px; padding:8px 18px 0; border-bottom:1px solid var(--line); }
   #tabs button { border-radius:8px 8px 0 0; border-bottom-color:transparent; padding:6px 14px; }
@@ -1308,11 +1318,53 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
     </div>`;
   }
 
-  function shot(label, who, path, exists, room) {
+  // ---- the human accept on a still ------------------------------------------------------------
+  // `authoring.seam.accepted` is the ONLY thing in the stills phase that certifies art, and until
+  // 2026-09-05 it had no UI at all: seam_stage refuses to set it ("a measurement cannot certify"),
+  // the overnight stills_iterate loop has no accept value in its verdict vocabulary, and yet
+  // run_all_tests.py gates the whole scenario on it via `seam_check.py --require-accepted`. It was
+  // therefore cleared and set by hand in scenario.json. This is that control.
+  //
+  // The verdict is shown with the seam panel deliberately: the join is the thing being signed off,
+  // and an accept made without looking at it is the failure this whole panel exists to prevent.
+  function acceptBadge(room, seam) {
+    seam = seam || {};
+    const on = !!seam.accepted, flagged = !!seam.needsWork;
+    const stage = seam.stage ? esc(seam.stage) : "not screened";
+    const worst = (seam.ratio != null)
+      ? ` · ${(+seam.ratio).toFixed(1)}x/${(+(seam.delta || 0)).toFixed(1)}` : "";
+    return `<span class="who" title="seam stage: ${stage}${worst}">${stage}${worst}</span>
+      <button class="who acceptbtn${on ? " on" : ""}${flagged && !on ? " flagged" : ""}"
+              onclick="toggleAccept('${esc(room)}', ${on ? "false" : "true"}, ${flagged})"
+              title="${on ? "accepted — click to clear (an accept certifies an IMAGE; clear it if the art changed)"
+                          : flagged ? "the seam stage flagged this one — accepting it anyway needs a written reason"
+                                    : "sign this still off. Nothing else can: metrics screen out, they cannot certify."}"
+      >${on ? "✓ accepted" : "accept"}</button>
+      ${on && seam.acceptedBy ? `<span class="who" style="opacity:.6">${esc(seam.acceptedBy)}</span>` : ""}
+      ${seam.humanNote ? `<span class="who" style="opacity:.6" title="${esc(seam.humanNote)}">note</span>` : ""}`;
+  }
+
+  async function toggleAccept(room, accepted, flagged) {
+    let note = "";
+    if (accepted && flagged) {
+      // Overriding the metric is legitimate — your eye outranks it in both directions — but the
+      // standing rule is to write the trade-off down so the choice is visible rather than buried.
+      note = prompt("The seam stage flagged this room. Why is it fine? (recorded as humanNote)") || "";
+      if (!note.trim()) return;
+    }
+    try {
+      const r = await post("/api/accept-still", { chapter: CH, scenario: SC, roomKey: room, accepted, note });
+      if (!r.ok) { alert(r.error || "refused"); return; }
+    } catch (e) { alert(String(e)); return; }
+    refresh();          // same path commitCand/discardCand use — re-reads scenario-state
+  }
+
+  function shot(label, who, path, exists, room, seam) {
     return `<div class="shot">
       <div class="shotcap"><b>${esc(label)}</b><span class="who">${who}</span>
         ${exists ? `<a class="who" href="${sfile(path)}" target="_blank" rel="noopener">native ↗</a>` : ""}
-        ${exists && room ? `<a class="who" href="${room360(room)}" target="_blank" rel="noopener">open in 360 ↗</a>` : ""}</div>
+        ${exists && room ? `<a class="who" href="${room360(room)}" target="_blank" rel="noopener">open in 360 ↗</a>` : ""}
+        ${exists && seam !== undefined ? acceptBadge(room, seam) : ""}</div>
       ${exists ? `<div class="shotrow">
                     <a class="main" href="${sfile(path)}" target="_blank" rel="noopener"><img loading="lazy" src="${sfile(path)}"></a>
                     ${seamPanel(path)}
@@ -1403,7 +1455,7 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
           ${vs.length ? `<span class="pill var">${vs.length} variant${vs.length === 1 ? "" : "s"}</span>` : ""}
           ${r.cinemagraphs ? `<span class="pill">${r.cinemagraphs} cinemagraph${r.cinemagraphs === 1 ? "" : "s"}</span>` : ""}
         </div>` +
-        shot("base", `${esc(r.key)}/scene.png`, `${r.key}/scene.png`, !!r.built, r.key) +
+        shot("base", `${esc(r.key)}/scene.png`, `${r.key}/scene.png`, !!r.built, r.key, r.seam || {}) +
         vs.map(v => shot(v.state,
                          `${esc(v.panorama || "—")} · ${v.fullScene ? "full scene" : "boxed"} · ${whenText(v.when, v.whenLabel)}`,
                          v.panorama, !!v.exists, r.key)).join("") +

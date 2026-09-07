@@ -18,13 +18,14 @@ Failure modes it guards:
     room loses the back door that makes an opt-in seal pickup retrievable (Lucas: NO auto-pickup);
   - the skiff loses its `availableWhen` gate and the lighthouse becomes reachable before the boss;
   - the skiff's TWO doors swap destinations again (found by Lucas, 2026-08-26). The generated boat
-    panorama put the CITY on the right, not the lighthouse island the scene prompt asked for — so the
-    box drawn on the "landing steps" sits on Alexandria's own harbour steps (your moored ship is right
-    behind them) while the box on the shipped oar sits amidships. The wiring had been authored off the
-    PROMPT rather than the picture, so the steps back to the city carried you ONWARD to the Pharos and
-    the oar carried you BACK, and the lighthouse dead ahead had no door on it at all. The hotspot boxes
-    are correct; only the targets were crossed. This pins oar -> pharos (onward, `open`) and
-    steps -> quay (`back`) in BOTH the sceneSpec element and the committed hotspot, which must agree;
+    panorama put the CITY on the right, not the lighthouse island the scene prompt asked for, and it
+    rendered no oar at all — the centre box sits on the lighthouse island across open water, the right
+    box on Alexandria's own harbor steps with their iron ring (your moored ship is right behind them).
+    The wiring had been authored off the PROMPT rather than the picture, so the steps back to the city
+    carried you ONWARD to the Pharos and the centre box carried you BACK. Targets were corrected
+    2026-08-26; the ids, labels and sceneSpec descs still named a phantom oar and were realigned to the
+    picture at the 2026-09-06 audit. This pins island_landing -> pharos (onward, `open`) and
+    harbor_steps -> quay (`back`) in BOTH the sceneSpec element and the committed hotspot, which agree;
   - a `reveal` sneaks back in, or a starter leaks the solution (the boss starter is deliberately buggy);
   - the THREE-BEAT Pharos finale collapses back into one room (restructured 2026-08-07, Lucas). It is
     deliberately spread across three: the gallery holds the grid puzzle, the sealed lamp chamber holds ONLY
@@ -251,11 +252,12 @@ def main():
             continue
         check(any(d == "back" for _, d in doors[rk]),
               f"{rk} has a back door (an opt-in seal must stay retrievable)")
-    # The skiff's two doors, pinned by hotspot id (see the docstring's swap failure mode). The oar is the
-    # way ONWARD to the lighthouse; the steps depicted at the right of the panorama are Alexandria's own
-    # harbour steps, so they go BACK to the quay. Both records must agree — the sceneSpec element feeds any
-    # future re-gen, the committed hotspot is what the player actually clicks.
-    WANT_BOAT = {"stern_oar": ("pharos", "open"), "landing_steps": ("quay", "back")}
+    # The skiff's two doors, pinned by hotspot id (see the docstring's swap failure mode). Named for what
+    # the delivered panorama ACTUALLY depicts, not what the prompt asked for: the centre box holds the
+    # lighthouse island rising out of open water, so it is the way ONWARD; the right box holds Alexandria's
+    # own harbor steps with their iron ring, so they go BACK to the quay. Both records must agree — the
+    # sceneSpec element feeds any future re-gen, the committed hotspot is what the player actually clicks.
+    WANT_BOAT = {"island_landing": ("pharos", "open"), "harbor_steps": ("quay", "back")}
     spec_boat = {e["id"]: e["door"] for e in rooms["boat"]["authoring"]["sceneSpec"]["elements"] if e.get("door")}
     live_boat = {h["id"]: h for h in rooms["boat"]["hotspots"] if h["type"] == "door"}
     for hid, (to, d) in WANT_BOAT.items():

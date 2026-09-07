@@ -1,0 +1,116 @@
+{
+ "verdict": "hold",
+ "fix_tier": null,
+ "findings": [
+  {
+   "check": "frame0_corr",
+   "value": 0.921,
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  },
+  {
+   "check": "landmark_drift_px",
+   "value": 0,
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  },
+  {
+   "check": "loop_jump",
+   "value": 1.29,
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  },
+  {
+   "check": "background_swing",
+   "value": {
+    "swing": 3.11,
+    "step": 2.45,
+    "rigid_frac": 0.91,
+    "rel_pct": 4.9
+   },
+   "band": "warn",
+   "tier": "human",
+   "note": "the part of the frame declared rigid changes brightness by 3.11 (worst single-frame step 2.45, 5% of its own mean) \u2014 look at whether a light source is going out and coming back, or only flickering. For scale: hold/base 6.07 was broken, quay/night 4.94 was fine."
+  },
+  {
+   "check": "colour_drift",
+   "value": 2.39,
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  }
+ ],
+ "subjects": [
+  {
+   "name": "tarn_surface",
+   "box": [
+    0.26,
+    0.58,
+    0.49,
+    0.8
+   ],
+   "p95": 15.63,
+   "mean": 4.88,
+   "luma": 64.1,
+   "verdict": "alive",
+   "expect_still": false,
+   "force": false,
+   "hot": false
+  },
+  {
+   "name": "horn_meltwater",
+   "box": [
+    0.12,
+    0.33,
+    0.23,
+    0.57
+   ],
+   "p95": 14.93,
+   "mean": 5.23,
+   "luma": 31.0,
+   "verdict": "alive",
+   "expect_still": false,
+   "force": false,
+   "hot": false
+  },
+  {
+   "name": "gap_grass",
+   "box": [
+    0.65,
+    0.52,
+    0.74,
+    0.64
+   ],
+   "p95": 18.22,
+   "mean": 8.77,
+   "luma": 73.6,
+   "verdict": "alive",
+   "expect_still": false,
+   "force": false,
+   "hot": false
+  },
+  {
+   "name": "survey_sheet",
+   "box": [
+    0.59,
+    0.76,
+    0.68,
+    0.87
+   ],
+   "p95": 1.15,
+   "mean": 0.18,
+   "luma": 101.6,
+   "verdict": "dead",
+   "expect_still": true,
+   "force": false,
+   "hot": false
+  }
+ ],
+ "reasons": [],
+ "room": "rams_head",
+ "state": "base",
+ "clip_mtime": 1788587818.2318761
+}

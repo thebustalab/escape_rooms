@@ -1,0 +1,145 @@
+{
+ "verdict": "reject",
+ "fix_tier": "rerender",
+ "findings": [
+  {
+   "check": "frame0_corr",
+   "value": 0.944,
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  },
+  {
+   "check": "landmark_drift_px",
+   "value": 0,
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  },
+  {
+   "check": "loop_jump",
+   "value": 0.45,
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  },
+  {
+   "check": "background_swing",
+   "value": {
+    "swing": 2.43,
+    "step": 1.73,
+    "rigid_frac": 0.9,
+    "rel_pct": 16.5
+   },
+   "band": "warn",
+   "tier": "human",
+   "note": "the part of the frame declared rigid changes brightness by 2.43 (worst single-frame step 1.73, 17% of its own mean) \u2014 look at whether a light source is going out and coming back, or only flickering. For scale: hold/base 6.07 was broken, quay/night 4.94 was fine."
+  },
+  {
+   "check": "dead_subjects",
+   "value": [
+    "hanging_drape"
+   ],
+   "band": "reject",
+   "tier": "rerender",
+   "note": "named subject(s) not moving in the shipped clip: hanging_drape p95 1.82"
+  },
+  {
+   "check": "weak_subjects",
+   "value": [
+    "brazier_coals"
+   ],
+   "band": "warn",
+   "tier": "human",
+   "note": "modest but real motion: brazier_coals p95 7.36"
+  }
+ ],
+ "subjects": [
+  {
+   "name": "brazier_coals",
+   "box": [
+    0.6,
+    0.68,
+    0.74,
+    0.92
+   ],
+   "p95": 7.36,
+   "mean": 2.08,
+   "luma": 22.6,
+   "verdict": "weak",
+   "expect_still": false,
+   "force": true,
+   "hot": false
+  },
+  {
+   "name": "brazier_smoke",
+   "box": [
+    0.6,
+    0.48,
+    0.72,
+    0.78
+   ],
+   "p95": 12.24,
+   "mean": 3.95,
+   "luma": 22.7,
+   "verdict": "alive",
+   "expect_still": false,
+   "force": false,
+   "hot": false
+  },
+  {
+   "name": "counter_lantern",
+   "box": [
+    0.288,
+    0.56,
+    0.342,
+    0.7
+   ],
+   "p95": 29.16,
+   "mean": 9.12,
+   "luma": 44.5,
+   "verdict": "alive",
+   "expect_still": false,
+   "force": false,
+   "hot": false
+  },
+  {
+   "name": "counter_lamp",
+   "box": [
+    0.518,
+    0.6,
+    0.582,
+    0.7
+   ],
+   "p95": 20.84,
+   "mean": 5.18,
+   "luma": 26.2,
+   "verdict": "alive",
+   "expect_still": false,
+   "force": false,
+   "hot": false
+  },
+  {
+   "name": "hanging_drape",
+   "box": [
+    0.585,
+    0.0,
+    0.665,
+    0.32
+   ],
+   "p95": 1.82,
+   "mean": 0.27,
+   "luma": 6.0,
+   "verdict": "dead",
+   "expect_still": false,
+   "force": false,
+   "hot": false
+  }
+ ],
+ "reasons": [
+  "named subject(s) not moving in the shipped clip: hanging_drape p95 1.82"
+ ],
+ "room": "market_boast",
+ "state": "night",
+ "clip_mtime": 1788548349.26183
+}

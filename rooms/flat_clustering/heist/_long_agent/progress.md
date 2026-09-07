@@ -1,0 +1,49 @@
+# Stills iteration — flat_clustering/heist
+
+Started 2026-09-05T16:59:35.714463+00:00.
+- **2026-09-05 16:59 UTC** — briefing: generating 1 candidate(s) — no art yet.
+- **2026-09-05 17:00 UTC** — briefing: 0/1 candidate(s) landed, still waiting (poll 1/60).
+- **2026-09-05 17:00 UTC** — briefing: 1 candidate(s) landed — ready to judge.
+- **2026-09-05 17:04 UTC** — cycle_04_briefing: committed l1_briefing_1.png — held for your eye (concerns: (1) Faint tone/texture step at the seam on otherwise-plain green wall — needs the normal screen/blur pass; the specced c).
+- **2026-09-05 17:05 UTC** — Output passed evaluation but did NOT meet all 3 declared done-criteria — held for review (see evaluations/done_criteria_check.md).
+- **2026-09-06 00:57 UTC** — a_opera: generating 1 candidate(s) — no art yet.
+- **2026-09-06 00:58 UTC** — a_opera: 1 candidate(s) landed — ready to judge.
+- **2026-09-06 01:00 UTC** — a_townhouse: generating 1 candidate(s) — no art yet.
+- **2026-09-06 01:01 UTC** — a_townhouse: 1 candidate(s) landed — ready to judge.
+- **2026-09-06 01:03 UTC** — a_gallery: generating 1 candidate(s) — no art yet.
+- **2026-09-06 01:04 UTC** — a_gallery: 1 candidate(s) landed — ready to judge.
+- **2026-09-06 01:05 UTC** — a_vault: generating 1 candidate(s) — no art yet.
+- **2026-09-06 01:06 UTC** — a_vault: 1 candidate(s) landed — ready to judge.
+- **2026-09-06 01:07 UTC** — b_pawnshop: generating 1 candidate(s) — no art yet.
+- **2026-09-06 01:08 UTC** — b_pawnshop: 1 candidate(s) landed — ready to judge.
+- **2026-09-06 01:09 UTC** — b_casino: generating 1 candidate(s) — no art yet.
+- **2026-09-06 01:10 UTC** — b_casino: 1 candidate(s) landed — ready to judge.
+- **2026-09-06 01:11 UTC** — b_docks: generating 1 candidate(s) — no art yet.
+- **2026-09-06 01:13 UTC** — b_docks: 1 candidate(s) landed — ready to judge.
+- **2026-09-06 01:14 UTC** — b_stateroom: generating 1 candidate(s) — no art yet.
+- **2026-09-06 01:15 UTC** — b_stateroom: 1 candidate(s) landed — ready to judge.
+- **2026-09-06 01:16 UTC** — gala: generating 1 candidate(s) — no art yet.
+- **2026-09-06 01:17 UTC** — gala: 1 candidate(s) landed — ready to judge.
+- **2026-09-06 01:21 UTC** — cycle_25_a_opera: regenerating 1 candidate(s) — The single change is the `lighter` element's description — naming it a flip-top lighter rather than a case, pulling it near the viewer and large in frame, and d
+- **2026-09-06 01:22 UTC** — a_opera: 1 candidate(s) landed — ready to judge.
+- **2026-09-06 01:28 UTC** — cycle_27_a_opera: regenerating 1 candidate(s) (spec revised) — The single change is the `lighter` element's desc — flip-top rather than a flat case, close to the viewer and large in frame, tilted into the stage light, one b
+- **2026-09-06 01:30 UTC** — a_opera: 1 candidate(s) landed — ready to judge.
+- **2026-09-06 01:33 UTC** — cycle_29_a_opera: committed l1_a_opera_1.png — held for your eye (with concerns — see stills.md).
+- **2026-09-06 01:38 UTC** — cycle_30_a_townhouse: regenerating 1 candidate(s) (spec revised) — The single change is the `card` element's description — from "slipped behind the mirror frame" (which the model rendered as nothing at all, since a card hidden 
+- **2026-09-06 01:39 UTC** — a_townhouse: 1 candidate(s) landed — ready to judge.
+- **2026-09-06 01:43 UTC** — cycle_32_a_townhouse: committed l1_a_townhouse_1.png — held for your eye (with concerns — see stills.md).
+- **2026-09-06 01:47 UTC** — cycle_33_a_gallery: regenerating 1 candidate(s) (spec revised) — The single change is adding the missing `fob` element — an evidence-bagged hotel key fob on a ledge beneath the locker — so that TOKEN 3/5's clue hotspot has an
+- **2026-09-06 01:48 UTC** — a_gallery: 1 candidate(s) landed — ready to judge.
+- **2026-09-06 01:52 UTC** — cycle_35_a_gallery: committed l1_a_gallery_1.png — held for your eye (with concerns — see stills.md).
+- **2026-09-06 01:57 UTC** — cycle_36_a_vault: committed l1_a_vault_1.png — held for your eye (with concerns — see stills.md).
+- **2026-09-06 02:01 UTC** — cycle_37_b_pawnshop: committed l1_b_pawnshop_1.png — held for your eye (with concerns — see stills.md).
+- **2026-09-06 02:07 UTC** — cycle_38_b_casino: committed l1_b_casino_1.png — held for your eye (with concerns — see stills.md).
+- **2026-09-06 02:12 UTC** — cycle_39_b_docks: regenerating 1 candidate(s) (spec revised) — The single change is the `console` element's desc — "a portable terminal" rendered as an anonymous metal tin, so it now names an upright glowing screen and a ke
+- **2026-09-06 02:13 UTC** — b_docks: 1 candidate(s) landed — ready to judge.
+- **2026-09-06 02:19 UTC** — cycle_41_b_docks: regenerating 1 candidate(s) (spec revised) — The single change is moving both doors one canonical slot inboard (`back` to "just right of centre", `on` to "to the right", vacating the x=0.92 far-right wrap 
+- **2026-09-06 02:20 UTC** — b_docks: 1 candidate(s) landed — ready to judge.
+- **2026-09-06 02:25 UTC** — cycle_43_b_docks: committed l1_b_docks_1.png — held for your eye (with concerns — see stills.md).
+- **2026-09-06 02:30 UTC** — cycle_44_b_stateroom: regenerating 1 candidate(s) (spec revised) — The single change is adding a `plan` element for the checklist's steward's table plan clue — the one hotspot in this room with no object to attach to, which the
+- **2026-09-06 02:31 UTC** — b_stateroom: 1 candidate(s) landed — ready to judge.
+- **2026-09-06 02:36 UTC** — cycle_46_b_stateroom: committed l1_b_stateroom_1.png — held for your eye (with concerns — see stills.md).
+- **2026-09-06 02:40 UTC** — cycle_47_gala: committed l1_gala_1.png — held for your eye (with concerns — see stills.md).

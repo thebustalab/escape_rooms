@@ -1,0 +1,120 @@
+{
+ "verdict": "reject",
+ "fix_tier": "rerender",
+ "findings": [
+  {
+   "check": "frame0_corr",
+   "value": 0.941,
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  },
+  {
+   "check": "landmark_drift_px",
+   "value": 0,
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  },
+  {
+   "check": "loop_jump",
+   "value": 0.53,
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  },
+  {
+   "check": "background_swing",
+   "value": {
+    "swing": 0.38,
+    "step": 0.19,
+    "rigid_frac": 0.96,
+    "rel_pct": 2.3
+   },
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  },
+  {
+   "check": "dead_subjects",
+   "value": [
+    "glacier_tarn"
+   ],
+   "band": "reject",
+   "tier": "rerender",
+   "note": "named subject(s) not moving in the shipped clip: glacier_tarn has no lit pixels in its box (0.14% above luma 80) \u2014 the box is aimed off the subject, or the subject is unlit; re-aim before re-rendering"
+  },
+  {
+   "check": "colour_drift",
+   "value": 0.38,
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  }
+ ],
+ "subjects": [
+  {
+   "name": "river_glimmer",
+   "box": [
+    0.34,
+    0.58,
+    0.59,
+    0.72
+   ],
+   "p95": 4.35,
+   "mean": 2.01,
+   "luma": 25.0,
+   "p95_lit": 10.12,
+   "lit_pct": 1.94,
+   "unlit": false,
+   "verdict": "alive",
+   "expect_still": false,
+   "force": false,
+   "hot": false
+  },
+  {
+   "name": "village_lamps",
+   "box": [
+    0.36,
+    0.6,
+    0.6,
+    0.7
+   ],
+   "p95": 4.49,
+   "mean": 2.07,
+   "luma": 25.4,
+   "p95_lit": 10.77,
+   "lit_pct": 1.92,
+   "unlit": false,
+   "verdict": "alive",
+   "expect_still": false,
+   "force": false,
+   "hot": false
+  },
+  {
+   "name": "glacier_tarn",
+   "box": [
+    0.26,
+    0.59,
+    0.34,
+    0.69
+   ],
+   "p95": 2.92,
+   "mean": 1.52,
+   "luma": 23.9,
+   "p95_lit": null,
+   "lit_pct": 0.14,
+   "unlit": true,
+   "verdict": "dead",
+   "expect_still": false,
+   "force": true,
+   "hot": false
+  }
+ ],
+ "reasons": [
+  "named subject(s) not moving in the shipped clip: glacier_tarn has no lit pixels in its box (0.14% above luma 80) \u2014 the box is aimed off the subject, or the subject is unlit; re-aim before re-rendering"
+ ],
+ "room": "crown",
+ "state": "night",
+ "clip_mtime": 1788740564.8645785
+}

@@ -270,7 +270,12 @@ PHAROS_SEAMS = [
     [0.4400, 0.7300, 0.5460, 0.7800],   # foot
     [0.4189, 0.7715, 0.5882, 0.8500],   # the brightest paving at the threshold
 ]
-PHAROS_WATER_OPEN = [[0.840, 0.400, 1.000, 0.478], [0.898, 0.500, 0.975, 0.870]]
+# The inner box STOPS AT 0.800, not 0.870: its lower strip reached into the shore band that is
+# pinned below, so a free mover overlapped a pin and the shore kept a residual p95 7.8 after
+# being 'pinned'. Overlapping boxes are decided by whichever list is applied last, which is not
+# something to leave to chance. Its LEFT edge moved 0.898 -> 0.910 for the same reason: an
+# 8-px sliver of it lay over the spur's pinned foam and carried that box's whole p95.
+PHAROS_WATER_OPEN = [[0.840, 0.400, 1.000, 0.478], [0.910, 0.500, 0.975, 0.800]]
 # THE SHORE WATER IS PINNED, after prompting was given two clear goes at it and did not take.
 # Naming it worked in the sense that matters — it went from unnamed to governed — but the foam among
 # the rocks still re-formed wholesale between consecutive frames at p95 19-29, and it brought a second

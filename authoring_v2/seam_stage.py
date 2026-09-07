@@ -2,10 +2,17 @@
 """seam_stage.py — the SEAM STAGE of the art pipeline, as four gated steps.
 
 WHY THIS IS A STAGE AND NOT A TECHNIQUE (Lucas, 2026-09-02). Seam repair was documented in three places
-and required by none, so beacons committed twelve stills nobody had checked. The art phase sits between
-`escape_room_scene_spec` and `escape_room_wiring` as "the human bit": no skill owns it, no stage list
-gates it, and `run_all_tests.py` never touched it. This file makes the seam a stage with a RECORDED
+and required by none, so beacons committed twelve stills nobody had checked. The art phase sat between
+`escape_room_scene_spec` and `escape_room_wiring` as "the human bit": no skill owned it, no stage list
+gated it, and `run_all_tests.py` never touched it. This file makes the seam a stage with a RECORDED
 VERDICT per room, so it can be gated instead of remembered.
+
+That gap is now closed on both ends (kept here because this paragraph is quoted elsewhere as if it
+still described the present): the `escape_room_stills` skill owns the phase, `preflight.py` gates its
+entry, and since 2026-09-05 the `stills_iterate` long_agent loop runs these three steps automatically
+over every committed base each cycle. What did NOT change is the last step — `accepted` is still only
+ever written by a human, now through the gallery's accept button (`POST /api/accept-still`) rather
+than by hand-editing scenario.json.
 
 THE FOUR STEPS, each gating the next:
 

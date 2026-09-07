@@ -1,0 +1,14 @@
+{
+  "stills_iterate": true,
+  "chapter": "flat_clustering",
+  "scenario": "heist",
+  "rooms": [],
+  "max_attempts_per_room": 3,
+  "candidates_per_room": 1,
+  "goal": "Drive every base still in flat_clustering/heist from its tab-1 scene spec to a committed, seam-clean scene.png that no automatic gate can fault, then hold it for Lucas's eye. Never accept a still and never place a hotspot box.",
+  "done_criteria": [
+    "Every room in scope has a committed scene.png that is `hold` (it survived every automatic gate) or is `parked` (a named human decision) \u2014 none are left in `reject` or `ungenerated`.",
+    "No still has been marked accepted, verified, or good by the loop itself: `authoring.seam.accepted` was not written by this job, and no hotspot box was placed.",
+    "Every parked room has a specific stated reason a human can act on, and every committed still the loop had reservations about carries them in its CONCERNS."
+  ]
+}

@@ -1,0 +1,11 @@
+I extracted frames from the shipped clip and checked the boxes myself, then re-ran `motion_spec.measure_subjects` independently.
+
+**What I verified:** the old `glacier_tarn` box (px 921–1229 × 307–410) is pure star field — no tarn, no moraine, confirmed by native crop. The old `village_lamps` box contains no lamps (upper river valley), and `river_glimmer`'s box is mostly rigid ridgeline. The worker's proposed boxes land correctly: the tarn box sits squarely on the lake behind its moraine wall with the glacier tongue above-left. So the diagnosis is real and frame-grounded.
+
+**Where it goes wrong:** re-measuring the *existing* shipped clip with the worker's own corrected boxes gives river 4.81 (p95_lit 11.33 → alive), lamps 3.90 (p95_lit 9.97 → alive), tarn 3.35 (p95_lit 7.35 → **weak**) and `repair_list` **empty**. The reject was entirely an artifact of the wrong boxes and dissolves without any GPU work.
+
+---
+
+You did look, and you were right about the boxes — I confirmed the `glacier_tarn` box is pure star field and that your three replacement boxes land on the tarn, the lamps and the braided channels. But I re-ran `measure_subjects` on the *shipped* clip with your corrected boxes and got your exact numbers with the verdicts alive / alive / weak and an **empty repair_list**, so this is a spec-box defect, not a render defect, and it does not need the GPU tier: correct the boxes and REBAKE, dropping the `glacier_tarn` patch that attempt 1 fired into the star field. `force_repair` is the mechanism `repair_list` reserves for a human who has looked and judged a WEAK subject too quiet — the module comment is explicit that weak is deliberately not auto-repaired — so setting it yourself on a subject your own measurement calls weak overrides Lucas's call, not the metrics'. Drop the phrase rewrite from this attempt too: bundling three box moves plus `force_repair` plus new wording means the next judge reading cannot be attributed to anything. If the tarn still reads too quiet after a rebake against correct boxes, that is a clean, attributable next attempt — and a legitimate one to raise for a human.
+
+VERDICT: FAIL

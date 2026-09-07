@@ -1,0 +1,1128 @@
+{
+ "status": "CONCEPT + PUZZLE phases complete (2026-09-03). Ladder verified against the shipped CSV in both Python/sklearn and base R (seed-robust, 12 seeds). Art not started. First TWO-PLAYER scenario; see notes.md.",
+ "chapter": "flat_clustering",
+ "scenario": "heist",
+ "id": 20,
+ "title": "Nobody Works Alone",
+ "subtitle": "Operation Magpie",
+ "story": "Sixty jobs in three years, and not one of them forced. The Service does not care who owns the stones; it cares that somebody has learned to move them, and that nobody can say how many somebodies that is. One report says a single crew with a long reach. Another says the city is thick with them. You and your partner have until the tide turns to settle it.\n\nYou will work the case from opposite ends. One of you takes the front door and the scenes themselves — how each place was entered, with what, and for how long. The other takes the back door and the disposal — what left each place, where it surfaced, and through whose hands. Neither half answers the question on its own. When you each have your count, meet aboard the Aurelia before the party ends, and bring everything you picked up on the way.",
+ "enterLabel": "Take your door",
+ "done": {
+  "title": "The count is made",
+  "body": "You have your number and your partner has theirs, and they are not the same number. Neither of you has made a mistake. That is the finding."
+ },
+ "escapeDone": {
+  "title": "Five hands, three tables",
+  "body": "Seated, the room reads at a glance: two houses running two crews apiece, and one man who answers to nobody. The count was never one number. It was a question about how far down you were willing to look."
+ },
+ "packages": [
+  "dplyr",
+  "ggplot2",
+  "readr"
+ ],
+ "setup": "suppressMessages({library(dplyr); library(ggplot2)})",
+ "state": {
+  "role": null
+ },
+ "datasets": [
+  {
+   "name": "case_file",
+   "url": "https://thebustalab.github.io/escape_rooms/rooms/flat_clustering/heist/data/case_file.csv"
+  }
+ ],
+ "debrief": {
+  "title": "How the count worked",
+  "intro": "This world was built to argue one thing: that k is not a property of your data. It is a property of the question you asked of it. You and your partner clustered the same eleven burglaries and got different numbers because you asked different questions of them — and both answers were true."
+ },
+ "ambient": "none",
+ "worldPlatePrompt": "A world-bible establishing plate: ONE single continuous interior, a single unbroken photographic frame — NOT a grid, NOT a montage, NOT a contact sheet, NOT panels or tiles. The grand ground-floor lobby of a private members' club in a modern European city, late at night, looking across it in one view. Cold white marble floor and columns give way to deep walnut panelling and oxblood buttoned leather; a long bar of dark wood and tarnished gilt runs down one side, ranked cut-crystal glassware catching the light; a green baize card table stands beyond it; brushed-steel and glass doors at the far end open onto wet black tarmac and a single cold neon sign in the street outside. Deep blue-black shadow throughout with warm sodium and amber pooling from low lamps, one cold accent from the doorway. Cigarette haze in the air. Painterly, cinematic, high contrast, film grain. TIME-NEUTRAL — soft even light, neither dawn nor dusk, so each room's own prompt drives its hour. No people, no figures, no lettering, no captions, no text, no signage, no numbers.",
+ "coverPrompt": "Minimalist stylised thumbnail poster, square: the bold dark silhouette of a single magpie perched on the rim of an open jewellery case, one amber glow rising from inside the case and throwing the bird into hard relief. Deep blue-black ground. No people, no lettering, no text. Must read at thumbnail size.",
+ "_designNotes": {
+  "phase": "CONCEPT partial. BLOCKED on escape_room_puzzles for the dataset, every exact answer, both elbow readabilities, the boss traps, and the escape verification script.",
+  "twoPlayer": "EXPERIMENTAL. Two students, two browsers, one dataset, two feature blocks. A clusters the entry block into 5 teams; B clusters the disposal block into 3 organisations; the truth is 5 nested inside 3, split 2+2+1. Coordination is verbal only — nothing is synced.",
+  "escapeTier": "TIER 2 by deliberate exception — connected to the puzzles but NOT driven by their data. The world confirms the numbers; no dataset value crosses into the escape. Documented in notes.md so an audit does not flag it against the data-free-meta-echo rule.",
+  "register": "Bond by INTERIORS AND HOURS, never by climate. The corpus is saturated with cold and hawaii already claims tropical. Urban/modern/clinical is this scenario's own claimed ground.",
+  "softGate": "Role choice is a soft gate — gameState resets on reload. Accepted; a student would be doing twice the work to avoid a conversation, and the codec records their path."
+ },
+ "rooms": [
+  {
+   "key": "briefing",
+   "title": "The Briefing Room",
+   "technique": "orientation (ungraded)",
+   "puzzleType": 0,
+   "phase": "analysis",
+   "built": false,
+   "unlockedWhen": true,
+   "designNote": "SHARED START — both players begin here, together. No graded puzzle. The room states the two-part goal (front-load it; no character explains anything) and offers TWO EXITS. Taking one sets state.role and the other's availableWhen fails with a diegetic lockedBody. ART: new. SHARED between both roles — this art is seen by everyone.",
+   "plannedHotspots": [
+    {
+     "type": "clue",
+     "label": "The case wall",
+     "note": "the assignment: a run of burglaries, two lines of enquiry, meet back at the gala"
+    },
+    {
+     "type": "door",
+     "direction": "open",
+     "to": "a_opera",
+     "label": "The front door — the scenes"
+    },
+    {
+     "type": "door",
+     "direction": "open",
+     "to": "b_pawnshop",
+     "label": "The back door — the disposal"
+    }
+   ],
+   "authoring": {
+    "tag": "briefing",
+    "sceneSpec": {
+     "room": "briefing",
+     "setting": "the centre of a Service operations room high above a rain-soaked city at dusk, tall sash windows on one side and a cork case-wall on the other",
+     "interior": true,
+     "seam": "a plain stretch of dark green distempered wall, uniform and unbroken",
+     "seamOccluder": "a cast-iron radiator pipe running floor to ceiling",
+     "elements": [
+      {
+       "id": "window",
+       "at": "to the left",
+       "desc": "a tall sash window, rain running down the near glass in heavy sheets, the city beyond reduced to smeared sodium",
+       "animate": {
+        "motion": "rain running down the near window glass in continuous slow rivulets",
+        "loop": "crossfade"
+       }
+      },
+      {
+       "id": "casewall",
+       "at": "just left of centre",
+       "desc": "a cork case-wall hung with photographs, pinned ribbon and a street plan",
+       "clue": true,
+       "label": "The case wall"
+      },
+      {
+       "id": "frontdoor",
+       "at": "dead ahead in the centre",
+       "desc": "a heavy panelled front door standing ajar onto a lit stair",
+       "door": {
+        "direction": "open",
+        "to": "a_opera"
+       },
+       "label": "The front door — the scenes"
+      },
+      {
+       "id": "table",
+       "at": "just right of centre",
+       "desc": "a long oak table, two open dossiers, a decanter and two untouched glasses"
+      },
+      {
+       "id": "backdoor",
+       "at": "on the far right",
+       "desc": "a narrow service door standing ajar onto a dark back stair",
+       "door": {
+        "direction": "open",
+        "to": "b_pawnshop"
+       },
+       "label": "The back door — the disposal"
+      }
+     ],
+     "atmosphere": "dusk, blue-black shadow with warm sodium pooling at the windows, cigarette haze, oxblood leather and brass, painterly, cinematic, film grain",
+     "negatives": "No people, no figures, no crowds, no lettering, no captions, no text, no signage, no numbers.",
+     "continuity": []
+    },
+    "scenePrompt": "This is a seamless 360-degree panorama from the centre of a Service operations room high above a rain-soaked city at dusk, tall sash windows on one side and a cork case-wall on the other. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stretch of dark green distempered wall, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. To the left, a tall sash window, rain running down the near glass in heavy sheets, the city beyond reduced to smeared sodium; just left of centre, a cork case-wall hung with photographs, pinned ribbon and a street plan; dead ahead in the centre, a heavy panelled front door standing ajar onto a lit stair; just right of centre, a long oak table, two open dossiers, a decanter and two untouched glasses; on the far right, a narrow service door standing ajar onto a dark back stair. dusk, blue-black shadow with warm sodium pooling at the windows, cigarette haze, oxblood leather and brass, painterly, cinematic, film grain. No people, no figures, no crowds, no lettering, no captions, no text, no signage, no numbers. Again: the extreme left and right edges must align perfectly into a plain stretch of dark green distempered wall, uniform and unbroken, with no visible seam, join, or repetition."
+   },
+   "debrief": "No analysis here — but the two doors are the argument in miniature. You and your partner were about to run k-means on the same sixty jobs and get different numbers, and the only thing that differed was which columns you took through the door with you."
+  },
+  {
+   "key": "a_opera",
+   "title": "The Royal Box",
+   "technique": "k-means on the entry block",
+   "puzzleType": 1,
+   "phase": "analysis",
+   "built": false,
+   "unlockedWhen": true,
+   "isBoss": false,
+   "designNote": "RUNG 1 (A) — assign a case to a group.\nWHY THEY ARE HERE: This is TONIGHT'S job — the twelfth. During the second act the contents of a private box's wall safe went; nothing forced. A servant found it in the interval and it was kept quiet so the house would not empty, which is why the performance is still running below. The agent has until the curtain.\nTHE QUESTION IN THE ROOM: Does tonight belong to the file at all, or is this a copycat?\nANALYSIS: Cluster the entry evidence across all twelve jobs and find which group tonight's falls into.\nVERIFIED ANSWER = 18. kmeans(scale(case_file[,c('entry_height_m','tool_score','approach_min','entry_hour')]), 5, nstart=50); table(cluster) -> 18/13/11/10/8. Busiest crew = 18, runner-up 13 (+38%). Distractors: 13, 11, 10, 8, 29, 60.\nSUPERSEDED-SPEC: ANSWER = the hand that did tonight's job.\nTHE JOB: **Thalberg Opera House** (row in case_file.csv — crew 1, tool_score 7.1, entry_height 0.4 m). ART CONTRACT FROM THE DATA: forced entry at ground level, heavy tool marks, visible damage. TOKEN 1 of 5 = crew 1's monogrammed lighter — the only token with a crisp marque.\nWHAT THEY FIND: TOKEN 1 of 5 — a monogrammed lighter on the velvet seat, dropped by that crew. The ONLY token with a crisp house marque; it teaches the player what a legible mark looks like, so the ambiguity of the other four reads as ambiguity rather than as bad art.\nWHAT IT CAUSES (why they leave): That same hand also did the Belgrave Mews job three weeks ago, which the file lumps into the same series and which was never properly worked. Go and confirm it.\n\nART: new. Mid-performance is diegetic, not decorative.",
+   "plannedHotspots": [
+    {
+     "type": "puzzle",
+     "label": "The writing-slope terminal",
+     "note": "k-means on the entry block"
+    },
+    {
+     "type": "clue",
+     "label": "A monogrammed lighter",
+     "pickup": true,
+     "note": "TOKEN 1/5 — crew 1's. Bears a crisp, complete MARQUE. The only token A can place unaided; it teaches A what a legible mark looks like, so the other four read as ambiguous rather than as bad art."
+    },
+    {
+     "type": "door",
+     "direction": "open",
+     "to": "briefing",
+     "label": "The way back"
+    },
+    {
+     "type": "door",
+     "direction": "open",
+     "to": "a_townhouse",
+     "label": "On to the next call"
+    }
+   ],
+   "authoring": {
+    "tag": "a_opera",
+    "hour": "evening",
+    "sceneSpec": {
+     "room": "a_opera",
+     "setting": "the centre of a gilded private box overhanging a great opera auditorium mid-performance, the tiers and the lit stage falling away beyond the parapet",
+     "interior": true,
+     "seam": "a plain stretch of deep crimson flock wallpaper, uniform and unbroken",
+     "seamOccluder": "a fluted gilt pilaster running floor to ceiling",
+     "elements": [
+      {
+       "id": "swag",
+       "at": "to the left",
+       "desc": "a heavy crimson velvet swag curtain gathered at the box mouth, stirring in a draught from the flies",
+       "animate": {
+        "motion": "the heavy velvet swag curtain breathing slowly in the draught",
+        "loop": "boomerang"
+       }
+      },
+      {
+       "id": "parapet",
+       "at": "just left of centre",
+       "desc": "the box parapet in worn gilt, and beyond it the auditorium tiers dropping away to a small brilliantly lit stage"
+      },
+      {
+       "id": "console",
+       "at": "dead ahead in the centre",
+       "desc": "a slim leather writing-slope open on the box rail, a portable terminal resting on it",
+       "puzzle": true,
+       "label": "The writing-slope terminal"
+      },
+      {
+       "id": "lighter",
+       "at": "just right of centre",
+       "desc": "a monogrammed silver lighter left on the velvet seat, its house marque crisp and unmistakable",
+       "clue": true,
+       "label": "A monogrammed lighter"
+      },
+      {
+       "id": "back",
+       "at": "to the right",
+       "desc": "a curtained doorway back to the corridor",
+       "door": {
+        "direction": "open",
+        "to": "briefing"
+       },
+       "label": "The way back"
+      },
+      {
+       "id": "on",
+       "at": "on the far right",
+       "desc": "a second curtained doorway giving onto the grand stair",
+       "door": {
+        "direction": "open",
+        "to": "a_townhouse"
+       },
+       "label": "On to the next call"
+      }
+     ],
+     "atmosphere": "evening, hot gilt and crimson, the stage a small brilliant source far below, deep warm shadow in the box, painterly, cinematic, film grain",
+     "negatives": "No people, no figures, no crowds, no lettering, no captions, no text, no signage, no numbers.",
+     "continuity": []
+    },
+    "scenePrompt": "This is a seamless 360-degree panorama from the centre of a gilded private box overhanging a great opera auditorium mid-performance, the tiers and the lit stage falling away beyond the parapet. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stretch of deep crimson flock wallpaper, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. To the left, a heavy crimson velvet swag curtain gathered at the box mouth, stirring in a draught from the flies; just left of centre, the box parapet in worn gilt, and beyond it the auditorium tiers dropping away to a small brilliantly lit stage; dead ahead in the centre, a slim leather writing-slope open on the box rail, a portable terminal resting on it; just right of centre, a monogrammed silver lighter left on the velvet seat, its house marque crisp and unmistakable; to the right, a curtained doorway back to the corridor; on the far right, a second curtained doorway giving onto the grand stair. evening, hot gilt and crimson, the stage a small brilliant source far below, deep warm shadow in the box, painterly, cinematic, film grain. No people, no figures, no crowds, no lettering, no captions, no text, no signage, no numbers. Again: the extreme left and right edges must align perfectly into a plain stretch of deep crimson flock wallpaper, uniform and unbroken, with no visible seam, join, or repetition."
+   },
+   "entry": "The safe in the box was emptied during the second act. A servant found it in the interval and the house has kept it quiet, so the performance is still running below you. You have until the curtain to say whether tonight belongs to the file at all.",
+   "debrief": "The plainest thing k-means does: given groups, say which one a case belongs to. You had no labels, no key, and no idea yet how many groups there were — only the geometry of the entry measurements. That is clustering doing its actual job, assigning by resemblance."
+  },
+  {
+   "key": "a_townhouse",
+   "title": "The Mayfair Townhouse",
+   "technique": "the elbow — how many hands?",
+   "puzzleType": 1,
+   "phase": "analysis",
+   "built": false,
+   "unlockedWhen": true,
+   "isBoss": false,
+   "designNote": "RUNG 2 (A) — THE ELBOW. This is A's half of the scenario's central divergence.\nWHY THEY ARE HERE: The unworked scene from room 1's answer. They arrive expecting to confirm ONE crew.\nTHE QUESTION IN THE ROOM: The house refuses that expectation: it carries two distinct sets of marks, left on two different occasions. So the question escalates from 'which crew did this one' to 'how many crews are there at all?'\nANALYSIS: The elbow. Cluster the entry block over all twelve jobs and read k off the plot.\nVERIFIED ANSWER = k=5. WSS k=1..8 = 236/126/61/23/5/4/4/3 — the drop collapses after 5 (ratio 0.03). PICK-THE-POINT, not MCQ. B's elbow is k=3 on the same 60 jobs. Both correct.\nSUPERSEDED-SPEC: ANSWER = 5 crews. B's elbow lands on 3 organisations. BOTH ARE RIGHT — 5 nested inside 3, split 2+2+1. Never 'fix' the divergence; it is the scenario.\nTHE JOB: **Belgrave Mews** (crew 2, tool_score 2.7, entry_height 7.6 m). ART CONTRACT: entry at an UPPER window, a climb, almost no tool damage — visibly unlike the opera's forced ground-floor entry. TOKEN 2 of 5 = crew 2's bone-coloured chip. Plus the valuer's card (the name B needs).\nWHAT THEY FIND: TOKENS 2 and 3 of 5 — a bone-coloured chip (no crest, only a fleur-de-lis pressed into the rim) and a hotel key fob (a number and a colour, no house name). TWO tokens here BECAUSE two crews hit this house: the objects ARE the evidence that forces the room's question. ALSO the mid-point trade: a discreet VALUER'S CARD slipped behind the mirror — the sort a household keeps for appraisals. The name means nothing to A, who can only read it aloud; that valuer runs the casino's private room, so B cannot get in without it.\nWHAT IT CAUSES (why they leave): The file said same series; the marks say otherwise — a different hand entirely. So the question is no longer which crew did this one, but HOW MANY crews are there. That is the elbow, and the room forced it.\n\nART: new.",
+   "plannedHotspots": [
+    {
+     "type": "puzzle",
+     "label": "The dressing-table terminal",
+     "note": "the elbow — how many hands?"
+    },
+    {
+     "type": "clue",
+     "label": "The house manager's card",
+     "pickup": true,
+     "note": "MID-POINT TRADE — the NAME B needs for the casino's private room. Read it aloud to your partner."
+    },
+    {
+     "type": "clue",
+     "label": "A bone-coloured chip",
+     "pickup": true,
+     "note": "TOKEN 2/5 — crew 2's. No crest anywhere. One small FLEUR-DE-LIS pressed into the rim. A can describe it; only B knows whose it is."
+    },
+    {
+     "type": "door",
+     "direction": "open",
+     "to": "a_opera",
+     "label": "The way back"
+    },
+    {
+     "type": "door",
+     "direction": "open",
+     "to": "a_gallery",
+     "label": "On to the next call"
+    }
+   ],
+   "authoring": {
+    "tag": "a_townhouse",
+    "hour": "late night",
+    "sceneSpec": {
+     "room": "a_townhouse",
+     "setting": "the centre of a ransacked first-floor dressing room in a Mayfair townhouse late at night, tall sash windows standing open to the street",
+     "interior": true,
+     "seam": "a plain stretch of pale grey panelled wall, uniform and unbroken",
+     "seamOccluder": "a slender panelled door-case running floor to ceiling",
+     "elements": [
+      {
+       "id": "back",
+       "at": "on the far left",
+       "desc": "the head of the stair beyond the landing",
+       "door": {
+        "direction": "open",
+        "to": "a_opera"
+       },
+       "label": "The way back"
+      },
+      {
+       "id": "chip",
+       "at": "to the left",
+       "desc": "a bone-coloured gaming chip fallen on the boards, bearing no crest at all — only a fleur-de-lis pressed into its rim",
+       "clue": true,
+       "label": "A bone-coloured chip"
+      },
+      {
+       "id": "nets",
+       "at": "just left of centre",
+       "desc": "tall sash windows standing open, floor-length net curtains billowing inward on the night air",
+       "animate": {
+        "motion": "the net curtains billowing inward and falling back on the night air",
+        "loop": "boomerang"
+       }
+      },
+      {
+       "id": "case",
+       "at": "just left of centre",
+       "desc": "a jewellery case forced open on the dressing table, its silk lining slashed, trays turned out"
+      },
+      {
+       "id": "console",
+       "at": "dead ahead in the centre",
+       "desc": "a portable terminal set down open among the scattered trays",
+       "puzzle": true,
+       "label": "The dressing-table terminal"
+      },
+      {
+       "id": "fob",
+       "at": "just right of centre",
+       "desc": "a hotel key fob on a leather tab, carrying only a number and a colour, no house name",
+       "clue": true,
+       "label": "A hotel key fob"
+      },
+      {
+       "id": "card",
+       "at": "to the right",
+       "desc": "a house manager's calling card slipped behind the mirror frame",
+       "clue": true,
+       "label": "The house manager's card"
+      },
+      {
+       "id": "on",
+       "at": "on the far right",
+       "desc": "a bedroom door standing open onto the landing",
+       "door": {
+        "direction": "open",
+        "to": "a_gallery"
+       },
+       "label": "On to the next call"
+      }
+     ],
+     "atmosphere": "late night, cold blue from the street lamps through the open sashes, one warm pool from a fallen table lamp, dust in the air, painterly, cinematic, film grain",
+     "negatives": "No people, no figures, no crowds, no lettering, no captions, no text, no signage, no numbers.",
+     "continuity": []
+    },
+    "scenePrompt": "This is a seamless 360-degree panorama from the centre of a ransacked first-floor dressing room in a Mayfair townhouse late at night, tall sash windows standing open to the street. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stretch of pale grey panelled wall, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the head of the stair beyond the landing; to the left, a bone-coloured gaming chip fallen on the boards, bearing no crest at all — only a fleur-de-lis pressed into its rim; just left of centre, tall sash windows standing open, floor-length net curtains billowing inward on the night air; just left of centre, a jewellery case forced open on the dressing table, its silk lining slashed, trays turned out; dead ahead in the centre, a portable terminal set down open among the scattered trays; just right of centre, a hotel key fob on a leather tab, carrying only a number and a colour, no house name; to the right, a house manager's calling card slipped behind the mirror frame; on the far right, a bedroom door standing open onto the landing. late night, cold blue from the street lamps through the open sashes, one warm pool from a fallen table lamp, dust in the air, painterly, cinematic, film grain. No people, no figures, no crowds, no lettering, no captions, no text, no signage, no numbers. Again: the extreme left and right edges must align perfectly into a plain stretch of pale grey panelled wall, uniform and unbroken, with no visible seam, join, or repetition."
+   },
+   "entry": "Tonight's hand also did this house three weeks ago — the file lists it in the same series and nobody ever worked it properly. The seals are still on the door.",
+   "debrief": "The elbow. Within-cluster variance always falls as you add clusters, so 'lowest variance' is not a criterion — it just counts rows. The elbow is where extra clusters stop buying you much, and reading it is a judgement, not an output. Yours said five."
+  },
+  {
+   "key": "a_gallery",
+   "title": "The Gallery, After Hours",
+   "technique": "summarise by cluster",
+   "puzzleType": 1,
+   "phase": "analysis",
+   "built": false,
+   "unlockedWhen": true,
+   "isBoss": false,
+   "designNote": "RUNG 3 (A) — summarise by cluster.\nWHY THEY ARE HERE: The museum is BOTH one of the twelve scenes (a vitrine stands open and emptied) and where the evidence store is kept. They came for the comparison material.\nTHE QUESTION IN THE ROOM: What actually distinguishes one crew from another?\nANALYSIS: Summarise by cluster and characterise one crew's signature.\nVERIFIED ANSWER = 10. Summarise by cluster: crew 4 went in highest (mean entry height 9.77 m vs 7.69 m, +27%); report its SIZE = 10 jobs. Distinct entity from rungs 1 and boss.\nSUPERSEDED-SPEC: ANSWER = that crew's signature.\nTHE JOB: **Harkness Gallery** (crew 4, entry_height 9.0 m — the HIGHEST in the file). ART CONTRACT: entry through the glazed barrel roof; the roof is load-bearing, not decoration. ALIGNMENT: crew 4 is this room's own rung-3 answer — the player is standing in the room that answers its question. TOKEN 3 = crew 4's book of matches, in situ. TOKEN 4 = crew 3's hotel key fob, in an EVIDENCE BAG from a job they never visit (this room is the evidence store).\nWHAT THEY FIND: TOKEN 4 of 5 — a book of matches, an address half burnt away. GATED: the evidence locker opens to the DOCKET NUMBER only B can supply from b_casino.\nWHAT IT CAUSES (why they leave): One crew is unlike the rest — forces nothing, is let in, takes only the best pieces. And the largest job in the file, the Ardsley Strongroom, is still unattributed. Go and attribute it.\n\nART: new.",
+   "plannedHotspots": [
+    {
+     "type": "lock",
+     "label": "The evidence locker",
+     "note": "opens to the DOCKET NUMBER only B can supply (from b_casino). Gates this room's puzzle via availableWhen.",
+     "id": "evidence_locker"
+    },
+    {
+     "type": "puzzle",
+     "label": "The conservator's terminal",
+     "note": "summarise by cluster"
+    },
+    {
+     "type": "clue",
+     "label": "A hotel key fob",
+     "pickup": true,
+     "note": "TOKEN 3/5 — crew 3's, EVIDENCE-BAGGED from a job A never visits (this room is the evidence store). Its only mark is a serial in one narrow band. A can read the number but cannot place it."
+    },
+    {
+     "type": "clue",
+     "label": "A book of matches",
+     "pickup": true,
+     "note": "TOKEN 4/5 — crew 4's. The address is burnt away; what survives is a FLEUR-DE-LIS blind-embossed inside the cover."
+    },
+    {
+     "type": "door",
+     "direction": "open",
+     "to": "a_townhouse",
+     "label": "The way back"
+    },
+    {
+     "type": "door",
+     "direction": "open",
+     "to": "a_vault",
+     "label": "On to the next call"
+    }
+   ],
+   "authoring": {
+    "tag": "a_gallery",
+    "hour": "small hours",
+    "sceneSpec": {
+     "room": "a_gallery",
+     "setting": "the centre of a marble sculpture hall in a great museum after closing, a glazed barrel roof overhead and empty plinths receding on both sides",
+     "interior": true,
+     "seam": "a plain stretch of cold veined marble walling, uniform and unbroken",
+     "seamOccluder": "a square marble pier running floor to ceiling",
+     "elements": [
+      {
+       "id": "locker",
+       "at": "to the left",
+       "desc": "a steel evidence locker set into the wall, its keypad dark",
+       "lock": true,
+       "label": "The evidence locker"
+      },
+      {
+       "id": "sheet",
+       "at": "just left of centre",
+       "desc": "a canvas dust sheet draped over a near plinth, lifting and settling in the draught from a propped fire door",
+       "animate": {
+        "motion": "the canvas dust sheet lifting and settling slowly over the plinth",
+        "loop": "boomerang"
+       }
+      },
+      {
+       "id": "vitrine",
+       "at": "just left of centre",
+       "desc": "a tall glass vitrine standing open and emptied, its felt bed still showing the impression of what stood there"
+      },
+      {
+       "id": "console",
+       "at": "dead ahead in the centre",
+       "desc": "a portable terminal open on a conservator's trolley",
+       "puzzle": true,
+       "label": "The conservator's terminal"
+      },
+      {
+       "id": "matches",
+       "at": "just right of centre",
+       "desc": "a book of matches dropped by the plinth, an address printed inside the cover and half burnt away",
+       "clue": true,
+       "label": "A book of matches"
+      },
+      {
+       "id": "back",
+       "at": "to the right",
+       "desc": "an archway back toward the stair hall",
+       "door": {
+        "direction": "open",
+        "to": "a_townhouse"
+       },
+       "label": "The way back"
+      },
+      {
+       "id": "on",
+       "at": "on the far right",
+       "desc": "a propped fire door giving onto a service corridor",
+       "door": {
+        "direction": "open",
+        "to": "a_vault"
+       },
+       "label": "On to the next call"
+      }
+     ],
+     "atmosphere": "the small hours, cold moonlight falling through the glazed roof onto white marble, one warm security lamp low down, long hard shadows, painterly, cinematic, film grain",
+     "negatives": "No people, no figures, no crowds, no lettering, no captions, no text, no signage, no numbers.",
+     "continuity": []
+    },
+    "scenePrompt": "This is a seamless 360-degree panorama from the centre of a marble sculpture hall in a great museum after closing, a glazed barrel roof overhead and empty plinths receding on both sides. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stretch of cold veined marble walling, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. To the left, a steel evidence locker set into the wall, its keypad dark; just left of centre, a canvas dust sheet draped over a near plinth, lifting and settling in the draught from a propped fire door; just left of centre, a tall glass vitrine standing open and emptied, its felt bed still showing the impression of what stood there; dead ahead in the centre, a portable terminal open on a conservator's trolley; just right of centre, a book of matches dropped by the plinth, an address printed inside the cover and half burnt away; to the right, an archway back toward the stair hall; on the far right, a propped fire door giving onto a service corridor. the small hours, cold moonlight falling through the glazed roof onto white marble, one warm security lamp low down, long hard shadows, painterly, cinematic, film grain. No people, no figures, no crowds, no lettering, no captions, no text, no signage, no numbers. Again: the extreme left and right edges must align perfectly into a plain stretch of cold veined marble walling, uniform and unbroken, with no visible seam, join, or repetition."
+   },
+   "entry": "Two houses, two entirely different hands. Before you can say how many are working, you need what separates them — and every cast, mark and photograph the Service holds is in the museum's evidence store. The gallery itself was one of the twelve.",
+   "debrief": "Summarising by cluster is what makes a cluster mean something. A group number is arbitrary until you ask what its members have in common — here, that one crew goes in higher than any other. Clusters become findings only when you describe them."
+  },
+  {
+   "key": "a_vault",
+   "title": "The Vault at First Light",
+   "technique": "the scaling trap (BOSS)",
+   "puzzleType": 2,
+   "phase": "analysis",
+   "built": false,
+   "unlockedWhen": true,
+   "isBoss": true,
+   "designNote": "BOSS (A) — the scaling trap. A SOLO rung: it has a right answer and a named decoy, so the two-player divergence stays at the elbow, not here.\nWHY THEY ARE HERE: The strongroom was hit last week — the largest haul of the twelve, still unattributed.\nTHE QUESTION IN THE ROOM: Which hand did the strongroom?\nANALYSIS: Haul value runs to thousands while every MO feature sits on a small scale. Cluster raw and you group by HOW MUCH was taken; scale first and you group by HOW IT WAS DONE. DECOY = the unscaled haul-band mate — the job that stole a similar amount, i.e. the mistake a real investigator would make.\nVERIFIED ANSWER = Garsington Row. DECOY = Ashcombe Villa (Ardsley's raw duration-band mate — what you get without scale()). OPTIONS: Aldwick Court, Ashcombe Villa, Beckington Hall, Belgrave Mews, Bramfield Place, Garsington Row. Exactly one true hand-mate among the six. CLUE: minutes_inside runs to hundreds while every other entry feature is single digits — scale first.\nSUPERSEDED-SPEC: ANSWER = the crew that did the strongroom.\nTHE JOB: **Ardsley Strongroom** (crew 5, tool_score 0.9 — the LOWEST in the file; haul_value 95,000, the largest). ART CONTRACT: NO forced entry anywhere. Nothing prised, nothing broken; the circular door stands open on its lugs, undamaged. The data says they were let in, so the art must not show a break-in. TOKEN 5 of 5 = crew 5's luggage tag.\nWHAT THEY FIND: TOKEN 5 of 5 — a leather luggage tag, its routing stamp only partly legible. This completes the set: FIVE tokens for FIVE crews, one each, every one found at a scene that crew actually hit. The count is never asserted — it accumulates in the player's pocket and independently confirms their elbow.\nWHAT IT CAUSES (why they leave): The routing stamp points at a vessel, and a gala invitation sits by the keypad.\n\nSPECTACLE ROOM. ART: new.",
+   "plannedHotspots": [
+    {
+     "type": "puzzle",
+     "label": "The assay-bench terminal",
+     "note": "the scaling trap (BOSS)"
+    },
+    {
+     "type": "clue",
+     "label": "A luggage tag",
+     "pickup": true,
+     "note": "TOKEN 5/5 — crew 5's. The same MARQUE as the lighter, worn thin by handling — A can see there is a stamp but not read it."
+    },
+    {
+     "type": "door",
+     "direction": "open",
+     "to": "a_gallery",
+     "label": "The way back"
+    },
+    {
+     "type": "lock",
+     "label": "The gala invitation",
+     "note": "requires the PARTNER'S CODE from their boss solve — neither player reaches the gala alone",
+     "id": "gala_invitation"
+    },
+    {
+     "type": "door",
+     "direction": "forward",
+     "to": "gala",
+     "label": "Aboard, to the gala",
+     "requires": "gala_invitation"
+    }
+   ],
+   "authoring": {
+    "tag": "a_vault",
+    "hour": "pre-dawn",
+    "sceneSpec": {
+     "room": "a_vault",
+     "setting": "the centre of a private bank's strongroom before dawn, walls of polished steel deposit boxes on every side and a great circular door standing open",
+     "interior": true,
+     "seam": "a plain stretch of riveted steel walling, uniform and unbroken",
+     "seamOccluder": "a steel corner column running floor to ceiling",
+     "elements": [
+      {
+       "id": "door",
+       "at": "to the left",
+       "desc": "the great circular strongroom door standing open on its gleaming lug-work"
+      },
+      {
+       "id": "back",
+       "at": "to the left",
+       "desc": "the corridor back toward the museum service door",
+       "door": {
+        "direction": "open",
+        "to": "a_gallery"
+       },
+       "label": "The way back"
+      },
+      {
+       "id": "lamp",
+       "at": "just left of centre",
+       "desc": "a caged inspection lamp hanging on a long flex, swinging slowly and throwing the box-fronts in and out of relief",
+       "animate": {
+        "motion": "the caged lamp swinging slowly on its flex, its light sweeping the steel",
+        "loop": "boomerang"
+       }
+      },
+      {
+       "id": "boxes",
+       "at": "just left of centre",
+       "desc": "a wall of polished steel deposit boxes, one row hanging open and empty"
+      },
+      {
+       "id": "console",
+       "at": "dead ahead in the centre",
+       "desc": "a portable terminal open on the assay bench in the middle of the floor",
+       "puzzle": true,
+       "label": "The assay-bench terminal"
+      },
+      {
+       "id": "tag",
+       "at": "just right of centre",
+       "desc": "a leather luggage tag left on the bench, a routing stamp across it only partly legible",
+       "clue": true,
+       "label": "A luggage tag"
+      },
+      {
+       "id": "invite",
+       "at": "to the right",
+       "desc": "a stiff engraved gala invitation propped against a keypad panel set into the wall",
+       "lock": true,
+       "label": "The gala invitation"
+      },
+      {
+       "id": "out",
+       "at": "on the far right",
+       "desc": "a steel service door onto the launch steps",
+       "door": {
+        "direction": "forward",
+        "to": "gala"
+       },
+       "label": "Aboard, to the gala"
+      }
+     ],
+     "atmosphere": "pre-dawn, cold steel and brushed nickel, a single warm caged lamp as the only source, deep black shadow between the box-walls, painterly, cinematic, film grain",
+     "negatives": "No people, no figures, no crowds, no lettering, no captions, no text, no signage, no numbers.",
+     "continuity": []
+    },
+    "scenePrompt": "This is a seamless 360-degree panorama from the centre of a private bank's strongroom before dawn, walls of polished steel deposit boxes on every side and a great circular door standing open. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stretch of riveted steel walling, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. To the left, the great circular strongroom door standing open on its gleaming lug-work; to the left, the corridor back toward the museum service door; just left of centre, a caged inspection lamp hanging on a long flex, swinging slowly and throwing the box-fronts in and out of relief; just left of centre, a wall of polished steel deposit boxes, one row hanging open and empty; dead ahead in the centre, a portable terminal open on the assay bench in the middle of the floor; just right of centre, a leather luggage tag left on the bench, a routing stamp across it only partly legible; to the right, a stiff engraved gala invitation propped against a keypad panel set into the wall; on the far right, a steel service door onto the launch steps. pre-dawn, cold steel and brushed nickel, a single warm caged lamp as the only source, deep black shadow between the box-walls, painterly, cinematic, film grain. No people, no figures, no crowds, no lettering, no captions, no text, no signage, no numbers. Again: the extreme left and right edges must align perfectly into a plain stretch of riveted steel walling, uniform and unbroken, with no visible seam, join, or repetition."
+   },
+   "entry": "You have a signature for each crew now. One of them forces nothing at all and is simply let in. The largest job in the file — the strongroom, last week — has never been attributed to anybody.",
+   "debrief": "The scaling trap. k-means measures straight-line distance, so a column in hundreds drowns columns in single digits — cluster the entry block raw and you group by how LONG they were inside rather than how they got in. Scaling is not tidying-up; it decides what the question was."
+  },
+  {
+   "key": "b_pawnshop",
+   "title": "The Pawnbroker's Back Room",
+   "technique": "k-means on the disposal block",
+   "puzzleType": 1,
+   "phase": "analysis",
+   "built": false,
+   "unlockedWhen": true,
+   "isBoss": false,
+   "designNote": "RUNG 1 (B) — assign a case to a group.\nWHY THEY ARE HERE: Whatever leaves a scene has to surface somewhere, and this is the nearest place it does.\nTHE QUESTION IN THE ROOM: Where is this stuff actually going?\nANALYSIS: Cluster the disposal evidence and read one value off the result.\nVERIFIED ANSWER = 29. kmeans(scale(case_file[,c('days_to_surface','lot_size','recut_score','ports_used')]), 3, nstart=50); table(cluster) -> 29/22/9. Busiest channel = 29, runner-up 22 (+32%). Distractors: 22, 9, 18, 13, 31, 60.\nWHAT THEY FIND: ESTABLISHMENT 1 of 3 — the pledge ledger under the counter: this house takes bone-coloured chips with no crest.\nWHAT IT CAUSES (why they leave): The ledger shows a run of pieces pledged and redeemed at once by a single buyer — a laundering pattern — and that buyer's account is settled from the casino.\nART: new.",
+   "plannedHotspots": [
+    {
+     "type": "puzzle",
+     "label": "The counter terminal",
+     "note": "k-means on the disposal block"
+    },
+    {
+     "type": "clue",
+     "label": "The ledger under the counter",
+     "note": "ESTABLISHMENT 1/3 — the bone house. It stamps NO crest on anything. Its goods carry one small FLEUR-DE-LIS pressed into the surface, and nothing else. The stamp itself sits in the ledger."
+    },
+    {
+     "type": "door",
+     "direction": "open",
+     "to": "briefing",
+     "label": "The way back"
+    },
+    {
+     "type": "door",
+     "direction": "open",
+     "to": "b_casino",
+     "label": "On to the next call"
+    }
+   ],
+   "authoring": {
+    "tag": "b_pawnshop",
+    "hour": "evening",
+    "sceneSpec": {
+     "room": "b_pawnshop",
+     "setting": "the centre of a cramped pawnbroker's back room on a wet backstreet in the evening, floor-to-ceiling shelves of pledged goods and a beaded curtain to the shop front",
+     "interior": true,
+     "seam": "a plain stretch of tobacco-stained plaster, uniform and unbroken",
+     "seamOccluder": "a stack of shelving uprights running floor to ceiling",
+     "elements": [
+      {
+       "id": "beads",
+       "at": "to the left",
+       "desc": "a long beaded curtain hanging across the shop doorway, swaying and clicking in the draught from the street",
+       "animate": {
+        "motion": "the beaded curtain swaying and settling in the draught",
+        "loop": "boomerang"
+       }
+      },
+      {
+       "id": "shelves",
+       "at": "to the left",
+       "desc": "floor-to-ceiling shelves of pledged goods — clocks, cased instruments, canteens of cutlery, all tagged"
+      },
+      {
+       "id": "ledger",
+       "at": "just left of centre",
+       "desc": "a heavy pledge ledger open under the counter lamp, columns of entries in a cramped hand",
+       "clue": true,
+       "label": "The ledger under the counter"
+      },
+      {
+       "id": "console",
+       "at": "dead ahead in the centre",
+       "desc": "a portable terminal open on the counter beside the ledger",
+       "puzzle": true,
+       "label": "The counter terminal"
+      },
+      {
+       "id": "window",
+       "at": "to the right",
+       "desc": "a small barred window onto a wet alley, tarmac shining under a single lamp"
+      },
+      {
+       "id": "back",
+       "at": "to the right",
+       "desc": "a narrow back door onto the stair",
+       "door": {
+        "direction": "open",
+        "to": "briefing"
+       },
+       "label": "The way back"
+      },
+      {
+       "id": "on",
+       "at": "on the far right",
+       "desc": "the beaded doorway through to the street",
+       "door": {
+        "direction": "open",
+        "to": "b_casino"
+       },
+       "label": "On to the next call"
+      }
+     ],
+     "atmosphere": "evening, warm low tungsten on brass and worn velvet, cold wet blue at the window, heavy dust and cigarette haze, painterly, cinematic, film grain",
+     "negatives": "No people, no figures, no crowds, no lettering, no captions, no text, no signage, no numbers.",
+     "continuity": []
+    },
+    "scenePrompt": "This is a seamless 360-degree panorama from the centre of a cramped pawnbroker's back room on a wet backstreet in the evening, floor-to-ceiling shelves of pledged goods and a beaded curtain to the shop front. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stretch of tobacco-stained plaster, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. To the left, a long beaded curtain hanging across the shop doorway, swaying and clicking in the draught from the street; to the left, floor-to-ceiling shelves of pledged goods — clocks, cased instruments, canteens of cutlery, all tagged; just left of centre, a heavy pledge ledger open under the counter lamp, columns of entries in a cramped hand; dead ahead in the centre, a portable terminal open on the counter beside the ledger; to the right, a small barred window onto a wet alley, tarmac shining under a single lamp; to the right, a narrow back door onto the stair; on the far right, the beaded doorway through to the street. evening, warm low tungsten on brass and worn velvet, cold wet blue at the window, heavy dust and cigarette haze, painterly, cinematic, film grain. No people, no figures, no crowds, no lettering, no captions, no text, no signage, no numbers. Again: the extreme left and right edges must align perfectly into a plain stretch of tobacco-stained plaster, uniform and unbroken, with no visible seam, join, or repetition."
+   },
+   "entry": "Whatever leaves a house has to surface somewhere, and this is the nearest place it does. Everything pledged over the counter passes through the ledger under it.",
+   "debrief": "The same move on the other half of the same table. Nothing about the method changed; only the columns did. Hold on to that — it is the whole scenario."
+  },
+  {
+   "key": "b_casino",
+   "title": "The Floor at Two",
+   "technique": "the elbow — how many channels?",
+   "puzzleType": 1,
+   "phase": "analysis",
+   "built": false,
+   "unlockedWhen": true,
+   "isBoss": false,
+   "designNote": "RUNG 2 (B) — THE ELBOW. B's half of the central divergence.\nWHY THEY ARE HERE: Following the money out of the pawnbroker's ledger.\nTHE QUESTION IN THE ROOM: How many separate channels are moving this stuff?\nANALYSIS: The elbow on the disposal block.\nVERIFIED ANSWER = k=3. WSS k=1..8 = 236/46/7/5/5/4/4/4 — the drop collapses after 3 (ratio 0.04). PICK-THE-POINT. A's elbow is k=5 on the same 60 jobs. Both correct.\nSUPERSEDED-SPEC: ANSWER = 3 organisations. A's elbow lands on 5 crews. BOTH ARE RIGHT — the crews are NESTED 2+2+1.\nWHAT THEY FIND: ESTABLISHMENT 2 of 3 — the brass marque above the cashier's cage, stamped again on every rack beneath it. GATED: the private-room door opens to the VALUER'S NAME only A can supply from a_townhouse. Solving yields the CASHIER'S DOCKET, the consignment number A needs for the museum locker.\nWHAT IT CAUSES (why they leave): The docket is a consignment note: goods leaving by water. Go to the shipping office.\nART: new.",
+   "plannedHotspots": [
+    {
+     "type": "lock",
+     "label": "The private-room door",
+     "note": "opens to the MANAGER'S NAME only A can supply (from a_townhouse). Gates this room's puzzle via availableWhen.",
+     "id": "private_room"
+    },
+    {
+     "type": "clue",
+     "label": "The marque above the cage",
+     "note": "ESTABLISHMENT 2/3 — the marque house. It stamps its MARQUE on everything it touches, the same mark worked in brass above the cage and struck into every rack beneath it."
+    },
+    {
+     "type": "clue",
+     "label": "The cashier's docket",
+     "pickup": true,
+     "note": "MID-POINT TRADE — the NUMBER A needs for the museum evidence locker."
+    },
+    {
+     "type": "puzzle",
+     "label": "The cashier's terminal",
+     "note": "the elbow — how many channels?"
+    },
+    {
+     "type": "door",
+     "direction": "open",
+     "to": "b_pawnshop",
+     "label": "The way back"
+    },
+    {
+     "type": "door",
+     "direction": "open",
+     "to": "b_docks",
+     "label": "On to the next call"
+    }
+   ],
+   "authoring": {
+    "tag": "b_casino",
+    "hour": "2am",
+    "sceneSpec": {
+     "room": "b_casino",
+     "setting": "the centre of a gaming floor at two in the morning, baize tables receding under a great chandelier and a brass cashier's cage along one side",
+     "interior": true,
+     "seam": "a plain stretch of deep green damask walling, uniform and unbroken",
+     "seamOccluder": "a gilt column running floor to ceiling",
+     "elements": [
+      {
+       "id": "back",
+       "at": "on the far left",
+       "desc": "the lobby doors back toward the street",
+       "door": {
+        "direction": "open",
+        "to": "b_pawnshop"
+       },
+       "label": "The way back"
+      },
+      {
+       "id": "smoke",
+       "at": "to the left",
+       "desc": "a heavy bank of cigarette smoke coiling across the near baize under the low table lamp",
+       "animate": {
+        "motion": "cigarette smoke coiling and rolling slowly across the near baize",
+        "loop": "crossfade"
+       }
+      },
+      {
+       "id": "tables",
+       "at": "to the left",
+       "desc": "baize tables abandoned mid-play, chips still stacked, cards face down"
+      },
+      {
+       "id": "marque",
+       "at": "just left of centre",
+       "desc": "a house marque worked in brass above the cashier's cage, stamped again on every chip rack beneath it",
+       "clue": true,
+       "label": "The marque above the cage"
+      },
+      {
+       "id": "console",
+       "at": "dead ahead in the centre",
+       "desc": "a portable terminal open on the cashier's marble counter",
+       "puzzle": true,
+       "label": "The cashier's terminal"
+      },
+      {
+       "id": "docket",
+       "at": "just right of centre",
+       "desc": "a carbon docket curling in the cage tray, a consignment number struck across it",
+       "clue": true,
+       "label": "The cashier's docket"
+      },
+      {
+       "id": "private",
+       "at": "to the right",
+       "desc": "a discreet padded door with a small keypad beside it",
+       "lock": true,
+       "label": "The private-room door"
+      },
+      {
+       "id": "on",
+       "at": "on the far right",
+       "desc": "a service passage giving onto the loading yard",
+       "door": {
+        "direction": "open",
+        "to": "b_docks"
+       },
+       "label": "On to the next call"
+      }
+     ],
+     "atmosphere": "two in the morning, hot gilt and green baize under a cold crystal chandelier, dense smoke, spilled amber light, painterly, cinematic, film grain",
+     "negatives": "No people, no figures, no crowds, no lettering, no captions, no text, no signage, no numbers.",
+     "continuity": []
+    },
+    "scenePrompt": "This is a seamless 360-degree panorama from the centre of a gaming floor at two in the morning, baize tables receding under a great chandelier and a brass cashier's cage along one side. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stretch of deep green damask walling, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the lobby doors back toward the street; to the left, a heavy bank of cigarette smoke coiling across the near baize under the low table lamp; to the left, baize tables abandoned mid-play, chips still stacked, cards face down; just left of centre, a house marque worked in brass above the cashier's cage, stamped again on every chip rack beneath it; dead ahead in the centre, a portable terminal open on the cashier's marble counter; just right of centre, a carbon docket curling in the cage tray, a consignment number struck across it; to the right, a discreet padded door with a small keypad beside it; on the far right, a service passage giving onto the loading yard. two in the morning, hot gilt and green baize under a cold crystal chandelier, dense smoke, spilled amber light, painterly, cinematic, film grain. No people, no figures, no crowds, no lettering, no captions, no text, no signage, no numbers. Again: the extreme left and right edges must align perfectly into a plain stretch of deep green damask walling, uniform and unbroken, with no visible seam, join, or repetition."
+   },
+   "entry": "The ledger shows a run of pieces pledged and redeemed within the hour by a single buyer, and that buyer settles his account from the tables. The room you want is behind the cage, and it is not open to you.",
+   "debrief": "Your partner's elbow, on the disposal columns, said three. Neither of you misread the plot. The drop collapses after five on one feature block and after three on the other, because the two blocks describe the same world at two different heights."
+  },
+  {
+   "key": "b_docks",
+   "title": "The Shipping Office",
+   "technique": "summarise by cluster",
+   "puzzleType": 1,
+   "phase": "analysis",
+   "built": false,
+   "unlockedWhen": true,
+   "isBoss": false,
+   "designNote": "RUNG 3 (B) — summarise by cluster.\nWHY THEY ARE HERE: The consignment note from the casino leads here.\nTHE QUESTION IN THE ROOM: What distinguishes one channel from another?\nANALYSIS: Summarise by cluster and characterise one channel.\nVERIFIED ANSWER = 22. Summarise by cluster: channel II sat on goods longest (mean 84 days vs 46, +80%); report its SIZE = 22 jobs. Distinct entity from rung 1 and boss.\nSUPERSEDED-SPEC: ANSWER = that channel's signature.\nWHAT THEY FIND: ESTABLISHMENT 3 of 3 — the consignment board of brass tallies, every one numbered inside one narrow range.\nWHAT IT CAUSES (why they leave): Every consignment routes to one vessel, the Aurelia, and there is a gala aboard her at dawn.\nART: new.",
+   "plannedHotspots": [
+    {
+     "type": "puzzle",
+     "label": "The clerk's terminal",
+     "note": "summarise by cluster"
+    },
+    {
+     "type": "clue",
+     "label": "The consignment board",
+     "note": "ESTABLISHMENT 3/3 — the range house. It marks nothing, but NUMBERS everything it handles inside one narrow band, and the band is on the board."
+    },
+    {
+     "type": "door",
+     "direction": "open",
+     "to": "b_casino",
+     "label": "The way back"
+    },
+    {
+     "type": "door",
+     "direction": "open",
+     "to": "b_stateroom",
+     "label": "On to the next call"
+    }
+   ],
+   "authoring": {
+    "tag": "b_docks",
+    "hour": "small hours",
+    "sceneSpec": {
+     "room": "b_docks",
+     "setting": "the centre of a shipping agent's office above a working wharf in the small hours, consignment boards on every wall and a wide loading hatch standing open to the quay",
+     "interior": true,
+     "seam": "a plain stretch of varnished tongue-and-groove boarding, uniform and unbroken",
+     "seamOccluder": "a timber roof-post running floor to ceiling",
+     "elements": [
+      {
+       "id": "tarp",
+       "at": "to the left",
+       "desc": "a heavy canvas tarpaulin lashed at the open loading hatch, flapping and snapping in the wind off the water",
+       "animate": {
+        "motion": "the canvas tarpaulin flapping and snapping at the open hatch",
+        "loop": "crossfade"
+       }
+      },
+      {
+       "id": "hatch",
+       "at": "to the left",
+       "desc": "the wide loading hatch itself, beyond it a crane gantry and black water under wharf lamps"
+      },
+      {
+       "id": "board",
+       "at": "just left of centre",
+       "desc": "a consignment board of hooked brass tallies, each numbered within one narrow range",
+       "clue": true,
+       "label": "The consignment board"
+      },
+      {
+       "id": "console",
+       "at": "dead ahead in the centre",
+       "desc": "a portable terminal open on the clerk's high desk",
+       "puzzle": true,
+       "label": "The clerk's terminal"
+      },
+      {
+       "id": "crates",
+       "at": "just right of centre",
+       "desc": "stencilled crates stacked and roped, one prised open and repacked with straw"
+      },
+      {
+       "id": "back",
+       "at": "to the right",
+       "desc": "a plank stair back down toward the yard",
+       "door": {
+        "direction": "open",
+        "to": "b_casino"
+       },
+       "label": "The way back"
+      },
+      {
+       "id": "on",
+       "at": "on the far right",
+       "desc": "a door onto the gangway out along the quay",
+       "door": {
+        "direction": "open",
+        "to": "b_stateroom"
+       },
+       "label": "On to the next call"
+      }
+     ],
+     "atmosphere": "the small hours, cold sodium off wet timber and black water, one warm desk lamp, salt haze, painterly, cinematic, film grain",
+     "negatives": "No people, no figures, no crowds, no lettering, no captions, no text, no signage, no numbers.",
+     "continuity": []
+    },
+    "scenePrompt": "This is a seamless 360-degree panorama from the centre of a shipping agent's office above a working wharf in the small hours, consignment boards on every wall and a wide loading hatch standing open to the quay. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stretch of varnished tongue-and-groove boarding, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. To the left, a heavy canvas tarpaulin lashed at the open loading hatch, flapping and snapping in the wind off the water; to the left, the wide loading hatch itself, beyond it a crane gantry and black water under wharf lamps; just left of centre, a consignment board of hooked brass tallies, each numbered within one narrow range; dead ahead in the centre, a portable terminal open on the clerk's high desk; just right of centre, stencilled crates stacked and roped, one prised open and repacked with straw; to the right, a plank stair back down toward the yard; on the far right, a door onto the gangway out along the quay. the small hours, cold sodium off wet timber and black water, one warm desk lamp, salt haze, painterly, cinematic, film grain. No people, no figures, no crowds, no lettering, no captions, no text, no signage, no numbers. Again: the extreme left and right edges must align perfectly into a plain stretch of varnished tongue-and-groove boarding, uniform and unbroken, with no visible seam, join, or repetition."
+   },
+   "entry": "The docket from the cage is a consignment note. The goods are not being sold in this city at all — they are leaving by water.",
+   "debrief": "The same summarise-by-cluster move on the channels: one house sits on goods far longer than the others. Note that you needed the grouping BEFORE you could compute the thing that characterises it. That order is not optional."
+  },
+  {
+   "key": "b_stateroom",
+   "title": "The Stateroom",
+   "technique": "the scaling trap (BOSS)",
+   "puzzleType": 2,
+   "phase": "analysis",
+   "built": false,
+   "unlockedWhen": true,
+   "isBoss": true,
+   "designNote": "BOSS (B) — the scaling trap on the disposal block, mirroring A's. A SOLO rung.\nWHY THEY ARE HERE: Aboard the Aurelia before the party, in the owner's stateroom.\nTHE QUESTION IN THE ROOM: Which channel moved the strongroom haul?\nANALYSIS: The scaling trap on the disposal features, with its own decoy.\nVERIFIED ANSWER = Lyndhurst Gate. DECOY = Edgeworth Hall (Ardsley's raw haul-band mate). OPTIONS: Bramfield Place, Cadogan Rise, Carlisle Terrace, Denholm House, Edgeworth Hall, Lyndhurst Gate. CLUE: haul_value_gbp runs to tens of thousands while every other disposal feature is single digits or days — scale first. NOTE the two bosses have DIFFERENT answers by construction (each is a LEAKED job the other block cannot see), so a partner's boss answer is worth nothing here.\nSUPERSEDED-SPEC: ANSWER = the channel that moved it.\nWHAT THEY FIND: A gala invitation lies on the desk beside the keypad.\nWHAT IT CAUSES (why they leave): B knows three houses and what each one's marks look like, and nothing about whose hands fed them. That is precisely A's half. Go up to the afterdeck.\nSPECTACLE ROOM. ART: new. B's boss and the gala are the SAME VESSEL — B is aboard early, A arrives by launch from the strongroom.",
+   "plannedHotspots": [
+    {
+     "type": "puzzle",
+     "label": "The owner's desk terminal",
+     "note": "the scaling trap (BOSS)"
+    },
+    {
+     "type": "clue",
+     "label": "The steward's table plan",
+     "pickup": true,
+     "note": "Three tables are laid for the gala, one per house, and the steward seats each guest at the table of whoever moves their goods. B carries this to the gala; it is why the seating plan is answerable at all."
+    },
+    {
+     "type": "door",
+     "direction": "open",
+     "to": "b_docks",
+     "label": "The way back"
+    },
+    {
+     "type": "lock",
+     "label": "The gala invitation",
+     "note": "requires the PARTNER'S CODE from their boss solve — neither player reaches the gala alone",
+     "id": "gala_invitation"
+    },
+    {
+     "type": "door",
+     "direction": "forward",
+     "to": "gala",
+     "label": "Aboard, to the gala",
+     "requires": "gala_invitation"
+    }
+   ],
+   "authoring": {
+    "tag": "b_stateroom",
+    "hour": "pre-dawn",
+    "sceneSpec": {
+     "room": "b_stateroom",
+     "setting": "the centre of a motor yacht's owner's stateroom before dawn, walnut panelling and low silk seating, a large porthole on one side giving onto open water",
+     "interior": true,
+     "seam": "a plain stretch of figured walnut panelling, uniform and unbroken",
+     "seamOccluder": "a polished brass handrail stanchion running floor to ceiling",
+     "elements": [
+      {
+       "id": "porthole",
+       "at": "to the left",
+       "desc": "a large brass-rimmed porthole, the slow swell rising and falling close beyond the glass",
+       "animate": {
+        "motion": "the slow sea swell rising and falling beyond the porthole glass",
+        "loop": "boomerang"
+       }
+      },
+      {
+       "id": "cabinet",
+       "at": "to the left",
+       "desc": "a walnut display cabinet, its velvet trays turned out and one lock sprung"
+      },
+      {
+       "id": "console",
+       "at": "dead ahead in the centre",
+       "desc": "a portable terminal open on the owner's desk among charts and manifests",
+       "puzzle": true,
+       "label": "The owner's desk terminal"
+      },
+      {
+       "id": "invite",
+       "at": "just right of centre",
+       "desc": "a stiff engraved gala invitation lying on the desk beside a small keypad panel",
+       "lock": true,
+       "label": "The gala invitation"
+      },
+      {
+       "id": "out",
+       "at": "to the right",
+       "desc": "a companionway door up toward the afterdeck",
+       "door": {
+        "direction": "forward",
+        "to": "gala"
+       },
+       "label": "Aboard, to the gala"
+      },
+      {
+       "id": "back",
+       "at": "on the far right",
+       "desc": "the passage back toward the gangway",
+       "door": {
+        "direction": "open",
+        "to": "b_docks"
+       },
+       "label": "The way back"
+      }
+     ],
+     "atmosphere": "pre-dawn, warm walnut and brass against cold grey sea light at the porthole, low silk sheen, painterly, cinematic, film grain",
+     "negatives": "No people, no figures, no crowds, no lettering, no captions, no text, no signage, no numbers.",
+     "continuity": []
+    },
+    "scenePrompt": "This is a seamless 360-degree panorama from the centre of a motor yacht's owner's stateroom before dawn, walnut panelling and low silk seating, a large porthole on one side giving onto open water. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stretch of figured walnut panelling, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. To the left, a large brass-rimmed porthole, the slow swell rising and falling close beyond the glass; to the left, a walnut display cabinet, its velvet trays turned out and one lock sprung; dead ahead in the centre, a portable terminal open on the owner's desk among charts and manifests; just right of centre, a stiff engraved gala invitation lying on the desk beside a small keypad panel; to the right, a companionway door up toward the afterdeck; on the far right, the passage back toward the gangway. pre-dawn, warm walnut and brass against cold grey sea light at the porthole, low silk sheen, painterly, cinematic, film grain. No people, no figures, no crowds, no lettering, no captions, no text, no signage, no numbers. Again: the extreme left and right edges must align perfectly into a plain stretch of figured walnut panelling, uniform and unbroken, with no visible seam, join, or repetition."
+   },
+   "entry": "Every consignment on the board routes to one vessel, and she is at her mooring with a party aboard her at dawn. You are early enough to be below deck before the guests arrive.",
+   "debrief": "The same trap wearing different clothes: haul value in tens of thousands against disposal features in days and counts. If you took the decoy on either side, you did not make an arithmetic mistake — you answered a different question, correctly."
+  },
+  {
+   "key": "gala",
+   "title": "The Gala at Sunrise",
+   "technique": "the escape — recognition, not computation",
+   "puzzleType": 0,
+   "phase": "escape",
+   "built": false,
+   "unlockedWhen": true,
+   "isBoss": false,
+   "designNote": "SHARED FINALE + ESCAPE. Reached only when BOTH players have solved their boss and traded codes.\nENGINE: a `grid` (items x buckets) — NOT a `lock`. Emitting it as a lock is a named silent killer.\nTHE BOARD: five token cards along the foot of a brass-framed seating plan; three named tables ruled across it. Pin each crew's token to the table of the house that moves its goods.\nHOW IT IS SOLVED — the mark, not the object. Each of the three houses is known by ONE MARK, shown in that house's own room on B's route: the bone house stamps no crest and presses a small FLEUR-DE-LIS; the marque house strikes its MARQUE on everything; the range house marks nothing but NUMBERS everything inside one narrow band. Each of A's five tokens CARRIES exactly one of those three marks. So the board is not object-matching — it is mark-matching, and the marks live on opposite sides of the pair.\nWHY NEITHER CAN DO IT ALONE. A holds the objects and can describe every mark but has never seen a house, so a fleur-de-lis means nothing to them; only the lighter's complete marque is placeable unaided, and it exists to teach A what a legible mark looks like. B has stood in all three houses and knows every convention but has never seen a token. The exchange is therefore A DESCRIBING a physical mark in plain language and B IDENTIFYING it — which is the communication task the whole scenario is built to force.\nSOLUTION (verified, _scratch/verify_escape.py, brute force over all 243 seatings -> exactly ONE): marque house = lighter + luggage tag; bone house = bone chip + book of matches; range house = key fob. 2+2+1, echoing the crews' nesting without carrying a single value out of the CSV.\nNON-REDUNDANT: every token is placed by its OWN mark, never by elimination.\nTHE DECOY: sorting by what the objects ARE rather than what is stamped on them — smoking (lighter, matches), gaming (chip, fob), travel (tag) — gives a DIFFERENT partition of the SAME 2+2+1 shape. A wrong answer that looks right because it has the shape you expected, which is this scenario's own lesson re-posed on props.\nART CONTRACT (binding, both sides): each of B's three rooms must VISIBLY DISPLAY its house's mark — the fleur-de-lis stamp in the pawnbroker's ledger, the brass marque above the cage, the numbered tallies on the consignment board. Each of A's five tokens must carry its mark legibly AT CLOSE RANGE, with only the lighter's complete. Five generic tokens, or five fully-legible ones, break the escape.\nNEVER label the slots 'organisations' and the cards 'crews' — that announces the nesting before the pair earn it. Five cards, three tables, no stated relationship. SPECTACLE ROOM. ART: new. SHARED.",
+   "plannedHotspots": [
+    {
+     "type": "grid",
+     "label": "The seating plan",
+     "note": "ESCAPE — 5 token cards into 3 tables, answer 2+2+1. endsEscape."
+    }
+   ],
+   "authoring": {
+    "tag": "gala",
+    "hour": "sunrise",
+    "sceneSpec": {
+     "room": "gala",
+     "setting": "the centre of a yacht's afterdeck laid for a gala at sunrise, round tables set with cloths and crystal, the open sea running away beyond the rail on one side",
+     "interior": true,
+     "seam": "a plain stretch of white-painted deckhouse boarding, uniform and unbroken",
+     "seamOccluder": "a white deckhouse corner post running floor to ceiling",
+     "elements": [
+      {
+       "id": "drapes",
+       "at": "to the left",
+       "desc": "long silk drapes and bunting rigged along the deckhouse, lifting and falling in the dawn breeze",
+       "animate": {
+        "motion": "the silk drapes lifting and falling steadily in the dawn breeze",
+        "loop": "boomerang"
+       }
+      },
+      {
+       "id": "tables",
+       "at": "to the left",
+       "desc": "three round tables laid with cloths and crystal, each set apart from the others, each with its own small standing card holder"
+      },
+      {
+       "id": "plan",
+       "at": "dead ahead in the centre",
+       "desc": "a large brass-framed seating plan on an easel, five loose card holders waiting along its foot and three named tables ruled across it",
+       "grid": true,
+       "label": "The seating plan"
+      },
+      {
+       "id": "rail",
+       "at": "just right of centre",
+       "desc": "the varnished afterdeck rail and beyond it open water running gold to the horizon"
+      },
+      {
+       "id": "tokens",
+       "at": "to the right",
+       "desc": "five small personal effects laid out on a salver — a lighter, a bone-coloured chip, a key fob, a book of matches, a luggage tag — each clearly a different object at close range, one crisply marked with a house marque and the others bearing only partial, ambiguous marks"
+      }
+     ],
+     "atmosphere": "sunrise, low gold raking across white cloths and crystal, cold blue sea shadow beneath, salt haze burning off, painterly, cinematic, film grain",
+     "negatives": "No people, no figures, no crowds, no lettering, no captions, no text, no signage, no numbers. No labels or captions on the tokens or the seating plan; the marks are marques and impressions, never words.",
+     "continuity": []
+    },
+    "scenePrompt": "This is a seamless 360-degree panorama from the centre of a yacht's afterdeck laid for a gala at sunrise, round tables set with cloths and crystal, the open sea running away beyond the rail on one side. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stretch of white-painted deckhouse boarding, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. To the left, long silk drapes and bunting rigged along the deckhouse, lifting and falling in the dawn breeze; to the left, three round tables laid with cloths and crystal, each set apart from the others, each with its own small standing card holder; dead ahead in the centre, a large brass-framed seating plan on an easel, five loose card holders waiting along its foot and three named tables ruled across it; just right of centre, the varnished afterdeck rail and beyond it open water running gold to the horizon; to the right, five small personal effects laid out on a salver — a lighter, a bone-coloured chip, a key fob, a book of matches, a luggage tag — each clearly a different object at close range, one crisply marked with a house marque and the others bearing only partial, ambiguous marks. sunrise, low gold raking across white cloths and crystal, cold blue sea shadow beneath, salt haze burning off, painterly, cinematic, film grain. No people, no figures, no crowds, no lettering, no captions, no text, no signage, no numbers. No labels or captions on the tokens or the seating plan; the marks are marques and impressions, never words. Again: the extreme left and right edges must align perfectly into a plain stretch of white-painted deckhouse boarding, uniform and unbroken, with no visible seam, join, or repetition."
+   },
+   "entry": "Sunrise, and the last of the party. Three years of the file is standing on this deck holding a glass, and your partner is coming up the other side with their pockets full.",
+   "debrief": "The lesson made physical. Five cards, three tables, and the arithmetic refusing to come out even — because k was never a property of the data. It was a property of the question each of you asked of it. And the tempting wrong seating, sorting the tokens by what they ARE instead of by what is stamped on them, is the scaling trap again with no numbers in it at all: group on the wrong feature and you get a wrong answer in exactly the right shape."
+  }
+ ],
+ "cover": "cover.png",
+ "worldPlate": "_world/plate.png"
+}

@@ -1,0 +1,13 @@
+I extracted the frames and checked independently rather than trusting the write-up.
+
+**The boil is real and I saw it.** Native-res strips of the basket, platform and spyglass across frames 1/16/31/46 show the iron bars changing spacing and count, the grate interior re-forming, and the dry-laid slab outlines re-drawing themselves — not translation, texture crawl. Per-region temporal std on the *bake* backs it: platform_stone 8.88, fuel_box 7.98, spyglass_tripod 7.78, fire_basket 7.21, against basin_river 7.33 and ridge_grass 8.61 — the "rigid" architecture is moving as much as the water, and 40× more than the pinned survey_sheet at 0.18.
+
+**The tier is right, and provably so.** On the raw render (`cine_base_src.mp4`) platform_stone's std_mean is 10.21 and spyglass_tripod's 10.15, both *above* basin_river at 8.31; needle_spindrift is 3.05. No `MASK_PCT` threshold can keep the river and drop the stone when the stone ranks higher, so a REBAKE cannot reach this — only a spec write can. (My percentile fractions come out 29%/18% at p90 rather than the worker's quoted 69%/45%, but the ordering is what carries the argument and it's stronger in my numbers, not weaker.) The mechanism is proven on this very clip: survey_sheet measures std 9.59 in the raw and 0.18 in the bake purely because it's named `still`.
+
+**The spec change is clean and attributable.** I diffed it: every existing subject name, box and phrase is byte-identical, the `rigid` string, negatives and the whole `night` state are untouched, and the only additions are one pinned sentence plus four `still` boxes. It is not a repeat of attempt 1, which changed nothing in the spec. Four boxes but one hypothesis — freeze the boiling architecture — so the loop can still attribute the outcome.
+
+**I checked the boxes hardest, including the overlaps.** Cropped from `scene.png`, all four land squarely on their objects: `spyglass_tripod` is dead-centre on the brass glass and its three legs, `fire_basket` on the ironwork, `platform_stone` on the slab courses, `fuel_box` on the stone masonry. `fire_basket` and `spyglass_tripod` do overlap `basin_river`'s rectangle and the freeze is a hard `m[r0:r1,c0:c1]=0`, so I simulated the post-pin composite through `auto_mask`: coverage drops 0.5575 → 0.4556, the four pinned boxes go to p95 0.00, and basin_river lands at 15.48, ridge_grass at 20.12, needle_spindrift at 11.96 — all far above WEAK_P95 8.0. Nothing alive gets smothered.
+
+Diagnosis grounded in the frames, cheapest sufficient tier, one attributable change, boxes verified against the art and against the post-pin residual.
+
+VERDICT: PASS

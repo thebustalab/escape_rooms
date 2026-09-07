@@ -1,0 +1,160 @@
+{
+ "verdict": "hold",
+ "fix_tier": null,
+ "findings": [
+  {
+   "check": "frame0_corr",
+   "value": 0.878,
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  },
+  {
+   "check": "landmark_drift_px",
+   "value": 0,
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  },
+  {
+   "check": "loop_jump",
+   "value": 0.74,
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  },
+  {
+   "check": "background_swing",
+   "value": {
+    "swing": 4.94,
+    "step": 1.45,
+    "rigid_frac": 0.75,
+    "rel_pct": 32.9
+   },
+   "band": "warn",
+   "tier": "human",
+   "note": "the part of the frame declared rigid changes brightness by 4.94 (worst single-frame step 1.45, 33% of its own mean) \u2014 look at whether a light source is going out and coming back, or only flickering. For scale: hold/base 6.07 was broken, quay/night 4.94 was fine."
+  },
+  {
+   "check": "weak_subjects",
+   "value": [
+    "pharos_flame",
+    "bunting"
+   ],
+   "band": "warn",
+   "tier": "human",
+   "note": "modest but real motion: pharos_flame p95 5.15, bunting p95 6.09"
+  },
+  {
+   "check": "hot_subjects",
+   "value": [
+    "flame_track"
+   ],
+   "band": "warn",
+   "tier": "human",
+   "note": "very hot: flame_track p95 66.15 \u2014 over-driven and lively measure the same"
+  }
+ ],
+ "subjects": [
+  {
+   "name": "pharos_flame",
+   "box": [
+    0.498,
+    0.27,
+    0.532,
+    0.37
+   ],
+   "p95": 5.15,
+   "mean": 1.29,
+   "luma": 26.9,
+   "verdict": "weak",
+   "expect_still": false,
+   "force": true,
+   "hot": false
+  },
+  {
+   "name": "flame_track",
+   "box": [
+    0.495,
+    0.54,
+    0.535,
+    0.92
+   ],
+   "p95": 66.15,
+   "mean": 19.83,
+   "luma": 42.8,
+   "verdict": "alive",
+   "expect_still": false,
+   "force": false,
+   "hot": true
+  },
+  {
+   "name": "ship_lantern",
+   "box": [
+    0.158,
+    0.58,
+    0.196,
+    0.7
+   ],
+   "p95": 28.81,
+   "mean": 12.37,
+   "luma": 44.8,
+   "verdict": "alive",
+   "expect_still": false,
+   "force": false,
+   "hot": false
+  },
+  {
+   "name": "quay_lamps",
+   "box": [
+    0.78,
+    0.5,
+    0.92,
+    0.74
+   ],
+   "p95": 17.63,
+   "mean": 6.98,
+   "luma": 42.4,
+   "verdict": "alive",
+   "expect_still": false,
+   "force": false,
+   "hot": false
+  },
+  {
+   "name": "harbour_water",
+   "box": [
+    0.0,
+    0.52,
+    1.0,
+    0.74
+   ],
+   "p95": 17.11,
+   "mean": 4.75,
+   "luma": 21.6,
+   "verdict": "alive",
+   "expect_still": false,
+   "force": false,
+   "hot": false
+  },
+  {
+   "name": "bunting",
+   "box": [
+    0.2,
+    0.46,
+    0.4,
+    0.56
+   ],
+   "p95": 6.09,
+   "mean": 2.24,
+   "luma": 20.5,
+   "verdict": "weak",
+   "expect_still": false,
+   "force": false,
+   "hot": false
+  }
+ ],
+ "reasons": [],
+ "room": "quay",
+ "state": "night",
+ "clip_mtime": 1788402217.6677966
+}

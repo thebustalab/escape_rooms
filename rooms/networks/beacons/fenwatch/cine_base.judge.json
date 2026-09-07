@@ -1,0 +1,116 @@
+{
+ "verdict": "hold",
+ "fix_tier": null,
+ "findings": [
+  {
+   "check": "frame0_corr",
+   "value": 0.92,
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  },
+  {
+   "check": "landmark_drift_px",
+   "value": 0,
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  },
+  {
+   "check": "loop_jump",
+   "value": 1.74,
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  },
+  {
+   "check": "background_swing",
+   "value": {
+    "swing": 3.49,
+    "step": 1.95,
+    "rigid_frac": 0.85,
+    "rel_pct": 4.4
+   },
+   "band": "warn",
+   "tier": "human",
+   "note": "the part of the frame declared rigid changes brightness by 3.49 (worst single-frame step 1.95, 4% of its own mean) \u2014 look at whether a light source is going out and coming back, or only flickering. For scale: hold/base 6.07 was broken, quay/night 4.94 was fine."
+  },
+  {
+   "check": "colour_drift",
+   "value": 3.14,
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  }
+ ],
+ "subjects": [
+  {
+   "name": "valley_mist",
+   "box": [
+    0.02,
+    0.3,
+    0.4,
+    0.52
+   ],
+   "p95": 10.6,
+   "mean": 4.14,
+   "luma": 113.6,
+   "verdict": "alive",
+   "expect_still": false,
+   "force": false,
+   "hot": false
+  },
+  {
+   "name": "chimney_smoke",
+   "box": [
+    0.55,
+    0.12,
+    0.74,
+    0.48
+   ],
+   "p95": 10.22,
+   "mean": 2.4,
+   "luma": 110.1,
+   "verdict": "alive",
+   "expect_still": false,
+   "force": false,
+   "hot": false
+  },
+  {
+   "name": "river_glint",
+   "box": [
+    0.1,
+    0.41,
+    0.35,
+    0.52
+   ],
+   "p95": 9.44,
+   "mean": 3.61,
+   "luma": 141.3,
+   "verdict": "alive",
+   "expect_still": false,
+   "force": false,
+   "hot": false
+  },
+  {
+   "name": "desk_ledgers",
+   "box": [
+    0.44,
+    0.62,
+    0.64,
+    0.72
+   ],
+   "p95": 1.0,
+   "mean": 0.3,
+   "luma": 89.4,
+   "verdict": "dead",
+   "expect_still": true,
+   "force": false,
+   "hot": false
+  }
+ ],
+ "reasons": [],
+ "room": "fenwatch",
+ "state": "base",
+ "clip_mtime": 1788582409.8653584
+}

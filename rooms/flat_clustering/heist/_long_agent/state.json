@@ -1,0 +1,282 @@
+{
+  "status": "done",
+  "retry_count": 0,
+  "started": "2026-09-05T16:59:35.714361+00:00",
+  "last_cycle": "2026-09-06T02:42:24.871069+00:00",
+  "cycles_completed": 48,
+  "rooms_state": {
+    "briefing": {
+      "verdict": "hold",
+      "attempts": 1,
+      "reasons": [
+        "Only candidate offered, and it independently clears the bar — all three checklist objects present, well-formed and placed on the specced bearings, both doors distinct and correctly ajar, seam landing on flat wall with no content crossing it, and no generated lettering."
+      ],
+      "history": [
+        {
+          "attempt": 1,
+          "action": "GENERATE",
+          "why": "no art yet",
+          "result": "pending"
+        },
+        {
+          "attempt": 1,
+          "action": "COMMIT",
+          "why": "Only candidate offered, and it independently clears the bar — all three checklist objects present, well-formed and placed on the specced bearings, both doors distinct and correctly ajar, seam landing on flat wall with no content crossing it, and no generated lettering.",
+          "result": "committed l1_briefing_1.png"
+        }
+      ],
+      "concerns": "(1) Faint tone/texture step at the seam on otherwise-plain green wall — needs the normal screen/blur pass; the specced cast-iron radiator-pipe occluder is not rendered, so if the blur is insufficient a planted occluder will have clean flat wall to sit on. (2) A handful of the case-wall photographs contain small dark blobs that read as possible human figures at full zoom — inside a photo-on-a-wall this is arguably correct for a case wall, but it brushes the \"no figures\" negative and is worth Lucas's eye. (3) The overall exposure is on the dark side; the back-stair interior in particular is near-black and its stair direction is ambiguous, which matters only if the b_pawnshop side needs to read as a matching descent. (4) The blank brass plaque above the back door is text-free now but is a natural spot for a hotspot label collision.",
+      "triaged": true
+    },
+    "a_opera": {
+      "verdict": "hold",
+      "attempts": 3,
+      "reasons": [
+        "It is the only candidate, it depicts all four hotspot objects with a clean 360 seam, and the one defect this loop was actually chasing — the illegible marque on the calibration token — is now a sharp, wordless, deeply-cut crest, so a fourth roll would be spending money on cosmetics Lucas can judge better than I can."
+      ],
+      "history": [
+        {
+          "attempt": 1,
+          "action": "GENERATE",
+          "why": "no art yet",
+          "result": "pending"
+        },
+        {
+          "attempt": 1,
+          "action": "REGENERATE",
+          "why": "The single change is the `lighter` element's description — naming it a flip-top lighter rather than a case, pulling it near the viewer and large in frame, and demanding one bold deeply-cut crest filling its face — because the render gave a cigarette case with an illegible smeared medallion, and at the size the old wording implied no render can carry the crisp marque this calibration token exists to teach; the bedroom behind \"The way back\" is a render miss against already-correct prompt text and should clear on the re-roll, so I have not touched that wording.",
+          "result": "regenerating"
+        },
+        {
+          "attempt": 2,
+          "action": "REGENERATE",
+          "why": "The single change is the `lighter` element's desc — flip-top rather than a flat case, close to the viewer and large in frame, tilted into the stage light, one bold deeply-cut wordless crest filling its face — fixing the illegible smeared marque on a ~110 px shadowed slab, and it is worth spending attempt 3 on because verification against `scene_specs_heist.json` shows this wording was never actually applied on attempt 1, so the diagnosed fix has not yet been tested even once.",
+          "result": "regenerating"
+        },
+        {
+          "attempt": 3,
+          "action": "COMMIT",
+          "why": "It is the only candidate, it depicts all four hotspot objects with a clean 360 seam, and the one defect this loop was actually chasing — the illegible marque on the calibration token — is now a sharp, wordless, deeply-cut crest, so a fourth roll would be spending money on cosmetics Lucas can judge better than I can.",
+          "result": "committed l1_a_opera_1.png"
+        }
+      ],
+      "concerns": "(1) People — a figure on stage and a crowd in the stalls/boxes, in violation of the room's own `negatives`, though small, blurred and deep in shadow; Lucas should decide whether an occupied auditorium is acceptable for a \"mid-performance\" box or whether the negatives should win. (2) The terminal's lid panel bears illegible handwriting-like scribble; it is not spelled text but it is generated mark-making and reads as a libretto page as much as a screen. (3) The clue object is a flat crested case with a lid seam rather than an unmistakable flip-top lighter — the MARQUE it exists to teach is crisp and complete, but the object's identity as a \"lighter\" rests on the hotspot label. (4) Door order is reversed from the spec: the grand-stair opening sits at x≈2050–2300 and the corridor door at x≈2280–2450, so the wiring phase must box `on`→stair-left and `back`→panelled-right, not by spec order. (5) \"The way back\" is an unlit panelled leaf, not a curtained opening; it only resolves as a door once brightened.",
+      "triaged": true
+    },
+    "a_townhouse": {
+      "verdict": "hold",
+      "attempts": 2,
+      "reasons": [
+        "Only one candidate was generated, and it depicts every checklist object with a boxable target, both doors arriving on the correct bearings, and a content-clean seam — the missing-card defect that forced attempt 1's regeneration is genuinely fixed, and the residual issues are cosmetic ones Lucas can judge in the morning rather than the missing-object or broken-passage failures this gate exists to catch."
+      ],
+      "history": [
+        {
+          "attempt": 1,
+          "action": "GENERATE",
+          "why": "no art yet",
+          "result": "pending"
+        },
+        {
+          "attempt": 1,
+          "action": "REGENERATE",
+          "why": "The single change is the `card` element's description — from \"slipped behind the mirror frame\" (which the model rendered as nothing at all, since a card hidden behind a frame plus the no-lettering negative gives it nothing visible to draw) to a blank pale card wedged upright in the frame and lit, fixing the missing MID-POINT TRADE hotspot that currently has no object to box.",
+          "result": "regenerating"
+        },
+        {
+          "attempt": 2,
+          "action": "COMMIT",
+          "why": "Only one candidate was generated, and it depicts every checklist object with a boxable target, both doors arriving on the correct bearings, and a content-clean seam — the missing-card defect that forced attempt 1's regeneration is genuinely fixed, and the residual issues are cosmetic ones Lucas can judge in the morning rather than the missing-object or broken-passage failures this gate exists to catch.",
+          "result": "committed l1_a_townhouse_1.png"
+        }
+      ],
+      "concerns": "(1) The calling card has faint pseudo-handwriting on its face rather than being blank — illegible at native resolution and arguably reads as ink on a calling card, but it is technically generated lettering and Lucas should decide whether it bothers him. (2) The gaming chip renders warm brass-gold, not bone-coloured, and shows no readable fleur-de-lis; several other gold discs are scattered centre-right, so the chip hotspot box must be placed precisely on the isolated disc at x≈787, y≈845. (3) The terminal is on the floorboards, not on the dressing table, which sits slightly at odds with the hotspot label \"The dressing-table terminal\" — the label may want rewording at the wiring stage. (4) The room is very dark overall in the left third; the chip and card are legible at native resolution but will be dim in a small viewport.",
+      "triaged": true
+    },
+    "a_gallery": {
+      "verdict": "hold",
+      "attempts": 2,
+      "reasons": [
+        "Only candidate, and it depicts every checklist object at the specified bearing with a clean plain-marble seam, so it needs no repair."
+      ],
+      "history": [
+        {
+          "attempt": 1,
+          "action": "GENERATE",
+          "why": "no art yet",
+          "result": "pending"
+        },
+        {
+          "attempt": 1,
+          "action": "REGENERATE",
+          "why": "The single change is adding the missing `fob` element — an evidence-bagged hotel key fob on a ledge beneath the locker — so that TOKEN 3/5's clue hotspot has an object to box, which the current spec (and therefore the render) does not provide.",
+          "result": "regenerating"
+        },
+        {
+          "attempt": 2,
+          "action": "COMMIT",
+          "why": "Only candidate, and it depicts every checklist object at the specified bearing with a clean plain-marble seam, so it needs no repair.",
+          "result": "committed l1_a_gallery_1.png"
+        }
+      ],
+      "concerns": "The bagged key fob is very dark against a dark ledge — it is present and boxable, but check it is legible enough at player scale that someone will realise there is an object to click. The matchbook reads as an opened card/folder rather than obviously a book of matches (no match comb visible); acceptable for a hotspot, worth a glance. There is a small dark blur on a distant wall panel around x≈1850 that could be misread as faint lettering at full size. There is also an extra dark doorway just left of centre (strip2) that is not on the checklist — make sure hotspot boxing does not confuse it with the archway back.",
+      "triaged": true
+    },
+    "a_vault": {
+      "verdict": "hold",
+      "attempts": 1,
+      "reasons": [
+        "It is the only candidate and it passes on every gate that matters — all five checklist objects depicted, well-formed and correctly placed, both doors readable as real passages on the right bearings, and a genuinely clean plain-steel seam — so its remaining faults are cosmetic and cheaper to live with than a re-generation that would put the seam and the open box row back at risk."
+      ],
+      "history": [
+        {
+          "attempt": 1,
+          "action": "GENERATE",
+          "why": "no art yet",
+          "result": "pending"
+        },
+        {
+          "attempt": 1,
+          "action": "COMMIT",
+          "why": "It is the only candidate and it passes on every gate that matters — all five checklist objects depicted, well-formed and correctly placed, both doors readable as real passages on the right bearings, and a genuinely clean plain-steel seam — so its remaining faults are cosmetic and cheaper to live with than a re-generation that would put the seam and the open box row back at risk.",
+          "result": "committed l1_a_vault_1.png"
+        }
+      ],
+      "concerns": "The boss terminal's screen is entirely unlit — boxable and unambiguous as an object, but it does not draw the eye the way a glowing screen would, and if the cinemagraph phase wants a screen-flicker beat there is nothing lit to flicker. The luggage tag is the smallest hotspot target in the room at roughly 160×130 px and sits at the right corner of the bench, some distance from the terminal; the box will need to be drawn generously. The gala invitation is propped on a low plinth beneath the wall keypad rather than literally leaning against it, which still reads correctly but is a slightly looser pairing than the spec's wording. Box fronts and the invitation carry faint pseudo-engraving that is illegible at native resolution but is worth Lucas's eye at full size in case any of it resolves into glyphs.",
+      "triaged": true
+    },
+    "b_pawnshop": {
+      "verdict": "hold",
+      "attempts": 1,
+      "reasons": [
+        "Only candidate, and it depicts all four checklist objects clearly and well-formed, keeps both edges on plain plaster with no content crossing the join, and carries the commissioned tungsten-on-brass / cold-blue-window mood without generating any text."
+      ],
+      "history": [
+        {
+          "attempt": 1,
+          "action": "GENERATE",
+          "why": "no art yet",
+          "result": "pending"
+        },
+        {
+          "attempt": 1,
+          "action": "COMMIT",
+          "why": "Only candidate, and it depicts all four checklist objects clearly and well-formed, keeps both edges on plain plaster with no content crossing the join, and carries the commissioned tungsten-on-brass / cold-blue-window mood without generating any text.",
+          "result": "committed l1_b_pawnshop_1.png"
+        }
+      ],
+      "concerns": "Clock dials on the left shelves have faint roman-numeral tick marks — not legible captions or signage, but a human eye should confirm they read as ambient dial detail rather than a negatives violation. The barred window drifts to centre-right rather than clearly right, which crowds it slightly behind the terminal; it is not a hotspot so no box conflicts, but the composition is a little denser at centre than the spec implies. The seam has a soft vertical brightness step on flat plaster that still needs the seam stage. The stair door and the far-right beaded doorway are both on the right half and about 250 px apart at their nearest edges, so the wiring phase should draw those two boxes carefully.",
+      "triaged": true
+    },
+    "b_casino": {
+      "verdict": "hold",
+      "attempts": 1,
+      "reasons": [
+        "Sole candidate, and it clears the bar on every gating criterion — all six checklist objects are depicted, distinct and well-formed at native resolution, both doors read as real passages on plausible bearings, the seam is flat damask with no content crossing the join, and world continuity holds; the remaining issues are placement and flavour, which are cheap for Lucas to judge and none of which a re-generation is guaranteed to improve."
+      ],
+      "history": [
+        {
+          "attempt": 1,
+          "action": "GENERATE",
+          "why": "no art yet",
+          "result": "pending"
+        },
+        {
+          "attempt": 1,
+          "action": "COMMIT",
+          "why": "Sole candidate, and it clears the bar on every gating criterion — all six checklist objects are depicted, distinct and well-formed at native resolution, both doors read as real passages on plausible bearings, the seam is flat damask with no content crossing the join, and world continuity holds; the remaining issues are placement and flavour, which are cheap for Lucas to judge and none of which a re-generation is guaranteed to improve.",
+          "result": "committed l1_b_casino_1.png"
+        }
+      ],
+      "concerns": "(1) Element order on the right side is swapped versus the spec — the service passage (`on` → b_docks) is left of the private-room door, not right of it; boxing is unaffected but if the map/bearing logic assumes far-right = service passage, check it. (2) The marque's \"same mark struck into every chip rack beneath it\" is not visibly rendered — the cage shelving reads as generic pigeonholes, so the clue's repetition beat lands only in the hotspot copy, not in the art. (3) The `docket` hotspot will most naturally box an open ledger plus loose counter slips rather than a carbon docket curling in a cage tray; check that reads acceptably against the clue text. (4) Two soft lettering risks I judged illegible but a human eye should confirm at full size: the cursive squiggle on the ledger pages (x≈1880–1950) and the vertical neon glyphs in the street (x≈690, y≈390–450). (5) Everything sits in x≈600–2450, leaving ~1200 px of plain wall across the wrap — intentional per the seam spec, but the floor feels a little empty on the far right.",
+      "triaged": true
+    },
+    "b_docks": {
+      "verdict": "hold",
+      "attempts": 3,
+      "reasons": [
+        "Only candidate, and it is genuinely correct rather than merely available — it fixes both prior defects (the terminal now renders as an upright glowing screen with keyboard, and the gangway door renders as an actual door clear of the seam arc), with every checklist object depicted and no content crossing the join."
+      ],
+      "history": [
+        {
+          "attempt": 1,
+          "action": "GENERATE",
+          "why": "no art yet",
+          "result": "pending"
+        },
+        {
+          "attempt": 1,
+          "action": "REGENERATE",
+          "why": "The single change is the `console` element's desc — \"a portable terminal\" rendered as an anonymous metal tin, so it now names an upright glowing screen and a keyboard, which fixes the missing puzzle object that the room's only puzzle hotspot has to attach to.",
+          "result": "regenerating"
+        },
+        {
+          "attempt": 2,
+          "action": "REGENERATE",
+          "why": "The single change is moving both doors one canonical slot inboard (`back` to \"just right of centre\", `on` to \"to the right\", vacating the x=0.92 far-right wrap slot entirely) so the `on` door no longer competes with the seam boarding for the same arc — which is why it rendered as blank plank wall and left the \"On to the next call\" hotspot with nothing to box.",
+          "result": "regenerating"
+        },
+        {
+          "attempt": 3,
+          "action": "COMMIT",
+          "why": "Only candidate, and it is genuinely correct rather than merely available — it fixes both prior defects (the terminal now renders as an upright glowing screen with keyboard, and the gangway door renders as an actual door clear of the seam arc), with every checklist object depicted and no content crossing the join.",
+          "result": "committed l1_b_docks_1.png"
+        }
+      ],
+      "concerns": "The plank stair (\"The way back\") shows a newel, raking handrail and floor opening but no clearly resolved treads — I read it as a stair going down and it is boxable, but it is worth Lucas's eye since this is the class of defect the pipeline keeps missing. Both door arcs and the seam boarding are near-black at native exposure; hotspot boxes there will need contrast. Mild tone step at the wrap join for the seam stage to screen out.",
+      "triaged": true
+    },
+    "b_stateroom": {
+      "verdict": "hold",
+      "attempts": 2,
+      "reasons": [
+        "Only candidate, and it depicts all five checklist objects — including the table plan whose absence forced the last regeneration — with a clean plain-panelling seam and correctly oriented, climbable/level door geometry."
+      ],
+      "history": [
+        {
+          "attempt": 1,
+          "action": "GENERATE",
+          "why": "no art yet",
+          "result": "pending"
+        },
+        {
+          "attempt": 1,
+          "action": "REGENERATE",
+          "why": "The single change is adding a `plan` element for the checklist's steward's table plan clue — the one hotspot in this room with no object to attach to, which the render duly omits and which the gala's seating-plan boss depends on B carrying forward.",
+          "result": "regenerating"
+        },
+        {
+          "attempt": 2,
+          "action": "COMMIT",
+          "why": "Only candidate, and it depicts all five checklist objects — including the table plan whose absence forced the last regeneration — with a clean plain-panelling seam and correctly oriented, climbable/level door geometry.",
+          "result": "committed l1_b_stateroom_1.png"
+        }
+      ],
+      "concerns": "The steward's table-plan card carries faint illegible ink squiggle around the three tables — it spells nothing, but it is the closest thing to generated lettering in the frame and worth a glance. The desk half of the panorama is dark; the invitation and keypad are legible at native resolution but will need a generous hotspot box. The porthole sea reads more overcast-night than pre-dawn, so check it against the other B-branch rooms for time-of-day continuity. There is a second, closed panelled door between the companionway stair and the aft passage that belongs to neither door hotspot — harmless, but wiring should box the stair and the open passage, not it.",
+      "triaged": true
+    },
+    "gala": {
+      "verdict": "hold",
+      "attempts": 1,
+      "reasons": [
+        "Only candidate, and it needs no repair — the sole checklist object is large, well-formed and unoccluded, every specced element sits on its correct bearing, and the seam lands on a genuinely continuous white deckhouse corner rather than on content."
+      ],
+      "history": [
+        {
+          "attempt": 1,
+          "action": "GENERATE",
+          "why": "no art yet",
+          "result": "pending"
+        },
+        {
+          "attempt": 1,
+          "action": "COMMIT",
+          "why": "Only candidate, and it needs no repair — the sole checklist object is large, well-formed and unoccluded, every specced element sits on its correct bearing, and the seam lands on a genuinely continuous white deckhouse corner rather than on content.",
+          "result": "committed l1_gala_1.png"
+        }
+      ],
+      "concerns": "(1) The key fob and the luggage tag both bear faint embossed marks that at native resolution read as letterform-like squiggles rather than pure marques — illegible, but Lucas's eye should confirm they don't cross into \"lettering\". (2) The easel foot shows six card holders, not five, if you count the one partly hidden behind the frame's left edge; the puzzle is 5 tokens into 3 tables, so a player counting props could be briefly misled. Cosmetic — the grid hotspot is a UI overlay, not the physical holders. (3) The horizon carries a distant mountainous coastline rather than the pure open water the prompt describes; harmless, but it is a landmark that other exterior views in this scenario will need to be consistent with.",
+      "triaged": true
+    }
+  },
+  "last_eval": ""
+}

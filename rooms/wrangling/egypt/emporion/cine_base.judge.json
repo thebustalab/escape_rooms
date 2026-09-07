@@ -1,0 +1,145 @@
+{
+ "verdict": "reject",
+ "fix_tier": "rebake",
+ "findings": [
+  {
+   "check": "frame0_corr",
+   "value": 0.985,
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  },
+  {
+   "check": "landmark_drift_px",
+   "value": 0,
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  },
+  {
+   "check": "loop_jump",
+   "value": 0.27,
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  },
+  {
+   "check": "background_swing",
+   "value": {
+    "swing": 0.05,
+    "step": 0.02,
+    "rigid_frac": 0.57,
+    "rel_pct": 0.0
+   },
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  },
+  {
+   "check": "masked_out",
+   "value": [
+    "trough_water"
+   ],
+   "band": "reject",
+   "tier": "rebake",
+   "note": "the mask is pinning subject(s) the spec says should move: trough_water p95 0.00 on the bake but 19.73 on the render"
+  },
+  {
+   "check": "hot_subjects",
+   "value": [
+    "striped_awning"
+   ],
+   "band": "warn",
+   "tier": "human",
+   "note": "very hot: striped_awning p95 48.13 \u2014 over-driven and lively measure the same"
+  }
+ ],
+ "subjects": [
+  {
+   "name": "striped_awning",
+   "box": [
+    0.308,
+    0.0699,
+    0.6806,
+    0.4031
+   ],
+   "p95": 48.13,
+   "mean": 9.3,
+   "luma": 105.5,
+   "verdict": "alive",
+   "expect_still": false,
+   "force": true,
+   "hot": true
+  },
+  {
+   "name": "awning_rope",
+   "box": [
+    0.63,
+    0.22,
+    0.71,
+    0.58
+   ],
+   "p95": 11.39,
+   "mean": 1.68,
+   "luma": 67.7,
+   "verdict": "alive",
+   "expect_still": false,
+   "force": false,
+   "hot": false
+  },
+  {
+   "name": "harbour_water",
+   "box": [
+    0.0,
+    0.4,
+    0.22,
+    0.64
+   ],
+   "p95": 18.81,
+   "mean": 2.58,
+   "luma": 150.2,
+   "verdict": "alive",
+   "expect_still": false,
+   "force": false,
+   "hot": false
+  },
+  {
+   "name": "trough_water",
+   "box": [
+    0.575,
+    0.7,
+    0.735,
+    0.86
+   ],
+   "p95": 0.0,
+   "mean": 0.01,
+   "luma": 96.1,
+   "verdict": "dead",
+   "expect_still": false,
+   "force": false,
+   "hot": false
+  },
+  {
+   "name": "morning_cloud",
+   "box": [
+    0.0,
+    0.0,
+    1.0,
+    0.3
+   ],
+   "p95": 27.46,
+   "mean": 2.99,
+   "luma": 141.1,
+   "verdict": "alive",
+   "expect_still": false,
+   "force": false,
+   "hot": false
+  }
+ ],
+ "reasons": [
+  "the mask is pinning subject(s) the spec says should move: trough_water p95 0.00 on the bake but 19.73 on the render"
+ ],
+ "room": "emporion",
+ "state": "base",
+ "clip_mtime": 1788387822.6089635
+}

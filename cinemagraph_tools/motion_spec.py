@@ -57,6 +57,32 @@ from PIL import Image
 
 DEAD_P95 = 4.5
 WEAK_P95 = 8.0
+
+# --- sparse lit subjects -----------------------------------------------------------------------
+# A p95 over a box that is almost entirely dark background is BLIND to the subject, as a matter of
+# arithmetic rather than calibration: if the lit pixels are f% of the box they occupy percentiles
+# (100-f) to 100, so for f < 5 the 95th percentile is *definitionally* sampling the background and
+# no amount of lamp motion can move it. The beacons night set is the demonstration — rams_head's
+# `village_lamps` is 0.79% lamp pixels, its lamp pixels measure tstd p95 8.09 against dark-flat
+# 2.66, and the box reads 2.77; three separate clips burned re-render attempts fighting that number
+# before an evaluator worked out it could not be moved (2026-09-06).
+#
+# NOT the brightness-scaled bar rejected above. The bar stays flat at 4.5. What changes is the
+# REGION the statistic is computed over — which is the same argument this module already made once,
+# when it moved from mean to p95: "the question is whether the THING in this region is moving".
+# For a sparse lit subject the box p95 is still answering the region question. Two consequences
+# keep this safe: the sparse path only engages when the lit fraction is small (a bright box like
+# boat's crown-fire, mean luma 82.9, never takes it, so the rejected failure mode cannot recur),
+# and the effective statistic is a MAX, so this can only ever rescue a subject, never newly kill
+# one.
+#
+# KEEP THE SCOPE HONEST: this rescued 3 of the 14 dead subjects on that set. `unlit` below — a box
+# holding no lit subject at all — accounted for 10, and 1 was genuinely quiet. So the bigger win was
+# the DIAGNOSTIC, not the rescue; see cinemagraph_tools/AGENTS.md, "A dead subject is one of three
+# things".
+BRIGHT_LUMA = 80.0     # a lit pixel
+SPARSE_FRAC = 0.05     # lit fraction below which the box p95 provably cannot see the subject
+MIN_LIT_PX = 50        # below this there is no lit subject in the box to measure — see `unlit`
 # ...and a CEILING. The scale above had a floor and no top, so an over-driven subject read as excellent:
 # j_c7's `upslot_daylight` measured 47.53 — the highest number in the canyon set — and Lucas's verdict was
 # "too intense, clouds dominate with really fast motion, looks odd, full re-render I think" (2026-08-31).
@@ -187,11 +213,33 @@ def measure_subjects(mp4, spec, frames=None):
         c, dd = int(x0 * W), max(int(x1 * W), int(x0 * W) + 1)
         reg, rl = tstd[a:bb, c:dd], luma[a:bb, c:dd]
         p95 = float(np.percentile(reg, 95))
+
+        # When the subject is a sparse lit thing on a dark field, measure the thing.
+        mask = rl >= BRIGHT_LUMA
+        lit_frac = float(mask.mean())
+        lit_p95, unlit = None, False
+        if lit_frac < SPARSE_FRAC:
+            lit = reg[mask]
+            if lit.size >= MIN_LIT_PX:
+                lit_p95 = float(np.percentile(lit, 95))
+            else:
+                # Nothing lit in the box at all. This is a DIFFERENT defect from "not moving" —
+                # it means the box is aimed off the subject or the subject is unlit — and saying
+                # so is worth more than another motion number. hood/night's `village_lamps` box
+                # was pure ridgeline with zero lamps in it and reported only "p95 4.42".
+                unlit = True
+
+        # MAX, so the sparse path can only rescue. `p95` stays the raw box figure: it is what the
+        # `still` pins are checked against and what every historical calibration note refers to.
+        eff = max(p95, lit_p95) if lit_p95 is not None else p95
         out.append({
             "name": s["name"], "box": list(b),
             "p95": round(p95, 2), "mean": round(float(reg.mean()), 2),
             "luma": round(float(rl.mean()), 1),
-            "verdict": "dead" if p95 < DEAD_P95 else ("weak" if p95 < WEAK_P95 else "alive"),
+            "p95_lit": round(lit_p95, 2) if lit_p95 is not None else None,
+            "lit_pct": round(lit_frac * 100, 2),
+            "unlit": unlit,
+            "verdict": "dead" if eff < DEAD_P95 else ("weak" if eff < WEAK_P95 else "alive"),
             "expect_still": bool(s.get("still")),
             "force": bool(s.get("force_repair")),
             "hot": bool(p95 >= HOT_P95),

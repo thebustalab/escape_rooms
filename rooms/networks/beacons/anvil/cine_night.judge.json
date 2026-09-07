@@ -1,0 +1,128 @@
+{
+ "verdict": "hold",
+ "fix_tier": null,
+ "findings": [
+  {
+   "check": "frame0_corr",
+   "value": 0.969,
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  },
+  {
+   "check": "landmark_drift_px",
+   "value": 0,
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  },
+  {
+   "check": "loop_jump",
+   "value": 0.7,
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  },
+  {
+   "check": "background_swing",
+   "value": {
+    "swing": 3.2,
+    "step": 0.89,
+    "rigid_frac": 0.96,
+    "rel_pct": 14.6
+   },
+   "band": "warn",
+   "tier": "human",
+   "note": "the part of the frame declared rigid changes brightness by 3.20 (worst single-frame step 0.89, 15% of its own mean) \u2014 look at whether a light source is going out and coming back, or only flickering. For scale: hold/base 6.07 was broken, quay/night 4.94 was fine."
+  },
+  {
+   "check": "colour_drift",
+   "value": 2.98,
+   "band": "ok",
+   "tier": null,
+   "note": ""
+  }
+ ],
+ "subjects": [
+  {
+   "name": "village_lamps",
+   "box": [
+    0.3,
+    0.5,
+    0.5,
+    0.6
+   ],
+   "p95": 4.5,
+   "mean": 1.26,
+   "luma": 14.3,
+   "p95_lit": 26.93,
+   "lit_pct": 0.81,
+   "unlit": false,
+   "verdict": "alive",
+   "expect_still": false,
+   "force": false,
+   "hot": false
+  },
+  {
+   "name": "river_glimmer",
+   "box": [
+    0.44,
+    0.51,
+    0.68,
+    0.62
+   ],
+   "p95": 6.87,
+   "mean": 2.11,
+   "luma": 13.8,
+   "p95_lit": 37.58,
+   "lit_pct": 1.77,
+   "unlit": false,
+   "verdict": "alive",
+   "expect_still": false,
+   "force": false,
+   "hot": false
+  },
+  {
+   "name": "fire_basket",
+   "box": [
+    0.31,
+    0.53,
+    0.4,
+    0.7
+   ],
+   "p95": 0.81,
+   "mean": 0.25,
+   "luma": 28.4,
+   "p95_lit": null,
+   "lit_pct": 5.78,
+   "unlit": false,
+   "verdict": "dead",
+   "expect_still": true,
+   "force": false,
+   "hot": false
+  },
+  {
+   "name": "spyglass",
+   "box": [
+    0.67,
+    0.53,
+    0.8,
+    0.72
+   ],
+   "p95": 0.67,
+   "mean": 0.21,
+   "luma": 23.8,
+   "p95_lit": 0.9,
+   "lit_pct": 2.46,
+   "unlit": false,
+   "verdict": "dead",
+   "expect_still": true,
+   "force": false,
+   "hot": false
+  }
+ ],
+ "reasons": [],
+ "room": "anvil",
+ "state": "night",
+ "clip_mtime": 1788711528.0169318
+}
