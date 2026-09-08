@@ -229,15 +229,17 @@
           text-align:center; border-radius:4px; cursor:pointer; font-size:14px; font-weight:600;
           background:rgba(0,0,0,.62); color:#ff9c9c; border:1px solid rgba(255,156,156,.5); padding:0; }
   .cdel:hover { background:#ff9c9c; color:#000; border-color:#ff9c9c; }
+  .crev { position:absolute; top:6px; right:32px; z-index:10; width:22px; height:22px; line-height:20px;
+          text-align:center; border-radius:4px; cursor:pointer; font-size:13px; font-weight:600;
+          background:rgba(0,0,0,.62); color:var(--dim); border:1px solid rgba(255,255,255,.22); padding:0; }
+  .crev.on { color:#0d1b12; background:var(--green); border-color:var(--green); }
+  .crev:hover { border-color:var(--green); }
   .cands { display:flex; gap:10px; overflow-x:auto; padding:10px 0 2px; }
   .cand { flex:0 0 320px; }
   .cand video { width:100%; display:block; border-radius:6px; border:1px solid var(--line); background:#050a0e; }
   .cand.live video { border-color:var(--green); }
   .candcap { display:flex; align-items:center; gap:6px; padding-top:4px; font-size:11px; color:var(--dim); }
   .vwrap { position:relative; }
-  .vwrap .blip { position:absolute; left:10px; top:10px; width:44px; height:44px; background:#000;
-                 border:1px solid rgba(255,255,255,.35); opacity:0; transition:opacity .05s; pointer-events:none; }
-  .vwrap .blip.on { opacity:1; }
   /* Motion map + patch outlines. The map is the per-pixel temporal std of the clip — white = moving —
      laid over the video with `screen` so you read WHERE it moves against WHAT is there. A patch is a
      repair tile composited into the clip; it is the one region that can carry its own artefacts, so it
@@ -421,13 +423,11 @@
   <!-- BAKED — the merged clips: full-frame render with its tile repairs composited in, which is what
        ships. Same flat scroll, same order, so a room reads the same way in both tabs. -->
   <div class="pane" id="pane-baked">
-    <div style="margin-top:16px; display:flex; align-items:baseline; gap:12px; flex-wrap:wrap">
-      <h2 style="font-size:14px; margin:0">Baked cinemagraphs — room by room</h2>
-      <span class="status" id="bakedStat"></span>
-      <label class="hint" style="cursor:pointer"><input type="checkbox" id="showBlip" checked style="vertical-align:-2px"> loop blip</label>
-      <span class="hint">each clip loads and plays only while it is on screen — nine 3072x1024 videos at once is not a thing a browser survives</span>
-    </div>
-    <div id="baked"></div>
+    <!-- No header strip: the room headers carry everything that was in it (clip counts, the unreviewed
+         pill) and the rest was explanation of behaviour rather than information (Lucas, 2026-09-08).
+         The lazy load/teardown it described is still there — see the IntersectionObserver in
+         `renderBaked`; nine 3072x1024 videos mounted at once does still wedge the tab. -->
+    <div id="baked" style="margin-top:16px"></div>
   </div>
 
   <!-- HOTSPOTS — the committed still with its hotspot boxes drawn on it, room by room, in the same
@@ -548,6 +548,7 @@
   let ST = null;
   function onScenario() {
     const v = $("#scenPick").value || ""; [CH, SC] = v.split("/");
+    loadFolds();                   // per-scenario: the keys are room names
     rememberView();
     refresh();
   }
@@ -1600,7 +1601,8 @@
       // A room whose still has been CHOSEN folds itself: it is done, and the only reason to look at it
       // again is deliberate. Everything still wanting a decision stays open.
       const chosen = !!((r.seam || {}).accepted);
-      return `<div class="room${chosen ? " folded" : ""}" data-room="${esc(r.key)}">
+      const aFold = FOLDS.art.has(r.key) ? FOLDS.art.get(r.key) : chosen;
+      return `<div class="room${aFold ? " folded" : ""}" data-room="${esc(r.key)}">
         <div class="roomhd" data-room="${esc(r.key)}">
           <span class="foldarrow">▾</span>
           <span class="k">${esc(r.key)}</span>
@@ -1632,6 +1634,45 @@
   // at once wedges the tab. IntersectionObserver attaches `src` on entry and tears it down on exit, so
   // scrolling the column behaves like scrolling the stills.
   let _cineObs = null;
+
+  // FOLD STATE IS STICKY AND SURVIVES A RELOAD; the auto-fold rule is a FIRST-SIGHT DEFAULT only.
+  //
+  // Two complaints, one mechanism. First: "when I click X on one of the candidates, it folds. It should
+  // not fold then." The x was not the cause — it does not bubble to the header handler. `refresh()` was:
+  // every commit, promote and delete re-renders a pane, the auto-fold predicate ran again from scratch,
+  // and a room that now qualified as settled folded itself mid-review, discarding any hand-fold too.
+  // Then: "if I have everything folded it would reload with everything folded."
+  //
+  // So the decision is remembered per (pane, scenario, room) in localStorage, and the predicate is only
+  // consulted for a room the pane has never drawn. Keyed by scenario because the keys are room names,
+  // and by pane because the stills and cinemagraph tabs are reviewed independently — folding a room in
+  // one is no statement about the other.
+  const FOLDS = { baked: new Map(), art: new Map() };
+  const foldKey = pane => `bw2_fold:${pane}:${CH}/${SC}`;
+  function loadFolds() {
+    for (const pane of Object.keys(FOLDS)) {
+      let obj = {};
+      try { obj = JSON.parse(localStorage.getItem(foldKey(pane)) || "{}") || {}; }
+      catch (e) { obj = {}; }
+      FOLDS[pane] = new Map(Object.entries(obj).filter(([, v]) => typeof v === "boolean"));
+    }
+  }
+  function saveFolds(pane) {
+    try { localStorage.setItem(foldKey(pane), JSON.stringify(Object.fromEntries(FOLDS[pane]))); }
+    catch (e) { /* private mode: folding still works for this session, just does not persist */ }
+  }
+  // One delegated handler for both panes.
+  function wireFolding(paneId, pane) {
+    $(paneId).addEventListener("click", e => {
+      const hd = e.target.closest(".roomhd");
+      if (!hd || e.target.closest("a, button, input, select, progress, label")) return;
+      const room = hd.closest(".room");
+      if (!room) return;
+      room.classList.toggle("folded");
+      FOLDS[pane].set(room.dataset.room, room.classList.contains("folded"));
+      saveFolds(pane);
+    });
+  }
 
   // THE TWO MASK AXES, and they are not the same question.
   //   `thresh` — HOW HARD a pixel must move. A percentile of this clip's own temporal std (absolute
@@ -1720,16 +1761,67 @@
     });
   }
 
+  // ---- new clips appear on their own ---------------------------------------------------------------
+  // Lucas, 2026-09-08: "Do I need to reload to see new cinemagraphs or will they just show up?" They did
+  // not — this pane only redrew on `refresh()`. A render batch drops candidates into the pool over an
+  // hour or two, so the answer needs to be yes.
+  //
+  // Cheap and non-intrusive by construction: it polls only while THIS tab is on screen and the browser
+  // tab is visible, compares a signature of every (room, state, clip, candidate tag) rather than
+  // re-rendering blindly, and preserves scroll across the redraw. Fold state already survives a
+  // re-render, so a room you had open stays open. It also stands down while a clip job is mid-flight,
+  // because those end in their own `refresh()` and two redraws would fight.
+  let _cineSig = null, _cinePoll = null;
+  const cineSignature = st => (st.rooms || []).map(r =>
+    (r.clips || []).map(c => `${r.key}/${c.state}:${c.file || "-"}:` +
+      (c.candidates || []).map(x => x.tag).sort().join(",")).join("|")).join("|");
+
+  function startCinePoll() {
+    if (_cinePoll) return;
+    _cinePoll = setInterval(async () => {
+      if (document.hidden) return;
+      if (!document.querySelector("#pane-baked.on")) return;
+      if (!CH || !SC) return;
+      if (document.querySelector("#baked .bakebar:not([style*=\"display: none\"])")) return;
+      let st;
+      try { st = await post("/api/scenario-state", { chapter: CH, scenario: SC }); }
+      catch (e) { return; }                       // a dropped poll is not an error worth surfacing
+      if (!st || !st.ok) return;
+      const sig = cineSignature(st);
+      if (_cineSig === null) { _cineSig = sig; return; }
+      if (sig === _cineSig) return;
+      _cineSig = sig;
+      const y = window.scrollY;
+      ST = st;
+      renderBaked(st);
+      window.scrollTo(0, y);                      // a redraw must not throw away where you were
+    }, 20000);
+  }
+
+  // Adjust a room's "N unreviewed" pill in place. Ticking a box must not cost a re-render, but the
+  // pill is the whole reason the tick exists, so it cannot go stale either.
+  function bumpUnreviewed(roomEl, delta) {
+    if (!roomEl) return;
+    const hd = roomEl.querySelector(".roomhd");
+    if (!hd) return;
+    let pill = Array.from(hd.querySelectorAll(".pill")).find(p => /unreviewed$/.test(p.textContent.trim()));
+    const cur = pill ? parseInt(pill.textContent, 10) || 0 : 0;
+    const next = Math.max(0, cur + delta);
+    if (!next) { if (pill) pill.remove(); return; }
+    if (!pill) {
+      pill = document.createElement("span");
+      pill.className = "pill";
+      pill.style.cssText = "color:#0d1b12; background:var(--amber); border-color:var(--amber); font-weight:600";
+      hd.appendChild(pill);
+    }
+    pill.textContent = next + " unreviewed";
+  }
+
   function renderBaked(st) {
     const host = $("#baked");
     const rooms = st.rooms || [];
     const total = rooms.reduce((n, r) => n + (r.clips || []).length, 0);
-    const candTotal = rooms.reduce((n, r) => n + (r.clips || []).reduce((m, c) => m + (c.candidates || []).length, 0), 0);
-    $("#bakedStat").innerHTML = (total || candTotal)
-      ? `${total} clip${total === 1 ? "" : "s"} across ${rooms.filter(r => (r.clips || []).length).length} room(s)`
-        + (candTotal ? ` · ${candTotal} candidate${candTotal === 1 ? "" : "s"} in the pools` : "")
-        + ` · click a room header to fold it`
-      : `no clips baked yet`;
+
     host.innerHTML = rooms.map(r => {
       const clips = r.clips || [];
       // SERVED vs merely BAKED. A clip on disk that no hotspot references is invisible to the player —
@@ -1744,9 +1836,15 @@
       // `!clips.length` is sufficient for "nothing to see": `_room_clips` emits a PENDING entry for any
       // state that has candidates but no committed clip, so a room holding an unpromoted pool always
       // has a clip row. Checking a `r.candidates` that does not exist would have read as true always.
+      // Unreviewed = every candidate plus the committed clip that has not been ticked. Counted on the
+      // header so a FOLDED room still reports new arrivals — otherwise a folded room that has just
+      // gained two seeds looks exactly like one that has not.
+      const unrev = clips.reduce((n, c) =>
+        n + (c.file && !c.reviewed ? 1 : 0)
+          + (c.candidates || []).filter(x => !x.reviewed).length, 0);
       const nothingToSee = !clips.length;
       const settled = clips.length && !unserved && !clips.some(c => c.raw);
-      const folded = nothingToSee || settled;
+      const folded = FOLDS.baked.has(r.key) ? FOLDS.baked.get(r.key) : (nothingToSee || settled);
       return `<div class="room${folded ? " folded" : ""}" data-room="${esc(r.key)}">
         <div class="roomhd" data-room="${esc(r.key)}">
           <span class="foldarrow">▾</span>
@@ -1754,6 +1852,8 @@
           <span style="opacity:.75">${esc(r.title || "")}</span>
           ${clips.length ? `<span class="pill var">${clips.length} clip${clips.length === 1 ? "" : "s"}</span>`
                          : `<span class="pill">not baked</span>`}
+          ${unrev ? `<span class="pill" style="color:#0d1b12; background:var(--amber); border-color:var(--amber); font-weight:600"
+                           title="clips in this room you have not ticked as reviewed \u2014 visible while the room is folded, which is the point">${unrev} unreviewed</span>` : ""}
           ${clips.length && !unserved ? `<span class="pill" style="color:var(--green); border-color:var(--green)">served in play</span>` : ""}
           ${unserved ? `<span class="pill" style="color:#ff9c9c; border-color:#ff9c9c">${unserved} not served</span>
                         <button data-serve="${esc(r.key)}" style="padding:2px 9px; font-size:12px">Serve ${unserved} in play →</button>
@@ -1767,7 +1867,7 @@
             ${(c.candidates || []).length ? `<div class="cands">${(c.candidates || []).map(cd => `
               <div class="cand${cd.live ? " live" : ""}">
                 <div class="cwrap"><video data-src="${sfile(cd.file)}" muted loop playsinline preload="none"></video>
-                <button class="cdel" data-room="${esc(r.key)}" data-state="${esc(c.state)}" data-tag="${esc(cd.tag)}" title="Delete this candidate. Moved to _scratch/cine_deleted, not unlinked \u2014 recoverable, but it leaves the harness.">&times;</button></div>
+                <button class="crev${cd.reviewed ? " on" : ""}" data-room="${esc(r.key)}" data-state="${esc(c.state)}" data-tag="${esc(cd.tag)}" title="Mark as reviewed. Unreviewed clips are counted on the room header, so a folded room still tells you when new ones have landed in it.">&check;</button><button class="cdel" data-room="${esc(r.key)}" data-state="${esc(c.state)}" data-tag="${esc(cd.tag)}" title="Delete this candidate. Moved to _scratch/cine_deleted, not unlinked \u2014 recoverable, but it leaves the harness.">&times;</button></div>
                 <div class="candcap">
                   <b style="color:var(--fg)">${esc(cd.tag)}</b>
                   <button class="canduse" data-room="${esc(r.key)}" data-state="${esc(c.state)}"
@@ -1812,13 +1912,13 @@
               </select></label>
               <span class="who pacestat"></span>
               <span class="who paintstat">${(((c.mask || {}).paintOut) || []).length ? (((c.mask || {}).paintOut) || []).length + " pinned" : ""}</span>
-              <span class="who blipnote" style="display:none"></span>
               <progress class="bakebar" max="5" value="0" style="display:none; width:120px; vertical-align:-3px"></progress>
               <span class="who bakestage"></span></div>
             <div class="mpad"><canvas width="300" height="170"></canvas><div class="padnote"></div></div>
             <div class="vwrap" data-room="${esc(r.key)}" data-state="${esc(c.state)}" data-pace="${(c.mask || {}).pace || 1}">
               <img class="still" src="${sfile(c.still || (r.key + "/scene.png"))}" loading="lazy">
               <video data-src="${sfile(c.file)}" muted loop playsinline preload="none"></video>
+              <button class="crev${c.reviewed ? " on" : ""}" data-room="${esc(r.key)}" data-state="${esc(c.state)}" data-tag="" title="Mark as reviewed. Unreviewed clips are counted on the room header, so a folded room still tells you when new ones have landed in it.">&check;</button>
               <button class="cdel" data-room="${esc(r.key)}" data-state="${esc(c.state)}" data-tag="" title="Delete this committed clip and its mask/patch sidecars. The room drops back to "no clip chosen yet" and its candidate pool is untouched, so you can pick again. Moved to _scratch/cine_deleted, not unlinked.">&times;</button>
 
               <img class="mmap">
@@ -1828,12 +1928,11 @@
                   <span>patch · ${esc(p.name || "tile")}${on ? "" : " · OFF (not shipped)"}</span>
                   <button onclick="setPatch('${esc(r.key)}','${esc(c.state)}','${esc(p.name)}',${!on},this)">${on ? "✕ drop" : "↺ keep"}</button>
                 </div>`; }).join("")}
-              <div class="blip"></div>
               <div class="paint" data-boxes="${esc(JSON.stringify(((c.mask || {}).paintOut) || []))}"></div></div>
             ${(c.candidates || []).length ? `<div class="cands">${(c.candidates || []).map(cd => `
               <div class="cand${cd.live ? " live" : ""}">
                 <div class="cwrap"><video data-src="${sfile(cd.file)}" muted loop playsinline preload="none"></video>
-                <button class="cdel" data-room="${esc(r.key)}" data-state="${esc(c.state)}" data-tag="${esc(cd.tag)}" title="Delete this candidate. Moved to _scratch/cine_deleted, not unlinked \u2014 recoverable, but it leaves the harness.">&times;</button></div>
+                <button class="crev${cd.reviewed ? " on" : ""}" data-room="${esc(r.key)}" data-state="${esc(c.state)}" data-tag="${esc(cd.tag)}" title="Mark as reviewed. Unreviewed clips are counted on the room header, so a folded room still tells you when new ones have landed in it.">&check;</button><button class="cdel" data-room="${esc(r.key)}" data-state="${esc(c.state)}" data-tag="${esc(cd.tag)}" title="Delete this candidate. Moved to _scratch/cine_deleted, not unlinked \u2014 recoverable, but it leaves the harness.">&times;</button></div>
                 <div class="candcap">
                   <b style="color:var(--fg)">${esc(cd.tag)}</b>
                   ${cd.live ? `<span class="pill" style="color:var(--green); border-color:var(--green)">live</span>` : ""}
@@ -1848,12 +1947,30 @@
           </div>`).join("")
           : `<div class="noclip">no cinemagraph rendered for this room yet</div>`) + `</div></div>`;
     }).join("");
+    _cineSig = cineSignature(st);
+    startCinePoll();
     host.querySelectorAll("[data-serve]").forEach(b => { b.onclick = () => serveClips(b.dataset.serve); });
     // One handler for every candidate, live one included. Promoting the live candidate is a legitimate
     // action (it re-bakes it against whatever the mask, pins and pace now say), which is the other half
     // of why the live card does not need its own menu.
     // One handler for every x — candidate cards and the committed clip alike. An empty `data-tag`
     // means the committed clip, which is the destructive one, so that is the only case that asks.
+    // Reviewed is a local tick, not a job: it writes one small JSON file and touches no video, so it
+    // updates in place rather than going through refresh() — a re-render here would tear down every
+    // decoding video and lose your scroll for the sake of a checkbox.
+    host.querySelectorAll(".crev").forEach(b => {
+      b.onclick = async () => {
+        const on = !b.classList.contains("on");
+        b.disabled = true;
+        const r = await post("/api/cine-reviewed", { chapter: CH, scenario: SC, room: b.dataset.room,
+                                                     state: b.dataset.state, tag: b.dataset.tag || "",
+                                                     reviewed: on });
+        b.disabled = false;
+        if (!r.ok) { alert(r.error || "could not save"); return; }
+        b.classList.toggle("on", on);
+        bumpUnreviewed(b.closest(".room"), on ? -1 : 1);
+      };
+    });
     host.querySelectorAll(".cdel").forEach(b => {
       b.onclick = async () => {
         const tag = b.dataset.tag || "";
@@ -2261,23 +2378,9 @@
 
     host.querySelectorAll("video").forEach(v => {
       _cineObs.observe(v);
-      // `loop` restarts the video without firing `ended`, so a backwards jump in currentTime is the only
-      // reliable wrap signal — and it is free. Flash the square, and count the laps in the caption.
-      let prev = 0, laps = 0;
-      const blip = v.parentElement.querySelector(".blip");
-      const shotEl = v.closest(".shot");
-      const note = shotEl ? shotEl.querySelector(".blipnote") : null;
-      v.addEventListener("timeupdate", () => {
-        if (v.currentTime < prev) {
-          laps++;
-          if (note) note.textContent = `loop ${laps} · ${v.duration ? v.duration.toFixed(2) + "s" : ""}`;
-          // Candidate videos have no `.blip` sibling — this used to be safe only because every
-          // observed video lived inside a `.vwrap`.
-          if (blip && $("#showBlip").checked) blip.classList.add("on");
-          if (blip) setTimeout(() => blip.classList.remove("on"), 180);
-        }
-        prev = v.currentTime;
-      });
+      // The loop blip and the lap counter are both gone: the blip was driven by a `#showBlip` checkbox
+      // that no longer exists, and the counter wrote into a caption span that is now hidden. Keeping
+      // either would mean a `timeupdate` listener on every video in the pane writing to nothing.
     });
   }
 
@@ -2307,21 +2410,11 @@
   });
   // Fold / unfold a room by clicking its header. Delegated to the pane so it survives every re-render,
   // and it ignores clicks that landed on a link or button in the header — those have their own jobs.
-  $("#pane-art").addEventListener("click", e => {
-    const hd = e.target.closest(".roomhd");
-    if (!hd || e.target.closest("a, button, input")) return;
-    const room = hd.closest(".room");
-    if (room) room.classList.toggle("folded");
-  });
-  // Same delegation for the cinemagraph pane. Folding here also frees decoders for free: the
+  // Folding for both panes. In the cinemagraph pane it also frees decoders for free: the
   // IntersectionObserver tears a video's `src` down when it leaves the viewport, and a folded section
   // is `display:none`, so a folded room stops costing anything to have on the page.
-  $("#pane-baked").addEventListener("click", e => {
-    const hd = e.target.closest(".roomhd");
-    if (!hd || e.target.closest("a, button, input, select, progress, label")) return;
-    const room = hd.closest(".room");
-    if (room) room.classList.toggle("folded");
-  });
+  wireFolding("#pane-art", "art");
+  wireFolding("#pane-baked", "baked");
 
   // Guarded, not raw: both rebuild the cards from disk, so an unsaved edit would vanish without a word.
   // The picker is put back to the scenario you were on when you decline, or the label lies about what

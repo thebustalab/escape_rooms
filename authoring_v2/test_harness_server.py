@@ -1640,6 +1640,83 @@ def test_room_clips_ignores_intermediates():
         assert hs._room_clips(base, "r1")[0]["file"] == "r1/cine_base.mp4"
 
 
+def test_a_pending_state_is_never_reported_as_served():
+    """FAILURE MODE UNDER TEST — a room whose candidates were never promoted said "served in play".
+
+    `served` was `live.get(c["state"]) == c["file"]`. A pending state carries `file: None`, and a state
+    with no clip carrier gives `live.get(...) == None`, so the comparison was None == None -> True. The
+    gallery then showed the room as done and hid its Serve button, on a room with no clip at all."""
+    with tempfile.TemporaryDirectory() as base:
+        os.makedirs(os.path.join(base, "r1"))
+        cd = os.path.join(base, "_scratch", "cine_cand", "r1")
+        os.makedirs(cd)
+        open(os.path.join(cd, "base__menu_s777.mp4"), "wb").write(b"\0")
+        json.dump({"rooms": [{"key": "r1", "hotspots": []}]},
+                  open(os.path.join(base, "scenario.json"), "w"))
+        clip = hs._room_clips(base, "r1")[0]
+        assert clip["file"] is None and clip["pending"] is True
+        assert clip["served"] is False, "a state with no clip cannot be served"
+
+
+def test_reviewed_ledger_covers_candidates_and_the_committed_clip():
+    """One ledger, with "" meaning the committed clip. The pill on a folded room counts off this."""
+    with tempfile.TemporaryDirectory() as base:
+        d = os.path.join(base, "r1")
+        os.makedirs(d)
+        open(os.path.join(d, "cine_base.mp4"), "wb").write(b"\0")
+        cd = os.path.join(base, "_scratch", "cine_cand", "r1")
+        os.makedirs(cd)
+        for nm in ("base__a.mp4", "base__b.mp4"):
+            open(os.path.join(cd, nm), "wb").write(b"\0")
+        clip = hs._room_clips(base, "r1")[0]
+        assert clip["reviewed"] is False
+        assert all(c["reviewed"] is False for c in clip["candidates"])
+        hs._cine_set_reviewed(base, "r1", "base", "a", True)
+        hs._cine_set_reviewed(base, "r1", "base", "", True)
+        clip = hs._room_clips(base, "r1")[0]
+        assert clip["reviewed"] is True                                  # "" = the committed clip
+        got = {c["tag"]: c["reviewed"] for c in clip["candidates"]}
+        assert got == {"a": True, "b": False}, got
+        # unticking removes it, and an emptied state drops out rather than leaving []
+        hs._cine_set_reviewed(base, "r1", "base", "a", False)
+        hs._cine_set_reviewed(base, "r1", "base", "", False)
+        assert hs._cine_reviewed(base, "r1") == {}
+        # the ledger must not read as a candidate
+        assert sorted(c["tag"] for c in hs._room_clips(base, "r1")[0]["candidates"]) == ["a", "b"]
+
+
+def test_dismissed_candidates_are_not_resurrected():
+    """FAILURE MODE UNDER TEST — a candidate deleted in the harness came back on the next staging pass.
+
+    `stage_candidates.py --from-exp` copies every render it finds in `temp/cine/_art_prompt_exp`, and
+    the re-roll batch runs it after each room. Those renders never go away, so deleting the staged COPY
+    could never be enough: the next pass re-created it. Lucas, 2026-09-08: "when there are new
+    candidates are the previously dismissed ones being re-added to the list? They should not be."
+
+    So a delete records the tag in a ledger the stager reads. The ledger lives inside the candidate pool
+    but is not named `*__*.mp4`, so the candidate glob cannot mistake it for a clip."""
+    import threading as _threading
+    with tempfile.TemporaryDirectory() as base:
+        os.makedirs(os.path.join(base, "r1"))
+        cd = os.path.join(base, "_scratch", "cine_cand", "r1")
+        os.makedirs(cd)
+        for nm in ("base__keep.mp4", "base__bin.mp4"):
+            open(os.path.join(cd, nm), "wb").write(b"\0")
+        old_jobs, old_lock = hs.JOBS, hs.LOCK
+        hs.JOBS, hs.LOCK = {"s": {}}, _threading.Lock()
+        try:
+            hs._run_cine_delete("s", base, "r1", "base", "bin")
+            assert not hs.JOBS["s"].get("error"), hs.JOBS["s"].get("error")
+        finally:
+            hs.JOBS, hs.LOCK = old_jobs, old_lock
+        assert hs._cine_dismissed(base, "r1") == {"base": ["bin"]}
+        # the ledger must not read as a candidate
+        assert [c["tag"] for c in hs._room_clips(base, "r1")[0]["candidates"]] == ["keep"]
+        # and dismissing twice is idempotent rather than duplicating the tag
+        hs._cine_dismiss(base, "r1", "base", "bin")
+        assert hs._cine_dismissed(base, "r1") == {"base": ["bin"]}
+
+
 def test_cine_delete_moves_rather_than_unlinks():
     """The x on a clip has to make the harness clean AND stay recoverable.
 

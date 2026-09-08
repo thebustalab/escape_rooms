@@ -2136,12 +2136,14 @@ def _cine_candidates(base, room_key, state):
             live = (json.load(open(cj, encoding="utf-8")) or {}).get("tag")
         except Exception:  # noqa: BLE001
             live = None
+    seen = set((_cine_reviewed(base, room_key).get(state) or []))
     out = []
     for f in glob.glob(os.path.join(d, "%s__*.mp4" % state)):
         tag = os.path.basename(f)[len(state) + 2:-len(".mp4")]
         out.append({"tag": tag,
                     "file": os.path.relpath(f, base),
                     "mtime": int(os.path.getmtime(f)),
+                    "reviewed": tag in seen,
                     "live": tag == live})
     out.sort(key=lambda c: -c["mtime"])
     return out
@@ -2204,6 +2206,7 @@ def _room_clips(base, room_key, doc=None):
                 raw = False
         out.append({"state": state, "file": "%s/%s" % (room_key, name),
                     "patches": patches, "mask": mask, "raw": raw,
+                    "reviewed": "" in (_cine_reviewed(base, room_key).get(state) or []),
                     "candidates": _cine_candidates(base, room_key, state),
                     "still": _state_still_rel(base, room_key, state, doc)})
     # A STATE WITH CANDIDATES BUT NO COMMITTED CLIP MUST STILL APPEAR. This loop is driven by
@@ -2222,7 +2225,7 @@ def _room_clips(base, room_key, doc=None):
                 pending.add(st)
         for st in sorted(pending):
             out.append({"state": st, "file": None, "pending": True,
-                        "patches": [], "mask": {},
+                        "patches": [], "mask": {}, "raw": False, "reviewed": False,
                         "candidates": _cine_candidates(base, room_key, st),
                         "still": _state_still_rel(base, room_key, st, doc)})
     out.sort(key=lambda c: (c["state"] != "base", c["state"]))   # base first, then variants
@@ -2243,7 +2246,10 @@ def _room_clips(base, room_key, doc=None):
         if c.get("video") and c.get("box") == [0, 0, 1, 1]:
             live[c.get("state") or "base"] = c["video"]
     for c in out:
-        c["served"] = live.get(c["state"]) == c["file"]
+        # `bool(c["file"])` FIRST. A pending state carries `file: None`, and a state with no carrier
+        # gives `live.get(...) == None`, so the comparison was None == None -> True and a room whose
+        # candidates had never been promoted advertised itself as "served in play" (Lucas, 2026-09-08).
+        c["served"] = bool(c["file"]) and live.get(c["state"]) == c["file"]
     return out
 
 
@@ -2649,6 +2655,88 @@ def _clear_raw(base, room, state):
         json.dump(d, open(cj, "w", encoding="utf-8"), indent=1)
 
 
+def _cine_reviewed_path(base, room_key):
+    """`_scratch/cine_cand/<room>/reviewed.json` — {state: [tag, ...]} of clips already looked at.
+
+    An empty-string tag means the room's COMMITTED clip for that state; any other tag is a candidate.
+    One ledger per room covers both, because the question the reviewer is asking is the same one:
+    "have I already looked at this?"
+
+    WHY IT EXISTS. With three seeds per room landing in a pool while other rooms render, a folded room
+    is indistinguishable from a folded room that has just gained two new clips. Lucas, 2026-09-08:
+    "can the folded lines get a pill if there are unreviewed clips in them ... That way I can see where
+    new ones are landing."
+
+    Not named `*__*.mp4`, so `_cine_candidates`' glob cannot mistake it for a candidate.
+    """
+    return os.path.join(_cine_cand_dir(base, room_key), "reviewed.json")
+
+
+def _cine_reviewed(base, room_key):
+    p = _cine_reviewed_path(base, room_key)
+    if not os.path.isfile(p):
+        return {}
+    try:
+        d = json.load(open(p, encoding="utf-8"))
+        return d if isinstance(d, dict) else {}
+    except Exception:  # noqa: BLE001
+        return {}
+
+
+def _cine_set_reviewed(base, room_key, state, tag, on):
+    """Mark (or unmark) one clip reviewed. `tag` "" is the committed clip for that state."""
+    d = _cine_reviewed(base, room_key)
+    tags = d.setdefault(state, [])
+    if on and tag not in tags:
+        tags.append(tag)
+    if not on and tag in tags:
+        tags.remove(tag)
+    if not tags:
+        d.pop(state, None)
+    p = _cine_reviewed_path(base, room_key)
+    os.makedirs(os.path.dirname(p), exist_ok=True)
+    json.dump(d, open(p, "w", encoding="utf-8"), indent=1)
+
+
+def _cine_dismissed_path(base, room_key):
+    """Ledger of candidate tags retired by hand: `_scratch/cine_cand/<room>/dismissed.json`.
+
+    WHY A LEDGER AND NOT JUST THE ABSENCE OF THE FILE. Lucas, 2026-09-08: "when there are new
+    candidates are the previously dismissed ones being re-added to the list? They should not be." They
+    were. `stage_candidates.py --from-exp` re-copies every render it finds in the experiment directory,
+    and the re-roll batch calls it after each room — so a candidate deleted in the harness reappeared
+    on the next staging pass, because the render it was staged FROM is still sitting on disk and always
+    will be. Deleting the copy could never be enough.
+
+    It lives inside the candidate directory (so it travels with the pool) but is not named `*__*.mp4`,
+    so `_cine_candidates`' own glob cannot pick it up as a candidate.
+    """
+    return os.path.join(_cine_cand_dir(base, room_key), "dismissed.json")
+
+
+def _cine_dismissed(base, room_key):
+    """{state: [tag, ...]} of hand-retired candidates. Missing or corrupt reads as nothing dismissed."""
+    p = _cine_dismissed_path(base, room_key)
+    if not os.path.isfile(p):
+        return {}
+    try:
+        d = json.load(open(p, encoding="utf-8"))
+        return d if isinstance(d, dict) else {}
+    except Exception:  # noqa: BLE001
+        return {}
+
+
+def _cine_dismiss(base, room_key, state, tag):
+    """Record one tag as dismissed for this (room, state), idempotently."""
+    d = _cine_dismissed(base, room_key)
+    tags = d.setdefault(state, [])
+    if tag not in tags:
+        tags.append(tag)
+    p = _cine_dismissed_path(base, room_key)
+    os.makedirs(os.path.dirname(p), exist_ok=True)
+    json.dump(d, open(p, "w", encoding="utf-8"), indent=1)
+
+
 def _cine_trash(base, room_key):
     """Where deleted clips and candidates go: `_scratch/cine_deleted/<room>/`.
 
@@ -2684,6 +2772,8 @@ def _run_cine_delete(slot, base, room, state, tag=None):
             if not os.path.isfile(src):
                 raise ValueError("no candidate %r for %s/%s" % (tag, room, state))
             shutil.move(src, os.path.join(trash, "%s__%s.%s.mp4" % (state, tag, stamp)))
+            # Record it, or the next `stage_candidates.py --from-exp` pass copies it straight back in.
+            _cine_dismiss(base, room, state, tag)
             moved.append(tag)
         else:
             rd = os.path.join(base, room)
@@ -4868,6 +4958,24 @@ class H(http.server.SimpleHTTPRequestHandler):
                                                          pace), 1):
                     return self._json({"ok": False, "error": "this clip is already rebuilding"}, 409)
                 return self._json({"ok": True, "slot": slot})
+            if route == "/api/cine-reviewed":    # tick/untick "I have looked at this one"
+                req = self._body()
+                try:
+                    base = _scenario_base(req.get("chapter"), req.get("scenario"))
+                except ValueError as ve:
+                    return self._json({"ok": False, "error": str(ve)}, 400)
+                room = re.sub(r"[^A-Za-z0-9_]", "", str(req.get("room") or ""))
+                state = re.sub(r"[^A-Za-z0-9_]", "", str(req.get("state") or "base"))
+                tag = re.sub(r"[^A-Za-z0-9_.-]", "", str(req.get("tag") or ""))
+                if not room:
+                    return self._json({"ok": False, "error": "need a room"}, 400)
+                # Synchronous: it writes one small JSON file and touches no video, so a job slot would
+                # only add a poll round-trip to a tick box.
+                try:
+                    _cine_set_reviewed(base, room, state, tag, bool(req.get("reviewed")))
+                except Exception as e:  # noqa: BLE001
+                    return self._json({"ok": False, "error": str(e)[-300:]}, 500)
+                return self._json({"ok": True})
             if route == "/api/cine-delete":      # retire a candidate, or the committed clip itself
                 req = self._body()
                 try:
