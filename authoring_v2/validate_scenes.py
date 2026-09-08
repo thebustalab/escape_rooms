@@ -110,6 +110,37 @@ def check_scenario(path):
         committed = {h.get("id"): h for h in (r.get("hotspots") or []) if isinstance(h, dict) and h.get("id")}
         dial_keys = {h.get("key") for h in planned.values() if h.get("type") == "dial" and h.get("key")}
 
+        # ---- PLANNED HOTSPOT WITH NO SPEC ELEMENT (added 2026-09-07) ----
+        # `place_hotspots.py` matches a planned hotspot to a spec element BY LABEL SLUG. A planned entry
+        # whose label matches nothing in the spec therefore gets NO BOX, silently — the run reports
+        # "no spec element matched" in its log and carries on, and the room ends up short of hotspots
+        # with every other check green. That is exactly how `networks/subway` lost every train door and
+        # ten clues at once when its stations were split: the ART was always right, because the prompt
+        # is derived from the spec elements; it was the separate hand-kept plannedHotspots list that
+        # drifted. Cheap to check here, and it is the only place that compares the two lists.
+        #
+        # `noElement: true` on a planned hotspot is the honest opt-out, for something that is genuinely
+        # not an object in the still (subway's ghost-station "sighting", live only during a ride).
+        spec_labels = {slug(e.get("label")) for e in els if e.get("label")}
+        for sl, h in planned.items():
+            if not sl or h.get("noElement"):
+                continue
+            if sl in spec_labels:
+                continue
+            # Calibration matters here or the check is noise. On a room that is ALREADY BUILT the
+            # planned list is largely historical — the boxes were placed long ago and live in
+            # `hotspots` — so a stale planned entry is worth a word, not a gate. It is a FAIL only
+            # where it can still do damage: a room whose art has not been committed yet, which is
+            # exactly when place_hotspots is about to run and silently skip it.
+            msg = (f"{rk}: plannedHotspot '{h.get('label')}' matches no spec element label — "
+                   f"place_hotspots keys on the label, so this one gets NO BOX. Rename it to the "
+                   f"element's label, add the element, or set noElement:true if it is deliberately "
+                   f"not in the picture.")
+            if r.get("built") or sl in {slug(c.get("label")) for c in committed.values()}:
+                warns.append(msg)
+            else:
+                fails.append(msg)
+
         if not str(spec.get("seam") or "").strip():
             warns.append(f"{rk}: no `seam` set — the L/R wrap has no named backdrop to join on")
 

@@ -201,11 +201,39 @@
   #tabs button { border-radius:8px 8px 0 0; border-bottom-color:transparent; padding:6px 14px; }
   #tabs button.on { background:var(--panel); border-color:var(--line); border-bottom-color:var(--panel);
                     color:var(--amber); font-weight:600; }
+  .pill.ok { color:#0d1b12; background:var(--green); border-color:var(--green); font-weight:600; }
   .pane { display:none; } .pane.on { display:block; }
+  /* Room folding (Lucas, 2026-09-06). A scenario is a long scroll of 3072px panoramas; once a room is
+     settled its section is just distance between you and the rooms that still need you. Boxes are
+     positioned in PERCENTAGES, so a folded section costs nothing to reopen — the geometry is correct
+     while hidden. */
+  .room.folded > .roomsec { display:none; }
+  .room.justfolded > .roomhd { outline:2px solid var(--green); outline-offset:2px; border-radius:6px;
+                               transition:outline-color .6s; }
+  .room > .roomhd { cursor:pointer; user-select:none; }
+  .foldarrow { display:inline-block; width:1em; opacity:.65; transition:transform .12s; }
+  .room.folded .foldarrow { transform:rotate(-90deg); }
+  .room.folded > .roomhd { opacity:.72; }
   .shot video { width:100%; display:block; border-radius:8px; border:1px solid var(--blue); background:#050a0e; }
   .noclip { padding:18px; text-align:center; border:1px dashed var(--line); border-radius:8px; color:var(--dim); }
   /* Loop blip: a black square that flashes at the wrap so you can SEE where the join is. Drawn over the
      video by the review UI, never baked into the clip — the shipped file stays clean. */
+  /* CANDIDATE CLIPS. Every candidate gets the identical card and the identical button, including the
+     one currently committed — Lucas, 2026-09-08, on the stills and hotspots panes: the committed item
+     arriving with a different menu from its siblings "just slightly complicates the interaction". So
+     `live` is a MARKER on an otherwise identical card, never a different control set. */
+  /* The little x sits OVER the video's top-right corner rather than in the caption, because the whole
+     point is to kill a bad clip the moment you see it without hunting for its row. */
+  .cwrap { position:relative; }
+  .cdel { position:absolute; top:6px; right:6px; z-index:10; width:22px; height:22px; line-height:20px;
+          text-align:center; border-radius:4px; cursor:pointer; font-size:14px; font-weight:600;
+          background:rgba(0,0,0,.62); color:#ff9c9c; border:1px solid rgba(255,156,156,.5); padding:0; }
+  .cdel:hover { background:#ff9c9c; color:#000; border-color:#ff9c9c; }
+  .cands { display:flex; gap:10px; overflow-x:auto; padding:10px 0 2px; }
+  .cand { flex:0 0 320px; }
+  .cand video { width:100%; display:block; border-radius:6px; border:1px solid var(--line); background:#050a0e; }
+  .cand.live video { border-color:var(--green); }
+  .candcap { display:flex; align-items:center; gap:6px; padding-top:4px; font-size:11px; color:var(--dim); }
   .vwrap { position:relative; }
   .vwrap .blip { position:absolute; left:10px; top:10px; width:44px; height:44px; background:#000;
                  border:1px solid rgba(255,255,255,.35); opacity:0; transition:opacity .05s; pointer-events:none; }
@@ -252,6 +280,25 @@
   .vwrap .patch span { position:absolute; top:-17px; left:0; font-size:10px; font-weight:700;
                        color:#ff9c9c; background:rgba(6,17,26,.85); padding:0 4px; border-radius:3px;
                        white-space:nowrap; }
+  /* PAINT-OUT: hand-drawn pins. The two mask sliders both SELECT FOR MOTION, so neither can remove one
+     specific unwanted mover without removing the wanted one first (canon: the churning codex at p95 32.9
+     against the dust at 4.3). Drawing the rectangle is the only thing that can, and it is bake-time —
+     no GPU. The layer sits ABOVE the mask overlay so you draw on what you are actually looking at, and
+     it only takes pointer events while paint mode is on: otherwise it would eat clicks meant for the
+     patch drop buttons. */
+  .vwrap .paint { position:absolute; inset:0; z-index:4; display:none; cursor:crosshair;
+                  touch-action:none; }
+  .vwrap.painting .paint { display:block; }
+  .vwrap .pbox { position:absolute; border:2px solid var(--amber); border-radius:3px;
+                 background:rgba(255,176,64,.16); box-shadow:0 0 0 1px rgba(0,0,0,.6); }
+  /* The in-progress rectangle, before the pointer is lifted. Dashed so a half-drawn box never reads as
+     a committed one. */
+  .vwrap .pbox.draft { border-style:dashed; background:rgba(255,176,64,.09); }
+  .vwrap .pbox button { position:absolute; top:2px; right:2px; padding:0 5px; font-size:11px;
+                        line-height:1.5; background:rgba(6,17,26,.9); }
+  .vwrap .pbox span { position:absolute; top:-17px; left:0; font-size:10px; font-weight:700;
+                      color:var(--amber); background:rgba(6,17,26,.85); padding:0 4px;
+                      border-radius:3px; white-space:nowrap; }
 </style>
 </head>
 <body>
@@ -273,13 +320,7 @@
       <button id="play" title="Open this scenario in NORMAL play mode (a student's view — no test tools) over the :8055 playtest server">▶ Play</button>
       <span class="status" id="topStat"></span>
     </div>
-    <div class="tbrow">
-      <span class="hint" style="white-space:nowrap">push changes (Mac terminal):</span>
-      <pre id="pushCmds" style="margin:0; flex:1; min-width:0; font:12px/1.5 ui-monospace,Menlo,Consolas,monospace; background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:6px 10px; white-space:pre; overflow:auto">cd ~/Documents/Tools/websites/thebustalab.github.io/escape_rooms
-git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
-      <button id="copyPush" title="Copy these commands"
-        onclick="navigator.clipboard&&navigator.clipboard.writeText(document.getElementById('pushCmds').textContent);this.textContent='Copied ✓';setTimeout(()=>this.textContent='Copy',1200)">Copy</button>
-    </div>
+    <!-- The "push changes (Mac terminal)" row was removed 2026-09-07 (Lucas). -->
   </div>
 
   <div id="tabs">
@@ -290,10 +331,9 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
          or move a box after its clip exists and the clip carries the old image. Hence: art, then boxes,
          then the states that sit in those boxes, then the motion, last. -->
     <button data-tab="concept" class="on">1. Concept &amp; world</button>
-    <button data-tab="art">2. Still art</button>
-    <button data-tab="hotspots">3. Hotspots</button>
-    <button data-tab="variants">4. Variants</button>
-    <button data-tab="baked">5. Cinemagraphs</button>
+    <button data-tab="art">2. Still art &amp; hotspots</button>
+    <button data-tab="variants">3. Variants</button>
+    <button data-tab="baked">4. Cinemagraphs</button>
   </div>
 
   <div class="pane on" id="pane-concept">
@@ -312,6 +352,24 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
       <br>Gate before tab 2 (the harness will not generate art without it):
       <b style="color:var(--fg)">python3 authoring_v2/preflight.py &lt;chapter&gt;/&lt;scenario&gt;</b>
     </div>
+    <!-- THE WORLD PLATE IS THE FIRST CARD (Lucas, 2026-09-07). It is the asset every room's art is
+         generated THROUGH, so it is the thing to settle before anything below it — and it was last on
+         a tab you have to scroll. Full width, because it is a 3072x1024 panorama. -->
+    <!-- The world plate at FULL WIDTH, like everything in the art tab. It is a 3072x1024 panorama and
+         the one asset every room's art is generated through, so judging it from a 44-px thumbnail was
+         backwards (Lucas, 2026-08-31). The committed plate sits on top, green-framed like a committed
+         still; the candidates follow at the same size, each click-to-commit. -->
+    <div id="platePanel" style="display:none"><div class="storyblk">
+      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap">
+        <div class="storylbl" style="margin:0">World plate · the shared backdrop</div>
+        <button onclick="viewWorldPrompt()">view prompt</button>
+        <button onclick="genPlate()">Generate plates ×2</button>
+        <span class="status" id="plateStat"></span>
+      </div>
+      <div id="plateShot"></div>
+      <div id="plateGrid"></div>
+    </div></div>
+
     <!-- FOUR CARDS (Lucas, 2026-09-01): opening + cover side by side at equal width and height, then
          the network full width, then the plate full width. `flex:1 1 0` — not a px basis — is what makes
          the top two the SAME width rather than "whichever wants more space gets it"; `align-items:
@@ -339,32 +397,9 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
         <div id="netWrap"><svg id="netSvg"></svg><div id="netTip"></div></div>
       </div></div>
     </div>
-    <!-- THE PLAYBOOK (Lucas, 2026-09-03). A full written walkthrough of how the scenario actually
-         plays, DERIVED from scenario.json rather than authored — so it cannot go stale, and a room with
-         no designNote or a hotspot with no note shows up as a visible hole. That is the point: read it
-         alongside the network to hold the whole scenario in your head and spot the gaps. -->
-    <div id="playbookPanel" style="display:none; margin-top:14px"><div class="storyblk">
-      <div style="display:flex; align-items:baseline; gap:10px; flex-wrap:wrap">
-        <div class="storylbl" style="margin:0">Playbook · how this scenario plays</div>
-        <span class="hint" id="pbStat"></span>
-      </div>
-      <div id="pbBody" class="pb"></div>
-    </div></div>
-
-    <!-- The world plate at FULL WIDTH, like everything in the art tab. It is a 3072x1024 panorama and
-         the one asset every room's art is generated through, so judging it from a 44-px thumbnail was
-         backwards (Lucas, 2026-08-31). The committed plate sits on top, green-framed like a committed
-         still; the candidates follow at the same size, each click-to-commit. -->
-    <div id="platePanel" style="display:none; margin-top:12px"><div class="storyblk">
-      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap">
-        <div class="storylbl" style="margin:0">World plate · the shared backdrop</div>
-        <button onclick="viewWorldPrompt()">view prompt</button>
-        <button onclick="genPlate()">Generate plates ×2</button>
-        <span class="status" id="plateStat"></span>
-      </div>
-      <div id="plateShot"></div>
-      <div id="plateGrid"></div>
-    </div></div>
+    <!-- The Playbook panel was REMOVED from this tab (Lucas, 2026-09-07) — he does not read it here.
+         `renderPlaybook()` is left in place and simply has nothing to draw into; restore the panel if
+         it is ever wanted back. -->
   </div>
 
   </div><!-- /pane-concept -->
@@ -372,11 +407,14 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
   <!-- STAGE 1 — the gpt-image-2 stills. Flat scroll: room by room, base art then its variants, then any
        candidate not yet committed. -->
   <div class="pane" id="pane-art">
-    <div style="margin-top:16px; display:flex; align-items:baseline; gap:12px; flex-wrap:wrap">
-      <h2 style="font-size:14px; margin:0">Stage 1 art — the stills, room by room</h2>
-      <span class="status" id="galStat"></span>
-      <label class="hint" style="cursor:pointer"><input type="checkbox" id="showCands" checked style="vertical-align:-2px"> show uncommitted candidates</label>
-    </div>
+    <!-- Header stripped 2026-09-07 (Lucas: "I don't ever use those things"). The tallies, the two
+         checkboxes and the drag hint are gone; the rooms start straight away. Both checkboxes are kept
+         as HIDDEN inputs because the render paths read `.checked` — candidates always show, labels
+         always draw, and no code had to learn a new shape. -->
+    <input type="checkbox" id="showCands" checked hidden>
+    <input type="checkbox" id="hsLabels" checked hidden>
+    <span class="status" id="galStat" hidden></span>
+    <span class="status" id="hsStat" hidden></span>
     <div id="gallery"></div>
   </div>
 
@@ -403,16 +441,6 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
   <!-- Native-resolution seam view, opened from any seam panel. One element for the whole page. -->
   <div id="seamZoom" onclick="this.style.display='none'">
     <div class="zcap"></div><canvas></canvas>
-  </div>
-
-  <div class="pane" id="pane-hotspots">
-    <div style="margin-top:16px; display:flex; align-items:baseline; gap:12px; flex-wrap:wrap">
-      <h2 style="font-size:14px; margin:0">Hotspots — placement, room by room</h2>
-      <span class="status" id="hsStat"></span>
-      <label class="hint" style="cursor:pointer"><input type="checkbox" id="hsLabels" checked style="vertical-align:-2px"> labels</label>
-      <span class="hint">drag a box to move it · corner to resize · arrow keys nudge the selected box (shift = ×5) · save from the header</span>
-    </div>
-    <div id="hotspots"></div>
   </div>
 
   <!-- VARIANTS — every alternate state of a room's art, each one paired with the base it was made FROM.
@@ -459,6 +487,41 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
     (w.solved ? `once <b>${esc(w.solved)}</b> is solved` :
       (w.eq ? `when <b>${esc(w.eq[0])}</b> = <b>${esc(w.eq[1])}</b>` : esc(JSON.stringify(w)))));
 
+  // ---- WHERE YOU WERE (Lucas, 2026-09-08) --------------------------------------------------------
+  // A reload used to drop you on tab 1 of whichever scenario the SERVER thought was active, which is
+  // whatever it was launched with rather than what you picked. The state lives in the URL (so reload,
+  // back/forward and a bookmark all work, and a link to "subway, cinemagraphs" is shareable) with
+  // localStorage as a fallback for a bare URL with no query on it.
+  //
+  // `replaceState`, not `pushState`: switching tab is not navigation, and filling the back stack with
+  // tab flips would make the back button useless for actually leaving the page.
+  const VKEY = "bw2_view";
+  function rememberView() {
+    const tab = (document.querySelector("#tabs button.on") || {}).dataset;
+    const q = new URLSearchParams();
+    if (CH) q.set("chapter", CH);
+    if (SC) q.set("scenario", SC);
+    if (tab && tab.tab) q.set("tab", tab.tab);
+    try {
+      history.replaceState(null, "", location.pathname + "?" + q.toString());
+      localStorage.setItem(VKEY, q.toString());
+    } catch (e) { /* private mode, or a file:// origin — the URL still carries it */ }
+  }
+  function wantedView() {
+    const fromUrl = new URLSearchParams(location.search);
+    if (fromUrl.get("chapter") || fromUrl.get("tab")) return fromUrl;
+    try { return new URLSearchParams(localStorage.getItem(VKEY) || ""); }
+    catch (e) { return new URLSearchParams(); }
+  }
+  function showTab(name) {
+    const btn = document.querySelector(`#tabs button[data-tab="${CSS.escape(name || "")}"]`);
+    if (!btn) return false;              // a tab that no longer exists must not blank the console
+    document.querySelectorAll("#tabs button").forEach(x => x.classList.toggle("on", x === btn));
+    document.querySelectorAll(".pane").forEach(p => p.classList.toggle("on", p.id === "pane-" + name));
+    fitSticky();
+    return true;
+  }
+
   async function loadScenarios() {
     const r = await getj("/api/scenarios");
     const sel = $("#scenPick"); sel.innerHTML = "";
@@ -468,13 +531,24 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
       sel.appendChild(o);
     });
     const act = r.active || {};
-    sel.value = (act.chapter && act.scenario) ? act.chapter + "/" + act.scenario : (sel.options[0] && sel.options[0].value) || "";
+    const want = wantedView();
+    // Only honour a remembered scenario that STILL EXISTS in the list — a renamed or retired scenario
+    // would otherwise leave the picker on a value with no option, which reads as "nothing loaded".
+    const remembered = (want.get("chapter") && want.get("scenario"))
+      ? want.get("chapter") + "/" + want.get("scenario") : "";
+    const has = v => v && Array.from(sel.options).some(o => o.value === v);
+    sel.value = has(remembered) ? remembered
+      : ((act.chapter && act.scenario && has(act.chapter + "/" + act.scenario))
+         ? act.chapter + "/" + act.scenario
+         : (sel.options[0] && sel.options[0].value) || "");
+    if (want.get("tab")) showTab(want.get("tab"));
     LASTPICK = sel.value;        // what the picker reverts to if a switch is declined over unsaved edits
     onScenario();
   }
   let ST = null;
   function onScenario() {
     const v = $("#scenPick").value || ""; [CH, SC] = v.split("/");
+    rememberView();
     refresh();
   }
 
@@ -490,12 +564,10 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
     renderLanding(st);
     await renderVariants(st);
     renderNetwork(st.rooms || []);
-    await renderPlaybook();
     renderPlate(st);
     renderCover(st);
     await renderGallery(st);
     renderBaked(st);
-    await renderHotspots(st);
     $("#topStat").textContent = "";
   }
 
@@ -1037,44 +1109,18 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
   const hsMoved = (room, h) => (HSB[room] || {})[h.uid] !== h.box.join(",");
   const hsDirtyRooms = () => Object.keys(HSW).filter(k => (HSW[k] || []).some(h => hsMoved(k, h)));
 
-  async function renderHotspots(st) {
-    const host = $("#hotspots");
-    HSW = {}; HSB = {}; HSSEL = null;
-    let doc = null;
-    try { doc = await getj(`/api/scenario?chapter=${encodeURIComponent(CH)}&scenario=${encodeURIComponent(SC)}`); }
-    catch (e) { doc = null; }
-    const nodes = (doc && doc.rooms) || [];
-    const byKey = {}; nodes.forEach(n => (byKey[n.key] = n));
-
-    const rooms = (st.rooms || []).filter(r => r.built);   // no still, nothing to place a box on
-    HSROOMS = rooms.map(r => r.key);
-    host.innerHTML = rooms.map(r => {
-      const c = loadRoomBoxes(r.key, byKey[r.key] || {});
-      return `<div class="roomhd" data-room="${esc(r.key)}">
-          <span class="k">${esc(r.key)}</span>
-          <span style="opacity:.75">${esc(r.title || "")}</span>
-          <span class="hspills">${pillsHtml(c)}</span>
-        </div>
-        <div class="shot">
-          <div class="hsrow">
-            <span class="hscommit">${commitBtnHtml(r.key, c)}</span>
-            <a class="who" href="${hsEdit(r.key)}" target="_blank" rel="noopener">add / remove / author ↗</a>
-            <a class="who" href="${room360(r.key)}" target="_blank" rel="noopener">open in 360 ↗</a>
-            <span class="status" id="hscm-${esc(r.key)}"></span>
-            <span class="who" id="hssel-${esc(r.key)}"></span>
-          </div>
-          <div class="hsframe" data-room="${esc(r.key)}" tabindex="0">
-            <img loading="lazy" src="${sfile(r.key + "/scene.png")}">
-          </div>
-        </div>`;
-    }).join("");
-    if (!rooms.length) host.innerHTML = `<div class="hint" style="margin-top:12px">No built rooms yet — hotspots are drawn on committed art.</div>`;
-    rooms.forEach(r => drawBoxes(r.key));
+  // Was `renderHotspots`, which owned its own pane. Since the tabs merged (Lucas, 2026-09-06) the
+  // gallery emits the frames and this only DRAWS and BINDS over them — one renderer owning the markup
+  // is what stops the two views of a room disagreeing, the same reason box CONTENT still lives in the
+  // per-room editor and not here. Placement only: drag, resize, nudge. No create/delete/retype.
+  function wireHotspots() {
+    HSROOMS.forEach(k => drawBoxes(k));
     bindCommitButtons();
     hsLabelSync();
     hsStatSync();
     syncSave();
   }
+
   let HSROOMS = [];                       // built rooms, in order — what hsStatSync totals over
 
   // Rebuild ONE room's working copy from its scenario node. Split out of the render so a room can be
@@ -1102,13 +1148,19 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
     HSB[key] = Object.fromEntries(HSW[key].map(h => [h.uid, h.box.join(",")]));
     return { live: live.length, planned: planned.length, unplaced };
   }
-  const pillsHtml = c => `<span class="pill">${c.live} live</span>`
+  // Lucas, 2026-09-07: a room whose still has been picked was reporting "0 live" — a true statement
+  // about its HOTSPOTS, read as a complaint about the room. Until boxes exist the useful thing to say
+  // is that the picture is settled, so a chosen room leads with a green "image selected" and the live
+  // count only appears once there is a live count worth showing.
+  const pillsHtml = (c, chosen) =>
+      (chosen ? `<span class="pill ok">image selected</span>` : "")
+    + (c.live ? `<span class="pill">${c.live} live</span>` : (chosen ? "" : `<span class="pill">no boxes yet</span>`))
     + (c.planned ? `<span class="pill var">${c.planned} planned</span>` : "")
     + (c.unplaced ? `<span class="pill">${c.unplaced} unboxed</span>` : "");
   const commitBtnHtml = (key, c) => c.planned
     ? `<button data-commit="${esc(key)}" style="padding:2px 9px; font-size:12px">Commit ${c.planned} planned →</button>` : "";
   function bindCommitButtons() {
-    $("#hotspots").querySelectorAll("[data-commit]").forEach(
+    $("#gallery").querySelectorAll("[data-commit]").forEach(
       b => { b.onclick = () => commitPlanned(b.dataset.commit); });
   }
   function hsStatSync() {
@@ -1193,7 +1245,9 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
   // trackpad, a pen and a touchscreen all work, and setPointerCapture keeps the drag alive when the
   // cursor leaves the box — which it does constantly when you are dragging a box to the edge of a room.
   (function bindHotspotDrag() {
-    const pane = $("#pane-hotspots");
+    // The frames now live on the merged art pane (Lucas, 2026-09-06). Still bound ONCE to the pane
+    // rather than per box, for the reason above.
+    const pane = $("#pane-art");
     let drag = null;
     const clamp = v => Math.max(0, Math.min(1, v));
     pane.addEventListener("pointerdown", e => {
@@ -1303,6 +1357,11 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
   // `room360` is the wrap/seam hub, which is the only place a still is shown on the sphere at the
   // room's OWN wrap — a panorama judged flat is judged at the wrong shape.
   const room360 = key => `reproject_test.html?room=${encodeURIComponent(key)}&chapter=${encodeURIComponent(CH)}&scenario=${encodeURIComponent(SC)}`;
+  // A candidate gets the SAME 360 as a committed still (Lucas, 2026-09-06): `reproject_test` already
+  // had a draft mode (`img=<candidate>`) that shows an uncommitted file at the room's own wrap — the
+  // gallery simply never linked to it, so the one view that can actually judge a panorama was
+  // unreachable until after you had committed. Judging flat is judging at the wrong shape.
+  const draft360 = (key, file) => room360(key) + `&img=${encodeURIComponent(file)}`;
   const clip360 = (key, state) => `cine360_clip.html?chapter=${encodeURIComponent(CH)}&scenario=${encodeURIComponent(SC)}&room=${encodeURIComponent(key)}&state=${encodeURIComponent(state)}`;
 
   // The seam window that rides beside a still. `path` is the same image the still shows, so the two can
@@ -1336,10 +1395,10 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
     return `<span class="who" title="seam stage: ${stage}${worst}">${stage}${worst}</span>
       <button class="who acceptbtn${on ? " on" : ""}${flagged && !on ? " flagged" : ""}"
               onclick="toggleAccept('${esc(room)}', ${on ? "false" : "true"}, ${flagged})"
-              title="${on ? "accepted — click to clear (an accept certifies an IMAGE; clear it if the art changed)"
-                          : flagged ? "the seam stage flagged this one — accepting it anyway needs a written reason"
-                                    : "sign this still off. Nothing else can: metrics screen out, they cannot certify."}"
-      >${on ? "✓ accepted" : "accept"}</button>
+              title="${on ? "chosen — click to clear (a sign-off certifies an IMAGE; clear it if the art changed)"
+                          : flagged ? "the seam stage flagged this one — choosing it anyway needs a written reason"
+                                    : "choose this still. Nothing else can: metrics screen out, they cannot certify."}"
+      >${on ? "✓ chosen" : "use this one"}</button>
       ${on && seam.acceptedBy ? `<span class="who" style="opacity:.6">${esc(seam.acceptedBy)}</span>` : ""}
       ${seam.humanNote ? `<span class="who" style="opacity:.6" title="${esc(seam.humanNote)}">note</span>` : ""}`;
   }
@@ -1359,14 +1418,28 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
     refresh();          // same path commitCand/discardCand use — re-reads scenario-state
   }
 
-  function shot(label, who, path, exists, room, seam) {
+  // `boxes` (Lucas, 2026-09-06): draw this still INSIDE an `.hsframe` so its hotspot boxes overlay it,
+  // instead of on a separate tab. Everything else about the block is unchanged — same caption, same
+  // native/360 links, same accept badge, same seam panel — because the merge must not cost the art
+  // review anything it had. Only the base still of a BUILT room is ever boxed: boxes are fractions of
+  // the base panorama, and a variant or an uncommitted candidate has no boxes of its own.
+  // The per-room "add / remove / author ↗" link was removed 2026-09-07 (Lucas). `hsEdit()` and
+  // `hotspots_edit.html` are untouched — only the link is gone, so the editor is still reachable by URL.
+  function shot(label, who, path, exists, room, seam, boxes) {
+    const img = `<img loading="lazy" src="${sfile(path)}">`;
     return `<div class="shot">
       <div class="shotcap"><b>${esc(label)}</b><span class="who">${who}</span>
-        ${exists ? `<a class="who" href="${sfile(path)}" target="_blank" rel="noopener">native ↗</a>` : ""}
         ${exists && room ? `<a class="who" href="${room360(room)}" target="_blank" rel="noopener">open in 360 ↗</a>` : ""}
-        ${exists && seam !== undefined ? acceptBadge(room, seam) : ""}</div>
+        ${exists && seam !== undefined ? acceptBadge(room, seam) : ""}
+        ${exists && boxes ? `<button onclick="discardCommitted('${esc(room)}',this)" style="padding:2px 8px; font-size:12px; color:#ff9c9c">Discard</button><span class="status cstat"></span>` : ""}</div>
+      ${exists && boxes ? `<div class="hsrow">
+                    <span class="hscommit">${commitBtnHtml(room, boxes)}</span>
+                    <span class="status" id="hscm-${esc(room)}"></span>
+                    <span class="who" id="hssel-${esc(room)}"></span>
+                  </div>` : ""}
       ${exists ? `<div class="shotrow">
-                    <a class="main" href="${sfile(path)}" target="_blank" rel="noopener"><img loading="lazy" src="${sfile(path)}"></a>
+                    ${boxes ? `<div class="hsframe main" data-room="${esc(room)}" tabindex="0">${img}</div>`
+                            : `<a class="main" href="${sfile(path)}" target="_blank" rel="noopener">${img}</a>`}
                     ${seamPanel(path)}
                   </div>`
                : `<div class="missing">not generated yet</div>`}
@@ -1403,9 +1476,9 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
     const p = "_scratch/" + file;
     return `<div class="shot cand">
       <div class="shotcap"><b style="color:var(--green)">candidate</b>
-        <span class="who">${esc(file)} · not committed</span>
-        <a class="who" href="${sfile(p)}" target="_blank" rel="noopener">native ↗</a>
-        <button onclick="commitCand('${esc(room)}','${esc(file)}',this)" style="padding:2px 8px; font-size:12px">Commit as this room's art</button>
+        <span class="who">${esc(file)}</span>
+        <a class="who" href="${draft360(room, file)}" target="_blank" rel="noopener">open in 360 ↗</a>
+        <button onclick="commitCand('${esc(room)}','${esc(file)}',this)" style="padding:2px 8px; font-size:12px">Use this one</button>
         <button onclick="discardCand('${esc(room)}','${esc(file)}',this)" style="padding:2px 8px; font-size:12px; color:#ff9c9c">Discard</button>
         <span class="status cstat"></span></div>
       <div class="shotrow">
@@ -1414,18 +1487,81 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
       </div>
     </div>`;
   }
+  // ONE ACT, NOT TWO (Lucas, 2026-09-06). "Commit" and "accept" were separate buttons asking the same
+  // question twice — you had to make a candidate the room's art, and then separately sign that art off.
+  // Picking a candidate now does both: it IS the human looking at it and choosing it.
+  //
+  // ⚠️ THIS DOES NOT WEAKEN THE ACCEPT RULE, and the distinction is load-bearing. `authoring.seam.accepted`
+  // still means "a human looked at this image", and it is still set ONLY from this page. The overnight
+  // loop's own `commit_candidate` must NEVER set it — a still it commits stays `hold` for exactly this
+  // click. Metrics may auto-reject and must never auto-approve.
   async function commitCand(room, file, btn) {
     const st = btn.parentElement.querySelector(".cstat"); st.textContent = "committing…";
     const r = await post("/api/commit-room", { chapter: CH, scenario: SC, roomKey: room, image: file });
     if (!r.ok) { st.innerHTML = `<span class="err">${esc(r.error)}</span>`; return; }
-    st.innerHTML = `<span class="ok">committed ✓</span>`;
-    refresh();
+    st.textContent = "signing off…";
+    try {
+      const a = await post("/api/accept-still", { chapter: CH, scenario: SC, roomKey: room, accepted: true, note: "" });
+      if (!a.ok) { st.innerHTML = `<span class="err">committed, but sign-off refused: ${esc(a.error)}</span>`; return; }
+    } catch (e) { st.innerHTML = `<span class="err">committed, but sign-off failed: ${esc(String(e))}</span>`; return; }
+    st.innerHTML = `<span class="ok">chosen ✓</span>`;
+    // IN PLACE, NOT refresh() (Lucas, 2026-09-06). A page-wide re-render re-creates every <img> on a
+    // tab holding a dozen 3072x1024 panoramas — they all re-decode, and the scroll position is lost, so
+    // choosing one room threw you back to the top and made the whole page flash. The same reason the
+    // hotspot commit and the cinemagraph wiring already update their badges in place.
+    roomChosen(room, file);
   }
+
+  // Fold the room away and bring its header up to date, without touching anything else on the page.
+  function roomChosen(room, file) {
+    const sec = document.querySelector(`.room[data-room="${cssq(room)}"]`);
+    if (!sec) return;
+    // The base still IS the candidate now. Point the base <img> at the committed bytes with a
+    // cache-buster — same URL, new content — and drop the candidate blocks that produced it.
+    const baseImg = sec.querySelector(`.hsframe[data-room="${cssq(room)}"] img, .shot:not(.cand) .main img`);
+    if (baseImg) baseImg.src = sfile(room + "/scene.png") + "&t=" + Date.now();   // sfile always has a query
+    sec.querySelectorAll(".shot.cand").forEach(c => c.remove());
+    // the header must agree with the render path, or the pill only appears after a refresh
+    const pills = sec.querySelector(".hspills");
+    if (pills && !pills.querySelector(".pill.ok")) {
+      pills.querySelectorAll(".pill").forEach(p => { if (/\bno boxes yet\b/.test(p.textContent)) p.remove(); });
+      pills.insertAdjacentHTML("afterbegin", `<span class="pill ok">image selected</span>`);
+    }
+    const badge = sec.querySelector(".acceptbtn");
+    if (badge) { badge.classList.add("on"); badge.textContent = "✓ chosen";
+                 badge.setAttribute("onclick", `toggleAccept('${room}', false, false)`); }
+    sec.classList.add("folded");
+    // Scroll the collapsed header into view. Folding on choose is right, but with no feedback the room
+    // simply VANISHES — Lucas picked Saffron Hill and thought he had lost the candidate (2026-09-07).
+    // Landing on the folded bar shows where it went and that it says "chosen".
+    try { sec.scrollIntoView({ behavior: "smooth", block: "center" }); } catch (_) { sec.scrollIntoView(); }
+    sec.classList.add("justfolded");
+    setTimeout(() => sec.classList.remove("justfolded"), 1600);
+    syncSave();
+  }
+  // Discard the COMMITTED still (Lucas, 2026-09-07: "ideally they would all have a discard button in
+  // case I want to get rid of it"). Uses the same delete endpoint as a candidate, on the room's
+  // `builtFrom` file, then clears the room in place. Refuses when the still has been chosen — clear the
+  // sign-off first, so a signed-off image cannot vanish by a stray click.
+  async function discardCommitted(room, btn) {
+    const sec = btn.closest(".room");
+    if (sec && sec.querySelector(".acceptbtn.on")) {
+      alert("This still is chosen. Clear the sign-off first, then discard.");
+      return;
+    }
+    if (!confirm(`Discard the committed still for ${room}?`)) return;
+    const st = btn.parentElement.querySelector(".cstat"); st.textContent = "discarding…";
+    const r = await post("/api/discard-room-art", { chapter: CH, scenario: SC, roomKey: room });
+    if (!r.ok) { st.innerHTML = `<span class="err">${esc(r.error)}</span>`; return; }
+    st.innerHTML = `<span class="ok">discarded ✓</span>`;
+    refresh();          // the room changes shape (built -> not built), so this one DOES re-render
+  }
+
   async function discardCand(room, file, btn) {
     const st = btn.parentElement.querySelector(".cstat"); st.textContent = "discarding…";
     const r = await post("/api/delete-room-pano", { chapter: CH, scenario: SC, roomKey: room, image: file });
     if (!r.ok) { st.innerHTML = `<span class="err">${esc(r.error)}</span>`; return; }
-    refresh();
+    btn.closest(".shot.cand").remove();      // in place, for the same reason as choosing
   }
 
   async function renderGallery(st) {
@@ -1433,6 +1569,18 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
     const rooms = st.rooms || [];
     let vr = { variants: [] };
     try { vr = await getj(`/api/variants?chapter=${encodeURIComponent(CH)}&scenario=${encodeURIComponent(SC)}`); } catch (e) { /* gallery still shows bases */ }
+    // MERGED TAB (Lucas, 2026-09-06): the boxes are drawn on the art here rather than on a tab of
+    // their own, because the assessment he is making — is this art right — is easier with the boxes
+    // on it. So the gallery now owns the hotspot working copies too; `wireHotspots` below only draws
+    // and binds over the frames this emits.
+    HSW = {}; HSB = {}; HSSEL = null;
+    let doc = null;
+    try { doc = await getj(`/api/scenario?chapter=${encodeURIComponent(CH)}&scenario=${encodeURIComponent(SC)}`); }
+    catch (e) { doc = null; }
+    const byKey = {}; ((doc && doc.rooms) || []).forEach(n => (byKey[n.key] = n));
+    HSROOMS = rooms.filter(r => r.built).map(r => r.key);
+    const boxesOf = {};
+    HSROOMS.forEach(k => (boxesOf[k] = loadRoomBoxes(k, byKey[k] || {})));
     const byRoom = {};
     (vr.variants || []).forEach(v => (byRoom[v.room] = byRoom[v.room] || []).push(v));
     const showCands = $("#showCands").checked;
@@ -1448,20 +1596,34 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
       // the room was built from, so `builtFrom` still matches while the file is new art — which is the
       // art most in need of a look. Three of canyon's nine rooms were in exactly that state (2026-08-31).
       const cands = r.panoUncommitted || [];
-      return `<div class="roomhd">
+      const bx = boxesOf[r.key] || null;
+      // A room whose still has been CHOSEN folds itself: it is done, and the only reason to look at it
+      // again is deliberate. Everything still wanting a decision stays open.
+      const chosen = !!((r.seam || {}).accepted);
+      return `<div class="room${chosen ? " folded" : ""}" data-room="${esc(r.key)}">
+        <div class="roomhd" data-room="${esc(r.key)}">
+          <span class="foldarrow">▾</span>
           <span class="k">${esc(r.key)}</span>
           <span style="opacity:.75">${esc(r.title || "")}</span>
           ${r.built ? "" : `<span class="pill">no art yet</span>`}
           ${vs.length ? `<span class="pill var">${vs.length} variant${vs.length === 1 ? "" : "s"}</span>` : ""}
           ${r.cinemagraphs ? `<span class="pill">${r.cinemagraphs} cinemagraph${r.cinemagraphs === 1 ? "" : "s"}</span>` : ""}
-        </div>` +
-        shot("base", `${esc(r.key)}/scene.png`, `${r.key}/scene.png`, !!r.built, r.key, r.seam || {}) +
+          ${bx ? `<span class="hspills">${pillsHtml(bx, chosen)}</span>` : ""}
+        </div>
+        <div class="roomsec">` +
+        // LABELS (Lucas, 2026-09-07): they are ALL candidates until one is picked, full stop —
+        // "candidate · in place" was still drawing a distinction he does not make. The committed
+        // still reads `candidate` like the rest and only becomes `chosen` when it is signed off.
+        shot(chosen ? "chosen" : "candidate",
+             `${esc(r.key)}/scene.png`, `${r.key}/scene.png`, !!r.built, r.key, r.seam || {}, bx) +
         vs.map(v => shot(v.state,
                          `${esc(v.panorama || "—")} · ${v.fullScene ? "full scene" : "boxed"} · ${whenText(v.when, v.whenLabel)}`,
                          v.panorama, !!v.exists, r.key)).join("") +
-        (showCands ? cands.map(f => cand(r.key, f)).join("") : "");
+        (showCands ? cands.map(f => cand(r.key, f)).join("") : "") +
+        `</div></div>`;
     }).join("");
     if (!rooms.length) host.innerHTML = `<div class="hint" style="margin-top:12px">This scenario has no rooms yet.</div>`;
+    wireHotspots();
   }
 
   // ---- baked cinemagraphs --------------------------------------------------------------------------
@@ -1505,6 +1667,31 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
   // Wire this room's baked clips onto carriers so the player plays them instead of the still. Updates the
   // badges IN PLACE for the same reason the hotspot commit does — this pane is a long scroll of decoding
   // videos, and a page-wide refresh() would tear every one of them down and lose your place.
+  // ONE poller for every clip job — mask commit, paint commit, pace, candidate promote. Each of these
+  // had its own copy of the same setInterval, which is why the bar is added here rather than four
+  // times. `done`/`total` and `stage` come straight off the job record; a re-bake reports five stages
+  // (patches, brightness, mask, bake+seam, pace) so the bar is real rather than decorative.
+  function runJob(slot, statEl, shot) {
+    const bar = shot ? shot.querySelector(".bakebar") : null;
+    const stg = shot ? shot.querySelector(".bakestage") : null;
+    if (bar) { bar.style.display = ""; bar.value = 0; }
+    return new Promise(resolve => {
+      const poll = setInterval(async () => {
+        let st;
+        try { st = await getj(`/api/status?slot=${encodeURIComponent(slot)}`); }
+        catch (e) { return; }                       // a dropped poll is not a failure; try again
+        if (bar && st.total) { bar.max = st.total; bar.value = st.done || 0; }
+        if (stg && st.stage) stg.textContent = st.stage;
+        if (st.active) return;
+        clearInterval(poll);
+        if (bar) { bar.value = bar.max; setTimeout(() => { bar.style.display = "none"; }, 400); }
+        if (stg) stg.textContent = "";
+        if (st.error) { statEl.innerHTML = `<span class="err">${esc(st.error)}</span>`; resolve(false); return; }
+        resolve(true);
+      }, 700);
+    });
+  }
+
   async function serveClips(room) {
     const out = $(`#hssrv-${cssq(room)}`);
     out.textContent = "wiring…";
@@ -1537,8 +1724,11 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
     const host = $("#baked");
     const rooms = st.rooms || [];
     const total = rooms.reduce((n, r) => n + (r.clips || []).length, 0);
-    $("#bakedStat").innerHTML = total
+    const candTotal = rooms.reduce((n, r) => n + (r.clips || []).reduce((m, c) => m + (c.candidates || []).length, 0), 0);
+    $("#bakedStat").innerHTML = (total || candTotal)
       ? `${total} clip${total === 1 ? "" : "s"} across ${rooms.filter(r => (r.clips || []).length).length} room(s)`
+        + (candTotal ? ` · ${candTotal} candidate${candTotal === 1 ? "" : "s"} in the pools` : "")
+        + ` · click a room header to fold it`
       : `no clips baked yet`;
     host.innerHTML = rooms.map(r => {
       const clips = r.clips || [];
@@ -1546,7 +1736,20 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
       // test play falls back to the still and nothing says why (canyon: nine reviewed clips, none wired).
       // The badge and the button make that state visible and fixable where the clip is reviewed.
       const unserved = clips.filter(c => !c.served).length;
-      return `<div class="roomhd">
+      // FOLDED, on the same rule as the stills tab: a room folds when it wants nothing from you.
+      // Two cases qualify here — every clip already served in play (done), and no clip and no
+      // candidate either (nothing to look at). A subway scenario is 22 rooms and most of them are
+      // currently the second case, so without this the tab is mostly a scroll of "not baked".
+      // Anything holding a candidate, an unserved clip or a raw promote stays OPEN.
+      // `!clips.length` is sufficient for "nothing to see": `_room_clips` emits a PENDING entry for any
+      // state that has candidates but no committed clip, so a room holding an unpromoted pool always
+      // has a clip row. Checking a `r.candidates` that does not exist would have read as true always.
+      const nothingToSee = !clips.length;
+      const settled = clips.length && !unserved && !clips.some(c => c.raw);
+      const folded = nothingToSee || settled;
+      return `<div class="room${folded ? " folded" : ""}" data-room="${esc(r.key)}">
+        <div class="roomhd" data-room="${esc(r.key)}">
+          <span class="foldarrow">▾</span>
           <span class="k">${esc(r.key)}</span>
           <span style="opacity:.75">${esc(r.title || "")}</span>
           ${clips.length ? `<span class="pill var">${clips.length} clip${clips.length === 1 ? "" : "s"}</span>`
@@ -1555,47 +1758,134 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
           ${unserved ? `<span class="pill" style="color:#ff9c9c; border-color:#ff9c9c">${unserved} not served</span>
                         <button data-serve="${esc(r.key)}" style="padding:2px 9px; font-size:12px">Serve ${unserved} in play →</button>
                         <span class="status" id="hssrv-${esc(r.key)}"></span>` : ""}
-        </div>` +
-        (clips.length ? clips.map(c => `<div class="shot">
+        </div>
+        <div class="roomsec">` +
+        (clips.length ? clips.map(c => !c.file ? `<div class="shot">
+            <div class="shotcap"><b>${esc(c.state)}</b>
+              <span class="pill" style="color:#ffd479; border-color:#ffd479">no clip chosen yet</span>
+              <span class="who">${(c.candidates || []).length} candidate${(c.candidates || []).length === 1 ? "" : "s"} in the pool \u2014 pick one with "use this" and it bakes into the committed clip</span></div>
+            ${(c.candidates || []).length ? `<div class="cands">${(c.candidates || []).map(cd => `
+              <div class="cand${cd.live ? " live" : ""}">
+                <div class="cwrap"><video data-src="${sfile(cd.file)}" muted loop playsinline preload="none"></video>
+                <button class="cdel" data-room="${esc(r.key)}" data-state="${esc(c.state)}" data-tag="${esc(cd.tag)}" title="Delete this candidate. Moved to _scratch/cine_deleted, not unlinked \u2014 recoverable, but it leaves the harness.">&times;</button></div>
+                <div class="candcap">
+                  <b style="color:var(--fg)">${esc(cd.tag)}</b>
+                  <button class="canduse" data-room="${esc(r.key)}" data-state="${esc(c.state)}"
+                          data-tag="${esc(cd.tag)}" style="padding:1px 7px; font-size:11px"
+                          title="Make this candidate the committed clip. Nothing else happens: no mask, no bake. Masking and baking are the controls that appear once a clip is committed.">use this</button>
+                  <a class="who" href="${clip360(r.key, c.state)}&cand=${encodeURIComponent(cd.tag)}"
+                     target="_blank" rel="noopener" title="Watch this candidate projected into the room's own 360 wrap before promoting it — a flat 3:1 panorama reads nothing like the same clip on the real haov/vaov.">open in 360 &#8599;</a>
+                  <span class="who candstat"></span>
+                </div>
+              </div>`).join("")}</div>` : ""}
+          </div>` : `<div class="shot">
             <div class="shotcap"><b>${esc(c.state)}</b>
               <span class="pill" style="${c.served ? "color:var(--green); border-color:var(--green)" : "color:#ff9c9c; border-color:#ff9c9c"}">${c.served ? "served" : "not served"}</span>
+              ${c.raw ? `<span class="pill" style="color:#ffd479; border-color:#ffd479" title="Promoted straight from a candidate: unmasked, and NOT yet baked — no loop crossfade and no wrap-seam repair. Set the mask and pace you want and hit 'commit mask + re-bake' to bake it.">raw &middot; not baked</span>` : ""}
               <span class="who">${esc(c.file)}</span>
               <a class="who" href="${clip360(r.key, c.state)}" target="_blank" rel="noopener">open in 360 ↗</a>
-              <a class="who" href="${sfile(c.file)}" target="_blank" rel="noopener">file ↗</a>
               <label class="who">map <input type="range" class="maskmix" min="0" max="100" value="0"
                      title="opacity of the top layer. At 100 you see that layer alone."
                      style="width:96px; vertical-align:-4px"></label>
-              <button class="segbtn ovmask on" title="top layer = THE MASK you are about to ship: white = this pixel plays the clip, black = it stays the still. Follows the threshold and region controls live.">mask</button><button
-                      class="segbtn ovmotion" title="top layer = the raw motion map: per-pixel temporal variation, auto-scaled to this clip's own p99.5. What MOVED, before any threshold.">motion</button>
-              <span class="who maskpct">off</span>
+              <span class="who maskpct" style="display:none">off</span>
               <label class="who">thresh <input type="range" class="maskthr" min="48" max="99" value="${thrPos(c)}"
                      title="HOW HARD a pixel must move. 48 = mask off (all video) · 49 = auto (solidity-picked) · 50-99 = percentile of this clip's own motion"
                      style="width:96px; vertical-align:-4px"></label>
               <label class="who">region <input type="range" class="maskreg" min="0" max="100" value="${regPos(c)}"
                      title="HOW MUCH COMPANY a moving pixel must keep. Drops connected moving regions smaller than the cut, so one-off speckle goes still and only large coherent movers are generated. 0 = off."
                      style="width:96px; vertical-align:-4px"></label>
-              <span class="who thrpct"></span>
+              <span class="who thrpct" style="display:none"></span>
               <button class="segbtn padtoggle" title="the threshold x region plane, coloured by how much of the frame moves">⊞ plane</button>
               <button class="maskcommit" style="padding:1px 7px; font-size:11px">commit mask + re-bake</button>
               <span class="who maskcstat">${esc(committedMask(c))}</span>
-              <span class="who">${(c.patches || []).length ? (c.patches || []).length + " patch(es)" : "no patches"}</span>
-              <span class="who blipnote"></span></div>
+              <button class="segbtn painttoggle" title="PAINT OUT a region: drag a rectangle over anything that moves and shouldn't, and it plays the still there instead. This is what the two sliders cannot do — they both select FOR motion, so tightening either drops the motion you wanted before the motion you didn't. Bake-time: no GPU.">✎ paint out</button>
+              <button class="paintcommit" style="display:none; padding:1px 7px; font-size:11px">commit pins + re-bake</button>
+              <button class="paintclear" style="display:none; padding:1px 7px; font-size:11px">clear</button>
+              <label class="who cnormwrap" style="display:none" title="Flatten a whole-frame brightness/colour arc (colour_normalise): rescale every frame so its channel means match frame 0. For the case a paint-out CANNOT reach — the drift is global, so there is no rectangle to draw around it, and no mask threshold removes it either (any rung tight enough to kill the swing kills the subjects first). NOT a default: a fire-lit room is supposed to change brightness, and over-applying this reads as pumping."><input type="checkbox" class="cnorm" ${((c.mask || {}).colourNormalise) ? "checked" : ""} style="vertical-align:-2px"> flatten brightness</label>
+              <label class="who" title="How long each generated frame is HELD. Slowing a clip down here adds, drops and interpolates nothing — every frame the model produced is shown, just for longer — which is why it reads as natural where a duplication retime does not. Applied after the bake by cine_scenario.paced; free, reversible, no GPU. The cost is fewer frames per second of playback, so far enough down a clip can judder.">pace <select class="pace">
+                <option value="1">as rendered</option>
+                <option value="1.25">1.25x slower</option>
+                <option value="1.5">1.5x slower</option>
+                <option value="2">2x slower</option>
+                <option value="2.5">2.5x slower</option>
+                <option value="3">3x slower</option>
+              </select></label>
+              <span class="who pacestat"></span>
+              <span class="who paintstat">${(((c.mask || {}).paintOut) || []).length ? (((c.mask || {}).paintOut) || []).length + " pinned" : ""}</span>
+              <span class="who blipnote" style="display:none"></span>
+              <progress class="bakebar" max="5" value="0" style="display:none; width:120px; vertical-align:-3px"></progress>
+              <span class="who bakestage"></span></div>
             <div class="mpad"><canvas width="300" height="170"></canvas><div class="padnote"></div></div>
-            <div class="vwrap" data-room="${esc(r.key)}" data-state="${esc(c.state)}">
+            <div class="vwrap" data-room="${esc(r.key)}" data-state="${esc(c.state)}" data-pace="${(c.mask || {}).pace || 1}">
               <img class="still" src="${sfile(c.still || (r.key + "/scene.png"))}" loading="lazy">
               <video data-src="${sfile(c.file)}" muted loop playsinline preload="none"></video>
-              <img class="mmap" data-src="/api/motion-map?chapter=${encodeURIComponent(CH)}&scenario=${encodeURIComponent(SC)}&room=${encodeURIComponent(r.key)}&state=${encodeURIComponent(c.state)}&v=${GV}">
+              <button class="cdel" data-room="${esc(r.key)}" data-state="${esc(c.state)}" data-tag="" title="Delete this committed clip and its mask/patch sidecars. The room drops back to "no clip chosen yet" and its candidate pool is untouched, so you can pick again. Moved to _scratch/cine_deleted, not unlinked.">&times;</button>
+
+              <img class="mmap">
               ${(c.patches || []).map(p => {
                 const on = p.enabled !== false;
                 return `<div class="patch${on ? "" : " off"}" style="left:${p.box[0]*100}%; top:${p.box[1]*100}%; width:${(p.box[2]-p.box[0])*100}%; height:${(p.box[3]-p.box[1])*100}%">
                   <span>patch · ${esc(p.name || "tile")}${on ? "" : " · OFF (not shipped)"}</span>
                   <button onclick="setPatch('${esc(r.key)}','${esc(c.state)}','${esc(p.name)}',${!on},this)">${on ? "✕ drop" : "↺ keep"}</button>
                 </div>`; }).join("")}
-              <div class="blip"></div></div>
+              <div class="blip"></div>
+              <div class="paint" data-boxes="${esc(JSON.stringify(((c.mask || {}).paintOut) || []))}"></div></div>
+            ${(c.candidates || []).length ? `<div class="cands">${(c.candidates || []).map(cd => `
+              <div class="cand${cd.live ? " live" : ""}">
+                <div class="cwrap"><video data-src="${sfile(cd.file)}" muted loop playsinline preload="none"></video>
+                <button class="cdel" data-room="${esc(r.key)}" data-state="${esc(c.state)}" data-tag="${esc(cd.tag)}" title="Delete this candidate. Moved to _scratch/cine_deleted, not unlinked \u2014 recoverable, but it leaves the harness.">&times;</button></div>
+                <div class="candcap">
+                  <b style="color:var(--fg)">${esc(cd.tag)}</b>
+                  ${cd.live ? `<span class="pill" style="color:var(--green); border-color:var(--green)">live</span>` : ""}
+                  <button class="canduse" data-room="${esc(r.key)}" data-state="${esc(c.state)}"
+                          data-tag="${esc(cd.tag)}" style="padding:1px 7px; font-size:11px"
+                          title="Make this candidate the committed clip. Nothing else happens: no mask, no bake. The previous clip and its mask sidecar are parked, not deleted. A mask threshold is a percentile of one clip's OWN motion, so inheriting it across renders is meaningless — set the mask and pace you want here and commit when you are ready.">use this</button>
+                  <a class="who" href="${clip360(r.key, c.state)}&cand=${encodeURIComponent(cd.tag)}"
+                     target="_blank" rel="noopener" title="Watch this candidate projected into the room's own 360 wrap before promoting it — a flat 3:1 panorama reads nothing like the same clip on the real haov/vaov.">open in 360 &#8599;</a>
+                  <span class="who candstat"></span>
+                </div>
+              </div>`).join("")}</div>` : ""}
           </div>`).join("")
-          : `<div class="noclip">no cinemagraph rendered for this room yet</div>`);
+          : `<div class="noclip">no cinemagraph rendered for this room yet</div>`) + `</div></div>`;
     }).join("");
     host.querySelectorAll("[data-serve]").forEach(b => { b.onclick = () => serveClips(b.dataset.serve); });
+    // One handler for every candidate, live one included. Promoting the live candidate is a legitimate
+    // action (it re-bakes it against whatever the mask, pins and pace now say), which is the other half
+    // of why the live card does not need its own menu.
+    // One handler for every x — candidate cards and the committed clip alike. An empty `data-tag`
+    // means the committed clip, which is the destructive one, so that is the only case that asks.
+    host.querySelectorAll(".cdel").forEach(b => {
+      b.onclick = async () => {
+        const tag = b.dataset.tag || "";
+        if (!tag && !confirm(`Delete the committed ${b.dataset.state} clip for ${b.dataset.room}?\n\n`
+                             + `Its mask and patch settings go with it. The candidate pool is kept, so `
+                             + `you can pick again. Files are moved to _scratch/cine_deleted, not erased.`)) return;
+        b.disabled = true; b.textContent = "\u00b7";
+        const r = await post("/api/cine-delete", { chapter: CH, scenario: SC, room: b.dataset.room,
+                                                   state: b.dataset.state, tag });
+        if (!r.ok) { b.disabled = false; b.innerHTML = "&times;"; alert(r.error || "delete failed"); return; }
+        const card = b.closest(".cand");
+        const statEl = (card && card.querySelector(".candstat"))
+                       || b.closest(".shot").querySelector(".bakestage");
+        const ok = await runJob(r.slot, statEl, b.closest(".shot"));
+        if (!ok) { b.disabled = false; b.innerHTML = "&times;"; return; }
+        refresh();
+      };
+    });
+    host.querySelectorAll(".canduse").forEach(b => {
+      b.onclick = async () => {
+        const stat = b.parentElement.querySelector(".candstat");
+        b.disabled = true; stat.textContent = "promoting…"; stat.style.color = "";
+        const r = await post("/api/cine-choose", { chapter: CH, scenario: SC, room: b.dataset.room,
+                                                   state: b.dataset.state, tag: b.dataset.tag });
+        if (!r.ok) { stat.innerHTML = `<span class="err">${esc(r.error)}</span>`; b.disabled = false; return; }
+        const ok = await runJob(r.slot, stat, b.closest(".shot"));
+        b.disabled = false;
+        if (!ok) return;
+        stat.innerHTML = `<span class="ok">committed \u2713 &mdash; unmasked, not baked</span>`;
+        refresh();
+      };
+    });
     if (_cineObs) _cineObs.disconnect();
     _cineObs = new IntersectionObserver(entries => {
       entries.forEach(en => {
@@ -1620,32 +1910,17 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
       const tpct = shot.querySelector(".thrpct");
       const cbtn = shot.querySelector(".maskcommit");
       const cstat = shot.querySelector(".maskcstat");
-      const bMask = shot.querySelector(".ovmask"), bMotion = shot.querySelector(".ovmotion");
+
       const padWrap = shot.querySelector(".mpad"), padCv = padWrap.querySelector("canvas");
       const padNote = padWrap.querySelector(".padnote"), padBtn = shot.querySelector(".padtoggle");
-      let ovMode = "mask";                 // what the `map` slider fades in: "mask" | "motion"
+      // The top layer is always the mask now; the motion-map mode and its two buttons are gone.
 
-      // ---- top layer: the motion map, faded in by the `map` slider -------------------------------
-      let mapLoad = null;
-      const loadMap = () => mapLoad || (mapLoad = (async () => {
-        const res = await fetch(img.dataset.src);
-        // A 404/500 here returns JSON, and assigning that blob to an <img> fails SILENTLY — the slider
-        // then moves an invisible layer forever. Clear the cached promise so the next drag retries.
-        if (!res.ok) { mapLoad = null; throw new Error("motion map: HTTP " + res.status); }
-        const sc = res.headers.get("X-Motion-Scale");
-        img.dataset.mapUrl = URL.createObjectURL(await res.blob());
-        if (sc) img.dataset.scale = (+sc).toFixed(2);
-      })());
+      // ---- top layer: THE MASK, faded in by the `map` slider -------------------------------------
       const applyMap = v => {
         wrap.classList.toggle("mask", v > 0);          // also reveals the patch outlines
         img.style.opacity = v / 100;
-        if (ovMode === "motion") {
-          const sc = img.dataset.scale ? ` · white = ${img.dataset.scale}` : "";
-          pct.textContent = v == 0 ? "off" : (v == 100 ? "motion map only" + sc : v + "% motion map" + sc);
-        } else {
-          const on = curMask ? " · white = plays the clip" : " · mask is off";
-          pct.textContent = v == 0 ? "off" : (v == 100 ? "mask only" + on : v + "% mask" + on);
-        }
+        const on = curMask ? " · white = plays the clip" : " · mask is off";
+        pct.textContent = v == 0 ? "off" : (v == 100 ? "mask only" + on : v + "% mask" + on);
       };
       // THE TOP LAYER SHOWS THE MASK BY DEFAULT, and follows the threshold and region controls live —
       // so at 100 you are looking at exactly the pixels that will play the clip, and dragging either
@@ -1655,20 +1930,7 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
       // No second request for it: the mask endpoint already serves RGBA that is white where the mask is
       // on and TRANSPARENT where it is off, and `.mmap` sits on a black backdrop — so the same blob the
       // video is masked with renders as a black-and-white map when it is the top layer.
-      const setOverlay = () => {
-        if (ovMode === "motion") { img.src = img.dataset.mapUrl || BLANK; return; }
-        img.src = curMask || BLANK;
-      };
-      const setMode = m => {
-        ovMode = m;
-        bMask.classList.toggle("on", m === "mask");
-        bMotion.classList.toggle("on", m === "motion");
-        (m === "motion" ? loadMap().catch(() => {}) : Promise.resolve()).then(() => {
-          setOverlay(); applyMap(+mix.value);
-        });
-      };
-      bMask.onclick = () => setMode("mask");
-      bMotion.onclick = () => setMode("motion");
+      const setOverlay = () => { img.src = curMask || BLANK; };
 
       // ---- middle layer: the cinemagraph, masked back to the still ---------------------------------
       // THE MASK IS `auto_mask` — the mechanism Lucas confirmed and that nothing had ever called: a
@@ -1856,23 +2118,137 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
                                                 pct: a.off ? "auto" : a.pct, region: a.ppm,
                                                 enabled: !a.off });
         if (!r.ok) { cstat.innerHTML = `<span class="err">${esc(r.error)}</span>`; cbtn.disabled = false; return; }
-        const poll = setInterval(async () => {
-          const s2 = await getj(`/api/status?slot=${encodeURIComponent(r.slot)}`);
-          if (s2.active) return;
-          clearInterval(poll);
-          if (s2.error) { cstat.innerHTML = `<span class="err">${esc(s2.error)}</span>`; cbtn.disabled = false; return; }
-          cstat.innerHTML = `<span class="ok">baked ✓</span>`;
-          refresh();                       // new clip on disk -> re-read state and re-point every video
-        }, 1500);
+        const ok = await runJob(r.slot, cstat, shot);
+        if (!ok) { cbtn.disabled = false; return; }
+        cstat.innerHTML = `<span class="ok">baked ✓</span>`;
+        refresh();                         // new clip on disk -> re-read state and re-point every video
       };
 
-      mix.oninput = async () => {
-        if (ovMode === "motion") {
-          try { await loadMap(); } catch (e) { pct.textContent = "motion map failed"; return; }
-          setOverlay();
-        }
-        applyMap(+mix.value);
+      // ---- PAINT OUT: hand-drawn pins ------------------------------------------------------------
+      // The affordance that makes "leave the tidying to the mask" an actual workflow. Both sliders
+      // select FOR motion — every rung that drops an unwanted mover has already dropped the wanted one
+      // — so until this existed, removing one specific churning object meant adding a `still: true`
+      // subject to the motion spec and re-rendering. Drawing a rectangle does the same thing at BAKE
+      // time: `paintOut` in `cine_<state>.mask.json`, forced black in the playback mask, rebuilt from
+      // the existing render in seconds with no GPU.
+      const pLayer = wrap.querySelector(".paint");
+      const pBtn = shot.querySelector(".painttoggle"), pStat = shot.querySelector(".paintstat");
+      const pCommit = shot.querySelector(".paintcommit"), pClear = shot.querySelector(".paintclear");
+      let pBoxes = [];
+      try { pBoxes = (JSON.parse(pLayer.dataset.boxes || "[]") || []).map((b, i) =>
+              ({ name: b.name || `paint_${i + 1}`, box: b.box || b })); } catch (e) { pBoxes = []; }
+      let pDirty = false;
+      const pLabel = () => {
+        pStat.textContent = pBoxes.length
+          ? `${pBoxes.length} pinned${pDirty ? " · uncommitted" : ""}`
+          : (pDirty ? "none · uncommitted" : "");
+        pStat.style.color = pDirty ? "var(--amber)" : "";
       };
+      const pDraw = () => {
+        // Rebuild the box list from scratch. Committed and draft rectangles are the same DOM shape, so
+        // a single redraw covers add, delete and drag-in-progress without three code paths.
+        pLayer.querySelectorAll(".pbox").forEach(el => el.remove());
+        pBoxes.forEach((b, i) => {
+          const d = document.createElement("div");
+          d.className = "pbox";
+          d.style.cssText = `left:${b.box[0] * 100}%; top:${b.box[1] * 100}%;`
+            + `width:${(b.box[2] - b.box[0]) * 100}%; height:${(b.box[3] - b.box[1]) * 100}%`;
+          d.innerHTML = `<span>still · ${esc(b.name)}</span><button title="remove this pin">✕</button>`;
+          d.querySelector("button").onclick = ev => {
+            ev.stopPropagation();
+            pBoxes.splice(i, 1); pDirty = true; pDraw(); pLabel();
+          };
+          pLayer.appendChild(d);
+        });
+        pLabel();
+      };
+      const pFrac = ev => {                       // pointer -> image fractions, clamped to the frame
+        const r = pLayer.getBoundingClientRect();
+        return [Math.max(0, Math.min(1, (ev.clientX - r.left) / r.width)),
+                Math.max(0, Math.min(1, (ev.clientY - r.top) / r.height))];
+      };
+      let pStart = null, pDraft = null;
+      pLayer.onpointerdown = ev => {
+        if (ev.target.tagName === "BUTTON") return;    // the ✕ on an existing box, not a new drag
+        pLayer.setPointerCapture(ev.pointerId);
+        pStart = pFrac(ev);
+        pDraft = document.createElement("div");
+        pDraft.className = "pbox draft";
+        pLayer.appendChild(pDraft);
+      };
+      pLayer.onpointermove = ev => {
+        if (!pStart || !pDraft) return;
+        const [x, y] = pFrac(ev);
+        const b = [Math.min(pStart[0], x), Math.min(pStart[1], y),
+                   Math.max(pStart[0], x), Math.max(pStart[1], y)];
+        pDraft.style.cssText = `left:${b[0] * 100}%; top:${b[1] * 100}%;`
+          + `width:${(b[2] - b[0]) * 100}%; height:${(b[3] - b[1]) * 100}%`;
+      };
+      pLayer.onpointerup = ev => {
+        if (!pStart) return;
+        const [x, y] = pFrac(ev);
+        const b = [Math.min(pStart[0], x), Math.min(pStart[1], y),
+                   Math.max(pStart[0], x), Math.max(pStart[1], y)];
+        pStart = null;
+        if (pDraft) { pDraft.remove(); pDraft = null; }
+        // A CLICK IS NOT A BOX. Without a floor, every stray click on the video while paint mode is on
+        // becomes a zero-area pin that the server then has to throw away — and the count in the label
+        // would climb with pins that pin nothing.
+        if (b[2] - b[0] < 0.004 || b[3] - b[1] < 0.008) { pDraw(); return; }
+        pBoxes.push({ name: `paint_${pBoxes.length + 1}`, box: b });
+        pDirty = true; pDraw();
+      };
+      pBtn.onclick = () => {
+        const on = !wrap.classList.contains("painting");
+        wrap.classList.toggle("painting", on);
+        pBtn.classList.toggle("on", on);
+        pCommit.style.display = pClear.style.display = on ? "" : "none";
+        cNormWrap.style.display = on ? "" : "none";
+        if (on) pDraw();
+      };
+      pClear.onclick = () => { pBoxes = []; pDirty = true; pDraw(); };
+      const cNorm = shot.querySelector(".cnorm"), cNormWrap = shot.querySelector(".cnormwrap");
+      cNorm.onchange = () => { pDirty = true; pLabel(); };
+      pCommit.onclick = async () => {
+        pCommit.disabled = true; pStat.textContent = "re-baking clip…"; pStat.style.color = "";
+        const r = await post("/api/mask-paint", { chapter: CH, scenario: SC, room: wrap.dataset.room,
+                                                  state: wrap.dataset.state, boxes: pBoxes,
+                                                  colourNormalise: cNorm.checked });
+        if (!r.ok) { pStat.innerHTML = `<span class="err">${esc(r.error)}</span>`;
+                     pCommit.disabled = false; return; }
+        const ok = await runJob(r.slot, pStat, shot);
+        if (!ok) { pCommit.disabled = false; return; }
+        pDirty = false;
+        pStat.innerHTML = `<span class="ok">pinned ✓</span>`;
+        refresh();                       // new clip on disk -> re-read state and re-point every video
+      };
+      // ---- pace -----------------------------------------------------------------------------------
+      // Commits on change and rebuilds immediately: unlike the paint boxes there is nothing to draw
+      // first, and unlike the two mask sliders there is no live preview possible — the only way to
+      // judge a pace is to watch the clip at it. Posts the CURRENT pins and flatten state alongside,
+      // so changing pace can never silently drop a paint-out that was already committed.
+      const paceSel = shot.querySelector(".pace"), paceStat = shot.querySelector(".pacestat");
+      const paceNow = +(wrap.dataset.pace || 1);
+      paceSel.value = String([1, 1.25, 1.5, 2, 2.5, 3].includes(paceNow) ? paceNow : 1);
+      if (paceNow > 1.001) paceStat.textContent = "committed: " + paceNow + "x";
+      paceSel.onchange = async () => {
+        const want = +paceSel.value;
+        paceSel.disabled = true;
+        paceStat.textContent = "re-baking clip…"; paceStat.style.color = "";
+        const r = await post("/api/mask-paint", { chapter: CH, scenario: SC, room: wrap.dataset.room,
+                                                  state: wrap.dataset.state, boxes: pBoxes,
+                                                  colourNormalise: cNorm.checked, pace: want });
+        if (!r.ok) { paceStat.innerHTML = `<span class="err">${esc(r.error)}</span>`;
+                     paceSel.disabled = false; return; }
+        const ok = await runJob(r.slot, paceStat, shot);
+        paceSel.disabled = false;
+        if (!ok) return;
+        paceStat.innerHTML = `<span class="ok">${want > 1.001 ? want + "x ✓" : "as rendered ✓"}</span>`;
+        refresh();                     // the file on disk changed -> re-point every video
+      };
+      pDraw();
+
+      mix.oninput = () => applyMap(+mix.value);
       thr.oninput = applyMask;
       reg.oninput = applyMask;
       applyMap(+mix.value);
@@ -1889,13 +2265,16 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
       // reliable wrap signal — and it is free. Flash the square, and count the laps in the caption.
       let prev = 0, laps = 0;
       const blip = v.parentElement.querySelector(".blip");
-      const note = v.closest(".shot").querySelector(".blipnote");
+      const shotEl = v.closest(".shot");
+      const note = shotEl ? shotEl.querySelector(".blipnote") : null;
       v.addEventListener("timeupdate", () => {
         if (v.currentTime < prev) {
           laps++;
           if (note) note.textContent = `loop ${laps} · ${v.duration ? v.duration.toFixed(2) + "s" : ""}`;
-          if ($("#showBlip").checked) blip.classList.add("on");
-          setTimeout(() => blip.classList.remove("on"), 180);
+          // Candidate videos have no `.blip` sibling — this used to be safe only because every
+          // observed video lived inside a `.vwrap`.
+          if (blip && $("#showBlip").checked) blip.classList.add("on");
+          if (blip) setTimeout(() => blip.classList.remove("on"), 180);
         }
         prev = v.currentTime;
       });
@@ -1924,12 +2303,26 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
   // Tabs are pure show/hide over already-rendered panes: switching never refetches, so flipping between
   // the still and its baked clip is instant and they cannot drift out of sync with each other.
   document.querySelectorAll("#tabs button").forEach(b => {
-    b.onclick = () => {
-      document.querySelectorAll("#tabs button").forEach(x => x.classList.toggle("on", x === b));
-      document.querySelectorAll(".pane").forEach(p => p.classList.toggle("on", p.id === "pane-" + b.dataset.tab));
-      fitSticky();
-    };
+    b.onclick = () => { showTab(b.dataset.tab); rememberView(); };
   });
+  // Fold / unfold a room by clicking its header. Delegated to the pane so it survives every re-render,
+  // and it ignores clicks that landed on a link or button in the header — those have their own jobs.
+  $("#pane-art").addEventListener("click", e => {
+    const hd = e.target.closest(".roomhd");
+    if (!hd || e.target.closest("a, button, input")) return;
+    const room = hd.closest(".room");
+    if (room) room.classList.toggle("folded");
+  });
+  // Same delegation for the cinemagraph pane. Folding here also frees decoders for free: the
+  // IntersectionObserver tears a video's `src` down when it leaves the viewport, and a folded section
+  // is `display:none`, so a folded room stops costing anything to have on the page.
+  $("#pane-baked").addEventListener("click", e => {
+    const hd = e.target.closest(".roomhd");
+    if (!hd || e.target.closest("a, button, input, select, progress, label")) return;
+    const room = hd.closest(".room");
+    if (room) room.classList.toggle("folded");
+  });
+
   // Guarded, not raw: both rebuild the cards from disk, so an unsaved edit would vanish without a word.
   // The picker is put back to the scenario you were on when you decline, or the label lies about what
   // is displayed.

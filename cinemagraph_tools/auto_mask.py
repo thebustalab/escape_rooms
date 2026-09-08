@@ -106,6 +106,23 @@ def mask_at_percentile(tstd, pct, close_radius=4, feather=6, min_px=0):
     return m, thr, float(m.mean()), reg
 
 
+# ⚠️ THE CAP IS A BACKSTOP AND IT WAS NOT ENOUGH (2026-09-07). `coverage_cap=0.55` permits over half
+# the frame to be generated video, and the ladder below scores candidates by object SOLIDITY — which a
+# uniform frame-wide shimmer satisfies perfectly, because a boiling frame IS one big solid "object".
+# So on the beacons corpus this settled at 60-90% coverage on clips with no local motion in them at
+# all, and the shimmer it admitted is what `cine_judge.rigid_flicker` now convicts on.
+#
+# Simulated on three of those clips, the coverage that actually freezes the rigid frame is 4-7%, an
+# order of magnitude tighter than what was shipped: ladder/base needs p93 (7% coverage) to take its
+# rigid region to 0.00 while its waterfall keeps all 29.58 of its motion, and rams_head/base needs p96
+# (4%). fenwatch/base has NO working rung — its mist dies at p90 and the stone only freezes at p96 —
+# which is the signature of a clip with no local motion to protect, and no threshold can rescue one.
+#
+# The cap is NOT lowered here, deliberately. With STABILISER_TAIL no longer requesting whole-frame
+# ambient motion, the tstd map should regain real structure and the solidity score should mean what it
+# was designed to mean; lowering the cap now would be tuning against art that is about to be replaced,
+# and a 0.55 cap is harmless on a clip whose motion is genuinely local. Re-measure coverage on the
+# first re-rendered scenario, and if it is still running high, THAT is when to move this number.
 def auto_mask(tstd, coverage_cap=0.55, close_radius=4, feather=6, min_frac=2e-4, min_px=0):
     """tstd: per-pixel temporal std (H,W). Returns (mask float 0..1, chosen threshold, report).
 

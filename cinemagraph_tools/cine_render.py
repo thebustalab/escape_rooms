@@ -74,8 +74,25 @@ def upload(cg, img, name):
     return os.path.join(j["subfolder"], n) if j.get("subfolder") else n
 
 
-def graph(image_name, positive, negative, w, h, length, prefix, end_guide=END_GUIDE, seed=SEED):
-    """The settled two-ended-guide graph. Frame 0 pinned hard, frame -1 at `end_guide`."""
+def graph(image_name, positive, negative, w, h, length, prefix, end_guide=END_GUIDE, seed=SEED,
+          cond_fps=None):
+    """The settled two-ended-guide graph. Frame 0 pinned hard, frame -1 at `end_guide`.
+
+    `cond_fps` DECOUPLES THE PACE FROM THE CONTAINER. `LTXVConditioning.frame_rate` is a conditioning
+    value telling the model what playback rate the frames it generates are meant for; `CreateVideo.fps`
+    is only the container's declared rate. This graph passed the same FPS to both, which tied them
+    together and left pace unadjustable.
+
+    Set `cond_fps` ABOVE FPS to slow the motion down: at cond_fps 48 the model lays out 48 frames'
+    worth of movement per second of intent, and playing those frames back at FPS=24 stretches it over
+    twice the time. The motion is GENERATED slower, not retimed — which matters, because retiming is
+    already a recorded dead end ("they look 'slowed', not natural"; frame duplication is not new
+    motion). Lowering it has the opposite effect and is also already recorded: frame_rate 16 was
+    tried and Lucas preferred 24, i.e. more motion per frame read as worse. Upward was never tested.
+
+    Defaults to FPS, so every existing caller renders exactly as before.
+    """
+    cond_fps = FPS if cond_fps is None else cond_fps
     return {"prompt": {
         "1":  {"class_type": "UNETLoader", "inputs": {"unet_name": DIST, "weight_dtype": "default"}},
         "2":  {"class_type": "CLIPLoader",
@@ -94,7 +111,7 @@ def graph(image_name, positive, negative, w, h, length, prefix, end_guide=END_GU
                "inputs": {"positive": ["31", 0], "negative": ["31", 1], "vae": ["17", 0],
                           "latent": ["31", 2], "image": ["6", 0], "frame_idx": -1, "strength": end_guide}},
         "8":  {"class_type": "LTXVConditioning",
-               "inputs": {"positive": ["32", 0], "negative": ["32", 1], "frame_rate": FPS}},
+               "inputs": {"positive": ["32", 0], "negative": ["32", 1], "frame_rate": cond_fps}},
         "9":  {"class_type": "LTXVScheduler",
                "inputs": {"steps": STEPS, "max_shift": 2.05, "base_shift": 0.95,
                           "stretch": True, "terminal": 0.1, "latent": ["32", 2]}},

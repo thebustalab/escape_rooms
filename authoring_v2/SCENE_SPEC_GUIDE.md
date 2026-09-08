@@ -47,6 +47,50 @@ network and a description of vibes, Claude drafts **one spec per room** followin
 ```
 
 ## Rules
+
+### ⚠️ RULE ZERO — STATE THE RELATIONSHIPS, NOT JUST THE OBJECTS
+
+**Read this before writing a single element.** It is the most expensive lesson in the corpus: it cost
+`networks/subway` roughly a dozen art rounds across two days, and every single one of those failures
+was the same mistake wearing a different coat.
+
+**A spec is a list of elements, and the model renders each one faithfully and INDEPENDENTLY.** It will
+give you a beautiful train and a beautiful platform and a beautiful tunnel mouth, and it has no reason
+whatever to put the train on the rails, or the rails into the mouth, unless you said so. Describing
+each object well is not enough. **What has to be stated is how they JOIN.**
+
+The four that cost subway its rounds, all found by eye on generated art, none catchable by
+`validate_scenes.py` (they are semantic, not structural):
+
+| the two things | what came back |
+|---|---|
+| the train and the platform's section | trains standing *beside* the rails on a flat floor, or on ballast laid on the platform |
+| the roads and the station's ends | one lone arch dead ahead on the *platform's* axis, with no rails running into it |
+| the buffer stops and the direction of travel | a barrier between a train and the very mouth its line has to leave by |
+| the rails under the train and the rails leaving the station | two separate railways in one picture, the train on a stub that reaches nothing |
+
+**The diagnostic, and it is quick.** Go through the elements in pairs and ask of each pair that must
+physically relate: *if these two were drawn independently, would anything be wrong?* If the answer is
+yes — and for anything load-bearing it usually is — the join is not optional and must be written.
+
+**Three things about HOW to write a join, each learned the hard way:**
+
+1. **Put it in BOTH elements, and again as a refusal in `negatives`.** A relationship stated in one
+   element only does not reliably hold; the other element is what the model is looking at when it gets
+   it wrong. Subway's rail alignment had to be in the road element *and* the negatives before it took.
+
+2. **A fact about the SHAPE of a room must be an ELEMENT, not a negative.** Negatives suppress things
+   the model wants to draw; they do not build geometry. Subway's track-bed clause sat in `negatives`
+   for two days and rendered *not once*; the same fact promoted to a foreground `platform_edge`
+   element — written in depth order, nearest first — worked immediately.
+
+3. **Write it in depth order, nearest first**, for the same reason as rule 0c: clause order decides
+   what a subject attaches to. *"the edge at your feet, then the drop, then the bed, then the rails in
+   it, then the train standing on them"* renders; the same facts in any other order do not.
+
+**And say counts as numerals** (rule 0e) — a relationship often implies a count, and "each road has its
+own bore" becomes reliable only when it is also "there are EXACTLY 4 tunnel mouths in this station".
+
 0. **Never name the structure you are STANDING ON as if it were in view** (2026-08-07, the Pharos gallery).
    `setting` reads as *"a panorama from …"*, but gpt-image treats a named landmark as **something to draw**,
    not a vantage to adopt — so `"from the gallery at the top of the Pharos lighthouse"` reliably paints a
@@ -77,6 +121,16 @@ network and a description of vibes, Claude drafts **one spec per room** followin
    first, then the subject, then the open space** — never the other way round. This is the same failure
    as 0a from the other side: 0a is two elements disagreeing about one region, 0c is one sentence
    attaching a subject to the wrong half of itself.
+0c-bis. **The equirectangular clause is EMITTED FOR YOU — do not write your own** (2026-09-07).
+   `render_prompt` now appends a standard `EQUIRECT` sentence to every scene prompt in every scenario:
+   the walls wrap continuously with strong barrel curvature, ceiling and floor bow across the frame,
+   surfaces near the frame edges are at the viewer's *side* seen at a glancing angle, and it is never a
+   flat frontal elevation, a single-vanishing-point composition, or a view of the room from outside it.
+   It came out of `networks/subway`, which produced the best equirect images in the corpus, and it lives
+   in the renderer rather than in each scenario's `negatives` **so that no author has to remember it and
+   no scenario can be missing it**. Interiors need it most — a small box of a room is where the model
+   most wants to give you one wall seen head-on.
+
 0d. **KEEP `setting` TO ONE SENTENCE — a long one flattens the projection** (2026-09-06,
    `networks/subway` `car_woad`). `render_prompt` opens with *"This is a seamless 360-degree panorama
    from {setting}"*, so everything in that field is read as a description of the VANTAGE. Grow it into

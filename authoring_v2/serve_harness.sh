@@ -3,7 +3,9 @@
 #
 # Two servers, each in its own persistent tmux session:
 #   harness_v2  -> authoring_v2/harness_server.py  on 127.0.0.1:8752  (build_world console + /api)
-#   playtest    -> authoring/playtest_server.py    on 0.0.0.0:8055     (site root for test-play, no-store)
+#   playtest    -> authoring_v2/playtest_server.py on 127.0.0.1:8055  (site root for test-play, no-store)
+#                  (was 0.0.0.0 until 2026-09-08; doc root is the whole site tree incl. answer keys.
+#                   PLAYTEST_BIND=0.0.0.0 restores LAN access if ever needed)
 #
 # The old v1 harness on :8751 (authoring/harness_server.py + harness_gpt.html) is NO LONGER STARTED
 # (2026-08-28, Lucas: "it should only open the build_world stuff — the other stuff is obsolete"). The

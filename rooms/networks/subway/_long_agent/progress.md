@@ -1,3 +1,83 @@
 # Stills iteration — networks/subway
 
 Started 2026-09-07T03:13:47.363154+00:00.
+- **2026-09-07 03:27 UTC** — ochre_hall: generating 1 candidate(s) — no art yet.
+- **2026-09-07 03:28 UTC** — ochre_hall: 0/1 candidate(s) landed, still waiting (poll 1/60).
+- **2026-09-07 03:29 UTC** — ochre_hall: 1 candidate(s) landed — ready to judge.
+- **2026-09-07 03:30 UTC** — ochre_woad: generating 1 candidate(s) — no art yet.
+- **2026-09-07 03:31 UTC** — ochre_woad: 0/1 candidate(s) landed, still waiting (poll 1/60).
+- **2026-09-07 03:32 UTC** — ochre_woad: 1 candidate(s) landed — ready to judge.
+- **2026-09-07 03:34 UTC** — ochre_verdigris: generating 1 candidate(s) — no art yet.
+- **2026-09-07 03:35 UTC** — ochre_verdigris: 0/1 candidate(s) landed, still waiting (poll 1/60).
+- **2026-09-07 03:36 UTC** — ochre_verdigris: 1 candidate(s) landed — ready to judge.
+- **2026-09-07 03:38 UTC** — saffron_hill: generating 1 candidate(s) — no art yet.
+- **2026-09-07 03:39 UTC** — saffron_hill: 0/1 candidate(s) landed, still waiting (poll 1/60).
+- **2026-09-07 03:40 UTC** — saffron_hill: 1 candidate(s) landed — ready to judge.
+- **2026-09-07 03:41 UTC** — ochre_hall: generating 1 candidate(s) — spec changed in tab 1 after commit.
+- **2026-09-07 03:42 UTC** — ochre_hall: 0/1 candidate(s) landed, still waiting (poll 1/60).
+- **2026-09-07 03:43 UTC** — ochre_hall: 1 candidate(s) landed — ready to judge.
+- **2026-09-07 03:44 UTC** — ochre_woad: generating 1 candidate(s) — spec changed in tab 1 after commit.
+- **2026-09-07 03:45 UTC** — ochre_woad: 0/1 candidate(s) landed, still waiting (poll 1/60).
+- **2026-09-07 03:46 UTC** — ochre_woad: 1 candidate(s) landed — ready to judge.
+- **2026-09-07 03:47 UTC** — ochre_verdigris: generating 1 candidate(s) — spec changed in tab 1 after commit.
+- **2026-09-07 03:48 UTC** — ochre_verdigris: 0/1 candidate(s) landed, still waiting (poll 1/60).
+- **2026-09-07 03:49 UTC** — ochre_verdigris: 1 candidate(s) landed — ready to judge.
+- **2026-09-07 03:51 UTC** — cropping_yard: generating 1 candidate(s) — no art yet.
+- **2026-09-07 03:52 UTC** — cropping_yard: 0/1 candidate(s) landed, still waiting (poll 1/60).
+- **2026-09-07 03:53 UTC** — cropping_yard: 1 candidate(s) landed — ready to judge.
+- **2026-09-07 03:54 UTC** — tannery_row: generating 1 candidate(s) — no art yet.
+- **2026-09-07 03:55 UTC** — tannery_row: 0/1 candidate(s) landed, still waiting (poll 1/60).
+- **2026-09-07 03:56 UTC** — tannery_row: 1 candidate(s) landed — ready to judge.
+- **2026-09-07 03:57 UTC** — logwood_quay: generating 1 candidate(s) — no art yet.
+- **2026-09-07 03:58 UTC** — logwood_quay: 0/1 candidate(s) landed, still waiting (poll 1/60).
+- **2026-09-07 03:59 UTC** — logwood_quay: 1 candidate(s) landed — ready to judge.
+- **2026-09-07 04:00 UTC** — car_madder: generating 1 candidate(s) — no art yet.
+- **2026-09-07 04:01 UTC** — car_madder: 0/1 candidate(s) landed, still waiting (poll 1/60).
+- **2026-09-07 04:02 UTC** — car_madder: 1 candidate(s) landed — ready to judge.
+- **2026-09-07 04:04 UTC** — car_weld: generating 1 candidate(s) — no art yet.
+- **2026-09-07 04:05 UTC** — car_weld: 0/1 candidate(s) landed, still waiting (poll 1/60).
+- **2026-09-07 04:06 UTC** — car_weld: 1 candidate(s) landed — ready to judge.
+- **2026-09-07 04:07 UTC** — car_verdigris: generating 1 candidate(s) — no art yet.
+- **2026-09-07 04:08 UTC** — car_verdigris: 0/1 candidate(s) landed, still waiting (poll 1/60).
+- **2026-09-07 04:09 UTC** — car_verdigris: 1 candidate(s) landed — ready to judge.
+- **2026-09-07 04:10 UTC** — car_lampblack: generating 1 candidate(s) — no art yet.
+- **2026-09-07 04:11 UTC** — car_lampblack: 0/1 candidate(s) landed, still waiting (poll 1/60).
+- **2026-09-07 04:12 UTC** — car_lampblack: 1 candidate(s) landed — ready to judge.
+- **2026-09-07 04:13 UTC** — ochre_hall: generating 1 candidate(s) — spec changed in tab 1 after commit.
+- **2026-09-07 04:14 UTC** — ochre_hall: 0/1 candidate(s) landed, still waiting (poll 1/60).
+- **2026-09-07 04:15 UTC** — ochre_hall: 1 candidate(s) landed — ready to judge.
+- **2026-09-07 04:17 UTC** — ochre_woad: generating 1 candidate(s) — spec changed in tab 1 after commit.
+- **2026-09-07 04:18 UTC** — ochre_woad: 0/1 candidate(s) landed, still waiting (poll 1/60).
+- **2026-09-07 04:19 UTC** — ochre_woad: 1 candidate(s) landed — ready to judge.
+- **2026-09-07 04:20 UTC** — ochre_verdigris: generating 1 candidate(s) — spec changed in tab 1 after commit.
+- **2026-09-07 04:21 UTC** — ochre_verdigris: 0/1 candidate(s) landed, still waiting (poll 1/60).
+- **2026-09-07 04:22 UTC** — ochre_verdigris: 1 candidate(s) landed — ready to judge.
+- **2026-09-07 04:28 UTC** — cycle_52_saffron_hill: regenerating 1 candidate(s) (spec revised) — The single change is removing the commissioned "back wall taken over by orange crop" from `setting` — that instruction is what put a terminating cross-wall at d
+- **2026-09-07 04:29 UTC** — saffron_hill: 0/1 candidate(s) landed, still waiting (poll 1/60).
+- **2026-09-07 04:30 UTC** — saffron_hill: 1 candidate(s) landed — ready to judge.
+- **2026-09-07 04:37 UTC** — cycle_55_saffron_hill: regenerating 1 candidate(s) (spec revised) — The single change is the angular geometry of the running road — both units are now placed nose-to-nose on ONE road crossing the frame horizontally with each uni
+- **2026-09-07 04:38 UTC** — saffron_hill: 0/1 candidate(s) landed, still waiting (poll 1/60).
+- **2026-09-07 04:39 UTC** — saffron_hill: 1 candidate(s) landed — ready to judge.
+- **2026-09-07 04:45 UTC** — cycle_58_saffron_hill: regenerating 1 candidate(s) (spec revised) — The single change moves the red unit's full body description from `berth_madder_fore` onto `berth_madder_aft` so the unit is introduced at its first (leftmost) 
+- **2026-09-07 04:45 UTC** — saffron_hill: attempt cap spent — parked for your decision.
+- **2026-09-07 04:46 UTC** — saffron_hill: 0/1 candidate(s) landed, still waiting (poll 1/60).
+- **2026-09-07 04:47 UTC** — saffron_hill: 1 candidate(s) landed — ready to judge.
+- **2026-09-07 04:52 UTC** — cycle_61_cropping_yard: regenerating 1 candidate(s) (spec revised) — The one change is the `setting`, which literally commissioned "a wide flat working floor built out over the rails" and so instructed the flat single-level paved
+- **2026-09-07 04:53 UTC** — cropping_yard: 0/1 candidate(s) landed, still waiting (poll 1/60).
+- **2026-09-07 04:55 UTC** — cropping_yard: 1 candidate(s) landed — ready to judge.
+- **2026-09-07 05:01 UTC** — cycle_64_cropping_yard: regenerating 1 candidate(s) (spec revised) — The single change is `setting` — it now fixes the viewer standing on the platform BESIDE a line that crosses left-to-right in front of them, with no track under
+- **2026-09-07 05:02 UTC** — cropping_yard: 0/1 candidate(s) landed, still waiting (poll 1/60).
+- **2026-09-07 05:03 UTC** — cropping_yard: 1 candidate(s) landed — ready to judge.
+- **2026-09-07 05:09 UTC** — cycle_67_cropping_yard: committed l1_cropping_yard_1.png — held for your eye (with concerns — see stills.md).
+- **2026-09-07 05:17 UTC** — cycle_68_tannery_row: regenerating 1 candidate(s) (spec revised) — The single change is re-placing the verdigris unit — its two cabs now occupy two clear adjacent inboard slots ("to the right" / "further right, just beyond it")
+- **2026-09-07 05:18 UTC** — tannery_row: 0/1 candidate(s) landed, still waiting (poll 1/60).
+- **2026-09-07 05:19 UTC** — tannery_row: 1 candidate(s) landed — ready to judge.
+- **2026-09-07 05:29 UTC** — cycle_71_tannery_row: evaluator FAIL on a COMMIT (retry 1/2).
+- **2026-09-07 05:35 UTC** — cycle_72_tannery_row: regenerating 1 candidate(s) (spec revised) — The single change is rewriting the room's `setting` — the one sentence at the very top of the prompt that frames the whole scene — so it establishes the platfor
+- **2026-09-07 05:36 UTC** — tannery_row: 0/1 candidate(s) landed, still waiting (poll 1/60).
+- **2026-09-07 05:37 UTC** — tannery_row: 1 candidate(s) landed — ready to judge.
+- **2026-09-07 05:46 UTC** — cycle_75_tannery_row: committed l1_tannery_row_1.png — held for your eye (with concerns — see stills.md).
+- **2026-09-07 05:54 UTC** — cycle_76_logwood_quay: regenerating 1 candidate(s) (spec revised) — The single change is moving the platform-versus-track-bed section into the high-weight `setting` line — establishing up front that the ground drops waist-deep i
+- **2026-09-07 05:55 UTC** — logwood_quay: 0/1 candidate(s) landed, still waiting (poll 1/60).
+- **2026-09-07 05:56 UTC** — logwood_quay: 1 candidate(s) landed — ready to judge.
+- **2026-09-07 06:03 UTC** — cycle_79_logwood_quay: regenerating 1 candidate(s) (spec revised) — The single change is promoting the platform-edge drop from prose into its own foreground **element** — `platform_edge`, first in the ordered list, describing th

@@ -1640,6 +1640,248 @@ def test_room_clips_ignores_intermediates():
         assert hs._room_clips(base, "r1")[0]["file"] == "r1/cine_base.mp4"
 
 
+def test_cine_delete_moves_rather_than_unlinks():
+    """The x on a clip has to make the harness clean AND stay recoverable.
+
+    "Park, never delete" is the standing rule in this pipeline — a parked file is the only way back
+    from a bad call — but Lucas wants bad clips gone from the tab as they land. A MOVE satisfies both:
+    the file leaves every glob the gallery reads and is still on disk. It goes under `_scratch`, which
+    is gitignored, because parking a 3-6 MB clip in the room directory would push it to a public repo.
+
+    Deleting the committed clip must take its sidecars with it. A mask left behind describes a render
+    nobody can see any more, and the next promote would inherit it — the same class of bug that masked
+    99.4% of cropping_weld."""
+    import threading as _threading
+    with tempfile.TemporaryDirectory() as base:
+        d = os.path.join(base, "r1")
+        os.makedirs(d)
+        cd = os.path.join(base, "_scratch", "cine_cand", "r1")
+        os.makedirs(cd)
+        for nm in ("base__good.mp4", "base__bad.mp4"):
+            open(os.path.join(cd, nm), "wb").write(b"\0")
+        open(os.path.join(d, "cine_base.mp4"), "wb").write(b"\0")
+        json.dump({"pct": 90.0}, open(os.path.join(d, "cine_base.mask.json"), "w"))
+        old_jobs, old_lock = hs.JOBS, hs.LOCK
+        hs.JOBS, hs.LOCK = {"s": {}}, _threading.Lock()
+        try:
+            hs._run_cine_delete("s", base, "r1", "base", "bad")
+            assert not hs.JOBS["s"].get("error"), hs.JOBS["s"].get("error")
+            tags = [c["tag"] for c in hs._room_clips(base, "r1")[0]["candidates"]]
+            assert tags == ["good"], tags                       # gone from the gallery
+            trash = hs._cine_trash(base, "r1")
+            assert any("bad" in f for f in os.listdir(trash))   # but still on disk
+            # now the committed clip, sidecars and all
+            hs.JOBS["s"] = {}
+            hs._run_cine_delete("s", base, "r1", "base", None)
+            assert not hs.JOBS["s"].get("error"), hs.JOBS["s"].get("error")
+        finally:
+            hs.JOBS, hs.LOCK = old_jobs, old_lock
+        assert not os.path.isfile(os.path.join(d, "cine_base.mp4"))
+        assert not os.path.isfile(os.path.join(d, "cine_base.mask.json")), "a stale mask would be inherited"
+        # the room falls back to pending, pool intact, so picking again is one click
+        clips = hs._room_clips(base, "r1")
+        assert clips[0]["file"] is None and clips[0]["pending"] is True
+        assert [c["tag"] for c in clips[0]["candidates"]] == ["good"]
+
+
+def test_bake_log_drives_progress_forward_only():
+    """The re-bake progress bar is driven off `rebuild_clip`'s own log lines.
+
+    A re-bake is 10-40 s of ffmpeg on a 3072x1024 clip and used to be passed `log=lambda m: None`, so
+    the UI had a spinner and no information — the information existed and was being discarded. Reading
+    the log rather than adding a callback API means the bar cannot drift out of step with the pipeline.
+
+    `done` must only ever move FORWARD: a scenario with several repair patches logs "re-applied patch"
+    once per patch, and a mask line arrives after them, so a naive assignment would let the bar jump
+    back and forth."""
+    import threading as _threading
+    old_jobs, old_lock = hs.JOBS, hs.LOCK
+    hs.JOBS, hs.LOCK = {"s": {"active": True, "done": 0, "total": 1}}, _threading.Lock()
+    try:
+        log = hs._bake_log("s")
+        assert hs.JOBS["s"]["total"] == hs._BAKE_TOTAL
+        log("  re-applied patch lamp")
+        assert hs.JOBS["s"]["done"] == 1
+        log("  mask: pct=88 region=0ppm(0px) thr=7.30 -> 30.1% video, rest still")
+        assert hs.JOBS["s"]["done"] == 3
+        log("  re-applied patch second")          # a later patch line must NOT rewind the bar
+        assert hs.JOBS["s"]["done"] == 3
+        log("  bake: seam 3 -> 0.00")
+        assert hs.JOBS["s"]["done"] == 4
+        log("  paced 1.50x: 16 fps container, frames held longer (none added or dropped)")
+        assert hs.JOBS["s"]["done"] == 5
+        assert hs.JOBS["s"]["stage"] == "slowing to the chosen pace"
+        log("  something unrecognised")           # unknown lines are inert, not an error
+        assert hs.JOBS["s"]["done"] == 5
+    finally:
+        hs.JOBS, hs.LOCK = old_jobs, old_lock
+
+
+def test_mask_slider_wins_over_stale_mover_boxes():
+    """FAILURE MODE UNDER TEST — the threshold slider did nothing on any room with a motion spec.
+
+    `cine_scenario._mask_inputs` picks its mask mode as `cfg.get("maskMode")` and, when that is absent,
+    defaults to "boxes" if the room has mover boxes. This endpoint recorded `pct` and never recorded
+    `maskMode`, so a percentile the human had chosen and committed was written to disk, then ignored in
+    favour of the box mask on exactly the rooms most likely to need a threshold.
+
+    It is also the mechanism behind cropping_weld baking at 0.6% coverage: one subject in the spec, a
+    0.096 x 0.061 extractor grille, so box mode froze 99.4% of the frame to the still. Right for a
+    hero-and-pins spec; wrong for a menu prompt, which names no boxes at all."""
+    import threading as _threading
+    import sys as _sys
+    import types as _types
+    with tempfile.TemporaryDirectory() as base:
+        d = os.path.join(base, "r1")
+        os.makedirs(d)
+        open(os.path.join(d, "cine_base.mp4"), "wb").write(b"\0")
+        old_jobs, old_lock = hs.JOBS, hs.LOCK
+        had_cs = "cine_scenario" in _sys.modules
+        prev_cs = _sys.modules.get("cine_scenario")
+        stub = _types.ModuleType("cine_scenario")
+        stub.rebuild_clip = lambda *a, **k: None
+        hs.JOBS, hs.LOCK = {"slot": {}}, _threading.Lock()
+        _sys.modules["cine_scenario"] = stub
+        try:
+            hs._run_mask_rebuild("slot", base, "r1", "base", 88.0, True, region=250.0)
+        finally:
+            hs.JOBS, hs.LOCK = old_jobs, old_lock
+            if had_cs:
+                _sys.modules["cine_scenario"] = prev_cs
+            else:
+                _sys.modules.pop("cine_scenario", None)
+        cfg = json.load(open(os.path.join(d, "cine_base.mask.json")))
+        assert cfg["pct"] == 88.0
+        assert cfg["region"] == 250.0
+        assert cfg["maskMode"] == "auto", "a committed threshold must not lose to stale mover boxes"
+
+
+def test_cine_choose_promotes_without_masking_or_baking():
+    """FAILURE MODE UNDER TEST — picking a candidate showed it with almost everything masked away.
+
+    The first `use this` re-baked through `rebuild_clip`, on the theory that the mask, paint-outs and
+    pace were decisions about the ROOM and should survive a change of render. They are not. A mask
+    threshold is a PERCENTILE of one clip's own temporal-std distribution — that is why the slider is a
+    percentile and not an absolute — so p88 carried from render A to render B selects a different set
+    of pixels entirely, and against a quieter B it can select almost none. Lucas hit it on the first
+    click: "it did some sort of baking before displaying it large with the controls and that masked
+    almost everything ... I want to handle the mask and baking manually."
+
+    So a promote is now EXACTLY a promote: the candidate's bytes land as both the committed clip and the
+    unpatched source, the old sidecar is parked, and the new one says `enabled: false` so the threshold
+    slider opens at OFF and describes the file rather than inheriting a dead claim."""
+    import threading as _threading
+    with tempfile.TemporaryDirectory() as base:
+        d = os.path.join(base, "r1")
+        os.makedirs(d)
+        cd = os.path.join(base, "_scratch", "cine_cand", "r1")
+        os.makedirs(cd)
+        open(os.path.join(cd, "base__menu_s4242.mp4"), "wb").write(b"CANDIDATE-BYTES")
+        open(os.path.join(d, "cine_base.mp4"), "wb").write(b"OLD-CLIP")
+        open(os.path.join(d, "cine_base_src.mp4"), "wb").write(b"OLD-SRC")
+        # the previous render's committed mask — tight enough to blank a quieter clip
+        json.dump({"pct": 96.0, "region": 400.0, "enabled": True, "pace": 2},
+                  open(os.path.join(d, "cine_base.mask.json"), "w"))
+        old_jobs, old_lock = hs.JOBS, hs.LOCK
+        hs.JOBS, hs.LOCK = {"slot": {}}, _threading.Lock()
+        try:
+            hs._run_cine_choose("slot", base, "r1", "base", "menu_s4242")
+            assert not hs.JOBS["slot"].get("error"), hs.JOBS["slot"].get("error")
+        finally:
+            hs.JOBS, hs.LOCK = old_jobs, old_lock
+        # the committed clip IS the candidate — unaltered, so nothing was baked over it
+        assert open(os.path.join(d, "cine_base.mp4"), "rb").read() == b"CANDIDATE-BYTES"
+        assert open(os.path.join(d, "cine_base_src.mp4"), "rb").read() == b"CANDIDATE-BYTES"
+        # the previous render's mask did NOT carry over
+        cfg = json.load(open(os.path.join(d, "cine_base.mask.json")))
+        assert cfg == {"enabled": False}, cfg
+        # ...and it was parked rather than dropped, so the old choice is recoverable
+        parked = [f for f in os.listdir(d) if f.startswith("cine_base.mask.json.pre_")]
+        assert len(parked) == 1, os.listdir(d)
+        assert json.load(open(os.path.join(d, parked[0])))["pct"] == 96.0
+        assert [f for f in os.listdir(d) if f.startswith("cine_base.mp4.pre_")]
+        # and the pane can say the clip has had no loop/seam treatment yet
+        clip = hs._room_clips(base, "r1")[0]
+        assert clip["raw"] is True
+        assert clip["mask"]["enabled"] is False        # slider opens OFF, truthfully
+        assert [c["tag"] for c in clip["candidates"]] == ["menu_s4242"]
+        assert clip["candidates"][0]["live"] is True
+
+
+def test_clear_raw_retires_the_not_baked_warning():
+    """Any real bake retires the `raw` flag, or the warning outlives the condition it describes."""
+    with tempfile.TemporaryDirectory() as base:
+        d = os.path.join(base, "r1")
+        os.makedirs(d)
+        open(os.path.join(d, "cine_base.mp4"), "wb").write(b"\0")
+        json.dump({"tag": "t", "raw": True}, open(os.path.join(d, "cine_base.cand.json"), "w"))
+        assert hs._room_clips(base, "r1")[0]["raw"] is True
+        hs._clear_raw(base, "r1", "base")
+        assert hs._room_clips(base, "r1")[0]["raw"] is False
+        # the tag survives — it is what marks the live candidate
+        assert json.load(open(os.path.join(d, "cine_base.cand.json")))["tag"] == "t"
+
+
+def test_cine_candidates_are_not_world_states():
+    """The candidate pool must live OUTSIDE the `cine_*` namespace.
+
+    `_room_clips` reads whatever follows the `cine_` prefix as a WORLD STATE NAME, so a candidate
+    stored beside the clip as `cine_base__menu_s1234.mp4` would present in the gallery as a state
+    called `base__menu_s1234`. That failure has already happened once with boxed-era orphans. Keeping
+    the pool in `_scratch/cine_cand/<room>/` makes it unreachable rather than guarded — and `_scratch`
+    is gitignored, which also keeps 3-6 MB videos out of a public Pages repo."""
+    with tempfile.TemporaryDirectory() as base:
+        d = os.path.join(base, "r1")
+        os.makedirs(d)
+        open(os.path.join(d, "cine_base.mp4"), "wb").write(b"\0")
+        cd = os.path.join(base, "_scratch", "cine_cand", "r1")
+        os.makedirs(cd)
+        for nm in ("base__menu_s4242.mp4", "base__menu_s1234.mp4"):
+            open(os.path.join(cd, nm), "wb").write(b"\0")
+        clips = hs._room_clips(base, "r1")
+        assert [c["state"] for c in clips] == ["base"], [c["state"] for c in clips]
+        assert sorted(c["tag"] for c in clips[0]["candidates"]) == ["menu_s1234", "menu_s4242"]
+
+
+def test_cine_candidate_live_marker_is_a_marker_not_a_menu():
+    """`live` flags which candidate the committed clip came from, and nothing else depends on it.
+
+    Lucas, 2026-09-08, on the stills and hotspots panes: the committed item arriving with a different
+    menu from its siblings "just slightly complicates the interaction". So every candidate carries the
+    same payload shape and the same control; the only difference is this boolean."""
+    with tempfile.TemporaryDirectory() as base:
+        d = os.path.join(base, "r1")
+        os.makedirs(d)
+        open(os.path.join(d, "cine_base.mp4"), "wb").write(b"\0")
+        cd = os.path.join(base, "_scratch", "cine_cand", "r1")
+        os.makedirs(cd)
+        for nm in ("base__a.mp4", "base__b.mp4"):
+            open(os.path.join(cd, nm), "wb").write(b"\0")
+        json.dump({"tag": "b"}, open(os.path.join(d, "cine_base.cand.json"), "w"))
+        cands = {c["tag"]: c for c in hs._room_clips(base, "r1")[0]["candidates"]}
+        assert cands["b"]["live"] is True
+        assert cands["a"]["live"] is False
+        assert set(cands["a"]) == set(cands["b"])        # identical payload shape, no special-casing
+
+
+def test_a_state_with_candidates_but_no_clip_is_reachable():
+    """A room whose renders have never been promoted must still show its pool.
+
+    `_room_clips` is driven by `cine_<state>.mp4`, so before this the first batch of candidates for a
+    room was completely invisible: the gallery said "no cinemagraph rendered for this room yet" while
+    three clips sat in the pool. Same unreachable-first-bake shape as the overnight loop's spec-with-no
+    -clip case, which declared itself finished having rendered nothing."""
+    with tempfile.TemporaryDirectory() as base:
+        os.makedirs(os.path.join(base, "r1"))
+        cd = os.path.join(base, "_scratch", "cine_cand", "r1")
+        os.makedirs(cd)
+        open(os.path.join(cd, "base__menu_s4242.mp4"), "wb").write(b"\0")
+        clips = hs._room_clips(base, "r1")
+        assert [c["state"] for c in clips] == ["base"], [c["state"] for c in clips]
+        assert clips[0]["file"] is None and clips[0]["pending"] is True
+        assert [c["tag"] for c in clips[0]["candidates"]] == ["menu_s4242"]
+
+
 def test_room_clips_carries_the_committed_mask():
     """The gallery's sliders open on the COMMITTED choice, so the clip payload must carry it.
 
@@ -1657,6 +1899,72 @@ def test_room_clips_carries_the_committed_mask():
         assert clips["base"]["mask"]["pct"] == 88.0
         assert clips["base"]["mask"]["region"] == 250.0
         assert clips["night"]["mask"] == {}          # no sidecar -> no claim, not a fabricated default
+
+
+def test_paint_out_boxes_reach_the_gallery_and_are_sanitised():
+    """The hand-drawn pins the Baked tab's `✎ paint out` writes, and the shape they arrive in.
+
+    Added 2026-09-06 with the loop's new hero-only policy: the overnight run stops spending re-renders
+    on suppressing incidental motion, on the understanding that Lucas removes what he doesn't want by
+    hand. That was only a workable trade once he had a tool for it — the two sliders both select FOR
+    motion, so no rung of either removes a specific unwanted mover (see cinemagraph_tools/AGENTS.md).
+
+    Two things pinned here. The sidecar's `paintOut` must reach the clip payload, or the layer reopens
+    empty and yesterday's pins look like they were never made. And the endpoint must drop degenerate
+    rectangles: a stray click in paint mode is a zero-area box, and one that reached `mask_png` would
+    be a pin that pins nothing while still being counted and displayed as a pin.
+    """
+    with tempfile.TemporaryDirectory() as base:
+        d = os.path.join(base, "r1")
+        os.makedirs(d)
+        open(os.path.join(d, "cine_base.mp4"), "wb").write(b"\0")
+        json.dump({"pct": "auto", "paintOut": [{"name": "churn", "box": [0.1, 0.2, 0.3, 0.4]}]},
+                  open(os.path.join(d, "cine_base.mask.json"), "w"))
+        clips = {c["state"]: c for c in hs._room_clips(base, "r1")}
+        assert clips["base"]["mask"]["paintOut"][0]["name"] == "churn"
+
+        # ...and the writer. `rebuild_clip` is stubbed: this asserts on the RECORD, which is the part
+        # the UI reads back and the bake resolves from.
+        #
+        # NO PYTEST FIXTURES IN THIS FILE. It doubles as a standalone script — the `__main__` block
+        # calls every `test_*` with no arguments, and `run_all_tests.py` runs it that way — so a
+        # `monkeypatch` parameter here breaks the repo-wide go/no-go while passing under pytest.
+        # Save and restore by hand.
+        #
+        # The stub is INJECTED into `sys.modules` rather than imported-and-patched: `_run_paint_rebuild`
+        # does its own `import cine_scenario` and resolves `rebuild_clip` off whatever is there, so this
+        # is both sufficient and independent of test ORDER — importing it for real passed alone and
+        # failed in the full run, because sys.path is not a stable fixture here.
+        import sys as _sys
+        import threading as _threading
+        import types as _types
+        old_jobs, old_lock = hs.JOBS, hs.LOCK
+        had_cs = "cine_scenario" in _sys.modules
+        prev_cs = _sys.modules.get("cine_scenario")
+        stub = _types.ModuleType("cine_scenario")
+        stub.rebuild_clip = lambda *a, **k: None
+        hs.JOBS, hs.LOCK = {"slot": {}}, _threading.Lock()
+        _sys.modules["cine_scenario"] = stub
+        try:
+            hs._run_paint_rebuild("slot", base, "r1", "base", [
+                {"name": "keep", "box": [0.5, 0.5, 0.6, 0.6]},
+                {"name": "click", "box": [0.2, 0.2, 0.2, 0.2]},        # zero area — a stray click
+                {"name": "inverted", "box": [0.9, 0.9, 0.1, 0.1]},     # dragged the wrong way
+                {"name": "short", "box": [0.1, 0.1, 0.2]},             # malformed
+            ])
+            cfg = json.load(open(os.path.join(d, "cine_base.mask.json")))
+            assert [b["name"] for b in cfg["paintOut"]] == ["keep"]
+            assert cfg["pct"] == "auto"      # the slider's committed choice was NOT clobbered
+
+            # Clearing every box must UNPIN, not leave an empty list that reads as "pins exist".
+            hs._run_paint_rebuild("slot", base, "r1", "base", [])
+            assert "paintOut" not in json.load(open(os.path.join(d, "cine_base.mask.json")))
+        finally:
+            hs.JOBS, hs.LOCK = old_jobs, old_lock
+            if had_cs:
+                _sys.modules["cine_scenario"] = prev_cs
+            else:
+                _sys.modules.pop("cine_scenario", None)
 
 
 def test_state_still_is_the_state_s_own_art():

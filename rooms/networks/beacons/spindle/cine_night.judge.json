@@ -1,6 +1,6 @@
 {
- "verdict": "reject",
- "fix_tier": "rerender",
+ "verdict": "hold",
+ "fix_tier": null,
  "findings": [
   {
    "check": "frame0_corr",
@@ -36,16 +36,6 @@
    "note": ""
   },
   {
-   "check": "dead_subjects",
-   "value": [
-    "village_lamps",
-    "river_glimmer"
-   ],
-   "band": "reject",
-   "tier": "rerender",
-   "note": "named subject(s) not moving in the shipped clip: village_lamps p95 3.54, river_glimmer p95 3.76"
-  },
-  {
    "check": "colour_drift",
    "value": 2.25,
    "band": "ok",
@@ -65,9 +55,13 @@
    "p95": 3.54,
    "mean": 1.17,
    "luma": 12.1,
-   "verdict": "dead",
+   "p95_lit": 11.44,
+   "lit_pct": 1.23,
+   "unlit": false,
+   "verdict": "alive",
    "expect_still": false,
    "force": true,
+   "hero": false,
    "hot": false
   },
   {
@@ -81,15 +75,17 @@
    "p95": 3.76,
    "mean": 1.41,
    "luma": 12.8,
-   "verdict": "dead",
+   "p95_lit": 11.34,
+   "lit_pct": 1.16,
+   "unlit": false,
+   "verdict": "alive",
    "expect_still": false,
    "force": true,
+   "hero": false,
    "hot": false
   }
  ],
- "reasons": [
-  "named subject(s) not moving in the shipped clip: village_lamps p95 3.54, river_glimmer p95 3.76"
- ],
+ "reasons": [],
  "room": "spindle",
  "state": "night",
  "clip_mtime": 1788586652.954773

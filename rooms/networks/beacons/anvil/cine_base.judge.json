@@ -1,6 +1,6 @@
 {
- "verdict": "reject",
- "fix_tier": "rerender",
+ "verdict": "hold",
+ "fix_tier": null,
  "findings": [
   {
    "check": "frame0_corr",
@@ -36,13 +36,13 @@
    "note": ""
   },
   {
-   "check": "dead_subjects",
+   "check": "quiet_subjects",
    "value": [
     "far_smoke"
    ],
-   "band": "reject",
-   "tier": "rerender",
-   "note": "named subject(s) not moving in the shipped clip: far_smoke p95 3.22"
+   "band": "warn",
+   "tier": "human",
+   "note": "named but not moving \u2014 the room's hero motion is alive, so this is a mask/accept question rather than a re-render: far_smoke p95 3.22"
   },
   {
    "check": "colour_drift",
@@ -70,6 +70,7 @@
    "verdict": "dead",
    "expect_still": false,
    "force": true,
+   "hero": false,
    "hot": false
   },
   {
@@ -89,6 +90,7 @@
    "verdict": "alive",
    "expect_still": false,
    "force": false,
+   "hero": false,
    "hot": false
   },
   {
@@ -108,12 +110,11 @@
    "verdict": "dead",
    "expect_still": true,
    "force": false,
+   "hero": false,
    "hot": false
   }
  ],
- "reasons": [
-  "named subject(s) not moving in the shipped clip: far_smoke p95 3.22"
- ],
+ "reasons": [],
  "room": "anvil",
  "state": "base",
  "clip_mtime": 1788709640.4665003

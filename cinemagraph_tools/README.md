@@ -26,7 +26,8 @@ older hotspot-crop clips (288x512 and similar) — see the note at the end.
 | `queue_drained.sh` | waits for ComfyUI's queue to be genuinely empty. Chaining on "the previous script exited" is wrong — a script that hits its poll timeout exits while its renders are still queued |
 | `auto_mask.py` | picks the post-processing mask threshold by OBJECT SOLIDITY, not by percentile. Also fills interior holes, which is what lets a high threshold and complete objects coexist. `drop_small` is the SECOND axis — a region-size cut that removes isolated speckle a percentile can never see (default off) |
 | `paste_tile.py` | composites a repair tile back into a full-frame clip. Pastes the OBJECT (where the tile moved, intersected with `--region`), feathers, and colour-matches first |
-| `colour_normalise.py` | flattens a global colour drift. **NOT a default step** — it can introduce visible brightness pumping; judge by eye, never by the number it optimises |
+| `cine_contact_sheet.py` | **the judging artefact, 2026-09-07.** Five panels per clip — first frame, mid-loop frame, amplified difference, optical-flow magnitude (what DISPLACED), motion-compensated residual (what flow could NOT explain = flicker). Makes the verdict obvious in a glance where the mp4 and every pixel statistic did not. **Numbers OFF by default** so the labels it collects stay uncontaminated; `--with-numbers` for reading a sheet afterwards |
+| `colour_normalise.py` | flattens a global colour drift — the one defect neither mask axis nor a paint-out can reach, because it is global. Called by `cine_scenario.colour_normalised`, **opt-in per clip** (`cine_<state>.mask.json` -> `colourNormalise`, or the Baked tab's `flatten brightness`). **NOT a default step** — it can introduce visible brightness pumping; judge by eye, never by the number it optimises |
 
 ## Unattended repair (the overnight loop)
 

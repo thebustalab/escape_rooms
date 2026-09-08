@@ -18,6 +18,11 @@ const SCENARIOS = [
   { name: "airship", path: "/escape_rooms/rooms/data_vis2/airship/play.html" },
   { name: "egypt", path: "/escape_rooms/rooms/wrangling/egypt/play.html" },
   { name: "canyon", path: "/escape_rooms/rooms/hierarchical_clustering/canyon/play.html" },
+  // subway is still `in_development`, but it is covered from WIRING rather than from promotion: it is
+  // the first DYNAMIC PUZZLE QUEUE scenario, so "does a queue scenario load, enter and attach hotspots"
+  // is a question about the shared engine and not just about this room (escape_room_wiring: add a new
+  // scenario's play URL here, one line, every time).
+  { name: "subway", path: "/escape_rooms/rooms/networks/subway/play.html" },
 ];
 
 for (const sc of SCENARIOS) {

@@ -464,6 +464,34 @@ COMPARING_MEANS_SPA_KEY <- list(
   }
 )
 
+# networks / subway (scenario id 21): "The Faintest Line" — gene co-expression networks on a disused
+# underground rail network run as a lichen farm.
+#
+# THIS ONE IS KEYED BY LADDER RUNG, NOT BY ROOM, and that is the whole reason it looks unlike its
+# siblings. subway uses the DYNAMIC PUZZLE QUEUE (`shared/puzzle_queue.js`): each locked driver's cab
+# is a `queue:true` SLOT that serves the NEXT unsolved rung, so which cab poses which question differs
+# between students and a room-keyed vector could not be graded. `queueSteps()` therefore emits one step
+# per queue entry in QUEUE order, so step k is always rung k for every student.
+#
+# The four rungs, with the correct option index varied across them (never all at [0], which would be a
+# visible tell): rung 1 the reference pair XAN_4574 (2), rung 2 the control strand XAN_6246 (0), rung 3
+# the works' standing practice XAN_1815 (5) — the taught trap — and rung 4 the regulator XAN_1192 (3).
+# Each is re-derived from data/lichen_expression.csv on every run of rooms/networks/subway/test_subway.py.
+#
+# The escape (the traffic-office routing frame, grid references E5 + I4) is an ungraded `lock` and is
+# NOT in the codec, exactly as in every other scenario.
+NETWORKS_SUBWAY_KEY <- list(
+  scenario_id = 21,
+  correct = c(2, 0, 5, 3),
+  score_step = function(correct, answer, attempts) {
+    if (answer != correct) return(0)
+    if (attempts <= 1) return(10)
+    if (attempts == 2) return(7)
+    if (attempts == 3) return(5)
+    3
+  }
+)
+
 # Vectorised over a data frame of submissions.
 grade_submissions <- function(df, key, id_col = "x500", code_col = "code",
                               secret = SECRET) {
@@ -664,5 +692,27 @@ if (identical(environment(), globalenv()) && sys.nframe() == 0) {
   cat("Pano canyon grade — points:", cg14$points, "|", cg14$detail, "\n")
   if (!isTRUE(cg14$valid && cg14$points == 40)) {
     stop("REGRESSION: pano canyon grade wrong — expected 40 pts for an all-first-try solve")
+  }
+
+  # Regression: pano scenario id 21 (networks/subway) — the DYNAMIC PUZZLE QUEUE. Four steps in QUEUE
+  # order (rung 1..4), not room order, correct indices c(2, 0, 5, 3). A full-marks solve answers each
+  # rung's correct option first try. This is the first queue scenario in the decoder, so the round-trip
+  # is worth pinning: if `queueSteps` ever emitted room-order steps instead, this is what would catch it.
+  qsteps21 <- list(list(answer = 2, attempts = 1),
+                   list(answer = 0, attempts = 1),
+                   list(answer = 5, attempts = 1),
+                   list(answer = 3, attempts = 1))
+  # VERSION 2, not 1: id 21 does not fit v1's 4-bit id nibble (1..15). The engine mints v2 for every
+  # scenario (pano-player.js -> EscapeCodec.encode), and a v1 call here would have truncated 21 to 5.
+  qcode21 <- encode_code(version = 2, scenario_id = 21, steps = qsteps21, student_id = "subway_test")
+  qd21 <- decode_code(qcode21, "subway_test")
+  qok21 <- qd21$valid && qd21$scenario_id == 21 &&
+    identical(qd21$answers, c(2L, 0L, 5L, 3L)) && identical(qd21$attempts, c(1L, 1L, 1L, 1L))
+  cat("Pano round-trip OK id 21 (should be TRUE):", qok21, "\n")
+  if (!qok21) stop("REGRESSION: pano round-trip failed (id 21 subway)")
+  qg21 <- grade_one(qcode21, "subway_test", NETWORKS_SUBWAY_KEY)
+  cat("Pano subway grade — points:", qg21$points, "|", qg21$detail, "\n")
+  if (!isTRUE(qg21$valid && qg21$points == 40)) {
+    stop("REGRESSION: pano subway grade wrong — expected 40 pts for an all-first-try solve")
   }
 }

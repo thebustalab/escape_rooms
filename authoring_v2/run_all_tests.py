@@ -93,6 +93,15 @@ def _suites(fast=False):
         rel = os.path.relpath(p, ROOT)
         add(rel, "python", [sys.executable, rel])
 
+    # cinemagraph_tools was MISSING from this runner until 2026-09-06, which is the worst omission it
+    # could have had: `test_cine_judge.py` exists specifically to pin verdicts this pipeline has got
+    # wrong on real art, and `test_still_pins.py` pins the mask blackout — i.e. exactly the regressions
+    # a go/no-go is for. They ran only when someone remembered to point pytest at that directory. Run
+    # from their own directory: they import sibling modules (`cine_judge`, `motion_spec`) by bare name.
+    for p in sorted(glob.glob(os.path.join(ROOT, "cinemagraph_tools", "test_*.py"))):
+        add(os.path.relpath(p, ROOT), "python",
+            [sys.executable, os.path.basename(p)], cwd=os.path.dirname(p))
+
     # --- per-scenario: discovered, so a new scenario is covered the day it is wired -----------------
     for p in sorted(glob.glob(os.path.join(ROOT, "rooms", "*", "*", "test_*.py"))):
         rel = os.path.relpath(p, ROOT)

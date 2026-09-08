@@ -82,6 +82,25 @@ def _seam_anchor(spec):
     return s.strip().rstrip(".")
 
 
+# EMITTED INTO EVERY SCENE PROMPT, FOR EVERY SCENARIO (Lucas, 2026-09-07).
+#
+# `networks/subway` produced the best equirectangular images in the corpus, and this is the clause that
+# did it. It was written for one room after a cab came back as a FLAT, rectilinear elevation of a single
+# wall — parallel walls, no barrel curvature, a corner returning at each frame edge — and every render
+# since has wrapped correctly. Lucas: *"whatever equirectangular verbiage you're using, that should
+# become standard verbiage for the specs of all scenarios going forward."*
+#
+# It lives HERE, in the renderer, rather than in each scenario's `negatives`, so no author has to
+# remember it and no scenario can be missing it. Interiors are the case that needs it most: a small box
+# of a room is where the model most wants to hand you one wall seen head-on.
+EQUIRECT = ("This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously "
+            "right around the viewer with strong barrel curvature, the ceiling and floor bow across the "
+            "frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen "
+            "at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, "
+            "there is no single-vanishing-point composition, and it is never a view of the room from "
+            "outside it or from across it")
+
+
 def render_prompt(spec):
     """Deterministically render a scene spec into a gpt-image-2 prompt in the house left-to-right format.
     The panorama's L/R wrap is anchored to a NAMED seam surface, stated at BOTH the head and tail of the
@@ -89,7 +108,7 @@ def render_prompt(spec):
     quality. gpt-image describes the far-left and far-right as one surface instead of two clashing objects."""
     setting = spec.get("setting", "the centre of the room")
     seam = _seam_anchor(spec)
-    intro = f"This is a seamless 360-degree panorama from {setting}."
+    intro = f"This is a seamless 360-degree panorama from {setting}. {EQUIRECT}."
     seam_head = (f"Directly behind the viewer, split across the extreme left and extreme right edges, is "
                  f"{seam}: the far-left edge and the far-right edge are the two halves of this one surface "
                  f"and must match exactly in colour, texture, and lighting, joining into a single continuous, "

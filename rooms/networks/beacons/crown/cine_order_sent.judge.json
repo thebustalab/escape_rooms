@@ -1,6 +1,6 @@
 {
- "verdict": "reject",
- "fix_tier": "rerender",
+ "verdict": "hold",
+ "fix_tier": null,
  "findings": [
   {
    "check": "frame0_corr",
@@ -36,13 +36,13 @@
    "note": "the part of the frame declared rigid changes brightness by 7.40 (worst single-frame step 3.49, 40% of its own mean) \u2014 look at whether a light source is going out and coming back, or only flickering. For scale: hold/base 6.07 was broken, quay/night 4.94 was fine."
   },
   {
-   "check": "dead_subjects",
+   "check": "quiet_subjects",
    "value": [
     "beacon_fires"
    ],
-   "band": "reject",
-   "tier": "rerender",
-   "note": "named subject(s) not moving in the shipped clip: beacon_fires p95 0.49"
+   "band": "warn",
+   "tier": "human",
+   "note": "named but not moving \u2014 the room's hero motion is alive, so this is a mask/accept question rather than a re-render: beacon_fires has no lit pixels in its box (0.20% above luma 80) \u2014 the box is aimed off the subject, or the subject is unlit; re-aim before re-rendering"
   },
   {
    "check": "weak_subjects",
@@ -82,9 +82,13 @@
    "p95": 0.49,
    "mean": 0.13,
    "luma": 2.8,
+   "p95_lit": null,
+   "lit_pct": 0.2,
+   "unlit": true,
    "verdict": "dead",
    "expect_still": false,
    "force": false,
+   "hero": false,
    "hot": false
   },
   {
@@ -98,9 +102,13 @@
    "p95": 38.52,
    "mean": 7.58,
    "luma": 23.7,
+   "p95_lit": null,
+   "lit_pct": 6.07,
+   "unlit": false,
    "verdict": "alive",
    "expect_still": false,
    "force": false,
+   "hero": false,
    "hot": true
   },
   {
@@ -114,15 +122,17 @@
    "p95": 4.79,
    "mean": 1.92,
    "luma": 24.2,
+   "p95_lit": 6.3,
+   "lit_pct": 2.59,
+   "unlit": false,
    "verdict": "weak",
    "expect_still": false,
    "force": false,
+   "hero": false,
    "hot": false
   }
  ],
- "reasons": [
-  "named subject(s) not moving in the shipped clip: beacon_fires p95 0.49"
- ],
+ "reasons": [],
  "room": "crown",
  "state": "order_sent",
  "clip_mtime": 1788672563.3155155

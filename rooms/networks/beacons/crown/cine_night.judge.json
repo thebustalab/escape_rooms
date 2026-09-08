@@ -1,6 +1,6 @@
 {
- "verdict": "reject",
- "fix_tier": "rerender",
+ "verdict": "hold",
+ "fix_tier": null,
  "findings": [
   {
    "check": "frame0_corr",
@@ -36,13 +36,13 @@
    "note": ""
   },
   {
-   "check": "dead_subjects",
+   "check": "quiet_subjects",
    "value": [
     "glacier_tarn"
    ],
-   "band": "reject",
-   "tier": "rerender",
-   "note": "named subject(s) not moving in the shipped clip: glacier_tarn has no lit pixels in its box (0.14% above luma 80) \u2014 the box is aimed off the subject, or the subject is unlit; re-aim before re-rendering"
+   "band": "warn",
+   "tier": "human",
+   "note": "named but not moving \u2014 the room's hero motion is alive, so this is a mask/accept question rather than a re-render: glacier_tarn has no lit pixels in its box (0.14% above luma 80) \u2014 the box is aimed off the subject, or the subject is unlit; re-aim before re-rendering"
   },
   {
    "check": "colour_drift",
@@ -70,6 +70,7 @@
    "verdict": "alive",
    "expect_still": false,
    "force": false,
+   "hero": false,
    "hot": false
   },
   {
@@ -89,6 +90,7 @@
    "verdict": "alive",
    "expect_still": false,
    "force": false,
+   "hero": false,
    "hot": false
   },
   {
@@ -108,12 +110,11 @@
    "verdict": "dead",
    "expect_still": false,
    "force": true,
+   "hero": false,
    "hot": false
   }
  ],
- "reasons": [
-  "named subject(s) not moving in the shipped clip: glacier_tarn has no lit pixels in its box (0.14% above luma 80) \u2014 the box is aimed off the subject, or the subject is unlit; re-aim before re-rendering"
- ],
+ "reasons": [],
  "room": "crown",
  "state": "night",
  "clip_mtime": 1788740564.8645785

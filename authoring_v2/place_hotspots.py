@@ -257,6 +257,36 @@ def apply_room(base, chapter, scenario, room, spec, pred, dry_run=False):
     return n, notes
 
 
+def write_motion_boxes(base, room, spec, pred, dry_run=False):
+    """Copy the measured box of each `animate` element into `authoring.motionSpec.subjects[].box`.
+
+    WHY IT BELONGS HERE AND NOT AT CINE TIME. The motion subject's box has to be MEASURED off the
+    committed image — guessing it from the element's `at` phrase puts the mask over the wrong region,
+    and `cine_scenario` will happily animate whatever is inside it. This pass has already paid for that
+    measurement: `localizer.py` measures every element in the spec, and the `animate` element is in
+    there even though it gets no hotspot (box cinemagraphs were retired 2026-09-02). So the box is free.
+
+    Subjects are matched to elements BY ID, which is how `motion_spec_from()` names them.
+    """
+    path = os.path.join(base, "scenario.json")
+    doc = json.load(open(path, encoding="utf-8"))
+    node = next((r for r in doc.get("rooms", []) if r.get("key") == room), None)
+    ms = ((node or {}).get("authoring") or {}).get("motionSpec")
+    if not ms or not ms.get("subjects"):
+        return []
+    written = []
+    for sub in ms["subjects"]:
+        box = (pred.get(sub.get("name")) or {}).get("box")
+        if not box:
+            continue
+        sub["box"] = [round(float(v), 4) for v in box]
+        sub["boxSource"] = "measured:localizer"
+        written.append("%s %s" % (sub["name"], sub["box"]))
+    if written and not dry_run:
+        json.dump(doc, open(path, "w", encoding="utf-8"), indent=2, ensure_ascii=False)
+    return written
+
+
 def _main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--chapter", required=True)
@@ -269,6 +299,14 @@ def _main():
                          "The single pass reads a 0.1 grid on a 1536-px downscale and returns "
                          "region-accurate, object-inaccurate boxes; this fixes that. One extra vision "
                          "call per hotspot.")
+    ap.add_argument("--motion", action="store_true",
+                    help="ALSO write each room's hero-motion subject box into `authoring.motionSpec`, "
+                         "measured in the SAME pass. The localizer already measures every element in "
+                         "the spec — including the `animate` one, which gets no hotspot since box "
+                         "cinemagraphs were retired — so the box is free once the pass has run. "
+                         "Without this the motion subject has to be measured by hand at cine time, "
+                         "which is how a subject box comes to be guessed from its `at` phrase instead "
+                         "of read off the committed image.")
     ap.add_argument("--commit-boxes", action="store_true",
                     help="write onto the COMMITTED hotspots (and mirror to plannedHotspots) instead of "
                          "drafting onto plannedHotspots only. Never overwrites a box tagged "
@@ -296,6 +334,11 @@ def _main():
                   % (room, len(cluster), ", ".join(cluster[:4])))
             failed.append(room)
             continue
+        if a.motion:
+            mv = write_motion_boxes(base, room, spec, pred, a.dry_run)
+            if mv:
+                print("%-12s motion subject box%s: %s" % (room, "" if len(mv) == 1 else "es",
+                                                          ", ".join(mv)))
         if a.commit_boxes:
             n, notes = apply_room_committed(base, room, spec, pred, a.dry_run)
         else:

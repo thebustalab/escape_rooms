@@ -38,6 +38,14 @@ Per rooms/<chapter>/<scenario>/scenario.json, for every BUILT room:
   - MISS  a graded engine (question/check/pick/map) hands the answer away via feedback.reveal
   - MISS  an MCQ has fewer than 6 options (need >=6 data-derived distractors)
   - MISS  a `ready` scenario has no test_<name>.py (pins each room's answer to the CSV + decoder lockstep)
+  - MISS  `done`/`escapeDone`/`debrief` is a bare string rather than an object — the engine reads
+          `.title`/`.body`, so the authored finish screen silently falls back to the generic one
+          (subway + clouds, found 2026-09-07). Valid JSON, clean prose, screen still renders: nothing
+          else catches this.
+  - MISS  `status` is neither "in_development" nor "ready" — a free-text progress note in the promotion
+          SWITCH reads as not-ready by accident and lands verbatim in scenario_inventory.json (subway
+          carried a 641-char build report there; clouds/heist/beacons too, 2026-09-07). Notes belong in
+          `_designNotes.buildState`.
 
   GLOBAL (whole repo — only on a full run, not a single-scenario check)
   - STALE   rooms/scenario_inventory.json is out of date (re-run authoring/scenario_inventory.py)
@@ -246,6 +254,34 @@ def check_scenario(path):
     scen = json.load(open(path, encoding="utf-8"))
     fails, misses = [], []
     ready = scen.get("status") == "ready"
+
+    # `status` IS THE PROMOTION SWITCH, and its vocabulary is closed: "in_development" or "ready"
+    # (absent = in_development). It is not a free-text progress note. The generator surfaces it into
+    # rooms/scenario_inventory.json and downstream surfaces filter on == "ready" (the newsletter's
+    # test-drive dropdown, newsletter/newsletter.py), so a prose value behaves as not-ready by
+    # accident rather than by decision, and dumps a paragraph into the inventory on the way past.
+    # Found 2026-09-07 auditing subway, which carried a 641-character build report here; clouds,
+    # heist and beacons had done the same thing. Checked centrally rather than fixed four times,
+    # per the audit's "a new generic error class belongs in the validator" rule. The progress note
+    # is worth keeping — put it in `_designNotes.buildState`, which is where subway's went.
+    if scen.get("status") is not None and scen["status"] not in ("in_development", "ready"):
+        misses.append("`status` is prose, not the in_development/ready SWITCH the inventory and the "
+                      "newsletter dropdown read — move the note to `_designNotes.buildState` "
+                      f"(got {scen['status'][:60]!r}...)")
+
+    # `done` / `escapeDone` / `debrief` must be OBJECTS, not bare strings. The engine reads
+    # `SCENARIO.done.title` and `SCENARIO.done.body` (pano-player.js -> finishAnalysis / showEscapeDone);
+    # a string has no `.title`, so BOTH fall through to the generic "Nice work — you've finished this
+    # scenario." and the authored finish screen is never once shown to a player. Nothing caught it:
+    # the JSON is valid, the text passes validate_story.py, and the screen still renders. Found
+    # 2026-09-07 in subway, whose two lines were the intended TITLES; clouds has the same shape.
+    for fld in ("done", "escapeDone", "debrief"):
+        v = scen.get(fld)
+        if v is not None and not isinstance(v, dict):
+            misses.append(f"`{fld}` is a bare {type(v).__name__}, not an object — the engine reads "
+                          f"`{fld}.title`/`.body`, so the authored screen never shows and the player "
+                          f"gets the generic fallback. Wrap it: {{\"title\": ..., \"body\": ...}}")
+
     # completeness (MISS)
     for r in scen.get("rooms", []):
         if not r.get("built"):

@@ -92,18 +92,159 @@ MIN_LIT_PX = 50        # below this there is no lit subject in the box to measur
 # the thing IS (a slot-canyon sky should be near-still; a waterfall should not) and no threshold knows that.
 HOT_P95 = 35.0
 
+# ── THE FLICKER PROBLEM, AND WHY LIVENESS HAD TO BECOME RELATIVE (2026-09-07) ──────────────────────
+# Lucas, after watching the beacons set: "a lot of the images have this kind of like flicker in them
+# that's part of the loop and ... it's registering in our metrics as the hero motion even though it
+# isn't actually that motion ... the pipeline that we have set up is like driving the whole situation
+# towards that type of loop."
+#
+# He was right, and the effect is not marginal. Every bar above this line is ABSOLUTE — a p95 of the
+# per-pixel temporal std inside the subject's own box, compared against a fixed number. Nothing
+# anywhere asked the only question that separates motion from shimmer: is this box varying MORE THAN
+# THE STONE IS? Measured over all 62 named movers in networks/beacons:
+#
+#   * ONE had real local motion — ladder/base's waterfall, p95 29.58 against a rigid background of
+#     8.82, i.e. 3.35x.
+#   * 14 were between 1.5x and 3x.
+#   * 47 were BELOW 1.5x, and many below 1.0x: fenwatch/base's mist band measured 9.08 while the
+#     rigid stone around it measured 12.72 — the stone was varying more than the mist. crown/order_sent
+#     was the starkest: beacon_fires 0.44 against a rigid background of 21.10, a clip that is pure
+#     frame-wide shimmer with a completely dead hero, and one Lucas had called fine.
+#
+# The whole-frame p95 and the rigid-region p95 agreed to within a few percent in every clip, which is
+# the signature: nothing in particular is moving, everything is boiling gently.
+#
+# WHY THE PIPELINE SELECTED FOR IT. A dead subject was the only finding that booked a re-render, so
+# the loop re-rolled until it got a clip that scored — and a uniform shimmer scores in every box at
+# once. STABILISER_TAIL was asking for exactly that ("Continuous gentle ambient motion throughout the
+# whole scene", now removed; see below). Metric and prompt were pulling the same way.
+#
+# AND IT IS LOCAL, NOT A GLOBAL DRIFT — which rules out the tool that looks like the answer. Splitting
+# the rigid-region variance into a per-frame global component and a per-pixel local one: global 0.15
+# to 0.29, local 2.17 to 4.18. `colour_normalise` is a single gain per frame and its own docstring
+# says it "cannot fix the small wiggle in supposedly-static pixels ... LOCAL, per-pixel and
+# uncorrelated". The mask is the only thing that removes this, and the prompt is the only thing that
+# stops it being generated.
+#
+# CALIBRATION IS THIN — ONE POSITIVE EXAMPLE — so the bars are deliberately asymmetric and the
+# contrast can only ever DEMOTE a verdict, never promote one. The convicting bar is the low one, where
+# the evidence is overwhelming (47 subjects, many under 1.0x, none of which Lucas could see moving).
+# The 3.0x bar only downgrades `alive` to `weak`, which is report-only everywhere. Per this repo's own
+# rule — a metric earns a gate only by reproducing Lucas's call several times — 3.0 is PROVISIONAL and
+# wants more accepted clips behind it before anything is allowed to convict on it.
+# ⚠️ RETRACTED AS A VERDICT THE SAME DAY IT WAS ADDED (2026-09-07 evening). The contrast is still
+# computed and reported; it no longer changes any verdict, because it does not reproduce Lucas's calls.
+# egypt/quay's `harbour_water` — a clip he ACCEPTED — measures p95 47.00 against a rigid 37.67, i.e.
+# contrast 1.25, which this rule would have demoted to `dead`. The rigid reference is only as good as
+# the subject boxes, and egypt's are drawn loosely enough that real water sits outside them, so the
+# "rigid" region contains movers. Turn this back on only when a labelled set says it should.
+CONTRAST_DECIDES = False
+DEAD_CONTRAST = 1.5    # at or under this, the box is not moving more than the rigid frame: not motion
+ALIVE_CONTRAST = 3.0   # provisional. below it, `alive` is demoted to `weak` and nothing else happens
+MIN_RIGID_PX = 500     # too little declared-rigid area to form a reference; contrast is then unknown
+
+
+def static_mask(spec, H, W):
+    """The part of the frame the spec declares rigid: everything outside every MOVING subject.
+
+    A `still` subject is not carved out — it is declared not to move, so it belongs to the region
+    being tested, and carving it out would exempt the pins from the very check they exist for.
+
+    Lives HERE rather than in `cine_judge` (where it started) so that `measure_subjects` can build the
+    background reference itself. A contrast that only some callers computed would be worse than none:
+    the judge would convict on it and a bare `motion_spec --clip` run would silently disagree.
+    """
+    import numpy as np
+    m = np.ones((H, W), bool)
+    for s in spec.get("subjects") or []:
+        b = s.get("box")
+        if not b or s.get("still"):
+            continue
+        y0, y1 = int(b[1] * H), max(int(b[3] * H), int(b[1] * H) + 1)
+        x0, x1 = int(b[0] * W), max(int(b[2] * W), int(b[0] * W) + 1)
+        m[y0:y1, x0:x1] = False
+    return m
+
+
+def background_p95(tstd, spec, luma=None, lit_only=False):
+    """p95 of the per-pixel temporal std over the declared-rigid region — the shimmer floor.
+
+    None when the spec leaves too little of the frame rigid to form a reference (a `[0,0,1,1]` mover
+    box, say). None means "unknown", and every caller must treat it as "no contrast check", never as
+    a pass or a fail.
+
+    IN A BAKED CLIP THIS SHOULD BE NEAR ZERO. The playback mask composites the frozen still into every
+    pixel it holds back, so a rigid pixel the mask covered is bit-identical frame to frame. A rigid p95
+    of 8 to 13 — which is what beacons measured — is therefore not a fact about the render, it is the
+    mask having admitted the shimmer as motion. That is what `cine_judge.rigid_flicker` convicts on,
+    and it is fixable by re-baking at a tighter threshold rather than by any amount of GPU.
+    """
+    import numpy as np
+    m = static_mask(spec, tstd.shape[0], tstd.shape[1])
+    if lit_only:
+        # LIKE FOR LIKE, and getting this wrong shipped a misleading number for one turn. A sparse lit
+        # subject is measured on its BRIGHTEST pixels (`lit_p95`), because a box that is 99% dark sky
+        # is arithmetically blind to a lamp in it. Dividing that by a background taken over ALL rigid
+        # pixels — most of them dark — compares two different populations and inflates the ratio:
+        # ladder/night's river reported contrast 2.94 that way, against an honest 0.49 on the raw box.
+        # So when the subject took the sparse path, the reference must be taken over rigid pixels of
+        # comparable brightness, or declared unknown.
+        if luma is None:
+            return None
+        m = m & (luma >= BRIGHT_LUMA)
+        if m.sum() < MIN_LIT_PX:
+            return None            # nothing bright and rigid to compare against: UNKNOWN, not a pass
+        return float(np.percentile(tstd[m], 95))
+    if m.sum() < MIN_RIGID_PX:
+        return None
+    return float(np.percentile(tstd[m], 95))
+
+
 # The stabiliser. Unchanged from the validated night/day runs; the last sentence is THE demonstrated
 # prompt rule — a two-ended loop forbids net travel, because both ends are pinned to the same still.
 STABILISER_HEAD = ("locked-off static camera bolted to a tripod, the frame never moves: ")
-STABILISER_TAIL = (". Continuous gentle ambient motion throughout the whole scene. {rigid} are rigid and "
-                   "fixed — they do not warp, drift, breathe or change shape. Only water, cloth, flame, "
-                   "smoke and haze move. NOTHING TRAVELS ACROSS THE FRAME: every movement is a small "
-                   "cyclic motion that returns to where it began. Seamless natural loop.")
+# ── REWRITTEN 2026-09-07, and this is the generation-side half of the flicker fix ─────────────────
+# WHAT WAS REMOVED, AND WHY IT WAS THE ROOT CAUSE. The tail used to open with "Continuous gentle
+# ambient motion throughout the whole scene." — a standing, unconditional request for exactly the
+# frame-wide boil Lucas identified: "a lot of the images have this kind of like flicker in them that's
+# part of the loop ... it's registering in our metrics as the hero motion even though it isn't
+# actually that motion." Under a one-hero spec that clause is not merely unhelpful, it is the
+# opposite of the instruction, and the relative-liveness gate above would now convict every clip it
+# succeeds in producing. Metric and prompt were both selecting for the same wrong thing; this is the
+# other half.
+#
+# It was already on record as harmful and the note was not followed far enough. AGENTS.md's
+# "A room whose ONLY legitimate mover is dust" entry says this clause "demands whole-frame motion and
+# then confiscates almost every outlet", which is how egypt's Library came to animate its paper. That
+# was read as a problem for STARVED rooms. It is a problem for every room.
+#
+# "Only water, cloth, flame, smoke and haze move" went with it, for a subtler reason: it licenses
+# every instance of those five substances in the frame, which in this world means every river, every
+# cloud and every snowfield — while the spec names one of them as the hero. The new sentence
+# subsumes it and says something stronger and unambiguous.
+#
+# THE STABILISER NO LONGER ASKS FOR ANY MOTION IT WAS NOT GIVEN A SUBJECT FOR. Everything the clip
+# should do now comes from the subject phrases; everything else is explicitly required to be
+# identical frame to frame.
+STABILISER_TAIL = (". THE NAMED SUBJECT ABOVE IS THE ONLY THING IN THE ENTIRE FRAME THAT MOVES. Every "
+                   "other pixel of the image is perfectly static and identical in every frame: no "
+                   "ambient motion, no shimmer, no flicker, no grain, no sparkle, no crawling or "
+                   "boiling texture, no rippling of any surface that is not named above, and no "
+                   "brightness change anywhere. {rigid} are rigid and fixed — they do not warp, "
+                   "drift, breathe, shimmer or change shape. NOTHING TRAVELS ACROSS THE FRAME: the "
+                   "one movement is a small cyclic motion that returns to where it began. Seamless "
+                   "natural loop.")
 DEFAULT_RIGID = "The buildings, walls, stonework, ground and horizon"
 
+# The negatives gained the shimmer vocabulary in the same change as the tail above. A negative cannot
+# outvote a positive whole-frame instruction — that is the Library lesson — so this is only worth
+# anything now that the positive request for ambient motion is gone. Both halves or neither.
 BASE_NEG = ("camera movement, pan, tilt, zoom, parallax, dolly, tracking shot, whole image moving, "
             "background sliding, warping, morphing, people, crowd, cars, vehicles, new objects "
-            "appearing, explosion, distorted, blurry, low quality, jittery, hard seam")
+            "appearing, explosion, distorted, blurry, low quality, jittery, hard seam, "
+            "shimmer, shimmering, flicker, flickering, film grain, noise, sparkle, twinkling texture, "
+            "crawling texture, boiling pixels, whole scene shimmering, ambient motion everywhere, "
+            "pulsing brightness, exposure change")
 # Written documents must be PINNED, not animated: the deck day render grew a curling corner with
 # visibly crawling text, and adding this plus an explicit "lies flat and still" phrase fixed it outright.
 NEG_PAPER = (", paper curling, parchment lifting, page turning, writing changing, text moving, "
@@ -130,6 +271,12 @@ def validate(spec):
         # the positive mover list. Its phrase, if given, is a PIN and is rendered as one.
         if not s.get("phrase") and not s.get("still"):
             errs.append("%s: no `phrase` — it would be measured but never named in the prompt" % nm)
+        # `hero` and `still` are opposite claims about the same subject — one says "this is the
+        # motion the room exists to show", the other "freeze this". A subject carrying both would
+        # be pinned black in the playback mask and then convicted for not moving, which is a loop
+        # that cannot be satisfied by any render. See `hero_deaths`.
+        if s.get("hero") and s.get("still"):
+            errs.append("%s: both `hero` and `still` — a pinned subject cannot be the hero motion" % nm)
         b = s.get("box")
         if not (isinstance(b, (list, tuple)) and len(b) == 4):
             errs.append("%s: no box — cannot be measured, so the gate would silently skip it" % nm)
@@ -203,6 +350,10 @@ def measure_subjects(mp4, spec, frames=None):
     tstd = st.std(axis=0).mean(axis=2)
     luma = st.mean(axis=0).mean(axis=2)
     H, W = tstd.shape
+    # THE SHIMMER FLOOR, computed ONCE per clip and attached to every subject. See the flicker note
+    # above: without it a frame-wide shimmer reads as motion in every box simultaneously.
+    bg = background_p95(tstd, spec)
+    bg_lit = background_p95(tstd, spec, luma=luma, lit_only=True)
     out = []
     for s in spec.get("subjects") or []:
         b = s.get("box")
@@ -232,6 +383,26 @@ def measure_subjects(mp4, spec, frames=None):
         # MAX, so the sparse path can only rescue. `p95` stays the raw box figure: it is what the
         # `still` pins are checked against and what every historical calibration note refers to.
         eff = max(p95, lit_p95) if lit_p95 is not None else p95
+
+        # ---- absolute verdict, then the contrast, which may only DEMOTE it ------------------------
+        verdict = "dead" if eff < DEAD_P95 else ("weak" if eff < WEAK_P95 else "alive")
+        contrast, flicker_pass = None, False
+        # Match the reference to the statistic: a subject rescued by the sparse-lit path is compared
+        # against LIT rigid pixels, everything else against the whole rigid region.
+        ref = bg_lit if lit_p95 is not None and eff == lit_p95 else bg
+        if ref is not None and ref > 1e-6:
+            contrast = eff / ref
+            # ⚠️ THE DEMOTION IS DISABLED — see CONTRAST_DECIDES. Kept computed because the number is
+            # informative; kept inert because it has never reproduced a verdict.
+            if CONTRAST_DECIDES and contrast <= DEAD_CONTRAST:
+                # Not moving more than the declared-rigid frame is. Whatever the absolute number says,
+                # there is no LOCAL motion here — this is the 47-of-62 case. `flicker_pass` records
+                # that the absolute bar was cleared on frame-wide shimmer, so a reader can tell this
+                # apart from a subject that simply measured low.
+                flicker_pass = (verdict != "dead")
+                verdict = "dead"
+            elif CONTRAST_DECIDES and contrast < ALIVE_CONTRAST and verdict == "alive":
+                verdict = "weak"       # provisional bar; `weak` is report-only everywhere
         out.append({
             "name": s["name"], "box": list(b),
             "p95": round(p95, 2), "mean": round(float(reg.mean()), 2),
@@ -239,12 +410,55 @@ def measure_subjects(mp4, spec, frames=None):
             "p95_lit": round(lit_p95, 2) if lit_p95 is not None else None,
             "lit_pct": round(lit_frac * 100, 2),
             "unlit": unlit,
-            "verdict": "dead" if eff < DEAD_P95 else ("weak" if eff < WEAK_P95 else "alive"),
+            "verdict": verdict,
+            "bg_p95": round(ref, 2) if ref is not None else None,
+            "bg_all_p95": round(bg, 2) if bg is not None else None,
+            "contrast": round(contrast, 2) if contrast is not None else None,
+            "flicker_pass": flicker_pass,
             "expect_still": bool(s.get("still")),
             "force": bool(s.get("force_repair")),
+            "hero": bool(s.get("hero")),
             "hot": bool(p95 >= HOT_P95),
         })
     return out
+
+
+def hero_deaths(measured):
+    """The dead subjects a loop is entitled to spend a RE-RENDER on. Everything else is advisory.
+
+    THE POLICY THIS ENCODES (Lucas, 2026-09-06): "look for one or two hero motions to animate and
+    get those going and then call it good, leaving me to do the mask and accept/commit ... rather
+    than doing a bunch of cycles to get some motion in some specific spots."
+
+    Why it needed encoding rather than a note in a prompt: `dead_subjects` is the ONLY expensive
+    gate in `cine_judge` — the others either convict on something free to fix (a rebake) or merely
+    warn — and it scales with how many subjects a spec names. Name eight movers and you have built
+    eight independent ways to demand ten minutes of DGX. On networks/beacons that arithmetic ran 42
+    re-renders against 4 rebakes for 25 clips: about seven GPU-hours, and almost all of it spent
+    suppressing or chasing incidental motion rather than establishing the room's actual hero.
+
+    So liveness is gated on the HERO, and the rest of the frame is the mask's business:
+
+      * heroes declared -> a dead hero convicts. That is the room failing to do the one thing it
+        was designed to do, and no mask can rescue it because there is no motion to let through.
+      * no heroes declared (every spec authored before this flag existed) -> convict only when
+        the WHOLE spec is dead, i.e. not one named mover animated. A clip with some motion in it
+        is a clip a human can finish; a clip with none is a failed render.
+
+    The second rule is what makes the change reach the ~12 scenarios already specced without
+    re-authoring them, and it is deliberately the gentlest reading: it can only ever convict a
+    strict subset of what the old any-dead-subject rule convicted.
+
+    A `still` subject is never a hero — the flags are mutually exclusive and `validate` says so.
+    """
+    movers = [m for m in measured if not m["expect_still"]]
+    if not movers:
+        return []
+    heroes = [m for m in movers if m.get("hero")]
+    if heroes:
+        return [m for m in heroes if m["verdict"] == "dead"]
+    dead = [m for m in movers if m["verdict"] == "dead"]
+    return dead if len(dead) == len(movers) else []
 
 
 def repair_list(measured):

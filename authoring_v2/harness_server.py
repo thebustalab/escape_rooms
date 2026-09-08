@@ -1550,6 +1550,13 @@ def _apply_balance(base=None, apply=True):
 
 # fields that describe the box/design manifest, never the authored content — never copied onto a
 # placed hotspot (box+id are placement; type/label are the placed box's own; note is design-only).
+#
+# `boxSource` is DELIBERATELY NOT in this set (decision 2026-09-08, Lucas). It is box provenance
+# (`draft:localizer` / `review:agent` / `review:lucas`) and so by the rule above it "should" be
+# skipped, but it rides onto every promoted hotspot and is kept there on purpose: the value stays
+# accurate, and a committed box that says `draft:localizer` is a box no human ever reviewed, which
+# is worth being able to see. Nothing reads it off a committed hotspot yet — that is fine, it is
+# recorded provenance, not an input. Do not "fix" this by adding it to the set.
 _PLANNED_SKIP = {"box", "id", "type", "label", "note"}
 
 
@@ -2093,6 +2100,53 @@ def _state_still_rel(base, room_key, state, doc=None):
     return "%s/scene.png" % room_key
 
 
+def _cine_cand_dir(base, room_key):
+    """Where cinemagraph CANDIDATES live: `_scratch/cine_cand/<room>/`.
+
+    NOT beside the clip and NOT under the `cine_` prefix, for two separate reasons.
+
+    Publish footprint: `escape_rooms/**/_scratch/` is gitignored, and these are 3-6 MB videos in a
+    public GitHub Pages repo. A candidate pool in the room directory would be pushed.
+
+    And the documented trap: `_room_clips` globs `cine_*.mp4` and treats whatever follows the prefix as
+    a WORLD STATE NAME, so a candidate called `cine_base_s1234.mp4` would present in the gallery as a
+    world state called `base_s1234`. That has already happened once with boxed-era orphans. Keeping
+    candidates out of that namespace makes the bug unreachable rather than guarded against.
+    """
+    return os.path.join(base, "_scratch", "cine_cand", room_key)
+
+
+def _cine_candidates(base, room_key, state):
+    """Every candidate clip for one (room, state), newest first.
+
+    Named `<state>__<tag>.mp4`; the tag is free-form (a seed, a prompt arm, a date) and is what the
+    reviewer sees. `live` marks the candidate the committed clip was built from, recorded in
+    `cine_<state>.cand.json` at promote time — a MARKER only. Every candidate, live one included,
+    carries the identical control set in the gallery, because Lucas's note on the stills and hotspots
+    panes is that the committed item arriving with a different menu from its siblings is exactly the
+    friction to avoid here.
+    """
+    d = _cine_cand_dir(base, room_key)
+    if not os.path.isdir(d):
+        return []
+    live = None
+    cj = os.path.join(base, room_key, "cine_%s.cand.json" % state)
+    if os.path.isfile(cj):
+        try:
+            live = (json.load(open(cj, encoding="utf-8")) or {}).get("tag")
+        except Exception:  # noqa: BLE001
+            live = None
+    out = []
+    for f in glob.glob(os.path.join(d, "%s__*.mp4" % state)):
+        tag = os.path.basename(f)[len(state) + 2:-len(".mp4")]
+        out.append({"tag": tag,
+                    "file": os.path.relpath(f, base),
+                    "mtime": int(os.path.getmtime(f)),
+                    "live": tag == live})
+    out.sort(key=lambda c: -c["mtime"])
+    return out
+
+
 def _room_clips(base, room_key, doc=None):
     """The baked cinemagraphs sitting in a room directory, as {state, file} in state order.
 
@@ -2138,9 +2192,39 @@ def _room_clips(base, room_key, doc=None):
         # THE STILL FOR **THIS** STATE. A variant clip sits over the variant's own panorama, not over
         # `scene.png`: showing the base art underneath a night clip makes the reviewer judge a composite
         # that will never exist. Resolved through `scene_states`, the same way the bake resolves it.
+        # RAW = promoted from a candidate and not baked since. The pane says so, because an un-baked
+        # clip has had no loop crossfade and no wrap-seam repair and would otherwise be judged as if
+        # it had. Cleared by any mask/patch commit, since those go through the full bake.
+        raw = False
+        cj2 = os.path.join(d, "cine_%s.cand.json" % state)
+        if os.path.isfile(cj2):
+            try:
+                raw = bool((json.load(open(cj2, encoding="utf-8")) or {}).get("raw"))
+            except Exception:  # noqa: BLE001
+                raw = False
         out.append({"state": state, "file": "%s/%s" % (room_key, name),
-                    "patches": patches, "mask": mask,
+                    "patches": patches, "mask": mask, "raw": raw,
+                    "candidates": _cine_candidates(base, room_key, state),
                     "still": _state_still_rel(base, room_key, state, doc)})
+    # A STATE WITH CANDIDATES BUT NO COMMITTED CLIP MUST STILL APPEAR. This loop is driven by
+    # `cine_<state>.mp4`, so a room whose first renders are sitting in the candidate pool and have never
+    # been promoted showed "no cinemagraph rendered for this room yet" and hid the pool completely —
+    # the same unreachable-first-bake shape the overnight loop hit (a spec with no clip matched no
+    # selector, so the job declared itself finished having rendered nothing). Emitted with `file: None`
+    # so the gallery knows to show the candidate strip and not the mask controls.
+    have = {c["state"] for c in out}
+    cd = _cine_cand_dir(base, room_key)
+    if os.path.isdir(cd):
+        pending = set()
+        for f in glob.glob(os.path.join(cd, "*__*.mp4")):
+            st = os.path.basename(f).split("__", 1)[0]
+            if st and st not in have:
+                pending.add(st)
+        for st in sorted(pending):
+            out.append({"state": st, "file": None, "pending": True,
+                        "patches": [], "mask": {},
+                        "candidates": _cine_candidates(base, room_key, st),
+                        "still": _state_still_rel(base, room_key, st, doc)})
     out.sort(key=lambda c: (c["state"] != "base", c["state"]))   # base first, then variants
     # SERVED — is this clip actually wired for play, or only sitting on disk? Baked-but-unwired is the
     # invisible state that let nine reviewed canyon clips never reach a player (2026-09-01), so it is
@@ -2401,10 +2485,278 @@ def _run_mask_rebuild(slot, base, room, state, pct, enabled, region=0.0):
         cfg["pct"] = pct
         cfg["region"] = float(region)      # ppm of the frame; see auto_mask.drop_small
         cfg["enabled"] = bool(enabled)
+        # THE SLIDER WAS INERT ON ANY ROOM WITH A MOTION SPEC. `_mask_inputs` defaults `maskMode` to
+        # "boxes" whenever the room has mover boxes, and this writer never set `maskMode` — so a
+        # committed percentile was recorded, ignored, and the box mask used instead. Dragging the
+        # threshold did nothing on exactly the rooms most likely to need it.
+        #
+        # It is also how cropping_weld came back with 0.6% of the frame playing: its spec names ONE
+        # subject, a 0.096 x 0.061 extractor grille, so box mode froze 99.4% of the picture to the
+        # still. That is correct behaviour for a hero-and-pins spec and wrong for a menu prompt, which
+        # names no boxes at all.
+        #
+        # A commit from this endpoint is an explicit human threshold decision, so it wins: record the
+        # mode alongside the rung. Box mode remains reachable by authoring `maskMode: "boxes"` in the
+        # sidecar, which is where that decision belongs.
+        cfg["maskMode"] = "auto"
         json.dump(cfg, open(sj, "w", encoding="utf-8"), indent=1)
         sys.path.insert(0, os.path.join(ESCAPE_ROOT, "cinemagraph_tools"))
         import cine_scenario as _cs  # noqa: WPS433
-        _cs.rebuild_clip(base, room, state, log=lambda m: None)
+        _cs.rebuild_clip(base, room, state, log=_bake_log(slot))
+        _clear_raw(base, room, state)
+        with LOCK:
+            JOBS[slot]["done"] = 1
+    except Exception as e:  # noqa: BLE001
+        with LOCK:
+            JOBS[slot]["error"] = str(e)[-400:]
+    with LOCK:
+        JOBS[slot]["active"] = False
+
+
+def _run_paint_rebuild(slot, base, room, state, boxes, cnorm=None, pace=None):
+    """Record the HAND-DRAWN pins for a clip and rebuild it, so the file matches what was painted.
+
+    Separate from `_run_mask_rebuild` on purpose. The two sliders and the paint boxes are both mask
+    decisions and both live in `cine_<state>.mask.json`, but they are edited independently: committing a
+    box must not also commit whatever position a slider happens to be sitting at mid-drag, and vice
+    versa. So each writer touches only its own keys.
+
+    WHY THIS ENDPOINT EXISTS. `thresh` and `region` both SELECT FOR MOTION, so neither can remove a
+    specific unwanted mover — canon is explicit that no rung drops a churning codex without dropping the
+    drifting dust several rungs earlier. Until now the only thing that could was a `still: True` subject
+    in the motion spec, i.e. authoring, which meant "leave the tidying to the human's mask pass" was not
+    actually a workflow the human had a tool for. Painting is pure bake-time: no GPU, seconds.
+    """
+    try:
+        sj = os.path.join(base, room, "cine_%s.mask.json" % state)
+        cfg = {}
+        if os.path.isfile(sj):
+            try:
+                cfg = json.load(open(sj, encoding="utf-8"))
+            except Exception:  # noqa: BLE001
+                cfg = {}
+        clean = []
+        for i, b in enumerate(boxes or []):
+            box = b.get("box") if isinstance(b, dict) else b
+            try:
+                x0, y0, x1, y1 = [max(0.0, min(1.0, float(v))) for v in box]
+            except Exception:  # noqa: BLE001
+                continue
+            if x1 <= x0 or y1 <= y0:
+                continue          # an empty or inverted rectangle pins nothing; drop it here, not in the bake
+            nm = (b.get("name") if isinstance(b, dict) else None) or "paint_%d" % (i + 1)
+            clean.append({"name": re.sub(r"[^A-Za-z0-9_]", "", str(nm))[:40] or "paint_%d" % (i + 1),
+                          "box": [x0, y0, x1, y1]})
+        if clean:
+            cfg["paintOut"] = clean
+        else:
+            cfg.pop("paintOut", None)      # clearing every box must actually UNPIN, not leave [] behind
+        # FLATTEN A WHOLE-FRAME BRIGHTNESS ARC. Carried on this endpoint because it is the same kind of
+        # decision as a paint-out — a human bake choice, written to the same sidecar, applied by the same
+        # rebuild — and because it is the one defect a paint-out CANNOT reach: the drift is global, so
+        # there is no rectangle to draw around it (`cine_scenario.colour_normalised`). `None` means the
+        # caller is not expressing an opinion, and leaves whatever was set alone.
+        if cnorm is not None:
+            if cnorm:
+                cfg["colourNormalise"] = True
+            else:
+                cfg.pop("colourNormalise", None)
+        # PACE — how long each generated frame is held, applied after the bake by
+        # `cine_scenario.paced`. Same shape as the two above: a human bake decision, same sidecar, same
+        # rebuild, free and reversible. `None` = no opinion expressed, leave whatever was set.
+        # 1.0 means "as rendered" and is stored as absence, so a clip never carries a no-op key.
+        if pace is not None:
+            try:
+                pv = float(pace)
+            except (TypeError, ValueError):
+                pv = 1.0
+            if pv > 1.001:
+                cfg["pace"] = round(min(4.0, pv), 3)
+            else:
+                cfg.pop("pace", None)
+        json.dump(cfg, open(sj, "w", encoding="utf-8"), indent=1)
+        sys.path.insert(0, os.path.join(ESCAPE_ROOT, "cinemagraph_tools"))
+        import cine_scenario as _cs  # noqa: WPS433
+        _cs.rebuild_clip(base, room, state, log=_bake_log(slot))
+        _clear_raw(base, room, state)
+        with LOCK:
+            JOBS[slot]["done"] = 1
+    except Exception as e:  # noqa: BLE001
+        with LOCK:
+            JOBS[slot]["error"] = str(e)[-400:]
+    with LOCK:
+        JOBS[slot]["active"] = False
+
+
+# Re-bake stages, in the order `cine_scenario.rebuild_clip` performs them, matched against its own log
+# lines. Driving the progress bar off the log rather than off a new callback API means the bar cannot
+# drift out of step with the pipeline: if a stage stops logging, it stops counting, and if a stage is
+# added it is one entry here. `done` only ever moves forward, so an out-of-order or repeated line (a
+# scenario with several repair patches logs "re-applied patch" once each) cannot make the bar go
+# backwards.
+_BAKE_STAGES = (
+    ("re-applied patch", 1, "re-applying repair patches"),
+    ("colour-normalised", 2, "flattening brightness"),
+    ("mask:", 3, "building the playback mask"),
+    ("mask disabled", 3, "baking unmasked"),
+    ("pinned still", 3, "applying pins"),
+    ("bake:", 4, "baking the loop and repairing the seam"),
+    ("paced", 5, "slowing to the chosen pace"),
+    ("rebuilt", 5, "done"),
+)
+_BAKE_TOTAL = 5
+
+
+def _bake_log(slot):
+    """A `log` callable for `rebuild_clip` that reports progress into the job record.
+
+    The rebuild was previously passed `log=lambda m: None`, so a re-bake was a spinner with no
+    information in it — and a re-bake is 10-40 s of ffmpeg on a 3072x1024 clip, long enough that Lucas
+    asked for a bar. This is where the information already was; it was being thrown away."""
+    with LOCK:
+        if slot in JOBS:
+            JOBS[slot]["total"] = _BAKE_TOTAL
+            JOBS[slot]["stage"] = "starting"
+
+    def _log(msg):
+        m = str(msg)
+        for needle, step, label in _BAKE_STAGES:
+            if needle in m:
+                with LOCK:
+                    j = JOBS.get(slot)
+                    if j is not None and step > j.get("done", 0):
+                        j["done"] = step
+                        j["stage"] = label
+                break
+    return _log
+
+
+def _clear_raw(base, room, state):
+    """A clip that has just been through `rebuild_clip` is no longer a raw promote.
+
+    The `raw` flag exists so the pane can warn that a promoted candidate has had no loop crossfade and
+    no wrap-seam repair. Every mask, paint and patch commit runs the full bake, so each of them has to
+    retire the flag — otherwise the warning outlives the condition and the pane cries wolf on a clip
+    that is properly baked."""
+    cj = os.path.join(base, room, "cine_%s.cand.json" % state)
+    if not os.path.isfile(cj):
+        return
+    try:
+        d = json.load(open(cj, encoding="utf-8")) or {}
+    except Exception:  # noqa: BLE001
+        return
+    if d.pop("raw", None):
+        json.dump(d, open(cj, "w", encoding="utf-8"), indent=1)
+
+
+def _cine_trash(base, room_key):
+    """Where deleted clips and candidates go: `_scratch/cine_deleted/<room>/`.
+
+    MOVED, NOT UNLINKED. "Park, never delete" is the standing rule in this pipeline and a parked file
+    is the only way back from a bad call — but the harness also has to actually LOOK clean, which is
+    what Lucas asked for ("a little x ... so I can delete bad ones as they show up, just so I can keep
+    the harness clean"). A move satisfies both: the file leaves every glob the gallery reads, and it is
+    still on disk.
+
+    Under `_scratch` because that is gitignored: these are 3-6 MB videos and this is a public GitHub
+    Pages repo. Parking a clip in the room directory as `cine_base.mp4.deleted_<stamp>` would drop out
+    of the `cine_*.mp4` glob correctly but would then be PUSHED.
+    """
+    return os.path.join(base, "_scratch", "cine_deleted", room_key)
+
+
+def _run_cine_delete(slot, base, room, state, tag=None):
+    """Retire a candidate (`tag` given) or the committed clip (`tag` None). No re-bake either way.
+
+    Deleting the COMMITTED clip takes its sidecars with it — the mask, the patch list and the candidate
+    marker all describe a file that no longer exists, and leaving them behind is how a later promote
+    would inherit a mask from a render nobody can see any more. That is the same class of bug as the
+    one that masked 99.4% of cropping_weld. The room drops back to "no clip chosen yet" and its pool
+    stays intact, so picking again is one click.
+    """
+    try:
+        trash = _cine_trash(base, room)
+        os.makedirs(trash, exist_ok=True)
+        stamp = time.strftime("%Y%m%d_%H%M%S")
+        moved = []
+        if tag:
+            src = os.path.join(_cine_cand_dir(base, room), "%s__%s.mp4" % (state, tag))
+            if not os.path.isfile(src):
+                raise ValueError("no candidate %r for %s/%s" % (tag, room, state))
+            shutil.move(src, os.path.join(trash, "%s__%s.%s.mp4" % (state, tag, stamp)))
+            moved.append(tag)
+        else:
+            rd = os.path.join(base, room)
+            names = ["cine_%s.mp4" % state, "cine_%s_src.mp4" % state, "cine_%s_raw.mp4" % state,
+                     "cine_%s.mask.json" % state, "cine_%s.patches.json" % state,
+                     "cine_%s.cand.json" % state, "cine_%s.judge.json" % state]
+            for nm in names:
+                cur = os.path.join(rd, nm)
+                if os.path.isfile(cur):
+                    shutil.move(cur, os.path.join(trash, "%s.%s" % (nm, stamp)))
+                    moved.append(nm)
+            if not moved:
+                raise ValueError("no committed clip for %s/%s" % (room, state))
+        with LOCK:
+            JOBS[slot]["outputs"] = moved
+            JOBS[slot]["done"] = 1
+    except Exception as e:  # noqa: BLE001
+        with LOCK:
+            JOBS[slot]["error"] = str(e)[-400:]
+    with LOCK:
+        JOBS[slot]["active"] = False
+
+
+def _run_cine_choose(slot, base, room, state, tag):
+    """Promote one candidate to the committed clip. NO bake, NO mask, nothing else.
+
+    WHY IT DOES NOTHING ELSE (Lucas, 2026-09-08). The first version re-baked through `rebuild_clip`,
+    reasoning that the mask, the paint-outs, the flatten flag and the pace were decisions about the
+    ROOM and so should survive a change of render. That was wrong, and it showed up immediately: on a
+    room whose previous clip had a committed mask, picking a candidate displayed it with "almost
+    everything" masked back to the still.
+
+    The reasoning was wrong because **a mask threshold is not a property of the room.** It is a
+    PERCENTILE of one specific clip's own temporal-std distribution — absolute std values are
+    meaningless across scenes, which is why the slider is a percentile in the first place. Carry p88
+    from render A to render B and it selects a completely different set of pixels; if B is quieter than
+    A it can select almost none, and the reviewer sees the still. Paint-out rectangles have the same
+    problem in a milder form: they were drawn around something that moved in A.
+
+    So the promote is now exactly a promote. The candidate becomes both the unpatched source (so the
+    ordinary mask/patch rebuild path works from it) and the committed clip itself (so what is displayed
+    at full size is the candidate, unaltered). The old sidecar is PARKED rather than deleted, and a
+    fresh one records `enabled: false` so the threshold slider opens at OFF and says the truth about
+    the file on disk instead of inheriting a claim from a render that no longer exists.
+
+    Masking and baking are then Lucas's, on the controls already in the pane: "Once I click 'use this'
+    I want to handle the mask and baking manually." The clip is therefore un-baked until he asks — no
+    loop crossfade and no wrap-seam repair yet — which is why it is flagged `raw` and the pane labels it.
+    """
+    try:
+        cand = os.path.join(_cine_cand_dir(base, room), "%s__%s.mp4" % (state, tag))
+        if not os.path.isfile(cand):
+            raise ValueError("no candidate %r for %s/%s" % (tag, room, state))
+        rd = os.path.join(base, room)
+        stamp = time.strftime("%Y%m%d_%H%M%S")
+        # Park, never delete — the standing rule here, and the only way back if this pick is worse.
+        for nm in ("cine_%s_src.mp4" % state, "cine_%s.mp4" % state,
+                   "cine_%s.mask.json" % state, "cine_%s.patches.json" % state):
+            cur = os.path.join(rd, nm)
+            if os.path.isfile(cur):
+                shutil.copyfile(cur, os.path.join(rd, "%s.pre_%s_choose" % (nm, stamp)))
+        shutil.copyfile(cand, os.path.join(rd, "cine_%s_src.mp4" % state))
+        shutil.copyfile(cand, os.path.join(rd, "cine_%s.mp4" % state))
+        # A fresh candidate carries no repair tiles: the old patch list described the render it replaced.
+        pj = os.path.join(rd, "cine_%s.patches.json" % state)
+        if os.path.isfile(pj):
+            json.dump([], open(pj, "w", encoding="utf-8"), indent=1)
+        # `enabled: false` is a positive statement that this file is unmasked, not an absence. Absence
+        # makes the slider open at "auto", which would be a second wrong claim about the same clip.
+        json.dump({"enabled": False},
+                  open(os.path.join(rd, "cine_%s.mask.json" % state), "w", encoding="utf-8"), indent=1)
+        json.dump({"tag": tag, "chosen": stamp, "raw": True},
+                  open(os.path.join(rd, "cine_%s.cand.json" % state), "w", encoding="utf-8"), indent=1)
         with LOCK:
             JOBS[slot]["done"] = 1
     except Exception as e:  # noqa: BLE001
@@ -2433,7 +2785,8 @@ def _run_patch_rebuild(slot, base, room, state, name, enabled):
         json.dump(patches, open(pj, "w", encoding="utf-8"), indent=1)
         sys.path.insert(0, os.path.join(ESCAPE_ROOT, "cinemagraph_tools"))
         import cine_scenario as _cs  # noqa: WPS433
-        _cs.rebuild_clip(base, room, state, log=lambda m: None)
+        _cs.rebuild_clip(base, room, state, log=_bake_log(slot))
+        _clear_raw(base, room, state)
         with LOCK:
             JOBS[slot]["done"] = 1
     except Exception as e:  # noqa: BLE001
@@ -4300,6 +4653,42 @@ class H(http.server.SimpleHTTPRequestHandler):
                     return self._json({"ok": True, **_delete_room_pano(base, rk, req.get("image"))})
                 except ValueError as ve:
                     return self._json({"ok": False, "error": str(ve)}, 400)
+            if route == "/api/discard-room-art":
+                # Discard a room's COMMITTED still (Lucas, 2026-09-07 — every image wants a discard, not
+                # only the uncommitted ones). PARK, NEVER DELETE, per the pipeline's own convention: the
+                # scene files are renamed aside with a dated suffix and the room falls back to unbuilt,
+                # so the next generation starts clean. REFUSES a signed-off still — the UI checks too,
+                # but the check that matters is the one nothing can click past.
+                req = self._body()
+                try:
+                    base = _scenario_base(req.get("chapter"), req.get("scenario"))
+                except ValueError as ve:
+                    return self._json({"ok": False, "error": str(ve)}, 400)
+                rk = re.sub(r"[^A-Za-z0-9_]", "", str(req.get("roomKey") or ""))
+                if not rk:
+                    return self._json({"ok": False, "error": "need roomKey"}, 400)
+                doc = _load_scenario(base)
+                node = next((r for r in doc.get("rooms", []) if r.get("key") == rk), None)
+                if node is None:
+                    return self._json({"ok": False, "error": f"no room {rk}"}, 400)
+                if ((node.get("authoring") or {}).get("seam") or {}).get("accepted"):
+                    return self._json({"ok": False,
+                                       "error": "this still is chosen — clear the sign-off first"}, 400)
+                stamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+                moved = []
+                rd = os.path.join(base, rk)
+                if os.path.isdir(rd):
+                    for fn in sorted(os.listdir(rd)):
+                        if fn == "scene.png" or fn.startswith("scene_"):
+                            if fn.endswith(".png"):
+                                os.rename(os.path.join(rd, fn),
+                                          os.path.join(rd, f"{fn}.pre_{stamp}_discarded"))
+                                moved.append(fn)
+                for k in ("built", "panorama", "builtFrom"):
+                    node.pop(k, None)
+                (node.setdefault("authoring", {})).pop("seam", None)
+                _save_scenario(doc, base)
+                return self._json({"ok": True, "room": rk, "parked": moved})
             if route == "/api/validate-story":
                 # The Story stage's closing gate — see authoring_v2/validate_story.py. `accept` snapshots
                 # the current landing card as the vetted reference; otherwise diff the rest of the text
@@ -4453,6 +4842,65 @@ class H(http.server.SimpleHTTPRequestHandler):
                 if not _start(slot, "maskrebuild",
                               lambda: _run_mask_rebuild(slot, base, room, state, pct,
                                                         req.get("enabled", True), region), 1):
+                    return self._json({"ok": False, "error": "this clip is already rebuilding"}, 409)
+                return self._json({"ok": True, "slot": slot})
+            if route == "/api/mask-paint":       # pin hand-drawn rectangles still, then rebuild the clip
+                req = self._body()
+                try:
+                    base = _scenario_base(req.get("chapter"), req.get("scenario"))
+                except ValueError as ve:
+                    return self._json({"ok": False, "error": str(ve)}, 400)
+                room = re.sub(r"[^A-Za-z0-9_]", "", str(req.get("room") or ""))
+                state = re.sub(r"[^A-Za-z0-9_]", "", str(req.get("state") or "base"))
+                if not room:
+                    return self._json({"ok": False, "error": "need a room"}, 400)
+                boxes = req.get("boxes")
+                if not isinstance(boxes, list):
+                    return self._json({"ok": False, "error": "boxes must be a list"}, 400)
+                # SAME SLOT as the threshold rebuild. Both rebuild the identical file, so letting them
+                # run concurrently would race two writers onto one clip and one sidecar.
+                slot = "mask_%s_%s" % (room, state)
+                cnorm = req.get("colourNormalise")
+                pace = req.get("pace")
+                if not _start(slot, "paintrebuild",
+                              lambda: _run_paint_rebuild(slot, base, room, state, boxes,
+                                                         None if cnorm is None else bool(cnorm),
+                                                         pace), 1):
+                    return self._json({"ok": False, "error": "this clip is already rebuilding"}, 409)
+                return self._json({"ok": True, "slot": slot})
+            if route == "/api/cine-delete":      # retire a candidate, or the committed clip itself
+                req = self._body()
+                try:
+                    base = _scenario_base(req.get("chapter"), req.get("scenario"))
+                except ValueError as ve:
+                    return self._json({"ok": False, "error": str(ve)}, 400)
+                room = re.sub(r"[^A-Za-z0-9_]", "", str(req.get("room") or ""))
+                state = re.sub(r"[^A-Za-z0-9_]", "", str(req.get("state") or "base"))
+                tag = re.sub(r"[^A-Za-z0-9_.-]", "", str(req.get("tag") or "")) or None
+                if not room:
+                    return self._json({"ok": False, "error": "need a room"}, 400)
+                # SAME SLOT as every other writer on this clip: deleting while a re-bake is mid-flight
+                # would race a move against the file that bake is writing.
+                slot = "mask_%s_%s" % (room, state)
+                if not _start(slot, "cinedelete",
+                              lambda: _run_cine_delete(slot, base, room, state, tag), 1):
+                    return self._json({"ok": False, "error": "this clip is busy"}, 409)
+                return self._json({"ok": True, "slot": slot})
+            if route == "/api/cine-choose":      # promote a candidate clip, then rebuild it
+                req = self._body()
+                try:
+                    base = _scenario_base(req.get("chapter"), req.get("scenario"))
+                except ValueError as ve:
+                    return self._json({"ok": False, "error": str(ve)}, 400)
+                room = re.sub(r"[^A-Za-z0-9_]", "", str(req.get("room") or ""))
+                state = re.sub(r"[^A-Za-z0-9_]", "", str(req.get("state") or "base"))
+                tag = re.sub(r"[^A-Za-z0-9_.-]", "", str(req.get("tag") or ""))
+                if not room or not tag:
+                    return self._json({"ok": False, "error": "need room + candidate tag"}, 400)
+                # SAME SLOT as the mask and patch rebuilds: all three write the same clip.
+                slot = "mask_%s_%s" % (room, state)
+                if not _start(slot, "cinechoose",
+                              lambda: _run_cine_choose(slot, base, room, state, tag), 1):
                     return self._json({"ok": False, "error": "this clip is already rebuilding"}, 409)
                 return self._json({"ok": True, "slot": slot})
             if route == "/api/patch-set":        # enable/disable a repair patch, then rebuild the clip

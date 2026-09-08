@@ -188,24 +188,167 @@ def state_still(base, room, state):
     return None
 
 
-def _still_boxes(base, room, state):
-    """The authored `still: True` subjects for this (room, state), as {name, box}.
+def paint_out_boxes(base, room, state):
+    """The HAND-DRAWN pins for this (room, state), from `cine_<state>.mask.json` -> `paintOut`.
 
-    Resolved from `scenario.json` HERE rather than passed in, so that every path to a bake honours the
-    pins — including the gallery's "commit mask + re-bake" and the per-patch rebuild, neither of which
-    has a spec in hand. A pin that survived a render but was dropped by a re-bake would be worse than no
-    pin at all, because it would come back only sometimes."""
+    THE SECOND SOURCE OF PINS, and the one a human owns. An authored `still: True` subject is a claim
+    about the room — this thing is not supposed to move — and it belongs in the motion spec, travels
+    into the render prompt, and is worth a re-render to get right. A paint-out is a much smaller claim:
+    *whatever* that rectangle is doing, do not let it reach the player. It is pure bake-time, costs a
+    `rebuild_clip` and no GPU, and it is the affordance the two mask sliders cannot provide.
+
+    WHY IT HAD TO EXIST BEFORE THE LOOP COULD STOP SUPPRESSING (2026-09-06). The plan is that the
+    overnight loop gets one or two hero motions alive and leaves everything else to Lucas's mask pass.
+    But the mask he had was `thresh` and `region`, and both of those SELECT FOR MOTION — the canon
+    entry is explicit that no rung of either can drop a churning codex without dropping the drifting
+    dust several rungs earlier. So "I'll handle the rest in the mask" was not yet true of the mask that
+    existed: the only thing that could remove a specific unwanted mover was a spec pin, i.e. exactly the
+    authoring the change was meant to avoid. This closes that gap.
+
+    Boxes are [x0, y0, x1, y1] image fractions, the same convention as a motion-spec box.
+    """
+    sj = os.path.join(base, room, "cine_%s.mask.json" % state)
+    if not os.path.isfile(sj):
+        return []
+    try:
+        cfg = json.load(open(sj, encoding="utf-8"))
+    except Exception:  # noqa: BLE001
+        return []
+    out = []
+    for i, b in enumerate(cfg.get("paintOut") or []):
+        box = b.get("box") if isinstance(b, dict) else b
+        if isinstance(box, (list, tuple)) and len(box) == 4:
+            nm = (b.get("name") if isinstance(b, dict) else None) or "paint_%d" % (i + 1)
+            out.append({"name": nm, "box": list(box)})
+    return out
+
+
+def mover_boxes(base, room, state):
+    """The boxes the spec says SHOULD move, as {name, box} — the hero(es) if any are marked, else
+    every non-`still` subject.
+
+    Hero-first is deliberate. Under the one-or-two-hero policy the hero is the motion the room is
+    promised to show; an incidental mover named alongside it is something nobody promised, and the
+    whole point of the box mask is that only promised motion reaches the player. A spec authored
+    before the `hero` flag existed has no heroes, so it falls back to all its movers and behaves as
+    it always did.
+    """
     try:
         doc = json.load(open(os.path.join(base, "scenario.json"), encoding="utf-8"))
-    except Exception:  # noqa: BLE001 — a clips-only fixture has no scenario; nothing is pinned
+    except Exception:  # noqa: BLE001
         return []
     node = next((r for r in doc.get("rooms") or [] if r.get("key") == room), None)
     spec = ((node or {}).get("authoring") or {}).get("motionSpec")
     if isinstance(spec, dict) and state != "base":
         spec = (spec.get("states") or {}).get(state)
-    subs = (spec or {}).get("subjects") or []
-    return [{"name": s.get("name"), "box": s["box"]}
-            for s in subs if s.get("still") and isinstance(s.get("box"), (list, tuple))]
+    subs = [s for s in ((spec or {}).get("subjects") or [])
+            if not s.get("still") and isinstance(s.get("box"), (list, tuple))]
+    heroes = [s for s in subs if s.get("hero")]
+    use = heroes or subs
+    return [{"name": s.get("name"), "box": list(s["box"])} for s in use]
+
+
+def box_mask(base, room, state, size, mover=None, still_boxes=None, feather=24):
+    """The playback mask built FROM THE AUTHORED BOXES, not from measured motion magnitude.
+
+    WHY THIS EXISTS, AND WHY THE THRESHOLD COULD NOT DO IT (2026-09-07, Lucas). The auto threshold
+    chooses which pixels play the video by how hard they move, and on this corpus the hardest-moving
+    thing is not the hero — it is the render's own drift of the rigid scene. Measured on
+    fenwatch/base frame 0 against frame 30: the mist box changed at p95 19 while the office and yard
+    STONE changed at p95 40, twice as hard. So every rung of the threshold ladder kept the drift and
+    dropped the mist, and no rung could do otherwise; the search was well-posed and the answer was
+    that magnitude cannot separate them.
+    A box can, because the spec already says where the motion is supposed to be. Baking fenwatch with
+    the hero box as the mask took the stone from p95 40.00 to **0.00** and the slate roof from 27.00
+    to 0.00 while the mist kept its 21.00, at 8.4% coverage against the threshold's 71.2%.
+
+    THIS IS HOW THE BOXED ERA WORKED, and losing it is what broke the pipeline. `wrangling/trees`
+    animates cloud and mist convincingly — Lucas: "I know for a fact that trees has clouds and mist
+    moving in it, though it was done with the old style box cinemagraphs" — and its clips are small
+    crops (416x448, 640x320) where the object fills the frame. The box WAS the mask, so drift outside
+    it was never in the picture. Replacing that with a magnitude threshold quietly discarded the one
+    thing that made it work.
+
+    THE BOX MUST CONTAIN THE WHOLE MOVING OBJECT. A feathered edge across a region that goes on
+    moving past it reads as motion stopping where it shouldn't — Lucas's own report of the old boxed
+    clips, and the same failure `tile_bounds` warns about for tiles. That is why the box wants a human
+    look, and it is the argument for drawing it during the hotspot phase (todo.md).
+    """
+    import numpy as np
+    from PIL import Image, ImageFilter
+    W, H = size
+    m = np.zeros((H, W), np.float32)
+    used = []
+    for b in (mover or []):
+        try:
+            x0, y0, x1, y1 = [float(v) for v in b["box"]]
+        except Exception:  # noqa: BLE001
+            continue
+        c0, r0 = int(round(x0 * W)), int(round(y0 * H))
+        c1, r1 = int(round(x1 * W)), int(round(y1 * H))
+        if c1 <= c0 or r1 <= r0:
+            continue
+        m[r0:r1, c0:c1] = 1.0
+        used.append(b.get("name") or "unnamed")
+    if not used:
+        return None, None
+    img = Image.fromarray((m * 255).astype("uint8"), "L")
+    if feather:
+        # Softened so the boundary is not a hard rectangle. Canon: a pin edge is invisible where
+        # nothing moves and glaring where something does, so the edge wants to fall off gradually.
+        img = img.filter(ImageFilter.GaussianBlur(feather))
+    a = np.asarray(img, np.float32) / 255.0
+    # PINS LAST, as in the threshold path: a `still` subject inside a mover box must still win.
+    pinned = []
+    for b in (still_boxes or []):
+        try:
+            x0, y0, x1, y1 = [float(v) for v in b["box"]]
+        except Exception:  # noqa: BLE001
+            continue
+        c0, r0 = int(round(x0 * W)), int(round(y0 * H))
+        c1, r1 = int(round(x1 * W)), int(round(y1 * H))
+        if c1 <= c0 or r1 <= r0:
+            continue
+        a[r0:r1, c0:c1] = 0.0
+        pinned.append(b.get("name") or "unnamed")
+    d = os.path.join(base, "_scratch", "motion")
+    os.makedirs(d, exist_ok=True)
+    out = os.path.join(d, "bakemask_%s_%s.png" % (room, state))
+    Image.fromarray((np.clip(a, 0, 1) * 255).astype("uint8"), "L").save(out)
+    meta = {"pct": "boxes", "maskMode": "boxes", "boxes": used, "feather": feather,
+            "coverage": round(float(np.clip(a, 0, 1).mean()), 4), "region": 0.0, "minPx": 0,
+            "threshold": None}
+    if pinned:
+        meta["stillBoxes"] = pinned
+    return out, meta
+
+
+def _still_boxes(base, room, state):
+    """Every pin the bake must honour for this (room, state), as {name, box}.
+
+    TWO SOURCES, UNIONED: the authored `still: True` subjects of the motion spec, and the hand-drawn
+    `paintOut` rectangles from the mask sidecar (`paint_out_boxes`). Both end up forced black in the
+    playback mask, because a pin is a pin once it reaches the bake — what differs is who owns it and
+    whether it also shapes the render prompt.
+
+    Resolved from disk HERE rather than passed in, so that every path to a bake honours the pins —
+    including the gallery's "commit mask + re-bake" and the per-patch rebuild, neither of which has a
+    spec in hand. A pin that survived a render but was dropped by a re-bake would be worse than no pin
+    at all, because it would come back only sometimes."""
+    authored = []
+    try:
+        doc = json.load(open(os.path.join(base, "scenario.json"), encoding="utf-8"))
+    except Exception:  # noqa: BLE001 — a clips-only fixture has no scenario; nothing is authored
+        doc = None
+    if doc is not None:
+        node = next((r for r in doc.get("rooms") or [] if r.get("key") == room), None)
+        spec = ((node or {}).get("authoring") or {}).get("motionSpec")
+        if isinstance(spec, dict) and state != "base":
+            spec = (spec.get("states") or {}).get(state)
+        subs = (spec or {}).get("subjects") or []
+        authored = [{"name": s.get("name"), "box": s["box"]}
+                    for s in subs if s.get("still") and isinstance(s.get("box"), (list, tuple))]
+    return authored + paint_out_boxes(base, room, state)
 
 
 def _mask_inputs(base, room, state, clip, log=print):
@@ -224,7 +367,7 @@ def _mask_inputs(base, room, state, clip, log=print):
     if not os.path.isfile(still):
         return None, None
     sj = os.path.join(room_dir, "cine_%s.mask.json" % state)
-    pct, region = "auto", 0.0
+    pct, region, cfg = "auto", 0.0, {}
     if os.path.isfile(sj):
         try:
             cfg = json.load(open(sj, encoding="utf-8"))
@@ -236,13 +379,163 @@ def _mask_inputs(base, room, state, clip, log=print):
         except Exception:  # noqa: BLE001
             pass
     pins = _still_boxes(base, room, state)
-    mk, meta = mask_png(base, room, state, clip, pct, region, still_boxes=pins)
-    json.dump(dict(meta, enabled=True), open(sj, "w", encoding="utf-8"), indent=1)
-    log("  mask: pct=%s region=%gppm(%dpx) thr=%.2f -> %.1f%% video, rest still"
-        % (meta["pct"], meta["region"], meta["minPx"], meta["threshold"], 100 * meta["coverage"]))
+
+    # ---- MASK MODE: boxes by default, threshold only as a fallback (2026-09-07) -------------------
+    # `maskMode` in the sidecar is an authored override ("boxes" | "auto" | a percentile via `pct`).
+    # With nothing authored, a state that HAS mover boxes uses them, because the threshold provably
+    # cannot separate the hero from the render's drift of the rigid scene — see `box_mask`. A state
+    # with no mover boxes (a boxed-era clip with no spec) has nothing to build a box mask from and
+    # keeps the old behaviour.
+    mode = cfg.get("maskMode")
+    movers = mover_boxes(base, room, state)
+    if mode is None:
+        mode = "boxes" if movers else "auto"
+    if mode == "boxes" and movers:
+        from PIL import Image as _Im  # noqa: WPS433
+        with _Im.open(still) as _s:
+            size = _s.size
+        mk, meta = box_mask(base, room, state, size, mover=movers, still_boxes=pins,
+                            feather=int(cfg.get("feather", 24)))
+        if mk is None:                        # every box malformed — do not ship an unmasked clip
+            log("  box mask produced nothing; falling back to the threshold")
+            mk, meta = mask_png(base, room, state, clip, pct, region, still_boxes=pins)
+        else:
+            log("  mask: BOXES (%s) feather=%d -> %.1f%% video, rest still"
+                % (", ".join(meta["boxes"]), meta["feather"], 100 * meta["coverage"]))
+    else:
+        mk, meta = mask_png(base, room, state, clip, pct, region, still_boxes=pins)
+        log("  mask: pct=%s region=%gppm(%dpx) thr=%.2f -> %.1f%% video, rest still"
+            % (meta["pct"], meta["region"], meta["minPx"], meta["threshold"],
+               100 * meta["coverage"]))
+    # PRESERVE `paintOut` ACROSS THIS REWRITE. `meta` is what the mask builder measured — pct, region,
+    # threshold, coverage — and this line replaces the whole sidecar with it. The hand-drawn pins live
+    # in the SAME file, so writing `dict(meta, ...)` alone deletes them, and it deletes them on the very
+    # next bake: paint a box, commit it, then drop a repair patch, and the boxes are gone with no error
+    # anywhere. That is the same shape as the stale-copy warning in authoring_v2/AGENTS.md ("a stale copy
+    # makes commit mask + re-bake silently drop the pins") and it wants the same treatment — carry the
+    # authored keys forward explicitly rather than trusting a wholesale overwrite.
+    keep = {k: cfg[k] for k in ("paintOut", "maskMode", "feather") if k in cfg}
+    json.dump(dict(meta, enabled=True, **keep), open(sj, "w", encoding="utf-8"), indent=1)
     if meta.get("stillBoxes"):
         log("  pinned still: %s" % ", ".join(meta["stillBoxes"]))
     return still, mk
+
+
+def paced(base, room, state, dest, log=print):
+    """Slow a baked clip down IN PLACE, if this clip's sidecar asks for it.
+
+    OPT-IN per clip via `cine_<state>.mask.json` -> `"pace": 1.5` (a multiplier: 1 = as rendered,
+    1.5 = half again as long, 2 = twice as long). Absent or 1 leaves the file untouched.
+
+    APPLIED AFTER `bake_loop`, not before. The retime rewrites presentation timestamps and the
+    container rate only; `bake_loop` re-encodes at its own constant rate, so anything done earlier is
+    discarded. This runs on the finished file and rewrites it.
+
+    HOW, AND WHY NOT THE OTHER WAYS. Each generated frame is HELD LONGER — no frame is duplicated,
+    dropped or interpolated, so every pixel the model produced is shown and nothing is invented. That
+    matters because the two obvious alternatives are both recorded failures here:
+
+      * Retiming by frame duplication was tried on the quay at half and third speed and Lucas's verdict
+        was "they look 'slowed', not natural" — duplication is not new motion.
+      * Slowing the GENERATION by raising `LTXVConditioning.frame_rate` was tried on 2026-09-08 at 36,
+        48 and 72 against a 24 baseline and it does not work: measured adjacent-frame difference went
+        1.00 -> 1.19 -> 1.60 -> 1.05, i.e. FASTER and non-monotone, because the model is trained around
+        24-25 and an out-of-distribution rate buys per-frame incoherence rather than slower movement.
+
+    Lucas accepted this hold at 1.5x on cropping_weld ("that slow down that you did that you're calling
+    hold that worked"), which is why it is the mechanism wired here. The trade is real and is the reason
+    this is opt-in rather than a default: fewer frames per second of playback means the motion can
+    judder, and how much is tolerable depends on the clip.
+    """
+    sj = os.path.join(base, room, "cine_%s.mask.json" % state)
+    if not os.path.isfile(sj):
+        return dest
+    try:
+        cfg = json.load(open(sj, encoding="utf-8"))
+    except Exception:  # noqa: BLE001
+        return dest
+    try:
+        pace = float(cfg.get("pace") or 1.0)
+    except Exception:  # noqa: BLE001
+        return dest
+    if pace <= 1.001:
+        return dest
+    pace = min(4.0, pace)
+    fps = CS.CR.FPS / pace
+    work = os.path.join(WORK_ROOT, os.path.basename(base.rstrip("/")), room)
+    os.makedirs(work, exist_ok=True)
+    tmp = os.path.join(work, "pace_%s.mp4" % state)
+    cmd = ["ffmpeg", "-v", "error", "-y", "-i", dest,
+           "-vf", "settb=1/%.6f,setpts=N/%.6f/TB" % (fps, fps),
+           "-r", "%.6f" % fps, "-c:v", "libx264", "-crf", "18",
+           "-pix_fmt", "yuv420p", "-movflags", "+faststart", tmp]
+    try:
+        subprocess.run(cmd, check=True)
+        shutil.copyfile(tmp, dest)
+    except Exception as e:  # noqa: BLE001
+        # A failed retime must not lose the clip: keep the baked file and say so.
+        log("  pace %.2fx FAILED (%s) — keeping the clip at rendered pace" % (pace, str(e)[:120]))
+        return dest
+    log("  paced %.2fx: %d fps container, frames held longer (none added or dropped)" % (pace, round(fps)))
+    return dest
+
+
+def colour_normalised(base, room, state, clip, log=print):
+    """Flatten a whole-frame brightness/colour drift, if this clip's sidecar asks for it.
+
+    OPT-IN, per clip, via `cine_<state>.mask.json` -> `"colourNormalise": true` (or a float strength
+    0..1). Returns the path to use for the bake — the input unchanged when the flag is absent, which is
+    every clip until someone sets it.
+
+    WHY IT IS OPT-IN AND NOT A DEFAULT. `colour_normalise.py`'s own docstring is the warning: it is a
+    GLOBAL per-frame gain, so it can only fix a defect that is itself global, and `colour_normalise` is
+    listed in the motion skill as "NOT a default step — it can introduce visible brightness pumping".
+    A night room lit by a fire is *supposed* to change brightness over the loop; flattening that would
+    remove the thing the room is for.
+
+    WHY IT IS WIRED AT ALL (anvil/night, 2026-09-06). This is the one defect class the mask provably
+    cannot touch, and the overnight loop proved it rather than guessing: it simulated the bake at mask
+    percentiles 46/60/75/85/90/93/96 and showed the bright pavement's brightening arc carries a LARGER
+    temporal std than the village lamps, so any mask tight enough to kill the swing kills the subjects
+    first (by p93 the pavement still swings 4.75 while `village_lamps` has collapsed to 0.45). It then
+    measured this tool on the same clip: frame swing 3.86 -> 0.31, pavement 11.03 -> 2.61, with the
+    subjects still alive (village_lamps 4.99 -> 4.37, river_glimmer 7.63 -> 6.60). And it could not act,
+    because the tool was ORPHANED — `grep` found no importer anywhere in the bake chain. That is the
+    "settled finding with no call site" failure this directory's AGENTS.md exists to prevent, hit for
+    the sixth time, so it gets a call site.
+
+    It is also why this belongs here rather than in the loop: with the loop hero-gated, a whole-frame
+    swing is report-only and will never book a re-render. Flattening it is a bake decision, free, and
+    re-runnable — the same shape as a pin.
+    """
+    sj = os.path.join(base, room, "cine_%s.mask.json" % state)
+    if not os.path.isfile(sj):
+        return clip
+    try:
+        cfg = json.load(open(sj, encoding="utf-8"))
+    except Exception:  # noqa: BLE001
+        return clip
+    want = cfg.get("colourNormalise")
+    if not want:
+        return clip
+    strength = 1.0 if want is True else max(0.0, min(1.0, float(want)))
+    if strength <= 0:
+        return clip
+    work = os.path.join(WORK_ROOT, os.path.basename(base.rstrip("/")), room)
+    os.makedirs(work, exist_ok=True)
+    dst = os.path.join(work, "cn_%s.mp4" % state)
+    try:
+        sys.path.insert(0, HERE)
+        from colour_normalise import normalise  # noqa: WPS433
+        drift, n = normalise(clip, dst, strength)
+    except Exception as e:  # noqa: BLE001
+        # A failed normalise must not lose the clip — bake the un-normalised source and SAY SO, rather
+        # than raising out of a bake the caller expects to produce a file.
+        log("  colour-normalise FAILED (%s) — baking un-normalised" % str(e)[:120])
+        return clip
+    log("  colour-normalised at strength %.2f: input drift was %.2f over %d frames"
+        % (strength, drift, n))
+    return dst
 
 
 def rebuild_clip(base, room, state, log=print):
@@ -284,8 +577,12 @@ def rebuild_clip(base, room, state, log=print):
         log("  re-applied patch %s" % p["name"])
     dest = os.path.join(room_dir, "cine_%s.mp4" % state)
     shutil.copyfile(cur, os.path.join(room_dir, "cine_%s_raw.mp4" % state))
+    # `_raw` is kept UN-normalised on purpose: it is the record of what the render produced, and the
+    # normalise is a reversible post step. Measure the mask against the same frames the bake sees.
+    cur = colour_normalised(base, room, state, cur, log)
     still, mk = _mask_inputs(base, room, state, cur, log)
     bake_loop(cur, dest, log=log, still=still, mask=mk)
+    paced(base, room, state, dest, log)
     log("  rebuilt %s/%s with %d of %d patch(es)" % (room, state, len(on), len(patches)))
     return dest
 
@@ -343,8 +640,10 @@ def run_state(st, spec, base, repair=True, reuse=False, log=print):
     shutil.copyfile(final, raw_keep)
     _record_patches(base, st["room"], st["state"], spec, res, out, work, log)
     dest = os.path.join(base, st["room"], "cine_%s.mp4" % st["state"])
+    final = colour_normalised(base, st["room"], st["state"], final, log)
     still, mk = _mask_inputs(base, st["room"], st["state"], final, log)
     bake_loop(final, dest, log=log, still=still, mask=mk)
+    paced(base, st["room"], st["state"], dest, log)
     res["raw"] = os.path.relpath(raw_keep, base)
     res["filed"] = os.path.relpath(dest, base)
     return res
