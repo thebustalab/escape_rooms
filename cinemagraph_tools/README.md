@@ -1,3 +1,7 @@
+---
+authority: canon
+---
+
 # Cinemagraph tools
 
 Built during the 2026-08-29/30 full-scene cinemagraph work. Rescued here from `/tmp/sweep`, which
