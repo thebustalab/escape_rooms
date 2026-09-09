@@ -263,10 +263,15 @@ button.ghost { background:transparent; color:var(--ink); border:1px solid var(--
 .console { display:flex; flex-direction:column; gap:8px; }
 #webr-status { font-size:12px; opacity:.8; min-height:16px; }
 #code-input { width:100%; min-height:46vh; background:#08131c; color:#e8eef2; border:1px solid var(--line); border-radius:8px; padding:10px; font:13px/1.45 ui-monospace,Menlo,Consolas,monospace; resize:vertical; }
+/* Run + the plot size/shape strip on one line. The strip's own styling is injected by webr-console.js
+   and inherits currentColor, so it needs no colours here — only the row layout. */
+.console .crow { display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
 /* no max-height: a plot renders at full height and you scroll the modal, not this little pane */
 #webr-output { background:#08131c; border:1px solid var(--line); border-radius:8px; padding:8px; min-height:60px; }
 .webr-out { margin:0; font:12px/1.4 ui-monospace,Menlo,Consolas,monospace; white-space:pre-wrap; color:#cfe6d8; }
 .webr-out.err { color:#ff9b9b; } .webr-out.muted { opacity:.5; }
+/* width/height are set inline by the console (logical px; the bitmap is 2x that). max-width stays as
+   the narrow-pane safety net — with height:auto inline, a canvas shrinks proportionally. */
 .webr-plot { max-width:100%; border-radius:6px; margin-top:6px; }
 
 /* question card */

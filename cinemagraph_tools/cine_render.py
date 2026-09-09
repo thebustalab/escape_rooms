@@ -74,8 +74,11 @@ def upload(cg, img, name):
     return os.path.join(j["subfolder"], n) if j.get("subfolder") else n
 
 
+CINEMAGRAPH_LORA = "LTX-2.3-22b-LoRA-Cinemagraph/ltx-2.3-22b-lora-cinemagraph-0.9.safetensors"
+
+
 def graph(image_name, positive, negative, w, h, length, prefix, end_guide=END_GUIDE, seed=SEED,
-          cond_fps=None):
+          cond_fps=None, lora=None):
     """The settled two-ended-guide graph. Frame 0 pinned hard, frame -1 at `end_guide`.
 
     `cond_fps` DECOUPLES THE PACE FROM THE CONTAINER. `LTXVConditioning.frame_rate` is a conditioning
@@ -93,6 +96,12 @@ def graph(image_name, positive, negative, w, h, length, prefix, end_guide=END_GU
     Defaults to FPS, so every existing caller renders exactly as before.
     """
     cond_fps = FPS if cond_fps is None else cond_fps
+    # `lora` = strength_model for the Lightricks cinemagraph LoRA, inserted between the UNET and the
+    # guider. It is a 2.3 adapter on a 2.5 base; Lightricks say most 2.3 LoRAs run on 2.5 unchanged but
+    # to validate. Its trigger word is CINEMAGRAPH_MOTION and the CALLER must supply it in `positive` —
+    # a LoRA fired without its trigger typically does nothing, which is the most likely explanation for
+    # the undocumented 2.5-era "no difference" verdict.
+    model_src = ["1", 0] if lora is None else ["40", 0]
     return {"prompt": {
         "1":  {"class_type": "UNETLoader", "inputs": {"unet_name": DIST, "weight_dtype": "default"}},
         "2":  {"class_type": "CLIPLoader",
@@ -117,7 +126,7 @@ def graph(image_name, positive, negative, w, h, length, prefix, end_guide=END_GU
                           "stretch": True, "terminal": 0.1, "latent": ["32", 2]}},
         "10": {"class_type": "RandomNoise", "inputs": {"noise_seed": seed}},
         "11": {"class_type": "CFGGuider",
-               "inputs": {"model": ["1", 0], "positive": ["8", 0], "negative": ["8", 1], "cfg": CFG}},
+               "inputs": {"model": model_src, "positive": ["8", 0], "negative": ["8", 1], "cfg": CFG}},
         "12": {"class_type": "KSamplerSelect", "inputs": {"sampler_name": "euler"}},
         "13": {"class_type": "SamplerCustomAdvanced",
                "inputs": {"noise": ["10", 0], "guider": ["11", 0], "sampler": ["12", 0],
@@ -128,6 +137,9 @@ def graph(image_name, positive, negative, w, h, length, prefix, end_guide=END_GU
                "inputs": {"samples": ["35", 2], "vae": ["17", 0], "tile_size": 512,
                           "overlap": 64, "temporal_size": 256, "temporal_overlap": 8}},
         "15": {"class_type": "CreateVideo", "inputs": {"images": ["14", 0], "fps": FPS}},
+        **({} if lora is None else {"40": {"class_type": "LoraLoaderModelOnly",
+               "inputs": {"model": ["1", 0], "lora_name": CINEMAGRAPH_LORA,
+                          "strength_model": float(lora)}}}),
         "16": {"class_type": "SaveVideo",
                "inputs": {"video": ["15", 0], "filename_prefix": prefix,
                           "format": "auto", "codec": "auto"}},

@@ -7,7 +7,7 @@ an ordered left-to-right list of placed elements + atmosphere, with each element
 MOVES (a cinemagraph) or is a gameplay object (puzzle/door/clue). From that single spec, three things
 derive deterministically:
 
-  1. render_prompt(spec)      -> the gpt-image-2 scene prompt, in the proven left-to-right spatial format.
+  1. render_prompt(spec)      -> the image-model scene prompt, in the proven left-to-right spatial format.
   2. cinemagraph_jobs(spec)   -> a batch job per animated element (motion prompt + loop already written) —
                                  the cinemagraphs fall out of the art step instead of being reverse-detected.
   3. to_hotspots(spec)        -> the hotspot stubs the room needs (ambient for animated decor, plus
@@ -101,8 +101,40 @@ EQUIRECT = ("This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the
             "outside it or from across it")
 
 
+# ---- the two clauses added for gpt-image-2.5-sunburst (2026-09-09) -------------------------------
+# Both go BEFORE `seam_tail`, never after: rule 5 puts the seam anchor last deliberately and it is the
+# biggest single lever on seam quality. Appending anything after it demotes it to mid-prompt.
+
+# STYLE. 2.5 renders more "cartoony" than gpt-image-2 did — flagged independently on four views. Of
+# five directives tested this one read best to Lucas ("the camera ones are slightly better and good
+# enough"). Counter-intuitively the look is NOT oversaturation: 2.5 is *less* saturated than
+# gpt-image-2 and carries ~40% more high-frequency energy, i.e. over-sharpened rather than garish —
+# so do not "fix" this by adding colour negatives, which measured WORSE.
+STYLE = ("Shot on a full-frame DSLR at 24mm, f/8, natural daylight, high dynamic range, realistic "
+         "depth of field, fine natural film grain, true-to-life colour.")
+
+# EDGE DISCIPLINE. 2.5's wrap seam broke in the GROUND band on 11 of 11 draws under the old anchor
+# alone (median delta 23.0, max 87.6) against 0 of 2 for gpt-image-2. These two sentences took the
+# median to 3.4, level with baseline.
+#
+# ⚠️ THEY ONLY WORK AS A PAIR. Measured separately: margins-only halves the median; ground-only is
+# WORSE than adding nothing at all (79.3 vs 42.1); together, 3.4. Nothing about that was predictable
+# from the parts. Do not split them, do not "simplify" one away, and if either is ever reworded,
+# re-measure the COMBINATION over >=5 draws — seam scores swing two orders of magnitude between
+# draws of an identical prompt, and a single draw once had 2.5 looking like the seam WINNER.
+EDGE_DISCIPLINE = (
+    "EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but "
+    "the plain continuous backdrop named above — no object, structure, post, path, fence, "
+    "building corner, vehicle or figure may appear, begin or end inside those two margins, and "
+    "no cast shadow may fall across them. Keep every object of interest well inboard. "
+    "THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme "
+    "right edge are the SAME patch of ground seen from the same standing point. Its paving, "
+    "texture, colour, wetness and the base of anything resting on it must continue unbroken and "
+    "perfectly aligned across that join, at the same height and the same scale on both sides.")
+
+
 def render_prompt(spec):
-    """Deterministically render a scene spec into a gpt-image-2 prompt in the house left-to-right format.
+    """Deterministically render a scene spec into the image-model prompt, in the house left-to-right format.
     The panorama's L/R wrap is anchored to a NAMED seam surface, stated at BOTH the head and tail of the
     prompt, so the extreme edges depict the SAME thing and line up when wrapped — the biggest lever on seam
     quality. gpt-image describes the far-left and far-right as one surface instead of two clashing objects."""
@@ -120,7 +152,7 @@ def render_prompt(spec):
     negatives = _period(spec.get("negatives") or "no people, no lettering, no captions, no text")
     seam_tail = (f"Again: the extreme left and right edges must align perfectly into {seam}, "
                  f"with no visible seam, join, or repetition.")
-    parts = [intro, seam_head, sweep, atmosphere, negatives, seam_tail]
+    parts = [intro, seam_head, sweep, atmosphere, negatives, STYLE, EDGE_DISCIPLINE, seam_tail]
     return " ".join(p for p in parts if p)
 
 

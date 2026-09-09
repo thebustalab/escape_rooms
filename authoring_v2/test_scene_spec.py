@@ -42,3 +42,40 @@ if __name__ == "__main__":
         t()
         print(f"  ok  {t.__name__}")
     print(f"all tests passed ({len(tests)})")
+
+
+def test_style_and_edge_discipline_sit_before_the_tail_seam_anchor():
+    """FAILURE MODE: a prompt clause appended AFTER the tail seam anchor.
+
+    Rule 5 puts the seam anchor last on purpose — it is the biggest single lever on wrap quality,
+    and the 2026-09-09 model switch added two more clauses (STYLE, EDGE_DISCIPLINE) that could
+    easily have been tacked on the end. Anything after the anchor demotes it to mid-prompt, which
+    would silently trade seam quality for style and look like a model regression rather than a
+    prompt-ordering bug.
+    """
+    p = scene_spec.render_prompt({"setting": "a yard", "seam": "a plain wall",
+                                  "elements": [{"at": "ahead", "desc": "a bench"}]})
+    assert p.rstrip().endswith("no visible seam, join, or repetition."), \
+        "the tail seam anchor must be the LAST thing in the prompt"
+    assert p.index(scene_spec.STYLE) < p.rindex("Again: the extreme left and right edges")
+    assert p.index(scene_spec.EDGE_DISCIPLINE) < p.rindex("Again: the extreme left and right edges")
+
+
+def test_edge_discipline_keeps_BOTH_of_its_clauses():
+    """FAILURE MODE: someone keeps half of EDGE_DISCIPLINE because it reads redundant.
+
+    Measured 2026-09-09 over 5 draws each, ground-band join delta (median): no clause 42.1,
+    margins-only 20.6, ground-only **79.3 — worse than adding nothing**, both together 3.4. The
+    two are non-additive and only work as a pair, which no amount of reading the sentences would
+    tell you. This test exists so the pair cannot be split without a deliberate decision.
+
+    If either clause is reworded, re-measure the COMBINATION over >=5 draws
+    (`model_probe/probe_models.py --stages 10`). Seam scores swing two orders of magnitude between
+    draws of an identical prompt: one lucky draw once had 2.5 looking like the seam winner at 0.73
+    when its true median was 42.
+    """
+    ed = scene_spec.EDGE_DISCIPLINE
+    assert "EDGE DISCIPLINE:" in ed, "the margins clause is missing"
+    assert "THE GROUND IS ONE SURFACE:" in ed, "the ground clause is missing"
+    p = scene_spec.render_prompt({"setting": "x", "seam": "y", "elements": []})
+    assert "EDGE DISCIPLINE:" in p and "THE GROUND IS ONE SURFACE:" in p

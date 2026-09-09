@@ -14,13 +14,43 @@
  *   - integrated_bioanalytics/webr-cell.js    — the book's runnable chapter cells
  * The last two live in a DIFFERENT git repo and import this by its public URL, so treat the exported
  * surface below as a published API: `init()`, `run(code, outEl, note)`, `runFrom(el, outEl)`,
- * `addStatusEl()`, `.ready`, `.webR`.
+ * `addStatusEl()`, `plotControls(opts)`, `.ready`, `.webR`.
  */
 import { WebR } from "https://webr.r-wasm.org/latest/webr.mjs";
-import { VIEW_R_SHIM, VIEW_R_DRAIN, fromR, viewTableHTML, ensureViewStyles } from "./webr_view.js?v=88";
-import { codeToRun, selectionNote } from "./code_sel.js?v=88";
+import { VIEW_R_SHIM, VIEW_R_DRAIN, fromR, viewTableHTML, ensureViewStyles } from "./webr_view.js?v=89";
+import { codeToRun, selectionNote } from "./code_sel.js?v=89";
+import { PLOT_ASPECTS, PLOT_DEFAULT_ASPECT, PLOT_LIMITS, PLOT_CTL_CSS, plotGeometry } from "./plot_size.js?v=89";
 
 const errText = e => (e && e.message ? e.message : String(e));
+
+// Plot size + shape is remembered ACROSS pages and rooms: a student who wants tall plots wants them in
+// room 4 as well as room 1, and re-picking in every puzzle modal would be its own small tax. A blocked or
+// unavailable localStorage (file://, private mode, storage disabled) must degrade to the default, never
+// throw — this module boots the whole console.
+const PLOT_STORE_KEY = "webrPlotSize.v1";
+function loadPlotSize() {
+  try {
+    const s = JSON.parse(window.localStorage.getItem(PLOT_STORE_KEY) || "{}");
+    return {
+      scale: Number.isFinite(s.scale) ? s.scale : PLOT_LIMITS.maxScale,
+      aspect: PLOT_ASPECTS.some(a => a.key === s.aspect) ? s.aspect : PLOT_DEFAULT_ASPECT,
+    };
+  } catch (e) {
+    return { scale: PLOT_LIMITS.maxScale, aspect: PLOT_DEFAULT_ASPECT };
+  }
+}
+function savePlotSize(size) {
+  try { window.localStorage.setItem(PLOT_STORE_KEY, JSON.stringify(size)); } catch (e) { /* not worth a throw */ }
+}
+
+function ensurePlotCtlStyles(doc) {
+  const d = doc || document;
+  if (d.getElementById("webr-plotctl-styles")) return;
+  const st = d.createElement("style");
+  st.id = "webr-plotctl-styles";
+  st.textContent = PLOT_CTL_CSS;
+  d.head.appendChild(st);
+}
 
 export class WebRConsole {
   constructor(config, ui) {
@@ -33,6 +63,12 @@ export class WebRConsole {
     // has many cells but ONE session, so "Starting R…" has to show wherever the student clicked).
     this.statusEls = new Set();
     if (this.ui.status) this.statusEls.add(this.ui.status);
+    // Plot size/shape, shared by every surface this session drives, and every control strip showing it.
+    this.plotSize = loadPlotSize();
+    this.plotCtls = new Set();
+    // The last thing run, so changing the size can re-render it instead of making the student press Run
+    // again to see what they just chose. Null until the first run.
+    this.lastRun = null;
   }
 
   addStatusEl(el) { if (el) this.statusEls.add(el); }
@@ -107,15 +143,130 @@ export class WebRConsole {
     out.appendChild(pre);
   }
 
-  async appendImage(imageBitmap, outEl) {
+  /*
+   * `geom` (optional) is the plotGeometry() the image was captured at. The canvas ELEMENT keeps the
+   * bitmap's full resolution — webr::canvas hands back 2x what we asked for — while CSS displays it at
+   * the logical size, so those extra pixels buy sharpness on a retina screen. Without the CSS size the
+   * canvas would lay out at its bitmap size (2x too big) and `max-width:100%` would scale it back down
+   * by whatever the pane happened to be, which is the magnification this whole change removes.
+   *
+   * `height:auto` is safe here because a canvas is a replaced element with an intrinsic aspect ratio, so
+   * a pane narrower than cssWidth shrinks it proportionally instead of squashing it.
+   */
+  async appendImage(imageBitmap, outEl, geom) {
     const out = outEl || this.ui.output;
     if (!out) return;
     const canvas = document.createElement("canvas");
     canvas.width = imageBitmap.width;
     canvas.height = imageBitmap.height;
     canvas.className = "webr-plot";
+    if (geom && geom.width) { canvas.style.width = geom.width + "px"; canvas.style.height = "auto"; }
     canvas.getContext("2d").drawImage(imageBitmap, 0, 0);
     out.appendChild(canvas);
+  }
+
+  /*
+   * The capture geometry for a run, measured from the element the plot will land in — so R lays the plot
+   * out for the space it will actually occupy. `clientWidth` includes padding, hence the subtraction;
+   * an unmeasurable (hidden) element falls back to a print-worthy default inside plotGeometry.
+   */
+  plotGeometryFor(outEl) {
+    const el = outEl || this.ui.output;
+    let availWidth = 0;
+    if (el) {
+      const win = el.ownerDocument && el.ownerDocument.defaultView;
+      const cs = win ? win.getComputedStyle(el) : null;
+      const pad = cs ? (parseFloat(cs.paddingLeft) || 0) + (parseFloat(cs.paddingRight) || 0) : 0;
+      availWidth = (el.clientWidth || 0) - pad;
+    }
+    return plotGeometry({ availWidth, scale: this.plotSize.scale, aspect: this.plotSize.aspect });
+  }
+
+  /*
+   * Change the plot size/shape. Persists it, syncs every control strip showing it, and (unless told not
+   * to) re-renders the last run so the student sees the effect of what they just picked.
+   */
+  setPlotSize(patch, opts) {
+    const o = opts || {};
+    this.plotSize = { ...this.plotSize, ...(patch || {}) };
+    savePlotSize(this.plotSize);
+    this.plotCtls.forEach(sync => sync());
+    if (o.rerun === false || !this.lastRun || !this.lastRun.code) return;
+    /*
+     * Only re-render when there is actually a plot ON SCREEN to re-render. Two reasons, one of them a
+     * bug this prevents: the escape rooms clear #webr-output THEMSELVES when a puzzle modal opens (the
+     * console isn't told), so without this check, changing the size in room 3 before running anything
+     * would re-run room 2's code and display room 2's plot in room 3's pane. It also skips a pointless
+     * R evaluation when the last run was text-only.
+     */
+    const out = this.lastRun.outEl;
+    if (!out || !out.querySelector || !out.querySelector("canvas.webr-plot")) return;
+    const { code, note } = this.lastRun;
+    return this.run(code, out, note);
+  }
+
+  /*
+   * Build a size control strip (a width slider + an aspect picker) bound to this console, and return it
+   * for the caller to drop into its own button row. Lives here rather than in each consumer so all the
+   * surfaces get the same control, per this dir's AGENTS.md ("add behaviour here, not in a consumer").
+   *
+   * Two things it deliberately does NOT do:
+   *  - No pixel spinboxes. The two things a student actually wants are "bigger" and "a different shape";
+   *    a raw width/height pair invites a 200x1400 sliver. Height is always derived from the aspect.
+   *  - It re-renders on `change`, not on `input`. Each re-render is a real R evaluation, so re-running on
+   *    every pixel of a slider drag would queue dozens of them. Dragging updates the readout only.
+   *
+   * opts.rerun:false for a caller that captures the plot itself and would be left holding a stale copy
+   * (the escape rooms' submission refine blocks re-run through their own button).
+   */
+  plotControls(opts) {
+    const o = opts || {};
+    const doc = o.document || document;
+    ensurePlotCtlStyles(doc);
+    const L = PLOT_LIMITS;
+
+    const wrap = doc.createElement("span");
+    wrap.className = "webr-plotctl";
+
+    const sizeLab = doc.createElement("label");
+    sizeLab.title = "How wide the plot is drawn, as a share of the space available";
+    sizeLab.appendChild(doc.createTextNode("Plot size"));
+    const range = doc.createElement("input");
+    range.type = "range";
+    range.min = String(Math.round(L.minScale * 100));
+    range.max = String(Math.round(L.maxScale * 100));
+    range.step = "5";
+    sizeLab.appendChild(range);
+    const val = doc.createElement("span");
+    val.className = "webr-plotctl-val";
+    sizeLab.appendChild(val);
+    wrap.appendChild(sizeLab);
+
+    const shapeLab = doc.createElement("label");
+    shapeLab.title = "The plot's shape; its height follows from its width";
+    shapeLab.appendChild(doc.createTextNode("Shape"));
+    const sel = doc.createElement("select");
+    PLOT_ASPECTS.forEach(a => {
+      const op = doc.createElement("option");
+      op.value = a.key; op.textContent = a.label;
+      sel.appendChild(op);
+    });
+    shapeLab.appendChild(sel);
+    wrap.appendChild(shapeLab);
+
+    const sync = () => {
+      range.value = String(Math.round(this.plotSize.scale * 100));
+      val.textContent = Math.round(this.plotSize.scale * 100) + "%";
+      sel.value = this.plotSize.aspect;
+    };
+    sync();
+    this.plotCtls.add(sync);
+
+    // input = readout only (cheap); change = commit + re-render (one R evaluation).
+    range.addEventListener("input", () => { val.textContent = range.value + "%"; });
+    range.addEventListener("change", () => this.setPlotSize({ scale: Number(range.value) / 100 }, { rerun: o.rerun }));
+    sel.addEventListener("change", () => this.setPlotSize({ aspect: sel.value }, { rerun: o.rerun }));
+    return wrap;
   }
 
   // Drain any tables queued by view() during the last run and render them. Evaluated inside the run's
@@ -166,6 +317,9 @@ export class WebRConsole {
   async run(code, outEl, note) {
     const out = outEl || this.ui.output;
     this.clearOutput(out);
+    // Remembered so setPlotSize() can re-render this exact run at the new size. Recorded BEFORE the boot
+    // check, so a size change after a failed boot still has something to retry.
+    this.lastRun = { code, outEl: out, note };
     if (note) this.appendText(note, "muted", out);
     if (!this.ready) {
       try { await this.init(); }
@@ -173,18 +327,20 @@ export class WebRConsole {
     }
     const shelter = await new this.webR.Shelter();
     let rendered = 0;
+    // Measured AFTER the boot await, so the geometry reflects the pane as it is when the plot lands.
+    const geom = this.plotGeometryFor(out);
     try {
       const result = await shelter.captureR(code, {
         withAutoprint: true,
         captureStreams: true,
-        captureGraphics: { width: 720, height: 460 },
+        captureGraphics: { width: geom.width, height: geom.height },
       });
       const text = result.output
         .filter((o) => o.type === "stdout" || o.type === "stderr")
         .map((o) => o.data)
         .join("\n");
       if (text.trim().length) { this.appendText(text, "", out); rendered++; }
-      for (const img of (result.images || [])) { await this.appendImage(img, out); rendered++; }
+      for (const img of (result.images || [])) { await this.appendImage(img, out, geom); rendered++; }
     } catch (err) {
       this.appendText("Error: " + errText(err), "err", out);
       rendered++;

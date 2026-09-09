@@ -12,7 +12,7 @@ Usage:
       List the image-capable models available on this account.
 
   python3 generate_scene.py gen --prompt-file scene.txt --out ../demo_hub/scene/station.png \
-      [--size 1536x1024] [--quality medium] [--model gpt-image-2]
+      [--size 3072x1024] [--quality xhigh] [--model <id>]
       Generate one image and save it.
 
 Because this needs the key, invoke it through a login shell so ~/.bashrc is
@@ -28,6 +28,26 @@ import urllib.request
 import urllib.error
 
 API = "https://api.openai.com/v1"
+
+# THE PIPELINE MODEL. Switched from gpt-image-2 on 2026-09-09 after the bake-off in
+# `model_probe/` (41-image probe, $5.77; full record in model_probe/AGENTS.md). Sunburst at
+# `xhigh` won on the thing that actually costs Lucas time — it draws far less AI nonsense
+# (five-legged chairs, incoherent pipework, garbled ladders) — while also being ~3x faster and
+# ~54% cheaper per panorama than gpt-image-2 at `high`.
+#
+# PIN THE DATED SNAPSHOT, never the floating alias: this pipeline has already thrown away seven
+# egypt night variants to a silently-changed image size.
+#
+# `xhigh`, NOT `high`. 2.5 added `xhigh` and `max` ABOVE `high`, so the old top rung is now a
+# middle one — gpt-image-2 `high` is 3952 output tokens, 2.5 `high` only 988. `high` was also the
+# WORST seam arm tested (0/5 clean). And not `max` either: it had the best detail and a
+# catastrophic seam (median ground delta 56).
+#
+# KNOWN QUIRK, accepted: 2.5's wrap seam has a fatter tail than gpt-image-2's. On twelve published
+# rooms both median 1.2, but gpt-image-2 was clean 11/12 (worst 4.7) against 7/12 (worst 49.3).
+# A bad one is obvious and a re-roll usually fixes it (Lucas, 2026-09-09).
+MODEL = "gpt-image-2.5-sunburst-2026-09-08"
+QUALITY = "xhigh"
 
 
 def _key():
@@ -84,7 +104,7 @@ def cmd_gen(a):
     b64 = resp["data"][0]["b64_json"]
     out = os.path.abspath(a.out)
     os.makedirs(os.path.dirname(out), exist_ok=True)
-    # Write the returned bytes VERBATIM (no PIL round-trip) so gpt-image-2's embedded C2PA "AI-generated"
+    # Write the returned bytes VERBATIM (no PIL round-trip) so the model's embedded C2PA "AI-generated"
     # provenance metadata is preserved on the base scene. Keep base scenes on this byte-write path; a PIL
     # re-encode would silently strip the manifest. (The pixel-editing paths — dooropen/seamfix/variant —
     # necessarily invalidate any signature, so provenance lives on the base scene, which is correct.)
@@ -291,7 +311,7 @@ def cmd_seamfix(a):
     mb = io.BytesIO(); mask.save(mb, "PNG"); mb.seek(0)
     ib = io.BytesIO(); rolled.save(ib, "PNG"); ib.seek(0)
     if a.occluder:
-        # Say the spatial constraint OUT LOUD as well as masking it. gpt-image-2 re-renders rather than
+        # Say the spatial constraint OUT LOUD as well as masking it. Both gpt-image-2 and 2.5 re-render rather than
         # truly inpainting, so the mask alone doesn't stop it drifting; naming "only the central third,
         # outer thirds untouched" measurably keeps the object off the edges, where any mismatch with the
         # original would show (Lucas, 2026-08-07).
@@ -370,7 +390,7 @@ def _finish_seamfix(a, res, rolled, w, h, x0, x1, strip, dx):
         # surroundings then come from ONE generation, so they're self-consistent — no cross-fade of two
         # near-identical layers, hence no ghosting (the failure mode of the composite path on continuous
         # sky/canopy). Trade-off: the whole scene is the model's re-render (slight drift from the committed
-        # art), so use it PRE-COMMIT. gpt-image-2 has no input_fidelity knob (it 400s), so this is the lever.
+        # art), so use it PRE-COMMIT. Neither gpt-image-2 nor 2.5 has an input_fidelity knob (both 400), so this is the lever.
         out_im = _roll_h(res, w - dx)
     else:
         # Composite mode: paste only the regenerated strip back over the original, feathered at its edges.
@@ -401,7 +421,7 @@ def main():
     g.add_argument("--out", required=True)
     g.add_argument("--size", default="1536x1024")
     g.add_argument("--quality", default="medium")
-    g.add_argument("--model", default="gpt-image-2")
+    g.add_argument("--model", default=MODEL)
     g.add_argument("--ref", action="append", default=[],
                    help="world-plate reference image (repeatable, up to 16); routes gen through "
                         "/images/edits for cross-room backdrop continuity")
@@ -411,7 +431,7 @@ def main():
     s.add_argument("--manifest", required=True)
     s.add_argument("--size", default="1536x1024")
     s.add_argument("--quality", default="medium")
-    s.add_argument("--model", default="gpt-image-2")
+    s.add_argument("--model", default=MODEL)
     s.add_argument("--force", action="store_true", help="regenerate even if the file exists")
     sl = sub.add_parser("slice"); sl.set_defaults(fn=cmd_slice)
     sl.add_argument("--input", required=True)
@@ -423,14 +443,14 @@ def main():
     e.add_argument("--prompt", required=True)
     e.add_argument("--out", required=True)
     e.add_argument("--size", default="1536x1024")
-    e.add_argument("--model", default="gpt-image-2")
+    e.add_argument("--model", default=MODEL)
     do = sub.add_parser("dooropen"); do.set_defaults(fn=cmd_dooropen)
     do.add_argument("--input", required=True)
     do.add_argument("--box", required=True, help="x0,y0,x1,y1 as 0-1 fractions")
     do.add_argument("--prompt", required=True)
     do.add_argument("--out", required=True)
     do.add_argument("--quality", default="medium")
-    do.add_argument("--model", default="gpt-image-2")
+    do.add_argument("--model", default=MODEL)
     sf = sub.add_parser("seamfix"); sf.set_defaults(fn=cmd_seamfix)
     sf.add_argument("--input", required=True)
     sf.add_argument("--out", required=True)
@@ -445,7 +465,7 @@ def main():
     sf.add_argument("--edit-frac", type=float, default=0.34, help="CROP-INPAINT: the fraction of the CROP that is editable, centred on the seam (default 0.34 = the middle third). The model still SEES the whole crop for context, but only this middle band is masked-in and only this band is composited back — so the outer thirds stay byte-identical and can't mismatch.")
     sf.add_argument("--prompt", default="")
     sf.add_argument("--quality", default="medium")
-    sf.add_argument("--model", default="gpt-image-2")
+    sf.add_argument("--model", default=MODEL)
     a = p.parse_args()
     a.fn(a)
 

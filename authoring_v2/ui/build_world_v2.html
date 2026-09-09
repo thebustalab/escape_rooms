@@ -1902,13 +1902,12 @@
               <button class="paintcommit" style="display:none; padding:1px 7px; font-size:11px">commit pins + re-bake</button>
               <button class="paintclear" style="display:none; padding:1px 7px; font-size:11px">clear</button>
               <label class="who cnormwrap" style="display:none" title="Flatten a whole-frame brightness/colour arc (colour_normalise): rescale every frame so its channel means match frame 0. For the case a paint-out CANNOT reach — the drift is global, so there is no rectangle to draw around it, and no mask threshold removes it either (any rung tight enough to kill the swing kills the subjects first). NOT a default: a fire-lit room is supposed to change brightness, and over-applying this reads as pumping."><input type="checkbox" class="cnorm" ${((c.mask || {}).colourNormalise) ? "checked" : ""} style="vertical-align:-2px"> flatten brightness</label>
-              <label class="who" title="How long each generated frame is HELD. Slowing a clip down here adds, drops and interpolates nothing — every frame the model produced is shown, just for longer — which is why it reads as natural where a duplication retime does not. Applied after the bake by cine_scenario.paced; free, reversible, no GPU. The cost is fewer frames per second of playback, so far enough down a clip can judder.">pace <select class="pace">
+              <label class="who" title="Slows the clip by MOTION-COMPENSATED INTERPOLATION - real in-between frames from the optical flow, so it stays at 24fps instead of juddering. Slowing a clip down here adds, drops and interpolates nothing — every frame the model produced is shown, just for longer — which is why it reads as natural where a duplication retime does not. Applied after the bake by cine_scenario.paced; free, reversible, no GPU. The cost is fewer frames per second of playback, so far enough down a clip can judder.">pace <select class="pace">
                 <option value="1">as rendered</option>
                 <option value="1.25">1.25x slower</option>
                 <option value="1.5">1.5x slower</option>
                 <option value="2">2x slower</option>
-                <option value="2.5">2.5x slower</option>
-                <option value="3">3x slower</option>
+                <option value="2.5">2.5x slower (max)</option>
               </select></label>
               <span class="who pacestat"></span>
               <span class="who paintstat">${(((c.mask || {}).paintOut) || []).length ? (((c.mask || {}).paintOut) || []).length + " pinned" : ""}</span>

@@ -431,9 +431,18 @@ def paced(base, room, state, dest, log=print):
     container rate only; `bake_loop` re-encodes at its own constant rate, so anything done earlier is
     discarded. This runs on the finished file and rewrites it.
 
-    HOW, AND WHY NOT THE OTHER WAYS. Each generated frame is HELD LONGER — no frame is duplicated,
-    dropped or interpolated, so every pixel the model produced is shown and nothing is invented. That
-    matters because the two obvious alternatives are both recorded failures here:
+    HOW (changed 2026-09-09): MOTION-COMPENSATED INTERPOLATION, not frame-holding. Intermediate frames
+    are estimated from the optical flow, so the clip lasts longer at a full 24 fps instead of showing
+    each original frame for longer. Lucas judged the two head to head at a matched 2x on the same clip
+    and again at 3x and 4x on hard-edged water: interpolation won, and the held version reads as a
+    slideshow as the factor rises.
+
+    CAPPED AT 2.5x, on his call: "a 3x slowdown is hard to recover from ... 2x or 2.5x is probably the
+    most that will look reasonable, if it needs more than that then a re-roll is probably better."
+
+    The earlier frame-HOLD is kept as `--hold` for the record; it is what he called "okay at best".
+    Both differ from the recorded dead end, which was retiming by DUPLICATION ("they look 'slowed', not
+    natural"). Interpolation invents genuine in-between frames; duplication invents nothing:
 
       * Retiming by frame duplication was tried on the quay at half and third speed and Lucas's verdict
         was "they look 'slowed', not natural" — duplication is not new motion.
@@ -460,14 +469,25 @@ def paced(base, room, state, dest, log=print):
         return dest
     if pace <= 1.001:
         return dest
-    pace = min(4.0, pace)
-    fps = CS.CR.FPS / pace
+    # 2.5x is the ceiling Lucas set by eye; beyond it a re-roll beats a slowdown.
+    if pace > 2.5:
+        log("  pace %.2fx requested; capping at 2.5x — beyond that a re-render is the better move" % pace)
+        pace = 2.5
+    fps = CS.CR.FPS
     work = os.path.join(WORK_ROOT, os.path.basename(base.rstrip("/")), room)
     os.makedirs(work, exist_ok=True)
     tmp = os.path.join(work, "pace_%s.mp4" % state)
-    cmd = ["ffmpeg", "-v", "error", "-y", "-i", dest,
-           "-vf", "settb=1/%.6f,setpts=N/%.6f/TB" % (fps, fps),
-           "-r", "%.6f" % fps, "-c:v", "libx264", "-crf", "18",
+    hold = bool((cfg or {}).get("paceHold"))
+    if hold:
+        f2 = fps / pace
+        vf = "settb=1/%.6f,setpts=N/%.6f/TB" % (f2, f2)
+        rate = "%.6f" % f2
+    else:
+        vf = ("minterpolate=fps=%.6f:mi_mode=mci:mc_mode=aobmc:me_mode=bidir:vsbmc=1,"
+              "settb=1/%.6f,setpts=N/%.6f/TB" % (fps * pace, fps, fps))
+        rate = "%.6f" % fps
+    cmd = ["ffmpeg", "-v", "error", "-y", "-i", dest, "-vf", vf,
+           "-r", rate, "-c:v", "libx264", "-crf", "18",
            "-pix_fmt", "yuv420p", "-movflags", "+faststart", tmp]
     try:
         subprocess.run(cmd, check=True)
@@ -476,7 +496,7 @@ def paced(base, room, state, dest, log=print):
         # A failed retime must not lose the clip: keep the baked file and say so.
         log("  pace %.2fx FAILED (%s) — keeping the clip at rendered pace" % (pace, str(e)[:120]))
         return dest
-    log("  paced %.2fx: %d fps container, frames held longer (none added or dropped)" % (pace, round(fps)))
+    log("  paced %.2fx by %s" % (pace, "holding frames" if hold else "motion-compensated interpolation"))
     return dest
 
 

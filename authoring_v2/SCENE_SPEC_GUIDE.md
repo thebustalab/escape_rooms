@@ -18,7 +18,7 @@ network and a description of vibes, Claude drafts **one spec per room** followin
   prompt — pack the key elements + palette into one frame, written **TIME-NEUTRAL** (soft even daylight, neither
   dawn nor sunset) so each room's own prompt still drives the time-of-day arc. It's generated FIRST in build-world
   step 2 and referenced by every room's gen for cross-room continuity, and it lives in this same bundle (single
-  source of truth) — not a separate field. (Caveat: gpt-image-2 references it at high fidelity, no loosen knob —
+  source of truth) — not a separate field. (Caveat: the model references it at high fidelity, no loosen knob — 2.5 rejects `input_fidelity` too —
   it can flatten the light arc at the extremes; a deep-dark or bright room may want to skip the reference.)
 
 ## Schema (per room)

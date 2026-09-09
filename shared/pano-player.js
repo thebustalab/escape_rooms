@@ -70,12 +70,12 @@
 // A bare `./variant_resolve.js` import is NOT refreshed by bumping the <script> tag's ?v, so a changed
 // helper module (e.g. a new export) leaves browsers on a stale cached copy → "doesn't provide an export
 // named X" SyntaxError → blank page (the 2026-08-05 airship regression). Bump all three together.
-import { WebRConsole } from "./webr-console.js?v=88";
-import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs } from "./variant_resolve.js?v=88";   // Phase 3: per-hotspot state variants; monorail switch-door nav
-import * as PQ from "./puzzle_queue.js?v=88";   // dynamic puzzle queue: location-independent puzzle serving
-import { particleCount } from "./particles.js?v=88";   // ambient-particle vocabulary + per-kind field density
-import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=88";
-import { condHolds } from "./cond.js?v=88";   // ledger + elevation-map card DOM
+import { WebRConsole } from "./webr-console.js?v=89";
+import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs } from "./variant_resolve.js?v=89";   // Phase 3: per-hotspot state variants; monorail switch-door nav
+import * as PQ from "./puzzle_queue.js?v=89";   // dynamic puzzle queue: location-independent puzzle serving
+import { particleCount } from "./particles.js?v=89";   // ambient-particle vocabulary + per-kind field density
+import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=89";
+import { condHolds } from "./cond.js?v=89";   // ledger + elevation-map card DOM
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 
@@ -102,7 +102,7 @@ root.innerHTML = `
     <div id="sfxChip" style="display:none;position:absolute;bottom:10px;left:14px;z-index:20;background:rgba(0,0,0,.4);padding:4px 11px;border-radius:14px;font:12px system-ui;color:rgba(255,216,140,.9);user-select:none">♫ sound effects: <span id="sfxState" title="Toggle sound effects on/off" style="cursor:pointer;text-decoration:underline;font-weight:600"></span></div>
     <button id="notebookChip" style="display:none;position:absolute;bottom:10px;right:14px;z-index:20;background:rgba(0,0,0,.42);padding:5px 12px;border-radius:14px;border:1px solid rgba(255,216,140,.35);font:12px system-ui;color:rgba(255,216,140,.92);cursor:pointer;user-select:none" title="Everything you've confirmed or picked up so far">🗒 Field notebook <span id="notebookCount" style="opacity:.7"></span></button>
     <button id="debriefChip" style="display:none;position:absolute;bottom:10px;left:50%;transform:translateX(-50%);z-index:20;background:rgba(0,0,0,.42);padding:5px 12px;border-radius:14px;border:1px solid rgba(255,216,140,.35);font:12px system-ui;color:rgba(255,216,140,.92);cursor:pointer;user-select:none" title="A look behind the scenes — how this world was built to teach the technique">🔎 Reveal how this world worked</button>
-    <button id="skipChip" style="display:none;position:absolute;bottom:10px;left:50%;transform:translateX(-50%);z-index:20;background:rgba(0,0,0,.42);padding:5px 12px;border-radius:14px;border:1px solid rgba(255,216,140,.35);font:12px system-ui;color:rgba(255,216,140,.92);cursor:pointer;user-select:none" title="Skip the ungraded escape and go straight to your submission">Skip the ungraded escape phase →</button>
+    <button id="skipChip" style="display:none;position:absolute;bottom:10px;left:50%;transform:translateX(-50%);z-index:20;background:rgba(0,0,0,.42);padding:5px 12px;border-radius:14px;border:1px solid rgba(255,216,140,.35);font:12px system-ui;color:rgba(255,216,140,.92);cursor:pointer;user-select:none" title="Open your submission — you can come back to it as often as you like">Prepare submission / skip the ungraded escape phase →</button>
     <div id="hud"><span id="hudroom"></span></div>
     <div id="motifHud"></div>
 
@@ -171,7 +171,7 @@ root.innerHTML = `
     <div id="console-block" class="console">
       <div id="webr-status">R console</div>
       <textarea id="code-input" spellcheck="false"></textarea>
-      <div><button id="run-btn" disabled>▶ Run</button></div>
+      <div class="crow"><button id="run-btn" disabled>▶ Run</button></div>
       <div id="webr-output"></div>
     </div>
   </div>`;
@@ -281,7 +281,7 @@ function init(data) {
   $("#subX500Go").onclick = confirmX500;
   $("#subX500").addEventListener("keydown", e => { if (e.key === "Enter") confirmX500(); });
   $("#notebookChip").onclick = openNotebook;
-  $("#skipChip").onclick = openSubmitPrep;   // persistent in-room "skip the ungraded escape" → submission
+  $("#skipChip").onclick = openSubmitPrep;   // the one persistent in-room route to submission (showSubmitChip)
   $("#enter").onclick = () => {
     $("#screen1").classList.remove("active");
     $("#screen2").classList.add("active");
@@ -298,7 +298,7 @@ function init(data) {
     updateNotebookChip();
     $("#notebookChip").style.display = "";                            // persistent chip, in-room only
     $("#debriefChip").style.display = "none";                        // appears only once analysis completes
-    $("#skipChip").style.display = "none";                           // appears once analysis is done + an escape remains
+    $("#skipChip").style.display = "none";                           // shown once analysis is done, then permanent (showSubmitChip)
     if (SCENARIO.heel) $("#pano").classList.add("heel");              // slow crash-heel of the horizon (opt-in)
     initMotif();                                                      // story-motif HUD (e.g. infection lesion)
     bootConsole();
@@ -2558,7 +2558,9 @@ function finishAnalysis() {
   // The code is NOT minted here: it's keyed on the student's x500, which is now collected on the
   // submission-prep screen (mintCode runs in buildSubmission after x500 is confirmed).
   // No escape phase → the graded work IS the end: go straight to the submission-prep screen.
-  if (!hasEscapePhase() && !hasPendingEscape()) { openSubmitPrep(); return; }
+  // No escape phase → the graded work IS the end: show the persistent chip FIRST (so closing the
+  // submission screen leaves a way back into it), then go straight there.
+  if (!hasEscapePhase() && !hasPendingEscape()) { showSubmitChip(); openSubmitPrep(); return; }
   // Escape phase exists → show the analysis finish card, offering to skip the (ungraded) escape.
   $("#doneTitle").textContent = (SCENARIO.done && SCENARIO.done.title) ||
     ((SCENARIO.title || "Scenario") + " — analysis complete");
@@ -2570,13 +2572,13 @@ function finishAnalysis() {
   $("#continueOut").style.display = "none";
   $("#doneDebrief").style.display = "none";                   // "how this world worked" now lives on the submission screen
   $("#doneClose").onclick = () => $("#done").classList.remove("open");   // X → back to the room to do the escape
-  // Analysis-finish card is just the finish message + the ✕. The "skip the ungraded escape" affordance is
-  // NOT on this card — it's a persistent bottom-of-screen chip (#skipChip, like the music/notebook chips),
-  // revealed here so the player can try the escape and bail to submission from the room if stuck. No
-  // play-again. (2026-07-28, Lucas)
+  // Analysis-finish card is just the finish message + the ✕. The route to submission is NOT on this card —
+  // it's a persistent bottom-of-screen chip (#skipChip, like the music/notebook chips), revealed here so
+  // the player can try the escape and bail to submission from the room if stuck, and never hidden again so
+  // the submission screen is always re-enterable. No play-again. (2026-07-28, chip made permanent 2026-09-09)
   $("#doneToSubmit").style.display = "none";
   $("#replay").style.display = "none";
-  $("#skipChip").style.display = "";
+  showSubmitChip();
   $("#done").classList.add("open");
 }
 
@@ -2585,7 +2587,7 @@ function finishAnalysis() {
 function showEscapeDone() {
   escapeFinished = true;                            // the escape is solved → debrief no longer needs a spoiler guard
   if (escapeFinishedTime == null) escapeFinishedTime = Date.now();   // stamp escape-phase end (once)
-  $("#skipChip").style.display = "none";            // escape is done — nothing left to skip
+  showSubmitChip();                                 // stays visible; label drops the now-moot "skip" half
   stopRoomSfx();                                    // silence the escape-room ambience on the finish card
   const e = SCENARIO.escapeDone || {};
   $("#doneTitle").textContent = e.title || "You escaped!";
@@ -2719,6 +2721,31 @@ async function runSubmitBlock(roomKey, ta, figWrap, stat, runBtn) {
   } catch (e) { stat.textContent = "error: " + (e && e.message ? e.message : e); }
   finally { runBtn.disabled = false; setTimeout(() => { if (/updated|no figure/.test(stat.textContent)) stat.textContent = ""; }, 3500); }
 }
+/*
+ * The ONE persistent route to the submission screen (2026-09-09, Lucas). Shown the moment the analysis is
+ * finished and NEVER hidden again, because closing the submission screen used to be a one-way door: the
+ * escape-finish card's "Prepare submission →" closed itself on the way through, `#subClose` only hides the
+ * screen, and `showEscapeDone` hid this chip ("nothing left to skip") — so a student who escaped, opened
+ * their submission and closed it was left in the room with no way back to the PDF, which is the only route
+ * to submitting. Reload was the sole recovery, and it restarts the scenario and discards every figure.
+ * Worse in a scenario with NO escape phase, where `finishAnalysis` goes straight to the submission screen
+ * and the chip had never been shown at all.
+ *
+ * The label carries the skip affordance only while there IS an escape left to skip — telling a student who
+ * has already escaped that they can skip the escape is just noise. (The id stays `#skipChip`: it is what
+ * `e2e/alaska_full.spec.js` uses to reach the submission screen, and the rename buys nothing.)
+ */
+function showSubmitChip() {
+  const chip = $("#skipChip");
+  if (!chip) return;
+  const canSkip = !escapeFinished && (hasEscapePhase() || hasPendingEscape());
+  chip.textContent = canSkip ? "Prepare submission / skip the ungraded escape phase →" : "Prepare submission →";
+  chip.title = canSkip
+    ? "Open your submission now, skipping the ungraded escape — you can come back as often as you like"
+    : "Open your submission — you can come back to it as often as you like";
+  chip.style.display = "";
+}
+
 function openSubmitPrep() {
   $("#done").classList.remove("open");
   bootConsole();                                            // warm up WebR so the refine-consoles are ready
@@ -3028,6 +3055,10 @@ function bootConsole() {
   // runFrom, not run: executes the student's highlighted selection if there is one, else the whole
   // editor. Matches the sandbox and the book cells (all three go through the shared console).
   runBtn.addEventListener("click", () => rconsole.runFrom($("#code-input")));
+  // Plot size + shape, alongside Run. It goes in the console BLOCK, which is relocated into whichever
+  // puzzle modal is open rather than rebuilt (see unmountConsole), so one strip serves every puzzle and
+  // survives every open/close. The console owns the control itself — see shared/AGENTS.md.
+  runBtn.parentNode.appendChild(rconsole.plotControls());
   // Ctrl/⌘+Enter in the editor runs it, like the standalone WebR sandbox. #code-input is the single
   // persistent console textarea (moved into whichever puzzle modal is open), so this one listener
   // covers every puzzle modal that carries a console (MCQ, check, and pick).

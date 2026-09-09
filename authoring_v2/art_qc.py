@@ -25,6 +25,14 @@ certify art, and the standing rule from the cinemagraph work is that metrics scr
 certify.
 
   art_qc.py --chapter hierarchical_clustering --scenario canyon --room j_c1 [--strips 6]
+
+ALSO TILES ARBITRARY IMAGES (added 2026-09-09 for the gpt-image-2.5 bake-off): `--files a.png b.png
+--labels A B [--stack]` skips the scenario lookup entirely and lays the given images out the same
+way. `--labels` BURNS each label onto its panel — do that for any sheet that leaves this machine,
+because the left-to-right key printed to stdout does not travel with the image, and "the second
+one" means nothing to someone reading it on a phone.
+
+  art_qc.py --files x.png y.png --labels "A base" "B new" --strips 6 --out /tmp/cmp
 """
 import argparse
 import glob
@@ -82,32 +90,65 @@ def grid_overlay(scene_png, out_png, step=0.05):
     return out_png
 
 
-def strips(paths, out_dir, n=6, labels=None):
-    """One image per vertical strip, candidates laid side by side, at native resolution."""
+def strips(paths, out_dir, n=6, labels=None, burn_labels=False, prefix="strip", stack=False):
+    """One image per vertical strip, candidates laid side by side, at native resolution.
+
+    `burn_labels` draws each panel's label ONTO the panel. Off by default so the original
+    scenario flow is unchanged, but on for any sheet that leaves this machine: a strip that
+    is read on a phone, or pasted into a chat, loses the left-to-right key printed to stdout,
+    and then "the second one" means nothing.
+
+    `stack` lays the panels vertically instead of horizontally — for a wide panorama strip
+    that is taller than it is wide, side-by-side quickly becomes unreadably narrow on a phone.
+    """
     os.makedirs(out_dir, exist_ok=True)
     ims = [Image.open(p).convert("RGB") for p in paths]
     W, H = ims[0].size
+    labels = labels or [os.path.basename(p) for p in paths]
     sw = W // n
+    pad = 34 if burn_labels else 0
+    try:
+        f = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 24)
+    except Exception:                                     # noqa: BLE001
+        f = ImageFont.load_default()
     made = []
     for i in range(n):
         x0 = i * sw
         x1 = W if i == n - 1 else x0 + sw
         crops = [im.crop((x0, 0, x1, H)) for im in ims]
         cw = crops[0].width
-        sheet = Image.new("RGB", (cw * len(crops), H), (10, 10, 12))
-        for j, c in enumerate(crops):
-            sheet.paste(c, (j * cw, 0))
-        p = os.path.join(out_dir, "strip%d_of%d.png" % (i + 1, n))
-        sheet.save(p)
-        made.append(p)
-    return made, (labels or [os.path.basename(p) for p in paths])
+        panels = []
+        for c, lab in zip(crops, labels):
+            if not burn_labels:
+                panels.append(c); continue
+            q = Image.new("RGB", (cw, H + pad), (10, 10, 12))
+            q.paste(c, (0, pad))
+            ImageDraw.Draw(q).text((8, 6), lab, fill=(255, 235, 120), font=f)
+            panels.append(q)
+        ph = panels[0].height
+        if stack:
+            sheet = Image.new("RGB", (cw, ph * len(panels)), (10, 10, 12))
+            for j, c in enumerate(panels):
+                sheet.paste(c, (0, j * ph))
+        else:
+            sheet = Image.new("RGB", (cw * len(panels), ph), (10, 10, 12))
+            for j, c in enumerate(panels):
+                sheet.paste(c, (j * cw, 0))
+        out = os.path.join(out_dir, "%s%d_of%d.png" % (prefix, i + 1, n))
+        sheet.save(out)
+        made.append(out)
+    return made, labels
 
 
 def _main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--chapter", required=True)
-    ap.add_argument("--scenario", required=True)
-    ap.add_argument("--room", required=True)
+    ap.add_argument("--files", nargs="+", help="tile ARBITRARY images instead of a room's candidates "
+                                               "(model bake-offs, before/after pairs). With --labels.")
+    ap.add_argument("--labels", nargs="+", help="one label per --files entry, burnt onto each panel")
+    ap.add_argument("--stack", action="store_true", help="lay panels vertically, not side by side")
+    ap.add_argument("--chapter")
+    ap.add_argument("--scenario")
+    ap.add_argument("--room")
     ap.add_argument("--strips", type=int, default=6)
     ap.add_argument("--out", default=None)
     ap.add_argument("--grid", action="store_true",
@@ -115,6 +156,20 @@ def _main():
                          "coordinates cannot be read reliably off a bare image (measured: the 0.83-IoU "
                          "hotspot result needed one)")
     a = ap.parse_args()
+    if a.files:
+        out = a.out or "/home/bustalab/Documents/Tools/temp/art_qc/files"
+        made, labels = strips(a.files, out, a.strips, labels=a.labels,
+                              burn_labels=True, stack=a.stack)
+        print("panels (%s):" % ("top -> bottom" if a.stack else "left -> right"))
+        for i, l in enumerate(labels, 1):
+            print("  %d. %s" % (i, l))
+        print("\nstrips at native resolution:")
+        for p in made:
+            print("  " + p)
+        return 0
+    missing = [f for f in ("chapter", "scenario", "room") if not getattr(a, f)]
+    if missing:
+        raise SystemExit("need --chapter/--scenario/--room (or --files): missing " + ", ".join(missing))
     base = os.path.join(ROOMS, a.chapter, a.scenario)
     doc = json.load(open(os.path.join(base, "scenario.json"), encoding="utf-8"))
     if a.grid:

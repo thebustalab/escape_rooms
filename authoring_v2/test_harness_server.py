@@ -2478,3 +2478,31 @@ def test_preflight_grandfathers_a_scenario_that_already_has_art(tmp_path):
     (base / "scenario.json").write_text(_json.dumps({"rooms": [{"key": "a", "built": True}]}))
     ok, why = preflight.stamp_is_fresh(str(base))
     assert ok and "grandfathered" in why, "a scenario with committed art must not be blocked"
+
+
+def test_every_generate_scene_call_carries_the_resolved_api_key():
+    """FAILURE MODE: a generation subprocess launched without env=gen_env().
+
+    `~/.bashrc` exports OPENAI_API_KEY below the "if not running interactively, return" guard, so a
+    daemon-launched harness inherits an environment without it. gen_env() re-resolves it from a
+    login+interactive bash — but it was only wired into 4 of the 11 `GEN` subprocess calls (the three
+    seam-repair paths and run_fullscene_variant). The main room-panorama, world-plate, clue and
+    door-open paths relied on the server itself having been started from an interactive shell. That
+    holds today via serve_harness.sh (`bash -lic`), so the gap was invisible — until the harness is
+    started any other way, when a generation dies with a flat "OPENAI_API_KEY not set" long after the
+    user has walked away. This is the exact failure gen_env() was written to prevent (2026-08-13,
+    egypt's first observer-fired night run, all six rooms).
+
+    The invariant, asserted over source rather than one call site so a NEW call can't reintroduce it:
+    every subprocess.run of GEN must pass env=gen_env().
+    """
+    import re
+    src = open(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                            "harness_server.py"), encoding="utf-8").read()
+    calls = list(re.finditer(r"subprocess\.run\(\s*(?:\[\"python3\", GEN,|_seamfix_argv\().*?\)\n",
+                             src, re.S))
+    assert len(calls) >= 11, ("expected every generate_scene.py call site to be found (8 direct + 3 "
+                              "seamfix); the regex has drifted, found %d" % len(calls))
+    bare = [src[:m.start()].count("\n") + 1 for m in calls if "env=gen_env()" not in m.group(0)]
+    assert not bare, ("generate_scene.py subprocess calls missing env=gen_env() at lines %s — a "
+                      "daemon-launched harness will fail these with 'OPENAI_API_KEY not set'" % bare)

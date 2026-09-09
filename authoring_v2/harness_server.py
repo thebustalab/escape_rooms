@@ -67,6 +67,10 @@ ESCAPE_ROOT = os.path.abspath(os.path.join(HERE, ".."))  # escape_rooms/ (commit
 ROOT = os.path.join(HERE, "ui")  # served web root: the authoring pages (harness_gpt/view360/reproject_test)
 ROOMS_ROOT = os.path.join(ESCAPE_ROOT, "rooms")          # rooms/<chapter>/<scenario>/
 GEN = os.path.join(HERE, "generate_scene.py")
+# The quality rung every server-side generation asks for. `generate_scene.QUALITY` is the single
+# definition; mirrored here so the routes do not each carry a literal. See that module for why
+# `xhigh` and not `high` or `max` (2026-09-09 model switch).
+PANO_QUALITY = "xhigh"
 MAX_PANO_CANDIDATES = 3    # build-world level 1: up to this many candidate panos per room in _scratch (l1_<room>_<n>.png)
 MAX_PLATE_CANDIDATES = 8   # world-plate candidates per generate call (the plate fixes every room's look — worth choosing)
 # V2 harness (authoring_v2/) runs on :8752 so it can sit alongside the production :8751 harness while
@@ -1876,7 +1880,10 @@ def _reserve(prefix, n):
 
 
 def _valid_size(size):
-    """Validate a WxH string against gpt-image-2 limits (Phase 1 native higher-res).
+    """Validate a WxH string against the image API's limits (Phase 1 native higher-res).
+
+    Unchanged across the 2026-09-09 gpt-image-2 -> 2.5-sunburst switch: same edge, pixel-count and
+    aspect constraints, and 2.5 honours the requested size on every call measured (27/27).
     Returns (ok, message). Limits: each edge a multiple of 16 and ≤3840, total pixels in
     [655360, 8294400], aspect ratio ≤3:1 either way. Mirrors the UI-side guard in harness_gpt.html."""
     try:
@@ -1914,7 +1921,7 @@ def _run_generate(slot, tag, prompt, n, quality, size, ref=None, input_fidelity=
         try:
             subprocess.run(["python3", GEN, "gen", "--prompt-file", ptmp,
                             "--out", out, "--quality", quality, "--size", size, *ref_args],
-                           check=True, capture_output=True, text=True)
+                           check=True, capture_output=True, text=True, env=gen_env())
             with LOCK:
                 JOBS[slot]["outputs"].append(os.path.basename(out))
                 JOBS[slot]["done"] += 1
@@ -2400,11 +2407,13 @@ def _run_gen_room_pano(slot, base, room_key, prompt, size, quality, idx):
     ptmp = os.path.join(scratch, ".l1prompt_%s.txt" % room_key)
     with open(ptmp, "w", encoding="utf-8") as f:
         f.write(prompt)
-    ref = _world_plate_abs(base)   # world plate = shared continuity reference (via /images/edits). NOTE: gpt-image-2
-    ref_args = ["--ref", ref] if ref else []   # rejects `input_fidelity` (gpt-image-1 only) — omit it; the ref rides at the model's default
+    ref = _world_plate_abs(base)   # world plate = shared continuity reference (via /images/edits). NEITHER
+    ref_args = ["--ref", ref] if ref else []   # gpt-image-2 NOR gpt-image-2.5 accepts `input_fidelity` (both
+                                               # 400 with invalid_input_fidelity_model, measured 2026-09-09) —
+                                               # omit it; the ref always rides at the model's default
     try:
         subprocess.run(["python3", GEN, "gen", "--prompt-file", ptmp, "--out", out,
-                        "--quality", quality, "--size", size, *ref_args], check=True, capture_output=True, text=True)
+                        "--quality", quality, "--size", size, *ref_args], check=True, capture_output=True, text=True, env=gen_env())
         with LOCK:
             JOBS[slot]["outputs"].append(os.path.basename(out)); JOBS[slot]["done"] = 1
     except subprocess.CalledProcessError as e:
@@ -2461,7 +2470,7 @@ def _run_gen_world_plate(slot, base, prompt, size, quality, n=1):
             subprocess.run(["python3", GEN, "gen", "--prompt-file", ptmp,
                             "--out", os.path.join(scratch, name),
                             "--quality", quality, "--size", size],
-                           check=True, capture_output=True, text=True)
+                           check=True, capture_output=True, text=True, env=gen_env())
             with LOCK:
                 JOBS[slot]["outputs"].append(name); JOBS[slot]["done"] += 1
     except subprocess.CalledProcessError as e:
@@ -2934,8 +2943,8 @@ def _run_gen_clue(slot, base, prefix, prompt, n, size):
         out = os.path.join(scratch, "%s%d.png" % (prefix, start + i))
         try:
             subprocess.run(["python3", GEN, "gen", "--prompt-file", ptmp,
-                            "--out", out, "--quality", "high", "--size", size],
-                           check=True, capture_output=True, text=True)
+                            "--out", out, "--quality", PANO_QUALITY, "--size", size],
+                           check=True, capture_output=True, text=True, env=gen_env())
             with LOCK:
                 JOBS[slot]["outputs"].append(os.path.basename(out))
                 JOBS[slot]["done"] += 1
@@ -2955,7 +2964,7 @@ def _run_dooropen(slot, image, box, prompt):
     try:
         subprocess.run(["python3", GEN, "dooropen", "--input", inp, "--box", boxstr,
                         "--prompt", prompt, "--out", out],
-                       check=True, capture_output=True, text=True)
+                       check=True, capture_output=True, text=True, env=gen_env())
         with LOCK:
             JOBS[slot]["outputs"].append(os.path.basename(out))
             JOBS[slot]["done"] = 1
@@ -3262,7 +3271,7 @@ def _run_dooropen_room(slot, base, room_key, box, prompt, hotspot_id=None):
     try:
         subprocess.run(["python3", GEN, "dooropen", "--input", inp, "--box", boxstr,
                         "--prompt", prompt, "--out", out],
-                       check=True, capture_output=True, text=True)
+                       check=True, capture_output=True, text=True, env=gen_env())
         if per_door:
             with SAVE_LOCK:
                 doc, _node, spot = _find_hotspot(base, room_key, hotspot_id)
@@ -3299,7 +3308,7 @@ def _run_variant(slot, base, room_key, hotspot_id, state, box, prompt, when=None
             raise RuntimeError("no committed scene.png for room %s (commit the room first)" % room_key)
         subprocess.run(["python3", GEN, "dooropen", "--input", inp, "--box", boxstr,
                         "--prompt", prompt, "--out", out],
-                       check=True, capture_output=True, text=True)
+                       check=True, capture_output=True, text=True, env=gen_env())
         rel = "%s/%s" % (room_key, fname)
         variant = {"state": safe_state, "box": box, "prompt": prompt, "panorama": rel}
         if when is not None:
@@ -4600,7 +4609,7 @@ class H(http.server.SimpleHTTPRequestHandler):
                 except (TypeError, ValueError):
                     n = 2
                 if not _start("worldplate", "genplate",
-                              lambda: _run_gen_world_plate("worldplate", base, prompt, size, "high", n), n):
+                              lambda: _run_gen_world_plate("worldplate", base, prompt, size, PANO_QUALITY, n), n):
                     return self._json({"ok": False, "error": "already generating the world plate"}, 409)
                 return self._json({"ok": True, "slot": "worldplate", "n": n})
             if route == "/api/gen-room-pano":        # build-world level 1: one hi-res pano for a room
@@ -4630,7 +4639,9 @@ class H(http.server.SimpleHTTPRequestHandler):
                 if idx is None:
                     return self._json({"ok": False, "error": "%s already has %d candidate panos — delete one first" % (rk, MAX_PANO_CANDIDATES)}, 409)
                 slot = "l1_%s_%d" % (rk, idx)
-                if not _start(slot, "genpano", lambda: _run_gen_room_pano(slot, base, rk, prompt, size, "high", idx), 1):
+                # PANO_QUALITY, not a literal: 2.5 added rungs ABOVE `high`, so the old top rung is
+                # now a middle one (gpt-image-2 `high` = 3952 output tokens, 2.5 `high` = 988).
+                if not _start(slot, "genpano", lambda: _run_gen_room_pano(slot, base, rk, prompt, size, PANO_QUALITY, idx), 1):
                     return self._json({"ok": False, "error": "already generating %s candidate %d" % (rk, idx)}, 409)
                 return self._json({"ok": True, "slot": slot, "idx": idx, "image": "l1_%s_%d.png" % (rk, idx)})
             if route == "/api/seamfix-scratch":      # build-world level 1: seam-fix a _scratch pano IN PLACE (pre-commit)
