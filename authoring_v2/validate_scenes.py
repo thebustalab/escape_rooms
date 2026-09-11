@@ -92,7 +92,13 @@ def check_scenario(path):
         return fails, warns, doc.get("status") == "ready", True   # nothing spec'd yet — nothing to check
 
     keys = {r.get("key") for r in rooms}
-    start = rooms[0].get("key") if rooms else None
+    # A two-player scenario starts its players in DIFFERENT rooms and declares them on the
+    # landing screen as `enterButtons`. Reachability must then be walked from EVERY start,
+    # or one role's whole branch reads as unreachable. (embeddings/submarine, 2026-09-10.)
+    starts = [b.get("startRoom") for b in (doc.get("enterButtons") or [])
+              if b.get("startRoom") in keys]
+    if not starts:
+        starts = [rooms[0].get("key")] if rooms else []
     adj, doors_by_room, switch_door_back = {}, {}, {}
 
     for r in spec_rooms:
@@ -311,19 +317,21 @@ def check_scenario(path):
         # such a room legitimately has no separate `back` door.
         if switch_door_back.get(rk):
             continue
-        if rk != start and not any(direction == "back" for _, direction in ds):
+        if rk not in starts and not any(direction == "back" for _, direction in ds):
             warns.append(f"{rk}: no `back` door — a missed opt-in pickup here could not be retrieved")
-    if start:
-        seen, stack = {start}, [start]
+    if starts:
+        seen, stack = set(starts), list(starts)
         while stack:
             n = stack.pop()
             for m in adj.get(n, ()):
                 if m not in seen:
                     seen.add(m)
                     stack.append(m)
+        where = "the start room '%s'" % starts[0] if len(starts) == 1 else \
+                "any start room (%s)" % ", ".join(starts)
         for r in spec_rooms:
             if r.get("key") not in seen:
-                fails.append(f"{r.get('key')}: not reachable from the start room '{start}'")
+                fails.append(f"{r.get('key')}: not reachable from {where}")
 
     if not str(doc.get("coverPrompt") or "").strip():
         warns.append("scenario has no coverPrompt")

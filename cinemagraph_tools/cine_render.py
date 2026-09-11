@@ -78,7 +78,7 @@ CINEMAGRAPH_LORA = "LTX-2.3-22b-LoRA-Cinemagraph/ltx-2.3-22b-lora-cinemagraph-0.
 
 
 def graph(image_name, positive, negative, w, h, length, prefix, end_guide=END_GUIDE, seed=SEED,
-          cond_fps=None, lora=None):
+          cond_fps=None, lora=None, max_shift=None):
     """The settled two-ended-guide graph. Frame 0 pinned hard, frame -1 at `end_guide`.
 
     `cond_fps` DECOUPLES THE PACE FROM THE CONTAINER. `LTXVConditioning.frame_rate` is a conditioning
@@ -121,8 +121,13 @@ def graph(image_name, positive, negative, w, h, length, prefix, end_guide=END_GU
                           "latent": ["31", 2], "image": ["6", 0], "frame_idx": -1, "strength": end_guide}},
         "8":  {"class_type": "LTXVConditioning",
                "inputs": {"positive": ["32", 0], "negative": ["32", 1], "frame_rate": cond_fps}},
+        # max_shift is RESOLUTION-DEPENDENT in LTX-style flow schedulers: the timestep shift wants
+        # to grow with latent token count. 2.05 was tuned at 3072x1024 but the same value is used at
+        # every size, which is a candidate explanation for hood animating at 1536x512 and going inert
+        # at 3072x1024 on the identical seed and end guide (2026-09-10).
         "9":  {"class_type": "LTXVScheduler",
-               "inputs": {"steps": STEPS, "max_shift": 2.05, "base_shift": 0.95,
+               "inputs": {"steps": STEPS, "max_shift": (2.05 if max_shift is None else max_shift),
+                          "base_shift": 0.95,
                           "stretch": True, "terminal": 0.1, "latent": ["32", 2]}},
         "10": {"class_type": "RandomNoise", "inputs": {"noise_seed": seed}},
         "11": {"class_type": "CFGGuider",

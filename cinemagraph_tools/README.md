@@ -26,6 +26,7 @@ older hotspot-crop clips (288x512 and similar) — see the note at the end.
 | `make_boomerang.py` | builds forward+reverse `_boom.mp4` copies. The only loop mode that permits TRAVELLING motion |
 | `add_to_viewer.py` | registers a clip in a 360 test viewer: copy, matching still, motion map, menu entry. Holds an exclusive lock across read-modify-write |
 | `auto_register.py` | watches render folders and registers new clips as they land; skips renders that failed the frame-0 check |
+| `cine_return_check.py` | **the only measure that is correct at FULL resolution.** Traces \|frame_t - frame_0\|: alive clips arc out and come back, dead ones drift one way and never return. Run it on the RAW render — a crossfade forces the return and makes every looped clip score well |
 | `sync_viewer.py` | rebuilds `cine360_endguide.html` from `cine360_test.html`, keeping its own clip list, so player changes never have to be made twice |
 | `queue_drained.sh` | waits for ComfyUI's queue to be genuinely empty. Chaining on "the previous script exited" is wrong — a script that hits its poll timeout exits while its renders are still queued |
 | `auto_mask.py` | picks the post-processing mask threshold by OBJECT SOLIDITY, not by percentile. Also fills interior holes, which is what lets a high threshold and complete objects coexist. `drop_small` is the SECOND axis — a region-size cut that removes isolated speckle a percentile can never see (default off) |

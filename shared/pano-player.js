@@ -282,10 +282,14 @@ function init(data) {
   $("#subX500").addEventListener("keydown", e => { if (e.key === "Enter") confirmX500(); });
   $("#notebookChip").onclick = openNotebook;
   $("#skipChip").onclick = openSubmitPrep;   // the one persistent in-room route to submission (showSubmitChip)
-  $("#enter").onclick = () => {
+  // Two-player scenarios start their players in DIFFERENT rooms, so the landing screen may
+  // offer one button per role instead of a single Begin. Additive: a scenario with no
+  // `enterButtons` behaves exactly as before. (embeddings/submarine, 2026-09-10.)
+  const beginGame = (role, startKey) => {
     $("#screen1").classList.remove("active");
     $("#screen2").classList.add("active");
     gameState = JSON.parse(JSON.stringify(SCENARIO.state || {}));
+    if (role) gameState.role = role;                                  // set by which landing button was taken
     solvedRooms.clear();
     solvedGates.clear();
     attemptCounts.clear();
@@ -303,10 +307,25 @@ function init(data) {
     initMotif();                                                      // story-motif HUD (e.g. infection lesion)
     bootConsole();
     if (music && musicOn) music.play().catch(() => {});   // Enter is the user gesture autoplay needs
-    const first = SCENARIO.rooms.findIndex(r => isBuilt(r) && condOK(r.unlockedWhen));
+    const named = startKey ? SCENARIO.rooms.findIndex(r => r.key === startKey && isBuilt(r)) : -1;
+    const first = named >= 0 ? named
+                             : SCENARIO.rooms.findIndex(r => isBuilt(r) && condOK(r.unlockedWhen));
     if (first < 0) { finishAnalysis(); return; }   // nothing built to play yet
     startRoom(first);
   };
+  $("#enter").onclick = () => beginGame(null, null);
+  const entryBtns = Array.isArray(SCENARIO.enterButtons) ? SCENARIO.enterButtons : [];
+  if (entryBtns.length) {
+    $("#enter").style.display = "none";
+    const holder = $("#enter").parentElement;
+    for (const b of entryBtns) {
+      const el = document.createElement("button");
+      el.textContent = b.label || "Begin \u2192";
+      el.className = $("#enter").className;
+      el.onclick = () => beginGame(b.role || null, b.startRoom || null);
+      holder.appendChild(el);
+    }
+  }
   setupMusic();
   setupSfxToggle();
 }

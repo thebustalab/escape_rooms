@@ -492,6 +492,23 @@ NETWORKS_SUBWAY_KEY <- list(
   }
 )
 
+# embeddings / submarine (scenario id 22): "The Sounding" — text-embedding retrieval over a ship
+# archive, played from the two ends of a crippled salvage submarine.
+#
+# >> ID 22 IS RESERVED, AND ITS KEY IS DEFERRED ON PURPOSE. There is deliberately NO key object here
+# yet. A key needs `correct = c(...)`, the option INDEX of each rung's right answer, and those indices
+# do not exist until `escape_room_wiring` authors the MCQ option order. A placeholder vector would grade
+# silently and wrongly, which is worse than a missing key: a missing key fails loudly.
+#
+# What the key will need when wiring runs:
+#   - TWO PLAYERS, ONE SCENARIO ID. Role is set by the landing button (state.role: "helm" | "sonar"),
+#     so a submission carries FOUR rungs — that player's own branch — not eight. Decide at wiring time
+#     whether the two roles share one key (the rung ORDER differs between them) or need one each.
+#   - The ladder answers themselves are re-derived, not transcribed: run
+#     rooms/embeddings/submarine/_scratch/verify_ladder.py, which reads the frozen CSV and exits non-zero
+#     if any rung has drifted.
+#   - The escape (the plotting-board `grid`) is ungraded and is NOT in the codec, as in every scenario.
+
 # Vectorised over a data frame of submissions.
 grade_submissions <- function(df, key, id_col = "x500", code_col = "code",
                               secret = SECRET) {

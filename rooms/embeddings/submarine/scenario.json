@@ -1,0 +1,910 @@
+{
+ "status": "in_development",
+ "chapter": "embeddings",
+ "scenario": "submarine",
+ "id": 22,
+ "title": "The Sounding",
+ "subtitle": "Two ends of a crippled boat, one archive, and a wreck that will not answer twice.",
+ "story": "You and your partner are on a deep-sea search for a long-lost and highly sought-after artifact: a giant bell of legend. However, information on what it looks like, and which ship it sank on, is a mystery whose solution your team recently worked out by analyzing the many documents you've collected in an archive about the bell.\n\nPartway through your search, your submarine struck a rock on the sea floor. Now the ship is flooded with you and your partner stranded on opposite ends of the ship. First, solve the puzzles to turn the power back on and drain the water from each room. Next, drive the submarine to find the correct wreck, then go out the airlock to claim your treasure!",
+ "enterLabel": "Take your end of the boat",
+ "enterButtons": [
+  {
+   "label": "Player one \u2014 the bow",
+   "role": "helm",
+   "startRoom": "torpedo_room"
+  },
+  {
+   "label": "Player two \u2014 the stern",
+   "role": "sonar",
+   "startRoom": "motor_room"
+  }
+ ],
+ "done": "Both halves are drained and powered and the boat is off the rock. You have a name and an assay; your partner has an area and a set of ranges. Neither of you has a wreck yet.",
+ "escapeDone": "You went out through your own trunk and your partner came out of theirs, and the two of you met on the seabed for the first time since the boat struck, standing over a short run of blackened frames no longer than a boat's length, with the bell between you.",
+ "packages": [
+  "dplyr",
+  "ggplot2",
+  "readr"
+ ],
+ "setup": "suppressMessages({library(dplyr); library(ggplot2)})",
+ "state": {
+  "role": null
+ },
+ "datasets": [
+  {
+   "name": "ship_archive",
+   "url": "https://thebustalab.github.io/escape_rooms/rooms/embeddings/submarine/data/ship_archive.csv"
+  }
+ ],
+ "debrief": {
+  "title": "How the archive worked",
+  "intro": "This world was built to argue one thing: that the top of a ranked list measures how much has been written about a subject, not how relevant that subject is. You and your partner searched the same hundred and twenty-six records and were both, at the last question, offered a confident wrong answer by the most natural method available. Weighing each subject's records evenly is what refused it; a column the embedding never looked at is what proved it."
+ },
+ "ambient": "none",
+ "worldPlatePrompt": "A world-bible establishing frame for the interior of a small salvage submarine of 1913, recently run onto rock and crippled but NOT derelict: a working boat, maintained and in commission until an hour ago, its brightwork still polished and its paint sound. CONDITION: hard-used and immaculate, now disordered by one violent impact \u2014 deck plates lifted, loose gear thrown down, water standing where it should not be. Nothing rusted, nothing abandoned, no ruin, no decay, no growth. MATERIALS: riveted steel plate, heavy brass fittings and valve wheels, white-enamelled deckheads gone warm and grimy with use, cork lagging on the pipe runs, banks of copper pipe, black rubber deck matting, leather-bound handrails. PALETTE: the boat's own emergency lighting is deep saturated RED and it is the register of the whole world; against it the steel reads near-black, the brass reads hot orange, and the enamel reads dull rose. The ONLY other pure colour anywhere is the ACID GREEN of instrument phosphor \u2014 nothing else in this world competes with those two for chroma, and the reds and greens are rich and fully saturated, never washed out or greyed. LIGHT: soft even interior illumination for this reference frame, neither bright nor black. Heavy air, faint haze, fine film grain.",
+ "coverPrompt": "A minimalist poster thumbnail: the flat black silhouette of a small submarine seen bow-on, centred on a deep red field, with a single small amber glow at its heart and one thin pale arc of sonar sweeping out behind it. Square. Bold, simple shapes that read at very small size. No people, no lettering, no text, no border.",
+ "_designNotes": "Two players, one codec id, role set by the door taken out of `impact` (heist precedent). NO SERVER SYNC ANYWHERE \u2014 see notes.md 'NO-SYNC ARCHITECTURE'. Ladder answers are re-derived by _scratch/verify_ladder.py; the escape by _scratch/verify_escape.py.",
+ "rooms": [
+  {
+   "key": "torpedo_room",
+   "title": "The Tube Space",
+   "technique": "cosine similarity between one query and two candidate records",
+   "puzzleType": 1,
+   "phase": "analysis",
+   "built": false,
+   "unlockedWhen": true,
+   "designNote": "P2 RUNG 1 (type 1, compute-the-key). VERIFIED ANSWER: D002 beats D005, margin 8.2%. Query: 'A report of the loss of a vessel, abandoned after striking, with no part of her cargo landed.' The student computes cosine from the query vector to the two named records and says which is nearer. Answers re-derived by _scratch/verify_ladder.py \u2014 do not restate the number anywhere else. BEAT: the forward bilge pump needs its bus closed before it will run; the record tells P2 which of two salvage files is a loss report at all, and that is what the log wants before it will give up the search circle. THE FORWARD ESCAPE TRUNK IS *NOT* HERE \u2014 see control_room.",
+   "plannedHotspots": [
+    {
+     "type": "puzzle",
+     "label": "The loading tray",
+     "note": "P2R1 \u2014 two candidate records, compute cosine to each"
+    },
+    {
+     "type": "clue",
+     "label": "The expedition brief",
+     "pickup": true,
+     "note": "PICKUP. A loose sheet the player takes with them. TWO HALVES, and the split is load-bearing. KNOWN (what the team already worked out, and the verification standard for both bosses): the bell is high-tin bell-metal, about 22 per cent tin, and it was carried by a small brig of about 190 tons. STILL UNKNOWN (what the bosses find): WHICH foundry cast it and WHICH vessel carried her down. Never names Hallorann or the Cordelia Vane. Identical copy at both ends - this scenario splits METHOD, never facts."
+    },
+    {
+     "type": "clue",
+     "label": "The captain's log",
+     "note": "the search circle: the coarse reported position, an AREA and never a point. Feeds P2's boss and the escape."
+    },
+    {
+     "type": "door",
+     "direction": "open",
+     "to": "crew_mess",
+     "label": "Aft, to the mess"
+    }
+   ],
+   "authoring": {
+    "sceneSpec": {
+     "room": "torpedo_room",
+     "setting": "the forward torpedo space of a small salvage submarine, her bow driven down onto the rock",
+     "interior": true,
+     "seam": "the curve of riveted hull plating arching continuously overhead, uniform and low in detail",
+     "seamOccluder": "a heavy timber shoring post wedged hard between deck and deckhead",
+     "elements": [
+      {
+       "id": "tubes",
+       "at": "on the far left",
+       "desc": "the polished brass breech doors of EXACTLY 4 torpedo tubes set in a square group into the forward bulkhead, standing at the low end of a deck that slopes down toward them, their locking rings bright above the water gathered around their sills"
+      },
+      {
+       "id": "water",
+       "at": "to the left",
+       "desc": "a continuous sheet of water lying over the sloping deck plates, deepest against the tube doors and thinning to bare wet plate further aft, sliding bodily fore and aft across the plates as the boat rocks",
+       "animate": {
+        "motion": "the whole sheet of water sliding bodily fore and aft across the sloping deck plates",
+        "loop": "boomerang"
+       }
+      },
+      {
+       "id": "bunks",
+       "at": "just left of centre",
+       "desc": "canvas bunks slung on chains from the deckhead above the tube doors, hanging still, their bedding still made up"
+      },
+      {
+       "id": "tray",
+       "at": "dead ahead in the centre",
+       "desc": "a long brass tube-loading tray racked at waist height along the hull, a brass-cornered file box wedged fast in it with two loose written records laid open on the tray beside it",
+       "puzzle": true,
+       "label": "The loading tray"
+      },
+      {
+       "id": "log",
+       "at": "just right of centre",
+       "desc": "a leather-bound ship's log open on a small chart desk bracketed to the hull, a pencil in the gutter",
+       "clue": true,
+       "label": "The captain's log"
+      },
+      {
+       "id": "brief",
+       "at": "to the right",
+       "desc": "a loose typed sheet lying face up on a small shelf with its corner curled, beside a brass bilge pump whose copper pipe runs turn up into the deckhead and end at a gland there",
+       "clue": true,
+       "label": "The expedition brief"
+      },
+      {
+       "id": "door",
+       "at": "on the far right",
+       "desc": "a heavy oval watertight door standing open in the after bulkhead, warm firelight beyond it",
+       "door": {
+        "direction": "open",
+        "to": "crew_mess"
+       },
+       "label": "Aft, to the mess"
+      }
+     ],
+     "atmosphere": "Cold white light from one caged lamp with red emergency lamps behind it, wet steel, brass highlights, the whole space tilted bow-down, heavy air, film grain.",
+     "negatives": "No people, no figures, no crew, no lettering, no captions, no text, no signage. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere \u2014 everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. The deck SLOPES down toward the tube doors and the water lies DEEP at that end and dry underfoot behind it \u2014 the deck is not level and not uniformly flooded. There are EXACTLY 4 tube doors. The pipe runs TERMINATE at a bulkhead gland and do not continue toward the frame edge.",
+     "continuity": []
+    }
+   },
+   "debrief": "Cosine similarity is the whole of retrieval in one move: turn two documents into vectors, measure the angle from each to your question, and take the smaller. You did it once here, by hand, on two records. Every later room is that same measurement done more times and read more carefully."
+  },
+  {
+   "key": "crew_mess",
+   "title": "The Mess Deck",
+   "technique": "rank the whole archive by similarity to one query",
+   "puzzleType": 4,
+   "phase": "analysis",
+   "built": false,
+   "unlockedWhen": true,
+   "designNote": "P2 RUNG 2 (type 4, pick-the-point). VERIFIED ANSWER: D106, margin 9.5%. Query: 'What a wreck spread over a long distance returns to a lead line, against a small compact one.' Student ranks all 126 records, plots the ranked similarities, and CLICKS the top point. BEAT: mess-deck talk \u2014 an old salvage hand's account of how you tell a big wreck from a small one on the lead line. >> THIS RUNG TEACHES THE ESCAPE'S EXTENT TELL OUTRIGHT. That is deliberate: taught-trap -> escape-echo. Without it the extent tell arrives from nowhere in the escape.",
+   "plannedHotspots": [
+    {
+     "type": "puzzle",
+     "label": "The mess table",
+     "note": "P2R2 \u2014 rank all records against the query, click the top point"
+    },
+    {
+     "type": "door",
+     "direction": "open",
+     "to": "chart_room",
+     "label": "Aft, to the chart room"
+    }
+   ],
+   "authoring": {
+    "sceneSpec": {
+     "room": "crew_mess",
+     "setting": "the crew mess of a small salvage submarine, down in the bottom of the hull cylinder",
+     "interior": true,
+     "seam": "a plain continuous run of white-enamelled panelling, uniform and low in detail",
+     "seamOccluder": "the stringer of a steel ladder running floor to deckhead",
+     "elements": [
+      {
+       "id": "hull_l",
+       "at": "on the far left",
+       "desc": "the riveted hull curving down on the port side until it meets the deck, enamelled panelling following it round"
+      },
+      {
+       "id": "lockers",
+       "at": "to the left",
+       "desc": "a bank of narrow steel crew lockers set into the curve of the hull, their doors dented, a folded oilskin on a hook"
+      },
+      {
+       "id": "range",
+       "at": "just left of centre",
+       "desc": "a small black cast-iron coal range standing at deck level, its firebox door swung fully open and the fire inside filling the whole opening, the light of it beating out across the deck matting in front of it",
+       "animate": {
+        "motion": "the fire filling the wide-open firebox and beating out across the deck matting",
+        "loop": "boomerang"
+       }
+      },
+      {
+       "id": "matting",
+       "at": "dead ahead in the centre",
+       "desc": "black rubber deck matting running away from the open firebox, thrown-down crockery and a tin mug lying on it where the impact put them"
+      },
+      {
+       "id": "table",
+       "at": "just right of centre",
+       "desc": "a mess table hinged down from the bulkhead directly above the range, a stack of loose written records spread across it",
+       "puzzle": true,
+       "label": "The mess table"
+      },
+      {
+       "id": "bench",
+       "at": "to the right",
+       "desc": "a fixed bench seat running along the hull immediately behind the mess table, worn leather cushions on it"
+      },
+      {
+       "id": "door",
+       "at": "on the far right",
+       "desc": "a heavy oval watertight door standing open in the after bulkhead, a hard pool of warm lamplight beyond it",
+       "door": {
+        "direction": "open",
+        "to": "chart_room"
+       },
+       "label": "Aft, to the chart room"
+      }
+     ],
+     "atmosphere": "Warm firelight thrown UPWARD from an open firebox at deck level, the deckhead lost in dim red above it, black rubber matting, worn leather and enamel, close and domestic, film grain.",
+     "negatives": "No people, no figures, no crew, no lettering, no captions, no text, no signage. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere \u2014 everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. The hull curves DOWN to meet the deck on BOTH sides, so the viewer stands in the bottom of a cylinder \u2014 this is not a box with vertical walls. The firebox sits at DECK LEVEL and its light comes from BELOW. There is EXACTLY 1 range in this room.",
+     "continuity": []
+    }
+   },
+   "debrief": "Ranking the whole archive is the move that makes retrieval retrieval. One query, every record scored, sorted, and the nearest read off the top. The account you found here \u2014 that a big wreck answers over a long spread and a small one answers as a single tight thing \u2014 is the fact your escape turns on."
+  },
+  {
+   "key": "chart_room",
+   "title": "The Chart Room",
+   "technique": "repair a broken retrieval, then verify against the metadata",
+   "puzzleType": 3,
+   "phase": "analysis",
+   "built": false,
+   "unlockedWhen": true,
+   "designNote": "P2 RUNG 3 (type 3, repair-the-pipeline). VERIFIED ANSWER: D113, margin 12.7%. Query: 'Chart symbols marking unnamed obstructions in an area that has been poorly surveyed.' Starter code is a colleague's BROKEN retrieval snippet \u2014 sorted ascending, self-match not dropped, wrong column. Student fixes it, gets the top record, then reads the record's `matrix` field to confirm it is what it claims. BEAT: learning what the chart's unnamed obstruction symbols actually mean. >> HARD ART CONSTRAINT: the sea chart in this room and in the control room must show the FIVE CHARTED OBSTRUCTIONS lettered A-E and the FOUR PRE-PLOTTED SEARCH STATIONS numbered I-IV. The escape is inert without them. The obstructions are UNNAMED on the chart \u2014 a labelled decoy is an inert decoy.",
+   "plannedHotspots": [
+    {
+     "type": "puzzle",
+     "label": "The chart table",
+     "note": "P2R3 \u2014 repair the broken retrieval, then verify the winner's metadata"
+    },
+    {
+     "type": "clue",
+     "label": "The sea chart",
+     "note": "the search area: five unnamed obstructions lettered A-E, four pre-plotted stations numbered I-IV. Feeds the escape. Names nothing."
+    },
+    {
+     "type": "door",
+     "direction": "open",
+     "to": "control_room",
+     "label": "Aft, to the control room"
+    }
+   ],
+   "authoring": {
+    "sceneSpec": {
+     "room": "chart_room",
+     "setting": "the low wide chart room of a small salvage submarine",
+     "interior": true,
+     "seam": "the plain boarded back of the chart rack, uniform and low in detail",
+     "seamOccluder": "a square ventilation trunk running floor to deckhead",
+     "elements": [
+      {
+       "id": "rack",
+       "at": "on the far left",
+       "desc": "a pigeonhole rack of rolled sea charts built floor to deckhead, the rolled ends filling every hole"
+      },
+      {
+       "id": "duckboards",
+       "at": "to the left",
+       "desc": "raised wooden duckboards laid over the deck for the whole width of the room, dry and pale, standing clear of the plating beneath"
+      },
+      {
+       "id": "table",
+       "at": "just left of centre",
+       "desc": "a broad low chart table filling the middle of the room, a large sea chart spread and weighted flat across its far end with brass dividers and a parallel rule lying on it, the chart marked with EXACTLY 5 small obstruction symbols and EXACTLY 4 pencilled station crosses",
+       "clue": true,
+       "label": "The sea chart"
+      },
+      {
+       "id": "slope",
+       "at": "dead ahead in the centre",
+       "desc": "a folding writing slope standing on the near end of that same chart table, a colleague's handwritten working papers pinned open on it",
+       "puzzle": true,
+       "label": "The chart table"
+      },
+      {
+       "id": "lamp",
+       "at": "just right of centre",
+       "desc": "a brass hooded lamp on a jointed arm reaching out over the chart table from above, throwing a hard pool of warm light straight down onto it"
+      },
+      {
+       "id": "punkah",
+       "at": "to the right",
+       "desc": "a broad slatted punkah louvre fan mounted flat against the deckhead, its blades turning over slowly and continuously, their shadows wheeling across the table below",
+       "animate": {
+        "motion": "the broad punkah louvre fan turning slowly against the deckhead, its shadows wheeling below",
+        "loop": "boomerang"
+       }
+      },
+      {
+       "id": "door",
+       "at": "on the far right",
+       "desc": "a heavy oval watertight door standing open in the after bulkhead, bright white light beyond it",
+       "door": {
+        "direction": "open",
+        "to": "control_room"
+       },
+       "label": "Aft, to the control room"
+      }
+     ],
+     "atmosphere": "A hard pool of warm light thrown DOWN from a hooded lamp onto a broad table, the room dim red beyond its edge, dry wood underfoot, low and wide, faint haze, film grain.",
+     "negatives": "No people, no figures, no crew, no lettering, no captions, no text, no signage. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere \u2014 everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. There is EXACTLY 1 chart table in this room and both the spread chart and the writing slope stand on that same table. The deck is RAISED WOODEN DUCKBOARDS and is DRY \u2014 no standing water, no rivulets, no condensation anywhere in this compartment. The lamp is BRASS with a warm bulb and hangs ABOVE the table; it is not green-shaded and not at deck level.",
+     "continuity": []
+    }
+   },
+   "debrief": "A retrieval is a small pipeline and every stage of it can be wrong in a way that still returns an answer. Sorted the wrong way it hands you the least similar record; left unguarded it hands you your own query back. Fixing someone else's is the fastest way to learn where the joints are."
+  },
+  {
+   "key": "control_room",
+   "title": "The Control Room",
+   "technique": "group by vessel, mean similarity, then verify against the record",
+   "puzzleType": 2,
+   "phase": "analysis",
+   "built": false,
+   "unlockedWhen": true,
+   "designNote": "P2 BOSS (type 2, classify-the-unknown) + the ESCAPE GATE. VERIFIED ANSWER: Cordelia Vane, mean-cosine margin 6.5%. Query: 'A vessel lost in thick weather in the approaches, her cargo still aboard and her position poorly taken.' >> THE TAUGHT TRAP: counting the retrieved records gives Marchioness of Ayr at EVERY k tested (5,8,10,12,15) \u2014 asserted in _scratch/verify_ladder.py. The correct move is mean cosine per vessel, equal weight per vessel, then VERIFY the winner against `tonnage`/`rig`: the brief wants a small brig of about 190 tons and the Marchioness is a 1,420-ton iron steamer. ESCAPE (grid): rows = the contact identities P1 reports; columns = the five charted obstructions A-E. The pair bind identity to place by co-observation across stations. See _scratch/verify_escape.py. THE FORWARD DIVING TRUNK IS HERE \u2014 a salvage boat carries her trunks beside the working spaces. DEVIATION FROM notes.md, FLAGGED: the notes wanted the trunk found in room one as a Chekhov's gun; putting it in the boss room instead keeps the room graph clean. Lucas to rule.",
+   "plannedHotspots": [
+    {
+     "type": "puzzle",
+     "label": "The plot",
+     "note": "P2 BOSS \u2014 group by vessel, mean cosine, verify against tonnage/rig"
+    },
+    {
+     "type": "grid",
+     "label": "The plotting board",
+     "note": "THE ESCAPE \u2014 bind each contact identity to its charted obstruction. Gated on the boss."
+    },
+    {
+     "type": "clue",
+     "label": "The scuttle",
+     "note": "a thick glass scuttle into the flooded midships compartment \u2014 your partner is on the far side of it and you can never reach them"
+    },
+    {
+     "type": "door",
+     "direction": "open",
+     "to": "wreck_site",
+     "label": "The forward diving trunk"
+    },
+    {
+     "type": "door",
+     "direction": "open",
+     "to": "chart_room",
+     "label": "Forward, to the chart room"
+    }
+   ],
+   "authoring": {
+    "sceneSpec": {
+     "room": "control_room",
+     "setting": "the control room at the heart of a small salvage submarine, built around a vertical well",
+     "interior": true,
+     "seam": "a plain continuous run of boxed ventilation trunking, uniform and low in detail",
+     "seamOccluder": "a steel ladder running up to the conning tower hatch",
+     "elements": [
+      {
+       "id": "door",
+       "at": "on the far left",
+       "desc": "a heavy oval watertight door standing open in the forward bulkhead, a pool of warm lamplight beyond it",
+       "door": {
+        "direction": "open",
+        "to": "chart_room"
+       },
+       "label": "Forward, to the chart room"
+      },
+      {
+       "id": "gauges",
+       "at": "to the left",
+       "desc": "a bank of large brass depth and trim gauges on the forward bulkhead, their glasses domed, their needles still"
+      },
+      {
+       "id": "plot",
+       "at": "just left of centre",
+       "desc": "a chart table with the search area chart weighted flat on it, brass dividers set to a span standing on the chart, a pencilled arc already swung across it",
+       "puzzle": true,
+       "label": "The plot"
+      },
+      {
+       "id": "periscope",
+       "at": "dead ahead in the centre",
+       "desc": "the polished steel barrel of the periscope standing in its well through the centre of the room, rising slowly and continuously out of the well on its wires as the hoist takes it up",
+       "animate": {
+        "motion": "the polished periscope barrel rising slowly out of its well",
+        "loop": "boomerang"
+       }
+      },
+      {
+       "id": "board",
+       "at": "just right of centre",
+       "desc": "a vertical plotting board mounted on the after face of the periscope well, ruled into a grid of empty slots with a rack of small brass name-tiles hanging beside it",
+       "grid": true,
+       "label": "The plotting board"
+      },
+      {
+       "id": "sump",
+       "at": "to the right",
+       "desc": "a diamond-plate deck ring around an open sump in the middle of the deck, dark water standing in the sump below the plating"
+      },
+      {
+       "id": "scuttle",
+       "at": "to the right",
+       "desc": "a small thick round glass scuttle set into the after bulkhead at head height, dark green flooded water pressing against the far side of the glass",
+       "clue": true,
+       "label": "The scuttle"
+      },
+      {
+       "id": "trunk",
+       "at": "on the far right",
+       "desc": "a vertical steel diving trunk let into the deckhead in the after corner, a short ladder running up into it and its lower hatch standing open",
+       "door": {
+        "direction": "open",
+        "to": "wreck_site"
+       },
+       "label": "The forward diving trunk"
+      }
+     ],
+     "atmosphere": "Full restored white electric light, the brightest space in the boat, brass and glass everywhere, hard clean highlights, dense with machinery, faint haze, film grain.",
+     "negatives": "No people, no figures, no crew, no lettering, no captions, no text, no signage. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere \u2014 everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. The room is built around a VERTICAL AXIS \u2014 the periscope well runs up through its centre and a ladder runs up to the conning tower \u2014 and the deck is a diamond-plate ring around an open sump. The scuttle is SMALL and ROUND and shows ONLY dark water on its far side: no room, no light, no figure beyond it. There is EXACTLY 1 periscope in this room and it stands in the FRONT half of the view, never behind the viewer.",
+     "continuity": []
+    }
+   },
+   "debrief": "The boss is the whole lesson in one question. Counting which vessel the retrieved records mention most measures how much was written, not what is true \u2014 and the archive was written lopsided. Weighing each vessel's records evenly instead, and then checking the winner against a column the embedding never saw, is what retrieval actually costs when the answer matters."
+  },
+  {
+   "key": "motor_room",
+   "title": "The Motor Room",
+   "technique": "cosine similarity between one query and two candidate records",
+   "puzzleType": 1,
+   "phase": "analysis",
+   "built": false,
+   "unlockedWhen": true,
+   "designNote": "P1 RUNG 1 (type 1, compute-the-key). VERIFIED ANSWER: D104 beats D095, margin 7.8%. Query: 'A bronze fitting lifted from the sea, the surface pitted and green beneath a hard crust of shell and sand.' BEAT: P1 must set the hydrophone's reference band before anything else, and the record tells them which of two salvage files describes the kind of object they are after. Closing the first bus. THE AMP-HOUR GAUGE IS THE CLOCK \u2014 diegetic, not an attempt counter.",
+   "plannedHotspots": [
+    {
+     "type": "puzzle",
+     "label": "The switchboard",
+     "note": "P1R1 \u2014 two candidate records, compute cosine to each"
+    },
+    {
+     "type": "clue",
+     "label": "The expedition brief",
+     "pickup": true,
+     "note": "PICKUP. A loose sheet the player takes with them. TWO HALVES, and the split is load-bearing. KNOWN (what the team already worked out, and the verification standard for both bosses): the bell is high-tin bell-metal, about 22 per cent tin, and it was carried by a small brig of about 190 tons. STILL UNKNOWN (what the bosses find): WHICH foundry cast it and WHICH vessel carried her down. Never names Hallorann or the Cordelia Vane. Identical copy at both ends - this scenario splits METHOD, never facts."
+    },
+    {
+     "type": "clue",
+     "label": "The amp-hour gauge",
+     "note": "the battery clock: the pumps are what keep the boat alive and they eat amp-hours. Explains why the escape has a finite number of pings."
+    },
+    {
+     "type": "door",
+     "direction": "open",
+     "to": "engine_room",
+     "label": "Forward, to the engine room"
+    }
+   ],
+   "authoring": {
+    "sceneSpec": {
+     "room": "motor_room",
+     "setting": "the after motor room of a small salvage submarine, a low crawl over the battery deck",
+     "interior": true,
+     "seam": "the plain riveted hull of the battery space running low and continuous, uniform and low in detail",
+     "seamOccluder": "a heavy steel king post running floor to deckhead",
+     "elements": [
+      {
+       "id": "motors",
+       "at": "on the far left",
+       "desc": "EXACTLY 2 large electric propulsion motors low against the after bulkhead, their commutators exposed under hinged covers, their heavy cables turning up into the deckhead and ending at a gland there"
+      },
+      {
+       "id": "brief",
+       "at": "to the left",
+       "desc": "a loose typed sheet lying face up on a narrow shelf welded to the hull, its corner curled",
+       "clue": true,
+       "label": "The expedition brief"
+      },
+      {
+       "id": "gratings",
+       "at": "just left of centre",
+       "desc": "open steel floor gratings underfoot the whole length of the space, the tops of the battery cells in long rows directly below them, their terminals visible through the grating"
+      },
+      {
+       "id": "shadow",
+       "at": "dead ahead in the centre",
+       "desc": "the hard barred shadow of the deck gratings thrown down across the battery tops below, the whole pattern sweeping steadily back and forth over the cells as the lamp above it swings",
+       "animate": {
+        "motion": "the barred shadow of the gratings sweeping back and forth across the battery tops",
+        "loop": "boomerang"
+       }
+      },
+      {
+       "id": "switchboard",
+       "at": "just right of centre",
+       "desc": "a marble switchboard panel on the hull side with brass knife switches in a row, two written records clipped flat to the face of the board beneath the switches",
+       "puzzle": true,
+       "label": "The switchboard"
+      },
+      {
+       "id": "ampgauge",
+       "at": "to the right",
+       "desc": "a single large brass amp-hour meter on that switchboard, its dial divided and its pointer well down the scale",
+       "clue": true,
+       "label": "The amp-hour gauge"
+      },
+      {
+       "id": "lamp",
+       "at": "on the far right",
+       "desc": "a portable hand-lamp hanging from a hook on the deckhead on a short flex, swinging slowly, the only light in the compartment"
+      },
+      {
+       "id": "door",
+       "at": "on the far right",
+       "desc": "a heavy oval watertight door standing open in the forward bulkhead beyond the hand-lamp, deep red light through it",
+       "door": {
+        "direction": "open",
+        "to": "engine_room"
+       },
+       "label": "Forward, to the engine room"
+      }
+     ],
+     "atmosphere": "The only unlit compartment in the boat: nothing but one swinging hand-lamp throwing the grating's shadow about, deep black shadow, wet steel, the smell of acid, cramped and low, heavy haze, film grain.",
+     "negatives": "No people, no figures, no crew, no lettering, no captions, no text, no signage. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere \u2014 everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. There are NO red emergency lamps in this compartment \u2014 the hand-lamp is the ONLY light source in the frame. The deck is OPEN GRATING with battery cells directly beneath it; it is not a solid floor. Headroom is LOW, a crawl space and not a hall. The motor cables TURN UP into the deckhead and end at a gland; they do not continue toward the frame edge.",
+     "continuity": []
+    }
+   },
+   "debrief": "The same first move your partner made at the other end of the boat, on a different question. That is the design: you both learn the identical technique on the identical archive, and the two of you end up with different answers because you asked different things of it."
+  },
+  {
+   "key": "engine_room",
+   "title": "The Engine Room",
+   "technique": "rank the whole archive by similarity to one query",
+   "puzzleType": 4,
+   "phase": "analysis",
+   "built": false,
+   "unlockedWhen": true,
+   "designNote": "P1 RUNG 2 (type 4, pick-the-point). VERIFIED ANSWER: D123, margin 6.8%. Query: 'How a founder judges an alloy by the note it gives when struck.' Student ranks all 126 records, plots, clicks the top point. BEAT: the trace printer needs a reference band, and the record that explains judging metal by its RING is what tells P1 what their instrument is even for. The diesels here are useless submerged \u2014 a second 'instrument that exists and cannot help you', same register as the stowed periscope.",
+   "plannedHotspots": [
+    {
+     "type": "puzzle",
+     "label": "The engine control platform",
+     "note": "P1R2 \u2014 rank all records against the query, click the top point"
+    },
+    {
+     "type": "door",
+     "direction": "open",
+     "to": "radio_room",
+     "label": "Forward, to the radio room"
+    }
+   ],
+   "authoring": {
+    "sceneSpec": {
+     "room": "engine_room",
+     "setting": "the engine room of a small salvage submarine, tall and narrow with a catwalk down its length",
+     "interior": true,
+     "seam": "the plain lagged casing of the exhaust silencer running continuously, uniform and low in detail",
+     "seamOccluder": "the boxed casing of the exhaust silencer, running floor to deckhead",
+     "elements": [
+      {
+       "id": "diesels",
+       "at": "on the far left",
+       "desc": "EXACTLY 2 heavy diesel engines standing dead and cold in a well below the walkway, their crankcase doors latched, their cylinder heads exposed"
+      },
+      {
+       "id": "catwalk",
+       "at": "to the left",
+       "desc": "a narrow steel catwalk with pipe handrails running the length of the space directly underfoot, raised well above the engine well so the engine tops stand at about knee height beside it"
+      },
+      {
+       "id": "trunking",
+       "at": "just left of centre",
+       "desc": "heavy lagged exhaust trunking running the length of the space above the walkway, carried on brackets off the hull"
+      },
+      {
+       "id": "valve",
+       "at": "dead ahead in the centre",
+       "desc": "a relief valve set into that exhaust trunking beside the walkway, a heavy plume of steam venting continuously from it and rolling up across the deckhead",
+       "animate": {
+        "motion": "a heavy plume of steam venting from the relief valve and rolling across the deckhead",
+        "loop": "crossfade"
+       }
+      },
+      {
+       "id": "platform",
+       "at": "just right of centre",
+       "desc": "the engine control platform at the head of the well, an engine-room log and a sheaf of loose written records spiked on a hook above it",
+       "puzzle": true,
+       "label": "The engine control platform"
+      },
+      {
+       "id": "door",
+       "at": "to the right",
+       "desc": "a heavy oval watertight door standing open in the forward bulkhead, warm amber light beyond it",
+       "door": {
+        "direction": "open",
+        "to": "radio_room"
+       },
+       "label": "Forward, to the radio room"
+      }
+     ],
+     "atmosphere": "Deep red emergency light and nothing else, hot steel, oil sheen, steam haze thick in the upper air, tall and echoing, film grain.",
+     "negatives": "No people, no figures, no crew, no lettering, no captions, no text, no signage. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere \u2014 everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. The catwalk is RAISED and the engines sit in a well BELOW it \u2014 the viewer looks DOWN on the engine tops from above and is not on the same level as them. This space is TALL. There are EXACTLY 2 engines. There are no floor gratings and no shafts of light from above in this compartment.",
+     "continuity": []
+    }
+   },
+   "debrief": "Ranking the whole archive, the same move your partner made in the mess. What you found is the founder's own test: strike the metal and judge it by the note. That is what your instrument does, and it is why the trace it prints is a shape and not a loudness."
+  },
+  {
+   "key": "radio_room",
+   "title": "The Radio Room",
+   "technique": "repair a broken retrieval, then verify against the metadata",
+   "puzzleType": 3,
+   "phase": "analysis",
+   "built": false,
+   "unlockedWhen": true,
+   "designNote": "P1 RUNG 3 (type 3, repair-the-pipeline). VERIFIED ANSWER: D122, margin 6.7%. Query: 'Blowholes and cold shuts as flaws in sand-cast work.' Broken snippet: sorted ascending, self-match not dropped, wrong column. Student fixes it, takes the top record, then reads its `matrix` field to confirm. BEAT: the archive itself lives here \u2014 card index drawers of old contact reports and salvage files. This is the room that makes the dataset a PLACE. >> The clue hotspot here MUST carry a real str() of the dataset (minimal-text carve-out in AGENTS.md): a student cannot write R against columns they cannot see.",
+   "plannedHotspots": [
+    {
+     "type": "puzzle",
+     "label": "The tube basket",
+     "note": "P1R3 \u2014 repair the broken retrieval, then verify the winner's metadata"
+    },
+    {
+     "type": "clue",
+     "label": "The card index",
+     "note": "the archive's own structure \u2014 MUST show a real str() of ship_archive.csv: the columns, their types, the row count"
+    },
+    {
+     "type": "door",
+     "direction": "open",
+     "to": "sound_room",
+     "label": "Forward, to the sound room"
+    }
+   ],
+   "authoring": {
+    "sceneSpec": {
+     "room": "radio_room",
+     "setting": "the wireless and records room of a small salvage submarine, a tall narrow slot between bulkheads",
+     "interior": true,
+     "seam": "a plain painted steel bulkhead, uniform and low in detail",
+     "seamOccluder": "the boxed casing of the wireless mast trunk, running floor to deckhead",
+     "elements": [
+      {
+       "id": "drawers",
+       "at": "on the far left",
+       "desc": "banks of small brass-handled card index drawers built floor to deckhead the full height of the bulkhead, EXACTLY 3 of them pulled open with filing cards standing up in them",
+       "clue": true,
+       "label": "The card index"
+      },
+      {
+       "id": "curtain",
+       "at": "to the left",
+       "desc": "a heavy oilskin curtain hung across the after doorway on rings, its whole sheet drawing slowly in and out with the ventilation, breathing against the opening",
+       "animate": {
+        "motion": "the heavy oilskin curtain breathing slowly in and out across the doorway",
+        "loop": "boomerang"
+       }
+      },
+      {
+       "id": "step",
+       "at": "just left of centre",
+       "desc": "a single steel step up into the compartment and dry pale cork linoleum laid over the deck beyond it"
+      },
+      {
+       "id": "basket",
+       "at": "dead ahead in the centre",
+       "desc": "a pneumatic tube terminal on the bulkhead with a wire basket beneath it, a brass signalling key on the shelf beside it and a roll of working papers opened out across that shelf",
+       "puzzle": true,
+       "label": "The tube basket"
+      },
+      {
+       "id": "valves",
+       "at": "just right of centre",
+       "desc": "a rack of glass receiving valves above the shelf, their filaments burning warm orange behind the glass"
+      },
+      {
+       "id": "lamp",
+       "at": "to the right",
+       "desc": "a small brass desk lamp on a jointed arm above the shelf, its warm beam thrown down across the papers"
+      },
+      {
+       "id": "door",
+       "at": "on the far right",
+       "desc": "a heavy oval watertight door standing open in the forward bulkhead, deep green light beyond it",
+       "door": {
+        "direction": "open",
+        "to": "sound_room"
+       },
+       "label": "Forward, to the sound room"
+      }
+     ],
+     "atmosphere": "Warm amber from one desk lamp and the glow of valve filaments against near darkness, varnished wood and brass, dry where the whole rest of the boat is wet, very narrow, film grain.",
+     "negatives": "No people, no figures, no crew, no lettering, no captions, no text, no signage. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere \u2014 everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. This space is TALL and NARROW, a slot barely wider than a person, and its deck is DRY cork linoleum one step UP from the passage \u2014 no standing water, no condensation, no rivulets anywhere. There is EXACTLY 1 mast trunk in this room.",
+     "continuity": []
+    }
+   },
+   "debrief": "The same repair your partner made forward, on a different question. Notice what the verification step did here: the record you retrieved claimed one thing and its own catalogued matrix confirmed it. In the next room the same check will refuse the answer instead of confirming it."
+  },
+  {
+   "key": "sound_room",
+   "title": "The Sound Room",
+   "technique": "group by foundry, mean similarity, then verify against the assay",
+   "puzzleType": 2,
+   "phase": "analysis",
+   "built": false,
+   "unlockedWhen": true,
+   "designNote": "P1 BOSS (type 2, classify-the-unknown) + the ESCAPE GATE. VERIFIED ANSWER: Hallorann & Sons, Greenock, mean-cosine margin 6.7%. Query: 'A sand-cast bronze casting of high tin content, close-grained and hard, that rings long and clear when struck.' >> THE TAUGHT TRAP: counting the retrieved records gives Brakewell Foundry at EVERY k tested (5,8,10,12,15) \u2014 asserted in _scratch/verify_ladder.py. Brakewell's top record is a BOAST that their bronze rings as sweetly as any bell-metal; the `alloy` column says gunmetal at 10% tin against the artifact's bell-metal at 22%. Correct move: mean cosine per foundry, then verify against `alloy`. >> THIS IS THE ESCAPE'S DIAGNOSTIC LINE, taught on data first. ESCAPE (grid): the same board as the control room, P1's half. See _scratch/verify_escape.py. >> HARD ART CONSTRAINT: the sonar console must carry a STATION SELECTOR for the four pre-plotted stations I-IV, matching the chart. The escape is inert without it.",
+   "plannedHotspots": [
+    {
+     "type": "puzzle",
+     "label": "The light box",
+     "note": "P1 BOSS \u2014 group by foundry, mean cosine, verify against alloy"
+    },
+    {
+     "type": "grid",
+     "label": "The trace board",
+     "note": "THE ESCAPE \u2014 bind each contact identity to its charted obstruction. Gated on the boss."
+    },
+    {
+     "type": "clue",
+     "label": "The observation port",
+     "note": "a glazed port into the flooded midships compartment \u2014 your partner is on the far side of it and you can never reach them"
+    },
+    {
+     "type": "door",
+     "direction": "open",
+     "to": "wreck_site",
+     "label": "The after diving trunk"
+    },
+    {
+     "type": "door",
+     "direction": "open",
+     "to": "radio_room",
+     "label": "Aft, to the radio room"
+    }
+   ],
+   "authoring": {
+    "sceneSpec": {
+     "room": "sound_room",
+     "setting": "the listening room of a small salvage submarine, a low domed cell sunk into the deck",
+     "interior": true,
+     "seam": "a plain continuous run of cork lining, uniform and low in detail",
+     "seamOccluder": "a padded vertical steel rib running floor to deckhead",
+     "elements": [
+      {
+       "id": "door",
+       "at": "on the far left",
+       "desc": "a heavy oval watertight door standing open in the after bulkhead, warm amber light beyond it",
+       "door": {
+        "direction": "open",
+        "to": "radio_room"
+       },
+       "label": "Aft, to the radio room"
+      },
+      {
+       "id": "well",
+       "at": "to the left",
+       "desc": "a sunken circular deck well padded round its edge, the cork-lined dome coming down to about shoulder height where it meets the rim"
+      },
+      {
+       "id": "console",
+       "at": "just left of centre",
+       "desc": "one continuous curved instrument console running right round the inner face of the well at waist height, every instrument in the room built into it, a large brass rotary station selector on its face with its dial divided into EXACTLY 4 numbered positions"
+      },
+      {
+       "id": "lightbox",
+       "at": "dead ahead in the centre",
+       "desc": "a broad glass light box let into the top of that same console, lit acid green from beneath, transparent trace strips laid across it in a fan",
+       "puzzle": true,
+       "label": "The light box"
+      },
+      {
+       "id": "board",
+       "at": "just right of centre",
+       "desc": "a vertical slotted board standing up from the console behind the light box, ruled into a grid of empty slots with a rack of small trace cards hanging beside it",
+       "grid": true,
+       "label": "The trace board"
+      },
+      {
+       "id": "port",
+       "at": "to the right",
+       "desc": "a large glazed observation port filling much of the after bulkhead, dark green flooded water pressing against its far side, and on the near face of the glass a continuous film of condensation sheeting steadily down it",
+       "animate": {
+        "motion": "a continuous film of condensation sheeting steadily down the inner face of the observation port",
+        "loop": "crossfade"
+       },
+       "clue": true,
+       "label": "The observation port"
+      },
+      {
+       "id": "trunk",
+       "at": "on the far right",
+       "desc": "a wet-and-dry escape chamber built into the after corner, its clip-down hatch in the deckhead standing open above it",
+       "door": {
+        "direction": "open",
+        "to": "wreck_site"
+       },
+       "label": "The after diving trunk"
+      }
+     ],
+     "atmosphere": "Near darkness lit almost wholly by acid green glowing up out of the light box from below, brass and glass picking it up, cork swallowing the rest, hushed and close, faint haze, film grain.",
+     "negatives": "No people, no figures, no crew, no lettering, no captions, no text, no signage. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere \u2014 everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. The deck is a SUNKEN PADDED CIRCULAR well and the dome comes down to shoulder height at its edges \u2014 the viewer stands down inside it. The ONLY significant light is the GREEN glow from below; the red emergency lamps are dim and distant here. The observation port shows ONLY dark water on its far side: no room, no light, no figure beyond it. Every instrument named stands ON the one continuous console \u2014 there is EXACTLY 1 console in this room.",
+     "continuity": []
+    }
+   },
+   "debrief": "Your boss and your partner's are the same question asked of different columns, and both punish the same shortcut. The foundry with the most records in your retrieved set is not the foundry that cast your artifact \u2014 it is the foundry that was written about most. The assay is what tells you the difference, and the assay is the line you are about to listen for."
+  },
+  {
+   "key": "wreck_site",
+   "title": "The Wreck",
+   "technique": "none \u2014 the payoff",
+   "puzzleType": 0,
+   "phase": "escape",
+   "built": false,
+   "unlockedWhen": true,
+   "designNote": "SHARED FINALE \u2014 the FIRST and ONLY place both players stand together. Reached through either diving trunk once that player's escape grid is solved. No graded puzzle: this is the victory lap. The artifact is a pickup. The phase ends here. WIRING NOTE: two open doors back into the two boss rooms, each with availableWhen on state.role so a player cannot walk into their partner's half of the boat.",
+   "plannedHotspots": [
+    {
+     "type": "clue",
+     "label": "The bell",
+     "note": "the artifact \u2014 high-tin bell-metal, the thing the whole expedition was for. Pickup."
+    },
+    {
+     "type": "door",
+     "direction": "open",
+     "to": "control_room",
+     "label": "The lifelines",
+     "note": "ONE box, one depicted object: two lifelines running up out of frame to the two trunks. WIRING: `to` is resolved from state.role \u2014 helm goes back to control_room, sonar to sound_room. Only one is ever live for a given player."
+    }
+   ],
+   "authoring": {
+    "sceneSpec": {
+     "room": "wreck_site",
+     "setting": "the open seabed in deep water alongside the broken ribs of a small wooden brig",
+     "interior": false,
+     "seam": "open dark water fading to black, featureless and continuous",
+     "seamOccluder": "a tall standing timber rib rising from the seabed to the top of the frame",
+     "elements": [
+      {
+       "id": "openwater",
+       "at": "on the far left",
+       "desc": "open dark water fading to black with nothing in it, meeting the same emptiness at the seam directly behind the viewer"
+      },
+      {
+       "id": "ribs",
+       "at": "to the left",
+       "desc": "the broken frames of a small wooden brig standing up out of the seabed in one short compact run, blackened and furred with growth, the whole wreck no longer than a boat's length"
+      },
+      {
+       "id": "silt",
+       "at": "just left of centre",
+       "desc": "fine pale silt lifting off the seabed in slow continuous clouds around the base of the frames and drifting up through the water",
+       "animate": {
+        "motion": "pale silt lifting off the seabed in slow continuous clouds",
+        "loop": "crossfade"
+       }
+      },
+      {
+       "id": "bell",
+       "at": "dead ahead in the centre",
+       "desc": "a large bronze bell lying half buried in the silt between the frames, its crown and shoulder swept clear of growth and showing bright metal",
+       "clue": true,
+       "label": "The bell"
+      },
+      {
+       "id": "lamps",
+       "at": "just right of centre",
+       "desc": "EXACTLY 2 diving lamps planted in the silt on either side of the bell, their cold blue-white beams thrown across it and lighting the frames behind"
+      },
+      {
+       "id": "ballast",
+       "at": "to the right",
+       "desc": "a low mound of ballast stones spilled from the wreck onto the seabed, half sunk into the silt"
+      },
+      {
+       "id": "lifelines",
+       "at": "to the right",
+       "desc": "EXACTLY 2 weighted lifelines dropping into the silt beside the ballast mound and running straight up out of the top of the frame, their lower ends shackled to a small anchor block",
+       "door": {
+        "direction": "open",
+        "to": "control_room"
+       },
+       "label": "The lifelines"
+      },
+      {
+       "id": "openwater2",
+       "at": "on the far right",
+       "desc": "open dark water fading to black with nothing in it, meeting the same emptiness at the seam directly behind the viewer"
+      }
+     ],
+     "atmosphere": "Cold blue-white lamp beams cutting through heavy suspended silt, everything beyond them swallowed by black water, still and enormous, film grain.",
+     "negatives": "No people, no figures, no crew, no lettering, no captions, no text, no signage. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere \u2014 everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. This is an EXTERIOR underwater scene on the open seabed \u2014 no submarine, no hull, no interior, no compartment, no red or green lighting anywhere. The wreck is SMALL and COMPACT, a single short run of frames, NOT a large ship and not spread across the frame. There are EXACTLY 2 lamps. The lifelines run straight UP out of the top of the frame and do not stretch toward the left or right edge; nothing is visible at their upper ends.",
+     "continuity": []
+    }
+   },
+   "debrief": "The escape is the technique with the numbers taken away. All game you retrieved by similarity and then checked the winner against something the measurement could not see. Out here it was the same move on sound and distance: your partner had kind without place, you had place without kind, and neither of you could have found this alone."
+  }
+ ]
+}
