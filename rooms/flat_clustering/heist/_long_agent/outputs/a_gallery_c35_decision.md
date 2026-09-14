@@ -1,0 +1,11 @@
+Evidence read. State on disk for `a_gallery`:
+
+- **The spec carries exactly one bounded mover.** `sheet` — a canvas dust sheet over a near plinth, with `motion.moves/vigour/phrase` all authored. Hanging cloth is the strongest confirmed mover category in the ledger, and it's bounded, not frame-filling.
+- **The still is new and derives from this spec.** `scene.png` is dated 2026-09-13 22:23, and the committed `scenePrompt` is **byte-identical** to `scene_spec.render_prompt(spec)` at 3389 chars — so the current art was rendered from the current spec, including the softened vigour "barely stirring… very gently in a slight draught". The seam was screened clean at 22:24 (`needsWork: false`, ratio 2.43). I looked at the left-of-centre crop: the draped sheet is plainly depicted, hanging quiet with a corner pooled on the marble.
+- **The motion prompt resolves from that same spec** — `render_motion_prompt` gives "…breathing very gently, barely lifting at one corner and settling back". (The `art_prompt_motion/heist/a_gallery.txt` fallback still holds the older, livelier sentence; since defect 5 was fixed the spec wins, so the two will not drift into the render, but that stale `.txt` is worth a tidy later.)
+- **No clip exists for this still.** Gate report is empty, nothing tried. The prior HOLD (cycle 13, return 0.23, glitch 0.042) belongs to the *previous* still, and the state's `review_note` for this batch says explicitly: new art from edited specs, render once each and gate, do not re-author without a gate result.
+
+So there is nothing to author, nothing to soften — the softening already happened in the spec — and nothing to pin. The only missing step is the single render.
+
+DECISION: RENDER
+WHY: The spec carries one bounded, vigour-authored cloth mover; the freshly regenerated, seam-screened still is byte-identically derived from that spec and visibly depicts the draped sheet; and no clip exists for it yet, so the one sanctioned 3072x1024 render at end guide 0.70 is the only step left.

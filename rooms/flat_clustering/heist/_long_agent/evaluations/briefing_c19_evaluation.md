@@ -1,0 +1,11 @@
+I verified this myself rather than taking the worker's account on trust.
+
+**What I checked.** Extracted all 61 frames and measured per-band temporal variation against frame 0: the window bank (x 0.12–0.30) carries p99 ≈ 19–22 against 3.8 and 4.8 in the far-left and far-right architecture — the mover is alive and bounded exactly where the spec puts it, not frame-filling and not dead. Native-resolution crops at frames 1 and 45 show the rivulet/droplet field on the glass plainly redistributing while the mullions, panelling, lamp and leather chair sit pixel-identical, which is the cyclic one-way flow that returns 0.00 by construction. The loop junction is clean (f61↔f1 corr 0.9956 against 0.9987 for an ordinary adjacent pair). The worker's ledger citation is real, not invented: `notes/cinemagraph_ledger.md:1282` records Lucas calling b_casino and logwood_verdigris alive at both settings with good loops, both measuring return 0.00 at full resolution.
+
+**Against the reject list.** No settings change, no frame-filling mover, no treating the zero return as death (the opposite), no acceptance and no write into `scenario.json`, no hand-written art prompt, no AUTHOR_MOVER on an unrendered mover. HOLD is the decision `room_iterate.yaml` defines for precisely this state — "survived the gates. This is NOT acceptance; it queues Lucas's eye."
+
+One note for the eye queue: the 0.30–0.45 band also runs ~18, so some motion sits beside the window bank rather than strictly inside it — that is mask work and Lucas's free hand-pass, not a re-author reason.
+
+Verified independently: the window band moves at 19–22 against 3.8/4.8 for the architecture, so the clip is alive and bounded; the crops show rain redistributing on the glass with the room rigid; the 0.0 return is the documented cyclic-flow ambiguity, with the b_casino/logwood_verdigris retraction confirmed at ledger line 1282. The worker proposes no settings change, no re-author, and no acceptance — HOLD is the defined terminal state for a clip that clears every reject-only gate.
+
+VERDICT: PASS

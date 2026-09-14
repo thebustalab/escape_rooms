@@ -1,0 +1,16 @@
+I've read all four documents plus the gating code. Here is what the evidence says.
+
+**The gate report cannot have come from `cine_room.py`.** That tool writes exactly one `auto_rejected` value — a long string beginning `"glitch gate: transient breadth ..."` (cinemagraph_tools/cine_room.py:64) — and a camera rejection requires `camera == "CAMERA MOVES"` (line 62). The report holds `camera: "still"` *and* `auto_rejected: "camera gate"`, a combination the code cannot emit. The label is wrong, and the label picks the remedy: camera rejections are never re-rolled, glitch rejections are re-rolled twice then escalated (lines 138-146).
+
+**The real rejection is the glitch gate:** breadth 0.896 against the 0.667 threshold wired 2026-09-13 — the very reading `cinemagraph_pipeline.md` calls out by name as a_vault's first pipeline clip that shipped as "survived gates" while the gate was still unenforced. Its sanctioned remedy is a seed re-roll, which is not in my decision vocabulary and which the tool performs itself; the report carries no `rolls` and no `escalate`, so the wired re-roll did not run.
+
+**And the clip is emphatically not dead.** Return 0.77 / peak 39.55 match the ledger's a_vault row exactly — "out-and-back (swinging lamp) — strongest numbers measured anywhere" (notes/cinemagraph_ledger.md:1300), with no camera motion in any of 16 cells. So nothing in the authoring vocabulary applies: the spec has its bounded mover with authored vigour, nothing that should be still is moving, and softening or re-authoring would damage a room whose art is working.
+
+DECISION: PARK
+WHY: The rejection is mislabelled — `camera: "still"` with `auto_rejected: "camera gate"` is unemittable by `cine_room.py`, the true fire is the glitch gate at breadth 0.896, and its sanctioned remedy is a seed re-roll that is both outside my vocabulary and absent from the report.
+
+What I want asked of Lucas, in one question with two parts:
+
+1. **Plumbing:** this is the first end-to-end cycle, and the notes predicted that anything other than RENDER→HOLD on a known-good room would be "a signal about the judgement rather than the plumbing". A known-good room came back rejected under a gate name the code cannot produce, with the automatic two-seed re-roll missing. Was this report produced by `cine_room.py` at all, or by something upstream that relabels the verdict? Nothing should re-run until that's known — a wrong gate name sends every future cycle down the wrong remedy branch.
+
+2. **Judgement, and the more interesting half:** the ledger records a_vault's motion character as *"what the LIGHTS do — flashing, panning, strobing"*. A caged lamp sweeping light across polished steel throws large-area transient brightness swings — exactly what a breadth metric reads as transient distortion. The gate was calibrated where accepts top out at 0.42; a_vault sits at 0.896 with the largest peak amplitude on record (39.55). So either it genuinely glitches, or this is the gate's first false positive on a light-sweep room. The ledger's governing principle is that a result isn't universal until it holds in a second room family, and three results previously written down as general all inverted between families. Two seeds of GPU won't settle that — Lucas's eye on the existing clip will, and it's free.

@@ -1,0 +1,13 @@
+I verified the evaluator's veto independently rather than taking it on trust.
+
+**Per-column temporal std across the 73 raw frames** (`ri61`): the authored mover at the box mouth (x≈0.20) measures **0.88** — indistinguishable from static background. The motion is entirely in the right-hand third, peaking at **x=0.839 (18.69)** with a second band at **x≈0.72 (12.20)**.
+
+**The frames say what those numbers mean.** At frame 0 both curtained doorways on the right are open — lit corridor, grand stair with chandelier and marble. By frame 36 heavy velvet drapes have swept fully across both, the grand-stair exit erased entirely. By frame 72 they are open again. That out-and-back *is* the 0.43 return that read as healthy. Two `rigid`-listed elements, both of them clickable door hotspots (`back` → briefing, `on` → a_townhouse), are the actual movers, and they are not bounded — they swallow a quadrant.
+
+**Why the existing rigid clause failed, and why restating it would not fix it.** The rendered prompt does name "both curtained doorways" as rigid, but it pins the *doorways*, not their drapes — while the one sanctioned mover is "the heavy crimson velvet swag curtain". Every crimson velvet curtain in the room is therefore an eligible mover under an ambiguous name, and the model picked the wrong two. The fix is to pin the door **drapes** by name and separate them from the mover by side of the view. This is pipeline step 6.2, the allowed lever, and it touches no art.
+
+The swag is well depicted — a large tasselled crimson swag at the box mouth, bounded, correctly drawn. This is not a dead-art case; the motion budget simply went elsewhere.
+
+DECISION: PIN_NON_MOVERS
+SPEC: {"rigid": "the heavy velvet portière drapes of both doorways on the right — the corridor door and the grand-stair door — which stay tied back at their tassels for the whole loop, both openings left wide, lit and unobstructed, the drapes never drawing or sweeping across them, together with the gilded box parapet, the panelled walls and their mouldings, the auditorium tiers and boxes beyond, the writing-slope and the terminal, and the lighter"}
+WHY: Measured motion sits at x=0.72–0.84, not at the authored swag at x=0.20, and the frames show both right-hand door drapes sweeping shut over two clickable exits — the existing rigid clause pinned the doorways but left their velvet drapes unnamed and therefore eligible as movers, so the drapes must be pinned explicitly and distinguished from the swag by side of the view.

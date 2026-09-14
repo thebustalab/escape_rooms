@@ -34,6 +34,22 @@ older hotspot-crop clips (288x512 and similar) — see the note at the end.
 | `cine_contact_sheet.py` | **the judging artefact, 2026-09-07.** Five panels per clip — first frame, mid-loop frame, amplified difference, optical-flow magnitude (what DISPLACED), motion-compensated residual (what flow could NOT explain = flicker). Makes the verdict obvious in a glance where the mp4 and every pixel statistic did not. **Numbers OFF by default** so the labels it collects stay uncontaminated; `--with-numbers` for reading a sheet afterwards |
 | `colour_normalise.py` | flattens a global colour drift — the one defect neither mask axis nor a paint-out can reach, because it is global. Called by `cine_scenario.colour_normalised`, **opt-in per clip** (`cine_<state>.mask.json` -> `colourNormalise`, or the Baked tab's `flatten brightness`). **NOT a default step** — it can introduce visible brightness pumping; judge by eye, never by the number it optimises |
 
+## The settled pipeline (2026-09-13) — one room, end to end
+
+| tool | what it does |
+|---|---|
+| `cine_room.py` | **The shipping pipeline for ONE room**, steps 3-5 of `notes/cinemagraph_pipeline.md`: render once at 3072x1024 in the working band, bake the loop, run the reject-only gates, write a verdict JSON. Never prompts, never polls, **never approves** — survivors are staged for Lucas's eye. Drives the `cine_room` observer row and is the render step `room_iterate` shells out to. `--rolls` caps the glitch re-roll (the loop passes 0 and owns the roll itself, because each roll lands under a new tag while the loop polls one fixed path) |
+| `test_cine_room_gate.py` | Pins the glitch gate: the a_vault FALSE POSITIVE that a light-sweep room produced, the whistlegate counter-example, and the both-readings rule. **Tuned for zero false positives, not maximum catch** — read its header before re-tuning |
+| `test_motion_prompt_source.py` | Pins that the **sceneSpec is the single source of truth** for the motion prompt and `.txt` is only a fallback, plus multi-mover handling |
+
+**The motion prompt comes from the SPEC now.** `exp_art_prompt.motion_prompt` resolves
+`scene_spec.render_motion_prompt(spec)` first and only falls back to
+`art_prompt_motion/<scenario>/<room>.txt` when the spec declares no mover. That test needs no
+scenario list: heist, subway and beacons are migrated and resolve from the spec; **egypt and trees
+are SHIPPED and deliberately untouched**, carry no `motion` fields, and keep their committed files.
+Until this was wired (2026-09-13) the renderer read only the `.txt` and **SKIPPED** any room without
+one — 6 of heist's 10 rooms, and most of subway and beacons.
+
 ## Unattended repair (the overnight loop)
 
 | tool | what it does |

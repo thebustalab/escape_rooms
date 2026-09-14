@@ -1,0 +1,12 @@
+Evidence read. Here's the state and the call.
+
+**What the gates say.** Cycle 58's render post-dates the softened still (scene.png 09-13 22:23, render 09-14 07:05), so this clip animates the current authored state — the thing cycle 58 existed to produce. Camera is clean on every reading: frame-0 correlation 0.961, zero landmark drift, loop jump 2.15. Glitch breadth is 0.021 on both the raw and the brightness-normalised reading, against a 0.70 reject line — nowhere near it, so no re-roll is owed.
+
+**The zero return is not a rejection here, and this room is the reason that rule exists.** `b_casino` is tabulated in the ledger twice at return 0.00 at both 0.65 and 0.70, with Lucas's own verdict attached: *"they're alive at both settings and their loops don't seem bad either — their movements are not an out-and-back thing, their movements are a cyclic thing with one full cycle per loop."* Drifting smoke never returns to its starting configuration pixel-wise. The measure detects out-and-back motion; it does not detect motion.
+
+**The one soft spot, and why it isn't an action.** Peak amplitude came in at 4.3, down from the 8.06 this room measured before the soften. But peak is the measure the ledger disqualifies for cyclic movers by name — three wrong calls, and b_casino's smoke is explicitly one of the three, alongside crown and rams_head: *"for cyclic movers, no metric we have measures the thing Lucas sees."* It was never given a threshold ("three points is not a threshold"), and it varies 3.8 to 38.4 across clips Lucas called alive. Acting on it would also mean reversing a soften that Lucas himself asked for — the casino smoke was one of his two pure motion notes, "way too quickly" — on the authority of a number that has no standing for this mover.
+
+Both down-levers were applied as designed: the depicted vigour narrowed from a heavy bank of smoke to a thin ribbon off a newly depicted cigar, and the phrase softened. A quieter clip is the intended result, not a defect. Whether it is now *too* quiet is precisely the judgement no metric may make.
+
+DECISION: HOLD
+WHY: Camera and glitch gates both pass cleanly, and the zero return is this room's own documented cyclic-flow signature rather than a death — the only remaining number, peak amplitude, is the measure the ledger disqualifies for cyclic movers with b_casino named as one of its three wrong calls, so the soften Lucas asked for goes to his eye rather than to another render.

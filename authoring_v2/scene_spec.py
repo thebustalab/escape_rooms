@@ -146,7 +146,8 @@ def render_prompt(spec):
                  f"and must match exactly in colour, texture, and lighting, joining into a single continuous, "
                  f"unbroken whole when the image wraps left to right.")
     # the left->right sweep: each element as "{at}, {desc}"
-    sweep = "; ".join(f"{e.get('at', 'ahead')}, {e['desc']}" for e in spec.get("elements", []) if e.get("desc"))
+    sweep = "; ".join(f"{e.get('at', 'ahead')}, {element_desc(e)}"
+                      for e in spec.get("elements", []) if e.get("desc"))
     sweep = _period(_cap(sweep))
     atmosphere = _period(spec.get("atmosphere", ""))
     negatives = _period(spec.get("negatives") or "no people, no lettering, no captions, no text")
@@ -354,3 +355,91 @@ if __name__ == "__main__":
     if len(sys.argv) != 2:
         print("usage: python3 scene_spec.py <spec.json>", file=sys.stderr); sys.exit(2)
     _demo(sys.argv[1])
+
+# ---------------------------------------------------------------------------
+# ONE SPEC, TWO CONSUMERS (Lucas, 2026-09-12; built 2026-09-13)
+#
+# An element may carry a `motion` object:
+#
+#   "motion": {"moves": true,
+#              "vigour": "straining rigid and dead horizontal in a hard gale, the halyard bowed",
+#              "phrase": "the pennant streaming and snapping, its free end lifting and falling"}
+#
+#   moves + vigour -> appended to this element's desc when the ART prompt is rendered, so the still
+#                     is generated with the right INITIAL CONDITIONS. Confirmed 2026-09-13 that
+#                     gpt-image-2.5 follows vigour language on cloth, canvas and cloud, and that the
+#                     clip model's motion follows the depiction.
+#   moves + phrase -> the MOTION prompt's positive.
+#   moves: false   -> the element's noun joins the rigid list when a motion prompt asks for one.
+#
+# WHY IT LIVES HERE. Before this, the still was authored from `sceneSpec` and the clip from a
+# SEPARATE `motionSpec` written afterwards, describing whatever the art happened to contain. When
+# the two drifted the model was asked to animate something not depicted — logwood_verdigris' water
+# that does not fall from the ceiling, alum_madder's drops that are not in the still and came back
+# invented and wrong. One authored intent, two derived prompts, no drift possible.
+# ---------------------------------------------------------------------------
+
+MOTION_HEAD = "locked-off static camera, zero camera movement."
+MOTION_TAIL = "Seamless natural loop."
+
+
+def element_desc(e):
+    """The element's description as the ART prompt should carry it: desc + authored vigour."""
+    d = (e.get("desc") or "").rstrip()
+    m = e.get("motion")
+    m = m if isinstance(m, dict) else {}
+    if m.get("moves") and m.get("vigour"):
+        d = d.rstrip(".,;") + ", " + m["vigour"].strip().rstrip(".")
+    return d
+
+
+def movers(spec):
+    """Elements authored as moving. A malformed `motion` must not take down a scenario load."""
+    out = []
+    for e in (spec or {}).get("elements", []):
+        m = e.get("motion")
+        if isinstance(m, dict) and m.get("moves"):
+            out.append(e)
+    return out
+
+
+def render_motion_prompt(spec, rigid=False):
+    """The MOTION prompt, from the same spec that authored the still. None if nothing moves.
+
+    Short by default and that is deliberate: re-describing the scene is a documented cause of
+    drift, and a 288-word spec-style prompt did not outperform a ~30-word one at full resolution.
+    `rigid=True` is the ESCALATION for a room where something that should be still is moving — it
+    names the non-movers, which is what the shipping motion specs have always done.
+    """
+    ms = movers(spec)
+    if not ms:
+        return None
+    phrases = [ (e["motion"].get("phrase") or element_desc(e)).strip().rstrip(".") for e in ms ]
+    only = "Only those move" if len(phrases) > 1 else "Only that moves"
+    parts = [MOTION_HEAD, _period(_cap("; ".join(phrases))),
+             f"{only}; everything else stays perfectly still.", MOTION_TAIL]
+    if rigid:
+        # AUTHORED, never auto-summarised. Truncating each non-mover's `desc` to a head noun was
+        # tried on 2026-09-13 and produced "ridge path arriving at the platform from, at the head of
+        # the valley, broad flat reading slab set on two" — a wall of mangled fragments, and
+        # re-describing the scene is itself a documented cause of drift. So the rigid clause comes
+        # from an AUTHORED string: the element's `motion.still_as`, or the spec's `rigid`.
+        still = [ (e.get("motion") or {}).get("still_as") for e in spec.get("elements", [])
+                  if e not in ms and (e.get("motion") or {}).get("still_as") ]
+        if not still and spec.get("rigid"):
+            _r = spec["rigid"].strip()
+            _first = _r.split(" ", 1)[0].lower().strip(",")
+            _r = ("" if _first in ("the", "a", "an") else "The ") + _r
+            parts.insert(2, _period(_cap(_r).rstrip(".") +
+                                    " are rigid and fixed — they do not warp, drift, breathe, "
+                                    "shimmer or change shape"))
+        if still:
+            joined = ", ".join(still)
+            # Compare against a word, not a fixed-width slice: joined[:4] can never equal "a " or
+            # "an ", so an authored "an anvil ..." used to come out as "The an anvil ...".
+            first = joined.split(" ", 1)[0].lower().strip(",")
+            lead = "" if first in ("the", "a", "an") else "The "
+            parts.insert(2, _period(_cap(lead + joined) +
+                                    " are rigid and fixed — they do not warp, drift, breathe, "
+                                    "shimmer or change shape"))
+    return " ".join(parts)

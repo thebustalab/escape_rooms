@@ -1,0 +1,2 @@
+ERROR: Claude Code exited with code 1. Permission allow rule (.claude/settings.local.json): Bash(mv to_read/* to_read/z_archive/) has a wildcard before the rest of the command, so it also matches any options inserted at that position and approves them without a prompt. Replace that * with the exact value you mean, or only use * after the subcommand.
+Permission allow rule (.claude/settings.local.json): Bash(mv Utilities/interview/* Utilities/interview/z_archive/) has a wildcard before the rest of the command, so it also matches any op

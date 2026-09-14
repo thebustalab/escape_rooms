@@ -1,49 +1,339 @@
-# Stills iteration — flat_clustering/heist
+# Room iteration — flat_clustering/heist
 
-Started 2026-09-05T16:59:35.714463+00:00.
-- **2026-09-05 16:59 UTC** — briefing: generating 1 candidate(s) — no art yet.
-- **2026-09-05 17:00 UTC** — briefing: 0/1 candidate(s) landed, still waiting (poll 1/60).
-- **2026-09-05 17:00 UTC** — briefing: 1 candidate(s) landed — ready to judge.
-- **2026-09-05 17:04 UTC** — cycle_04_briefing: committed l1_briefing_1.png — held for your eye (concerns: (1) Faint tone/texture step at the seam on otherwise-plain green wall — needs the normal screen/blur pass; the specced c).
-- **2026-09-05 17:05 UTC** — Output passed evaluation but did NOT meet all 3 declared done-criteria — held for review (see evaluations/done_criteria_check.md).
-- **2026-09-06 00:57 UTC** — a_opera: generating 1 candidate(s) — no art yet.
-- **2026-09-06 00:58 UTC** — a_opera: 1 candidate(s) landed — ready to judge.
-- **2026-09-06 01:00 UTC** — a_townhouse: generating 1 candidate(s) — no art yet.
-- **2026-09-06 01:01 UTC** — a_townhouse: 1 candidate(s) landed — ready to judge.
-- **2026-09-06 01:03 UTC** — a_gallery: generating 1 candidate(s) — no art yet.
-- **2026-09-06 01:04 UTC** — a_gallery: 1 candidate(s) landed — ready to judge.
-- **2026-09-06 01:05 UTC** — a_vault: generating 1 candidate(s) — no art yet.
-- **2026-09-06 01:06 UTC** — a_vault: 1 candidate(s) landed — ready to judge.
-- **2026-09-06 01:07 UTC** — b_pawnshop: generating 1 candidate(s) — no art yet.
-- **2026-09-06 01:08 UTC** — b_pawnshop: 1 candidate(s) landed — ready to judge.
-- **2026-09-06 01:09 UTC** — b_casino: generating 1 candidate(s) — no art yet.
-- **2026-09-06 01:10 UTC** — b_casino: 1 candidate(s) landed — ready to judge.
-- **2026-09-06 01:11 UTC** — b_docks: generating 1 candidate(s) — no art yet.
-- **2026-09-06 01:13 UTC** — b_docks: 1 candidate(s) landed — ready to judge.
-- **2026-09-06 01:14 UTC** — b_stateroom: generating 1 candidate(s) — no art yet.
-- **2026-09-06 01:15 UTC** — b_stateroom: 1 candidate(s) landed — ready to judge.
-- **2026-09-06 01:16 UTC** — gala: generating 1 candidate(s) — no art yet.
-- **2026-09-06 01:17 UTC** — gala: 1 candidate(s) landed — ready to judge.
-- **2026-09-06 01:21 UTC** — cycle_25_a_opera: regenerating 1 candidate(s) — The single change is the `lighter` element's description — naming it a flip-top lighter rather than a case, pulling it near the viewer and large in frame, and d
-- **2026-09-06 01:22 UTC** — a_opera: 1 candidate(s) landed — ready to judge.
-- **2026-09-06 01:28 UTC** — cycle_27_a_opera: regenerating 1 candidate(s) (spec revised) — The single change is the `lighter` element's desc — flip-top rather than a flat case, close to the viewer and large in frame, tilted into the stage light, one b
-- **2026-09-06 01:30 UTC** — a_opera: 1 candidate(s) landed — ready to judge.
-- **2026-09-06 01:33 UTC** — cycle_29_a_opera: committed l1_a_opera_1.png — held for your eye (with concerns — see stills.md).
-- **2026-09-06 01:38 UTC** — cycle_30_a_townhouse: regenerating 1 candidate(s) (spec revised) — The single change is the `card` element's description — from "slipped behind the mirror frame" (which the model rendered as nothing at all, since a card hidden 
-- **2026-09-06 01:39 UTC** — a_townhouse: 1 candidate(s) landed — ready to judge.
-- **2026-09-06 01:43 UTC** — cycle_32_a_townhouse: committed l1_a_townhouse_1.png — held for your eye (with concerns — see stills.md).
-- **2026-09-06 01:47 UTC** — cycle_33_a_gallery: regenerating 1 candidate(s) (spec revised) — The single change is adding the missing `fob` element — an evidence-bagged hotel key fob on a ledge beneath the locker — so that TOKEN 3/5's clue hotspot has an
-- **2026-09-06 01:48 UTC** — a_gallery: 1 candidate(s) landed — ready to judge.
-- **2026-09-06 01:52 UTC** — cycle_35_a_gallery: committed l1_a_gallery_1.png — held for your eye (with concerns — see stills.md).
-- **2026-09-06 01:57 UTC** — cycle_36_a_vault: committed l1_a_vault_1.png — held for your eye (with concerns — see stills.md).
-- **2026-09-06 02:01 UTC** — cycle_37_b_pawnshop: committed l1_b_pawnshop_1.png — held for your eye (with concerns — see stills.md).
-- **2026-09-06 02:07 UTC** — cycle_38_b_casino: committed l1_b_casino_1.png — held for your eye (with concerns — see stills.md).
-- **2026-09-06 02:12 UTC** — cycle_39_b_docks: regenerating 1 candidate(s) (spec revised) — The single change is the `console` element's desc — "a portable terminal" rendered as an anonymous metal tin, so it now names an upright glowing screen and a ke
-- **2026-09-06 02:13 UTC** — b_docks: 1 candidate(s) landed — ready to judge.
-- **2026-09-06 02:19 UTC** — cycle_41_b_docks: regenerating 1 candidate(s) (spec revised) — The single change is moving both doors one canonical slot inboard (`back` to "just right of centre", `on` to "to the right", vacating the x=0.92 far-right wrap 
-- **2026-09-06 02:20 UTC** — b_docks: 1 candidate(s) landed — ready to judge.
-- **2026-09-06 02:25 UTC** — cycle_43_b_docks: committed l1_b_docks_1.png — held for your eye (with concerns — see stills.md).
-- **2026-09-06 02:30 UTC** — cycle_44_b_stateroom: regenerating 1 candidate(s) (spec revised) — The single change is adding a `plan` element for the checklist's steward's table plan clue — the one hotspot in this room with no object to attach to, which the
-- **2026-09-06 02:31 UTC** — b_stateroom: 1 candidate(s) landed — ready to judge.
-- **2026-09-06 02:36 UTC** — cycle_46_b_stateroom: committed l1_b_stateroom_1.png — held for your eye (with concerns — see stills.md).
-- **2026-09-06 02:40 UTC** — cycle_47_gala: committed l1_gala_1.png — held for your eye (with concerns — see stills.md).
+Started 2026-09-13T18:59:08.470014+00:00.
+- **2026-09-13 18:59 UTC** — room_iterate crashed: NameError: name 'run_room_iterate_cycle' is not defined. Full traceback in state.json -> last_error.
+- **2026-09-13 19:14 UTC** — a_vault: RENDER refused — the spec has no element with motion.moves and a vigour. Author the mover first; a settings change has never woken a room whose art gives it nothing to move.
+- **2026-09-13 19:22 UTC** — a_vault: AUTHOR_MOVER applied. Both prompts re-rendered from the one spec. Still must be regenerated before the next render.
+- **2026-09-13 19:26 UTC** — b_docks: decision not acted on (RENDER, verdict FAIL).
+- **2026-09-13 19:32 UTC** — b_docks: decision not acted on (AUTHOR_MOVER, verdict FAIL).
+- **2026-09-13 19:32 UTC** — Every room is held or parked. HELD (need Lucas's eye): none. Nothing here is accepted — metrics may reject and must never approve.
+- **2026-09-13 21:11 UTC** — a_vault: render launched at end guide 0.70.
+- **2026-09-13 21:11 UTC** — a_vault: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-13 21:12 UTC** — a_vault: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-13 21:12 UTC** — a_vault: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-13 21:13 UTC** — a_vault: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-13 21:13 UTC** — a_vault: waiting on the render (poll 5/40). No Claude call spent.
+- **2026-09-13 21:14 UTC** — a_vault: waiting on the render (poll 6/40). No Claude call spent.
+- **2026-09-13 21:14 UTC** — a_vault: waiting on the render (poll 7/40). No Claude call spent.
+- **2026-09-13 21:15 UTC** — a_vault: waiting on the render (poll 8/40). No Claude call spent.
+- **2026-09-13 21:15 UTC** — a_vault: waiting on the render (poll 9/40). No Claude call spent.
+- **2026-09-13 21:16 UTC** — a_vault: waiting on the render (poll 10/40). No Claude call spent.
+- **2026-09-13 21:16 UTC** — a_vault: waiting on the render (poll 11/40). No Claude call spent.
+- **2026-09-13 21:17 UTC** — a_vault: waiting on the render (poll 12/40). No Claude call spent.
+- **2026-09-13 21:17 UTC** — a_vault: waiting on the render (poll 13/40). No Claude call spent.
+- **2026-09-13 21:18 UTC** — a_vault: waiting on the render (poll 14/40). No Claude call spent.
+- **2026-09-13 21:18 UTC** — a_vault: waiting on the render (poll 15/40). No Claude call spent.
+- **2026-09-13 21:19 UTC** — a_vault: waiting on the loop bake (poll 16/40). No Claude call spent.
+- **2026-09-13 21:19 UTC** — a_vault: waiting on the loop bake (poll 17/40). No Claude call spent.
+- **2026-09-13 21:20 UTC** — a_vault: AUTO-REJECTED by the camera gate — still
+- **2026-09-13 21:20 UTC** — a_vault: gated — {"camera": "still", "return": 0.77, "peak": 39.55, "glitch": {"spike": 6.15, "breadth": 0.896, "at_pct": 56.9, "frames": 73}, "auto_rejected": "camera gate"}
+- **2026-09-13 21:28 UTC** — b_docks: render launched at end guide 0.70.
+- **2026-09-13 21:28 UTC** — b_docks: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-13 21:29 UTC** — b_docks: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-13 21:29 UTC** — b_docks: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-13 21:30 UTC** — b_docks: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-13 21:30 UTC** — b_docks: waiting on the render (poll 5/40). No Claude call spent.
+- **2026-09-13 21:31 UTC** — b_docks: waiting on the render (poll 6/40). No Claude call spent.
+- **2026-09-13 21:31 UTC** — b_docks: waiting on the render (poll 7/40). No Claude call spent.
+- **2026-09-13 21:32 UTC** — b_docks: waiting on the render (poll 8/40). No Claude call spent.
+- **2026-09-13 21:32 UTC** — b_docks: waiting on the render (poll 9/40). No Claude call spent.
+- **2026-09-13 21:33 UTC** — b_docks: waiting on the render (poll 10/40). No Claude call spent.
+- **2026-09-13 21:33 UTC** — b_docks: waiting on the render (poll 11/40). No Claude call spent.
+- **2026-09-13 21:34 UTC** — b_docks: waiting on the render (poll 12/40). No Claude call spent.
+- **2026-09-13 21:34 UTC** — b_docks: waiting on the render (poll 13/40). No Claude call spent.
+- **2026-09-13 21:35 UTC** — b_docks: waiting on the render (poll 14/40). No Claude call spent.
+- **2026-09-13 21:35 UTC** — b_docks: waiting on the render (poll 15/40). No Claude call spent.
+- **2026-09-13 21:36 UTC** — b_docks: waiting on the loop bake (poll 16/40). No Claude call spent.
+- **2026-09-13 21:36 UTC** — b_docks: waiting on the loop bake (poll 17/40). No Claude call spent.
+- **2026-09-13 21:37 UTC** — b_docks: waiting on the loop bake (poll 18/40). No Claude call spent.
+- **2026-09-13 21:38 UTC** — b_docks: gated — {"camera": "still", "return": 0.31, "peak": 5.13, "glitch": {"spike": 2.89, "breadth": 0.0, "at_pct": 73.6, "frames": 73}}
+- **2026-09-13 21:41 UTC** — b_docks: HELD for Lucas's eye — The authored tarp rendered once at the pinned default and the clip cleared all three reject-only gates — camera still, glitch breadth 0.0 against the 0.667 line, return 0.31 rather than an ambiguous zero — so the only step left is Lucas's eye, which this queues.. NOT accepted.
+- **2026-09-13 21:41 UTC** — Every room is held or parked. HELD (need Lucas's eye): ['b_docks']. Nothing here is accepted — metrics may reject and must never approve.
+- **2026-09-13 22:58 UTC** — a_gallery: render launched at end guide 0.70.
+- **2026-09-13 22:58 UTC** — a_gallery: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-13 22:59 UTC** — a_gallery: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-13 22:59 UTC** — a_gallery: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-13 23:00 UTC** — a_gallery: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-13 23:00 UTC** — a_gallery: waiting on the render (poll 5/40). No Claude call spent.
+- **2026-09-13 23:01 UTC** — a_gallery: waiting on the render (poll 6/40). No Claude call spent.
+- **2026-09-13 23:01 UTC** — a_gallery: waiting on the render (poll 7/40). No Claude call spent.
+- **2026-09-13 23:02 UTC** — a_gallery: waiting on the render (poll 8/40). No Claude call spent.
+- **2026-09-13 23:02 UTC** — a_gallery: waiting on the render (poll 9/40). No Claude call spent.
+- **2026-09-13 23:03 UTC** — a_gallery: waiting on the render (poll 10/40). No Claude call spent.
+- **2026-09-13 23:03 UTC** — a_gallery: waiting on the render (poll 11/40). No Claude call spent.
+- **2026-09-13 23:04 UTC** — a_gallery: waiting on the render (poll 12/40). No Claude call spent.
+- **2026-09-13 23:04 UTC** — a_gallery: waiting on the render (poll 13/40). No Claude call spent.
+- **2026-09-13 23:05 UTC** — a_gallery: waiting on the render (poll 14/40). No Claude call spent.
+- **2026-09-13 23:05 UTC** — a_gallery: waiting on the render (poll 15/40). No Claude call spent.
+- **2026-09-13 23:06 UTC** — a_gallery: waiting on the loop bake (poll 16/40). No Claude call spent.
+- **2026-09-13 23:06 UTC** — a_gallery: waiting on the loop bake (poll 17/40). No Claude call spent.
+- **2026-09-13 23:07 UTC** — a_gallery: gated — {"camera": "still", "return": 0.23, "peak": 2.97, "glitch": {"spike": 6.46, "breadth": 0.042, "at_pct": 37.5, "frames": 73, "breadth_normalised": 0.042}}
+- **2026-09-13 23:10 UTC** — a_gallery: HELD for Lucas's eye — The clip survived all three reject-only gates — camera still, return 0.23 which is shipping-grade and non-zero, glitch breadth 0.042 against a 0.667 threshold on the raw render — so there is no authored or prompt-side fix left and the only remaining step is Lucas's eye.. NOT accepted.
+- **2026-09-13 23:14 UTC** — b_casino: render launched at end guide 0.70.
+- **2026-09-13 23:15 UTC** — b_casino: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-13 23:15 UTC** — b_casino: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-13 23:16 UTC** — b_casino: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-13 23:16 UTC** — b_casino: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-13 23:17 UTC** — b_casino: waiting on the render (poll 5/40). No Claude call spent.
+- **2026-09-13 23:17 UTC** — b_casino: waiting on the render (poll 6/40). No Claude call spent.
+- **2026-09-13 23:18 UTC** — b_casino: waiting on the render (poll 7/40). No Claude call spent.
+- **2026-09-13 23:18 UTC** — b_casino: waiting on the render (poll 8/40). No Claude call spent.
+- **2026-09-13 23:19 UTC** — b_casino: waiting on the render (poll 9/40). No Claude call spent.
+- **2026-09-13 23:19 UTC** — b_casino: waiting on the render (poll 10/40). No Claude call spent.
+- **2026-09-13 23:20 UTC** — b_casino: waiting on the render (poll 11/40). No Claude call spent.
+- **2026-09-13 23:20 UTC** — b_casino: waiting on the render (poll 12/40). No Claude call spent.
+- **2026-09-13 23:21 UTC** — b_casino: waiting on the render (poll 13/40). No Claude call spent.
+- **2026-09-13 23:21 UTC** — b_casino: waiting on the render (poll 14/40). No Claude call spent.
+- **2026-09-13 23:22 UTC** — b_casino: waiting on the render (poll 15/40). No Claude call spent.
+- **2026-09-13 23:22 UTC** — b_casino: waiting on the loop bake (poll 16/40). No Claude call spent.
+- **2026-09-13 23:23 UTC** — b_casino: waiting on the loop bake (poll 17/40). No Claude call spent.
+- **2026-09-13 23:24 UTC** — b_casino: gated — {"camera": "still", "return": 0.0, "peak": 8.06, "glitch": {"spike": 5.98, "breadth": 0.354, "at_pct": 48.6, "frames": 73, "breadth_normalised": 0.021}, "note": "no out-and-back: dead, or cyclic flow. NEEDS AN EYE \u2014 this measure has called three good clips dead."}
+- **2026-09-13 23:26 UTC** — b_casino: HELD for Lucas's eye — The clip cleared the camera and glitch gates outright, and its lone zero return is the ledger's canonical b_casino cyclic-flow false-dead — peak 8.06 matches the value Lucas himself labelled alive — so it queues for his eye rather than another render.. NOT accepted.
+- **2026-09-13 23:27 UTC** — Every room is held or parked. HELD (need Lucas's eye): ['a_gallery', 'b_casino']. Nothing here is accepted — metrics may reject and must never approve.
+- **2026-09-13 23:39 UTC** — briefing: render launched at end guide 0.70.
+- **2026-09-13 23:40 UTC** — briefing: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-13 23:40 UTC** — briefing: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-13 23:41 UTC** — briefing: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-13 23:41 UTC** — briefing: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-13 23:42 UTC** — briefing: waiting on the render (poll 5/40). No Claude call spent.
+- **2026-09-13 23:42 UTC** — briefing: waiting on the render (poll 6/40). No Claude call spent.
+- **2026-09-13 23:43 UTC** — briefing: waiting on the render (poll 7/40). No Claude call spent.
+- **2026-09-13 23:43 UTC** — briefing: waiting on the render (poll 8/40). No Claude call spent.
+- **2026-09-13 23:44 UTC** — briefing: waiting on the render (poll 9/40). No Claude call spent.
+- **2026-09-13 23:44 UTC** — briefing: waiting on the render (poll 10/40). No Claude call spent.
+- **2026-09-13 23:45 UTC** — briefing: waiting on the render (poll 11/40). No Claude call spent.
+- **2026-09-13 23:45 UTC** — briefing: waiting on the render (poll 12/40). No Claude call spent.
+- **2026-09-13 23:46 UTC** — briefing: waiting on the render (poll 13/40). No Claude call spent.
+- **2026-09-13 23:46 UTC** — briefing: waiting on the render (poll 14/40). No Claude call spent.
+- **2026-09-13 23:47 UTC** — briefing: waiting on the render (poll 15/40). No Claude call spent.
+- **2026-09-13 23:47 UTC** — briefing: waiting on the loop bake (poll 16/40). No Claude call spent.
+- **2026-09-13 23:48 UTC** — briefing: waiting on the loop bake (poll 17/40). No Claude call spent.
+- **2026-09-13 23:49 UTC** — briefing: gated — {"camera": "still", "return": 0.0, "peak": 2.51, "glitch": {"spike": 2.76, "breadth": 0.0, "at_pct": 72.2, "frames": 73, "breadth_normalised": 0.0}, "note": "no out-and-back: dead, or cyclic flow. NEEDS AN EYE \u2014 this measure has called three good clips dead."}
+- **2026-09-13 23:52 UTC** — briefing: HELD for Lucas's eye — The cycle-17 clip cleared the camera and glitch gates outright and its 0.0 return is the documented cyclic-flow ambiguity for a flowing mover like rain — escalate to Lucas's eye, never reject or re-author on it.. NOT accepted.
+- **2026-09-13 23:55 UTC** — a_opera: render launched at end guide 0.70.
+- **2026-09-13 23:56 UTC** — a_opera: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-13 23:56 UTC** — a_opera: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-13 23:57 UTC** — a_opera: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-13 23:57 UTC** — a_opera: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-13 23:58 UTC** — a_opera: waiting on the render (poll 5/40). No Claude call spent.
+- **2026-09-13 23:58 UTC** — a_opera: waiting on the render (poll 6/40). No Claude call spent.
+- **2026-09-13 23:59 UTC** — a_opera: waiting on the render (poll 7/40). No Claude call spent.
+- **2026-09-13 23:59 UTC** — a_opera: waiting on the render (poll 8/40). No Claude call spent.
+- **2026-09-14 00:00 UTC** — a_opera: waiting on the render (poll 9/40). No Claude call spent.
+- **2026-09-14 00:00 UTC** — a_opera: waiting on the render (poll 10/40). No Claude call spent.
+- **2026-09-14 00:01 UTC** — a_opera: waiting on the render (poll 11/40). No Claude call spent.
+- **2026-09-14 00:01 UTC** — a_opera: waiting on the render (poll 12/40). No Claude call spent.
+- **2026-09-14 00:02 UTC** — a_opera: waiting on the render (poll 13/40). No Claude call spent.
+- **2026-09-14 00:02 UTC** — a_opera: waiting on the render (poll 14/40). No Claude call spent.
+- **2026-09-14 00:03 UTC** — a_opera: waiting on the render (poll 15/40). No Claude call spent.
+- **2026-09-14 00:03 UTC** — a_opera: waiting on the loop bake (poll 16/40). No Claude call spent.
+- **2026-09-14 00:04 UTC** — a_opera: waiting on the loop bake (poll 17/40). No Claude call spent.
+- **2026-09-14 00:05 UTC** — a_opera: gated — {"camera": "still", "return": 0.13, "peak": 3.6, "glitch": {"spike": 2.97, "breadth": 0.0, "at_pct": 73.6, "frames": 73, "breadth_normalised": 0.0}}
+- **2026-09-14 00:09 UTC** — a_opera: HELD for Lucas's eye — The single allowed render cleared the camera, glitch and return gates with a non-zero 0.13 out-and-back return inside the committed shipping range, so there is nothing left for a metric to reject and the clip belongs in front of Lucas's eye.. NOT accepted.
+- **2026-09-14 00:14 UTC** — a_townhouse: render launched at end guide 0.70.
+- **2026-09-14 00:14 UTC** — a_townhouse: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-14 00:15 UTC** — a_townhouse: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-14 00:15 UTC** — a_townhouse: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-14 00:16 UTC** — a_townhouse: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-14 00:17 UTC** — a_townhouse: waiting on the render (poll 5/40). No Claude call spent.
+- **2026-09-14 00:17 UTC** — a_townhouse: waiting on the render (poll 6/40). No Claude call spent.
+- **2026-09-14 00:18 UTC** — a_townhouse: waiting on the render (poll 7/40). No Claude call spent.
+- **2026-09-14 00:18 UTC** — a_townhouse: waiting on the render (poll 8/40). No Claude call spent.
+- **2026-09-14 00:19 UTC** — a_townhouse: waiting on the render (poll 9/40). No Claude call spent.
+- **2026-09-14 00:19 UTC** — a_townhouse: waiting on the render (poll 10/40). No Claude call spent.
+- **2026-09-14 00:20 UTC** — a_townhouse: waiting on the render (poll 11/40). No Claude call spent.
+- **2026-09-14 00:20 UTC** — a_townhouse: waiting on the render (poll 12/40). No Claude call spent.
+- **2026-09-14 00:21 UTC** — a_townhouse: waiting on the render (poll 13/40). No Claude call spent.
+- **2026-09-14 00:21 UTC** — a_townhouse: waiting on the render (poll 14/40). No Claude call spent.
+- **2026-09-14 00:22 UTC** — a_townhouse: waiting on the render (poll 15/40). No Claude call spent.
+- **2026-09-14 00:22 UTC** — a_townhouse: waiting on the loop bake (poll 16/40). No Claude call spent.
+- **2026-09-14 00:23 UTC** — a_townhouse: waiting on the loop bake (poll 17/40). No Claude call spent.
+- **2026-09-14 00:24 UTC** — a_townhouse: gated — {"camera": "still", "return": 0.37, "peak": 4.62, "glitch": {"spike": 2.79, "breadth": 0.0, "at_pct": 27.8, "frames": 73, "breadth_normalised": 0.0}}
+- **2026-09-14 00:27 UTC** — a_townhouse: HELD for Lucas's eye — The clip rendered at the canonical settings and cleared every reject-only gate — camera still, glitch breadth 0.0 on both readings, and a 0.37 out-and-back return that outranks four shipped Egypt clips — with the low peak of 4.62 falling inside the 3.8-38.4 alive range rather than being a dead tell, so the room is done to the last step a machine is permitted to take and belongs in front of Lucas's eye.. NOT accepted.
+- **2026-09-14 00:33 UTC** — b_pawnshop: render launched at end guide 0.70.
+- **2026-09-14 00:33 UTC** — b_pawnshop: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-14 00:34 UTC** — b_pawnshop: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-14 00:34 UTC** — b_pawnshop: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-14 00:35 UTC** — b_pawnshop: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-14 00:35 UTC** — b_pawnshop: waiting on the render (poll 5/40). No Claude call spent.
+- **2026-09-14 00:36 UTC** — b_pawnshop: waiting on the render (poll 6/40). No Claude call spent.
+- **2026-09-14 00:36 UTC** — b_pawnshop: waiting on the render (poll 7/40). No Claude call spent.
+- **2026-09-14 00:37 UTC** — b_pawnshop: waiting on the render (poll 8/40). No Claude call spent.
+- **2026-09-14 00:37 UTC** — b_pawnshop: waiting on the render (poll 9/40). No Claude call spent.
+- **2026-09-14 00:38 UTC** — b_pawnshop: waiting on the render (poll 10/40). No Claude call spent.
+- **2026-09-14 00:38 UTC** — b_pawnshop: waiting on the render (poll 11/40). No Claude call spent.
+- **2026-09-14 00:39 UTC** — b_pawnshop: waiting on the render (poll 12/40). No Claude call spent.
+- **2026-09-14 00:39 UTC** — b_pawnshop: waiting on the render (poll 13/40). No Claude call spent.
+- **2026-09-14 00:40 UTC** — b_pawnshop: waiting on the render (poll 14/40). No Claude call spent.
+- **2026-09-14 00:40 UTC** — b_pawnshop: waiting on the render (poll 15/40). No Claude call spent.
+- **2026-09-14 00:41 UTC** — b_pawnshop: waiting on the loop bake (poll 16/40). No Claude call spent.
+- **2026-09-14 00:41 UTC** — b_pawnshop: waiting on the loop bake (poll 17/40). No Claude call spent.
+- **2026-09-14 00:42 UTC** — room_iterate crashed: CalledProcessError: Command '['ffmpeg', '-v', 'error', '-y', '-i', '/home/bustalab/Documents/Tools/temp/cine/_art_prompt_exp/heist/b_pawnshop_motion_ri26_looped.mp4', '/tmp/cr_10uhwwzy/%04d.png']' returned non-zero exit . Full traceback in state.json -> last_error.
+- **2026-09-14 00:43 UTC** — b_pawnshop: the loop bake is still growing (3386245 bytes). Waiting for it to settle. No Claude call spent.
+- **2026-09-14 00:45 UTC** — b_pawnshop: gated — {"camera": "one object moving (camera still)", "return": 0.14, "peak": 4.28, "glitch": {"spike": 2.04, "breadth": 0.0, "at_pct": 33.3, "frames": 73, "breadth_normalised": 0.0}}
+- **2026-09-14 00:49 UTC** — b_pawnshop: HELD for Lucas's eye — The cycle-26 render at seed 4242 cleared all three reject-only gates — camera still with zero landmark drift, return 0.14 inside the shipped 0.13–0.51 band, glitch breadth 0.0 on both readings — on a spec-derived motion prompt naming a bounded depicted mover, so the clip now waits on Lucas's eye rather than on any further authoring or drive change.. NOT accepted.
+- **2026-09-14 00:53 UTC** — b_stateroom: render launched at end guide 0.70.
+- **2026-09-14 00:54 UTC** — b_stateroom: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-14 00:54 UTC** — b_stateroom: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-14 00:55 UTC** — b_stateroom: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-14 00:55 UTC** — b_stateroom: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-14 00:56 UTC** — b_stateroom: waiting on the render (poll 5/40). No Claude call spent.
+- **2026-09-14 00:56 UTC** — b_stateroom: waiting on the render (poll 6/40). No Claude call spent.
+- **2026-09-14 00:57 UTC** — b_stateroom: waiting on the render (poll 7/40). No Claude call spent.
+- **2026-09-14 00:57 UTC** — b_stateroom: waiting on the render (poll 8/40). No Claude call spent.
+- **2026-09-14 00:58 UTC** — b_stateroom: waiting on the render (poll 9/40). No Claude call spent.
+- **2026-09-14 00:58 UTC** — b_stateroom: waiting on the render (poll 10/40). No Claude call spent.
+- **2026-09-14 00:59 UTC** — b_stateroom: waiting on the render (poll 11/40). No Claude call spent.
+- **2026-09-14 00:59 UTC** — b_stateroom: waiting on the render (poll 12/40). No Claude call spent.
+- **2026-09-14 01:07 UTC** — b_stateroom: the loop bake is still growing (2376555 bytes). Waiting for it to settle. No Claude call spent.
+- **2026-09-14 01:09 UTC** — b_stateroom: gated — {"camera": "still", "return": 0.26, "peak": 3.5, "glitch": {"spike": 3.54, "breadth": 0.042, "at_pct": 55.6, "frames": 73, "breadth_normalised": 0.042}}
+- **2026-09-14 01:11 UTC** — b_stateroom: HELD for Lucas's eye — The single sanctioned render exists and cleared all three reject-only gates — camera still, glitch breadth 0.042 against a 0.70 two-reading threshold, return 0.26 which is above the shipping precedent of 0.23 — so the only step left is Lucas's eye, which is the only thing that may accept it.. NOT accepted.
+- **2026-09-14 01:14 UTC** — gala: render launched at end guide 0.70.
+- **2026-09-14 01:15 UTC** — gala: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-14 01:15 UTC** — gala: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-14 01:16 UTC** — gala: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-14 01:16 UTC** — gala: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-14 01:17 UTC** — gala: waiting on the render (poll 5/40). No Claude call spent.
+- **2026-09-14 01:17 UTC** — gala: waiting on the render (poll 6/40). No Claude call spent.
+- **2026-09-14 01:18 UTC** — gala: waiting on the render (poll 7/40). No Claude call spent.
+- **2026-09-14 01:19 UTC** — gala: waiting on the render (poll 8/40). No Claude call spent.
+- **2026-09-14 01:19 UTC** — gala: waiting on the render (poll 9/40). No Claude call spent.
+- **2026-09-14 01:20 UTC** — gala: waiting on the render (poll 10/40). No Claude call spent.
+- **2026-09-14 01:20 UTC** — gala: waiting on the render (poll 11/40). No Claude call spent.
+- **2026-09-14 01:21 UTC** — gala: waiting on the render (poll 12/40). No Claude call spent.
+- **2026-09-14 01:21 UTC** — gala: waiting on the render (poll 13/40). No Claude call spent.
+- **2026-09-14 01:22 UTC** — gala: waiting on the render (poll 14/40). No Claude call spent.
+- **2026-09-14 01:22 UTC** — gala: waiting on the render (poll 15/40). No Claude call spent.
+- **2026-09-14 01:23 UTC** — gala: waiting on the loop bake (poll 16/40). No Claude call spent.
+- **2026-09-14 01:23 UTC** — gala: waiting on the loop bake (poll 17/40). No Claude call spent.
+- **2026-09-14 01:24 UTC** — gala: the loop bake is still growing (2874382 bytes). Waiting for it to settle. No Claude call spent.
+- **2026-09-14 01:25 UTC** — gala: gated — {"camera": "still", "return": 0.0, "peak": 3.78, "glitch": {"spike": 3.3, "breadth": 0.042, "at_pct": 77.8, "frames": 73, "breadth_normalised": 0.021}, "note": "no out-and-back: dead, or cyclic flow. NEEDS AN EYE \u2014 this measure has called three good clips dead."}
+- **2026-09-14 01:31 UTC** — gala: HELD for Lucas's eye — The one sanctioned render cleared the camera gate and sits far under the glitch threshold on both readings, and its sole remaining signal — a 0.00 return — is the documented dead-or-cyclic ambiguity that must escalate rather than reject, with a peak mid-pack among this run's five held clips giving no independent evidence of deadness.. NOT accepted.
+- **2026-09-14 01:31 UTC** — Every room is held or parked. HELD (need Lucas's eye): ['briefing', 'a_opera', 'a_townhouse', 'b_pawnshop', 'b_stateroom', 'gala']. Nothing here is accepted — metrics may reject and must never approve.
+- **2026-09-14 02:28 UTC** — a_gallery: render launched at end guide 0.70.
+- **2026-09-14 02:29 UTC** — a_gallery: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-14 02:29 UTC** — a_gallery: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-14 02:30 UTC** — a_gallery: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-14 02:30 UTC** — a_gallery: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-14 02:31 UTC** — a_gallery: waiting on the render (poll 5/40). No Claude call spent.
+- **2026-09-14 02:31 UTC** — a_gallery: waiting on the render (poll 6/40). No Claude call spent.
+- **2026-09-14 02:32 UTC** — a_gallery: waiting on the render (poll 7/40). No Claude call spent.
+- **2026-09-14 02:32 UTC** — a_gallery: waiting on the render (poll 8/40). No Claude call spent.
+- **2026-09-14 02:33 UTC** — a_gallery: waiting on the render (poll 9/40). No Claude call spent.
+- **2026-09-14 02:33 UTC** — a_gallery: waiting on the render (poll 10/40). No Claude call spent.
+- **2026-09-14 02:34 UTC** — a_gallery: waiting on the render (poll 11/40). No Claude call spent.
+- **2026-09-14 02:34 UTC** — a_gallery: waiting on the render (poll 12/40). No Claude call spent.
+- **2026-09-14 02:35 UTC** — a_gallery: waiting on the render (poll 13/40). No Claude call spent.
+- **2026-09-14 02:35 UTC** — a_gallery: waiting on the render (poll 14/40). No Claude call spent.
+- **2026-09-14 02:36 UTC** — a_gallery: waiting on the render (poll 15/40). No Claude call spent.
+- **2026-09-14 02:36 UTC** — a_gallery: waiting on the loop bake (poll 16/40). No Claude call spent.
+- **2026-09-14 02:37 UTC** — a_gallery: waiting on the loop bake (poll 17/40). No Claude call spent.
+- **2026-09-14 02:37 UTC** — a_gallery: the loop bake is still growing (2810927 bytes). Waiting for it to settle. No Claude call spent.
+- **2026-09-14 02:39 UTC** — a_gallery: gated — {"camera": "still", "return": 0.0, "peak": 3.62, "glitch": {"spike": 2.9, "breadth": 0.0, "at_pct": 80.6, "frames": 73, "breadth_normalised": 0.0}, "note": "no out-and-back: dead, or cyclic flow. NEEDS AN EYE \u2014 this measure has called three good clips dead."}
+- **2026-09-14 02:45 UTC** — a_gallery: decision not acted on (ADJUST_VIGOUR, verdict REVIEW).
+- **2026-09-14 02:51 UTC** — a_gallery: decision not acted on (ADJUST_VIGOUR, verdict FAIL).
+- **2026-09-14 02:59 UTC** — b_casino: decision not acted on (RENDER, verdict REVIEW).
+- **2026-09-14 03:00 UTC** — b_casino: worker error — ERROR: Claude Code exited with code 1. Permission allow rule (.claude/settings.local.json): Bash(mv to_read/* to_read/z_archive/) has a wildcard before the rest of the command, so it also matches any 
+- **2026-09-14 03:00 UTC** — b_casino: worker error — ERROR: Claude Code exited with code 1. Permission allow rule (.claude/settings.local.json): Bash(mv to_read/* to_read/z_archive/) has a wildcard before the rest of the command, so it also matches any 
+- **2026-09-14 03:01 UTC** — b_casino: worker error — ERROR: Claude Code exited with code 1. Permission allow rule (.claude/settings.local.json): Bash(mv to_read/* to_read/z_archive/) has a wildcard before the rest of the command, so it also matches any 
+- **2026-09-14 03:01 UTC** — a_opera: worker error — ERROR: Claude Code exited with code 1. Permission allow rule (.claude/settings.local.json): Bash(mv to_read/* to_read/z_archive/) has a wildcard before the rest of the command, so it also matches any 
+- **2026-09-14 03:02 UTC** — a_opera: worker error — ERROR: Claude Code exited with code 1. Permission allow rule (.claude/settings.local.json): Bash(mv to_read/* to_read/z_archive/) has a wildcard before the rest of the command, so it also matches any 
+- **2026-09-14 03:02 UTC** — a_opera: worker error — ERROR: Claude Code exited with code 1. Permission allow rule (.claude/settings.local.json): Bash(mv to_read/* to_read/z_archive/) has a wildcard before the rest of the command, so it also matches any 
+- **2026-09-14 03:03 UTC** — a_opera: worker error — ERROR: Claude Code exited with code 1. Permission allow rule (.claude/settings.local.json): Bash(mv to_read/* to_read/z_archive/) has a wildcard before the rest of the command, so it also matches any 
+- **2026-09-14 03:03 UTC** — b_docks: worker error — ERROR: Claude Code exited with code 1. Permission allow rule (.claude/settings.local.json): Bash(mv to_read/* to_read/z_archive/) has a wildcard before the rest of the command, so it also matches any 
+- **2026-09-14 03:04 UTC** — b_docks: worker error — ERROR: Claude Code exited with code 1. Permission allow rule (.claude/settings.local.json): Bash(mv to_read/* to_read/z_archive/) has a wildcard before the rest of the command, so it also matches any 
+- **2026-09-14 03:05 UTC** — b_docks: worker error — ERROR: Claude Code exited with code 1. Permission allow rule (.claude/settings.local.json): Bash(mv to_read/* to_read/z_archive/) has a wildcard before the rest of the command, so it also matches any 
+- **2026-09-14 03:05 UTC** — b_docks: worker error — ERROR: Claude Code exited with code 1. Permission allow rule (.claude/settings.local.json): Bash(mv to_read/* to_read/z_archive/) has a wildcard before the rest of the command, so it also matches any 
+- **2026-09-14 03:06 UTC** — gala: worker error — ERROR: Claude Code exited with code 1. Permission allow rule (.claude/settings.local.json): Bash(mv to_read/* to_read/z_archive/) has a wildcard before the rest of the command, so it also matches any 
+- **2026-09-14 03:06 UTC** — gala: worker error — ERROR: Claude Code exited with code 1. Permission allow rule (.claude/settings.local.json): Bash(mv to_read/* to_read/z_archive/) has a wildcard before the rest of the command, so it also matches any 
+- **2026-09-14 03:07 UTC** — gala: worker error — ERROR: Claude Code exited with code 1. Permission allow rule (.claude/settings.local.json): Bash(mv to_read/* to_read/z_archive/) has a wildcard before the rest of the command, so it also matches any 
+- **2026-09-14 03:07 UTC** — gala: worker error — ERROR: Claude Code exited with code 1. Permission allow rule (.claude/settings.local.json): Bash(mv to_read/* to_read/z_archive/) has a wildcard before the rest of the command, so it also matches any 
+- **2026-09-14 03:08 UTC** — Every room is held or parked. HELD (need Lucas's eye): none. Nothing here is accepted — metrics may reject and must never approve.
+- **2026-09-14 10:46 UTC** — a_gallery: decision not acted on (RENDER, verdict FAIL).
+- **2026-09-14 10:50 UTC** — a_gallery: HELD for Lucas's eye — The current spec's render, ri35, already exists at the pipeline default and cleared every reject-only gate with direct frame measurement confirming the dust sheet alive, so the remaining question — whether the deliberate softening overshot — is an aesthetic call that belongs to Lucas's eye, not to another render.. NOT accepted.
+- **2026-09-14 10:56 UTC** — b_casino: render launched at end guide 0.70.
+- **2026-09-14 10:56 UTC** — b_casino: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-14 10:57 UTC** — b_casino: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-14 10:57 UTC** — b_casino: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-14 10:58 UTC** — b_casino: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-14 10:58 UTC** — b_casino: waiting on the render (poll 5/40). No Claude call spent.
+- **2026-09-14 10:59 UTC** — b_casino: waiting on the render (poll 6/40). No Claude call spent.
+- **2026-09-14 11:00 UTC** — b_casino: waiting on the render (poll 7/40). No Claude call spent.
+- **2026-09-14 11:00 UTC** — b_casino: waiting on the render (poll 8/40). No Claude call spent.
+- **2026-09-14 11:01 UTC** — b_casino: waiting on the render (poll 9/40). No Claude call spent.
+- **2026-09-14 11:01 UTC** — b_casino: waiting on the render (poll 10/40). No Claude call spent.
+- **2026-09-14 11:02 UTC** — b_casino: waiting on the render (poll 11/40). No Claude call spent.
+- **2026-09-14 11:02 UTC** — b_casino: waiting on the render (poll 12/40). No Claude call spent.
+- **2026-09-14 11:03 UTC** — b_casino: waiting on the render (poll 13/40). No Claude call spent.
+- **2026-09-14 11:03 UTC** — b_casino: waiting on the render (poll 14/40). No Claude call spent.
+- **2026-09-14 11:04 UTC** — b_casino: waiting on the loop bake (poll 15/40). No Claude call spent.
+- **2026-09-14 11:04 UTC** — b_casino: waiting on the loop bake (poll 16/40). No Claude call spent.
+- **2026-09-14 11:05 UTC** — b_casino: the loop bake is still growing (48 bytes). Waiting for it to settle. No Claude call spent.
+- **2026-09-14 11:05 UTC** — b_casino: the loop bake is still growing (3478622 bytes). Waiting for it to settle. No Claude call spent.
+- **2026-09-14 11:06 UTC** — b_casino: gated — {"camera": "still", "return": 0.0, "peak": 4.3, "glitch": {"spike": 3.08, "breadth": 0.021, "at_pct": 31.9, "frames": 73, "breadth_normalised": 0.021}, "note": "no out-and-back: dead, or cyclic flow. NEEDS AN EYE \u2014 this measure has called three good clips dead."}
+- **2026-09-14 11:09 UTC** — b_casino: HELD for Lucas's eye — Camera and glitch gates both pass cleanly, and the zero return is this room's own documented cyclic-flow signature rather than a death — the only remaining number, peak amplitude, is the measure the ledger disqualifies for cyclic movers with b_casino named as one of its three wrong calls, so the soften Lucas asked for goes to his eye rather than to another render.. NOT accepted.
+- **2026-09-14 11:14 UTC** — a_opera: render launched at end guide 0.70.
+- **2026-09-14 11:15 UTC** — a_opera: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-14 11:15 UTC** — a_opera: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-14 11:16 UTC** — a_opera: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-14 11:16 UTC** — a_opera: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-14 11:17 UTC** — a_opera: waiting on the render (poll 5/40). No Claude call spent.
+- **2026-09-14 11:18 UTC** — a_opera: waiting on the render (poll 6/40). No Claude call spent.
+- **2026-09-14 11:18 UTC** — a_opera: waiting on the render (poll 7/40). No Claude call spent.
+- **2026-09-14 11:19 UTC** — a_opera: waiting on the render (poll 8/40). No Claude call spent.
+- **2026-09-14 11:19 UTC** — a_opera: waiting on the render (poll 9/40). No Claude call spent.
+- **2026-09-14 11:20 UTC** — a_opera: waiting on the render (poll 10/40). No Claude call spent.
+- **2026-09-14 11:20 UTC** — a_opera: waiting on the render (poll 11/40). No Claude call spent.
+- **2026-09-14 11:21 UTC** — a_opera: waiting on the render (poll 12/40). No Claude call spent.
+- **2026-09-14 11:21 UTC** — a_opera: waiting on the render (poll 13/40). No Claude call spent.
+- **2026-09-14 11:22 UTC** — a_opera: waiting on the loop bake (poll 14/40). No Claude call spent.
+- **2026-09-14 11:22 UTC** — a_opera: waiting on the loop bake (poll 15/40). No Claude call spent.
+- **2026-09-14 11:23 UTC** — a_opera: waiting on the loop bake (poll 16/40). No Claude call spent.
+- **2026-09-14 11:23 UTC** — a_opera: the loop bake is still growing (3593063 bytes). Waiting for it to settle. No Claude call spent.
+- **2026-09-14 11:24 UTC** — a_opera: gated — {"camera": "still", "return": 0.43, "peak": 7.43, "glitch": {"spike": 6.68, "breadth": 0.083, "at_pct": 83.3, "frames": 73, "breadth_normalised": 0.042}}
+- **2026-09-14 11:28 UTC** — a_opera: decision not acted on (HOLD, verdict FAIL).
+- **2026-09-14 11:33 UTC** — a_opera: PIN_NON_MOVERS applied. Both prompts re-rendered from the one spec. Still must be regenerated before the next render.
+- **2026-09-14 11:39 UTC** — a_opera: PIN_NON_MOVERS applied. Both prompts re-rendered from the one spec. Still must be regenerated before the next render.
+- **2026-09-14 11:50 UTC** — b_docks: render launched at end guide 0.70.
+- **2026-09-14 11:50 UTC** — b_docks: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-14 11:51 UTC** — b_docks: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-14 11:51 UTC** — b_docks: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-14 11:52 UTC** — b_docks: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-14 11:52 UTC** — b_docks: waiting on the render (poll 5/40). No Claude call spent.
+- **2026-09-14 11:53 UTC** — b_docks: waiting on the render (poll 6/40). No Claude call spent.
+- **2026-09-14 11:53 UTC** — b_docks: waiting on the render (poll 7/40). No Claude call spent.
+- **2026-09-14 11:54 UTC** — b_docks: waiting on the render (poll 8/40). No Claude call spent.
+- **2026-09-14 11:54 UTC** — b_docks: waiting on the render (poll 9/40). No Claude call spent.
+- **2026-09-14 11:55 UTC** — b_docks: waiting on the render (poll 10/40). No Claude call spent.
+- **2026-09-14 11:56 UTC** — b_docks: waiting on the render (poll 11/40). No Claude call spent.
+- **2026-09-14 11:56 UTC** — b_docks: waiting on the render (poll 12/40). No Claude call spent.
+- **2026-09-14 11:57 UTC** — b_docks: waiting on the render (poll 13/40). No Claude call spent.
+- **2026-09-14 11:57 UTC** — b_docks: waiting on the render (poll 14/40). No Claude call spent.
+- **2026-09-14 11:58 UTC** — b_docks: waiting on the render (poll 15/40). No Claude call spent.
+- **2026-09-14 11:58 UTC** — b_docks: waiting on the loop bake (poll 16/40). No Claude call spent.
+- **2026-09-14 11:59 UTC** — b_docks: waiting on the loop bake (poll 17/40). No Claude call spent.
+- **2026-09-14 11:59 UTC** — b_docks: the loop bake is still growing (3932173 bytes). Waiting for it to settle. No Claude call spent.
+- **2026-09-14 12:00 UTC** — b_docks: gated — {"camera": "still", "return": 0.07, "peak": 5.11, "glitch": {"spike": 4.33, "breadth": 0.021, "at_pct": 45.8, "frames": 73, "breadth_normalised": 0.042}}
+- **2026-09-14 12:05 UTC** — b_docks: HELD for Lucas's eye — Localised measurement shows the authored tarpaulin is the only significant mover — peak 10.26 and return 0.34 over a clean mid-clip arc at x=0.14-0.20, against a ~2.0 background elsewhere — so the low global peak is the arithmetic of a correctly bounded mover rather than a dead clip, and with camera and glitch both clear the only question left is whether the billow's excursion is to Lucas's taste, which is his eye's call and not another render's.. NOT accepted.
+- **2026-09-14 12:10 UTC** — gala: render launched at end guide 0.70.
+- **2026-09-14 12:10 UTC** — gala: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-14 12:11 UTC** — gala: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-14 12:11 UTC** — gala: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-14 12:12 UTC** — gala: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-14 12:13 UTC** — gala: waiting on the render (poll 5/40). No Claude call spent.
+- **2026-09-14 12:13 UTC** — gala: waiting on the render (poll 6/40). No Claude call spent.
+- **2026-09-14 12:14 UTC** — gala: waiting on the render (poll 7/40). No Claude call spent.
+- **2026-09-14 12:14 UTC** — gala: waiting on the render (poll 8/40). No Claude call spent.
+- **2026-09-14 12:15 UTC** — gala: waiting on the render (poll 9/40). No Claude call spent.
+- **2026-09-14 12:15 UTC** — gala: waiting on the render (poll 10/40). No Claude call spent.
+- **2026-09-14 12:16 UTC** — gala: waiting on the render (poll 11/40). No Claude call spent.
+- **2026-09-14 12:16 UTC** — gala: waiting on the render (poll 12/40). No Claude call spent.
+- **2026-09-14 12:17 UTC** — gala: waiting on the render (poll 13/40). No Claude call spent.
+- **2026-09-14 12:17 UTC** — gala: waiting on the render (poll 14/40). No Claude call spent.
+- **2026-09-14 12:18 UTC** — gala: waiting on the render (poll 15/40). No Claude call spent.
+- **2026-09-14 12:18 UTC** — gala: waiting on the loop bake (poll 16/40). No Claude call spent.
+- **2026-09-14 12:19 UTC** — gala: waiting on the loop bake (poll 17/40). No Claude call spent.
+- **2026-09-14 12:19 UTC** — gala: the loop bake is still growing (4046602 bytes). Waiting for it to settle. No Claude call spent.
+- **2026-09-14 12:20 UTC** — gala: gated — {"camera": "still", "return": 0.21, "peak": 6.87, "glitch": {"spike": 11.17, "breadth": 0.062, "at_pct": 90.3, "frames": 73, "breadth_normalised": 0.042}}
+- **2026-09-14 12:24 UTC** — gala: HELD for Lucas's eye — The re-authored pennant art rendered clean — camera still, return 0.21 and peak 6.87 against the dead version's 0.00 and 3.78, glitch breadth 0.062/0.042 far under threshold, and the difference strip shows the bounded pennant as the dominant mover with nothing rigid warping — so it survives every gate and belongs in front of Lucas's eye.. NOT accepted.
+- **2026-09-14 12:24 UTC** — Every room is held or parked. HELD (need Lucas's eye): ['a_gallery', 'b_casino', 'b_docks', 'gala']. Nothing here is accepted — metrics may reject and must never approve.

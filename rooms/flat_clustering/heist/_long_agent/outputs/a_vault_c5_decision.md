@@ -1,0 +1,13 @@
+Read the four evidence files, the room on disk, both prior cycles' decisions and evaluations, and the runner's own RENDER path. What holds:
+
+- **The mover is authored and machine-readable.** Cycle 2's `AUTHOR_MOVER` landed: the lamp now carries `motion.{moves, vigour, phrase}` on disk, so `_has_authored_mover` (long_agent.py:3549) returns True and RENDER is no longer refused. Verified against `rooms/flat_clustering/heist/scenario.json`, not the brief.
+- **Bounded, not frame-filling** — a caged lamp on a flex just left of centre (`_POS` 0.36), the exact class the finding rests on. Every other `at` in the spec resolves in the closed vocabulary too.
+- **The prompts derive from the one spec.** `render_motion_prompt(spec)` is byte-identical to `art_prompt_motion/heist/a_vault.txt`; `render_prompt` carries the EQUIRECT clause. Nothing hand-written. `scenePrompt` is empty on this room, so the prompt-overwrite hazard the cycle-2 evaluator raised on b_docks does not bite here.
+- **The still is current and depicts the mover.** `scene.png` (Sep 5) is a human-triaged `hold` with a clean plain-steel seam. The cycle-2 edit only relocated the vigour clause out of `desc` and back in via `element_desc` — a round trip, so the art prompt's authored content is unchanged and the still is not stale in substance. And the runner cannot block on it anyway: `state.json`'s `rooms` is `{}`, so `needs_still` is unset.
+- **No clip exists.** `temp/cine` is empty, no verdict JSON, `pending_render` is null. The two a_vault mp4s under `authoring_v2/ui/cine360` are 2048 factorial-grid experiments, not a pipeline clip.
+- **Vigour is already at the right level.** "Swinging slowly" is the soft end, which is what the re-authoring result argues for — authored movers came back moving *more* than wanted, and intensity language only works downward.
+
+Nothing to author, nothing to soften, nothing mis-moving. One caution I am deliberately not acting on: the pipeline note records a_vault's first pipeline clip at raw glitch breadth 0.896, over the now-enforced 0.667. That is a seed property and `cine_room.py` handles it itself — reject, re-roll twice onto the recorded grid seeds, then escalate. It is not grounds to touch the art.
+
+DECISION: RENDER
+WHY: The spec carries a bounded depicted mover with an authored vigour that `_has_authored_mover` can see, the motion prompt renders byte-identically from that same spec and names only the lamp, the committed still is seam-clean and depicts it, and no clip exists yet — so the one render at the pinned 0.70 default is the only remaining step.

@@ -79,3 +79,64 @@ def test_edge_discipline_keeps_BOTH_of_its_clauses():
     assert "THE GROUND IS ONE SURFACE:" in ed, "the ground clause is missing"
     p = scene_spec.render_prompt({"setting": "x", "seam": "y", "elements": []})
     assert "EDGE DISCIPLINE:" in p and "THE GROUND IS ONE SURFACE:" in p
+
+
+# --- one spec, two consumers (2026-09-13) -------------------------------------------------
+# B14 from review: this surface shipped with no tests, and an article bug ("The an anvil ...")
+# would have been caught by a single assertion.
+
+def test_element_desc_appends_authored_vigour():
+    e = {"desc": "a pennant on a mast", "motion": {"moves": True, "vigour": "straining in a gale"}}
+    assert scene_spec.element_desc(e) == "a pennant on a mast, straining in a gale"
+
+
+def test_element_desc_ignores_a_non_mover_and_a_malformed_motion():
+    assert scene_spec.element_desc({"desc": "a bench", "motion": {"moves": False,
+                                                                  "vigour": "x"}}) == "a bench"
+    assert scene_spec.element_desc({"desc": "a bench", "motion": "oops"}) == "a bench"
+
+
+def test_render_prompt_unchanged_without_motion_fields():
+    spec = {"setting": "the centre", "elements": [{"at": "left", "desc": "a bench"}]}
+    assert "a bench" in scene_spec.render_prompt(spec)
+    assert "EQUIRECTANGULAR" in scene_spec.render_prompt(spec)
+
+
+def test_render_motion_prompt_none_when_nothing_moves():
+    assert scene_spec.render_motion_prompt({"elements": [{"desc": "a bench"}]}) is None
+
+
+def test_render_motion_prompt_uses_phrase_not_desc():
+    spec = {"elements": [{"at": "left", "desc": "a lantern on a hook",
+                          "motion": {"moves": True, "vigour": "swinging hard",
+                                     "phrase": "the lantern swinging to and fro"}}]}
+    out = scene_spec.render_motion_prompt(spec)
+    assert "the lantern swinging to and fro".capitalize() in out or "lantern swinging" in out
+    assert "swinging hard" not in out          # vigour belongs to the ART prompt, not this one
+    assert out.startswith("locked-off static camera") and out.endswith("Seamless natural loop.")
+
+
+def test_render_motion_prompt_plural_agreement():
+    spec = {"elements": [
+        {"at": "left", "desc": "a", "motion": {"moves": True, "vigour": "v", "phrase": "the smoke coiling"}},
+        {"at": "right", "desc": "b", "motion": {"moves": True, "vigour": "v", "phrase": "the water rippling"}}]}
+    assert "Only those move" in scene_spec.render_motion_prompt(spec)
+
+
+def test_rigid_clause_articles():
+    """`joined[:4]` can never equal "a " or "an ", which produced "The an anvil ... are rigid"."""
+    spec = {"elements": [
+        {"at": "left", "desc": "an anvil", "motion": {"moves": False, "still_as": "an anvil on a block"}},
+        {"at": "right", "desc": "a lantern",
+         "motion": {"moves": True, "vigour": "v", "phrase": "the lantern swinging"}}]}
+    out = scene_spec.render_motion_prompt(spec, rigid=True)
+    assert "The an anvil" not in out
+    assert "An anvil on a block are rigid and fixed" in out
+
+
+def test_rigid_clause_from_spec_level_field_is_capitalised():
+    spec = {"rigid": "the slabs and the bench", "elements": [
+        {"at": "left", "desc": "a lantern",
+         "motion": {"moves": True, "vigour": "v", "phrase": "the lantern swinging"}}]}
+    out = scene_spec.render_motion_prompt(spec, rigid=True)
+    assert "The slabs and the bench are rigid and fixed" in out

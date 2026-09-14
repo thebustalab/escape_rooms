@@ -1,0 +1,16 @@
+Read all four authority documents, then checked the room's actual on-disk state, the runner's apply/selection logic, and verified two claims by running `scene_spec` directly.
+
+**What I found:** cycle 65's pin *did* apply — `spec["rigid"]` now names both door drapes and the motion prompt carries the clause. But `PIN_NON_MOVERS` unconditionally sets `needs_still`, and I confirmed by running `render_prompt` with and without the pin that the art prompt is **byte-identical**: `render_prompt` never reads `spec["rigid"]`, and cycle 64's inert element is skipped by the sweep's `if e.get("desc")` filter. So the committed still is exactly the right art, the block is spurious, and `RENDER` would park the room with a message telling Lucas to regenerate a seam-staged panorama for nothing. A parked room is also skipped *before* the self-clear runs, so `touch scene.png` can't rescue it.
+
+I also hit a live landmine: `to_hotspots` on the current spec raises `KeyError: 'id'`, because cycle 64's inert `{"rigid": ...}` element is still in `elements`.
+
+DECISION: PARK
+WHY: Cycle 65's pin is correctly applied and the motion prompt now names both door drapes, but PIN_NON_MOVERS set `needs_still` even though `render_prompt` never reads `spec["rigid"]` — I verified the art prompt is byte-identical with and without the pin, so the committed seam-staged scene.png from 2026-09-13 22:24 is exactly the right art and regenerating it would spend a generation to discard a panorama Lucas has already commented on; please delete `needs_still`, `spec_edited_at` and `parked` from rooms.a_opera in rooms/flat_clustering/heist/_long_agent/state.json (parked rooms are skipped before the self-clear can fire, so touching scene.png alone will not work) so the loop can spend its one remaining render on the pinned prompt — and separately, cycle 64's inert {"rigid": ...} element is still in a_opera's `elements` in rooms/flat_clustering/heist/scenario.json, where it now makes scene_spec.to_hotspots raise KeyError 'id', so it should be deleted before the hotspots phase.
+
+---
+
+Spoken version: the opera room is one command away from being unstuck. The drape pin worked — the motion prompt now tells the model to hold both doorway curtains still, which is the actual defect the last clip had. But applying that pin tripped a safety flag that says "the art changed, regenerate the still". The art did not change; I checked that directly, and the prompt comes out identical. So the room is sitting behind a false alarm with one render left in its budget.
+
+The fix is deleting three keys from the job's state file — needs_still, spec_edited_at and parked, under a_opera. Path is rooms/flat_clustering/heist/_long_agent/state.json. Then it renders once and you get a clip to look at.
+
+One extra thing worth knowing: a bad edit from cycle 64 left a malformed entry in the opera room's element list in rooms/flat_clustering/heist/scenario.json. It's harmless for the art and the clip, but it will crash hotspot generation later, so it should come out before that phase.

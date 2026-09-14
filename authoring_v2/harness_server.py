@@ -4625,9 +4625,20 @@ class H(http.server.SimpleHTTPRequestHandler):
                 if not rk:
                     return self._json({"ok": False, "error": "need roomKey"}, 400)
                 node = next((r for r in _load_scenario(base).get("rooms", []) if r.get("key") == rk), None)
-                prompt = (((node or {}).get("authoring") or {}).get("scenePrompt") or "").strip()
+                # RENDER FROM THE SPEC, AT GENERATION TIME (2026-09-13). This used to read the
+                # STORED `scenePrompt`, which is a second place the truth can live and had already
+                # gone stale: five heist rooms held prompts written before the EQUIRECTANGULAR
+                # clause existed, so regenerating any of them silently reproduced art from a prompt
+                # missing the panorama discipline, the camera line and the edge rules — with no
+                # warning. Editing a spec and pressing generate now does what it looks like it does.
+                # `scenePrompt` is kept as the RECORD of what was used, never as the input.
+                _spec = ((node or {}).get("authoring") or {}).get("sceneSpec")
+                prompt = (scene_spec.render_prompt(_spec) or "").strip() if _spec else ""
                 if not prompt:
-                    return self._json({"ok": False, "error": "room %s has no scenePrompt — render its spec first" % rk}, 400)
+                    # No spec: fall back to the stored prompt, for rooms authored before sceneSpec.
+                    prompt = (((node or {}).get("authoring") or {}).get("scenePrompt") or "").strip()
+                if not prompt:
+                    return self._json({"ok": False, "error": "room %s has neither a sceneSpec nor a scenePrompt" % rk}, 400)
                 size = req.get("size", "3072x1024")
                 ok_size, size_err = _valid_size(size)
                 if not ok_size:

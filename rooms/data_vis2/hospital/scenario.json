@@ -339,7 +339,7 @@
             0.7314,
             0.5049
           ],
-          "starterCode": "metabolomics_hospital %>%\nmutate(patient_number = as.character(patient_number)) %>%\nbind_rows(dplyr::mutate(metabolomics_hospital_unknown, patient_status = \"Elias\")) %>%\nfilter(metabolite != \"Creatinine\") %>%\ngroup_by(metabolite) %>%\nmutate(level = as.numeric(scale(concentration))) %>%\nungroup() -> metabolomics_hospital\n\nmetabolomics_hospital",
+          "starterCode": "metabolomics_hospital %>%\nmutate(patient_number = as.character(patient_number)) %>%\nbind_rows(dplyr::mutate(metabolomics_hospital_unknown, patient_status = \"Elias\")) %>%\nfilter(metabolite != \"Creatinine\") %>%\ngroup_by(metabolite) %>%\nmutate(level = as.numeric(scale(concentration))) %>%\nungroup() -> metabolomics_hospital_scaled\n\nmetabolomics_hospital_scaled",
           "question": {
             "prompt": "The data analysis is started, but not finished. Draw a heatmap — metabolite and patient on the axes, colour intensity from each metabolite's scaled level — and find the patient whose whole row of tiles looks most like Elias's. (Creatinine, the specialist renal assay, is still pending from the lab, so it's not in the panel yet.) Which patient is Elias' closest chemical match?",
             "options": [

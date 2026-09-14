@@ -1,14 +1,21 @@
 {
-  "stills_iterate": true,
+  "room_iterate": true,
   "chapter": "flat_clustering",
   "scenario": "heist",
-  "rooms": [],
-  "max_attempts_per_room": 3,
-  "candidates_per_room": 1,
-  "goal": "Drive every base still in flat_clustering/heist from its tab-1 scene spec to a committed, seam-clean scene.png that no automatic gate can fault, then hold it for Lucas's eye. Never accept a still and never place a hotspot box.",
+  "rooms": [
+    "a_gallery",
+    "b_casino",
+    "a_opera",
+    "b_docks",
+    "gala"
+  ],
+  "max_attempts_per_room": 2,
+  "max_render_polls": 40,
+  "end_guide": "0.70",
+  "goal": "Drive the named rooms in flat_clustering/heist to a cinemagraph that no automatic gate can fault, by AUTHORING \u2014 a bounded depicted mover with an authored vigour in the sceneSpec \u2014 and never by searching settings. Hold every survivor for Lucas's eye. Never accept a clip.",
   "done_criteria": [
-    "Every room in scope has a committed scene.png that is `hold` (it survived every automatic gate) or is `parked` (a named human decision) \u2014 none are left in `reject` or `ungenerated`.",
-    "No still has been marked accepted, verified, or good by the loop itself: `authoring.seam.accepted` was not written by this job, and no hotspot box was placed.",
-    "Every parked room has a specific stated reason a human can act on, and every committed still the loop had reservations about carries them in its CONCERNS."
+    "Every room in scope is HELD (it survived every automatic gate) or PARKED with a specific stated reason a human can act on.",
+    "No clip has been marked accepted or good by the loop itself, and nothing has been wired into scenario.json's committed hotspots.",
+    "Every room that was re-authored had its art regenerated before it was rendered \u2014 no clip animates a still that predates its own motion prompt."
   ]
 }

@@ -1,0 +1,10 @@
+Evidence read. State of `a_opera`:
+
+- **Bounded mover, authored, and actually depicted.** The `swag` element carries a well-formed `motion` block (`moves`/`vigour`/`phrase`), so `_has_authored_mover` will see it. The committed `scenePrompt` already contains the vigour clause *"stirring in a draught from the flies"*, and the Sep-5 still at `rooms/flat_clustering/heist/a_opera/scene.png` shows exactly that: a gathered crimson velvet swag with tieback tassel and bullion fringe, occupying roughly a fifth of the frame at `to the left` — bounded, not frame-filling, and hanging cloth is the strongest confirmed mover category in the ledger.
+- **Motion prompt is fine.** The absent `.txt` is expected — all six remaining heist rooms take their prompt from the migrated `sceneSpec` via the `render_motion_prompt` fallback. It renders as: *"locked-off static camera, zero camera movement. The heavy velvet swag curtain breathing slowly in the draught. Only that moves; everything else stays perfectly still. Seamless natural loop."* House form, names the depicted mover and nothing else, oscillatory so it respects the no-travel rule.
+- **Nothing has been rendered.** Empty gate report, empty attempt history.
+
+There is no reason to touch the art. Regenerating the still would overwrite a human-triaged panorama (`verdict: hold`, with five recorded concerns for Lucas) under a `render_prompt` that is no longer byte-identical to the committed one — and this tree is not under version control. That cost is only justified if the clip comes back dead, which is step 6 of the pipeline, not step 1.
+
+DECISION: RENDER
+WHY: The spec's `swag` carries a bounded authored mover with vigour that the committed 3072 still visibly depicts as gathered velvet cloth, the motion prompt derives correctly from that same spec and names only that mover, and no clip exists yet — so the one render the pipeline allows is the next step.

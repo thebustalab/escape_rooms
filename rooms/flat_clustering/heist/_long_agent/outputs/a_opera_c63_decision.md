@@ -1,0 +1,12 @@
+Read all four evidence files, then checked the room on disk rather than trusting the summary.
+
+**What the disk says.** Cycle 61's RENDER executed: `a_opera_motion_ri61_looped.mp4`, baked 2026-09-14 07:23, seed 4242, end guide 0.70, 73 frames, 3072x1024 — the one sanctioned pass, params byte-matched against ri20's. It animates the *current* committed still: `scene.png` is from 22:24 on 09-13 and `scene_spec.render_prompt(sceneSpec)` reproduces `authoring.scenePrompt` (3129 chars) byte-identically, so the spec is still the live source of that art and nothing has moved under it since.
+
+**Both of Lucas's a_opera notes are addressed in this render.** The lighter now reads "at natural size, no larger than a matchbox in the frame" in the sweep, and `rigid` is set, which trips the escalation at `exp_art_prompt.py:98` — the motion prompt built from the spec names the parapet, the panelled walls and mouldings, the tiers, the writing-slope, the lighter and both doorways as "rigid and fixed — they do not warp, drift, breathe, shimmer or change shape", the direct fix for the breathing-wall note. Only the swag carries a phrase, so only one mover is named.
+
+**Every reject-only gate passes with margin.** Camera still — `frame0_corr` 0.961, landmark drift 0 px. Glitch breadth 0.083 raw and 0.042 normalised, against a threshold of 0.70 that requires *both* readings to exceed it. Return 0.43 is a clean out-and-back, mid-band against the committed Egypt clips' 0.13–0.51, so the zero-return ambiguity never arises here.
+
+I considered SOFTEN_PROMPT on the peak of 7.43 and rejected it: peak is a whole-frame amplitude measure the ledger disqualifies for this judgement, ri20's 3.6 came from a different still and may not be compared, and the authored vigour is already at the gentle end ("stirring gently in a draught, its folds shifting a little"). Softening on that number would be tuning blind against a metric that has been wrong before, and the intensity lever only works downward from the eye's verdict.
+
+DECISION: HOLD
+WHY: The one sanctioned render of the current art cleared every reject-only gate with margin — camera still, glitch an order of magnitude under threshold, and a healthy 0.43 out-and-back return — so the clip is a question for Lucas's eye, not a case for another render.

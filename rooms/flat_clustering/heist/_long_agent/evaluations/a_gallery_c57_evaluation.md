@@ -1,0 +1,13 @@
+I checked the room on disk and measured the frames myself rather than taking the worker's account on trust. Every load-bearing claim holds.
+
+**The clip exists and is from this spec.** `a_gallery_motion_ri35_looped.mp4` was baked 2026-09-13 22:37:48, after `scene.png` (22:23:56). Hashing a_gallery's `authoring.sceneSpec` across the scenario backups: it last moved in the 22:01 lucas_feedback edit (`164840a5` → `b49198bc`) and has been byte-stable since; `scenePrompt` last moved at 22:08. `params.json` is the pipeline default — seed 4242, end guide 0.70, 3072×1024, 73 frames, 8 steps, cfg 2.0 — identical to ri11's. So ri35 is exactly the render a RENDER decision would produce.
+
+**The spec's mover is bounded and both down-levers are pulled.** `motion.vigour` = "barely stirring… very gently in a slight draught", `motion.phrase` = "breathing very gently, barely lifting at one corner", both answering Lucas's "too aggressive" note; `other_cases` answers the "cases all empty" note.
+
+**Independent frame measurement (73 frames, mean-corrected, 8×24 block map).** The hot region is a single block at column 8/24 — x ≈ 0.35, which is where the spec places `sheet` — peaking 10.7 against a 1.5–2.5 background; only 1% of blocks exceed half peak. That is bounded, not frame-filling. Its temporal profile is a clean out-and-back: 0 → 2.42 at f40 → 1.57 at the end, ~35% off peak. Everything outside it rises to ~1.5 by f16 and plateaus. The gate's `return: 0.00` is a localised arc swamped by diffuse global drift — the documented false-dead, and the gate line's own note says so. Gate values confirmed in `a_gallery_ri35_render.log`: `camera: still`, breadth 0.0 and breadth_normalised 0.0, verdict "survived gates — needs Lucas's eye."
+
+**The adjudication history is as described.** c37 REVIEW (ri11/ri35 are different stills, premise confounded), c38 FAIL, c39 PARK → PASSed, c56 RENDER → FAILed for missing ri35. `state.json`'s `review_note` names this room: a low return here is the intended outcome of the softening, "HOLD it for his eye rather than adjusting vigour again."
+
+Nothing on the reject list applies — no settings change, no frame-filling mover, the zero return is argued against rather than treated as death, no clip accepted, nothing written to `scenario.json`, no hand-written prompt, no AUTHOR_MOVER. HOLD spends no render, preserves the last one for whatever Lucas answers, and matches `done_criteria`'s HELD terminal state. The carried-forward note about the ~3.5-level global creep, with a `motion.still_as` clause as the fix rather than a vigour change, is the right thing to put in front of his eye.
+
+VERDICT: PASS
