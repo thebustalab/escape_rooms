@@ -1,0 +1,16 @@
+I read the four authorities, then reconstructed what actually changed on disk rather than trusting the brief's summary — because the brief's two "empty" fields and its quoted motion prompt both turned out to be misleading.
+
+**What I established:**
+
+- **The brief's "current motion prompt" is not the one that will fire.** That 104-word text is `cinemagraph_tools/art_prompt_motion/heist/a_opera.txt` (07:39), which is unreachable fallback. The spec declares a mover, so `render_motion_prompt(spec, rigid=True)` wins. I rendered it: **57 words**, walls and parapet pinned only.
+- **The spec changed at 12:00:16 today, after the last clip.** `scenario.json.bak_20260914_120016_feedback_round2` preserves the pre-edit state: `swag.motion.phrase` was *"stirring gently in a draught, its folds shifting and settling"* (61 words rendered). It is now *"breathing very slightly, its folds barely shifting"*. That edit is Lucas's round-2 note in `state.json`: **"a_opera — the clip was TOO AGGRESSIVE. Only the motion PHRASE was softened... Render each ONCE and gate. Neither room needs re-authoring."**
+- **So ri75 is not the clip in question.** ri75 (11:40–11:50) rendered the *pre-softening* 61-word prompt, cleared every gate, was held at 11:56, was synced to `cine360/` at 11:52 — and is exactly the clip Lucas then called too aggressive. `state.json` was reset at 12:29 (`rooms: {}`), which is why the gate report and attempt list reach me empty. **The softened phrase has never been rendered.**
+- **No still is pending.** `render_prompt(spec)` is byte-identical to the stored `scenePrompt` (3129 chars both), the depicted `vigour` is untouched, and `rigid` is not an input to the art prompt — so the committed `scene.png` (2026-09-13 22:24) is still correct, and `needs_still` must not fire, exactly as the note instructs.
+- `movers(spec)` returns one bounded mover, `swag`, with `motion.{moves,vigour,phrase}` complete, so RENDER will not be refused. The `rigid` clause stays at two items; the note is explicit that lengthening it is what produced ri73's CAMERA MOVES at 176 words, and the new prompt is shorter than ri75's, so drift risk is lower, not higher.
+
+I considered SOFTEN_PROMPT and rejected it: the softening has already been authored, by a human, into the one source of truth. Re-supplying prompt text would overwrite his wording with mine and reintroduce the two-sources-of-truth drift the spec design exists to prevent.
+
+DECISION: RENDER
+WHY: Lucas's round-2 softening of `swag.motion.phrase` postdates every existing clip, the committed still matches its own unchanged art prompt so no regeneration is owed, and the one thing that has never been rendered is the 57-word spec-derived prompt he asked to be rendered once and gated.
+
+One thing for a human, outside this decision: the brief-builder quotes the stale `art_prompt_motion/heist/a_opera.txt` as the room's motion prompt while the renderer resolves from the spec. Three cycles in a row have now had to correct for that by hand — it's a one-line fix in whatever assembles the brief, and worth making before it misleads a cycle that doesn't check.

@@ -359,3 +359,45 @@ Started 2026-09-13T18:59:08.470014+00:00.
 - **2026-09-14 14:34 UTC** — a_opera: AUTO-REJECTED — camera gate — CAMERA MOVES
 - **2026-09-14 14:34 UTC** — a_opera: gated — {"camera": "CAMERA MOVES", "return": 0.68, "peak": 12.99, "glitch": {"spike": 7.43, "breadth": 0.104, "at_pct": 88.9, "frames": 73, "breadth_normalised": 0.083}, "auto_rejected": "camera gate \u2014 CAMERA MOVES"}
 - **2026-09-14 14:35 UTC** — Every room is held or parked. HELD (need Lucas's eye): ['a_gallery', 'b_casino', 'b_docks', 'gala']. Nothing here is accepted — metrics may reject and must never approve.
+- **2026-09-14 15:40 UTC** — a_opera: render launched at end guide 0.70.
+- **2026-09-14 15:41 UTC** — a_opera: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-14 15:42 UTC** — a_opera: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-14 15:42 UTC** — a_opera: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-14 15:43 UTC** — a_opera: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-14 15:43 UTC** — a_opera: waiting on the render (poll 5/40). No Claude call spent.
+- **2026-09-14 15:44 UTC** — a_opera: waiting on the render (poll 6/40). No Claude call spent.
+- **2026-09-14 15:44 UTC** — a_opera: waiting on the render (poll 7/40). No Claude call spent.
+- **2026-09-14 15:45 UTC** — a_opera: waiting on the render (poll 8/40). No Claude call spent.
+- **2026-09-14 15:45 UTC** — a_opera: waiting on the render (poll 9/40). No Claude call spent.
+- **2026-09-14 15:46 UTC** — a_opera: waiting on the render (poll 10/40). No Claude call spent.
+- **2026-09-14 15:46 UTC** — a_opera: waiting on the render (poll 11/40). No Claude call spent.
+- **2026-09-14 15:47 UTC** — a_opera: waiting on the render (poll 12/40). No Claude call spent.
+- **2026-09-14 15:47 UTC** — a_opera: waiting on the render (poll 13/40). No Claude call spent.
+- **2026-09-14 15:48 UTC** — a_opera: waiting on the render (poll 14/40). No Claude call spent.
+- **2026-09-14 15:48 UTC** — a_opera: waiting on the render (poll 15/40). No Claude call spent.
+- **2026-09-14 15:49 UTC** — a_opera: waiting on the loop bake (poll 16/40). No Claude call spent.
+- **2026-09-14 15:49 UTC** — a_opera: waiting on the loop bake (poll 17/40). No Claude call spent.
+- **2026-09-14 15:50 UTC** — a_opera: the loop bake is still growing (3879106 bytes). Waiting for it to settle. No Claude call spent.
+- **2026-09-14 15:51 UTC** — a_opera: gated — {"camera": "still", "return": 0.2, "peak": 5.04, "glitch": {"spike": 5.21, "breadth": 0.042, "at_pct": 52.8, "frames": 73, "breadth_normalised": 0.042}}
+- **2026-09-14 15:56 UTC** — a_opera: HELD for Lucas's eye — ri75 cleared camera, glitch and return, its motion is confined to the single authored bounded mover at its authored position, the door-swallowing drape that spoiled ri61 is absent, and both outstanding human notes on this room are visibly resolved — so the clip is clean-pending-eye and there is nothing left for the loop to author.. NOT accepted.
+- **2026-09-14 15:57 UTC** — Every room is held or parked. HELD (need Lucas's eye): ['a_opera']. Nothing here is accepted — metrics may reject and must never approve.
+- **2026-09-14 16:36 UTC** — a_opera: render launched at end guide 0.70.
+- **2026-09-14 16:36 UTC** — a_opera: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-14 16:37 UTC** — a_opera: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-14 16:37 UTC** — a_opera: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-14 16:38 UTC** — a_opera: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-14 16:38 UTC** — a_opera: waiting on the render (poll 5/40). No Claude call spent.
+- **2026-09-14 16:39 UTC** — a_opera: waiting on the render (poll 6/40). No Claude call spent.
+- **2026-09-14 16:39 UTC** — a_opera: waiting on the render (poll 7/40). No Claude call spent.
+- **2026-09-14 16:40 UTC** — a_opera: waiting on the render (poll 8/40). No Claude call spent.
+- **2026-09-14 16:40 UTC** — a_opera: waiting on the render (poll 9/40). No Claude call spent.
+- **2026-09-14 16:41 UTC** — a_opera: waiting on the render (poll 10/40). No Claude call spent.
+- **2026-09-14 16:41 UTC** — a_opera: waiting on the render (poll 11/40). No Claude call spent.
+- **2026-09-14 16:42 UTC** — a_opera: waiting on the render (poll 12/40). No Claude call spent.
+- **2026-09-14 16:42 UTC** — a_opera: waiting on the render (poll 13/40). No Claude call spent.
+- **2026-09-14 16:43 UTC** — a_opera: waiting on the render (poll 14/40). No Claude call spent.
+- **2026-09-14 16:43 UTC** — a_opera: waiting on the render (poll 15/40). No Claude call spent.
+- **2026-09-14 16:44 UTC** — a_opera: waiting on the loop bake (poll 16/40). No Claude call spent.
+- **2026-09-14 16:44 UTC** — a_opera: waiting on the loop bake (poll 17/40). No Claude call spent.
+- **2026-09-14 16:45 UTC** — a_opera: the loop bake is still growing (3301258 bytes). Waiting for it to settle. No Claude call spent.
+- **2026-09-14 16:46 UTC** — a_opera: gated — {"camera": "still", "return": 0.0, "peak": 3.7, "glitch": {"spike": 3.36, "breadth": 0.021, "at_pct": 83.3, "frames": 73, "breadth_normalised": 0.021}, "note": "no out-and-back: dead, or cyclic flow. NEEDS AN EYE \u2014 this measure has called three good clips dead."}
