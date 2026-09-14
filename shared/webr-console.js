@@ -14,12 +14,13 @@
  *   - integrated_bioanalytics/webr-cell.js    — the book's runnable chapter cells
  * The last two live in a DIFFERENT git repo and import this by its public URL, so treat the exported
  * surface below as a published API: `init()`, `run(code, outEl, note)`, `runFrom(el, outEl)`,
- * `addStatusEl()`, `plotControls(opts)`, `.ready`, `.webR`.
+ * `addStatusEl()`, `plotControls(opts)`, `resetSession()`, `resetControl(opts)`, `.ready`, `.webR`.
  */
 import { WebR } from "https://webr.r-wasm.org/latest/webr.mjs";
-import { VIEW_R_SHIM, VIEW_R_DRAIN, fromR, viewTableHTML, ensureViewStyles } from "./webr_view.js?v=89";
-import { codeToRun, selectionNote } from "./code_sel.js?v=89";
-import { PLOT_ASPECTS, PLOT_DEFAULT_ASPECT, PLOT_LIMITS, PLOT_CTL_CSS, plotGeometry } from "./plot_size.js?v=89";
+import { VIEW_R_SHIM, VIEW_R_DRAIN, fromR, viewTableHTML, ensureViewStyles } from "./webr_view.js?v=90";
+import { codeToRun, selectionNote } from "./code_sel.js?v=90";
+import { PLOT_ASPECTS, PLOT_DEFAULT_ASPECT, PLOT_LIMITS, PLOT_CTL_CSS, plotGeometry } from "./plot_size.js?v=90";
+import { RESET_R_SHIM, RESET_R_CALL, RESET_CTL_CSS, RESET_LABEL, RESET_CONFIRM_LABEL, RESET_CONFIRM_MS, nextConfirmState } from "./webr_reset.js?v=90";
 
 const errText = e => (e && e.message ? e.message : String(e));
 
@@ -52,6 +53,15 @@ function ensurePlotCtlStyles(doc) {
   d.head.appendChild(st);
 }
 
+function ensureResetCtlStyles(doc) {
+  const d = doc || document;
+  if (d.getElementById("webr-resetctl-styles")) return;
+  const st = d.createElement("style");
+  st.id = "webr-resetctl-styles";
+  st.textContent = RESET_CTL_CSS;
+  d.head.appendChild(st);
+}
+
 export class WebRConsole {
   constructor(config, ui) {
     this.config = config || {};   // { packages, datasets:[{name,url}], setup }
@@ -66,6 +76,11 @@ export class WebRConsole {
     // Plot size/shape, shared by every surface this session drives, and every control strip showing it.
     this.plotSize = loadPlotSize();
     this.plotCtls = new Set();
+    // Every reset button built for this session, so init() can enable them all when R comes up. Same
+    // pattern as statusEls/plotCtls: consumers build the control before boot (the rooms do it in
+    // bootConsole, the sandbox at module scope), and a reset before .__reset exists would report a
+    // failure the student can do nothing about.
+    this.resetCtls = new Set();
     // The last thing run, so changing the size can re-render it instead of making the student press Run
     // again to see what they just chose. Null until the first run.
     this.lastRun = null;
@@ -118,7 +133,16 @@ export class WebRConsole {
         await this.webR.evalRVoid(this.config.setup);
       }
 
+      /*
+       * LAST, on purpose: resetSession() restores whatever the global environment holds at this moment,
+       * so anything evaluated after this line would be missing from the state a reset restores. Keep new
+       * boot steps ABOVE it. A failure here would brick the boot for a convenience feature, so it is
+       * swallowed — resetSession()'s exists() guard then reports the control as unavailable.
+       */
+      try { await this.webR.evalRVoid(RESET_R_SHIM); } catch (e) { /* reset is optional; the session is not */ }
+
       this.ready = true;
+      this.resetCtls.forEach(b => { b.disabled = false; });
       this.setStatus("R is ready. Type code below and press Run.");
     })().catch(err => {
       this.booting = null;
@@ -203,6 +227,100 @@ export class WebRConsole {
     if (!out || !out.querySelector || !out.querySelector("canvas.webr-plot")) return;
     const { code, note } = this.lastRun;
     return this.run(code, out, note);
+  }
+
+  /*
+   * Put the R session back exactly as it booted: datasets restored to their loaded values, everything
+   * the student has made since removed, the caller's `setup` helpers and view() back. The EDITOR is
+   * never touched — that is the whole reason this exists rather than "reload the page".
+   *
+   * Resolves true on success, false if the session predates the shim (a cached page meeting an older
+   * console across the two repos' separate deploys). A caller should say "reload the page for a full
+   * restart" on false rather than pretending it worked.
+   *
+   * Clears `lastRun` as well as the output: otherwise the next plot-size change would re-run code
+   * against objects the reset has just removed.
+   */
+  async resetSession(outEl) {
+    if (!this.webR) return false;
+    let done = false;
+    let shelter = null;
+    try {
+      shelter = await new this.webR.Shelter();
+      const r = await (await shelter.evalR(RESET_R_CALL)).toJs();
+      done = Array.isArray(r.values) && r.values[0] === true;
+    } catch (e) {
+      done = false;
+    } finally {
+      if (shelter) shelter.purge();
+    }
+    if (!done) return false;
+    const out = outEl || this.ui.output;
+    this.clearOutput(out);
+    this.lastRun = null;
+    this.appendText(
+      "Session reset. The datasets are back as they loaded and everything made since is gone. Your code is untouched.",
+      "muted", out);
+    return true;
+  }
+
+  /*
+   * Build a "reset session" button bound to this console and return it for the caller to place — same
+   * contract as plotControls(): the console owns the behaviour, consumers only choose where it goes.
+   *
+   * TWO-STEP CONFIRM, and it expires. A reset destroys every object the student has built; one stray
+   * click after twenty minutes of work is a bad way to learn that. The arming window lives in
+   * webr_reset.js's nextConfirmState() so the expiry rule is unit-tested without a browser — an armed
+   * button that stayed armed for ever would be its own trap.
+   *
+   * opts.output — the element to clear and report into (the book's cells each have their own).
+   * opts.onDone — called after a successful reset, e.g. to refresh the sandbox's Environment pane.
+   * opts.document — for a consumer building into another document.
+   */
+  resetControl(opts) {
+    const o = opts || {};
+    const doc = o.document || document;
+    ensureResetCtlStyles(doc);
+
+    const btn = doc.createElement("button");
+    btn.type = "button";
+    btn.className = "webr-resetctl";
+    btn.textContent = RESET_LABEL;
+    btn.disabled = !this.ready;
+    this.resetCtls.add(btn);
+    btn.title = "Put the R session back exactly as it loaded: the datasets restored, everything you have made since removed. Your code is untouched.";
+
+    let state = { armedAt: null };
+    let timer = null;
+    const disarm = () => {
+      state = { armedAt: null };
+      if (timer) { clearTimeout(timer); timer = null; }
+      btn.classList.remove("armed");
+      btn.textContent = RESET_LABEL;
+    };
+
+    btn.addEventListener("click", async () => {
+      if (btn.disabled) return;
+      const next = nextConfirmState(state, Date.now());
+      state = { armedAt: next.armedAt };
+      if (next.action === "arm") {
+        btn.classList.add("armed");
+        btn.textContent = RESET_CONFIRM_LABEL;
+        if (timer) clearTimeout(timer);
+        timer = setTimeout(disarm, RESET_CONFIRM_MS);
+        return;
+      }
+      disarm();
+      btn.disabled = true;
+      this.setStatus("Resetting the R session…");
+      let done = false;
+      try { done = await this.resetSession(o.output); } catch (e) { done = false; }
+      this.setStatus(done ? "R is ready. Type code below and press Run."
+                          : "Could not reset the session — reload the page for a full restart.");
+      btn.disabled = false;
+      if (done && typeof o.onDone === "function") { try { await o.onDone(); } catch (e) { /* never break the reset */ } }
+    });
+    return btn;
   }
 
   /*

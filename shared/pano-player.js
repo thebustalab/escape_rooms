@@ -70,12 +70,12 @@
 // A bare `./variant_resolve.js` import is NOT refreshed by bumping the <script> tag's ?v, so a changed
 // helper module (e.g. a new export) leaves browsers on a stale cached copy → "doesn't provide an export
 // named X" SyntaxError → blank page (the 2026-08-05 airship regression). Bump all three together.
-import { WebRConsole } from "./webr-console.js?v=89";
-import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs } from "./variant_resolve.js?v=89";   // Phase 3: per-hotspot state variants; monorail switch-door nav
-import * as PQ from "./puzzle_queue.js?v=89";   // dynamic puzzle queue: location-independent puzzle serving
-import { particleCount } from "./particles.js?v=89";   // ambient-particle vocabulary + per-kind field density
-import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=89";
-import { condHolds } from "./cond.js?v=89";   // ledger + elevation-map card DOM
+import { WebRConsole } from "./webr-console.js?v=90";
+import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs } from "./variant_resolve.js?v=90";   // Phase 3: per-hotspot state variants; monorail switch-door nav
+import * as PQ from "./puzzle_queue.js?v=90";   // dynamic puzzle queue: location-independent puzzle serving
+import { particleCount } from "./particles.js?v=90";   // ambient-particle vocabulary + per-kind field density
+import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=90";
+import { condHolds } from "./cond.js?v=90";   // ledger + elevation-map card DOM
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 
@@ -3078,6 +3078,12 @@ function bootConsole() {
   // puzzle modal is open rather than rebuilt (see unmountConsole), so one strip serves every puzzle and
   // survives every open/close. The console owns the control itself — see shared/AGENTS.md.
   runBtn.parentNode.appendChild(rconsole.plotControls());
+  // "reset session", same row and for the same reason: the console block is relocated into whichever
+  // puzzle modal is open, so one control serves every puzzle. It is for the student who has just
+  // overwritten a boot-loaded dataset (`d <- d %>% filter(...)`) and now has nothing for the next
+  // puzzle — a page reload would cost them a 20-40s WebR boot MID-ROOM. Two-step confirm lives in the
+  // console; this is placement only.
+  runBtn.parentNode.appendChild(rconsole.resetControl());
   // Ctrl/⌘+Enter in the editor runs it, like the standalone WebR sandbox. #code-input is the single
   // persistent console textarea (moved into whichever puzzle modal is open), so this one listener
   // covers every puzzle modal that carries a console (MCQ, check, and pick).
