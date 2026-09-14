@@ -1,0 +1,17 @@
+I checked the clip, the spec, and the loop code rather than the worker's summary.
+
+**What the worker got right.** I reproduced its measurements independently on the raw renders at my own scale and they land on the same numbers: ri78's swag band (x 0.15–0.33) has a per-column temporal std of 0.83 against a frame median of 0.86, global column max 1.49 (at x=0.40, not even at the swag), pixel-std max 4.74. ri75: swag band 5.23, median 1.17, max 10.51 sitting exactly at x=0.26. Mean absolute difference from frame 0 in ri78 rises to ~1.6/255 by frame 12 and flatlines for the remaining 60 frames. Params JSON for ri61/73/75/78 are byte-identical — same seed 4242, same cfg, steps, end guide, length. So ri78 is dead on spatial grounds, not on the ambiguous return, and the worker was right to distrust the gate note and measure. It correctly avoided every listed reject condition: no settings change, no frame-filling mover, no re-author off a zero return, no acceptance, no hand-written prompt.
+
+**Why the decision still fails.** Its load-bearing reason for PARK is that no rung of the fix ladder fits, because "ADJUST_VIGOUR regenerates a still that is demonstrably fine and would redraw the panorama Lucas already accepted, including the lighter sizing." That is false, and I tested it against the real spec:
+
+- scene_spec.render_prompt folds only `motion.vigour` into the art prompt (via element_desc, line 386). `motion.phrase` is read by render_motion_prompt alone.
+- I applied a phrase-only fragment to this exact spec: the art prompt is **unchanged** (536 words, identical), the motion prompt changes.
+- long_agent.py line ~4093 sets `needs_still` only if `SS.render_prompt(spec) != prompt_before`. Unchanged art prompt means no regeneration, no redraw, no lost lighter sizing — the next RENDER re-bakes the clip off the committed still.
+
+The comment guarding that branch is dated 2026-09-14 and says in as many words that setting needs_still unconditionally "parked a_opera behind a generation that would have produced a byte-identical prompt and discarded art Lucas had already reviewed... caught by the worker." The worker has reasoned straight past a guard rail built this same day for this same room.
+
+So the cheap path exists and is the designed one: ADJUST_VIGOUR carrying only `{at: "to the left", motion: {phrase: ...}}` with an intermediate wording, then RENDER, then HOLD. The loop never accepts, so that hands Lucas a third measured point between 0.83 and 5.23 instead of a prose question he has to answer blind. Note the spec is also internally inconsistent right now — `motion.vigour` still reads "stirring gently in a draught from the flies, its folds shifting a little" while `phrase` reads "breathing very slightly" — but touching vigour is what would cost a still, so leave it.
+
+**The aside is half right.** The stale file is real: /home/bustalab/Documents/Tools/websites/thebustalab.github.io/escape_rooms/cinemagraph_tools/art_prompt_motion/heist/a_opera.txt is 104 words, timestamped 07:39, and carries the superseded phrase. exp_art_prompt.motion_prompt does resolve from the spec for heist, so it is genuinely unused and genuinely misleading in the brief. The worker's "57-word" figure is wrong though — the spec renders a 33-word prompt.
+
+VERDICT: FAIL

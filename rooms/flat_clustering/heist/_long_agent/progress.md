@@ -401,3 +401,69 @@ Started 2026-09-13T18:59:08.470014+00:00.
 - **2026-09-14 16:44 UTC** — a_opera: waiting on the loop bake (poll 17/40). No Claude call spent.
 - **2026-09-14 16:45 UTC** — a_opera: the loop bake is still growing (3301258 bytes). Waiting for it to settle. No Claude call spent.
 - **2026-09-14 16:46 UTC** — a_opera: gated — {"camera": "still", "return": 0.0, "peak": 3.7, "glitch": {"spike": 3.36, "breadth": 0.021, "at_pct": 83.3, "frames": 73, "breadth_normalised": 0.021}, "note": "no out-and-back: dead, or cyclic flow. NEEDS AN EYE \u2014 this measure has called three good clips dead."}
+- **2026-09-14 16:53 UTC** — a_opera: decision not acted on (PARK, verdict FAIL).
+- **2026-09-14 16:57 UTC** — a_opera: ADJUST_VIGOUR applied. The art prompt is unchanged, so the committed still still matches — only the clip needs re-rendering.
+- **2026-09-14 17:02 UTC** — a_opera: render launched at end guide 0.70.
+- **2026-09-14 17:03 UTC** — a_opera: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-14 17:03 UTC** — a_opera: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-14 17:04 UTC** — a_opera: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-14 17:04 UTC** — a_opera: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-14 17:05 UTC** — a_opera: waiting on the render (poll 5/40). No Claude call spent.
+- **2026-09-14 17:06 UTC** — a_opera: waiting on the render (poll 6/40). No Claude call spent.
+- **2026-09-14 17:06 UTC** — a_opera: waiting on the render (poll 7/40). No Claude call spent.
+- **2026-09-14 17:07 UTC** — a_opera: waiting on the render (poll 8/40). No Claude call spent.
+- **2026-09-14 17:07 UTC** — a_opera: waiting on the render (poll 9/40). No Claude call spent.
+- **2026-09-14 17:08 UTC** — a_opera: waiting on the render (poll 10/40). No Claude call spent.
+- **2026-09-14 17:08 UTC** — a_opera: waiting on the render (poll 11/40). No Claude call spent.
+- **2026-09-14 17:09 UTC** — a_opera: waiting on the render (poll 12/40). No Claude call spent.
+- **2026-09-14 17:09 UTC** — a_opera: waiting on the render (poll 13/40). No Claude call spent.
+- **2026-09-14 17:10 UTC** — a_opera: waiting on the render (poll 14/40). No Claude call spent.
+- **2026-09-14 17:10 UTC** — a_opera: waiting on the loop bake (poll 15/40). No Claude call spent.
+- **2026-09-14 17:11 UTC** — a_opera: waiting on the loop bake (poll 16/40). No Claude call spent.
+- **2026-09-14 17:11 UTC** — a_opera: the loop bake is still growing (3774746 bytes). Waiting for it to settle. No Claude call spent.
+- **2026-09-14 17:12 UTC** — a_opera: gated — {"camera": "borderline", "return": 0.59, "peak": 12.59, "glitch": {"spike": 9.94, "breadth": 0.125, "at_pct": 25.0, "frames": 73, "breadth_normalised": 0.104}}
+- **2026-09-14 17:17 UTC** — b_casino: render launched at end guide 0.70.
+- **2026-09-14 17:17 UTC** — b_casino: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-14 17:18 UTC** — b_casino: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-14 17:18 UTC** — b_casino: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-14 17:19 UTC** — b_casino: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-14 17:19 UTC** — b_casino: waiting on the render (poll 5/40). No Claude call spent.
+- **2026-09-14 17:20 UTC** — b_casino: waiting on the render (poll 6/40). No Claude call spent.
+- **2026-09-14 17:20 UTC** — b_casino: waiting on the render (poll 7/40). No Claude call spent.
+- **2026-09-14 17:21 UTC** — b_casino: waiting on the render (poll 8/40). No Claude call spent.
+- **2026-09-14 17:21 UTC** — b_casino: waiting on the render (poll 9/40). No Claude call spent.
+- **2026-09-14 17:22 UTC** — b_casino: waiting on the render (poll 10/40). No Claude call spent.
+- **2026-09-14 17:22 UTC** — b_casino: waiting on the render (poll 11/40). No Claude call spent.
+- **2026-09-14 17:23 UTC** — b_casino: waiting on the render (poll 12/40). No Claude call spent.
+- **2026-09-14 17:23 UTC** — b_casino: waiting on the render (poll 13/40). No Claude call spent.
+- **2026-09-14 17:24 UTC** — b_casino: waiting on the render (poll 14/40). No Claude call spent.
+- **2026-09-14 17:24 UTC** — b_casino: waiting on the render (poll 15/40). No Claude call spent.
+- **2026-09-14 17:25 UTC** — b_casino: waiting on the loop bake (poll 16/40). No Claude call spent.
+- **2026-09-14 17:25 UTC** — b_casino: waiting on the loop bake (poll 17/40). No Claude call spent.
+- **2026-09-14 17:26 UTC** — b_casino: the loop bake is still growing (3535548 bytes). Waiting for it to settle. No Claude call spent.
+- **2026-09-14 17:27 UTC** — b_casino: gated — {"camera": "still", "return": 0.07, "peak": 4.82, "glitch": {"spike": 9.66, "breadth": 0.167, "at_pct": 95.8, "frames": 73, "breadth_normalised": 0.167}}
+- **2026-09-14 17:31 UTC** — b_casino: HELD for Lucas's eye — The clip cleared every gate — camera still, glitch breadth 0.167 on both readings, return 0.07 — and an independent spatial measurement confirms a bounded, well-localised left-side mover at ~12x contrast against a stationary remainder, so the low whole-frame peak is the documented cyclic-flow metric failure rather than a dead room, and the only question left (is the smoke still too quick on this new still?) is one no metric may answer.. NOT accepted.
+- **2026-09-14 17:32 UTC** — Every room is held or parked. HELD (need Lucas's eye): ['b_casino']. Nothing here is accepted — metrics may reject and must never approve.
+- **2026-09-14 17:35 UTC** — a_opera: art generation started (l1_a_opera_3), generation 1/2. No Claude call spent.
+- **2026-09-14 17:35 UTC** — a_opera: waiting on the art generation (poll 1/40). No Claude call spent.
+- **2026-09-14 17:36 UTC** — a_opera: new art committed from l1_a_opera_3.png and seam-staged (screen: a_opera         sky 2.5x/2.7  ->  clean, done  (stage RESET from blurred — file is newer) | blur: a_opera         skip — screened clean). NOT accepted — that is Lucas's call in the stills tab.
+- **2026-09-14 17:41 UTC** — a_opera: render launched at end guide 0.70.
+- **2026-09-14 17:42 UTC** — a_opera: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-14 17:42 UTC** — a_opera: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-14 17:43 UTC** — a_opera: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-14 17:43 UTC** — a_opera: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-14 17:44 UTC** — a_opera: waiting on the render (poll 5/40). No Claude call spent.
+- **2026-09-14 17:44 UTC** — a_opera: waiting on the render (poll 6/40). No Claude call spent.
+- **2026-09-14 17:45 UTC** — a_opera: waiting on the render (poll 7/40). No Claude call spent.
+- **2026-09-14 17:45 UTC** — a_opera: waiting on the render (poll 8/40). No Claude call spent.
+- **2026-09-14 17:46 UTC** — a_opera: waiting on the render (poll 9/40). No Claude call spent.
+- **2026-09-14 17:46 UTC** — a_opera: waiting on the render (poll 10/40). No Claude call spent.
+- **2026-09-14 17:47 UTC** — a_opera: waiting on the render (poll 11/40). No Claude call spent.
+- **2026-09-14 17:47 UTC** — a_opera: waiting on the render (poll 12/40). No Claude call spent.
+- **2026-09-14 17:48 UTC** — a_opera: waiting on the render (poll 13/40). No Claude call spent.
+- **2026-09-14 17:48 UTC** — a_opera: waiting on the render (poll 14/40). No Claude call spent.
+- **2026-09-14 17:49 UTC** — a_opera: waiting on the render (poll 15/40). No Claude call spent.
+- **2026-09-14 17:49 UTC** — a_opera: waiting on the loop bake (poll 16/40). No Claude call spent.
+- **2026-09-14 17:50 UTC** — a_opera: waiting on the loop bake (poll 17/40). No Claude call spent.
+- **2026-09-14 17:50 UTC** — a_opera: the loop bake is still growing (3711555 bytes). Waiting for it to settle. No Claude call spent.
+- **2026-09-14 17:51 UTC** — a_opera: gated — {"camera": "still", "return": 0.58, "peak": 9.01, "glitch": {"spike": 4.29, "breadth": 0.083, "at_pct": 41.7, "frames": 73, "breadth_normalised": 0.042}}

@@ -2,35 +2,36 @@
   "status": "working",
   "retry_count": 0,
   "started": "2026-09-13T18:59:08.469868+00:00",
-  "last_cycle": "2026-09-14T16:46:30.244913+00:00",
-  "cycles_completed": 79,
+  "last_cycle": "2026-09-14T17:51:54.432162+00:00",
+  "cycles_completed": 90,
   "rooms": {
     "a_opera": {
+      "art_generated": 1,
       "history": [
         {
-          "cycle": 78,
+          "cycle": 89,
           "decision": "RENDER",
-          "why": "Lucas's round-2 softening of swag.motion.phrase postdates every existing clip, the committed still matches its own unchanged art prompt so no regeneration is owed, and the one thing that has never been rendered is the 57-word spec-derived prompt he asked to be rendered once and gated."
+          "why": "The room was re-authored onto a new bounded mover (three candle flames) and its still was regenerated at 13:36 from that spec, leaving the art prompt byte-identical to the stored one and the spec-derived motion prompt naming only the flames — but no clip has ever been rendered against this still, so a single render is the only thing that can answer whether the new mover works."
         }
       ],
       "attempts": 1,
       "last_gate": {
         "camera": "still",
-        "return": 0.0,
-        "peak": 3.7,
+        "return": 0.58,
+        "peak": 9.01,
         "glitch": {
-          "spike": 3.36,
-          "breadth": 0.021,
-          "at_pct": 83.3,
+          "spike": 4.29,
+          "breadth": 0.083,
+          "at_pct": 41.7,
           "frames": 73,
-          "breadth_normalised": 0.021
-        },
-        "note": "no out-and-back: dead, or cyclic flow. NEEDS AN EYE — this measure has called three good clips dead."
+          "breadth_normalised": 0.042
+        }
       },
-      "clip": "/home/bustalab/Documents/Tools/temp/cine/_art_prompt_exp/heist/a_opera_motion_ri78_looped.mp4"
+      "clip": "/home/bustalab/Documents/Tools/temp/cine/_art_prompt_exp/heist/a_opera_motion_ri89_looped.mp4"
     }
   },
-  "last_eval": "I pulled the frames myself rather than reading the worker's summary.\n\n**The disk facts check out.** ri61 exists, baked 07:22–07:23 today, params byte-identical to ri20 (seed 4242, end guide 0.70, 73 frames, 3072x1024), and it postdates the committed scene.png from 22:24 yesterday. So cycle 61's RENDER did execute against the current art, as claimed.\n\n**But the render refutes the worker's central claim.** The far-right element — \"On to the next call\", the second curtained doorway onto the grand stair, a live door hotspot to a_townhouse and explicitly listed in `rigid` — does not stay put. Frame 0: doorway open, grand stair, red carpet, chandelier all visible. Frame 30: a velvet drape sweeping across it. Frame 45: the doorway is **gone**, the whole opening swallowed by curtain, the marble jamb and gilt architrave deformed with it. Frame 72: open again. That out-and-back is exactly the 0.43 return the worker read as healthy.\n\nSo there is a second, unnamed mover, it is not bounded — it swells to fill that quadrant — and it erases a rigid element that is also a clickable exit. The rigid clause did not hold. The breadth metric (0.083) simply cannot see it, which is why \"cleared every gate with margin\" is the wrong conclusion rather than a lucky one.\n\nHOLD parks this as clean-pending-eye. It isn't clean: it's a spec-level defect with an allowed lever — bind the swag's motion to the box mouth, and name the corridor and grand-stair door drapes as rigid and non-moving — then re-render.",
+  "last_eval": "I checked the clip, the spec, and the loop code rather than the worker's summary.\n\n**What the worker got right.** I reproduced its measurements independently on the raw renders at my own scale and they land on the same numbers: ri78's swag band (x 0.15–0.33) has a per-column temporal std of 0.83 against a frame median of 0.86, global column max 1.49 (at x=0.40, not even at the swag), pixel-std max 4.74. ri75: swag band 5.23, median 1.17, max 10.51 sitting exactly at x=0.26. Mean absolute difference from frame 0 in ri78 rises to ~1.6/255 by frame 12 and flatlines for the remaining 60 frames. Params JSON for ri61/73/75/78 are byte-identical — same seed 4242, same cfg, steps, end guide, length. So ri78 is dead on spatial grounds, not on the ambiguous return, and the worker was right to distrust the gate note and measure. It correctly avoided every listed reject condition: no settings change, no frame-filling mover, no re-author off a zero return, no acceptance, no hand-written prompt.\n\n**Why the decision still fails.** Its load-bearing reason for PARK is that no rung of the fix ladder fits, because \"ADJUST_VIGOUR regenerates a still that is demonstrably fine and would redraw the panorama Lucas already accepted, including the lighter sizing.\" That is false, and I tested it against the real spec:\n\n- scene_spec.render_prompt folds only `motion.vigour` into the art prompt (via element_desc, line 386). `motion.phrase` is read by render_motion_prompt alone.\n- I applied a phrase-only f",
   "render_polls": 0,
-  "review_note": "Two rooms, from Lucas's second 360 review. He approved the other eight.\na_opera — the clip was TOO AGGRESSIVE. Only the motion PHRASE was softened; the depicted vigour and therefore the art prompt are untouched, so the committed still is still correct and needs_still must NOT fire. Its rigid clause is deliberately short (two items): a long pin is what made the previous render CAMERA MOVES at 176 words. Do not lengthen it.\nb_casino — NEW committed art. Its seamOccluder was removed because the model rendered the seam as a dead floor-to-ceiling damask slab; the seam now continues the room panelling. Seam-staged clean.\nRender each ONCE and gate. Neither room needs re-authoring."
+  "review_note": "The mover has been CHANGED, not tuned. The swag curtain read as jumping at every wording Lucas tried, so it is no longer the mover — a large gathered curtain across the box mouth has too much amplitude and sits near the frame-filling failure. The mover is now an ornate gilt candelabra sconce with three candles: flame is a CONFIRMED category and is bounded by its own physics. The art must be regenerated first (you do this yourself now). The rigid clause is two items ON PURPOSE — seven items took this room to 176 words and a moving camera. Do not lengthen it.",
+  "generations": 1
 }
