@@ -1,0 +1,14 @@
+I reconstructed the room's real state on disk rather than reading the brief's fields (its "current motion prompt" is again the stale `art_prompt_motion/heist/a_opera.txt` fallback, which is unreachable for heist — the renderer resolves from the spec, which names only the flames).
+
+**The render cycle 89 called for has happened, and it cleared every gate.** `a_opera_motion_ri89` (13:50), seed 4242, 73 frames: camera still (frame0_corr 0.968, landmark drift 0 px), return 0.58 — a clear out-and-back, not the ambiguous zero — glitch breadth 0.083 raw / 0.042 normalised, an order of magnitude under the 0.70 both-readings threshold.
+
+Because no gate may approve, I checked the two things the gates cannot see — *is the authored mover the thing that moved*, and *is it out of family*:
+
+- **The motion is the flames, and only the flames.** Per-pixel temporal std on the RAW render is one compact blob at x 0.19–0.28, y 0.09–0.26, peaking 44. I cropped `scene.png` at that band: it lands exactly on the three candles of the gilt candelabra. This also settles the caveat cycle 89's evaluation raised — `approx_boxes` puts the sconce at 0.28–0.44, which is wrong, but the measurement was spatial and didn't use that box.
+- **Nothing that should be still is moving.** The swag band and the panelled walls read 1.6–3.2 against a frame median of 1.38 — background. The two secondary warm spots at x≈0.65 and x≈0.88 are the small candle sconces in the doorway alcoves and the tier lights, magnitude 8–10 against the hero's 44. Every moving pixel in the frame is a flame. The two-item rigid pin held, and Lucas's "wall is weirdly breathing" note is answered.
+- **The amplitude is in family with the nine clips Lucas accepted.** ri89 median 1.38 / p99 46.2 / frac>8 0.098, against a_townhouse 0.81 / 33.1 / 0.068, b_pawnshop 0.82 / 18.2 / 0.055, b_casino 1.15 / 9.8 / 0.018, a_vault 10.97 / 64.0 / 0.601. It is livelier than most and far quieter than a_vault, the accepted light-mover room. The superseded swag clip ri82 measured 0.218 — this is the quieter one. High per-pixel std on a flame is luminance, not displacement, which is the same reading that made a_vault's raw glitch score a false positive.
+
+No fix rung applies: the mover is bounded, its vigour is authored, the art is current, and there is nothing left to soften or pin.
+
+DECISION: HOLD
+WHY: The re-authored candle-flame mover rendered clean — camera still, return 0.58, both glitch readings an order of magnitude under threshold — and the motion is spatially confined to the three flames with the swag and walls at background level, putting it in family with the nine accepted heist clips, so it goes to Lucas's eye rather than back to the art.

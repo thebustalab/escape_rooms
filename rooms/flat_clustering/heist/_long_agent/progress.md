@@ -467,3 +467,32 @@ Started 2026-09-13T18:59:08.470014+00:00.
 - **2026-09-14 17:50 UTC** — a_opera: waiting on the loop bake (poll 17/40). No Claude call spent.
 - **2026-09-14 17:50 UTC** — a_opera: the loop bake is still growing (3711555 bytes). Waiting for it to settle. No Claude call spent.
 - **2026-09-14 17:51 UTC** — a_opera: gated — {"camera": "still", "return": 0.58, "peak": 9.01, "glitch": {"spike": 4.29, "breadth": 0.083, "at_pct": 41.7, "frames": 73, "breadth_normalised": 0.042}}
+- **2026-09-14 17:57 UTC** — a_opera: HELD for Lucas's eye — The re-authored candle-flame mover rendered clean — camera still, return 0.58, both glitch readings an order of magnitude under threshold — and the motion is spatially confined to the three flames with the swag and walls at background level, putting it in family with the nine accepted heist clips, so it goes to Lucas's eye rather than back to the art.. NOT accepted.
+- **2026-09-14 17:57 UTC** — 360 page published with 1 room(s): http://127.0.0.1:8752/cine360_heist.html
+- **2026-09-14 17:57 UTC** — Every room is held or parked. HELD (need Lucas's eye): ['a_opera']. 360 page published with 1 room(s): http://127.0.0.1:8752/cine360_heist.html. Nothing here is accepted — metrics may reject and must never approve.
+- **2026-09-14 18:00 UTC** — b_casino: could not start an art generation: HTTPError: HTTP Error 409: Conflict
+- **2026-09-14 18:01 UTC** — 360 page published with 1 room(s): http://127.0.0.1:8752/cine360_heist.html
+- **2026-09-14 18:01 UTC** — Every room is held or parked. HELD (need Lucas's eye): ['a_opera']. 360 page published with 1 room(s): http://127.0.0.1:8752/cine360_heist.html. Nothing here is accepted — metrics may reject and must never approve.
+- **2026-09-14 18:14 UTC** — b_casino: could not start an art generation: HTTPError: HTTP Error 409: Conflict
+- **2026-09-14 18:15 UTC** — 360 page published with 9 room(s): http://127.0.0.1:8752/cine360_heist.html
+- **2026-09-14 18:15 UTC** — Every room is held or parked. HELD (need Lucas's eye): ['a_opera']. 360 page published with 9 room(s): http://127.0.0.1:8752/cine360_heist.html. Nothing here is accepted — metrics may reject and must never approve.
+- **2026-09-14 18:24 UTC** — a_opera: render launched at end guide 0.70.
+- **2026-09-14 18:25 UTC** — b_casino: waiting on the art generation (poll 1/40). No Claude call spent.
+- **2026-09-14 18:25 UTC** — b_casino: waiting on the art generation (poll 2/40). No Claude call spent.
+- **2026-09-14 18:26 UTC** — b_casino: new art committed from l1_b_casino_1.png and seam-staged (screen: b_casino        ground 9.8x/9.6  ->  needs work  (stage RESET from blurred — file is newer) | blur: b_casino        ground 9.8x/9.6  ->  sky 0.0x/0.0  CLEARED). NOT accepted — that is Lucas's call in the stills tab.
+- **2026-09-14 18:26 UTC** — a_opera: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-14 18:27 UTC** — a_opera: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-14 18:27 UTC** — a_opera: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-14 18:28 UTC** — a_opera: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-14 18:28 UTC** — a_opera: waiting on the render (poll 5/40). No Claude call spent.
+- **2026-09-14 18:29 UTC** — a_opera: waiting on the render (poll 6/40). No Claude call spent.
+- **2026-09-14 18:29 UTC** — a_opera: waiting on the render (poll 7/40). No Claude call spent.
+- **2026-09-14 18:30 UTC** — a_opera: waiting on the render (poll 8/40). No Claude call spent.
+- **2026-09-14 18:30 UTC** — a_opera: waiting on the render (poll 9/40). No Claude call spent.
+- **2026-09-14 18:31 UTC** — a_opera: waiting on the render (poll 10/40). No Claude call spent.
+- **2026-09-14 18:31 UTC** — a_opera: waiting on the render (poll 11/40). No Claude call spent.
+- **2026-09-14 18:32 UTC** — a_opera: waiting on the render (poll 12/40). No Claude call spent.
+- **2026-09-14 18:32 UTC** — a_opera: waiting on the loop bake (poll 13/40). No Claude call spent.
+- **2026-09-14 18:33 UTC** — a_opera: waiting on the loop bake (poll 14/40). No Claude call spent.
+- **2026-09-14 18:33 UTC** — a_opera: the loop bake is still growing (2710305 bytes). Waiting for it to settle. No Claude call spent.
+- **2026-09-14 18:35 UTC** — a_opera: gated — {"camera": "still", "return": 0.0, "peak": 3.13, "glitch": {"spike": 3.73, "breadth": 0.021, "at_pct": 77.8, "frames": 73, "breadth_normalised": 0.021}, "note": "no out-and-back: dead, or cyclic flow. NEEDS AN EYE \u2014 this measure has called three good clips dead."}
