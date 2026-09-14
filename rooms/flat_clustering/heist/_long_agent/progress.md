@@ -337,3 +337,25 @@ Started 2026-09-13T18:59:08.470014+00:00.
 - **2026-09-14 12:20 UTC** — gala: gated — {"camera": "still", "return": 0.21, "peak": 6.87, "glitch": {"spike": 11.17, "breadth": 0.062, "at_pct": 90.3, "frames": 73, "breadth_normalised": 0.042}}
 - **2026-09-14 12:24 UTC** — gala: HELD for Lucas's eye — The re-authored pennant art rendered clean — camera still, return 0.21 and peak 6.87 against the dead version's 0.00 and 3.78, glitch breadth 0.062/0.042 far under threshold, and the difference strip shows the bounded pennant as the dominant mover with nothing rigid warping — so it survives every gate and belongs in front of Lucas's eye.. NOT accepted.
 - **2026-09-14 12:24 UTC** — Every room is held or parked. HELD (need Lucas's eye): ['a_gallery', 'b_casino', 'b_docks', 'gala']. Nothing here is accepted — metrics may reject and must never approve.
+- **2026-09-14 14:24 UTC** — a_opera: render launched at end guide 0.70.
+- **2026-09-14 14:24 UTC** — a_opera: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-14 14:25 UTC** — a_opera: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-14 14:25 UTC** — a_opera: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-14 14:26 UTC** — a_opera: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-14 14:26 UTC** — a_opera: waiting on the render (poll 5/40). No Claude call spent.
+- **2026-09-14 14:27 UTC** — a_opera: waiting on the render (poll 6/40). No Claude call spent.
+- **2026-09-14 14:27 UTC** — a_opera: waiting on the render (poll 7/40). No Claude call spent.
+- **2026-09-14 14:28 UTC** — a_opera: waiting on the render (poll 8/40). No Claude call spent.
+- **2026-09-14 14:29 UTC** — a_opera: waiting on the render (poll 9/40). No Claude call spent.
+- **2026-09-14 14:29 UTC** — a_opera: waiting on the render (poll 10/40). No Claude call spent.
+- **2026-09-14 14:30 UTC** — a_opera: waiting on the render (poll 11/40). No Claude call spent.
+- **2026-09-14 14:30 UTC** — a_opera: waiting on the render (poll 12/40). No Claude call spent.
+- **2026-09-14 14:31 UTC** — a_opera: waiting on the render (poll 13/40). No Claude call spent.
+- **2026-09-14 14:31 UTC** — a_opera: waiting on the render (poll 14/40). No Claude call spent.
+- **2026-09-14 14:32 UTC** — a_opera: waiting on the render (poll 15/40). No Claude call spent.
+- **2026-09-14 14:32 UTC** — a_opera: waiting on the loop bake (poll 16/40). No Claude call spent.
+- **2026-09-14 14:33 UTC** — a_opera: waiting on the loop bake (poll 17/40). No Claude call spent.
+- **2026-09-14 14:33 UTC** — a_opera: the loop bake is still growing (3635963 bytes). Waiting for it to settle. No Claude call spent.
+- **2026-09-14 14:34 UTC** — a_opera: AUTO-REJECTED — camera gate — CAMERA MOVES
+- **2026-09-14 14:34 UTC** — a_opera: gated — {"camera": "CAMERA MOVES", "return": 0.68, "peak": 12.99, "glitch": {"spike": 7.43, "breadth": 0.104, "at_pct": 88.9, "frames": 73, "breadth_normalised": 0.083}, "auto_rejected": "camera gate \u2014 CAMERA MOVES"}
+- **2026-09-14 14:35 UTC** — Every room is held or parked. HELD (need Lucas's eye): ['a_gallery', 'b_casino', 'b_docks', 'gala']. Nothing here is accepted — metrics may reject and must never approve.
