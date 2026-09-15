@@ -402,9 +402,22 @@ def main():
                 bare_imports += [(os.path.basename(mod), m)
                                  for m in _re.findall(r'from\s+"(\./[\w-]+\.js)"', src)]
             shells = glob.glob(os.path.join(ROOMS, "*", "*", "play.html")) + [os.path.join(shared, "test_play.html")]
-            tag_tokens = set()
+            tag_tokens, classic = set(), {}
             for sh in shells:
-                tag_tokens |= set(_re.findall(r'pano-player\.js\?v=(\d+)', open(sh, encoding="utf-8").read()))
+                src = open(sh, encoding="utf-8").read()
+                tag_tokens |= set(_re.findall(r'pano-player\.js\?v=(\d+)', src))
+                # CLASSIC shared scripts (map_graph.js) carry their OWN counter, like codec.js/debrief.js
+                # — they are not in the ES-module lockstep. But every shell must still agree on it, and a
+                # shell that omits one entirely is the same blank-page class of bug (the player reads
+                # window.MapGraph). Neither case was visible to the engine-only scan above.
+                for name in ("map_graph",):
+                    found = _re.findall(name + r'\.js\?v=(\d+)', src)
+                    classic.setdefault(name, {}).setdefault(found[0] if found else "MISSING", []).append(os.path.basename(os.path.dirname(sh)))
+            for name, byver in classic.items():
+                if len(byver) > 1:
+                    detail = "; ".join(f"?v={v} in {', '.join(sorted(where))}" for v, where in sorted(byver.items()))
+                    print(f"VBUMP  shells disagree on {name}.js — {detail}; every play.html + test_play.html must carry the same token")
+                    any_bad = True
             if bare_imports:
                 for mod, imp in bare_imports:
                     print(f"VBUMP  {mod} imports {imp} with NO ?v= token (a bare local import is never cache-busted — add ?v=N in lockstep with the engine)")

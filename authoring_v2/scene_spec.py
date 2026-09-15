@@ -443,3 +443,65 @@ def render_motion_prompt(spec, rigid=False):
                                     " are rigid and fixed — they do not warp, drift, breathe, "
                                     "shimmer or change shape"))
     return " ".join(parts)
+
+
+# ===========================================================================================
+# SOUND — the spec's FOURTH consumer (2026-09-15)
+#
+# The spec already drives three things from one authored intent: the ART prompt (`render_prompt`),
+# the MOTION prompt (`render_motion_prompt`) and the hotspot stubs (`to_hotspots`). Sound was the
+# only one authored from scratch in a different phase, months later, by someone reading the finished
+# picture rather than the intent — and no room in the corpus carried a sound field at all.
+#
+# WHY IT BELONGS HERE. In most rooms THE MOVER IS THE SOUND SOURCE: beacons' fenwatch is a rope of
+# meltwater pouring into a butt, shears a spout into a stone basin, whistlegate a kettle at a boil,
+# kiln a smouldering juniper dish. The spec already names those objects and how vigorously they move,
+# so the sound follows from what has been authored. Sourcing it independently lets it name something
+# the art does not contain — the verdigris ceiling-water drift, in a different register.
+#
+# It also carries judgements that are otherwise made at review time and lost. Lucas on beacons
+# (2026-09-15): sisters' flags and anvil's tarpaulin both need a strong wind bed for their motion to
+# read as WEATHER rather than agitation. That is a fact about the mover, decided when the mover is
+# decided, and it had nowhere to live.
+#
+# TWO RULES, both agreed with Lucas before this was built:
+#   1. INTENT ONLY. What should be heard and its character. Never a file path, a volume, a loop
+#      length or a mixer setting — those are the wiring phase's, they change independently, and
+#      putting them here would make this a second source of truth for something it does not own.
+#   2. `render_prompt` MUST NEVER SEE IT. Element fields get concatenated into the art prompt, and
+#      "a steady rope of water, loud" leaking into an IMAGE prompt is exactly the class of bug this
+#      whole design exists to prevent. `sound` is read here and nowhere else; the test suite pins it.
+
+def sounding(spec):
+    """Elements that make a noise. A malformed `sound` must not take down a scenario load."""
+    out = []
+    for e in (spec or {}).get("elements", []):
+        s = e.get("sound")
+        if isinstance(s, dict) and (s.get("source") or s.get("character")):
+            out.append(e)
+    return out
+
+
+def render_sound_brief(spec):
+    """The per-room sound brief the WIRING phase starts from, instead of a blank page.
+
+    Returns None when nothing is authored, so a scenario that predates this is unaffected. The
+    shape is deliberately a brief and not a spec: it says what should be heard and why, and leaves
+    every decision about files, levels and looping to the phase that owns them.
+    """
+    spec = spec or {}
+    bed = (spec.get("soundBed") or "").strip()
+    items = []
+    for e in sounding(spec):
+        s = e["sound"]
+        src = (s.get("source") or e.get("desc") or "").strip().rstrip(".")
+        chr_ = (s.get("character") or "").strip().rstrip(".")
+        moves = bool((e.get("motion") or {}).get("moves"))
+        items.append({"id": e.get("id"), "source": src, "character": chr_,
+                      "isMover": moves,
+                      "prominence": (s.get("prominence") or ("hero" if moves else "detail"))})
+    if not bed and not items:
+        return None
+    return {"bed": bed or None, "sources": items,
+            "note": ("The HERO source is the room's declared mover — the thing the cinemagraph "
+                     "animates — so its sound and its motion must agree.")}

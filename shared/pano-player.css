@@ -477,3 +477,27 @@ code { background:#0a1620; padding:1px 5px; border-radius:4px; }
 .qopt.tpcorrect { outline:1px dashed rgba(123,216,140,.75); outline-offset:3px; border-radius:5px; }
 /* a hotspot being dragged in test play */
 .hsmark.tpdragging { opacity:.55; cursor:grabbing; }
+
+/* ── the in-game MAP (2026-09-15; notes/player_map_plan.md) ─────────────────────────────────────
+   A read-only fog-of-war map opened from the 🗺 chip above the field notebook. Rendered by the shared
+   shared/map_graph.js in its "player" mode: CONNECTIVITY AND ROOM NAMES ONLY (Lucas). The harness draws
+   the same graph with a coloured dot per puzzle/clue/switch — none of that reaches here, and the
+   player-mode assertions in tests/map_graph.test.js exist to keep it that way.
+   Modal titles are suppressed (.mtitle above), so the card carries its own legend. */
+.mapcard { padding:2px 0 0; }
+.mapsvg { display:block; width:100%; height:auto; max-height:72vh; }
+/* A room drawn on the map. Visited rooms are lit and named; a `known` room — one the player has seen a
+   door to but not entered — is dim and deliberately anonymous, so the map never hands over the shape of
+   somewhere they have not reached. */
+.rmnode .rmcircle { fill:#12222f; stroke:var(--line); stroke-width:1.5; }
+.rmnode .rmname { fill:var(--amber); font-weight:600; font-size:11px; text-anchor:middle; pointer-events:none; }
+.rm-known .rmcircle { fill:#0b1621; stroke-dasharray:4,4; opacity:.7; }
+.rm-known .rmname { fill:var(--ink); opacity:.45; font-size:15px; font-weight:400; }
+.rm-current .rmcircle { stroke:var(--amber); stroke-width:3; }
+.mapedge { stroke:rgba(255,255,255,.34); stroke-width:2; }
+.maplegend { margin-top:8px; font-size:12px; color:var(--ink); opacity:.65; text-align:center; }
+.maplegend span { display:inline-block; width:10px; height:10px; border-radius:50%; margin:0 6px 0 16px;
+                  vertical-align:baseline; }
+.maplegend span:first-child { margin-left:0; }
+.maplegend .mk-cur { border:2px solid var(--amber); }
+.maplegend .mk-unknown { border:1px dashed var(--ink); opacity:.5; }

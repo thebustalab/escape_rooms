@@ -143,11 +143,23 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--chapter", required=True)
     ap.add_argument("--scenario", required=True)
-    ap.add_argument("--step", required=True, choices=["screen", "blur", "occlude", "status"])
+    ap.add_argument("--step", required=True,
+                    choices=["screen", "blur", "occlude", "status", "auto"],
+                    help="`auto` is the MOTIVATED path (2026-09-14): screen on the UNBLURRED image, "
+                         "then let seam_band choose the remedy — a tonal step gets the blur, a band "
+                         "that fails to continue gets the occluder. The individual steps remain for "
+                         "hand use.")
     ap.add_argument("--state", default=None,
                     help="act on a full-scene state VARIANT (e.g. --state night -> scene_night.png) "
                          "instead of the committed base. The variant keeps its own stage record, its own "
                          "undo stack and its own human accept.")
+    ap.add_argument("--room", default=None,
+                    help="act on ONE room. The acting steps otherwise sweep the WHOLE scenario, and "
+                         "a blur or occlude REWRITES that room's scene.png — so seaming room N can "
+                         "silently restamp an earlier room whose clip had already rendered, making "
+                         "a perfectly good clip look stale. Three beacons rooms were dropped from "
+                         "the review page that way (2026-09-15). Callers that work room-by-room "
+                         "(room_iterate) MUST pass this.")
     ap.add_argument("--threshold", type=float, default=3.0)
     ap.add_argument("--min-delta", dest="min_delta", type=float, default=4.0)
     a = ap.parse_args()
@@ -156,6 +168,10 @@ def main():
     doc = _load(base)
     fname = scene_file(a.state)
     rooms = [r for r in doc.get("rooms", []) if os.path.isfile(os.path.join(base, r["key"], fname))]
+    if a.room:
+        rooms = [r for r in rooms if r.get("key") == a.room]
+        if not rooms:
+            print("no room %r with a committed %s" % (a.room, fname)); return 1
     if not rooms:
         print("no %s found — %s" % (fname, "generate the variants first" if a.state
                                     else "commit the bases first")); return 1
@@ -181,6 +197,81 @@ def main():
         return 0
 
     import harness_server as H                       # imported late: only the acting steps need it
+
+    if a.step == "auto":
+        # THE MOTIVATED ORDER (Lucas, 2026-09-14). The old chain was screen -> blur -> occlude, with
+        # occlude reached only if the room was STILL flagged after the blur. It almost never was:
+        # blurring the join averages the two edge columns together, which is exactly what
+        # `seam_ratio` measures, so the blur drives its own test to zero BY CONSTRUCTION. b_casino
+        # measured 0.00x on a wrap Lucas rejected on sight, and the occluder had to be triggered by
+        # hand.
+        #
+        # So: screen the UNBLURRED image, and when it flags, pick the remedy by the SHAPE of the
+        # fault rather than by re-measuring after the cheap fix.
+        #   * a tonal/texture STEP — one side brighter — is what a blur actually repairs;
+        #   * a BAND BREAK — the floor changes material, the dado turns a corner — is untouched by
+        #     blurring at any strength and needs the occluder planted over the join.
+        # `seam_band` separates them on the unblurred image: the two wraps Lucas rejected scored
+        # 0.158 and 0.221, the nine he accepted 0.000-0.044. Calibration + the three falsified
+        # alternatives: `seam_band.py` docstring and `test_seam_band.py`.
+        import seam_band as SB
+        for r in rooms:
+            k = r["key"]
+            p = os.path.join(base, k, fname)
+            s_rec = seam_state(r, a.state)
+            b, ra, d = worst_band(p)
+            m = SB.measure(p)
+            band_break = m["longest_run"] >= SB.FLAG
+            if not (ra >= a.threshold and d >= a.min_delta) and not band_break:
+                record(base, k, a.state, stage="screened", band=b, ratio=round(ra, 2),
+                       delta=round(d, 2), needsWork=False,
+                       accepted=bool(s_rec.get("accepted")), seamBandRun=round(m["longest_run"], 3))
+                print(f"  {k:16}{b} {ra:.1f}x/{d:.1f}  run {m['longest_run']:.3f}  ->  clean, done")
+                continue
+            if band_break:
+                occl = ((r.get("authoring") or {}).get("sceneSpec") or {}).get("seamOccluder")
+                if not occl:
+                    record(base, k, a.state, stage="screened", band=b, ratio=round(ra, 2),
+                           delta=round(d, 2), needsWork=True,
+                           seamBandRun=round(m["longest_run"], 3))
+                    print(f"  {k:16}BAND BREAK run {m['longest_run']:.3f} at "
+                          f"{m['at'][0]:.2f}-{m['at'][1]:.2f} of height — but NO seamOccluder is "
+                          f"authored on the spec. Author one; a blur cannot fix this.")
+                    continue
+                t = time.time()
+                H._start("seam", "seamfix",
+                         lambda k=k, o=occl, f=fname: H._run_seamfix_room("seam", base, k, crop=0.34,
+                                                                          occluder=o,
+                                                                          edit_frac=EDIT_FRAC, file=f), 1)
+                while H.JOBS["seam"]["active"]:
+                    time.sleep(3)
+                j = H.JOBS["seam"]
+                if j.get("error"):
+                    print(f"  {k:16}ERROR {j['error']}")
+                    continue
+                nb, nr, nd = worst_band(p)
+                nm = SB.measure(p)
+                record(base, k, a.state, stage="occluded", band=nb, ratio=round(nr, 2),
+                       delta=round(nd, 2), needsWork=False, accepted=False,
+                       seamBandRun=round(nm["longest_run"], 3))
+                print(f"  {k:16}BAND BREAK run {m['longest_run']:.3f} -> OCCLUDED -> "
+                      f"run {nm['longest_run']:.3f}  ({time.time()-t:.0f}s)  — LOOK at it")
+            else:
+                # a tonal/texture step: the cheap fix is the RIGHT fix
+                H._start("seam", "seamfix",
+                         lambda k=k, f=fname: H._run_seamfix_room("seam", base, k, file=f), 1)
+                while H.JOBS["seam"]["active"]:
+                    time.sleep(3)
+                nb, nr, nd = worst_band(p)
+                nm = SB.measure(p)
+                record(base, k, a.state, stage="blurred", band=nb, ratio=round(nr, 2),
+                       delta=round(nd, 2), needsWork=False, accepted=False,
+                       seamBandRun=round(nm["longest_run"], 3))
+                print(f"  {k:16}tonal step {ra:.1f}x -> BLURRED -> {nr:.1f}x  "
+                      f"(run {m['longest_run']:.3f} -> {nm['longest_run']:.3f})")
+        print("\nNothing is `accepted` until a human looks. The metric screens; it cannot certify.")
+        return 0
+
 
     for r in rooms:
         k = r["key"]

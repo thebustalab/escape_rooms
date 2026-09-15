@@ -327,7 +327,7 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
     </div>
   </div>
 
-<script src="net_graph.js"></script>
+<script src="/shared/map_graph.js"></script>
 <script>
   const $ = s => document.querySelector(s);
   let CH = "", SC = "", poll = 0;
@@ -1001,13 +1001,13 @@ git add -A &amp;&amp; git commit -m "whatever changed" &amp;&amp; git push</pre>
   function closePrompt() { $("#promptModal").style.display = "none"; }
 
   // Network view — the deterministic metro-map builder (layoutRooms / buildNetSvg + the palette) lives in
-  // net_graph.js (loaded above; window.NetGraph), shared with tests/net_graph.test.js. renderNetwork injects it.
+  // map_graph.js (loaded above; window.MapGraph), shared with tests/map_graph.test.js. renderNetwork injects it.
 
   function renderNetwork(rooms) {
     const spec = rooms.filter(r => r.hasSpec), svg = $("#netSvg"), show = spec.length > 0;
     $("#netWrap").style.display = show ? "" : "none";
     if (!show) { svg.innerHTML = ""; return; }
-    const g = NetGraph.buildNetSvg(spec);
+    const g = MapGraph.buildNetSvg(spec);
     svg.setAttribute("width", g.W); svg.setAttribute("height", g.H); svg.setAttribute("viewBox", `0 0 ${g.W} ${g.H}`);
     svg.innerHTML = g.html;
   }

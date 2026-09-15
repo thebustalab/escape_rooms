@@ -114,6 +114,15 @@ def _suites(fast=False):
         add("node unit suites (%d files)" % len(node_files), "node",
             ["node", "--test"] + node_files, cwd=TESTS, needs="node")
 
+    # --- deploy: the cache-token step, against throwaway git repos ---------------------------------
+    # deploy.sh itself refuses to run without escape_rooms/.git (Mac-only), so this harness builds a
+    # miniature pair of repos in a temp dir and drives the real script against them. Worth having in the
+    # go/no-go because deploy.sh now OWNS the ?v= bump, and a bump that is wrong is a blank page for
+    # every student.
+    _deploy_t = os.path.join(TESTS, "test_deploy_sh.sh")
+    if os.path.exists(_deploy_t):
+        add("deploy.sh cache-token step", "guards", ["bash", _deploy_t], cwd=ROOT, needs="git")
+
     # --- codec: the JS↔R contract ------------------------------------------------------------------
     add("R codec self-test (decode_codes.R)", "codec", ["Rscript", "decode_codes.R"],
         cwd=os.path.join(ROOT, "decoder"), needs="Rscript")

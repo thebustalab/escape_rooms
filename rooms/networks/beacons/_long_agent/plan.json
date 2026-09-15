@@ -1,13 +1,19 @@
 {
-  "cine_iterate": true,
+  "room_iterate": true,
   "chapter": "networks",
   "scenario": "beacons",
-  "rooms": [],
-  "max_attempts_per_clip": 3,
-  "goal": "Drive every cinemagraph in networks/beacons to the point where no automatic gate can fault it, then hold it for Lucas's eye. Never accept a clip and never wire one into scenario.json.",
+  "rooms": [
+    "anvil"
+  ],
+  "max_attempts_per_room": 1,
+  "max_render_polls": 40,
+  "max_generations": 14,
+  "max_gen_polls": 40,
+  "end_guide": "0.70",
+  "goal": "Drive the named rooms in networks/beacons to a cinemagraph that no automatic gate can fault, by AUTHORING \u2014 a bounded depicted mover with an authored vigour in the sceneSpec \u2014 and never by searching settings. Hold every survivor for Lucas's eye. Never accept a clip.",
   "done_criteria": [
-    "Every clip in scope is either `hold` (it survived every automatic gate) or `parked` (a named human decision) — none are left in `reject`.",
-    "No clip has been marked accepted, verified, or good by the loop itself, and no clip has been wired into scenario.json.",
-    "Every parked clip has a specific stated reason a human can act on."
+    "Every room in scope is HELD (it survived every automatic gate) or PARKED with a specific stated reason a human can act on.",
+    "No clip has been marked accepted or good by the loop itself, and nothing has been wired into scenario.json's committed hotspots.",
+    "Every room that was re-authored had its art regenerated before it was rendered \u2014 no clip animates a still that predates its own motion prompt."
   ]
 }

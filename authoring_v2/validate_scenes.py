@@ -75,6 +75,10 @@ def _x_rank(at):
 
 ENGINE_TYPES = {"puzzle", "clue", "door", "lock", "grid", "ledger", "elevmap", "dial", "mapview", "ambient"}
 GAMEPLAY = {"puzzle", "clue", "door", "lock", "grid", "ledger", "elevmap", "dial", "switch", "mapview"}
+# Subjects the cinemagraph ledger records as NOT CONFIRMED — they measure dead however they are
+# prompted, because they are distant and low-contrast. Checked against a declared mover's own text.
+FALSIFIED_MOVERS = ("spindrift", "sea of cloud", "cloud sea", "lenticular", "distant river",
+                    "shallow water sheet", "heat shimmer", "vault dust", "banner of cloud")
 LOOPS = {"boomerang", "crossfade"}
 EDGE_X = (0.08, 0.92)   # the far-left / far-right slots — the ±180° wrap seam
 
@@ -231,6 +235,33 @@ def check_scenario(path):
                     fails.append(f"{rk}/{eid}: label slug '{sl}' collides with {seen_slugs[sl]} — pre-art "
                                  f"content would attach to the wrong box")
                 seen_slugs[sl] = eid
+
+            # ---- the DECLARED MOVER must be a near, confirmed subject --------------------
+            # beacons, 2026-09-14: 9 of its 12 rooms declared a DISTANT ATMOSPHERIC mover —
+            # spindrift, cloud rivers, cloud seas, lenticulars, banner cloud, distant tarns, an
+            # avalanche plume — which is almost exactly the ledger's not-confirmed list. Every one
+            # rendered DEAD. Angular size decides what can animate: the same lamp scores 22 near and
+            # 2 far, and the rule was already written in the concept skill and simply not followed.
+            # So it is checked here instead of asserted in prose. WARN, never FAIL: it is a
+            # judgement call, and a genuine near mover may legitimately mention a distant backdrop.
+            m = e.get("motion")
+            if isinstance(m, dict) and m.get("moves"):
+                # include the element ID: authors name these things honestly, and `heat_shimmer`
+                # says what the prose only implies.
+                blob = (" ".join(str(m.get(k) or "") for k in ("vigour", "phrase"))
+                        + " " + str(e.get("desc") or "") + " " + str(eid).replace("_", " "))
+                lo = blob.lower()
+                bad = [w for w in FALSIFIED_MOVERS if w in lo]
+                if bad:
+                    warns.append(f"{rk}/{eid}: declared mover reads as {bad[0]!r}, which the ledger "
+                                 f"lists as NOT CONFIRMED — these measure dead however they are "
+                                 f"prompted. Move a large NEAR carrier into the foreground instead")
+                # A "does this text mention nearness" heuristic was tried here and REMOVED the same
+                # day: it flagged 24 rooms including a_vault's swinging lamp, b_docks' tarpaulin and
+                # b_pawnshop's beaded curtain — all near movers Lucas had already accepted. They
+                # simply did not use the vocabulary it looked for. Tune for ZERO false positives:
+                # a check that cries wolf on approved work is worse than no check, because it
+                # trains the reader to skip the whole class.
 
             # ---- animation / seam ----
             a = e.get("animate")

@@ -1,0 +1,13 @@
+Verified every load-bearing claim against the files rather than the description:
+
+**Confirmed — the motion prompt resolves from the spec.** I ran the real resolver against the live `scenario.json`: `movers()` returns exactly `['hearth_kettle']`, and `motion_prompt('beacons','whistlegate', rec)` returns the worker's quoted string verbatim. `exp_art_prompt.py:86-104` puts the spec ahead of the `.txt`, and `test_motion_prompt_source.py` pins that precedence for beacons specifically. The `.txt` the brief quoted is genuinely dead weight here.
+
+**Confirmed — and stronger than the worker argued.** `scene.png` is 2026-09-15 00:59; `cine_base.mp4` is 2026-09-07 14:08. But the old clip also animated the *wrong* hearth: `cine_base.judge.json`'s `hearth_fire` box sits at x 0.54–0.61, the right-of-centre `hearth` element, matching the old `.txt` prompt ("the low fire burns in the stone hearth … smoke draws up the flue"). The spec's declared mover — the left-of-centre boiling kettle — has never been rendered at all. That lands squarely on the rule forbidding AUTHOR_MOVER for an unrendered mover, and the worker correctly chose RENDER instead.
+
+**Confirmed — the mover is depicted and bounded.** At the still, the left-of-centre hearth has a black iron kettle on a crane over live split-wood flames with a thick plume standing into the roof beams. It occupies a modest slice of a 3072×1024 pano — bounded, in the confirmed flame/smoke categories, not frame-filling.
+
+**No rejection criterion fires.** No settings lever touched; no clip accepted; nothing written to committed art or hotspots; no hand-written art prompt; no zero-return reasoning anywhere — the staleness argument rests on mtimes and box geometry, not on a motion metric.
+
+The worker's one deferred item is also handled correctly: the second `hearth` carries only a legacy `animate` block, so `movers()` ignores it while "Only that moves" will ask its visible fire and plume to freeze. Flagging that for a human eye rather than speculatively re-authoring is the right restraint — and a render is what will actually show whether it matters. Worth passing to Lucas after the clip lands. Note also that `cine_base.mask.json`'s boxes were drawn against the pre-regeneration art, so its geometry (including the `paint_1` paint-out) is stale; if the render path reuses that mask rather than re-deriving it, the masking will be aimed at the old layout.
+
+VERDICT: PASS

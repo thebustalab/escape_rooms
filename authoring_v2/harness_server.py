@@ -231,6 +231,63 @@ def _room_patch(room_key, fields, base=None):
     return target
 
 
+def _save_map_layout(positions, base=None):
+    """Write every room's map grid cell (`mapPos`) in ONE pass.
+
+    Deliberately NOT N x `_room_patch`: `_save_scenario` keeps a single ROLLING `.bak`, so patching a
+    dozen dragged rooms one at a time would do a dozen writes and leave the backup reflecting the
+    second-to-last state — useless as an undo for the drag session that just happened. One read, one
+    write, one backup.
+
+    `positions` is {roomKey: {c,r}}; a value of None CLEARS that room's mapPos (back to auto-layout).
+    A duplicate cell is REJECTED rather than merged: the editor already prevents it, so a collision
+    arriving here is a real authoring error and silently keeping one of the two rooms would hide it.
+    """
+    if not isinstance(positions, dict):
+        raise ValueError("positions must be an object")
+    with SAVE_LOCK:
+        doc = _load_scenario(base)
+        rooms = doc.get("rooms")
+        if not isinstance(rooms, list):
+            raise ValueError("scenario has no rooms[]")
+        by_key = {r.get("key"): r for r in rooms}
+        unknown = sorted(k for k in positions if k not in by_key)
+        if unknown:
+            raise ValueError("unknown room key(s): %s" % ", ".join(unknown))
+        # NORMALISE to the origin. A layout drawn at columns 2-4 / rows 1-4 (egypt's first pass) is the
+        # same layout as one at 0-2 / 0-3, but the extra offset renders as dead space in the player's
+        # map. The renderer rebases defensively too; doing it here as well keeps what is ON DISK tidy,
+        # so the editor's absolute drag maths never has an offset to reason about.
+        cells = [p for p in positions.values() if isinstance(p, dict)]
+        try:
+            off_c = min(int(p["c"]) for p in cells) if cells else 0
+            off_r = min(int(p["r"]) for p in cells) if cells else 0
+        except (TypeError, KeyError, ValueError):
+            off_c = off_r = 0           # a malformed cell is reported per-room below; don't fail here
+        seen, placed, cleared = {}, 0, 0
+        for key, p in positions.items():
+            node = by_key[key]
+            if p is None:
+                if node.pop("mapPos", None) is not None:
+                    cleared += 1
+                continue
+            try:
+                c, rw = int(p["c"]), int(p["r"])
+            except (TypeError, KeyError, ValueError):
+                raise ValueError("bad cell for %r: expected {c:<int>, r:<int>}" % key)
+            if c < 0 or rw < 0:
+                raise ValueError("negative cell for %r: (%d,%d)" % (key, c, rw))
+            c -= off_c
+            rw -= off_r
+            if (c, rw) in seen:
+                raise ValueError("cell (%d,%d) claimed by both %r and %r" % (c, rw, seen[(c, rw)], key))
+            seen[(c, rw)] = key
+            node["mapPos"] = {"c": c, "r": rw}
+            placed += 1
+        _save_scenario(doc, base)
+    return {"placed": placed, "cleared": cleared}
+
+
 def _find_hotspot(base, room_key, hotspot_id):
     """(doc, node, hotspot) for a committed room's hotspot, or raise ValueError. Caller holds SAVE_LOCK."""
     doc = _load_scenario(base)
@@ -982,6 +1039,13 @@ def _scenario_state(base):
         rooms.append({
             "key": r.get("key"), "title": r.get("title", ""),
             "hasSpec": bool(spec),
+            "mapPos": r.get("mapPos") or None,        # hand-authored map grid cell {c,r}; absent -> auto-layout
+            # The graph the PLAYER actually walks, from the COMMITTED hotspots — not `doors` below, which
+            # comes from the scene spec. The two can drift, and the map layout is authored for the player,
+            # so the layout editor lays out this one. Empty until the room's hotspots are placed.
+            "playerDoors": [{"to": h.get("to"), "direction": h.get("direction", "forward"),
+                             "x": round((h["box"][0] + h["box"][2]) / 2, 4) if h.get("box") else None}
+                            for h in hs if h.get("type") == "door"],
             "scenePrompt": auth.get("scenePrompt", ""),   # for the console's view/edit-prompt button
             "animateCount": len(scene_spec.cinemagraph_jobs(spec)) if spec else 0,
             "doorViewCount": len(scene_spec.dooropen_jobs(spec)) if spec else 0,
@@ -3771,6 +3835,16 @@ class H(http.server.SimpleHTTPRequestHandler):
 
     def do_GET(self):
         route = self.path.split("?")[0]
+        # The served web root is authoring_v2/ui/, so `../../shared/x.js` from a console page is
+        # collapsed by SimpleHTTPRequestHandler and 404s. `shared/map_graph.js` is deliberately shared
+        # with the PLAYER (it has to live under shared/ to reach GitHub Pages at all — authoring_v2/ is
+        # gitignored), so the harness reaches it through this confined passthrough instead of a copy.
+        # no-store because this path has no `?v=` lockstep to bust it (that convention protects the
+        # PRODUCTION Pages cache, via play.html); without it, editing map_graph.js would appear to do
+        # nothing in the console — the exact failure the cache convention warns about.
+        if route.startswith("/shared/"):
+            return self._serve_file(os.path.join(ESCAPE_ROOT, "shared"), route[len("/shared/"):],
+                                    {"Cache-Control": "no-store"})
         if route == "/api/status":
             qs = urllib.parse.parse_qs(self.path.split("?", 1)[1] if "?" in self.path else "")
             with LOCK:
@@ -4025,6 +4099,8 @@ class H(http.server.SimpleHTTPRequestHandler):
         if not p.startswith(os.path.abspath(base) + os.sep) or not os.path.isfile(p):
             return self._json({"error": "not found"}, 404)
         ctype = ("image/png" if p.endswith(".png")
+                 else "text/javascript" if p.endswith(".js")
+                 else "text/css" if p.endswith(".css")
                  else "application/json" if p.endswith(".json")
                  else "audio/mpeg" if p.endswith(".mp3")
                  else "audio/wav" if p.endswith(".wav")
@@ -4164,6 +4240,13 @@ class H(http.server.SimpleHTTPRequestHandler):
                 except ValueError as ve:
                     return self._json({"ok": False, "error": str(ve)}, 400)
                 return self._json({"ok": True, "room": node})
+            if route == "/api/map-layout":   # the whole drag session's room positions, in ONE atomic write
+                req = self._body()
+                try:
+                    base = _scenario_base(req.get("chapter"), req.get("scenario"))
+                    return self._json({"ok": True, **_save_map_layout(req.get("positions") or {}, base)})
+                except ValueError as ve:
+                    return self._json({"ok": False, "error": str(ve)}, 400)
             if route == "/api/rebuild-inventory":     # regenerate rooms/scenario_inventory.json (finish step)
                 try:
                     return self._json({"ok": True, **_rebuild_inventory()})

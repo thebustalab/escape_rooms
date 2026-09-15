@@ -1,0 +1,12 @@
+Evidence read: pipeline (six steps), report, ledger (all sisters entries), `scene_spec.render_prompt`/`render_motion_prompt`, plus the live state of this run.
+
+**What I found**
+
+- This is the beacons full re-author run. sisters' declared mover is now `marker_line` — a cord of weathered marker flags, nearest one an arm's length from the viewer — replacing the old distant `col_cloud` (which stays in the picture, un-declared, exactly as the review note requires).
+- Fresh art was committed and seam-staged at 02:00 UTC (tonal step 16.0x → blurred → 1.7x, band run 0.065 → 0.039). I opened it at native resolution: the flag line is genuinely depicted, near, large in the lower left, ~15% of frame width — bounded, and in the ledger's strongest confirmed-mover category (hanging cloth, p95 up to 76.8). Fire-basket is cold and unlit; the landscape is intact.
+- The "current motion prompt" on the table is a **display artefact**, not what will render. The runner's `fmt_vars` reads `art_prompt_motion/beacons/sisters.txt`, which still holds the old cloud sentence because Lucas's spec edit did not go through a loop decision. The actual render path is `cine_room → exp_art_prompt`, which calls `motion_prompt(scenario, room, room_rec)` with the room record, so it resolves from the spec: *"locked-off static camera, zero camera movement. The row of marker flags on their cord lifting and running along the line, the nearest ones snapping. Only that moves; everything else stays perfectly still. Seamless natural loop."* — 35 words, one mover, house form. I ran it to confirm rather than reading it off.
+- I also checked the trap the spindle evaluator flagged: `motionSpec` still names `cloud_river` as hero and lists `flags, pennants, bunting` in its negatives. The `motion` arm does **not** use those — `arms_for` gives it a short camera/quality-only negative. So the new mover is not suppressed.
+- No clip exists for this art, gate report is empty, `needs_still` is not set, `_has_authored_mover` passes.
+
+DECISION: RENDER
+WHY: The freshly committed still visibly depicts one near, bounded, vigour-authored mover in the strongest confirmed category, the spec renders a 35-word motion prompt naming only that flag line, and no clip has yet been rendered from this art — so the next step is the single render at the pinned 0.70.

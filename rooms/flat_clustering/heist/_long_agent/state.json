@@ -1,9 +1,9 @@
 {
-  "status": "working",
+  "status": "awaiting_review",
   "retry_count": 0,
   "started": "2026-09-13T18:59:08.469868+00:00",
-  "last_cycle": "2026-09-14T18:35:05.785418+00:00",
-  "cycles_completed": 96,
+  "last_cycle": "2026-09-14T20:46:26.158104+00:00",
+  "cycles_completed": 108,
   "rooms": {
     "a_opera": {
       "clip": "/home/bustalab/Documents/Tools/temp/cine/_art_prompt_exp/heist/a_opera_motion_ri94_looped.mp4",
@@ -12,6 +12,11 @@
           "cycle": 94,
           "decision": "RENDER",
           "why": "The spec's softened candle-flame phrase and its three-item rigid pin — the exact remedy Lucas's note prescribed for the drooping candles — were authored at 14:20, thirty minutes after the newest clip was baked, so no clip has ever been rendered against the current motion prompt and a single render is the only thing that can answer whether it holds."
+        },
+        {
+          "cycle": 97,
+          "decision": "HOLD",
+          "why": "ri94 clears camera and glitch, and against the dead ri78 control it shows a 73-peak motion field confined to the candle flames with the wax and the wall provably still — the drooping and the breathing wall are both fixed, so the zero return is the cyclic-flow false alarm and this clip is a question for Lucas's eye, not a defect."
         }
       ],
       "attempts": 1,
@@ -27,14 +32,43 @@
           "breadth_normalised": 0.021
         },
         "note": "no out-and-back: dead, or cyclic flow. NEEDS AN EYE — this measure has called three good clips dead."
-      }
+      },
+      "held": true
     },
     "b_casino": {
-      "art_generated": 1
+      "history": [
+        {
+          "cycle": 106,
+          "decision": "RENDER",
+          "why": "The still depicts one bounded, legible, non-frame-filling mover with its vigour authored into the desc, the spec-derived motion prompt names only that mover, the rigid clause is two items pinning the composited seam pilaster, and no clip has been rendered yet — so the only thing left is the one render at the pinned default."
+        },
+        {
+          "cycle": 108,
+          "decision": "HOLD",
+          "why": "The clip cleared all three gates — camera still, glitch breadth 0.042 on both readings against a 0.70 threshold — and its near-zero return is the documented cyclic-flow signature of this room's smoke rather than evidence of death, so the only step left is Lucas's eye."
+        }
+      ],
+      "attempts": 1,
+      "last_gate": {
+        "camera": "still",
+        "return": 0.01,
+        "peak": 4.19,
+        "glitch": {
+          "spike": 3.53,
+          "breadth": 0.042,
+          "at_pct": 88.9,
+          "frames": 73,
+          "breadth_normalised": 0.042
+        },
+        "note": "no out-and-back: dead, or cyclic flow. NEEDS AN EYE — this measure has called three good clips dead."
+      },
+      "clip": "/home/bustalab/Documents/Tools/temp/cine/_art_prompt_exp/heist/b_casino_motion_ri106_looped.mp4",
+      "held": true
     }
   },
   "last_eval": "I checked the clip, the spec, and the loop code rather than the worker's summary.\n\n**What the worker got right.** I reproduced its measurements independently on the raw renders at my own scale and they land on the same numbers: ri78's swag band (x 0.15–0.33) has a per-column temporal std of 0.83 against a frame median of 0.86, global column max 1.49 (at x=0.40, not even at the swag), pixel-std max 4.74. ri75: swag band 5.23, median 1.17, max 10.51 sitting exactly at x=0.26. Mean absolute difference from frame 0 in ri78 rises to ~1.6/255 by frame 12 and flatlines for the remaining 60 frames. Params JSON for ri61/73/75/78 are byte-identical — same seed 4242, same cfg, steps, end guide, length. So ri78 is dead on spatial grounds, not on the ambiguous return, and the worker was right to distrust the gate note and measure. It correctly avoided every listed reject condition: no settings change, no frame-filling mover, no re-author off a zero return, no acceptance, no hand-written prompt.\n\n**Why the decision still fails.** Its load-bearing reason for PARK is that no rung of the fix ladder fits, because \"ADJUST_VIGOUR regenerates a still that is demonstrably fine and would redraw the panorama Lucas already accepted, including the lighter sizing.\" That is false, and I tested it against the real spec:\n\n- scene_spec.render_prompt folds only `motion.vigour` into the art prompt (via element_desc, line 386). `motion.phrase` is read by render_motion_prompt alone.\n- I applied a phrase-only f",
   "render_polls": 0,
-  "review_note": "a_opera: Lucas — \"the candles are all drooping and weird — need a much gentler prompt, just gentle flickering\". The STILL is correct (candles stand straight, sconce is right), so this is the clip deforming them: the art prompt is unchanged and needs_still must NOT fire. The phrase is now the smallest verb available — flickering gently in place, a slight tremble at the tips — and the candles themselves are pinned rigid so the wax cannot bend. Render once and gate. Do NOT re-author the art and do NOT lengthen the rigid clause beyond its three items.",
-  "generations": 2
+  "review_note": "b_casino: the seam OCCLUDER has been planted on the committed still — a fluted marble pilaster standing on the join — so the art has changed and the clip must be re-rendered against it. needs_still must NOT fire: the art is already correct and current, it was produced by the seam stage rather than by a regeneration. Render ONCE and gate. The motion (cigar smoke) is already approved by Lucas; do not re-author it. The pilaster and the damask are pinned rigid so only the smoke moves.",
+  "generations": 3,
+  "pending_gen": null
 }

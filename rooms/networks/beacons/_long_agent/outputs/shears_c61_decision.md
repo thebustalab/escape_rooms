@@ -1,0 +1,14 @@
+I read the four authority documents, then checked the disk rather than the gate summary.
+
+**The gate report on the table is the PRE-FIX render.** Its numbers — return 0.01, peak 10.08, spike 3.92, breadth 0.167, at_pct 77.8 — are byte-identical to the ones cycle 60 evaluated. The only shears clip on disk is `shears_motion_ri57.mp4`, written 2026-09-15 00:01:52 with `_looped` at 00:03:08; cycle 60's pin was applied at ~00:16–00:19 (`outputs/` 00:16, `state.json` 00:19). Nothing under `temp/cine/_art_prompt_exp/beacons/` is newer than 00:04. So the hallucinated spyglass jet that cycle 60 diagnosed is still in the clip being reported, and the pin has never been rendered. This is exactly `fenwatch` cycle 20 — "the rigid pin landed in the spec but the only clip on disk is the pre-fix render" — and it took RENDER there.
+
+**The pin landed and costs nothing on the art side.** `sceneSpec.rigid` reads *"the brass spyglass, its tripod and the folded survey sheet beside it"*. I re-rendered the art prompt through `scene_spec.render_prompt` and compared it to the committed `scenePrompt`: **identical**, so `render_prompt` genuinely never reads `rigid`, the committed still stands and no still regeneration is implied. `render_motion_prompt(..., rigid=True)` returns the 65-word prompt on the table — one mover named, one rigid item, the same register as fenwatch's 66-word pinned prompt that rendered camera-still, nowhere near the 176-word a_opera failure.
+
+**The art holds up its end.** I cropped the left third of the committed `scene.png` (written 23:48:33, before the ri57 render, so the clip is not animating a stale still) and looked at it: the meltwater spout is plainly depicted, jetting from the crack in the blade, arcing clear and breaking white into the stone basin at its foot. A near, bounded, vigorously-depicted mover in the strongest confirmed category — falling water, the same class as `rams_head`, which held.
+
+**Against the reject list.** No settings lever is touched — end guide stays pinned at 0.70, seed stays 4242, steps, cfg, length and resolution unchanged. No seed roll is proposed. No probe render, no composite. The 0.01 return is not read as death. Nothing is accepted. Budget allows it: `attempts` is 1 against `max_attempts_per_room` 2, and that counter counts renders.
+
+```
+DECISION: RENDER
+WHY: The rigid pin from cycle 60 is in the spec and produces a correct 65-word motion prompt, the art prompt is byte-identical so the committed still is intact and genuinely depicts the bounded spout, but the only clip on disk is ri57 from 00:01 — rendered before the pin existed — so the gate report on the table is the pre-fix render and no clip has yet been made from the corrected prompt.
+```

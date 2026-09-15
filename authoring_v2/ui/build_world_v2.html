@@ -82,7 +82,7 @@
   .vcmp img.top { position:absolute; inset:0; height:100%; }
   .vcmp video.clip { position:absolute; display:none; object-fit:fill; border-radius:8px; z-index:3; }
   .vmissing { padding:26px; text-align:center; border:1px dashed var(--line); border-radius:8px; color:var(--dim); }
-  /* The room network. Same builder and the same palette as the full console (net_graph.js), so the two
+  /* The room network. Same builder and the same palette as the full console (map_graph.js), so the two
      views of the same door graph cannot drift into looking like different maps. */
   /* The graph scales to its card via the viewBox. Drawing it at intrinsic pixel width is what made
      the panel scroll horizontally (2026-09-03). */
@@ -108,6 +108,31 @@
             pointer-events:none; display:none; box-shadow:0 4px 14px rgba(0,0,0,.55); }
   .legend { font-size:11px; color:var(--dim); margin-top:6px; display:flex; flex-wrap:wrap; gap:3px 14px; }
   .legend b { font-weight:700; }
+  /* ── the MAP LAYOUT editor (2026-09-15, notes/player_map_plan.md Phase 2) ──────────────────────
+     Drag rooms onto a snap grid so the PLAYER's map is a readable near-square instead of the
+     auto-layout's strip (heist renders 12.5:1 by door depth; a 4x3 grid makes it 1.66:1). The cells
+     are saved to each room's `mapPos` and consumed unchanged by the in-game map. */
+  #layoutBar { display:none; align-items:center; gap:8px; flex-wrap:wrap; margin-top:8px; }
+  #layoutBar.on { display:flex; }
+  #netSvg.laying { cursor:default; touch-action:none; }
+  #netSvg.laying g[data-room] { cursor:grab; }
+  #netSvg.laying g[data-room].dragging { cursor:grabbing; }
+  #netSvg.laying g[data-room].dragging .rmcircle { stroke:var(--amber); stroke-width:2.5; }
+  .gridline { stroke:var(--line); stroke-width:1; opacity:.28; }
+  .gridline.axis { opacity:.5; }
+  /* The layout editor renders in map_graph.js's PLAYER mode, whose styling lives in
+     shared/pano-player.css — which this page does not load. Without these three rules the room-to-room
+     connections draw unstroked and the labels draw black on a dark panel, i.e. invisible: you could see
+     the circles but not what joined to what, which is the one thing you need while arranging
+     (Lucas, 2026-09-15). Scoped to #netSvg so they cannot touch the read-only network view above. */
+  #netSvg .mapedge { stroke:rgba(255,255,255,.40); stroke-width:2; }
+  #netSvg .rmname { fill:var(--amber); font-weight:600; font-size:11px; text-anchor:middle; pointer-events:none; }
+  #netSvg .rm-current .rmcircle { stroke:var(--amber); stroke-width:3; }
+  /* An unbuilt room still needs a cell — you place it now so the layout does not have to be redone
+     when its art lands — but it must not read as part of the playable map. */
+  #netSvg.laying g[data-room].unbuilt .rmcircle { stroke-dasharray:4,3; opacity:.55; }
+  #netSvg.laying g[data-room].unbuilt .rmname { opacity:.55; }
+  .lay-dirty { color:var(--amber); font-weight:600; }
   /* ── the gallery ──────────────────────────────────────────────────────────────────────────────── */
   .shot { margin-top:18px; }
   .shot img { width:100%; display:block; border-radius:8px; border:1px solid var(--line); background:#050a0e; }
@@ -385,6 +410,7 @@
       <div id="netPanel" style="display:none"><div class="storyblk" style="height:100%">
         <div style="display:flex; align-items:baseline; gap:10px; flex-wrap:wrap">
           <div class="storylbl" style="margin:0">Room network · the door graph</div>
+          <button class="segbtn" id="layEdit" title="Drag the rooms onto a grid to lay out the player's in-game map">Edit map layout</button>
           <span class="hint" id="netStat"></span>
         </div>
         <div class="legend">
@@ -395,6 +421,13 @@
           <span><b style="color:#7bd88c">●</b> clue</span>
           <span><b style="color:#7fd1ff">●</b> door</span>
           <span><b style="color:#c79cff">●</b> switch</span>
+        </div>
+        <div id="layoutBar">
+          <button class="segbtn" id="layAuto" title="Re-seed every room from the automatic layout, discarding the current arrangement">Auto-arrange</button>
+          <button class="segbtn" id="laySave" title="Write every room's cell to scenario.json in one atomic save">Save layout</button>
+          <button class="segbtn" id="layCancel" title="Discard this session's drags">Cancel</button>
+          <button class="segbtn" id="layClear" title="Remove every saved mapPos, so the map falls back to the automatic layout">Clear saved</button>
+          <span class="hint" id="layStat"></span>
         </div>
         <div id="netWrap"><svg id="netSvg"></svg><div id="netTip"></div></div>
       </div></div>
@@ -470,7 +503,7 @@
     </div>
   </div>
 
-<script src="net_graph.js"></script>
+<script src="/shared/map_graph.js"></script>
 <script>
   const $ = s => document.querySelector(s);
   let CH = "", SC = "";
@@ -562,14 +595,29 @@
     const st = await post("/api/scenario-state", { chapter: CH, scenario: SC });
     if (!st.ok) { $("#topStat").innerHTML = `<span class="err">${esc(st.error)}</span>`; return; }
     ST = st;                    // the on-disk baseline the header's Save diffs the two cards against
-    renderLanding(st);
-    await renderVariants(st);
-    renderNetwork(st.rooms || []);
-    renderPlate(st);
-    renderCover(st);
-    await renderGallery(st);
-    renderBaked(st);
-    $("#topStat").textContent = "";
+    // Each panel is isolated. refresh() used to be a bare sequence of awaits, so ONE throwing renderer
+    // took down every panel after it AND left #topStat stuck on "loading…" — with the real error only in
+    // the browser console. That is exactly what a 404 on map_graph.js did on 2026-09-15: the network
+    // graph threw, and the plate, cover and gallery below it simply never drew. A panel that breaks
+    // should cost you that panel, and should SAY so on the page.
+    // Still STRICTLY SEQUENTIAL, in the original order — these share DOM and module state, so running
+    // them concurrently would be a different (and racier) program. The only change is the try/catch.
+    const failed = [];
+    for (const [name, fn] of [
+      ["landing", () => renderLanding(st)],
+      ["variants", () => renderVariants(st)],
+      ["network", () => renderNetwork(st.rooms || [])],
+      ["world plate", () => renderPlate(st)],
+      ["cover", () => renderCover(st)],
+      ["gallery", () => renderGallery(st)],
+      ["baked", () => renderBaked(st)],
+    ]) {
+      try { await fn(); }
+      catch (e) { console.error("[build_world_v2] " + name + " failed:", e); failed.push(name); }
+    }
+    $("#topStat").innerHTML = failed.length
+      ? `<span class="err">${esc(failed.join(", "))} failed to render — see the browser console (F12). The rest of the page is live.</span>`
+      : "";
   }
 
   // ---- concept / landing / world -------------------------------------------------------------------
@@ -696,7 +744,7 @@
   }
 
   // ---- the room network -------------------------------------------------------------------------
-  // Built by net_graph.js — the SAME module and palette the full console uses, deliberately, so two
+  // Built by map_graph.js — the SAME module and palette the full console uses, deliberately, so two
   // views of one door graph cannot drift into disagreeing about it. It is a pure function of the rooms
   // array (rooms -> {W,H,html}), and `/api/scenario-state` already carries everything it reads: `doors`,
   // `planned` and `hasSpec`. Nothing new was needed on the server.
@@ -704,11 +752,33 @@
   // Rooms without a scene spec are excluded, as in the console: a room with no spec has no ports to draw,
   // so it would sit on the map as a bare circle implying it is unconnected rather than un-authored.
   function renderNetwork(rooms) {
+    NET_ROOMS = rooms;
+    $("#netPanel").style.display = rooms.length ? "" : "none";
+    $("#layEdit").style.display = rooms.length ? "" : "none";
+    // map_graph.js lives in shared/ (the player's runtime) and reaches this page through the server's
+    // /shared/ passthrough — so an OLD harness process, started before that route existed, 404s it and
+    // leaves MapGraph undefined. Say so, rather than throwing: see the `step()` note in refresh().
+    if (typeof MapGraph === "undefined" || !window.MapGraph) {
+      $("#netSvg").innerHTML = "";
+      $("#layEdit").style.display = "none";
+      $("#netStat").innerHTML = `<span class="err">map_graph.js did not load — restart the harness (serve_harness.sh). Everything else on this page still works.</span>`;
+      return;
+    }
+    if (LAY.on) {
+      // Switching scenario while the editor is open would otherwise draw the new rooms at the old
+      // scenario's cells (and save them there).
+      const same = Object.keys(LAY.pos).length === rooms.length && rooms.every(r => LAY.pos[r.key]);
+      if (!same) { laySeed(false); LAY.dirty = false; }
+      return renderLayout();
+    }
     const spec = rooms.filter(r => r.hasSpec);
-    $("#netPanel").style.display = spec.length ? "" : "none";
     const svg = $("#netSvg");
-    if (!spec.length) { svg.innerHTML = ""; return; }
-    const g = NetGraph.buildNetSvg(spec);
+    if (!spec.length) {
+      svg.innerHTML = "";
+      $("#netStat").textContent = rooms.length ? `${rooms.length} rooms · no scene specs yet — the door graph appears once they are authored` : "";
+      return;
+    }
+    const g = MapGraph.buildNetSvg(spec);
     // viewBox ONLY — width/height come from CSS so the graph always fits its card.
     svg.removeAttribute("width"); svg.removeAttribute("height");
     svg.setAttribute("viewBox", `0 0 ${g.W} ${g.H}`);
@@ -716,9 +786,159 @@
     svg.innerHTML = g.html;
     const doors = spec.reduce((n, r) => n + (r.doors || []).length, 0);
     const skipped = rooms.length - spec.length;
+    const laid = rooms.filter(r => r.mapPos).length;
     $("#netStat").textContent = `${spec.length} room${spec.length === 1 ? "" : "s"} · ${doors} door${doors === 1 ? "" : "s"}`
-      + (skipped ? ` · ${skipped} without a scene spec, not drawn` : "");
+      + (skipped ? ` · ${skipped} without a scene spec, not drawn` : "")
+      + (laid ? ` · map layout: ${laid}/${rooms.length} placed` : " · map layout: automatic");
   }
+
+  // ---- the MAP LAYOUT editor --------------------------------------------------------------------
+  // Phase 2 of notes/player_map_plan.md. The auto-layout ranks rooms left-to-right by door depth, so a
+  // near-linear scenario lands in ONE row (heist 12.5:1, trees 10.0:1) — unreadable squeezed into a
+  // player's portrait modal. Here you drag the rooms onto a snap grid; the cells are written to each
+  // room's `mapPos` and consumed unchanged by the in-game map.
+  //
+  // Two things this view does differently from the network view above, both deliberate:
+  //   - EVERY room is shown, not just the spec'd ones. You are laying out the player's map, and a room
+  //     with no spec yet still needs a cell — otherwise the layout has to be redone when its art lands.
+  //     Unbuilt rooms are drawn dashed so they cannot be mistaken for playable ones.
+  //   - Edges come from the COMMITTED hotspots (`playerDoors`) where they exist, not the scene spec,
+  //     because that is the graph the player actually walks. The spec graph is the fallback for a room
+  //     whose hotspots have not been placed.
+  const LAY = { on: false, pos: {}, dirty: false, drag: null };
+  let NET_ROOMS = [];
+
+  const layCell = c => ({ x: MapGraph.GEOM.MX + c.c * MapGraph.GEOM.DX, y: MapGraph.GEOM.MY + c.r * MapGraph.GEOM.DY });
+  const laySpec = () => NET_ROOMS.map(r => ({
+    key: r.key,
+    title: r.key,                       // the KEY, not the title: short, unique, and what you arrange by
+    mapPos: LAY.pos[r.key] || null,
+    doors: (r.playerDoors && r.playerDoors.length ? r.playerDoors : (r.doors || [])).filter(d => d.to),
+    planned: [],
+  }));
+
+  // Seed from whatever is on disk (`fromAuto` ignores it and re-seeds from the auto-layout). The
+  // rounding + de-collision rule lives in MapGraph.gridCells, where it is unit-tested, rather than here.
+  function laySeed(fromAuto) {
+    LAY.pos = MapGraph.gridCells(NET_ROOMS.map(r => ({
+      key: r.key, title: r.key, mapPos: fromAuto ? null : (r.mapPos || null),
+      doors: (r.playerDoors && r.playerDoors.length ? r.playerDoors : (r.doors || [])).filter(d => d.to),
+      planned: [],
+    })));
+  }
+
+  function renderLayout() {
+    const svg = $("#netSvg"), G = MapGraph.GEOM;
+    const spec = laySpec();
+    // Player-style rendering — plain nodes and straight room-to-room connections, which is exactly what
+    // you want while arranging — but with ABSOLUTE positions (`rebase:false`), because the grid lines
+    // below and the drag maths both work in absolute cells. The connections are the point: you cannot
+    // judge a layout without seeing what joins to what as you move things.
+    const g = MapGraph.buildNetSvg(spec, { mode: "player", rebase: false });
+    // One spare column and row of headroom, so there is always somewhere to drag a room TO.
+    let maxC = 0, maxR = 0;
+    Object.values(LAY.pos).forEach(p => { if (p.c > maxC) maxC = p.c; if (p.r > maxR) maxR = p.r; });
+    const W = G.MX * 2 + (maxC + 1) * G.DX, H = G.MY * 2 + (maxR + 1) * G.DY;
+    let grid = "";
+    for (let c = 0; c <= maxC + 1; c++) {
+      const x = (G.MX + c * G.DX).toFixed(1);
+      grid += `<line class="gridline${c ? "" : " axis"}" x1="${x}" y1="0" x2="${x}" y2="${H}"/>`;
+    }
+    for (let r = 0; r <= maxR + 1; r++) {
+      const y = (G.MY + r * G.DY).toFixed(1);
+      grid += `<line class="gridline${r ? "" : " axis"}" x1="0" y1="${y}" x2="${W}" y2="${y}"/>`;
+    }
+    svg.removeAttribute("width"); svg.removeAttribute("height");
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+    svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
+    svg.innerHTML = grid + g.html;
+    const unbuilt = new Set(NET_ROOMS.filter(r => !r.built).map(r => r.key));
+    svg.querySelectorAll("g[data-room]").forEach(el => {
+      if (unbuilt.has(el.getAttribute("data-room"))) el.classList.add("unbuilt");
+      if (LAY.drag && LAY.drag.key === el.getAttribute("data-room")) el.classList.add("dragging");
+    });
+    // Report the TRIMMED grid — what a player actually sees. The editor draws in absolute cells (so
+    // dragging never slides the view), but empty leading columns/rows are rebased away on save and at
+    // render, so quoting the untrimmed size here would overstate the map and mis-state its shape.
+    let minC = Infinity, minR = Infinity;
+    Object.values(LAY.pos).forEach(p => { if (p.c < minC) minC = p.c; if (p.r < minR) minR = p.r; });
+    const cols = maxC - minC + 1, rows = maxR - minR + 1, nUnbuilt = unbuilt.size;
+    const ratio = ((MapGraph.GEOM.MX * 2 + (cols - 1) * MapGraph.GEOM.DX)
+                 / (MapGraph.GEOM.MY * 2 + (rows - 1) * MapGraph.GEOM.DY)).toFixed(2);
+    $("#layStat").innerHTML = `${NET_ROOMS.length} rooms · grid ${cols}×${rows} · shape ${ratio}:1`
+      + ((minC || minR) ? ` · trims to the origin on save` : "")
+      + (nUnbuilt ? ` · ${nUnbuilt} not built yet (dashed)` : "")
+      + (LAY.dirty ? ` · <span class="lay-dirty">unsaved</span>` : "");
+  }
+
+  function layToggle(on) {
+    LAY.on = on;
+    $("#layoutBar").classList.toggle("on", on);
+    $("#netSvg").classList.toggle("laying", on);
+    $("#layEdit").classList.toggle("on", on);
+    $("#layEdit").textContent = on ? "Done" : "Edit map layout";
+    $("#netTip").style.display = "none";
+    if (on) { laySeed(false); LAY.dirty = false; renderLayout(); }
+    else { LAY.drag = null; renderNetwork(NET_ROOMS); }
+  }
+
+  // Snap-during-drag rather than free-drag-then-snap: the room is only ever ON a cell, so the editor
+  // cannot produce the overlap that `_save_map_layout` rejects, and you see the real arrangement (and
+  // the re-routed edges) as you move rather than after you let go.
+  (function bindLayoutDrag() {
+    const svg = $("#netSvg");
+    const toSvg = e => {
+      const pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY;
+      return pt.matrixTransform(svg.getScreenCTM().inverse());
+    };
+    svg.addEventListener("pointerdown", e => {
+      if (!LAY.on) return;
+      const g = e.target.closest && e.target.closest("g[data-room]"); if (!g) return;
+      const key = g.getAttribute("data-room"), cur = layCell(LAY.pos[key]), p = toSvg(e);
+      LAY.drag = { key, dx: p.x - cur.x, dy: p.y - cur.y };
+      try { svg.setPointerCapture(e.pointerId); } catch (err) {}
+      e.preventDefault(); renderLayout();
+    });
+    svg.addEventListener("pointermove", e => {
+      if (!LAY.on || !LAY.drag) return;
+      const G = MapGraph.GEOM, p = toSvg(e);
+      const c = Math.max(0, Math.round((p.x - LAY.drag.dx - G.MX) / G.DX));
+      const r = Math.max(0, Math.round((p.y - LAY.drag.dy - G.MY) / G.DY));
+      const now = LAY.pos[LAY.drag.key];
+      if (now.c === c && now.r === r) return;
+      // refuse rather than swap: a cell is occupied or it is not, and a silent swap would move a room
+      // the author never touched.
+      if (Object.keys(LAY.pos).some(k => k !== LAY.drag.key && LAY.pos[k].c === c && LAY.pos[k].r === r)) return;
+      LAY.pos[LAY.drag.key] = { c, r }; LAY.dirty = true; renderLayout();
+    });
+    const drop = e => {
+      if (!LAY.drag) return;
+      try { svg.releasePointerCapture(e.pointerId); } catch (err) {}
+      LAY.drag = null; renderLayout();
+    };
+    svg.addEventListener("pointerup", drop);
+    svg.addEventListener("pointercancel", drop);
+  })();
+
+  $("#layEdit").onclick = () => layToggle(!LAY.on);
+  $("#layAuto").onclick = () => { laySeed(true); LAY.dirty = true; renderLayout(); };
+  $("#layCancel").onclick = () => { laySeed(false); LAY.dirty = false; renderLayout(); };
+  $("#laySave").onclick = async () => {
+    $("#layStat").textContent = "saving…";
+    const res = await post("/api/map-layout", { chapter: CH, scenario: SC, positions: LAY.pos });
+    if (!res.ok) { $("#layStat").innerHTML = `<span class="err">${esc(res.error)}</span>`; return; }
+    LAY.dirty = false;
+    await refresh();                       // pull the saved mapPos back, so what you see IS what is on disk
+    if (LAY.on) { laySeed(false); renderLayout(); }
+  };
+  $("#layClear").onclick = async () => {
+    if (!confirm("Remove every saved map position for this scenario? The player's map falls back to the automatic layout.")) return;
+    const positions = {}; NET_ROOMS.forEach(r => positions[r.key] = null);
+    const res = await post("/api/map-layout", { chapter: CH, scenario: SC, positions });
+    if (!res.ok) { $("#layStat").innerHTML = `<span class="err">${esc(res.error)}</span>`; return; }
+    await refresh();
+    if (LAY.on) { laySeed(false); LAY.dirty = false; renderLayout(); }
+  };
   // ---- the PLAYBOOK ------------------------------------------------------------------------------
   // A full written walkthrough of how the scenario plays, DERIVED from scenario.json rather than
   // authored anywhere (Lucas, 2026-09-03). Deriving it is the whole point: it cannot drift from the
@@ -756,7 +976,7 @@
     });
     let order = rooms.map((r, i) => [r, i]);
     try {
-      const L = NetGraph.layoutRooms(spec);
+      const L = MapGraph.layoutRooms(spec);
       order = rooms.map((r, i) => [r, (L.rank[r.key] || 0) * 100 + (L.row[r.key] || 0)]);
     } catch (e) { /* file order is a fine fallback */ }
     order.sort((a, b) => a[1] - b[1]);
@@ -1101,7 +1321,7 @@
   // dragging. HSB[roomKey] maps uid -> the box as loaded, so "moved" is a comparison rather than a flag
   // someone has to remember to set.
   let HSW = {}, HSB = {}, HSSEL = null;                 // HSSEL: {room, uid} of the selected box
-  const HSCOL = () => (window.NetGraph && NetGraph.TYPE_COL) || {};
+  const HSCOL = () => (window.MapGraph && MapGraph.TYPE_COL) || {};
   // MUST mirror harness_server.py `_slug` and hotspots_edit.html `slug`: (type, slug(label)) is the
   // harness's planned->placed matching key, and it is what identifies a planned entry here, because
   // 348 of the 385 planned entries in the corpus carry no `id` at all.

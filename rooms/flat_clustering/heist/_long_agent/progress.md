@@ -496,3 +496,74 @@ Started 2026-09-13T18:59:08.470014+00:00.
 - **2026-09-14 18:33 UTC** — a_opera: waiting on the loop bake (poll 14/40). No Claude call spent.
 - **2026-09-14 18:33 UTC** — a_opera: the loop bake is still growing (2710305 bytes). Waiting for it to settle. No Claude call spent.
 - **2026-09-14 18:35 UTC** — a_opera: gated — {"camera": "still", "return": 0.0, "peak": 3.13, "glitch": {"spike": 3.73, "breadth": 0.021, "at_pct": 77.8, "frames": 73, "breadth_normalised": 0.021}, "note": "no out-and-back: dead, or cyclic flow. NEEDS AN EYE \u2014 this measure has called three good clips dead."}
+- **2026-09-14 18:41 UTC** — a_opera: HELD for Lucas's eye — ri94 clears camera and glitch, and against the dead ri78 control it shows a 73-peak motion field confined to the candle flames with the wax and the wall provably still — the drooping and the breathing wall are both fixed, so the zero return is the cyclic-flow false alarm and this clip is a question for Lucas's eye, not a defect.. NOT accepted.
+- **2026-09-14 18:45 UTC** — b_casino: render launched at end guide 0.70.
+- **2026-09-14 18:46 UTC** — b_casino: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-14 18:46 UTC** — b_casino: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-14 18:47 UTC** — b_casino: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-14 18:47 UTC** — b_casino: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-14 18:48 UTC** — b_casino: waiting on the render (poll 5/40). No Claude call spent.
+- **2026-09-14 18:48 UTC** — b_casino: waiting on the render (poll 6/40). No Claude call spent.
+- **2026-09-14 18:49 UTC** — b_casino: waiting on the render (poll 7/40). No Claude call spent.
+- **2026-09-14 18:49 UTC** — b_casino: waiting on the render (poll 8/40). No Claude call spent.
+- **2026-09-14 18:50 UTC** — b_casino: waiting on the render (poll 9/40). No Claude call spent.
+- **2026-09-14 18:50 UTC** — b_casino: waiting on the render (poll 10/40). No Claude call spent.
+- **2026-09-14 18:51 UTC** — b_casino: waiting on the render (poll 11/40). No Claude call spent.
+- **2026-09-14 18:51 UTC** — b_casino: waiting on the render (poll 12/40). No Claude call spent.
+- **2026-09-14 18:52 UTC** — b_casino: waiting on the render (poll 13/40). No Claude call spent.
+- **2026-09-14 18:52 UTC** — b_casino: waiting on the render (poll 14/40). No Claude call spent.
+- **2026-09-14 18:53 UTC** — b_casino: waiting on the render (poll 15/40). No Claude call spent.
+- **2026-09-14 18:53 UTC** — b_casino: waiting on the loop bake (poll 16/40). No Claude call spent.
+- **2026-09-14 18:54 UTC** — b_casino: waiting on the loop bake (poll 17/40). No Claude call spent.
+- **2026-09-14 18:54 UTC** — b_casino: the loop bake is still growing (3143909 bytes). Waiting for it to settle. No Claude call spent.
+- **2026-09-14 18:56 UTC** — b_casino: gated — {"camera": "still", "return": 0.0, "peak": 3.78, "glitch": {"spike": 3.2, "breadth": 0.021, "at_pct": 77.8, "frames": 73, "breadth_normalised": 0.0}, "note": "no out-and-back: dead, or cyclic flow. NEEDS AN EYE \u2014 this measure has called three good clips dead."}
+- **2026-09-14 19:02 UTC** — b_casino: AUTHOR_MOVER applied. Both prompts re-rendered from the one spec. The ART prompt changed, so the still must be regenerated first.
+- **2026-09-14 19:03 UTC** — b_casino: art generation started (l1_b_casino_2), generation 3/3. No Claude call spent.
+- **2026-09-14 19:03 UTC** — b_casino: waiting on the art generation (poll 1/40). No Claude call spent.
+- **2026-09-14 19:04 UTC** — b_casino: new art committed from l1_b_casino_2.png and seam-staged (screen: b_casino        ground 8.9x/8.0  ->  needs work  (stage RESET from blurred — file is newer) | blur: b_casino        ground 8.9x/8.0  ->  sky 0.0x/0.0  CLEARED). NOT accepted — that is Lucas's call in the stills tab.
+- **2026-09-14 19:16 UTC** — b_casino: AUTHOR_MOVER applied. The art prompt is unchanged, so the committed still still matches — only the clip needs re-rendering.
+- **2026-09-14 19:20 UTC** — b_casino: render launched at end guide 0.70.
+- **2026-09-14 19:20 UTC** — b_casino: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-14 19:21 UTC** — b_casino: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-14 19:21 UTC** — b_casino: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-14 19:22 UTC** — b_casino: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-14 19:22 UTC** — b_casino: waiting on the render (poll 5/40). No Claude call spent.
+- **2026-09-14 19:23 UTC** — b_casino: waiting on the render (poll 6/40). No Claude call spent.
+- **2026-09-14 19:23 UTC** — b_casino: waiting on the render (poll 7/40). No Claude call spent.
+- **2026-09-14 19:24 UTC** — b_casino: waiting on the render (poll 8/40). No Claude call spent.
+- **2026-09-14 19:24 UTC** — b_casino: waiting on the render (poll 9/40). No Claude call spent.
+- **2026-09-14 19:25 UTC** — b_casino: waiting on the render (poll 10/40). No Claude call spent.
+- **2026-09-14 19:25 UTC** — b_casino: waiting on the render (poll 11/40). No Claude call spent.
+- **2026-09-14 19:26 UTC** — b_casino: waiting on the render (poll 12/40). No Claude call spent.
+- **2026-09-14 19:27 UTC** — b_casino: waiting on the render (poll 13/40). No Claude call spent.
+- **2026-09-14 19:27 UTC** — b_casino: waiting on the render (poll 14/40). No Claude call spent.
+- **2026-09-14 19:28 UTC** — b_casino: waiting on the render (poll 15/40). No Claude call spent.
+- **2026-09-14 19:28 UTC** — b_casino: waiting on the loop bake (poll 16/40). No Claude call spent.
+- **2026-09-14 19:29 UTC** — b_casino: waiting on the loop bake (poll 17/40). No Claude call spent.
+- **2026-09-14 19:29 UTC** — b_casino: the loop bake is still growing (3346457 bytes). Waiting for it to settle. No Claude call spent.
+- **2026-09-14 19:30 UTC** — b_casino: gated — {"camera": "still", "return": 0.04, "peak": 4.47, "glitch": {"spike": 4.15, "breadth": 0.042, "at_pct": 88.9, "frames": 73, "breadth_normalised": 0.042}, "note": "no out-and-back: dead, or cyclic flow. NEEDS AN EYE \u2014 this measure has called three good clips dead."}
+- **2026-09-14 19:31 UTC** — 360 page published with 10 room(s): http://127.0.0.1:8752/cine360_heist.html
+- **2026-09-14 19:31 UTC** — Every room is held or parked. HELD (need Lucas's eye): ['a_opera']. 360 page published with 10 room(s): http://127.0.0.1:8752/cine360_heist.html. Nothing here is accepted — metrics may reject and must never approve.
+- **2026-09-14 20:31 UTC** — b_casino: render launched at end guide 0.70.
+- **2026-09-14 20:32 UTC** — b_casino: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-14 20:32 UTC** — b_casino: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-14 20:33 UTC** — b_casino: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-14 20:33 UTC** — b_casino: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-14 20:34 UTC** — b_casino: waiting on the render (poll 5/40). No Claude call spent.
+- **2026-09-14 20:35 UTC** — b_casino: waiting on the render (poll 6/40). No Claude call spent.
+- **2026-09-14 20:35 UTC** — b_casino: waiting on the render (poll 7/40). No Claude call spent.
+- **2026-09-14 20:36 UTC** — b_casino: waiting on the render (poll 8/40). No Claude call spent.
+- **2026-09-14 20:36 UTC** — b_casino: waiting on the render (poll 9/40). No Claude call spent.
+- **2026-09-14 20:37 UTC** — b_casino: waiting on the render (poll 10/40). No Claude call spent.
+- **2026-09-14 20:37 UTC** — b_casino: waiting on the render (poll 11/40). No Claude call spent.
+- **2026-09-14 20:38 UTC** — b_casino: waiting on the render (poll 12/40). No Claude call spent.
+- **2026-09-14 20:38 UTC** — b_casino: waiting on the render (poll 13/40). No Claude call spent.
+- **2026-09-14 20:39 UTC** — b_casino: waiting on the render (poll 14/40). No Claude call spent.
+- **2026-09-14 20:39 UTC** — b_casino: waiting on the render (poll 15/40). No Claude call spent.
+- **2026-09-14 20:40 UTC** — b_casino: waiting on the loop bake (poll 16/40). No Claude call spent.
+- **2026-09-14 20:40 UTC** — b_casino: waiting on the loop bake (poll 17/40). No Claude call spent.
+- **2026-09-14 20:41 UTC** — b_casino: the loop bake is still growing (3310766 bytes). Waiting for it to settle. No Claude call spent.
+- **2026-09-14 20:42 UTC** — b_casino: gated — {"camera": "still", "return": 0.01, "peak": 4.19, "glitch": {"spike": 3.53, "breadth": 0.042, "at_pct": 88.9, "frames": 73, "breadth_normalised": 0.042}, "note": "no out-and-back: dead, or cyclic flow. NEEDS AN EYE \u2014 this measure has called three good clips dead."}
+- **2026-09-14 20:45 UTC** — b_casino: HELD for Lucas's eye — The clip cleared all three gates — camera still, glitch breadth 0.042 on both readings against a 0.70 threshold — and its near-zero return is the documented cyclic-flow signature of this room's smoke rather than evidence of death, so the only step left is Lucas's eye.. NOT accepted.
+- **2026-09-14 20:46 UTC** — 360 page published with 10 room(s): http://127.0.0.1:8752/cine360_heist.html
+- **2026-09-14 20:46 UTC** — Every room is held or parked. HELD (need Lucas's eye): ['a_opera', 'b_casino']. 360 page published with 10 room(s): http://127.0.0.1:8752/cine360_heist.html. Nothing here is accepted — metrics may reject and must never approve.

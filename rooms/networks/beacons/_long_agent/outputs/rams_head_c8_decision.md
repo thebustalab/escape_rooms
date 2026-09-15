@@ -1,0 +1,11 @@
+I read the four evidence documents, the room's own history (cycle 7's AUTHOR_MOVER was failed by the evaluator, rams_head `retries: 1`), the live spec, the committed still, and the runner's decision-application code.
+
+**What's actually wrong.** The live spec's only mover is `cirque_tarn`, whose `motion.vigour` describes cat's-paws on the water — but whose `motion.phrase` is a stale artefact of the 2026-09-13 `animate`→`motion` migration and names *"the signal lantern hanging from its short iron gibbet arm"*. I looked at the committed 3072 panorama: there is no lantern, no gibbet arm and no mast anywhere in it. That is exactly the two-sources-of-truth drift that produced verdigris' ceiling water — the motion prompt asks for a mover the art does not contain.
+
+**What is not wrong.** The tarn is a real, bounded, depicted mover: a small ice-rimmed black pool at roughly x 0.26–0.49, y 0.58–0.80 — bounded, not frame-filling — and this room's own `cine_base.judge.json` scores `tarn_surface` **alive, p95 15.63** on a prior render of this same art. Re-authoring would spend a paid generation to replace a panorama Lucas accepted on 2026-09-03.
+
+**Verified before deciding**, by dry-running the merge: a fragment keyed on `at: "to the left of centre"` merges into `cirque_tarn`, deep-merges `motion`, leaves `desc` and `vigour` untouched — and `render_prompt` comes back **byte-identical**, so `long_agent.py:4199` does not set `needs_still` and the accepted still survives. `SOFTEN_PROMPT` is the wrong instrument here: it writes only the `art_prompt_motion/*.txt` fallback, which the renderer ignores for any room whose spec declares a mover.
+
+DECISION: ADJUST_VIGOUR
+SPEC: {"at": "to the left of centre", "motion": {"phrase": "Cat's-paws of wind travel in slow bands across the black surface of the tarn, darkening and silvering it as they pass"}}
+WHY: The spec's one bounded mover is the tarn, which the committed still depicts and which has already rendered alive, but a migration artefact left its motion phrase naming a signal lantern the art does not contain — so this rewrites only the phrase, which leaves the art prompt byte-identical and keeps the accepted panorama.

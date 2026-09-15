@@ -1,0 +1,13 @@
+I checked the render, the live prompt, and the gate source myself rather than the worker's summary.
+
+**What holds up.** I re-derived the motion prompt from the live spec and got exactly what the worker quoted — it names the drip curtain and nothing else. I extracted all 73 frames of the raw render and computed my own column profile: one contiguous peak band at x 0.12–0.25, which is where the mover is authored ("to the left"), with the centre — the frame-filling cloud sea — sitting *below* the noise floor at 0.55–0.75× and both seam edges at ~1.0×. Eyeballing that band across frames 1/25/50/73 shows real falling water, threads breaking and reforming, ripples in the puddle at its foot, with the rock cowl and wall behind it dead still. That is a bounded mover working and no non-mover moving.
+
+I confirmed the gates in the source: the glitch gate rejects only when *both* breadth readings clear 0.70 — hood is 0.125 and 0.083, nowhere near. And the zero-return comment in cine_room.py says in its own words that a zero return "escalates; it never rejects," naming rams_head as one of the three good clips it was wrong about. The worker's rams_head precedent isn't an analogy, it's written into the gate.
+
+**Two corrections that don't change the call.** The worker's motion magnitudes (6.4–9.0×) are inflated against mine (~3.7× peak); that's a normalisation difference, and the *structure* — which is what decides this — reproduces exactly. And their claim that no fallback file exists is a wrong path: there is no networks/hood.txt, but there is a beacons/hood.txt, and it still holds the stale cloud-sea text. It's inert because the spec wins by design, which I verified by running the resolver, but it's live drift bait sitting on disk and worth a cleanup pass later.
+
+**Their side note is right, and I checked it independently.** hood's mover is falling meltwater — and so are rams_head, ladder, broken_tooth, shears and fenwatch. Six of twelve beacons rooms animate the same subject. Against the review note asking every room's mover to differ, that's a real collection-level finding for your eye, separate from this clip.
+
+Nothing in the decision proposes a settings change, a frame-filling mover, a re-author off the zero return, an acceptance, a hand-written prompt, or AUTHOR_MOVER on an unrendered mover. The runner already recorded "survived gates — needs Lucas's eye," and HOLD leaves it there.
+
+VERDICT: PASS

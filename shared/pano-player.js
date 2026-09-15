@@ -70,12 +70,12 @@
 // A bare `./variant_resolve.js` import is NOT refreshed by bumping the <script> tag's ?v, so a changed
 // helper module (e.g. a new export) leaves browsers on a stale cached copy → "doesn't provide an export
 // named X" SyntaxError → blank page (the 2026-08-05 airship regression). Bump all three together.
-import { WebRConsole } from "./webr-console.js?v=90";
-import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs } from "./variant_resolve.js?v=90";   // Phase 3: per-hotspot state variants; monorail switch-door nav
-import * as PQ from "./puzzle_queue.js?v=90";   // dynamic puzzle queue: location-independent puzzle serving
-import { particleCount } from "./particles.js?v=90";   // ambient-particle vocabulary + per-kind field density
-import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=90";
-import { condHolds } from "./cond.js?v=90";   // ledger + elevation-map card DOM
+import { WebRConsole } from "./webr-console.js?v=92";
+import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs } from "./variant_resolve.js?v=92";   // Phase 3: per-hotspot state variants; monorail switch-door nav
+import * as PQ from "./puzzle_queue.js?v=92";   // dynamic puzzle queue: location-independent puzzle serving
+import { particleCount } from "./particles.js?v=92";   // ambient-particle vocabulary + per-kind field density
+import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=92";
+import { condHolds } from "./cond.js?v=92";   // ledger + elevation-map card DOM
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 
@@ -101,6 +101,7 @@ root.innerHTML = `
     <div id="musicChip" style="display:none;position:absolute;bottom:10px;left:14px;z-index:20;background:rgba(0,0,0,.4);padding:4px 11px;border-radius:14px;font:12px system-ui;color:rgba(255,216,140,.9);user-select:none">♪ <a id="musicCredit" target="_blank" rel="noopener" title="Open the track on YouTube" style="color:inherit;text-decoration:underline"></a>: <span id="musicState" title="Toggle music on/off" style="cursor:pointer;text-decoration:underline;font-weight:600"></span></div>
     <div id="sfxChip" style="display:none;position:absolute;bottom:10px;left:14px;z-index:20;background:rgba(0,0,0,.4);padding:4px 11px;border-radius:14px;font:12px system-ui;color:rgba(255,216,140,.9);user-select:none">♫ sound effects: <span id="sfxState" title="Toggle sound effects on/off" style="cursor:pointer;text-decoration:underline;font-weight:600"></span></div>
     <button id="notebookChip" style="display:none;position:absolute;bottom:10px;right:14px;z-index:20;background:rgba(0,0,0,.42);padding:5px 12px;border-radius:14px;border:1px solid rgba(255,216,140,.35);font:12px system-ui;color:rgba(255,216,140,.92);cursor:pointer;user-select:none" title="Everything you've confirmed or picked up so far">🗒 Field notebook <span id="notebookCount" style="opacity:.7"></span></button>
+    <button id="mapChip" style="display:none;position:absolute;bottom:42px;right:14px;z-index:20;background:rgba(0,0,0,.42);padding:5px 12px;border-radius:14px;border:1px solid rgba(255,216,140,.35);font:12px system-ui;color:rgba(255,216,140,.92);cursor:pointer;user-select:none" title="The rooms you have found so far, and how they connect">🗺 Map</button>
     <button id="debriefChip" style="display:none;position:absolute;bottom:10px;left:50%;transform:translateX(-50%);z-index:20;background:rgba(0,0,0,.42);padding:5px 12px;border-radius:14px;border:1px solid rgba(255,216,140,.35);font:12px system-ui;color:rgba(255,216,140,.92);cursor:pointer;user-select:none" title="A look behind the scenes — how this world was built to teach the technique">🔎 Reveal how this world worked</button>
     <button id="skipChip" style="display:none;position:absolute;bottom:10px;left:50%;transform:translateX(-50%);z-index:20;background:rgba(0,0,0,.42);padding:5px 12px;border-radius:14px;border:1px solid rgba(255,216,140,.35);font:12px system-ui;color:rgba(255,216,140,.92);cursor:pointer;user-select:none" title="Open your submission — you can come back to it as often as you like">Prepare submission / skip the ungraded escape phase →</button>
     <div id="hud"><span id="hudroom"></span></div>
@@ -233,6 +234,13 @@ let sfxOn = true;   // global sound-effects on/off (per-room ambience layers + s
 // screen 1 — wired once scenario.json has loaded
 function init(data) {
   SCENARIO = data;
+  // `window.SCENARIO` too — the header comment above has always called this "the window.SCENARIO shape"
+  // and TWO opt-out switches read it, but nothing ever assigned it (found 2026-09-15 by the map's e2e).
+  // `fitWrap()` and `mapEnabled()` both test `!(window.SCENARIO && SCENARIO.<flag> === false)`, which on
+  // an undefined `window.SCENARIO` is `!undefined` → **always true**: `SCENARIO.fitWrap: false` has never
+  // been able to turn anything off. Behaviour-neutral to fix — no scenario sets `fitWrap: false` today
+  // (canyon sets it TRUE, already the default) — and it makes both documented switches real.
+  window.SCENARIO = data;
   document.title = SCENARIO.title || "Escape room";
   const ambient = SCENARIO.ambient || "fireflies";   // fireflies | snow | embers | leaves | dust | rays | none
   if (ambient !== "none") {
@@ -281,6 +289,7 @@ function init(data) {
   $("#subX500Go").onclick = confirmX500;
   $("#subX500").addEventListener("keydown", e => { if (e.key === "Enter") confirmX500(); });
   $("#notebookChip").onclick = openNotebook;
+  $("#mapChip").onclick = openMap;
   $("#skipChip").onclick = openSubmitPrep;   // the one persistent in-room route to submission (showSubmitChip)
   // Two-player scenarios start their players in DIFFERENT rooms, so the landing screen may
   // offer one button per role instead of a single Begin. Additive: a scenario with no
@@ -291,6 +300,10 @@ function init(data) {
     gameState = JSON.parse(JSON.stringify(SCENARIO.state || {}));
     if (role) gameState.role = role;                                  // set by which landing button was taken
     solvedRooms.clear();
+    // visitedRooms was NOT cleared here (bug, found 2026-09-15 building the map). It only suppressed
+    // repeat entry cards, so a "play again" without a page reload silently skipped them; with a map it
+    // would also open pre-explored. Session state, like everything else cleared in this block.
+    visitedRooms.clear();
     solvedGates.clear();
     attemptCounts.clear();
     queueSolved.clear(); queueResults.clear(); queueAssign.clear();   // dynamic puzzle queue
@@ -301,6 +314,7 @@ function init(data) {
     if (SCENARIO.story) logToNotebook("Your assignment", SCENARIO.story);  // the opening premise stays re-readable once per-room entry cards are dropped
     updateNotebookChip();
     $("#notebookChip").style.display = "";                            // persistent chip, in-room only
+    $("#mapChip").style.display = mapEnabled() ? "" : "none";         // stacked above the notebook; hidden when opted out
     $("#debriefChip").style.display = "none";                        // appears only once analysis completes
     $("#skipChip").style.display = "none";                           // shown once analysis is done, then permanent (showSubmitChip)
     if (SCENARIO.heel) $("#pano").classList.add("heel");              // slow crash-heel of the horizon (opt-in)
@@ -917,6 +931,62 @@ function doorIsOpen(h, r) {
     return ids.every(id => solvedGates.has(gateKey(r.key, id)));
   }
   return isPrimarySolved(r);                                    // legacy: the room's primary gate
+}
+
+// --- The in-game map (opt-out: SCENARIO.playerMap === false) ----------------------------------------
+// A read-only fog-of-war map of the rooms, opened from a chip above the field notebook. Connectivity and
+// room NAMES only — no hotspots (Lucas, 2026-09-15): the harness draws a dot per puzzle/clue/switch on
+// this same graph, and shipping those would spoil every room at a glance. The renderer is the shared
+// `map_graph.js` (window.MapGraph, a classic script like codec.js/debrief.js — NOT an ES import, so the
+// authoring harness can load the same file). Plan + phases: notes/player_map_plan.md.
+//
+// Default ON; only an explicit `playerMap: false` turns it off — the same posture as `fitWrap`. It is
+// `playerMap`, not `map`, because `map` is already a puzzle `type` (pick-a-point) and `"map": false` in a
+// scenario.json would read as "map puzzles off". `?playermap=1|0` overrides per URL, so a scenario can be
+// A/B'd on a live room without editing anything.
+function mapEnabled() {
+  const q = new URLSearchParams(location.search).get("playermap");
+  if (q === "1") return true;
+  if (q === "0") return false;
+  if (typeof MapGraph === "undefined" && !window.MapGraph) return false;   // shell didn't load the module
+  return !(window.SCENARIO && SCENARIO.playerMap === false);
+}
+
+// The graph the player can actually WALK: built rooms, and door targets read from the COMMITTED
+// `hotspots` — not from `authoring.sceneSpec`, which the harness draws and which can drift from what
+// shipped. Switch-doors (the monorail) resolve through `doorNav`, so a state-dependent door shows its
+// LIVE destination rather than a stale base `to`.
+function mapSpec() {
+  const built = (SCENARIO.rooms || []).filter(isBuilt);
+  const keys = new Set(built.map(r => r.key));
+  return built.map(r => ({
+    key: r.key,
+    title: r.title || r.key,
+    mapPos: r.mapPos || null,                   // hand-authored grid cell; absent => the auto-layout
+    doors: (r.hotspots || [])
+      .filter(h => h.type === "door")
+      .map(h => {
+        const nav = doorNav(h);
+        return { to: nav.to, direction: nav.direction, x: Array.isArray(h.box) ? (h.box[0] + h.box[2]) / 2 : 0.5 };
+      })
+      .filter(d => d.to && keys.has(d.to)),     // a door to an unbuilt room is not a connection yet
+    planned: [],                                // player mode ignores this; kept explicit so it can't leak
+  }));
+}
+
+function openMap() {
+  const MG = window.MapGraph;
+  const d = document.createElement("div");
+  if (!MG) { d.textContent = "The map is unavailable."; return openModal("🗺 Map", d); }
+  const g = MG.buildNetSvg(mapSpec(), {
+    mode: "player",
+    fog: { visited: [...visitedRooms], current: room ? room.key : null },
+  });
+  d.className = "mapcard";
+  d.innerHTML = `<svg class="mapsvg" viewBox="0 0 ${g.W} ${g.H}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Map of the rooms you have visited">${g.html}</svg>`
+    + `<div class="maplegend"><span class="mk-cur"></span> where you are`
+    + `<span class="mk-unknown"></span> somewhere you have not been yet</div>`;
+  openModal("🗺 Map", d);
 }
 
 // --- Three-phase portals (opt-in: SCENARIO.stonePortals) --------------------------------------------

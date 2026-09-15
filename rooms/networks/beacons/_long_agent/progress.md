@@ -1,131 +1,595 @@
-# Long-Running Agent Progress
+# Room iteration — networks/beacons
 
-**Task:** cine_iterate  
-**Scenario:** networks/beacons  
-**Rooms:** all  
-**Created:** 2026-09-05T04:00:13.219359+00:00  
-
----
-
-- **2026-09-05 04:02 UTC** — Judged 6 clip(s); more still stale.
-- **2026-09-05 04:06 UTC** — Judged 6 clip(s); more still stale.
-- **2026-09-05 04:09 UTC** — Judged 6 clip(s); more still stale.
-- **2026-09-05 04:12 UTC** — Judged 6 clip(s); more still stale.
-- **2026-09-05 04:17 UTC** — cycle_05_fenwatch_base: spec updated and render launched — The spec is not at fault and is resubmitted unchanged — all four boxes were re-checked against the current `scene.png` and still land on the
-- **2026-09-05 04:27 UTC** — Render landed for fenwatch/base after 605s — judge says hold
-- **2026-09-05 04:35 UTC** — cycle_06_fenwatch_night: spec updated and render launched — The single change is re-rendering against the current `scene_night.png` — which replaced the render this clip was baked from — with the spec
-- **2026-09-05 04:45 UTC** — Render landed for fenwatch/night after 606s — judge says hold
-- **2026-09-05 04:49 UTC** — cycle_07_spindle_base: spec updated and render launched — The spec is already correct for the current art and is left unchanged — the single change is re-rendering the clip against the recommitted `
-- **2026-09-05 04:59 UTC** — Render landed for spindle/base after 604s — judge says hold
-- **2026-09-05 05:04 UTC** — cycle_08_spindle_night: spec updated and render launched — Rerender against the current scene_night.png (the shipped clip animates superseded art), with both subject boxes moved off the bare rock the
-- **2026-09-05 05:15 UTC** — Render landed for spindle/night after 617s — judge says reject (named subject(s) not moving in the shipped clip: village_lamps p95 4.19, river_glimmer p95 4.29)
-- **2026-09-05 05:23 UTC** — cycle_09_spindle_night: spec updated and render launched — Stop the fire-basket igniting — the pin is rewritten from "is cold/unlit" (a state the model satisfied at frame 0 and then abandoned) to an 
-- **2026-09-05 05:38 UTC** — Render landed for spindle/night after 846s — judge says reject (named subject(s) not moving in the shipped clip: village_lamps p95 3.54, river_glimmer p95 3.76)
-- **2026-09-05 05:43 UTC** — cycle_10_spindle_night: judge overruled with evidence — holding for review. Both "dead" subjects are visibly and measurably animating (p95 range 33 on their lit pixels, with the variance map falling exactly on the lamps and channels and
-- **2026-09-05 05:47 UTC** — cycle_11_rams_head_base: spec updated and render launched — The clip was rendered from superseded art and must simply be re-rendered against the current `scene.png`; the spec is carried over essential
-- **2026-09-05 05:57 UTC** — Render landed for rams_head/base after 602s — judge says hold
-- **2026-09-05 06:03 UTC** — cycle_12_rams_head_night: spec updated and render launched — The clip predates a replacement `scene_night.png` and animates the old, superseded panorama, so it must be re-rendered from the current stil
-- **2026-09-06 00:57 UTC** — Render landed for rams_head/night after 740s — judge says reject (named subject(s) not moving in the shipped clip: village_lamps p95 2.79)
-- **2026-09-06 00:58 UTC** — Judged 6 clip(s); more still stale.
-- **2026-09-06 01:00 UTC** — Judged 6 clip(s); more still stale.
-- **2026-09-06 01:01 UTC** — Judged 6 clip(s); more still stale.
-- **2026-09-06 01:03 UTC** — sisters/base: art was recommitted over this clip — re-rendered directly against the current panorama (no diagnosis cycle spent).
-- **2026-09-06 01:14 UTC** — Render landed for sisters/base after 616s — judge says hold
-- **2026-09-06 01:15 UTC** — sisters/night: art was recommitted over this clip — re-rendered directly against the current panorama (no diagnosis cycle spent).
-- **2026-09-06 01:29 UTC** — Render landed for sisters/night after 612s — judge says hold
-- **2026-09-06 01:31 UTC** — hood/base: art was recommitted over this clip — re-rendered directly against the current panorama (no diagnosis cycle spent).
-- **2026-09-06 01:44 UTC** — Render landed for hood/base after 594s — judge says hold
-- **2026-09-06 01:48 UTC** — hood/night: art was recommitted over this clip — re-rendered directly against the current panorama (no diagnosis cycle spent).
-- **2026-09-06 02:03 UTC** — Render landed for hood/night after 850s — judge says reject (named subject(s) not moving in the shipped clip: village_lamps p95 4.42, river_glimmer p95 4.18)
-- **2026-09-06 02:08 UTC** — ladder/base: art was recommitted over this clip — re-rendered directly against the current panorama (no diagnosis cycle spent).
-- **2026-09-06 02:20 UTC** — Render landed for ladder/base after 615s — judge says hold
-- **2026-09-06 02:21 UTC** — ladder/night: art was recommitted over this clip — re-rendered directly against the current panorama (no diagnosis cycle spent).
-- **2026-09-06 02:37 UTC** — Render landed for ladder/night after 844s — judge says reject (named subject(s) not moving in the shipped clip: village_lamps p95 2.66, river_glimmer p95 1.62)
-- **2026-09-06 02:41 UTC** — anvil/base: art was recommitted over this clip — re-rendered directly against the current panorama (no diagnosis cycle spent).
-- **2026-09-06 02:54 UTC** — Render landed for anvil/base after 717s — judge says reject (named subject(s) not moving in the shipped clip: far_smoke p95 3.18)
-- **2026-09-06 02:55 UTC** — anvil/night: art was recommitted over this clip — re-rendered directly against the current panorama (no diagnosis cycle spent).
-- **2026-09-06 03:07 UTC** — Render landed for anvil/night after 705s — judge says reject (named subject(s) not moving in the shipped clip: river_glimmer p95 0.55)
-- **2026-09-06 03:08 UTC** — shears/base: art was recommitted over this clip — re-rendered directly against the current panorama (no diagnosis cycle spent).
-- **2026-09-06 03:21 UTC** — Render landed for shears/base after 716s — judge says reject (named subject(s) not moving in the shipped clip: lens_cloud p95 4.50)
-- **2026-09-06 03:22 UTC** — shears/night: art was recommitted over this clip — re-rendered directly against the current panorama (no diagnosis cycle spent).
-- **2026-09-06 03:36 UTC** — Render landed for shears/night after 848s — judge says reject (named subject(s) not moving in the shipped clip: village_lamps p95 1.11, river_glimmer p95 3.05)
-- **2026-09-06 03:37 UTC** — whistlegate/base: art was recommitted over this clip — re-rendered directly against the current panorama (no diagnosis cycle spent).
-- **2026-09-06 03:48 UTC** — Render landed for whistlegate/base after 613s — judge says hold
-- **2026-09-06 03:49 UTC** — whistlegate/night: art was recommitted over this clip — re-rendered directly against the current panorama (no diagnosis cycle spent).
-- **2026-09-06 04:02 UTC** — Render landed for whistlegate/night after 741s — judge says hold
-- **2026-09-06 04:03 UTC** — broken_tooth/base: art was recommitted over this clip — re-rendered directly against the current panorama (no diagnosis cycle spent).
-- **2026-09-06 04:13 UTC** — Render landed for broken_tooth/base after 599s — judge says hold
-- **2026-09-06 04:14 UTC** — broken_tooth/night: art was recommitted over this clip — re-rendered directly against the current panorama (no diagnosis cycle spent).
-- **2026-09-06 04:26 UTC** — Render landed for broken_tooth/night after 613s — judge says reject (named subject(s) not moving in the shipped clip: river_glimmer p95 4.49)
-- **2026-09-06 04:27 UTC** — kiln/base: art was recommitted over this clip — re-rendered directly against the current panorama (no diagnosis cycle spent).
-- **2026-09-06 04:37 UTC** — Render landed for kiln/base after 599s — judge says hold
-- **2026-09-06 04:38 UTC** — kiln/night: art was recommitted over this clip — re-rendered directly against the current panorama (no diagnosis cycle spent).
-- **2026-09-06 04:51 UTC** — Render landed for kiln/night after 752s — judge says reject (named subject(s) not moving in the shipped clip: village_lamps p95 2.77, river_glimmer p95 4.22)
-- **2026-09-06 04:52 UTC** — crown/base: art was recommitted over this clip — re-rendered directly against the current panorama (no diagnosis cycle spent).
-- **2026-09-06 05:02 UTC** — Render landed for crown/base after 594s — judge says hold
-- **2026-09-06 05:03 UTC** — crown/night: art was recommitted over this clip — re-rendered directly against the current panorama (no diagnosis cycle spent).
-- **2026-09-06 05:16 UTC** — Render landed for crown/night after 735s — judge says reject (named subject(s) not moving in the shipped clip: glacier_tarn p95 1.89)
-- **2026-09-06 05:17 UTC** — crown/order_sent: art was recommitted over this clip — re-rendered directly against the current panorama (no diagnosis cycle spent).
-- **2026-09-06 05:30 UTC** — Render landed for crown/order_sent after 717s — judge says reject (named subject(s) not moving in the shipped clip: beacon_fires p95 0.49)
-- **2026-09-06 05:39 UTC** — cycle_35_rams_head_night: evaluator FAIL on a REBAKE (retry 1/2).
-- **2026-09-06 05:46 UTC** — cycle_36_rams_head_night: spec updated and render launched — The far flats are released from `rigid` and the `village_lamps` mover is recast as thin cold haze drifting over them — a category the stabil
-- **2026-09-06 05:57 UTC** — Render landed for rams_head/night after 611s — judge says hold
-- **2026-09-06 06:06 UTC** — cycle_37_hood_night: evaluator FAIL on a RERENDER (retry 1/2).
-- **2026-09-06 15:02 UTC** — cycle_38_hood_night: judge overruled with evidence — holding for review. The rejection is stale — it was written before the sparse-lit-pixel path landed, and re-judging the identical shipped `cine_night.mp4` with the current code ret
-- **2026-09-06 15:10 UTC** — cycle_39_ladder_night: evaluator FAIL on a RERENDER (retry 1/2).
-- **2026-09-06 15:17 UTC** — cycle_40_ladder_night: spec updated and render launched — The single fix is re-aiming `village_lamps` and `river_glimmer` onto the lamps and channels that are actually in the trough (verified `alive
-- **2026-09-06 15:28 UTC** — Render landed for ladder/night after 616s — judge says hold
-- **2026-09-06 15:35 UTC** — cycle_41_anvil_base: spec updated and render launched — The fire-basket pin's "no smoke rises from it" clause is written verbatim into the positive prompt and suppresses the one subject that is sm
-- **2026-09-06 15:48 UTC** — Render landed for anvil/base after 711s — judge says reject (named subject(s) not moving in the shipped clip: far_smoke p95 3.22)
-- **2026-09-06 16:01 UTC** — cycle_42_anvil_base: parked for a human — The base art is the defect — the scene prompt asks for "one fat grey column of woodsmoke, broad and solid" but `scene.png` renders a ~40 px translucent thread t
-- **2026-09-06 16:09 UTC** — cycle_43_anvil_night: spec updated and render launched — The single change is polarity — every fire word moves out of the positive-side `pinned` prose into the negatives (the pin is now an affirmat
-- **2026-09-06 16:19 UTC** — Render landed for anvil/night after 599s — judge says hold
-- **2026-09-06 16:23 UTC** — cycle_44_shears_base: judge overruled with evidence — holding for review. The lens cloud is demonstrably alive — its rim feathers and its underside light shifts across the loop with coherent lag-growing motion — and the "dead" verdict
-- **2026-09-06 16:30 UTC** — cycle_45_shears_night: spec updated and render launched — Both subject boxes are re-aimed onto the lamps and river as they actually sit in the current art (they measure alive/near-alive on the exist
-- **2026-09-06 16:41 UTC** — Render landed for shears/night after 617s — judge says hold
-- **2026-09-06 16:48 UTC** — cycle_46_broken_tooth_night: spec updated and render launched — The single fix is relocating `village_lamps` onto the band where the lamps actually are ([0.35,0.425,0.77,0.50], where this very clip alread
-- **2026-09-06 16:58 UTC** — Render landed for broken_tooth/night after 600s — judge says hold
-- **2026-09-06 17:05 UTC** — cycle_47_kiln_night: spec updated and render launched — The only change is moving both boxes off bare dome rock and onto the villages and braided channels they name — the phrases, rigid, pinned an
-- **2026-09-06 17:16 UTC** — Render landed for kiln/night after 625s — judge says hold
-- **2026-09-06 17:23 UTC** — cycle_48_crown_night: evaluator FAIL on a RERENDER (retry 1/2).
-- **2026-09-06 17:34 UTC** — cycle_49_crown_night: rebaked (The reject was an artifact of three mis-aimed subject boxes (now corrected in the spec) and of a rep) → hold
-- **2026-09-06 17:40 UTC** — cycle_50_crown_order_sent: judge overruled with evidence — holding for review. The only convicting finding is a measurement artefact — `beacon_fires` is measured over a patch of pinned night sky rather than the flame, which sits at about `
-- **2026-09-06 17:46 UTC** — cycle_51_fenwatch_night: spec updated and render launched — The single change is pinning the scene's actual varying light source — the ambient moonlight, which no line in the old spec constrained — as
-- **2026-09-06 17:56 UTC** — Render landed for fenwatch/night after 608s — judge says hold
-- **2026-09-06 18:08 UTC** — cycle_52_spindle_base: spec updated and render launched — The single change is naming the boiling architecture as `still` subjects — `platform_stone`, `fire_basket`, `spyglass_tripod`, `fuel_box` — 
-- **2026-09-06 18:19 UTC** — Render landed for spindle/base after 600s — judge says hold
-- **2026-09-06 18:26 UTC** — cycle_53_rams_head_base: judge overruled with evidence — holding for review. The swing is a sub-visual ~5% exposure breath over the last third of the loop with no light source cycling and no rigid-object motion — eight frames spanning th
-- **2026-09-06 18:31 UTC** — cycle_54_rams_head_night: spec updated and render launched — The brightness-modulation clause is stripped out of the `village_lamps` phrase — the haze mechanic that made the box alive is kept intact, b
-- **2026-09-06 18:42 UTC** — Render landed for rams_head/night after 611s — judge says hold
-- **2026-09-06 18:48 UTC** — cycle_55_sisters_base: judge overruled with evidence — holding for review. The pinned `slab_ledger` is visually and metrically frozen at native resolution across the whole loop with landmark drift at 0 px, so the report-only `still_vio
-- **2026-09-06 18:54 UTC** — cycle_56_sisters_night: evaluator FAIL on a RERENDER (retry 1/2).
-- **2026-09-06 19:04 UTC** — cycle_57_sisters_night: spec updated and render launched — The single change is declaring the four fire-prone regions (fire-basket, both slate cairns, the seam cairn at both edges) as `still` subject
-- **2026-09-06 19:15 UTC** — Render landed for sisters/night after 622s — judge says hold
-- **2026-09-06 19:23 UTC** — cycle_58_hood_base: evaluator FAIL on a PASS (retry 1/2).
-- **2026-09-06 19:30 UTC** — cycle_59_hood_base: spec updated and render launched — The single change is `force_repair: true` on cloud_sea — identical names, boxes, phrases, rigid, pinned and negatives — so the pipeline tile
-- **2026-09-06 19:44 UTC** — Render landed for hood/base after 840s — judge says hold
-- **2026-09-06 19:56 UTC** — cycle_60_hood_night: evaluator FAIL on a RERENDER (retry 1/2).
-- **2026-09-06 20:13 UTC** — cycle_61_hood_night: rebaked (The sky was swarming in violation of the spec's star pin, so I added a `still: true` `star_field` bo) → hold
-- **2026-09-06 20:18 UTC** — cycle_62_ladder_base: judge overruled with evidence — holding for review. The only expect_still subject measures p95 0.77 (below the 8.0 trigger, so no still_violation is actually present in the current judge record), landmark drift i
-- **2026-09-06 20:23 UTC** — cycle_63_ladder_night: spec updated and render launched — The one change is re-aiming `fire_basket` onto the fire bed it was missing ([0.02,0.52,0.22,1.0] instead of the empty rim air at [0.06,0.55,
-- **2026-09-06 20:35 UTC** — Render landed for ladder/night after 614s — judge says hold
-- **2026-09-06 20:45 UTC** — cycle_64_anvil_night: parked for a human — The fix is known, verified and free but not reachable by any action available here — I simulated the bake at mask percentiles 46/60/75/85/90/93/96 and masking p
-- **2026-09-06 20:49 UTC** — cycle_65_shears_base: judge overruled with evidence — holding for review. The lens cloud is measurably and visibly animating — rim feathering and underside light travel, 5.6% area breathing, ~50-level peak changes — while holding stat
-- **2026-09-06 20:57 UTC** — cycle_66_shears_night: spec updated and render launched — The scene's illumination has never been pinned and the two subject phrases explicitly license it to change ("flickering", "catching and losi
-- **2026-09-06 21:07 UTC** — Render landed for shears/night after 600s — judge says hold
-- **2026-09-06 21:19 UTC** — cycle_67_whistlegate_base: evaluator FAIL on a RERENDER (retry 1/2).
-- **2026-09-06 21:27 UTC** — cycle_68_whistlegate_base: rebaked (The mask sidecar is enabled at auto and already pins `desk_ledger`, so re-baking from `cine_base_src) → hold
-- **2026-09-06 21:33 UTC** — cycle_69_whistlegate_night: judge overruled with evidence — holding for review. The baked clip is visually correct — lamps gutter without extinguishing, the fire animates, everything pinned is still, and both warnings are artifacts of subje
-- **2026-09-06 21:38 UTC** — cycle_70_broken_tooth_base: evaluator FAIL on a PASS (retry 1/2).
-- **2026-09-06 21:43 UTC** — cycle_71_broken_tooth_base: judge overruled with evidence — holding for review. The plume is mandated by the room's own scene prompt and measurably billows in place without descending or spreading onto the shelf across all 61 frames, `gorge
-- **2026-09-06 21:52 UTC** — cycle_72_kiln_night: evaluator FAIL on a RERENDER (retry 1/2).
-- **2026-09-06 23:32 UTC** — cycle_73_kiln_night: rebaked (I have written one `still: true` subject `sky_and_ridgelines` box [0.0,0.0,1.0,0.46] into the night ) → hold
-- **2026-09-06 23:41 UTC** — cycle_74_crown_base: evaluator FAIL on a RERENDER (retry 1/2).
-- **2026-09-06 23:48 UTC** — cycle_75_crown_base: spec updated and render launched — The single change is enlarging the `slab_sheet` still box from (0.53,0.74,0.63,0.96) to (0.545,0.50,0.685,1.00) so it covers the whole measu
-- **2026-09-06 23:58 UTC** — Render landed for crown/base after 583s — judge says hold
-- **2026-09-07 00:04 UTC** — cycle_76_crown_night: evaluator FAIL on a PASS (retry 1/2).
-- **2026-09-07 00:10 UTC** — cycle_77_crown_night: spec updated and render launched — The single change is to stop asking the tarn for the spreading, seeping, level-changing water the room's own pinned line and negatives expli
-- **2026-09-07 00:24 UTC** — Render landed for crown/night after 734s — judge says reject (named subject(s) not moving in the shipped clip: glacier_tarn has no lit pixels in its box (0.14% above luma 80) — the box is aimed off the subject, or the subj)
-- **2026-09-07 00:29 UTC** — cycle_78_crown_order_sent: judge overruled with evidence — holding for review. The clip is correct — the flame light legitimately beats on the rigid stone it illuminates while distant rigid geometry stays dead flat, no fire extinguishes an
-- **2026-09-07 00:30 UTC** — Nothing left to fix: 22 clip(s) hold for review, 3 parked.
-- **2026-09-07 00:31 UTC** — Output passed evaluation but did NOT meet all 3 declared done-criteria — held for review (see evaluations/done_criteria_check.md).
+Started 2026-09-14T22:51:18.406598+00:00.
+- **2026-09-14 22:56 UTC** — fenwatch: render launched at end guide 0.70.
+- **2026-09-14 22:56 UTC** — fenwatch: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-14 22:57 UTC** — fenwatch: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-14 22:57 UTC** — fenwatch: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-14 22:58 UTC** — fenwatch: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-14 22:58 UTC** — fenwatch: waiting on the render (poll 5/40). No Claude call spent.
+- **2026-09-14 22:59 UTC** — fenwatch: waiting on the render (poll 6/40). No Claude call spent.
+- **2026-09-14 22:59 UTC** — fenwatch: waiting on the render (poll 7/40). No Claude call spent.
+- **2026-09-14 23:00 UTC** — fenwatch: waiting on the render (poll 8/40). No Claude call spent.
+- **2026-09-14 23:00 UTC** — fenwatch: waiting on the render (poll 9/40). No Claude call spent.
+- **2026-09-14 23:01 UTC** — fenwatch: waiting on the render (poll 10/40). No Claude call spent.
+- **2026-09-14 23:01 UTC** — fenwatch: waiting on the render (poll 11/40). No Claude call spent.
+- **2026-09-14 23:02 UTC** — fenwatch: waiting on the render (poll 12/40). No Claude call spent.
+- **2026-09-14 23:02 UTC** — fenwatch: waiting on the render (poll 13/40). No Claude call spent.
+- **2026-09-14 23:03 UTC** — fenwatch: waiting on the render (poll 14/40). No Claude call spent.
+- **2026-09-14 23:03 UTC** — fenwatch: waiting on the render (poll 15/40). No Claude call spent.
+- **2026-09-14 23:04 UTC** — fenwatch: waiting on the loop bake (poll 16/40). No Claude call spent.
+- **2026-09-14 23:04 UTC** — fenwatch: waiting on the loop bake (poll 17/40). No Claude call spent.
+- **2026-09-14 23:05 UTC** — fenwatch: the loop bake is still growing (6286412 bytes). Waiting for it to settle. No Claude call spent.
+- **2026-09-14 23:06 UTC** — fenwatch: gated — {"camera": "still", "return": 0.0, "peak": 8.09, "glitch": {"spike": 4.03, "breadth": 0.104, "at_pct": 94.4, "frames": 73, "breadth_normalised": 0.104}, "note": "no out-and-back: dead, or cyclic flow. NEEDS AN EYE \u2014 this measure has called three good clips dead."}
+- **2026-09-14 23:10 UTC** — fenwatch: HELD for Lucas's eye — The clip cleared the camera and glitch gates outright and the only flag is a 0.00 return, which the ledger defines as ambiguous rather than fatal — and the render's own frame strip shows the plume changing shape and the river mist spreading and re-settling across the loop, which is the cyclic-flow case that measures 0.00 by construction, so this is a question for Lucas's eye, not a reason to spend art or a render.. NOT accepted.
+- **2026-09-14 23:14 UTC** — spindle: render launched at end guide 0.70.
+- **2026-09-14 23:14 UTC** — spindle: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-14 23:15 UTC** — spindle: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-14 23:15 UTC** — spindle: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-14 23:16 UTC** — spindle: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-14 23:16 UTC** — spindle: waiting on the render (poll 5/40). No Claude call spent.
+- **2026-09-14 23:17 UTC** — spindle: waiting on the render (poll 6/40). No Claude call spent.
+- **2026-09-14 23:17 UTC** — spindle: waiting on the render (poll 7/40). No Claude call spent.
+- **2026-09-14 23:18 UTC** — spindle: waiting on the render (poll 8/40). No Claude call spent.
+- **2026-09-14 23:18 UTC** — spindle: waiting on the render (poll 9/40). No Claude call spent.
+- **2026-09-14 23:19 UTC** — spindle: waiting on the render (poll 10/40). No Claude call spent.
+- **2026-09-14 23:19 UTC** — spindle: waiting on the render (poll 11/40). No Claude call spent.
+- **2026-09-14 23:20 UTC** — spindle: waiting on the render (poll 12/40). No Claude call spent.
+- **2026-09-14 23:20 UTC** — spindle: waiting on the render (poll 13/40). No Claude call spent.
+- **2026-09-14 23:21 UTC** — spindle: waiting on the render (poll 14/40). No Claude call spent.
+- **2026-09-14 23:21 UTC** — spindle: waiting on the render (poll 15/40). No Claude call spent.
+- **2026-09-14 23:22 UTC** — spindle: waiting on the loop bake (poll 16/40). No Claude call spent.
+- **2026-09-14 23:22 UTC** — spindle: waiting on the loop bake (poll 17/40). No Claude call spent.
+- **2026-09-14 23:23 UTC** — spindle: the loop bake is still growing (5379263 bytes). Waiting for it to settle. No Claude call spent.
+- **2026-09-14 23:24 UTC** — spindle: gated — {"camera": "still", "return": 0.0, "peak": 7.74, "glitch": {"spike": 12.44, "breadth": 0.5, "at_pct": 91.7, "frames": 73, "breadth_normalised": 0.458}, "note": "no out-and-back: dead, or cyclic flow. NEEDS AN EYE \u2014 this measure has called three good clips dead."}
+- **2026-09-14 23:27 UTC** — spindle: HELD for Lucas's eye — The clip cleared the camera gate and sits well under the glitch threshold on both readings, and its 0.00 return is the documented cyclic-flow ambiguity for a flowing mover rather than evidence of death — so it queues for Lucas's eye rather than triggering a re-author.. NOT accepted.
+- **2026-09-14 23:34 UTC** — rams_head: decision not acted on (AUTHOR_MOVER, verdict FAIL).
+- **2026-09-14 23:39 UTC** — rams_head: ADJUST_VIGOUR applied. The art prompt is unchanged, so the committed still still matches — only the clip needs re-rendering.
+- **2026-09-14 23:42 UTC** — rams_head: render launched at end guide 0.70.
+- **2026-09-14 23:42 UTC** — rams_head: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-14 23:43 UTC** — rams_head: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-14 23:43 UTC** — rams_head: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-14 23:44 UTC** — rams_head: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-14 23:44 UTC** — rams_head: waiting on the render (poll 5/40). No Claude call spent.
+- **2026-09-14 23:45 UTC** — rams_head: waiting on the render (poll 6/40). No Claude call spent.
+- **2026-09-14 23:45 UTC** — rams_head: waiting on the render (poll 7/40). No Claude call spent.
+- **2026-09-14 23:46 UTC** — rams_head: waiting on the render (poll 8/40). No Claude call spent.
+- **2026-09-14 23:46 UTC** — rams_head: waiting on the render (poll 9/40). No Claude call spent.
+- **2026-09-14 23:47 UTC** — rams_head: waiting on the render (poll 10/40). No Claude call spent.
+- **2026-09-14 23:47 UTC** — rams_head: waiting on the render (poll 11/40). No Claude call spent.
+- **2026-09-14 23:48 UTC** — rams_head: waiting on the render (poll 12/40). No Claude call spent.
+- **2026-09-14 23:48 UTC** — rams_head: waiting on the render (poll 13/40). No Claude call spent.
+- **2026-09-14 23:49 UTC** — rams_head: waiting on the render (poll 14/40). No Claude call spent.
+- **2026-09-14 23:49 UTC** — rams_head: waiting on the render (poll 15/40). No Claude call spent.
+- **2026-09-14 23:50 UTC** — rams_head: waiting on the loop bake (poll 16/40). No Claude call spent.
+- **2026-09-14 23:50 UTC** — rams_head: waiting on the loop bake (poll 17/40). No Claude call spent.
+- **2026-09-14 23:51 UTC** — rams_head: the loop bake is still growing (5287400 bytes). Waiting for it to settle. No Claude call spent.
+- **2026-09-14 23:52 UTC** — rams_head: gated — {"camera": "still", "return": 0.0, "peak": 6.4, "glitch": {"spike": 3.57, "breadth": 0.354, "at_pct": 72.2, "frames": 73, "breadth_normalised": 0.312}, "note": "no out-and-back: dead, or cyclic flow. NEEDS AN EYE \u2014 this measure has called three good clips dead."}
+- **2026-09-14 23:58 UTC** — rams_head: decision not acted on (AUTHOR_MOVER, verdict FAIL).
+- **2026-09-15 00:02 UTC** — rams_head: HELD for Lucas's eye — The clip cleared every reject-only gate — camera still, glitch breadth less than half the 0.70 threshold on both readings — and its 0.00 return is the documented cyclic-flow signature of a wind-on-water mover, a call the ledger has already retracted twice on rams_head itself, so this goes to Lucas's eye rather than back to the art.. NOT accepted.
+- **2026-09-15 00:07 UTC** — sisters: render launched at end guide 0.70.
+- **2026-09-15 00:08 UTC** — sisters: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-15 00:08 UTC** — sisters: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-15 00:09 UTC** — sisters: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-15 00:09 UTC** — sisters: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-15 00:10 UTC** — sisters: waiting on the render (poll 5/40). No Claude call spent.
+- **2026-09-15 00:10 UTC** — sisters: waiting on the render (poll 6/40). No Claude call spent.
+- **2026-09-15 00:11 UTC** — sisters: waiting on the render (poll 7/40). No Claude call spent.
+- **2026-09-15 00:19 UTC** — fenwatch: art generation started (l1_fenwatch_2), generation 1/14. No Claude call spent.
+- **2026-09-15 00:20 UTC** — fenwatch: waiting on the art generation (poll 1/40). No Claude call spent.
+- **2026-09-15 00:21 UTC** — fenwatch: new art committed from l1_fenwatch_2.png and seam-staged (fenwatch        tonal step 3.8x -> BLURRED -> 2.4x  (run 0.011 -> 0.015)). NOT accepted — that is Lucas's call in the stills tab.
+- **2026-09-15 00:28 UTC** — fenwatch: render launched at end guide 0.70.
+- **2026-09-15 00:29 UTC** — fenwatch: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-15 00:29 UTC** — fenwatch: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-15 00:30 UTC** — fenwatch: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-15 00:30 UTC** — fenwatch: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-15 00:31 UTC** — fenwatch: waiting on the render (poll 5/40). No Claude call spent.
+- **2026-09-15 00:31 UTC** — fenwatch: waiting on the render (poll 6/40). No Claude call spent.
+- **2026-09-15 00:32 UTC** — fenwatch: waiting on the render (poll 7/40). No Claude call spent.
+- **2026-09-15 00:32 UTC** — fenwatch: waiting on the render (poll 8/40). No Claude call spent.
+- **2026-09-15 00:33 UTC** — fenwatch: waiting on the render (poll 9/40). No Claude call spent.
+- **2026-09-15 00:33 UTC** — fenwatch: waiting on the render (poll 10/40). No Claude call spent.
+- **2026-09-15 00:34 UTC** — fenwatch: waiting on the render (poll 11/40). No Claude call spent.
+- **2026-09-15 00:34 UTC** — fenwatch: waiting on the render (poll 12/40). No Claude call spent.
+- **2026-09-15 00:35 UTC** — fenwatch: waiting on the render (poll 13/40). No Claude call spent.
+- **2026-09-15 00:35 UTC** — fenwatch: waiting on the render (poll 14/40). No Claude call spent.
+- **2026-09-15 00:36 UTC** — fenwatch: waiting on the render (poll 15/40). No Claude call spent.
+- **2026-09-15 00:36 UTC** — fenwatch: waiting on the loop bake (poll 16/40). No Claude call spent.
+- **2026-09-15 00:37 UTC** — fenwatch: waiting on the loop bake (poll 17/40). No Claude call spent.
+- **2026-09-15 00:37 UTC** — fenwatch: the loop bake is still growing (6363329 bytes). Waiting for it to settle. No Claude call spent.
+- **2026-09-15 00:39 UTC** — fenwatch: gated — {"camera": "still", "return": 0.0, "peak": 8.73, "glitch": {"spike": 3.37, "breadth": 0.208, "at_pct": 77.8, "frames": 73, "breadth_normalised": 0.042}, "note": "no out-and-back: dead, or cyclic flow. NEEDS AN EYE \u2014 this measure has called three good clips dead."}
+- **2026-09-15 00:44 UTC** — fenwatch: decision not acted on (PIN_NON_MOVERS, verdict FAIL).
+- **2026-09-15 00:51 UTC** — fenwatch: PIN_NON_MOVERS applied. The art prompt is unchanged, so the committed still still matches — only the clip needs re-rendering.
+- **2026-09-15 00:56 UTC** — fenwatch: render launched at end guide 0.70.
+- **2026-09-15 00:57 UTC** — fenwatch: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-15 00:57 UTC** — fenwatch: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-15 00:58 UTC** — fenwatch: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-15 00:58 UTC** — fenwatch: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-15 00:59 UTC** — fenwatch: waiting on the render (poll 5/40). No Claude call spent.
+- **2026-09-15 00:59 UTC** — fenwatch: waiting on the render (poll 6/40). No Claude call spent.
+- **2026-09-15 01:00 UTC** — fenwatch: waiting on the render (poll 7/40). No Claude call spent.
+- **2026-09-15 01:00 UTC** — fenwatch: waiting on the render (poll 8/40). No Claude call spent.
+- **2026-09-15 01:01 UTC** — fenwatch: waiting on the render (poll 9/40). No Claude call spent.
+- **2026-09-15 01:01 UTC** — fenwatch: waiting on the render (poll 10/40). No Claude call spent.
+- **2026-09-15 01:02 UTC** — fenwatch: waiting on the render (poll 11/40). No Claude call spent.
+- **2026-09-15 01:02 UTC** — fenwatch: waiting on the render (poll 12/40). No Claude call spent.
+- **2026-09-15 01:03 UTC** — fenwatch: waiting on the render (poll 13/40). No Claude call spent.
+- **2026-09-15 01:04 UTC** — fenwatch: waiting on the render (poll 14/40). No Claude call spent.
+- **2026-09-15 01:04 UTC** — fenwatch: waiting on the render (poll 15/40). No Claude call spent.
+- **2026-09-15 01:05 UTC** — fenwatch: waiting on the loop bake (poll 16/40). No Claude call spent.
+- **2026-09-15 01:05 UTC** — fenwatch: waiting on the loop bake (poll 17/40). No Claude call spent.
+- **2026-09-15 01:06 UTC** — fenwatch: the loop bake is still growing (6665972 bytes). Waiting for it to settle. No Claude call spent.
+- **2026-09-15 01:07 UTC** — fenwatch: gated — {"camera": "still", "return": 0.0, "peak": 9.04, "glitch": {"spike": 3.33, "breadth": 0.062, "at_pct": 30.6, "frames": 73, "breadth_normalised": 0.021}, "note": "no out-and-back: dead, or cyclic flow. NEEDS AN EYE \u2014 this measure has called three good clips dead."}
+- **2026-09-15 01:07 UTC** — fenwatch: HELD — its last render cleared every gate, and the render budget ran out on the same cycle. NOT accepted.
+- **2026-09-15 01:07 UTC** — spindle: art generation started (l1_spindle_2), generation 2/14. No Claude call spent.
+- **2026-09-15 01:08 UTC** — spindle: waiting on the art generation (poll 1/40). No Claude call spent.
+- **2026-09-15 01:09 UTC** — spindle: new art committed from l1_spindle_2.png and seam-staged (spindle         BAND BREAK run 0.104 -> OCCLUDED -> run 0.033  (22s)  — LOOK at it). NOT accepted — that is Lucas's call in the stills tab.
+- **2026-09-15 01:13 UTC** — spindle: decision not acted on (RENDER, verdict REVIEW).
+- **2026-09-15 01:19 UTC** — spindle: render launched at end guide 0.70.
+- **2026-09-15 01:19 UTC** — spindle: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-15 01:20 UTC** — spindle: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-15 01:20 UTC** — spindle: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-15 01:21 UTC** — spindle: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-15 01:21 UTC** — spindle: waiting on the render (poll 5/40). No Claude call spent.
+- **2026-09-15 01:22 UTC** — spindle: waiting on the render (poll 6/40). No Claude call spent.
+- **2026-09-15 01:22 UTC** — spindle: waiting on the render (poll 7/40). No Claude call spent.
+- **2026-09-15 01:23 UTC** — spindle: waiting on the render (poll 8/40). No Claude call spent.
+- **2026-09-15 01:23 UTC** — spindle: waiting on the render (poll 9/40). No Claude call spent.
+- **2026-09-15 01:24 UTC** — spindle: waiting on the render (poll 10/40). No Claude call spent.
+- **2026-09-15 01:24 UTC** — spindle: waiting on the render (poll 11/40). No Claude call spent.
+- **2026-09-15 01:25 UTC** — spindle: waiting on the render (poll 12/40). No Claude call spent.
+- **2026-09-15 01:25 UTC** — spindle: waiting on the render (poll 13/40). No Claude call spent.
+- **2026-09-15 01:26 UTC** — spindle: waiting on the render (poll 14/40). No Claude call spent.
+- **2026-09-15 01:26 UTC** — spindle: waiting on the render (poll 15/40). No Claude call spent.
+- **2026-09-15 01:27 UTC** — spindle: waiting on the loop bake (poll 16/40). No Claude call spent.
+- **2026-09-15 01:27 UTC** — spindle: waiting on the loop bake (poll 17/40). No Claude call spent.
+- **2026-09-15 01:28 UTC** — spindle: the loop bake is still growing (6937829 bytes). Waiting for it to settle. No Claude call spent.
+- **2026-09-15 01:29 UTC** — spindle: gated — {"camera": "still", "return": 0.14, "peak": 10.78, "glitch": {"spike": 3.32, "breadth": 0.104, "at_pct": 33.3, "frames": 73, "breadth_normalised": 0.042}}
+- **2026-09-15 01:33 UTC** — spindle: HELD for Lucas's eye — The clip cleared all three reject-only gates and the motion is measurably confined to the authored signal cloth with the rest of the frame at the noise floor, so there is nothing left for the loop to fix and the only remaining step is Lucas's eye.. NOT accepted.
+- **2026-09-15 01:33 UTC** — rams_head: art generation started (l1_rams_head_3), generation 3/14. No Claude call spent.
+- **2026-09-15 01:34 UTC** — rams_head: waiting on the art generation (poll 1/40). No Claude call spent.
+- **2026-09-15 01:36 UTC** — rams_head: new art committed from l1_rams_head_3.png and seam-staged (rams_head       tonal step 4.7x -> BLURRED -> 6.7x  (run 0.033 -> 0.018)). NOT accepted — that is Lucas's call in the stills tab.
+- **2026-09-15 01:42 UTC** — rams_head: render launched at end guide 0.70.
+- **2026-09-15 01:43 UTC** — rams_head: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-15 01:44 UTC** — rams_head: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-15 01:44 UTC** — rams_head: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-15 01:45 UTC** — rams_head: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-15 01:45 UTC** — rams_head: waiting on the render (poll 5/40). No Claude call spent.
+- **2026-09-15 01:46 UTC** — rams_head: waiting on the render (poll 6/40). No Claude call spent.
+- **2026-09-15 01:46 UTC** — rams_head: waiting on the render (poll 7/40). No Claude call spent.
+- **2026-09-15 01:47 UTC** — rams_head: waiting on the render (poll 8/40). No Claude call spent.
+- **2026-09-15 01:47 UTC** — rams_head: waiting on the render (poll 9/40). No Claude call spent.
+- **2026-09-15 01:48 UTC** — rams_head: waiting on the render (poll 10/40). No Claude call spent.
+- **2026-09-15 01:48 UTC** — rams_head: waiting on the render (poll 11/40). No Claude call spent.
+- **2026-09-15 01:49 UTC** — rams_head: waiting on the render (poll 12/40). No Claude call spent.
+- **2026-09-15 01:49 UTC** — rams_head: waiting on the render (poll 13/40). No Claude call spent.
+- **2026-09-15 01:50 UTC** — rams_head: waiting on the loop bake (poll 14/40). No Claude call spent.
+- **2026-09-15 01:50 UTC** — rams_head: waiting on the loop bake (poll 15/40). No Claude call spent.
+- **2026-09-15 01:51 UTC** — rams_head: the loop bake is still growing (8198640 bytes). Waiting for it to settle. No Claude call spent.
+- **2026-09-15 01:52 UTC** — rams_head: gated — {"camera": "still", "return": 0.02, "peak": 10.18, "glitch": {"spike": 3.49, "breadth": 0.083, "at_pct": 33.3, "frames": 73, "breadth_normalised": 0.042}, "note": "no out-and-back: dead, or cyclic flow. NEEDS AN EYE \u2014 this measure has called three good clips dead."}
+- **2026-09-15 01:57 UTC** — rams_head: HELD for Lucas's eye — The clip cleared all three reject-only gates and its zero return is the documented cyclic-flow signature of falling water, with the motion measurably confined to the authored meltwater ribbon at 13.2x the frame median — the same register as the two clips this run already held — so nothing is left for the loop to fix and only Lucas's eye can decide.. NOT accepted.
+- **2026-09-15 01:58 UTC** — sisters: art generation started (l1_sisters_3), generation 4/14. No Claude call spent.
+- **2026-09-15 01:58 UTC** — sisters: waiting on the art generation (poll 1/40). No Claude call spent.
+- **2026-09-15 02:00 UTC** — sisters: new art committed from l1_sisters_3.png and seam-staged (sisters         tonal step 16.0x -> BLURRED -> 1.7x  (run 0.065 -> 0.039)). NOT accepted — that is Lucas's call in the stills tab.
+- **2026-09-15 02:05 UTC** — sisters: render launched at end guide 0.70.
+- **2026-09-15 02:06 UTC** — sisters: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-15 02:06 UTC** — sisters: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-15 02:07 UTC** — sisters: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-15 02:07 UTC** — sisters: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-15 02:08 UTC** — sisters: waiting on the render (poll 5/40). No Claude call spent.
+- **2026-09-15 02:08 UTC** — sisters: waiting on the render (poll 6/40). No Claude call spent.
+- **2026-09-15 02:09 UTC** — sisters: waiting on the render (poll 7/40). No Claude call spent.
+- **2026-09-15 02:09 UTC** — sisters: waiting on the render (poll 8/40). No Claude call spent.
+- **2026-09-15 02:10 UTC** — sisters: waiting on the render (poll 9/40). No Claude call spent.
+- **2026-09-15 02:10 UTC** — sisters: waiting on the render (poll 10/40). No Claude call spent.
+- **2026-09-15 02:11 UTC** — sisters: waiting on the render (poll 11/40). No Claude call spent.
+- **2026-09-15 02:11 UTC** — sisters: waiting on the render (poll 12/40). No Claude call spent.
+- **2026-09-15 02:12 UTC** — sisters: waiting on the render (poll 13/40). No Claude call spent.
+- **2026-09-15 02:13 UTC** — sisters: waiting on the render (poll 14/40). No Claude call spent.
+- **2026-09-15 02:13 UTC** — sisters: waiting on the render (poll 15/40). No Claude call spent.
+- **2026-09-15 02:14 UTC** — sisters: waiting on the loop bake (poll 16/40). No Claude call spent.
+- **2026-09-15 02:14 UTC** — sisters: waiting on the loop bake (poll 17/40). No Claude call spent.
+- **2026-09-15 02:15 UTC** — sisters: the loop bake is still growing (7343716 bytes). Waiting for it to settle. No Claude call spent.
+- **2026-09-15 02:16 UTC** — sisters: gated — {"camera": "still", "return": 0.03, "peak": 10.36, "glitch": {"spike": 3.88, "breadth": 0.167, "at_pct": 88.9, "frames": 73, "breadth_normalised": 0.083}, "note": "no out-and-back: dead, or cyclic flow. NEEDS AN EYE \u2014 this measure has called three good clips dead."}
+- **2026-09-15 02:21 UTC** — sisters: HELD for Lucas's eye — The clip cleared all three reject-only gates and its motion is bounded and confined to the authored marker-flag line at 25.2x the frame median with every other region — including the old cloud river — at the noise floor, so the 0.03 return is the documented cyclic-flow signature of a wave travelling along a line and there is nothing left for the loop to fix.. NOT accepted.
+- **2026-09-15 02:21 UTC** — hood: art generation started (l1_hood_2), generation 5/14. No Claude call spent.
+- **2026-09-15 02:22 UTC** — hood: waiting on the art generation (poll 1/40). No Claude call spent.
+- **2026-09-15 02:23 UTC** — hood: new art committed from l1_hood_2.png and seam-staged (hood            tonal step 9.0x -> BLURRED -> 1.9x  (run 0.005 -> 0.012)). NOT accepted — that is Lucas's call in the stills tab.
+- **2026-09-15 02:27 UTC** — hood: render launched at end guide 0.70.
+- **2026-09-15 02:28 UTC** — hood: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-15 02:28 UTC** — hood: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-15 02:29 UTC** — hood: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-15 02:29 UTC** — hood: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-15 02:30 UTC** — hood: waiting on the render (poll 5/40). No Claude call spent.
+- **2026-09-15 02:30 UTC** — hood: waiting on the render (poll 6/40). No Claude call spent.
+- **2026-09-15 02:31 UTC** — hood: waiting on the render (poll 7/40). No Claude call spent.
+- **2026-09-15 02:31 UTC** — hood: waiting on the render (poll 8/40). No Claude call spent.
+- **2026-09-15 02:32 UTC** — hood: waiting on the render (poll 9/40). No Claude call spent.
+- **2026-09-15 02:32 UTC** — hood: waiting on the render (poll 10/40). No Claude call spent.
+- **2026-09-15 02:33 UTC** — hood: waiting on the render (poll 11/40). No Claude call spent.
+- **2026-09-15 02:33 UTC** — hood: waiting on the render (poll 12/40). No Claude call spent.
+- **2026-09-15 02:34 UTC** — hood: waiting on the render (poll 13/40). No Claude call spent.
+- **2026-09-15 02:34 UTC** — hood: waiting on the render (poll 14/40). No Claude call spent.
+- **2026-09-15 02:35 UTC** — hood: waiting on the render (poll 15/40). No Claude call spent.
+- **2026-09-15 02:35 UTC** — hood: waiting on the loop bake (poll 16/40). No Claude call spent.
+- **2026-09-15 02:36 UTC** — hood: waiting on the loop bake (poll 17/40). No Claude call spent.
+- **2026-09-15 02:36 UTC** — hood: the loop bake is still growing (6489032 bytes). Waiting for it to settle. No Claude call spent.
+- **2026-09-15 02:38 UTC** — hood: gated — {"camera": "still", "return": 0.02, "peak": 9.5, "glitch": {"spike": 3.71, "breadth": 0.125, "at_pct": 72.2, "frames": 73, "breadth_normalised": 0.083}, "note": "no out-and-back: dead, or cyclic flow. NEEDS AN EYE \u2014 this measure has called three good clips dead."}
+- **2026-09-15 02:43 UTC** — hood: HELD for Lucas's eye — The clip cleared all three reject-only gates and its motion is confined to a single contiguous band at 9x the frame median exactly where the authored drip curtain sits, with the cloud sea and both seams at the noise floor, so the 0.02 return is the cyclic-flow signature of falling water — the same reading rams_head was held on in this run.. NOT accepted.
+- **2026-09-15 02:44 UTC** — ladder: art generation started (l1_ladder_1), generation 6/14. No Claude call spent.
+- **2026-09-15 02:44 UTC** — ladder: waiting on the art generation (poll 1/40). No Claude call spent.
+- **2026-09-15 02:46 UTC** — ladder: new art committed from l1_ladder_1.png and seam-staged (ladder          tonal step 4.2x -> BLURRED -> 2.2x  (run 0.009 -> 0.005)). NOT accepted — that is Lucas's call in the stills tab.
+- **2026-09-15 02:49 UTC** — ladder: render launched at end guide 0.70.
+- **2026-09-15 02:49 UTC** — ladder: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-15 02:51 UTC** — ladder: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-15 02:52 UTC** — ladder: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-15 02:52 UTC** — ladder: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-15 02:53 UTC** — ladder: waiting on the render (poll 5/40). No Claude call spent.
+- **2026-09-15 02:53 UTC** — ladder: waiting on the render (poll 6/40). No Claude call spent.
+- **2026-09-15 02:54 UTC** — ladder: waiting on the render (poll 7/40). No Claude call spent.
+- **2026-09-15 02:54 UTC** — ladder: waiting on the render (poll 8/40). No Claude call spent.
+- **2026-09-15 02:55 UTC** — ladder: waiting on the render (poll 9/40). No Claude call spent.
+- **2026-09-15 02:55 UTC** — ladder: waiting on the render (poll 10/40). No Claude call spent.
+- **2026-09-15 02:56 UTC** — ladder: waiting on the render (poll 11/40). No Claude call spent.
+- **2026-09-15 02:56 UTC** — ladder: waiting on the render (poll 12/40). No Claude call spent.
+- **2026-09-15 02:57 UTC** — ladder: waiting on the render (poll 13/40). No Claude call spent.
+- **2026-09-15 02:57 UTC** — ladder: waiting on the loop bake (poll 14/40). No Claude call spent.
+- **2026-09-15 02:58 UTC** — ladder: waiting on the loop bake (poll 15/40). No Claude call spent.
+- **2026-09-15 02:58 UTC** — ladder: the loop bake is still growing (9539408 bytes). Waiting for it to settle. No Claude call spent.
+- **2026-09-15 02:59 UTC** — ladder: gated — {"camera": "still", "return": 0.03, "peak": 12.28, "glitch": {"spike": 3.45, "breadth": 0.021, "at_pct": 77.8, "frames": 73, "breadth_normalised": 0.021}, "note": "no out-and-back: dead, or cyclic flow. NEEDS AN EYE \u2014 this measure has called three good clips dead."}
+- **2026-09-15 03:06 UTC** — ladder: HELD for Lucas's eye — The clip cleared the camera and glitch gates outright, and its near-zero return is the documented cyclic-flow signature of a water mover rather than death — peak 12.28 sits well above the dead band (5.1-5.2) and above the known-live cyclic movers (8.06-9.35), so the only remaining step is Lucas's eye.. NOT accepted.
+- **2026-09-15 03:06 UTC** — anvil: art generation started (l1_anvil_1), generation 7/14. No Claude call spent.
+- **2026-09-15 03:07 UTC** — anvil: waiting on the art generation (poll 1/40). No Claude call spent.
+- **2026-09-15 03:08 UTC** — anvil: new art committed from l1_anvil_1.png and seam-staged (anvil           tonal step 15.3x -> BLURRED -> 1.2x  (run 0.025 -> 0.037)). NOT accepted — that is Lucas's call in the stills tab.
+- **2026-09-15 03:12 UTC** — anvil: render launched at end guide 0.70.
+- **2026-09-15 03:13 UTC** — anvil: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-15 03:13 UTC** — anvil: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-15 03:14 UTC** — anvil: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-15 03:14 UTC** — anvil: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-15 03:15 UTC** — anvil: waiting on the render (poll 5/40). No Claude call spent.
+- **2026-09-15 03:15 UTC** — anvil: waiting on the render (poll 6/40). No Claude call spent.
+- **2026-09-15 03:16 UTC** — anvil: waiting on the render (poll 7/40). No Claude call spent.
+- **2026-09-15 03:16 UTC** — anvil: waiting on the render (poll 8/40). No Claude call spent.
+- **2026-09-15 03:17 UTC** — anvil: waiting on the render (poll 9/40). No Claude call spent.
+- **2026-09-15 03:17 UTC** — anvil: waiting on the render (poll 10/40). No Claude call spent.
+- **2026-09-15 03:18 UTC** — anvil: waiting on the render (poll 11/40). No Claude call spent.
+- **2026-09-15 03:18 UTC** — anvil: waiting on the render (poll 12/40). No Claude call spent.
+- **2026-09-15 03:19 UTC** — anvil: waiting on the render (poll 13/40). No Claude call spent.
+- **2026-09-15 03:19 UTC** — anvil: waiting on the render (poll 14/40). No Claude call spent.
+- **2026-09-15 03:20 UTC** — anvil: waiting on the render (poll 15/40). No Claude call spent.
+- **2026-09-15 03:20 UTC** — anvil: waiting on the loop bake (poll 16/40). No Claude call spent.
+- **2026-09-15 03:21 UTC** — anvil: waiting on the loop bake (poll 17/40). No Claude call spent.
+- **2026-09-15 03:21 UTC** — anvil: the loop bake is still growing (7666645 bytes). Waiting for it to settle. No Claude call spent.
+- **2026-09-15 03:23 UTC** — anvil: gated — {"camera": "still", "return": 0.0, "peak": 10.04, "glitch": {"spike": 4.32, "breadth": 0.625, "at_pct": 70.8, "frames": 73, "breadth_normalised": 0.604}, "note": "no out-and-back: dead, or cyclic flow. NEEDS AN EYE \u2014 this measure has called three good clips dead."}
+- **2026-09-15 03:31 UTC** — anvil: PIN_NON_MOVERS applied. The art prompt is unchanged, so the committed still still matches — only the clip needs re-rendering.
+- **2026-09-15 03:36 UTC** — anvil: render launched at end guide 0.70.
+- **2026-09-15 03:36 UTC** — anvil: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-15 03:37 UTC** — anvil: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-15 03:37 UTC** — anvil: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-15 03:38 UTC** — anvil: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-15 03:38 UTC** — anvil: waiting on the render (poll 5/40). No Claude call spent.
+- **2026-09-15 03:39 UTC** — anvil: waiting on the render (poll 6/40). No Claude call spent.
+- **2026-09-15 03:39 UTC** — anvil: waiting on the render (poll 7/40). No Claude call spent.
+- **2026-09-15 03:40 UTC** — anvil: waiting on the render (poll 8/40). No Claude call spent.
+- **2026-09-15 03:40 UTC** — anvil: waiting on the render (poll 9/40). No Claude call spent.
+- **2026-09-15 03:41 UTC** — anvil: waiting on the render (poll 10/40). No Claude call spent.
+- **2026-09-15 03:41 UTC** — anvil: waiting on the render (poll 11/40). No Claude call spent.
+- **2026-09-15 03:42 UTC** — anvil: waiting on the render (poll 12/40). No Claude call spent.
+- **2026-09-15 03:42 UTC** — anvil: waiting on the render (poll 13/40). No Claude call spent.
+- **2026-09-15 03:43 UTC** — anvil: waiting on the render (poll 14/40). No Claude call spent.
+- **2026-09-15 03:43 UTC** — anvil: waiting on the render (poll 15/40). No Claude call spent.
+- **2026-09-15 03:44 UTC** — anvil: waiting on the loop bake (poll 16/40). No Claude call spent.
+- **2026-09-15 03:44 UTC** — anvil: waiting on the loop bake (poll 17/40). No Claude call spent.
+- **2026-09-15 03:45 UTC** — anvil: the loop bake is still growing (7445294 bytes). Waiting for it to settle. No Claude call spent.
+- **2026-09-15 03:46 UTC** — anvil: gated — {"camera": "one object moving (camera still)", "return": 0.17, "peak": 13.85, "glitch": {"spike": 8.26, "breadth": 0.062, "at_pct": 72.2, "frames": 73, "breadth_normalised": 0.5}}
+- **2026-09-15 03:46 UTC** — anvil: HELD — its last render cleared every gate, and the render budget ran out on the same cycle. NOT accepted.
+- **2026-09-15 03:46 UTC** — shears: art generation started (l1_shears_3), generation 8/14. No Claude call spent.
+- **2026-09-15 03:47 UTC** — shears: waiting on the art generation (poll 1/40). No Claude call spent.
+- **2026-09-15 03:48 UTC** — shears: new art committed from l1_shears_3.png and seam-staged (shears          tonal step 4.5x -> BLURRED -> 11.8x  (run 0.016 -> 0.008)). NOT accepted — that is Lucas's call in the stills tab.
+- **2026-09-15 03:54 UTC** — shears: render launched at end guide 0.70.
+- **2026-09-15 03:54 UTC** — shears: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-15 03:55 UTC** — shears: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-15 03:55 UTC** — shears: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-15 03:56 UTC** — shears: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-15 03:56 UTC** — shears: waiting on the render (poll 5/40). No Claude call spent.
+- **2026-09-15 03:57 UTC** — shears: waiting on the render (poll 6/40). No Claude call spent.
+- **2026-09-15 03:57 UTC** — shears: waiting on the render (poll 7/40). No Claude call spent.
+- **2026-09-15 03:58 UTC** — shears: waiting on the render (poll 8/40). No Claude call spent.
+- **2026-09-15 03:58 UTC** — shears: waiting on the render (poll 9/40). No Claude call spent.
+- **2026-09-15 03:59 UTC** — shears: waiting on the render (poll 10/40). No Claude call spent.
+- **2026-09-15 03:59 UTC** — shears: waiting on the render (poll 11/40). No Claude call spent.
+- **2026-09-15 04:00 UTC** — shears: waiting on the render (poll 12/40). No Claude call spent.
+- **2026-09-15 04:07 UTC** — shears: the loop bake is still growing (6934397 bytes). Waiting for it to settle. No Claude call spent.
+- **2026-09-15 04:08 UTC** — shears: gated — {"camera": "still", "return": 0.01, "peak": 10.08, "glitch": {"spike": 3.92, "breadth": 0.167, "at_pct": 77.8, "frames": 73, "breadth_normalised": 0.042}, "note": "no out-and-back: dead, or cyclic flow. NEEDS AN EYE \u2014 this measure has called three good clips dead."}
+- **2026-09-15 04:14 UTC** — shears: decision not acted on (HOLD, verdict FAIL).
+- **2026-09-15 04:19 UTC** — shears: PIN_NON_MOVERS applied. The art prompt is unchanged, so the committed still still matches — only the clip needs re-rendering.
+- **2026-09-15 04:24 UTC** — shears: render launched at end guide 0.70.
+- **2026-09-15 04:24 UTC** — shears: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-15 04:25 UTC** — shears: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-15 04:25 UTC** — shears: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-15 04:26 UTC** — shears: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-15 04:26 UTC** — shears: waiting on the render (poll 5/40). No Claude call spent.
+- **2026-09-15 04:27 UTC** — shears: waiting on the render (poll 6/40). No Claude call spent.
+- **2026-09-15 04:27 UTC** — shears: waiting on the render (poll 7/40). No Claude call spent.
+- **2026-09-15 04:28 UTC** — shears: waiting on the render (poll 8/40). No Claude call spent.
+- **2026-09-15 04:28 UTC** — shears: waiting on the render (poll 9/40). No Claude call spent.
+- **2026-09-15 04:29 UTC** — shears: waiting on the render (poll 10/40). No Claude call spent.
+- **2026-09-15 04:29 UTC** — shears: waiting on the render (poll 11/40). No Claude call spent.
+- **2026-09-15 04:56 UTC** — shears: the loop bake is still growing (6985428 bytes). Waiting for it to settle. No Claude call spent.
+- **2026-09-15 04:57 UTC** — shears: gated — {"camera": "still", "return": 0.01, "peak": 10.29, "glitch": {"spike": 3.52, "breadth": 0.271, "at_pct": 72.2, "frames": 73, "breadth_normalised": 0.125}, "note": "no out-and-back: dead, or cyclic flow. NEEDS AN EYE \u2014 this measure has called three good clips dead."}
+- **2026-09-15 04:57 UTC** — shears: HELD — its last render cleared every gate, and the render budget ran out on the same cycle. NOT accepted.
+- **2026-09-15 04:57 UTC** — whistlegate: art generation started (l1_whistlegate_3), generation 9/14. No Claude call spent.
+- **2026-09-15 04:58 UTC** — whistlegate: waiting on the art generation (poll 1/40). No Claude call spent.
+- **2026-09-15 04:59 UTC** — whistlegate: new art committed from l1_whistlegate_3.png and seam-staged (whistlegate     tonal step 6.7x -> BLURRED -> 1.5x  (run 0.008 -> 0.035)). NOT accepted — that is Lucas's call in the stills tab.
+- **2026-09-15 05:03 UTC** — whistlegate: render launched at end guide 0.70.
+- **2026-09-15 05:04 UTC** — whistlegate: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-15 05:04 UTC** — whistlegate: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-15 05:05 UTC** — whistlegate: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-15 05:05 UTC** — whistlegate: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-15 05:06 UTC** — whistlegate: waiting on the render (poll 5/40). No Claude call spent.
+- **2026-09-15 05:06 UTC** — whistlegate: waiting on the render (poll 6/40). No Claude call spent.
+- **2026-09-15 05:07 UTC** — whistlegate: waiting on the render (poll 7/40). No Claude call spent.
+- **2026-09-15 05:07 UTC** — whistlegate: waiting on the render (poll 8/40). No Claude call spent.
+- **2026-09-15 05:08 UTC** — whistlegate: waiting on the render (poll 9/40). No Claude call spent.
+- **2026-09-15 05:08 UTC** — whistlegate: waiting on the render (poll 10/40). No Claude call spent.
+- **2026-09-15 05:09 UTC** — whistlegate: waiting on the render (poll 11/40). No Claude call spent.
+- **2026-09-15 05:09 UTC** — whistlegate: waiting on the render (poll 12/40). No Claude call spent.
+- **2026-09-15 05:10 UTC** — whistlegate: waiting on the render (poll 13/40). No Claude call spent.
+- **2026-09-15 05:10 UTC** — whistlegate: waiting on the render (poll 14/40). No Claude call spent.
+- **2026-09-15 05:11 UTC** — whistlegate: waiting on the render (poll 15/40). No Claude call spent.
+- **2026-09-15 05:11 UTC** — whistlegate: waiting on the loop bake (poll 16/40). No Claude call spent.
+- **2026-09-15 05:12 UTC** — whistlegate: waiting on the loop bake (poll 17/40). No Claude call spent.
+- **2026-09-15 05:12 UTC** — whistlegate: the loop bake is still growing (6021590 bytes). Waiting for it to settle. No Claude call spent.
+- **2026-09-15 05:14 UTC** — whistlegate: gated — {"camera": "still", "return": 0.0, "peak": 7.93, "glitch": {"spike": 3.47, "breadth": 0.146, "at_pct": 72.2, "frames": 73, "breadth_normalised": 0.083}, "note": "no out-and-back: dead, or cyclic flow. NEEDS AN EYE \u2014 this measure has called three good clips dead."}
+- **2026-09-15 05:18 UTC** — whistlegate: HELD for Lucas's eye — The clip cleared all three reject-only gates and its motion is bounded and confined to the authored kettle plume at 11.4x the frame median with every non-mover at the noise floor, so the zero return is the cyclic-flow signature of rising steam rather than death and nothing is left for the loop to fix.. NOT accepted.
+- **2026-09-15 05:19 UTC** — broken_tooth: art generation started (l1_broken_tooth_1), generation 10/14. No Claude call spent.
+- **2026-09-15 05:19 UTC** — broken_tooth: waiting on the art generation (poll 1/40). No Claude call spent.
+- **2026-09-15 05:21 UTC** — broken_tooth: new art committed from l1_broken_tooth_1.png and seam-staged (broken_tooth    tonal step 16.1x -> BLURRED -> 1.3x  (run 0.020 -> 0.010)). NOT accepted — that is Lucas's call in the stills tab.
+- **2026-09-15 05:24 UTC** — broken_tooth: render launched at end guide 0.70.
+- **2026-09-15 05:24 UTC** — broken_tooth: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-15 05:25 UTC** — broken_tooth: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-15 05:25 UTC** — broken_tooth: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-15 05:26 UTC** — broken_tooth: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-15 05:26 UTC** — broken_tooth: waiting on the render (poll 5/40). No Claude call spent.
+- **2026-09-15 05:27 UTC** — broken_tooth: waiting on the render (poll 6/40). No Claude call spent.
+- **2026-09-15 05:27 UTC** — broken_tooth: waiting on the render (poll 7/40). No Claude call spent.
+- **2026-09-15 05:28 UTC** — broken_tooth: waiting on the render (poll 8/40). No Claude call spent.
+- **2026-09-15 05:28 UTC** — broken_tooth: waiting on the render (poll 9/40). No Claude call spent.
+- **2026-09-15 05:29 UTC** — broken_tooth: waiting on the render (poll 10/40). No Claude call spent.
+- **2026-09-15 05:29 UTC** — broken_tooth: waiting on the render (poll 11/40). No Claude call spent.
+- **2026-09-15 05:30 UTC** — broken_tooth: waiting on the render (poll 12/40). No Claude call spent.
+- **2026-09-15 05:30 UTC** — broken_tooth: waiting on the render (poll 13/40). No Claude call spent.
+- **2026-09-15 05:31 UTC** — broken_tooth: waiting on the render (poll 14/40). No Claude call spent.
+- **2026-09-15 05:31 UTC** — broken_tooth: waiting on the render (poll 15/40). No Claude call spent.
+- **2026-09-15 05:32 UTC** — broken_tooth: waiting on the loop bake (poll 16/40). No Claude call spent.
+- **2026-09-15 05:32 UTC** — broken_tooth: waiting on the loop bake (poll 17/40). No Claude call spent.
+- **2026-09-15 05:33 UTC** — broken_tooth: the loop bake is still growing (7135002 bytes). Waiting for it to settle. No Claude call spent.
+- **2026-09-15 05:34 UTC** — broken_tooth: gated — {"camera": "still", "return": 0.0, "peak": 9.64, "glitch": {"spike": 3.8, "breadth": 0.292, "at_pct": 33.3, "frames": 73, "breadth_normalised": 0.167}, "note": "no out-and-back: dead, or cyclic flow. NEEDS AN EYE \u2014 this measure has called three good clips dead."}
+- **2026-09-15 05:38 UTC** — broken_tooth: HELD for Lucas's eye — The clip survived every gate and the zero return is cyclic flow, not death — the pour is visibly alive in a bounded column at 9x the frame's background variance with everything else frozen — so it goes to Lucas's eye, which is the only thing that may accept it.. NOT accepted.
+- **2026-09-15 05:38 UTC** — kiln: art generation started (l1_kiln_2), generation 11/14. No Claude call spent.
+- **2026-09-15 05:39 UTC** — kiln: waiting on the art generation (poll 1/40). No Claude call spent.
+- **2026-09-15 05:40 UTC** — kiln: new art committed from l1_kiln_2.png and seam-staged (kiln            tonal step 12.1x -> BLURRED -> 1.7x  (run 0.000 -> 0.011)). NOT accepted — that is Lucas's call in the stills tab.
+- **2026-09-15 05:45 UTC** — kiln: render launched at end guide 0.70.
+- **2026-09-15 05:46 UTC** — kiln: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-15 05:46 UTC** — kiln: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-15 05:47 UTC** — kiln: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-15 05:47 UTC** — kiln: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-15 05:48 UTC** — kiln: waiting on the render (poll 5/40). No Claude call spent.
+- **2026-09-15 05:48 UTC** — kiln: waiting on the render (poll 6/40). No Claude call spent.
+- **2026-09-15 05:49 UTC** — kiln: waiting on the render (poll 7/40). No Claude call spent.
+- **2026-09-15 05:49 UTC** — kiln: waiting on the render (poll 8/40). No Claude call spent.
+- **2026-09-15 05:50 UTC** — kiln: waiting on the render (poll 9/40). No Claude call spent.
+- **2026-09-15 05:50 UTC** — kiln: waiting on the render (poll 10/40). No Claude call spent.
+- **2026-09-15 05:51 UTC** — kiln: waiting on the render (poll 11/40). No Claude call spent.
+- **2026-09-15 05:52 UTC** — kiln: waiting on the render (poll 12/40). No Claude call spent.
+- **2026-09-15 05:52 UTC** — kiln: waiting on the render (poll 13/40). No Claude call spent.
+- **2026-09-15 05:53 UTC** — kiln: waiting on the render (poll 14/40). No Claude call spent.
+- **2026-09-15 05:53 UTC** — kiln: waiting on the render (poll 15/40). No Claude call spent.
+- **2026-09-15 05:54 UTC** — kiln: waiting on the loop bake (poll 16/40). No Claude call spent.
+- **2026-09-15 05:54 UTC** — kiln: waiting on the loop bake (poll 17/40). No Claude call spent.
+- **2026-09-15 05:55 UTC** — kiln: the loop bake is still growing (7375756 bytes). Waiting for it to settle. No Claude call spent.
+- **2026-09-15 05:56 UTC** — kiln: gated — {"camera": "still", "return": 0.0, "peak": 9.81, "glitch": {"spike": 3.02, "breadth": 0.042, "at_pct": 91.7, "frames": 73, "breadth_normalised": 0.0}, "note": "no out-and-back: dead, or cyclic flow. NEEDS AN EYE \u2014 this measure has called three good clips dead."}
+- **2026-09-15 06:03 UTC** — kiln: decision not acted on (AUTHOR_MOVER, verdict FAIL).
+- **2026-09-15 06:11 UTC** — kiln: AUTHOR_MOVER applied. Both prompts re-rendered from the one spec. The ART prompt changed, so the still must be regenerated first.
+- **2026-09-15 06:11 UTC** — kiln: art generation started (l1_kiln_3), generation 12/14. No Claude call spent.
+- **2026-09-15 06:12 UTC** — kiln: waiting on the art generation (poll 1/40). No Claude call spent.
+- **2026-09-15 06:13 UTC** — kiln: new art committed from l1_kiln_3.png and seam-staged (kiln            tonal step 9.5x -> BLURRED -> 0.8x  (run 0.010 -> 0.015)). NOT accepted — that is Lucas's call in the stills tab.
+- **2026-09-15 06:19 UTC** — kiln: render launched at end guide 0.70.
+- **2026-09-15 06:19 UTC** — kiln: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-15 06:20 UTC** — kiln: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-15 06:20 UTC** — kiln: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-15 06:21 UTC** — kiln: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-15 06:21 UTC** — kiln: waiting on the render (poll 5/40). No Claude call spent.
+- **2026-09-15 06:22 UTC** — kiln: waiting on the render (poll 6/40). No Claude call spent.
+- **2026-09-15 06:22 UTC** — kiln: waiting on the render (poll 7/40). No Claude call spent.
+- **2026-09-15 06:23 UTC** — kiln: waiting on the render (poll 8/40). No Claude call spent.
+- **2026-09-15 06:23 UTC** — kiln: waiting on the render (poll 9/40). No Claude call spent.
+- **2026-09-15 06:24 UTC** — kiln: waiting on the render (poll 10/40). No Claude call spent.
+- **2026-09-15 06:24 UTC** — kiln: waiting on the render (poll 11/40). No Claude call spent.
+- **2026-09-15 06:25 UTC** — kiln: waiting on the render (poll 12/40). No Claude call spent.
+- **2026-09-15 06:25 UTC** — kiln: waiting on the render (poll 13/40). No Claude call spent.
+- **2026-09-15 06:26 UTC** — kiln: waiting on the render (poll 14/40). No Claude call spent.
+- **2026-09-15 06:26 UTC** — kiln: waiting on the render (poll 15/40). No Claude call spent.
+- **2026-09-15 06:27 UTC** — kiln: waiting on the loop bake (poll 16/40). No Claude call spent.
+- **2026-09-15 06:27 UTC** — kiln: waiting on the loop bake (poll 17/40). No Claude call spent.
+- **2026-09-15 06:28 UTC** — kiln: the loop bake is still growing (6447793 bytes). Waiting for it to settle. No Claude call spent.
+- **2026-09-15 06:29 UTC** — kiln: gated — {"camera": "still", "return": 0.01, "peak": 8.4, "glitch": {"spike": 3.03, "breadth": 0.021, "at_pct": 30.6, "frames": 73, "breadth_normalised": 0.0}, "note": "no out-and-back: dead, or cyclic flow. NEEDS AN EYE \u2014 this measure has called three good clips dead."}
+- **2026-09-15 06:29 UTC** — kiln: HELD — its last render cleared every gate, and the render budget ran out on the same cycle. NOT accepted.
+- **2026-09-15 06:29 UTC** — crown: art generation started (l1_crown_2), generation 13/14. No Claude call spent.
+- **2026-09-15 06:30 UTC** — crown: waiting on the art generation (poll 1/40). No Claude call spent.
+- **2026-09-15 06:31 UTC** — crown: new art committed from l1_crown_2.png and seam-staged (crown           mid 1.9x/6.5  run 0.037  ->  clean, done). NOT accepted — that is Lucas's call in the stills tab.
+- **2026-09-15 06:35 UTC** — crown: render launched at end guide 0.70.
+- **2026-09-15 06:36 UTC** — crown: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-15 06:36 UTC** — crown: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-15 06:37 UTC** — crown: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-15 06:37 UTC** — crown: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-15 06:38 UTC** — crown: waiting on the render (poll 5/40). No Claude call spent.
+- **2026-09-15 06:38 UTC** — crown: waiting on the render (poll 6/40). No Claude call spent.
+- **2026-09-15 06:39 UTC** — crown: waiting on the render (poll 7/40). No Claude call spent.
+- **2026-09-15 06:39 UTC** — crown: waiting on the render (poll 8/40). No Claude call spent.
+- **2026-09-15 06:40 UTC** — crown: waiting on the render (poll 9/40). No Claude call spent.
+- **2026-09-15 06:40 UTC** — crown: waiting on the render (poll 10/40). No Claude call spent.
+- **2026-09-15 06:41 UTC** — crown: waiting on the render (poll 11/40). No Claude call spent.
+- **2026-09-15 06:42 UTC** — crown: waiting on the render (poll 12/40). No Claude call spent.
+- **2026-09-15 06:42 UTC** — crown: waiting on the render (poll 13/40). No Claude call spent.
+- **2026-09-15 06:43 UTC** — crown: waiting on the render (poll 14/40). No Claude call spent.
+- **2026-09-15 06:43 UTC** — crown: waiting on the render (poll 15/40). No Claude call spent.
+- **2026-09-15 06:44 UTC** — crown: waiting on the loop bake (poll 16/40). No Claude call spent.
+- **2026-09-15 06:44 UTC** — crown: waiting on the loop bake (poll 17/40). No Claude call spent.
+- **2026-09-15 06:45 UTC** — crown: the loop bake is still growing (7262344 bytes). Waiting for it to settle. No Claude call spent.
+- **2026-09-15 06:46 UTC** — crown: gated — {"camera": "still", "return": 0.01, "peak": 9.85, "glitch": {"spike": 4.77, "breadth": 0.104, "at_pct": 30.6, "frames": 73, "breadth_normalised": 0.062}, "note": "no out-and-back: dead, or cyclic flow. NEEDS AN EYE \u2014 this measure has called three good clips dead."}
+- **2026-09-15 06:50 UTC** — crown: HELD for Lucas's eye — Camera is independently confirmed still with zero pixel shift, the glitch readings clear the threshold by a wide margin, and the only thing moving is the authored dispatch pennant — the zero return is the documented cyclic-flow ambiguity, not death, so this goes to Lucas's eye rather than back to the art.. NOT accepted.
+- **2026-09-15 06:51 UTC** — 360 page published with 9 room(s): http://127.0.0.1:8752/cine360_beacons.html
+- **2026-09-15 06:51 UTC** — Every room is held or parked. HELD (need Lucas's eye): ['fenwatch', 'spindle', 'rams_head', 'sisters', 'hood', 'ladder', 'anvil', 'shears', 'whistlegate', 'broken_tooth', 'kiln', 'crown']. 360 page published with 9 room(s): http://127.0.0.1:8752/cine360_beacons.html. Nothing here is accepted — metrics may reject and must never approve.
+- **2026-09-15 10:53 UTC** — spindle: render launched at end guide 0.70.
+- **2026-09-15 10:53 UTC** — spindle: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-15 10:54 UTC** — spindle: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-15 10:54 UTC** — spindle: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-15 10:55 UTC** — spindle: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-15 10:56 UTC** — spindle: waiting on the render (poll 5/40). No Claude call spent.
+- **2026-09-15 10:56 UTC** — spindle: waiting on the render (poll 6/40). No Claude call spent.
+- **2026-09-15 10:57 UTC** — spindle: waiting on the render (poll 7/40). No Claude call spent.
+- **2026-09-15 10:57 UTC** — spindle: waiting on the render (poll 8/40). No Claude call spent.
+- **2026-09-15 10:58 UTC** — spindle: waiting on the render (poll 9/40). No Claude call spent.
+- **2026-09-15 10:58 UTC** — spindle: waiting on the render (poll 10/40). No Claude call spent.
+- **2026-09-15 10:59 UTC** — spindle: waiting on the render (poll 11/40). No Claude call spent.
+- **2026-09-15 10:59 UTC** — spindle: waiting on the render (poll 12/40). No Claude call spent.
+- **2026-09-15 11:00 UTC** — spindle: waiting on the render (poll 13/40). No Claude call spent.
+- **2026-09-15 11:00 UTC** — spindle: waiting on the render (poll 14/40). No Claude call spent.
+- **2026-09-15 11:01 UTC** — spindle: waiting on the render (poll 15/40). No Claude call spent.
+- **2026-09-15 11:01 UTC** — spindle: waiting on the loop bake (poll 16/40). No Claude call spent.
+- **2026-09-15 11:02 UTC** — spindle: waiting on the loop bake (poll 17/40). No Claude call spent.
+- **2026-09-15 11:02 UTC** — spindle: the loop bake is still growing (6877181 bytes). Waiting for it to settle. No Claude call spent.
+- **2026-09-15 11:03 UTC** — spindle: gated — {"camera": "one object moving (camera still)", "return": 0.16, "peak": 10.91, "glitch": {"spike": 3.42, "breadth": 0.146, "at_pct": 72.2, "frames": 73, "breadth_normalised": 0.021}}
+- **2026-09-15 11:04 UTC** — spindle: HELD — its last render cleared every gate, and the render budget ran out on the same cycle. NOT accepted.
+- **2026-09-15 11:07 UTC** — rams_head: render launched at end guide 0.70.
+- **2026-09-15 11:08 UTC** — rams_head: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-15 11:08 UTC** — rams_head: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-15 11:09 UTC** — rams_head: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-15 11:09 UTC** — rams_head: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-15 11:10 UTC** — rams_head: waiting on the render (poll 5/40). No Claude call spent.
+- **2026-09-15 11:10 UTC** — rams_head: waiting on the render (poll 6/40). No Claude call spent.
+- **2026-09-15 11:11 UTC** — rams_head: waiting on the render (poll 7/40). No Claude call spent.
+- **2026-09-15 11:11 UTC** — rams_head: waiting on the render (poll 8/40). No Claude call spent.
+- **2026-09-15 11:12 UTC** — rams_head: waiting on the render (poll 9/40). No Claude call spent.
+- **2026-09-15 11:13 UTC** — rams_head: waiting on the render (poll 10/40). No Claude call spent.
+- **2026-09-15 11:13 UTC** — rams_head: waiting on the render (poll 11/40). No Claude call spent.
+- **2026-09-15 11:14 UTC** — rams_head: waiting on the render (poll 12/40). No Claude call spent.
+- **2026-09-15 11:14 UTC** — rams_head: waiting on the render (poll 13/40). No Claude call spent.
+- **2026-09-15 11:15 UTC** — rams_head: waiting on the loop bake (poll 14/40). No Claude call spent.
+- **2026-09-15 11:15 UTC** — rams_head: waiting on the loop bake (poll 15/40). No Claude call spent.
+- **2026-09-15 11:16 UTC** — rams_head: waiting on the loop bake (poll 16/40). No Claude call spent.
+- **2026-09-15 11:16 UTC** — rams_head: the loop bake is still growing (8014336 bytes). Waiting for it to settle. No Claude call spent.
+- **2026-09-15 11:18 UTC** — rams_head: gated — {"camera": "still", "return": 0.03, "peak": 10.1, "glitch": {"spike": 3.28, "breadth": 0.062, "at_pct": 33.3, "frames": 73, "breadth_normalised": 0.0}, "note": "no out-and-back: dead, or cyclic flow. NEEDS AN EYE \u2014 this measure has called three good clips dead."}
+- **2026-09-15 11:18 UTC** — rams_head: HELD — its last render cleared every gate, and the render budget ran out on the same cycle. NOT accepted.
+- **2026-09-15 11:22 UTC** — shears: render launched at end guide 0.70.
+- **2026-09-15 11:23 UTC** — shears: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-15 11:23 UTC** — shears: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-15 11:24 UTC** — shears: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-15 11:24 UTC** — shears: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-15 11:25 UTC** — shears: waiting on the render (poll 5/40). No Claude call spent.
+- **2026-09-15 11:25 UTC** — shears: waiting on the render (poll 6/40). No Claude call spent.
+- **2026-09-15 11:26 UTC** — shears: waiting on the render (poll 7/40). No Claude call spent.
+- **2026-09-15 11:26 UTC** — shears: waiting on the render (poll 8/40). No Claude call spent.
+- **2026-09-15 11:27 UTC** — shears: waiting on the render (poll 9/40). No Claude call spent.
+- **2026-09-15 11:27 UTC** — shears: waiting on the render (poll 10/40). No Claude call spent.
+- **2026-09-15 11:28 UTC** — shears: waiting on the render (poll 11/40). No Claude call spent.
+- **2026-09-15 11:28 UTC** — shears: waiting on the render (poll 12/40). No Claude call spent.
+- **2026-09-15 11:29 UTC** — shears: waiting on the render (poll 13/40). No Claude call spent.
+- **2026-09-15 11:29 UTC** — shears: waiting on the render (poll 14/40). No Claude call spent.
+- **2026-09-15 11:30 UTC** — shears: waiting on the render (poll 15/40). No Claude call spent.
+- **2026-09-15 11:30 UTC** — shears: waiting on the loop bake (poll 16/40). No Claude call spent.
+- **2026-09-15 11:31 UTC** — shears: waiting on the loop bake (poll 17/40). No Claude call spent.
+- **2026-09-15 11:31 UTC** — shears: the loop bake is still growing (6759933 bytes). Waiting for it to settle. No Claude call spent.
+- **2026-09-15 11:33 UTC** — shears: gated — {"camera": "still", "return": 0.01, "peak": 9.98, "glitch": {"spike": 4.4, "breadth": 0.188, "at_pct": 0.0, "frames": 73, "breadth_normalised": 0.042}, "note": "no out-and-back: dead, or cyclic flow. NEEDS AN EYE \u2014 this measure has called three good clips dead."}
+- **2026-09-15 11:33 UTC** — shears: HELD — its last render cleared every gate, and the render budget ran out on the same cycle. NOT accepted.
+- **2026-09-15 11:33 UTC** — 360 page published with 12 room(s): http://127.0.0.1:8752/cine360_beacons.html
+- **2026-09-15 11:33 UTC** — Every room is held or parked. HELD (need Lucas's eye): ['spindle', 'rams_head', 'shears']. 360 page published with 12 room(s): http://127.0.0.1:8752/cine360_beacons.html. Nothing here is accepted — metrics may reject and must never approve.
+- **2026-09-15 11:59 UTC** — sisters: render launched at end guide 0.70.
+- **2026-09-15 12:00 UTC** — sisters: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-15 12:00 UTC** — sisters: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-15 12:01 UTC** — sisters: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-15 12:01 UTC** — sisters: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-15 12:02 UTC** — sisters: waiting on the render (poll 5/40). No Claude call spent.
+- **2026-09-15 12:02 UTC** — sisters: waiting on the render (poll 6/40). No Claude call spent.
+- **2026-09-15 12:03 UTC** — sisters: waiting on the render (poll 7/40). No Claude call spent.
+- **2026-09-15 12:03 UTC** — sisters: waiting on the render (poll 8/40). No Claude call spent.
+- **2026-09-15 12:04 UTC** — sisters: waiting on the render (poll 9/40). No Claude call spent.
+- **2026-09-15 12:04 UTC** — sisters: waiting on the render (poll 10/40). No Claude call spent.
+- **2026-09-15 12:05 UTC** — sisters: waiting on the render (poll 11/40). No Claude call spent.
+- **2026-09-15 12:05 UTC** — sisters: waiting on the render (poll 12/40). No Claude call spent.
+- **2026-09-15 12:06 UTC** — sisters: waiting on the render (poll 13/40). No Claude call spent.
+- **2026-09-15 12:06 UTC** — sisters: waiting on the render (poll 14/40). No Claude call spent.
+- **2026-09-15 12:07 UTC** — sisters: waiting on the render (poll 15/40). No Claude call spent.
+- **2026-09-15 12:07 UTC** — sisters: waiting on the loop bake (poll 16/40). No Claude call spent.
+- **2026-09-15 12:08 UTC** — sisters: waiting on the loop bake (poll 17/40). No Claude call spent.
+- **2026-09-15 12:08 UTC** — sisters: the loop bake is still growing (6993185 bytes). Waiting for it to settle. No Claude call spent.
+- **2026-09-15 12:10 UTC** — sisters: gated — {"camera": "still", "return": 0.05, "peak": 10.09, "glitch": {"spike": 3.28, "breadth": 0.062, "at_pct": 30.6, "frames": 73, "breadth_normalised": 0.021}, "note": "no out-and-back: dead, or cyclic flow. NEEDS AN EYE \u2014 this measure has called three good clips dead."}
+- **2026-09-15 12:10 UTC** — sisters: HELD — its last render cleared every gate, and the render budget ran out on the same cycle. NOT accepted.
+- **2026-09-15 12:14 UTC** — anvil: render launched at end guide 0.70.
+- **2026-09-15 12:14 UTC** — anvil: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-15 12:15 UTC** — anvil: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-15 12:15 UTC** — anvil: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-15 12:16 UTC** — anvil: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-15 12:16 UTC** — anvil: waiting on the render (poll 5/40). No Claude call spent.
+- **2026-09-15 12:17 UTC** — anvil: waiting on the render (poll 6/40). No Claude call spent.
+- **2026-09-15 12:17 UTC** — anvil: waiting on the render (poll 7/40). No Claude call spent.
+- **2026-09-15 12:18 UTC** — anvil: waiting on the render (poll 8/40). No Claude call spent.
+- **2026-09-15 12:18 UTC** — anvil: waiting on the render (poll 9/40). No Claude call spent.
+- **2026-09-15 12:19 UTC** — anvil: waiting on the render (poll 10/40). No Claude call spent.
+- **2026-09-15 12:19 UTC** — anvil: waiting on the render (poll 11/40). No Claude call spent.
+- **2026-09-15 12:20 UTC** — anvil: waiting on the render (poll 12/40). No Claude call spent.
+- **2026-09-15 12:20 UTC** — anvil: waiting on the render (poll 13/40). No Claude call spent.
+- **2026-09-15 12:21 UTC** — anvil: waiting on the render (poll 14/40). No Claude call spent.
+- **2026-09-15 12:22 UTC** — anvil: waiting on the render (poll 15/40). No Claude call spent.
+- **2026-09-15 12:22 UTC** — anvil: waiting on the loop bake (poll 16/40). No Claude call spent.
+- **2026-09-15 12:23 UTC** — anvil: waiting on the loop bake (poll 17/40). No Claude call spent.
+- **2026-09-15 12:23 UTC** — anvil: the loop bake is still growing (7488925 bytes). Waiting for it to settle. No Claude call spent.
+- **2026-09-15 12:24 UTC** — anvil: gated — {"camera": "one object moving (camera still)", "return": 0.05, "peak": 10.8, "glitch": {"spike": 3.81, "breadth": 0.104, "at_pct": 72.2, "frames": 73, "breadth_normalised": 0.062}}
+- **2026-09-15 12:25 UTC** — anvil: HELD — its last render cleared every gate, and the render budget ran out on the same cycle. NOT accepted.
+- **2026-09-15 12:29 UTC** — shears: render launched at end guide 0.70.
+- **2026-09-15 12:30 UTC** — shears: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-15 12:30 UTC** — shears: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-15 12:31 UTC** — shears: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-15 12:31 UTC** — shears: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-15 12:32 UTC** — shears: waiting on the render (poll 5/40). No Claude call spent.
+- **2026-09-15 12:32 UTC** — shears: waiting on the render (poll 6/40). No Claude call spent.
+- **2026-09-15 12:33 UTC** — shears: waiting on the render (poll 7/40). No Claude call spent.
+- **2026-09-15 12:33 UTC** — shears: waiting on the render (poll 8/40). No Claude call spent.
+- **2026-09-15 12:34 UTC** — shears: waiting on the render (poll 9/40). No Claude call spent.
+- **2026-09-15 12:34 UTC** — shears: waiting on the render (poll 10/40). No Claude call spent.
+- **2026-09-15 12:35 UTC** — shears: waiting on the render (poll 11/40). No Claude call spent.
+- **2026-09-15 12:35 UTC** — shears: waiting on the render (poll 12/40). No Claude call spent.
+- **2026-09-15 12:36 UTC** — shears: waiting on the render (poll 13/40). No Claude call spent.
+- **2026-09-15 12:36 UTC** — shears: waiting on the render (poll 14/40). No Claude call spent.
+- **2026-09-15 12:37 UTC** — shears: waiting on the render (poll 15/40). No Claude call spent.
+- **2026-09-15 12:38 UTC** — shears: waiting on the loop bake (poll 16/40). No Claude call spent.
+- **2026-09-15 12:38 UTC** — shears: waiting on the loop bake (poll 17/40). No Claude call spent.
+- **2026-09-15 12:39 UTC** — shears: the loop bake is still growing (6702451 bytes). Waiting for it to settle. No Claude call spent.
+- **2026-09-15 12:40 UTC** — shears: gated — {"camera": "still", "return": 0.01, "peak": 9.81, "glitch": {"spike": 3.66, "breadth": 0.229, "at_pct": 72.2, "frames": 73, "breadth_normalised": 0.083}, "note": "no out-and-back: dead, or cyclic flow. NEEDS AN EYE \u2014 this measure has called three good clips dead."}
+- **2026-09-15 12:40 UTC** — shears: HELD — its last render cleared every gate, and the render budget ran out on the same cycle. NOT accepted.
+- **2026-09-15 12:41 UTC** — 360 page published with 12 room(s): http://127.0.0.1:8752/cine360_beacons.html
+- **2026-09-15 12:41 UTC** — Every room is held or parked. HELD (need Lucas's eye): ['sisters', 'anvil', 'shears']. 360 page published with 12 room(s): http://127.0.0.1:8752/cine360_beacons.html. Nothing here is accepted — metrics may reject and must never approve.
+- **2026-09-15 12:52 UTC** — anvil: render launched at end guide 0.70.
+- **2026-09-15 12:53 UTC** — anvil: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-15 12:53 UTC** — anvil: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-15 12:54 UTC** — anvil: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-15 12:54 UTC** — anvil: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-15 12:55 UTC** — anvil: waiting on the render (poll 5/40). No Claude call spent.
+- **2026-09-15 12:55 UTC** — anvil: waiting on the render (poll 6/40). No Claude call spent.
+- **2026-09-15 12:56 UTC** — anvil: waiting on the render (poll 7/40). No Claude call spent.
+- **2026-09-15 12:56 UTC** — anvil: waiting on the render (poll 8/40). No Claude call spent.
+- **2026-09-15 12:57 UTC** — anvil: waiting on the render (poll 9/40). No Claude call spent.
+- **2026-09-15 12:58 UTC** — anvil: waiting on the render (poll 10/40). No Claude call spent.
+- **2026-09-15 12:58 UTC** — anvil: waiting on the render (poll 11/40). No Claude call spent.
+- **2026-09-15 12:59 UTC** — anvil: waiting on the render (poll 12/40). No Claude call spent.
+- **2026-09-15 12:59 UTC** — anvil: waiting on the render (poll 13/40). No Claude call spent.
+- **2026-09-15 13:00 UTC** — anvil: waiting on the render (poll 14/40). No Claude call spent.
+- **2026-09-15 13:00 UTC** — anvil: waiting on the render (poll 15/40). No Claude call spent.
+- **2026-09-15 13:01 UTC** — anvil: waiting on the loop bake (poll 16/40). No Claude call spent.
+- **2026-09-15 13:01 UTC** — anvil: waiting on the loop bake (poll 17/40). No Claude call spent.
+- **2026-09-15 13:02 UTC** — anvil: the loop bake is still growing (8301553 bytes). Waiting for it to settle. No Claude call spent.
+- **2026-09-15 13:03 UTC** — anvil: gated — {"camera": "still", "return": 0.1, "peak": 10.98, "glitch": {"spike": 4.38, "breadth": 0.375, "at_pct": 22.2, "frames": 73, "breadth_normalised": 0.333}}
+- **2026-09-15 13:03 UTC** — anvil: HELD — its last render cleared every gate, and the render budget ran out on the same cycle. NOT accepted.
+- **2026-09-15 13:03 UTC** — 360 page published with 12 room(s): http://127.0.0.1:8752/cine360_beacons.html
+- **2026-09-15 13:03 UTC** — Every room is held or parked. HELD (need Lucas's eye): ['anvil']. 360 page published with 12 room(s): http://127.0.0.1:8752/cine360_beacons.html. Nothing here is accepted — metrics may reject and must never approve.
