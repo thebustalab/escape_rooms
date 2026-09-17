@@ -1,8 +1,0 @@
-Read all four documents, plus the live spec, the run state, and both stills.
-
-**What I found:** the still was regenerated at 02:13 today from the merged cycle-78 spec, and it genuinely depicts the new mover — a large, near-field, bleached-white-and-slate flag flying out clear of the staff against cobalt sky, frayed trailing edge, halyard bowed. The juniper plume, which cycle 78 correctly measured dead (0.89× frame median, below bare rock), now renders as a dense rope rather than a faint veil. The only clip on disk, `kiln_motion_ri75_looped.mp4` (01:53), predates that still by twenty minutes — it was rendered from the 01:40 art, whose flag came incidentally from the "flagged platform" setting text and was never named in the motion prompt. So the gate report on the table is stale, exactly as fenwatch's was at cycle 20.
-
-One defect worth recording, not fixable from this cycle's verb list: the runner's fragment merge (`long_agent.py:4183` matching on `at` alone) folded the flag into `path_broken_tooth` rather than adding an element, so the broken_tooth door now hangs on a flag staff while still labelled "The path north toward The Broken Tooth", and no north path is depicted. It does not affect the clip; the evaluator already logged it in `last_eval`.
-
-DECISION: RENDER
-WHY: The freshly committed still visibly depicts a large near-field bounded cloth mover with its authored vigour — the strongest confirmed category, and the same reading its sisters and spindle siblings were held on — the spec-derived motion prompt names only depicted movers, and the sole clip on disk was rendered from the previous art twenty minutes before this still existed.

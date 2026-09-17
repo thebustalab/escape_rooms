@@ -149,3 +149,33 @@ test("all-or-nothing returns the same shape as confirmGroups", () => {
   assert.deepEqual(Object.keys(r).sort(), ["complete", "groupCount", "locked", "newly"]);
   assert.equal(r.groupCount, 4);
 });
+
+// UNORDERED slots (2026-09-17, Lucas): "the escape should accept any order, it just needs to be the
+// combination of those four". The rows are interchangeable fire slots, so the answer is a SET of towers.
+test("unordered: a permutation of the right four completes", () => {
+  const shuffled = { f_south: "t7", f_mid: "t6", f_north: "t5", f_far: "t3" };
+  assert.equal(confirmAll(FIRES, shuffled, true).complete, true);
+  assert.equal(confirmAll(FIRES, shuffled).complete, false, "ordered mode still demands the slots match");
+});
+
+test("unordered: the right four in their canonical slots still completes", () => {
+  assert.equal(confirmAll(FIRES, FIRES_RIGHT, true).complete, true);
+});
+
+test("unordered: naming one tower twice is NOT complete (a duplicate leaves a village dark)", () => {
+  const dupe = { f_south: "t3", f_mid: "t3", f_north: "t5", f_far: "t6" };
+  assert.equal(confirmAll(FIRES, dupe, true).complete, false);
+});
+
+test("unordered: three right plus a wrong one is not complete, and still reports nothing", () => {
+  const near = { f_south: "t3", f_mid: "t5", f_north: "t6", f_far: "t0" };
+  const r = confirmAll(FIRES, near, true);
+  assert.equal(r.complete, false);
+  assert.equal(r.newly.length, 0);
+  assert.equal(r.locked.size, 0);
+});
+
+test("unordered: an unassigned slot is never complete", () => {
+  const { f_far, ...rest } = FIRES_RIGHT;
+  assert.equal(confirmAll(FIRES, rest, true).complete, false);
+});

@@ -70,12 +70,12 @@
 // A bare `./variant_resolve.js` import is NOT refreshed by bumping the <script> tag's ?v, so a changed
 // helper module (e.g. a new export) leaves browsers on a stale cached copy → "doesn't provide an export
 // named X" SyntaxError → blank page (the 2026-08-05 airship regression). Bump all three together.
-import { WebRConsole } from "./webr-console.js?v=92";
-import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs } from "./variant_resolve.js?v=92";   // Phase 3: per-hotspot state variants; monorail switch-door nav
-import * as PQ from "./puzzle_queue.js?v=92";   // dynamic puzzle queue: location-independent puzzle serving
-import { particleCount } from "./particles.js?v=92";   // ambient-particle vocabulary + per-kind field density
-import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=92";
-import { condHolds } from "./cond.js?v=92";   // ledger + elevation-map card DOM
+import { WebRConsole } from "./webr-console.js?v=102";
+import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers } from "./variant_resolve.js?v=102";   // Phase 3: per-hotspot state variants; monorail switch-door nav
+import * as PQ from "./puzzle_queue.js?v=102";   // dynamic puzzle queue: location-independent puzzle serving
+import { particleCount } from "./particles.js?v=102";   // ambient-particle vocabulary + per-kind field density
+import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=102";
+import { condHolds } from "./cond.js?v=102";   // ledger + elevation-map card DOM
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 
@@ -511,31 +511,71 @@ function _sfxCrossfade(src, vol, cfg) {
     setVolume(v) { curVol = v; try { if (!ramp) cur.volume = v; } catch (e) {} }   // ramp reads curVol live
   };
 }
-function startRoomSfx(r) {
-  const list = sfxListFor(r);
-  sfxMixer = [];
-  if (!sfxOn || !list.length) { notifySfxChange(); return; }   // sfx toggled off → start no layers (music undisturbed)
-  let deepestDuck = null;
-  list.forEach((cfg, idx) => {
-    const vol = (cfg.volume != null) ? cfg.volume : 0.7;
-    const mode = (cfg.mode === "interval") ? "interval" : "loop";   // legacy "crossfade" ⇒ loop (now always crossfades)
-    const begin = () => {
-      const handle = (mode === "interval") ? _sfxInterval(cfg.src, vol, cfg) : _sfxCrossfade(cfg.src, vol, cfg);
-      sfxHandles.push(handle);
-      sfxMixer.push({ label: sfxLabel(cfg, idx), mode, vol, cfg, handle });
-      notifySfxChange();
-    };
-    const delayMs = (cfg.delay || 0) * 1000;
-    if (delayMs) { const t = setTimeout(begin, delayMs); sfxHandles.push({ stop: () => clearTimeout(t) }); }
-    else begin();
-    if (cfg.duckMusicTo != null) deepestDuck = (deepestDuck == null) ? cfg.duckMusicTo : Math.min(deepestDuck, cfg.duckMusicTo);
+// STATE-AWARE LAYERS (2026-09-16). A layer may carry `states: [...]` ("base", "night", …) and then plays only
+// while that backdrop is showing (variant_resolve.js → pickSfxLayers; absent = every state). Each started
+// layer is tracked with its cfg, so when the backdrop changes INSIDE a room (beacons goes to night the
+// moment whistlegate is solved, while you're standing in it) syncRoomSfx stops only the layers that no
+// longer apply and starts only the new ones — a layer true of both states plays on without a cut.
+let sfxLayers = [];        // [{cfg, handles:[…]}] — one per started layer of the active room
+let sfxScene;              // backdrop state the active layers were chosen for (undefined = none started)
+function roomSceneState(r) { try { return fullSceneState(activeVariants(r)); } catch (e) { return null; } }
+function applySfxDuck() {
+  let deepest = null;
+  sfxLayers.forEach(({ cfg }) => {
+    if (cfg.duckMusicTo != null) deepest = (deepest == null) ? cfg.duckMusicTo : Math.min(deepest, cfg.duckMusicTo);
   });
-  if (deepestDuck != null && music) music.volume = musicBaseVol * deepestDuck;
+  if (music) music.volume = (deepest != null) ? musicBaseVol * deepest : musicBaseVol;
+}
+function startSfxLayer(cfg, idx) {
+  const entry = { cfg, handles: [] };
+  const vol = (cfg.volume != null) ? cfg.volume : 0.7;
+  const mode = (cfg.mode === "interval") ? "interval" : "loop";   // legacy "crossfade" ⇒ loop (now always crossfades)
+  const begin = () => {
+    const handle = (mode === "interval") ? _sfxInterval(cfg.src, vol, cfg) : _sfxCrossfade(cfg.src, vol, cfg);
+    entry.handles.push(handle); sfxHandles.push(handle);
+    sfxMixer.push({ label: sfxLabel(cfg, idx), mode, vol, cfg, handle });
+    notifySfxChange();
+  };
+  const delayMs = (cfg.delay || 0) * 1000;
+  if (delayMs) { const t = setTimeout(begin, delayMs); const h = { stop: () => clearTimeout(t) }; entry.handles.push(h); sfxHandles.push(h); }
+  else begin();
+  sfxLayers.push(entry);
+}
+function stopSfxLayer(entry) {
+  entry.handles.forEach(h => { try { h.stop(); } catch (e) {} });
+  sfxHandles = sfxHandles.filter(h => !entry.handles.includes(h));
+  sfxMixer = sfxMixer.filter(m => m.cfg !== entry.cfg);
+  sfxLayers = sfxLayers.filter(e => e !== entry);
+}
+function startRoomSfx(r) {
+  sfxMixer = []; sfxLayers = [];
+  sfxScene = roomSceneState(r);
+  const all = sfxListFor(r);
+  const list = pickSfxLayers(all, sfxScene);
+  if (!sfxOn || !list.length) { notifySfxChange(); return; }   // sfx toggled off → start no layers (music undisturbed)
+  list.forEach(cfg => startSfxLayer(cfg, all.indexOf(cfg)));
+  applySfxDuck();
+}
+// Called after every viewer build: if the backdrop state moved since the layers were chosen, swap only the
+// layers that differ. A no-op when nothing has been started (room entry starts its own layers right after).
+function syncRoomSfx() {
+  if (!room || !sfxOn || sfxScene === undefined) return;
+  const st = roomSceneState(room);
+  if (st === sfxScene) return;
+  sfxScene = st;
+  const all = sfxListFor(room);
+  const want = pickSfxLayers(all, st);
+  sfxLayers.slice().forEach(e => { if (!want.includes(e.cfg)) stopSfxLayer(e); });
+  want.forEach(cfg => { if (!sfxLayers.some(e => e.cfg === cfg)) startSfxLayer(cfg, all.indexOf(cfg)); });
+  applySfxDuck();
+  notifySfxChange();
 }
 function stopRoomSfx() {
   sfxHandles.forEach(h => { try { h.stop(); } catch (e) {} });
   sfxHandles = [];
   sfxMixer = [];
+  sfxLayers = [];
+  sfxScene = undefined;
   if (music) music.volume = musicBaseVol;                   // un-duck
   notifySfxChange();
 }
@@ -933,6 +973,60 @@ function doorIsOpen(h, r) {
   return isPrimarySolved(r);                                    // legacy: the room's primary gate
 }
 
+// --- Door name-plates (opt-in: SCENARIO.doorLabels) -------------------------------------------------
+// Captions a door's marker with the TITLE of the room it leads to, so a roamable world can be navigated
+// by name instead of by memory of which arch was which. Two deliberate limits (Lucas, 2026-09-15), both
+// the same fog-of-war posture the player map already takes:
+//   (1) a LOCKED door is never named — the caption would leak what sits behind a gate the player has not
+//       earned (and `doorIsOpen` is the single source of truth for that, so an `availableWhen` seal, a
+//       `requires` gate and an unsolved primary all suppress it for free); and
+//   (2) a door into a room the player has NEVER ENTERED is never named — a label is a reminder of where
+//       you have been, not a preview of where you have not.
+// The caption is a CHILD of the pannellum marker, so it rides the marker's own transform as the player
+// pans and needs no projection maths of its own; `pointer-events:none` keeps it from eating the click (and
+// from blocking the test-play drag). Switch-doors resolve through `doorNav`/`resolveDoorTarget`, so a
+// monorail car's caption names its LIVE destination, and since throwing a dial re-renders the room the
+// caption re-resolves with it. Default OFF — only an explicit `doorLabels: true` turns it on, with
+// `?doorlabels=1|0` as a per-URL override so a scenario can be A/B'd on a live room without editing it.
+function doorLabelsEnabled() {
+  const q = new URLSearchParams(location.search).get("doorlabels");
+  if (q === "1") return true;
+  if (q === "0") return false;
+  return !!(window.SCENARIO && SCENARIO.doorLabels);
+}
+// The caption text for one door, or null if this door should stay anonymous.
+function doorLabelText(h, r) {
+  if (!doorIsOpen(h, r)) return null;                       // locked => no name (rule 1)
+  const idx = resolveDoorTarget(h, doorNav(h).direction);
+  if (idx < 0) return null;                                 // unbuilt / unresolved target
+  const t = SCENARIO.rooms[idx];
+  if (!t || !t.key) return null;
+  // Same "have they been here" predicate `navigateTo` uses for the first-visit entry card, so a room
+  // counts as seen by exactly one rule everywhere in the engine.
+  if (!(visitedRooms.has(t.key) || solvedRooms.has(t.key))) return null;   // never been => no name (rule 2)
+  return t.title || null;
+}
+// Attach the captions to the markers pannellum has just rendered. Called from `reveal`, which can fire
+// TWICE (the viewer's `load` event and the 1200ms safety net), so this has to be idempotent.
+function renderDoorLabels() {
+  if (!doorLabelsEnabled()) return;
+  const stage = $("#pano"); if (!stage || !room) return;
+  stage.querySelectorAll(".hsmark.door").forEach(el => {
+    if (el.querySelector(".doorname")) return;              // already captioned by the first reveal
+    const idCls = [...el.classList].find(k => k.startsWith("hs-"));
+    if (!idCls) return;                                     // an id-less door can't be matched back
+    const h = (room.hotspots || []).find(x => x.type === "door" &&
+      "hs-" + String(x.id).replace(/[^\w-]/g, "_") === idCls);
+    if (!h) return;
+    const txt = doorLabelText(h, room);
+    if (!txt) return;
+    const lab = document.createElement("div");
+    lab.className = "doorname";
+    lab.textContent = txt;
+    el.appendChild(lab);
+  });
+}
+
 // --- The in-game map (opt-out: SCENARIO.playerMap === false) ----------------------------------------
 // A read-only fog-of-war map of the rooms, opened from a chip above the field notebook. Connectivity and
 // room NAMES only — no hotspots (Lucas, 2026-09-15): the harness draws a dot per puzzle/clue/switch on
@@ -1095,7 +1189,7 @@ function spawnParticles(parent, kind, n) {
       f.style.animation = `${drifts[i % drifts.length]} ${fd.toFixed(1)}s linear ${(-Math.random() * fd).toFixed(1)}s infinite`;
     } else if (kind === "dust") {
       const drifts = ["dustDrift", "dustDrift2", "dustDrift3"];
-      const size = (1.5 + Math.random() * 2.5).toFixed(1);    // 1.5–4px motes — finer than every other kind
+      const size = (2.5 + Math.random() * 4).toFixed(1);      // 2.5–6.5px motes (was 1.5–4: too subtle, Lucas 2026-09-17)
       const fd = 20 + Math.random() * 18;                      // wander 20–38s: suspended, not falling
       const gd = 4 + Math.random() * 5;                        // glint 4–9s as it turns in the light
       f.className = "dustmote";
@@ -1439,6 +1533,7 @@ function startCinemagraph(baseUrl, cines, yaw) {
   }).catch(e => { console.error("cinemagraph start failed", e); _renderViewer(baseUrl, yaw); });
 }
 function buildViewer(img, yaw = 0) {
+  syncRoomSfx();   // the backdrop may have changed state (a solve flipping the scene to night) — follow it with sound
   const withCinemagraph = url => {
     const cines = activeCinemagraphs(room);
     if (!cines.length) return _renderViewer(url, yaw);   // no cinemagraph → static render (all existing rooms)
@@ -1504,6 +1599,7 @@ function _renderViewer(img, yaw = 0, dynamic = false) {
   const reveal = () => {
     stage.style.opacity = "1";               // fade up from black once the panorama is in
     tpEnableHotspotDrag();                   // markers only exist once pannellum has rendered them
+    renderDoorLabels();                      // ...and so do the door name-plates
     // If rebuilding the viewer interrupted the music (paused it, or reset it toward the start) while
     // it should be playing, resume from where it was — so the loop is continuous across a scene swap.
     if (music && musicOn && musicPos >= 0 && (music.paused || music.currentTime < musicPos - 1)) {
@@ -1709,12 +1805,28 @@ async function tpPersist(route, body) {
 // Re-committing a room's boxes in the harness REBUILDS its hotspots from the planned manifest, so
 // anything written only onto the placed hotspot is silently dropped by Lucas's next save. That has
 // already eaten a set of wired solve stings once. Matching is by `id`.
+// Planned entries often carry NO id (they are keyed by type + label — the harness's own attach rule,
+// `_attach_planned_content`), so matching on id alone silently mirrored nothing for those scenarios
+// (beacons, 2026-09-16). Match by id, then type + label, then — when a room has exactly one of that type
+// on each side — by type alone, which is what survives a label that was itself just edited here.
+function tpPlannedTwin(planned, placed, h) {
+  const live = x => x && typeof x === "object";
+  let p = planned.find(x => live(x) && x.id && x.id === h.id);
+  if (!p) p = planned.find(x => live(x) && x.type === h.type && x.label === h.label);
+  if (!p) {
+    const a = planned.filter(x => live(x) && x.type === h.type), b = placed.filter(x => live(x) && x.type === h.type);
+    if (a.length === 1 && b.length === 1) p = a[0];
+  }
+  return p || null;
+}
 function tpSaveRoom(r) {
   const planned = r.plannedHotspots || [];
-  (r.hotspots || []).forEach(h => {
-    const p = planned.find(x => x && x.id === h.id);
+  const placed = r.hotspots || [];
+  placed.forEach(h => {
+    const p = tpPlannedTwin(planned, placed, h);
     if (!p) return;
-    ["question", "feedback", "body", "label", "lockedBody", "prompt", "box"].forEach(k => {
+    ["question", "check", "pick", "feedback", "body", "label", "lockedBody", "prompt", "hint",
+     "pickup", "rows", "options", "states"].forEach(k => {
       if (k in h) p[k] = JSON.parse(JSON.stringify(h[k]));
     });
   });
@@ -1746,6 +1858,25 @@ function tpAuthorPanel(host, rows) {
     tpEditable(val, row.get, row.set);
   });
   host.appendChild(box);
+}
+
+// The authoring rows every console-graded card shares (check + pick): the correct line (also the notebook
+// entry), each escalating wrong-answer hint, the nudge `hint`, and the hotspot's "not yet" lockedBody.
+function tpFeedbackRows(spec, h, note) {
+  const save = () => tpSaveRoom(room);
+  const rows = [];
+  if (note) rows.push({ note });
+  rows.push({ label: "On the correct answer (also the field-notebook entry)",
+              get: () => (spec.feedback && spec.feedback.correct) || "",
+              set: v => { spec.feedback = spec.feedback || {}; spec.feedback.correct = v; return save(); } });
+  ((spec.feedback && spec.feedback.wrong) || []).forEach((_, i) => rows.push({
+    label: "Wrong-answer hint " + (i + 1) + " (shown on attempt " + (i + 1) + ")",
+    get: () => spec.feedback.wrong[i] || "", set: v => { spec.feedback.wrong[i] = v; return save(); } }));
+  rows.push({ label: "Nudge (shown before an answer exists / as the chart hint)", get: () => spec.hint || "",
+              set: v => { spec.hint = v; return save(); } });
+  if (h) rows.push({ label: "Shown while the puzzle is still locked (lockedBody)", get: () => h.lockedBody || "",
+                     set: v => { h.lockedBody = v; return save(); } });
+  return rows;
 }
 
 function tpEditable(el, getVal, save) {
@@ -1810,6 +1941,20 @@ function openLocked(h) {
   d.appendChild(p);
   if (isTestPlay()) p.textContent = h.lockedBody || "";       // raw source, so an HTML edit round-trips
   tpEditable(p, () => h.lockedBody || "", v => { h.lockedBody = v; return tpSaveRoom(room); });
+  // Test-play only (2026-09-16): an author must be able to read and edit a gated puzzle without solving
+  // everything upstream of it — the same courtesy locked DOORS already get. The gate is lifted for this
+  // one open (availableWhen restored straight after the synchronous open), so nothing is solved or saved.
+  if (isTestPlay()) {
+    const btn = document.createElement("button"); btn.className = "ghost";
+    btn.textContent = "Test-play: open it anyway";
+    btn.onclick = () => {
+      const gate = h.availableWhen;
+      closeModal();
+      h.availableWhen = undefined;
+      try { onHotspot(null, h); } finally { h.availableWhen = gate; }
+    };
+    d.appendChild(btn);
+  }
   openModal(h.label || "Not yet", d, null, h);
 }
 
@@ -1892,7 +2037,10 @@ function openDial(h) {
     const b = document.createElement("button"); b.className = "ghost"; b.dataset.v = s.value;
     b.textContent = s.label || s.value;
     b.onclick = () => {
-      gameState[key] = s.value; toast("The dial clicks to " + (s.label || s.value) + "."); refresh();
+      // A state may carry its own `toast` (2026-09-16): "The dial clicks to Put the torch to the brazier." read
+      // badly on a ceremonial gesture. Absent keeps the stock line; an empty string suppresses it.
+      const msg = (s.toast != null) ? s.toast : ("The dial clicks to " + (s.label || s.value) + ".");
+      gameState[key] = s.value; if (msg) toast(msg); refresh();
       // A dial may carry `sfx` (path string or {src,volume}) — the lever/valve throw sound (a monorail
       // switch-door's clunk). One-shot on each throw. Absent ⇒ silent, so every existing dial is unchanged.
       if (h.sfx) playOneShot(typeof h.sfx === "string" ? h.sfx : h.sfx.src, (typeof h.sfx === "object") ? h.sfx.volume : undefined);
@@ -1912,6 +2060,16 @@ function openDial(h) {
     row.appendChild(b);
   });
   wrap.appendChild(face); wrap.appendChild(row); wrap.appendChild(caption);
+  tpAuthorPanel(wrap, [
+    { note: "State values are not editable here — world-state conditions and art variants key on them." },
+    { label: "Caption before it is turned (hint)", get: () => h.hint || "", set: v => { h.hint = v; return tpSaveRoom(room); } },
+    ...states.map((s, i) => ({ label: "Button " + (i + 1) + " (" + s.value + ")", get: () => s.label || "",
+                               set: v => { s.label = v; return tpSaveRoom(room); } })),
+    ...states.map((s, i) => ({ label: "Message when turned to " + s.value + " (toast)", get: () => s.toast || "",
+                               set: v => { s.toast = v; return tpSaveRoom(room); } })),
+    { label: "Shown while it is still locked (lockedBody)", get: () => h.lockedBody || "",
+      set: v => { h.lockedBody = v; return tpSaveRoom(room); } },
+  ]);
   openModal(h.label || "The dial", wrap, null, h);
   refresh();
 }
@@ -2000,7 +2158,7 @@ function openPuzzle(h, qIndex) {
   const onSolved = (result) => { closeModal(); solveRoom(result, h, qIndex); };
   // A puzzle grades EITHER on the live R session (`check`) OR by multiple choice (`question`).
   const pid = gateKey(room.key, h.id);   // per-room attempt-count key (ids repeat across rooms)
-  right.appendChild(h.check ? buildCheckCard(h.check, onSolved, pid) : buildQuestion(h.question, onSolved, pid));
+  right.appendChild(h.check ? buildCheckCard(h.check, onSolved, pid, h) : buildQuestion(h.question, onSolved, pid));
   grid.appendChild(left); grid.appendChild(right);
   openModal(h.label || "Puzzle", grid, devSolveThunk(h, qIndex), h);
 }
@@ -2073,7 +2231,7 @@ function buildQuestion(q, onSolved, pid) {
 // answer", and the engine evaluates check.expr (a single R logical) against their session. Same
 // feedback ladder as the MCQ card. A puzzle carries EITHER `check` OR `question`.
 // check: { prompt, requires:[vars], expr, hint, maxAttempts?, feedback?:{correct,wrong[],reveal} }
-function buildCheckCard(check, onSolved, pid) {
+function buildCheckCard(check, onSolved, pid, h) {
   const maxA = check.maxAttempts || 4; let attempts = attemptCounts.get(pid) || 0;
   const fbk = check.feedback || {};
   const card = document.createElement("div"); card.className = "qcard";
@@ -2081,6 +2239,9 @@ function buildCheckCard(check, onSolved, pid) {
     `<div class="qprompt">${check.prompt || "Assign your result, then check it."}</div>
      <div class="qfeedback"></div><button class="qsubmit">Check my answer</button>`;
   const fb = card.querySelector(".qfeedback"), sub = card.querySelector(".qsubmit");
+  tpEditable(card.querySelector(".qprompt"), () => check.prompt || "", v => { check.prompt = v; return tpSaveRoom(room); });
+  tpAuthorPanel(card, tpFeedbackRows(check, h, "The grader (check.expr) is not editable here — it is pinned "
+    + "by the scenario's tests. Required object(s): " + ((check.requires || []).join(", ") || "none") + "."));
   sub.addEventListener("click", async () => {
     if (!rconsole || !rconsole.ready) {
       fb.className = "qfeedback no"; fb.innerHTML = "R is still starting — give it a moment, run your code, then check.";
@@ -2093,6 +2254,21 @@ function buildCheckCard(check, onSolved, pid) {
       fb.className = "qfeedback no";
       fb.innerHTML = check.hint ||
         ("Assign your result to " + (check.requires || []).map(v => `<code>${v}</code>`).join(", ") + " first, then run it.");
+      sub.disabled = false; return;
+    }
+    /*
+     * The check itself ERRORED — it did not return an answer, so it has not told us the student is
+     * wrong. This used to fall straight through to attempts++ and the generic "Not quite — check your
+     * pipeline and rerun.", which burned one of (usually) four graded attempts and told the student
+     * their ANSWER was wrong when in fact their object was the wrong type or shape for the check to run
+     * against at all. No attempt is spent here, for the same reason "missing" spends none: an error
+     * carries no evidence about correctness.
+     */
+    if (res.reason === "error") {
+      fb.className = "qfeedback no";
+      fb.innerHTML = "That didn't cost you an attempt — the check couldn't run against your result, " +
+        "which usually means " + (check.requires || []).map(v => `<code>${v}</code>`).join(", ") +
+        " holds something of an unexpected type or shape. Run it on its own and look at what comes back.";
       sub.disabled = false; return;
     }
     attempts++; attemptCounts.set(pid, attempts);
@@ -2187,12 +2363,27 @@ async function renderStudentPickSvg(webR, pick) {
     cand <- paste0("GeomInteractive", sub("^Geom", "", class(geom)[1]))
     if (exists(cand, envir = ns, inherits = FALSE)) get(cand, envir = ns) else NULL
   }
+  # The id column the student's plot actually carries. A summary the student BUILDS names its own key
+  # column (origin / station / destination...), so when idcol is absent from the layer's data, fall back
+  # to that data's first text column — in a one-row-per-entity summary, that is the entity (2026-09-16).
+  pick_col <- function(d) {
+    if (!is.data.frame(d) || idcol %in% names(d)) return(idcol)
+    txt <- names(d)[vapply(d, function(x) is.character(x) || is.factor(x), logical(1))]
+    if (length(txt)) txt[1] else idcol
+  }
+  layer_df <- function(i) { ld <- p$layers[[i]]$data; if (is.data.frame(ld)) ld else p$data }
+  # If ANY layer carries idcol, tag only those layers. A drawn network has a segment layer (edges: start_node,
+  # end_node...) and a point layer (nodes: node_name); falling back on the edges would make a LINE clickable
+  # as if it were a station (2026-09-16, beacons' boss). The fallback is for plots where no layer has idcol.
+  has_id <- vapply(seq_along(p$layers), function(i) { d <- layer_df(i); is.data.frame(d) && idcol %in% names(d) }, logical(1))
   changed <- FALSE
   for (i in seq_along(p$layers)) {
+    if (any(has_id) && !has_id[i]) next
     g <- twin(p$layers[[i]]$geom)
     if (is.null(g)) next
     p$layers[[i]]$geom <- g
-    add <- ggplot2::aes(data_id = !!rlang::sym(idcol), tooltip = !!rlang::sym(idcol))
+    col <- pick_col(layer_df(i))
+    add <- ggplot2::aes(data_id = !!rlang::sym(col), tooltip = !!rlang::sym(col))
     m <- p$layers[[i]]$mapping
     p$layers[[i]]$mapping <- if (is.null(m)) add else utils::modifyList(m, add)
     changed <- TRUE
@@ -2222,11 +2413,11 @@ function openPickPuzzle(h, qIndex) {
   left.appendChild(cb);
   const onSolved = (result) => { closeModal(); solveRoom(result, h, qIndex); };
   const pid = gateKey(room.key, h.id);            // per-room attempt-count key (ids repeat across rooms)
-  right.appendChild(buildPickCard(h.pick, onSolved, pid));
+  right.appendChild(buildPickCard(h.pick, onSolved, pid, h));
   grid.appendChild(left); grid.appendChild(right);
   openModal(h.label || "Puzzle", grid, devSolveThunk(h, qIndex), h);
 }
-function buildPickCard(pick, onSolved, pid) {
+function buildPickCard(pick, onSolved, pid, h) {
   const maxA = pick.maxAttempts || 4; let attempts = attemptCounts.get(pid) || 0;
   const fbk = pick.feedback || {};
   // STUDENT mode (`pick.idColumn` set) renders the student's own plot (`p`) tagged by idColumn; LEGACY
@@ -2240,6 +2431,9 @@ function buildPickCard(pick, onSolved, pid) {
      <button class="qsubmit">${studentMode ? "Draw the clickable chart" : "Draw the chart"}</button>`;
   const holder = card.querySelector(".pickholder"), fb = card.querySelector(".qfeedback"),
         btn = card.querySelector(".qsubmit");
+  tpEditable(card.querySelector(".qprompt"), () => pick.prompt || "", v => { pick.prompt = v; return tpSaveRoom(room); });
+  tpAuthorPanel(card, tpFeedbackRows(pick, h, "The keyed answer is “" + (pick.answer || "") + "” (id column: "
+    + (pick.idColumn || "—") + "). Not editable here — it is pinned by the scenario's tests."));
   let done = attempts >= maxA;
   // STUDENT mode: they build a ggplot in the console and assign it to `p`, and the engine renders THAT.
   // `p` is cleared on modal open, so this gate only passes once they've built a fresh plot in THIS puzzle.
@@ -2532,10 +2726,21 @@ const ledgerLocks = new Map();          // gateKey -> Set(locked verdict keys)
 
 function openLedger(h) {
   if (viewer) resumeYaw = viewer.getYaw();
-  openModal(h.label || "Ledger",
-            buildLedgerCard(h, (result) => { closeModal(); solveRoom(result, h); },
-                            { pid: gateKey(room.key, h.id), attemptCounts, locks: ledgerLocks }),
-            devSolveThunk(h));
+  const lcard = buildLedgerCard(h, (result) => { closeModal(); solveRoom(result, h); },
+                                { pid: gateKey(room.key, h.id), attemptCounts, locks: ledgerLocks });
+  const save = () => tpSaveRoom(room);
+  const fb = k => ({ label: { correct: "On the correct ledger", wrong: "On a wrong ledger",
+                              progress: "On partial progress", partial: "On a partly-right ledger", out: "Out of attempts" }[k],
+                     get: () => (h.feedback && h.feedback[k]) || "",
+                     set: v => { h.feedback = h.feedback || {}; h.feedback[k] = v; return save(); } });
+  tpAuthorPanel(lcard, [
+    { note: "Row answers and the option list are not editable here — they are pinned by the scenario's tests." },
+    { label: "Prompt", get: () => h.prompt || "", set: v => { h.prompt = v; return save(); } },
+    ...["correct", "wrong", "progress", "partial", "out"].filter(k => h.feedback && k in h.feedback).map(fb),
+    { label: "Shown while the ledger is still locked (lockedBody)", get: () => h.lockedBody || "",
+      set: v => { h.lockedBody = v; return save(); } },
+  ]);
+  openModal(h.label || "Ledger", lcard, devSolveThunk(h));
 }
 
 // ---- Elevation map — the draggable transcription surface -------------------------------------------
@@ -2796,7 +3001,38 @@ async function runSubmitBlock(roomKey, ta, figWrap, stat, runBtn) {
     // run(), NOT runFrom(): this regenerates the figure that goes into the student's GRADED PDF, so a
     // stray selection must never shrink it to a partial plot. Always re-run the whole block.
     await rconsole.run(ta.value);
-    const plots = $("#webr-output").querySelectorAll("canvas.webr-plot");
+    const outPane = $("#webr-output");
+    /*
+     * SHOW THE ERROR. The shared console renders into #webr-output, which on THIS screen lives inside
+     * the hidden #console-holder — so an R error here was completely invisible. A student who submitted
+     * with a syntax error was told "ran — but no figure was drawn", which points them at the plot when
+     * the problem is that their code never ran at all. Worst-affected surface in the app for a syntax
+     * error, and the one where it costs the most: this block is what goes into the graded PDF.
+     *
+     * The error is lifted out WITH the hint box the console attached to it, so the plain-English
+     * explanation follows it here exactly as it does in a room and in the book.
+     *
+     * The previously captured figure is kept underneath rather than wiped: the failed run produced
+     * nothing to replace it with, and blanking it would read as "your earlier work is gone too".
+     */
+    const errNode = outPane.querySelector(".webr-out.err");
+    if (errNode) {
+      figWrap.innerHTML = "";
+      const box = document.createElement("div");
+      box.className = "swerr";
+      box.appendChild(errNode.cloneNode(true));
+      const maybeHint = errNode.nextElementSibling;
+      if (maybeHint && maybeHint.classList.contains("webr-hintbox")) box.appendChild(maybeHint.cloneNode(true));
+      figWrap.appendChild(box);
+      const kept = w.figure || w.figureRaw;
+      if (kept) {
+        const img = document.createElement("img"); img.src = kept; img.alt = "figure";
+        figWrap.appendChild(img);
+      }
+      stat.textContent = "that code didn't run — see below";
+      return;
+    }
+    const plots = outPane.querySelectorAll("canvas.webr-plot");
     const src = plots[plots.length - 1];
     if (src) {
       w.figureRaw = src.toDataURL("image/png");                 // keep raw as the re-stampable source of truth

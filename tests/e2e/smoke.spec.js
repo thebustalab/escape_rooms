@@ -23,6 +23,8 @@ const SCENARIOS = [
   // is a question about the shared engine and not just about this room (escape_room_wiring: add a new
   // scenario's play URL here, one line, every time).
   { name: "subway", path: "/escape_rooms/rooms/networks/subway/play.html" },
+  // beacons: in_development, covered from WIRING (2026-09-16) per escape_room_wiring.
+  { name: "beacons", path: "/escape_rooms/rooms/networks/beacons/play.html" },
 ];
 
 for (const sc of SCENARIOS) {

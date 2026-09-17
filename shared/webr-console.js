@@ -17,12 +17,56 @@
  * `addStatusEl()`, `plotControls(opts)`, `resetSession()`, `resetControl(opts)`, `.ready`, `.webR`.
  */
 import { WebR } from "https://webr.r-wasm.org/latest/webr.mjs";
-import { VIEW_R_SHIM, VIEW_R_DRAIN, fromR, viewTableHTML, ensureViewStyles } from "./webr_view.js?v=92";
-import { codeToRun, selectionNote } from "./code_sel.js?v=92";
-import { PLOT_ASPECTS, PLOT_DEFAULT_ASPECT, PLOT_LIMITS, PLOT_CTL_CSS, plotGeometry } from "./plot_size.js?v=92";
-import { RESET_R_SHIM, RESET_R_CALL, RESET_CTL_CSS, RESET_LABEL, RESET_CONFIRM_LABEL, RESET_CONFIRM_MS, nextConfirmState } from "./webr_reset.js?v=92";
+import { VIEW_R_SHIM, VIEW_R_DRAIN, fromR, viewTableHTML, ensureViewStyles } from "./webr_view.js?v=102";
+import { codeToRun, selectionNote } from "./code_sel.js?v=102";
+import { PLOT_ASPECTS, PLOT_DEFAULT_ASPECT, PLOT_LIMITS, PLOT_CTL_CSS, plotGeometry } from "./plot_size.js?v=102";
+import { RESET_R_SHIM, RESET_R_CALL, RESET_CTL_CSS, RESET_LABEL, RESET_CONFIRM_LABEL, RESET_CONFIRM_MS, nextConfirmState } from "./webr_reset.js?v=102";
+import { explainError, looksLikeOrphanLayer } from "./r_diagnose.js?v=102";
 
 const errText = e => (e && e.message ? e.message : String(e));
+
+/*
+ * The error line as a student should read it. webR builds its message as "Error in `<call>`: <msg>", so
+ * the old `"Error: " + errText(err)` rendered "Error: Error in `mean(x)`: …" — the word twice, before
+ * they have read anything. Prefix only when R has not already said it.
+ */
+function errLine(err) {
+  const t = errText(err);
+  return /^Error\b/.test(t.trim()) ? t : "Error: " + t;
+}
+
+/*
+ * The plain-English gloss under an R error. Injected HERE rather than written into each surface's CSS,
+ * because the whole point of moving the hints into the shared console is that a room and the book cannot
+ * drift apart — and a hint that renders unstyled in one of them is exactly that drift, in a form nobody
+ * notices until a student meets it.
+ *
+ * Styled SUBORDINATE to R's own message on purpose: the student reads R's words first and ours second,
+ * because R's are the ones they will meet again in RStudio where we are not there to translate.
+ *
+ * Colours are hard-coded rather than taken from CSS variables: the three surfaces define different
+ * variable names (the rooms' palette is per-scenario), and a var() that does not resolve renders
+ * invisible text. These are the sandbox's amber/green on a dark pane, which all three share.
+ */
+const HINT_CSS = `
+.webr-hintbox { border-left:3px solid #ffd88c; background:rgba(255,216,140,.06);
+                padding:8px 12px; margin:-2px 0 8px; border-radius:0 6px 6px 0; font-size:13px;
+                line-height:1.45; color:inherit; }
+.webr-hintbox .webr-hlabel { font-size:11px; letter-spacing:.06em; color:#ffd88c; opacity:.85;
+                             display:block; margin-bottom:3px; }
+.webr-hintbox .webr-htry { display:block; margin-top:6px;
+                           font:12.5px ui-monospace, Menlo, Consolas, monospace; color:#9be89b; }
+`;
+
+function ensureHintStyles(doc) {
+  const d = doc || document;
+  if (d.getElementById("webr-hint-styles")) return;
+  const st = d.createElement("style");
+  st.id = "webr-hint-styles";
+  st.textContent = HINT_CSS;
+  d.head.appendChild(st);
+}
+
 
 // Plot size + shape is remembered ACROSS pages and rooms: a student who wants tall plots wants them in
 // room 4 as well as room 1, and re-picking in every puzzle modal would be its own small tax. A blocked or
@@ -81,6 +125,10 @@ export class WebRConsole {
     // bootConsole, the sandbox at module scope), and a reset before .__reset exists would report a
     // failure the student can do nothing about.
     this.resetCtls = new Set();
+    // Extra context for the error hints, set by the surface after construction. Only for things that
+    // differ BETWEEN surfaces — e.g. sandbox.html sets {envLabel:"Environment pane"}, which a room must
+    // not say because it has no such pane. See hintCtx().
+    this.hintContext = null;
     // The last thing run, so changing the size can re-render it instead of making the student press Run
     // again to see what they just chose. Null until the first run.
     this.lastRun = null;
@@ -115,7 +163,16 @@ export class WebRConsole {
 
       for (const ds of (this.config.datasets || [])) {
         this.setStatus("Loading data: " + ds.name + " …");
-        const resp = await fetch(ds.url);
+        // Off the live site (test play on localhost, the e2e servers), prefer THIS checkout's copy of a
+        // dataset published under thebustalab.github.io — otherwise every local test silently reads the last
+        // DEPLOYED CSV, not the one just engineered (beacons' v2 ledger, 2026-09-16). On the live site the
+        // URL is used as-is; locally a missing copy falls back to the published one.
+        const SITE = "https://thebustalab.github.io";
+        let resp = null;
+        if (location.origin !== SITE && ds.url.startsWith(SITE + "/")) {
+          try { const r = await fetch(location.origin + ds.url.slice(SITE.length), { cache: "no-store" }); if (r.ok) resp = r; } catch (e) {}
+        }
+        if (!resp) resp = await fetch(ds.url);
         if (!resp.ok) throw new Error("Could not fetch dataset: " + ds.url);
         const bytes = new Uint8Array(await resp.arrayBuffer());
         const path = "/home/web_user/" + ds.name + ".csv";
@@ -158,13 +215,101 @@ export class WebRConsole {
     if (out) out.innerHTML = "";
   }
 
+  // Returns the <pre> it appended (or null), so a caller can attach a hint box directly after it.
   appendText(text, cls, outEl) {
     const out = outEl || this.ui.output;
-    if (!out) return;
+    if (!out) return null;
     const pre = document.createElement("pre");
     pre.className = "webr-out " + (cls || "");
     pre.textContent = text;
     out.appendChild(pre);
+    return pre;
+  }
+
+  /*
+   * Render one hint from r_diagnose.js directly beneath `afterEl`.
+   *
+   * `.dataset.hinted` guards against a second pass double-annotating the same line. It also lets a
+   * surface that still runs its OWN annotation (sandbox.html did, before the hints moved in here) win
+   * the race without the student seeing two boxes — which matters during the push window, when the
+   * rooms repo has deployed and the book repo has not yet.
+   */
+  appendHint(hint, afterEl) {
+    if (!hint || !afterEl || afterEl.dataset.hinted) return false;
+    afterEl.dataset.hinted = "1";
+    ensureHintStyles(afterEl.ownerDocument);
+    const div = afterEl.ownerDocument.createElement("div");
+    div.className = "webr-hintbox";
+    const lab = afterEl.ownerDocument.createElement("span");
+    lab.className = "webr-hlabel";
+    lab.textContent = "WHAT THAT MEANS";
+    div.appendChild(lab);
+    div.appendChild(afterEl.ownerDocument.createTextNode(hint.message));
+    if (hint.try) {
+      const t = afterEl.ownerDocument.createElement("span");
+      t.className = "webr-htry";
+      t.textContent = hint.try;
+      div.appendChild(t);
+    }
+    afterEl.insertAdjacentElement("afterend", div);
+    return true;
+  }
+
+  /*
+   * The names that exist in the student's session RIGHT NOW, as candidates for "did you mean".
+   *
+   * Read on demand — only when a run has actually errored — so the common path pays nothing. Failure is
+   * not interesting: no candidates simply means the hint says "check the spelling" instead of naming a
+   * near-miss, which is still a useful hint.
+   */
+  async hintObjects(shelter) {
+    try {
+      const js = await (await shelter.evalR("ls()")).toJs();
+      return Array.isArray(js.values) ? js.values.filter(v => typeof v === "string") : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  /*
+   * Context handed to r_diagnose.js. `hintContext` is the hook a surface uses to say what IT has on
+   * screen — sandbox.html sets {envLabel:"Environment pane"}; a room leaves it unset, because naming a
+   * pane a student cannot see sends them hunting for UI that is not there.
+   */
+  hintCtx(source, objects) {
+    const cfg = this.config || {};
+    return Object.assign({
+      source: source || "",
+      objects: objects || [],
+      packages: cfg.packages || [],
+      datasets: (cfg.datasets || []).map(d => d && d.name).filter(Boolean),
+    }, this.hintContext || {});
+  }
+
+  /*
+   * Put a plain-English hint under what just went wrong — the shared half of what used to be
+   * sandbox.html's annotateErrors().
+   *
+   * `code` is what ACTUALLY ran, which is the highlighted selection when there is one. That matters: the
+   * structural analysis reads the source to find the real bracket fault, and handing it the whole editor
+   * would make it report brackets R was never asked to read. (A stray part-line selection producing a
+   * baffling parse error is itself one of the commonest confusions on this console.)
+   *
+   * Two distinct cases, and the second has no error at all: `ggplot(...)` followed by `geom_point()` with
+   * no trailing `+` runs as two expressions, prints the layer's internals and draws a blank panel. The
+   * student sees output and reasonably assumes it worked. It must NOT be gated on "no plot present" —
+   * `ggplot(d, aes(...))` alone DOES render a blank panel, so the case produces a canvas AND the stray
+   * text; gating on the absence of a plot made the check never fire (caught 2026-09-13 in the browser).
+   */
+  async annotateErrors(shelter, out, code, errEl, plainEl) {
+    if (errEl) {
+      // Candidate names are read only now, on the error path, so a working run pays nothing for them.
+      const objects = await this.hintObjects(shelter);
+      this.appendHint(explainError(errEl.textContent || "", this.hintCtx(code, objects)), errEl);
+      return;
+    }
+    if (!plainEl) return;
+    this.appendHint(looksLikeOrphanLayer(plainEl.textContent || ""), plainEl);
   }
 
   /*
@@ -445,28 +590,49 @@ export class WebRConsole {
     }
     const shelter = await new this.webR.Shelter();
     let rendered = 0;
+    // Held for the hint pass in `finally`: the error line to explain, and the plain output line that a
+    // stray ggplot layer would have been printed into (the one failure that produces no error at all).
+    let errEl = null, plainEl = null;
     // Measured AFTER the boot await, so the geometry reflects the pane as it is when the plot lands.
     const geom = this.plotGeometryFor(out);
     try {
       const result = await shelter.captureR(code, {
         withAutoprint: true,
         captureStreams: true,
+        // captureConditions:false is what makes message() and warning() VISIBLE. webR's default
+        // intercepts both as conditions, which never reach result.output — so a run whose only output
+        // was a warning rendered "(no output)" and students never saw R's warnings at all, which in a
+        // teaching console is the more interesting half. With this flag R prints them to stderr, which
+        // the filter below already renders. Do NOT "improve" this by rendering condition entries
+        // instead; that was the first plan and this one flag replaces all of it.
+        //
+        // It does NOT help ERRORS — those stay truncated to their first line either way. That is why
+        // r_diagnose.js reconstructs meaning from the headline; see its header.
+        captureConditions: false,
         captureGraphics: { width: geom.width, height: geom.height },
       });
       const text = result.output
         .filter((o) => o.type === "stdout" || o.type === "stderr")
         .map((o) => o.data)
         .join("\n");
-      if (text.trim().length) { this.appendText(text, "", out); rendered++; }
+      if (text.trim().length) { plainEl = this.appendText(text, "", out); rendered++; }
       for (const img of (result.images || [])) { await this.appendImage(img, out, geom); rendered++; }
     } catch (err) {
-      this.appendText("Error: " + errText(err), "err", out);
+      errEl = this.appendText(errLine(err), "err", out);
       rendered++;
     } finally {
       // Drain views even after an error: view() may have run on a line BEFORE the one that failed, and
       // an undrained queue would otherwise surface those tables on the student's next, unrelated run.
       try { rendered += await this.appendViews(shelter, out); } catch (e) { /* viewer never breaks a run */ }
       if (!rendered) this.appendText("(no output)", "muted", out);
+      // Explain the error in plain English — for EVERY surface, which is the point of it living here.
+      // This used to be wired into sandbox.html alone, so the rooms (the homework for the very chapters
+      // the sandbox demonstrates in class) showed a raw, misleading parse error with no explanation.
+      //
+      // Wrapped so a hint can never break a run: a missing explanation is a nuisance, a Run button that
+      // throws is the 2026-09-04 outage again. Same reasoning as appendViews above.
+      try { await this.annotateErrors(shelter, out, code, errEl, plainEl); }
+      catch (e) { /* a hint never breaks a run */ }
       shelter.purge();
     }
   }

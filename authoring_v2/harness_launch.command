@@ -1,35 +1,42 @@
 #!/usr/bin/env bash
-# harness_launch.command — ONE-CLICK escape-room harness launcher, run FROM THE MAC.
+# harness_launch.command — ONE-CLICK escape-room harness CONNECTOR, run FROM THE MAC.
 #
-# Run in Terminal (or double-click in Finder once it's executable: `chmod +x harness_launch.command`).
-# It:
-#   1. SSHes into host2 (the Linux desktop) and runs serve_harness.sh with HARNESS_RESTART=1 to
-#      (re)start BOTH servers FRESH (build_world harness :8752 + playtest :8055) — so every launch picks up the
-#      latest code (server changes like the no-cache headers only take effect on a fresh process).
-#   2. Opens ONE SSH tunnel mapping the Mac's own localhost:8752 and :8055 to host2's, so the Mac sees
-#      both servers exactly where host2 does. That keeps the test-play flow's origins consistent
-#      (the mixer on localhost:8055 posts volumes to the harness on localhost:8752 — same as on host2).
-#   3. Opens the build_world GALLERY (build_world_v2.html) in the default browser — the flat, scrollable
-#      view of every room's art and variants; the full authoring console (build_world.html) is linked in
-#      its header. The old v1 harness (:8751, harness_gpt.html) is obsolete and is no longer started.
-#   4. HOLDS THE TERMINAL. Press Ctrl+C (or close the window) to TEAR THE WHOLE THING DOWN — the SSH
-#      tunnel AND both host2 servers — so nothing is left running. The next launch then spins it all up
-#      fresh. (Set KEEP_SERVERS=1 to leave the servers running on exit, the old behaviour.)
+# Lifecycle in one line: the servers live on host2 permanently (cron watchdog); this only connects —
+# ensure-up, tunnel, open the console — and Ctrl+C / closing the laptop closes ONLY the tunnel it opened.
 #
-# Lifecycle in one line: each launch = fresh servers + tunnel; each Ctrl+C = full teardown.
+# Run in Terminal (or double-click in Finder; it must stay executable: `chmod +x harness_launch.command`).
+#   1. SSHes into host2 and runs serve_harness.sh ENSURE-ONLY (no restart): a healthy server is left alone,
+#      a missing/wedged one is started. It never interrupts a running job.
+#   2. Opens ONE SSH tunnel mapping the Mac's localhost:8752 (harness) and :8055 (playtest) to host2's.
+#   3. Opens the review console (build_world_v3.html) in the default browser.
+#   4. HOLDS THE TERMINAL until Ctrl+C / window close / tunnel drop, then closes the tunnel it opened.
+#      The host2 servers are NEVER stopped from here.
+#
+#   ./harness_launch.command --restart   (or HARNESS_RESTART=1 ./harness_launch.command)
+#      After the tunnel is up, asks the harness to restart itself via POST /api/restart-harness — the SAME
+#      guarded path as the console's "Restart harness" button, so it REFUSES while a job or room_iterate
+#      run is live. Use it to load new server code.
 #
 # ── CONFIG ─────────────────────────────────────────────────────────────────────────────────────────
 HOST2="${HARNESS_HOST:-bustalab@131.212.57.217}"      # override: HARNESS_HOST=bustalab@… ./harness_launch.command
 SSH_OPTS="${HARNESS_SSH_OPTS:-}"                       # e.g. HARNESS_SSH_OPTS='-J host1'  if you must hop via host1
 REMOTE_ENSURE="/home/bustalab/Documents/Tools/websites/thebustalab.github.io/escape_rooms/authoring_v2/serve_harness.sh"
-URL="http://localhost:8752/build_world_v2.html"   # the gallery harness (2026-08-31): header + concept/landing/world
-                                                  # card, then every room's art and variants flat, for scrolling review.
-                                                  # The full authoring console is one link away in its header.
+URL="http://localhost:8752/build_world_v3.html"   # the clip-review console (v3, 2026-09-15); v2 gallery and the full
+                                                  # console stay reachable at their own URLs on the same server.
 # Dedicated control socket for OUR tunnel — kept separate from your ~/.ssh/config multiplexing so the
 # tunnel can never silently attach to some other master connection (that was the "no tunnel" bug).
 CTRL="$HOME/.ssh/cm-harness.sock"
 # ────────────────────────────────────────────────────────────────────────────────────────────────────
 set -u
+
+RESTART="${HARNESS_RESTART:-0}"
+for arg in "$@"; do
+  case "$arg" in
+    --restart) RESTART=1 ;;
+    -h|--help) sed -n '2,20p' "$0"; exit 0 ;;
+    *) echo "✗ unknown argument: $arg   (only --restart is accepted)"; exit 2 ;;
+  esac
+done
 
 # does the Mac's localhost:8752 actually reach the harness API? (the real end-to-end tunnel test)
 tunnel_up() { curl -s -o /dev/null -m 2 "http://localhost:8752/api/scenarios"; }
@@ -39,8 +46,9 @@ echo "  host2: $HOST2   ${SSH_OPTS:+(ssh opts: $SSH_OPTS)}"
 
 # 1) ensure the servers are up on host2. ControlMaster=no: this call must NOT open/reuse a shared master
 #    (which is what let the tunnel below no-op against an existing connection).
-echo "① (re)starting servers FRESH on host2…"   # HARNESS_RESTART=1 → both servers relaunched so code changes take effect
-if ! ssh $SSH_OPTS -o ControlMaster=no -o ConnectTimeout=8 "$HOST2" "HARNESS_RESTART=1 bash '$REMOTE_ENSURE'"; then
+#    Ensure-only: NO HARNESS_RESTART here, ever — a restart goes through the guarded endpoint below.
+echo "① ensuring servers are up on host2 (no restart)…"
+if ! ssh $SSH_OPTS -o ControlMaster=no -o ConnectTimeout=8 "$HOST2" "HARNESS_RESTART=0 bash '$REMOTE_ENSURE'"; then
   echo "✗ couldn't reach host2 over SSH (or the ensure script failed)."
   echo "  Check you can run:  ssh $SSH_OPTS $HOST2   — on campus / VPN, key authorized on the desktop."
   echo "  If you must hop through host1:  HARNESS_SSH_OPTS='-J host1' $0"
@@ -76,7 +84,9 @@ else
   echo "   tunnel verified ✓"
 fi
 
-# Cleanup runs on Ctrl+C (INT), termination (TERM/HUP — e.g. closing the window), and normal exit.
+# Cleanup runs on Ctrl+C (INT), termination (TERM/HUP — e.g. closing the window or the laptop lid), and
+# normal exit. It closes ONLY the tunnel this run opened; the host2 servers are never touched (2026-09-17,
+# Lucas: the old full teardown parked long-running art jobs whenever the laptop closed).
 # Idempotent via CLEANED so the EXIT trap doesn't double-run after an INT/TERM.
 CLEANED=0
 cleanup() {
@@ -89,31 +99,43 @@ cleanup() {
   else
     echo "⏹ leaving the pre-existing tunnel in place (this run didn't open it)."
   fi
-  # Full teardown by default (2026-07-28, Lucas): Ctrl+C / closing the window stops BOTH host2 servers, not
-  # just the tunnel — so nothing is left running and the next launch spins everything up fresh. Set
-  # KEEP_SERVERS=1 to leave them up (the old behaviour) if you ever want a launch to not tear them down.
-  if [ "${KEEP_SERVERS:-0}" = 1 ]; then
-    echo "⏹ leaving host2 servers running (KEEP_SERVERS=1)."
-  else
-    echo "⏹ stopping host2 servers…"
-    ssh $SSH_OPTS -o ControlMaster=no -o ConnectTimeout=8 "$HOST2" \
-        "tmux kill-session -t harness_v2 2>/dev/null; tmux kill-session -t playtest 2>/dev/null; true" \
-        && echo "   servers stopped ✓" || echo "   (couldn't reach host2 to stop servers)"
-  fi
+  echo "   host2 servers left running (they are persistent)."
   echo "bye."
 }
 trap 'cleanup; exit 0' INT TERM HUP
 trap cleanup EXIT
+
+# 2b) optional guarded restart — the same endpoint as the console button, so it refuses while anything
+#     is live. The server replies at once and restarts ~1 s later; wait for it to go away and come back.
+if [ "$RESTART" = 1 ]; then
+  echo "↻ requesting a guarded harness restart…"
+  rbody=$(mktemp -t harness_restart)
+  code=$(curl -s -m 10 -o "$rbody" -w '%{http_code}' -X POST -H 'Content-Type: application/json' -d '{}' \
+         "http://localhost:8752/api/restart-harness")
+  body=$(cat "$rbody"); rm -f "$rbody"
+  if [ "$code" = 200 ]; then
+    sleep 4
+    for _ in $(seq 1 30); do tunnel_up && break; sleep 1; done
+    tunnel_up && echo "   harness restarted ✓ (re-select your scenario: a restart resets it to the default)" \
+              || echo "✗ harness did not come back within ~35 s — see ~/.local/state/escape_harness/restart.log on host2"
+  elif [ "$code" = 404 ]; then
+    echo "✗ this harness predates the restart endpoint. Once no art run is live, restart it by hand on host2:"
+    echo "    HARNESS_RESTART=1 bash '$REMOTE_ENSURE'    (unguarded — check first)"
+  else
+    echo "✗ restart refused (HTTP $code): $body"
+  fi
+fi
 
 # 3) open the harness in the browser
 echo "③ opening $URL"
 open "$URL" 2>/dev/null || echo "  (open the URL manually: $URL)"
 
 echo "✓ ready. build_world: $URL   ·   test-play server: http://localhost:8055/"
-echo "  Holding the tunnel open. Press Ctrl+C (or close this window) to close it and exit."
+echo "  Holding the tunnel open. Ctrl+C (or close this window) closes the tunnel only; servers keep running."
 
 # 4) HOLD — keep the terminal (and the tunnel) alive until Ctrl+C. If the tunnel drops on its own
 #    (network blip, host2 reboot), notice and exit rather than pretending it's still up.
+MISSES=0                       # a reused tunnel blips while the harness restarts; exit only on a sustained drop
 while :; do
   sleep 5 &                    # backgrounded sleep so the INT signal interrupts the wait promptly
   wait $!
@@ -121,8 +143,11 @@ while :; do
     echo "✗ tunnel master went away — exiting."
     break
   fi
-  if [ "$WE_OPENED" != 1 ] && ! tunnel_up; then
-    echo "✗ reused tunnel is no longer reachable — exiting."
-    break
+  if [ "$WE_OPENED" != 1 ]; then
+    if tunnel_up; then MISSES=0; else MISSES=$((MISSES + 1)); fi
+    if [ "$MISSES" -ge 6 ]; then
+      echo "✗ reused tunnel is no longer reachable — exiting."
+      break
+    fi
   fi
 done

@@ -505,3 +505,218 @@ def render_sound_brief(spec):
     return {"bed": bed or None, "sources": items,
             "note": ("The HERO source is the room's declared mover — the thing the cinemagraph "
                      "animates — so its sound and its motion must agree.")}
+
+
+def sound_briefs(spec, defaults=None):
+    """The sound brief for EVERY state the room can stand in — base first, then each world state.
+
+    (2026-09-16, Lucas: "make the tab read both day and night and get separate sounds where needed".)
+    Each state is rendered through `state_spec`, so a state-level `soundBed`, a per-element `sound`
+    override, a state-only element with its own sound, and a mover retired for the state (which demotes
+    its sound from hero to detail) all come through with no second copy of the overlay rules. `same` is
+    True when that state sounds exactly like the base, so a reader can say "as day" rather than
+    repeating it. The v3 Sounds tab reads THIS, not its own reimplementation, so the tab and the spec
+    cannot disagree about which source leads. Returns [] when nothing is authored in any state.
+    """
+    out = []
+    base = render_sound_brief(spec)
+    if base:
+        out.append({"state": None, "brief": base, "same": False})
+    for st in state_names(spec, defaults):
+        b = render_sound_brief(state_spec(spec, st, defaults))
+        if not b:
+            continue
+        # Compared on what is HEARD. `isMover` is left out: kiln's smudge stops being a mover at night
+        # (smoke can't be seen) but still crackles the same, and that is not a separate sound.
+        heard = lambda br: (br["bed"], [(s["id"], s["source"], s["character"], s["prominence"])
+                                        for s in br["sources"]])
+        same = bool(base) and heard(b) == heard(base)
+        out.append({"state": st, "brief": b, "same": same})
+    return out
+
+
+# ===========================================================================================
+# WORLD STATES — the spec's FIFTH consumer (2026-09-15)
+#
+# A room is authored once and then RE-LIT for each world state: `night` across all of beacons,
+# `order_sent` on its crown, `energised` on subway's cars. Until now exactly ONE thing was per-state
+# and it did not live in the spec at all: the full-scene re-light prompt was a free-text string handed
+# to `/api/gen-fullscene-variant` and recorded afterwards on the carrier hotspot's `variants[]`. The
+# spec could not see it, so nothing else could follow it.
+#
+# The consequence, stated plainly by Lucas on 2026-09-15: `motion` lives on the ELEMENT, so a night
+# clip animates the same subject with the same phrase as the day clip. Six beacons heroes are
+# meltwater catching daylight, which is not what the night art shows; crown's `order_sent` puts four
+# burning fires in a frame whose declared mover is a dispatch pennant. The art moved with the state
+# and the motion could not follow it — which is the SAME drift that putting `motion` in the spec was
+# built to kill (see ONE SPEC, TWO CONSUMERS above), reappearing one axis over.
+#
+# So a state is authored as an OVERLAY on the room's own spec, and everything derives through it:
+#
+#   "states": {
+#     "night": {
+#       "prompt":      "<verbatim re-light prompt>",   # escape hatch: wins over derivation. Used to
+#                                                      #   BACKFILL art already on disk, so the spec
+#                                                      #   records the exact string that made it.
+#       "change":      "the time of day",              # the KEEP line's tail
+#       "light":       "it is now deep night, ...",    # this ROOM's grade clause
+#       "constraints": "NO smoke is visible ...",      # this ROOM's NOT clauses
+#       "soundBed":    "...", "rigid": "...",
+#       "elements": {
+#         "office":      {"look": "warm lamplight now shows inside through the open shutters"},
+#         "meltwater":   {"motion": null},             # null/false -> STOP being a mover in this state
+#         "ridge_fires": {"at": "dead ahead", "desc": "...", "motion": {...}}   # state-ONLY element
+#       }}}
+#
+# `defaults` is the SCENARIO-level `states` block (scenario.json root): the shared grade every room
+# repeats — beacons' twelve night prompts are the same 600-character wash with one room clause each.
+# Authoring it once is the point; a room's own `light`/`constraints` are added to it, never replace it.
+#
+# Everything downstream is unchanged: `state_spec()` returns a spec, so `render_prompt`,
+# `render_motion_prompt`, `movers`, `to_hotspots` and `render_sound_brief` all take the overlay with
+# no new arguments. A spec with no `states` block returns itself, so every shipped scenario is
+# byte-for-byte unaffected.
+# ===========================================================================================
+
+STATE_KEEP = ("Keep this exact scene, composition, camera framing and every object precisely where "
+              "it is, and change ONLY %s:")
+STATE_CHANGE_DEFAULT = "the lighting and the world state"
+
+
+def _state_block(spec, state, defaults=None):
+    """This room's authored block for `state`, and the scenario-level default block. Either may be
+    absent; both absent means the state is not authored here at all."""
+    st = ((spec or {}).get("states") or {}).get(state)
+    df = ((defaults or {}) or {}).get(state)
+    return (st if isinstance(st, dict) else None), (df if isinstance(df, dict) else None)
+
+
+def state_names(spec, defaults=None):
+    """Every state name this room can be rendered in, room-authored and scenario-wide, sorted."""
+    names = set((spec or {}).get("states") or {})
+    names |= set(defaults or {})
+    return sorted(names)
+
+
+def still_only(spec, state):
+    """True when the room's authored `states.<state>.stillOnly` says this state SHIPS AS A STILL.
+
+    Added 2026-09-16 for beacons/anvil at night: every render animated the filed report's pages however
+    hard they were pinned, and Lucas's call was "just going with the still and no clip". The player
+    already falls back to the still when no clip is wired for a state; this flag is what stops the
+    PIPELINE treating the missing clip as work to do. Retiring every mover (`motion: null`) is NOT
+    enough on its own: a spec with no movers falls back to the room's legacy `.txt` motion prompt, and
+    the loop reads "no mover" as AUTHOR_MOVER. The base state cannot be still-only this way — take the
+    movers out of the base spec instead.
+    """
+    if not state:
+        return False
+    st = ((spec or {}).get("states") or {}).get(state)
+    return bool(isinstance(st, dict) and st.get("stillOnly"))
+
+
+def state_spec(spec, state, defaults=None):
+    """The room's spec AS IT STANDS IN `state` — the overlay applied, ready for any renderer.
+
+    Returns `spec` unchanged when `state` is falsy or nothing is authored for it, so the base path
+    costs nothing and cannot change behaviour. Never mutates the input.
+    """
+    if not state:
+        return spec
+    st, _df = _state_block(spec, state, defaults)
+    if not st:
+        return spec
+    out = dict(spec or {})
+    out["state"] = state
+    for key in ("soundBed", "rigid", "stillOnly"):
+        if st.get(key):
+            out[key] = st[key]
+
+    overrides = st.get("elements") or {}
+    if not isinstance(overrides, dict):
+        overrides = {}
+    seen = set()
+    elements = []
+    for e in (spec or {}).get("elements", []):
+        ov = overrides.get(e.get("id"))
+        if not isinstance(ov, dict):
+            elements.append(e)
+            continue
+        seen.add(e.get("id"))
+        merged = dict(e)
+        for key in ("at", "desc", "label", "sound"):
+            if ov.get(key):
+                merged[key] = ov[key]
+        if ov.get("look"):
+            # ADDITIVE, and that is the common case: the day description still holds, the state adds
+            # to it ("...and warm lamplight now shows inside"). A full `desc` replacement is there for
+            # the rarer case where the object genuinely reads as something else after dark.
+            merged["desc"] = (merged.get("desc") or "").rstrip().rstrip(".,;") + ", " + \
+                             ov["look"].strip().rstrip(".")
+        if "motion" in ov:
+            # An explicit null/false RETIRES the mover for this state — the meltwater that catches
+            # daylight and reads as nothing at midnight. A dict REPLACES it outright, because a
+            # half-overridden motion (new phrase, stale vigour) is how the two prompts drift apart.
+            if ov["motion"]:
+                merged["motion"] = ov["motion"]
+            else:
+                merged.pop("motion", None)
+        elements.append(merged)
+
+    for eid, ov in overrides.items():
+        # A state-ONLY element: something that exists in this state and nowhere else — crown's four
+        # burning ridge fires, a lit lamp, stars. It is a normal element from here on, so it can carry
+        # `motion` and become the state's hero.
+        if eid in seen or not isinstance(ov, dict) or not ov.get("desc"):
+            continue
+        new = {k: v for k, v in ov.items() if k != "look"}
+        new["id"] = eid
+        new.setdefault("at", "ahead")
+        elements.append(new)
+
+    out["elements"] = elements
+    return out
+
+
+def render_variant_prompt(spec, state, defaults=None):
+    """The FULL-SCENE re-light prompt for `state` — what `/api/gen-fullscene-variant` should be given.
+
+    Order is deliberate: hold the composition, then the shared grade, then this room's grade, then
+    each element that changes, then the NOT clauses last. An authored `prompt` short-circuits the lot
+    and is returned verbatim — that is how art already on disk is recorded truthfully rather than
+    re-derived into a string that never made it.
+
+    None when the state is not authored for this room.
+    """
+    st, df = _state_block(spec, state, defaults)
+    if not st and not df:
+        return None
+    st = st or {}
+    df = df or {}
+    if st.get("prompt"):
+        return st["prompt"].strip()
+
+    change = st.get("change") or df.get("change") or STATE_CHANGE_DEFAULT
+    parts = [STATE_KEEP % change.strip().rstrip(":.")]
+    for block in (df.get("light"), st.get("light")):
+        if block:
+            parts.append(_period(_cap(block.strip())))
+
+    overrides = st.get("elements") or {}
+    if isinstance(overrides, dict):
+        order = [e.get("id") for e in (spec or {}).get("elements", [])]
+        order += [k for k in overrides if k not in order]
+        for eid in order:
+            ov = overrides.get(eid)
+            if not isinstance(ov, dict):
+                continue
+            clause = ov.get("look") or ov.get("desc")
+            if clause:
+                parts.append(_period(_cap(clause.strip())))
+
+    for block in (df.get("constraints"), st.get("constraints")):
+        if block:
+            parts.append(_period(_cap(block.strip())))
+    if len(parts) == 1:
+        return None
+    return " ".join(parts)

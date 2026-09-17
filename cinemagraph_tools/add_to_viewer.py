@@ -11,13 +11,15 @@ does all four from one command.
 or the masked composite silently blends two different scenes.
 """
 import os, sys, json, re, shutil, argparse, fcntl
+from pathlib import Path
 import numpy as np
 from PIL import Image
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from motion_mask import sample_frames
 
-UI = "/home/bustalab/Documents/Tools/websites/thebustalab.github.io/escape_rooms/authoring_v2/ui"
-EGY = "/home/bustalab/Documents/Tools/websites/thebustalab.github.io/escape_rooms/rooms/wrangling/egypt"
+ER = Path(__file__).resolve().parent.parent          # .../escape_rooms
+UI = str(ER / "authoring_v2" / "ui")
+EGY = str(ER / "rooms" / "wrangling" / "egypt")
 MOTION_SCALE = 40.0
 
 

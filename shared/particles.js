@@ -13,7 +13,10 @@
 export const AMBIENT_KINDS = ["fireflies", "snow", "embers", "leaves", "dust", "rain", "rays", "none"];
 
 // Density is per-KIND, not one number, because the kinds are not the same size or shape:
-//   - dust  — the finest motes in the set; needs the most or it doesn't read as a haze at all
+//   - dust  — the finest motes in the set; needs the most or it doesn't read as a haze at all.
+//             RAISED 46->78 on 2026-09-17: Lucas, on subway's landing, "the dust is too subtle". Density,
+//             mote size and glint opacity were all lifted together (see .dustmote in pano-player.css) —
+//             one lever alone did not carry it. Subway is the only consumer of `dust`.
 //   - snow  — larger flakes, wants a real fall of them
 //   - rain  — thin fast streaks; a heavy field (just under dust) or it reads as drizzle. NOT denser
 //             than dust: a streak is 10-24px long and plainly visible on its own, where a dust
@@ -24,7 +27,7 @@ export const AMBIENT_KINDS = ["fireflies", "snow", "embers", "leaves", "dust", "
 // Kept in one place so the four call sites in pano-player.js can't drift apart.
 export function particleCount(kind, big) {
   if (kind === "snow") return big ? 40 : 32;
-  if (kind === "dust") return big ? 46 : 34;
+  if (kind === "dust") return big ? 78 : 58;
   if (kind === "rain") return big ? 44 : 33;
   if (kind === "rays") return big ? 7 : 5;
   return big ? 18 : 14;

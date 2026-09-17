@@ -80,7 +80,8 @@ GAMEPLAY = {"puzzle", "clue", "door", "lock", "grid", "ledger", "elevmap", "dial
 FALSIFIED_MOVERS = ("spindrift", "sea of cloud", "cloud sea", "lenticular", "distant river",
                     "shallow water sheet", "heat shimmer", "vault dust", "banner of cloud")
 LOOPS = {"boomerang", "crossfade"}
-EDGE_X = (0.08, 0.92)   # the far-left / far-right slots — the ±180° wrap seam
+EDGE_X = (0.08, 0.92)
+BULKY_STRUCTURE = ("stair", "shaft", "tunnel mouth", "archway", "doorway", "portal")   # the far-left / far-right slots — the ±180° wrap seam
 
 
 def slug(s):
@@ -154,6 +155,25 @@ def check_scenario(path):
         if not str(spec.get("seam") or "").strip():
             warns.append(f"{rk}: no `seam` set — the L/R wrap has no named backdrop to join on")
 
+        # BOXES ARE FRACTIONS OF A PARTICULAR PICTURE (2026-09-15). `/api/commit-room` keeps a room's
+        # boxes when its art is swapped, so a regenerated panorama leaves every hotspot pointing at an
+        # image that no longer exists — and nothing said so. Beacons ran that way for eleven days: 43
+        # boxes measured on 09-04 against art replaced on 09-14, a puzzle box on the wall above its
+        # desk. `place_hotspots` now stamps `authoring.boxesFrom.art` with a digest of the panorama it
+        # measured, and this compares that against the art on disk.
+        base_dir = os.path.dirname(path)
+        try:
+            import place_hotspots as _PH
+            if (r.get("hotspots") or []) and _PH.boxes_are_stale(r, base_dir, rk):
+                fails.append(f"{rk}: hotspot boxes were measured on DIFFERENT art than the committed "
+                             f"scene.png — they are fractions of a picture that no longer exists. "
+                             f"Re-place: place_hotspots.py --rooms {rk} --refine --commit-boxes --sheet")
+            elif (r.get("hotspots") or []) and not ((r.get("authoring") or {}).get("boxesFrom") or {}).get("art"):
+                warns.append(f"{rk}: hotspot boxes carry no `boxesFrom` stamp, so nothing can tell "
+                             f"whether they match the committed art. Re-place once to stamp them.")
+        except Exception:  # noqa: BLE001 — a missing Pillow/openai path must not break validation
+            pass
+
         # ---- left→right sweep order (rule 1) ----
         # `render_prompt` joins elements in FILE order, so a spec whose `at` phrases run out of sequence
         # emits a prompt that sweeps across the panorama and then jumps backwards. The boxes are fine
@@ -169,6 +189,39 @@ def check_scenario(path):
             warns.append(f"{rk}: elements are not in left→right order ({'; '.join(inversions)}) — "
                          f"`render_prompt` joins them in file order, so the prompt sweeps backwards; "
                          f"reorder to match their own `at` phrases")
+
+        # ---- BULKY STRUCTURE crowded beside the wrap seam (subway, 2026-09-17) ----
+        # Eight of thirteen subway stations rendered a DOUBLED spiral stair (two also a doubled tunnel
+        # mouth): the template put the stair AND the tunnel mouth both `to the left`, next to the seam
+        # wall, and the model packed them against the edge until they spilled across the ±180° join and
+        # showed on both sides. The seam metric passed them and the occluder cannot hide something that
+        # big. So: a big structural element (stair, shaft, tunnel mouth, archway, doorway) in the OUTER
+        # band (x <= 0.20 or >= 0.80) warns if it sits ON the edge slot, or shares its outer slot with
+        # anything else. Fix: move it inboard (`just left/right of centre`) and say "well in from the
+        # edge". Seam backdrop elements are skipped — they legitimately NAME these things ("no arch, no
+        # doorway") to forbid them. WARN, never FAIL. Pinned by test_validate_scenes.py
+        # (test_bulky_structure_sharing_an_outer_slot_warns and its negatives).
+        outer = {}
+        seam_txt = str(spec.get("seam") or "").strip().lower()[:60]
+        for e in els:
+            eid_l = str(e.get("id") or "").lower()
+            dsc = str(e.get("desc") or "").lower()
+            if "seam" in eid_l or (seam_txt and dsc.startswith(seam_txt)):
+                continue
+            ex = scene_spec._x_from_at(e.get("at") or "")
+            if ex is None or 0.2 < ex < 0.8:
+                continue
+            outer.setdefault(round(ex, 2), []).append(e)
+        for ex, group in sorted(outer.items()):
+            bulky = [e for e in group
+                     if any(w in (str(e.get("desc") or "") + " " + str(e.get("id") or "")).lower().replace("_", " ")
+                            for w in BULKY_STRUCTURE)]
+            if bulky and (len(group) >= 2 or ex in EDGE_X):
+                others = [str(e.get("id")) for e in group if e not in bulky[:1]]
+                warns.append(f"{rk}/{bulky[0].get('id')}: bulky structure in the outer band (x={ex})"
+                             + (f" sharing that slot with {others}" if others else " on the edge slot")
+                             + " — it will crowd onto the wrap seam and render DOUBLED at both edges; move it "
+                               "inboard (just left/right of centre) and say 'well in from the edge'")
 
         seen_slugs, seen_x = {}, {}
         for e in els:

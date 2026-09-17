@@ -12,9 +12,9 @@ Creating a page this way starts it with an empty clip list, which is the point: 
 it with `add_to_viewer.py --page <that page>` rather than hand-editing the HTML.
 """
 import re, json, sys
+from pathlib import Path
 
-UI = ("/home/bustalab/Documents/Tools/websites/thebustalab.github.io/escape_rooms/"
-      "authoring_v2/ui")
+UI = str(Path(__file__).resolve().parent.parent / "authoring_v2" / "ui")
 SRC = f"{UI}/cine360_test.html"
 DST = f"{UI}/{sys.argv[1]}" if len(sys.argv) > 1 else f"{UI}/cine360_endguide.html"
 TITLE = sys.argv[2] if len(sys.argv) > 2 else "Cinemagraph 360 — end-guide sweep"

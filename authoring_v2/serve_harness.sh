@@ -18,8 +18,10 @@
 # from the Mac launcher (harness_launch.command). Prints a status line per server and the URLs at the end.
 #
 # HARNESS_RESTART=1 forces a FRESH restart of BOTH servers even if they're already up — so a new
-# `python3 harness_server.py` process picks up code changes (e.g. the no-cache headers). The launcher
-# passes this on every run so each launch spins everything up fresh.
+# `python3 harness_server.py` process picks up code changes. Since 2026-09-17 the servers are PERSISTENT:
+# a cron watchdog runs this (no HARNESS_RESTART) every 5 min, the Mac launcher runs it ensure-only, and
+# the only restart paths are the guarded POST /api/restart-harness (v3 sticky-bar button, or
+# `harness_launch.command --restart`), which refuse while a job or room_iterate run is live.
 set -u
 FORCE_RESTART="${HARNESS_RESTART:-0}"
 
@@ -39,6 +41,9 @@ HARNESS_V2="$SITE/escape_rooms/authoring_v2/harness_server.py"
 PLAYTEST="$SITE/escape_rooms/authoring_v2/playtest_server.py"          # no-store, so no stale bytes locally
 
 answers() { curl -s -o /dev/null -m 2 "$1"; }                      # 0 if the URL responds at all
+# The "is it up?" gate retries before declaring a server missing/wedged: the cron watchdog runs this
+# every 5 min against a server that may be mid-run, and one slow reply must never get it killed.
+alive() { for _ in 1 2 3; do curl -s -o /dev/null -m 5 "$1" && return 0; sleep 2; done; return 1; }
 
 # (Re)start a server in its OWN tmux session, robustly. We KILL any existing session and CREATE a fresh
 # one already RUNNING the command — rather than creating an idle shell and send-keys'ing into it. That
@@ -52,7 +57,7 @@ restart_in() {                                                    # <session> <c
 }
 
 # --- build_world harness on :8752 ---
-if [ "$FORCE_RESTART" != 1 ] && answers "http://127.0.0.1:8752/api/scenarios"; then
+if [ "$FORCE_RESTART" != 1 ] && alive "http://127.0.0.1:8752/api/scenarios"; then
   echo "harness  :8752  already up"
 else
   [ "$FORCE_RESTART" = 1 ] && echo "harness  :8752  force-restarting (fresh) in tmux 'harness_v2'…" || echo "harness  :8752  (re)starting in tmux 'harness_v2'…"
@@ -60,7 +65,7 @@ else
 fi
 
 # --- playtest static server on :8055 ---
-if [ "$FORCE_RESTART" != 1 ] && answers "http://127.0.0.1:8055/escape_rooms/shared/test_play.html"; then
+if [ "$FORCE_RESTART" != 1 ] && alive "http://127.0.0.1:8055/escape_rooms/shared/test_play.html"; then
   echo "playtest :8055  already up"
 else
   [ "$FORCE_RESTART" = 1 ] && echo "playtest :8055  force-restarting (fresh) in tmux 'playtest'…" || echo "playtest :8055  (re)starting in tmux 'playtest'…"

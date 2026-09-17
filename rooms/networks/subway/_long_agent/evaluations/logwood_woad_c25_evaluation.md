@@ -1,0 +1,15 @@
+I checked the decision against disk rather than the write-up.
+
+**Verified independently:**
+
+- **Art is current.** `logwood_woad/scene.png` is 15:29 Sep 17; `_scratch/.l1prompt_logwood_woad.txt` (15:28) carries the round‑3 stair wording ("standing well in from the left-hand edge… a clear stretch of plain tiled wall") and the current `river_wall` line. `progress.md` logs "19:29 — new art committed from l1_logwood_woad_1.png" as generation 5 of this run. Art is not stale against the spec.
+- **No clip exists for this art.** `.cine_published.json` does list a `logwood_woad` entry, but it points at `logwood_woad_motion_ri44_looped.mp4`, timestamped **10:39 Sep 17** — nearly five hours before the committed still, and its candidate is filed under `z_archive/pre_regen2_wrapjoin_20260917/`. The only other render, `ri87`, is Sep 16 03:00. `state.json.rooms.logwood_woad` is `{"art_generated": 1, "retries": 1}` — no `attempts`, no `history`, no `clip`, no `last_gate`. The worker's central claim holds: this mover has never been put in front of the clip model.
+- **Seam is clean.** `authoring.seam`: `stage: screened`, `band: ground`, `ratio 2.36`, `seamBandRun 0.007`, `needsWork: false`, stamped 15:29:50 — matched by the commit log line "ground 2.4x/5.6 run 0.007 → clean, done". No occluder call needed.
+- **One bounded mover, not frame-filling.** The committed `sceneSpec` carries exactly one element with `motion.moves` — `river_wall` — with both `vigour` and `phrase` authored. `motionSpec.rigid` pins the stair, sump pump, platform edge, berth and both station ends; `pinned` explicitly freezes the train, tunnel mouths, rails and lamps. In the panorama the water reads as a bounded teal sheet down the curved brick, walled in by the amber arch ribs left and right and cut off below by the train roof — the same one-surface family as `logwood_verdigris`, one of Lucas's winners. Large, but bounded, and the prompt carries "Only that moves".
+- **No settings change.** "3072x1024 / end guide 0.70" are the run's defaults, not a proposal — `ri44.params.json`, `ochre_woad ri9` and `tannery_weld ri19` are byte-for-byte identical on `end_guide 0.7`, `width 3072`, `height 1024`, `steps 8`, `cfg 2.0`, `seed 4242`, `length 73`. The worker is naming the default path, not reaching for a lever.
+
+**None of the reject conditions fires.** No settings lever, no frame-filling mover, no zero-return-as-death reasoning (no gate report exists at all), no clip acceptance, nothing written to committed art or hotspots, no hand-written art prompt. And the AUTHOR_MOVER trap is the one the worker is correctly refusing — it explicitly declines to re-author a mover that has never been rendered, which is exactly why last cycle's proposal was failed at 19:36.
+
+The decision is to do the one thing that produces the missing evidence: render once at the house defaults and let the gate speak.
+
+VERDICT: PASS

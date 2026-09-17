@@ -37,6 +37,8 @@ Needs OPENAI_API_KEY. It lives in ~/.bashrc BELOW the non-interactive guard, so 
 not have it: resolve it at call time from a login shell, exactly as the harness's `gen_env()` does.
 """
 import argparse
+import datetime
+import hashlib
 import json
 import os
 import subprocess
@@ -177,6 +179,50 @@ def refine_pred(base, room, spec, pred, env):
     return pred, {"refined": refined, "kept": kept, "floored": floored}
 
 
+def art_fingerprint(base, room):
+    """A short digest of the room's committed panorama — the identity boxes are measured AGAINST.
+
+    WHY THIS EXISTS (2026-09-15). Beacons' 43 boxes were placed on 09-04 and every base panorama was
+    regenerated on 09-14. `/api/commit-room` deliberately KEEPS a room's boxes when its art is swapped
+    (so a re-roll does not throw away hand-placement), and nothing else re-measured them — so every
+    hotspot in the scenario pointed at a picture that no longer existed, for eleven days, silently. A
+    puzzle box sat on a window ledge above its desk; a door box sat on a stone wall. Nothing in the
+    pipeline could tell, because a box carries no record of what it was measured on.
+
+    mtime is not enough (Syncthing rewrites it); the bytes are the identity.
+    """
+    p = os.path.join(base, room, "scene.png")
+    if not os.path.isfile(p):
+        return None
+    h = hashlib.sha1()
+    with open(p, "rb") as f:
+        for chunk in iter(lambda: f.read(1 << 20), b""):
+            h.update(chunk)
+    return h.hexdigest()[:12]
+
+
+def stamp_boxes_from(node, base, room):
+    """Record the art the boxes were just measured against, on the room's `authoring` block."""
+    fp = art_fingerprint(base, room)
+    if not fp:
+        return
+    node.setdefault("authoring", {})["boxesFrom"] = {
+        "art": fp, "at": datetime.datetime.now().isoformat(timespec="seconds")}
+
+
+def boxes_are_stale(node, base, room):
+    """True when the committed art is NOT the art the boxes were measured on.
+
+    Unknown (no stamp) is NOT stale — every scenario predating the stamp would otherwise scream. Those
+    are caught by the stamp being absent, which `validate_scenes` reports separately.
+    """
+    rec = ((node.get("authoring") or {}).get("boxesFrom") or {})
+    if not rec.get("art"):
+        return False
+    fp = art_fingerprint(base, room)
+    return bool(fp and fp != rec["art"])
+
+
 def apply_room_committed(base, room, spec, pred, dry_run=False):
     """Write boxes onto the COMMITTED hotspots, mirroring onto plannedHotspots. See `--commit-boxes`.
 
@@ -202,7 +248,12 @@ def apply_room_committed(base, room, spec, pred, dry_run=False):
         for h in (node.get(layer) or []):
             if h.get("type") == "ambient":
                 continue
-            if h.get("boxSource") == "review:lucas":
+            if str(h.get("boxSource") or "").startswith("review:"):
+                # ANY reviewed box is left alone, not just Lucas's. `review:agent-vision` marks a box an
+                # agent measured off the art by eye after the localiser got it wrong — 16 of 43 on
+                # beacons — and re-running the draft pass would silently undo exactly the corrections
+                # that were worth making. If the ART changes, the `boxesFrom` stamp stops matching and
+                # `validate_scenes` fails the room, which is the right way to find out.
                 skipped += 1
                 continue
             box = by_label.get(_slug(h.get("label"))) or by_id.get(h.get("id"))
@@ -217,6 +268,7 @@ def apply_room_committed(base, room, spec, pred, dry_run=False):
     if skipped:
         notes.append("%d hand-reviewed box(es) left alone" % skipped)
     if not dry_run and n:
+        stamp_boxes_from(node, base, room)
         json.dump(doc, open(P, "w", encoding="utf-8"), indent=2)
     return n, notes
 
@@ -287,6 +339,58 @@ def write_motion_boxes(base, room, spec, pred, dry_run=False):
     return written
 
 
+def contact_sheet(base, room, out_dir="/tmp/hs_sheets", width=980, tile_h=460):
+    """One image per room: every box drawn on the CURRENT art, with context, labelled.
+
+    The localiser is right about two thirds of the time here — reliable on framed architecture
+    (doorways, gates, flights of steps) and on large near objects, unreliable on a small object sitting
+    on a support (it boxes the tripod, not the spyglass) and on a path across open ground (it boxes the
+    nearest object instead). So a placement pass is not finished until someone has LOOKED. This makes
+    looking one command instead of a hand-rolled crop script.
+    """
+    from PIL import Image, ImageDraw
+    doc = json.load(open(os.path.join(base, "scenario.json"), encoding="utf-8"))
+    node = next((r for r in doc.get("rooms", []) if r.get("key") == room), None)
+    png = os.path.join(base, room, "scene.png")
+    if node is None or not os.path.isfile(png):
+        return None
+    os.makedirs(out_dir, exist_ok=True)
+    im = Image.open(png).convert("RGB")
+    W, H = im.size
+    tiles = []
+    for h in (node.get("hotspots") or []):
+        b = h.get("box")
+        if not b or len(b) != 4 or list(b) == [0, 0, 1, 1]:
+            continue                       # a full-frame ambient carrier has nothing to look at
+        x0, y0, x1, y1 = b
+        bw, bh = (x1 - x0) * W, (y1 - y0) * H
+        px0, px1 = max(0, int(x0 * W - bw)), min(W, int(x1 * W + bw))
+        py0, py1 = max(0, int(y0 * H - bh)), min(H, int(y1 * H + bh))
+        crop = im.crop((px0, py0, px1, py1))
+        dr = ImageDraw.Draw(crop)
+        dr.rectangle([int(x0 * W) - px0, int(y0 * H) - py0, int(x1 * W) - px0, int(y1 * H) - py0],
+                     outline=(255, 165, 0), width=max(2, crop.width // 200))
+        sc = min(width / crop.width, tile_h / crop.height)
+        crop = crop.resize((max(1, int(crop.width * sc)), max(1, int(crop.height * sc))), Image.LANCZOS)
+        canvas = Image.new("RGB", (width, crop.height), (0, 0, 0))
+        canvas.paste(crop, ((width - crop.width) // 2, 0))
+        bar = Image.new("RGB", (width, 24), (12, 18, 24))
+        ImageDraw.Draw(bar).text((6, 6), "%s · %s · %s" % (h.get("type"), h.get("id"),
+                                                          (h.get("label") or "")[:60]),
+                                 fill=(255, 200, 120))
+        tiles.append((bar, canvas))
+    if not tiles:
+        return None
+    sheet = Image.new("RGB", (width, sum(b.height + c.height + 5 for b, c in tiles)), (0, 0, 0))
+    y = 0
+    for bar, c in tiles:
+        sheet.paste(bar, (0, y)); y += bar.height
+        sheet.paste(c, (0, y)); y += c.height + 5
+    out = os.path.join(out_dir, "%s.png" % room)
+    sheet.save(out)
+    return out
+
+
 def _main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--chapter", required=True)
@@ -307,6 +411,12 @@ def _main():
                          "Without this the motion subject has to be measured by hand at cine time, "
                          "which is how a subject box comes to be guessed from its `at` phrase instead "
                          "of read off the committed image.")
+    ap.add_argument("--sheet", action="store_true",
+                    help="ALSO write a per-room contact sheet (every box drawn on the current art, "
+                         "with context) to /tmp/hs_sheets/<room>.png. A placement pass is not done "
+                         "until someone has looked: the localiser is reliable on framed architecture "
+                         "and large near objects, and unreliable on a small object on a support (it "
+                         "boxes the tripod, not the spyglass) and on a path across open ground.")
     ap.add_argument("--commit-boxes", action="store_true",
                     help="write onto the COMMITTED hotspots (and mirror to plannedHotspots) instead of "
                          "drafting onto plannedHotspots only. Never overwrites a box tagged "
@@ -344,6 +454,13 @@ def _main():
         else:
             n, notes = apply_room(base, a.chapter, a.scenario, room, spec, pred, a.dry_run)
         total += n
+        if a.sheet and not a.dry_run:
+            try:
+                sheet = contact_sheet(base, room)
+                if sheet:
+                    notes.append("sheet: %s" % sheet)
+            except Exception as e:  # noqa: BLE001 — a missing Pillow must not lose the placement
+                notes.append("sheet failed: %s" % str(e)[:60])
         rtxt = ("  [refined %d, kept %d, floored %d]"
                 % (rstat["refined"], rstat["kept"], rstat["floored"])) if rstat else ""
         print("%-12s %d box(es)%s%s%s" % (room, n, rtxt, "  [dry-run]" if a.dry_run else "",

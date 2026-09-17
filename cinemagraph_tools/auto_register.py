@@ -11,8 +11,10 @@ and then builds the boomerang file, so every loop mode works on it immediately.
 Stops when /tmp/sweep/STOP_WATCH exists, or after MAX_HOURS.
 """
 import os, sys, time, json, subprocess, glob
+from pathlib import Path
 
-TEMP = "/home/bustalab/Documents/Tools/temp"
+ER = Path(__file__).resolve().parent.parent          # .../escape_rooms
+TEMP = str(ER.parents[2] / "temp")                     # Tools/temp
 # Menu labels say what each clip is FOR, so the dropdown itself tells Lucas what to compare.
 LABELS = {
   "AB1": "F1. BOATS boat-first prompt (vs D) --",
@@ -71,8 +73,7 @@ def page_for(name):
     return ENDGUIDE_PAGE if name.startswith(("AC", "AD", "AE", "AF", "AG", "AH", "AI", "AK", "AB4")) else "cine360_test.html"
 
 
-UI = ("/home/bustalab/Documents/Tools/websites/thebustalab.github.io/escape_rooms/"
-      "authoring_v2/ui")
+UI = str(ER / "authoring_v2" / "ui")
 
 
 def registered_urls():

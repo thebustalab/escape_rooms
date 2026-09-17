@@ -3,8 +3,8 @@
 // the engine's own state — the gate key, the attempt counter, the lock table, the world-state bag — is
 // INJECTED as `ctx` rather than read from module scope. pano-player passes its real objects; the test
 // passes plain ones.
-import { confirmGroups, confirmAll } from "./ledger_rule.js?v=92";
-import { makeScale, junctionsAbove, placedCount } from "./elev_scale.js?v=92";
+import { confirmGroups, confirmAll } from "./ledger_rule.js?v=102";
+import { makeScale, junctionsAbove, placedCount } from "./elev_scale.js?v=102";
 
 export function buildLedgerCard(h, onSolved, ctx) {
   const rows = h.rows || [];
@@ -70,7 +70,7 @@ export function buildLedgerCard(h, onSolved, ctx) {
     // GROUPS closed on this press, which is the whole point.
     const verdict = {};
     sels().forEach(s => { if (s.value) verdict[s.dataset.row] = s.value; });
-    const res = allOrNothing ? confirmAll(rows, verdict) : confirmGroups(rows, verdict, locked);
+    const res = allOrNothing ? confirmAll(rows, verdict, !!h.unordered) : confirmGroups(rows, verdict, locked);
     const newly = res.newly;
     newly.forEach(v => locked.add(v));
     if (!allOrNothing) paintLocks();

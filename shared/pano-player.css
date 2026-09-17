@@ -80,13 +80,13 @@ button.ghost { background:transparent; color:var(--ink); border:1px solid var(--
    it hangs and wanders, which is what dust in a closed space actually does. Kept desaturated warm-grey so
    it reads as dust rather than as a scenario's reserved colour. First consumer: networks/subway. */
 .dustmote { position:absolute; border-radius:50%;
-  background:radial-gradient(circle, rgba(240,228,205,.85) 0%, rgba(206,184,148,.45) 50%, rgba(206,184,148,0) 74%);
+  background:radial-gradient(circle, rgba(246,236,215,.95) 0%, rgba(214,194,160,.62) 52%, rgba(214,194,160,0) 76%);
   will-change:transform, opacity; }
-@keyframes dustGlint { 0%,100%{ opacity:.14; } 50%{ opacity:.58; } }
+@keyframes dustGlint { 0%,100%{ opacity:.28; } 50%{ opacity:.9; } }   /* was .14/.58 — too subtle (Lucas, 2026-09-17) */
 @keyframes dustDrift  { 0%{transform:translate(0,0)} 30%{transform:translate(11px,7px)} 60%{transform:translate(-6px,15px)} 100%{transform:translate(0,0)} }
 @keyframes dustDrift2 { 0%{transform:translate(0,0)} 30%{transform:translate(-13px,5px)} 60%{transform:translate(5px,-9px)} 100%{transform:translate(0,0)} }
 @keyframes dustDrift3 { 0%{transform:translate(0,0)} 30%{transform:translate(7px,-6px)} 60%{transform:translate(15px,9px)} 100%{transform:translate(0,0)} }
-@media (prefers-reduced-motion: reduce){ .dustmote { animation:none !important; opacity:.3; } }
+@media (prefers-reduced-motion: reduce){ .dustmote { animation:none !important; opacity:.5; } }
 /* rays — shafts of sunlight raking across the frame (daylight scenarios: cloud-tops, ridges, windows).
    Structurally unlike the other kinds: not points but long soft blurred bars, and they are PARALLEL —
    real sun shafts don't fan out from a point in frame, so every ray shares one base tilt with only a few
@@ -197,6 +197,18 @@ button.ghost { background:transparent; color:var(--ink); border:1px solid var(--
 .hsmark.door.locked { background:rgba(180,180,180,.18); border-color:rgba(200,200,200,.5); box-shadow:none; animation:none; }
 .hsmark.door.open { background:rgba(120,255,170,.30); border-color:#7dffaa; box-shadow:0 0 0 4px rgba(120,255,170,.14),0 0 20px rgba(120,255,170,.7); }
 .hsmark.puzzle.done { opacity:.5; box-shadow:none; animation:none; }
+
+/* Door name-plates (SCENARIO.doorLabels) — the target room's title above an open door's marker.
+   A child of the marker, so pannellum's own transform carries it as the player pans. `pointer-events:none`
+   keeps the click (and the test-play drag) on the dot underneath. NOTE: `.hsmark` runs the `pulse` opacity
+   animation, and a parent's opacity composites over its whole subtree — so the caption breathes in step
+   with its door. That is deliberate: the caption reads as part of the door's affordance, not as chrome. */
+.doorname { position:absolute; left:50%; bottom:calc(100% + 9px); transform:translateX(-50%);
+  white-space:nowrap; pointer-events:none; user-select:none;
+  font:600 12px/1.25 system-ui,-apple-system,sans-serif; letter-spacing:.2px;
+  color:rgba(255,236,190,.96); background:rgba(9,18,26,.78);
+  border:1px solid rgba(255,216,140,.32); border-radius:999px; padding:3px 11px;
+  text-shadow:0 1px 3px rgba(0,0,0,.85); }
 
 /* --- Three-phase portals (SCENARIO.stonePortals) --- */
 /* Awakened forward-door marker: shift the locked-grey dot to a starry blue. */
@@ -408,6 +420,12 @@ code { background:#0a1620; padding:1px 5px; border-radius:4px; }
   font: 12px/1.45 ui-monospace, Menlo, Consolas, monospace; white-space: pre-wrap; word-break: break-word; margin: 0 0 10px; }
 #subWork img { max-width: 100%; border-radius: 8px; display: block; }
 #subWork .swnone { opacity: .55; font-size: 12px; margin: 0 0 8px; }
+/* An R error lifted out of the hidden console pane into the submission block. Without this the run
+   rendered into #console-holder (display:none) and the student saw only "no figure was drawn" — see
+   runSubmitBlock(). The hint box inside carries its own styling, injected by the shared console. */
+#subWork .swerr { margin: 0 0 10px; }
+#subWork .swerr .webr-out.err { color: #ff9b9b; font: 12px ui-monospace, Menlo, Consolas, monospace;
+                                white-space: pre-wrap; margin: 0 0 4px; }
 #subWork .swintro { opacity: .8; font-size: 12.5px; margin: 2px 0 4px; }
 #subWork .swq { font-size: 12.5px; opacity: .92; margin: 0 0 8px; line-height: 1.5;
   background: rgba(255,216,140,.06); border-left: 2px solid rgba(255,216,140,.5); padding: 7px 10px; border-radius: 0 6px 6px 0; }

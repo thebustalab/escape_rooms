@@ -5,7 +5,7 @@
 
 import test from "node:test";
 import assert from "node:assert/strict";
-import { pickActiveVariants, roomHasVariants, activeDoorVariant, fullSceneState, pickCinemagraphs } from "../shared/variant_resolve.js";
+import { pickActiveVariants, roomHasVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers } from "../shared/variant_resolve.js";
 
 const box = [0.1, 0.1, 0.2, 0.2];
 const box2 = [0.5, 0.5, 0.7, 0.7];
@@ -216,3 +216,30 @@ test("baked full-scene carrier: base clip plays on the base backdrop", () => {
   assert.equal(pickCinemagraphs(wrong, null).length, 0);
 });
 
+
+// ---- state-aware room sound layers (2026-09-16) --------------------------------------------------
+// The inverted default is the point: an unlabelled SOUND plays in every backdrop (the river is the same
+// by day and night), unlike an unlabelled CLIP, which is base-only. And here "base" DOES name the base
+// backdrop — a separate field (`states`, a list) from a clip's `state`, where "base" matches nothing.
+test("sfx layers: no `states` plays everywhere; a list restricts to those backdrops", () => {
+  const layers = [
+    { src: "river.mp3" },
+    { src: "rooks.mp3", states: ["base"] },
+    { src: "owl.mp3", states: ["night"] },
+    { src: "both.mp3", states: ["base", "night"] },
+    { src: "nowhere.mp3", states: [] },
+    { volume: 0.3 },                                  // no src → never a layer
+  ];
+  const srcs = st => pickSfxLayers(layers, st).map(l => l.src);
+  assert.deepEqual(srcs(null), ["river.mp3", "rooks.mp3", "both.mp3"]);
+  assert.deepEqual(srcs("night"), ["river.mp3", "owl.mp3", "both.mp3"]);
+  assert.deepEqual(srcs("order_sent"), ["river.mp3"]);
+  assert.deepEqual(pickSfxLayers(undefined, null), []);
+});
+
+test("sfx layers: returns the SAME cfg objects, so the player can diff layers across a state change", () => {
+  const river = { src: "river.mp3" }, rooks = { src: "rooks.mp3", states: ["base"] };
+  const day = pickSfxLayers([river, rooks], null), night = pickSfxLayers([river, rooks], "night");
+  assert.ok(day.includes(river) && night.includes(river));   // identity kept → river plays on uncut
+  assert.ok(day.includes(rooks) && !night.includes(rooks));
+});

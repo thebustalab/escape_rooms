@@ -11,11 +11,11 @@ Distances are normalised by the mean ADJACENT-frame difference, so "1.0x" means 
 smooth as any ordinary frame step - a perfect loop - and is comparable across clips.
 """
 import os, subprocess, json
+from pathlib import Path
 import numpy as np
 from PIL import Image
 
-UI = ("/home/bustalab/Documents/Tools/websites/thebustalab.github.io/escape_rooms/"
-      "authoring_v2/ui/cine360")
+UI = str(Path(__file__).resolve().parent.parent / "authoring_v2" / "ui" / "cine360")
 SCALE = 4          # 768x256: keeps real detail, and the pair matrix stays small
 
 

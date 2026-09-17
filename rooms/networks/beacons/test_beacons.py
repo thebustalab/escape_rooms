@@ -76,13 +76,22 @@ def components(nodes, undirected_edges):
 
 
 def test_ladder():
-    print("\nA. THE GRADED LADDER — against data/dispatch_ledger.csv")
+    print("\nA. THE GRADED LADDER — against data/dispatch_ledger.csv (v2: the twelve places of the world)")
     edges = load_edges()
     nodes = sorted({e[0] for e in edges} | {e[1] for e in edges})
-    check(len(nodes) == 20, "20 stations", f"{len(nodes)}")
-    check(len(edges) == 184, "184 directed weighted edges", f"{len(edges)}")
+    d = json.load(open(os.path.join(HERE, "scenario.json")))
+    world = {r["key"] for r in d["rooms"]}
+    token = lambda k: "_".join(w.capitalize() for w in k.split("_"))       # rams_head -> Rams_Head
+    check(set(nodes) == {token(k) for k in world}, "the dataset's stations ARE the world's twelve places",
+          str(sorted(set(nodes) ^ {token(k) for k in world})))
+    check(len(edges) == 40, "40 directed weighted edges", f"{len(edges)}")
 
-    # rung 2 — direction/asymmetry: the station that sends far more than it receives
+    # rung 1 — the heaviest single link
+    top = sorted(edges, key=lambda e: -e[2])
+    check((top[0][0], top[0][1]) == ("Anvil", "Ladder"), "rung 1: Anvil -> Ladder is the heaviest link", f"{top[0]}")
+    other = next(e for e in top if {e[0], e[1]} != {"Anvil", "Ladder"})
+    check(top[0][2] >= 1.05 * other[2], "rung 1: a clean single winner over any other pair", f"{top[0][2]} vs {other}")
+
     out = {n: 0 for n in nodes}
     inn = {n: 0 for n in nodes}
     for a, b, w in edges:
@@ -90,32 +99,23 @@ def test_ladder():
         inn[b] += w
     ratio = sorted(((out[n] / inn[n], n) for n in nodes if inn[n]), reverse=True)
     check(ratio[0][1] == "Fenwatch", "rung 2: Fenwatch has the highest out/in ratio", ratio[0][1])
-    check(ratio[0][0] / ratio[1][0] >= 3.0,
-          "rung 2: Fenwatch's ratio is a runaway single winner",
-          f"{ratio[0][0]:.2f} vs {ratio[1][0]:.2f} ({ratio[1][1]})")
+    check(ratio[0][0] / ratio[1][0] >= 3.0, "rung 2: a runaway single winner", f"{ratio[0][0]:.2f} vs {ratio[1][0]:.2f} ({ratio[1][1]})")
 
-    # rung 3 — THE SHORTCUT: busiest overall by total volume
     vol = {n: out[n] + inn[n] for n in nodes}
     busiest = sorted(vol.items(), key=lambda kv: -kv[1])
-    check(busiest[0][0] == "Kingsmuster", "rung 3 (shortcut): Kingsmuster is busiest", busiest[0][0])
-    check(busiest[0][1] >= 2.0 * busiest[1][1],
-          "rung 3: the shortcut answer is a clean single winner",
-          f"{busiest[0][1]} vs {busiest[1][1]} ({busiest[1][0]})")
+    check(busiest[0][0] == "Crown", "rung 3 (shortcut): the Crown is busiest", busiest[0][0])
+    check(busiest[0][1] >= 1.15 * busiest[1][1], "rung 3: a clean single winner", f"{busiest[0][1]} vs {busiest[1][1]} ({busiest[1][0]})")
 
-    # BOSS — components under node removal: the sole articulation point
     und = {(min(a, b), max(a, b)) for a, b, _ in edges if a != b}
     base = components(nodes, und)
     cut = [n for n in nodes
-           if components([x for x in nodes if x != n],
-                         [(a, b) for a, b in und if n not in (a, b)]) > base]
+           if components([x for x in nodes if x != n], [(a, b) for a, b in und if n not in (a, b)]) > base]
     check(cut == ["Whistlegate"], "BOSS: Whistlegate is the SOLE articulation point", str(cut))
-
-    # THE TAUGHT TRAP, and it is the whole scenario: volume is not importance
     rank = [n for n, _ in busiest].index("Whistlegate") + 1
-    check(rank == 20, "the articulation point ranks 20th of 20 by volume", f"rank {rank}")
-    check(components([x for x in nodes if x != "Kingsmuster"],
-                     [(a, b) for a, b in und if "Kingsmuster" not in (a, b)]) == base,
+    check(rank == 12, "the station holding the march together is the QUIETEST of twelve", f"rank {rank}")
+    check(components([x for x in nodes if x != "Crown"], [(a, b) for a, b in und if "Crown" not in (a, b)]) == base,
           "removing the BUSIEST station changes nothing structurally")
+    check(len({"Anvil->Ladder", "Fenwatch", "Crown", "Whistlegate"}) == 4, "four rungs, four different answers")
 
 
 # ---------------------------------------------------------------- B. the escape
@@ -235,6 +235,11 @@ def test_wiring():
                   "the escape ledger sets allOrNothing (every row holds a different answer, so the "
                   "stock group rule would confirm one row at a time)",
                   f"{len(rows)} rows, {distinct} distinct answers")
+        check(lg.get("unordered") is True,
+              "the escape accepts the four fires in ANY order (Lucas, 2026-09-17) — the rows are "
+              "interchangeable slots, so the answer is a SET of towers")
+        check(not any(w in (r.get("label") or "").lower() for r in rows for w in ("south", "north")),
+              "no row label implies an order")
         check(not lg.get("maxAttempts"),
               "attempts are unlimited (maxAttempts unset), so the ungraded escape cannot dead-end")
         opts = {o["key"] if isinstance(o, dict) else o for o in (lg.get("options") or [])}
@@ -253,10 +258,146 @@ def test_wiring():
                   f"wired {sorted(x for x in wired if x is not None)} vs placement {sorted(P['answer_fires'])}")
 
 
+def test_survey_pickups():
+    """The survey the escape is built on (2026-09-16). One base sheet in Fenwatch and one spyglass per
+    tower room, each landing its OWN line-tile and counting toward the Crown's gate. Guards: a spyglass
+    that forgets `onPickup` (the gate can never open), a tile wired to the wrong room (the player stacks a
+    network that is not the terrain's), a missing image, and the gate threshold drifting from the count."""
+    d = json.load(open(os.path.join(HERE, "scenario.json")))
+    tm = {k: v for k, v in (d.get("_designNotes", {}).get("towerMap") or {}).items() if not k.startswith("_")}
+    rooms = {r["key"]: r for r in d["rooms"]}
+    glassed = 0
+    for room in tm:
+        spy = [h for h in rooms[room].get("hotspots", []) if h.get("type") == "clue" and h.get("id") == "spyglass"]
+        check(len(spy) == 1, f"{room}: exactly one spyglass", str(len(spy)))
+        if not spy:
+            continue
+        h = spy[0]
+        check(h.get("image") == f"survey/tile_{room}.png", f"{room}: spyglass lands its own line-tile", h.get("image"))
+        check(os.path.exists(os.path.join(HERE, h.get("image") or "-")), f"{room}: line-tile image exists")
+        check(h.get("overlay") is True and h.get("pickup"), f"{room}: tile is a pickup overlay")
+        check(h.get("onPickup") == {"inc": "tiles_glassed"}, f"{room}: spyglass counts toward the gate", str(h.get("onPickup")))
+        glassed += h.get("onPickup") == {"inc": "tiles_glassed"}
+    sheet = [h for h in rooms["fenwatch"].get("hotspots", []) if h.get("id") == "survey_sheet"]
+    check(len(sheet) == 1 and not sheet[0].get("overlay") and os.path.exists(os.path.join(HERE, sheet[0].get("image") or "-")),
+          "Fenwatch carries the opaque base survey sheet")
+    gate = [h for h in rooms["crown"].get("hotspots", []) if h.get("id") == "watch_order"]
+    need = [c["gte"][1] for c in ((gate[0].get("availableWhen") or {}).get("all") or []) if "gte" in c] if gate else []
+    check(need == [glassed] == [len(tm)], "the Crown's gate asks for exactly the tiles that can be collected",
+          f"gate {need}, counting pickups {glassed}, towers {len(tm)}")
+
+
+def test_brazier():
+    """The finale gesture (2026-09-16): the crown brazier sets order_sent=lit, which is exactly what the
+    order_sent night variant waits for, can only be lit once the watch order is sealed, and ends the escape.
+    A drifted value means the fires never appear; a missing gate lets the escape end with no order sent."""
+    d = json.load(open(os.path.join(HERE, "scenario.json")))
+    cr = next(r for r in d["rooms"] if r["key"] == "crown")
+    dial = [h for h in cr["hotspots"] if h.get("id") == "dispatch_brazier"]
+    check(len(dial) == 1, "crown carries the brazier dial")
+    if not dial:
+        return
+    h = dial[0]
+    values = [s.get("value") for s in h.get("states") or []]
+    wants = [v.get("when") for c in cr["hotspots"] for v in (c.get("variants") or []) if v.get("state") == "order_sent"]
+    check(values == ["lit"] and wants == [{"eq": [h.get("key"), "lit"]}],
+          "lighting the brazier is exactly what the order_sent art waits for", f"{values} vs {wants}")
+    check(h.get("availableWhen") == {"solved": "crown"} and h.get("lockedBody"),
+          "the brazier is locked until the watch order is sealed")
+    check(h.get("endsEscape") is True, "lighting the brazier ends the escape")
+
+
+def test_puzzles():
+    """The four graded MCQs (wired 2026-09-16), each correct option re-derived from the shipped CSV — not
+    from the designNote — plus the house rules: >=6 options, no reveal, a bare starter except the boss
+    (repair-the-pipeline), whose broken script must really report no split and whose fix must really
+    find exactly one. Also that every station a distractor names exists, so no option is noise."""
+    import csv
+    from collections import defaultdict
+    rows = list(csv.DictReader(open(os.path.join(HERE, "data", "dispatch_ledger.csv"))))
+    for r in rows:
+        r["dispatches"] = int(r["dispatches"])
+    names = {r["origin"] for r in rows} | {r["destination"] for r in rows}
+    heaviest = max(rows, key=lambda r: r["dispatches"])
+    sent, recv = defaultdict(int), defaultdict(int)
+    for r in rows:
+        sent[r["origin"]] += r["dispatches"]; recv[r["destination"]] += r["dispatches"]
+    ratio = max(names, key=lambda s: sent[s] / max(1, recv[s]))
+    busiest = max(names, key=lambda s: sent[s] + recv[s])
+
+    def pieces(edges):
+        adj = defaultdict(set)
+        for a, b in edges:
+            adj[a].add(b); adj[b].add(a)
+        seen, n = set(), 0
+        for v in adj:
+            if v in seen:
+                continue
+            n += 1; stack = [v]
+            while stack:
+                u = stack.pop()
+                if u not in seen:
+                    seen.add(u); stack.extend(adj[u] - seen)
+        return n
+    buggy = {s: pieces([(r["origin"], r["destination"]) for r in rows if r["origin"] != s]) for s in names}
+    fixed = {s: pieces([(r["origin"], r["destination"]) for r in rows if s not in (r["origin"], r["destination"])]) for s in names}
+    splitters = [s for s, n in fixed.items() if n > 1]
+
+    d = json.load(open(os.path.join(HERE, "scenario.json")))
+    rooms = {r["key"]: r for r in d["rooms"]}
+    pz = {k: [h for h in rooms[k]["hotspots"] if h.get("type") == "puzzle"] for k in ("fenwatch", "sisters", "anvil", "whistlegate")}
+    for k, hs in pz.items():
+        check(len(hs) == 1, f"{k}: exactly one puzzle")
+    # Lucas 2026-09-16: click-the-point where possible, otherwise a code check. The boss is a DRAWN network.
+    shape = {k: ("pick" if hs[0].get("pick") else "check" if hs[0].get("check") else "question" if hs[0].get("question") else None) for k, hs in pz.items()}
+    check(shape == {"fenwatch": "check", "sisters": "pick", "anvil": "pick", "whistlegate": "pick"},
+          "puzzle types: rung 1 check, rungs 2-3 and the boss pick-the-point", str(shape))
+    want = {"sisters": ratio, "anvil": busiest, "whistlegate": splitters[0] if len(splitters) == 1 else None}
+    for k, ans in want.items():
+        pk = pz[k][0].get("pick") or {}
+        check(pk.get("answer") == ans and ans in names, f"{k}: pick answer re-derives from the CSV", f"{pk.get('answer')!r} vs {ans!r}")
+        check(pz[k][0].get("starterCode") == "dispatch_ledger", f"{k}: starter is the bare data object")
+    check((pz["whistlegate"][0].get("pick") or {}).get("idColumn") == "node_name",
+          "boss: tags buildNetwork()'s node column, so edges are not clickable as stations")
+    fen = pz["fenwatch"][0].get("check") or {}
+    check(f'"{heaviest["origin"]}"' in fen.get("expr", "") and f'"{heaviest["destination"]}"' in fen.get("expr", ""),
+          "fenwatch: check expr names the CSV's heaviest link, in direction", f"{heaviest['origin']} -> {heaviest['destination']}")
+    check(pz["fenwatch"][0].get("starterCode") == "dispatch_ledger", "fenwatch: starter is the bare data object")
+    for k, hs in pz.items():
+        body = hs[0].get("pick") or hs[0].get("check") or {}
+        check("reveal" not in (body.get("feedback") or {}) and len((body.get("feedback") or {}).get("wrong") or []) >= 3,
+              f"{k}: >=3 escalating hints, no reveal")
+        planned = [h for h in rooms[k].get("plannedHotspots", []) if h.get("type") == "puzzle"]
+        check(planned and all(planned[0].get(x) == hs[0].get(x) for x in ("pick", "check", "starterCode")),
+              f"{k}: content mirrored on plannedHotspots")
+    check(all(p in d.get("packages", []) for p in ("igraph", "network", "ggnetwork")) and "buildNetwork <- function" in (d.get("setup") or ""),
+          "the book's buildNetwork() and its packages are in the R session for the boss")
+    old = [w for w in ("Kingsmuster", "Slatecrag", "Ossfell", "depot", "twentieth") if w in json.dumps([{k: v for k, v in r.items() if k != "authoring"} for r in d["rooms"]] + [{k: v for k, v in d.items() if k not in ("_designNotes", "rooms")}])]
+    check(not old, "no v1 station names or numbers left in player-facing text", str(old))
+
+def test_clips_served():
+    """Every committed clip on disk (`<room>/cine_<state>.mp4`, not the `_src` intermediate) is served on a
+    carrier the player reads, base as state ABSENT (pickCinemagraphs matches base that way; "base" matches
+    nothing). A clip re-committed after this ran is caught here rather than as a room silently showing its still."""
+    import glob, re
+    d = json.load(open(os.path.join(HERE, "scenario.json")))
+    for r in d["rooms"]:
+        disk = sorted(re.match(r"cine_(.+)\.mp4$", os.path.basename(f)).group(1)
+                      for f in glob.glob(os.path.join(HERE, r["key"], "cine_*.mp4")) if not f.endswith("_src.mp4"))
+        served = sorted((h["cinemagraph"].get("state") or "base") for h in r.get("hotspots", []) if h.get("cinemagraph"))
+        check(disk == served, f"{r['key']}: every committed clip is served", f"disk {disk} vs served {served}")
+        bad = [h["id"] for h in r.get("hotspots", []) if (h.get("cinemagraph") or {}).get("state") == "base"]
+        check(not bad, f"{r['key']}: no carrier says state 'base'", str(bad))
+
+
 if __name__ == "__main__":
     test_ladder()
     test_escape()
     test_tower_map()
     test_wiring()
+    test_survey_pickups()
+    test_brazier()
+    test_puzzles()
+    test_clips_served()
     print(f"\n{'ALL CHECKS PASSED' if not FAILS else 'FAILED: ' + '; '.join(FAILS)}")
     sys.exit(1 if FAILS else 0)

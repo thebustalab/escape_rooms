@@ -492,6 +492,25 @@ NETWORKS_SUBWAY_KEY <- list(
   }
 )
 
+# networks / beacons (scenario id 19): "the post-mortem" on a dispatch ledger between the TWELVE places of the
+# world (v2 dataset, 2026-09-16). Four GRADED rooms in room order — fenwatch (console check: heaviest link
+# Anvil -> Ladder), sisters (pick-the-point: the lopsided sender Fenwatch), anvil (pick-the-point, THE
+# SHORTCUT: busiest the Crown), whistlegate (BOSS, pick-the-point on the student's buildNetwork() drawing:
+# Whistlegate). Check and pick rooms encode a solve as answer = 1, so correct = c(1, 1, 1, 1). The seven
+# survey-stop rooms carry no puzzle and the Crown's ledger is the ungraded escape, so none take a codec slot.
+# Re-derived from data/dispatch_ledger.csv by rooms/networks/beacons/test_beacons.py.
+NETWORKS_BEACONS_KEY <- list(
+  scenario_id = 19,
+  correct = c(1, 1, 1, 1),
+  score_step = function(correct, answer, attempts) {
+    if (answer != correct) return(0)
+    if (attempts <= 1) return(10)
+    if (attempts == 2) return(7)
+    if (attempts == 3) return(4)
+    return(2)
+  }
+)
+
 # embeddings / submarine (scenario id 22): "The Sounding" — text-embedding retrieval over a ship
 # archive, played from the two ends of a crippled salvage submarine.
 #
@@ -731,5 +750,22 @@ if (identical(environment(), globalenv()) && sys.nframe() == 0) {
   cat("Pano subway grade — points:", qg21$points, "|", qg21$detail, "\n")
   if (!isTRUE(qg21$valid && qg21$points == 40)) {
     stop("REGRESSION: pano subway grade wrong — expected 40 pts for an all-first-try solve")
+  }
+
+  # Regression: pano scenario id 19 (networks/beacons) — check/pick rooms (solve = 1), v2 header (19 > 15).
+  bsteps19 <- list(list(answer = 1, attempts = 1),
+                   list(answer = 1, attempts = 1),
+                   list(answer = 1, attempts = 1),
+                   list(answer = 1, attempts = 1))
+  bcode19 <- encode_code(version = 2, scenario_id = 19, steps = bsteps19, student_id = "beacons_test")
+  bd19 <- decode_code(bcode19, "beacons_test")
+  bok19 <- bd19$valid && bd19$scenario_id == 19 &&
+    identical(bd19$answers, c(1L, 1L, 1L, 1L)) && identical(bd19$attempts, c(1L, 1L, 1L, 1L))
+  cat("Pano round-trip OK id 19 (should be TRUE):", bok19, "\n")
+  if (!bok19) stop("REGRESSION: pano round-trip failed (id 19 beacons)")
+  bg19 <- grade_one(bcode19, "beacons_test", NETWORKS_BEACONS_KEY)
+  cat("Pano beacons grade — points:", bg19$points, "|", bg19$detail, "\n")
+  if (!isTRUE(bg19$valid && bg19$points == 40)) {
+    stop("REGRESSION: pano beacons grade wrong — expected 40 pts for an all-first-try solve")
   }
 }

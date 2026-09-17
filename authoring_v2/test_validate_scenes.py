@@ -271,3 +271,47 @@ def test_two_gameplay_hotspots_sharing_an_x_do_warn(tmp_path):
     doc = _two_at({"puzzle": True}, {"clue": True},
                   hotspots=[{"id": "a", "type": "puzzle"}, {"id": "b", "type": "clue"}])
     assert len(_collisions(tmp_path, doc, "roles.json")) == 1
+
+
+# ---- bulky structure crowded beside the wrap seam (subway, 2026-09-17) ---------------------------------
+# The subway station template put a spiral stair AND a tunnel mouth both `to the left`, beside the seam
+# wall; 8 of 13 stations rendered the stair doubled across the ±180° join. The check warns on the
+# layout that caused it, and must stay quiet on the fixed layout and on seam backdrops that name
+# "no arch, no doorway" to forbid them.
+
+def _outer_doc(elements):
+    return {"rooms": [{"key": "r1", "authoring": {"sceneSpec": {
+        "room": "r1", "setting": "a platform", "seam": "a plain tiled wall, no arch or doorway",
+        "elements": elements}}}]}
+
+
+def _outer_warns(tmp_path, elements, name):
+    p = tmp_path / name
+    p.write_text(json.dumps(_outer_doc(elements)))
+    _f, warns, _r, _o = vs.check_scenario(str(p))
+    return [w for w in warns if "bulky structure" in w]
+
+
+def test_bulky_structure_sharing_an_outer_slot_warns(tmp_path):
+    els = [{"id": "seam_left", "at": "on the far left", "desc": "a plain tiled wall, no arch or doorway"},
+           {"id": "end_left", "at": "to the left", "desc": "where the road ducks into its arched tunnel mouth"},
+           {"id": "spiral_down", "at": "to the left", "desc": "a cast-iron spiral stair winding down"}]
+    assert len(_outer_warns(tmp_path, els, "subway_bad.json")) == 1
+
+
+def test_bulky_structure_moved_inboard_does_not_warn(tmp_path):
+    els = [{"id": "seam_left", "at": "on the far left", "desc": "a plain tiled wall, no arch or doorway"},
+           {"id": "end_left", "at": "to the left", "desc": "where the road ducks into its arched tunnel mouth"},
+           {"id": "spiral_down", "at": "just left of centre", "desc": "a cast-iron spiral stair winding down"}]
+    assert _outer_warns(tmp_path, els, "subway_fixed.json") == []
+
+
+def test_seam_backdrop_naming_forbidden_structure_does_not_warn(tmp_path):
+    els = [{"id": "seam_left", "at": "on the far left", "desc": "a plain tiled wall, no arch or doorway"},
+           {"id": "seam_right", "at": "on the far right", "desc": "a plain tiled wall, no arch or doorway"}]
+    assert _outer_warns(tmp_path, els, "seam_only.json") == []
+
+
+def test_bulky_structure_on_the_edge_slot_warns_alone(tmp_path):
+    els = [{"id": "gate", "at": "on the far right", "desc": "a stone archway onto the street"}]
+    assert len(_outer_warns(tmp_path, els, "edge.json")) == 1

@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Tests for validate_assets.door_reciprocity — the scriptable bidirectional-passage check.
+"""Tests for the scriptable scenario checks in validate_assets — currently `door_reciprocity` (the
+bidirectional-passage check) and `door_labels_undecided` (the publish-time door-name-plate decision).
+
+## door_reciprocity
 
 Regression for the monorail SWITCH-DOOR (2026-08-05): a car's single door routes back OR forward by lever
 state, so its return path lives on a state VARIANT's `to`, not the base `to` (which points onward). The
@@ -84,3 +87,50 @@ def test_a_gate_with_a_solve_sound_is_clean():
 def test_non_gate_hotspots_do_not_need_one():
     for typ in ("clue", "door", "ambient", "dial", "elevmap"):
         assert _solve_misses({"id": "h", "type": typ, "body": "x", "to": "r1"}) == []
+
+
+# --- door_labels_undecided: the publish-time door-name-plate decision (2026-09-16) -------------------
+# `doorLabels` captions each open door with its target room's title. The check's whole job is to make the
+# choice EXPLICIT at promotion, so it fires on ABSENCE and never on `false` — declining is an answer,
+# forgetting is not. It only asks where a player can get lost, i.e. a room with 3+ doors.
+
+def _junction(n_doors, **scen_extra):
+    """One built room carrying `n_doors` doors, plus whatever scenario-level fields the test sets."""
+    scen = {"rooms": [{"key": "hub", "built": True, "hotspots": [
+        {"id": f"d{i}", "type": "door", "to": f"r{i}"} for i in range(n_doors)]}]}
+    scen.update(scen_extra)
+    return va.door_labels_undecided(scen)
+
+
+def test_unset_on_a_junction_is_flagged():
+    # 3 exits and no decision recorded — the case the check exists for
+    out = _junction(3)
+    assert out and "doorLabels" in out[0] and "hub (3)" in out[0]
+
+
+def test_false_is_a_decision_and_passes():
+    # explicitly declined — must NOT nag, or the only way to silence it would be to turn it on
+    assert _junction(3, doorLabels=False) == []
+
+
+def test_true_is_a_decision_and_passes():
+    assert _junction(3, doorLabels=True) == []
+
+
+def test_two_door_corridor_is_never_asked():
+    # a corridor disambiguates itself (you came from one door, you're going to the other)
+    assert _junction(2) == []
+
+
+def test_unbuilt_rooms_do_not_trigger_it():
+    scen = {"rooms": [{"key": "hub", "built": False, "hotspots": [
+        {"id": f"d{i}", "type": "door", "to": f"r{i}"} for i in range(4)]}]}
+    assert va.door_labels_undecided(scen) == []
+
+
+def test_non_door_hotspots_are_not_counted_as_exits():
+    # a room with two doors and three puzzles is a corridor, not a junction
+    scen = {"rooms": [{"key": "hub", "built": True, "hotspots": [
+        {"id": "d0", "type": "door", "to": "r0"}, {"id": "d1", "type": "door", "to": "r1"},
+        {"id": "p0", "type": "puzzle"}, {"id": "p1", "type": "clue"}, {"id": "p2", "type": "dial"}]}]}
+    assert va.door_labels_undecided(scen) == []

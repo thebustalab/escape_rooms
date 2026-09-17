@@ -1,0 +1,15 @@
+I looked at the clip myself rather than the numbers. The worker's arithmetic checks out — `cine_room.py:44` is `GLITCH_BREADTH_REJECT = 0.70` with a `min()` of the two breadth readings (`cine_room.py:70-71`), `cine_dead_check.py` is 1.75/0.45, and HOLD is indeed the documented verdict for a gate survivor. But its one substantive art claim — that the clip is "in the register the art asked for" — is contradicted by the frames.
+
+**What the frames show** (`ochre_hall_motion_ri3_3_strip.jpg`, and frames 0/12/24/36/48/60/72 pulled from the raw mp4):
+
+- **Frame 0**: the track bed is clear — ballast, sleepers, rails, the train's wheels all visible. The dust-sheeting is the short run of canvas lashed to the platform rail at right, exactly as authored.
+- **Frames 12–60**: a large pale canvas sheet *materialises out of nothing* and unfurls left-to-right across the track bed and platform edge, burying the ballast, the sleepers and the wheels under it for most of the loop. In the panorama it spans roughly half the frame width along the bottom.
+- **Frame 72**: gone again, back to frame 0.
+
+That is precisely what the spec's own `dust_sheeting` text was written to forbid: "one distinct bounded object read against the dark train road behind it, **not a covering laid over the platform**." Mid-loop it is a covering laid over the platform — and it occludes `platform_edge` and `berth_lampblack`, two elements the spec spends most of its length pinning down. The 9.56 peak is not a gentle breathing of a bounded prop; it is the area change of a prop that grows to many times its authored extent. The gates cannot see this — a large, smooth, spatially-coherent morph is neither a transient spike nor a frozen render — which is exactly the failure mode `cine_judge.py:17` records ("six times a metric certified a visibly wrong clip; the fix is not a better metric, it is refusing to let a metric certify at all"). The worker let the metrics certify.
+
+The comparison render `ri3_2` (older still, same seed) shows the sheeting behaving correctly as a bounded run on the rail, so this is a property of the new still plus the current motion phrase, not an inevitability.
+
+HOLD itself is a safe no-op, but the worker attached a standing instruction to the verdict file — that the 0.167/0.896 pairing "should not be re-litigated next cycle." Acting on this decision parks a visibly broken clip in front of Lucas with a note pre-arguing that nothing is wrong with it. There is a legitimate, in-bounds action here instead: re-author `dust_sheeting.motion.phrase`/`vigour` so the bounded-extent constraint lives in the *motion* text and not only in the still description — pin the cloth to the rail, forbid it spreading onto the track bed or platform — and re-render. No settings lever, no hand-written prompt, and the mover has been rendered so AUTHOR_MOVER is not blocked.
+
+VERDICT: FAIL

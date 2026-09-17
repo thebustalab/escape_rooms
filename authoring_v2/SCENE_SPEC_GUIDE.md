@@ -163,6 +163,10 @@ own bore" becomes reliable only when it is also "there are EXACTLY 4 tunnel mout
    not add further trains, carriages or wagons anywhere in the frame or receding down any tunnel."*
    Note that `beacons`' own notes had already concluded *"treat any exact count in a generated frame
    as unreliable"*; this is the constructive half of that rule.
+   **If a room needs two of a LARGE repeated subject and the count still won't hold, split it** — one
+   room per subject joined by a walk-across door — rather than re-rolling vantages. A panorama reliably
+   renders one instance: subway's two-train station rooms failed on three different vantages while every
+   one-train room succeeded, and the split fixed them in one pass.
 
 0f. **A still bound for a cinemagraph must be explicitly SHARP.** Describing something as *sliding
    past* or *running* invites the model to paint the motion INTO the still as motion blur and smeared
@@ -278,6 +282,20 @@ own bore" becomes reliable only when it is also "there are EXACTLY 4 tunnel mout
    Animatable objects especially stay off the extreme edges (a seam-crossing cinemagraph needs a hand-drawn
    wrap box — avoid it by placement). If an object genuinely must straddle the seam, the human draws a wrap
    box in the flat editor (the engine rolls + splits).
+   **Keep bulky structure OUT of the outer band (`to the left`/`to the right` and beyond).** A stair or shaft,
+   a tunnel mouth, an archway or a doorway placed at 0.20/0.80 — above all when it SHARES that slot with
+   another element — gets packed against the edge by the model until it spills across the ±180° join and
+   renders DOUBLED, once at each edge. The seam metric passes it and an occluder cannot hide something that
+   big. Subway, 2026-09-17: the station template put the spiral stair AND the tunnel mouth both `to the
+   left`, and 8 of 13 stations came back with two stairs. Put big structure `just left/right of centre`
+   (or dead ahead), prefix its desc "standing well in from the edge of the frame, with plain wall between
+   it and that edge", and give the outer slots only ONE thing each. `validate_scenes.py` warns on this
+   ("bulky structure in the outer band").
+   **Describe each structure ONCE, and never list what must NOT appear.** A tunnel mouth written into both the
+   track element and a separate end element rendered as two mouths (subway, 2026-09-17), and a seam clause
+   reading "no stair, no shaft, no tunnel mouth, no arch" planted exactly those things at the join. State
+   counts positively in one place ("EXACTLY ONE tunnel mouth in the whole panorama") and keep the seam text a
+   plain description of the surface.
 6. **Gameplay elements** — `puzzle:true` (the graded object; grading is wired separately in the harness),
    `switch:true` (a world-state control — lever/dial/valve; placed + boxed now, its state effect wired later —
    kept distinct from `puzzle` so real graded puzzles aren't confused with switches), `clue:true`, and the two
@@ -300,8 +318,8 @@ own bore" becomes reliable only when it is also "there are EXACTLY 4 tunnel mout
 ## Pipeline after authoring
 1. `POST /api/save-scene-specs {chapter, scenario, specs:{roomKey:spec}}` — stores every spec + renders every
    prompt into `authoring.scenePrompt`.
-2. Per room — generate art from the rendered prompt → judge it → commit. Art is the expensive step, so
-   this is where the money goes. Two ways to run it, both owned by the `escape_room_stills` skill:
+2. Per room — generate art from the rendered prompt → judge it → commit. Generation is cheap and runs
+   unattended, so per-room art cost is not a reason to cut rooms. Two ways to run it, both owned by the `escape_room_stills` skill:
    **by hand** (generate, review the candidates with `art_qc.py` at NATIVE resolution, commit), or
    **unattended** via the `stills_iterate` long_agent loop, which does the same thing overnight for a
    whole scenario and leaves an accept queue. Neither ever marks art accepted — that stays human.

@@ -89,3 +89,25 @@ export function pickCinemagraphs(hotspots, sceneState) {
     .map(h => h.cinemagraph)
     .filter(c => (c.state || null) === (sceneState || null));
 }
+
+// --- Which room SOUND layers belong to the backdrop currently on screen (2026-09-16) -----------------
+//
+// The sound counterpart of pickCinemagraphs, with the default deliberately INVERTED. A clip carries one
+// image's lighting, so an unlabelled clip is base-only. A sound usually does not: beacons' river sounds
+// the same by day and by night. So a room `sfx` layer with NO `states` plays in every backdrop — every
+// scenario authored before this is unchanged — and a layer that is only true of some states lists them:
+//
+//   { "src": "audio/fenwatch_rooks.mp3", "states": ["base"] }      // day only: the rooks roost at night
+//   { "src": "audio/shears_trickle.mp3", "states": ["night"] }     // night only
+//
+// `"base"` names the base backdrop (no full-scene variant showing). This is a DIFFERENT field from a
+// cinemagraph's `state`, where base is ABSENT and "base" matches nothing (see the carrier test); the
+// plural name and the list shape keep the two from being confused. An empty list plays nowhere.
+export function pickSfxLayers(layers, sceneState) {
+  const here = sceneState || "base";
+  return (layers || []).filter(l => {
+    if (!l || !l.src) return false;
+    if (!Array.isArray(l.states)) return true;
+    return l.states.includes(here);
+  });
+}

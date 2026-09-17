@@ -2435,6 +2435,83 @@ def test_a_state_variant_accept_nests_under_its_own_state():
     _with_rooms_root(body)
 
 
+# ---------------------------------------------------------------------------------------------
+# GUARDED RESTART (2026-09-17). POST /api/restart-harness must refuse while a job slot or a
+# room_iterate run is live, and must never actually restart from a test: `_spawn_restart` is
+# swapped for a recorder. Driven through a real handler on an ephemeral port, with the Host header
+# set to the production 127.0.0.1:8752 the guard expects. No fixtures (see the __main__ note).
+def _restart_post(headers=None):
+    import http.client
+    httpd = hs.http.server.ThreadingHTTPServer(("127.0.0.1", 0), hs.H)
+    th = threading.Thread(target=httpd.serve_forever, daemon=True)
+    th.start()
+    try:
+        conn = http.client.HTTPConnection("127.0.0.1", httpd.server_address[1], timeout=5)
+        h = {"Host": "127.0.0.1:%d" % hs.PORT, "Content-Type": "application/json"}
+        h.update(headers or {})
+        conn.request("POST", "/api/restart-harness", body=b"{}", headers=h)
+        r = conn.getresponse()
+        return r.status, json.loads(r.read() or b"{}")
+    finally:
+        httpd.shutdown(); httpd.server_close()
+
+
+def _with_restart_sandbox(fn):
+    calls = []
+    save = (hs.JOBS, hs._spawn_restart)
+    hs.JOBS = {}
+    hs._spawn_restart = lambda: calls.append(1)
+    try:
+        _with_rooms_root(lambda tmp: fn(tmp, calls))
+    finally:
+        hs.JOBS, hs._spawn_restart = save
+
+
+def _long_agent_state(tmp, chapter, scenario, status):
+    d = os.path.join(tmp, "rooms", chapter, scenario, "_long_agent")
+    os.makedirs(d, exist_ok=True)
+    with open(os.path.join(d, "state.json"), "w") as f:
+        json.dump({"status": status}, f)
+
+
+def test_restart_refused_while_job_slot_active():
+    def body(tmp, calls):
+        hs.JOBS["gen1"] = dict(hs._IDLE, active=True)
+        code, out = _restart_post()
+        assert code == 409 and out["ok"] is False and "gen1" in out["error"], (code, out)
+        assert calls == []
+    _with_restart_sandbox(body)
+
+
+def test_restart_refused_while_room_iterate_working():
+    def body(tmp, calls):
+        _long_agent_state(tmp, "ch", "idle_sc", "awaiting_review")
+        _long_agent_state(tmp, "ch", "live_sc", "working")
+        code, out = _restart_post()
+        assert code == 409 and "ch/live_sc" in out["error"] and "idle_sc" not in out["error"], (code, out)
+        assert calls == []
+    _with_restart_sandbox(body)
+
+
+def test_restart_accepted_when_idle_without_restarting():
+    def body(tmp, calls):
+        hs.JOBS["gen1"] = dict(hs._IDLE)                       # finished job: not a blocker
+        _long_agent_state(tmp, "ch", "done_sc", "awaiting_review")
+        code, out = _restart_post({"Origin": "http://localhost:8752"})
+        assert code == 200 and out == {"ok": True, "restarting": True}, (code, out)
+        assert calls == [1]
+    _with_restart_sandbox(body)
+
+
+def test_restart_rejects_foreign_host_or_origin():
+    def body(tmp, calls):
+        assert _restart_post({"Host": "evil.example:8752"})[0] == 403        # DNS rebinding
+        assert _restart_post({"Origin": "http://evil.example"})[0] == 403    # cross-site POST
+        assert _restart_post({"Origin": "http://localhost:8055"})[0] == 403  # not the harness page
+        assert calls == []
+    _with_restart_sandbox(body)
+
+
 if __name__ == "__main__":
     tests = [v for k, v in sorted(globals().items()) if k.startswith("test_") and callable(v)]
     for t in tests:
@@ -2506,3 +2583,35 @@ def test_every_generate_scene_call_carries_the_resolved_api_key():
     bare = [src[:m.start()].count("\n") + 1 for m in calls if "env=gen_env()" not in m.group(0)]
     assert not bare, ("generate_scene.py subprocess calls missing env=gen_env() at lines %s — a "
                       "daemon-launched harness will fail these with 'OPENAI_API_KEY not set'" % bare)
+
+
+def test_sound_briefs_carries_music_states_and_live_committed_levels(tmp_path):
+    """2026-09-16: the v3 Sounds tab shows the theme music, each room's intent for EVERY state, and
+    the committed layers read live from scenario.json — so a level saved from the test-play mixer
+    appears in the harness with nothing to sync."""
+    import json as _json, sys as _sys, os as _os
+    _sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)))
+    import harness_server as hs
+    base = tmp_path / "sc"; base.mkdir()
+    spec = {"room": "a", "seam": "wall", "setting": "a room", "soundBed": "wind",
+            "elements": [{"id": "flag", "at": "centre", "desc": "a flag",
+                          "motion": {"moves": True, "phrase": "flapping"},
+                          "sound": {"source": "flag", "character": "snaps"}}],
+            "states": {"night": {"soundBed": "still night air"}, "dusk": {"prompt": "dusk"}}}
+    doc = {"music": "audio/theme.mp3", "musicVolume": 0.15, "musicCredit": {"text": "someone"},
+           "rooms": [{"key": "a", "title": "A", "authoring": {"sceneSpec": spec},
+                      "sfx": {"src": "audio/a.mp3", "volume": 0.4}}]}
+    (base / "scenario.json").write_text(_json.dumps(doc))
+    out = hs._sound_briefs(str(base))
+    assert out["music"] == {"src": "audio/theme.mp3", "volume": 0.15, "volumeIsDefault": False,
+                            "credit": {"text": "someone"}}
+    room = out["rooms"][0]
+    by = {s["state"]: s for s in room["states"]}
+    assert set(by) == {None, "night", "dusk"}
+    assert by["night"]["same"] is False and by["night"]["brief"]["bed"] == "still night air"
+    assert by["dusk"]["same"] is True
+    assert room["committed"] == [{"src": "audio/a.mp3", "volume": 0.4}]
+    assert room["knownStates"] == ["base", "dusk", "night"]     # what a layer's `states` may name
+    doc["rooms"][0]["sfx"]["volume"] = 0.2            # what /api/save-mix does
+    (base / "scenario.json").write_text(_json.dumps(doc))
+    assert hs._sound_briefs(str(base))["rooms"][0]["committed"][0]["volume"] == 0.2

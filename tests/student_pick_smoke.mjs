@@ -60,12 +60,27 @@ const results = await page.evaluate(async ({ port, picks }) => {
     cand <- paste0("GeomInteractive", sub("^Geom", "", class(geom)[1]))
     if (exists(cand, envir = ns, inherits = FALSE)) get(cand, envir = ns) else NULL
   }
+  # The id column the student's plot actually carries. A summary the student BUILDS names its own key
+  # column (origin / station / destination...), so when idcol is absent from the layer's data, fall back
+  # to that data's first text column — in a one-row-per-entity summary, that is the entity (2026-09-16).
+  pick_col <- function(d) {
+    if (!is.data.frame(d) || idcol %in% names(d)) return(idcol)
+    txt <- names(d)[vapply(d, function(x) is.character(x) || is.factor(x), logical(1))]
+    if (length(txt)) txt[1] else idcol
+  }
+  layer_df <- function(i) { ld <- p$layers[[i]]$data; if (is.data.frame(ld)) ld else p$data }
+  # If ANY layer carries idcol, tag only those layers. A drawn network has a segment layer (edges: start_node,
+  # end_node...) and a point layer (nodes: node_name); falling back on the edges would make a LINE clickable
+  # as if it were a station (2026-09-16, beacons' boss). The fallback is for plots where no layer has idcol.
+  has_id <- vapply(seq_along(p$layers), function(i) { d <- layer_df(i); is.data.frame(d) && idcol %in% names(d) }, logical(1))
   changed <- FALSE
   for (i in seq_along(p$layers)) {
+    if (any(has_id) && !has_id[i]) next
     g <- twin(p$layers[[i]]$geom)
     if (is.null(g)) next
     p$layers[[i]]$geom <- g
-    add <- ggplot2::aes(data_id = !!rlang::sym(idcol), tooltip = !!rlang::sym(idcol))
+    col <- pick_col(layer_df(i))
+    add <- ggplot2::aes(data_id = !!rlang::sym(col), tooltip = !!rlang::sym(col))
     m <- p$layers[[i]]$mapping
     p$layers[[i]]$mapping <- if (is.null(m)) add else utils::modifyList(m, add)
     changed <- TRUE

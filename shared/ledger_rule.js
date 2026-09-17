@@ -48,12 +48,19 @@ export function assignedGroups(assignment) {
  * is right or it is not. Deliberately returns the SAME shape as confirmGroups so the caller does not
  * branch on more than the flag.
  */
-export function confirmAll(rows, assignment) {
+export function confirmAll(rows, assignment, unordered) {
   const mine = (assignment instanceof Map)
     ? Object.fromEntries(assignment.entries())
     : (assignment || {});
-  const complete = (rows || []).length > 0
-    && (rows || []).every(r => mine[r.id] === r.answer);
+  const rs = rows || [];
+  // UNORDERED (2026-09-17, Lucas): the rows are interchangeable slots — beacons' four fires are a SET of
+  // towers, and which slot a tower is written in carries no meaning, so any arrangement of the right four
+  // is right. Compared as MULTISETS, so naming one tower twice is still wrong (it leaves a village dark).
+  const bag = xs => { const m = new Map(); for (const x of xs) m.set(x, (m.get(x) || 0) + 1); return m; };
+  const same = (a, b) => a.size === b.size && Array.from(a).every(([k, v]) => b.get(k) === v);
+  const complete = rs.length > 0 && (unordered
+    ? same(bag(rs.map(r => mine[r.id]).filter(Boolean)), bag(rs.map(r => r.answer)))
+    : rs.every(r => mine[r.id] === r.answer));
   return { locked: new Set(), newly: [], groupCount: trueGroups(rows).size, complete };
 }
 

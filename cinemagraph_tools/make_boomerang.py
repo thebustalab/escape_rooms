@@ -10,9 +10,9 @@ The turnaround frames are dropped from the reversed half, otherwise the first an
 show twice and the motion visibly hesitates at both ends.
 """
 import os, subprocess, sys, json
+from pathlib import Path
 
-UI = ("/home/bustalab/Documents/Tools/websites/thebustalab.github.io/escape_rooms/"
-      "authoring_v2/ui/cine360")
+UI = str(Path(__file__).resolve().parent.parent / "authoring_v2" / "ui" / "cine360")
 
 
 def nframes(p):

@@ -29,8 +29,9 @@ tests/playwright-report/
 
 # --- Keep the public repo to PLAY-REQUIRED assets only (2026-08-06) ---
 # Rule: only files the player fetches at runtime (scenario.json, play.html, referenced
-# panoramas/cinemagraphs/audio/images, data CSVs, shared engine, decoder) belong on the
-# public site. Authoring records, build caches, backups, and history-tier dirs do not.
+# panoramas/cinemagraphs/audio/images, data CSVs, shared engine) belong on the
+# public site. NOT decoder/ — it holds the answer keys and is ignored below.
+# Authoring records, build caches, backups, and history-tier dirs do not.
 # NOTE: .gitignore does NOT untrack already-committed files — after this syncs to the Mac,
 # run once in the escape_rooms repo:  git rm -r --cached . && git add . && git commit
 # (re-applies these rules; disk files are untouched, git just stops tracking the ignored ones.)

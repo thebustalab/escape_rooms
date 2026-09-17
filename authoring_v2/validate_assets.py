@@ -38,6 +38,8 @@ Per rooms/<chapter>/<scenario>/scenario.json, for every BUILT room:
   - MISS  a graded engine (question/check/pick/map) hands the answer away via feedback.reveal
   - MISS  an MCQ has fewer than 6 options (need >=6 data-derived distractors)
   - MISS  a `ready` scenario has no test_<name>.py (pins each room's answer to the CSV + decoder lockstep)
+  - MISS  `doorLabels` is unset while a room has 3+ doors — the door-name-plate decision was never
+          made (absent != false; set it either way at promotion)
   - MISS  `done`/`escapeDone`/`debrief` is a bare string rather than an object — the engine reads
           `.title`/`.body`, so the authored finish screen silently falls back to the generic one
           (subway + clouds, found 2026-09-07). Valid JSON, clean prose, screen still renders: nothing
@@ -170,6 +172,34 @@ def dials_without_states(scen):
                 out.append("dial '%s/%s' has no `states` — nothing to click, so it is inert"
                            % (r["key"], h.get("id")))
     return out
+
+
+def door_labels_undecided(scen):
+    """`doorLabels` is a DECISION every roamable scenario owes, not a field that may simply be absent.
+    Set true, each open door is captioned in play with the title of the room it leads to (only for rooms the
+    player has already entered — see the hub's "Door name-plates"); set false, it declines them. ABSENT is
+    the one value that means nobody thought about it, which is why this fires on absence and never on
+    `false`: declining is a fine answer, forgetting is not.
+
+    Only worth asking where the player can actually get lost, so the trigger is a room with **3+ doors** — a
+    junction offering a real choice between similar-looking exits. A two-door corridor disambiguates itself
+    (you came from one, you are going to the other) and gains nothing from captions, so a linear scenario
+    never sees this. Added 2026-09-16 after egypt shipped the first `doorLabels` scenario, so that the
+    choice lands at promotion rather than being discovered by a lost student."""
+    if "doorLabels" in scen:
+        return []                                          # decided either way — true or false, both fine
+    junctions = []
+    for r in scen.get("rooms", []):
+        if not r.get("built"):
+            continue
+        n = len([h for h in r.get("hotspots", []) if h.get("type") == "door"])
+        if n >= 3:
+            junctions.append(f"{r['key']} ({n})")
+    if not junctions:
+        return []                                          # nowhere to get lost; the question doesn't arise
+    return [f"`doorLabels` is unset while {len(junctions)} room(s) offer 3+ exits ({', '.join(junctions)}) — "
+            f"decide it explicitly: `true` captions each open door with its target room's title, `false` "
+            f"declines. Absent reads as never-considered, not as no."]
 
 
 def door_reciprocity(scen):
@@ -328,6 +358,7 @@ def check_scenario(path):
     if ready and not glob.glob(os.path.join(d, "test_*.py")):
         misses.append("no test_<name>.py (pins answers to the CSV + decoder lockstep — a ready scenario needs one)")
     misses.extend(door_reciprocity(scen))                # topology: every passage has a return door
+    misses.extend(door_labels_undecided(scen))           # a roamable world owes a doorLabels decision
     misses.extend(dials_without_states(scen))            # a stateless dial is an inert control
     misses.extend(pickup_tile_shape(scen, d))            # notebook board tiles are square-cropped
     _cm, _cf = clip_state_pairing(scen)                  # a full-scene state whose motion doesn't match it

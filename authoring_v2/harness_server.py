@@ -1021,6 +1021,46 @@ def _set_clues(base, items):
     return {"updated": updated, "errors": errors}
 
 
+def _sound_briefs(base):
+    """Everything the v3 Sounds tab shows, in one read (2026-09-16).
+
+    The scenario's theme MUSIC (src, level, credit) — which is a sound like any other and used to be
+    visible nowhere in the console — then, per room, the authored sound INTENT for every state it can
+    stand in (`scene_spec.sound_briefs`: base, night, order_sent, ... each marked `same` when it sounds
+    like the base) and the COMMITTED layers underneath. Committed layers are read straight off
+    `room.sfx` on every call, so a level saved from the test-play mixer (`/api/save-mix`) or a flag
+    raised there shows up here on the next render with nothing to sync: scenario.json is the one store,
+    and this tab, the test-play mixer and harness_gpt step 8 are three editors on it."""
+    doc = _load_scenario(base)
+    defaults = doc.get("states")
+    rooms = []
+    for r in doc.get("rooms", []):
+        if not isinstance(r, dict):
+            continue
+        spec = (r.get("authoring") or {}).get("sceneSpec") or {}
+        sfx = r.get("sfx")
+        layers = sfx if isinstance(sfx, list) else ([sfx] if isinstance(sfx, dict) else [])
+        # Backdrop states this room can actually show: spec-authored states plus any variant state on a
+        # hotspot (art made before states moved onto the spec). A committed layer naming anything else
+        # in its `states` would never play — the tab flags it.
+        known = set(scene_spec.state_names(spec, defaults))
+        for h in (r.get("hotspots") or []):
+            for v in ((h or {}).get("variants") or []):
+                if isinstance(v, dict) and v.get("state"):
+                    known.add(v["state"])
+        rooms.append({"key": r.get("key"), "title": r.get("title") or "",
+                      "knownStates": ["base"] + sorted(known),
+                      "states": scene_spec.sound_briefs(spec, defaults),
+                      "committed": [l for l in layers if isinstance(l, dict) and l.get("src")]})
+    return {"ok": True,
+            "music": {"src": doc.get("music"),
+                      "volume": doc.get("musicVolume") if doc.get("musicVolume") is not None
+                      else _MUSIC_DEFAULT_VOL,
+                      "volumeIsDefault": doc.get("musicVolume") is None,
+                      "credit": doc.get("musicCredit")} if doc.get("music") else None,
+            "rooms": rooms}
+
+
 def _scenario_state(base):
     """Per-room pipeline status for the build-world console: spec loaded? art built? hotspots placed?
     cinemagraphs done vs candidates awaiting a pick? Plus the batch status + queue depth."""
@@ -2275,11 +2315,20 @@ def _room_clips(base, room_key, doc=None):
                 raw = bool((json.load(open(cj2, encoding="utf-8")) or {}).get("raw"))
             except Exception:  # noqa: BLE001
                 raw = False
+        # `mtime` on the COMMITTED clip, and on the still it animates (2026-09-16). Candidates already
+        # carried one; the committed clip did not, so the v3 review tab could not place it in recency
+        # order and always put it FIRST. Lucas then reviewed hood's "day 1" as dead with a broken wrap
+        # — it was a clip committed on 09-15 from art replaced on 09-16, sitting above the good new
+        # render. `stillMtime` lets the page flag any clip older than its own art as STALE.
+        _still_rel = _state_still_rel(base, room_key, state, doc)
+        _still_abs = os.path.join(base, _still_rel) if _still_rel else ""
         out.append({"state": state, "file": "%s/%s" % (room_key, name),
+                    "mtime": int(os.path.getmtime(f)),
+                    "stillMtime": int(os.path.getmtime(_still_abs)) if _still_abs and os.path.isfile(_still_abs) else None,
                     "patches": patches, "mask": mask, "raw": raw,
                     "reviewed": "" in (_cine_reviewed(base, room_key).get(state) or []),
                     "candidates": _cine_candidates(base, room_key, state),
-                    "still": _state_still_rel(base, room_key, state, doc)})
+                    "still": _still_rel})
     # A STATE WITH CANDIDATES BUT NO COMMITTED CLIP MUST STILL APPEAR. This loop is driven by
     # `cine_<state>.mp4`, so a room whose first renders are sitting in the candidate pool and have never
     # been promoted showed "no cinemagraph rendered for this room yet" and hid the pool completely —
@@ -2845,6 +2894,17 @@ def _run_cine_delete(slot, base, room, state, tag=None):
             if not os.path.isfile(src):
                 raise ValueError("no candidate %r for %s/%s" % (tag, room, state))
             shutil.move(src, os.path.join(trash, "%s__%s.%s.mp4" % (state, tag, stamp)))
+            # The review tab's preview copies (2026-09-15) describe a clip that no longer exists, so
+            # they go with it — otherwise `proxy/` and `poster/` accumulate files for candidates nobody
+            # can see any more. Both are derived and cheap to rebuild, so they are removed rather than
+            # trashed; the master in the trash is what makes this recoverable.
+            for sub, ext in (("proxy", ".mp4"), ("poster", ".jpg")):
+                side = os.path.join(_cine_cand_dir(base, room), sub, "%s__%s%s" % (state, tag, ext))
+                if os.path.isfile(side):
+                    try:
+                        os.remove(side)
+                    except OSError:
+                        pass
             # Record it, or the next `stage_candidates.py --from-exp` pass copies it straight back in.
             _cine_dismiss(base, room, state, tag)
             moved.append(tag)
@@ -3786,6 +3846,68 @@ def _delete_scene(base, fn):
     return removed
 
 
+# ── Guarded self-restart (POST /api/restart-harness, 2026-09-17) ──────────────────────────────────
+# The servers run persistently on host2 (cron watchdog re-runs serve_harness.sh every 5 min), so a
+# restart to load new code is an explicit act: the v3 sticky-bar button, or `harness_launch.command
+# --restart`, which POSTs here over the tunnel. It REFUSES while anything live would be cut off: a
+# harness job slot, or a room_iterate run whose `_long_agent/state.json` says "working".
+SERVE_HARNESS = os.path.join(HERE, "serve_harness.sh")
+RESTART_LOG = os.path.expanduser("~/.local/state/escape_harness/restart.log")
+SERVE_LOCK = os.path.expanduser("~/.local/state/escape_harness/serve.lock")   # shared with the watchdog
+_LOCAL_HOSTS = ("127.0.0.1", "localhost")
+
+
+def _restart_blockers(rooms_root=None):
+    """Reasons a restart must be refused right now ([] = safe). Unreadable state.json blocks too:
+    it may be mid-write, and guessing "not working" is the failure this guard exists to prevent."""
+    reasons = []
+    with LOCK:
+        busy = sorted(s for s, j in JOBS.items() if j.get("active"))
+    if busy:
+        reasons.append("harness job running in slot(s): " + ", ".join(busy))
+    root = rooms_root or ROOMS_ROOT
+    for p in sorted(glob.glob(os.path.join(root, "*", "*", "_long_agent", "state.json"))):
+        where = "/".join(os.path.relpath(p, root).split(os.sep)[:2])
+        try:
+            with open(p) as f:
+                status = (json.load(f) or {}).get("status")
+        except Exception:  # noqa: BLE001
+            reasons.append("cannot read long-agent state for %s (retry shortly)" % where)
+            continue
+        if status == "working":
+            reasons.append("room_iterate run is live for %s" % where)
+    return reasons
+
+
+def _local_request_ok(headers):
+    """Anti-DNS-rebinding / cross-site guard for the restart route: Host must be this server on
+    localhost, and a browser Origin (always sent on fetch POST) must be the same localhost origin."""
+    ok_hosts = {"%s:%d" % (h, PORT) for h in _LOCAL_HOSTS}
+    if (headers.get("Host") or "").strip().lower() not in ok_hosts:
+        return False
+    origin = (headers.get("Origin") or "").strip().lower()
+    return not origin or origin in {"http://" + h for h in ok_hosts}
+
+
+def _spawn_restart():
+    """Fully detached `HARNESS_RESTART=1 bash -lic serve_harness.sh`, 1 s after the reply goes out.
+    Own session (setsid + start_new_session) so killing the harness_v2 tmux session — which kills
+    THIS process — does not take the restarter with it. Takes the watchdog's lock so the two can't
+    interleave kill/create on the same tmux session. No request input reaches the command."""
+    os.makedirs(os.path.dirname(RESTART_LOG), exist_ok=True)
+    env = {k: v for k, v in os.environ.items() if k not in ("TMUX", "TMUX_PANE")}
+    env["HARNESS_RESTART"] = "1"
+    import shlex
+    inner = "sleep 1; flock -w 120 %s bash -lic %s" % (shlex.quote(SERVE_LOCK),
+                                                       shlex.quote("bash " + shlex.quote(SERVE_HARNESS)))
+    with open(RESTART_LOG, "a") as log:
+        log.write("\n== restart requested %s ==\n" % datetime.datetime.now().isoformat(timespec="seconds"))
+        log.flush()
+        subprocess.Popen(["setsid", "bash", "-c", inner], stdin=subprocess.DEVNULL, stdout=log,
+                         stderr=subprocess.STDOUT, env=env, cwd=HERE, start_new_session=True,
+                         close_fds=True)
+
+
 class H(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *a, **k):
         super().__init__(*a, directory=ROOT, **k)
@@ -4059,6 +4181,11 @@ class H(http.server.SimpleHTTPRequestHandler):
             return self._json({"scenarios": _list_scenarios(), "active": dict(ACTIVE)})
         if route == "/api/scenario-config":
             return self._json(_scenario_config())
+        if route == "/api/sound-briefs":     # ?chapter&scenario — v3 Sounds tab: music + per-state intent + committed
+            try:
+                return self._json(_sound_briefs(self._query_base()))
+            except Exception as e:  # noqa: BLE001
+                return self._json({"ok": False, "error": str(e)}, 500)
         if route == "/api/scenario":         # ?chapter&scenario for a specific one, else active
             try:
                 return self._json(_load_scenario(self._query_base()))
@@ -4119,6 +4246,15 @@ class H(http.server.SimpleHTTPRequestHandler):
     def do_POST(self):
         route = self.path.split("?")[0]
         try:
+            if route == "/api/restart-harness":
+                if not _local_request_ok(self.headers):
+                    return self._json({"ok": False, "error": "restart only accepted from the local harness origin"}, 403)
+                blockers = _restart_blockers()
+                if blockers:
+                    return self._json({"ok": False, "error": "refusing to restart: " + "; ".join(blockers),
+                                       "blockers": blockers}, 409)
+                _spawn_restart()
+                return self._json({"ok": True, "restarting": True})
             if route == "/api/generate":
                 req = self._body()
                 prompt = (req.get("prompt") or "").strip()
@@ -4396,12 +4532,29 @@ class H(http.server.SimpleHTTPRequestHandler):
                 prompt = (req.get("prompt") or "").strip()
                 if not rk or not state:
                     return self._json({"ok": False, "error": "need roomKey and state"}, 400)
-                if not prompt:
-                    return self._json({"ok": False, "error": "empty variant prompt"}, 400)
                 try:
                     base = _scenario_base(req.get("chapter"), req.get("scenario"))
                 except ValueError as ve:
                     return self._json({"ok": False, "error": str(ve)}, 400)
+                if not prompt:
+                    # AUTHORED RE-LIGHT (2026-09-15). A caller may now omit the prompt and let the
+                    # room's own `sceneSpec.states.<state>` render it. The prompt used to exist only
+                    # as whatever string the caller typed, recorded on the carrier afterwards — so
+                    # the spec could not see the state, and the motion prompt could not follow the
+                    # art into it. A hand-passed prompt still wins, for a one-off experiment.
+                    try:
+                        doc = _load_scenario(base)
+                        rec = next((x for x in doc.get("rooms", []) if x.get("key") == rk), None)
+                        spec = ((rec or {}).get("authoring") or {}).get("sceneSpec")
+                        prompt = (scene_spec.render_variant_prompt(spec, state,
+                                                                   doc.get("states")) or "").strip()
+                    except Exception as e:  # noqa: BLE001
+                        return self._json({"ok": False, "error": "could not render the variant "
+                                                                 "prompt: %s" % e}, 400)
+                if not prompt:
+                    return self._json({"ok": False, "error":
+                                       "no prompt given and %s authors no `states.%s` block"
+                                       % (rk, state)}, 400)
                 if not os.path.isfile(os.path.join(base, rk, "scene.png")):
                     return self._json({"ok": False, "error": "room %s has no committed scene.png" % rk}, 400)
                 if _batch_running(base):
