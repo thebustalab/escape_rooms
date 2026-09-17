@@ -6,7 +6,7 @@
   "playerMap": false,
   "title": "The Faintest Line",
   "subtitle": "A shift on the dye district railway",
-  "story": "The dye district made colour for two hundred years, and when the trade died the railway under it went dark. The works has it now: the lichen grows on the tunnel fabric itself, orange and grey-green across the old tile, and it is scraped and racked and sold for pigment. You are on shift, and there are two jobs on the slate.\n\nFirst, the yield. It has fallen nine seasons running. The works re-seeds from the heaviest growth on the wall every season and the colour keeps thinning, so somebody wants to know which gene actually governs pigment \u2014 not which one shouts loudest. The assay is filed from a car's engineer's compartment, and a filed answer is the reason the traffic office energises a line.\n\nSecond, find us more wall. The standing order is bigger than the growing face. The network is older than the works and not all of it is on the books. Ride it, keep your eyes open, and note anything you see out there that should not be there.\n\nThe river takes the low tunnels on the evening tide. You have one ebb.",
+  "story": "This city's dye district made colours for two hundred years. When the trade died, the railway beneath the district went dark, but the lichen emerged: orange and grey-green, creeping across the old tile.\n\nYour biotechnology company scrapes the lichen off the tunnel walls and sells it on today's boutique pigment market. You have two jobs today. First, work out which gene in the lichen's genome controls pigment abundance. Then find somewhere new to grow the lichen: places on the network that no train has stopped at in decades.\n\nRide the lines. Keep your eyes open.",
   "enterLabel": "Start the shift",
   "done": {
     "title": "The assay is filed",
@@ -16,7 +16,7 @@
     "title": "There is a great deal of wall down there",
     "body": "Two platforms that were on no map are on the record, fixed off nothing but the hops you rode and what you saw go past. The standing order was bigger than the growing face; it is bigger again now. The river has the low tunnels \u2014 but the survey holds, and the ebb was enough."
   },
-  "music": "",
+  "music": "audio/subway_theme.mp3",
   "musicVolume": 0.15,
   "musicCredit": "",
   "packages": [
@@ -163,10 +163,10 @@
           "note": "transfer on foot -> ochre_woad",
           "to": "ochre_woad",
           "box": [
-            0.168,
-            0.598,
-            0.188,
-            0.694
+            0.0906,
+            0.26,
+            0.1338,
+            0.65
           ],
           "boxSource": "draft:localizer"
         },
@@ -175,10 +175,10 @@
           "label": "The traffic office desk",
           "note": "ESCAPE. Both grid references in ONE submission, no partial feedback: Halliwell E5 and Cold Harbour I4. Gate on {gte:[sightings,5]}. Capping attempts is still open. WIRED 2026-09-07: answer E5I4 (length 4, letters pass \u2014 normalizeCode uppercases and strips non-alphanumerics). endsEscape:true rather than phase:'escape' on the room, because ochre_hall is ALSO the lampblack boarding platform and the player's first room. maxAttempts left UNSET (uncapped) \u2014 the escape is ungraded, and 'out of attempts' darkens the keypad with no recovery. availableWhen {gte:[sightings,5]} NOT wired: `sightings` is incremented by the ride's sighting clue, which is ride work.",
           "box": [
-            0.77,
-            0.6,
-            0.866,
-            0.76
+            0.823,
+            0.41,
+            0.9238,
+            0.698
           ],
           "boxSource": "draft:localizer"
         },
@@ -189,10 +189,10 @@
           "note": "board this line -> car_lampblack; the destination is chosen on the cab's selector, so ONE door hotspot is enough (Lucas, 2026-09-07). Line: lampblack.",
           "to": "car_lampblack",
           "box": [
-            0.18,
-            0.436,
-            0.82,
-            0.564
+            0.2952,
+            0.504,
+            0.6408,
+            0.696
           ],
           "boxSource": "draft:localizer"
         },
@@ -219,13 +219,13 @@
           "type": "door",
           "label": "The spiral stair down",
           "box": [
-            0.168,
-            0.598,
-            0.188,
-            0.694
+            0.0906,
+            0.26,
+            0.1338,
+            0.65
           ],
           "direction": "open",
-          "boxSource": "draft:pre-regen",
+          "boxSource": "draft:localizer",
           "to": "ochre_woad",
           "boxNote": "box [0.168, 0.598, 0.188, 0.694] (draft:localizer) predates the 2026-09-17 round-3 tunnel fix; unlocked for re-placement"
         },
@@ -234,12 +234,12 @@
           "type": "lock",
           "label": "The traffic office desk",
           "box": [
-            0.77,
-            0.6,
-            0.866,
-            0.76
+            0.823,
+            0.41,
+            0.9238,
+            0.698
           ],
-          "boxSource": "draft:pre-regen",
+          "boxSource": "draft:localizer",
           "solveSfx": {
             "src": "audio/solve_routing_frame.mp3",
             "volume": 0.65,
@@ -260,13 +260,13 @@
           "type": "door",
           "label": "The lampblack train (grey)",
           "box": [
-            0.18,
-            0.436,
-            0.82,
-            0.564
+            0.2952,
+            0.504,
+            0.6408,
+            0.696
           ],
           "direction": "open",
-          "boxSource": "draft:pre-regen",
+          "boxSource": "draft:localizer",
           "to": "car_lampblack",
           "boxNote": "box [0.18, 0.436, 0.82, 0.564] (draft:localizer) predates the 2026-09-17 round-3 tunnel fix; unlocked for re-placement"
         },
@@ -317,7 +317,7 @@
             },
             {
               "id": "spiral_down",
-              "desc": "standing well in from the left-hand edge of the frame, with a clear stretch of plain tiled wall between it and that edge \u2014 a cast-iron spiral stair winding DOWN out of this platform through a round shaft in the floor, its worn handrail curving away into lamplight below",
+              "desc": "standing well in from the left-hand edge of the frame, with a clear stretch of plain tiled wall between it and that edge \u2014 a cast-iron spiral stair winding DOWN out of this platform through a round shaft in the floor, its worn handrail curving away into lamplight below. This is the ONLY stair in the whole panorama: EXACTLY ONE spiral stair and ONE round shaft, standing out on the open platform floor about a third of the way in from the left-hand edge of the frame and clear of the back wall. There is no second stair, no second shaft and no railed opening anywhere else in the frame, and none at either extreme edge.",
               "label": "The spiral stair down",
               "door": {
                 "direction": "open",
@@ -341,18 +341,6 @@
               "at": "dead ahead in the centre"
             },
             {
-              "id": "dust_sheeting",
-              "desc": "lashed along the platform rail close to the viewer, a SHORT run of loose canvas dust-sheeting \u2014 a couple of metres of pale heavy canvas, tied at intervals and hanging free between the ties, one distinct bounded object read against the dark train road behind it, not a covering laid over the platform",
-              "lock": true,
-              "at": "just right of centre",
-              "motion": {
-                "moves": true,
-                "phrase": "the short run of loose canvas dust-sheeting on the platform rail lifting and rippling very gently between its ties and settling back, no more than a slow soft breathing of the cloth",
-                "vigour": "the canvas stirring only gently in the draught off the train road, lifting a little away from the rail and rippling loosely between its ties, slack rather than taut and never snapping or cracking"
-              },
-              "role": "prop"
-            },
-            {
               "id": "vault_shafts",
               "desc": "high in the ochre vault above the platform, long shafts of amber lamplight crossing the dark air beneath the ribs, thick with slow-drifting dust and damp haze",
               "animate": {
@@ -360,6 +348,16 @@
                 "loop": "boomerang"
               },
               "at": "just right of centre"
+            },
+            {
+              "id": "drip_bucket",
+              "at": "just right of centre, close beside the viewer",
+              "desc": "in the IMMEDIATE FOREGROUND an arm's length from the viewer, a galvanised bucket standing on the platform under a slow drip coming down out of the vault, half full of clear water, the tiles dark and wet around it",
+              "motion": {
+                "moves": true,
+                "vigour": "the drip falling steadily into the bucket, rings spreading across the water",
+                "phrase": "the slow drip falling into the bucket and the rings spreading out across the water and fading, over and over; gentle and unhurried"
+              }
             },
             {
               "id": "traffic_desk",
@@ -408,24 +406,24 @@
           ]
         },
         "seam": {
-          "band": "ground",
-          "ratio": 2.0,
-          "delta": 4.84,
+          "band": "mid",
+          "ratio": 2.17,
+          "delta": 4.66,
           "needsWork": false,
           "stage": "blurred",
-          "at": "2026-09-17T11:31:10",
+          "at": "2026-09-17T14:08:23",
           "accepted": false,
           "acceptedBy": "lucas 2026-09-07",
-          "seamBandRun": 0.018
+          "seamBandRun": 0.0
         },
         "scenePrompt": "This is a seamless 360-degree panorama from the vast vaulted booking hall of a disused Victorian underground station, now the lichen works' traffic office and the topmost of its three stacked platforms, its ochre vault arching high overhead \u2014 the viewer is standing ON THE PLATFORM FACING THE LAMPBLACK TRAIN across its road, so that one road runs left-to-right across the view in front of them, with the platform's back wall behind them. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the platform's plain tiled back wall directly behind the viewer, uniform and unbroken, with no road, arch, doorway or opening in it: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the platform's plain tiled back wall directly behind the viewer, uniform and unbroken, with no road, arch, doorway or opening in it, the left half of that one surface; to the left, the LEFT-HAND END of the station, low at track level, where the lampblack road ducks into its own arched tunnel mouth \u2014 each bore taking only its own road's single pair of rails, never shared, and the running road leading to it kept CLEAR: no barrier of any kind between a train and the mouth its line uses; to the left, a cast-iron spiral stair winding DOWN out of this platform through a round shaft in the floor, its worn handrail curving away into lamplight below; just left of centre, lashed along the platform rail close to the viewer, a SHORT run of loose canvas dust-sheeting \u2014 a couple of metres of pale heavy canvas, tied at intervals and hanging free between the ties, one distinct bounded object read against the dark train road behind it, not a covering laid over the platform, the canvas stirring only gently in the draught off the train road, lifting a little away from the rail and rippling loosely between its ties, slack rather than taut and never snapping or cracking; dead ahead in the centre, in the IMMEDIATE FOREGROUND at the viewer's own feet, the platform's square worn granite edge with its white-painted line \u2014 and just beyond it the ballast and sleepers of the track bed, a single step down, with the two running rails lying on them roughly knee-deep below the platform surface: deep enough to take a train's wheels and no deeper; dead ahead in the centre, dead ahead beyond that edge, this berth's single road: the sunken track bed and its ONE pair of running rails, its rails running away to the LEFT and ducking into its OWN brick-ringed arched TUNNEL MOUTH low at track level \u2014 the road between the train and that mouth completely CLEAR and unobstructed, so the train could run straight out of the station \u2014 while to the RIGHT, BEYOND the far end of the train, the same rails stop dead at heavy timber-and-iron BUFFER STOPS with a sand drag and a red lamp against a blind wall. These are ONE unbroken pair of rails running dead straight through the whole station and out at its end(s), and the train stands on that very pair, in line with them. Standing DOWN IN that bed, broadside to the viewer, a short heavy black iron works unit \u2014 flat soot-black sides, barred goods sections amidships \u2014 ONE vehicle, a single unbroken body, sitting square and level along the road with a driver's cab at the end nearer the viewer and its side doors slid open. ITS WHEELS SIT VISIBLY ON THOSE RAILS, squarely on the railheads and clearly in contact with them, and THE CAR'S FLOOR COMES UP EXACTLY LEVEL WITH THE PLATFORM EDGE so its open doorways give straight out onto the platform at the viewer's own foot level, a single stride across with no step up or down and no drop in front of them; just right of centre, high in the ochre vault above the platform, long shafts of amber lamplight crossing the dark air beneath the ribs, thick with slow-drifting dust and damp haze; to the right, the RIGHT-HAND END of the station, low at track level, where the lampblack road stops dead at heavy timber-and-iron buffer stops with a sand drag and a red lamp; on the far right, the platform's plain tiled back wall directly behind the viewer, uniform and unbroken, with no road, arch, doorway or opening in it, the right half of that one surface, joining its other half. vast, cathedral-quiet, warm amber work-lamps against cold ochre tile and deep vault shadow, damp haze, film grain, sombre and grand. A CENTURY OF DERELICTION, ACTIVELY WORKED IN: crazed and missing glazed tile with the bedding mortar showing through, paint peeling in sheets, long rust and water stains bleeding down the walls, perished cable looped on old porcelain insulators, chipped enamel, sooted brick, treads worn hollow. And over the top of all of it the crew who work here now \u2014 notices, tally sheets, work rotas and curling postcards tacked and taped up, chalked marks and scratched tallies on the tile, duckboards laid over the wet, cable ties and gaffer tape, cheap bright LED work-lamps on yellow flex, a kettle, a coat on a hook. Lived-in, cared for, and plainly somebody's workplace. Warm, purposeful and characterful \u2014 a magnificent run-down place that a good crew has taken on and made theirs. NOT eerie, NOT spooky, NOT creepy, NOT haunted, NOT menacing, NOT post-apocalyptic and NOT an abandoned ruin: dark and dirty in places, and still plainly and warmly worked in. No cobwebs, no gloom-for-its-own-sake. No people, no lettering, captions, text, signage or readable writing of any kind, no station name, no daylight. EXACTLY ONE train and EXACTLY ONE road in this view \u2014 no second train anywhere, not behind the viewer, not at the frame edges, not down a tunnel. The train is ONE CONTINUOUS VEHICLE with a single unbroken body \u2014 never two separate vehicles, never two detached cab-boxes with a gap of floor between them, and never the same vehicle drawn twice. It is seen from the SIDE, standing straight and square along its road, and it is NOT bent, curved, twisted, skewed, splayed or wrapped round to bring its far end into view: only the flank facing the viewer needs to be visible, and the far end may simply run out of frame. COUNT THE TRACKWORK EXACTLY: this station has 1 road and 1 pair of running rails, ONE per train, and no others \u2014 no third track, no siding, no crossover, no points, no spare rails crossing the floor. Every road has its OWN bore, never shared, so there are EXACTLY 1 tunnel mouth and 1 set of buffer stops in this station, all of them on the viewer's LEFT and RIGHT and all in line with the rails that enter them. Each train sits SQUARE AND LEVEL along its own road, parallel to its rails \u2014 never nose-to-nose with another train, never wedged into a corner, never twisted, skewed or bent to show its far end, and never crossing another road. THE RAILS UNDER THE TRAIN ARE THE SAME RAILS THAT LEAVE THE STATION. One single unbroken pair of rails runs dead straight from one end of the station to the other, the train stands squarely on that pair, and each tunnel mouth sits directly in line with it \u2014 you could follow the railheads with your eye from under the train's wheels, along the bed, and straight in through the arch without a break, a bend, a kink or an offset. There is never a second set of rails running to the mouths beside or past the train, and the train is never parked on a stub of track that does not reach them. A BUFFER STOP MAY ONLY EVER STAND AT A BLIND END \u2014 beyond the far end of a train, on a road that dies there, against a wall. There is NEVER a buffer stop, gate, barrier, fence, hoarding or blockage of any kind BETWEEN a train and a tunnel mouth its own line runs into: every train must have a clear, unobstructed road out of the station. Nothing stands in the road but the train: no barrel, crate, bench or rack in the track bed. The image is SHARP, with no motion blur or streaking \u2014 everything is standing still. No blank empty wall areas. Nothing eerie, spooky, creepy, haunted or menacing; no cobwebs. Shot on a full-frame DSLR at 24mm, f/8, natural daylight, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above \u2014 no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into the platform's plain tiled back wall directly behind the viewer, uniform and unbroken, with no road, arch, doorway or opening in it, with no visible seam, join, or repetition.",
         "boxesFrom": {
-          "art": "e4deb9d3ac34",
-          "at": "2026-09-17T11:31:36"
+          "art": "947b6b419ab5",
+          "at": "2026-09-17T14:08:49"
         }
       },
       "panorama": "ochre_hall/scene.png",
-      "builtFrom": "l1_ochre_hall_1.png",
+      "builtFrom": "l1_ochre_hall_2.png",
       "wrap": {
         "haov": 360,
         "vaov": 90,
@@ -446,7 +444,11 @@
           "volume": 0.1,
           "needsReplacement": true
         }
-      ]
+      ],
+      "mapPos": {
+        "c": 1,
+        "r": 0
+      }
     },
     {
       "key": "ochre_woad",
@@ -462,10 +464,10 @@
           "note": "transfer on foot -> ochre_hall",
           "to": "ochre_hall",
           "box": [
-            0.195,
-            0.078,
-            0.225,
-            0.351
+            0.098,
+            0.0,
+            0.162,
+            0.52
           ],
           "boxSource": "draft:localizer"
         },
@@ -477,9 +479,9 @@
           "to": "car_woad",
           "box": [
             0.18,
-            0.406,
-            0.628,
-            0.694
+            0.454,
+            0.756,
+            0.646
           ],
           "boxSource": "draft:localizer"
         },
@@ -490,10 +492,10 @@
           "note": "transfer on foot -> ochre_verdigris",
           "to": "ochre_verdigris",
           "box": [
-            0.785,
-            0.74,
-            0.805,
-            1.0
+            0.82,
+            0.675,
+            0.852,
+            0.87
           ],
           "boxSource": "draft:localizer"
         }
@@ -505,13 +507,13 @@
           "type": "door",
           "label": "The spiral stair up",
           "box": [
-            0.195,
-            0.078,
-            0.225,
-            0.351
+            0.1313,
+            0.3881,
+            0.2038,
+            0.6044
           ],
           "direction": "open",
-          "boxSource": "draft:pre-regen",
+          "boxSource": "draft:localizer",
           "to": "ochre_hall",
           "boxNote": "box [0.195, 0.078, 0.225, 0.351] (draft:localizer) predates the 2026-09-17 round-3 tunnel fix; unlocked for re-placement"
         },
@@ -520,12 +522,12 @@
           "type": "clue",
           "label": "The drying racks",
           "box": [
-            0.84,
-            0.406,
-            0.86,
-            0.598
+            0.8585,
+            0.4694,
+            0.8968,
+            0.609
           ],
-          "boxSource": "draft:pre-regen",
+          "boxSource": "draft:localizer",
           "body": "Trays of orange crust drying on galvanised racking, three deep. Behind them the blue tile has gone furry with the same crop, growing where nobody planted it.",
           "boxNote": "box [0.84, 0.406, 0.86, 0.598] (draft:localizer) predates the 2026-09-17 round-3 tunnel fix; unlocked for re-placement"
         },
@@ -534,13 +536,13 @@
           "type": "door",
           "label": "The woad train (blue)",
           "box": [
-            0.18,
-            0.406,
-            0.628,
-            0.694
+            0.3373,
+            0.4152,
+            0.3783,
+            0.6038
           ],
           "direction": "open",
-          "boxSource": "draft:pre-regen",
+          "boxSource": "draft:localizer",
           "to": "car_woad",
           "boxNote": "box [0.18, 0.406, 0.628, 0.694] (draft:localizer) predates the 2026-09-17 round-3 tunnel fix; unlocked for re-placement"
         },
@@ -549,13 +551,13 @@
           "type": "door",
           "label": "The spiral stair down",
           "box": [
-            0.785,
-            0.74,
-            0.805,
-            1.0
+            0.7941,
+            0.6514,
+            0.8565,
+            0.897
           ],
           "direction": "open",
-          "boxSource": "draft:pre-regen",
+          "boxSource": "draft:localizer",
           "to": "ochre_verdigris",
           "boxNote": "box [0.785, 0.74, 0.805, 1.0] (draft:localizer) predates the 2026-09-17 round-3 tunnel fix; unlocked for re-placement"
         }
@@ -667,24 +669,24 @@
           ]
         },
         "seam": {
-          "band": "sky",
-          "ratio": 1.34,
-          "delta": 2.6,
+          "band": "mid",
+          "ratio": 1.39,
+          "delta": 3.56,
           "needsWork": false,
-          "stage": "blurred",
-          "at": "2026-09-17T12:10:14",
+          "stage": "screened",
+          "at": "2026-09-17T14:30:30",
           "accepted": false,
           "acceptedBy": "lucas 2026-09-07",
-          "seamBandRun": 0.013
+          "seamBandRun": 0.018
         },
         "scenePrompt": "This is a seamless 360-degree panorama from the middle of the three stacked platforms at Ochre Steps, barrel-roofed and tiled in deep blue, the round shaft of a cast-iron spiral stair opening in its roof \u2014 the viewer is standing ON THE PLATFORM FACING THE WOAD TRAIN across its road, so that one road runs left-to-right across the view in front of them, with the platform's back wall behind them. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the platform's plain tiled back wall directly behind the viewer, uniform and unbroken, with no road, arch, doorway or opening in it: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the platform's plain tiled back wall directly behind the viewer, uniform and unbroken, with no road, arch, doorway or opening in it, the left half of that one surface; to the left, the LEFT-HAND END of the station, low at track level, where the woad road ducks into its own arched tunnel mouth \u2014 each bore taking only its own road's single pair of rails, never shared, and the running road leading to it kept CLEAR: no barrier of any kind between a train and the mouth its line uses; to the left, a cast-iron spiral stair winding UP out of this platform through a round shaft in the roof, its worn handrail curving away into a pale glow above; just left of centre, galvanised racking bolted along the platform's back wall, loaded with plastic trays of drying orange crust, the blue tile behind it furred over with living lichen; dead ahead in the centre, in the IMMEDIATE FOREGROUND at the viewer's own feet, the platform's square worn granite edge with its white-painted line \u2014 and just beyond it the ballast and sleepers of the track bed, a single step down, with the two running rails lying on them roughly knee-deep below the platform surface: deep enough to take a train's wheels and no deeper; dead ahead in the centre, dead ahead beyond that edge, this berth's single road: the sunken track bed and its ONE pair of running rails, its rails running away to the LEFT and ducking into its OWN brick-ringed arched TUNNEL MOUTH low at track level \u2014 the road between the train and that mouth completely CLEAR and unobstructed, so the train could run straight out of the station \u2014 while to the RIGHT, BEYOND the far end of the train, the same rails stop dead at heavy timber-and-iron BUFFER STOPS with a sand drag and a red lamp against a blind wall. These are ONE unbroken pair of rails running dead straight through the whole station and out at its end(s), and the train stands on that very pair, in line with them. Standing DOWN IN that bed, broadside to the viewer, a short underground unit in deep blue livery, recently relaid \u2014 flat tunnel-profile sides and clean brass window frames \u2014 ONE vehicle, a single unbroken body, sitting square and level along the road with a driver's cab at the end nearer the viewer and its side doors slid open. ITS WHEELS SIT VISIBLY ON THOSE RAILS, squarely on the railheads and clearly in contact with them, and THE CAR'S FLOOR COMES UP EXACTLY LEVEL WITH THE PLATFORM EDGE so its open doorways give straight out onto the platform at the viewer's own foot level, a single stride across with no step up or down and no drop in front of them; just right of centre, a single caged work-lamp hanging on a long yellow flex from the low roof, swinging gently in the draught coming up the stair shaft; to the right, the RIGHT-HAND END of the station, low at track level, where the woad road stops dead at heavy timber-and-iron buffer stops with a sand drag and a red lamp; to the right, a cast-iron spiral stair winding DOWN out of this platform through a round shaft in the floor, its worn handrail curving away into lamplight below; on the far right, the platform's plain tiled back wall directly behind the viewer, uniform and unbroken, with no road, arch, doorway or opening in it, the right half of that one surface, joining its other half. tight and low after the hall, warm lamplight from above and cold damp from below, deep blue tile, film grain. A CENTURY OF DERELICTION, ACTIVELY WORKED IN: crazed and missing glazed tile with the bedding mortar showing through, paint peeling in sheets, long rust and water stains bleeding down the walls, perished cable looped on old porcelain insulators, chipped enamel, sooted brick, treads worn hollow. And over the top of all of it the crew who work here now \u2014 notices, tally sheets, work rotas and curling postcards tacked and taped up, chalked marks and scratched tallies on the tile, duckboards laid over the wet, cable ties and gaffer tape, cheap bright LED work-lamps on yellow flex, a kettle, a coat on a hook. Lived-in, cared for, and plainly somebody's workplace. Warm, purposeful and characterful \u2014 a magnificent run-down place that a good crew has taken on and made theirs. NOT eerie, NOT spooky, NOT creepy, NOT haunted, NOT menacing, NOT post-apocalyptic and NOT an abandoned ruin: dark and dirty in places, and still plainly and warmly worked in. No cobwebs, no gloom-for-its-own-sake. No people, no lettering, captions, text, signage or readable writing of any kind, no station name, no daylight. EXACTLY ONE train and EXACTLY ONE road in this view \u2014 no second train anywhere, not behind the viewer, not at the frame edges, not down a tunnel. The train is ONE CONTINUOUS VEHICLE with a single unbroken body \u2014 never two separate vehicles, never two detached cab-boxes with a gap of floor between them, and never the same vehicle drawn twice. It is seen from the SIDE, standing straight and square along its road, and it is NOT bent, curved, twisted, skewed, splayed or wrapped round to bring its far end into view: only the flank facing the viewer needs to be visible, and the far end may simply run out of frame. COUNT THE TRACKWORK EXACTLY: this station has 1 road and 1 pair of running rails, ONE per train, and no others \u2014 no third track, no siding, no crossover, no points, no spare rails crossing the floor. Every road has its OWN bore, never shared, so there are EXACTLY 1 tunnel mouth and 1 set of buffer stops in this station, all of them on the viewer's LEFT and RIGHT and all in line with the rails that enter them. Each train sits SQUARE AND LEVEL along its own road, parallel to its rails \u2014 never nose-to-nose with another train, never wedged into a corner, never twisted, skewed or bent to show its far end, and never crossing another road. THE RAILS UNDER THE TRAIN ARE THE SAME RAILS THAT LEAVE THE STATION. One single unbroken pair of rails runs dead straight from one end of the station to the other, the train stands squarely on that pair, and each tunnel mouth sits directly in line with it \u2014 you could follow the railheads with your eye from under the train's wheels, along the bed, and straight in through the arch without a break, a bend, a kink or an offset. There is never a second set of rails running to the mouths beside or past the train, and the train is never parked on a stub of track that does not reach them. A BUFFER STOP MAY ONLY EVER STAND AT A BLIND END \u2014 beyond the far end of a train, on a road that dies there, against a wall. There is NEVER a buffer stop, gate, barrier, fence, hoarding or blockage of any kind BETWEEN a train and a tunnel mouth its own line runs into: every train must have a clear, unobstructed road out of the station. Nothing stands in the road but the train: no barrel, crate, bench or rack in the track bed. The image is SHARP, with no motion blur or streaking \u2014 everything is standing still. No blank empty wall areas. Nothing eerie, spooky, creepy, haunted or menacing; no cobwebs. Again: the extreme left and right edges must align perfectly into the platform's plain tiled back wall directly behind the viewer, uniform and unbroken, with no road, arch, doorway or opening in it, with no visible seam, join, or repetition.",
         "boxesFrom": {
-          "art": "19b8b4bbc77f",
-          "at": "2026-09-17T12:10:42"
+          "art": "bb6d7527ae21",
+          "at": "2026-09-17T14:30:53"
         }
       },
       "panorama": "ochre_woad/scene.png",
-      "builtFrom": "l1_ochre_woad_2.png",
+      "builtFrom": "l1_ochre_woad_3.png",
       "wrap": {
         "haov": 360,
         "vaov": 90,
@@ -707,7 +709,11 @@
           "gapMax": 26,
           "needsReplacement": true
         }
-      ]
+      ],
+      "mapPos": {
+        "c": 2,
+        "r": 0
+      }
     },
     {
       "key": "ochre_verdigris",
@@ -723,10 +729,10 @@
           "note": "transfer on foot -> ochre_woad",
           "to": "ochre_woad",
           "box": [
-            0.182,
+            0.068,
             0.0,
-            0.214,
-            0.364
+            0.116,
+            0.585
           ],
           "boxSource": "draft:localizer"
         },
@@ -737,10 +743,10 @@
           "note": "board this line -> car_verdigris; the destination is chosen on the cab's selector, so ONE door hotspot is enough (Lucas, 2026-09-07). Line: verdigris.",
           "to": "car_verdigris",
           "box": [
-            0.212,
-            0.504,
+            0.116,
+            0.406,
             0.788,
-            0.76
+            0.646
           ],
           "boxSource": "draft:localizer"
         }
@@ -752,13 +758,13 @@
           "type": "door",
           "label": "The spiral stair up",
           "box": [
-            0.182,
-            0.0,
-            0.214,
-            0.364
+            0.064,
+            0.4691,
+            0.1097,
+            0.6559
           ],
           "direction": "open",
-          "boxSource": "draft:pre-regen",
+          "boxSource": "draft:localizer",
           "to": "ochre_woad",
           "boxNote": "box [0.182, 0.0, 0.214, 0.364] (draft:localizer) predates the 2026-09-17 round-3 tunnel fix; unlocked for re-placement"
         },
@@ -767,12 +773,12 @@
           "type": "clue",
           "label": "The mordant store",
           "box": [
-            0.8,
-            0.28,
-            0.864,
-            0.856
+            0.908,
+            0.404,
+            0.9456,
+            0.5772
           ],
-          "boxSource": "draft:pre-regen",
+          "boxSource": "draft:localizer",
           "body": "Mordant tins stacked to the door, and a works logbook propping it ajar. The last entry is a re-seeding. So is the one before it, and the one before that.",
           "boxNote": "box [0.8, 0.28, 0.864, 0.856] (draft:localizer) predates the 2026-09-17 round-3 tunnel fix; unlocked for re-placement"
         },
@@ -781,13 +787,13 @@
           "type": "door",
           "label": "The verdigris train (green)",
           "box": [
-            0.212,
-            0.504,
-            0.788,
-            0.76
+            0.2727,
+            0.3638,
+            0.3296,
+            0.6072
           ],
           "direction": "open",
-          "boxSource": "draft:pre-regen",
+          "boxSource": "draft:localizer",
           "to": "car_verdigris",
           "boxNote": "box [0.212, 0.504, 0.788, 0.76] (draft:localizer) predates the 2026-09-17 round-3 tunnel fix; unlocked for re-placement"
         }
@@ -807,7 +813,7 @@
             },
             {
               "id": "spiral_up",
-              "desc": "standing well in from the left-hand edge of the frame, with a clear stretch of plain tiled wall between it and that edge \u2014 a cast-iron spiral stair winding UP out of this platform through a round shaft in the roof, its worn handrail curving away into a pale glow above",
+              "desc": "standing well in from the left-hand edge of the frame, with a clear stretch of plain tiled wall between it and that edge \u2014 a cast-iron spiral stair winding UP out of this platform through a round shaft in the roof, its worn handrail curving away into a pale glow above. This is the ONLY stair in the whole panorama: EXACTLY ONE spiral stair and ONE round shaft, standing out on the open platform floor about a third of the way in from the left-hand edge of the frame and clear of the back wall. There is no second stair, no second shaft and no railed opening anywhere else in the frame, and none at either extreme edge.",
               "label": "The spiral stair up",
               "door": {
                 "direction": "open",
@@ -889,24 +895,24 @@
           ]
         },
         "seam": {
-          "band": "ground",
-          "ratio": 3.03,
-          "delta": 7.46,
+          "band": "mid",
+          "ratio": 1.05,
+          "delta": 2.83,
           "needsWork": false,
           "stage": "blurred",
-          "at": "2026-09-17T12:24:45",
+          "at": "2026-09-17T14:50:34",
           "accepted": false,
           "acceptedBy": "lucas 2026-09-07",
-          "seamBandRun": 0.019
+          "seamBandRun": 0.01
         },
         "scenePrompt": "This is a seamless 360-degree panorama from the lowest of the three stacked platforms at Ochre Steps, cut deeper than the others and wet with it, green-stained tile on every side \u2014 the viewer is standing ON THE PLATFORM FACING THE VERDIGRIS TRAIN across its road, so that one road runs left-to-right across the view in front of them, with the platform's back wall behind them. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the platform's plain tiled back wall directly behind the viewer, uniform and unbroken, with no road, arch, doorway or opening in it: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the platform's plain tiled back wall directly behind the viewer, uniform and unbroken, with no road, arch, doorway or opening in it, the left half of that one surface; to the left, the LEFT-HAND END of the station, low at track level, where the verdigris road ducks into its own arched tunnel mouth \u2014 each bore taking only its own road's single pair of rails, never shared, and the running road leading to it kept CLEAR: no barrier of any kind between a train and the mouth its line uses; to the left, a cast-iron spiral stair winding UP out of this platform through a round shaft in the roof, its worn handrail curving away into a pale glow above; just left of centre, a copper-sheathed store cupboard set into the platform's back wall, its door propped ajar on a stack of mordant tins and a works logbook; dead ahead in the centre, in the IMMEDIATE FOREGROUND at the viewer's own feet, the platform's square worn granite edge with its white-painted line \u2014 and just beyond it the ballast and sleepers of the track bed, a single step down, with the two running rails lying on them roughly knee-deep below the platform surface: deep enough to take a train's wheels and no deeper; dead ahead in the centre, dead ahead beyond that edge, this berth's single road: the sunken track bed and its ONE pair of running rails, its rails running away to the LEFT and ducking into its OWN brick-ringed arched TUNNEL MOUTH low at track level \u2014 the road between the train and that mouth completely CLEAR and unobstructed, so the train could run straight out of the station \u2014 while to the RIGHT, BEYOND the far end of the train, the same rails stop dead at heavy timber-and-iron BUFFER STOPS with a sand drag and a red lamp against a blind wall. These are ONE unbroken pair of rails running dead straight through the whole station and out at its end(s), and the train stands on that very pair, in line with them. Standing DOWN IN that bed, broadside to the viewer, a short underground unit sheathed in copper gone bright green with patina, wet through \u2014 flat tunnel-profile sides beaded with water \u2014 ONE vehicle, a single unbroken body, sitting square and level along the road with a driver's cab at the end nearer the viewer and its side doors slid open. ITS WHEELS SIT VISIBLY ON THOSE RAILS, squarely on the railheads and clearly in contact with them, and THE CAR'S FLOOR COMES UP EXACTLY LEVEL WITH THE PLATFORM EDGE so its open doorways give straight out onto the platform at the viewer's own foot level, a single stride across with no step up or down and no drop in front of them; just right of centre, a shallow channel cut along the foot of the back wall running with clear water, fed by a steady seep down the tile face above it; to the right, the RIGHT-HAND END of the station, low at track level, where the verdigris road stops dead at heavy timber-and-iron buffer stops with a sand drag and a red lamp; on the far right, the platform's plain tiled back wall directly behind the viewer, uniform and unbroken, with no road, arch, doorway or opening in it, the right half of that one surface, joining its other half. the deepest and wettest of the three levels, green-stained tile and standing damp under hard cold lamps, heavy haze, film grain. A CENTURY OF DERELICTION, ACTIVELY WORKED IN: crazed and missing glazed tile with the bedding mortar showing through, paint peeling in sheets, long rust and water stains bleeding down the walls, perished cable looped on old porcelain insulators, chipped enamel, sooted brick, treads worn hollow. And over the top of all of it the crew who work here now \u2014 notices, tally sheets, work rotas and curling postcards tacked and taped up, chalked marks and scratched tallies on the tile, duckboards laid over the wet, cable ties and gaffer tape, cheap bright LED work-lamps on yellow flex, a kettle, a coat on a hook. Lived-in, cared for, and plainly somebody's workplace. Warm, purposeful and characterful \u2014 a magnificent run-down place that a good crew has taken on and made theirs. NOT eerie, NOT spooky, NOT creepy, NOT haunted, NOT menacing, NOT post-apocalyptic and NOT an abandoned ruin: dark and dirty in places, and still plainly and warmly worked in. No cobwebs, no gloom-for-its-own-sake. No people, no lettering, captions, text, signage or readable writing of any kind, no station name, no daylight. EXACTLY ONE train and EXACTLY ONE road in this view \u2014 no second train anywhere, not behind the viewer, not at the frame edges, not down a tunnel. The train is ONE CONTINUOUS VEHICLE with a single unbroken body \u2014 never two separate vehicles, never two detached cab-boxes with a gap of floor between them, and never the same vehicle drawn twice. It is seen from the SIDE, standing straight and square along its road, and it is NOT bent, curved, twisted, skewed, splayed or wrapped round to bring its far end into view: only the flank facing the viewer needs to be visible, and the far end may simply run out of frame. COUNT THE TRACKWORK EXACTLY: this station has 1 road and 1 pair of running rails, ONE per train, and no others \u2014 no third track, no siding, no crossover, no points, no spare rails crossing the floor. Every road has its OWN bore, never shared, so there are EXACTLY 1 tunnel mouth and 1 set of buffer stops in this station, all of them on the viewer's LEFT and RIGHT and all in line with the rails that enter them. Each train sits SQUARE AND LEVEL along its own road, parallel to its rails \u2014 never nose-to-nose with another train, never wedged into a corner, never twisted, skewed or bent to show its far end, and never crossing another road. THE RAILS UNDER THE TRAIN ARE THE SAME RAILS THAT LEAVE THE STATION. One single unbroken pair of rails runs dead straight from one end of the station to the other, the train stands squarely on that pair, and each tunnel mouth sits directly in line with it \u2014 you could follow the railheads with your eye from under the train's wheels, along the bed, and straight in through the arch without a break, a bend, a kink or an offset. There is never a second set of rails running to the mouths beside or past the train, and the train is never parked on a stub of track that does not reach them. A BUFFER STOP MAY ONLY EVER STAND AT A BLIND END \u2014 beyond the far end of a train, on a road that dies there, against a wall. There is NEVER a buffer stop, gate, barrier, fence, hoarding or blockage of any kind BETWEEN a train and a tunnel mouth its own line runs into: every train must have a clear, unobstructed road out of the station. Nothing stands in the road but the train: no barrel, crate, bench or rack in the track bed. The image is SHARP, with no motion blur or streaking \u2014 everything is standing still. No blank empty wall areas. Nothing eerie, spooky, creepy, haunted or menacing; no cobwebs. Again: the extreme left and right edges must align perfectly into the platform's plain tiled back wall directly behind the viewer, uniform and unbroken, with no road, arch, doorway or opening in it, with no visible seam, join, or repetition.",
         "boxesFrom": {
-          "art": "81a5532a76b8",
-          "at": "2026-09-17T12:25:06"
+          "art": "609f971aad90",
+          "at": "2026-09-17T14:50:53"
         }
       },
       "panorama": "ochre_verdigris/scene.png",
-      "builtFrom": "l1_ochre_verdigris_3.png",
+      "builtFrom": "l1_ochre_verdigris_1.png",
       "wrap": {
         "haov": 360,
         "vaov": 90,
@@ -927,7 +933,11 @@
           "volume": 0.14,
           "needsReplacement": true
         }
-      ]
+      ],
+      "mapPos": {
+        "c": 3,
+        "r": 0
+      }
     },
     {
       "key": "saffron_madder",
@@ -972,10 +982,10 @@
           "type": "door",
           "label": "The spiral stair down to the lampblack platform",
           "box": [
-            0.176,
-            0.276,
-            0.208,
-            0.724
+            0.1467,
+            0.6337,
+            0.2024,
+            0.751
           ],
           "direction": "open",
           "boxSource": "draft:localizer",
@@ -1001,10 +1011,10 @@
           "type": "door",
           "label": "The madder train (red)",
           "box": [
-            0.1,
-            0.406,
-            0.82,
-            0.646
+            0.4439,
+            0.3976,
+            0.4755,
+            0.641
           ],
           "direction": "open",
           "boxSource": "draft:localizer",
@@ -1153,7 +1163,11 @@
           "volume": 0.09,
           "needsReplacement": true
         }
-      ]
+      ],
+      "mapPos": {
+        "c": 0,
+        "r": 2
+      }
     },
     {
       "key": "saffron_lampblack",
@@ -1227,10 +1241,10 @@
           "type": "door",
           "label": "The lampblack train (grey)",
           "box": [
-            0.1817,
-            0.4619,
-            0.8217,
-            0.7179
+            0.6192,
+            0.418,
+            0.6616,
+            0.6099
           ],
           "direction": "open",
           "boxSource": "draft:localizer",
@@ -1385,7 +1399,11 @@
           "gapMax": 32,
           "needsReplacement": true
         }
-      ]
+      ],
+      "mapPos": {
+        "c": 0,
+        "r": 0
+      }
     },
     {
       "key": "cropping_weld",
@@ -1442,10 +1460,10 @@
           "type": "door",
           "label": "The spiral stair down to the lampblack platform",
           "box": [
-            0.1,
-            0.63,
-            0.13,
-            0.774
+            0.1304,
+            0.6283,
+            0.1604,
+            0.7723
           ],
           "direction": "open",
           "boxSource": "draft:localizer",
@@ -1457,10 +1475,10 @@
           "type": "clue",
           "label": "The cutting bench",
           "box": [
-            0.239,
-            0.487,
-            0.359,
-            0.559
+            0.2413,
+            0.4819,
+            0.3613,
+            0.5539
           ],
           "boxSource": "draft:localizer",
           "body": "Curved blades, a set of scales, shallow trays of cut crust waiting to be flatted. The bench is swept clean at one end and has not been used at the other in some time.",
@@ -1471,10 +1489,10 @@
           "type": "door",
           "label": "The weld train (yellow)",
           "box": [
-            0.26,
-            0.502,
-            0.74,
-            0.742
+            0.6777,
+            0.3906,
+            0.7343,
+            0.634
           ],
           "direction": "open",
           "boxSource": "draft:localizer",
@@ -1629,7 +1647,11 @@
           "volume": 0.11,
           "needsReplacement": true
         }
-      ]
+      ],
+      "mapPos": {
+        "c": 2,
+        "r": 2
+      }
     },
     {
       "key": "cropping_lampblack",
@@ -1859,7 +1881,11 @@
           "volume": 0.09,
           "needsReplacement": true
         }
-      ]
+      ],
+      "mapPos": {
+        "c": 1,
+        "r": 2
+      }
     },
     {
       "key": "tannery_weld",
@@ -1875,10 +1901,10 @@
           "note": "transfer on foot -> tannery_verdigris",
           "to": "tannery_verdigris",
           "box": [
-            0.1944,
-            0.372,
-            0.2328,
-            0.756
+            0.0982,
+            0.578,
+            0.1318,
+            0.866
           ],
           "boxSource": "draft:localizer"
         },
@@ -1889,10 +1915,10 @@
           "note": "board this line -> car_weld; the destination is chosen on the cab's selector, so ONE door hotspot is enough (Lucas, 2026-09-07). Line: weld.",
           "to": "car_weld",
           "box": [
-            0.18,
-            0.454,
-            0.756,
-            0.646
+            0.26,
+            0.452,
+            0.548,
+            0.58
           ],
           "boxSource": "draft:localizer"
         }
@@ -1904,13 +1930,13 @@
           "type": "door",
           "label": "The spiral stair down to the verdigris platform",
           "box": [
-            0.1944,
-            0.372,
-            0.2328,
-            0.756
+            0.1021,
+            0.6033,
+            0.1656,
+            0.7934
           ],
           "direction": "open",
-          "boxSource": "draft:pre-regen",
+          "boxSource": "draft:localizer",
           "to": "tannery_verdigris",
           "boxNote": "box [0.1944, 0.372, 0.2328, 0.756] (draft:localizer) predates the 2026-09-17 round-3 tunnel fix; unlocked for re-placement"
         },
@@ -1919,12 +1945,12 @@
           "type": "clue",
           "label": "The gall barrels",
           "box": [
-            0.882,
-            0.65,
-            0.914,
-            0.89
+            0.8518,
+            0.572,
+            0.9238,
+            0.732
           ],
-          "boxSource": "draft:pre-regen",
+          "boxSource": "draft:localizer",
           "body": "Three oak gall barrels standing well back from the road, one open with a scoop laid across it. The tile behind them is stained black where they have leaked for a century.",
           "boxNote": "box [0.882, 0.65, 0.914, 0.89] (draft:localizer) predates the 2026-09-17 round-3 tunnel fix; unlocked for re-placement"
         },
@@ -1933,13 +1959,13 @@
           "type": "door",
           "label": "The weld train (yellow)",
           "box": [
-            0.18,
-            0.454,
-            0.756,
-            0.646
+            0.3074,
+            0.3997,
+            0.3575,
+            0.6239
           ],
           "direction": "open",
-          "boxSource": "draft:pre-regen",
+          "boxSource": "draft:localizer",
           "to": "car_weld",
           "boxNote": "box [0.18, 0.454, 0.756, 0.646] (draft:localizer) predates the 2026-09-17 round-3 tunnel fix; unlocked for re-placement"
         }
@@ -2043,22 +2069,22 @@
         "seam": {
           "accepted": false,
           "acceptedBy": "lucas 2026-09-07",
-          "at": "2026-09-17T12:55:18",
+          "at": "2026-09-17T15:10:45",
           "stage": "blurred",
-          "band": "mid",
-          "ratio": 2.6,
-          "delta": 5.33,
+          "band": "ground",
+          "ratio": 2.9,
+          "delta": 7.67,
           "needsWork": false,
-          "seamBandRun": 0.019
+          "seamBandRun": 0.026
         },
         "scenePrompt": "This is a seamless 360-degree panorama from the yellow berth at Tannery Row, the narrowest platform on the network, a slot between dark tiled walls where the lamp string fails to reach the end \u2014 the viewer is standing ON THE PLATFORM FACING THE WELD TRAIN across its road, so that one road runs left-to-right across the view in front of them, with the platform's back wall behind them. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the platform's plain tiled back wall directly behind the viewer, uniform and unbroken, with no road, arch, doorway or opening in it: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the platform's plain tiled back wall directly behind the viewer, uniform and unbroken, with no road, arch, doorway or opening in it, the left half of that one surface; to the left, the LEFT-HAND END of the station, low at track level, where the weld road ducks into its own arched tunnel mouth \u2014 each bore taking only its own road's single pair of rails, never shared, and the running road leading to it kept CLEAR: no barrier of any kind between a train and the mouth its line uses; to the left, a cast-iron spiral stair winding DOWN out of this platform through a round shaft in the floor, its worn handrail curving away into lamplight below \u2014 it goes to this station's other platform, where the verdigris line stands; just left of centre, three oak gall barrels standing back against the platform's back wall, well clear of the road, one open with a scoop laid across it, the tile behind them stained black where they have leaked for a century; dead ahead in the centre, in the IMMEDIATE FOREGROUND at the viewer's own feet, the platform's square worn granite edge with its white-painted line \u2014 and just beyond it the ballast and sleepers of the track bed, a single step down, with the two running rails lying on them roughly knee-deep below the platform surface: deep enough to take a train's wheels and no deeper; dead ahead in the centre, dead ahead beyond that edge, this berth's single road: the sunken track bed and its ONE pair of running rails, its rails running away to the LEFT and ducking into its OWN brick-ringed arched TUNNEL MOUTH low at track level \u2014 the road between the train and that mouth completely CLEAR and unobstructed, so the train could run straight out of the station \u2014 while to the RIGHT, BEYOND the far end of the train, the same rails stop dead at heavy timber-and-iron BUFFER STOPS with a sand drag and a red lamp against a blind wall. These are ONE unbroken pair of rails running dead straight through the whole station and out at its end(s), and the train stands on that very pair, in line with them. Standing DOWN IN that bed, broadside to the viewer, a short ochre-yellow works unit \u2014 open flatbed deck amidships with drop gates at knee height, stacked flats lashed down under canvas straps \u2014 ONE vehicle, a single unbroken body, sitting square and level along the road with a driver's cab at the end nearer the viewer and its side doors slid open. ITS WHEELS SIT VISIBLY ON THOSE RAILS, squarely on the railheads and clearly in contact with them, and THE CAR'S FLOOR COMES UP EXACTLY LEVEL WITH THE PLATFORM EDGE so its open doorways give straight out onto the platform at the viewer's own foot level, a single stride across with no step up or down and no drop in front of them; just right of centre, a long iron rail slung under the roof a good arm's length CLEAR of the back wall, carrying a row of hanging oiled canvas sheets \u2014 loose supple cloth rather than boards, each sheet hung singly with open air behind it and a hand's gap to the next, so lamplight shows through between them, caught mid-swing in the draught off the tunnel mouth: every sheet blown well out of plumb and leaning the same way, loose bottom hems lifted clear of vertical and flapping open, deep folds running along the row; to the right, the RIGHT-HAND END of the station, low at track level, where the weld road stops dead at heavy timber-and-iron buffer stops with a sand drag and a red lamp; on the far right, the platform's plain tiled back wall directly behind the viewer, uniform and unbroken, with no road, arch, doorway or opening in it, the right half of that one surface, joining its other half. narrow, close, sour and dim, dark brown tile, one failing lamp string, deep shadow, film grain. A CENTURY OF DERELICTION, ACTIVELY WORKED IN: crazed and missing glazed tile with the bedding mortar showing through, paint peeling in sheets, long rust and water stains bleeding down the walls, perished cable looped on old porcelain insulators, chipped enamel, sooted brick, treads worn hollow. And over the top of all of it the crew who work here now \u2014 notices, tally sheets, work rotas and curling postcards tacked and taped up, chalked marks and scratched tallies on the tile, duckboards laid over the wet, cable ties and gaffer tape, cheap bright LED work-lamps on yellow flex, a kettle, a coat on a hook. Lived-in, cared for, and plainly somebody's workplace. Warm, purposeful and characterful \u2014 a magnificent run-down place that a good crew has taken on and made theirs. NOT eerie, NOT spooky, NOT creepy, NOT haunted, NOT menacing, NOT post-apocalyptic and NOT an abandoned ruin: dark and dirty in places, and still plainly and warmly worked in. No cobwebs, no gloom-for-its-own-sake. No people, no lettering, captions, text, signage or readable writing of any kind, no station name, no daylight. EXACTLY ONE train and EXACTLY ONE road in this view \u2014 no second train anywhere, not behind the viewer, not at the frame edges, not down a tunnel. The train is ONE CONTINUOUS VEHICLE with a single unbroken body \u2014 never two separate vehicles, never two detached cab-boxes with a gap of floor between them, and never the same vehicle drawn twice. It is seen from the SIDE, standing straight and square along its road, and it is NOT bent, curved, twisted, skewed, splayed or wrapped round to bring its far end into view: only the flank facing the viewer needs to be visible, and the far end may simply run out of frame. COUNT THE TRACKWORK EXACTLY: this station has 1 road and 1 pair of running rails, ONE per train, and no others \u2014 no third track, no siding, no crossover, no points, no spare rails crossing the floor. Every road has its OWN bore, never shared, so there are EXACTLY 1 tunnel mouth and 1 set of buffer stops in this station, all of them on the viewer's LEFT and RIGHT and all in line with the rails that enter them. Each train sits SQUARE AND LEVEL along its own road, parallel to its rails \u2014 never nose-to-nose with another train, never wedged into a corner, never twisted, skewed or bent to show its far end, and never crossing another road. THE RAILS UNDER THE TRAIN ARE THE SAME RAILS THAT LEAVE THE STATION. One single unbroken pair of rails runs dead straight from one end of the station to the other, the train stands squarely on that pair, and each tunnel mouth sits directly in line with it \u2014 you could follow the railheads with your eye from under the train's wheels, along the bed, and straight in through the arch without a break, a bend, a kink or an offset. There is never a second set of rails running to the mouths beside or past the train, and the train is never parked on a stub of track that does not reach them. A BUFFER STOP MAY ONLY EVER STAND AT A BLIND END \u2014 beyond the far end of a train, on a road that dies there, against a wall. There is NEVER a buffer stop, gate, barrier, fence, hoarding or blockage of any kind BETWEEN a train and a tunnel mouth its own line runs into: every train must have a clear, unobstructed road out of the station. Nothing stands in the road but the train: no barrel, crate, bench or rack in the track bed. The image is SHARP, with no motion blur or streaking \u2014 everything is standing still. No blank empty wall areas. Nothing eerie, spooky, creepy, haunted or menacing; no cobwebs. Shot on a full-frame DSLR at 24mm, f/8, natural daylight, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above \u2014 no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into the platform's plain tiled back wall directly behind the viewer, uniform and unbroken, with no road, arch, doorway or opening in it, with no visible seam, join, or repetition.",
         "boxesFrom": {
-          "art": "02dfbe7c0cb0",
-          "at": "2026-09-17T12:55:43"
+          "art": "ed06befde484",
+          "at": "2026-09-17T15:11:01"
         }
       },
       "panorama": "tannery_weld/scene.png",
-      "builtFrom": "l1_tannery_weld_3.png",
+      "builtFrom": "l1_tannery_weld_1.png",
       "wrap": {
         "haov": 360,
         "vaov": 90,
@@ -2081,7 +2107,11 @@
           "gapMax": 22,
           "needsReplacement": true
         }
-      ]
+      ],
+      "mapPos": {
+        "c": 3,
+        "r": 2
+      }
     },
     {
       "key": "tannery_verdigris",
@@ -2126,10 +2156,10 @@
           "type": "door",
           "label": "The spiral stair up to the weld platform",
           "box": [
-            0.14,
-            0.106,
-            0.17,
-            0.394
+            0.1513,
+            0.4671,
+            0.1931,
+            0.6235
           ],
           "direction": "open",
           "boxSource": "draft:localizer",
@@ -2141,7 +2171,7 @@
           "type": "clue",
           "label": "The mordant bench",
           "box": [
-            0.0,
+            0,
             0.44,
             0.15,
             0.6
@@ -2155,10 +2185,10 @@
           "type": "door",
           "label": "The verdigris train (green)",
           "box": [
-            0.18,
-            0.504,
-            0.756,
-            0.696
+            0.3604,
+            0.391,
+            0.4166,
+            0.6724
           ],
           "direction": "open",
           "boxSource": "draft:localizer",
@@ -2311,7 +2341,11 @@
           "volume": 0.13,
           "needsReplacement": true
         }
-      ]
+      ],
+      "mapPos": {
+        "c": 3,
+        "r": 1
+      }
     },
     {
       "key": "logwood_woad",
@@ -2327,10 +2361,10 @@
           "note": "transfer on foot -> logwood_verdigris",
           "to": "logwood_verdigris",
           "box": [
-            0.115,
-            0.156,
-            0.1598,
-            0.468
+            0.13,
+            0.225,
+            0.162,
+            0.75
           ],
           "boxSource": "draft:localizer"
         },
@@ -2339,10 +2373,10 @@
           "label": "The sump pump",
           "body": "A sump pump bolted to the platform, its hose run into the channel at the wall foot. The logbook on the casing records the hours it runs, and the figure climbs every season.",
           "box": [
-            0.75,
-            0.5,
-            0.8,
-            0.7
+            0.786,
+            0.504,
+            0.834,
+            0.6
           ],
           "boxSource": "draft:localizer"
         },
@@ -2353,10 +2387,10 @@
           "note": "board this line -> car_woad; the destination is chosen on the cab's selector, so ONE door hotspot is enough (Lucas, 2026-09-07). Line: woad.",
           "to": "car_woad",
           "box": [
-            0.18,
-            0.408,
-            0.82,
-            0.792
+            0.244,
+            0.406,
+            0.692,
+            0.55
           ],
           "boxSource": "draft:localizer"
         }
@@ -2368,13 +2402,13 @@
           "type": "door",
           "label": "The spiral stair down to the verdigris platform",
           "box": [
-            0.115,
-            0.156,
-            0.1598,
-            0.468
+            0.1182,
+            0.4882,
+            0.1705,
+            0.7061
           ],
           "direction": "open",
-          "boxSource": "draft:pre-regen",
+          "boxSource": "draft:localizer",
           "to": "logwood_verdigris",
           "boxNote": "box [0.115, 0.156, 0.1598, 0.468] (draft:localizer) predates the 2026-09-17 round-3 tunnel fix; unlocked for re-placement"
         },
@@ -2383,12 +2417,12 @@
           "type": "clue",
           "label": "The sump pump",
           "box": [
-            0.75,
-            0.5,
-            0.8,
-            0.7
+            0.786,
+            0.504,
+            0.834,
+            0.6
           ],
-          "boxSource": "draft:pre-regen",
+          "boxSource": "draft:localizer",
           "body": "A sump pump bolted to the platform, its hose run into the channel at the wall foot. The logbook on the casing records the hours it runs, and the figure climbs every season.",
           "boxNote": "box [0.75, 0.5, 0.8, 0.7] (draft:localizer) predates the 2026-09-17 round-3 tunnel fix; unlocked for re-placement"
         },
@@ -2397,13 +2431,13 @@
           "type": "door",
           "label": "The woad train (blue)",
           "box": [
-            0.18,
-            0.408,
-            0.82,
-            0.792
+            0.3212,
+            0.4347,
+            0.365,
+            0.5989
           ],
           "direction": "open",
-          "boxSource": "draft:pre-regen",
+          "boxSource": "draft:localizer",
           "to": "car_woad",
           "boxNote": "box [0.18, 0.408, 0.82, 0.792] (draft:localizer) predates the 2026-09-17 round-3 tunnel fix; unlocked for re-placement"
         }
@@ -2509,22 +2543,22 @@
         "seam": {
           "accepted": false,
           "acceptedBy": "lucas 2026-09-07",
-          "at": "2026-09-17T13:09:49",
-          "stage": "blurred",
-          "band": "sky",
-          "ratio": 0.79,
-          "delta": 1.93,
+          "at": "2026-09-17T15:29:50",
+          "stage": "screened",
+          "band": "ground",
+          "ratio": 2.36,
+          "delta": 5.58,
           "needsWork": false,
-          "seamBandRun": 0.03
+          "seamBandRun": 0.007
         },
         "scenePrompt": "This is a seamless 360-degree panorama from the blue berth at Logwood Quay, a platform built hard against the river wall where the water is directly behind the brickwork and makes no secret of it \u2014 the viewer is standing ON THE PLATFORM FACING THE WOAD TRAIN across its road, so that one road runs left-to-right across the view in front of them, with the platform's back wall behind them. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the platform's plain tiled back wall directly behind the viewer, uniform and unbroken, with no road, arch, doorway or opening in it: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the platform's plain tiled back wall directly behind the viewer, uniform and unbroken, with no road, arch, doorway or opening in it, the left half of that one surface; to the left, the LEFT-HAND END of the station, low at track level, where the woad road ducks into its own arched tunnel mouth \u2014 each bore taking only its own road's single pair of rails, never shared, and the running road leading to it kept CLEAR: no barrier of any kind between a train and the mouth its line uses; to the left, a cast-iron spiral stair winding DOWN out of this platform through a round shaft in the floor, its worn handrail curving away into lamplight below \u2014 it goes to this station's other platform, where the verdigris line stands; just left of centre, a squat electric sump pump bolted to the platform against the back wall, its hose run into a shallow channel at the wall foot, a logbook and a pencil left on the casing; dead ahead in the centre, in the IMMEDIATE FOREGROUND at the viewer's own feet, the platform's square worn granite edge with its white-painted line \u2014 and just beyond it the ballast and sleepers of the track bed, a single step down, with the two running rails lying on them roughly knee-deep below the platform surface: deep enough to take a train's wheels and no deeper; dead ahead in the centre, dead ahead beyond that edge, this berth's single road: the sunken track bed and its ONE pair of running rails, its rails running away to BOTH sides and ducking into its OWN brick-ringed arched TUNNEL MOUTH at each \u2014 two separate bores for this road, one at either end of the station, low at track level, with the road CLEAR and unobstructed between the train and both of them: no buffer stop, gate, barrier or blockage of any kind on this road, which runs straight through. These are ONE unbroken pair of rails running dead straight through the whole station and out at its end(s), and the train stands on that very pair, in line with them. Standing DOWN IN that bed, broadside to the viewer, a short underground unit in deep blue livery, recently relaid \u2014 flat tunnel-profile sides and clean brass window frames \u2014 ONE vehicle, a single unbroken body, sitting square and level along the road with a driver's cab at the end nearer the viewer and its side doors slid open. ITS WHEELS SIT VISIBLY ON THOSE RAILS, squarely on the railheads and clearly in contact with them, and THE CAR'S FLOOR COMES UP EXACTLY LEVEL WITH THE PLATFORM EDGE so its open doorways give straight out onto the platform at the viewer's own foot level, a single stride across with no step up or down and no drop in front of them; just right of centre, the great curved retaining wall behind the platform running with water, sheets of it sliding down the brick face and gathering in the channel below; to the right, the RIGHT-HAND END of the station, low at track level, where the woad road ducks into its own arched tunnel mouth; on the far right, the platform's plain tiled back wall directly behind the viewer, uniform and unbroken, with no road, arch, doorway or opening in it, the right half of that one surface, joining its other half. cold, wet and echoing, blue-green brick running with water against one hard amber lamp, heavy damp haze, film grain. A CENTURY OF DERELICTION, ACTIVELY WORKED IN: crazed and missing glazed tile with the bedding mortar showing through, paint peeling in sheets, long rust and water stains bleeding down the walls, perished cable looped on old porcelain insulators, chipped enamel, sooted brick, treads worn hollow. And over the top of all of it the crew who work here now \u2014 notices, tally sheets, work rotas and curling postcards tacked and taped up, chalked marks and scratched tallies on the tile, duckboards laid over the wet, cable ties and gaffer tape, cheap bright LED work-lamps on yellow flex, a kettle, a coat on a hook. Lived-in, cared for, and plainly somebody's workplace. Warm, purposeful and characterful \u2014 a magnificent run-down place that a good crew has taken on and made theirs. NOT eerie, NOT spooky, NOT creepy, NOT haunted, NOT menacing, NOT post-apocalyptic and NOT an abandoned ruin: dark and dirty in places, and still plainly and warmly worked in. No cobwebs, no gloom-for-its-own-sake. No people, no lettering, captions, text, signage or readable writing of any kind, no station name, no daylight and no view of the river itself \u2014 the water is entirely behind the wall. EXACTLY ONE train and EXACTLY ONE road in this view \u2014 no second train anywhere, not behind the viewer, not at the frame edges, not down a tunnel. The train is ONE CONTINUOUS VEHICLE with a single unbroken body \u2014 never two separate vehicles, never two detached cab-boxes with a gap of floor between them, and never the same vehicle drawn twice. It is seen from the SIDE, standing straight and square along its road, and it is NOT bent, curved, twisted, skewed, splayed or wrapped round to bring its far end into view: only the flank facing the viewer needs to be visible, and the far end may simply run out of frame. COUNT THE TRACKWORK EXACTLY: this station has 1 road and 1 pair of running rails, ONE per train, and no others \u2014 no third track, no siding, no crossover, no points, no spare rails crossing the floor. Every road has its OWN bore, never shared, so there are EXACTLY 2 tunnel mouths in this station, all of them on the viewer's LEFT and RIGHT and all in line with the rails that enter them. Each train sits SQUARE AND LEVEL along its own road, parallel to its rails \u2014 never nose-to-nose with another train, never wedged into a corner, never twisted, skewed or bent to show its far end, and never crossing another road. THE RAILS UNDER THE TRAIN ARE THE SAME RAILS THAT LEAVE THE STATION. One single unbroken pair of rails runs dead straight from one end of the station to the other, the train stands squarely on that pair, and each tunnel mouth sits directly in line with it \u2014 you could follow the railheads with your eye from under the train's wheels, along the bed, and straight in through the arch without a break, a bend, a kink or an offset. There is never a second set of rails running to the mouths beside or past the train, and the train is never parked on a stub of track that does not reach them. A BUFFER STOP MAY ONLY EVER STAND AT A BLIND END \u2014 beyond the far end of a train, on a road that dies there, against a wall. There is NEVER a buffer stop, gate, barrier, fence, hoarding or blockage of any kind BETWEEN a train and a tunnel mouth its own line runs into: every train must have a clear, unobstructed road out of the station. Nothing stands in the road but the train: no barrel, crate, bench or rack in the track bed. The image is SHARP, with no motion blur or streaking \u2014 everything is standing still. No blank empty wall areas. Nothing eerie, spooky, creepy, haunted or menacing; no cobwebs. Again: the extreme left and right edges must align perfectly into the platform's plain tiled back wall directly behind the viewer, uniform and unbroken, with no road, arch, doorway or opening in it, with no visible seam, join, or repetition.",
         "boxesFrom": {
-          "art": "313e7fee3cba",
-          "at": "2026-09-17T13:10:13"
+          "art": "5422c3a74543",
+          "at": "2026-09-17T15:30:16"
         }
       },
       "panorama": "logwood_woad/scene.png",
-      "builtFrom": "l1_logwood_woad_3.png",
+      "builtFrom": "l1_logwood_woad_1.png",
       "wrap": {
         "haov": 360,
         "vaov": 90,
@@ -2545,7 +2579,11 @@
           "volume": 0.26,
           "needsReplacement": true
         }
-      ]
+      ],
+      "mapPos": {
+        "c": 4,
+        "r": 2
+      }
     },
     {
       "key": "logwood_verdigris",
@@ -2561,10 +2599,10 @@
           "note": "transfer on foot -> logwood_woad",
           "to": "logwood_woad",
           "box": [
-            0.025,
+            0.11,
             0.0,
-            0.045,
-            0.26
+            0.15,
+            0.65
           ],
           "boxSource": "draft:localizer"
         },
@@ -2575,10 +2613,10 @@
           "note": "board this line -> car_verdigris; the destination is chosen on the cab's selector, so ONE door hotspot is enough (Lucas, 2026-09-07). Line: verdigris.",
           "to": "car_verdigris",
           "box": [
-            0.18,
-            0.436,
-            0.756,
-            0.564
+            0.244,
+            0.454,
+            0.692,
+            0.646
           ],
           "boxSource": "draft:localizer"
         }
@@ -2590,13 +2628,13 @@
           "type": "door",
           "label": "The spiral stair up to the woad platform",
           "box": [
-            0.025,
-            0.0,
-            0.045,
-            0.26
+            0.176,
+            0.4725,
+            0.2352,
+            0.6787
           ],
           "direction": "open",
-          "boxSource": "draft:pre-regen",
+          "boxSource": "draft:localizer",
           "to": "logwood_woad",
           "boxNote": "box [0.025, 0.0, 0.045, 0.26] (draft:localizer) predates the 2026-09-17 round-3 tunnel fix; unlocked for re-placement"
         },
@@ -2605,12 +2643,12 @@
           "type": "clue",
           "label": "The wet growing face",
           "box": [
-            0.77,
-            0.21,
-            0.85,
-            0.45
+            0.845,
+            0.546,
+            0.865,
+            0.642
           ],
-          "boxSource": "draft:pre-regen",
+          "boxSource": "draft:localizer",
           "body": "The crop at its rankest \u2014 grey-green crusts swollen dark, orange rosettes crowding the brick above the waterline. A scraper and a tray wait underneath.",
           "boxNote": "box [0.77, 0.21, 0.85, 0.45] (draft:localizer) predates the 2026-09-17 round-3 tunnel fix; unlocked for re-placement"
         },
@@ -2619,13 +2657,13 @@
           "type": "door",
           "label": "The verdigris train (green)",
           "box": [
-            0.18,
-            0.436,
-            0.756,
-            0.564
+            0.4036,
+            0.3493,
+            0.4451,
+            0.5801
           ],
           "direction": "open",
-          "boxSource": "draft:pre-regen",
+          "boxSource": "draft:localizer",
           "to": "car_verdigris",
           "boxNote": "box [0.18, 0.436, 0.756, 0.564] (draft:localizer) predates the 2026-09-17 round-3 tunnel fix; unlocked for re-placement"
         }
@@ -2730,22 +2768,22 @@
         "seam": {
           "accepted": false,
           "acceptedBy": "lucas 2026-09-07",
-          "at": "2026-09-17T13:13:35",
-          "stage": "blurred",
-          "band": "sky",
-          "ratio": 2.06,
-          "delta": 4.7,
+          "at": "2026-09-17T15:55:57",
+          "stage": "screened",
+          "band": "mid",
+          "ratio": 2.77,
+          "delta": 6.81,
           "needsWork": false,
-          "seamBandRun": 0.029
+          "seamBandRun": 0.025
         },
         "scenePrompt": "This is a seamless 360-degree panorama from the green berth at Logwood Quay, the far end of the same river-wall platform, where the crop grows rankest on the wet brick \u2014 the viewer is standing ON THE PLATFORM FACING THE VERDIGRIS TRAIN across its road, so that one road runs left-to-right across the view in front of them, with the platform's back wall behind them. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the platform's plain tiled back wall directly behind the viewer, uniform and unbroken, with no road, arch, doorway or opening in it: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the platform's plain tiled back wall directly behind the viewer, uniform and unbroken, with no road, arch, doorway or opening in it, the left half of that one surface; to the left, the LEFT-HAND END of the station, low at track level, where the verdigris road ducks into its own arched tunnel mouth \u2014 each bore taking only its own road's single pair of rails, never shared, and the running road leading to it kept CLEAR: no barrier of any kind between a train and the mouth its line uses; to the left, a cast-iron spiral stair winding UP out of this platform through a round shaft in the roof, its worn handrail curving away into a pale glow above \u2014 it goes to this station's other platform, where the woad line stands; just left of centre, the crop at its rankest along the wet back wall, grey-green crusts swollen and dark and orange rosettes crowding the brick above the waterline, a scraper and a tray beneath them; dead ahead in the centre, in the IMMEDIATE FOREGROUND at the viewer's own feet, the platform's square worn granite edge with its white-painted line \u2014 and just beyond it the ballast and sleepers of the track bed, a single step down, with the two running rails lying on them roughly knee-deep below the platform surface: deep enough to take a train's wheels and no deeper; dead ahead in the centre, dead ahead beyond that edge, this berth's single road: the sunken track bed and its ONE pair of running rails, its rails running away to BOTH sides and ducking into its OWN brick-ringed arched TUNNEL MOUTH at each \u2014 two separate bores for this road, one at either end of the station, low at track level, with the road CLEAR and unobstructed between the train and both of them: no buffer stop, gate, barrier or blockage of any kind on this road, which runs straight through. These are ONE unbroken pair of rails running dead straight through the whole station and out at its end(s), and the train stands on that very pair, in line with them. Standing DOWN IN that bed, broadside to the viewer, a short underground unit sheathed in copper gone bright green with patina, wet through \u2014 flat tunnel-profile sides beaded with water \u2014 ONE vehicle, a single unbroken body, sitting square and level along the road with a driver's cab at the end nearer the viewer and its side doors slid open. ITS WHEELS SIT VISIBLY ON THOSE RAILS, squarely on the railheads and clearly in contact with them, and THE CAR'S FLOOR COMES UP EXACTLY LEVEL WITH THE PLATFORM EDGE so its open doorways give straight out onto the platform at the viewer's own foot level, a single stride across with no step up or down and no drop in front of them; just right of centre, a broad seep coming through the brick joints of the back wall and running down it in slow sheets into a cut channel at its foot; to the right, the RIGHT-HAND END of the station, low at track level, where the verdigris road ducks into its own arched tunnel mouth; on the far right, the platform's plain tiled back wall directly behind the viewer, uniform and unbroken, with no road, arch, doorway or opening in it, the right half of that one surface, joining its other half. cold, wet and green, brick sweating under one caged lamp, heavy damp haze, film grain. A CENTURY OF DERELICTION, ACTIVELY WORKED IN: crazed and missing glazed tile with the bedding mortar showing through, paint peeling in sheets, long rust and water stains bleeding down the walls, perished cable looped on old porcelain insulators, chipped enamel, sooted brick, treads worn hollow. And over the top of all of it the crew who work here now \u2014 notices, tally sheets, work rotas and curling postcards tacked and taped up, chalked marks and scratched tallies on the tile, duckboards laid over the wet, cable ties and gaffer tape, cheap bright LED work-lamps on yellow flex, a kettle, a coat on a hook. Lived-in, cared for, and plainly somebody's workplace. Warm, purposeful and characterful \u2014 a magnificent run-down place that a good crew has taken on and made theirs. NOT eerie, NOT spooky, NOT creepy, NOT haunted, NOT menacing, NOT post-apocalyptic and NOT an abandoned ruin: dark and dirty in places, and still plainly and warmly worked in. No cobwebs, no gloom-for-its-own-sake. No people, no lettering, captions, text, signage or readable writing of any kind, no station name, no daylight and no view of the river itself \u2014 the water is entirely behind the wall. EXACTLY ONE train and EXACTLY ONE road in this view \u2014 no second train anywhere, not behind the viewer, not at the frame edges, not down a tunnel. The train is ONE CONTINUOUS VEHICLE with a single unbroken body \u2014 never two separate vehicles, never two detached cab-boxes with a gap of floor between them, and never the same vehicle drawn twice. It is seen from the SIDE, standing straight and square along its road, and it is NOT bent, curved, twisted, skewed, splayed or wrapped round to bring its far end into view: only the flank facing the viewer needs to be visible, and the far end may simply run out of frame. COUNT THE TRACKWORK EXACTLY: this station has 1 road and 1 pair of running rails, ONE per train, and no others \u2014 no third track, no siding, no crossover, no points, no spare rails crossing the floor. Every road has its OWN bore, never shared, so there are EXACTLY 2 tunnel mouths in this station, all of them on the viewer's LEFT and RIGHT and all in line with the rails that enter them. Each train sits SQUARE AND LEVEL along its own road, parallel to its rails \u2014 never nose-to-nose with another train, never wedged into a corner, never twisted, skewed or bent to show its far end, and never crossing another road. THE RAILS UNDER THE TRAIN ARE THE SAME RAILS THAT LEAVE THE STATION. One single unbroken pair of rails runs dead straight from one end of the station to the other, the train stands squarely on that pair, and each tunnel mouth sits directly in line with it \u2014 you could follow the railheads with your eye from under the train's wheels, along the bed, and straight in through the arch without a break, a bend, a kink or an offset. There is never a second set of rails running to the mouths beside or past the train, and the train is never parked on a stub of track that does not reach them. A BUFFER STOP MAY ONLY EVER STAND AT A BLIND END \u2014 beyond the far end of a train, on a road that dies there, against a wall. There is NEVER a buffer stop, gate, barrier, fence, hoarding or blockage of any kind BETWEEN a train and a tunnel mouth its own line runs into: every train must have a clear, unobstructed road out of the station. Nothing stands in the road but the train: no barrel, crate, bench or rack in the track bed. The image is SHARP, with no motion blur or streaking \u2014 everything is standing still. No blank empty wall areas. Nothing eerie, spooky, creepy, haunted or menacing; no cobwebs. Again: the extreme left and right edges must align perfectly into the platform's plain tiled back wall directly behind the viewer, uniform and unbroken, with no road, arch, doorway or opening in it, with no visible seam, join, or repetition.",
         "boxesFrom": {
-          "art": "2ec5142129b3",
-          "at": "2026-09-17T13:13:57"
+          "art": "8a59055eef8c",
+          "at": "2026-09-17T15:56:18"
         }
       },
       "panorama": "logwood_verdigris/scene.png",
-      "builtFrom": "l1_logwood_verdigris_3.png",
+      "builtFrom": "l1_logwood_verdigris_1.png",
       "wrap": {
         "haov": 360,
         "vaov": 90,
@@ -2766,7 +2804,11 @@
           "volume": 0.24,
           "needsReplacement": true
         }
-      ]
+      ],
+      "mapPos": {
+        "c": 4,
+        "r": 1
+      }
     },
     {
       "key": "alum_madder",
@@ -2811,10 +2853,10 @@
           "type": "door",
           "label": "The spiral stair down to the lampblack platform",
           "box": [
-            0.184,
-            0.106,
-            0.216,
-            0.346
+            0.1998,
+            0.4772,
+            0.2436,
+            0.5771
           ],
           "direction": "open",
           "boxSource": "draft:localizer",
@@ -2840,10 +2882,10 @@
           "type": "door",
           "label": "The madder train (red)",
           "box": [
-            0.18,
-            0.436,
-            0.756,
-            0.596
+            0.3395,
+            0.3972,
+            0.3946,
+            0.6449
           ],
           "direction": "open",
           "boxSource": "draft:localizer",
@@ -3005,7 +3047,11 @@
           "volume": 0.14,
           "needsReplacement": true
         }
-      ]
+      ],
+      "mapPos": {
+        "c": 1,
+        "r": 3
+      }
     },
     {
       "key": "alum_lampblack",
@@ -3104,13 +3150,8 @@
               "desc": "the platform's plain tiled back wall directly behind the viewer, uniform and unbroken, with no road, arch, doorway or opening in it, the left half of that one surface"
             },
             {
-              "id": "end_left",
-              "at": "to the left",
-              "desc": "the LEFT-HAND END of the station, low at track level, where the lampblack road ducks into its own arched tunnel mouth \u2014 each bore taking only its own road's single pair of rails, never shared, and the running road leading to it kept CLEAR: no barrier of any kind between a train and the mouth its line uses; the mouth is set well in from the edge of the frame, with plain back wall between it and the frame edge"
-            },
-            {
               "id": "spiral_up",
-              "desc": "standing well in from the left-hand edge of the frame, with a clear stretch of plain tiled wall between it and that edge \u2014 a cast-iron spiral stair winding UP out of this platform through a round shaft in the roof, its worn handrail curving away into a pale glow above \u2014 it goes to this station's other platform, where the madder line stands",
+              "desc": "standing well in from the left-hand edge of the frame, with a clear stretch of plain tiled wall between it and that edge \u2014 a cast-iron spiral stair winding UP out of this platform through a round shaft in the roof, its worn handrail curving away into a pale glow above \u2014 it goes to this station's other platform, where the madder line stands. This is the ONLY stair in the whole panorama: EXACTLY ONE spiral stair and ONE round shaft, standing out on the open platform floor about a third of the way in from the left-hand edge of the frame and clear of the back wall. There is no second stair, no second shaft and no railed opening anywhere else in the frame, and none at either extreme edge.",
               "label": "The spiral stair up to the madder platform",
               "door": {
                 "direction": "open",
@@ -3125,7 +3166,7 @@
             },
             {
               "id": "berth_lampblack",
-              "desc": "dead ahead beyond that edge, this berth's single road: the sunken track bed and its ONE pair of running rails, its rails running away to the LEFT and ducking into its OWN brick-ringed arched TUNNEL MOUTH low at track level \u2014 the road between the train and that mouth completely CLEAR and unobstructed, so the train could run straight out of the station \u2014 while to the RIGHT, BEYOND the far end of the train, the same rails stop dead at heavy timber-and-iron BUFFER STOPS with a sand drag and a red lamp against a blind wall. These are ONE unbroken pair of rails running dead straight through the whole station and out at its end(s), and the train stands on that very pair, in line with them. Standing DOWN IN that bed, broadside to the viewer, a short heavy black iron works unit \u2014 flat soot-black sides, barred goods sections amidships \u2014 ONE vehicle, a single unbroken body, sitting square and level along the road with a driver's cab at the end nearer the viewer and its side doors slid open. ITS WHEELS SIT VISIBLY ON THOSE RAILS, squarely on the railheads and clearly in contact with them, and THE CAR'S FLOOR COMES UP EXACTLY LEVEL WITH THE PLATFORM EDGE so its open doorways give straight out onto the platform at the viewer's own foot level, a single stride across with no step up or down and no drop in front of them",
+              "desc": "dead ahead beyond that edge, this berth's single road: the sunken track bed and its ONE pair of running rails, its rails running away to the LEFT and ducking into its OWN brick-ringed arched TUNNEL MOUTH low at track level \u2014 the road between the train and that mouth completely CLEAR and unobstructed, so the train could run straight out of the station \u2014 while to the RIGHT, BEYOND the far end of the train, the same rails stop dead at heavy timber-and-iron BUFFER STOPS with a sand drag and a red lamp against a blind wall. These are ONE unbroken pair of rails running dead straight through the whole station and out at its end(s), and the train stands on that very pair, in line with them. Standing DOWN IN that bed, broadside to the viewer, a short heavy black iron works unit \u2014 flat soot-black sides, barred goods sections amidships \u2014 ONE vehicle, a single unbroken body, sitting square and level along the road with a driver's cab at the end nearer the viewer and its side doors slid open. ITS WHEELS SIT VISIBLY ON THOSE RAILS, squarely on the railheads and clearly in contact with them, and THE CAR'S FLOOR COMES UP EXACTLY LEVEL WITH THE PLATFORM EDGE so its open doorways give straight out onto the platform at the viewer's own foot level, a single stride across with no step up or down and no drop in front of them. THE TRACK GEOMETRY IS ONE STRAIGHT LINE: exactly ONE pair of running rails in the whole panorama, running dead straight along the platform and continuing straight into the tunnel mouth at the far end, the mouth square on the end of those same rails and IN LINE with them, never across them or at an angle to them. No second road, no siding, no crossover, no points, no other rails anywhere in the frame. There is EXACTLY ONE tunnel mouth in the whole panorama, at the left-hand end of this single road; the right-hand end is the blind wall behind the buffer stops. No other tunnel, bore or arched opening anywhere.",
               "label": "The lampblack train (grey)",
               "door": {
                 "direction": "open",
@@ -3139,8 +3180,8 @@
               "desc": "in the IMMEDIATE FOREGROUND an arm's length from the viewer, a squat cast-iron soot-lamp standing OPEN on the platform, its wide shallow oil pan carrying a broad soft yellow flame a full hand high with NOTHING in front of it \u2014 no glass, no shield, no grille \u2014 and a thick black column of smoke lifting straight off the flame into a blackened tin hood held well clear above it on three iron legs, the hood and the tile above furred with collected lampblack \u2014 the flame and its smoke column large in frame and unobstructed, the nearest object in the view after the platform edge itself",
               "motion": {
                 "moves": true,
-                "vigour": "the flame standing tall and rolling slowly, the smoke column lifting thick and unbroken",
-                "phrase": "the soot-lamp's tall yellow flame rolling and leaning in its open pan, its thick column of black smoke lifting steadily into the hood above it"
+                "vigour": "a thin coil of smoke rising gently from the flame",
+                "phrase": "the flame in the open pan guttering softly and a thin coil of black smoke rising UPWARD from it, drifting up and away and thinning as it goes; the smoke only ever travels upward, never downward and never back into the pan; gentle and slow"
               },
               "sound": {
                 "source": "an open oil flame under a tin hood",
@@ -3155,11 +3196,6 @@
                 "loop": "boomerang"
               },
               "at": "to the right"
-            },
-            {
-              "id": "end_right",
-              "at": "to the right",
-              "desc": "the RIGHT-HAND END of the station, low at track level, where the lampblack road stops dead at heavy timber-and-iron buffer stops with a sand drag and a red lamp"
             },
             {
               "id": "seam_right",
@@ -3239,7 +3275,11 @@
           "volume": 0.16,
           "needsReplacement": true
         }
-      ]
+      ],
+      "mapPos": {
+        "c": 2,
+        "r": 3
+      }
     },
     {
       "key": "car_madder",
@@ -3538,7 +3578,60 @@
           "continuity": [],
           "states": {
             "energised": {
-              "prompt": "the same cab with its line ENERGISED: the driving desk's instruments now live \u2014 gauge faces glowing from within, indicator lamps lit in amber and green, the master controller's brass catching the light \u2014 and the destination selector's ring of enamel plates lit from behind so the pointer reads clearly. The cab is a little warmer and brighter for it, light spilling off the desk onto the panelling and the floor nearby. NOTHING ELSE CHANGES: same viewpoint, same layout, same objects in the same places, the doors exactly as they were, no new objects and nothing moved \u2014 only the instruments come alive and the light they throw."
+              "prompt": "the same cab with its line ENERGISED: the driving desk's instruments live \u2014 gauge faces glowing from within, indicator lamps lit in amber and green, the master controller's brass catching the light \u2014 and the direction lever's enamel plates lit from behind. The cab is a little warmer and brighter for it, light spilling off the desk onto the panelling and the floor nearby. NOTHING ELSE CHANGES: same viewpoint, same layout, same objects in the same places, the window frame exactly where it is, the doors exactly as they were, no new objects in the cab and nothing in the cab moved.",
+              "elements": {
+                "fore_window": {
+                  "motion": null
+                },
+                "desk_live": {
+                  "at": "just right of centre",
+                  "desc": "the lit driving desk itself, its ring of gauge faces and its indicator lamps",
+                  "motion": {
+                    "moves": true,
+                    "vigour": "the instrument lamps and gauge faces alive with light",
+                    "phrase": "the desk's indicator lamps and glowing gauge faces breathing and flickering gently, the light on the brass rising and falling; the view through the window is completely STILL, the train is standing at a platform"
+                  }
+                }
+              },
+              "clipNote": "STOPPED at a platform: the window must NOT travel. Lucas (2026-09-17) likes the non-travelling clips \u2014 'there's like flashing lights and stuff which is kind of fun'. If the dead gate rejects the flicker on two seeds, ship this state as its still (stillOnly) rather than hunting seeds."
+            },
+            "running": {
+              "prompt": "the same cab with its line ENERGISED: the driving desk's instruments live \u2014 gauge faces glowing from within, indicator lamps lit in amber and green, the master controller's brass catching the light \u2014 and the direction lever's enamel plates lit from behind. The cab is a little warmer and brighter for it, light spilling off the desk onto the panelling and the floor nearby. NOTHING ELSE CHANGES: same viewpoint, same layout, same objects in the same places, the window frame exactly where it is, the doors exactly as they were, no new objects in the cab and nothing in the cab moved.",
+              "artFrom": "energised",
+              "note": "SAME ART as `energised` \u2014 copy scene_energised.png to scene_running.png rather than regenerating, so the ride cuts between stopped and running with no visible change but the motion.",
+              "elements": {
+                "fore_window": {
+                  "motion": {
+                    "moves": true,
+                    "vigour": "the tunnel ring and running rails streaming steadily toward the viewer",
+                    "phrase": "the tunnel ring and the running rails coming steadily toward the viewer and passing out of frame, the lamps drawing forward one after another out of the dark ahead"
+                  }
+                }
+              }
+            },
+            "live": {
+              "prompt": "the same cab with its line ENERGISED and the train RUNNING THROUGH A WORKING STATION: the driving desk's instruments live \u2014 gauge faces glowing from within, indicator lamps lit in amber and green, the master controller's brass catching the light \u2014 and the direction lever's enamel plates lit from behind. The cab is a little warmer and brighter for it, light spilling off the desk onto the panelling and the floor nearby. The ONE other change is the view through the large forward window: instead of plain tunnel, the rails run through a BUSY, CLUTTERED, WORKED-IN underground platform \u2014 crates and stacked flats along its whole length, galvanised racking loaded with drying trays, duckboards over the wet, coiled hose and cable on the wall, notices and work rotas tacked up, a kettle and mugs on a plank shelf, coats on hooks, and its own STRING OF BRIGHT WARM WORK-LAMPS on yellow flex lighting the whole platform from end to end, glazed tile catching the light. Plainly in daily use and full of gear, though nobody is standing on it. NOTHING ELSE CHANGES: same viewpoint, same layout, same objects in the same places, the window frame exactly where it is, the doors exactly as they were, no new objects in the cab and nothing in the cab moved.",
+              "elements": {
+                "fore_window": {
+                  "motion": {
+                    "moves": true,
+                    "vigour": "the working platform, its lamps and pillars streaming steadily toward the viewer",
+                    "phrase": "the lit platform with its lamps, racking and stacked crates, the platform edge and the running rails coming steadily toward the viewer and passing out of frame at the window's edges, one after another, as the train runs through the station"
+                  }
+                }
+              }
+            },
+            "ghost": {
+              "prompt": "the same cab with its line ENERGISED and the train RUNNING THROUGH A GHOST STATION: the driving desk's instruments live \u2014 gauge faces glowing from within, indicator lamps lit in amber and green, the master controller's brass catching the light \u2014 and the direction lever's enamel plates lit from behind. The cab is a little warmer and brighter for it, light spilling off the desk onto the panelling and the floor nearby. The ONE other change is the view through the large forward window: instead of plain tunnel, the rails run through a long-abandoned platform that is on no map \u2014 STRIPPED BARE AND EMPTY: nothing whatever stands on it, no crates, no racking, no shelves, no tools, no notices, no cable, no lamps of its own lit anywhere, the exits bricked up, no enamel name board and no lettering. Just the bare platform edge running away alongside the rails, a long evenly spaced row of square tiled pillars marching into the dark, the tile grimed and crazed. It is lit ONLY by the train's own headlamp, so the near pillars stand out and the far end falls away into black where the tunnel ring resumes. Cold, empty and silent against a working station's clutter. NOTHING ELSE CHANGES: same viewpoint, same layout, same objects in the same places, the window frame exactly where it is, the doors exactly as they were, no new objects in the cab and nothing in the cab moved.",
+              "elements": {
+                "fore_window": {
+                  "motion": {
+                    "moves": true,
+                    "vigour": "the bare platform and its pillars streaming steadily toward the viewer",
+                    "phrase": "the empty platform and its row of square pillars, the platform edge and the running rails coming steadily toward the viewer and passing out of frame at the window's edges, one after another, as the train runs through the station"
+                  }
+                }
+              }
             }
           }
         },
@@ -3592,7 +3685,11 @@
           "volume": 0.22,
           "needsReplacement": true
         }
-      ]
+      ],
+      "mapPos": {
+        "c": 0,
+        "r": 3
+      }
     },
     {
       "key": "car_woad",
@@ -3922,16 +4019,57 @@
           "continuity": [],
           "states": {
             "energised": {
-              "prompt": "the same cab with its line ENERGISED: the driving desk's instruments now live \u2014 gauge faces glowing from within, indicator lamps lit in amber and green, the master controller's brass catching the light \u2014 and the destination selector's ring of enamel plates lit from behind so the pointer reads clearly. The cab is a little warmer and brighter for it, light spilling off the desk onto the panelling and the floor nearby. NOTHING ELSE CHANGES: same viewpoint, same layout, same objects in the same places, the doors exactly as they were, no new objects and nothing moved \u2014 only the instruments come alive and the light they throw."
+              "prompt": "the same cab with its line ENERGISED: the driving desk's instruments live \u2014 gauge faces glowing from within, indicator lamps lit in amber and green, the master controller's brass catching the light \u2014 and the direction lever's enamel plates lit from behind. The cab is a little warmer and brighter for it, light spilling off the desk onto the panelling and the floor nearby. NOTHING ELSE CHANGES: same viewpoint, same layout, same objects in the same places, the window frame exactly where it is, the doors exactly as they were, no new objects in the cab and nothing in the cab moved.",
+              "elements": {
+                "fore_window": {
+                  "motion": null
+                },
+                "desk_live": {
+                  "at": "just right of centre",
+                  "desc": "the lit driving desk itself, its ring of gauge faces and its indicator lamps",
+                  "motion": {
+                    "moves": true,
+                    "vigour": "the instrument lamps and gauge faces alive with light",
+                    "phrase": "the desk's indicator lamps and glowing gauge faces breathing and flickering gently, the light on the brass rising and falling; the view through the window is completely STILL, the train is standing at a platform"
+                  }
+                }
+              },
+              "clipNote": "STOPPED at a platform: the window must NOT travel. Lucas (2026-09-17) likes the non-travelling clips \u2014 'there's like flashing lights and stuff which is kind of fun'. If the dead gate rejects the flicker on two seeds, ship this state as its still (stillOnly) rather than hunting seeds."
             },
             "ghost": {
-              "prompt": "the same cab with its line ENERGISED and the train RUNNING THROUGH A GHOST STATION: the driving desk's instruments live \u2014 gauge faces glowing from within, indicator lamps lit in amber and green, the master controller's brass catching the light \u2014 and the destination selector's ring of enamel plates lit from behind, the cab a little warmer and brighter for it. The ONE other change is the view through the large forward window: instead of plain tunnel, the rails now run straight through a long-abandoned underground station that is on no map \u2014 a disused platform alongside the track on the left, its edge running parallel to the rails away into the distance, a long evenly spaced row of square tiled pillars marching away down its length, the tiles grimed and crazed, the exits bricked up, no enamel name board and no lettering anywhere, no people, no lamps of its own \u2014 lit only by the train's headlamp, so the near pillars are bright and the far end falls into dark where the tunnel ring resumes. NOTHING ELSE CHANGES: same viewpoint, same layout, the window frame exactly where it is, the doors exactly as they were, no new objects in the cab and nothing in the cab moved.",
+              "prompt": "the same cab with its line ENERGISED and the train RUNNING THROUGH A GHOST STATION: the driving desk's instruments live \u2014 gauge faces glowing from within, indicator lamps lit in amber and green, the master controller's brass catching the light \u2014 and the direction lever's enamel plates lit from behind. The cab is a little warmer and brighter for it, light spilling off the desk onto the panelling and the floor nearby. The ONE other change is the view through the large forward window: instead of plain tunnel, the rails run through a long-abandoned platform that is on no map \u2014 STRIPPED BARE AND EMPTY: nothing whatever stands on it, no crates, no racking, no shelves, no tools, no notices, no cable, no lamps of its own lit anywhere, the exits bricked up, no enamel name board and no lettering. Just the bare platform edge running away alongside the rails, a long evenly spaced row of square tiled pillars marching into the dark, the tile grimed and crazed. It is lit ONLY by the train's own headlamp, so the near pillars stand out and the far end falls away into black where the tunnel ring resumes. Cold, empty and silent against a working station's clutter. NOTHING ELSE CHANGES: same viewpoint, same layout, same objects in the same places, the window frame exactly where it is, the doors exactly as they were, no new objects in the cab and nothing in the cab moved.",
               "elements": {
                 "fore_window": {
                   "motion": {
                     "moves": true,
-                    "vigour": "the ghost platform and its pillars streaming steadily toward the viewer",
-                    "phrase": "the abandoned platform, its row of square pillars and the running rails coming steadily toward the viewer and passing out of frame at the window's edges, the pillars sweeping past one after another as the train runs through the dark station"
+                    "vigour": "the bare platform and its pillars streaming steadily toward the viewer",
+                    "phrase": "the empty platform and its row of square pillars, the platform edge and the running rails coming steadily toward the viewer and passing out of frame at the window's edges, one after another, as the train runs through the station"
+                  }
+                }
+              }
+            },
+            "running": {
+              "prompt": "the same cab with its line ENERGISED: the driving desk's instruments live \u2014 gauge faces glowing from within, indicator lamps lit in amber and green, the master controller's brass catching the light \u2014 and the direction lever's enamel plates lit from behind. The cab is a little warmer and brighter for it, light spilling off the desk onto the panelling and the floor nearby. NOTHING ELSE CHANGES: same viewpoint, same layout, same objects in the same places, the window frame exactly where it is, the doors exactly as they were, no new objects in the cab and nothing in the cab moved.",
+              "artFrom": "energised",
+              "note": "SAME ART as `energised` \u2014 copy scene_energised.png to scene_running.png rather than regenerating, so the ride cuts between stopped and running with no visible change but the motion.",
+              "elements": {
+                "fore_window": {
+                  "motion": {
+                    "moves": true,
+                    "vigour": "the tunnel ring and running rails streaming steadily toward the viewer",
+                    "phrase": "the tunnel ring and the running rails coming steadily toward the viewer and passing out of frame, the lamps drawing forward one after another out of the dark ahead"
+                  }
+                }
+              }
+            },
+            "live": {
+              "prompt": "the same cab with its line ENERGISED and the train RUNNING THROUGH A WORKING STATION: the driving desk's instruments live \u2014 gauge faces glowing from within, indicator lamps lit in amber and green, the master controller's brass catching the light \u2014 and the direction lever's enamel plates lit from behind. The cab is a little warmer and brighter for it, light spilling off the desk onto the panelling and the floor nearby. The ONE other change is the view through the large forward window: instead of plain tunnel, the rails run through a BUSY, CLUTTERED, WORKED-IN underground platform \u2014 crates and stacked flats along its whole length, galvanised racking loaded with drying trays, duckboards over the wet, coiled hose and cable on the wall, notices and work rotas tacked up, a kettle and mugs on a plank shelf, coats on hooks, and its own STRING OF BRIGHT WARM WORK-LAMPS on yellow flex lighting the whole platform from end to end, glazed tile catching the light. Plainly in daily use and full of gear, though nobody is standing on it. NOTHING ELSE CHANGES: same viewpoint, same layout, same objects in the same places, the window frame exactly where it is, the doors exactly as they were, no new objects in the cab and nothing in the cab moved.",
+              "elements": {
+                "fore_window": {
+                  "motion": {
+                    "moves": true,
+                    "vigour": "the working platform, its lamps and pillars streaming steadily toward the viewer",
+                    "phrase": "the lit platform with its lamps, racking and stacked crates, the platform edge and the running rails coming steadily toward the viewer and passing out of frame at the window's edges, one after another, as the train runs through the station"
                   }
                 }
               }
@@ -4019,7 +4157,11 @@
           "volume": 0.22,
           "needsReplacement": true
         }
-      ]
+      ],
+      "mapPos": {
+        "c": 2,
+        "r": 1
+      }
     },
     {
       "key": "car_weld",
@@ -4318,7 +4460,60 @@
           "continuity": [],
           "states": {
             "energised": {
-              "prompt": "the same cab with its line ENERGISED: the driving desk's instruments now live \u2014 gauge faces glowing from within, indicator lamps lit in amber and green, the master controller's brass catching the light \u2014 and the destination selector's ring of enamel plates lit from behind so the pointer reads clearly. The cab is a little warmer and brighter for it, light spilling off the desk onto the panelling and the floor nearby. NOTHING ELSE CHANGES: same viewpoint, same layout, same objects in the same places, the doors exactly as they were, no new objects and nothing moved \u2014 only the instruments come alive and the light they throw."
+              "prompt": "the same cab with its line ENERGISED: the driving desk's instruments live \u2014 gauge faces glowing from within, indicator lamps lit in amber and green, the master controller's brass catching the light \u2014 and the direction lever's enamel plates lit from behind. The cab is a little warmer and brighter for it, light spilling off the desk onto the panelling and the floor nearby. NOTHING ELSE CHANGES: same viewpoint, same layout, same objects in the same places, the window frame exactly where it is, the doors exactly as they were, no new objects in the cab and nothing in the cab moved.",
+              "elements": {
+                "fore_window": {
+                  "motion": null
+                },
+                "desk_live": {
+                  "at": "just right of centre",
+                  "desc": "the lit driving desk itself, its ring of gauge faces and its indicator lamps",
+                  "motion": {
+                    "moves": true,
+                    "vigour": "the instrument lamps and gauge faces alive with light",
+                    "phrase": "the desk's indicator lamps and glowing gauge faces breathing and flickering gently, the light on the brass rising and falling; the view through the window is completely STILL, the train is standing at a platform"
+                  }
+                }
+              },
+              "clipNote": "STOPPED at a platform: the window must NOT travel. Lucas (2026-09-17) likes the non-travelling clips \u2014 'there's like flashing lights and stuff which is kind of fun'. If the dead gate rejects the flicker on two seeds, ship this state as its still (stillOnly) rather than hunting seeds."
+            },
+            "running": {
+              "prompt": "the same cab with its line ENERGISED: the driving desk's instruments live \u2014 gauge faces glowing from within, indicator lamps lit in amber and green, the master controller's brass catching the light \u2014 and the direction lever's enamel plates lit from behind. The cab is a little warmer and brighter for it, light spilling off the desk onto the panelling and the floor nearby. NOTHING ELSE CHANGES: same viewpoint, same layout, same objects in the same places, the window frame exactly where it is, the doors exactly as they were, no new objects in the cab and nothing in the cab moved.",
+              "artFrom": "energised",
+              "note": "SAME ART as `energised` \u2014 copy scene_energised.png to scene_running.png rather than regenerating, so the ride cuts between stopped and running with no visible change but the motion.",
+              "elements": {
+                "fore_window": {
+                  "motion": {
+                    "moves": true,
+                    "vigour": "the tunnel ring and running rails streaming steadily toward the viewer",
+                    "phrase": "the tunnel ring and the running rails coming steadily toward the viewer and passing out of frame, the lamps drawing forward one after another out of the dark ahead"
+                  }
+                }
+              }
+            },
+            "live": {
+              "prompt": "the same cab with its line ENERGISED and the train RUNNING THROUGH A WORKING STATION: the driving desk's instruments live \u2014 gauge faces glowing from within, indicator lamps lit in amber and green, the master controller's brass catching the light \u2014 and the direction lever's enamel plates lit from behind. The cab is a little warmer and brighter for it, light spilling off the desk onto the panelling and the floor nearby. The ONE other change is the view through the large forward window: instead of plain tunnel, the rails run through a BUSY, CLUTTERED, WORKED-IN underground platform \u2014 crates and stacked flats along its whole length, galvanised racking loaded with drying trays, duckboards over the wet, coiled hose and cable on the wall, notices and work rotas tacked up, a kettle and mugs on a plank shelf, coats on hooks, and its own STRING OF BRIGHT WARM WORK-LAMPS on yellow flex lighting the whole platform from end to end, glazed tile catching the light. Plainly in daily use and full of gear, though nobody is standing on it. NOTHING ELSE CHANGES: same viewpoint, same layout, same objects in the same places, the window frame exactly where it is, the doors exactly as they were, no new objects in the cab and nothing in the cab moved.",
+              "elements": {
+                "fore_window": {
+                  "motion": {
+                    "moves": true,
+                    "vigour": "the working platform, its lamps and pillars streaming steadily toward the viewer",
+                    "phrase": "the lit platform with its lamps, racking and stacked crates, the platform edge and the running rails coming steadily toward the viewer and passing out of frame at the window's edges, one after another, as the train runs through the station"
+                  }
+                }
+              }
+            },
+            "ghost": {
+              "prompt": "the same cab with its line ENERGISED and the train RUNNING THROUGH A GHOST STATION: the driving desk's instruments live \u2014 gauge faces glowing from within, indicator lamps lit in amber and green, the master controller's brass catching the light \u2014 and the direction lever's enamel plates lit from behind. The cab is a little warmer and brighter for it, light spilling off the desk onto the panelling and the floor nearby. The ONE other change is the view through the large forward window: instead of plain tunnel, the rails run through a long-abandoned platform that is on no map \u2014 STRIPPED BARE AND EMPTY: nothing whatever stands on it, no crates, no racking, no shelves, no tools, no notices, no cable, no lamps of its own lit anywhere, the exits bricked up, no enamel name board and no lettering. Just the bare platform edge running away alongside the rails, a long evenly spaced row of square tiled pillars marching into the dark, the tile grimed and crazed. It is lit ONLY by the train's own headlamp, so the near pillars stand out and the far end falls away into black where the tunnel ring resumes. Cold, empty and silent against a working station's clutter. NOTHING ELSE CHANGES: same viewpoint, same layout, same objects in the same places, the window frame exactly where it is, the doors exactly as they were, no new objects in the cab and nothing in the cab moved.",
+              "elements": {
+                "fore_window": {
+                  "motion": {
+                    "moves": true,
+                    "vigour": "the bare platform and its pillars streaming steadily toward the viewer",
+                    "phrase": "the empty platform and its row of square pillars, the platform edge and the running rails coming steadily toward the viewer and passing out of frame at the window's edges, one after another, as the train runs through the station"
+                  }
+                }
+              }
             }
           }
         },
@@ -4372,7 +4567,11 @@
           "volume": 0.22,
           "needsReplacement": true
         }
-      ]
+      ],
+      "mapPos": {
+        "c": 3,
+        "r": 3
+      }
     },
     {
       "key": "car_verdigris",
@@ -4703,7 +4902,60 @@
           "continuity": [],
           "states": {
             "energised": {
-              "prompt": "the same cab with its line ENERGISED: the driving desk's instruments now live \u2014 gauge faces glowing from within, indicator lamps lit in amber and green, the master controller's brass catching the light \u2014 and the destination selector's ring of enamel plates lit from behind so the pointer reads clearly. The cab is a little warmer and brighter for it, light spilling off the desk onto the panelling and the floor nearby. NOTHING ELSE CHANGES: same viewpoint, same layout, same objects in the same places, the doors exactly as they were, no new objects and nothing moved \u2014 only the instruments come alive and the light they throw."
+              "prompt": "the same cab with its line ENERGISED: the driving desk's instruments live \u2014 gauge faces glowing from within, indicator lamps lit in amber and green, the master controller's brass catching the light \u2014 and the direction lever's enamel plates lit from behind. The cab is a little warmer and brighter for it, light spilling off the desk onto the panelling and the floor nearby. NOTHING ELSE CHANGES: same viewpoint, same layout, same objects in the same places, the window frame exactly where it is, the doors exactly as they were, no new objects in the cab and nothing in the cab moved.",
+              "elements": {
+                "fore_window": {
+                  "motion": null
+                },
+                "desk_live": {
+                  "at": "just right of centre",
+                  "desc": "the lit driving desk itself, its ring of gauge faces and its indicator lamps",
+                  "motion": {
+                    "moves": true,
+                    "vigour": "the instrument lamps and gauge faces alive with light",
+                    "phrase": "the desk's indicator lamps and glowing gauge faces breathing and flickering gently, the light on the brass rising and falling; the view through the window is completely STILL, the train is standing at a platform"
+                  }
+                }
+              },
+              "clipNote": "STOPPED at a platform: the window must NOT travel. Lucas (2026-09-17) likes the non-travelling clips \u2014 'there's like flashing lights and stuff which is kind of fun'. If the dead gate rejects the flicker on two seeds, ship this state as its still (stillOnly) rather than hunting seeds."
+            },
+            "running": {
+              "prompt": "the same cab with its line ENERGISED: the driving desk's instruments live \u2014 gauge faces glowing from within, indicator lamps lit in amber and green, the master controller's brass catching the light \u2014 and the direction lever's enamel plates lit from behind. The cab is a little warmer and brighter for it, light spilling off the desk onto the panelling and the floor nearby. NOTHING ELSE CHANGES: same viewpoint, same layout, same objects in the same places, the window frame exactly where it is, the doors exactly as they were, no new objects in the cab and nothing in the cab moved.",
+              "artFrom": "energised",
+              "note": "SAME ART as `energised` \u2014 copy scene_energised.png to scene_running.png rather than regenerating, so the ride cuts between stopped and running with no visible change but the motion.",
+              "elements": {
+                "fore_window": {
+                  "motion": {
+                    "moves": true,
+                    "vigour": "the tunnel ring and running rails streaming steadily toward the viewer",
+                    "phrase": "the tunnel ring and the running rails coming steadily toward the viewer and passing out of frame, the lamps drawing forward one after another out of the dark ahead"
+                  }
+                }
+              }
+            },
+            "live": {
+              "prompt": "the same cab with its line ENERGISED and the train RUNNING THROUGH A WORKING STATION: the driving desk's instruments live \u2014 gauge faces glowing from within, indicator lamps lit in amber and green, the master controller's brass catching the light \u2014 and the direction lever's enamel plates lit from behind. The cab is a little warmer and brighter for it, light spilling off the desk onto the panelling and the floor nearby. The ONE other change is the view through the large forward window: instead of plain tunnel, the rails run through a BUSY, CLUTTERED, WORKED-IN underground platform \u2014 crates and stacked flats along its whole length, galvanised racking loaded with drying trays, duckboards over the wet, coiled hose and cable on the wall, notices and work rotas tacked up, a kettle and mugs on a plank shelf, coats on hooks, and its own STRING OF BRIGHT WARM WORK-LAMPS on yellow flex lighting the whole platform from end to end, glazed tile catching the light. Plainly in daily use and full of gear, though nobody is standing on it. NOTHING ELSE CHANGES: same viewpoint, same layout, same objects in the same places, the window frame exactly where it is, the doors exactly as they were, no new objects in the cab and nothing in the cab moved.",
+              "elements": {
+                "fore_window": {
+                  "motion": {
+                    "moves": true,
+                    "vigour": "the working platform, its lamps and pillars streaming steadily toward the viewer",
+                    "phrase": "the lit platform with its lamps, racking and stacked crates, the platform edge and the running rails coming steadily toward the viewer and passing out of frame at the window's edges, one after another, as the train runs through the station"
+                  }
+                }
+              }
+            },
+            "ghost": {
+              "prompt": "the same cab with its line ENERGISED and the train RUNNING THROUGH A GHOST STATION: the driving desk's instruments live \u2014 gauge faces glowing from within, indicator lamps lit in amber and green, the master controller's brass catching the light \u2014 and the direction lever's enamel plates lit from behind. The cab is a little warmer and brighter for it, light spilling off the desk onto the panelling and the floor nearby. The ONE other change is the view through the large forward window: instead of plain tunnel, the rails run through a long-abandoned platform that is on no map \u2014 STRIPPED BARE AND EMPTY: nothing whatever stands on it, no crates, no racking, no shelves, no tools, no notices, no cable, no lamps of its own lit anywhere, the exits bricked up, no enamel name board and no lettering. Just the bare platform edge running away alongside the rails, a long evenly spaced row of square tiled pillars marching into the dark, the tile grimed and crazed. It is lit ONLY by the train's own headlamp, so the near pillars stand out and the far end falls away into black where the tunnel ring resumes. Cold, empty and silent against a working station's clutter. NOTHING ELSE CHANGES: same viewpoint, same layout, same objects in the same places, the window frame exactly where it is, the doors exactly as they were, no new objects in the cab and nothing in the cab moved.",
+              "elements": {
+                "fore_window": {
+                  "motion": {
+                    "moves": true,
+                    "vigour": "the bare platform and its pillars streaming steadily toward the viewer",
+                    "phrase": "the empty platform and its row of square pillars, the platform edge and the running rails coming steadily toward the viewer and passing out of frame at the window's edges, one after another, as the train runs through the station"
+                  }
+                }
+              }
             }
           }
         },
@@ -4757,7 +5009,11 @@
           "volume": 0.22,
           "needsReplacement": true
         }
-      ]
+      ],
+      "mapPos": {
+        "c": 4,
+        "r": 0
+      }
     },
     {
       "key": "car_lampblack",
@@ -4830,7 +5086,7 @@
         },
         {
           "type": "dial",
-          "label": "The direction lever",
+          "label": "The destination selector",
           "note": "THE RIDE (2026-09-17): one up-line / down-line lever; express to the next transfer station. Until the ride engine lands this is still wired as the old destination dial (key dest_lampblack). Berth rooms this line calls at: ochre_hall, saffron_lampblack, cropping_lampblack, alum_lampblack.",
           "key": "dest_lampblack",
           "states": [
@@ -4939,12 +5195,12 @@
           "type": "puzzle",
           "label": "The driving desk",
           "box": [
-            0.5378,
-            0.5663,
-            0.6081,
-            0.7819
+            0.5372,
+            0.5537,
+            0.6075,
+            0.7693
           ],
-          "boxSource": "review:lucas",
+          "boxSource": "moved:testplay",
           "solveSfx": {
             "src": "audio/solve_line_energised.mp3",
             "volume": 0.65,
@@ -5115,7 +5371,60 @@
           "continuity": [],
           "states": {
             "energised": {
-              "prompt": "the same cab with its line ENERGISED: the driving desk's instruments now live \u2014 gauge faces glowing from within, indicator lamps lit in amber and green, the master controller's brass catching the light \u2014 and the destination selector's ring of enamel plates lit from behind so the pointer reads clearly. The cab is a little warmer and brighter for it, light spilling off the desk onto the panelling and the floor nearby. NOTHING ELSE CHANGES: same viewpoint, same layout, same objects in the same places, the doors exactly as they were, no new objects and nothing moved \u2014 only the instruments come alive and the light they throw."
+              "prompt": "the same cab with its line ENERGISED: the driving desk's instruments live \u2014 gauge faces glowing from within, indicator lamps lit in amber and green, the master controller's brass catching the light \u2014 and the direction lever's enamel plates lit from behind. The cab is a little warmer and brighter for it, light spilling off the desk onto the panelling and the floor nearby. NOTHING ELSE CHANGES: same viewpoint, same layout, same objects in the same places, the window frame exactly where it is, the doors exactly as they were, no new objects in the cab and nothing in the cab moved.",
+              "elements": {
+                "fore_window": {
+                  "motion": null
+                },
+                "desk_live": {
+                  "at": "just right of centre",
+                  "desc": "the lit driving desk itself, its ring of gauge faces and its indicator lamps",
+                  "motion": {
+                    "moves": true,
+                    "vigour": "the instrument lamps and gauge faces alive with light",
+                    "phrase": "the desk's indicator lamps and glowing gauge faces breathing and flickering gently, the light on the brass rising and falling; the view through the window is completely STILL, the train is standing at a platform"
+                  }
+                }
+              },
+              "clipNote": "STOPPED at a platform: the window must NOT travel. Lucas (2026-09-17) likes the non-travelling clips \u2014 'there's like flashing lights and stuff which is kind of fun'. If the dead gate rejects the flicker on two seeds, ship this state as its still (stillOnly) rather than hunting seeds."
+            },
+            "running": {
+              "prompt": "the same cab with its line ENERGISED: the driving desk's instruments live \u2014 gauge faces glowing from within, indicator lamps lit in amber and green, the master controller's brass catching the light \u2014 and the direction lever's enamel plates lit from behind. The cab is a little warmer and brighter for it, light spilling off the desk onto the panelling and the floor nearby. NOTHING ELSE CHANGES: same viewpoint, same layout, same objects in the same places, the window frame exactly where it is, the doors exactly as they were, no new objects in the cab and nothing in the cab moved.",
+              "artFrom": "energised",
+              "note": "SAME ART as `energised` \u2014 copy scene_energised.png to scene_running.png rather than regenerating, so the ride cuts between stopped and running with no visible change but the motion.",
+              "elements": {
+                "fore_window": {
+                  "motion": {
+                    "moves": true,
+                    "vigour": "the tunnel ring and running rails streaming steadily toward the viewer",
+                    "phrase": "the tunnel ring and the running rails coming steadily toward the viewer and passing out of frame, the lamps drawing forward one after another out of the dark ahead"
+                  }
+                }
+              }
+            },
+            "live": {
+              "prompt": "the same cab with its line ENERGISED and the train RUNNING THROUGH A WORKING STATION: the driving desk's instruments live \u2014 gauge faces glowing from within, indicator lamps lit in amber and green, the master controller's brass catching the light \u2014 and the direction lever's enamel plates lit from behind. The cab is a little warmer and brighter for it, light spilling off the desk onto the panelling and the floor nearby. The ONE other change is the view through the large forward window: instead of plain tunnel, the rails run through a BUSY, CLUTTERED, WORKED-IN underground platform \u2014 crates and stacked flats along its whole length, galvanised racking loaded with drying trays, duckboards over the wet, coiled hose and cable on the wall, notices and work rotas tacked up, a kettle and mugs on a plank shelf, coats on hooks, and its own STRING OF BRIGHT WARM WORK-LAMPS on yellow flex lighting the whole platform from end to end, glazed tile catching the light. Plainly in daily use and full of gear, though nobody is standing on it. NOTHING ELSE CHANGES: same viewpoint, same layout, same objects in the same places, the window frame exactly where it is, the doors exactly as they were, no new objects in the cab and nothing in the cab moved.",
+              "elements": {
+                "fore_window": {
+                  "motion": {
+                    "moves": true,
+                    "vigour": "the working platform, its lamps and pillars streaming steadily toward the viewer",
+                    "phrase": "the lit platform with its lamps, racking and stacked crates, the platform edge and the running rails coming steadily toward the viewer and passing out of frame at the window's edges, one after another, as the train runs through the station"
+                  }
+                }
+              }
+            },
+            "ghost": {
+              "prompt": "the same cab with its line ENERGISED and the train RUNNING THROUGH A GHOST STATION: the driving desk's instruments live \u2014 gauge faces glowing from within, indicator lamps lit in amber and green, the master controller's brass catching the light \u2014 and the direction lever's enamel plates lit from behind. The cab is a little warmer and brighter for it, light spilling off the desk onto the panelling and the floor nearby. The ONE other change is the view through the large forward window: instead of plain tunnel, the rails run through a long-abandoned platform that is on no map \u2014 STRIPPED BARE AND EMPTY: nothing whatever stands on it, no crates, no racking, no shelves, no tools, no notices, no cable, no lamps of its own lit anywhere, the exits bricked up, no enamel name board and no lettering. Just the bare platform edge running away alongside the rails, a long evenly spaced row of square tiled pillars marching into the dark, the tile grimed and crazed. It is lit ONLY by the train's own headlamp, so the near pillars stand out and the far end falls away into black where the tunnel ring resumes. Cold, empty and silent against a working station's clutter. NOTHING ELSE CHANGES: same viewpoint, same layout, same objects in the same places, the window frame exactly where it is, the doors exactly as they were, no new objects in the cab and nothing in the cab moved.",
+              "elements": {
+                "fore_window": {
+                  "motion": {
+                    "moves": true,
+                    "vigour": "the bare platform and its pillars streaming steadily toward the viewer",
+                    "phrase": "the empty platform and its row of square pillars, the platform edge and the running rails coming steadily toward the viewer and passing out of frame at the window's edges, one after another, as the train runs through the station"
+                  }
+                }
+              }
             }
           }
         },
@@ -5169,7 +5478,11 @@
           "volume": 0.22,
           "needsReplacement": true
         }
-      ]
+      ],
+      "mapPos": {
+        "c": 1,
+        "r": 1
+      }
     }
   ],
   "_designNotes": {
@@ -5186,5 +5499,6 @@
     ],
     "buildState": "WIRED AND GREEN 2026-09-07 (docs re-verified 2026-09-08). 18 rooms (13 one-road berth platforms + 5 driver's cabs), all built and human-accepted; 67 hotspots with measured boxes; 18 hero-motion subjects; 5 'energised' cab variants. CONTENT COMPLETE: 4 rungs in puzzleQueue (dynamic queue \u2014 each cab desk is a queue:true slot), escape lock E5I4 with endsEscape, 19 clue bodies, 5 dial state sets, both finish screens, decoder key NETWORKS_SUBWAY_KEY c(2,0,5,3) keyed by RUNG not room, sound staged by reuse. GREEN: validate_assets, validate_story (200 strings), validate_keys, Rscript decode_codes.R, test_subway.py, npm test 155/155, e2e smoke. NOT DONE, and all three block promotion: (1) THE RIDE \u2014 the transit sequencer, the live sighting click, 10 baked loops, and the lock's {gte:[sightings,5]} gate; Lucas's own work. (2) CINEMAGRAPH subjects for the 13 platforms (the 5 cabs are healthy); Lucas's own work. (3) a HUMAN EAR on 37 placeholder audio cues \u2014 every one is flagged needsReplacement and test_subway.py fails any 'ready' scenario that still carries one. Also waiting on Lucas: the per-line music tracks, and auto_balance.py after them."
   },
-  "doorLabels": true
+  "doorLabels": true,
+  "cover": "cover.png"
 }
