@@ -1,0 +1,53 @@
+{
+  "status": "awaiting_review",
+  "retry_count": 0,
+  "started": "2026-09-18T02:44:10.198289+00:00",
+  "last_cycle": "2026-09-18T03:03:38.147516+00:00",
+  "cycles_completed": 8,
+  "rooms": {
+    "undercroft": {
+      "art_generated": 2,
+      "history": [
+        {
+          "cycle": 3,
+          "decision": "AUTHOR_MOVER",
+          "why": "The only mover in this spec is in an old-style animate block, which the loop's mover check (_has_authored_mover) can't see, so the loop treats the room as having no mover. Adding a motion block to the same bounded pool on the left fixes that: the pool gets a visibly rippled surface in the still and a matching short motion prompt. The runner matches this to the existing still_flood element by its at value (\"to the left\" hits still_flood before flood_door) and merges rather than replaces, so the old animate block stays for the player."
+        },
+        {
+          "cycle": 6,
+          "decision": "RENDER",
+          "why": "The new 3072x1024 scene.png (made 2026-09-17 22:48, after cycle 3 added the mover) shows the pool on the left with wide ripple rings and wavering amber reflections, and the motion prompt describes that same movement; the only clip on disk is from 2026-09-01 and the gate report is empty, so no clip exists for this still yet."
+        },
+        {
+          "cycle": 8,
+          "decision": "HOLD",
+          "why": "The seed-4242 clip rendered from the new rippled-pool still passed the camera, glitch and dead gates cleanly, so it is queued for Lucas to judge; that is not acceptance."
+        }
+      ],
+      "attempts": 1,
+      "last_gate": {
+        "camera": "still",
+        "return": 0.05,
+        "peak": 5.03,
+        "glitch": {
+          "spike": 3.0,
+          "breadth": 0.0,
+          "at_pct": 33.3,
+          "frames": 73,
+          "breadth_normalised": 0.021
+        },
+        "dead": {
+          "ratio": 15.74,
+          "peak": 6.05,
+          "dead": false
+        }
+      },
+      "clip": "/home/bustalab/Documents/Tools/temp/cine/_art_prompt_exp/canyon/undercroft_motion_ri6_looped.mp4",
+      "held": true,
+      "staged": "/home/bustalab/Documents/Tools/websites/thebustalab.github.io/escape_rooms/rooms/hierarchical_clustering/canyon/_scratch/cine_cand/undercroft/base__ri6.mp4"
+    }
+  },
+  "review_note": "undercroft (the DRY hall) has a rewritten spec: a bronze flood door on the left above the water, a control panel with EXACTLY THREE rows of cells (the old art drew four), sluice-wheel and stone tunnel removed. Generate new art from the spec, commit, seam, render one clip and hold. Do NOT touch the `works` room: its art will be made later as an image-edit of this room's new scene.png, by hand.",
+  "generations": 2,
+  "render_polls": 0
+}

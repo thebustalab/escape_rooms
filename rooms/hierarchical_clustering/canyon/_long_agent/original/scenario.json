@@ -1,0 +1,3661 @@
+{
+  "status": "in_development",
+  "chapter": "hierarchical_clustering",
+  "scenario": "canyon",
+  "id": 14,
+  "title": "The Confluence",
+  "subtitle": "Hierarchical Clustering · hclust + cutree + summarise",
+  "story": "You came down into the red canyon to map its springs, and the flood season came early. Sheltering, you find a stair into a drowned hall the old makers left behind — their floodworks, a single bronze flood door, shut fast, that leads up to safety, an engraved panel no living hand has set, and a map of the whole canyon with every height left blank. A ladder climbs from the hall to the high springs. The makers built this place to be run by someone who could read the canyon as they did — its waters sorted into families, its channels into one branching tree. Climb, and roam the whole canyon: read the springs at each junction to learn which waters are kin, and mark each junction's height on your map as you pass it. Then come back down to the hall and read the shape of the land itself — before the water climbs to meet you.",
+  "enterLabel": "Climb into the canyon →",
+  "done": {
+    "title": "The map lied",
+    "body": "The carved map grouped the springs by the fork they rise in — but two springs' water swore a different kin, and you saw it. The storm breaks; the canyon fills. Kinship hides beneath the surface, and only the reading finds it. Back down to the hall — the panel is waiting, and your map of heights is full."
+  },
+  "escapeDone": {
+    "title": "Free of the canyon",
+    "body": "You draw the waterline across your map and count the canyon's severed limbs — and the panel takes it. You spin the great wheel on the bronze door; the bolt grinds back and the door swings open onto a stair. You climb as the hall drowns behind you, into rain and open sky. The canyon kept its one promise: read me truly, and go free."
+  },
+  "packages": [
+    "dplyr",
+    "ggplot2",
+    "readr"
+  ],
+  "setup": "suppressMessages({library(dplyr); library(ggplot2)})",
+  "state": {
+    "rooms_solved": 0
+  },
+  "datasets": [
+    {
+      "name": "canyon_water_chem",
+      "url": "https://thebustalab.github.io/escape_rooms/rooms/hierarchical_clustering/canyon/data/canyon_water_chem.csv"
+    },
+    {
+      "name": "unknown_spring",
+      "url": "https://thebustalab.github.io/escape_rooms/rooms/hierarchical_clustering/canyon/data/unknown_spring.csv"
+    }
+  ],
+  "ambient": "rain",
+  "fx": [],
+  "coverPrompt": "Minimalist stylised thumbnail poster of a lone red slot-canyon: a single narrow cleft in dark sandstone opening downward into a branching gorge, water flowing through it deep below, a cool teal storm-sky above. One bold high-contrast silhouette, iconic and uncluttered, minimal detail. Flat limited palette: deep teal, icy blue. Soft film grain, painterly but clean, strong negative space, single centred focal subject. No people, no text, no lettering, no logos. Square composition.",
+  "debrief": {
+    "title": "How this world worked",
+    "intro": "The whole canyon was one skill in disguise: sorting many things into a nested tree of families by how alike they are. Each junction taught one move of hierarchical clustering, and the escape was the move made physical — reading the true branching structure of the land and cutting it into groups."
+  },
+  "rooms": [
+    {
+      "key": "undercroft",
+      "title": "The drowned hall",
+      "technique": "Framing — the makers' floodworks",
+      "built": true,
+      "unlockedWhen": true,
+      "authoring": {
+        "tag": "undercroft",
+        "scenePrompt": "This is a seamless 360-degree panorama from the middle of a vast underground hall hewn from red sandstone — the drowned floodworks of a vanished people; the viewer stands on a broad flagged stone floor at its centre, surrounded by carved piers and walls channelled with old sluice-cuts, still black water lying across the sunken half of the floor, a squat bronze lamp hanging on a long chain above it, and a tall iron sluice-wheel green with age fixed beside a sealed tunnel mouth whose heavy stone door is shut fast. THIS WHOLE CANYON WAS ENGINEERED BY A VANISHED PEOPLE AND THEIR WATERWORKS ARE EVERYWHERE: carved stone channels and cut sluice-races thread the walls at several different heights, stepped weirs and spillways drop the water from level to level in small falls, narrow flights of steps are cut straight into the rock face and iron-runged ladders climb past them to little gauging platforms and corbelled ledges, verdigrised bronze sluice-gates and toothed rack-and-pinion mechanisms stand in the races, worn carved disc-sigils and level-marks are set into the stone at intervals, and small lamp niches burn at every landing — and this drowned hall is where they are commanded from: banks of gate machinery, capstans and counterweights and stone-cut conduits running away into the dark under the canyon. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain unbroken stretch of wet red-sandstone wall in deep shadow, near-black and featureless, uniform and unlit: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, a plain unbroken stretch of wet red-sandstone wall in deep shadow, near-black and featureless, the half of that one wall that meets its other half cleanly at the seam directly behind you; to the left, still black floodwater lying flat across the sunken half of the floor, glassy and dark, the lamplight lying broken on it; to the left of centre, a low stone table where a rolled hide map lies half open, the canyon's branching channels drawn on it in fine incised lines with every height left blank; dead ahead in the centre, a great engraved control panel set into the rock face — a grid of empty square stone cells above a row of dark bronze dials, unlit, its purpose not apparent; just right of centre, a rough dark-timber ladder set against the rock, climbing up through a shaft in the ceiling toward a far, pale scrap of daylight; to the right, a low carved arch in the wall opening onto the drowned trunk passage, dark water sliding away through it; on the far right, the same plain unbroken stretch of wet red-sandstone wall in deep shadow, near-black and featureless, the other half of that one wall, joining cleanly at the seam directly behind you. wet red sandstone and black still water, warm amber lamplight pooling against cold blue-green dark, heavy air, painterly, cinematic, subtle film grain, hushed and expectant. No people, no lettering, no captions, no text, no readable writing, no signage, no UI. Again: the extreme left and right edges must align perfectly into a plain unbroken stretch of wet red-sandstone wall in deep shadow, near-black and featureless, uniform and unlit, with no visible seam, join, or repetition.",
+        "doorPrompt": "The same hall with the ladder-shaft up into the canyon brightening with cool daylight from above; the sealed tunnel and panel unchanged.",
+        "sceneSpec": {
+          "room": "undercroft",
+          "interior": true,
+          "seam": "a plain unbroken stretch of wet red-sandstone wall in deep shadow, near-black and featureless, uniform and unlit",
+          "setting": "the middle of a vast underground hall hewn from red sandstone — the drowned floodworks of a vanished people; the viewer stands on a broad flagged stone floor at its centre, surrounded by carved piers and walls channelled with old sluice-cuts, still black water lying across the sunken left half of the floor, and a squat bronze lamp hanging on a long chain above it",
+          "elements": [
+            {
+              "id": "seam_wall_left",
+              "at": "on the far left",
+              "desc": "a plain unbroken stretch of wet red-sandstone wall in deep shadow, near-black and featureless, the half of that one wall that meets its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "still_flood",
+              "at": "to the left",
+              "desc": "still black floodwater lying flat across the sunken left half of the floor, glassy and dark, the lamplight lying broken on it, its edge stopping two steps below the bronze flood door",
+              "animate": {
+                "motion": "the black water stirring in slow wide rings, the broken lamplight on it sliding and reforming",
+                "loop": "boomerang"
+              }
+            },
+            {
+              "id": "flood_door",
+              "at": "to the left",
+              "clue": true,
+              "label": "The bronze flood door",
+              "desc": "a heavy riveted bronze flood door, green with age, set flush into the rock at the top of four worn stone steps, a great spoked wheel-lock at its centre, the only metal door in the hall, standing well in from the edge above the still water, shut fast"
+            },
+            {
+              "id": "map_table",
+              "at": "to the left of centre",
+              "label": "The rolled canyon map",
+              "desc": "a low stone table where a rolled hide map lies half open, the canyon's branching channels drawn on it in fine incised lines with every height left blank",
+              "elevmap": true
+            },
+            {
+              "id": "control_panel",
+              "at": "dead ahead in the centre",
+              "clue": true,
+              "label": "The engraved control panel",
+              "desc": "a great engraved control panel set into the rock face — exactly three horizontal rows of square stone cells stacked one above another, and only three, four cells to a row with a long narrow carved plate at the left end of each row, framed by a plain smooth stone border; unlit, its purpose not apparent"
+            },
+            {
+              "id": "hall_ladder",
+              "at": "just right of centre",
+              "door": {
+                "direction": "open",
+                "to": "j_c1"
+              },
+              "label": "The ladder to the high springs",
+              "desc": "a rough dark-timber ladder set against the rock, climbing up through a shaft in the ceiling toward a far, pale scrap of daylight"
+            },
+            {
+              "id": "trunk_arch",
+              "at": "to the right",
+              "label": "The trunk arch",
+              "desc": "a low carved arch in the wall opening onto the drowned trunk passage, dark water sliding away through it",
+              "clue": true
+            },
+            {
+              "id": "seam_wall_right",
+              "at": "on the far right",
+              "desc": "the same plain unbroken stretch of wet red-sandstone wall in deep shadow, near-black and featureless, the other half of that one wall, joining cleanly at the seam directly behind you"
+            }
+          ],
+          "atmosphere": "wet red sandstone and black still water, warm amber lamplight pooling against cold blue-green dark, heavy air, painterly, cinematic, subtle film grain, hushed and expectant",
+          "negatives": "No people, no lettering, no captions, no text, no readable writing, no signage, no UI",
+          "seamOccluder": "a broad carved stone pier, floor to ceiling, plain and unlit"
+        },
+        "motionSpec": {
+          "rigid": "The hall walls, carved piers, flagged floor, stone table, engraved panel, ladder and stonework",
+          "has_document": true,
+          "pinned": [
+            "The rolled hide map lies flat and still on the stone table; its incised channel lines and marks do not move, lift, curl or change.",
+            "The water level is fixed: the flood does not rise, spread, surge or advance.",
+            "The flagged stone walkway and the paving across the foreground and the right of the hall are DRY solid stone — wet-looking and polished, but stone. They do not ripple, flow, shimmer or behave like water, and no water covers, creeps over or spreads onto them."
+          ],
+          "negatives": [
+            ", rising water, flooding, water level changing, water spreading across the floor, surging water, waves, tide coming in, splashing, water covering the paving, water creeping over the walkway, flooded walkway, wet floor rippling, the stone floor turning to water, fast ripples, choppy water, churning water, rapid surface motion, current, flowing water, sloshing"
+          ],
+          "subjects": [
+            {
+              "name": "still_flood",
+              "box": [
+                0.03,
+                0.61,
+                0.22,
+                0.92
+              ],
+              "phrase": "the black floodwater in the left of the hall lying dead flat and utterly level, its mirrored lamplight stretching and easing across the surface in one very slow breath — the waterline stays exactly where it is, hard against the stone kerb, and the water neither rises, spreads nor creeps onto the paving"
+            },
+            {
+              "name": "trunk_arch_water",
+              "box": [
+                0.72,
+                0.62,
+                0.9,
+                0.86
+              ],
+              "phrase": "dark water standing in the low carved arch on the right, its surface creasing and smoothing very slowly in place"
+            },
+            {
+              "name": "hall_air",
+              "box": [
+                0.3,
+                0.06,
+                0.72,
+                0.3
+              ],
+              "phrase": "the faintest possible suggestion of damp air high under the hall's vault, almost imperceptible"
+            },
+            {
+              "name": "lights_1",
+              "box": [
+                0.6023,
+                0.3441,
+                0.621,
+                0.4107
+              ],
+              "phrase": "the hanging oil lanterns burning with a live, restless flame that gutters and flares, their pools of amber light pulsing on the wet stone"
+            },
+            {
+              "name": "lights_2",
+              "box": [
+                0.178,
+                0.7055,
+                0.1874,
+                0.7336
+              ],
+              "phrase": "the hanging oil lanterns burning with a live, restless flame that gutters and flares, their pools of amber light pulsing on the wet stone"
+            },
+            {
+              "name": "lights_3",
+              "box": [
+                0.2328,
+                0.5307,
+                0.2851,
+                0.6295
+              ],
+              "phrase": "the hanging oil lanterns burning with a live, restless flame that gutters and flares, their pools of amber light pulsing on the wet stone"
+            }
+          ],
+          "room": "undercroft",
+          "state": "base"
+        }
+      },
+      "entry": {
+        "title": "The drowned hall",
+        "text": "You came down into the red canyon to map its waters and have found a drowned hall left by the long-gone builders of an old floodworks. Climb out into the canyon to roam and survey its waters, but watch out! There are reports that flood season may come early this year."
+      },
+      "designNote": "FRAME ROOM (no graded puzzle). Cold open: seed the mystery — the PANEL (clue, unreadable now; pays off at 'works') and the blank MAP (clue, pickup; the escape's reading surface). Passages: a LADDER up to j_c1 (the high springs) and a TRUNK arch to j_c7. Both UNGATED. NEW ART; the escape room 'works' REUSES this scene (water higher, panel lit). MAZE MODEL (engine work Lucas will build): every passage is OPEN from the start (roam freely, backtrack anytime); a puzzle at a junction is served next-in-queue via availableWhen (a diegetic 'not yet' if out of order); the survey is DRY so nothing seals off; the escape panel refuses an INCOMPLETE map, so the player goes back for any junction whose height is still blank. Scene shows OPEN fork-passages (no closed-door art needed on maze passages) — only the escape tunnel is a gated closed->open door.",
+      "plannedHotspots": [
+        {
+          "type": "clue",
+          "label": "The engraved control panel",
+          "note": "the calibration matrix; unreadable now, pays off at the escape",
+          "box": [
+            0.4,
+            0.3,
+            0.6,
+            0.6
+          ],
+          "boxSource": "draft:localizer",
+          "id": "control_panel",
+          "body": "Three rows are cut into the panel. Each gives a flood height, and beside it the sizes of the groups the canyon breaks into when the water stands at that height — read left to right across the forks.<pre>1300 · 2 2 2 2\n 950 · 4 4\n1125 · _ _ _</pre>The lamp behind the last row is dead.",
+          "pickup": "The hall's panel: 1300 -> 2 2 2 2, 950 -> 4 4, and 1125 dark. Group sizes at a flood height, read left to right across the forks."
+        },
+        {
+          "type": "elevmap",
+          "label": "The rolled canyon map",
+          "note": "blank map; the escape's reading surface (fills as you read junction heights)",
+          "key": "canyon_heights",
+          "countKey": "heights_placed",
+          "axis": {
+            "min": 800,
+            "max": 1500,
+            "step": 25,
+            "unit": "m",
+            "label": "elevation"
+          },
+          "nodes": [
+            {
+              "id": "c1",
+              "label": "c1 · high confluence",
+              "x": 0.125,
+              "answer": 1400,
+              "tol": 0,
+              "requires": "c1_read"
+            },
+            {
+              "id": "c3",
+              "label": "c3 · left fork",
+              "x": 0.25,
+              "answer": 1050,
+              "tol": 0,
+              "requires": "c3_read"
+            },
+            {
+              "id": "c2",
+              "label": "c2 · orphan junction",
+              "x": 0.375,
+              "answer": 1380,
+              "tol": 0,
+              "requires": "c2_read"
+            },
+            {
+              "id": "c7",
+              "label": "c7 · the trunk",
+              "x": 0.5,
+              "answer": 850,
+              "tol": 0,
+              "requires": "c7_read"
+            },
+            {
+              "id": "c4",
+              "label": "c4 · bitter confluence",
+              "x": 0.625,
+              "answer": 1420,
+              "tol": 0,
+              "requires": "c4_read"
+            },
+            {
+              "id": "c6",
+              "label": "c6 · right fork",
+              "x": 0.75,
+              "answer": 1200,
+              "tol": 0,
+              "requires": "c6_read"
+            },
+            {
+              "id": "c5",
+              "label": "c5 · still pool",
+              "x": 0.875,
+              "answer": 1390,
+              "tol": 0,
+              "requires": "c5_read"
+            }
+          ],
+          "prompt": "The makers drew the canyon's whole branching plan, and left every height blank. Drag each junction to the elevation you read off its benchmark.",
+          "feedback": {
+            "placed": "{n} of {m} junction heights marked"
+          },
+          "box": [
+            0.368,
+            0.655,
+            0.485,
+            0.745
+          ],
+          "boxSource": "review:agent",
+          "id": "map_table"
+        },
+        {
+          "type": "door",
+          "label": "The ladder to the high springs",
+          "to": "j_c1",
+          "note": "UNGATED climb to the top",
+          "box": [
+            0.6192,
+            0.046,
+            0.6892,
+            0.666
+          ],
+          "boxSource": "review:lucas",
+          "id": "hall_ladder",
+          "direction": "open"
+        },
+        {
+          "type": "clue",
+          "label": "The trunk arch",
+          "note": "UNGATED; open maze",
+          "box": [
+            0.7123,
+            0.4841,
+            0.8183,
+            0.7321
+          ],
+          "boxSource": "review:lucas",
+          "id": "trunk_arch",
+          "body": "The arch runs full. Black water slides through it out of the hall and away down the trunk, deep and cold and moving, and there is no floor under it you would find by wading. The ladder is the only dry way out of here."
+        },
+        {
+          "type": "clue",
+          "label": "The bronze flood door",
+          "id": "flood_door",
+          "note": "the escape door, seen locked from the cold open; opens in 'works' when the panel takes 224",
+          "body": "A bronze door, green with age, at the top of worn steps above the water. There is no keyhole, and the great wheel at its centre will not turn a finger's width. A bronze rod runs from its bolt into the rock, towards the panel."
+        }
+      ],
+      "panorama": "undercroft/scene.png",
+      "builtFrom": "l1_undercroft_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "sfx": [
+        {
+          "src": "audio/canyon_cave_hall.mp3",
+          "volume": 0.2,
+          "mode": "loop"
+        },
+        {
+          "src": "audio/canyon_drip_cave.mp3",
+          "volume": 0.25,
+          "mode": "loop"
+        }
+      ],
+      "hotspots": [
+        {
+          "id": "control_panel",
+          "type": "clue",
+          "label": "The engraved control panel",
+          "box": [
+            0.4,
+            0.3,
+            0.6,
+            0.6
+          ],
+          "boxSource": "draft:localizer",
+          "body": "Three rows are cut into the panel. Each gives a flood height, and beside it the sizes of the groups the canyon breaks into when the water stands at that height — read left to right across the forks.<pre>1300 · 2 2 2 2\n 950 · 4 4\n1125 · _ _ _</pre>The lamp behind the last row is dead.",
+          "pickup": "The hall's panel: 1300 -> 2 2 2 2, 950 -> 4 4, and 1125 dark. Group sizes at a flood height, read left to right across the forks."
+        },
+        {
+          "id": "map_table",
+          "type": "elevmap",
+          "label": "The rolled canyon map",
+          "box": [
+            0.368,
+            0.655,
+            0.485,
+            0.745
+          ],
+          "key": "canyon_heights",
+          "countKey": "heights_placed",
+          "axis": {
+            "min": 800,
+            "max": 1500,
+            "step": 25,
+            "unit": "m",
+            "label": "elevation"
+          },
+          "nodes": [
+            {
+              "id": "c1",
+              "label": "c1 · high confluence",
+              "x": 0.125,
+              "answer": 1400,
+              "tol": 0,
+              "requires": "c1_read"
+            },
+            {
+              "id": "c3",
+              "label": "c3 · left fork",
+              "x": 0.25,
+              "answer": 1050,
+              "tol": 0,
+              "requires": "c3_read"
+            },
+            {
+              "id": "c2",
+              "label": "c2 · orphan junction",
+              "x": 0.375,
+              "answer": 1380,
+              "tol": 0,
+              "requires": "c2_read"
+            },
+            {
+              "id": "c7",
+              "label": "c7 · the trunk",
+              "x": 0.5,
+              "answer": 850,
+              "tol": 0,
+              "requires": "c7_read"
+            },
+            {
+              "id": "c4",
+              "label": "c4 · bitter confluence",
+              "x": 0.625,
+              "answer": 1420,
+              "tol": 0,
+              "requires": "c4_read"
+            },
+            {
+              "id": "c6",
+              "label": "c6 · right fork",
+              "x": 0.75,
+              "answer": 1200,
+              "tol": 0,
+              "requires": "c6_read"
+            },
+            {
+              "id": "c5",
+              "label": "c5 · still pool",
+              "x": 0.875,
+              "answer": 1390,
+              "tol": 0,
+              "requires": "c5_read"
+            }
+          ],
+          "prompt": "The makers drew the canyon's whole branching plan, and left every height blank. Drag each junction to the elevation you read off its benchmark.",
+          "feedback": {
+            "placed": "{n} of {m} junction heights marked"
+          },
+          "boxSource": "review:agent"
+        },
+        {
+          "id": "hall_ladder",
+          "type": "door",
+          "label": "The ladder to the high springs",
+          "box": [
+            0.6192,
+            0.046,
+            0.6892,
+            0.666
+          ],
+          "to": "j_c1",
+          "boxSource": "review:lucas",
+          "direction": "open"
+        },
+        {
+          "id": "trunk_arch",
+          "type": "clue",
+          "label": "The trunk arch",
+          "box": [
+            0.7123,
+            0.4841,
+            0.8183,
+            0.7321
+          ],
+          "boxSource": "review:lucas",
+          "body": "The arch runs full. Black water slides through it out of the hall and away down the trunk, deep and cold and moving, and there is no floor under it you would find by wading. The ladder is the only dry way out of here."
+        },
+        {
+          "id": "clip_base",
+          "type": "ambient",
+          "label": "Scene motion (base)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/serve-clips.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "undercroft/cine_base.mp4"
+          }
+        }
+      ]
+    },
+    {
+      "key": "j_c1",
+      "title": "The high confluence",
+      "technique": "hclust — read the tree (nearest relative)",
+      "puzzleType": 1,
+      "built": true,
+      "unlockedWhen": true,
+      "onSolve": [
+        {
+          "set": "j_c1_solved"
+        },
+        {
+          "inc": "rooms_solved"
+        }
+      ],
+      "debrief": "Put every spring's water on the same footing, measure how alike any two are, and read off the closest kin — a distance matrix and the first join of a dendrogram.",
+      "authoring": {
+        "tag": "j_c1",
+        "scenePrompt": "This is a seamless 360-degree panorama from the floor of the highest confluence in the canyon, where two clear spring-slots run together — the viewer stands on wet pale rock between the two waters, banded red walls rising sheer and vertiginous on every side into shadow, a thin ribbon of bruised pre-storm sky far overhead. THIS WHOLE CANYON WAS ENGINEERED BY A VANISHED PEOPLE AND THEIR WATERWORKS ARE EVERYWHERE: carved stone channels and cut sluice-races thread the walls at three or four different heights, stepped weirs and spillways drop the water from level to level in small falls, narrow flights of steps are cut straight into the rock face and iron-runged ladders climb past them to little gauging platforms and corbelled ledges high above, verdigrised bronze sluice-gates and toothed rack-and-pinion mechanisms stand in the races, worn carved disc-sigils and level-marks are set into the stone at intervals, and small lamp niches burn in the walls at every landing — an intricate, layered, awe-inspiring machine of water climbing out of sight in both directions. Directly behind the viewer, split across the extreme left and extreme right edges, is a deep, narrow, unlit cleft in the sandstone, near-black and featureless, its two walls falling into full shadow: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the mouth of a deep, narrow, unlit cleft falling into full shadow, near-black and featureless, the half of that one shadowed cleft that meets its other half cleanly at the seam directly behind you; to the left, a narrow tributary slot climbing away into the rock, a thin fall of clear water running down its throat over a stepped stone weir and beading off pale limestone seeps; to the left of centre, a weathered survey stone standing at the water's edge, a level line and a group of simple incised marks cut deep into its face; dead ahead in the centre, a squat carved stone reading-table set with a pane of glowing glass, standing over the clear pool where the two spring-slots meet and turn together; just right of centre, a rough dark-timber ladder dropping into a shaft in the canyon floor, darkness below it; to the right, a wide open slot leading away and downward, its floor stepping down out of sight past more cut channels and sluices; on the far right, the same deep, narrow, unlit cleft continuing in full shadow, near-black and featureless, the other half of that one shadowed cleft, joining cleanly at the seam directly behind you. banded red sandstone in cool teal shadow cut by warm amber lamplight, wet rock, spray and fine drifting dust, a bruised pre-storm sky far overhead, deep layered perspective, painterly, cinematic, subtle film grain, tense and expectant and vast. No people, no lettering, no captions, no text, no readable writing, no signage, no UI. Again: the extreme left and right edges must align perfectly into a deep, narrow, unlit cleft in the sandstone, near-black and featureless, its two walls falling into full shadow, with no visible seam, join, or repetition.",
+        "doorPrompt": "The same high confluence; all fork-passages already open (maze) — no change.",
+        "sceneSpec": {
+          "room": "j_c1",
+          "interior": false,
+          "seam": "a deep, narrow, unlit cleft in the sandstone, near-black and featureless, its two walls falling into full shadow",
+          "setting": "the floor of the highest confluence in the canyon, where two clear spring-slots run together — the viewer stands on wet pale rock between the two waters, banded red walls rising sheer on every side and a thin ribbon of bruised pre-storm sky far overhead",
+          "elements": [
+            {
+              "id": "j_c1_cleft_left",
+              "at": "on the far left",
+              "desc": "the mouth of a deep, narrow, unlit cleft falling into full shadow, near-black and featureless, the half of that one shadowed cleft that meets its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "spring_slot_a",
+              "at": "to the left",
+              "desc": "a narrow tributary slot climbing away into the rock, a thin fall of clear water running down its throat and beading off pale limestone seeps",
+              "animate": {
+                "motion": "the thin fall of water running steadily down the slot and beading off the limestone",
+                "loop": "crossfade"
+              }
+            },
+            {
+              "id": "bm_c1",
+              "at": "to the left of centre",
+              "clue": true,
+              "label": "The high benchmark",
+              "desc": "a weathered survey stone standing at the water's edge, a level line and a group of simple incised marks cut deep into its face"
+            },
+            {
+              "id": "table_c1",
+              "at": "dead ahead in the centre",
+              "puzzle": true,
+              "label": "The high reading-table",
+              "desc": "a squat carved stone reading-table set with a pane of glowing glass, standing over the clear pool where the two spring-slots meet and turn together"
+            },
+            {
+              "id": "ladder_shaft_c1",
+              "at": "just right of centre",
+              "label": "The ladder shaft down to the hall",
+              "desc": "a rough dark-timber ladder dropping into a shaft in the canyon floor, darkness below it",
+              "clue": true
+            },
+            {
+              "id": "down_slot_c1",
+              "at": "to the right",
+              "door": {
+                "direction": "open",
+                "to": "j_c3"
+              },
+              "label": "The down-canyon slot from the high confluence",
+              "desc": "a wide open slot leading away and downward, its floor stepping down out of sight"
+            },
+            {
+              "id": "j_c1_cleft_right",
+              "at": "on the far right",
+              "desc": "the same deep, narrow, unlit cleft continuing in full shadow, near-black and featureless, the other half of that one shadowed cleft, joining cleanly at the seam directly behind you"
+            }
+          ],
+          "atmosphere": "banded red sandstone in cool teal shadow cut by warm amber light, wet rock, fine drifting dust, a bruised pre-storm sky far overhead, painterly, cinematic, subtle film grain, tense and expectant",
+          "negatives": "No people, no lettering, no captions, no text, no readable writing, no signage, no UI",
+          "seamOccluder": "a tall fin of banded sandstone standing from the canyon floor to the sky, plain and unlit"
+        },
+        "motionSpec": {
+          "rigid": "The canyon walls, banded rock, stone shelves, piers, survey stones, reading-tables, ladders and ground",
+          "subjects": [
+            {
+              "name": "spring_fall",
+              "box": [
+                0.1,
+                0.18,
+                0.3,
+                0.86
+              ],
+              "phrase": "a strong steady fall of clear water pouring down the throat of the left tributary slot, breaking white where it lands and throwing up a shivering spray that beads and runs off the wet rock"
+            },
+            {
+              "name": "confluence_pool",
+              "box": [
+                0.34,
+                0.6,
+                0.68,
+                1.0
+              ],
+              "phrase": "the clear pool where the two spring-slots run together, its surface alive with wavelets and swirling eddies turning in place, the light shattering and re-forming across it"
+            },
+            {
+              "name": "sky_ribbon",
+              "box": [
+                0.0,
+                0.0,
+                1.0,
+                0.14
+              ],
+              "phrase": "the thin ribbon of bruised pre-storm sky far overhead, its cloud churning slowly in place"
+            },
+            {
+              "name": "drifting_dust",
+              "box": [
+                0.56,
+                0.14,
+                0.88,
+                0.7
+              ],
+              "phrase": "fine dust drifting slowly through the warm light against the shadowed banded rock"
+            },
+            {
+              "name": "lights_1",
+              "box": [
+                0.6673,
+                0.558,
+                0.6716,
+                0.5816
+              ],
+              "phrase": "the hanging oil lanterns burning with a live, restless flame that gutters and flares, their pools of amber light pulsing on the wet stone"
+            },
+            {
+              "name": "lights_2",
+              "box": [
+                0.4025,
+                0.6674,
+                0.4949,
+                0.7498
+              ],
+              "phrase": "the hanging oil lanterns burning with a live, restless flame that gutters and flares, their pools of amber light pulsing on the wet stone"
+            },
+            {
+              "name": "lights_3",
+              "box": [
+                0.7212,
+                0.5385,
+                0.7255,
+                0.5621
+              ],
+              "phrase": "the hanging oil lanterns burning with a live, restless flame that gutters and flares, their pools of amber light pulsing on the wet stone"
+            }
+          ],
+          "room": "j_c1",
+          "state": "base"
+        }
+      },
+      "entry": {
+        "title": "The ladder breaks",
+        "text": "You are most of the way up when the rung under your boot lets go. The whole ladder peels off the wall behind you and drops into the dark, and you hear it hit water a long time later. The hall is shut. Whatever way out of this canyon there is, it is upstream of you now.",
+        "button": "Turn and face the canyon"
+      },
+      "designNote": "PUZZLE (Read-the-tree / nearest relative). CODE (WebR-safe base R, NO ggtree): m<-canyon_water_chem; hc<-hclust(dist(m[,3:8]),method='ward.D2'); plot(hc,labels=m$spring). Q: 'Which spring is most chemically similar to Dripstone?' ANSWER: Lime_Hollow (d 2.45; runner-up Chalkseep 2.83; 15%% margin). DISTRACTORS(>=6): Chalkseep, Palegate, Brimstone_Font, Glasswater, Brineseep, Bitterwell. Benchmark height 1400. NEW ART.",
+      "plannedHotspots": [
+        {
+          "type": "puzzle",
+          "label": "The high reading-table",
+          "note": "NN of Dripstone -> Lime_Hollow",
+          "box": [
+            0.398,
+            0.632,
+            0.492,
+            0.8
+          ],
+          "boxSource": "review:agent",
+          "id": "table_c1",
+          "starterCode": "canyon_water_chem",
+          "question": {
+            "prompt": "The old surveyors sorted these springs by the fork they run down. You are here to sort them by their water. Start with the one they named first: which spring's water is most like Dripstone's?",
+            "options": [
+              "Chalkseep",
+              "Palegate",
+              "Bitterwell",
+              "Lime_Hollow",
+              "Saltglass",
+              "Sulphur_Step",
+              "Brimstone_Font",
+              "Glasswater"
+            ],
+            "correct": 3,
+            "maxAttempts": 4,
+            "feedback": {
+              "correct": "Correct — noted in your field notebook: Dripstone's nearest kin is Lime_Hollow.",
+              "wrong": [
+                "Each spring is six numbers — the six dissolved classes. Two springs are kin when those six numbers sit closest together, so measure the distance from Dripstone to every other spring.",
+                "`dist()` on the six mineral columns gives every pairwise distance at once; read Dripstone's row and take its smallest entry.",
+                "Three springs sit close to Dripstone and the rest sit a long way off. Among those three, one is clearly nearer than the other two — that is the kin, not merely a neighbour."
+              ]
+            }
+          },
+          "solveSfx": {
+            "src": "audio/solve_stone_slot.mp3",
+            "volume": 0.43758254650883743
+          }
+        },
+        {
+          "type": "clue",
+          "label": "The high benchmark",
+          "pickup": true,
+          "note": "confluence height 1400 — mark it on the map (escape)",
+          "onPickup": {
+            "set": "c1_read"
+          },
+          "body": "Carved into the stone are the numbers 1400.",
+          "box": [
+            0.172,
+            0.5346,
+            0.222,
+            0.8346
+          ],
+          "boxSource": "review:lucas",
+          "id": "bm_c1"
+        },
+        {
+          "type": "door",
+          "label": "The down-canyon slot from the high confluence",
+          "to": "j_c3",
+          "note": "open maze",
+          "box": [
+            0.7656,
+            0.2347,
+            0.8156,
+            0.6347
+          ],
+          "boxSource": "review:lucas",
+          "id": "down_slot_c1",
+          "direction": "open"
+        },
+        {
+          "type": "clue",
+          "label": "The ladder shaft down to the hall",
+          "note": "open",
+          "box": [
+            0.4498,
+            0.3068,
+            0.4998,
+            0.6068
+          ],
+          "boxSource": "review:lucas",
+          "id": "ladder_shaft_c1",
+          "body": "The shaft drops away below the lip, and there is nothing in it now. The ladder is somewhere at the bottom of it, in the water."
+        }
+      ],
+      "panorama": "j_c1/scene.png",
+      "builtFrom": "l1_j_c1_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "sfx": [
+        {
+          "src": "audio/canyon_waterfall.mp3",
+          "volume": 0.2,
+          "mode": "loop"
+        },
+        {
+          "src": "audio/canyon_slot_wind.mp3",
+          "volume": 0.1,
+          "mode": "loop"
+        }
+      ],
+      "hotspots": [
+        {
+          "id": "table_c1",
+          "type": "puzzle",
+          "label": "The high reading-table",
+          "box": [
+            0.3806,
+            0.5963,
+            0.4746,
+            0.7643
+          ],
+          "boxSource": "moved:testplay",
+          "starterCode": "canyon_water_chem",
+          "question": {
+            "prompt": "The old surveyors sorted these springs by the fork they run down. You are here to sort them by their water. Start with the one they named first: which spring's water is most like Dripstone's?",
+            "options": [
+              "Chalkseep",
+              "Palegate",
+              "Bitterwell",
+              "Lime_Hollow",
+              "Saltglass",
+              "Sulphur_Step",
+              "Brimstone_Font",
+              "Glasswater"
+            ],
+            "correct": 3,
+            "maxAttempts": 4,
+            "feedback": {
+              "correct": "Correct — noted in your field notebook: Dripstone's nearest kin is Lime_Hollow.",
+              "wrong": [
+                "Each spring is six numbers — the six dissolved classes. Two springs are kin when those six numbers sit closest together, so measure the distance from Dripstone to every other spring.",
+                "`dist()` on the six mineral columns gives every pairwise distance at once; read Dripstone's row and take its smallest entry.",
+                "Three springs sit close to Dripstone and the rest sit a long way off. Among those three, one is clearly nearer than the other two — that is the kin, not merely a neighbour."
+              ]
+            }
+          },
+          "solveSfx": {
+            "src": "audio/solve_stone_slot.mp3",
+            "volume": 0.43758254650883743
+          }
+        },
+        {
+          "id": "bm_c1",
+          "type": "clue",
+          "label": "The high benchmark",
+          "box": [
+            0.172,
+            0.5346,
+            0.222,
+            0.8346
+          ],
+          "pickup": true,
+          "onPickup": {
+            "set": "c1_read"
+          },
+          "body": "Carved into the stone are the numbers 1400.",
+          "boxSource": "review:lucas"
+        },
+        {
+          "id": "down_slot_c1",
+          "type": "door",
+          "label": "The down-canyon slot from the high confluence",
+          "box": [
+            0.7656,
+            0.2347,
+            0.8156,
+            0.6347
+          ],
+          "to": "j_c3",
+          "boxSource": "review:lucas",
+          "direction": "open"
+        },
+        {
+          "id": "ladder_shaft_c1",
+          "type": "clue",
+          "label": "The ladder shaft down to the hall",
+          "box": [
+            0.4498,
+            0.3068,
+            0.4998,
+            0.6068
+          ],
+          "boxSource": "review:lucas",
+          "body": "The shaft drops away below the lip, and there is nothing in it now. The ladder is somewhere at the bottom of it, in the water."
+        },
+        {
+          "id": "clip_base",
+          "type": "ambient",
+          "label": "Scene motion (base)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/serve-clips.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "j_c1/cine_base.mp4"
+          }
+        }
+      ],
+      "fx": [
+        {
+          "fx": "rain",
+          "when": {
+            "solved": "j_c2"
+          }
+        }
+      ]
+    },
+    {
+      "key": "j_c2",
+      "title": "The orphan junction",
+      "technique": "hclust — classify an unknown into the tree",
+      "puzzleType": 1,
+      "built": true,
+      "unlockedWhen": true,
+      "onSolve": [
+        {
+          "set": "j_c2_solved"
+        },
+        {
+          "inc": "rooms_solved"
+        }
+      ],
+      "debrief": "Add an unlabelled sample and see which clade it falls into — the water's own profile decides its family, not where you found it.",
+      "authoring": {
+        "tag": "j_c2",
+        "scenePrompt": "This is a seamless 360-degree panorama from the floor of a high side confluence where two spring-slots meet — the viewer stands on wet banded rock between them, sheer red walls close on either hand and a narrow strip of bruised sky far above. THIS WHOLE CANYON WAS ENGINEERED BY A VANISHED PEOPLE AND THEIR WATERWORKS ARE EVERYWHERE: carved stone channels and cut sluice-races thread the walls at several different heights, stepped weirs and spillways drop the water from level to level in small falls, narrow flights of steps are cut straight into the rock face and iron-runged ladders climb past them to little gauging platforms and corbelled ledges, verdigrised bronze sluice-gates and toothed rack-and-pinion mechanisms stand in the races, worn carved disc-sigils and level-marks are set into the stone at intervals, and small lamp niches burn at every landing — sparser this high up but unmistakably built, the works climbing away toward the light. Directly behind the viewer, split across the extreme left and extreme right edges, is a deep, narrow, unlit cleft in the sandstone, near-black and featureless, its two walls falling into full shadow: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the mouth of a deep, narrow, unlit cleft falling into full shadow, near-black and featureless, the half of that one shadowed cleft that meets its other half cleanly at the seam directly behind you; to the left, a nameless spring seeping straight out of a crack in the wall, its water milky and opalescent and quite unlike the clear water it runs into, with no survey stone set beside it; to the left of centre, a weathered survey stone at the water's edge, a level line and a group of simple incised marks cut deep into its face; dead ahead in the centre, a squat carved stone reading-table set with a pane of glowing glass, standing above the mingling water; just right of centre, the pool below the table where the milky seep and the clear spring water braid together without quite mixing; to the right, an open slot leading away and downward, its floor stepping down out of sight; on the far right, the same deep, narrow, unlit cleft continuing in full shadow, near-black and featureless, the other half of that one shadowed cleft, joining cleanly at the seam directly behind you. banded red sandstone in cool teal shadow cut by warm amber light, wet rock, fine drifting dust, a bruised pre-storm sky far overhead, painterly, cinematic, subtle film grain, tense and expectant. No people, no lettering, no captions, no text, no readable writing, no signage, no UI. Again: the extreme left and right edges must align perfectly into a deep, narrow, unlit cleft in the sandstone, near-black and featureless, its two walls falling into full shadow, with no visible seam, join, or repetition.",
+        "doorPrompt": "The same junction; fork-passages already open (maze) — no change.",
+        "sceneSpec": {
+          "room": "j_c2",
+          "interior": false,
+          "seam": "a deep, narrow, unlit cleft in the sandstone, near-black and featureless, its two walls falling into full shadow",
+          "setting": "the floor of a high side confluence where two spring-slots meet — the viewer stands on wet banded rock between them, sheer red walls close on either hand and a narrow strip of bruised sky far above",
+          "elements": [
+            {
+              "id": "j_c2_cleft_left",
+              "at": "on the far left",
+              "desc": "the mouth of a deep, narrow, unlit cleft falling into full shadow, near-black and featureless, the half of that one shadowed cleft that meets its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "orphan_seep",
+              "at": "to the left",
+              "desc": "a nameless spring seeping straight out of a crack in the wall, its water milky and opalescent and quite unlike the clear water it runs into, with no survey stone set beside it",
+              "animate": {
+                "motion": "the milky water seeping and running steadily down the wall face",
+                "loop": "crossfade"
+              }
+            },
+            {
+              "id": "bm_c2",
+              "at": "to the left of centre",
+              "clue": true,
+              "label": "The orphan benchmark",
+              "desc": "a weathered survey stone at the water's edge, a level line and a group of simple incised marks cut deep into its face"
+            },
+            {
+              "id": "table_c2",
+              "at": "dead ahead in the centre",
+              "puzzle": true,
+              "label": "The orphan reading-table",
+              "desc": "a squat carved stone reading-table set with a pane of glowing glass, standing above the mingling water"
+            },
+            {
+              "id": "orphan_pool",
+              "at": "just right of centre",
+              "desc": "the pool below the table where the milky seep and the clear spring water braid together without quite mixing",
+              "animate": {
+                "motion": "the pale and clear waters braiding and curling slowly past each other on the pool's surface",
+                "loop": "boomerang"
+              }
+            },
+            {
+              "id": "down_slot_c2",
+              "at": "to the right",
+              "door": {
+                "direction": "back",
+                "to": "j_c3"
+              },
+              "label": "The slot down from the orphan junction",
+              "desc": "an open slot leading away and downward, its floor stepping down out of sight"
+            },
+            {
+              "id": "j_c2_cleft_right",
+              "at": "on the far right",
+              "desc": "the same deep, narrow, unlit cleft continuing in full shadow, near-black and featureless, the other half of that one shadowed cleft, joining cleanly at the seam directly behind you"
+            }
+          ],
+          "atmosphere": "banded red sandstone in cool teal shadow cut by warm amber light, wet rock, fine drifting dust, a bruised pre-storm sky far overhead, painterly, cinematic, subtle film grain, tense and expectant",
+          "negatives": "No people, no lettering, no captions, no text, no readable writing, no signage, no UI",
+          "seamOccluder": "a tall fin of banded sandstone standing from the canyon floor to the sky, plain and unlit"
+        },
+        "motionSpec": {
+          "rigid": "The canyon walls, banded rock, stone shelves, piers, survey stones, reading-tables, ladders and ground",
+          "subjects": [
+            {
+              "name": "orphan_seep",
+              "box": [
+                0.08,
+                0.26,
+                0.3,
+                0.88
+              ],
+              "phrase": "the milky opalescent spring seeping out of the crack in the left wall and running down the rock in thin threads"
+            },
+            {
+              "name": "braided_pool",
+              "box": [
+                0.46,
+                0.58,
+                0.8,
+                1.0
+              ],
+              "phrase": "the pool below the table where the milky seep and the clear spring water braid together, the two waters curling past each other without mixing"
+            },
+            {
+              "name": "sky_ribbon",
+              "box": [
+                0.0,
+                0.0,
+                1.0,
+                0.14
+              ],
+              "force_repair": true,
+              "phrase": "the narrow strip of bruised sky far above, its cloud rolling and folding in place"
+            },
+            {
+              "name": "lights_1",
+              "box": [
+                0.7351,
+                0.551,
+                0.7444,
+                0.5896
+              ],
+              "phrase": "the hanging oil lanterns burning with a live, restless flame that gutters and flares, their pools of amber light pulsing on the wet stone"
+            },
+            {
+              "name": "lights_2",
+              "box": [
+                0.4544,
+                0.5055,
+                0.4594,
+                0.5355
+              ],
+              "phrase": "the hanging oil lanterns burning with a live, restless flame that gutters and flares, their pools of amber light pulsing on the wet stone"
+            },
+            {
+              "name": "lights_3",
+              "box": [
+                0.376,
+                0.5057,
+                0.3975,
+                0.5523
+              ],
+              "phrase": "the hanging oil lanterns burning with a live, restless flame that gutters and flares, their pools of amber light pulsing on the wet stone"
+            }
+          ],
+          "room": "j_c2",
+          "state": "base"
+        }
+      },
+      "entry": null,
+      "designNote": "PUZZLE (Classify-the-Unknown; wood_smoke style). CODE: all<-rbind(canyon_water_chem,unknown_spring); hc<-hclust(dist(all[,3:8]),method='ward.D2'); plot(hc,labels=all$spring). Q: 'Which family does Unmarked_Spring join?' ANSWER: the SILICA / North_Branch family (Glasswater/Flintrun/Obsidian_Weep/Silverglass). DISTRACTORS: carbonate/West, sulfate/East, saline/South, 'its own new group', 'closest to Bitterwell', 'cannot tell'. Benchmark height 1380. NEW ART.",
+      "plannedHotspots": [
+        {
+          "type": "puzzle",
+          "label": "The orphan reading-table",
+          "note": "Classify-the-Unknown -> silica/North family",
+          "box": [
+            0.452,
+            0.568,
+            0.542,
+            0.708
+          ],
+          "boxSource": "review:agent",
+          "id": "table_c2",
+          "starterCode": "canyon_water_chem\nunknown_spring",
+          "question": {
+            "prompt": "A spring runs out of the rock above this junction with no name carved anywhere near it. Someone sampled it anyway and left the reading behind. Which of the canyon's families does the Unmarked Spring belong to?",
+            "options": [
+              "The carbonate springs of the West Fork",
+              "The sulfate springs of the East Fork",
+              "The silica springs of the North Branch",
+              "The saline springs of the South Branch",
+              "It stands with Saltglass, apart from the four",
+              "It is a family of its own",
+              "It is nearest to Bitterwell",
+              "The reading cannot place it"
+            ],
+            "correct": 2,
+            "maxAttempts": 4,
+            "feedback": {
+              "correct": "Correct — noted in your field notebook: the Unmarked Spring is silica water, kin to the North Branch springs.",
+              "wrong": [
+                "The unknown reading has the same six columns as the survey. Stack it onto the bottom of the table and the whole set can be sorted together.",
+                "`rbind()` the two tables, then cluster the six mineral columns as before — the unknown will attach itself to whichever family it belongs in.",
+                "Look at which named springs it lands beside, then at what dominates their water. One class runs far higher in that group than in any other."
+              ]
+            }
+          },
+          "availableWhen": {
+            "solved": "j_c1"
+          },
+          "lockedBody": "You have the sample in your hand, but nothing yet to hold it against. Read a family you already know first.",
+          "solveSfx": {
+            "src": "audio/solve_stone_slot.mp3",
+            "volume": 0.43758254650883743
+          }
+        },
+        {
+          "type": "clue",
+          "label": "The orphan benchmark",
+          "pickup": true,
+          "note": "confluence height 1380 — mark it on the map (escape)",
+          "onPickup": {
+            "set": "c2_read"
+          },
+          "body": "Carved into the stone are the numbers 1380.",
+          "box": [
+            0.266,
+            0.598,
+            0.31,
+            0.8
+          ],
+          "boxSource": "review:agent",
+          "id": "bm_c2"
+        },
+        {
+          "type": "door",
+          "label": "The slot down from the orphan junction",
+          "to": "j_c3",
+          "note": "open maze",
+          "box": [
+            0.6271,
+            0.3613,
+            0.7271,
+            0.5613
+          ],
+          "boxSource": "review:lucas",
+          "id": "down_slot_c2",
+          "direction": "open"
+        }
+      ],
+      "panorama": "j_c2/scene.png",
+      "builtFrom": "l1_j_c2_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "sfx": [
+        {
+          "src": "audio/canyon_stream_gentle.mp3",
+          "volume": 0.18,
+          "mode": "loop"
+        },
+        {
+          "src": "audio/canyon_slot_wind.mp3",
+          "volume": 0.09,
+          "mode": "loop"
+        }
+      ],
+      "hotspots": [
+        {
+          "id": "table_c2",
+          "type": "puzzle",
+          "label": "The orphan reading-table",
+          "box": [
+            0.452,
+            0.568,
+            0.542,
+            0.708
+          ],
+          "boxSource": "review:agent",
+          "starterCode": "canyon_water_chem\nunknown_spring",
+          "question": {
+            "prompt": "A spring runs out of the rock above this junction with no name carved anywhere near it. Someone sampled it anyway and left the reading behind. Which of the canyon's families does the Unmarked Spring belong to?",
+            "options": [
+              "The carbonate springs of the West Fork",
+              "The sulfate springs of the East Fork",
+              "The silica springs of the North Branch",
+              "The saline springs of the South Branch",
+              "It stands with Saltglass, apart from the four",
+              "It is a family of its own",
+              "It is nearest to Bitterwell",
+              "The reading cannot place it"
+            ],
+            "correct": 2,
+            "maxAttempts": 4,
+            "feedback": {
+              "correct": "Correct — noted in your field notebook: the Unmarked Spring is silica water, kin to the North Branch springs.",
+              "wrong": [
+                "The unknown reading has the same six columns as the survey. Stack it onto the bottom of the table and the whole set can be sorted together.",
+                "`rbind()` the two tables, then cluster the six mineral columns as before — the unknown will attach itself to whichever family it belongs in.",
+                "Look at which named springs it lands beside, then at what dominates their water. One class runs far higher in that group than in any other."
+              ]
+            }
+          },
+          "availableWhen": {
+            "solved": "j_c1"
+          },
+          "lockedBody": "You have the sample in your hand, but nothing yet to hold it against. Read a family you already know first.",
+          "solveSfx": {
+            "src": "audio/solve_stone_slot.mp3",
+            "volume": 0.43758254650883743
+          }
+        },
+        {
+          "id": "bm_c2",
+          "type": "clue",
+          "label": "The orphan benchmark",
+          "box": [
+            0.266,
+            0.598,
+            0.31,
+            0.8
+          ],
+          "pickup": true,
+          "onPickup": {
+            "set": "c2_read"
+          },
+          "body": "Carved into the stone are the numbers 1380.",
+          "boxSource": "review:agent"
+        },
+        {
+          "id": "down_slot_c2",
+          "type": "door",
+          "label": "The slot down from the orphan junction",
+          "box": [
+            0.5056,
+            0.3266,
+            0.6056,
+            0.5266
+          ],
+          "to": "j_c3",
+          "boxSource": "review:lucas",
+          "direction": "open"
+        },
+        {
+          "id": "clip_base",
+          "type": "ambient",
+          "label": "Scene motion (base)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/serve-clips.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "j_c2/cine_base.mp4"
+          }
+        }
+      ],
+      "fx": [
+        {
+          "fx": "rain",
+          "when": {
+            "solved": "j_c2"
+          }
+        }
+      ]
+    },
+    {
+      "key": "j_c3",
+      "title": "The left fork",
+      "technique": "Junction — read the height",
+      "built": true,
+      "unlockedWhen": true,
+      "authoring": {
+        "tag": "j_c3",
+        "scenePrompt": "This is a seamless 360-degree panorama from the floor of a deep confluence low in the left branch of the canyon, where two large canyons run together into one — the viewer stands on a broad rock shelf above the joined channel, the walls much higher and closer here and only a hairline of grey sky showing far overhead. THIS WHOLE CANYON WAS ENGINEERED BY A VANISHED PEOPLE AND THEIR WATERWORKS ARE EVERYWHERE: carved stone channels and cut sluice-races thread the walls at several different heights, stepped weirs and spillways drop the water from level to level in small falls, narrow flights of steps are cut straight into the rock face and iron-runged ladders climb past them to little gauging platforms and corbelled ledges, verdigrised bronze sluice-gates and toothed rack-and-pinion mechanisms stand in the races, worn carved disc-sigils and level-marks are set into the stone at intervals, and small lamp niches burn at every landing — denser at this depth, tier upon tier of channels stacked up the narrowing walls into shadow. Directly behind the viewer, split across the extreme left and extreme right edges, is a deep, narrow, unlit cleft in the sandstone, near-black and featureless, its two walls falling into full shadow: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the mouth of a deep, narrow, unlit cleft falling into full shadow, near-black and featureless, the half of that one shadowed cleft that meets its other half cleanly at the seam directly behind you; to the left, an open slot climbing away and upward, worn steps cut into its floor; to the left of centre, a second open slot climbing away and upward beside the first, narrower and darker; dead ahead in the centre, a tall weathered survey stone set on the shelf above the joined channel, a level line and a group of simple incised marks cut deep into its face; just right of centre, the joined channel running below the shelf, the two waters folded into one and moving faster; to the right, a wide open slot leading away and downward toward deeper shadow; on the far right, the same deep, narrow, unlit cleft continuing in full shadow, near-black and featureless, the other half of that one shadowed cleft, joining cleanly at the seam directly behind you. banded red sandstone in cool teal shadow cut by warm amber light, wet rock, fine drifting dust, a bruised pre-storm sky far overhead, painterly, cinematic, subtle film grain, tense and expectant. No people, no lettering, no captions, no text, no readable writing, no signage, no UI. Again: the extreme left and right edges must align perfectly into a deep, narrow, unlit cleft in the sandstone, near-black and featureless, its two walls falling into full shadow, with no visible seam, join, or repetition.",
+        "doorPrompt": "The same fork; passages already open (maze) — no change.",
+        "sceneSpec": {
+          "room": "j_c3",
+          "interior": false,
+          "seam": "a deep, narrow, unlit cleft in the sandstone, near-black and featureless, its two walls falling into full shadow",
+          "setting": "the floor of a deep confluence low in the left branch of the canyon, where two large canyons run together into one — the viewer stands on a broad rock shelf above the joined channel, the walls much higher and closer here and only a hairline of grey sky showing far overhead",
+          "elements": [
+            {
+              "id": "j_c3_cleft_left",
+              "at": "on the far left",
+              "desc": "the mouth of a deep, narrow, unlit cleft falling into full shadow, near-black and featureless, the half of that one shadowed cleft that meets its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "up_slot_c3_a",
+              "at": "to the left",
+              "door": {
+                "direction": "back",
+                "to": "j_c1"
+              },
+              "label": "The climb to the high confluence",
+              "desc": "an open slot climbing away and upward, worn steps cut into its floor"
+            },
+            {
+              "id": "up_slot_c3_b",
+              "at": "to the left of centre",
+              "door": {
+                "direction": "open",
+                "to": "j_c2"
+              },
+              "label": "The climb to the orphan junction",
+              "desc": "a second open slot climbing away and upward beside the first, narrower and darker"
+            },
+            {
+              "id": "bm_c3",
+              "at": "dead ahead in the centre",
+              "clue": true,
+              "label": "The left-fork benchmark",
+              "desc": "a tall weathered survey stone set on the shelf above the joined channel, a level line and a group of simple incised marks cut deep into its face"
+            },
+            {
+              "id": "joined_channel",
+              "at": "just right of centre",
+              "desc": "the joined channel running below the shelf, the two waters folded into one and moving faster",
+              "animate": {
+                "motion": "the joined water sliding steadily past below, its surface creasing and folding",
+                "loop": "crossfade"
+              }
+            },
+            {
+              "id": "down_slot_c3",
+              "at": "to the right",
+              "door": {
+                "direction": "open",
+                "to": "j_c7"
+              },
+              "label": "The slot down from the left fork",
+              "desc": "a wide open slot leading away and downward toward deeper shadow"
+            },
+            {
+              "id": "j_c3_cleft_right",
+              "at": "on the far right",
+              "desc": "the same deep, narrow, unlit cleft continuing in full shadow, near-black and featureless, the other half of that one shadowed cleft, joining cleanly at the seam directly behind you"
+            }
+          ],
+          "atmosphere": "banded red sandstone in cool teal shadow cut by warm amber light, wet rock, fine drifting dust, a bruised pre-storm sky far overhead, painterly, cinematic, subtle film grain, tense and expectant",
+          "negatives": "No people, no lettering, no captions, no text, no readable writing, no signage, no UI",
+          "seamOccluder": "a tall fin of banded sandstone standing from the canyon floor to the sky, plain and unlit"
+        },
+        "motionSpec": {
+          "rigid": "The canyon walls, banded rock, stone shelves, piers, survey stones, reading-tables, ladders and ground",
+          "subjects": [
+            {
+              "name": "joined_channel",
+              "box": [
+                0.5,
+                0.58,
+                0.88,
+                1.0
+              ],
+              "phrase": "the joined channel running fast below the shelf, the two waters folded into one, its surface breaking and glinting as it goes"
+            },
+            {
+              "name": "wall_seeps",
+              "box": [
+                0.04,
+                0.22,
+                0.32,
+                0.88
+              ],
+              "phrase": "thin threads of water tracing down the banded rock at the mouths of the upper slots, wet stone glistening"
+            },
+            {
+              "name": "sky_hairline",
+              "box": [
+                0.0,
+                0.0,
+                1.0,
+                0.12
+              ],
+              "force_repair": true,
+              "phrase": "the hairline of bruised sky far overhead, its cloud rolling and folding in place"
+            },
+            {
+              "name": "lights_1",
+              "box": [
+                0.8238,
+                0.5457,
+                0.8611,
+                0.6896
+              ],
+              "phrase": "the hanging oil lanterns burning with a live, restless flame that gutters and flares, their pools of amber light pulsing on the wet stone"
+            },
+            {
+              "name": "lights_2",
+              "box": [
+                0.7868,
+                0.5854,
+                0.7939,
+                0.609
+              ],
+              "phrase": "the hanging oil lanterns burning with a live, restless flame that gutters and flares, their pools of amber light pulsing on the wet stone"
+            },
+            {
+              "name": "lights_3",
+              "box": [
+                0.2877,
+                0.7133,
+                0.292,
+                0.7262
+              ],
+              "phrase": "the hanging oil lanterns burning with a live, restless flame that gutters and flares, their pools of amber light pulsing on the wet stone"
+            }
+          ],
+          "room": "j_c3",
+          "state": "base"
+        }
+      },
+      "entry": null,
+      "designNote": "PLAIN JUNCTION (no chemistry puzzle) — exists so the player reads confluence height 1050 for the escape map, and to branch the maze (up to j_c1/j_c2, down to j_c7). Benchmark height 1050. NEW ART.",
+      "plannedHotspots": [
+        {
+          "type": "clue",
+          "label": "The left-fork benchmark",
+          "pickup": true,
+          "note": "confluence height 1050 — mark it on the map (escape)",
+          "onPickup": {
+            "set": "c3_read"
+          },
+          "body": "Carved into the stone are the numbers 1050.",
+          "box": [
+            0.436,
+            0.312,
+            0.506,
+            0.792
+          ],
+          "boxSource": "review:agent",
+          "id": "bm_c3"
+        },
+        {
+          "type": "door",
+          "label": "The climb to the high confluence",
+          "to": "j_c1",
+          "note": "open maze",
+          "box": [
+            0.1818,
+            0.2214,
+            0.2818,
+            0.5214
+          ],
+          "boxSource": "review:lucas",
+          "id": "up_slot_c3_a",
+          "direction": "back"
+        },
+        {
+          "type": "door",
+          "label": "The climb to the orphan junction",
+          "to": "j_c2",
+          "note": "open maze",
+          "box": [
+            0.5843,
+            0.2959,
+            0.6843,
+            0.5959
+          ],
+          "boxSource": "review:lucas",
+          "id": "up_slot_c3_b",
+          "direction": "back"
+        },
+        {
+          "type": "door",
+          "label": "The slot down from the left fork",
+          "to": "j_c7",
+          "note": "open maze",
+          "box": [
+            0.6956,
+            0.294,
+            0.7956,
+            0.594
+          ],
+          "boxSource": "review:lucas",
+          "id": "down_slot_c3",
+          "direction": "open"
+        }
+      ],
+      "panorama": "j_c3/scene.png",
+      "builtFrom": "l1_j_c3_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "sfx": [
+        {
+          "src": "audio/canyon_stream_gentle.mp3",
+          "volume": 0.2,
+          "mode": "loop"
+        },
+        {
+          "src": "audio/canyon_slot_wind.mp3",
+          "volume": 0.09,
+          "mode": "loop"
+        }
+      ],
+      "hotspots": [
+        {
+          "id": "bm_c3",
+          "type": "clue",
+          "label": "The left-fork benchmark",
+          "box": [
+            0.4439,
+            0.2597,
+            0.5139,
+            0.7397
+          ],
+          "pickup": true,
+          "onPickup": {
+            "set": "c3_read"
+          },
+          "body": "Carved into the stone are the numbers 1050.",
+          "boxSource": "moved:testplay"
+        },
+        {
+          "id": "up_slot_c3_a",
+          "type": "door",
+          "label": "The climb to the high confluence",
+          "box": [
+            0.1935,
+            0.1984,
+            0.2935,
+            0.4984
+          ],
+          "to": "j_c1",
+          "boxSource": "moved:testplay",
+          "direction": "back"
+        },
+        {
+          "id": "up_slot_c3_b",
+          "type": "door",
+          "label": "The climb to the orphan junction",
+          "box": [
+            0.5863,
+            0.3074,
+            0.6863,
+            0.6074
+          ],
+          "to": "j_c2",
+          "boxSource": "moved:testplay",
+          "direction": "back"
+        },
+        {
+          "id": "down_slot_c3",
+          "type": "door",
+          "label": "The slot down from the left fork",
+          "box": [
+            0.6971,
+            0.2668,
+            0.7971,
+            0.5668
+          ],
+          "to": "j_c7",
+          "boxSource": "moved:testplay",
+          "direction": "open"
+        },
+        {
+          "id": "clip_base",
+          "type": "ambient",
+          "label": "Scene motion (base)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/serve-clips.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "j_c3/cine_base.mp4"
+          }
+        }
+      ],
+      "fx": [
+        {
+          "fx": "rain",
+          "when": {
+            "solved": "j_c2"
+          }
+        }
+      ]
+    },
+    {
+      "key": "j_c4",
+      "title": "The bitter confluence",
+      "technique": "cutree(k=4) + group_by |> summarise(mean)",
+      "puzzleType": 1,
+      "built": true,
+      "unlockedWhen": true,
+      "onSolve": [
+        {
+          "set": "j_c4_solved"
+        },
+        {
+          "inc": "rooms_solved"
+        }
+      ],
+      "debrief": "Cut the tree into families and summarise each with a single number — the bridge from a tree to an answer you can act on.",
+      "authoring": {
+        "tag": "j_c4",
+        "scenePrompt": "This is a seamless 360-degree panorama from the floor of a high confluence in the right branch where two spring-slots meet — the viewer stands on rock crusted pale yellow at the waterline, red walls streaked rust-orange rising close on either hand, a strip of bruised sky far above. THIS WHOLE CANYON WAS ENGINEERED BY A VANISHED PEOPLE AND THEIR WATERWORKS ARE EVERYWHERE: carved stone channels and cut sluice-races thread the walls at several different heights, stepped weirs and spillways drop the water from level to level in small falls, narrow flights of steps are cut straight into the rock face and iron-runged ladders climb past them to little gauging platforms and corbelled ledges, verdigrised bronze sluice-gates and toothed rack-and-pinion mechanisms stand in the races, worn carved disc-sigils and level-marks are set into the stone at intervals, and small lamp niches burn at every landing — here the crusted yellow mineral has grown over the older channels and half-swallowed them. Directly behind the viewer, split across the extreme left and extreme right edges, is a deep, narrow, unlit cleft in the sandstone, near-black and featureless, its two walls falling into full shadow: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the mouth of a deep, narrow, unlit cleft falling into full shadow, near-black and featureless, the half of that one shadowed cleft that meets its other half cleanly at the seam directly behind you; to the left, a thick pale-yellow mineral crust rimming the water and climbing the rock, long rust-orange stains bleeding down the wall above it; to the left of centre, a weathered survey stone at the crusted water's edge, a level line and a group of simple incised marks cut deep into its face; dead ahead in the centre, a squat carved stone reading-table set with a pane of glowing glass, its base rimed with the same pale yellow crust; just right of centre, a dull green-yellow pool where the two waters meet, slow bubbles breaking on it and a faint haze hanging over the surface; to the right, an open slot leading away and downward, its floor stepping down out of sight; on the far right, the same deep, narrow, unlit cleft continuing in full shadow, near-black and featureless, the other half of that one shadowed cleft, joining cleanly at the seam directly behind you. banded red sandstone in cool teal shadow cut by warm amber light, wet rock, fine drifting dust, a bruised pre-storm sky far overhead, painterly, cinematic, subtle film grain, tense and expectant. No people, no lettering, no captions, no text, no readable writing, no signage, no UI. Again: the extreme left and right edges must align perfectly into a deep, narrow, unlit cleft in the sandstone, near-black and featureless, its two walls falling into full shadow, with no visible seam, join, or repetition.",
+        "doorPrompt": "The same sulphurous confluence; passages already open (maze) — no change.",
+        "sceneSpec": {
+          "room": "j_c4",
+          "interior": false,
+          "seam": "a deep, narrow, unlit cleft in the sandstone, near-black and featureless, its two walls falling into full shadow",
+          "setting": "the floor of a high confluence in the right branch where two spring-slots meet — the viewer stands on rock crusted pale yellow at the waterline, red walls streaked rust-orange rising close on either hand, a strip of bruised sky far above",
+          "elements": [
+            {
+              "id": "j_c4_cleft_left",
+              "at": "on the far left",
+              "desc": "the mouth of a deep, narrow, unlit cleft falling into full shadow, near-black and featureless, the half of that one shadowed cleft that meets its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "sulphur_crust",
+              "at": "to the left",
+              "desc": "a thick pale-yellow mineral crust rimming the water and climbing the rock, long rust-orange stains bleeding down the wall above it"
+            },
+            {
+              "id": "bm_c4",
+              "at": "to the left of centre",
+              "clue": true,
+              "label": "The bitter benchmark",
+              "desc": "a weathered survey stone at the crusted water's edge, a level line and a group of simple incised marks cut deep into its face"
+            },
+            {
+              "id": "table_c4",
+              "at": "dead ahead in the centre",
+              "puzzle": true,
+              "label": "The bitter reading-table",
+              "desc": "a squat carved stone reading-table set with a pane of glowing glass, its base rimed with the same pale yellow crust"
+            },
+            {
+              "id": "bitter_pool",
+              "at": "just right of centre",
+              "desc": "a dull green-yellow pool where the two waters meet, slow bubbles breaking on it and a faint haze hanging over the surface",
+              "animate": {
+                "motion": "slow bubbles rising and breaking on the pool and the faint haze drifting up off it",
+                "loop": "crossfade"
+              }
+            },
+            {
+              "id": "down_slot_c4",
+              "at": "to the right",
+              "door": {
+                "direction": "back",
+                "to": "j_c6"
+              },
+              "label": "The slot down from the bitter confluence",
+              "desc": "an open slot leading away and downward, its floor stepping down out of sight"
+            },
+            {
+              "id": "j_c4_cleft_right",
+              "at": "on the far right",
+              "desc": "the same deep, narrow, unlit cleft continuing in full shadow, near-black and featureless, the other half of that one shadowed cleft, joining cleanly at the seam directly behind you"
+            }
+          ],
+          "atmosphere": "banded red sandstone in cool teal shadow cut by warm amber light, wet rock, fine drifting dust, a bruised pre-storm sky far overhead, painterly, cinematic, subtle film grain, tense and expectant",
+          "negatives": "No people, no lettering, no captions, no text, no readable writing, no signage, no UI",
+          "seamOccluder": "a tall fin of banded sandstone standing from the canyon floor to the sky, plain and unlit"
+        },
+        "motionSpec": {
+          "rigid": "The canyon walls, banded rock, stone shelves, piers, survey stones, reading-tables, ladders and ground",
+          "subjects": [
+            {
+              "name": "bitter_pool",
+              "box": [
+                0.48,
+                0.58,
+                0.84,
+                1.0
+              ],
+              "phrase": "the dull green-yellow pool where the two waters meet, slow bubbles rising and breaking on its surface"
+            },
+            {
+              "name": "bitter_haze",
+              "box": [
+                0.44,
+                0.32,
+                0.86,
+                0.72
+              ],
+              "phrase": "a faint haze hanging over the bitter water, curling and thinning in place"
+            },
+            {
+              "name": "crust_seep",
+              "box": [
+                0.06,
+                0.26,
+                0.32,
+                0.9
+              ],
+              "phrase": "water trickling over the pale yellow mineral crust and the long rust-orange stains bleeding down the left wall"
+            },
+            {
+              "name": "sky_ribbon",
+              "box": [
+                0.0,
+                0.0,
+                1.0,
+                0.13
+              ],
+              "force_repair": true,
+              "phrase": "the strip of bruised sky far above, its cloud rolling and folding in place"
+            },
+            {
+              "name": "lights_1",
+              "box": [
+                0.4193,
+                0.5664,
+                0.4251,
+                0.6094
+              ],
+              "phrase": "the hanging oil lanterns burning with a live, restless flame that gutters and flares, their pools of amber light pulsing on the wet stone"
+            },
+            {
+              "name": "lights_2",
+              "box": [
+                0.5055,
+                0.5568,
+                0.5199,
+                0.5948
+              ],
+              "phrase": "the hanging oil lanterns burning with a live, restless flame that gutters and flares, their pools of amber light pulsing on the wet stone"
+            },
+            {
+              "name": "lights_3",
+              "box": [
+                0.3185,
+                0.6424,
+                0.3264,
+                0.6896
+              ],
+              "phrase": "the hanging oil lanterns burning with a live, restless flame that gutters and flares, their pools of amber light pulsing on the wet stone"
+            }
+          ],
+          "room": "j_c4",
+          "state": "base"
+        }
+      },
+      "entry": null,
+      "designNote": "PUZZLE (Cut + summarise — the chapter expansion). CODE: m<-canyon_water_chem; m$cluster<-cutree(hclust(dist(m[,3:8]),method='ward.D2'),4); m %>% group_by(cluster) %>% summarise(meanSO4=mean(sulfate)). Q: 'Cut into 4 families; which has the highest average sulfate?' ANSWER: the SULFATE family (East + Bitterwell), mean SO4 61.0 vs 8.0/8.0/7.8 — dominant. DISTRACTORS: carbonate, silica, saline families, 'the single highest sample', 'the largest cluster', 'the chloride family'. Benchmark height 1420. NEW ART.",
+      "plannedHotspots": [
+        {
+          "type": "puzzle",
+          "label": "The bitter reading-table",
+          "note": "cut k=4, highest mean sulfate -> sulfate family",
+          "box": [
+            0.41,
+            0.628,
+            0.52,
+            0.782
+          ],
+          "boxSource": "review:agent",
+          "id": "table_c4",
+          "starterCode": "canyon_water_chem",
+          "question": {
+            "prompt": "The water here comes up bitter enough to taste from the bank. Sort the whole survey into four families by their water. Which family carries the most sulfate on average, and which springs make it up?",
+            "options": [
+              "The carbonate family — Dripstone, Palegate, Lime_Hollow, Chalkseep",
+              "The sulfate family — Brimstone_Font, Sulphur_Step, Cinderpool, Matchhead_Spring and Bitterwell",
+              "The East Fork springs — Brimstone_Font, Sulphur_Step, Cinderpool, Matchhead_Spring",
+              "The silica family — Glasswater, Flintrun, Obsidian_Weep, Silverglass",
+              "The saline family — Saltglass, Brineseep, Saltmouth, Tidewell, Pillar_Brine",
+              "Cinderpool by itself, the single highest reading in the survey",
+              "Whichever family has the most springs in it"
+            ],
+            "correct": 1,
+            "maxAttempts": 4,
+            "feedback": {
+              "correct": "Correct — noted in your field notebook: the sulfate family averages 61 sulfate against 8 everywhere else, and Bitterwell runs with it.",
+              "wrong": [
+                "Cluster the six mineral columns as before, then cut the tree into four groups and take the average sulfate within each one.",
+                "`cutree(..., 4)` gives each spring a family number; `group_by()` that number and `summarise()` the mean of the sulfate column.",
+                "One family's average is many times every other's, so which family wins is not in doubt. The care is in its membership — check whether the springs the cut puts together are the same springs the forks put together."
+              ]
+            }
+          },
+          "availableWhen": {
+            "solved": "j_c2"
+          },
+          "lockedBody": "The bitter water is not going anywhere. There is a junction upstream you have not finished reading.",
+          "solveSfx": {
+            "src": "audio/solve_stone_slot.mp3",
+            "volume": 0.43758254650883743
+          }
+        },
+        {
+          "type": "clue",
+          "label": "The bitter benchmark",
+          "pickup": true,
+          "note": "confluence height 1420 — mark it on the map (escape)",
+          "onPickup": {
+            "set": "c4_read"
+          },
+          "body": "Carved into the stone are the numbers 1420.",
+          "box": [
+            0.251,
+            0.596,
+            0.292,
+            0.802
+          ],
+          "boxSource": "review:agent",
+          "id": "bm_c4"
+        },
+        {
+          "type": "door",
+          "label": "The slot down from the bitter confluence",
+          "to": "j_c6",
+          "note": "open maze",
+          "box": [
+            0.2424,
+            0.091,
+            0.3424,
+            0.391
+          ],
+          "boxSource": "review:lucas",
+          "id": "down_slot_c4",
+          "direction": "open"
+        }
+      ],
+      "panorama": "j_c4/scene.png",
+      "builtFrom": "l1_j_c4_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "sfx": [
+        {
+          "src": "audio/canyon_stream_gentle.mp3",
+          "volume": 0.19,
+          "mode": "loop"
+        },
+        {
+          "src": "audio/canyon_slot_wind.mp3",
+          "volume": 0.09,
+          "mode": "loop"
+        }
+      ],
+      "hotspots": [
+        {
+          "id": "table_c4",
+          "type": "puzzle",
+          "label": "The bitter reading-table",
+          "box": [
+            0.4115,
+            0.5871,
+            0.5215,
+            0.7411
+          ],
+          "boxSource": "moved:testplay",
+          "starterCode": "canyon_water_chem",
+          "question": {
+            "prompt": "The water here comes up bitter enough to taste from the bank. Sort the whole survey into four families by their water. Which family carries the most sulfate on average, and which springs make it up?",
+            "options": [
+              "The carbonate family — Dripstone, Palegate, Lime_Hollow, Chalkseep",
+              "The sulfate family — Brimstone_Font, Sulphur_Step, Cinderpool, Matchhead_Spring and Bitterwell",
+              "The East Fork springs — Brimstone_Font, Sulphur_Step, Cinderpool, Matchhead_Spring",
+              "The silica family — Glasswater, Flintrun, Obsidian_Weep, Silverglass",
+              "The saline family — Saltglass, Brineseep, Saltmouth, Tidewell, Pillar_Brine",
+              "Cinderpool by itself, the single highest reading in the survey",
+              "Whichever family has the most springs in it"
+            ],
+            "correct": 1,
+            "maxAttempts": 4,
+            "feedback": {
+              "correct": "Correct — noted in your field notebook: the sulfate family averages 61 sulfate against 8 everywhere else, and Bitterwell runs with it.",
+              "wrong": [
+                "Cluster the six mineral columns as before, then cut the tree into four groups and take the average sulfate within each one.",
+                "`cutree(..., 4)` gives each spring a family number; `group_by()` that number and `summarise()` the mean of the sulfate column.",
+                "One family's average is many times every other's, so which family wins is not in doubt. The care is in its membership — check whether the springs the cut puts together are the same springs the forks put together."
+              ]
+            }
+          },
+          "availableWhen": {
+            "solved": "j_c2"
+          },
+          "lockedBody": "The bitter water is not going anywhere. There is a junction upstream you have not finished reading.",
+          "solveSfx": {
+            "src": "audio/solve_stone_slot.mp3",
+            "volume": 0.43758254650883743
+          }
+        },
+        {
+          "id": "bm_c4",
+          "type": "clue",
+          "label": "The bitter benchmark",
+          "box": [
+            0.251,
+            0.596,
+            0.292,
+            0.802
+          ],
+          "pickup": true,
+          "onPickup": {
+            "set": "c4_read"
+          },
+          "body": "Carved into the stone are the numbers 1420.",
+          "boxSource": "review:agent"
+        },
+        {
+          "id": "down_slot_c4",
+          "type": "door",
+          "label": "The slot down from the bitter confluence",
+          "box": [
+            0.5956,
+            0.2496,
+            0.6956,
+            0.5496
+          ],
+          "to": "j_c6",
+          "boxSource": "moved:testplay",
+          "direction": "open"
+        },
+        {
+          "id": "clip_base",
+          "type": "ambient",
+          "label": "Scene motion (base)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/serve-clips.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "j_c4/cine_base.mp4"
+          }
+        }
+      ],
+      "fx": [
+        {
+          "fx": "rain",
+          "when": {
+            "solved": "j_c2"
+          }
+        }
+      ]
+    },
+    {
+      "key": "j_c5",
+      "title": "The still pool",
+      "technique": "Junction — read the height",
+      "built": true,
+      "unlockedWhen": true,
+      "authoring": {
+        "tag": "j_c5",
+        "scenePrompt": "This is a seamless 360-degree panorama from the floor of a quiet high confluence in the right branch where two slots meet in a wide still basin — the viewer stands on dry pale rock at the basin's rim, sheer red walls around it and a strip of bruised sky far overhead. THIS WHOLE CANYON WAS ENGINEERED BY A VANISHED PEOPLE AND THEIR WATERWORKS ARE EVERYWHERE: carved stone channels and cut sluice-races thread the walls at several different heights, stepped weirs and spillways drop the water from level to level in small falls, narrow flights of steps are cut straight into the rock face and iron-runged ladders climb past them to little gauging platforms and corbelled ledges, verdigrised bronze sluice-gates and toothed rack-and-pinion mechanisms stand in the races, worn carved disc-sigils and level-marks are set into the stone at intervals, and small lamp niches burn at every landing — quieter here, the races running still and full, their mechanisms long since set and forgotten. Directly behind the viewer, split across the extreme left and extreme right edges, is a deep, narrow, unlit cleft in the sandstone, near-black and featureless, its two walls falling into full shadow: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the mouth of a deep, narrow, unlit cleft falling into full shadow, near-black and featureless, the half of that one shadowed cleft that meets its other half cleanly at the seam directly behind you; to the left, a wide still basin of clear water, its surface a flat mirror holding the banded walls and the sky upside down; to the left of centre, a raft of bleached driftwood and dry reed wrack jammed high in a crack in the wall, far above the present water; dead ahead in the centre, a weathered survey stone standing at the basin's rim, a level line and a group of simple incised marks cut deep into its face; just right of centre, a single narrow shaft of pale daylight falling from the slot far above onto the rock, thick with hanging dust; to the right, an open slot leading away and downward out of the basin; on the far right, the same deep, narrow, unlit cleft continuing in full shadow, near-black and featureless, the other half of that one shadowed cleft, joining cleanly at the seam directly behind you. banded red sandstone in cool teal shadow cut by warm amber light, wet rock, fine drifting dust, a bruised pre-storm sky far overhead, painterly, cinematic, subtle film grain, tense and expectant. No people, no lettering, no captions, no text, no readable writing, no signage, no UI. Again: the extreme left and right edges must align perfectly into a deep, narrow, unlit cleft in the sandstone, near-black and featureless, its two walls falling into full shadow, with no visible seam, join, or repetition.",
+        "doorPrompt": "The same pool; passages already open (maze) — no change.",
+        "sceneSpec": {
+          "room": "j_c5",
+          "interior": false,
+          "seam": "a deep, narrow, unlit cleft in the sandstone, near-black and featureless, its two walls falling into full shadow",
+          "setting": "the floor of a quiet high confluence in the right branch where two slots meet in a wide still basin — the viewer stands on dry pale rock at the basin's rim, sheer red walls around it and a strip of bruised sky far overhead",
+          "elements": [
+            {
+              "id": "j_c5_cleft_left",
+              "at": "on the far left",
+              "desc": "the mouth of a deep, narrow, unlit cleft falling into full shadow, near-black and featureless, the half of that one shadowed cleft that meets its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "still_basin",
+              "at": "to the left",
+              "desc": "a wide still basin of clear water, its surface a flat mirror holding the banded walls and the sky upside down",
+              "animate": {
+                "motion": "the mirror surface of the basin trembling in slow rings and settling flat again",
+                "loop": "boomerang"
+              }
+            },
+            {
+              "id": "flood_wrack",
+              "at": "to the left of centre",
+              "desc": "a raft of bleached driftwood and dry reed wrack jammed high in a crack in the wall, far above the present water"
+            },
+            {
+              "id": "bm_c5",
+              "at": "dead ahead in the centre",
+              "clue": true,
+              "label": "The still-pool benchmark",
+              "desc": "a weathered survey stone standing at the basin's rim, a level line and a group of simple incised marks cut deep into its face"
+            },
+            {
+              "id": "light_shaft",
+              "at": "just right of centre",
+              "desc": "a single narrow shaft of pale daylight falling from the slot far above onto the rock, thick with hanging dust",
+              "animate": {
+                "motion": "dust drifting slowly upward through the shaft of light",
+                "loop": "crossfade"
+              }
+            },
+            {
+              "id": "down_slot_c5",
+              "at": "to the right",
+              "door": {
+                "direction": "back",
+                "to": "j_c6"
+              },
+              "label": "The slot down from the still pool",
+              "desc": "an open slot leading away and downward out of the basin"
+            },
+            {
+              "id": "j_c5_cleft_right",
+              "at": "on the far right",
+              "desc": "the same deep, narrow, unlit cleft continuing in full shadow, near-black and featureless, the other half of that one shadowed cleft, joining cleanly at the seam directly behind you"
+            }
+          ],
+          "atmosphere": "banded red sandstone in cool teal shadow cut by warm amber light, wet rock, fine drifting dust, a bruised pre-storm sky far overhead, painterly, cinematic, subtle film grain, tense and expectant",
+          "negatives": "No people, no lettering, no captions, no text, no readable writing, no signage, no UI",
+          "seamOccluder": "a tall fin of banded sandstone standing from the canyon floor to the sky, plain and unlit"
+        },
+        "motionSpec": {
+          "rigid": "The canyon walls, banded rock, stone shelves, piers, survey stones, reading-tables, ladders and ground",
+          "negatives": [
+            ", pulsing light, flickering beam, strobing, searchlight, sweeping beam, moving light beam, beam brightening and dimming, shafts of light sweeping, lens flare, falling droplets, water drops, large droplets, dripping, splashes, ripple rings spreading, raindrops, rain"
+          ],
+          "subjects": [
+            {
+              "name": "still_basin",
+              "box": [
+                0.09,
+                0.58,
+                0.4,
+                0.88
+              ],
+              "phrase": "the wide mirror pool lying almost perfectly still, its reflection of the banded walls easing and settling with the faintest slow swell — nothing falls into it and nothing breaks its surface"
+            },
+            {
+              "name": "light_shaft",
+              "box": [
+                0.535,
+                0.02,
+                0.615,
+                0.8
+              ],
+              "phrase": "the soft column of pale daylight standing in the slot far above, its brightness absolutely constant and unchanging, with only the finest motes of dust drifting slowly within it"
+            },
+            {
+              "name": "right_channel",
+              "box": [
+                0.6,
+                0.63,
+                0.82,
+                0.93
+              ],
+              "phrase": "the stepped watercourse on the right, water running down over its weir and along the cut channel below, breaking white on the stones and glinting as it turns, the small fall at its head churning in place"
+            },
+            {
+              "name": "sky_ribbon",
+              "box": [
+                0.44,
+                0.0,
+                0.56,
+                0.13
+              ],
+              "phrase": "the narrow strip of bruised sky far overhead, its cloud turning over very slowly in place"
+            },
+            {
+              "name": "lights_1",
+              "box": [
+                0.2395,
+                0.5451,
+                0.2553,
+                0.5782
+              ],
+              "phrase": "the hanging oil lanterns burning with a live, restless flame that gutters and flares, their pools of amber light pulsing on the wet stone"
+            },
+            {
+              "name": "lights_2",
+              "box": [
+                0.8143,
+                0.5761,
+                0.8245,
+                0.5899
+              ],
+              "phrase": "the hanging oil lanterns burning with a live, restless flame that gutters and flares, their pools of amber light pulsing on the wet stone"
+            },
+            {
+              "name": "lights_3",
+              "box": [
+                0.7882,
+                0.1215,
+                0.7925,
+                0.1344
+              ],
+              "phrase": "the hanging oil lanterns burning with a live, restless flame that gutters and flares, their pools of amber light pulsing on the wet stone"
+            }
+          ],
+          "room": "j_c5",
+          "state": "base"
+        }
+      },
+      "entry": null,
+      "designNote": "PLAIN JUNCTION (no chemistry puzzle) — the player reads confluence height 1390 here for the escape map. Benchmark height 1390. NEW ART.",
+      "plannedHotspots": [
+        {
+          "type": "clue",
+          "label": "The still-pool benchmark",
+          "pickup": true,
+          "note": "confluence height 1390 — mark it on the map (escape)",
+          "onPickup": {
+            "set": "c5_read"
+          },
+          "body": "Carved into the stone are the numbers 1390.",
+          "box": [
+            0.453,
+            0.54,
+            0.537,
+            0.928
+          ],
+          "boxSource": "review:agent",
+          "id": "bm_c5"
+        },
+        {
+          "type": "door",
+          "label": "The slot down from the still pool",
+          "to": "j_c6",
+          "note": "open maze",
+          "box": [
+            0.7381,
+            0.3154,
+            0.8381,
+            0.7154
+          ],
+          "boxSource": "review:lucas",
+          "id": "down_slot_c5",
+          "direction": "open"
+        }
+      ],
+      "panorama": "j_c5/scene.png",
+      "builtFrom": "l1_j_c5_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "sfx": [
+        {
+          "src": "audio/canyon_stream_gentle.mp3",
+          "volume": 0.12,
+          "mode": "loop"
+        },
+        {
+          "src": "audio/canyon_drip_cave.mp3",
+          "volume": 0.28,
+          "mode": "loop"
+        }
+      ],
+      "hotspots": [
+        {
+          "id": "bm_c5",
+          "type": "clue",
+          "label": "The still-pool benchmark",
+          "box": [
+            0.453,
+            0.54,
+            0.537,
+            0.928
+          ],
+          "pickup": true,
+          "onPickup": {
+            "set": "c5_read"
+          },
+          "body": "Carved into the stone are the numbers 1390.",
+          "boxSource": "review:agent"
+        },
+        {
+          "id": "down_slot_c5",
+          "type": "door",
+          "label": "The slot down from the still pool",
+          "box": [
+            0.7332,
+            0.3386,
+            0.8332,
+            0.7386
+          ],
+          "to": "j_c6",
+          "boxSource": "moved:testplay",
+          "direction": "open"
+        },
+        {
+          "id": "clip_base",
+          "type": "ambient",
+          "label": "Scene motion (base)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/serve-clips.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "j_c5/cine_base.mp4"
+          }
+        }
+      ],
+      "fx": [
+        {
+          "fx": "rain",
+          "when": {
+            "solved": "j_c2"
+          }
+        }
+      ]
+    },
+    {
+      "key": "j_c6",
+      "title": "The right fork",
+      "technique": "Junction — read the height",
+      "built": true,
+      "unlockedWhen": true,
+      "authoring": {
+        "tag": "j_c6",
+        "scenePrompt": "This is a seamless 360-degree panorama from the floor of a deep confluence low in the right branch of the canyon, where two large canyons run together into one — the viewer stands on a rock shelf above the joined channel, the walls high and close, only a hairline of grey sky showing far overhead. THIS WHOLE CANYON WAS ENGINEERED BY A VANISHED PEOPLE AND THEIR WATERWORKS ARE EVERYWHERE: carved stone channels and cut sluice-races thread the walls at several different heights, stepped weirs and spillways drop the water from level to level in small falls, narrow flights of steps are cut straight into the rock face and iron-runged ladders climb past them to little gauging platforms and corbelled ledges, verdigrised bronze sluice-gates and toothed rack-and-pinion mechanisms stand in the races, worn carved disc-sigils and level-marks are set into the stone at intervals, and small lamp niches burn at every landing — denser at this depth, whole terraces of sluices and catch-basins stepping away above you. Directly behind the viewer, split across the extreme left and extreme right edges, is a deep, narrow, unlit cleft in the sandstone, near-black and featureless, its two walls falling into full shadow: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the mouth of a deep, narrow, unlit cleft falling into full shadow, near-black and featureless, the half of that one shadowed cleft that meets its other half cleanly at the seam directly behind you; to the left, an open slot climbing away and upward, a faint yellow crust staining the rock at its mouth; to the left of centre, a second open slot climbing away and upward beside the first, its floor worn smooth; dead ahead in the centre, a tall weathered survey stone set on the shelf above the joined channel, a level line and a group of simple incised marks cut deep into its face; just right of centre, the joined channel running below the shelf, both waters folded into one and moving fast; to the right, a wide open slot leading away and downward toward deeper shadow; on the far right, the same deep, narrow, unlit cleft continuing in full shadow, near-black and featureless, the other half of that one shadowed cleft, joining cleanly at the seam directly behind you. banded red sandstone in cool teal shadow cut by warm amber light, wet rock, fine drifting dust, a bruised pre-storm sky far overhead, painterly, cinematic, subtle film grain, tense and expectant. No people, no lettering, no captions, no text, no readable writing, no signage, no UI. Again: the extreme left and right edges must align perfectly into a deep, narrow, unlit cleft in the sandstone, near-black and featureless, its two walls falling into full shadow, with no visible seam, join, or repetition.",
+        "doorPrompt": "The same fork; passages already open (maze) — no change.",
+        "sceneSpec": {
+          "room": "j_c6",
+          "interior": false,
+          "seam": "a deep, narrow, unlit cleft in the sandstone, near-black and featureless, its two walls falling into full shadow",
+          "setting": "the floor of a deep confluence low in the right branch of the canyon, where two large canyons run together into one — the viewer stands on a rock shelf above the joined channel, the walls high and close, only a hairline of grey sky showing far overhead",
+          "elements": [
+            {
+              "id": "j_c6_cleft_left",
+              "at": "on the far left",
+              "desc": "the mouth of a deep, narrow, unlit cleft falling into full shadow, near-black and featureless, the half of that one shadowed cleft that meets its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "up_slot_c6_a",
+              "at": "to the left",
+              "door": {
+                "direction": "open",
+                "to": "j_c4"
+              },
+              "label": "The climb to the bitter confluence",
+              "desc": "an open slot climbing away and upward, a faint yellow crust staining the rock at its mouth"
+            },
+            {
+              "id": "up_slot_c6_b",
+              "at": "to the left of centre",
+              "door": {
+                "direction": "open",
+                "to": "j_c5"
+              },
+              "label": "The climb to the still pool",
+              "desc": "a second open slot climbing away and upward beside the first, its floor worn smooth"
+            },
+            {
+              "id": "bm_c6",
+              "at": "dead ahead in the centre",
+              "clue": true,
+              "label": "The right-fork benchmark",
+              "desc": "a tall weathered survey stone set on the shelf above the joined channel, a level line and a group of simple incised marks cut deep into its face"
+            },
+            {
+              "id": "joined_channel_r",
+              "at": "just right of centre",
+              "desc": "the joined channel running below the shelf, both waters folded into one and moving fast",
+              "animate": {
+                "motion": "the joined water sliding fast past below, its surface creasing and folding",
+                "loop": "crossfade"
+              }
+            },
+            {
+              "id": "down_slot_c6",
+              "at": "to the right",
+              "door": {
+                "direction": "back",
+                "to": "j_c7"
+              },
+              "label": "The slot down from the right fork",
+              "desc": "a wide open slot leading away and downward toward deeper shadow"
+            },
+            {
+              "id": "j_c6_cleft_right",
+              "at": "on the far right",
+              "desc": "the same deep, narrow, unlit cleft continuing in full shadow, near-black and featureless, the other half of that one shadowed cleft, joining cleanly at the seam directly behind you"
+            }
+          ],
+          "atmosphere": "banded red sandstone in cool teal shadow cut by warm amber light, wet rock, fine drifting dust, a bruised pre-storm sky far overhead, painterly, cinematic, subtle film grain, tense and expectant",
+          "negatives": "No people, no lettering, no captions, no text, no readable writing, no signage, no UI",
+          "seamOccluder": "a tall fin of banded sandstone standing from the canyon floor to the sky, plain and unlit"
+        },
+        "motionSpec": {
+          "rigid": "The canyon walls, banded rock, stone shelves, piers, survey stones, reading-tables, ladders and ground",
+          "subjects": [
+            {
+              "name": "joined_channel_r",
+              "box": [
+                0.5,
+                0.58,
+                0.88,
+                1.0
+              ],
+              "phrase": "the joined channel running fast below the shelf, both waters folded into one, its surface breaking white over the rock"
+            },
+            {
+              "name": "wall_seeps",
+              "box": [
+                0.04,
+                0.22,
+                0.34,
+                0.88
+              ],
+              "phrase": "thin threads of water tracing down the crusted rock at the mouths of the upper slots, the wet stone glistening"
+            },
+            {
+              "name": "sky_hairline",
+              "box": [
+                0.0,
+                0.0,
+                1.0,
+                0.1
+              ],
+              "force_repair": true,
+              "phrase": "the hairline of grey sky far overhead, its cloud rolling and folding in place"
+            },
+            {
+              "name": "lights_1",
+              "box": [
+                0.5794,
+                0.5129,
+                0.5837,
+                0.5408
+              ],
+              "phrase": "the hanging oil lanterns burning with a live, restless flame that gutters and flares, their pools of amber light pulsing on the wet stone"
+            },
+            {
+              "name": "lights_2",
+              "box": [
+                0.6743,
+                0.5238,
+                0.6786,
+                0.5475
+              ],
+              "phrase": "the hanging oil lanterns burning with a live, restless flame that gutters and flares, their pools of amber light pulsing on the wet stone"
+            },
+            {
+              "name": "lights_3",
+              "box": [
+                0.2719,
+                0.6332,
+                0.2776,
+                0.6676
+              ],
+              "phrase": "the hanging oil lanterns burning with a live, restless flame that gutters and flares, their pools of amber light pulsing on the wet stone"
+            }
+          ],
+          "room": "j_c6",
+          "state": "base"
+        }
+      },
+      "entry": null,
+      "designNote": "PLAIN JUNCTION (no chemistry puzzle) — confluence height 1200 for the escape map, and the right-branch fork (up to j_c4/j_c5, down to j_c7). Benchmark height 1200. NEW ART.",
+      "plannedHotspots": [
+        {
+          "type": "clue",
+          "label": "The right-fork benchmark",
+          "pickup": true,
+          "note": "confluence height 1200 — mark it on the map (escape)",
+          "onPickup": {
+            "set": "c6_read"
+          },
+          "body": "Carved into the stone are the numbers 1200.",
+          "box": [
+            0.458,
+            0.298,
+            0.51,
+            0.878
+          ],
+          "boxSource": "review:agent",
+          "id": "bm_c6"
+        },
+        {
+          "type": "door",
+          "label": "The climb to the bitter confluence",
+          "to": "j_c4",
+          "note": "open maze",
+          "box": [
+            0.1824,
+            0.1551,
+            0.2824,
+            0.5551
+          ],
+          "boxSource": "review:lucas",
+          "id": "up_slot_c6_a",
+          "direction": "back"
+        },
+        {
+          "type": "door",
+          "label": "The climb to the still pool",
+          "to": "j_c5",
+          "note": "open maze",
+          "box": [
+            0.501,
+            0.298,
+            0.601,
+            0.698
+          ],
+          "boxSource": "review:lucas",
+          "id": "up_slot_c6_b",
+          "direction": "back"
+        },
+        {
+          "type": "door",
+          "label": "The slot down from the right fork",
+          "to": "j_c7",
+          "note": "open maze",
+          "box": [
+            0.7011,
+            0.3276,
+            0.8011,
+            0.6276
+          ],
+          "boxSource": "review:lucas",
+          "id": "down_slot_c6",
+          "direction": "open"
+        }
+      ],
+      "panorama": "j_c6/scene.png",
+      "builtFrom": "l1_j_c6_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "sfx": [
+        {
+          "src": "audio/canyon_stream_gentle.mp3",
+          "volume": 0.21,
+          "mode": "loop"
+        },
+        {
+          "src": "audio/canyon_slot_wind.mp3",
+          "volume": 0.09,
+          "mode": "loop"
+        }
+      ],
+      "hotspots": [
+        {
+          "id": "bm_c6",
+          "type": "clue",
+          "label": "The right-fork benchmark",
+          "box": [
+            0.4672,
+            0.1497,
+            0.5192,
+            0.7297
+          ],
+          "pickup": true,
+          "onPickup": {
+            "set": "c6_read"
+          },
+          "body": "Carved into the stone are the numbers 1200.",
+          "boxSource": "moved:testplay"
+        },
+        {
+          "id": "up_slot_c6_a",
+          "type": "door",
+          "label": "The climb to the bitter confluence",
+          "box": [
+            0.1841,
+            0.1443,
+            0.2841,
+            0.5443
+          ],
+          "to": "j_c4",
+          "boxSource": "moved:testplay",
+          "direction": "back"
+        },
+        {
+          "id": "up_slot_c6_b",
+          "type": "door",
+          "label": "The climb to the still pool",
+          "box": [
+            0.6814,
+            0.2698,
+            0.7814,
+            0.6698
+          ],
+          "to": "j_c5",
+          "boxSource": "moved:testplay",
+          "direction": "back"
+        },
+        {
+          "id": "down_slot_c6",
+          "type": "door",
+          "label": "The slot down from the right fork",
+          "box": [
+            0.4926,
+            0.3317,
+            0.5926,
+            0.6317
+          ],
+          "to": "j_c7",
+          "boxSource": "moved:testplay",
+          "direction": "open"
+        },
+        {
+          "id": "clip_base",
+          "type": "ambient",
+          "label": "Scene motion (base)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/serve-clips.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "j_c6/cine_base.mp4"
+          }
+        }
+      ],
+      "fx": [
+        {
+          "fx": "rain",
+          "when": {
+            "solved": "j_c2"
+          }
+        }
+      ]
+    },
+    {
+      "key": "j_c7",
+      "title": "The trunk — the carved map",
+      "technique": "hclust — outliers: kinship beats adjacency",
+      "puzzleType": 2,
+      "isBoss": true,
+      "built": true,
+      "unlockedWhen": {
+        "allSolved": [
+          "j_c1",
+          "j_c2",
+          "j_c4"
+        ]
+      },
+      "deliverable": {
+        "type": "figure",
+        "submitCodec": true
+      },
+      "debrief": "The makers' carved map grouped the springs by the fork they rise in — but two springs' water swears a different kin. Clustering the chemistry, not trusting the surface arrangement, is what exposes them. Kinship hides beneath the surface.",
+      "authoring": {
+        "tag": "j_c7",
+        "scenePrompt": "This is a seamless 360-degree panorama from the floor of the trunk — the last and deepest junction, a great cavernous hollow where every water in the canyon has come together into one dark channel; the viewer stands on a wide stone shelf beside it, walls of banded red rock towering into darkness with no sky visible at all. THIS WHOLE CANYON WAS ENGINEERED BY A VANISHED PEOPLE AND THEIR WATERWORKS ARE EVERYWHERE: carved stone channels and cut sluice-races thread the walls at several different heights, stepped weirs and spillways drop the water from level to level in small falls, narrow flights of steps are cut straight into the rock face and iron-runged ladders climb past them to little gauging platforms and corbelled ledges, verdigrised bronze sluice-gates and toothed rack-and-pinion mechanisms stand in the races, worn carved disc-sigils and level-marks are set into the stone at intervals, and small lamp niches burn at every landing — and here at the trunk they are vast: galleries of channels and spillways rising tier on tier into total darkness overhead, the greatest works in the whole system. Directly behind the viewer, split across the extreme left and extreme right edges, is a deep, narrow, unlit cleft in the sandstone, near-black and featureless, its two walls falling into full shadow: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the mouth of a deep, narrow, unlit cleft falling into full shadow, near-black and featureless, the half of that one shadowed cleft that meets its other half cleanly at the seam directly behind you; to the left, an open slot climbing away and upward into the left branch, faint grey light somewhere far up it; to the left of centre, a towering wall-map incised into the red rock face — the canyon's whole branching plan cut in deep lines, with clusters of small carved marks gathered along each fork; dead ahead in the centre, a squat carved stone reading-table set with a pane of glowing glass, standing on the shelf before the incised wall; just right of centre, a weathered survey stone at the channel's edge, a level line and a group of simple incised marks cut deep into its face, the stone wet far above the present water; to the centre-right, a low carved arch with worn steps dropping away below the channel toward lamplight; to the right, an open slot climbing away and upward into the right branch; on the far right, the same deep, narrow, unlit cleft continuing in full shadow, near-black and featureless, the other half of that one shadowed cleft, joining cleanly at the seam directly behind you. banded red sandstone in cool teal shadow cut by warm amber light, wet rock, fine drifting dust, a bruised pre-storm sky far overhead, painterly, cinematic, subtle film grain, tense and expectant. No people, no lettering, no captions, no text, no readable writing, no signage, no UI. Again: the extreme left and right edges must align perfectly into a deep, narrow, unlit cleft in the sandstone, near-black and featureless, its two walls falling into full shadow, with no visible seam, join, or repetition.",
+        "doorPrompt": "The same trunk chamber; the branch-passages already open (maze), the arch down to the hall unchanged.",
+        "sceneSpec": {
+          "room": "j_c7",
+          "interior": false,
+          "seam": "a deep, narrow, unlit cleft in the sandstone, near-black and featureless, its two walls falling into full shadow",
+          "setting": "the floor of the trunk — the last and deepest junction, a great cavernous hollow where every water in the canyon has come together into one dark channel; the viewer stands on a wide stone shelf beside it, walls of banded red rock towering into darkness with no sky visible at all",
+          "elements": [
+            {
+              "id": "j_c7_cleft_left",
+              "at": "on the far left",
+              "desc": "the mouth of a deep, narrow, unlit cleft falling into full shadow, near-black and featureless, the half of that one shadowed cleft that meets its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "up_slot_left",
+              "at": "to the left",
+              "door": {
+                "direction": "back",
+                "to": "j_c3"
+              },
+              "label": "The climb up the left branch",
+              "desc": "an open slot climbing away and upward into the left branch, faint grey light somewhere far up it"
+            },
+            {
+              "id": "carved_wall_map",
+              "at": "to the left of centre",
+              "clue": true,
+              "label": "The carved wall-map",
+              "desc": "a towering wall-map incised into the red rock face — the canyon's whole branching plan cut in deep lines, with clusters of small carved marks gathered along each fork"
+            },
+            {
+              "id": "table_c7",
+              "at": "dead ahead in the centre",
+              "puzzle": true,
+              "label": "The trunk reading-table",
+              "desc": "a squat carved stone reading-table set with a pane of glowing glass, standing on the shelf before the incised wall"
+            },
+            {
+              "id": "bm_c7",
+              "at": "just right of centre",
+              "clue": true,
+              "label": "The trunk benchmark",
+              "desc": "a weathered survey stone at the channel's edge, a level line and a group of simple incised marks cut deep into its face, the stone wet far above the present water"
+            },
+            {
+              "id": "down_stair",
+              "at": "to the centre-right",
+              "door": {
+                "direction": "open",
+                "to": "works"
+              },
+              "label": "The stair down to the floodworks",
+              "desc": "a low carved arch with worn steps dropping away below the channel toward lamplight"
+            },
+            {
+              "id": "up_slot_right",
+              "at": "to the right",
+              "door": {
+                "direction": "open",
+                "to": "j_c6"
+              },
+              "label": "The climb up the right branch",
+              "desc": "an open slot climbing away and upward into the right branch"
+            },
+            {
+              "id": "j_c7_cleft_right",
+              "at": "on the far right",
+              "desc": "the same deep, narrow, unlit cleft continuing in full shadow, near-black and featureless, the other half of that one shadowed cleft, joining cleanly at the seam directly behind you"
+            }
+          ],
+          "atmosphere": "banded red sandstone in cool teal shadow cut by warm amber light, wet rock, fine drifting dust, a bruised pre-storm sky far overhead, painterly, cinematic, subtle film grain, tense and expectant",
+          "negatives": "No people, no lettering, no captions, no text, no readable writing, no signage, no UI",
+          "seamOccluder": "a massive column of banded rock rising from the floor into the darkness above"
+        },
+        "motionSpec": {
+          "rigid": "The canyon walls, banded rock, stone shelves, piers, survey stones, reading-tables, ladders and ground, and the incised wall-map and its cut lines",
+          "has_document": true,
+          "pinned": [
+            "The towering incised wall-map is cut into solid rock: its lines, clusters and marks are perfectly still and do not move, shift or change.",
+            "The overall brightness of this scene is CONSTANT. The image does not brighten or darken as a whole, no large area of wall or floor changes its luminance, and the lamplight does not pulse across the scene. Only the small flames themselves vary.",
+            "The great carved wall-map face keeps exactly the same brightness from the first frame to the last: it does not glow, dim, brighten, or have light wash across it.",
+            "Each movement is small and slow, and stays where it is."
+          ],
+          "negatives": [
+            ", fast motion, rapid movement, hurried motion, churning, racing, time-lapse, sped up, frantic, turbulent, choppy water, rushing water, whitewater, flickering, strobing, fast moving clouds, racing clouds, churning sky, storm rolling in, dramatic sky motion, global brightness change, exposure change, scene brightening, scene darkening, whole image pulsing, luminance pulse, glow expanding, light blooming across the wall, fade in, fade out"
+          ],
+          "subjects": [
+            {
+              "name": "trunk_channel",
+              "box": [
+                0.55,
+                0.68,
+                0.92,
+                0.97
+              ],
+              "phrase": "the great dark channel where every water in the canyon has come together, lying deep and nearly still, its surface creasing very slowly in place and holding the lamplight"
+            },
+            {
+              "name": "stair_lamplight",
+              "box": [
+                0.6,
+                0.34,
+                0.82,
+                0.84
+              ],
+              "phrase": "the small warm pool of lamplight on the low arch and the worn steps below the channel, holding a constant brightness, only its edge trembling very slightly where it meets the stone"
+            },
+            {
+              "name": "left_channel",
+              "box": [
+                0.15,
+                0.55,
+                0.28,
+                0.8
+              ],
+              "phrase": "the narrow channel below the left stair, its water creasing and glinting in place as it passes"
+            },
+            {
+              "name": "right_cascade",
+              "box": [
+                0.7,
+                0.24,
+                0.8,
+                0.58
+              ],
+              "phrase": "the thin cascade slipping down the far right wall, breaking white on the ledges it falls across"
+            },
+            {
+              "name": "lights_1",
+              "box": [
+                0.5509,
+                0.2313,
+                0.5552,
+                0.2463
+              ],
+              "phrase": "the hanging oil lanterns, the small flame inside each one wavering and settling gently within its glass; the light they cast on the surrounding stone holds steady and does not swell, pulse or spread"
+            },
+            {
+              "name": "lights_2",
+              "box": [
+                0.2508,
+                0.735,
+                0.2645,
+                0.808
+              ],
+              "phrase": "the hanging oil lanterns, the small flame inside each one wavering and settling gently within its glass; the light they cast on the surrounding stone holds steady and does not swell, pulse or spread"
+            },
+            {
+              "name": "lights_3",
+              "box": [
+                0.7303,
+                0.6465,
+                0.7404,
+                0.6787
+              ],
+              "phrase": "the hanging oil lanterns, the small flame inside each one wavering and settling gently within its glass; the light they cast on the surrounding stone holds steady and does not swell, pulse or spread"
+            }
+          ],
+          "room": "j_c7",
+          "state": "base"
+        }
+      },
+      "entry": null,
+      "designNote": "BOSS PUZZLE (misdirection: adjacency vs data). Sited at the trunk (root of the tree). CODE: m<-canyon_water_chem; m$cluster<-cutree(hclust(dist(m[,3:8]),method='ward.D2'),4); m %>% arrange(cluster) # compare cluster vs fork. TEMPTING(wrong)=trust the carved map / group by fork. CORRECT: Bitterwell (West->sulfate) AND Saltglass (North->saline). DELIVERABLE figure + submitCodec. HINT CLUE = the carved wall-map (two names sit wrong) — NOT removable and NOT foldable into the wrong-hints: the distractor \"none, the map is right\" refers to it, and a taught trap has to be tempting BEFORE the answer, not revealed after it. Distinct from the escape's reading surface, which is the `elevmap` in `works`. DISTRACTORS: only Bitterwell; only Saltglass; Bitterwell+Brimstone; Saltglass+Brineseep; a within-fork pair; 'none, the map is right'. unlockedWhen allSolved [j_c1,j_c2,j_c4]. Benchmark height 850. NEW ART.",
+      "plannedHotspots": [
+        {
+          "type": "puzzle",
+          "label": "The trunk reading-table",
+          "note": "BOSS: outliers Bitterwell + Saltglass (fork vs chemistry)",
+          "box": [
+            0.37,
+            0.688,
+            0.472,
+            0.832
+          ],
+          "boxSource": "review:agent",
+          "id": "table_c7",
+          "starterCode": "canyon_water_chem",
+          "question": {
+            "prompt": "The makers cut their own map of the canyon into the wall behind you, every spring set into the branch of the fork it runs down. You have the water itself. Which springs does the carved map put in the wrong company?",
+            "options": [
+              "Bitterwell and Saltglass",
+              "Bitterwell only",
+              "Saltglass only",
+              "Bitterwell and Brimstone_Font",
+              "Saltglass and Brineseep",
+              "Chalkseep and Palegate",
+              "None — the carved map is right"
+            ],
+            "correct": 0,
+            "maxAttempts": 4,
+            "feedback": {
+              "correct": "Correct — noted in your field notebook: Bitterwell and Saltglass each run down one fork and belong to another.",
+              "wrong": [
+                "Give every spring its family from the water, then set that beside the fork it runs down, and look for the rows where the two disagree.",
+                "`cutree(..., 4)` for the family, the `fork` column for the makers' grouping — put them side by side and the mismatches stand out.",
+                "Most springs agree with the carving. More than one does not. A spring can run down one fork and still be tapping the same stratum as a family in another."
+              ]
+            }
+          },
+          "availableWhen": {
+            "allSolved": [
+              "j_c1",
+              "j_c2",
+              "j_c4"
+            ]
+          },
+          "lockedBody": "The trunk gathers every water in the canyon, and you have not yet read them all. Go back up and finish the survey.",
+          "solveSfx": {
+            "src": "audio/solve_storm_breaks.mp3",
+            "volume": 0.5
+          }
+        },
+        {
+          "type": "clue",
+          "label": "The carved wall-map",
+          "note": "the makers' fork grouping (misdirection); two names sit wrong — the hint",
+          "box": [
+            0.323,
+            0.1882,
+            0.528,
+            0.5765
+          ],
+          "boxSource": "review:lucas",
+          "id": "carved_wall_map",
+          "body": "The makers' own map of the canyon, cut deep into the rock: every spring set into the branch of the fork it runs down. West, East, North, South — four groups, and the carving is very sure of itself."
+        },
+        {
+          "type": "clue",
+          "label": "The trunk benchmark",
+          "pickup": true,
+          "note": "confluence height 850 — mark it on the map (escape)",
+          "onPickup": {
+            "set": "c7_read"
+          },
+          "body": "Carved into the stone are the numbers 850.",
+          "box": [
+            0.5625,
+            0.623,
+            0.6085,
+            0.807
+          ],
+          "boxSource": "review:lucas",
+          "id": "bm_c7"
+        },
+        {
+          "type": "door",
+          "label": "The climb up the left branch",
+          "to": "j_c3",
+          "note": "open maze",
+          "box": [
+            0.1412,
+            0.0827,
+            0.2412,
+            0.4827
+          ],
+          "boxSource": "review:lucas",
+          "id": "up_slot_left",
+          "direction": "back"
+        },
+        {
+          "type": "door",
+          "label": "The climb up the right branch",
+          "to": "j_c6",
+          "note": "open maze",
+          "box": [
+            0.7075,
+            0.0592,
+            0.8075,
+            0.4592
+          ],
+          "boxSource": "review:lucas",
+          "id": "up_slot_right",
+          "direction": "back"
+        },
+        {
+          "type": "door",
+          "label": "The stair down to the floodworks",
+          "to": "works",
+          "note": "to the escape once the boss is solved",
+          "box": [
+            0.8131,
+            0.5031,
+            0.9131,
+            0.8031
+          ],
+          "boxSource": "review:lucas",
+          "id": "down_stair",
+          "direction": "forward",
+          "requires": "table_c7",
+          "lockedBody": "The stair drops away into the dark below the channel. Whatever is down there, the canyon has not finished telling you about it yet."
+        }
+      ],
+      "panorama": "j_c7/scene.png",
+      "builtFrom": "l1_j_c7_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "sfx": [
+        {
+          "src": "audio/canyon_deepfall.mp3",
+          "volume": 0.2,
+          "mode": "loop"
+        },
+        {
+          "src": "audio/canyon_cave_hall.mp3",
+          "volume": 0.1,
+          "mode": "loop"
+        }
+      ],
+      "hotspots": [
+        {
+          "id": "table_c7",
+          "type": "puzzle",
+          "label": "The trunk reading-table",
+          "box": [
+            0.3499,
+            0.6785,
+            0.4519,
+            0.8225
+          ],
+          "boxSource": "moved:testplay",
+          "starterCode": "canyon_water_chem",
+          "question": {
+            "prompt": "The makers cut their own map of the canyon into the wall behind you, every spring set into the branch of the fork it runs down. You have the water itself. Which springs does the carved map put in the wrong company?",
+            "options": [
+              "Bitterwell and Saltglass",
+              "Bitterwell only",
+              "Saltglass only",
+              "Bitterwell and Brimstone_Font",
+              "Saltglass and Brineseep",
+              "Chalkseep and Palegate",
+              "None — the carved map is right"
+            ],
+            "correct": 0,
+            "maxAttempts": 4,
+            "feedback": {
+              "correct": "Correct — noted in your field notebook: Bitterwell and Saltglass each run down one fork and belong to another.",
+              "wrong": [
+                "Give every spring its family from the water, then set that beside the fork it runs down, and look for the rows where the two disagree.",
+                "`cutree(..., 4)` for the family, the `fork` column for the makers' grouping — put them side by side and the mismatches stand out.",
+                "Most springs agree with the carving. More than one does not. A spring can run down one fork and still be tapping the same stratum as a family in another."
+              ]
+            }
+          },
+          "availableWhen": {
+            "allSolved": [
+              "j_c1",
+              "j_c2",
+              "j_c4"
+            ]
+          },
+          "lockedBody": "The trunk gathers every water in the canyon, and you have not yet read them all. Go back up and finish the survey.",
+          "solveSfx": {
+            "src": "audio/solve_storm_breaks.mp3",
+            "volume": 0.5
+          }
+        },
+        {
+          "id": "carved_wall_map",
+          "type": "clue",
+          "label": "The carved wall-map",
+          "box": [
+            0.323,
+            0.1882,
+            0.528,
+            0.5765
+          ],
+          "boxSource": "review:lucas",
+          "body": "The makers' own map of the canyon, cut deep into the rock: every spring set into the branch of the fork it runs down. West, East, North, South — four groups, and the carving is very sure of itself."
+        },
+        {
+          "id": "bm_c7",
+          "type": "clue",
+          "label": "The trunk benchmark",
+          "box": [
+            0.5625,
+            0.623,
+            0.6085,
+            0.807
+          ],
+          "pickup": true,
+          "onPickup": {
+            "set": "c7_read"
+          },
+          "body": "Carved into the stone are the numbers 850.",
+          "boxSource": "review:lucas"
+        },
+        {
+          "id": "up_slot_left",
+          "type": "door",
+          "label": "The climb up the left branch",
+          "box": [
+            0.1388,
+            0.0562,
+            0.2388,
+            0.4562
+          ],
+          "to": "j_c3",
+          "boxSource": "review:lucas",
+          "direction": "back"
+        },
+        {
+          "id": "up_slot_right",
+          "type": "door",
+          "label": "The climb up the right branch",
+          "box": [
+            0.7269,
+            0.0332,
+            0.8269,
+            0.4332
+          ],
+          "to": "j_c6",
+          "boxSource": "moved:testplay",
+          "direction": "back"
+        },
+        {
+          "id": "down_stair",
+          "type": "door",
+          "label": "The stair down to the floodworks",
+          "box": [
+            0.8193,
+            0.5003,
+            0.9193,
+            0.8003
+          ],
+          "to": "works",
+          "boxSource": "moved:testplay",
+          "direction": "forward",
+          "requires": "table_c7",
+          "lockedBody": "The stair drops away into the dark below the channel. Whatever is down there, the canyon has not finished telling you about it yet."
+        },
+        {
+          "id": "clip_base",
+          "type": "ambient",
+          "label": "Scene motion (base)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/serve-clips.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "j_c7/cine_base.mp4"
+          }
+        }
+      ]
+    },
+    {
+      "key": "works",
+      "title": "The drowned hall",
+      "technique": "Escape — cut the land's tree (data-free)",
+      "phase": "escape",
+      "built": true,
+      "unlockedWhen": {
+        "solved": "j_c7"
+      },
+      "debrief": "The escape was the whole skill made physical and stripped of data: read the canyon's own branching tree from the heights you gathered, then CUT it at a flood-height and count the families that remain. Reading the true structure beneath the surface — in the water, then in the rock — is literally what opened the way out.",
+      "authoring": {
+        "tag": "works",
+        "scenePrompt": "This is a seamless 360-degree panorama from the middle of the same vast underground hall of the old floodworks, later — the viewer stands on the same broad flagged floor at its centre, surrounded by the same carved piers and sluice-cut walls, but the black water has risen well up the floor and the great engraved panel is lit; a squat bronze lamp hangs on a long chain above the water, its flame drawn sideways by the draught coming down the canyon. THIS WHOLE CANYON WAS ENGINEERED BY A VANISHED PEOPLE AND THEIR WATERWORKS ARE EVERYWHERE: carved stone channels and cut sluice-races thread the walls at several different heights, stepped weirs and spillways drop the water from level to level in small falls, narrow flights of steps are cut straight into the rock face and iron-runged ladders climb past them to little gauging platforms and corbelled ledges, verdigrised bronze sluice-gates and toothed rack-and-pinion mechanisms stand in the races, worn carved disc-sigils and level-marks are set into the stone at intervals, and small lamp niches burn at every landing — and this is the floodworks itself, the machine that drives the whole system, its gates and races now running full and loud. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain unbroken stretch of wet red-sandstone wall in deep shadow, near-black and featureless, uniform and unlit: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, a plain unbroken stretch of wet red-sandstone wall in deep shadow, near-black and featureless, the half of that one wall that meets its other half cleanly at the seam directly behind you; to the left, the floodwater risen well up the hall floor, lapping at the feet of the carved piers and still climbing, drowned steps showing pale beneath it; to the left of centre, the hide map unrolled and pinned flat on the stone table, lit from beneath, its branching channels now marked all the way down with the heights gathered on the climb; dead ahead in the centre, the great engraved panel awake at last — its grid of square stone cells glowing, two rows filled with lit carved marks and the row between them standing dark and empty; just right of centre, the sealed tunnel mouth beside its tall iron sluice-wheel, its heavy stone door still shut fast, worn steps climbing away behind it; to the right, the low carved arch back out to the trunk passage, water pouring steadily in through it now; on the far right, the same plain unbroken stretch of wet red-sandstone wall in deep shadow, near-black and featureless, the other half of that one wall, joining cleanly at the seam directly behind you. wet red sandstone and rising black water, the panel's cold glow against warm amber lamplight, spray and heavy air, painterly, cinematic, subtle film grain, urgent. No people, no lettering, no captions, no text, no readable writing, no signage, no UI. Again: the extreme left and right edges must align perfectly into a plain unbroken stretch of wet red-sandstone wall in deep shadow, near-black and featureless, uniform and unlit, with no visible seam, join, or repetition.",
+        "doorPrompt": "The same hall with the sealed tunnel mouth grinding open — a dark escape passage beyond the thrown sluice-wheel; the way back up unchanged.",
+        "sceneSpec": {
+          "room": "works",
+          "interior": true,
+          "seam": "a plain unbroken stretch of wet red-sandstone wall in deep shadow, near-black and featureless, uniform and unlit",
+          "setting": "the middle of the same vast underground hall of the old floodworks, later — the viewer stands on the same broad flagged floor at its centre, surrounded by the same carved piers and sluice-cut walls, but the black water has risen well up the floor and the great engraved panel is lit; the same squat bronze lamp hangs on its long chain above the water, its flame drawn sideways by the draught coming down the canyon",
+          "elements": [
+            {
+              "id": "seam_wall_left_lit",
+              "at": "on the far left",
+              "desc": "a plain unbroken stretch of wet red-sandstone wall in deep shadow, near-black and featureless, the half of that one wall that meets its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "risen_flood",
+              "at": "to the left",
+              "desc": "the floodwater risen well up the hall floor, covering the flagstones, lapping at the bottom step of the bronze flood door and around the feet of the carved piers and the stone table, drowned steps showing pale beneath it",
+              "animate": {
+                "motion": "the risen water surging and falling against the piers, creeping a little further up the stone each time",
+                "loop": "boomerang"
+              }
+            },
+            {
+              "id": "flood_door",
+              "at": "to the left",
+              "door": {
+                "direction": "forward"
+              },
+              "label": "The bronze flood door",
+              "desc": "the same heavy riveted bronze flood door, green with age, set flush into the rock at the top of four worn stone steps, a great spoked wheel-lock at its centre, the only metal door in the hall, standing well in from the edge, the floodwater now up to its bottom step, still shut fast"
+            },
+            {
+              "id": "lit_canyon_map",
+              "at": "to the left of centre",
+              "label": "The lit canyon map",
+              "desc": "the hide map unrolled and pinned flat on the same stone table, the water now around its feet, lit from beneath, its branching channels marked all the way down with the heights gathered on the climb",
+              "elevmap": true
+            },
+            {
+              "id": "calibration_panel",
+              "at": "dead ahead in the centre",
+              "lock": true,
+              "label": "The calibration panel",
+              "desc": "the same great engraved panel awake at last — its three horizontal rows of square stone cells stacked one above another, and only three, four cells to a row with a long narrow carved plate at the left end of each row, framed by a plain smooth stone border; the top two rows glowing with lit carved marks, the bottom row dark and empty"
+            },
+            {
+              "id": "empty_shaft",
+              "at": "just right of centre",
+              "clue": true,
+              "label": "The empty ladder shaft",
+              "desc": "the same shaft climbing through the ceiling toward a far, pale scrap of daylight, empty now: the timber ladder is gone from it, its broken lengths floating in the water below"
+            },
+            {
+              "id": "back_arch",
+              "at": "to the right",
+              "door": {
+                "direction": "back",
+                "to": "j_c7"
+              },
+              "label": "The arch back up the canyon",
+              "desc": "the low carved arch back out to the trunk passage, water pouring steadily in through it now"
+            },
+            {
+              "id": "seam_wall_right_lit",
+              "at": "on the far right",
+              "desc": "the same plain unbroken stretch of wet red-sandstone wall in deep shadow, near-black and featureless, the other half of that one wall, joining cleanly at the seam directly behind you"
+            }
+          ],
+          "atmosphere": "wet red sandstone and rising black water, the panel's cold glow against warm amber lamplight, spray and heavy air, painterly, cinematic, subtle film grain, urgent",
+          "negatives": "No people, no lettering, no captions, no text, no readable writing, no signage, no UI",
+          "seamOccluder": "a broad carved stone pier, floor to ceiling, plain and unlit"
+        },
+        "motionSpec": {
+          "rigid": "The hall walls, carved piers, flagged floor, stone table, engraved panel, ladder and stonework, and the iron sluice-wheel",
+          "has_document": true,
+          "pinned": [
+            "The unrolled hide map lies flat and pinned on the stone table; its channel lines and marks do not move, lift, curl or change."
+          ],
+          "subjects": [
+            {
+              "name": "risen_flood",
+              "box": [
+                0.06,
+                0.52,
+                0.4,
+                1.0
+              ],
+              "phrase": "the risen black floodwater lapping at the feet of the carved piers, its surface heaving and slapping against the stone"
+            },
+            {
+              "name": "pour_arch",
+              "box": [
+                0.66,
+                0.42,
+                0.94,
+                1.0
+              ],
+              "phrase": "water pouring steadily in through the low carved arch and breaking white where it lands"
+            },
+            {
+              "name": "spray_air",
+              "box": [
+                0.32,
+                0.12,
+                0.8,
+                0.58
+              ],
+              "phrase": "spray and heavy damp air hanging and curling through the lamplit hall"
+            },
+            {
+              "name": "lights_1",
+              "box": [
+                0.2323,
+                0.4898,
+                0.2674,
+                0.5629
+              ],
+              "phrase": "the hanging oil lanterns burning with a live, restless flame that gutters and flares, their pools of amber light pulsing on the wet stone"
+            },
+            {
+              "name": "lights_2",
+              "box": [
+                0.5058,
+                0.5687,
+                0.5251,
+                0.6354
+              ],
+              "phrase": "the hanging oil lanterns burning with a live, restless flame that gutters and flares, their pools of amber light pulsing on the wet stone"
+            },
+            {
+              "name": "lights_3",
+              "box": [
+                0.3801,
+                0.5957,
+                0.3959,
+                0.6602
+              ],
+              "phrase": "the hanging oil lanterns burning with a live, restless flame that gutters and flares, their pools of amber light pulsing on the wet stone"
+            }
+          ],
+          "states": {
+            "open": {
+              "rigid": "The hall walls, carved piers, flagged floor, stone table, engraved panel, ladder and stonework, and the iron sluice-wheel",
+              "subjects": [
+                {
+                  "name": "risen_flood",
+                  "box": [
+                    0.06,
+                    0.52,
+                    0.4,
+                    1.0
+                  ],
+                  "phrase": "the risen black floodwater lapping at the feet of the carved piers, its surface heaving and slapping against the stone"
+                },
+                {
+                  "name": "pour_arch",
+                  "box": [
+                    0.66,
+                    0.42,
+                    0.94,
+                    1.0
+                  ],
+                  "phrase": "water pouring steadily in through the low carved arch and breaking white where it lands"
+                },
+                {
+                  "name": "spray_air",
+                  "box": [
+                    0.32,
+                    0.12,
+                    0.8,
+                    0.58
+                  ],
+                  "phrase": "spray and heavy damp air hanging and curling through the lamplit hall"
+                },
+                {
+                  "name": "lights_1",
+                  "box": [
+                    0.2323,
+                    0.4898,
+                    0.2674,
+                    0.5629
+                  ],
+                  "phrase": "the hanging oil lanterns burning with a live, restless flame that gutters and flares, their pools of amber light pulsing on the wet stone"
+                },
+                {
+                  "name": "lights_2",
+                  "box": [
+                    0.5058,
+                    0.5687,
+                    0.5251,
+                    0.6354
+                  ],
+                  "phrase": "the hanging oil lanterns burning with a live, restless flame that gutters and flares, their pools of amber light pulsing on the wet stone"
+                },
+                {
+                  "name": "lights_3",
+                  "box": [
+                    0.3801,
+                    0.5957,
+                    0.3959,
+                    0.6602
+                  ],
+                  "phrase": "the hanging oil lanterns burning with a live, restless flame that gutters and flares, their pools of amber light pulsing on the wet stone"
+                }
+              ],
+              "pinned": [
+                "The unrolled hide map lies flat and pinned on the stone table; its channel lines and marks do not move, lift, curl or change.",
+                "The escape tunnel stands OPEN and stays open: its stone door does not move, swing, close or change, and the dark passage beyond it stays empty — nothing appears in it, moves in it or comes out of it.",
+                "The great iron sluice-wheel has been thrown and is at rest: it does not turn."
+              ],
+              "negatives": [
+                ", door closing, door swinging, gate shutting, stone door moving, wheel turning, figure in the doorway, light coming down the tunnel, something emerging from the passage"
+              ],
+              "has_document": true
+            }
+          },
+          "room": "works",
+          "state": "base"
+        }
+      },
+      "entry": null,
+      "designNote": "ESCAPE (data-free meta-echo; the cut). MECHANIC (current engine): a LOCK whose code is the panel's missing row, read off THE LIT CANYON MAP — this room's own `elevmap`, NOT j_c7's carved wall-map, which is the boss's taught trap and has nothing to do with the escape — showing the confluence tree + the heights the player gathered: c1 1400, c2 1380, c4 1420, c5 1390, LEFT-mid c3 1050, RIGHT-mid c6 1200, trunk c7 850). The panel gives three flood-heights x cluster sizes; two rows lit, one dark: HIGH 1300 -> 2,2,2,2 (lit); LOW 950 -> 4,4 (lit); MIDDLE 1125 -> ? (dark). Player draws the 1125 waterline: above c3(1050), below c6(1200) -> the RIGHT half stays whole (4) while the LEFT splits (2,2) => 2,2,4. LOCK ANSWER = '224' (left-to-right across the canyon). Verified: _scratch/verify_escape_topology.py. NO data/CSV — heights are world props. EXIT tunnel requires the lock; ALSO gate on MAP-COMPLETENESS (all 7 junction heights read) — engine. REUSES 'undercroft' scene (water higher, panel lit). MAZE MODEL (engine work Lucas will build): every passage is OPEN from the start (roam freely, backtrack anytime); a puzzle at a junction is served next-in-queue via availableWhen (a diegetic 'not yet' if out of order); the survey is DRY so nothing seals off; the escape panel refuses an INCOMPLETE map, so the player goes back for any junction whose height is still blank. Scene shows OPEN fork-passages (no closed-door art needed on maze passages) — only the escape tunnel is a gated closed->open door. FUTURE UPGRADE: replace the lock with the draggable-node map + live matrix-grid panel (puzzle_inventory #19).",
+      "plannedHotspots": [
+        {
+          "type": "elevmap",
+          "label": "The lit canyon map",
+          "note": "the confluence tree + gathered heights — the escape's reading surface",
+          "key": "canyon_heights",
+          "countKey": "heights_placed",
+          "axis": {
+            "min": 800,
+            "max": 1500,
+            "step": 25,
+            "unit": "m",
+            "label": "elevation"
+          },
+          "nodes": [
+            {
+              "id": "c1",
+              "label": "c1 · high confluence",
+              "x": 0.125,
+              "answer": 1400,
+              "tol": 0,
+              "requires": "c1_read"
+            },
+            {
+              "id": "c3",
+              "label": "c3 · left fork",
+              "x": 0.25,
+              "answer": 1050,
+              "tol": 0,
+              "requires": "c3_read"
+            },
+            {
+              "id": "c2",
+              "label": "c2 · orphan junction",
+              "x": 0.375,
+              "answer": 1380,
+              "tol": 0,
+              "requires": "c2_read"
+            },
+            {
+              "id": "c7",
+              "label": "c7 · the trunk",
+              "x": 0.5,
+              "answer": 850,
+              "tol": 0,
+              "requires": "c7_read"
+            },
+            {
+              "id": "c4",
+              "label": "c4 · bitter confluence",
+              "x": 0.625,
+              "answer": 1420,
+              "tol": 0,
+              "requires": "c4_read"
+            },
+            {
+              "id": "c6",
+              "label": "c6 · right fork",
+              "x": 0.75,
+              "answer": 1200,
+              "tol": 0,
+              "requires": "c6_read"
+            },
+            {
+              "id": "c5",
+              "label": "c5 · still pool",
+              "x": 0.875,
+              "answer": 1390,
+              "tol": 0,
+              "requires": "c5_read"
+            }
+          ],
+          "prompt": "The map, lit from beneath. Drag the flood height across it and read what the canyon breaks into.",
+          "feedback": {
+            "placed": "{n} of {m} junction heights marked"
+          },
+          "waterline": {
+            "enabled": true,
+            "start": 1125,
+            "label": "flood height"
+          },
+          "box": [
+            0.403,
+            0.668,
+            0.52,
+            0.757
+          ],
+          "boxSource": "review:agent",
+          "id": "lit_canyon_map"
+        },
+        {
+          "type": "lock",
+          "label": "The calibration panel",
+          "note": "answer 224 (fill the 1125 row: left splits 2,2, right stays 4)",
+          "availableWhen": {
+            "gte": [
+              "heights_placed",
+              7
+            ]
+          },
+          "lockedBody": "The cells stay dark. The panel is keyed to the canyon's own heights, and the map in your hands still has junctions on it you have never stood at.",
+          "box": [
+            0.445,
+            0.308,
+            0.538,
+            0.472
+          ],
+          "boxSource": "review:agent",
+          "id": "calibration_panel",
+          "answer": "224",
+          "length": 3,
+          "feedback": {
+            "correct": "The cells light one after another, and somewhere above you a bolt draws back.",
+            "wrong": "The panel holds. The row stays dark.",
+            "out": "The panel goes quiet and will not take another attempt."
+          },
+          "solveSfx": {
+            "src": "audio/solve_sluice.mp3",
+            "volume": 0.4088462242400288
+          }
+        },
+        {
+          "type": "door",
+          "label": "The bronze flood door",
+          "note": "the way out: requires the panel lock (and a complete map). The same door the player saw locked in the dry hall.",
+          "id": "emergency_tunnel",
+          "direction": "forward",
+          "requires": "calibration_panel"
+        },
+        {
+          "type": "door",
+          "label": "The arch back up the canyon",
+          "to": "j_c7",
+          "note": "open",
+          "box": [
+            0.2604,
+            0.0849,
+            0.3604,
+            0.3849
+          ],
+          "boxSource": "review:lucas",
+          "id": "back_arch",
+          "direction": "back"
+        },
+        {
+          "type": "clue",
+          "label": "The empty ladder shaft",
+          "id": "empty_shaft",
+          "note": "the ladder fell at j_c1's entry card; depicted, so it must be clickable",
+          "body": "The ladder that brought you up is gone from the shaft. Its broken lengths turn slowly in the water below. There is no climbing out this way now."
+        }
+      ],
+      "panorama": "works/scene.png",
+      "builtFrom": "l1_works_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "sfx": [
+        {
+          "src": "audio/canyon_deepfall.mp3",
+          "volume": 0.3,
+          "mode": "loop"
+        },
+        {
+          "src": "audio/canyon_cave_hall.mp3",
+          "volume": 0.12,
+          "mode": "loop"
+        }
+      ],
+      "hotspots": [
+        {
+          "id": "lit_canyon_map",
+          "type": "elevmap",
+          "label": "The lit canyon map",
+          "box": [
+            0.403,
+            0.668,
+            0.52,
+            0.757
+          ],
+          "key": "canyon_heights",
+          "countKey": "heights_placed",
+          "axis": {
+            "min": 800,
+            "max": 1500,
+            "step": 25,
+            "unit": "m",
+            "label": "elevation"
+          },
+          "nodes": [
+            {
+              "id": "c1",
+              "label": "c1 · high confluence",
+              "x": 0.125,
+              "answer": 1400,
+              "tol": 0,
+              "requires": "c1_read"
+            },
+            {
+              "id": "c3",
+              "label": "c3 · left fork",
+              "x": 0.25,
+              "answer": 1050,
+              "tol": 0,
+              "requires": "c3_read"
+            },
+            {
+              "id": "c2",
+              "label": "c2 · orphan junction",
+              "x": 0.375,
+              "answer": 1380,
+              "tol": 0,
+              "requires": "c2_read"
+            },
+            {
+              "id": "c7",
+              "label": "c7 · the trunk",
+              "x": 0.5,
+              "answer": 850,
+              "tol": 0,
+              "requires": "c7_read"
+            },
+            {
+              "id": "c4",
+              "label": "c4 · bitter confluence",
+              "x": 0.625,
+              "answer": 1420,
+              "tol": 0,
+              "requires": "c4_read"
+            },
+            {
+              "id": "c6",
+              "label": "c6 · right fork",
+              "x": 0.75,
+              "answer": 1200,
+              "tol": 0,
+              "requires": "c6_read"
+            },
+            {
+              "id": "c5",
+              "label": "c5 · still pool",
+              "x": 0.875,
+              "answer": 1390,
+              "tol": 0,
+              "requires": "c5_read"
+            }
+          ],
+          "prompt": "The map, lit from beneath. Drag the flood height across it and read what the canyon breaks into.",
+          "feedback": {
+            "placed": "{n} of {m} junction heights marked"
+          },
+          "waterline": {
+            "enabled": true,
+            "start": 1125,
+            "label": "flood height"
+          },
+          "boxSource": "review:agent"
+        },
+        {
+          "id": "calibration_panel",
+          "type": "lock",
+          "label": "The calibration panel",
+          "box": [
+            0.445,
+            0.308,
+            0.538,
+            0.472
+          ],
+          "availableWhen": {
+            "gte": [
+              "heights_placed",
+              7
+            ]
+          },
+          "lockedBody": "The cells stay dark. The panel is keyed to the canyon's own heights, and the map in your hands still has junctions on it you have never stood at.",
+          "boxSource": "review:agent",
+          "answer": "224",
+          "length": 3,
+          "feedback": {
+            "correct": "The cells light one after another, and somewhere above you a bolt draws back.",
+            "wrong": "The panel holds. The row stays dark.",
+            "out": "The panel goes quiet and will not take another attempt."
+          },
+          "solveSfx": {
+            "src": "audio/solve_sluice.mp3",
+            "volume": 0.4088462242400288
+          }
+        },
+        {
+          "id": "emergency_tunnel",
+          "type": "door",
+          "label": "The bronze flood door",
+          "box": [
+            0.5898,
+            0.1664,
+            0.6898,
+            0.4664
+          ],
+          "boxSource": "review:lucas",
+          "direction": "forward",
+          "requires": "calibration_panel",
+          "variants": [
+            {
+              "state": "open",
+              "when": {
+                "solved": "works"
+              },
+              "box": [
+                0,
+                0,
+                1,
+                1
+              ],
+              "panorama": "works/scene_open.png",
+              "prompt": "The same hall with the bronze flood door swung open, its wheel-lock spun, a dark stair climbing away behind it; everything else unchanged."
+            }
+          ]
+        },
+        {
+          "id": "back_arch",
+          "type": "door",
+          "label": "The arch back up the canyon",
+          "box": [
+            0.2604,
+            0.0849,
+            0.3604,
+            0.3849
+          ],
+          "to": "j_c7",
+          "boxSource": "review:lucas",
+          "direction": "back"
+        },
+        {
+          "id": "clip_base",
+          "type": "ambient",
+          "label": "Scene motion (base)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/serve-clips.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "works/cine_base.mp4"
+          }
+        },
+        {
+          "id": "clip_open",
+          "type": "ambient",
+          "label": "Scene motion (open)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for the OPEN state's baked full-scene cinemagraph. `state` is what stops it playing over the sealed backdrop and vice versa (variant_resolve.pickCinemagraphs).",
+          "cinemagraph": {
+            "state": "open",
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "works/cine_open.mp4"
+          }
+        }
+      ]
+    }
+  ],
+  "worldPlatePrompt": "A world-bible establishing plate for a red slot-canyon system engineered long ago by a vanished people. One frame holding the whole world's vocabulary: banded red-sandstone walls rising sheer and narrow, a dendritic network of slot canyons forking and merging, clear pale water running in carved channels, weathered stone survey benchmarks incised with simple geometric marks, low carved arches and rough ladders of dark timber, a squat carved stone reading-table set with a pane of glowing glass, and iron sluice machinery green with age. Soft even daylight, neither dawn nor sunset, flat and neutral. Palette: banded red and ochre sandstone, cool teal shadow, warm amber lamplight, pale blue-green water. Painterly, cinematic, subtle film grain. No people, no lettering, no captions, no text, no readable writing, no signage, no UI.",
+  "worldPlate": "_world/plate.png",
+  "music": "audio/canyon_confluence_theme.mp3",
+  "musicVolume": 0.4,
+  "musicCredit": {
+    "text": "Vraell — “Guitar Meditations X”",
+    "url": "https://www.youtube.com/watch?v=z04Oyndw3cM"
+  },
+  "fitWrap": true,
+  "cover": "cover.png",
+  "doorLabels": true
+}

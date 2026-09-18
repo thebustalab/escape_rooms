@@ -1,2 +1,0 @@
-DECISION: RENDER
-WHY: The new 3072 still was committed and seam-staged at 00:42 UTC from the current spec, and it follows the spec: the forward window is a plain brick tube with the rails running away into the distance, which gives the clip one moving thing in a small area, and the line map and direction lever are both in the art. There's no clip yet, and Lucas's review note asks for one throwaway base render per cab and no re-authoring, so car_woad's travel-based PARK shouldn't be repeated here.

@@ -18,6 +18,16 @@
 // R source injected during boot, BEFORE the scenario/page `setup` — so a setup that defines its own
 // `view` still wins. Defined in the global environment, which masks any package's `view` (e.g.
 // tibble::view) no matter what is attached later.
+//
+// Capital-V `View()` is aliased here too (2026-09-17, moved from the book sandbox's setup so all three
+// surfaces get it). `utils::View` EXISTS in WebR and silently does nothing — no table, no error, just
+// "(no output)" — so a student with RStudio habits, or following the book's "the local equivalent is
+// View()" note, got dead silence. Two details are load-bearing:
+//  - `eval.parent(substitute(view(x)))`, NOT `view(x, ...)`. view() captions the table with
+//    deparse(substitute(x)); called through a plain wrapper that sees the wrapper's own formal, so every
+//    View() table was captioned "x". Rebuilding the call in the caller's frame keeps the real label.
+//  - It resolves `view` at CALL time, so a setup that redefines view() is still honoured by View().
+// `title` is accepted (RStudio's second argument) so `View(d, "t")` does not error; it is ignored.
 export const VIEW_R_SHIM = `
 .__view_env <- new.env()
 .__view_env$tables <- list()
@@ -46,6 +56,7 @@ view <- function(x, n = 1000L) {
   )
   invisible(x)
 }
+View <- function(x, title) eval.parent(substitute(view(x)))
 .__view_take <- function() {
   out <- .__view_env$tables
   .__view_env$tables <- list()
