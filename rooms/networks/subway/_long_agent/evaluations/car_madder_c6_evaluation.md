@@ -1,0 +1,8 @@
+I checked the new car_madder still against the spec and Lucas's review note, and the render should go ahead.
+
+- **The still matches the spec.** It's the 3072×1024 image written at 00:42 UTC. The forward window shows a plain round brick tube with the rails running away. It has no side arches or alcoves, though a thin row of wall lamps runs along one side. The laminated line map is taped above the speaker, and the brass direction lever stands at the end of the desk. The frosted platform door, the glazed gangway door and the blind side walls are all where the spec puts them. The run state shows no new still is needed for this room, so the clip won't animate old art.
+- **The mover is small and has never been rendered.** The only thing that moves is the tunnel inside the forward window. There's no clip yet, so rendering it is the first real test of that mover.
+- **It follows Lucas's instructions.** His note asks for exactly one throwaway base clip per cab and says not to re-author anything. That's why car_woad's PARK, which argued that travel can't loop, doesn't apply here. The note also says a dark, unpowered cab must not look like it's moving, and this mover is a moving tunnel. That only matters for a throwaway clip, and the real cab clips come later from the energised and running states.
+- **Nothing on the reject list applies.** It changes no settings, doesn't rely on a zero-return reading, accepts no clip, writes nothing into `scenario.json`, and hand-writes no art prompt.
+
+VERDICT: PASS

@@ -1,23 +1,51 @@
 {
   "status": "working",
   "retry_count": 0,
-  "started": "2026-09-17T23:22:49.192570+00:00",
-  "last_cycle": null,
-  "cycles_completed": 0,
-  "pending_render": null,
+  "started": "2026-09-18T00:33:51.514195+00:00",
+  "last_cycle": "2026-09-18T00:45:08.425167+00:00",
+  "cycles_completed": 6,
+  "pending_render": {
+    "room": "car_madder",
+    "raw": "/home/bustalab/Documents/Tools/temp/cine/_art_prompt_exp/subway/car_madder_motion_ri6.mp4",
+    "log": "/home/bustalab/Documents/Tools/websites/thebustalab.github.io/escape_rooms/rooms/networks/subway/_long_agent/outputs/car_madder_ri6_render.log"
+  },
   "rooms": {
-    "ochre_hall": {
-      "needs_still": true,
-      "spec_edited_at": 1789687369.2345877
+    "car_woad": {
+      "art_generated": 1,
+      "history": [
+        {
+          "cycle": 3,
+          "decision": "PARK",
+          "why": "The only mover in the spec is the forward window \"coming steadily toward the viewer\", which is travel; a two-ended loop can't show travel (the no-travel rule, the one prompt rule the notes show is proven). The overnight plan also says to leave the five car_* cab rooms out of this loop as travelling shots. And Lucas has put the subway ride order and its cinemagraph subjects on hold as his own decision, so I shouldn't choose a new subject for him."
+        }
+      ],
+      "parked": "The only mover in the spec is the forward window \"coming steadily toward the viewer\", which is travel; a two-ended loop can't show travel (the no-travel rule, the one prompt rule the notes show is proven). The overnight plan also says to leave the five car_* cab rooms out of this loop as travelling shots. And Lucas has put the subway ride order and its cinemagraph subjects on hold as his own decision, so I shouldn't choose a new subject for him."
     },
-    "ochre_verdigris": {
-      "needs_still": true,
-      "spec_edited_at": 1789687369.2345886
+    "car_madder": {
+      "art_generated": 1,
+      "history": [
+        {
+          "cycle": 6,
+          "decision": "RENDER",
+          "why": "The new 3072 still was committed and seam-staged at 00:42 UTC from the current spec, and it follows the spec: the forward window is a plain brick tube with the rails running away into the distance, which gives the clip one moving thing in a small area, and the line map and direction lever are both in the art. There's no clip yet, and Lucas's review note asks for one throwaway base render per cab and no re-authoring, so car_woad's travel-based PARK shouldn't be repeated here."
+        }
+      ],
+      "attempts": 1
     },
-    "alum_lampblack": {
+    "car_weld": {
       "needs_still": true,
-      "spec_edited_at": 1789687369.2345889
+      "spec_edited_at": 1789691631.5632598
+    },
+    "car_verdigris": {
+      "needs_still": true,
+      "spec_edited_at": 1789691631.5632598
+    },
+    "car_lampblack": {
+      "needs_still": true,
+      "spec_edited_at": 1789691631.5632603
     }
   },
-  "review_note": "SUBWAY ROUND 4 (Lucas's review, 2026-09-17). Three rooms only; every other station is PASSED and must not be touched. The specs are already fixed \u2014 generate from them as they stand, commit, seam, render. ochre_hall: the stair was drawn ACROSS the wrap join again (two half-stairs, one at each edge), so its element now states EXACTLY ONE stair and one shaft, out on the floor a third of the way in from the left edge and none at either extreme edge. Its canvas dust-sheeting mover is GONE (the clip invented crazy fabric along the tracks); the mover is now a galvanised bucket in the immediate foreground catching a slow drip, rings spreading \u2014 Lucas asked for something subtle, so do NOT make it vigorous and do NOT add a second mover. ochre_verdigris: same one-stair clause; its water clip was GOOD, keep the seep mover and its phrase exactly. alum_lampblack: the train's road and the tunnel read at right angles and the left side doubled its tracks, so the berth element now states ONE straight pair of rails in line with ONE tunnel mouth, no siding/crossover/points, and the duplicate end elements are deleted; its smoke fell INTO the fire, so the phrase now says the coil rises upward only, gently. HARD RULE: never remove, rename or replace a labelled element, and never add a list of forbidden structures to the seam text (that priming is what doubled these in the first place)."
+  "review_note": "SUBWAY CABS — BASE ART ONLY, on gpt-image-2.5. All five cab specs were re-authored: the forward window is now a PLAIN ROUND BRICK TUBE of repeating rings with no side arches or alcoves (a busy arcade in that window is why car_madder's clip froze), the destination selector is now a brass DIRECTION LEVER, and a laminated LINE MAP is taped above the driver's speaker (it becomes a pickup that overlays the survey sheet — it must actually appear in the art). Generate, commit, seam. The ONE base clip this loop renders per cab is a THROWAWAY: a dark, unpowered cab must not appear to travel, and the real cab clips come from the energised/running/live/ghost states afterwards. Do not re-author anything; do not touch any station.",
+  "generations": 2,
+  "render_polls": 3
 }

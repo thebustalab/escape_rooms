@@ -1,0 +1,9 @@
+I'm letting the worker park car_woad for you. The runner should act on it.
+
+- **The only moving part can't loop.** I read the spec myself. There's no clip yet. The one mover is the forward window, with the tunnel and rails "coming steadily toward the viewer and passing out of frame". That's forward travel, and a loop that has to join end to start can't show it. Rendering this mover as written would waste a run, so stopping for you is right. Picking a new mover is also a decision the worker shouldn't make alone.
+- **None of the rejection rules apply.** It changes no settings, proposes no mover of any kind, rests on no zero-return score, accepts no clip, writes nothing into scenario.json, and writes no art prompt by hand. It isn't an AUTHOR_MOVER either.
+- **The question for you is well framed.** It's in plain prose and gives three clear choices: take the cab out of this loop, swap the tunnel for a small back-and-forth motion like the coat on its hook, or try playing the tunnel forward then in reverse, which has never been tested.
+
+**I couldn't confirm the history the worker quotes to you.** None of it turned up in this machine's notes. That covers your hold on the subway ride from 2026-09-08, the plan to leave the five cab rooms out of the loop, and your "beautiful and looks perfect" comment on the earlier clip. The subway review logs and manifest are here, so the rule and plan notes are probably kept elsewhere. The case for parking doesn't depend on them, because the travel problem is enough. But if a quote reads wrong when the question reaches you, check it before you pick an option.
+
+VERDICT: PASS
