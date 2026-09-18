@@ -70,12 +70,13 @@
 // A bare `./variant_resolve.js` import is NOT refreshed by bumping the <script> tag's ?v, so a changed
 // helper module (e.g. a new export) leaves browsers on a stale cached copy → "doesn't provide an export
 // named X" SyntaxError → blank page (the 2026-08-05 airship regression). Bump all three together.
-import { WebRConsole } from "./webr-console.js?v=104";
-import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers } from "./variant_resolve.js?v=104";   // Phase 3: per-hotspot state variants; monorail switch-door nav
-import * as PQ from "./puzzle_queue.js?v=104";   // dynamic puzzle queue: location-independent puzzle serving
-import { particleCount } from "./particles.js?v=104";   // ambient-particle vocabulary + per-kind field density
-import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=104";
-import { condHolds } from "./cond.js?v=104";   // ledger + elevation-map card DOM
+import { WebRConsole } from "./webr-console.js?v=105";
+import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers } from "./variant_resolve.js?v=105";   // Phase 3: per-hotspot state variants; monorail switch-door nav
+import * as PQ from "./puzzle_queue.js?v=105";   // dynamic puzzle queue: location-independent puzzle serving
+import { particleCount } from "./particles.js?v=105";   // ambient-particle vocabulary + per-kind field density
+import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=105";
+import { condHolds } from "./cond.js?v=105";   // ledger + elevation-map card DOM
+import * as RIDE from "./ride.js?v=105";   // THE RIDE (subway): express lever + clip-sequence planner
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 
@@ -200,6 +201,7 @@ let resumeYaw = 0;
 // room's `unlockedWhen`, and `onSolve` effects are recorded — so non-linear scenarios (counter
 // gates, out-of-order rooms) drop in later with no re-authoring.
 let gameState = {};
+let riding = null;   // THE RIDE in progress ({plan, stop()}) — while set, no hotspot answers (see startRide)
 const solvedRooms = new Set();
 const visitedRooms = new Set();   // physically-entered rooms (incl. puzzle-less junctions) — first-visit entry cards
 // Per-GATE solve state (per-gate model, 2026-07-18): hotspot ids of solved puzzle/lock gates. Lets one
@@ -913,7 +915,7 @@ function condOK(cond) {
   // site stays unchanged.
   const ok = condHolds(cond, { solved: solvedRooms, state: gameState });
   if (!ok && cond && typeof cond === "object"
-      && !["solved", "allSolved", "gte", "eq", "ne", "all", "any"].some(k => k in cond)) {
+      && !["solved", "allSolved", "gte", "eq", "ne", "all", "any", "not"].some(k => k in cond)) {
     console.warn("pano-player: unsupported unlockedWhen (treating as locked):", cond);
   }
   return ok;
@@ -1087,8 +1089,12 @@ function openMap() {
 // A forward arch is ASLEEP (black) until the analysis (primary puzzle) is solved -> AWAKENED (a dim
 // starfield kindles in the arch) -> UNLOCKED (open galaxy, walkable) once its keypad lock is keyed.
 // Everything here is gated on SCENARIO.stonePortals so no other scenario's behaviour changes.
+// A hotspot hidden by `shownWhen` is not in the room right now, so it can be neither the room's forward
+// door nor the door we turn to face on entry (canyon: the dry hall must not face the flooded-state escape
+// door, which would leave the only live exit, the ladder, off-screen).
+const isShown = h => condOK(h.shownWhen);
 function forwardDoor(r) {
-  return (r.hotspots || []).find(h => h.type === "door" && (h.direction || "forward") === "forward") || null;
+  return (r.hotspots || []).find(h => h.type === "door" && isShown(h) && (h.direction || "forward") === "forward") || null;
 }
 function portalUnlocked(r) {            // show the open panorama + make the forward door walkable
   const fd = forwardDoor(r);
@@ -1102,12 +1108,13 @@ function portalAwakened(r) {            // analysis solved (or a pre-awakened ro
 // Prefer a forward door; fall back to whatever door exists (a room may have only a back door).
 function doorYaw(r) {
   const c = r.wrap || { haov: 360, vaov: 90 };
-  const doors = (r.hotspots || []).filter(h => h.type === "door" && Array.isArray(h.box));
+  const doors = (r.hotspots || []).filter(h => h.type === "door" && Array.isArray(h.box) && isShown(h));
   const door = doors.find(h => (h.direction || "forward") === "forward") || doors[0];
   return door ? boxToYP(door.box, c).yaw : 0;
 }
 
 function startRoom(i) {
+  if (riding) cancelRide();          // a test-play jump mid-ride: drop the ride, don't arrive anywhere
   stopRoomSfx();                     // stop the previous room's ambience + restore music volume
   roomIdx = i; room = SCENARIO.rooms[i];
   if (room && room.key) visitedRooms.add(room.key);   // mark entered (so a puzzle-less junction's entry card won't re-show)
@@ -1153,6 +1160,7 @@ window.addEventListener("resize", () => {
     const a = (window.innerWidth || 1) / (window.innerHeight || 1);
     if (Math.abs(a - _lastAspect) / _lastAspect < 0.02) return;
     _lastAspect = a;
+    if (riding) return;                // the ride owns the viewer; arrival re-renders at the new fit anyway
     if (room && viewer) rerenderCurrentRoom();
   }, 250);
 });
@@ -1551,7 +1559,7 @@ function buildViewer(img, yaw = 0) {
   }
   withVariants(img);
 }
-function _renderViewer(img, yaw = 0, dynamic = false) {
+function _renderViewer(img, yaw = 0, dynamic = false, bare = false) {   // bare: no markers (THE RIDE)
   // Stop any prior room's cinemagraph rAF + <video>s before we tear down its viewer (else the loop keeps
   // drawing into a destroyed viewer). No-op for non-cinemagraph rooms.
   if (_cineStop) { try { _cineStop(); } catch (e) {} _cineStop = null; }
@@ -1570,7 +1578,10 @@ function _renderViewer(img, yaw = 0, dynamic = false) {
   // static, non-draggable viewer — addHotSpot-after-load leaves them unpositioned).
   // `ambient` hotspots are decoration-only: they carry a cinemagraph (composited by activeCinemagraphs,
   // independent of markers) but get NO player marker/ring and aren't clickable. Every other type gets a marker.
-  const hotSpots = (room.hotspots || []).filter(h => h.type !== "ambient").map(h => {
+  // `shownWhen` (2026-09-18, canyon): a hotspot that exists only in one world state of the room — the
+  // dry hall's ladder before the flood, the escape lock after it. False ⇒ no marker at all (unlike
+  // `availableWhen`, which keeps the marker and answers with a `lockedBody`). Absent ⇒ always shown.
+  const hotSpots = (bare ? [] : (room.hotspots || [])).filter(h => h.type !== "ambient" && isShown(h)).map(h => {
     const { yaw, pitch } = boxToYP(h.box, c);
     // Every marker also carries `hs-<id>`, so a hotspot is addressable by WHICH ONE IT IS rather than by
     // its position among its siblings. Pannellum puts no id on the div, so a test/stylesheet otherwise has
@@ -1585,7 +1596,10 @@ function _renderViewer(img, yaw = 0, dynamic = false) {
   // No up/down / no zoom is enforced by disabling drag + zoom and only moving yaw
   // via the arrows — NOT by min===max pitch/hfov locks (those break hotspot projection).
   const stage = $("#pano");
-  stage.style.opacity = "0";                  // hidden until the new scene loads, so no white/blank flash
+  // hidden until the new scene loads, so no white/blank flash — except across THE RIDE's own viewer swaps
+  // (departure, arrival), where a dip to black between two frames of the same cab reads as a glitch.
+  if (!_keepStage) stage.style.opacity = "0";
+  _keepStage = false;
   viewer = pannellum.viewer("pano", {
     type: "equirectangular", panorama: img, dynamic: dynamic,
     haov: c.haov, vaov: c.vaov, vOffset: c.vOffset || 0,
@@ -1616,7 +1630,13 @@ $("#next").onclick = () => viewer && viewer.setYaw(viewer.getYaw() + TURN, 600);
 
 function onHotspot(evt, h) {   // Pannellum calls clickHandlerFunc(event, clickHandlerArgs)
   try {
+    if (riding) return;                               // THE RIDE: nothing is clickable until arrival
     if (h.type === "clue") return openClue(h);
+    if (h.type === "lever") {
+      // THE RIDE's one cab control (scenario.ride). Gated like a dial; see openLever.
+      if (!condOK(h.availableWhen)) return openLocked(h);
+      return openLever(h);
+    }
     if (h.type === "dial") {
       // A dial may be GATED like a puzzle/lock (`availableWhen` + diegetic `lockedBody`) — the Pharos lamp
       // dial only becomes turnable once the lantern door's grid is solved. Undefined ⇒ always open, so
@@ -1668,7 +1688,12 @@ function onHotspot(evt, h) {   // Pannellum calls clickHandlerFunc(event, clickH
 // back is always live and shows no entry. Absent direction/to ⇒ the legacy linear fallback.
 function handleDoor(h) {
   const nav = doorNav(h);                                      // effective direction/to (a switch-door follows its active variant)
+  // `onPass` (2026-09-18, subway): world-state effects applied when the player actually walks through —
+  // a berth's boarding door records which station the cab stands at ({set:"at_<line>", to:<berth>}).
+  // Same {set,to}/{inc} grammar as `onSolve`/`onPickup`. Absent on every other door, so nothing changes.
+  const passed = () => { if (Array.isArray(h.onPass)) applyEffects(h.onPass); };
   if (nav.direction === "back") {
+    passed();
     return navigateTo(resolveDoorTarget(h, "back"), false);   // back: no gate, no entry
   }
   if (!doorIsOpen(h, room)) {
@@ -1683,6 +1708,7 @@ function handleDoor(h) {
       : "The door won't budge — solve the puzzle first.");
   }
   if (h.endsEscape) return showEscapeDone();                  // a terminal escape exit inside any room
+  passed();
   if (nav.to) {                                               // explicit forward target (or the active variant's)
     const idx = SCENARIO.rooms.findIndex(r => r.key === nav.to && isBuilt(r));
     if (idx >= 0) return navigateTo(idx, true);
@@ -2073,6 +2099,193 @@ function openDial(h) {
   openModal(h.label || "The dial", wrap, null, h);
   refresh();
 }
+// ---- THE RIDE (networks/subway, settled 2026-09-17) ------------------------------------------------
+// A cab's one control is a `lever` hotspot: {type:"lever", line, availableWhen?, lockedBody?, hint?, sfx?}.
+// It offers up-line / down-line (only the directions with a next berth — ride.js), and a pull runs the
+// train EXPRESS to the next berth: a sequence of full-scene clip states on the cab's own panorama
+// (running / live / ghost …), crossfaded where the state changes, then arrival on the stopped state. The
+// planning is pure and unit-tested in ride.js; this block only turns the plan into pictures and time.
+// Inert unless SCENARIO.ride is authored AND a hotspot is typed `lever`, so no other scenario can reach it.
+function openLever(h) {
+  const cfg = SCENARIO.ride;
+  const line = h.line;
+  const wrap = document.createElement("div");
+  const p = document.createElement("p");
+  if (!RIDE.usesRide(SCENARIO) || !cfg.lines[line]) {
+    p.textContent = "The lever is seized solid.";
+    console.warn("pano-player: lever with no scenario.ride line", line);
+    wrap.appendChild(p);
+    return openModal(h.label || "The lever", wrap, null, h);
+  }
+  const here = RIDE.currentStation(cfg, line, gameState[RIDE.atKey(cfg, line)]);
+  const opts = RIDE.leverOptions(cfg, line, here);
+  p.textContent = opts.length ? (h.hint || "Pull the lever and the train runs through to the next station.")
+                              : "The line runs nowhere from here.";
+  wrap.appendChild(p);
+  const row = document.createElement("div");
+  row.style.cssText = "display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:10px 0";
+  opts.forEach(o => {
+    const b = document.createElement("button"); b.className = "ghost"; b.dataset.dir = o.dir;
+    b.textContent = o.label;
+    b.onclick = () => {
+      closeModal();
+      if (h.sfx) playOneShot(typeof h.sfx === "string" ? h.sfx : h.sfx.src, (typeof h.sfx === "object") ? h.sfx.volume : undefined);
+      startRide(RIDE.planRide(cfg, line, here, o.dir));
+    };
+    row.appendChild(b);
+  });
+  wrap.appendChild(row);
+  tpAuthorPanel(wrap, [
+    { note: "Directions and destinations come from scenario.ride (line " + line + "), not from this card." },
+    { label: "Caption above the buttons (hint)", get: () => h.hint || "", set: v => { h.hint = v; return tpSaveRoom(room); } },
+    { label: "Shown while it is still locked (lockedBody)", get: () => h.lockedBody || "",
+      set: v => { h.lockedBody = v; return tpSaveRoom(room); } },
+  ]);
+  openModal(h.label || "The lever", wrap, null, h);
+}
+
+// The still for a clip state in this room: a full-scene variant carrying that state (the house carriers:
+// night_wash→energised, ride_live, ride_ghost, ride_running), else the convention `<room>/scene_<state>.png`.
+function rideStill(r, state) {
+  for (const h of (r.hotspots || [])) {
+    for (const v of (h && Array.isArray(h.variants) ? h.variants : [])) {
+      const b = Array.isArray(v.box) ? v.box : h.box;
+      if (v && v.state === state && v.panorama && Array.isArray(b) && b.join() === "0,0,1,1") return v.panorama;
+    }
+  }
+  return r.key + "/scene_" + state + ".png";
+}
+// The committed FULL-SCENE clip baked from that state (carrier `cinemagraph.state`), or null.
+function rideClip(r, state) {
+  const c = pickCinemagraphs(r.hotspots, state).find(c => c.box.join() === "0,0,1,1");
+  return c ? c.video : null;
+}
+function _loadVideo(src) {
+  // Resolves to a playing-ready <video> or null (missing/failed file => the state's still stands in).
+  return new Promise(res => {
+    if (!src) return res(null);
+    const v = document.createElement("video");
+    v.muted = true; v.loop = true; v.playsInline = true; v.preload = "auto";
+    let done = false;
+    const fin = ok => { if (done) return; done = true; res(ok ? v : null); };
+    v.addEventListener("loadeddata", () => fin(true), { once: true });
+    v.addEventListener("error", () => fin(false), { once: true });
+    setTimeout(() => fin(v.readyState >= 2), 6000);
+    v.src = src;
+  });
+}
+
+function cancelRide() {
+  const r = riding; riding = null;
+  if (r && r.stop) { try { r.stop(); } catch (e) {} }
+  delete gameState.ride_segment;
+}
+
+function startRide(plan) {
+  if (!plan || riding) return;
+  const cfg = SCENARIO.ride, cab = room;
+  const xf = cfg.crossfade != null ? cfg.crossfade : RIDE.DEFAULT_CROSSFADE;
+  const loopS = cfg.loopSeconds || RIDE.DEFAULT_LOOP_SECONDS;
+  let yaw = 0; try { yaw = viewer.getYaw(); } catch (e) {}
+  const log = [];
+  riding = { plan, stop: null, log };            // set NOW: markers go dead while the media loads
+  const want = [...new Set([plan.arrival.state, ...plan.segments.map(s => s.state)])];
+  Promise.all(want.map(st =>
+    _loadImg(rideStill(cab, st)).catch(() => _loadImg(cab.panorama)).catch(() => null)
+      .then(img => _loadVideo(rideClip(cab, st)).then(video => [st, { img, video }]))))
+  .then(pairs => {
+    if (!riding || riding.plan !== plan || room !== cab) return;   // cancelled while loading
+    const media = Object.fromEntries(pairs);
+    const first = media[plan.arrival.state].img || pairs.find(([, m]) => m.img)[1].img;
+    const W = first.naturalWidth || first.width, H = first.naturalHeight || first.height;
+    // Timeline: departure (the stopped state, fading straight into the first tunnel), the planned
+    // segments, then arrival. A segment lasts loops × its clip's own length (the still's: loopSeconds);
+    // where the state changes the next segment starts `xf` early and fades up over it (ride_preview.py).
+    const clipLen = st => { const v = media[st].video; return (v && isFinite(v.duration) && v.duration > 0) ? v.duration : loopS; };
+    const segs = [{ state: plan.arrival.state, dur: xf }]
+      .concat(plan.segments.map(s => ({ state: s.state, station: s.station, dur: s.loops * clipLen(s.state) })))
+      .concat([{ state: plan.arrival.state, dur: xf, arrive: true }]);
+    let t = 0;
+    segs.forEach((s, i) => {
+      if (i > 0) t -= (segs[i - 1].state !== s.state) ? xf : 0;
+      s.start = Math.max(0, t); t = s.start + s.dur; s.end = t;
+    });
+    const arriveAt = segs[segs.length - 1].start + xf;
+    const cv = document.createElement("canvas"); cv.width = W; cv.height = H;
+    const ctx = cv.getContext("2d");
+    const draw = st => {
+      const m = media[st];
+      if (m.video && m.video.readyState >= 2) ctx.drawImage(m.video, 0, 0, W, H);
+      else if (m.img) ctx.drawImage(m.img, 0, 0, W, H);
+    };
+    let raf = 0, t0 = 0, cur = null;
+    const playing = new Set();
+    const setPlaying = states => {
+      Object.entries(media).forEach(([st, m]) => {
+        if (!m.video) return;
+        if (states.has(st) && !playing.has(st)) { m.video.play().catch(() => {}); playing.add(st); }
+        if (!states.has(st) && playing.has(st)) { m.video.pause(); playing.delete(st); }
+      });
+    };
+    const frame = now => {
+      if (!riding || riding.plan !== plan) return;
+      if (!t0) t0 = now;
+      const el = (now - t0) / 1000;
+      if (el >= arriveAt) return arriveRide(plan);
+      const live = segs.filter(s => s.start <= el && el < s.end);
+      const top = live[live.length - 1] || segs[segs.length - 1];
+      setPlaying(new Set(live.map(s => s.state)));
+      if (top !== cur) {                      // a new segment is on screen: world state + sound follow
+        cur = top;
+        gameState.ride_segment = top.state;
+        log.push(top.station ? top.state + ":" + top.station : top.state);
+        try { syncRoomSfx(); } catch (e) {}
+      }
+      ctx.globalAlpha = 1;
+      live.forEach((s, i) => {
+        ctx.globalAlpha = i === 0 ? 1 : Math.min(1, Math.max(0, (el - s.start) / xf));
+        draw(s.state);
+      });
+      ctx.globalAlpha = 1;
+      try { viewer && viewer.setUpdate && viewer.setUpdate(true); } catch (e) {}
+      raf = requestAnimationFrame(frame);
+    };
+    draw(plan.arrival.state);
+    _keepStage = true;
+    _renderViewer(cv, yaw, true, true);          // one dynamic, marker-less viewer for the whole run
+    // Registered AFTER _renderViewer (which tears down whatever was there), so the next viewer rebuild —
+    // arrival, or a test-play jump — stops this loop and releases the videos.
+    _cineStop = () => {
+      cancelAnimationFrame(raf);
+      Object.values(media).forEach(m => { if (m.video) { try { m.video.pause(); m.video.removeAttribute("src"); m.video.load(); } catch (e) {} } });
+    };
+    riding.stop = _cineStop;
+    raf = requestAnimationFrame(frame);
+  })
+  .catch(e => { console.error("ride failed; arriving directly", e); arriveRide(plan); });
+}
+
+function arriveRide(plan) {
+  if (!riding || riding.plan !== plan) return;
+  const log = riding.log;
+  riding = null;
+  delete gameState.ride_segment;
+  gameState[RIDE.atKey(SCENARIO.ride, plan.line)] = plan.toRoom;   // the platform door now opens here
+  const tail = log[log.length - 1] === plan.arrival.state ? [] : [plan.arrival.state];
+  lastRide = { from: plan.from, to: plan.to, toRoom: plan.toRoom, log: log.concat(tail) };
+  _keepStage = true;
+  rerenderCurrentRoom();                         // stopped state, markers back, door leads to the new berth
+}
+let lastRide = null;
+let _keepStage = false;   // one-shot: the next _renderViewer keeps #pano visible (ride swaps)
+// Read-only probe for tests / the author console (harmless in play, like window.PanoMixer).
+window.PanoRide = {
+  riding: () => !!riding,
+  segment: () => (riding ? gameState.ride_segment || null : null),
+  at: line => (SCENARIO && SCENARIO.ride ? gameState[RIDE.atKey(SCENARIO.ride, line)] : undefined),
+  last: () => lastRide,
+};
+
 function openMapview(h) {
   const key = h.key || "dial";
   const state = gameState[key];
@@ -2672,7 +2885,9 @@ function buildGridCard(h, onSolved) {
       items.map(it => `<tr><th class="rowlab">${esc(it.label)}</th>` +
         buckets.map(b => `<td><button class="cell" data-item="${esc(it.key)}" data-bucket="${esc(b.key)}" aria-label="${esc(it.label)}: ${esc(b.label)}"></button></td>`).join("") +
         `</tr>`).join("") +
-    `</tbody></table><div class="qfeedback"></div><button class="qsubmit">Set the cache</button>`;
+    // `submitLabel` / `feedback.incomplete` default to the trees vault's wording (the first consumer);
+    // canyon's floodgate panel is the second and says its own thing.
+    `</tbody></table><div class="qfeedback"></div><button class="qsubmit">${esc(h.submitLabel || "Set the cache")}</button>`;
   const fb = card.querySelector(".qfeedback"), sub = card.querySelector(".qsubmit");
   card.querySelectorAll(".cell").forEach(btn => btn.addEventListener("click", () => {
     const it = btn.dataset.item;
@@ -2682,7 +2897,7 @@ function buildGridCard(h, onSolved) {
     fb.className = "qfeedback"; fb.innerHTML = "";
   }));
   const submit = () => {
-    if (items.some(it => !sel[it.key])) { fb.className = "qfeedback no"; fb.innerHTML = "Place every kind first."; return; }
+    if (items.some(it => !sel[it.key])) { fb.className = "qfeedback no"; fb.innerHTML = fbk.incomplete || "Place every kind first."; return; }
     attempts++; attemptCounts.set(pid, attempts);
     if (items.every(it => sel[it.key] === answer[it.key])) {
       fb.className = "qfeedback ok"; fb.innerHTML = fbk.correct || "The cache-frame settles into place.";

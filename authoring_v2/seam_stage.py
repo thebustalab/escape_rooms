@@ -229,6 +229,21 @@ def main():
                 print(f"  {k:16}{b} {ra:.1f}x/{d:.1f}  run {m['longest_run']:.3f}  ->  clean, done")
                 continue
             if band_break:
+                # BLUR FIRST, OCCLUDER ONLY IF THE BLUR DOES NOT RESOLVE IT (Lucas, 2026-09-18). The
+                # pixel gradient is local and cannot invent content; re-measure the BAND (not the
+                # ratio, which a blur zeroes by construction) and plant the occluder only if it
+                # still breaks.
+                H._seam_local(p, "gradient", {"span": GRADIENT_SPAN})
+                m2 = SB.measure(p)
+                if m2["longest_run"] < SB.FLAG:
+                    nb, nr, nd = worst_band(p)
+                    record(base, k, a.state, stage="blurred", band=nb, ratio=round(nr, 2),
+                           delta=round(nd, 2), needsWork=False, accepted=False,
+                           seamBandRun=round(m2["longest_run"], 3))
+                    print(f"  {k:16}BAND BREAK run {m['longest_run']:.3f} -> BLURRED -> run "
+                          f"{m2['longest_run']:.3f}  resolved, no occluder needed")
+                    continue
+                m = m2
                 occl = ((r.get("authoring") or {}).get("sceneSpec") or {}).get("seamOccluder")
                 if not occl:
                     record(base, k, a.state, stage="screened", band=b, ratio=round(ra, 2),
@@ -257,11 +272,13 @@ def main():
                 print(f"  {k:16}BAND BREAK run {m['longest_run']:.3f} -> OCCLUDED -> "
                       f"run {nm['longest_run']:.3f}  ({time.time()-t:.0f}s)  — LOOK at it")
             else:
-                # a tonal/texture step: the cheap fix is the RIGHT fix
-                H._start("seam", "seamfix",
-                         lambda k=k, f=fname: H._run_seamfix_room("seam", base, k, file=f), 1)
-                while H.JOBS["seam"]["active"]:
-                    time.sleep(3)
+                # a tonal/texture step: the cheap fix is the RIGHT fix — the LOCAL PIXEL GRADIENT.
+                # This branch used to call `_run_seamfix_room` without an occluder, i.e. the AI
+                # `seamfix` repaint, while recording stage="blurred". The image model redrew the
+                # crop around the join and CLONED whatever stood beside it — subway's ochre_hall and
+                # alum_madder came back with see-through second stairs and a second tunnel mouth
+                # (2026-09-18). Pinned by test_seam_stage_auto.py.
+                H._seam_local(p, "gradient", {"span": GRADIENT_SPAN})
                 nb, nr, nd = worst_band(p)
                 nm = SB.measure(p)
                 record(base, k, a.state, stage="blurred", band=nb, ratio=round(nr, 2),

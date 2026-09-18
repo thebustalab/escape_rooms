@@ -64,3 +64,19 @@ test("an unknown clause fails CLOSED — a gate nobody can evaluate must not ope
   assert.equal(h({ all: [{ solved: "fenwatch" }, { typo: 1 }] }), false,
                "one unreadable clause shuts the whole composition");
 });
+
+test("`not` — one room in two world states (canyon's hall, dry before the boss, flooded after)", () => {
+  // canyon's hall is ONE room: the ladder shows only BEFORE the boss (`{not:{solved:"j_c7"}}`) and the
+  // escape lock only AFTER it (`{solved:"j_c7"}`). If `not` failed to invert, the dry and flooded
+  // hotspots would both show, or neither — a ladder over floodwater, or a hall with no way out.
+  const before = { solved: new Set(), state: {} };
+  const after = { solved: new Set(["j_c7"]), state: {} };
+  const dry = { not: { solved: "j_c7" } };
+  assert.equal(condHolds(dry, before), true, "dry hotspot shows before the boss");
+  assert.equal(condHolds(dry, after), false, "dry hotspot gone after it");
+  assert.equal(condHolds({ solved: "j_c7" }, after), true);
+  assert.equal(condHolds({ not: { not: { solved: "j_c7" } } }, after), true, "double negation");
+  assert.equal(condHolds({ all: [{ not: { solved: "a" } }, { gte: ["n", 1] }] },
+                         { solved: new Set(), state: { n: 1 } }), true, "composes");
+  assert.equal(condHolds({ not: undefined }, before), false, "a missing operand fails CLOSED");
+});

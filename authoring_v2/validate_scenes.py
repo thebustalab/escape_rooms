@@ -73,8 +73,10 @@ def _x_rank(at):
     return scene_spec._x_from_at(at)
 
 
-ENGINE_TYPES = {"puzzle", "clue", "door", "lock", "grid", "ledger", "elevmap", "dial", "mapview", "ambient"}
-GAMEPLAY = {"puzzle", "clue", "door", "lock", "grid", "ledger", "elevmap", "dial", "switch", "mapview"}
+ENGINE_TYPES = {"puzzle", "clue", "door", "lock", "grid", "ledger", "elevmap", "dial", "lever", "mapview", "ambient"}
+GAMEPLAY = {"puzzle", "clue", "door", "lock", "grid", "ledger", "elevmap", "dial", "lever", "switch", "mapview"}
+# `lever` = THE RIDE's cab control (subway, 2026-09-18; shared/ride.js). Hand-authored by the ride patch,
+# never emitted by scene_spec — listed so a committed lever is not reported as undispatched.
 # Subjects the cinemagraph ledger records as NOT CONFIRMED — they measure dead however they are
 # prompted, because they are distant and low-contrast. Checked against a declared mover's own text.
 FALSIFIED_MOVERS = ("spindrift", "sea of cloud", "cloud sea", "lenticular", "distant river",

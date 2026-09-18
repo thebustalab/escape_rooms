@@ -10,6 +10,7 @@
 //   {ne:  [stateKey, value]}      state inequality
 //   {all: [cond, ...]}            every sub-condition holds
 //   {any: [cond, ...]}            at least one does
+//   {not: cond}                   the sub-condition does NOT hold
 //
 // WHY `all`/`any` EXIST (2026-09-02). Every other clause is a single test, so a gate that genuinely
 // depends on two things could not be expressed. The first real case was `networks/beacons`' escape,
@@ -37,6 +38,9 @@ export function condHolds(cond, ctx) {
     if ("ne" in cond) { const e = cond.ne || []; return String(state[e[0]]) !== String(e[1]); }
     if ("all" in cond) return (cond.all || []).every(c => condHolds(c, ctx));
     if ("any" in cond) return (cond.any || []).some(c => condHolds(c, ctx));
+    // `not` (2026-09-18, canyon): one room in two world states needs "only BEFORE the boss" as well as
+    // "only after". A missing operand is still an unknown shape, so it fails closed like everything else.
+    if ("not" in cond) return cond.not === undefined ? false : !condHolds(cond.not, ctx);
   }
   return false;
 }

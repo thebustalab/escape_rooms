@@ -1,53 +1,46 @@
 {
   "status": "awaiting_review",
   "retry_count": 0,
-  "started": "2026-09-18T02:44:10.198289+00:00",
-  "last_cycle": "2026-09-18T03:03:38.147516+00:00",
-  "cycles_completed": 8,
+  "started": "2026-09-18T18:26:01.983431+00:00",
+  "last_cycle": "2026-09-18T18:44:44.620060+00:00",
+  "cycles_completed": 3,
   "rooms": {
     "undercroft": {
-      "art_generated": 2,
       "history": [
         {
-          "cycle": 3,
-          "decision": "AUTHOR_MOVER",
-          "why": "The only mover in this spec is in an old-style animate block, which the loop's mover check (_has_authored_mover) can't see, so the loop treats the room as having no mover. Adding a motion block to the same bounded pool on the left fixes that: the pool gets a visibly rippled surface in the still and a matching short motion prompt. The runner matches this to the existing still_flood element by its at value (\"to the left\" hits still_flood before flood_door) and merges rather than replaces, so the old animate block stays for the player."
-        },
-        {
-          "cycle": 6,
+          "cycle": 1,
           "decision": "RENDER",
-          "why": "The new 3072x1024 scene.png (made 2026-09-17 22:48, after cycle 3 added the mover) shows the pool on the left with wide ripple rings and wavering amber reflections, and the motion prompt describes that same movement; the only clip on disk is from 2026-09-01 and the gate report is empty, so no clip exists for this still yet."
+          "why": "This job is for the flooded state. Its still (scene_flooded.png) was replaced by hand at 14:24 with one that shows a raging flood, and its seam is already staged. The spec's flooded movers are the churning water, the torrent through the arch and the shaft pour, each with fast wording, and still_as pins the panel's lit cells. No clip has been made from this still yet: the newest flooded candidate, ri1_flooded_2, is from 14:17. So the spec and prompt are right, and the review note asks for exactly one render with the wording left alone."
         },
         {
-          "cycle": 8,
-          "decision": "HOLD",
-          "why": "The seed-4242 clip rendered from the new rippled-pool still passed the camera, glitch and dead gates cleanly, so it is queued for Lucas to judge; that is not acceptance."
+          "cycle": 3,
+          "decision": "PARK",
+          "why": "The camera gate rejected the flooded clip (shift 6.50 px, median 6.54 vs mean 12.29), but the flood covers the whole lower half of the frame, and in the frame-difference strip the walls, panel, door and table barely change. So the gate may be reading the flood as camera drift, which is the known weakness of a mover that fills the frame. Neither fix is allowed in this job: new art is off (max_generations 0) and the review note forbids softening the wording. A re-roll is also not a fix for a camera rejection, so only Lucas's eye can decide. Ask him to watch temp/cine/_art_prompt_exp/canyon/undercroft_motion_ri1_flooded_3_looped.mp4 and say whether the hall itself sways or only the water moves. If only the water moves, he can overrule the gate and review the clip as normal. If the hall really sways, he has three options:"
         }
       ],
       "attempts": 1,
       "last_gate": {
-        "camera": "still",
-        "return": 0.05,
-        "peak": 5.03,
+        "camera": "CAMERA MOVES",
+        "return": 0.41,
+        "peak": 15.58,
         "glitch": {
-          "spike": 3.0,
+          "spike": 2.34,
           "breadth": 0.0,
-          "at_pct": 33.3,
+          "at_pct": 30.6,
           "frames": 73,
-          "breadth_normalised": 0.021
+          "breadth_normalised": 0.0
         },
         "dead": {
-          "ratio": 15.74,
-          "peak": 6.05,
+          "ratio": 3.6,
+          "peak": 5.33,
           "dead": false
-        }
+        },
+        "auto_rejected": "camera gate — CAMERA MOVES"
       },
-      "clip": "/home/bustalab/Documents/Tools/temp/cine/_art_prompt_exp/canyon/undercroft_motion_ri6_looped.mp4",
-      "held": true,
-      "staged": "/home/bustalab/Documents/Tools/websites/thebustalab.github.io/escape_rooms/rooms/hierarchical_clustering/canyon/_scratch/cine_cand/undercroft/base__ri6.mp4"
+      "clip": "/home/bustalab/Documents/Tools/temp/cine/_art_prompt_exp/canyon/undercroft_motion_ri1_flooded_3_looped.mp4",
+      "parked": "The camera gate rejected the flooded clip (shift 6.50 px, median 6.54 vs mean 12.29), but the flood covers the whole lower half of the frame, and in the frame-difference strip the walls, panel, door and table barely change. So the gate may be reading the flood as camera drift, which is the known weakness of a mover that fills the frame. Neither fix is allowed in this job: new art is off (max_generations 0) and the review note forbids softening the wording. A re-roll is also not a fix for a camera rejection, so only Lucas's eye can decide. Ask him to watch temp/cine/_art_prompt_exp/canyon/undercroft_motion_ri1_flooded_3_looped.mp4 and say whether the hall itself sways or only the water moves. If only the water moves, he can overrule the gate and review the clip as normal. If the hall really sways, he has three options:"
     }
   },
-  "review_note": "undercroft (the DRY hall) has a rewritten spec: a bronze flood door on the left above the water, a control panel with EXACTLY THREE rows of cells (the old art drew four), sluice-wheel and stone tunnel removed. Generate new art from the spec, commit, seam, render one clip and hold. Do NOT touch the `works` room: its art will be made later as an image-edit of this room's new scene.png, by hand.",
-  "generations": 2,
+  "review_note": "undercroft's FLOODED still was just REPLACED by a hand-made one that DEPICTS a raging flood (Lucas: the clip was slow motion twice; 'we need a new still that shows the movement being faster'). The seam is already staged. Render ONE clip from the current scene_flooded.png and hold. Do NOT soften the motion wording, do NOT change anything that alters the art (max_generations is 0 on purpose), and do NOT delete the older flooded candidates: ri1 is his backup and is in use. The panel's lit cells must stay still.",
   "render_polls": 0
 }

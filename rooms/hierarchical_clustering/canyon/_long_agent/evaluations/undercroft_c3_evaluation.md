@@ -1,13 +1,8 @@
-I'm passing this one: the runner should act on the worker's proposal. I checked the code and the current image myself rather than taking the worker's word for it.
+I'm passing the worker's PARK decision.
 
-- **The worker's main claim holds.** The loop only counts an element as a moving one if it has a `motion` block with `moves`, `vigour` and `phrase` (`Utilities/long_agent/long_agent.py:3580`). The pool's old-style `animate` block doesn't have those. Until this change goes in, the loop will refuse every render request for this room (`long_agent.py:4567`). So the rule against re-authoring a mover that was never rendered doesn't block this. The old mover can't be rendered at all on this path, and the proposal keeps the same pool as the moving element rather than picking a new one.
-- **It merges onto the right element.** The first element placed "to the left" is `still_flood`, which comes before `flood_door`. The runner merges the new fields into it, so the `animate` block stays.
-- **The pool is a bounded area.** In today's image (`scene.png`, written 17 Sep at 22:45) the water fills about the left third of the floor. A kerb, the door steps and the map table hem it in. It doesn't fill the frame.
-- **None of the other rejection reasons apply.** The proposal doesn't change any render settings or argue from a zero-motion score. It accepts no clip and touches no committed art or hotspots. The art description is generated from the spec by the renderer, not written by hand.
-
-Three minor points, none of them a reason to reject:
-- The change will trigger one paid image generation.
-- The new `desc` drops "glassy" and "the lamplight lying broken on it". The new `vigour` text carries the broken lamplight, so that part isn't lost.
-- An older motion spec from a 1 Sep clip bans "fast ripples" and "choppy water". The proposed "wide slow concentric ripples" fits within that, but it's worth watching the new still for rings that come out too strong.
+- **The worker's reading holds up.** I measured the clip directly. In the parts of the hall that shouldn't move (the rock and panel band, and the flood door), the shift between frame 0 and frames 10 to 60 is zero pixels in both directions. Side-by-side crops of the panel and rock at frames 0 and 30 look identical. The only change there is from the shaft pour and the spray. Over the whole frame the difference is about 12–15 grey levels, compared with about 3–5 in the hall regions, so the churning flood across the lower half is what the camera gate is picking up. The camera doesn't appear to move.
+- **Parking is the right call.** The loop can't accept the clip or overrule the gate. New art is turned off for this job (max_generations 0), and the review note rules out softening the wording. So the next step is Lucas watching the clip.
+- **It breaks none of the rejection rules.** It doesn't propose a settings change or lean on a zero return (the return is 0.41). It doesn't accept the clip or touch scenario.json, and it doesn't hand-write an art prompt. Its fallback option actually moves toward a bounded mover, keeping the rough water to a band in front of the arch torrent and the shaft pour.
+- **One small mismatch:** the figures the worker quotes (6.50 px shift, median 6.54 vs mean 12.29) aren't in the gate report I was given. They don't change the conclusion, because my own measurement agrees.
 
 VERDICT: PASS

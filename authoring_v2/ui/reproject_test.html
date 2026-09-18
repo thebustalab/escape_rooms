@@ -272,7 +272,7 @@
     let batchPoll = 0;   // walk-away batch: status poll handle while a run is in flight
     // EVERY type the player engine dispatches on (shared/pano-player.js `onHotspotClick`), plus `ambient`.
     // MUST stay in lockstep with hotspots_edit.html's copy — pinned by tests/editor_types.test.js.
-    const TYPES = ["puzzle", "clue", "door", "lock", "grid", "ledger", "elevmap", "dial", "mapview", "ambient"];   // ambient = cinemagraph-only, no player marker; grid = the matrix-select escape, ledger = the deduction escape, elevmap = the transcription tool (content hand-authored in scenario.json)
+    const TYPES = ["puzzle", "clue", "door", "lock", "grid", "ledger", "elevmap", "dial", "lever", "mapview", "ambient"];   // ambient = cinemagraph-only, no player marker; grid = the matrix-select escape, ledger = the deduction escape, elevmap = the transcription tool (content hand-authored in scenario.json)
     // Cinemagraph preset prompts — rich, model-tuned motion descriptions for the things we animate most.
     // Picking one fills the motion box (still editable) AND sets the right loop (crossfade = one-way/rising,
     // boomerang = oscillating). LTX+Gemma wants prose, not keywords; these are written long on purpose.

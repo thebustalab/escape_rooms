@@ -103,7 +103,7 @@ check(int(re.search(r"scenario_id = (\d+)", block).group(1)) == doc["id"],
 check(len(set(expected)) > 1, "the correct index is not the same slot in every room (%s)" % expected)
 
 print("\n-- the benchmarks the player copies onto the map --")
-elev = next(h for h in rooms["works"]["hotspots"] if h.get("type") == "elevmap")
+elev = next(h for h in rooms["undercroft"]["hotspots"] if h.get("id") == "lit_canyon_map")
 nodes = {n["id"]: n for n in elev["nodes"]}
 for rk, room in rooms.items():
     for h in (room.get("hotspots") or []):
@@ -120,7 +120,9 @@ for rk, room in rooms.items():
 
 print("\n-- the escape code is what the panel's own rule produces --")
 # leaves pair at c1/c2/c4/c5; c3 joins the left pair-groups, c6 the right, c7 the two halves.
-MERGE = {"c1": 1400, "c2": 1380, "c4": 1420, "c5": 1390, "c3": 1050, "c6": 1200, "c7": 850}
+# Heights come from the escape map ITSELF (one source of truth), not a copy kept here.
+_map = next(h for h in rooms["undercroft"]["hotspots"] if h.get("id") == "lit_canyon_map")
+MERGE = {n["id"]: n["answer"] for n in _map["nodes"]}
 def cut(water):
     """Group sizes left to right at a waterline: a confluence BELOW the line is severed, above it holds."""
     def grp(node):
@@ -130,17 +132,48 @@ def cut(water):
         left, right = (grp(k) for k in kids)
         return (left + right) if MERGE[node] <= water else [sum(left + right)]
     return grp("c7")
-check(cut(1300) == [2, 2, 2, 2], "panel's lit row 1300 -> %s" % cut(1300))
-check(cut(950) == [4, 4], "panel's lit row 950 -> %s" % cut(950))
-lock = gate("works", "lock")
-check("".join(map(str, cut(1125))) == lock["answer"],
-      "the dark row 1125 -> %s, and the lock answer is %r" % (cut(1125), lock["answer"]))
-check(lock.get("length") == len(lock["answer"]), "lock length %s matches its answer" % lock.get("length"))
-check(str(cut(1300)[0]) in (rooms["undercroft"]["hotspots"][0].get("body") or "") or
-      any("1300" in (h.get("body") or "") for h in rooms["undercroft"]["hotspots"]),
+# The panel's three rows, read from its own text (Lucas, 2026-09-18: rows sit ON the map's dotted lines,
+# and heights on the drag step — 1125/950/1300 and junctions at 10s did neither).
+panel_txt = next(h for h in rooms["undercroft"]["hotspots"] if h.get("id") == "control_panel")["body"]
+ROWS = [int(x) for x in re.findall(r"(\d{3,4}) =", panel_txt)]
+check(len(ROWS) == 3, "the panel states three rows (%s)" % ROWS)
+HIGH, MID, LOW = ROWS
+check(cut(HIGH) == [2, 2, 2, 2], "panel's lit top row %s -> %s" % (HIGH, cut(HIGH)))
+check(cut(LOW) == [4, 4], "panel's lit bottom row %s -> %s" % (LOW, cut(LOW)))
+ax = _map["axis"]
+LINES = [ax["min"] + i * (ax["max"] - ax["min"]) / 4 for i in range(5)]   # widgets.js: five even gridlines
+for r in ROWS:
+    check(r in LINES, "panel row %s lies on one of the map's dotted lines %s" % (r, LINES))
+    check((r - ax["min"]) % ax["step"] == 0, "panel row %s is reachable by the waterline's %s step" % (r, ax["step"]))
+for m in (_map, next(h for h in rooms["undercroft"]["hotspots"] if h.get("id") == "map_table")):
+    for n in m["nodes"]:
+        check((n["answer"] - m["axis"]["min"]) % m["axis"]["step"] == 0,
+              "%s: junction %s at %s sits on the %s drag step" % (m["id"], n["id"], n["answer"], m["axis"]["step"]))
+check(_map["waterline"]["start"] == MID, "the waterline starts at the dark row, %s" % MID)
+# The escape is a GRID over the dark row's four cells (Lucas, 2026-09-18): each cell takes a group size,
+# or stays dark when the cut leaves fewer groups than cells — exactly as the lit bottom row shows 4 4 and two
+# dark cells. Four cells for three groups also means the panel no longer gives away the group count.
+panel_grid = next(h for h in rooms["undercroft"]["hotspots"] if h.get("id") == "calibration_panel")
+check(panel_grid.get("type") == "grid", "the escape panel is a grid, not a code lock")
+def as_cells(sizes, n=4):
+    return [str(x) for x in sizes] + ["dark"] * (n - len(sizes))
+items = [it["key"] for it in panel_grid["items"]]
+check(len(items) == 4, "the grid has the panel's four cells")
+check([panel_grid["answer"][k] for k in items] == as_cells(cut(MID)),
+      "the dark row %s -> %s, and the grid answer reads %s"
+      % (MID, as_cells(cut(MID)), [panel_grid["answer"][k] for k in items]))
+buckets = {b["key"] for b in panel_grid["buckets"]}
+check(set(panel_grid["answer"].values()) <= buckets, "every answer value is a column the player can pick")
+check({"dark", "1", "2", "3", "4"} <= buckets, "the columns offer every size the panel could need, plus dark")
+check(HIGH > MID > LOW, "the panel lists its rows by height, so the dark row %s is the MIDDLE one" % MID)
+check(any(str(HIGH) in (h.get("body") or "") for h in rooms["undercroft"]["hotspots"]),
       "the control panel clue states the lit rows the player generalises from")
 
-print("\n-- the hall is a one-visit prologue, so what it teaches must travel --")
+print("\n-- the hall is ONE room in two states: dry cold open, flooded escape --")
+# Merged 2026-09-18 (Lucas): the old `works` escape room was this hall after the boss, and showed up as a
+# second node in the door graph. Now the dry state is a one-visit prologue (the ladder breaks behind the
+# player), and the ONLY way back in is j_c7's stair, gated on the boss — which is also what floods it.
+check("works" not in rooms, "there is no separate `works` room any more")
 edges = {k: [h["to"] for h in (r.get("hotspots") or []) if h.get("type") == "door" and h.get("to")]
          for k, r in rooms.items()}
 def reach(start):
@@ -151,13 +184,38 @@ def reach(start):
                 seen.add(t); stack.append(t)
     return seen
 check(reach("undercroft") == set(rooms), "every room is reachable from the drowned hall")
-check(not any(k != "undercroft" and "undercroft" in reach(k) for k in rooms),
-      "nothing reaches the hall again — the ladder breaks behind the player, by design")
+into = [(k, h) for k, r in rooms.items() if k != "undercroft"
+        for h in (r.get("hotspots") or []) if h.get("type") == "door" and h.get("to") == "undercroft"]
+check([k for k, _ in into] == ["j_c7"], "the only door back into the hall is j_c7's (%s)" % [k for k, _ in into])
+check(all(h.get("direction") == "forward" and h.get("requires") == "table_c7" for _, h in into),
+      "j_c7's stair is a forward door gated on the boss, so the hall is never re-entered dry")
+hall = {h["id"]: h for h in rooms["undercroft"]["hotspots"]}
+DRY, WET = {"not": {"solved": "j_c7"}}, {"solved": "j_c7"}
+for i in ("control_panel", "map_table", "hall_ladder", "trunk_arch", "flood_door"):
+    check(hall[i].get("shownWhen") == DRY, "%s shows only in the DRY hall" % i)
+for i in ("lit_canyon_map", "calibration_panel", "emergency_tunnel", "back_arch", "empty_shaft"):
+    check(hall[i].get("shownWhen") == WET, "%s shows only in the FLOODED hall" % i)
+wash = hall["flood_wash"]["variants"][0]
+check(wash["when"] == WET and wash["box"] == [0, 0, 1, 1], "the flood is a full-scene variant switched on by the boss")
+check(hall["clip_flooded"]["cinemagraph"].get("state") == wash["state"],
+      "the flooded clip is tagged with the flooded state, so it only plays over the flooded art")
+check(not hall["clip_base"]["cinemagraph"].get("state"), "the dry clip stays base-only")
+# A full-frame clip is drawn OVER every variant, so a door-open patch that is only a BOX would sit under the
+# flooded clip and the opened door would never be seen (introduced and caught 2026-09-18). It must be a
+# full-scene state, which stops the flooded clip because clips follow the backdrop's state.
+opened = [v for v in hall["emergency_tunnel"].get("variants", []) if v.get("state") == "open"]
+check(len(opened) == 1 and opened[0].get("box") == [0, 0, 1, 1] and opened[0].get("when") == {"solved": "undercroft"},
+      "the door-open art is a FULL-SCENE state switched on by the panel, so the flooded clip cannot hide it")
+door = hall["emergency_tunnel"]
+check(door.get("endsEscape") and door.get("requires") == "calibration_panel",
+      "the bronze door ends the escape and opens only on the panel's 224")
+check(ids.index("flood_wash") < ids.index("emergency_tunnel") if (ids := [h["id"] for h in rooms["undercroft"]["hotspots"]]) else False,
+      "the flood carrier precedes the door, so the door-open patch composites OVER the flooded art")
 panel = next(h for h in rooms["undercroft"]["hotspots"] if h.get("id") == "control_panel")
 check(bool(panel.get("pickup")),
       "the control panel is a PICKUP — the player can never return to re-read it, and the lock renders "
       "no instructions, so its rows have to travel in the field notebook or the escape is unsolvable")
-for n in ("1300", "950", "1125"):
+for n in map(str, ROWS):
     check(n in str(panel.get("pickup")), "the notebook entry carries the %s row" % n)
 
 print("\n-- the taught trap stays a trap --")

@@ -164,7 +164,13 @@ button.ghost { background:transparent; color:var(--ink); border:1px solid var(--
 .fx-haze { background:linear-gradient(0deg, rgba(190,205,220,.14) 0%, rgba(190,205,220,.05) 22%, transparent 45%);
   animation:fxHaze 16s ease-in-out infinite; }
 @keyframes fxHaze { 0%,100%{ opacity:.6; transform:translateX(-1.5%); } 50%{ opacity:1; transform:translateX(1.5%); } }
-@media (prefers-reduced-motion: reduce){ .fx-flicker, .fx-frost, .fx-godrays, .fx-rain, .fx-dust, .fx-haze { animation:none !important; } }
+/* "flood" — cold floodwater tint banked up from the bottom of the scene, surging slowly. The in-room half of a
+   storm clock: gate it with `{fx:"flood", when:…}` so the water arrives on a story beat (canyon: the trunk
+   after the boss, when the storm breaks). A tint, not a picture of water — the flooded art is its own room. */
+.fx-flood { background:linear-gradient(0deg, rgba(40,90,105,.30) 0%, rgba(40,90,105,.16) 16%, rgba(60,110,125,.05) 30%, transparent 40%);
+  transform-origin:50% 100%; animation:fxFlood 9s ease-in-out infinite; }
+@keyframes fxFlood { 0%,100%{ opacity:.75; transform:scaleY(1); } 50%{ opacity:1; transform:scaleY(1.12); } }
+@media (prefers-reduced-motion: reduce){ .fx-flicker, .fx-frost, .fx-godrays, .fx-rain, .fx-dust, .fx-haze, .fx-flood { animation:none !important; } }
 
 /* tactile dial — a brass gauge face with a needle that swings to the chosen sigil */
 .dialface { position:relative; width:150px; height:88px; margin:4px auto 12px;
