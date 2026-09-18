@@ -35,7 +35,7 @@
  *
  * PURE — no DOM, no WebR. Tested in Node (`tests/r_diagnose.test.mjs`).
  */
-import { tokenizeR } from "./r_highlight.js?v=102";
+import { tokenizeR } from "./r_highlight.js?v=103";
 
 const OPENERS = { "(": ")", "[": "]", "{": "}" };
 const CLOSERS = { ")": "(", "]": "[", "}": "{" };
@@ -178,6 +178,33 @@ export function structuralProblems(src) {
   }
   if (stack.length) {
     const open = stack[0];
+    /*
+     * The commonest ggplot bracket slip gets named precisely: `ggplot(d, aes(x = a, y = b) +` — the
+     * ) that should close ggplot( is missing, so the + and every layer after it end up INSIDE ggplot's
+     * brackets. "The ( on line 5 is never closed" is true but sends the student to count brackets across
+     * the whole plot; pointing at the + tells them where the ) belongs.
+     */
+    const at = tokens.indexOf(open);
+    const before = tokens.slice(0, at).filter(t => t.type !== "ws" && t.type !== "co").pop();
+    if (open.value === "(" && before && before.value === "ggplot") {
+      let depth = 0, plus = null;
+      for (const t of tokens.slice(at + 1)) {
+        if (t.type !== "op") continue;
+        if (OPENERS[t.value]) depth++;
+        else if (CLOSERS[t.value]) depth--;
+        else if (t.value === "+" && depth === 0) { plus = t; break; }
+      }
+      if (plus) {
+        const lo = lineAt(src, open.start), lp = lineAt(src, plus.start);
+        problems.push({
+          kind: "unclosed-ggplot",
+          line: lo,
+          message: `The ( after ggplot on line ${lo} is never closed, so the + on line ${lp} has ended up ` +
+                   `inside ggplot's brackets. Close ggplot( … ) with a ) just before that +.`,
+        });
+        return problems;
+      }
+    }
     problems.push({
       kind: "unclosed-bracket",
       line: lineAt(src, open.start),
@@ -449,6 +476,17 @@ export function explainError(text, ctx) {
   }
 
   m = text.match(/could not find function "([^"]+)"/);
+  if (m && /^%.*%$/.test(m[1])) {
+    // A %...% OPERATOR, not a function — `%<%` is the pipe with its arrow turned round. The generic
+    // "check the spelling or it lives in another package" is the wrong advice for this: there is no
+    // package, and the student needs the right operator, not a hunt.
+    const near = didYouMean(m[1], ["%>%", "%in%"]);
+    if (near === "%>%") {
+      return hint(`R has no operator called ${m[1]}. The pipe is %>% — its arrow points forward, toward the next step.`);
+    }
+    if (near) return hint(`R has no operator called ${m[1]}. Did you mean ${near}?`);
+    return hint(`R has no operator called ${m[1]}. The ones you will use here are %>% (the pipe) and %in%.`);
+  }
   if (m) {
     const near = didYouMean(m[1], KNOWN_FUNCTIONS.concat(c.functions || []));
     if (near) return hint(`R has no function called ${m[1]}. Did you mean ${near}()?`);
@@ -466,6 +504,24 @@ export function explainError(text, ctx) {
     return hint(
       "One of the names inside aes() does not match a column in your data. R usually names the culprit here, but the browser drops that part of the message — so check the spelling of each name in aes() against the columns.",
       "colnames(your_data)");
+  }
+
+  /*
+   * `mapping` must be created by `aes()`: the second thing inside ggplot() was not an aes(). By far the
+   * commonest route here is piping the data in AND naming it again — `d %>% ggplot(d, aes(...))` — so
+   * the pipe supplies d as the data and the written `d` lands in the aes() slot. The thrown error's call
+   * shows it as `ggplot(., d, …)`, the dot being the piped-in data; the source check covers a surface
+   * whose error text has lost the call.
+   */
+  if (/`mapping` must be created by `aes\(\)`/.test(text)) {
+    const piped = /ggplot\(\s*\.\s*,/.test(text) || /%>%\s*ggplot\(\s*(?!aes\s*\()[\w.]+\s*,/.test(src);
+    if (piped) {
+      return hint("You piped the data into ggplot() with %>% and ALSO named it inside ggplot(). The pipe " +
+                  "already hands ggplot() the data, so the name you wrote lands where aes() should be. " +
+                  "Take the data's name out of ggplot( … ).");
+    }
+    return hint("The second thing inside ggplot() has to be wrapped in aes(): the data first, then " +
+                "aes(x = …, y = …).");
   }
 
   if (/We detected a named input|named argument/i.test(text)) {

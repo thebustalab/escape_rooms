@@ -17,11 +17,11 @@
  * `addStatusEl()`, `plotControls(opts)`, `resetSession()`, `resetControl(opts)`, `.ready`, `.webR`.
  */
 import { WebR } from "https://webr.r-wasm.org/latest/webr.mjs";
-import { VIEW_R_SHIM, VIEW_R_DRAIN, fromR, viewTableHTML, ensureViewStyles } from "./webr_view.js?v=102";
-import { codeToRun, selectionNote } from "./code_sel.js?v=102";
-import { PLOT_ASPECTS, PLOT_DEFAULT_ASPECT, PLOT_LIMITS, PLOT_CTL_CSS, plotGeometry } from "./plot_size.js?v=102";
-import { RESET_R_SHIM, RESET_R_CALL, RESET_CTL_CSS, RESET_LABEL, RESET_CONFIRM_LABEL, RESET_CONFIRM_MS, nextConfirmState } from "./webr_reset.js?v=102";
-import { explainError, looksLikeOrphanLayer } from "./r_diagnose.js?v=102";
+import { VIEW_R_SHIM, VIEW_R_DRAIN, fromR, viewTableHTML, ensureViewStyles } from "./webr_view.js?v=103";
+import { codeToRun, selectionNote } from "./code_sel.js?v=103";
+import { PLOT_ASPECTS, PLOT_DEFAULT_ASPECT, PLOT_LIMITS, PLOT_CTL_CSS, plotGeometry } from "./plot_size.js?v=103";
+import { RESET_R_SHIM, RESET_R_CALL, RESET_CTL_CSS, RESET_LABEL, RESET_CONFIRM_LABEL, RESET_CONFIRM_MS, nextConfirmState } from "./webr_reset.js?v=103";
+import { explainError, looksLikeOrphanLayer } from "./r_diagnose.js?v=103";
 
 const errText = e => (e && e.message ? e.message : String(e));
 
@@ -30,6 +30,22 @@ const errText = e => (e && e.message ? e.message : String(e));
  * the old `"Error: " + errText(err)` rendered "Error: Error in `mean(x)`: …" — the word twice, before
  * they have read anything. Prefix only when R has not already said it.
  */
+/*
+ * A message() or warning() condition as the line a student should see. Read from the condition object
+ * while its shelter is still alive (run() calls this before purge). Warnings are labelled the way R labels
+ * them, because "Warning message:" is what the student will meet again in RStudio; a message() is shown
+ * bare, as R shows it. Unreadable → nothing, never a throw: a missing warning is a nuisance, a run that
+ * dies on its way to the output is not.
+ */
+async function conditionLine(o) {
+  try {
+    const msg = String(await (await o.data.get("message")).toString()).replace(/\n+$/, "");
+    return o.type === "warning" ? "Warning message:\n" + msg : msg;
+  } catch (e) {
+    return "";
+  }
+}
+
 function errLine(err) {
   const t = errText(err);
   return /^Error\b/.test(t.trim()) ? t : "Error: " + t;
@@ -599,22 +615,27 @@ export class WebRConsole {
       const result = await shelter.captureR(code, {
         withAutoprint: true,
         captureStreams: true,
-        // captureConditions:false is what makes message() and warning() VISIBLE. webR's default
-        // intercepts both as conditions, which never reach result.output — so a run whose only output
-        // was a warning rendered "(no output)" and students never saw R's warnings at all, which in a
-        // teaching console is the more interesting half. With this flag R prints them to stderr, which
-        // the filter below already renders. Do NOT "improve" this by rendering condition entries
-        // instead; that was the first plan and this one flag replaces all of it.
-        //
-        // It does NOT help ERRORS — those stay truncated to their first line either way. That is why
-        // r_diagnose.js reconstructs meaning from the headline; see its header.
-        captureConditions: false,
+        // Do NOT pass `captureConditions: false`. It looks like the one-flag way to make message() and
+        // warning() visible, and it was shipped as exactly that on 2026-09-17 — and it silently switched
+        // off every error hint on all three surfaces. With the flag, an R error is no longer THROWN: R
+        // prints it to stderr and captureR returns normally, so the catch below never runs, nothing is
+        // marked as an error, and annotateErrors() has nothing to explain. It also buys nothing for the
+        // error text — measured against real webR, it gives the same one-line headline, minus the
+        // function name the thrown version carries. Warnings and messages are rendered below instead.
         captureGraphics: { width: geom.width, height: geom.height },
       });
-      const text = result.output
-        .filter((o) => o.type === "stdout" || o.type === "stderr")
-        .map((o) => o.data)
-        .join("\n");
+      // Output in the order R produced it. message() and warning() arrive as CONDITION entries rather
+      // than stream text, so they are turned into lines here — without this a run whose only output was
+      // a warning showed "(no output)", and students never saw R's warnings at all.
+      const lines = [];
+      for (const o of result.output) {
+        if (o.type === "stdout" || o.type === "stderr") lines.push(o.data);
+        else if (o.type === "warning" || o.type === "message") {
+          const line = await conditionLine(o);
+          if (line) lines.push(line);
+        }
+      }
+      const text = lines.join("\n");
       if (text.trim().length) { plainEl = this.appendText(text, "", out); rendered++; }
       for (const img of (result.images || [])) { await this.appendImage(img, out, geom); rendered++; }
     } catch (err) {
