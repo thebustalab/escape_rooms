@@ -3,8 +3,8 @@
 // the engine's own state — the gate key, the attempt counter, the lock table, the world-state bag — is
 // INJECTED as `ctx` rather than read from module scope. pano-player passes its real objects; the test
 // passes plain ones.
-import { confirmGroups, confirmAll } from "./ledger_rule.js?v=106";
-import { makeScale, junctionsAbove, placedCount } from "./elev_scale.js?v=106";
+import { confirmGroups, confirmAll } from "./ledger_rule.js?v=107";
+import { makeScale, junctionsAbove, placedCount } from "./elev_scale.js?v=107";
 
 export function buildLedgerCard(h, onSolved, ctx) {
   const rows = h.rows || [];

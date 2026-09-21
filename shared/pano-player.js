@@ -70,13 +70,13 @@
 // A bare `./variant_resolve.js` import is NOT refreshed by bumping the <script> tag's ?v, so a changed
 // helper module (e.g. a new export) leaves browsers on a stale cached copy → "doesn't provide an export
 // named X" SyntaxError → blank page (the 2026-08-05 airship regression). Bump all three together.
-import { WebRConsole } from "./webr-console.js?v=106";
-import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers } from "./variant_resolve.js?v=106";   // Phase 3: per-hotspot state variants; monorail switch-door nav
-import * as PQ from "./puzzle_queue.js?v=106";   // dynamic puzzle queue: location-independent puzzle serving
-import { particleCount } from "./particles.js?v=106";   // ambient-particle vocabulary + per-kind field density
-import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=106";
-import { condHolds } from "./cond.js?v=106";   // ledger + elevation-map card DOM
-import * as RIDE from "./ride.js?v=106";   // THE RIDE (subway): express lever + clip-sequence planner
+import { WebRConsole } from "./webr-console.js?v=107";
+import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers } from "./variant_resolve.js?v=107";   // Phase 3: per-hotspot state variants; monorail switch-door nav
+import * as PQ from "./puzzle_queue.js?v=107";   // dynamic puzzle queue: location-independent puzzle serving
+import { particleCount } from "./particles.js?v=107";   // ambient-particle vocabulary + per-kind field density
+import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=107";
+import { condHolds } from "./cond.js?v=107";   // ledger + elevation-map card DOM
+import * as RIDE from "./ride.js?v=107";   // THE RIDE (subway): express lever + clip-sequence planner
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 
@@ -649,12 +649,21 @@ function puzzleNoteText(h) {
     || (c && c.feedback && c.feedback.correct)
     || (p && p.feedback && p.feedback.correct) || "";
 }
+// The R the player had in the console when they solved a puzzle (2026-09-21) — logged under the answer
+// so the notebook records HOW they got there, not just what it was. Blank when the console still holds
+// only the untouched starter code (the bare data object): that is our code, not their working.
+function puzzleSolveCode(h) {
+  const ci = $("#code-input");
+  const code = ci ? (ci.value || "").trim() : "";
+  const starter = ((h && h.starterCode) || "").trim();
+  return code && code !== starter ? code : "";
+}
 // A notebook entry may carry TEXT and/or an IMAGE (path rel. to play.html). Image-carrying entries let
 // pick-up clues log a visual fragment — e.g. a mask/template a later meta-puzzle overlays by eye in the
 // notebook (Alaska's three filtered-glass templates). At least one of text/image must be present.
-function logToNotebook(source, text, image, overlay) {
+function logToNotebook(source, text, image, overlay, code) {
   if (!text && !image) return;
-  caseFile.push({ source: source || "", text: text || "", image: image || "", overlay: !!overlay });
+  caseFile.push({ source: source || "", text: text || "", image: image || "", overlay: !!overlay, code: code || "" });
   updateNotebookChip();
 }
 function updateNotebookChip() {
@@ -840,6 +849,8 @@ function openNotebook() {
         `<div style="margin:0 0 12px;padding:0 0 12px;border-bottom:1px solid rgba(255,255,255,.08)">
            ${e.source ? `<div style="font:600 12px system-ui;opacity:.6;margin-bottom:3px">${e.source}</div>` : ""}
            <div>${e.text}</div>
+           ${e.code ? `<div style="font:600 11px system-ui;opacity:.55;margin:8px 0 3px">Your code</div>
+           <pre class="nbcode" style="margin:0;padding:8px 10px;background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.12);border-radius:6px;font:12px/1.45 ui-monospace,Menlo,Consolas,monospace;white-space:pre-wrap;word-break:break-word;user-select:text">${escHtml(e.code)}</pre>` : ""}
          </div>`).join("");
     d.appendChild(sec);
   }
@@ -3037,7 +3048,7 @@ function solveRoom(result, h, qIndex) {
   if (ss) playOneShot(typeof ss === "string" ? ss : ss.src, (typeof ss === "object") ? ss.volume : undefined);
   // Auto-log the confirmed fact for a solved PUZZLE (its feedback.correct, reused as the note). Runs
   // once per gate: a re-entered solved gate short-circuits in onHotspot and never re-enters here.
-  if (h && h.type === "puzzle") logToNotebook(room.title, puzzleNoteText(h));
+  if (h && h.type === "puzzle") logToNotebook(room.title, puzzleNoteText(h), "", false, puzzleSolveCode(h));
   const prim = primaryGate(room);
   const isPrimary = !!(h && prim && h.id === prim.id);
   const graded = !!(h && h.type === "puzzle");        // locks are never graded / never in the codec

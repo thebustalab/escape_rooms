@@ -165,6 +165,15 @@ test("alaska: full analysis + notebook image-stack + keypad escape", async ({ pa
   // fix — without it logToNotebook drops the empty note and the entry is silently lost).
   await expect(page.locator("#notebookCount")).toHaveText(new RegExp(`\\(${nbBefore + 1}\\)`), { timeout: 10_000 });
   expect(await pickupClues()).toBe(1);
+  // The solving code rides with the answer (2026-09-21): room 3's entry carries the student's ggplot
+  // under "Your code". Rooms 1–2 were MCQs answered with the console still on its starter code, so they
+  // must NOT carry a code block — the negative control that keeps "exactly one" from passing vacuously.
+  await page.locator("#notebookChip").click();
+  await expect(page.locator("#modal.open")).toBeVisible();
+  await expect(page.locator("#modal .nbcode")).toHaveCount(1);
+  await expect(page.locator("#modal .nbcode")).toContainText("geom_col()");
+  await page.locator("#mback").click();
+  await expect(page.locator("#modal.open")).toBeHidden();
   await walkForward(room("room3"));
 
   // --- boss: solve (pick-the-point) → analysis finishes and mints the graded code
