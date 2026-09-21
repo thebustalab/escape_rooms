@@ -251,9 +251,9 @@
           "ratio": 2.56,
           "delta": 2.96,
           "needsWork": false,
-          "accepted": false,
+          "accepted": true,
           "seamBandRun": 0.013,
-          "at": "2026-09-17T22:48:47",
+          "at": "2026-09-19T11:15:28",
           "states": {
             "flooded": {
               "stage": "blurred",
@@ -261,11 +261,15 @@
               "ratio": 0.0,
               "delta": 0.0,
               "needsWork": false,
-              "accepted": false,
+              "accepted": true,
               "seamBandRun": 0.0,
-              "at": "2026-09-18T14:24:32"
+              "at": "2026-09-19T11:15:28",
+              "acceptedBy": "lucas 2026-09-19",
+              "humanNote": "Lucas accepted by voice, 2026-09-19: 'okay i accept the seams' (canyon audit)"
             }
-          }
+          },
+          "acceptedBy": "lucas 2026-09-19",
+          "humanNote": "Lucas accepted by voice, 2026-09-19: 'okay i accept the seams' (canyon audit)"
         },
         "boxesFrom": {
           "art": "677307f18de1",
@@ -274,7 +278,7 @@
       },
       "entry": {
         "title": "The drowned hall",
-        "text": "You came down into the red canyon to map its waters and have found a drowned hall left by the long-gone builders of an old floodworks. Climb out into the canyon to roam and survey its waters, but watch out! There are reports that flood season may come early this year."
+        "text": "You came down into the red canyon to map its waters and have found a drowned hall left by the long-gone builders of an old floodworks. Climb out into the canyon to roam and survey its waters, but watch out! Flood season has come early this year."
       },
       "designNote": "FRAME ROOM (no graded puzzle). Cold open: seed the mystery — the PANEL (clue, unreadable now; pays off at 'works') and the blank MAP (clue, pickup; the escape's reading surface). Passages: a LADDER up to j_c1 (the high springs) and a TRUNK arch to j_c7. Both UNGATED. NEW ART; the escape room 'works' REUSES this scene (water higher, panel lit). MAZE MODEL (engine work Lucas will build): every passage is OPEN from the start (roam freely, backtrack anytime); a puzzle at a junction is served next-in-queue via availableWhen (a diegetic 'not yet' if out of order); the survey is DRY so nothing seals off; the escape panel refuses an INCOMPLETE map, so the player goes back for any junction whose height is still blank. Scene shows OPEN fork-passages (no closed-door art needed on maze passages) — only the escape tunnel is a gated closed->open door.\n\nMERGED 2026-09-18 (Lucas): the old `works` escape room IS this hall after the boss, so it is now ONE room in two world states. DRY (before j_c7 is solved): cold open, panel clue (pickup), blank map, ladder to j_c1, trunk arch clue, bronze flood door clue. FLOODED (after): full-scene variant `flood_wash`, lit map (waterline), calibration_panel LOCK (224, gated on 7 heights), bronze door `emergency_tunnel` (endsEscape, requires the lock), back arch to j_c7, empty ladder shaft. Hotspots switch by `shownWhen`. Escape design (former works note): ESCAPE (data-free meta-echo; the cut). MECHANIC (current engine): a LOCK whose code is the panel's missing row, read off THE LIT CANYON MAP — this room's own `elevmap`, NOT j_c7's carved wall-map, which is the boss's taught trap and has nothing to do with the escape — showing the confluence tree + the heights the player gathered: c1 1400, c2 1375, c4 1425, c5 1400, LEFT-mid c3 1050, RIGHT-mid c6 1200, trunk c7 850). The panel gives three flood-heights x cluster sizes; two rows lit, one dark: HIGH 1325 -> 2,2,2,2 (lit); LOW 975 -> 4,4 (lit); MIDDLE 1150 -> ? (dark). Player draws the 1150 waterline: above c3(1050), below c6(1200) -> the RIGHT half stays whole (4) while the LEFT splits (2,2) => 2,2,4. LOCK ANSWER = '224' (left-to-right across the canyon). Verified: _scratch/verify_escape_topology.py. NO data/CSV — heights are world props. EXIT tunnel requires the lock; ALSO gate on MAP-COMPLETENESS (all 7 junction heights read) — engine. REUSES 'undercroft' scene (water higher, panel lit). MAZE MODEL (engine work Lucas will build): every passage is OPEN from the start (roam freely, backtrack anytime); a puzzle at a junction is served next-in-queue via availableWhen (a diegetic 'not yet' if out of order); the survey is DRY so nothing seals off; the escape panel refuses an INCOMPLETE map, so the player goes back for any junction whose height is still blank. Scene shows OPEN fork-passages (no closed-door art needed on maze passages) — only the escape tunnel is a gated closed->open door. FUTURE UPGRADE: replace the lock with the draggable-node map + live matrix-grid panel (puzzle_inventory #19).",
       "plannedHotspots": [
@@ -560,7 +564,7 @@
               7
             ]
           },
-          "lockedBody": "The cells stay dark. The panel is keyed to the canyon's own heights, and the map in your hands still has junctions on it you have never stood at.",
+          "lockedBody": "The cells stay dark. The panel is keyed to the canyon's own heights, and your map is not filled in yet: some of its junctions still have no height marked.",
           "items": [
             {
               "key": "cell1",
@@ -614,8 +618,8 @@
             "incomplete": "Set all four cells first. A cell with no group stays dark."
           },
           "solveSfx": {
-            "src": "audio/solve_sluice.mp3",
-            "volume": 0.4088462242400288
+            "src": "audio/solve_bronze_door.mp3",
+            "volume": 0.34
           },
           "note": "answer 2 · 2 · 4 · dark (the 1150 cut: left splits 2,2, right stays 4; the 4th cell has no group)",
           "noElement": true
@@ -1041,7 +1045,7 @@
               7
             ]
           },
-          "lockedBody": "The cells stay dark. The panel is keyed to the canyon's own heights, and the map in your hands still has junctions on it you have never stood at.",
+          "lockedBody": "The cells stay dark. The panel is keyed to the canyon's own heights, and your map is not filled in yet: some of its junctions still have no height marked.",
           "items": [
             {
               "key": "cell1",
@@ -1095,8 +1099,8 @@
             "incomplete": "Set all four cells first. A cell with no group stays dark."
           },
           "solveSfx": {
-            "src": "audio/solve_sluice.mp3",
-            "volume": 0.4088462242400288
+            "src": "audio/solve_bronze_door.mp3",
+            "volume": 0.34
           }
         },
         {
@@ -1190,6 +1194,28 @@
             ],
             "video": "undercroft/cine_flooded.mp4",
             "state": "flooded"
+          }
+        },
+        {
+          "id": "clip_open",
+          "type": "ambient",
+          "label": "Scene motion (door open)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for the door-open state's full-scene clip (the flood keeps raging once the bronze door opens). Retimed 2x like the flooded clip.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "undercroft/cine_open.mp4",
+            "state": "open"
           }
         }
       ],
@@ -1355,6 +1381,12 @@
           ],
           "room": "j_c1",
           "state": "base"
+        },
+        "seam": {
+          "accepted": true,
+          "acceptedBy": "lucas 2026-09-19",
+          "humanNote": "Lucas accepted by voice, 2026-09-19: 'okay i accept the seams' (canyon audit)",
+          "at": "2026-09-19T11:15:28"
         }
       },
       "entry": {
@@ -1744,6 +1776,12 @@
           ],
           "room": "j_c2",
           "state": "base"
+        },
+        "seam": {
+          "accepted": true,
+          "acceptedBy": "lucas 2026-09-19",
+          "humanNote": "Lucas accepted by voice, 2026-09-19: 'okay i accept the seams' (canyon audit)",
+          "at": "2026-09-19T11:15:28"
         }
       },
       "entry": null,
@@ -2104,6 +2142,12 @@
           ],
           "room": "j_c3",
           "state": "base"
+        },
+        "seam": {
+          "accepted": true,
+          "acceptedBy": "lucas 2026-09-19",
+          "humanNote": "Lucas accepted by voice, 2026-09-19: 'okay i accept the seams' (canyon audit)",
+          "at": "2026-09-19T11:15:28"
         }
       },
       "entry": null,
@@ -2445,6 +2489,12 @@
           ],
           "room": "j_c4",
           "state": "base"
+        },
+        "seam": {
+          "accepted": true,
+          "acceptedBy": "lucas 2026-09-19",
+          "humanNote": "Lucas accepted by voice, 2026-09-19: 'okay i accept the seams' (canyon audit)",
+          "at": "2026-09-19T11:15:28"
         }
       },
       "entry": null,
@@ -2809,6 +2859,12 @@
           ],
           "room": "j_c5",
           "state": "base"
+        },
+        "seam": {
+          "accepted": true,
+          "acceptedBy": "lucas 2026-09-19",
+          "humanNote": "Lucas accepted by voice, 2026-09-19: 'okay i accept the seams' (canyon audit)",
+          "at": "2026-09-19T11:15:28"
         }
       },
       "entry": null,
@@ -3080,6 +3136,12 @@
           ],
           "room": "j_c6",
           "state": "base"
+        },
+        "seam": {
+          "accepted": true,
+          "acceptedBy": "lucas 2026-09-19",
+          "humanNote": "Lucas accepted by voice, 2026-09-19: 'okay i accept the seams' (canyon audit)",
+          "at": "2026-09-19T11:15:28"
         }
       },
       "entry": null,
@@ -3446,6 +3508,12 @@
           ],
           "room": "j_c7",
           "state": "base"
+        },
+        "seam": {
+          "accepted": true,
+          "acceptedBy": "lucas 2026-09-19",
+          "humanNote": "Lucas accepted by voice, 2026-09-19: 'okay i accept the seams' (canyon audit)",
+          "at": "2026-09-19T11:15:28"
         }
       },
       "entry": null,

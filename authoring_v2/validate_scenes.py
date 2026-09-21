@@ -40,6 +40,11 @@ Checks (all against each room's `authoring.sceneSpec`; rooms without one are ski
     - elements run in left→right sweep order (the prompt is rendered in FILE order, so an out-of-order
       spec describes the panorama as jumping backwards)
   ANIMATION / SEAM
+    - an element authored `animate` also carries `motion:{moves,phrase}` — the field the LIVE motion
+      path reads (`movers`/`render_motion_prompt`/the whole-panorama bake). `animate` alone renders the
+      still fine and then reports NO MOVER, so the clip has no authored subject (fails only on rooms
+      whose art is not built yet; a built room's clips already exist)
+    - `soundBed` is authored on an unbuilt room (warn) — the sfx phase starts from spec intent
     - `seam` is set on every room
     - an `animate` element is not parked at the extreme wrap edges (needs a hand-drawn wrap box)
     - `animate.loop` is boomerang|crossfade and `animate.motion` is non-empty
@@ -323,6 +328,25 @@ def check_scenario(path):
             if isinstance(a, dict):     # a non-dict is already reported above; don't crash reading it
                 if not str(a.get("motion") or "").strip():
                     fails.append(f"{rk}/{eid}: `animate` with no motion")
+                # THE FIELD THAT MOVED, AND THE SILENT FAILURE IT CAUSED (2026-09-20).
+                # `animate:{motion,loop}` feeds `cinemagraph_jobs` — the RETIRED box-cinemagraph path.
+                # The live motion path (`movers()` -> `render_motion_prompt()` -> the whole-panorama
+                # bake) reads `element.motion:{moves,phrase}` instead. A spec authored with `animate`
+                # alone therefore generates its STILL happily and then reports NO MOVER: the motion
+                # prompt comes back None, and the clip stage either falls back to a legacy `.txt`
+                # prompt or reads the room as "author a mover", which is the exact drift that putting
+                # motion in the spec was built to kill. Nothing caught it — this validator only knew
+                # `animate` — and `flat_clustering/waterfalls` was one command away from generating 19
+                # views that way (Lucas spotted it by asking, 2026-09-20).
+                # FAIL only where art has NOT been generated yet: a built room's clips already exist,
+                # so flagging it is noise about water under the bridge.
+                m = e.get("motion")
+                if not (isinstance(m, dict) and m.get("moves")):
+                    msg = (f"{rk}/{eid}: `animate` but no `motion:{{moves:true, phrase:…}}` — "
+                           f"`movers()` returns nothing for this room, so `render_motion_prompt()` is "
+                           f"None and the cinemagraph has no authored subject. Add `motion` (keep "
+                           f"`animate`; heist carries both).")
+                    (warns if r.get("built") else fails).append(msg)
                 if a.get("loop") and a["loop"] not in LOOPS:
                     fails.append(f"{rk}/{eid}: animate.loop '{a['loop']}' not in {sorted(LOOPS)}")
                 bx = boxes.get(eid)

@@ -1,0 +1,2 @@
+DECISION: HOLD
+WHY: The 3072 clip passed every gate that can reject it. Camera reads still, glitch breadth is 0.062 (the reject line is 0.70), and the dead check is well clear (ratio 11.03, peak 8.47). The 0.00 return is the known dead-or-cyclic ambiguity, and flowing water in a sheet should give exactly that, so it goes to Lucas's eye rather than back to the art. The run record lists the motion prompt as NONE even though cycle 1 rendered from motion.phrase, so that field is worth checking when the clip is reviewed.

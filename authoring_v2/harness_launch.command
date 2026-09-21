@@ -18,7 +18,23 @@
 #      run is live. Use it to load new server code.
 #
 # ── CONFIG ─────────────────────────────────────────────────────────────────────────────────────────
-HOST2="${HARNESS_HOST:-bustalab@131.212.57.217}"      # override: HARNESS_HOST=bustalab@… ./harness_launch.command
+# WHERE host2 IS (2026-09-20). Lab addresses are ~1-hour DHCP leases and they MOVE: host2 went
+# .217 -> .181 that day (and took the dgx's old address), which broke this launcher until it was
+# repointed. So resolve in three steps, cheapest first:
+#   1. $HARNESS_HOST, if you set it
+#   2. the `host2` ssh alias, if this machine has one with a real hostname behind it — on the lab
+#      boxes `infrastructure/fabric/fabric_resolve.py` keeps that alias on the current address
+#   3. host2's address as of 2026-09-20, as a last resort for the roaming Mac
+# If step 3 starts failing, the lease moved again: run fabric_resolve.py (or ask an agent to) and
+# prefer giving this Mac a `host2` ssh alias so step 2 does the work from then on.
+HOST2="${HARNESS_HOST:-}"
+if [ -z "$HOST2" ]; then
+  if ssh -G host2 2>/dev/null | grep -qE '^hostname ([0-9]{1,3}\.){3}[0-9]{1,3}$'; then
+    HOST2="host2"
+  else
+    HOST2="bustalab@131.212.57.181"
+  fi
+fi
 SSH_OPTS="${HARNESS_SSH_OPTS:-}"                       # e.g. HARNESS_SSH_OPTS='-J host1'  if you must hop via host1
 REMOTE_ENSURE="/home/bustalab/Documents/Tools/websites/thebustalab.github.io/escape_rooms/authoring_v2/serve_harness.sh"
 URL="http://localhost:8752/build_world_v3.html"   # the clip-review console (v3, 2026-09-15); v2 gallery and the full
@@ -48,10 +64,26 @@ echo "  host2: $HOST2   ${SSH_OPTS:+(ssh opts: $SSH_OPTS)}"
 #    (which is what let the tunnel below no-op against an existing connection).
 #    Ensure-only: NO HARNESS_RESTART here, ever — a restart goes through the guarded endpoint below.
 echo "① ensuring servers are up on host2 (no restart)…"
-if ! ssh $SSH_OPTS -o ControlMaster=no -o ConnectTimeout=8 "$HOST2" "HARNESS_RESTART=0 bash '$REMOTE_ENSURE'"; then
+ensure_up() { ssh $SSH_OPTS -o ControlMaster=no -o ConnectTimeout=8 "$HOST2" "HARNESS_RESTART=0 bash '$REMOTE_ENSURE'"; }
+if ! ensure_up; then
+  # AUTOMATIC HOP VIA host1 (2026-09-20). host2 sits on the wired lab subnet; this Mac roams, and from
+  # campus wifi / off site the direct route TIMES OUT (not "refused" — the packets are dropped in the
+  # network, nothing is wrong with host2: host1 reaches its port 22 fine at the same moment). host1
+  # answers on a PUBLIC DNS NAME, so jumping through it works from anywhere the Mac has a network.
+  if [ -z "$SSH_OPTS" ]; then
+    echo "  direct route to host2 failed — retrying through host1 (bustalab.d.umn.edu)…"
+    SSH_OPTS="-J bustalab@bustalab.d.umn.edu"
+    if ensure_up; then
+      echo "  ✓ reached host2 via host1. Set HARNESS_SSH_OPTS='-J bustalab@bustalab.d.umn.edu' to skip the retry."
+      HOPPED=1
+    fi
+  fi
+fi
+if [ "${HOPPED:-0}" != 1 ] && ! ensure_up; then
   echo "✗ couldn't reach host2 over SSH (or the ensure script failed)."
   echo "  Check you can run:  ssh $SSH_OPTS $HOST2   — on campus / VPN, key authorized on the desktop."
-  echo "  If you must hop through host1:  HARNESS_SSH_OPTS='-J host1' $0"
+  echo "  A timeout (rather than 'refused') usually means the network, not the box: try the host1 hop,"
+  echo "  HARNESS_SSH_OPTS='-J bustalab@bustalab.d.umn.edu' $0"
   exit 1
 fi
 

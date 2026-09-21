@@ -1,0 +1,2 @@
+DECISION: HOLD
+WHY: The clip passed every gate that is enforced. Glitch breadth is 0.0, well under the 0.70 threshold (spike is only reported, never enforced). The dead gate passed at ratio 14.86 with a peak of 9.61, so the clip is moving. The near-zero return (0.04) is what you'd expect from two curtains of water that flow in a loop rather than moving out and back, and the notes say that metric can't judge that kind of clip. So it goes to Lucas to watch.

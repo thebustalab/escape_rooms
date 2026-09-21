@@ -14,7 +14,7 @@
   },
   "escapeDone": {
     "title": "There is a great deal of wall down there",
-    "body": "Two platforms that were on no map are on the record, fixed off nothing but the hops you rode and what you saw go past. The standing order was bigger than the growing face; it is bigger again now. The river has the low tunnels — but the survey holds, and the ebb was enough."
+    "body": "Two platforms that were on no map are on the record, fixed off nothing but five route cards laid over one survey sheet, and the dark platforms you ran through on the way. The standing order was bigger than the growing face; it is bigger again now. The river has the low tunnels — but the survey holds, and the ebb was enough."
   },
   "music": "audio/subway_theme.mp3",
   "musicVolume": 0.15,
@@ -144,7 +144,7 @@
   ],
   "debrief": {
     "title": "How this railway worked",
-    "intro": "Two networks, and they had nothing to do with each other. The genes' network you built yourself — correlate, threshold, read. The rails' network was handed to you as observed fact, one ride at a time, and you could only ever know the parts of it you had been down. Both times the loudest thing was not the most connected thing."
+    "intro": "Two networks, and they had nothing to do with each other. The genes' network you built yourself — correlate, threshold, read. The rails' network was handed to you as observed fact, one line at a time, off the route card in each cab you drove, and it only showed its gaps once every card lay on the sheet together. Both times the loudest thing was not the most connected thing."
   },
   "worldPlatePrompt": "A wide establishing view inside a Victorian underground railway that stood derelict for a century and is now being worked again as a lichen farm. TIME-NEUTRAL soft even underground light, neither dawn nor dusk, no daylight in this frame. THE CROP IS THE ARCHITECTURE, AND THIS IS THE MOST IMPORTANT THING IN THE FRAME: the lichen grows ON THE FABRIC OF THE TUNNEL ITSELF, not in containers — thick living sheets of flat orange rosettes and swollen grey-green crusts spreading across the glazed wall tile, climbing the pilasters and furring the brick soffits of the arches overhead, so the walls themselves are visibly alive and shaggy with it. It is a crop growing on a building. Galvanised racking and plastic trays of cut crust stand about as the HARVEST TAKEN OFF THOSE WALLS — the product, never the source. Nothing is cultivated in a tray. THE FABRIC UNDER IT IS OLD AND DAMAGED: glazed brick and tile in ochre, saffron and dirty cream, much of it crazed, chipped or missing with the bedding mortar showing through; paint peeling in sheets off cast-iron columns; rust and water stains bleeding down; perished cable looped on old porcelain insulators; sooted segmental brick arches; granite platform edges worn hollow. A CREW WORKS HERE NOW, VISIBLY AND WELL: cheap bright LED work-lamps on yellow flex strung along the arches, duckboards laid over the wet, cable ties and gaffer tape, a kettle and enamel mugs on a plank shelf, a coat on a hook, and notices, work rotas, tally sheets and curling postcards tacked and taped to the tile with chalked marks and scratched tallies beside them. Repairs done with ingenuity — a propped timber, a patched panel, a hose run into a channel. TWO COLOUR TEMPERATURES, AND BOTH MUST BE STRONGLY PRESENT — this must NOT be a monochrome amber or sepia picture. WARM: pools of amber lamplight around the work-lamps and the crew's corner. COLD: everywhere the lamps do not reach, a distinct COLD BLUE-GREEN DAMP — wet black tile going blue in the shadow, green-black standing water, cold blue-green light down the tunnel mouths and in the depths of the arches, the chill of a place with a river behind the wall. The cold blue-green should occupy at least as much of the frame as the warm amber, and the two should meet in clear contrast rather than blending into brown. Damp air, faint haze, film grain. Photographic and beautiful. THE MOOD IS WARM, PURPOSEFUL AND CHARACTERFUL — a magnificent run-down place that a good crew has taken on and made theirs. It is emphatically NOT eerie, NOT spooky, NOT creepy, NOT haunted, NOT menacing, NOT post-apocalyptic and NOT an abandoned ruin. Dark and dirty in places, and still plainly and warmly worked in. No cobwebs, no gloom for its own sake, no horror atmosphere of any kind. No large blank empty wall areas — every surface carries the marks and clutter of a working place. No people, no lettering, no captions, no text, no signage or readable writing of any kind anywhere. No sepia monochrome, no uniform brown or orange cast over the whole image.",
   "coverPrompt": "A bold, graphic, MID-TO-HIGH-KEY square poster in flat vector-poster shapes. A single Victorian underground railway arch seen head-on and filling most of the frame, its opening a LARGE GLOWING field of warm amber lamplight — the brightest thing in the picture and the first thing the eye finds. Growing across that glowing arch, in strong flat silhouette, a bold band of LICHEN: fat round orange rosettes and a ragged grey-green crust spreading in from the arch's rim and over the tilework, deliberately oversized and simplified so it still reads at the size of a postage stamp. Two rails run out of the arch toward the viewer as two clean converging lines. The surround is a cool blue-green tile field, MID-TONE — clearly darker than the arch but never black. Three values only: bright amber, mid blue-green, and the orange crop. Big simple shapes, few of them, strong edges. NOT a dark or murky picture: no near-black fields, no deep shadow, no gloom, nothing dim, and no photographic haze — this is a printed poster, not a photograph of a tunnel. Square. No people, no lettering, no captions, no text, no logos.",
@@ -180,7 +180,12 @@
             0.914,
             0.876
           ],
-          "boxSource": "draft:localizer"
+          "boxSource": "draft:localizer",
+          "feedback": {
+            "correct": "The lever goes over and the frame takes both plates. Two platforms that appear on no map are on the record.",
+            "wrong": "The frame returns the plates."
+          },
+          "lockedBody": "The frame is empty and the lever will not go over. Standing Order 4 is plain about it: no unserved location is filed until every line on the network has been run by the crew filing it."
         },
         {
           "type": "door",
@@ -248,12 +253,46 @@
           "answer": "E5I4",
           "length": 4,
           "endsEscape": true,
-          "lockedBody": "The frame is empty and the lever will not go over. There is nothing yet to file.",
+          "lockedBody": "The frame is empty and the lever will not go over. Standing Order 4 is plain about it: no unserved location is filed until every line on the network has been run by the crew filing it.",
           "feedback": {
             "correct": "The lever goes over and the frame takes both plates. Two platforms that appear on no map are on the record.",
             "wrong": "The frame returns the plates."
           },
-          "boxNote": "the routing frame and its brass lever on the desk (the escape lock), not the whole desk — measured by eye on raw l1_ochre_hall_3 (box_grid), 2026-09-18"
+          "boxNote": "the routing frame and its brass lever on the desk (the escape lock), not the whole desk — measured by eye on raw l1_ochre_hall_3 (box_grid), 2026-09-18",
+          "availableWhen": {
+            "all": [
+              {
+                "eq": [
+                  "rode_madder",
+                  "1"
+                ]
+              },
+              {
+                "eq": [
+                  "rode_woad",
+                  "1"
+                ]
+              },
+              {
+                "eq": [
+                  "rode_weld",
+                  "1"
+                ]
+              },
+              {
+                "eq": [
+                  "rode_verdigris",
+                  "1"
+                ]
+              },
+              {
+                "eq": [
+                  "rode_lampblack",
+                  "1"
+                ]
+              }
+            ]
+          }
         },
         {
           "id": "berth_lampblack",
@@ -268,19 +307,25 @@
           "direction": "open",
           "boxSource": "review:agent-vision",
           "to": "car_lampblack",
-          "boxNote": "the locomotive's open cab doorway — measured by eye on raw l1_ochre_hall_3 (box_grid), 2026-09-18"
+          "boxNote": "the locomotive's open cab doorway — measured by eye on raw l1_ochre_hall_3 (box_grid), 2026-09-18",
+          "onPass": [
+            {
+              "set": "at_lampblack",
+              "to": "ochre_hall"
+            }
+          ]
         },
         {
           "id": "survey_sheet",
           "type": "clue",
           "label": "The linen survey sheet",
           "box": [
-            0.855,
-            0.584,
-            0.918,
-            0.643
+            0.8573,
+            0.5905,
+            0.9203,
+            0.6495
           ],
-          "boxSource": "review:agent-vision",
+          "boxSource": "moved:testplay",
           "image": "survey/sheet.png",
           "body": "A linen survey sheet, weighted flat and gone brown along the folds. Every station the line serves, printed where the surveyors put it — and no running lines at all. A survey sheet was never drawn to show track.<br><br>A reference border runs the margins: A to L across, 1 to 10 up.",
           "pickup": "The operator's survey sheet — every SERVED station in surveyed position, running lines not shown. Reference border A-L across, 1-10 up.",
@@ -291,12 +336,12 @@
           "type": "clue",
           "label": "The filing card",
           "box": [
-            0.878,
-            0.548,
-            0.915,
-            0.572
+            0.8194,
+            0.5658,
+            0.8564,
+            0.5898
           ],
-          "boxSource": "review:agent-vision",
+          "boxSource": "moved:testplay",
           "body": "A printer's card slipped under the frame's foot, worn soft at the corners.<br><br><i>STANDING ORDER 4 — UNSERVED LOCATIONS. Both references to be filed in a single entry, the lower letter first. The frame accepts no part entry and passes no comment on one.</i>",
           "pickup": "Standing Order 4 — both references filed in a single entry, the LOWER LETTER FIRST. No part entry, and no comment on one.",
           "boxNote": "no card is drawn distinctly; boxed at the routing frame's foot, where the body says it is slipped — measured by eye on raw l1_ochre_hall_3 (box_grid), 2026-09-18"
@@ -566,7 +611,13 @@
           "direction": "open",
           "boxSource": "review:agent-vision",
           "to": "car_woad",
-          "boxNote": "the woad car's wide open double doorway at centre (a smaller open door at x~0.34 also exists) — measured by eye on current scene.png (box_grid), 2026-09-18"
+          "boxNote": "the woad car's wide open double doorway at centre (a smaller open door at x~0.34 also exists) — measured by eye on current scene.png (box_grid), 2026-09-18",
+          "onPass": [
+            {
+              "set": "at_woad",
+              "to": "ochre_woad"
+            }
+          ]
         },
         {
           "id": "spiral_down",
@@ -772,10 +823,10 @@
           "note": "transfer on foot -> ochre_woad",
           "to": "ochre_woad",
           "box": [
-            0.102,
-            0.15,
-            0.15,
-            0.75
+            0.122,
+            0.13,
+            0.154,
+            0.65
           ],
           "boxSource": "draft:localizer"
         },
@@ -786,10 +837,10 @@
           "note": "board this line -> car_verdigris; the destination is chosen on the cab's selector, so ONE door hotspot is enough (Lucas, 2026-09-07). Line: verdigris.",
           "to": "car_verdigris",
           "box": [
-            0.2504,
-            0.4592,
-            0.7496,
-            0.7408
+            0.244,
+            0.372,
+            0.756,
+            0.628
           ],
           "boxSource": "draft:localizer"
         }
@@ -801,44 +852,71 @@
           "type": "door",
           "label": "The spiral stair up",
           "box": [
-            0.108,
-            0.02,
-            0.201,
-            0.74
+            0.12,
+            0.03,
+            0.215,
+            0.73
           ],
           "direction": "open",
           "boxSource": "review:agent-vision",
           "to": "ochre_woad",
-          "boxNote": "the one railed cast-iron spiral stair at left, floor foot to roof shaft — measured by eye on current scene.png (box_grid), 2026-09-18"
+          "boxNote": "the single spiral stair, shaft rim to base slab — measured by eye on the round 10 scene.png (box_grid), 2026-09-19"
         },
         {
           "id": "copper_store",
           "type": "clue",
           "label": "The mordant store",
           "box": [
-            0.862,
-            0.314,
-            0.942,
-            0.75
+            0.836,
+            0.32,
+            0.905,
+            0.7
           ],
           "boxSource": "review:agent-vision",
           "body": "Mordant tins stacked to the door, and a works logbook propping it ajar. The last entry is a re-seeding. So is the one before it, and the one before that.",
-          "boxNote": "the copper-sheathed store cupboard, door ajar, with the mordant tins at its foot — measured by eye on current scene.png (box_grid), 2026-09-18"
+          "boxNote": "the green store cupboard, open door and shelves, incl. the coat — measured by eye on the round 10 scene.png (box_grid), 2026-09-19"
         },
         {
           "id": "berth_verdigris",
           "type": "door",
           "label": "The verdigris train (green)",
           "box": [
-            0.534,
-            0.383,
-            0.599,
-            0.652
+            0.279,
+            0.33,
+            0.706,
+            0.7
           ],
           "direction": "open",
           "boxSource": "review:agent-vision",
           "to": "car_verdigris",
-          "boxNote": "the verdigris car's open side doorway right of centre (a second open door at x~0.33 also exists) — measured by eye on current scene.png (box_grid), 2026-09-18"
+          "boxNote": "the green carriage, cab end to rear end, roof to wheels — measured by eye on the round 10 scene.png (box_grid), 2026-09-19",
+          "onPass": [
+            {
+              "set": "at_verdigris",
+              "to": "ochre_verdigris"
+            }
+          ]
+        },
+        {
+          "id": "clip_base",
+          "type": "ambient",
+          "label": "Scene motion (base)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/serve-clips.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "ochre_verdigris/cine_base.mp4"
+          }
         }
       ],
       "authoring": {
@@ -866,12 +944,12 @@
             },
             {
               "id": "platform_edge",
-              "desc": "in the IMMEDIATE FOREGROUND at the viewer's own feet, the platform's square worn granite edge with its white-painted line — and just beyond it the ballast and sleepers of the track bed, a single step down, with the two running rails lying on them roughly knee-deep below the platform surface: deep enough to take a train's wheels and no deeper",
+              "desc": "in the IMMEDIATE FOREGROUND at the viewer's own feet, the platform's square worn granite edge with its white-painted line — and just beyond it the ballast and sleepers of the track bed, a single step down, with the two running rails lying on them roughly knee-deep below the platform surface: deep enough to take a train's wheels and no deeper. Those rails are the ONLY rails in the station: the same single pair runs on straight into the tunnel mouth at the left-hand end and straight into the buffer stops at the right-hand end, and the train stands on it. The platform edge runs dead straight left-to-right, parallel to the rails and to the train, and continues straight on toward the tunnel mouth in the station's left END wall.",
               "at": "dead ahead in the centre"
             },
             {
               "id": "berth_verdigris",
-              "desc": "dead ahead beyond that edge, this berth's single road: the sunken track bed and its ONE pair of running rails, its rails running away to the LEFT and ducking into its OWN brick-ringed arched TUNNEL MOUTH low at track level — the road between the train and that mouth completely CLEAR and unobstructed, so the train could run straight out of the station — while to the RIGHT, BEYOND the far end of the train, the same rails stop dead at heavy timber-and-iron BUFFER STOPS with a sand drag and a red lamp against a blind wall. These are ONE unbroken pair of rails running dead straight through the whole station and out at its end(s), and the train stands on that very pair, in line with them. Standing DOWN IN that bed, broadside to the viewer, a short underground unit sheathed in copper gone bright green with patina, wet through — flat tunnel-profile sides beaded with water — ONE vehicle, a single unbroken body, sitting square and level along the road with a driver's cab at the end nearer the viewer and its side doors slid open. ITS WHEELS SIT VISIBLY ON THOSE RAILS, squarely on the railheads and clearly in contact with them, and THE CAR'S FLOOR COMES UP EXACTLY LEVEL WITH THE PLATFORM EDGE so its open doorways give straight out onto the platform at the viewer's own foot level, a single stride across with no step up or down and no drop in front of them. There is EXACTLY ONE tunnel mouth in the whole panorama, at the left-hand end of this single road, and no other tunnel, bore or arched opening anywhere; the right-hand end is the blind wall behind the buffer stops.",
+              "desc": "dead ahead beyond that edge, this berth's single road: the sunken track bed and its ONE pair of running rails, its rails running away to the LEFT and ducking into its OWN brick-ringed arched TUNNEL MOUTH low at track level — the road between the train and that mouth completely CLEAR and unobstructed, so the train could run straight out of the station — while to the RIGHT, BEYOND the far end of the train, the same rails stop dead at heavy timber-and-iron BUFFER STOPS with a sand drag and a red lamp against a blind wall. These are ONE unbroken pair of rails running dead straight through the whole station and out at its end(s), and the train stands on that very pair, in line with them. Standing DOWN IN that bed, broadside to the viewer, a short underground unit sheathed in copper gone bright green with patina, wet through — flat tunnel-profile sides beaded with water — ONE vehicle, a single unbroken body, sitting square and level along the road with a driver's cab at the end nearer the viewer and its side doors slid open. ITS WHEELS SIT VISIBLY ON THOSE RAILS, squarely on the railheads and clearly in contact with them, and THE CAR'S FLOOR COMES UP EXACTLY LEVEL WITH THE PLATFORM EDGE so its open doorways give straight out onto the platform at the viewer's own foot level, a single stride across with no step up or down and no drop in front of them. There is EXACTLY ONE tunnel mouth in the whole panorama, at the left-hand end of this single road, and no other tunnel, bore or arched opening anywhere; the right-hand end is the blind wall behind the buffer stops. THE TRACK GEOMETRY IS ONE STRAIGHT LINE: exactly ONE pair of running rails in the whole panorama, the very rails the train stands on, running dead straight along the platform and continuing straight into the tunnel mouth at the left-hand end, the mouth square on the end of those same rails and IN LINE with them. Only ONE platform, the one the viewer stands on. No second road, no siding, no crossover, no points, no other rails anywhere in the frame. At the right-hand end those SAME rails run straight into the buffer stops, which stand square ACROSS the ends of the two rails and in line with them, never off to one side of the track. The car's body follows those rails exactly: its wheels sit on the railheads along its whole length, so the car and the rails beneath it curve together as one. THE PHYSICAL LAYOUT, AS IN A REAL STATION: the platform, the running rails and the train are all PARALLEL, running LEFT-TO-RIGHT across the view. The viewer stands on the platform facing the train BROADSIDE — its long side, doors and windows face the viewer squarely, the whole car parallel to the platform edge, never turned or angled toward or away. The tunnel mouth is in the END WALL of the station at the far LEFT END of the platform, NOT in the long wall across the track: from the viewer it is seen end-on, off to the left, and the rails run straight along the platform from under the train into it, the platform edge, the rails and the train all receding to ONE vanishing point inside that mouth. The train's wheels sit ON TOP of those two rails along the whole of its length: the rail nearest the viewer disappears UNDER the train's wheels and is hidden by them, never running in front of the wheels or below them at a different level. Beyond the train's far end the SAME two rails carry on in the same straight line, without a kink or a step, and end under the buffer stops, which stand astride those very rails and not beside them on a separate stub.",
               "label": "The verdigris train (green)",
               "door": {
                 "direction": "open",
@@ -905,7 +983,7 @@
             }
           ],
           "atmosphere": "the deepest and wettest of the three levels, green-stained tile and standing damp under hard cold lamps, heavy haze, film grain. A CENTURY OF DERELICTION, ACTIVELY WORKED IN: crazed and missing glazed tile with the bedding mortar showing through, paint peeling in sheets, long rust and water stains bleeding down the walls, perished cable looped on old porcelain insulators, chipped enamel, sooted brick, treads worn hollow. And over the top of all of it the crew who work here now — notices, tally sheets, work rotas and curling postcards tacked and taped up, chalked marks and scratched tallies on the tile, duckboards laid over the wet, cable ties and gaffer tape, cheap bright LED work-lamps on yellow flex, a kettle, a coat on a hook. Lived-in, cared for, and plainly somebody's workplace. Warm, purposeful and characterful — a magnificent run-down place that a good crew has taken on and made theirs. NOT eerie, NOT spooky, NOT creepy, NOT haunted, NOT menacing, NOT post-apocalyptic and NOT an abandoned ruin: dark and dirty in places, and still plainly and warmly worked in. No cobwebs, no gloom-for-its-own-sake",
-          "negatives": "No people, no lettering, captions, text, signage or readable writing of any kind, no station name, no daylight. EXACTLY ONE train and EXACTLY ONE road in this view — no second train anywhere, not behind the viewer, not at the frame edges, not down a tunnel. The train is ONE CONTINUOUS VEHICLE with a single unbroken body — never two separate vehicles, never two detached cab-boxes with a gap of floor between them, and never the same vehicle drawn twice. It is seen from the SIDE, standing straight and square along its road, and it is NOT bent, curved, twisted, skewed, splayed or wrapped round to bring its far end into view: only the flank facing the viewer needs to be visible, and the far end may simply run out of frame. COUNT THE TRACKWORK EXACTLY: this station has 1 road and 1 pair of running rails, ONE per train, and no others — no third track, no siding, no crossover, no points, no spare rails crossing the floor. Every road has its OWN bore, never shared, so there are EXACTLY 1 tunnel mouth and 1 set of buffer stops in this station, all of them on the viewer's LEFT and RIGHT and all in line with the rails that enter them. Each train sits SQUARE AND LEVEL along its own road, parallel to its rails — never nose-to-nose with another train, never wedged into a corner, never twisted, skewed or bent to show its far end, and never crossing another road. THE RAILS UNDER THE TRAIN ARE THE SAME RAILS THAT LEAVE THE STATION. One single unbroken pair of rails runs dead straight from one end of the station to the other, the train stands squarely on that pair, and each tunnel mouth sits directly in line with it — you could follow the railheads with your eye from under the train's wheels, along the bed, and straight in through the arch without a break, a bend, a kink or an offset. There is never a second set of rails running to the mouths beside or past the train, and the train is never parked on a stub of track that does not reach them. A BUFFER STOP MAY ONLY EVER STAND AT A BLIND END — beyond the far end of a train, on a road that dies there, against a wall. There is NEVER a buffer stop, gate, barrier, fence, hoarding or blockage of any kind BETWEEN a train and a tunnel mouth its own line runs into: every train must have a clear, unobstructed road out of the station. Nothing stands in the road but the train: no barrel, crate, bench or rack in the track bed. The image is SHARP, with no motion blur or streaking — everything is standing still. No blank empty wall areas. Nothing eerie, spooky, creepy, haunted or menacing; no cobwebs.",
+          "negatives": "No people, no lettering, captions, text, signage or readable writing of any kind, no station name, no daylight. EXACTLY ONE train and EXACTLY ONE road in this view — no second train anywhere, not behind the viewer, not at the frame edges, not down a tunnel. The train is ONE CONTINUOUS VEHICLE with a single unbroken body — never two separate vehicles, never two detached cab-boxes with a gap of floor between them, and never the same vehicle drawn twice. It is seen from the SIDE, standing straight and square along its road, and it is NOT bent, curved, twisted, skewed, splayed or wrapped round to bring its far end into view: only the flank facing the viewer needs to be visible, and the far end may simply run out of frame. COUNT THE TRACKWORK EXACTLY: this station has 1 road and 1 pair of running rails, ONE per train, and no others — no third track, no siding, no crossover, no points, no spare rails crossing the floor. Every road has its OWN bore, never shared, so there are EXACTLY 1 tunnel mouth and 1 set of buffer stops in this station, all of them on the viewer's LEFT and RIGHT and all in line with the rails that enter them. Each train sits SQUARE AND LEVEL along its own road, parallel to its rails — never nose-to-nose with another train, never wedged into a corner, never twisted, skewed or bent to show its far end, and never crossing another road. THE RAILS UNDER THE TRAIN ARE THE SAME RAILS THAT LEAVE THE STATION. One single unbroken pair of rails runs dead straight from one end of the station to the other, the train stands squarely on that pair, and each tunnel mouth sits directly in line with it — you could follow the railheads with your eye from under the train's wheels, along the bed, and straight in through the arch without a break, a bend, a kink or an offset. There is never a second set of rails running to the mouths beside or past the train, and the train is never parked on a stub of track that does not reach them. A BUFFER STOP MAY ONLY EVER STAND AT A BLIND END — beyond the far end of a train, on a road that dies there, against a wall. There is NEVER a buffer stop, gate, barrier, fence, hoarding or blockage of any kind BETWEEN a train and a tunnel mouth its own line runs into: every train must have a clear, unobstructed road out of the station. Nothing stands in the road but the train: no barrel, crate, bench or rack in the track bed. The image is SHARP, with no motion blur or streaking — everything is standing still. No blank empty wall areas. Nothing eerie, spooky, creepy, haunted or menacing; no cobwebs. NOT two separate railways: there is no second pair of rails, no rails running in front of or behind the train other than the pair it stands on, no train floating over or beside its rails, and the buffer stops never stand off to the side of the track. NEVER a tunnel mouth in the long wall facing the viewer across the track; NEVER a train standing at an angle to the platform or swinging round toward a mouth; the rails never bend or turn toward the viewer. No rail running in FRONT of the train's wheels or at a different level from them, no kink, step or break in the rails between the tunnel mouth, the train and the buffer stops, and no buffer stop on a separate stub of track beside the train's road.",
           "continuity": []
         },
         "motionSpec": {
@@ -938,20 +1016,20 @@
           ]
         },
         "seam": {
-          "band": "mid",
-          "ratio": 2.91,
-          "delta": 8.11,
+          "band": "sky",
+          "ratio": 0.0,
+          "delta": 0.0,
           "needsWork": false,
           "stage": "blurred",
-          "at": "2026-09-17T19:49:37",
+          "at": "2026-09-19T11:01:50",
           "accepted": false,
           "acceptedBy": "lucas 2026-09-07",
-          "seamBandRun": 0.014
+          "seamBandRun": 0.0
         },
         "scenePrompt": "This is a seamless 360-degree panorama from the lowest of the three stacked platforms at Ochre Steps, cut deeper than the others and wet with it, green-stained tile on every side — the viewer is standing ON THE PLATFORM FACING THE VERDIGRIS TRAIN across its road, so that one road runs left-to-right across the view in front of them, with the platform's back wall behind them. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the platform's plain tiled back wall directly behind the viewer, uniform and unbroken, with no road, arch, doorway or opening in it: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the platform's plain tiled back wall directly behind the viewer, uniform and unbroken, with no road, arch, doorway or opening in it, the left half of that one surface; to the left, the LEFT-HAND END of the station, low at track level, where the verdigris road ducks into its own arched tunnel mouth — each bore taking only its own road's single pair of rails, never shared, and the running road leading to it kept CLEAR: no barrier of any kind between a train and the mouth its line uses; to the left, a cast-iron spiral stair winding UP out of this platform through a round shaft in the roof, its worn handrail curving away into a pale glow above; just left of centre, a copper-sheathed store cupboard set into the platform's back wall, its door propped ajar on a stack of mordant tins and a works logbook; dead ahead in the centre, in the IMMEDIATE FOREGROUND at the viewer's own feet, the platform's square worn granite edge with its white-painted line — and just beyond it the ballast and sleepers of the track bed, a single step down, with the two running rails lying on them roughly knee-deep below the platform surface: deep enough to take a train's wheels and no deeper; dead ahead in the centre, dead ahead beyond that edge, this berth's single road: the sunken track bed and its ONE pair of running rails, its rails running away to the LEFT and ducking into its OWN brick-ringed arched TUNNEL MOUTH low at track level — the road between the train and that mouth completely CLEAR and unobstructed, so the train could run straight out of the station — while to the RIGHT, BEYOND the far end of the train, the same rails stop dead at heavy timber-and-iron BUFFER STOPS with a sand drag and a red lamp against a blind wall. These are ONE unbroken pair of rails running dead straight through the whole station and out at its end(s), and the train stands on that very pair, in line with them. Standing DOWN IN that bed, broadside to the viewer, a short underground unit sheathed in copper gone bright green with patina, wet through — flat tunnel-profile sides beaded with water — ONE vehicle, a single unbroken body, sitting square and level along the road with a driver's cab at the end nearer the viewer and its side doors slid open. ITS WHEELS SIT VISIBLY ON THOSE RAILS, squarely on the railheads and clearly in contact with them, and THE CAR'S FLOOR COMES UP EXACTLY LEVEL WITH THE PLATFORM EDGE so its open doorways give straight out onto the platform at the viewer's own foot level, a single stride across with no step up or down and no drop in front of them; just right of centre, a shallow channel cut along the foot of the back wall running with clear water, fed by a steady seep down the tile face above it; to the right, the RIGHT-HAND END of the station, low at track level, where the verdigris road stops dead at heavy timber-and-iron buffer stops with a sand drag and a red lamp; on the far right, the platform's plain tiled back wall directly behind the viewer, uniform and unbroken, with no road, arch, doorway or opening in it, the right half of that one surface, joining its other half. the deepest and wettest of the three levels, green-stained tile and standing damp under hard cold lamps, heavy haze, film grain. A CENTURY OF DERELICTION, ACTIVELY WORKED IN: crazed and missing glazed tile with the bedding mortar showing through, paint peeling in sheets, long rust and water stains bleeding down the walls, perished cable looped on old porcelain insulators, chipped enamel, sooted brick, treads worn hollow. And over the top of all of it the crew who work here now — notices, tally sheets, work rotas and curling postcards tacked and taped up, chalked marks and scratched tallies on the tile, duckboards laid over the wet, cable ties and gaffer tape, cheap bright LED work-lamps on yellow flex, a kettle, a coat on a hook. Lived-in, cared for, and plainly somebody's workplace. Warm, purposeful and characterful — a magnificent run-down place that a good crew has taken on and made theirs. NOT eerie, NOT spooky, NOT creepy, NOT haunted, NOT menacing, NOT post-apocalyptic and NOT an abandoned ruin: dark and dirty in places, and still plainly and warmly worked in. No cobwebs, no gloom-for-its-own-sake. No people, no lettering, captions, text, signage or readable writing of any kind, no station name, no daylight. EXACTLY ONE train and EXACTLY ONE road in this view — no second train anywhere, not behind the viewer, not at the frame edges, not down a tunnel. The train is ONE CONTINUOUS VEHICLE with a single unbroken body — never two separate vehicles, never two detached cab-boxes with a gap of floor between them, and never the same vehicle drawn twice. It is seen from the SIDE, standing straight and square along its road, and it is NOT bent, curved, twisted, skewed, splayed or wrapped round to bring its far end into view: only the flank facing the viewer needs to be visible, and the far end may simply run out of frame. COUNT THE TRACKWORK EXACTLY: this station has 1 road and 1 pair of running rails, ONE per train, and no others — no third track, no siding, no crossover, no points, no spare rails crossing the floor. Every road has its OWN bore, never shared, so there are EXACTLY 1 tunnel mouth and 1 set of buffer stops in this station, all of them on the viewer's LEFT and RIGHT and all in line with the rails that enter them. Each train sits SQUARE AND LEVEL along its own road, parallel to its rails — never nose-to-nose with another train, never wedged into a corner, never twisted, skewed or bent to show its far end, and never crossing another road. THE RAILS UNDER THE TRAIN ARE THE SAME RAILS THAT LEAVE THE STATION. One single unbroken pair of rails runs dead straight from one end of the station to the other, the train stands squarely on that pair, and each tunnel mouth sits directly in line with it — you could follow the railheads with your eye from under the train's wheels, along the bed, and straight in through the arch without a break, a bend, a kink or an offset. There is never a second set of rails running to the mouths beside or past the train, and the train is never parked on a stub of track that does not reach them. A BUFFER STOP MAY ONLY EVER STAND AT A BLIND END — beyond the far end of a train, on a road that dies there, against a wall. There is NEVER a buffer stop, gate, barrier, fence, hoarding or blockage of any kind BETWEEN a train and a tunnel mouth its own line runs into: every train must have a clear, unobstructed road out of the station. Nothing stands in the road but the train: no barrel, crate, bench or rack in the track bed. The image is SHARP, with no motion blur or streaking — everything is standing still. No blank empty wall areas. Nothing eerie, spooky, creepy, haunted or menacing; no cobwebs. Again: the extreme left and right edges must align perfectly into the platform's plain tiled back wall directly behind the viewer, uniform and unbroken, with no road, arch, doorway or opening in it, with no visible seam, join, or repetition.",
         "boxesFrom": {
-          "art": "f43c9e6bd4a2",
-          "at": "2026-09-18T14:18:50"
+          "art": "c166687db099",
+          "at": "2026-09-19T11:02:09"
         }
       },
       "panorama": "ochre_verdigris/scene.png",
@@ -1062,7 +1140,13 @@
           "direction": "open",
           "boxSource": "review:agent-vision",
           "to": "car_madder",
-          "boxNote": "the madder car's single open side doorway — measured by eye on current scene.png (box_grid), 2026-09-18"
+          "boxNote": "the madder car's single open side doorway — measured by eye on current scene.png (box_grid), 2026-09-18",
+          "onPass": [
+            {
+              "set": "at_madder",
+              "to": "saffron_madder"
+            }
+          ]
         },
         {
           "id": "clip_base",
@@ -1313,7 +1397,13 @@
           "direction": "open",
           "boxSource": "review:agent-vision",
           "to": "car_lampblack",
-          "boxNote": "the lampblack loco's open cab doorway — measured by eye on current scene.png (box_grid), 2026-09-18"
+          "boxNote": "the lampblack loco's open cab doorway — measured by eye on current scene.png (box_grid), 2026-09-18",
+          "onPass": [
+            {
+              "set": "at_lampblack",
+              "to": "saffron_lampblack"
+            }
+          ]
         },
         {
           "id": "clip_base",
@@ -1582,7 +1672,13 @@
           "direction": "open",
           "boxSource": "review:agent-vision",
           "to": "car_weld",
-          "boxNote": "the weld loco's open cab doorway — measured by eye on current scene.png (box_grid), 2026-09-18"
+          "boxNote": "the weld loco's open cab doorway — measured by eye on current scene.png (box_grid), 2026-09-18",
+          "onPass": [
+            {
+              "set": "at_weld",
+              "to": "cropping_weld"
+            }
+          ]
         },
         {
           "id": "clip_base",
@@ -1839,7 +1935,13 @@
           "direction": "open",
           "boxSource": "review:agent-vision",
           "to": "car_lampblack",
-          "boxNote": "the lampblack loco's open cab doorway — measured by eye on current scene.png (box_grid), 2026-09-18"
+          "boxNote": "the lampblack loco's open cab doorway — measured by eye on current scene.png (box_grid), 2026-09-18",
+          "onPass": [
+            {
+              "set": "at_lampblack",
+              "to": "cropping_lampblack"
+            }
+          ]
         },
         {
           "id": "clip_base",
@@ -2094,7 +2196,13 @@
           "direction": "open",
           "boxSource": "review:agent-vision",
           "to": "car_weld",
-          "boxNote": "the weld loco's open cab side (two adjoining open doorways) — measured by eye on current scene.png (box_grid), 2026-09-18"
+          "boxNote": "the weld loco's open cab side (two adjoining open doorways) — measured by eye on current scene.png (box_grid), 2026-09-18",
+          "onPass": [
+            {
+              "set": "at_weld",
+              "to": "tannery_weld"
+            }
+          ]
         },
         {
           "id": "clip_base",
@@ -2341,7 +2449,13 @@
           "direction": "open",
           "boxSource": "review:agent-vision",
           "to": "car_verdigris",
-          "boxNote": "the verdigris car's left open side doorway (a second at x~0.55 also exists) — measured by eye on current scene.png (box_grid), 2026-09-18"
+          "boxNote": "the verdigris car's left open side doorway (a second at x~0.55 also exists) — measured by eye on current scene.png (box_grid), 2026-09-18",
+          "onPass": [
+            {
+              "set": "at_verdigris",
+              "to": "tannery_verdigris"
+            }
+          ]
         },
         {
           "id": "clip_base",
@@ -2608,7 +2722,13 @@
           "direction": "open",
           "boxSource": "review:agent-vision",
           "to": "car_woad",
-          "boxNote": "the woad car's wide open doorway at centre (a smaller open door at x~0.32 also exists) — measured by eye on current scene.png (box_grid), 2026-09-18"
+          "boxNote": "the woad car's wide open doorway at centre (a smaller open door at x~0.32 also exists) — measured by eye on current scene.png (box_grid), 2026-09-18",
+          "onPass": [
+            {
+              "set": "at_woad",
+              "to": "logwood_woad"
+            }
+          ]
         },
         {
           "id": "clip_base",
@@ -2855,7 +2975,13 @@
           "direction": "open",
           "boxSource": "review:agent-vision",
           "to": "car_verdigris",
-          "boxNote": "the verdigris car's open side doorway (a second open door at x~0.59 also exists) — measured by eye on current scene.png (box_grid), 2026-09-18"
+          "boxNote": "the verdigris car's open side doorway (a second open door at x~0.59 also exists) — measured by eye on current scene.png (box_grid), 2026-09-18",
+          "onPass": [
+            {
+              "set": "at_verdigris",
+              "to": "logwood_verdigris"
+            }
+          ]
         },
         {
           "id": "clip_base",
@@ -3101,7 +3227,13 @@
           "direction": "open",
           "boxSource": "review:agent-vision",
           "to": "car_madder",
-          "boxNote": "measured by eye on l1_alum_madder_2 (box_grid crops, 2026-09-17); restored when that art was recommitted 2026-09-18"
+          "boxNote": "measured by eye on l1_alum_madder_2 (box_grid crops, 2026-09-17); restored when that art was recommitted 2026-09-18",
+          "onPass": [
+            {
+              "set": "at_madder",
+              "to": "alum_madder"
+            }
+          ]
         },
         {
           "id": "clip_base",
@@ -3366,7 +3498,34 @@
           "direction": "open",
           "boxSource": "review:agent-vision",
           "to": "car_lampblack",
-          "boxNote": "the lampblack loco's open cab doorway — measured by eye on current scene.png (box_grid), 2026-09-18"
+          "boxNote": "the lampblack loco's open cab doorway — measured by eye on current scene.png (box_grid), 2026-09-18",
+          "onPass": [
+            {
+              "set": "at_lampblack",
+              "to": "alum_lampblack"
+            }
+          ]
+        },
+        {
+          "id": "clip_base",
+          "type": "ambient",
+          "label": "Scene motion (base)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/serve-clips.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "alum_lampblack/cine_base.mp4"
+          }
         }
       ],
       "authoring": {
@@ -3518,12 +3677,6 @@
       "key": "car_madder",
       "title": "The madder cab",
       "built": true,
-      "unlockedWhen": {
-        "gte": [
-          "rungs_solved",
-          1
-        ]
-      },
       "designNote": "The madder car (red line). Stops: saffron_madder, alum_madder. Carries a QUEUE SLOT, so which rung is served here differs between students — the codec is keyed by QUEUE INDEX, never by room (shared/puzzle_queue.js). Personality is the mnemonic the escape runs on: the player must remember which colour ran where in order to plot the map.",
       "plannedHotspots": [
         {
@@ -3583,7 +3736,7 @@
               "label": "Alum Wharf"
             }
           ],
-          "hint": "Set the destination this line is to run to."
+          "hint": "The direction lever. Throw it up-line or down-line and the train runs through to the next station it stops at."
         },
         {
           "type": "clue",
@@ -3595,7 +3748,7 @@
           "pickup": "Line map — the madder line drawn through its stops, on the survey sheet's grid. Lay it over the sheet."
         }
       ],
-      "debrief": "The madder line. Every ride you took on it was an edge you observed rather than computed — handed to you as a fact, by having been there. That is the difference between this network and the one you built out of correlations in the compartment: the genes' edges you derived and thresholded; the rails' edges you simply rode.",
+      "debrief": "The madder line. Every run you made on it was an edge you observed rather than computed — handed to you as a fact, by having been there. That is the difference between this network and the one you built out of correlations at the driving desk: the genes' edges you derived and thresholded; the rails' edges you simply rode.",
       "hotspots": [
         {
           "id": "driver_radio",
@@ -3646,7 +3799,7 @@
               "state": "saffron_madder",
               "when": {
                 "eq": [
-                  "dest_madder",
+                  "at_madder",
                   "saffron_madder"
                 ]
               },
@@ -3656,7 +3809,7 @@
               "state": "alum_madder",
               "when": {
                 "eq": [
-                  "dest_madder",
+                  "at_madder",
                   "alum_madder"
                 ]
               },
@@ -3687,8 +3840,8 @@
         },
         {
           "id": "selector",
-          "type": "dial",
-          "label": "The destination selector",
+          "type": "lever",
+          "label": "The direction lever",
           "box": [
             0.782,
             0.555,
@@ -3699,19 +3852,10 @@
           "availableWhen": {
             "solved": "car_madder"
           },
-          "key": "dest_madder",
-          "states": [
-            {
-              "value": "saffron_madder",
-              "label": "Saffron Hill"
-            },
-            {
-              "value": "alum_madder",
-              "label": "Alum Wharf"
-            }
-          ],
-          "hint": "Set the destination this line is to run to.",
-          "boxNote": "the brass direction lever in its slotted quadrant at the outboard end of the desk — measured by eye on current scene.png (box_grid), 2026-09-18"
+          "boxNote": "the brass direction lever in its slotted quadrant at the outboard end of the desk — measured by eye on current scene.png (box_grid), 2026-09-18",
+          "line": "madder",
+          "hint": "The direction lever. Throw it up-line or down-line and the train runs through to the next station it stops at.",
+          "lockedBody": "The lever will not move. The line is dead until the desk is energised."
         },
         {
           "id": "night_wash",
@@ -3833,6 +3977,94 @@
               }
             }
           ]
+        },
+        {
+          "id": "clip_energised",
+          "type": "ambient",
+          "label": "Scene motion (energised)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/serve-clips.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "car_madder/cine_energised.mp4",
+            "state": "energised"
+          }
+        },
+        {
+          "id": "clip_live",
+          "type": "ambient",
+          "label": "Scene motion (live)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/serve-clips.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "car_madder/cine_live.mp4",
+            "state": "live"
+          }
+        },
+        {
+          "id": "clip_ghost",
+          "type": "ambient",
+          "label": "Scene motion (ghost)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/serve-clips.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "car_madder/cine_ghost.mp4",
+            "state": "ghost"
+          }
+        },
+        {
+          "id": "clip_running",
+          "type": "ambient",
+          "label": "Scene motion (running)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/serve-clips.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "car_madder/cine_running.mp4",
+            "state": "running"
+          }
         }
       ],
       "authoring": {
@@ -4086,12 +4318,6 @@
       "key": "car_woad",
       "title": "The woad cab",
       "built": true,
-      "unlockedWhen": {
-        "gte": [
-          "rungs_solved",
-          2
-        ]
-      },
       "designNote": "The woad car (blue line). Stops: ochre_woad, logwood_woad. Carries a QUEUE SLOT, so which rung is served here differs between students — the codec is keyed by QUEUE INDEX, never by room (shared/puzzle_queue.js). Personality is the mnemonic the escape runs on: the player must remember which colour ran where in order to plot the map.",
       "plannedHotspots": [
         {
@@ -4151,7 +4377,7 @@
               "label": "Logwood Quay"
             }
           ],
-          "hint": "Set the destination this line is to run to."
+          "hint": "The direction lever. Throw it up-line or down-line and the train runs through to the next station it stops at."
         },
         {
           "type": "clue",
@@ -4163,7 +4389,7 @@
           "pickup": "Line map — the woad line drawn through its stops, on the survey sheet's grid. Lay it over the sheet."
         }
       ],
-      "debrief": "The woad line. Every ride you took on it was an edge you observed rather than computed — handed to you as a fact, by having been there. That is the difference between this network and the one you built out of correlations in the compartment: the genes' edges you derived and thresholded; the rails' edges you simply rode.",
+      "debrief": "The woad line. Every run you made on it was an edge you observed rather than computed — handed to you as a fact, by having been there. That is the difference between this network and the one you built out of correlations at the driving desk: the genes' edges you derived and thresholded; the rails' edges you simply rode.",
       "hotspots": [
         {
           "id": "driver_radio",
@@ -4214,7 +4440,7 @@
               "state": "ochre_woad",
               "when": {
                 "eq": [
-                  "dest_woad",
+                  "at_woad",
                   "ochre_woad"
                 ]
               },
@@ -4224,7 +4450,7 @@
               "state": "logwood_woad",
               "when": {
                 "eq": [
-                  "dest_woad",
+                  "at_woad",
                   "logwood_woad"
                 ]
               },
@@ -4255,8 +4481,8 @@
         },
         {
           "id": "selector",
-          "type": "dial",
-          "label": "The destination selector",
+          "type": "lever",
+          "label": "The direction lever",
           "box": [
             0.742,
             0.555,
@@ -4267,19 +4493,10 @@
           "availableWhen": {
             "solved": "car_woad"
           },
-          "key": "dest_woad",
-          "states": [
-            {
-              "value": "ochre_woad",
-              "label": "Ochre Steps"
-            },
-            {
-              "value": "logwood_woad",
-              "label": "Logwood Quay"
-            }
-          ],
-          "hint": "Set the destination this line is to run to.",
-          "boxNote": "the brass direction lever in its slotted quadrant at the outboard end of the desk — measured by eye on current scene.png (box_grid), 2026-09-18"
+          "boxNote": "the brass direction lever in its slotted quadrant at the outboard end of the desk — measured by eye on current scene.png (box_grid), 2026-09-18",
+          "line": "woad",
+          "hint": "The direction lever. Throw it up-line or down-line and the train runs through to the next station it stops at.",
+          "lockedBody": "The lever will not move. The line is dead until the desk is energised."
         },
         {
           "id": "night_wash",
@@ -4370,6 +4587,94 @@
               }
             }
           ]
+        },
+        {
+          "id": "clip_ghost",
+          "type": "ambient",
+          "label": "Scene motion (ghost)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/serve-clips.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "car_woad/cine_ghost.mp4",
+            "state": "ghost"
+          }
+        },
+        {
+          "id": "clip_live",
+          "type": "ambient",
+          "label": "Scene motion (live)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/serve-clips.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "car_woad/cine_live.mp4",
+            "state": "live"
+          }
+        },
+        {
+          "id": "clip_running",
+          "type": "ambient",
+          "label": "Scene motion (running)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/serve-clips.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "car_woad/cine_running.mp4",
+            "state": "running"
+          }
+        },
+        {
+          "id": "clip_energised",
+          "type": "ambient",
+          "label": "Scene motion (energised)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/serve-clips.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "car_woad/cine_energised.mp4",
+            "state": "energised"
+          }
         }
       ],
       "authoring": {
@@ -4466,7 +4771,7 @@
               "elements": {
                 "fore_window": {
                   "motion": {
-                    "still_as": "the tunnel seen through the forward window, the rear gangway door and the passenger car behind it, and the frosted platform door"
+                    "still_as": "the tunnel seen through the forward window, the rear gangway door and the passenger car behind it, the frosted platform door, the driving desk itself and its levers and handles, the direction lever, the line map, the speaker, the coat and every panel, pipe and fitting of the cab interior"
                   }
                 },
                 "desk_live": {
@@ -4640,12 +4945,6 @@
       "key": "car_weld",
       "title": "The weld cab",
       "built": true,
-      "unlockedWhen": {
-        "gte": [
-          "rungs_solved",
-          3
-        ]
-      },
       "designNote": "The weld car (yellow line). Stops: cropping_weld, tannery_weld. Carries a QUEUE SLOT, so which rung is served here differs between students — the codec is keyed by QUEUE INDEX, never by room (shared/puzzle_queue.js). Personality is the mnemonic the escape runs on: the player must remember which colour ran where in order to plot the map.",
       "plannedHotspots": [
         {
@@ -4705,7 +5004,7 @@
               "label": "Tannery Row"
             }
           ],
-          "hint": "Set the destination this line is to run to."
+          "hint": "The direction lever. Throw it up-line or down-line and the train runs through to the next station it stops at."
         },
         {
           "type": "clue",
@@ -4717,7 +5016,7 @@
           "pickup": "Line map — the weld line drawn through its stops, on the survey sheet's grid. Lay it over the sheet."
         }
       ],
-      "debrief": "The weld line. Every ride you took on it was an edge you observed rather than computed — handed to you as a fact, by having been there. That is the difference between this network and the one you built out of correlations in the compartment: the genes' edges you derived and thresholded; the rails' edges you simply rode.",
+      "debrief": "The weld line. Every run you made on it was an edge you observed rather than computed — handed to you as a fact, by having been there. That is the difference between this network and the one you built out of correlations at the driving desk: the genes' edges you derived and thresholded; the rails' edges you simply rode.",
       "hotspots": [
         {
           "id": "driver_radio",
@@ -4768,7 +5067,7 @@
               "state": "cropping_weld",
               "when": {
                 "eq": [
-                  "dest_weld",
+                  "at_weld",
                   "cropping_weld"
                 ]
               },
@@ -4778,7 +5077,7 @@
               "state": "tannery_weld",
               "when": {
                 "eq": [
-                  "dest_weld",
+                  "at_weld",
                   "tannery_weld"
                 ]
               },
@@ -4809,8 +5108,8 @@
         },
         {
           "id": "selector",
-          "type": "dial",
-          "label": "The destination selector",
+          "type": "lever",
+          "label": "The direction lever",
           "box": [
             0.795,
             0.488,
@@ -4821,19 +5120,10 @@
           "availableWhen": {
             "solved": "car_weld"
           },
-          "key": "dest_weld",
-          "states": [
-            {
-              "value": "cropping_weld",
-              "label": "Cropping Yard"
-            },
-            {
-              "value": "tannery_weld",
-              "label": "Tannery Row"
-            }
-          ],
-          "hint": "Set the destination this line is to run to.",
-          "boxNote": "the brass direction lever in its slotted quadrant at the outboard end of the desk — measured by eye on current scene.png (box_grid), 2026-09-18"
+          "boxNote": "the brass direction lever in its slotted quadrant at the outboard end of the desk — measured by eye on current scene.png (box_grid), 2026-09-18",
+          "line": "weld",
+          "hint": "The direction lever. Throw it up-line or down-line and the train runs through to the next station it stops at.",
+          "lockedBody": "The lever will not move. The line is dead until the desk is energised."
         },
         {
           "id": "night_wash",
@@ -4924,6 +5214,94 @@
               }
             }
           ]
+        },
+        {
+          "id": "clip_live",
+          "type": "ambient",
+          "label": "Scene motion (live)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/serve-clips.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "car_weld/cine_live.mp4",
+            "state": "live"
+          }
+        },
+        {
+          "id": "clip_running",
+          "type": "ambient",
+          "label": "Scene motion (running)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/serve-clips.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "car_weld/cine_running.mp4",
+            "state": "running"
+          }
+        },
+        {
+          "id": "clip_ghost",
+          "type": "ambient",
+          "label": "Scene motion (ghost)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/serve-clips.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "car_weld/cine_ghost.mp4",
+            "state": "ghost"
+          }
+        },
+        {
+          "id": "clip_energised",
+          "type": "ambient",
+          "label": "Scene motion (energised)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/serve-clips.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "car_weld/cine_energised.mp4",
+            "state": "energised"
+          }
         }
       ],
       "authoring": {
@@ -5020,7 +5398,7 @@
               "elements": {
                 "fore_window": {
                   "motion": {
-                    "still_as": "the tunnel seen through the forward window, the rear gangway door and the passenger car behind it, and the frosted platform door"
+                    "still_as": "the tunnel seen through the forward window, the rear gangway door and the passenger car behind it, the frosted platform door, the driving desk itself and its levers and handles, the direction lever, the line map, the speaker, the coat and every panel, pipe and fitting of the cab interior"
                   }
                 },
                 "desk_live": {
@@ -5178,12 +5556,6 @@
       "key": "car_verdigris",
       "title": "The verdigris cab",
       "built": true,
-      "unlockedWhen": {
-        "gte": [
-          "rungs_solved",
-          4
-        ]
-      },
       "designNote": "The verdigris car (green line). Stops: ochre_verdigris, tannery_verdigris, logwood_verdigris. Carries a QUEUE SLOT, so which rung is served here differs between students — the codec is keyed by QUEUE INDEX, never by room (shared/puzzle_queue.js). Personality is the mnemonic the escape runs on: the player must remember which colour ran where in order to plot the map.",
       "plannedHotspots": [
         {
@@ -5257,7 +5629,7 @@
               "label": "Logwood Quay"
             }
           ],
-          "hint": "Set the destination this line is to run to."
+          "hint": "The direction lever. Throw it up-line or down-line and the train runs through to the next station it stops at."
         },
         {
           "type": "clue",
@@ -5269,40 +5641,58 @@
           "pickup": "Line map — the verdigris line drawn through its stops, on the survey sheet's grid. Lay it over the sheet."
         }
       ],
-      "debrief": "The verdigris line. Every ride you took on it was an edge you observed rather than computed — handed to you as a fact, by having been there. That is the difference between this network and the one you built out of correlations in the compartment: the genes' edges you derived and thresholded; the rails' edges you simply rode.",
+      "debrief": "The verdigris line. Every run you made on it was an edge you observed rather than computed — handed to you as a fact, by having been there. That is the difference between this network and the one you built out of correlations at the driving desk: the genes' edges you derived and thresholded; the rails' edges you simply rode.",
       "hotspots": [
         {
           "id": "driver_radio",
           "type": "clue",
           "label": "The driver's speaker",
           "box": [
-            0.2924,
-            0.4828,
-            0.3436,
-            0.6475
+            0.355,
+            0.43,
+            0.382,
+            0.59
           ],
-          "boxSource": "review:lucas",
-          "body": "A waterproof speaker hung on a hook by its wrist strap, beaded with water. On this line that is not optional."
+          "boxSource": "review:agent-vision",
+          "body": "A waterproof speaker hung on a hook by its wrist strap, beaded with water. On this line that is not optional.",
+          "boxNote": "the green waterproof speaker hung by its strap above the shelf, charging lead trailing — measured by eye on current scene.png (box_grid), 2026-09-18"
+        },
+        {
+          "id": "line_map",
+          "type": "clue",
+          "label": "The laminated line map",
+          "body": "A laminated route card for the verdigris line, taped up by whoever drives this cab. Just the one line, drawn through its stops on the same survey grid as the operator's sheet: Tannery Row — Gall Street — Logwood Quay — Ochre Steps.",
+          "image": "survey/line_verdigris.png",
+          "overlay": true,
+          "pickup": "Line map — the verdigris line drawn through its stops, on the survey sheet's grid. Lay it over the sheet.",
+          "box": [
+            0.325,
+            0.237,
+            0.386,
+            0.412
+          ],
+          "boxSource": "review:agent-vision",
+          "boxNote": "the taped laminated line map above the speaker — measured by eye on current scene.png (box_grid), 2026-09-18"
         },
         {
           "id": "platform_door",
           "type": "door",
           "label": "The platform door",
           "box": [
-            0.3718,
-            0.2243,
-            0.4875,
-            0.9151
+            0.416,
+            0.16,
+            0.537,
+            0.91
           ],
           "direction": "open",
-          "boxSource": "review:lucas",
+          "boxSource": "review:agent-vision",
           "to": "ochre_verdigris",
           "variants": [
             {
               "state": "ochre_verdigris",
               "when": {
                 "eq": [
-                  "dest_verdigris",
+                  "at_verdigris",
                   "ochre_verdigris"
                 ]
               },
@@ -5312,7 +5702,7 @@
               "state": "tannery_verdigris",
               "when": {
                 "eq": [
-                  "dest_verdigris",
+                  "at_verdigris",
                   "tannery_verdigris"
                 ]
               },
@@ -5322,63 +5712,53 @@
               "state": "logwood_verdigris",
               "when": {
                 "eq": [
-                  "dest_verdigris",
+                  "at_verdigris",
                   "logwood_verdigris"
                 ]
               },
               "to": "logwood_verdigris"
             }
-          ]
+          ],
+          "boxNote": "the frosted-glass side door leaf and its handle — measured by eye on current scene.png (box_grid), 2026-09-18"
         },
         {
           "id": "control_desk",
           "type": "puzzle",
           "label": "The driving desk",
           "box": [
-            0.7155,
-            0.6057,
-            0.8308,
-            0.8091
+            0.553,
+            0.585,
+            0.815,
+            0.89
           ],
-          "boxSource": "review:lucas",
+          "boxSource": "review:agent-vision",
           "solveSfx": {
             "src": "audio/solve_line_energised.mp3",
             "volume": 0.65,
             "needsReplacement": true
           },
           "queue": true,
-          "queueEmptyBody": "The line is already energised. There is nothing left to file at this desk."
+          "queueEmptyBody": "The line is already energised. There is nothing left to file at this desk.",
+          "boxNote": "the copper-topped driving desk: writing flap with assay sheets, three gauges, master controller and brake — measured by eye on current scene.png (box_grid), 2026-09-18"
         },
         {
           "id": "selector",
-          "type": "dial",
-          "label": "The destination selector",
+          "type": "lever",
+          "label": "The direction lever",
           "box": [
-            0.605,
-            0.6395,
-            0.6957,
-            0.8745
+            0.818,
+            0.485,
+            0.88,
+            0.84
           ],
-          "boxSource": "review:lucas",
+          "boxSource": "review:agent-vision",
           "availableWhen": {
             "solved": "car_verdigris"
           },
-          "key": "dest_verdigris",
-          "states": [
-            {
-              "value": "ochre_verdigris",
-              "label": "Ochre Steps"
-            },
-            {
-              "value": "tannery_verdigris",
-              "label": "Tannery Row"
-            },
-            {
-              "value": "logwood_verdigris",
-              "label": "Logwood Quay"
-            }
-          ],
-          "hint": "Set the destination this line is to run to."
+          "boxNote": "the brass direction lever in its slotted quadrant at the outboard end of the desk — measured by eye on current scene.png (box_grid), 2026-09-18",
+          "line": "verdigris",
+          "hint": "The direction lever. Throw it up-line or down-line and the train runs through to the next station it stops at.",
+          "lockedBody": "The lever will not move. The line is dead until the desk is energised."
         },
         {
           "id": "night_wash",
@@ -5500,6 +5880,94 @@
               }
             }
           ]
+        },
+        {
+          "id": "clip_energised",
+          "type": "ambient",
+          "label": "Scene motion (energised)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/serve-clips.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "car_verdigris/cine_energised.mp4",
+            "state": "energised"
+          }
+        },
+        {
+          "id": "clip_live",
+          "type": "ambient",
+          "label": "Scene motion (live)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/serve-clips.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "car_verdigris/cine_live.mp4",
+            "state": "live"
+          }
+        },
+        {
+          "id": "clip_ghost",
+          "type": "ambient",
+          "label": "Scene motion (ghost)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/serve-clips.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "car_verdigris/cine_ghost.mp4",
+            "state": "ghost"
+          }
+        },
+        {
+          "id": "clip_running",
+          "type": "ambient",
+          "label": "Scene motion (running)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/serve-clips.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "car_verdigris/cine_running.mp4",
+            "state": "running"
+          }
         }
       ],
       "authoring": {
@@ -5725,6 +6193,10 @@
               "phrase": "the view through the cab's forward window: a wide horseshoe bore of wet glazed brick, cable runs strung along both haunches, together with the running rails and the string of small wall lamps, all travelling STEADILY TOWARD THE VIEWER and expanding outward past the edges of the window, as a train moving forward down a tunnel — a slow continuous forward dolly, the lamps drawing out of the dark ahead one after another and sweeping past, the rails sliding under and out of frame"
             }
           ]
+        },
+        "boxesFrom": {
+          "art": "22efa9df94f7",
+          "at": "2026-09-18T18:02:39"
         }
       },
       "panorama": "car_verdigris/scene.png",
@@ -5753,7 +6225,6 @@
       "key": "car_lampblack",
       "title": "The lampblack cab",
       "built": true,
-      "unlockedWhen": true,
       "designNote": "The lampblack car (grey line). Stops: ochre_hall, saffron_lampblack, cropping_lampblack, alum_lampblack. Carries a QUEUE SLOT, so which rung is served here differs between students — the codec is keyed by QUEUE INDEX, never by room (shared/puzzle_queue.js). Personality is the mnemonic the escape runs on: the player must remember which colour ran where in order to plot the map. LIVE FROM THE START — lampblack is the only line sharing a station with all four others, which is what dissolves the forced unlock order and frees the queue to float the puzzles.",
       "plannedHotspots": [
         {
@@ -5826,22 +6297,21 @@
           "boxSource": "draft:localizer"
         },
         {
-          "type": "puzzle",
+          "type": "clue",
           "label": "The driving desk",
-          "note": "QUEUE SLOT — queue:true. Serves the next unsolved rung of SCENARIO.puzzleQueue. The assay is filed AT THE CONTROLS: you are already in the cab, the line is simply not energised, and the filed answer is what energises it (\"power, not permission\").",
-          "queue": true,
-          "queueEmptyBody": "The line is already energised. There is nothing left to file at this desk.",
+          "note": "LIVE FROM THE START (restored 2026-09-19): five cabs, four puzzle rungs. Lampblack shares a station with every other line, so it is the one that never needs energising; its lever works from the first visit.",
           "box": [
             0.54,
             0.566,
             0.732,
             0.938
           ],
-          "boxSource": "draft:localizer"
+          "boxSource": "draft:localizer",
+          "body": "The desk is already live: gauges up, the master controller warm under your hand. Somebody left this line energised when the rest of the network went dark, and it has been running ever since. Lampblack calls at a station on every other line."
         },
         {
           "type": "dial",
-          "label": "The destination selector",
+          "label": "The direction lever",
           "note": "THE RIDE (2026-09-17): one up-line / down-line lever; express to the next transfer station. Until the ride engine lands this is still wired as the old destination dial (key dest_lampblack). Berth rooms this line calls at: ochre_hall, saffron_lampblack, cropping_lampblack, alum_lampblack.",
           "key": "dest_lampblack",
           "states": [
@@ -5862,7 +6332,7 @@
               "label": "Alum Wharf"
             }
           ],
-          "hint": "Set the destination this line is to run to."
+          "hint": "The direction lever. Throw it up-line or down-line and the train runs through to the next station it stops at."
         },
         {
           "type": "clue",
@@ -5881,40 +6351,58 @@
           "boxSource": "draft:localizer"
         }
       ],
-      "debrief": "The lampblack line. Every ride you took on it was an edge you observed rather than computed — handed to you as a fact, by having been there. That is the difference between this network and the one you built out of correlations in the compartment: the genes' edges you derived and thresholded; the rails' edges you simply rode.",
+      "debrief": "The lampblack line. Every run you made on it was an edge you observed rather than computed — handed to you as a fact, by having been there. That is the difference between this network and the one you built out of correlations at the driving desk: the genes' edges you derived and thresholded; the rails' edges you simply rode.",
       "hotspots": [
         {
           "id": "driver_radio",
           "type": "clue",
           "label": "The driver's speaker",
           "box": [
+            0.278,
+            0.28,
             0.315,
-            0.4,
-            0.374,
-            0.5822
+            0.47
           ],
-          "boxSource": "review:lucas",
-          "body": "Cable-tied into a bracket never meant for it, scuffed grey, lead trailing. Still playing to an empty cab."
+          "boxSource": "review:agent-vision",
+          "body": "Cable-tied into a bracket never meant for it, scuffed grey, lead trailing. Still playing to an empty cab.",
+          "boxNote": "the grey speaker cable-tied into its bulkhead bracket on the shelf (right edge stops at the line map) — measured by eye on current scene.png (box_grid), 2026-09-18"
+        },
+        {
+          "id": "line_map",
+          "type": "clue",
+          "label": "The laminated line map",
+          "body": "A laminated route card for the lampblack line, taped up by whoever drives this cab. Just the one line, drawn through its stops on the same survey grid as the operator's sheet: Ochre Steps — Saffron Hill — Indigo Reach — Dyers Gate — Cropping Yard — Alum Wharf.",
+          "image": "survey/line_lampblack.png",
+          "overlay": true,
+          "pickup": "Line map — the lampblack line drawn through its stops, on the survey sheet's grid. Lay it over the sheet.",
+          "box": [
+            0.316,
+            0.21,
+            0.362,
+            0.39
+          ],
+          "boxSource": "review:agent-vision",
+          "boxNote": "the taped laminated line map beside and above the speaker — measured by eye on current scene.png (box_grid), 2026-09-18"
         },
         {
           "id": "platform_door",
           "type": "door",
           "label": "The platform door",
           "box": [
-            0.4107,
-            0.2343,
-            0.5168,
-            0.8583
+            0.41,
+            0.17,
+            0.54,
+            0.88
           ],
           "direction": "open",
-          "boxSource": "review:lucas",
+          "boxSource": "review:agent-vision",
           "to": "ochre_hall",
           "variants": [
             {
               "state": "ochre_hall",
               "when": {
                 "eq": [
-                  "dest_lampblack",
+                  "at_lampblack",
                   "ochre_hall"
                 ]
               },
@@ -5924,7 +6412,7 @@
               "state": "saffron_lampblack",
               "when": {
                 "eq": [
-                  "dest_lampblack",
+                  "at_lampblack",
                   "saffron_lampblack"
                 ]
               },
@@ -5934,7 +6422,7 @@
               "state": "cropping_lampblack",
               "when": {
                 "eq": [
-                  "dest_lampblack",
+                  "at_lampblack",
                   "cropping_lampblack"
                 ]
               },
@@ -5944,67 +6432,43 @@
               "state": "alum_lampblack",
               "when": {
                 "eq": [
-                  "dest_lampblack",
+                  "at_lampblack",
                   "alum_lampblack"
                 ]
               },
               "to": "alum_lampblack"
             }
-          ]
+          ],
+          "boxNote": "the frosted-glass side door leaf and its latch — measured by eye on current scene.png (box_grid), 2026-09-18"
         },
         {
           "id": "control_desk",
-          "type": "puzzle",
+          "type": "clue",
           "label": "The driving desk",
           "box": [
-            0.54,
-            0.566,
-            0.732,
-            0.938
+            0.543,
+            0.58,
+            0.782,
+            0.88
           ],
-          "boxSource": "draft:localizer",
-          "solveSfx": {
-            "src": "audio/solve_line_energised.mp3",
-            "volume": 0.65,
-            "needsReplacement": true
-          },
-          "queue": true,
-          "queueEmptyBody": "The line is already energised. There is nothing left to file at this desk."
+          "boxSource": "review:agent-vision",
+          "boxNote": "the soot-blackened driving desk: writing flap with assay sheets, two gauges and master controller (starts at the door edge) — measured by eye on current scene.png (box_grid), 2026-09-18",
+          "body": "The desk is already live: gauges up, the master controller warm under your hand. Somebody left this line energised when the rest of the network went dark, and it has been running ever since. Lampblack calls at a station on every other line."
         },
         {
           "id": "selector",
-          "type": "dial",
-          "label": "The destination selector",
+          "type": "lever",
+          "label": "The direction lever",
           "box": [
-            0.717,
-            0.654,
-            0.7645,
-            0.7998
+            0.785,
+            0.505,
+            0.855,
+            0.86
           ],
-          "boxSource": "review:lucas",
-          "availableWhen": {
-            "solved": "car_lampblack"
-          },
-          "key": "dest_lampblack",
-          "states": [
-            {
-              "value": "ochre_hall",
-              "label": "Ochre Steps"
-            },
-            {
-              "value": "saffron_lampblack",
-              "label": "Saffron Hill"
-            },
-            {
-              "value": "cropping_lampblack",
-              "label": "Cropping Yard"
-            },
-            {
-              "value": "alum_lampblack",
-              "label": "Alum Wharf"
-            }
-          ],
-          "hint": "Set the destination this line is to run to."
+          "boxSource": "review:agent-vision",
+          "boxNote": "the brass direction lever in its slotted quadrant with enamel plates at the outboard end of the desk — measured by eye on current scene.png (box_grid), 2026-09-18",
+          "line": "lampblack",
+          "hint": "The direction lever. Throw it up-line or down-line and the train runs through to the next station it stops at."
         },
         {
           "id": "night_wash",
@@ -6028,9 +6492,7 @@
               ],
               "prompt": "the same cab with its line ENERGISED: the driving desk's instruments live — gauge faces glowing from within, indicator lamps lit in amber and green, the master controller's brass catching the light — and the direction lever's enamel plates lit from behind. The cab is a little warmer and brighter for it, light spilling off the desk onto the panelling and the floor nearby. NOTHING ELSE CHANGES: same viewpoint, same layout, same objects in the same places, the window frame exactly where it is, the doors exactly as they were, no new objects in the cab and nothing in the cab moved.",
               "panorama": "car_lampblack/scene_energised.png",
-              "when": {
-                "solved": "car_lampblack"
-              }
+              "when": true
             }
           ]
         },
@@ -6095,6 +6557,94 @@
               }
             }
           ]
+        },
+        {
+          "id": "clip_energised",
+          "type": "ambient",
+          "label": "Scene motion (energised)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/serve-clips.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "car_lampblack/cine_energised.mp4",
+            "state": "energised"
+          }
+        },
+        {
+          "id": "clip_ghost",
+          "type": "ambient",
+          "label": "Scene motion (ghost)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/serve-clips.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "car_lampblack/cine_ghost.mp4",
+            "state": "ghost"
+          }
+        },
+        {
+          "id": "clip_live",
+          "type": "ambient",
+          "label": "Scene motion (live)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/serve-clips.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "car_lampblack/cine_live.mp4",
+            "state": "live"
+          }
+        },
+        {
+          "id": "clip_running",
+          "type": "ambient",
+          "label": "Scene motion (running)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/serve-clips.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "car_lampblack/cine_running.mp4",
+            "state": "running"
+          }
         }
       ],
       "authoring": {
@@ -6162,7 +6712,7 @@
               "at": "just right of centre",
               "desc": "a soot-blackened iron driving desk with a massive master controller, a worn brake handle, two round gauges with plain unmarked dials, and a hinged writing-flap folded down at its left end carrying the works' assay sheets under a bulldog clip",
               "label": "The driving desk",
-              "puzzle": true
+              "clue": true
             },
             {
               "id": "lever",
@@ -6328,7 +6878,7 @@
         },
         "boxesFrom": {
           "art": "e8f6e3aedc47",
-          "at": "2026-09-17T21:36:26"
+          "at": "2026-09-18T18:03:38"
         }
       },
       "panorama": "car_lampblack/scene.png",
@@ -6369,5 +6919,108 @@
     "buildState": "WIRED AND GREEN 2026-09-07 (docs re-verified 2026-09-08). 18 rooms (13 one-road berth platforms + 5 driver's cabs), all built and human-accepted; 67 hotspots with measured boxes; 18 hero-motion subjects; 5 'energised' cab variants. CONTENT COMPLETE: 4 rungs in puzzleQueue (dynamic queue — each cab desk is a queue:true slot), escape lock E5I4 with endsEscape, 19 clue bodies, 5 dial state sets, both finish screens, decoder key NETWORKS_SUBWAY_KEY c(2,0,5,3) keyed by RUNG not room, sound staged by reuse. GREEN: validate_assets, validate_story (200 strings), validate_keys, Rscript decode_codes.R, test_subway.py, npm test 155/155, e2e smoke. NOT DONE, and all three block promotion: (1) THE RIDE — the transit sequencer, the live sighting click, 10 baked loops, and the lock's {gte:[sightings,5]} gate; Lucas's own work. (2) CINEMAGRAPH subjects for the 13 platforms (the 5 cabs are healthy); Lucas's own work. (3) a HUMAN EAR on 37 placeholder audio cues — every one is flagged needsReplacement and test_subway.py fails any 'ready' scenario that still carries one. Also waiting on Lucas: the per-line music tracks, and auto_balance.py after them."
   },
   "doorLabels": true,
-  "cover": "cover.png"
+  "cover": "cover.png",
+  "ride": {
+    "_note": "THE RIDE (shared/ride.js; shared/AGENTS.md 'THE RIDE'). Written by _scratch/apply_ride_patch.py from verify_escape.py class M — re-run it after a layout change rather than hand-editing. up = towards the END of stops.",
+    "loops": {
+      "hop": 3,
+      "tunnel": 2,
+      "pass": 2
+    },
+    "loopSeconds": 2.5,
+    "crossfade": 0.4,
+    "ghosts": [
+      "Halliwell",
+      "Cold Harbour"
+    ],
+    "labels": {
+      "up": "Up-line",
+      "down": "Down-line"
+    },
+    "lines": {
+      "madder": {
+        "cab": "car_madder",
+        "stops": [
+          "Alum Wharf",
+          "Kettle Yard",
+          "Halliwell",
+          "Vat Row",
+          "Bleachfield",
+          "Saffron Hill"
+        ],
+        "berths": {
+          "Alum Wharf": "alum_madder",
+          "Saffron Hill": "saffron_madder"
+        },
+        "home": "saffron_madder"
+      },
+      "woad": {
+        "cab": "car_woad",
+        "stops": [
+          "Fullers Cross",
+          "Skein Lane",
+          "Halliwell",
+          "Teasel Green",
+          "Logwood Quay",
+          "Ochre Steps"
+        ],
+        "berths": {
+          "Logwood Quay": "logwood_woad",
+          "Ochre Steps": "ochre_woad"
+        },
+        "home": "ochre_woad"
+      },
+      "weld": {
+        "cab": "car_weld",
+        "stops": [
+          "Tannery Row",
+          "Mordant Lane",
+          "Tenter Fields",
+          "Halliwell",
+          "Cropping Yard",
+          "Scouring Bank"
+        ],
+        "berths": {
+          "Tannery Row": "tannery_weld",
+          "Cropping Yard": "cropping_weld"
+        },
+        "home": "cropping_weld"
+      },
+      "verdigris": {
+        "cab": "car_verdigris",
+        "stops": [
+          "Tannery Row",
+          "Gall Street",
+          "Cold Harbour",
+          "Logwood Quay",
+          "Ochre Steps"
+        ],
+        "berths": {
+          "Tannery Row": "tannery_verdigris",
+          "Logwood Quay": "logwood_verdigris",
+          "Ochre Steps": "ochre_verdigris"
+        },
+        "home": "ochre_verdigris"
+      },
+      "lampblack": {
+        "cab": "car_lampblack",
+        "stops": [
+          "Ochre Steps",
+          "Saffron Hill",
+          "Cold Harbour",
+          "Indigo Reach",
+          "Dyers Gate",
+          "Cropping Yard",
+          "Alum Wharf"
+        ],
+        "berths": {
+          "Ochre Steps": "ochre_hall",
+          "Saffron Hill": "saffron_lampblack",
+          "Cropping Yard": "cropping_lampblack",
+          "Alum Wharf": "alum_lampblack"
+        },
+        "home": "ochre_hall"
+      }
+    }
+  }
 }

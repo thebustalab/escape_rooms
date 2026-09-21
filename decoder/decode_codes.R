@@ -511,6 +511,42 @@ NETWORKS_BEACONS_KEY <- list(
   }
 )
 
+# flat_clustering / heist (scenario id 20): "Nobody Works Alone" — the corpus's FIRST TWO-PLAYER
+# scenario. Two students play simultaneously in separate browsers and take different exits from the
+# briefing room: agent A works the ENTRY evidence (a_opera, a_townhouse, a_gallery, a_vault), agent B
+# works the DISPOSAL evidence (b_pawnshop, b_casino, b_docks, b_stateroom). Eight graded rooms exist;
+# EACH STUDENT PLAYS FOUR.
+#
+# >> WHY THE VECTOR REPEATS, AND WHY EACH STUDENT'S MAXIMUM IS 40, NOT 80 (2026-09-19).
+#
+# The codec emits one step per graded room the student ACTUALLY SOLVED, in room order
+# (`pano-player.js`: `roomResults.has(r.key)`), and `grade_one` compares those steps POSITIONALLY
+# against this vector. So a four-step code — which is what every student of this scenario mints — is
+# graded against positions 1..4 whichever branch they played. One positional key therefore cannot
+# serve two branches UNLESS the two branches' correct indices agree element by element.
+#
+# They now do, by construction: both ladders read c(4, 2, 3, 5) — rung 1, the elbow, rung 3, the boss.
+# The MCQ option lists were curated to make that true (Lucas's call, 2026-09-19, choosing index
+# alignment over an engine change that would have had to carry the role inside the code). If anyone
+# re-orders an option list in this scenario, BOTH branches move together or grading silently breaks
+# for one of them; `rooms/flat_clustering/heist/test_heist.py` asserts the two vectors still match.
+#
+# The vector is written out TWICE — once per branch — because `validate_keys.py` derives its
+# expectation from every built graded room in room order, i.e. all eight. The consequence to know at
+# marking time: `grade_one` scores all eight positions, the four rooms a student never entered come
+# back `ans=-1 att=0 -> 0pt`, and so **a flawless run scores 40 out of a nominal 80**. Mark out of 40.
+FLAT_CLUSTERING_HEIST_KEY <- list(
+  scenario_id = 20,
+  correct = c(4, 2, 3, 5, 4, 2, 3, 5),
+  score_step = function(correct, answer, attempts) {
+    if (answer != correct) return(0)
+    if (attempts <= 1) return(10)
+    if (attempts == 2) return(7)
+    if (attempts == 3) return(5)
+    3
+  }
+)
+
 # embeddings / submarine (scenario id 22): "The Sounding" — text-embedding retrieval over a ship
 # archive, played from the two ends of a crippled salvage submarine.
 #
@@ -767,5 +803,25 @@ if (identical(environment(), globalenv()) && sys.nframe() == 0) {
   cat("Pano beacons grade — points:", bg19$points, "|", bg19$detail, "\n")
   if (!isTRUE(bg19$valid && bg19$points == 40)) {
     stop("REGRESSION: pano beacons grade wrong — expected 40 pts for an all-first-try solve")
+  }
+
+  # Regression: pano scenario id 20 (flat_clustering/heist) — the TWO-PLAYER case. Each student mints
+  # FOUR steps, not eight, and the same four-step code must score 40 whichever branch produced it,
+  # because both branches' correct indices are aligned to c(4, 2, 3, 5). The four unplayed positions
+  # score 0, so 40 is the intended full marks — see the key's comment block.
+  hsteps20 <- list(list(answer = 4, attempts = 1),
+                   list(answer = 2, attempts = 1),
+                   list(answer = 3, attempts = 1),
+                   list(answer = 5, attempts = 1))
+  hcode20 <- encode_code(version = 2, scenario_id = 20, steps = hsteps20, student_id = "heist_test")
+  hd20 <- decode_code(hcode20, "heist_test")
+  hok20 <- hd20$valid && hd20$scenario_id == 20 &&
+    identical(hd20$answers, c(4L, 2L, 3L, 5L)) && identical(hd20$attempts, c(1L, 1L, 1L, 1L))
+  cat("Pano round-trip OK id 20 (should be TRUE):", hok20, "\n")
+  if (!hok20) stop("REGRESSION: pano round-trip failed (id 20 heist)")
+  hg20 <- grade_one(hcode20, "heist_test", FLAT_CLUSTERING_HEIST_KEY)
+  cat("Pano heist grade — points:", hg20$points, "|", hg20$detail, "\n")
+  if (!isTRUE(hg20$valid && hg20$points == 40)) {
+    stop("REGRESSION: pano heist grade wrong — expected 40 pts for one branch solved first-try")
   }
 }

@@ -112,6 +112,18 @@ EQUIRECT = ("This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the
 # so do not "fix" this by adding colour negatives, which measured WORSE.
 STYLE = ("Shot on a full-frame DSLR at 24mm, f/8, natural daylight, high dynamic range, realistic "
          "depth of field, fine natural film grain, true-to-life colour.")
+# `styleLight` (2026-09-21, flat_clustering/waterfalls): STYLE hard-coded "natural daylight" into EVERY
+# prompt, after the negatives, as the last lighting word the model reads. A night scenario said NIGHT in
+# its atmosphere and "no daylight anywhere" in its negatives, and then this clause contradicted both —
+# and the model blends contradictions (guide rule 0a) rather than arbitrating, so the result is a
+# blue-hour grade with torches. A spec may now replace ONLY that token. Every spec without the field
+# renders byte-identically to before, which is what the STYLE A/B was measured against.
+STYLE_DEFAULT_LIGHT = "natural daylight"
+
+
+def style_for(spec):
+    light = str((spec or {}).get("styleLight") or "").strip()
+    return STYLE if not light else STYLE.replace(STYLE_DEFAULT_LIGHT, light, 1)
 
 # EDGE DISCIPLINE. 2.5's wrap seam broke in the GROUND band on 11 of 11 draws under the old anchor
 # alone (median delta 23.0, max 87.6) against 0 of 2 for gpt-image-2. These two sentences took the
@@ -153,7 +165,7 @@ def render_prompt(spec):
     negatives = _period(spec.get("negatives") or "no people, no lettering, no captions, no text")
     seam_tail = (f"Again: the extreme left and right edges must align perfectly into {seam}, "
                  f"with no visible seam, join, or repetition.")
-    parts = [intro, seam_head, sweep, atmosphere, negatives, STYLE, EDGE_DISCIPLINE, seam_tail]
+    parts = [intro, seam_head, sweep, atmosphere, negatives, style_for(spec), EDGE_DISCIPLINE, seam_tail]
     return " ".join(p for p in parts if p)
 
 

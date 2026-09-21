@@ -1,1 +1,0 @@
-ERROR: Claude Code exited with code 1. (no stderr beyond the benign permission-rule warnings — the settings file is NOT the cause; look at the decision output)

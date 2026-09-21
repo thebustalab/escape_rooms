@@ -1,0 +1,2 @@
+DECISION: RENDER
+WHY: The spec already has one authored, bounded mover (the rim_overfall sheet on the left, with `motion.moves`, a vigour and a phrase that match its `desc`), and there's no clip or gate report yet, so the next step is the single 3072 render at the settled recipe, with the motion prompt built from `motion.phrase`. If the clip comes back slow, the ledger's rule is to raise the still's vigour and then retime ×2, not to reword the prompt.

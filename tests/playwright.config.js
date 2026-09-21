@@ -7,6 +7,7 @@ const path = require("path");
 
 module.exports = defineConfig({
   testDir: "./e2e",
+  testIgnore: ["**/z_archive/**"],   // retired specs are history, never run (2026-09-18)
   timeout: 120_000,            // WebR-heavy tests can be slow
   expect: { timeout: 30_000 },
   fullyParallel: false,        // one shared static server; keep it simple

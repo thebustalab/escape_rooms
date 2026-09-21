@@ -35,6 +35,16 @@ The figures are NAMED on the plate. That is deliberate, and it is not a giveaway
 shrines by *shared* figures, which needs reliable comparison across nine niches. Naming removes a
 rendering lottery, not a deduction — the same reason Egypt prints the colour word under each seal.
 
+PAINTED TILES (2026-09-20, Lucas). The flat drawn glyphs below did the job but were not pretty, and
+gpt-image-2.5 turned out to render these objects unmistakably — the bee, monkey and maize-cake that
+defeated the 2026-08-27 probe all came back correct at thumbnail size. So the art is generated ONCE PER
+FIGURE TYPE (twelve tiles, `prep_tiles.py`) and every plate pastes the SAME file: not "drawn
+consistently" but pixel-identical, which is a stronger guarantee than the prompt could ever give and
+is exactly what the ledger comparison needs. Layout, names, banner bar and the board itself stay code-
+drawn and deterministic, so nothing about the puzzle moved into the model's hands. `figures/tiles/
+MANIFEST.json` pins the bytes and `test_temple.py` checks them. Delete `figures/tiles/` and the glyph
+path below still builds every plate — the escape cannot be blocked on missing art.
+
 Deterministic: same inputs -> same PNGs. Run:  python3 make_figures.py
 Then:                                          python3 test_temple.py
 """
@@ -49,6 +59,7 @@ from matplotlib.patches import Circle, Ellipse, Polygon, Rectangle, Wedge, Fancy
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, "figures")
+TILES = os.path.join(OUT, "tiles")
 
 
 def _load(name, path):
@@ -220,7 +231,16 @@ def plate(shrine, path):
         ax = fig.add_axes([0.07, y0, 0.34, 0.265])
         ax.set_xlim(0, 1); ax.set_ylim(0, 1); ax.set_axis_off()
         ax.set_facecolor(GROUND)
-        GLYPH[name](ax)
+        # PAINTED TILE IF WE HAVE ONE, drawn glyph otherwise (2026-09-20). The tile is generated ONCE
+        # per figure TYPE and pasted into every plate that shares it, so "the same frog" is literally
+        # the same pixels — a stronger guarantee than the drawn glyphs gave, and far prettier. The
+        # glyph path stays as the fallback: delete figures/tiles/ and the plates still build, so the
+        # escape can never be blocked on missing art. See prep_tiles.py.
+        tile = os.path.join(TILES, "%s.png" % name)
+        if os.path.isfile(tile):
+            ax.imshow(plt.imread(tile), extent=(0, 1, 0, 1), aspect="auto", interpolation="lanczos")
+        else:
+            GLYPH[name](ax)
         fig.text(0.48, y0 + 0.13, name, ha="left", va="center", fontsize=32, color=LABEL,
                  family="DejaVu Sans")
     fig.savefig(path, facecolor=GROUND)

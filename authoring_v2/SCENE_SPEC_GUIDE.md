@@ -59,7 +59,7 @@ give you a beautiful train and a beautiful platform and a beautiful tunnel mouth
 whatever to put the train on the rails, or the rails into the mouth, unless you said so. Describing
 each object well is not enough. **What has to be stated is how they JOIN.**
 
-The four that cost subway its rounds, all found by eye on generated art, none catchable by
+The joins that cost subway its rounds, all found by eye on generated art, none catchable by
 `validate_scenes.py` (they are semantic, not structural):
 
 | the two things | what came back |
@@ -68,6 +68,13 @@ The four that cost subway its rounds, all found by eye on generated art, none ca
 | the roads and the station's ends | one lone arch dead ahead on the *platform's* axis, with no rails running into it |
 | the buffer stops and the direction of travel | a barrier between a train and the very mouth its line has to leave by |
 | the rails under the train and the rails leaving the station | two separate railways in one picture, the train on a stub that reaches nothing |
+| the station's ORIENTATION — which wall the tunnel is in (subway ochre_verdigris, 2026-09-19) | the tunnel mouth drawn in the long wall ACROSS the track facing the viewer, and the train swinging round at an angle to meet it. The one-road clause alone did not fix it; stating the layout did: tunnel mouth in the END wall, platform edge + rails + train all parallel, receding to ONE vanishing point in that mouth, train broadside |
+| the train's WHEELS and the near rail, and the buffer stops and the train's road (subway ochre_verdigris r9, 2026-09-19) | the layout right, but the rail nearest the viewer ran IN FRONT of the wheels at a different level, and the buffer stops stood on a separate stub at another angle. Fixed by saying it outright: the wheels sit ON TOP of the rails, the near rail disappears UNDER them, the same rails carry on without a kink to end under buffer stops that straddle them |
+
+**Stating every join does not guarantee every draw keeps them.** ochre_verdigris r9 broke a join on a spec whose
+wording was identical to ochre_woad's, which passed first time. Once the joins are written, a failure is a
+RE-ROLL, not automatically a spec defect. Tell the loop's judge to TRACE the join on the still (follow the near
+rail from mouth to buffer), and trace it yourself before sending him the art.
 
 **The diagnostic, and it is quick.** Go through the elements in pairs and ask of each pair that must
 physically relate: *if these two were drawn independently, would anything be wrong?* If the answer is

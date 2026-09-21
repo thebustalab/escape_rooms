@@ -27,7 +27,7 @@ box with a routable campus IP that was an unauthenticated directory listing of t
 
 To playtest from another device on the LAN (phone, iPad), set the bind explicitly:
     PLAYTEST_BIND=0.0.0.0 python3 playtest_server.py 8055
-Prefer an SSH tunnel where you can: `ssh -L 8055:localhost:8055 bustalab@131.212.57.217`.
+Prefer an SSH tunnel where you can: `ssh -L 8055:localhost:8055 bustalab@host2  # or the current IP; see infrastructure/fabric/ — 131.212.57.217`.
 """
 import http.server
 import os

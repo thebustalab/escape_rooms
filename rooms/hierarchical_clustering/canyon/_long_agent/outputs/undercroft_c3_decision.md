@@ -1,7 +1,0 @@
-I've read the notes and looked at the rejected clip. The camera gate flagged it, but the frame strip suggests the gate may be misreading the flood. The loop isn't allowed to try either remedy here, so this goes to Lucas.
-
-DECISION: PARK
-WHY: The camera gate rejected the flooded clip (shift 6.50 px, median 6.54 vs mean 12.29), but the flood covers the whole lower half of the frame, and in the frame-difference strip the walls, panel, door and table barely change. So the gate may be reading the flood as camera drift, which is the known weakness of a mover that fills the frame. Neither fix is allowed in this job: new art is off (max_generations 0) and the review note forbids softening the wording. A re-roll is also not a fix for a camera rejection, so only Lucas's eye can decide. Ask him to watch `temp/cine/_art_prompt_exp/canyon/undercroft_motion_ri1_flooded_3_looped.mp4` and say whether the hall itself sways or only the water moves. If only the water moves, he can overrule the gate and review the clip as normal. If the hall really sways, he has three options:
-- redo the still so the violence stays near the arch torrent and the shaft pour, with rougher water only in a band in front of them instead of across the whole floor;
-- set the flooded state to still-only;
-- keep ri1 as the backup.

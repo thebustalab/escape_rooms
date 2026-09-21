@@ -234,9 +234,13 @@ test("alaska: full analysis + notebook image-stack + keypad escape", async ({ pa
   await page.mouse.up();
   const lightbox = page.locator(".nblightbox");
   await expect(lightbox).toBeVisible();
-  await expect(lightbox.locator("img")).toHaveAttribute("src", await tiles.first().getAttribute("src"));
+  // The drag above dropped this mask ONTO the next one, so the click opens the whole cell as a stack
+  // (openTileLightbox, 2026-09-19): both masks, the one just moved on top, as they lie on the board.
+  const shown = lightbox.locator("img");
+  await expect(shown).toHaveCount(2);
+  await expect(shown.last()).toHaveAttribute("src", await tiles.first().getAttribute("src"));
   // it shows the WHOLE image — no square crop — so a wide plate survives here even if the tile crops it
-  expect(await lightbox.locator("img").evaluate(el => getComputedStyle(el).objectFit)).not.toBe("cover");
+  expect(await shown.first().evaluate(el => getComputedStyle(el).objectFit)).not.toBe("cover");
   await lightbox.click({ position: { x: 5, y: 5 } });
   await expect(lightbox).toBeHidden();
   // negative control: the drag above must NOT have opened it (else this assertion is vacuous)

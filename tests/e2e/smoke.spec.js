@@ -25,6 +25,10 @@ const SCENARIOS = [
   { name: "subway", path: "/escape_rooms/rooms/networks/subway/play.html" },
   // beacons: in_development, covered from WIRING (2026-09-16) per escape_room_wiring.
   { name: "beacons", path: "/escape_rooms/rooms/networks/beacons/play.html" },
+  // heist: in_development, covered from WIRING (2026-09-19). It is the corpus's first TWO-PLAYER
+  // scenario — the briefing's two role doors each set `state.role` via `onPass` and close the other,
+  // so "does a role-gated start load and attach hotspots" is a question about the shared engine.
+  { name: "heist", path: "/escape_rooms/rooms/flat_clustering/heist/play.html" },
 ];
 
 for (const sc of SCENARIOS) {

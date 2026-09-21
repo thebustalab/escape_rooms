@@ -274,9 +274,20 @@ print("\n-- shipped content: the DYNAMIC QUEUE is where subway's puzzles live --
 # driver's cab is a `queue:true` SLOT and the content lives in `SCENARIO.puzzleQueue`, served next-rung-
 # first (shared/puzzle_queue.js), because the player roams and no one can predict which cab they reach
 # first. So the graded content is checked against the QUEUE, and the decoder is keyed by rung, not room.
-SLOTS = ["car_madder", "car_woad", "car_weld", "car_verdigris", "car_lampblack"]
+SLOTS = ["car_madder", "car_woad", "car_weld", "car_verdigris"]
 queue = doc.get("puzzleQueue") or []
 check(len(queue) == 4, "the queue holds all four rungs (%d)" % len(queue))
+# ONE SLOT PER RUNG, and the fifth cab LIVE FROM THE START. The escape is gated on having ridden every line
+# (rode_<line>), and a cab's lever only works once its desk is solved. With five queue slots and four rungs
+# the fifth cab visited could never be energised, so its line could never be ridden and the escape was
+# unreachable, while every other check stayed green (found 2026-09-19).
+n_slots = sum(1 for r in rooms.values() for h in r.get("hotspots", []) if h.get("queue"))
+check(n_slots == len(queue), "one queue slot per rung (%d slots, %d rungs) — a spare slot can never be solved"
+      % (n_slots, len(queue)))
+lb = {h["id"]: h for h in rooms["car_lampblack"]["hotspots"]}
+check("availableWhen" not in lb["selector"], "car_lampblack's lever works from the first visit (no gate)")
+check(all(v.get("when") is True for v in lb["night_wash"].get("variants", [])),
+      "car_lampblack is energised from the start (its energised variant is unconditional)")
 for rk in SLOTS:
     h = next((x for x in rooms[rk]["hotspots"] if x.get("type") == "puzzle"), None)
     check(h is not None, "%s carries its driving-desk gate" % rk)

@@ -35,7 +35,7 @@
  *
  * PURE — no DOM, no WebR. Tested in Node (`tests/r_diagnose.test.mjs`).
  */
-import { tokenizeR } from "./r_highlight.js?v=105";
+import { tokenizeR } from "./r_highlight.js?v=106";
 
 const OPENERS = { "(": ")", "[": "]", "{": "}" };
 const CLOSERS = { ")": "(", "]": "[", "}": "{" };

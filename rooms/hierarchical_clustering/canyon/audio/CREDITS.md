@@ -18,6 +18,18 @@ The **music** (`canyon_confluence_theme.mp3`) is NOT CC0 — it is a YouTube upl
 | `canyon_slot_wind.mp3`     | https://freesound.org/people/dhallcomposer/sounds/697217/ | dhallcomposer | CC0 | j_c1–j_c4, j_c6 — thin wind down the open slot |
 | `canyon_drip_cave.mp3`     | https://freesound.org/people/Sclolex/sounds/177958/       | Sclolex       | CC0 | undercroft, j_c5 — sparse drips over a bed |
 
+## The escape sting — a bronze door, not a sluice (2026-09-18)
+
+| file | source | uploader | licence | used in |
+|---|---|---|---|---|
+| `solve_bronze_door.mp3` | https://freesound.org/people/lolamadeus/sounds/161228/ ("large metal door opening", 4.9 s) | lolamadeus | **NOT YET VERIFIED — see below** | undercroft `calibration_panel` (the escape grid): the bolt draws back and the bronze flood door swings open |
+
+Reused from `wrangling/egypt` (its `solve_pharos_bronze_door_v2.mp3`, same bytes), because the escape door is now a
+riveted bronze door rather than a sluice. Volume 0.34 = the old sluice sting's 0.41 less the 1.6 dB it measures louder
+(mean −19.5 vs −21.1 dBFS). **The licence was never recorded when egypt pulled it, and freesound was down (502) on
+2026-09-18.** This file is CC0-only by rule, so re-check the licence: if it is not CC0, either credit it here as
+Attribution or swap in a CC0 metal-door sound. `solve_sluice.mp3` is kept on disk, now unused.
+
 ## Levels
 
 Each file was **gain-matched on materialisation** so the mixer's volume numbers are comparable across

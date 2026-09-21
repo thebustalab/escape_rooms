@@ -373,6 +373,12 @@ code { background:#0a1620; padding:1px 5px; border-radius:4px; }
   background:rgba(3,8,13,.92); padding:20px; cursor:zoom-out; }
 .nblightbox img { max-width:min(96vw,1100px); max-height:88vh; border-radius:10px;
   box-shadow:0 10px 40px rgba(0,0,0,.6); background:#08131c; }
+/* a clicked cell holding SEVERAL tiles opens as the stack (openTileLightbox): the first image sets the size,
+   the rest lie exactly on it. Overlays keep the board's .82 so Alaska's glass masks still read as glass. */
+.nblightbox .nbstack { position:relative; display:inline-block; line-height:0; }
+.nblightbox .nbstack img + img { position:absolute; inset:0; width:100%; height:100%; object-fit:contain;
+  background:transparent; box-shadow:none; }
+.nblightbox .nbstack img.overlay { opacity:.82; }
 .nblightbox .nbcap { position:absolute; left:0; right:0; bottom:16px; text-align:center; font:13px system-ui;
   color:var(--ink); opacity:.75; padding:0 20px; }
 .nbtile.overlay { opacity:.82; background:transparent; box-shadow:none; }

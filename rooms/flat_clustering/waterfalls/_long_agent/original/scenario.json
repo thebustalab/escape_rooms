@@ -1,0 +1,2459 @@
+{
+  "status": "in_development",
+  "chapter": "flat_clustering",
+  "scenario": "waterfalls",
+  "id": 10,
+  "title": "Where the Waters Divide",
+  "subtitle": "Flat Clustering \u00b7 k-means (assignment + choosing k)",
+  "story": "They called themselves the Assay \u2014 an order of alchemists who held that all things could be sorted, grouped, categorized and clustered, so that the worthy could be kept and the rest poured away. To feed their great sorting engine, the Assay bled a whole valley of its water and tore from its people the Wellheart \u2014 an enchanted stone the valley-folk say will make any water clean, and which had kept their springs sweet for a thousand years. Their springs have run bitter ever since. The Assay are long gone now, and their engine \u2014 a waterworks at the bottom of a flooded shaft \u2014 is failing, its lower levels filling. You have come to take the Wellheart back and carry it home to the valley. But the engine mirrors its makers' conceit, and lets past only those who can work it as its makers did. Climb down its bridges and ladders, throw the diverters that turn the falling water aside, and reach the drowned floor before the water does. Take the Wellheart, and bring it back into the light.",
+  "enterLabel": "Descend into the shaft \u2192",
+  "done": {
+    "title": "The engine turns over",
+    "body": "The last diverter grinds home under your hands, and deep below a sluice the Assay meant never to be reached gives way. The falling water finds new channels; the way down clears to the drowned floor. The engine is finishing the sort its makers died believing in \u2014 and the vault at the bottom, with the Wellheart sealed inside it, is finally within reach."
+  },
+  "escapeDone": {
+    "title": "Out, and the Wellheart with you",
+    "body": "You wade the rising floor one last time and understand the Assay's engine at last. The same two threads of water fell here every time you came down; only the gates above had changed, and with each setting they gathered into a different sort \u2014 split between two basins, split between another two, or run together into one. The water never decided how many kinds there were. The gates did. You set each setting against the sort it makes, the frame settles, and the vault yields. You lift the Wellheart from its cradle and climb the rising passage as the flood closes over the engine behind you \u2014 out under the stars, the Assay's cold conceit turned against them at last, and the vale's first clean water on its way home.",
+    "note": "REDESIGNED 2026-09-20 (Lucas): the escape is SETTING -> SORT, a grid, not the old '324' keypad. The four settings of the two upper gates map to three sorts on the floor (cave_engine/basin_sort.py). Still data-free and independent of the reliquary_phials dataset."
+  },
+  "packages": [
+    "dplyr",
+    "ggplot2",
+    "readr",
+    "ggiraph"
+  ],
+  "datasets": [
+    {
+      "name": "reliquary_phials",
+      "url": "https://thebustalab.github.io/escape_rooms/rooms/flat_clustering/waterfalls/data/reliquary_phials.csv"
+    }
+  ],
+  "setup": "suppressMessages({library(dplyr); library(ggplot2)})",
+  "state": {
+    "rooms_solved": 0,
+    "d1": "shut",
+    "d2": "shut",
+    "d3": "shut",
+    "d4": "shut"
+  },
+  "ambient": "none",
+  "fx": [],
+  "coverPrompt": "Minimalist stylised thumbnail poster of a tight circular stone well seen from directly above at night: a small ring of stars at the mouth, and falling away inside it a crowded spiral of torchlit landings, ropes and wooden flumes hung with creepers, with iron grading sieves and brass scale-pans on chains glinting among them. Deep at the base, THREE small basins glow warm amber in a line, the leftmost plainly set apart, and EXACTLY 2 thin threads of water fall down the well and land INSIDE basins \u2014 2 threads and no others. Firelight and the basins' amber are the only warm colour against blue-black stone and deep green. One bold high-contrast image, iconic despite the detail, a strong radial composition pulling the eye down the well to the glowing basins. Flat limited palette: blue-black, deep green, verdigris, one warm amber glow. Soft film grain, painterly but clean, single centred focal subject. No people, no text, no lettering, no logos. Square composition.",
+  "debrief": {
+    "title": "How this world worked",
+    "intro": "The whole engine was one idea the Assay built into stone and water: flat clustering \u2014 sorting many things into a few true kinds by which they most belong together. Every font you answered was one move of it, every diverter an assignment, and the flooded floor was the result laid bare \u2014 the essences gathered into k groups, waiting only to be read. The Assay used the sort to decide what was worthy of keeping; you used the very same skill to walk out with everything they kept."
+  },
+  "rooms": [
+    {
+      "key": "catwalk",
+      "title": "The Catwalk",
+      "technique": "orientation \u2014 read the whole structure before acting",
+      "puzzleType": 0,
+      "built": true,
+      "debrief": "Standing at the rim before you touch anything is worth a moment: the whole engine is one structure, and everything below is a variation on what you can see from here. Looking at the shape of the whole thing before you act is where every analysis should start.",
+      "authoring": {
+        "tag": "catwalk",
+        "scenePrompt": "This is a seamless 360-degree panorama from the middle of a narrow walkway of lashed planks slung across the open mouth of a tight stone well, with the night sky directly overhead. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the near rim wall, plain lichened stone, with the walkway's planks running unbroken across its foot into a notch cut in the rim: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. To the left, the nearer of the 2 streams: a heavy wooden flume runs in over the rim on timber trestles and ends in open air, and a broad glassy sheet of water pours off the END of that flume and falls away down the inside of the well wall, vanishing into the tangle a few yards below, flume and sheet one continuous run of water, a wide, smooth, unhurried sheet \u2014 heavy and glassy, no spray, no churn; just left of centre, the walkway itself, lashed planks on two heavy hawsers, running away ahead of the viewer to iron rings set in the opposite rim a few body-lengths off, where an iron brazier burns on its anchor post; behind the viewer its other end runs into a notch cut in the near rim and is lashed out of sight beneath the planks; creepers trail from its hawsers; just right of centre, a rope-and-timber ladder hanging from iron rings bolted into the walkway's own planks, dropping straight down into the tangle of ropes and flumes below; no falling water touches it: its rungs run clear and dry; to the right, the Assay's rim-station on the rim: a great iron RING-GAUGE standing upright like a ship's wheel, bolted to a stone post, a heavy coil of tarred rope on an iron cleat beside it, and a brass scale-pan hanging on a chain from the gauge's post, and beyond it, across the mouth, the second stream pouring from the end of its own trestle flume. It is NIGHT, the same deep night everywhere in this world: no daylight, no dawn, no dusk. The ONLY room that sees the sky: a deep night sky thick with bright stars fills the mouth of the well overhead, cold and clear, the stars sharp and unobstructed. Iron braziers burn on the walkway's far anchor post and on the rim beside the ring-gauge, their firelight warm on the nearest stone. A few yards below the walkway the well is CHOKED \u2014 ropes, flumes, hanging baskets and roots in a dense tangle lit by the braziers \u2014 and nothing deeper than that tangle can be seen. The engine still RUNS by the Assay's own craft \u2014 its fires burn and its water moves \u2014 but no one has tended it in generations. Grey-green lichen on the rim stones and only a few trailing creepers: up here, the green is only beginning. Wooden flumes on timber trestles and green-copper gutters on little stone arches run in over the rim; ropes and pulley lines hang DOWN into the well below the walkway, hung with baskets. ALL of the Assay's water is HELD \u2014 it runs inside flumes, gutters, pipes and wheel buckets, and passes from one channel to the next only as a short spill of less than a body's height, lip straight into mouth. Palette: cold night blue-black stone, deep wet green, verdigris copper; firelight is the only warm, fully saturated colour, apart from the Assay's amber glow in its fonts and basins. Cinematic, dense and richly detailed, fine natural film grain. No people, no figures, no creatures, no lettering, no captions, no text, no numbers, no signage. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere \u2014 everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. Fantastical and wondrous, NOT a horror scene: no skulls, no bones, no gore, no cobwebs, no bodies, nothing lurking. No daylight and no dusk light anywhere. This is the ONE room where the sky IS visible, directly overhead through the well's mouth \u2014 starlit night, no moon glare, no clouds hiding the stars, and NO ropes, beams or lines crossing the mouth overhead. The viewer is standing ON the only walkway there is \u2014 no second walkway, bridge or catwalk anywhere in view. Directly below the walkway, a few yards down, the well is choked with ropes, flumes, baskets and hanging roots, so nothing deeper than that can be seen. EXACTLY 2 falls of water drop free through open air in this picture \u2014 one from the flume on the left and one across the mouth beyond the ring-gauge \u2014 and NO OTHERS. Every other drop of water runs inside a flume, gutter, pipe or wheel bucket, or passes as a short spill of less than a body's height from one channel's lip straight into the next channel's mouth. The walkway is made fast at BOTH ends \u2014 to iron rings in the far rim and into a notch in the near rim \u2014 and its ladder hangs from rings in its own planks; nothing ends in mid-air. Shot on a full-frame DSLR at 24mm, f/8, a long night exposure under a clear starry sky, lit by starlight and the braziers described, no daylight, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above \u2014 no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into the near rim wall, plain lichened stone, with the walkway's planks running unbroken across its foot into a notch cut in the rim, with no visible seam, join, or repetition.",
+        "sceneSpec": {
+          "room": "catwalk",
+          "setting": "the middle of a narrow walkway of lashed planks slung across the open mouth of a tight stone well, with the night sky directly overhead",
+          "interior": true,
+          "seam": "the near rim wall, plain lichened stone, with the walkway's planks running unbroken across its foot into a notch cut in the rim",
+          "seamOccluder": "a squared stone buttress standing proud of the rim wall, running from the walkway's level up to the lip",
+          "elements": [
+            {
+              "id": "rim_overfall",
+              "at": "to the left",
+              "desc": "the nearer of the 2 streams: a heavy wooden flume runs in over the rim on timber trestles and ends in open air, and a broad glassy sheet of water pours off the END of that flume and falls away down the inside of the well wall, vanishing into the tangle a few yards below, flume and sheet one continuous run of water",
+              "animate": {
+                "motion": "the broad sheet of water sliding steadily over the stone lip and peeling away down the inside of the wall",
+                "loop": "crossfade"
+              },
+              "motion": {
+                "moves": true,
+                "vigour": "a wide, smooth, unhurried sheet \u2014 heavy and glassy, no spray, no churn",
+                "phrase": "the broad sheet of water sliding steadily over the stone lip and peeling away down the inside of the wall"
+              },
+              "sound": {
+                "source": "a broad sheet of water sliding over a stone lip and falling away down the inside of a huge stone well",
+                "character": "open and airy, the fall receding into depth below you \u2014 distant, not close"
+              }
+            },
+            {
+              "id": "catwalk_span",
+              "at": "just left of centre",
+              "desc": "the walkway itself, lashed planks on two heavy hawsers, running away ahead of the viewer to iron rings set in the opposite rim a few body-lengths off, where an iron brazier burns on its anchor post; behind the viewer its other end runs into a notch cut in the near rim and is lashed out of sight beneath the planks; creepers trail from its hawsers"
+            },
+            {
+              "id": "way_down",
+              "at": "just right of centre",
+              "desc": "a rope-and-timber ladder hanging from iron rings bolted into the walkway's own planks, dropping straight down into the tangle of ropes and flumes below; no falling water touches it: its rungs run clear and dry",
+              "door": {
+                "direction": "open",
+                "to": "station1"
+              },
+              "label": "Ladder down into the shaft"
+            },
+            {
+              "id": "far_inlets",
+              "at": "to the right",
+              "desc": "the Assay's rim-station on the rim: a great iron RING-GAUGE standing upright like a ship's wheel, bolted to a stone post, a heavy coil of tarred rope on an iron cleat beside it, and a brass scale-pan hanging on a chain from the gauge's post, and beyond it, across the mouth, the second stream pouring from the end of its own trestle flume"
+            }
+          ],
+          "atmosphere": "It is NIGHT, the same deep night everywhere in this world: no daylight, no dawn, no dusk. The ONLY room that sees the sky: a deep night sky thick with bright stars fills the mouth of the well overhead, cold and clear, the stars sharp and unobstructed. Iron braziers burn on the walkway's far anchor post and on the rim beside the ring-gauge, their firelight warm on the nearest stone. A few yards below the walkway the well is CHOKED \u2014 ropes, flumes, hanging baskets and roots in a dense tangle lit by the braziers \u2014 and nothing deeper than that tangle can be seen. The engine still RUNS by the Assay's own craft \u2014 its fires burn and its water moves \u2014 but no one has tended it in generations. Grey-green lichen on the rim stones and only a few trailing creepers: up here, the green is only beginning. Wooden flumes on timber trestles and green-copper gutters on little stone arches run in over the rim; ropes and pulley lines hang DOWN into the well below the walkway, hung with baskets. ALL of the Assay's water is HELD \u2014 it runs inside flumes, gutters, pipes and wheel buckets, and passes from one channel to the next only as a short spill of less than a body's height, lip straight into mouth. Palette: cold night blue-black stone, deep wet green, verdigris copper; firelight is the only warm, fully saturated colour, apart from the Assay's amber glow in its fonts and basins. Cinematic, dense and richly detailed, fine natural film grain.",
+          "negatives": "No people, no figures, no creatures, no lettering, no captions, no text, no numbers, no signage. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere \u2014 everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. Fantastical and wondrous, NOT a horror scene: no skulls, no bones, no gore, no cobwebs, no bodies, nothing lurking. No daylight and no dusk light anywhere. This is the ONE room where the sky IS visible, directly overhead through the well's mouth \u2014 starlit night, no moon glare, no clouds hiding the stars, and NO ropes, beams or lines crossing the mouth overhead. The viewer is standing ON the only walkway there is \u2014 no second walkway, bridge or catwalk anywhere in view. Directly below the walkway, a few yards down, the well is choked with ropes, flumes, baskets and hanging roots, so nothing deeper than that can be seen. EXACTLY 2 falls of water drop free through open air in this picture \u2014 one from the flume on the left and one across the mouth beyond the ring-gauge \u2014 and NO OTHERS. Every other drop of water runs inside a flume, gutter, pipe or wheel bucket, or passes as a short spill of less than a body's height from one channel's lip straight into the next channel's mouth. The walkway is made fast at BOTH ends \u2014 to iron rings in the far rim and into a notch in the near rim \u2014 and its ladder hangs from rings in its own planks; nothing ends in mid-air.",
+          "continuity": [],
+          "soundBed": "the rim of a colossal open stone well: wind over the mouth far above, water sliding over the lip, the whole drop echoing below",
+          "styleLight": "a long night exposure under a clear starry sky, lit by starlight and the braziers described, no daylight",
+          "worldPlateRef": false
+        },
+        "seam": {
+          "stage": "blurred",
+          "band": "sky",
+          "ratio": 0.0,
+          "delta": 0.0,
+          "needsWork": false,
+          "accepted": false,
+          "seamBandRun": 0.0,
+          "at": "2026-09-21T08:27:01"
+        }
+      },
+      "unlockedWhen": true,
+      "designNote": "ORIENTATION room (no graded puzzle, no diverter). Top of the shaft, highest vantage. VIEWING PORT REMOVED 2026-09-20 (Lucas): the escape is now read by standing on the basin floor and looking at the basins, so a planning map has no job \u2014 and a LIVE map was a mechanic the engine does not have (`mapview` is a static image switcher keyed on ONE dial, so it would have meant ~8 pre-rendered charts plus a composite key). This room is now purely the establishing view: it shows the player the whole shaft before they start down it. `player_map.html` survives as an AUTHORING tool, not a player-facing one.",
+      "plannedHotspots": [
+        {
+          "type": "door",
+          "label": "Ladder down into the shaft",
+          "direction": "open",
+          "note": "DOWN -> station1 | direction corrected forward->open 2026-09-20: this room is GATELESS, and validate_scenes fails a `forward` door with no primary gate (it would gate on a puzzle that does not exist and never open). The sceneSpec already says `open`.",
+          "to": "station1",
+          "_waterGate": "generated by cave_engine/wire_maze.py from span V-0-0 (dry in 16 of 16 lever configurations) \u2014 regenerate, do not hand-edit"
+        }
+      ],
+      "mapPos": {
+        "c": 1,
+        "r": 0
+      },
+      "panorama": "catwalk/scene.png",
+      "builtFrom": "l1_catwalk_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      }
+    },
+    {
+      "key": "station1",
+      "title": "The first reading-landing",
+      "entry": {
+        "title": "The first font",
+        "text": "Down the first ladder, and the water's roar closes overhead. A stone font juts from the landing, a tray of the Assay's phials jammed in its basin, the diverter beside it dead until the font is answered. The engine will not let you pass on trust \u2014 only on a reading."
+      },
+      "technique": "flat clustering \u2014 k-means (assignment, step 1)",
+      "puzzleType": 1,
+      "built": true,
+      "debrief": "This landing was one decision of the sort: which pool a stream of samples belongs to. Solving it and throwing the diverter committed that assignment, and the water below fell differently for it.",
+      "authoring": {
+        "tag": "station1",
+        "scenePrompt": "This is a seamless 360-degree panorama from the middle of a broad working shelf built out from the wall of a tight, crowded stone well. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stretch of wet dressed stone wall, dark and even, with nothing fixed to it, the floor running unbroken across its foot: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. To the left, set round at the viewer's left side, with a broad stretch of plain wall between it and the wall directly behind the viewer: a rope-and-timber ladder made fast to iron rings in the shelf, its rails climbing the wall to the level above, where its head is lashed to that level's rim; no falling water touches it: its rungs run clear and dry; just left of centre, a gap in the shelf's rim with a ladder hanging from it down the face of the shelf's own stone brackets; a curtain of water \u2014 one of the well's 2 streams \u2014 drops out of the tangle overhead and comes down THROUGH it, so its rungs are plainly BEHIND the water and nothing could cross it, ragged and hard, the curtain breaking as it falls and flinging spray over the rim; dead ahead in the centre, a low carved stone font glowing faint amber from the still water in its bowl, and beside it this shelf's signature: a tall rack of shallow stone SAMPLE DRAWERS, each pulled out a different distance, holding graded gravels and grains, the rack's frame wound with creeper; just right of centre, a squat stone housing with a long iron lever, linked by an iron rod to a vane that stands IN an open copper chute running along the shelf's rim; the chute is fed by a flume above and empties straight into the mouth of a wooden flume just below the rim, so its water never falls free \u2014 lever, rod, vane and chute one connected machine; to the right, set round at the viewer's right side, with a broad stretch of plain wall between it and the wall directly behind the viewer: a short rope-and-plank bridge running level from two timber posts on this shelf to the rim of a landing close by across the well, made fast at both ends; a curtain of water \u2014 one of the well's 2 streams \u2014 drops out of the tangle overhead and comes down THROUGH it, so its planks are plainly BEHIND the water and nothing could cross it, steady and unbroken. It is NIGHT, the same deep night everywhere in this world: no daylight, no dawn, no dusk. Many iron cressets burn in wall brackets along the walls to either side and ahead, bright and close, throwing warm flickering light across wet stone and the underside of the level above. The engine still RUNS by the Assay's own craft \u2014 its fires burn and its water moves \u2014 but no one has tended it in generations. The valley's living green is TAKING IT BACK: roots split the dressed stone, creepers hang in long swags off the gutters, ferns fill every joint, moss coats the wheels and rails, and patches of faintly glowing pale blue-green moss show in the damp. The menace is in the MACHINERY, never in the plants, which are lush and alive: iron grading sieves with toothed rims, brass scale-pans hanging on chains, hinged rejection chutes, iron sorting-baskets, calipers and clamps \u2014 cold, exact, built to measure and reject. Every surface is busy: wooden flumes on timber trestles and green-copper gutters carried along the walls on little stone arches like a miniature aqueduct run in every direction; here and there a great timber water wheel twice a man's height stands in the path of a flume, its buckets brimming; ropes are strung back and forth across from iron rings in one wall to iron rings in the opposite wall, hung with pulleys, chains, counterweights and baskets. ALL of the Assay's water is HELD \u2014 it runs inside flumes, gutters, pipes and wheel buckets, and passes from one channel to the next only as a short spill of less than a body's height, lip straight into mouth. The view is CLOSE and CLOSED: the well is only a few body-lengths across; overhead, the underside of the level above is crowded with flumes, ropes and hanging roots, so no sky and nothing higher up can be seen; below, the drop is hidden by planks and the tangle of apparatus at the landing's edge. The shelf is broad: a wide flagged floor with room to work, backed by the wall along its whole length. Bright copper VERDIGRIS runs down the wall in broad streaks and greens every gutter and fitting. Palette: cold night blue-black stone, deep wet green, verdigris copper; firelight is the only warm, fully saturated colour, apart from the Assay's amber glow in its fonts and basins. Cinematic, dense and richly detailed, fine natural film grain. No people, no figures, no creatures, no lettering, no captions, no text, no numbers, no signage. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere \u2014 everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. Fantastical and wondrous, NOT a horror scene: no skulls, no bones, no gore, no cobwebs, no bodies, nothing lurking. No daylight and no dusk light anywhere. EXACTLY 2 falls of water drop free through open air in this picture \u2014 the two curtains on the ways out, one through the ladder going down and one across the bridge \u2014 and NO OTHERS. Every other drop of water runs inside a flume, gutter, pipe or wheel bucket, or passes as a short spill of less than a body's height from one channel's lip straight into the next channel's mouth. Each curtain of water falls squarely THROUGH the crossing it covers, never beside or behind it, and a crossing with no curtain has no water on it or directly above it. Every bridge and ladder is made fast at BOTH ends \u2014 nothing ends in mid-air. Each lever, its rod and its vane are one connected machine standing in its chute. Shot on a full-frame DSLR at 24mm, f/8, a long night exposure lit only by the fires and glows described, no daylight, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above \u2014 no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a plain stretch of wet dressed stone wall, dark and even, with nothing fixed to it, the floor running unbroken across its foot, with no visible seam, join, or repetition.",
+        "sceneSpec": {
+          "room": "station1",
+          "setting": "the middle of a broad working shelf built out from the wall of a tight, crowded stone well",
+          "interior": true,
+          "seam": "a plain stretch of wet dressed stone wall, dark and even, with nothing fixed to it, the floor running unbroken across its foot",
+          "seamOccluder": "a squared stone pilaster rising out of the shelf and running up into the tangle overhead",
+          "elements": [
+            {
+              "id": "up_ladder",
+              "at": "to the left",
+              "desc": "set round at the viewer's left side, with a broad stretch of plain wall between it and the wall directly behind the viewer: a rope-and-timber ladder made fast to iron rings in the shelf, its rails climbing the wall to the level above, where its head is lashed to that level's rim; no falling water touches it: its rungs run clear and dry",
+              "door": {
+                "direction": "back",
+                "to": "catwalk"
+              },
+              "label": "Ladder up to the catwalk"
+            },
+            {
+              "id": "down_ladder",
+              "at": "just left of centre",
+              "desc": "a gap in the shelf's rim with a ladder hanging from it down the face of the shelf's own stone brackets; a curtain of water \u2014 one of the well's 2 streams \u2014 drops out of the tangle overhead and comes down THROUGH it, so its rungs are plainly BEHIND the water and nothing could cross it",
+              "door": {
+                "direction": "open",
+                "to": "station2"
+              },
+              "label": "Ladder down to the lower landing",
+              "animate": {
+                "motion": "the ragged full-height curtain falling through the gap over the ladder going down, its edges wavering, flinging spray over the rim",
+                "loop": "crossfade"
+              },
+              "motion": {
+                "moves": true,
+                "vigour": "ragged and hard, the curtain breaking as it falls and flinging spray over the rim",
+                "phrase": "the ragged full-height curtain falling through the gap over the ladder going down, its edges wavering, flinging spray over the rim"
+              },
+              "sound": {
+                "source": "a full-height curtain of water falling past a timber ladder, close enough to wet the rungs",
+                "character": "loud, close and broken \u2014 spatter on stone and timber over a steady roar"
+              }
+            },
+            {
+              "id": "font",
+              "at": "dead ahead in the centre",
+              "desc": "a low carved stone font glowing faint amber from the still water in its bowl, and beside it this shelf's signature: a tall rack of shallow stone SAMPLE DRAWERS, each pulled out a different distance, holding graded gravels and grains, the rack's frame wound with creeper",
+              "puzzle": true,
+              "label": "The reading-console"
+            },
+            {
+              "id": "diverter",
+              "at": "just right of centre",
+              "desc": "a squat stone housing with a long iron lever, linked by an iron rod to a vane that stands IN an open copper chute running along the shelf's rim; the chute is fed by a flume above and empties straight into the mouth of a wooden flume just below the rim, so its water never falls free \u2014 lever, rod, vane and chute one connected machine",
+              "dial": true,
+              "label": "The S1 diverter lever"
+            },
+            {
+              "id": "across_bridge",
+              "at": "to the right",
+              "desc": "set round at the viewer's right side, with a broad stretch of plain wall between it and the wall directly behind the viewer: a short rope-and-plank bridge running level from two timber posts on this shelf to the rim of a landing close by across the well, made fast at both ends; a curtain of water \u2014 one of the well's 2 streams \u2014 drops out of the tangle overhead and comes down THROUGH it, so its planks are plainly BEHIND the water and nothing could cross it",
+              "door": {
+                "direction": "open",
+                "to": "station3"
+              },
+              "label": "Rope bridge across the shaft",
+              "motion": {
+                "moves": true,
+                "vigour": "steady and unbroken",
+                "phrase": "the curtain of water pouring steadily down through the bridge, its edges shifting"
+              },
+              "animate": {
+                "motion": "the curtain of water pouring steadily down through the bridge, its edges shifting",
+                "loop": "crossfade"
+              }
+            }
+          ],
+          "atmosphere": "It is NIGHT, the same deep night everywhere in this world: no daylight, no dawn, no dusk. Many iron cressets burn in wall brackets along the walls to either side and ahead, bright and close, throwing warm flickering light across wet stone and the underside of the level above. The engine still RUNS by the Assay's own craft \u2014 its fires burn and its water moves \u2014 but no one has tended it in generations. The valley's living green is TAKING IT BACK: roots split the dressed stone, creepers hang in long swags off the gutters, ferns fill every joint, moss coats the wheels and rails, and patches of faintly glowing pale blue-green moss show in the damp. The menace is in the MACHINERY, never in the plants, which are lush and alive: iron grading sieves with toothed rims, brass scale-pans hanging on chains, hinged rejection chutes, iron sorting-baskets, calipers and clamps \u2014 cold, exact, built to measure and reject. Every surface is busy: wooden flumes on timber trestles and green-copper gutters carried along the walls on little stone arches like a miniature aqueduct run in every direction; here and there a great timber water wheel twice a man's height stands in the path of a flume, its buckets brimming; ropes are strung back and forth across from iron rings in one wall to iron rings in the opposite wall, hung with pulleys, chains, counterweights and baskets. ALL of the Assay's water is HELD \u2014 it runs inside flumes, gutters, pipes and wheel buckets, and passes from one channel to the next only as a short spill of less than a body's height, lip straight into mouth. The view is CLOSE and CLOSED: the well is only a few body-lengths across; overhead, the underside of the level above is crowded with flumes, ropes and hanging roots, so no sky and nothing higher up can be seen; below, the drop is hidden by planks and the tangle of apparatus at the landing's edge. The shelf is broad: a wide flagged floor with room to work, backed by the wall along its whole length. Bright copper VERDIGRIS runs down the wall in broad streaks and greens every gutter and fitting. Palette: cold night blue-black stone, deep wet green, verdigris copper; firelight is the only warm, fully saturated colour, apart from the Assay's amber glow in its fonts and basins. Cinematic, dense and richly detailed, fine natural film grain.",
+          "negatives": "No people, no figures, no creatures, no lettering, no captions, no text, no numbers, no signage. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere \u2014 everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. Fantastical and wondrous, NOT a horror scene: no skulls, no bones, no gore, no cobwebs, no bodies, nothing lurking. No daylight and no dusk light anywhere. EXACTLY 2 falls of water drop free through open air in this picture \u2014 the two curtains on the ways out, one through the ladder going down and one across the bridge \u2014 and NO OTHERS. Every other drop of water runs inside a flume, gutter, pipe or wheel bucket, or passes as a short spill of less than a body's height from one channel's lip straight into the next channel's mouth. Each curtain of water falls squarely THROUGH the crossing it covers, never beside or behind it, and a crossing with no curtain has no water on it or directly above it. Every bridge and ladder is made fast at BOTH ends \u2014 nothing ends in mid-air. Each lever, its rod and its vane are one connected machine standing in its chute.",
+          "continuity": [],
+          "soundBed": "a junction landing part-way down the shaft: one fall close and breaking, the rest of the well echoing behind it",
+          "styleLight": "a long night exposure lit only by the fires and glows described, no daylight",
+          "states": {
+            "wet_across_bridge": {
+              "change": "where the falling water lands on the ways off this landing",
+              "constraints": "Ladder up to the catwalk: unchanged \u2014 it stays exactly as it is, dry, with no water on or near it. Ladder down to the lower landing: its curtain is GONE \u2014 the stream has been turned aside into the tangle and out of sight \u2014 and its rungs run dry. Rope bridge across the shaft: keeps its curtain exactly as it is. EXACTLY 1 fall of water drops free through open air in this picture \u2014 the curtain through the bridge \u2014 and NO OTHERS. Nothing else in the picture moves, changes, is added or is taken away \u2014 same scene, same camera, same objects, same light.",
+              "elements": {
+                "down_ladder": {
+                  "motion": null
+                }
+              },
+              "_why": "lever configurations 1000, 1001 (cave_engine/water_states.py \u2014 regenerate, do not hand-edit)"
+            },
+            "all_clear": {
+              "change": "where the falling water lands on the ways off this landing",
+              "constraints": "Ladder up to the catwalk: unchanged \u2014 it stays exactly as it is, dry, with no water on or near it. Ladder down to the lower landing: its curtain is GONE \u2014 the stream has been turned aside into the tangle and out of sight \u2014 and its rungs run dry. Rope bridge across the shaft: its curtain is GONE \u2014 the stream has been turned aside into the tangle and out of sight \u2014 and its planks run dry. NO water falls free through open air anywhere in this picture. Nothing else in the picture moves, changes, is added or is taken away \u2014 same scene, same camera, same objects, same light.",
+              "elements": {
+                "down_ladder": {
+                  "motion": null
+                },
+                "across_bridge": {
+                  "motion": null
+                },
+                "up_ladder": {
+                  "motion": {
+                    "moves": true,
+                    "phrase": "the cresset flames beside the ladder going up flickering and leaning, their light wavering on the wet stone"
+                  }
+                }
+              },
+              "_why": "lever configurations 1100, 0100, 1101, 0101 (cave_engine/water_states.py \u2014 regenerate, do not hand-edit)"
+            }
+          }
+        },
+        "seam": {
+          "stage": "screened",
+          "band": "mid",
+          "ratio": 2.58,
+          "delta": 6.8,
+          "needsWork": false,
+          "accepted": false,
+          "seamBandRun": 0.006,
+          "at": "2026-09-21T08:27:02"
+        }
+      },
+      "unlockedWhen": true,
+      "onSolve": [
+        {
+          "set": "station1_solved"
+        },
+        {
+          "inc": "rooms_solved"
+        }
+      ],
+      "designNote": "PUZZLE (verified, escape_room_puzzles 2026-07-26). Dataset reliquary_phials. TYPE 1 MCQ. CODE: km <- kmeans(reliquary_phials[,c('clarity','mineral','resin','ash')], centers=3, nstart=25); table(km$cluster). Q: 'Cluster the phials into 3 families by their four profile measures. How many phials are in the LARGEST family?' ANSWER: 10 (families sized 10/8/6; ARI 1.0 vs true). DISTRACTORS(>=6): 8, 6, 12, 9, 3, 24. Solving UNLOCKS diverter S1 -> D1 (a dial). Upper shaft. NEW ART.",
+      "plannedHotspots": [
+        {
+          "type": "ambient",
+          "label": "The water on the ways out",
+          "noElement": true,
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "variants": [
+            {
+              "state": "wet_across_bridge",
+              "box": [
+                0,
+                0,
+                1,
+                1
+              ],
+              "when": {
+                "any": [
+                  {
+                    "all": [
+                      {
+                        "eq": [
+                          "d1",
+                          "thrown"
+                        ]
+                      },
+                      {
+                        "eq": [
+                          "d2",
+                          "shut"
+                        ]
+                      },
+                      {
+                        "eq": [
+                          "d3",
+                          "shut"
+                        ]
+                      },
+                      {
+                        "eq": [
+                          "d4",
+                          "shut"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "all": [
+                      {
+                        "eq": [
+                          "d1",
+                          "thrown"
+                        ]
+                      },
+                      {
+                        "eq": [
+                          "d2",
+                          "shut"
+                        ]
+                      },
+                      {
+                        "eq": [
+                          "d3",
+                          "shut"
+                        ]
+                      },
+                      {
+                        "eq": [
+                          "d4",
+                          "thrown"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "state": "all_clear",
+              "box": [
+                0,
+                0,
+                1,
+                1
+              ],
+              "when": {
+                "any": [
+                  {
+                    "all": [
+                      {
+                        "eq": [
+                          "d1",
+                          "thrown"
+                        ]
+                      },
+                      {
+                        "eq": [
+                          "d2",
+                          "thrown"
+                        ]
+                      },
+                      {
+                        "eq": [
+                          "d3",
+                          "shut"
+                        ]
+                      },
+                      {
+                        "eq": [
+                          "d4",
+                          "shut"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "all": [
+                      {
+                        "eq": [
+                          "d1",
+                          "shut"
+                        ]
+                      },
+                      {
+                        "eq": [
+                          "d2",
+                          "thrown"
+                        ]
+                      },
+                      {
+                        "eq": [
+                          "d3",
+                          "shut"
+                        ]
+                      },
+                      {
+                        "eq": [
+                          "d4",
+                          "shut"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "all": [
+                      {
+                        "eq": [
+                          "d1",
+                          "thrown"
+                        ]
+                      },
+                      {
+                        "eq": [
+                          "d2",
+                          "thrown"
+                        ]
+                      },
+                      {
+                        "eq": [
+                          "d3",
+                          "shut"
+                        ]
+                      },
+                      {
+                        "eq": [
+                          "d4",
+                          "thrown"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "all": [
+                      {
+                        "eq": [
+                          "d1",
+                          "shut"
+                        ]
+                      },
+                      {
+                        "eq": [
+                          "d2",
+                          "thrown"
+                        ]
+                      },
+                      {
+                        "eq": [
+                          "d3",
+                          "shut"
+                        ]
+                      },
+                      {
+                        "eq": [
+                          "d4",
+                          "thrown"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ],
+          "note": "Full-scene water-state carrier, generated by cave_engine/water_states.py. The BASE art is the view the player ARRIVES in (across_bridge, down_ladder wet); each variant is another picture of the same landing with the water moved. Keep in lockstep with the door gates \u2014 both come from the router."
+        },
+        {
+          "type": "puzzle",
+          "label": "The reading-console",
+          "note": "kmeans(4 profiles,k=3) -> largest family = 10"
+        },
+        {
+          "type": "dial",
+          "label": "The S1 diverter lever",
+          "note": "flips diverter D1 (starts '/', throws to '|'); throwable after the puzzle is solved",
+          "key": "d1",
+          "states": [
+            {
+              "value": "shut",
+              "label": "Leave the S1 gate shut"
+            },
+            {
+              "value": "thrown",
+              "label": "Throw the S1 gate"
+            }
+          ],
+          "availableWhen": {
+            "solved": "station1"
+          },
+          "lockedBody": "The lever will not move. Whatever holds it is waiting on the reading at this landing's console.",
+          "hint": "Throw it, and somewhere below the water changes its course."
+        },
+        {
+          "type": "door",
+          "label": "Ladder down to the lower landing",
+          "direction": "open",
+          "note": "DOWN -> station2 (open rope/ladder, water-gated)",
+          "to": "station2",
+          "availableWhen": {
+            "any": [
+              {
+                "eq": [
+                  "d1",
+                  "thrown"
+                ]
+              },
+              {
+                "all": [
+                  {
+                    "eq": [
+                      "d2",
+                      "thrown"
+                    ]
+                  },
+                  {
+                    "eq": [
+                      "d3",
+                      "shut"
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "lockedBody": "Water is pouring straight across it. Nothing crosses while it runs \u2014 the stream has to be sent somewhere else first.",
+          "_waterGate": "generated by cave_engine/wire_maze.py from span V-1-0 (dry in 10 of 16 lever configurations) \u2014 regenerate, do not hand-edit"
+        },
+        {
+          "type": "door",
+          "label": "Ladder up to the catwalk",
+          "direction": "back",
+          "note": "UP -> catwalk",
+          "to": "catwalk",
+          "_waterGate": "generated by cave_engine/wire_maze.py from span V-0-0 (dry in 16 of 16 lever configurations) \u2014 regenerate, do not hand-edit"
+        },
+        {
+          "type": "door",
+          "label": "Rope bridge across the shaft",
+          "direction": "open",
+          "note": "ACROSS -> station3 (same level; this is the 3-way JUNCTION)",
+          "to": "station3",
+          "availableWhen": {
+            "all": [
+              {
+                "eq": [
+                  "d2",
+                  "thrown"
+                ]
+              },
+              {
+                "eq": [
+                  "d3",
+                  "shut"
+                ]
+              }
+            ]
+          },
+          "lockedBody": "Water is pouring straight across it. Nothing crosses while it runs \u2014 the stream has to be sent somewhere else first.",
+          "_waterGate": "generated by cave_engine/wire_maze.py from span H-1-0 (dry in 4 of 16 lever configurations) \u2014 regenerate, do not hand-edit"
+        }
+      ],
+      "mapPos": {
+        "c": 0,
+        "r": 0
+      },
+      "panorama": "station1/scene.png",
+      "builtFrom": "l1_station1_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      }
+    },
+    {
+      "key": "station2",
+      "title": "The second reading-landing",
+      "entry": {
+        "title": "Deeper, a subtler test",
+        "text": "Lower, closer, the torches smoking under a heavy lip of rock. This font asks less kindly than the last: not how large a kind is, but how many true kinds there even are. The Assay set it to turn away anyone who could only count what they were handed."
+      },
+      "technique": "flat clustering \u2014 k-means (choosing k, the elbow)",
+      "puzzleType": 4,
+      "built": true,
+      "debrief": "A second assignment, deeper in the machine: read which group these samples belong to, throw the diverter, and watch the falling water re-route for everything below.",
+      "authoring": {
+        "tag": "station2",
+        "scenePrompt": "This is a seamless 360-degree panorama from the middle of a low landing tucked under a heavy overhang of rock in the wall of a tight, crowded stone well. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stretch of wet rock under the overhang, crusted pale with lime, dark and even, with nothing fixed to it, the floor running unbroken across its foot: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. To the left, set round at the viewer's left side, with a broad stretch of plain wall between it and the wall directly behind the viewer: a rope-and-timber ladder made fast to iron rings in this landing, climbing the wall to the level above; no falling water touches it: its rungs run clear and dry; just left of centre, a gap cut through the landing's rim with a long ladder-and-plank descent hanging from it; a heavy column of water \u2014 one of the well's 2 streams \u2014 drops out of the tangle overhead and comes down THROUGH it, so its rungs and planks are plainly BEHIND the water and nothing could cross it, striking a jutting stone shelf a little below and bursting into a thick cloud of spray, a heavy unbroken column, striking hard and bursting into a fat cloud of spray; dead ahead in the centre, a low carved stone font glowing faint amber, and beside it this landing's signature: a row of stone SETTLING TROUGHS stepped one below the next, each spilling from its worn spout into the trough beneath, and a small wooden overshot water wheel turning under the lowest spout; just right of centre, a squat stone housing with a long iron lever, linked by an iron rod to a vane that stands IN an open copper chute running along the landing's rim; the chute empties straight into the mouth of a wooden flume just below the rim, so its water never falls free \u2014 lever, rod, vane and chute one connected machine; to the right, set round at the viewer's right side, with a broad stretch of plain wall between it and the wall directly behind the viewer: a short rope-and-plank bridge running level from two timber posts on this landing to the mouth of a cramped gallery in the wall close by, made fast at both ends; a curtain of water \u2014 one of the well's 2 streams \u2014 drops out of the tangle overhead and comes down THROUGH it, so its planks are plainly BEHIND the water and nothing could cross it, steady and unbroken. It is NIGHT, the same deep night everywhere in this world: no daylight, no dawn, no dusk. Smoky torches sputter in iron brackets along the underside of the overhang, their light hazed by spray, warm against the cold wet dark. The engine still RUNS by the Assay's own craft \u2014 its fires burn and its water moves \u2014 but no one has tended it in generations. The valley's living green is TAKING IT BACK: roots split the dressed stone, creepers hang in long swags off the gutters, ferns fill every joint, moss coats the wheels and rails, and patches of faintly glowing pale blue-green moss show in the damp. The menace is in the MACHINERY, never in the plants, which are lush and alive: iron grading sieves with toothed rims, brass scale-pans hanging on chains, hinged rejection chutes, iron sorting-baskets, calipers and clamps \u2014 cold, exact, built to measure and reject. Every surface is busy: wooden flumes on timber trestles and green-copper gutters carried along the walls on little stone arches like a miniature aqueduct run in every direction; here and there a great timber water wheel twice a man's height stands in the path of a flume, its buckets brimming; ropes are strung back and forth across from iron rings in one wall to iron rings in the opposite wall, hung with pulleys, chains, counterweights and baskets. ALL of the Assay's water is HELD \u2014 it runs inside flumes, gutters, pipes and wheel buckets, and passes from one channel to the next only as a short spill of less than a body's height, lip straight into mouth. The view is CLOSE and CLOSED: the low rock overhang hangs close over the whole landing, hung with roots and ropes, so nothing above can be seen; below, the drop is hidden by planks and the tangle of apparatus at the landing's edge. WHITE lime crust and flowstone hang frozen in pale stone draperies down the wall \u2014 hard white stone, not water. Palette: cold night blue-black stone, deep wet green, verdigris copper; firelight is the only warm, fully saturated colour, apart from the Assay's amber glow in its fonts and basins. Cinematic, dense and richly detailed, fine natural film grain. No people, no figures, no creatures, no lettering, no captions, no text, no numbers, no signage. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere \u2014 everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. Fantastical and wondrous, NOT a horror scene: no skulls, no bones, no gore, no cobwebs, no bodies, nothing lurking. No daylight and no dusk light anywhere. EXACTLY 2 falls of water drop free through open air in this picture \u2014 the heavy column through the descent and the curtain across the bridge \u2014 and NO OTHERS. Every other drop of water runs inside a flume, gutter, pipe or wheel bucket, or passes as a short spill of less than a body's height from one channel's lip straight into the next channel's mouth. Each curtain of water falls squarely THROUGH the crossing it covers, never beside or behind it, and a crossing with no curtain has no water on it or directly above it. Every bridge and ladder is made fast at BOTH ends \u2014 nothing ends in mid-air. Each lever, its rod and its vane are one connected machine standing in its chute. Shot on a full-frame DSLR at 24mm, f/8, a long night exposure lit only by the fires and glows described, no daylight, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above \u2014 no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a plain stretch of wet rock under the overhang, crusted pale with lime, dark and even, with nothing fixed to it, the floor running unbroken across its foot, with no visible seam, join, or repetition.",
+        "sceneSpec": {
+          "room": "station2",
+          "setting": "the middle of a low landing tucked under a heavy overhang of rock in the wall of a tight, crowded stone well",
+          "interior": true,
+          "seam": "a plain stretch of wet rock under the overhang, crusted pale with lime, dark and even, with nothing fixed to it, the floor running unbroken across its foot",
+          "seamOccluder": "a heavy stone rib standing out from the wall and running up into the overhang",
+          "elements": [
+            {
+              "id": "up_ladder",
+              "at": "to the left",
+              "desc": "set round at the viewer's left side, with a broad stretch of plain wall between it and the wall directly behind the viewer: a rope-and-timber ladder made fast to iron rings in this landing, climbing the wall to the level above; no falling water touches it: its rungs run clear and dry",
+              "door": {
+                "direction": "open",
+                "to": "station1"
+              },
+              "label": "Ladder up to the junction"
+            },
+            {
+              "id": "descent",
+              "at": "just left of centre",
+              "desc": "a gap cut through the landing's rim with a long ladder-and-plank descent hanging from it; a heavy column of water \u2014 one of the well's 2 streams \u2014 drops out of the tangle overhead and comes down THROUGH it, so its rungs and planks are plainly BEHIND the water and nothing could cross it, striking a jutting stone shelf a little below and bursting into a thick cloud of spray",
+              "door": {
+                "direction": "open",
+                "to": "basin"
+              },
+              "label": "The long descent to the drowned floor",
+              "animate": {
+                "motion": "the heavy column of water pouring down past the descent and bursting into a fat cloud of spray boiling up off the stone shelf below it",
+                "loop": "crossfade"
+              },
+              "motion": {
+                "moves": true,
+                "vigour": "a heavy unbroken column, striking hard and bursting into a fat cloud of spray",
+                "phrase": "the heavy column of water pouring down past the descent and bursting into a fat cloud of spray boiling up off the stone shelf below it"
+              },
+              "sound": {
+                "source": "a heavy column of water striking a jutting stone shelf and bursting off it",
+                "character": "deep and percussive, with a hiss of spray riding on top \u2014 the heaviest water in the scenario"
+              }
+            },
+            {
+              "id": "font",
+              "at": "dead ahead in the centre",
+              "desc": "a low carved stone font glowing faint amber, and beside it this landing's signature: a row of stone SETTLING TROUGHS stepped one below the next, each spilling from its worn spout into the trough beneath, and a small wooden overshot water wheel turning under the lowest spout",
+              "puzzle": true,
+              "label": "The reading-console"
+            },
+            {
+              "id": "diverter",
+              "at": "just right of centre",
+              "desc": "a squat stone housing with a long iron lever, linked by an iron rod to a vane that stands IN an open copper chute running along the landing's rim; the chute empties straight into the mouth of a wooden flume just below the rim, so its water never falls free \u2014 lever, rod, vane and chute one connected machine",
+              "dial": true,
+              "label": "The S2 diverter lever"
+            },
+            {
+              "id": "across_bridge",
+              "at": "to the right",
+              "desc": "set round at the viewer's right side, with a broad stretch of plain wall between it and the wall directly behind the viewer: a short rope-and-plank bridge running level from two timber posts on this landing to the mouth of a cramped gallery in the wall close by, made fast at both ends; a curtain of water \u2014 one of the well's 2 streams \u2014 drops out of the tangle overhead and comes down THROUGH it, so its planks are plainly BEHIND the water and nothing could cross it",
+              "door": {
+                "direction": "open",
+                "to": "spillway"
+              },
+              "label": "Rope bridge across to the cast-off gallery",
+              "motion": {
+                "moves": true,
+                "vigour": "steady and unbroken",
+                "phrase": "the curtain of water pouring steadily down through the bridge, its edges shifting"
+              },
+              "animate": {
+                "motion": "the curtain of water pouring steadily down through the bridge, its edges shifting",
+                "loop": "crossfade"
+              }
+            }
+          ],
+          "atmosphere": "It is NIGHT, the same deep night everywhere in this world: no daylight, no dawn, no dusk. Smoky torches sputter in iron brackets along the underside of the overhang, their light hazed by spray, warm against the cold wet dark. The engine still RUNS by the Assay's own craft \u2014 its fires burn and its water moves \u2014 but no one has tended it in generations. The valley's living green is TAKING IT BACK: roots split the dressed stone, creepers hang in long swags off the gutters, ferns fill every joint, moss coats the wheels and rails, and patches of faintly glowing pale blue-green moss show in the damp. The menace is in the MACHINERY, never in the plants, which are lush and alive: iron grading sieves with toothed rims, brass scale-pans hanging on chains, hinged rejection chutes, iron sorting-baskets, calipers and clamps \u2014 cold, exact, built to measure and reject. Every surface is busy: wooden flumes on timber trestles and green-copper gutters carried along the walls on little stone arches like a miniature aqueduct run in every direction; here and there a great timber water wheel twice a man's height stands in the path of a flume, its buckets brimming; ropes are strung back and forth across from iron rings in one wall to iron rings in the opposite wall, hung with pulleys, chains, counterweights and baskets. ALL of the Assay's water is HELD \u2014 it runs inside flumes, gutters, pipes and wheel buckets, and passes from one channel to the next only as a short spill of less than a body's height, lip straight into mouth. The view is CLOSE and CLOSED: the low rock overhang hangs close over the whole landing, hung with roots and ropes, so nothing above can be seen; below, the drop is hidden by planks and the tangle of apparatus at the landing's edge. WHITE lime crust and flowstone hang frozen in pale stone draperies down the wall \u2014 hard white stone, not water. Palette: cold night blue-black stone, deep wet green, verdigris copper; firelight is the only warm, fully saturated colour, apart from the Assay's amber glow in its fonts and basins. Cinematic, dense and richly detailed, fine natural film grain.",
+          "negatives": "No people, no figures, no creatures, no lettering, no captions, no text, no numbers, no signage. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere \u2014 everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. Fantastical and wondrous, NOT a horror scene: no skulls, no bones, no gore, no cobwebs, no bodies, nothing lurking. No daylight and no dusk light anywhere. EXACTLY 2 falls of water drop free through open air in this picture \u2014 the heavy column through the descent and the curtain across the bridge \u2014 and NO OTHERS. Every other drop of water runs inside a flume, gutter, pipe or wheel bucket, or passes as a short spill of less than a body's height from one channel's lip straight into the next channel's mouth. Each curtain of water falls squarely THROUGH the crossing it covers, never beside or behind it, and a crossing with no curtain has no water on it or directly above it. Every bridge and ladder is made fast at BOTH ends \u2014 nothing ends in mid-air. Each lever, its rod and its vane are one connected machine standing in its chute.",
+          "continuity": [],
+          "soundBed": "the lower landing, enclosed and low-heavy: a big fall hitting stone close by, the drop below carrying the sound down",
+          "styleLight": "a long night exposure lit only by the fires and glows described, no daylight",
+          "states": {
+            "wet_descent": {
+              "change": "where the falling water lands on the ways off this landing",
+              "constraints": "Ladder up to the junction: unchanged \u2014 it stays exactly as it is, dry, with no water on or near it. The long descent to the drowned floor: keeps its curtain exactly as it is. Rope bridge across to the cast-off gallery: its curtain is GONE \u2014 the stream has been turned aside into the tangle and out of sight \u2014 and its planks run dry. EXACTLY 1 fall of water drops free through open air in this picture \u2014 the curtain through the long descent \u2014 and NO OTHERS. Nothing else in the picture moves, changes, is added or is taken away \u2014 same scene, same camera, same objects, same light.",
+              "elements": {
+                "across_bridge": {
+                  "motion": null
+                }
+              },
+              "_why": "lever configurations 1100, 0100 (cave_engine/water_states.py \u2014 regenerate, do not hand-edit)"
+            },
+            "wet_descent_up_ladder": {
+              "change": "where the falling water lands on the ways off this landing",
+              "constraints": "Ladder up to the junction: a curtain of water \u2014 one of the well's 2 streams \u2014 now drops out of the tangle overhead and comes down THROUGH it, so its rungs are plainly BEHIND the water and nothing could cross it. The long descent to the drowned floor: keeps its curtain exactly as it is. Rope bridge across to the cast-off gallery: its curtain is GONE \u2014 the stream has been turned aside into the tangle and out of sight \u2014 and its planks run dry. EXACTLY 2 falls of water drop free through open air in this picture \u2014 the curtain through the long descent, the curtain through the ladder going up \u2014 and NO OTHERS. Nothing else in the picture moves, changes, is added or is taken away \u2014 same scene, same camera, same objects, same light.",
+              "elements": {
+                "up_ladder": {
+                  "motion": {
+                    "moves": true,
+                    "phrase": "the curtain of water pouring steadily down through the ladder going up, its edges shifting"
+                  }
+                },
+                "across_bridge": {
+                  "motion": null
+                }
+              },
+              "_why": "lever configurations 0000 (cave_engine/water_states.py \u2014 regenerate, do not hand-edit)"
+            },
+            "all_clear": {
+              "change": "where the falling water lands on the ways off this landing",
+              "constraints": "Ladder up to the junction: unchanged \u2014 it stays exactly as it is, dry, with no water on or near it. The long descent to the drowned floor: its curtain is GONE \u2014 the stream has been turned aside into the tangle and out of sight \u2014 and its rungs and planks run dry. Rope bridge across to the cast-off gallery: its curtain is GONE \u2014 the stream has been turned aside into the tangle and out of sight \u2014 and its planks run dry. NO water falls free through open air anywhere in this picture. Nothing else in the picture moves, changes, is added or is taken away \u2014 same scene, same camera, same objects, same light.",
+              "elements": {
+                "descent": {
+                  "motion": null
+                },
+                "across_bridge": {
+                  "motion": null
+                },
+                "font": {
+                  "motion": {
+                    "moves": true,
+                    "phrase": "the water spilling from spout to spout down the stepped settling troughs and turning the small overshot wheel"
+                  }
+                }
+              },
+              "_why": "lever configurations 1101, 0101 (cave_engine/water_states.py \u2014 regenerate, do not hand-edit)"
+            },
+            "wet_across_bridge": {
+              "change": "where the falling water lands on the ways off this landing",
+              "constraints": "Ladder up to the junction: unchanged \u2014 it stays exactly as it is, dry, with no water on or near it. The long descent to the drowned floor: its curtain is GONE \u2014 the stream has been turned aside into the tangle and out of sight \u2014 and its rungs and planks run dry. Rope bridge across to the cast-off gallery: keeps its curtain exactly as it is. EXACTLY 1 fall of water drops free through open air in this picture \u2014 the curtain through the bridge \u2014 and NO OTHERS. Nothing else in the picture moves, changes, is added or is taken away \u2014 same scene, same camera, same objects, same light.",
+              "elements": {
+                "descent": {
+                  "motion": null
+                }
+              },
+              "_why": "lever configurations 1001 (cave_engine/water_states.py \u2014 regenerate, do not hand-edit)"
+            },
+            "wet_up_ladder": {
+              "change": "where the falling water lands on the ways off this landing",
+              "constraints": "Ladder up to the junction: a curtain of water \u2014 one of the well's 2 streams \u2014 now drops out of the tangle overhead and comes down THROUGH it, so its rungs are plainly BEHIND the water and nothing could cross it. The long descent to the drowned floor: its curtain is GONE \u2014 the stream has been turned aside into the tangle and out of sight \u2014 and its rungs and planks run dry. Rope bridge across to the cast-off gallery: its curtain is GONE \u2014 the stream has been turned aside into the tangle and out of sight \u2014 and its planks run dry. EXACTLY 1 fall of water drops free through open air in this picture \u2014 the curtain through the ladder going up \u2014 and NO OTHERS. Nothing else in the picture moves, changes, is added or is taken away \u2014 same scene, same camera, same objects, same light.",
+              "elements": {
+                "up_ladder": {
+                  "motion": {
+                    "moves": true,
+                    "phrase": "the curtain of water pouring steadily down through the ladder going up, its edges shifting"
+                  }
+                },
+                "descent": {
+                  "motion": null
+                },
+                "across_bridge": {
+                  "motion": null
+                }
+              },
+              "_why": "lever configurations 0001 (cave_engine/water_states.py \u2014 regenerate, do not hand-edit)"
+            }
+          }
+        },
+        "seam": {
+          "stage": "blurred",
+          "band": "sky",
+          "ratio": 0.0,
+          "delta": 0.0,
+          "needsWork": false,
+          "accepted": false,
+          "seamBandRun": 0.0,
+          "at": "2026-09-21T00:02:54"
+        }
+      },
+      "unlockedWhen": true,
+      "onSolve": [
+        {
+          "set": "station2_solved"
+        },
+        {
+          "inc": "rooms_solved"
+        }
+      ],
+      "designNote": "PUZZLE (verified). Dataset reliquary_phials. TYPE 4 PICK-THE-POINT (click the elbow) \u2014 for puzzle-type variety. The student plots within-cluster spread vs k and CLICKS the elbow. starterCode: reliquary_phials. pick.plotCode (WebR, ggiraph): wss <- sapply(1:6, function(k) kmeans(reliquary_phials[,c('clarity','mineral','resin','ash')], centers=k, nstart=25)$tot.withinss); df <- data.frame(k=1:6, wss=wss); p <- ggplot(df, aes(k, wss)) + geom_line() + ggiraph::geom_point_interactive(aes(data_id=k, tooltip=k), size=4) + labs(x='number of families (k)', y='within-cluster spread'). pick.prompt: 'Adding families always tightens the clusters a little \u2014 but only up to a point. Plot the within-cluster spread against k and click the ELBOW: the k past which more families barely help.' ANSWER: the point at k=3 (WSS 37689 -> 11667 -> 966 [elbow] -> 810 -> 661 -> 543; the drop collapses after 3). Solving UNLOCKS diverter S2 -> D2. Mid shaft. NEW ART.",
+      "plannedHotspots": [
+        {
+          "type": "ambient",
+          "label": "The water on the ways out",
+          "noElement": true,
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "variants": [
+            {
+              "state": "wet_descent",
+              "box": [
+                0,
+                0,
+                1,
+                1
+              ],
+              "when": {
+                "any": [
+                  {
+                    "all": [
+                      {
+                        "eq": [
+                          "d1",
+                          "thrown"
+                        ]
+                      },
+                      {
+                        "eq": [
+                          "d2",
+                          "thrown"
+                        ]
+                      },
+                      {
+                        "eq": [
+                          "d3",
+                          "shut"
+                        ]
+                      },
+                      {
+                        "eq": [
+                          "d4",
+                          "shut"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "all": [
+                      {
+                        "eq": [
+                          "d1",
+                          "shut"
+                        ]
+                      },
+                      {
+                        "eq": [
+                          "d2",
+                          "thrown"
+                        ]
+                      },
+                      {
+                        "eq": [
+                          "d3",
+                          "shut"
+                        ]
+                      },
+                      {
+                        "eq": [
+                          "d4",
+                          "shut"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "state": "wet_descent_up_ladder",
+              "box": [
+                0,
+                0,
+                1,
+                1
+              ],
+              "when": {
+                "all": [
+                  {
+                    "eq": [
+                      "d1",
+                      "shut"
+                    ]
+                  },
+                  {
+                    "eq": [
+                      "d2",
+                      "shut"
+                    ]
+                  },
+                  {
+                    "eq": [
+                      "d3",
+                      "shut"
+                    ]
+                  },
+                  {
+                    "eq": [
+                      "d4",
+                      "shut"
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "state": "all_clear",
+              "box": [
+                0,
+                0,
+                1,
+                1
+              ],
+              "when": {
+                "any": [
+                  {
+                    "all": [
+                      {
+                        "eq": [
+                          "d1",
+                          "thrown"
+                        ]
+                      },
+                      {
+                        "eq": [
+                          "d2",
+                          "thrown"
+                        ]
+                      },
+                      {
+                        "eq": [
+                          "d3",
+                          "shut"
+                        ]
+                      },
+                      {
+                        "eq": [
+                          "d4",
+                          "thrown"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "all": [
+                      {
+                        "eq": [
+                          "d1",
+                          "shut"
+                        ]
+                      },
+                      {
+                        "eq": [
+                          "d2",
+                          "thrown"
+                        ]
+                      },
+                      {
+                        "eq": [
+                          "d3",
+                          "shut"
+                        ]
+                      },
+                      {
+                        "eq": [
+                          "d4",
+                          "thrown"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "state": "wet_across_bridge",
+              "box": [
+                0,
+                0,
+                1,
+                1
+              ],
+              "when": {
+                "all": [
+                  {
+                    "eq": [
+                      "d1",
+                      "thrown"
+                    ]
+                  },
+                  {
+                    "eq": [
+                      "d2",
+                      "shut"
+                    ]
+                  },
+                  {
+                    "eq": [
+                      "d3",
+                      "shut"
+                    ]
+                  },
+                  {
+                    "eq": [
+                      "d4",
+                      "thrown"
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "state": "wet_up_ladder",
+              "box": [
+                0,
+                0,
+                1,
+                1
+              ],
+              "when": {
+                "all": [
+                  {
+                    "eq": [
+                      "d1",
+                      "shut"
+                    ]
+                  },
+                  {
+                    "eq": [
+                      "d2",
+                      "shut"
+                    ]
+                  },
+                  {
+                    "eq": [
+                      "d3",
+                      "shut"
+                    ]
+                  },
+                  {
+                    "eq": [
+                      "d4",
+                      "thrown"
+                    ]
+                  }
+                ]
+              }
+            }
+          ],
+          "note": "Full-scene water-state carrier, generated by cave_engine/water_states.py. The BASE art is the view the player ARRIVES in (across_bridge, descent wet); each variant is another picture of the same landing with the water moved. Keep in lockstep with the door gates \u2014 both come from the router."
+        },
+        {
+          "type": "puzzle",
+          "label": "The reading-console",
+          "note": "TYPE 4 pick-the-point: click the elbow at k=3 on the within-cluster-spread plot"
+        },
+        {
+          "type": "dial",
+          "label": "The S2 diverter lever",
+          "note": "flips diverter D2 (starts '|', throws to '\\')",
+          "key": "d2",
+          "states": [
+            {
+              "value": "shut",
+              "label": "Leave the S2 gate shut"
+            },
+            {
+              "value": "thrown",
+              "label": "Throw the S2 gate"
+            }
+          ],
+          "availableWhen": {
+            "solved": "station2"
+          },
+          "lockedBody": "The lever will not move. Whatever holds it is waiting on the reading at this landing's console.",
+          "hint": "Throw it, and somewhere below the water changes its course."
+        },
+        {
+          "type": "door",
+          "label": "Ladder up to the junction",
+          "direction": "open",
+          "note": "UP -> station1",
+          "to": "station1",
+          "availableWhen": {
+            "any": [
+              {
+                "eq": [
+                  "d1",
+                  "thrown"
+                ]
+              },
+              {
+                "all": [
+                  {
+                    "eq": [
+                      "d2",
+                      "thrown"
+                    ]
+                  },
+                  {
+                    "eq": [
+                      "d3",
+                      "shut"
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "lockedBody": "Water is pouring straight across it. Nothing crosses while it runs \u2014 the stream has to be sent somewhere else first.",
+          "_waterGate": "generated by cave_engine/wire_maze.py from span V-1-0 (dry in 10 of 16 lever configurations) \u2014 regenerate, do not hand-edit"
+        },
+        {
+          "type": "door",
+          "label": "Rope bridge across to the cast-off gallery",
+          "direction": "open",
+          "note": "ACROSS -> spillway (2,1); same level (row 2), water-gated; the side-spur, not on the critical path",
+          "to": "spillway",
+          "availableWhen": {
+            "any": [
+              {
+                "eq": [
+                  "d1",
+                  "shut"
+                ]
+              },
+              {
+                "all": [
+                  {
+                    "eq": [
+                      "d2",
+                      "thrown"
+                    ]
+                  },
+                  {
+                    "eq": [
+                      "d3",
+                      "shut"
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "lockedBody": "Water is pouring straight across it. Nothing crosses while it runs \u2014 the stream has to be sent somewhere else first.",
+          "_waterGate": "generated by cave_engine/wire_maze.py from span H-2-0 (dry in 10 of 16 lever configurations) \u2014 regenerate, do not hand-edit"
+        },
+        {
+          "type": "door",
+          "label": "The long descent to the drowned floor",
+          "direction": "open",
+          "note": "DOWN -> basin (the final drop; opens only once the sort is complete)",
+          "to": "basin",
+          "availableWhen": {
+            "any": [
+              {
+                "eq": [
+                  "d3",
+                  "thrown"
+                ]
+              },
+              {
+                "eq": [
+                  "d4",
+                  "thrown"
+                ]
+              }
+            ]
+          },
+          "lockedBody": "Water is pouring straight across it. Nothing crosses while it runs \u2014 the stream has to be sent somewhere else first.",
+          "_waterGate": "generated by cave_engine/wire_maze.py from span V-2-0 (dry in 12 of 16 lever configurations) \u2014 regenerate, do not hand-edit"
+        }
+      ],
+      "mapPos": {
+        "c": 0,
+        "r": 1
+      },
+      "panorama": "station2/scene.png",
+      "builtFrom": "l1_station2_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      }
+    },
+    {
+      "key": "spillway",
+      "title": "The cast-off gallery",
+      "entry": {
+        "title": "The cast-off gallery",
+        "text": "A bridge out from the second landing ends not at a font but at a reeking side-gallery \u2014 the Assay's spillway, where all they judged base was sluiced away. No reading waits here, only their cold accounting of everything they threw out, and a ladder dropping on into the dark."
+      },
+      "technique": "flavour \u2014 the discard stream (no graded puzzle)",
+      "puzzleType": 0,
+      "built": true,
+      "debrief": "Nothing here had to be solved \u2014 it was the engine's waste channel, where the Assay poured away everything their sort judged base. Every clustering has a flip side: deciding what belongs together is also deciding what gets left out.",
+      "authoring": {
+        "tag": "spillway",
+        "scenePrompt": "This is a seamless 360-degree panorama from the middle of a cramped, rough-hewn gallery hacked back into the wall of a tight stone well. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stretch of rough-hewn rock at the back of the gallery, stained sour yellow, dark and even, with nothing fixed to it, the floor running unbroken across its foot: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. To the left, set round at the viewer's left side, with a broad stretch of plain wall between it and the wall directly behind the viewer: a rank of square discharge mouths in the gallery wall, thick ropes of foul water gushing from them into a stone channel cut in the floor directly beneath, the channel carrying it away along the floor and out through a grated drain in the wall, gushing in thick uneven ropes, surging and slackening; just left of centre, a hatch in the gallery floor with a ladder dropping from it into a black pit below; a stream of foul water drops out of a slot in the gallery roof and comes down THROUGH the hatch, so its rungs are plainly BEHIND the water and nothing could cross it, steady and unbroken; dead ahead in the centre, the gallery's mouth, a low rough arch opening onto a short rope-and-plank bridge back across to a landing close by, made fast at both ends; no falling water touches it: its planks run clear and dry; just right of centre, the rotted stubs of old wooden sieves and graded grilles fallen from their frames, choked with sour-green slime and creeper; to the right, this gallery's signature: a squat stone pillar covered in rows of shallow scored tally marks, lit by one of the cloudy pale lamps. It is NIGHT, the same deep night everywhere in this world: no daylight, no dawn, no dusk. NO fire and NO amber here: the gallery is lit by a sour, sickly green-white glow seeping from the discharge and from pale lamps of cloudy glass, unlike any other light in the world. Long ABANDONED by the engine: a dead-end the Assay used for what it threw away, its channels cracked and choked, its old sieves and grilles rotted from their frames, creeper and pale fern pushing through every crack. Nothing is tended here. Palette: cold blue-black and sour yellow-green, with no warm colour anywhere. Cinematic, richly detailed, fine natural film grain. Sour SULPHUR yellow-green crusts ring every mouth and channel. The view is CLOSE and CLOSED: the gallery's rough rock roof hangs low overhead and the well is seen only as a close gap back through the gallery's mouth. No people, no figures, no creatures, no lettering, no captions, no text, no numbers, no signage. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere \u2014 everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. Fantastical and wondrous, NOT a horror scene: no skulls, no bones, no gore, no cobwebs, no bodies, nothing lurking. No daylight and no dusk light anywhere. This gallery is rough, fouled and genuinely RUINED, and it has NO warm light at all \u2014 no torches, no fire, no amber anywhere. Ruined and fouled, but NOT a horror scene: no bodies, no remains, no eyes or shapes in the water, nothing lurking; the unease comes from the discarded apparatus, not from anything alive. EXACTLY 1 fall of water drops free through open air in this picture \u2014 the stream of foul water dropping through the hatch in the floor \u2014 and NO OTHERS. Every other drop of water runs inside a flume, gutter, pipe or wheel bucket, or passes as a short spill of less than a body's height from one channel's lip straight into the next channel's mouth. The stream falls squarely THROUGH the hatch, never beside it. The bridge beyond the gallery's mouth is made fast at BOTH ends. Shot on a full-frame DSLR at 24mm, f/8, a long night exposure lit only by the sickly green-white glows described, no firelight, no daylight, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above \u2014 no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a plain stretch of rough-hewn rock at the back of the gallery, stained sour yellow, dark and even, with nothing fixed to it, the floor running unbroken across its foot, with no visible seam, join, or repetition.",
+        "sceneSpec": {
+          "room": "spillway",
+          "setting": "the middle of a cramped, rough-hewn gallery hacked back into the wall of a tight stone well",
+          "interior": true,
+          "seam": "a plain stretch of rough-hewn rock at the back of the gallery, stained sour yellow, dark and even, with nothing fixed to it, the floor running unbroken across its foot",
+          "seamOccluder": "a thick fouled stone pier standing against the gallery's rear wall",
+          "elements": [
+            {
+              "id": "discharge_mouths",
+              "at": "to the left",
+              "desc": "set round at the viewer's left side, with a broad stretch of plain wall between it and the wall directly behind the viewer: a rank of square discharge mouths in the gallery wall, thick ropes of foul water gushing from them into a stone channel cut in the floor directly beneath, the channel carrying it away along the floor and out through a grated drain in the wall",
+              "animate": {
+                "motion": "the thick ropes of foul water gushing from the ranked mouths into the floor channel below them, surging and slackening",
+                "loop": "crossfade"
+              },
+              "motion": {
+                "moves": true,
+                "vigour": "gushing in thick uneven ropes, surging and slackening",
+                "phrase": "the thick ropes of foul water gushing from the ranked mouths into the floor channel below them, surging and slackening"
+              },
+              "sound": {
+                "source": "thick ropes of foul water gushing from ranked discharge mouths down a stained wall",
+                "character": "ugly and irregular \u2014 gulping, spattering, nothing musical about it"
+              }
+            },
+            {
+              "id": "down_ladder",
+              "at": "just left of centre",
+              "desc": "a hatch in the gallery floor with a ladder dropping from it into a black pit below; a stream of foul water drops out of a slot in the gallery roof and comes down THROUGH the hatch, so its rungs are plainly BEHIND the water and nothing could cross it",
+              "door": {
+                "direction": "open",
+                "to": "sump"
+              },
+              "label": "Ladder down to the drowned sump",
+              "motion": {
+                "moves": true,
+                "vigour": "steady and unbroken",
+                "phrase": "the stream of foul water pouring steadily down through the hatch in the floor, its edges shifting"
+              },
+              "animate": {
+                "motion": "the stream of foul water pouring steadily down through the hatch in the floor, its edges shifting",
+                "loop": "crossfade"
+              }
+            },
+            {
+              "id": "gallery_mouth",
+              "at": "dead ahead in the centre",
+              "desc": "the gallery's mouth, a low rough arch opening onto a short rope-and-plank bridge back across to a landing close by, made fast at both ends; no falling water touches it: its planks run clear and dry",
+              "door": {
+                "direction": "open",
+                "to": "station2"
+              },
+              "label": "Rope bridge back across to the second landing"
+            },
+            {
+              "id": "collapsed_stubs",
+              "at": "just right of centre",
+              "desc": "the rotted stubs of old wooden sieves and graded grilles fallen from their frames, choked with sour-green slime and creeper"
+            },
+            {
+              "id": "tally_stone",
+              "at": "to the right",
+              "desc": "this gallery's signature: a squat stone pillar covered in rows of shallow scored tally marks, lit by one of the cloudy pale lamps",
+              "clue": true,
+              "label": "The discard-tally stone"
+            }
+          ],
+          "atmosphere": "It is NIGHT, the same deep night everywhere in this world: no daylight, no dawn, no dusk. NO fire and NO amber here: the gallery is lit by a sour, sickly green-white glow seeping from the discharge and from pale lamps of cloudy glass, unlike any other light in the world. Long ABANDONED by the engine: a dead-end the Assay used for what it threw away, its channels cracked and choked, its old sieves and grilles rotted from their frames, creeper and pale fern pushing through every crack. Nothing is tended here. Palette: cold blue-black and sour yellow-green, with no warm colour anywhere. Cinematic, richly detailed, fine natural film grain. Sour SULPHUR yellow-green crusts ring every mouth and channel. The view is CLOSE and CLOSED: the gallery's rough rock roof hangs low overhead and the well is seen only as a close gap back through the gallery's mouth.",
+          "negatives": "No people, no figures, no creatures, no lettering, no captions, no text, no numbers, no signage. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere \u2014 everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. Fantastical and wondrous, NOT a horror scene: no skulls, no bones, no gore, no cobwebs, no bodies, nothing lurking. No daylight and no dusk light anywhere. This gallery is rough, fouled and genuinely RUINED, and it has NO warm light at all \u2014 no torches, no fire, no amber anywhere. Ruined and fouled, but NOT a horror scene: no bodies, no remains, no eyes or shapes in the water, nothing lurking; the unease comes from the discarded apparatus, not from anything alive. EXACTLY 1 fall of water drops free through open air in this picture \u2014 the stream of foul water dropping through the hatch in the floor \u2014 and NO OTHERS. Every other drop of water runs inside a flume, gutter, pipe or wheel bucket, or passes as a short spill of less than a body's height from one channel's lip straight into the next channel's mouth. The stream falls squarely THROUGH the hatch, never beside it. The bridge beyond the gallery's mouth is made fast at BOTH ends.",
+          "continuity": [],
+          "soundBed": "a cramped fouled side-gallery: discharge splattering down a wall, the open well beyond it",
+          "styleLight": "a long night exposure lit only by the sickly green-white glows described, no firelight, no daylight",
+          "worldPlateRef": false,
+          "states": {
+            "all_clear": {
+              "change": "where the falling water lands on the ways off this landing",
+              "constraints": "Ladder down to the drowned sump: its curtain is GONE \u2014 the stream has been turned aside into the tangle and out of sight \u2014 and its rungs run dry. Rope bridge back across to the second landing: unchanged \u2014 it stays exactly as it is, dry, with no water on or near it. NO water falls free through open air anywhere in this picture. Nothing else in the picture moves, changes, is added or is taken away \u2014 same scene, same camera, same objects, same light.",
+              "elements": {
+                "down_ladder": {
+                  "motion": null
+                }
+              },
+              "_why": "lever configurations 1101, 0101, 0001 (cave_engine/water_states.py \u2014 regenerate, do not hand-edit)"
+            }
+          }
+        },
+        "seam": {
+          "stage": "screened",
+          "band": "ground",
+          "ratio": 1.17,
+          "delta": 2.94,
+          "needsWork": false,
+          "accepted": false,
+          "seamBandRun": 0.01,
+          "at": "2026-09-21T00:49:15"
+        }
+      },
+      "unlockedWhen": true,
+      "designNote": "FLAVOUR / SIDE ROOM (no graded puzzle, no diverter, no console). Reachable platform (2,1), level with station2 (row 2), reached ACROSS from station2 via bridge H-2-0. Added 2026-07-28 (open-decision #1: Lucas wants (2,1)/(3,1) visitable). Off the critical path \u2014 pure lore, reinforcing the Assay-as-villains via the discard/waste stream (what they judged 'base' and poured away). Holds a single `clue` hotspot (the discard-tally stone); deliberately NO lever/wheel/console/font/keypad so there is no orphan interactive object. Passages: ACROSS(back) -> station2; DOWN(forward) -> sump (3,1) via ladder V-2-1. NOTE: map bridge H-2-1 leads only to platform (2,2), which is UNREACHABLE and roomless, so that third side is depicted as a COLLAPSED bridge (no passage, no hotspot) rather than a phantom way on. State-variance is single-view strict (reach_art mode A); the down-ladder to the sump is water-gated by the global diverter state (part of the deferred state-variant work, open-decisions #2/#3). unlockedWhen true; ungraded; not in codec. NEW ART.",
+      "plannedHotspots": [
+        {
+          "type": "ambient",
+          "label": "The water on the ways out",
+          "noElement": true,
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "variants": [
+            {
+              "state": "all_clear",
+              "box": [
+                0,
+                0,
+                1,
+                1
+              ],
+              "when": {
+                "any": [
+                  {
+                    "all": [
+                      {
+                        "eq": [
+                          "d1",
+                          "thrown"
+                        ]
+                      },
+                      {
+                        "eq": [
+                          "d2",
+                          "thrown"
+                        ]
+                      },
+                      {
+                        "eq": [
+                          "d3",
+                          "shut"
+                        ]
+                      },
+                      {
+                        "eq": [
+                          "d4",
+                          "thrown"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "all": [
+                      {
+                        "eq": [
+                          "d1",
+                          "shut"
+                        ]
+                      },
+                      {
+                        "eq": [
+                          "d2",
+                          "thrown"
+                        ]
+                      },
+                      {
+                        "eq": [
+                          "d3",
+                          "shut"
+                        ]
+                      },
+                      {
+                        "eq": [
+                          "d4",
+                          "thrown"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "all": [
+                      {
+                        "eq": [
+                          "d1",
+                          "shut"
+                        ]
+                      },
+                      {
+                        "eq": [
+                          "d2",
+                          "shut"
+                        ]
+                      },
+                      {
+                        "eq": [
+                          "d3",
+                          "shut"
+                        ]
+                      },
+                      {
+                        "eq": [
+                          "d4",
+                          "thrown"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ],
+          "note": "Full-scene water-state carrier, generated by cave_engine/water_states.py. The BASE art is the view the player ARRIVES in (down_ladder wet); each variant is another picture of the same landing with the water moved. Keep in lockstep with the door gates \u2014 both come from the router."
+        },
+        {
+          "type": "clue",
+          "label": "The discard-tally stone",
+          "note": "the Assay's cold accounting of all they poured away as 'base' \u2014 lore only, reinforces the villain framing; no coding help, no answer"
+        },
+        {
+          "type": "door",
+          "label": "Rope bridge back across to the second landing",
+          "direction": "open",
+          "note": "ACROSS -> station2 (same level, row 2; the way in)",
+          "to": "station2",
+          "availableWhen": {
+            "any": [
+              {
+                "eq": [
+                  "d1",
+                  "shut"
+                ]
+              },
+              {
+                "all": [
+                  {
+                    "eq": [
+                      "d2",
+                      "thrown"
+                    ]
+                  },
+                  {
+                    "eq": [
+                      "d3",
+                      "shut"
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "lockedBody": "Water is pouring straight across it. Nothing crosses while it runs \u2014 the stream has to be sent somewhere else first.",
+          "_waterGate": "generated by cave_engine/wire_maze.py from span H-2-0 (dry in 10 of 16 lever configurations) \u2014 regenerate, do not hand-edit"
+        },
+        {
+          "type": "door",
+          "label": "Ladder down to the drowned sump",
+          "direction": "open",
+          "note": "DOWN -> sump (3,1) via V-2-1 | direction corrected forward->open 2026-09-20: this room is GATELESS, and validate_scenes fails a `forward` door with no primary gate (it would gate on a puzzle that does not exist and never open). The sceneSpec already says `open`.",
+          "to": "sump",
+          "availableWhen": {
+            "any": [
+              {
+                "eq": [
+                  "d3",
+                  "thrown"
+                ]
+              },
+              {
+                "eq": [
+                  "d4",
+                  "thrown"
+                ]
+              }
+            ]
+          },
+          "lockedBody": "Water is pouring straight across it. Nothing crosses while it runs \u2014 the stream has to be sent somewhere else first.",
+          "_waterGate": "generated by cave_engine/wire_maze.py from span V-2-1 (dry in 12 of 16 lever configurations) \u2014 regenerate, do not hand-edit"
+        }
+      ],
+      "mapPos": {
+        "c": 1,
+        "r": 2
+      },
+      "panorama": "spillway/scene.png",
+      "builtFrom": "l1_spillway_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      }
+    },
+    {
+      "key": "sump",
+      "title": "The drowned sump",
+      "entry": {
+        "title": "The drowned sump",
+        "text": "The ladder lets you down into a dead-end pocket at the very bottom of the shaft, where the cast-off gathered and went foul years ago. A ruined vale-folk marker lies half-drowned in the wall \u2014 left to rot among the discards. There is nothing down here but the one way back up, and the water still rising."
+      },
+      "technique": "flavour \u2014 the drowned discard sump (no graded puzzle)",
+      "puzzleType": 0,
+      "built": true,
+      "debrief": "A dead-end, and meant to be one: the bottom of the waste stream, where everything the Assay cast off finally settled. Seeing it is the point \u2014 the sort's grand sacred pools have a foul twin, and the vale-folk's marker rotting here says who paid for the Assay's tidy kinds.",
+      "authoring": {
+        "tag": "sump",
+        "scenePrompt": "This is a seamless 360-degree panorama from the middle of a small drowned pit cut down into the rock at the foot of a tight stone well. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stretch of black wet rock wall of the pit, dark and even, with nothing fixed to it, the still water running unbroken across its foot: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. To the left, rough ledges of broken stone stepping down into the water, thick with black rot and pale glowing moss; just left of centre, the pit's black, oily water, with fat slow bubbles rising through its skin and scum turning on its surface, barely moving \u2014 fat slow bubbles breaking the skin, scum turning without a current; dead ahead in the centre, this pit's signature: the vale-folk's carved stone marker, tilted and half sunk in the water, its carving worn smooth, a few living ferns growing from it; just right of centre, a ladder rising out of the water up the pit wall to the hatch in the rock lid above; no falling water touches it: its rungs run clear and dry; to the right, two old channel mouths in the pit wall, dry and choked with creeper. It is NIGHT, the same deep night everywhere in this world: no daylight, no dawn, no dusk. The DARKEST room: no fire at all. The only light is the faint pale blue-green of glowing moss on the walls and a weak wavering reflection of it on the water. Long ABANDONED by the engine: a dead-end the Assay used for what it threw away, its channels cracked and choked, its old sieves and grilles rotted from their frames, creeper and pale fern pushing through every crack. Nothing is tended here. Palette: cold blue-black and sour yellow-green, with no warm colour anywhere. Cinematic, richly detailed, fine natural film grain. BLACK rot and an oily iridescent sheen on the standing water. The view is CLOSE and CLOSED: the pit's black walls rise to a low rock lid with a single hatch in it, so nothing above can be seen. No people, no figures, no creatures, no lettering, no captions, no text, no numbers, no signage. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere \u2014 everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. Fantastical and wondrous, NOT a horror scene: no skulls, no bones, no gore, no cobwebs, no bodies, nothing lurking. No daylight and no dusk light anywhere. This pit is fouled and genuinely RUINED. No torches, no fire, no warm light anywhere. The water has no current. Ruined and fouled, but NOT a horror scene: no bodies, no remains, no eyes or shapes in the water, nothing lurking; the unease comes from what was thrown away, not from anything alive. NO water falls free through open air anywhere in this picture \u2014 every drop is held in a channel, or lies still. Shot on a full-frame DSLR at 24mm, f/8, a long night exposure lit only by faintly glowing moss, no firelight, no daylight, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above \u2014 no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a plain stretch of black wet rock wall of the pit, dark and even, with nothing fixed to it, the still water running unbroken across its foot, with no visible seam, join, or repetition.",
+        "sceneSpec": {
+          "room": "sump",
+          "setting": "the middle of a small drowned pit cut down into the rock at the foot of a tight stone well",
+          "interior": true,
+          "seam": "a plain stretch of black wet rock wall of the pit, dark and even, with nothing fixed to it, the still water running unbroken across its foot",
+          "seamOccluder": "a broken stone column standing in the water",
+          "elements": [
+            {
+              "id": "rubble_ledges",
+              "at": "to the left",
+              "desc": "rough ledges of broken stone stepping down into the water, thick with black rot and pale glowing moss"
+            },
+            {
+              "id": "stagnant_flood",
+              "at": "just left of centre",
+              "desc": "the pit's black, oily water, with fat slow bubbles rising through its skin and scum turning on its surface",
+              "animate": {
+                "motion": "fat slow bubbles rising through the stagnant skin and breaking, the foul scum drifting and turning on the black surface",
+                "loop": "crossfade"
+              },
+              "motion": {
+                "moves": true,
+                "vigour": "barely moving \u2014 fat slow bubbles breaking the skin, scum turning without a current",
+                "phrase": "fat slow bubbles rising through the stagnant skin and breaking, the foul scum drifting and turning on the black surface"
+              },
+              "sound": {
+                "source": "fat bubbles rising through standing foul water and breaking on its surface",
+                "character": "almost silent, sparse and close: a bloop, then a long wait \u2014 the only quiet room in the scenario"
+              }
+            },
+            {
+              "id": "marker",
+              "at": "dead ahead in the centre",
+              "desc": "this pit's signature: the vale-folk's carved stone marker, tilted and half sunk in the water, its carving worn smooth, a few living ferns growing from it",
+              "clue": true,
+              "label": "The ruined vale-folk marker"
+            },
+            {
+              "id": "up_ladder",
+              "at": "just right of centre",
+              "desc": "a ladder rising out of the water up the pit wall to the hatch in the rock lid above; no falling water touches it: its rungs run clear and dry",
+              "door": {
+                "direction": "open",
+                "to": "spillway"
+              },
+              "label": "Ladder up to the cast-off gallery"
+            },
+            {
+              "id": "channel_mouths",
+              "at": "to the right",
+              "desc": "two old channel mouths in the pit wall, dry and choked with creeper"
+            }
+          ],
+          "atmosphere": "It is NIGHT, the same deep night everywhere in this world: no daylight, no dawn, no dusk. The DARKEST room: no fire at all. The only light is the faint pale blue-green of glowing moss on the walls and a weak wavering reflection of it on the water. Long ABANDONED by the engine: a dead-end the Assay used for what it threw away, its channels cracked and choked, its old sieves and grilles rotted from their frames, creeper and pale fern pushing through every crack. Nothing is tended here. Palette: cold blue-black and sour yellow-green, with no warm colour anywhere. Cinematic, richly detailed, fine natural film grain. BLACK rot and an oily iridescent sheen on the standing water. The view is CLOSE and CLOSED: the pit's black walls rise to a low rock lid with a single hatch in it, so nothing above can be seen.",
+          "negatives": "No people, no figures, no creatures, no lettering, no captions, no text, no numbers, no signage. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere \u2014 everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. Fantastical and wondrous, NOT a horror scene: no skulls, no bones, no gore, no cobwebs, no bodies, nothing lurking. No daylight and no dusk light anywhere. This pit is fouled and genuinely RUINED. No torches, no fire, no warm light anywhere. The water has no current. Ruined and fouled, but NOT a horror scene: no bodies, no remains, no eyes or shapes in the water, nothing lurking; the unease comes from what was thrown away, not from anything alive. NO water falls free through open air anywhere in this picture \u2014 every drop is held in a channel, or lies still.",
+          "continuity": [],
+          "soundBed": "a dead-end sump at the bottom of the discard stream: still water, dripping stone, everything else far above",
+          "styleLight": "a long night exposure lit only by faintly glowing moss, no firelight, no daylight",
+          "worldPlateRef": false
+        },
+        "seam": {
+          "stage": "screened",
+          "band": "mid",
+          "ratio": 2.45,
+          "delta": 5.24,
+          "needsWork": false,
+          "accepted": false,
+          "seamBandRun": 0.042,
+          "at": "2026-09-21T01:04:14"
+        }
+      },
+      "unlockedWhen": true,
+      "designNote": "FLAVOUR / SIDE ROOM (no graded puzzle, no diverter, no console) and a true DEAD-END. Reachable platform (3,1), bottom of the shaft (row 3, basin's depth) but WALLED OFF from the basin (H-3-0 absent, no bridge between (3,0) and (3,1)). Reached only DOWN from the spillway (2,1) via ladder V-2-1; its ONLY passage is that one ladder back up. Added 2026-07-28 with the spillway (open-decision #1). Pure lore: the drowned discard-sump, a grim mirror of the sacred basins, reinforcing the villain framing (holds a ruined vale-folk marker among the cast-off). Single `clue` hotspot; deliberately NO interactive machinery so no orphan object. Environmental arc: bottom-of-shaft = flooded / no sky / rising water, consistent with the basin, but ruined and stagnant vs the grand basins. reach_art: single-view (mode A and B). unlockedWhen true; ungraded; not in codec. NEW ART.",
+      "plannedHotspots": [
+        {
+          "type": "clue",
+          "label": "The ruined vale-folk marker",
+          "note": "a weathered relic of the people the Assay stripped bare, left to rot among the discards \u2014 lore only, deepens the villain framing; no coding help, no answer"
+        },
+        {
+          "type": "door",
+          "label": "Ladder up to the cast-off gallery",
+          "direction": "open",
+          "note": "UP -> spillway (2,1); the ONLY way in or out of this dead-end",
+          "to": "spillway",
+          "availableWhen": {
+            "any": [
+              {
+                "eq": [
+                  "d3",
+                  "thrown"
+                ]
+              },
+              {
+                "eq": [
+                  "d4",
+                  "thrown"
+                ]
+              }
+            ]
+          },
+          "lockedBody": "Water is pouring straight across it. Nothing crosses while it runs \u2014 the stream has to be sent somewhere else first.",
+          "_waterGate": "generated by cave_engine/wire_maze.py from span V-2-1 (dry in 12 of 16 lever configurations) \u2014 regenerate, do not hand-edit"
+        }
+      ],
+      "mapPos": {
+        "c": 2,
+        "r": 3
+      },
+      "panorama": "sump/scene.png",
+      "builtFrom": "l1_sump_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      }
+    },
+    {
+      "key": "station3",
+      "title": "The third reading-landing",
+      "entry": {
+        "title": "The measuring font",
+        "text": "Back up to the junction, and out across the shaft on a swaying bridge to a landing level with it on the far side. This font is not satisfied that you can sort \u2014 it wants you to weigh what you have sorted, to read a kind by its own measure. The makers' inscription gloats that most who came this far turned back here."
+      },
+      "technique": "flat clustering \u2014 k-means (summarise by cluster)",
+      "puzzleType": 3,
+      "built": true,
+      "debrief": "The third assignment seals the way behind you as it opens the way on \u2014 the sort commits, and there is no reading it backward without turning the machine over first.",
+      "authoring": {
+        "tag": "station3",
+        "scenePrompt": "This is a seamless 360-degree panorama from the middle of a small slab of a landing jutting from the far wall of a tight, crowded stone well. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stretch of wet dressed stone wall with iron cramps set in it, dark and even, with nothing fixed to it, the floor running unbroken across its foot: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. To the left, set round at the viewer's left side, with a broad stretch of plain wall between it and the wall directly behind the viewer: a short rope-and-plank bridge running level from two timber posts on this landing back to the broad shelf across the well, made fast at both ends; no falling water touches it: its planks run clear and dry; just left of centre, this landing's signature, on the landing just ahead: a copper trough runs out overhead and pours a broad glassy spill, a short drop, straight down onto the crest of a carved stone WEDGE set in a stone basin on the landing's floor; the wedge parts the water cleanly into two carved channels, and each half runs away in its own copper gutter over the rim \u2014 held all the way, the stone worn into two glassy grooves, steady and even, parting cleanly on the wedge into two channels; dead ahead in the centre, a low carved stone font glowing faint amber from the still water in its bowl, its rim thick with moss and small ferns; just right of centre, a squat stone housing with a long iron lever, linked by an iron rod to a vane that stands IN an open copper chute running along the landing's rim, emptying straight into the mouth of a flume just below \u2014 lever, rod, vane and chute one connected machine; to the right, set round at the viewer's right side, with a broad stretch of plain wall between it and the wall directly behind the viewer: a short rope-and-plank bridge running level from this landing to the lit arched threshold of a hall cut into the wall close by, made fast at both ends; a curtain of water \u2014 one of the well's 2 streams \u2014 drops out of the tangle overhead and comes down THROUGH it, so its planks are plainly BEHIND the water and nothing could cross it, steady and unbroken. It is NIGHT, the same deep night everywhere in this world: no daylight, no dawn, no dusk. Iron lanterns hang on chains from the ropes overhead, several of them, each a warm pool of light; between them the pale glow-moss shows on the wet stone. The engine still RUNS by the Assay's own craft \u2014 its fires burn and its water moves \u2014 but no one has tended it in generations. The valley's living green is TAKING IT BACK: roots split the dressed stone, creepers hang in long swags off the gutters, ferns fill every joint, moss coats the wheels and rails, and patches of faintly glowing pale blue-green moss show in the damp. The menace is in the MACHINERY, never in the plants, which are lush and alive: iron grading sieves with toothed rims, brass scale-pans hanging on chains, hinged rejection chutes, iron sorting-baskets, calipers and clamps \u2014 cold, exact, built to measure and reject. Every surface is busy: wooden flumes on timber trestles and green-copper gutters carried along the walls on little stone arches like a miniature aqueduct run in every direction; here and there a great timber water wheel twice a man's height stands in the path of a flume, its buckets brimming; ropes are strung back and forth across from iron rings in one wall to iron rings in the opposite wall, hung with pulleys, chains, counterweights and baskets. ALL of the Assay's water is HELD \u2014 it runs inside flumes, gutters, pipes and wheel buckets, and passes from one channel to the next only as a short spill of less than a body's height, lip straight into mouth. The view is CLOSE and CLOSED, and this slab is a PERCH: it juts out alone from the far wall with the tangle of ropes, flumes and hanging baskets pressing in on three sides at arm's length and the wall only at its back; overhead the underside of the level above is crowded with flumes and roots, so no sky can be seen; below, nothing but the dark tangle under its edge. Deep RUST bleeds orange-brown from every iron pin, cramp and bracket. Palette: cold night blue-black stone, deep wet green, verdigris copper; firelight is the only warm, fully saturated colour, apart from the Assay's amber glow in its fonts and basins. Cinematic, dense and richly detailed, fine natural film grain. No people, no figures, no creatures, no lettering, no captions, no text, no numbers, no signage. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere \u2014 everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. Fantastical and wondrous, NOT a horror scene: no skulls, no bones, no gore, no cobwebs, no bodies, nothing lurking. No daylight and no dusk light anywhere. The landing has NO way up and NO way down \u2014 only the two bridges leave it. EXACTLY 1 fall of water drops free through open air in this picture \u2014 the curtain across the bridge to the hall \u2014 and NO OTHERS. Every other drop of water runs inside a flume, gutter, pipe or wheel bucket, or passes as a short spill of less than a body's height from one channel's lip straight into the next channel's mouth. Each curtain of water falls squarely THROUGH the crossing it covers, never beside or behind it, and a crossing with no curtain has no water on it or directly above it. Every bridge is made fast at BOTH ends \u2014 nothing ends in mid-air. Each lever, its rod and its vane are one connected machine standing in its chute. Shot on a full-frame DSLR at 24mm, f/8, a long night exposure lit only by the fires and glows described, no daylight, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above \u2014 no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a plain stretch of wet dressed stone wall with iron cramps set in it, dark and even, with nothing fixed to it, the floor running unbroken across its foot, with no visible seam, join, or repetition.",
+        "sceneSpec": {
+          "room": "station3",
+          "setting": "the middle of a small slab of a landing jutting from the far wall of a tight, crowded stone well",
+          "interior": true,
+          "seam": "a plain stretch of wet dressed stone wall with iron cramps set in it, dark and even, with nothing fixed to it, the floor running unbroken across its foot",
+          "seamOccluder": "a slender engaged stone column standing against the wall behind the landing and running up into the tangle overhead",
+          "elements": [
+            {
+              "id": "back_bridge",
+              "at": "to the left",
+              "desc": "set round at the viewer's left side, with a broad stretch of plain wall between it and the wall directly behind the viewer: a short rope-and-plank bridge running level from two timber posts on this landing back to the broad shelf across the well, made fast at both ends; no falling water touches it: its planks run clear and dry",
+              "door": {
+                "direction": "open",
+                "to": "station1"
+              },
+              "label": "Rope bridge across to the junction"
+            },
+            {
+              "id": "splitter",
+              "at": "just left of centre",
+              "desc": "this landing's signature, on the landing just ahead: a copper trough runs out overhead and pours a broad glassy spill, a short drop, straight down onto the crest of a carved stone WEDGE set in a stone basin on the landing's floor; the wedge parts the water cleanly into two carved channels, and each half runs away in its own copper gutter over the rim \u2014 held all the way, the stone worn into two glassy grooves",
+              "animate": {
+                "motion": "the broad spill pouring onto the crest of the stone wedge and parting into two channels running away either side",
+                "loop": "crossfade"
+              },
+              "motion": {
+                "moves": true,
+                "vigour": "steady and even, parting cleanly on the wedge into two channels",
+                "phrase": "the broad spill pouring onto the crest of the stone wedge and parting into two channels running away either side"
+              },
+              "sound": {
+                "source": "a broad fall striking a carved stone splitter and parting into two fans",
+                "character": "two-voiced and even \u2014 one fall becoming two, clean rather than churning"
+              }
+            },
+            {
+              "id": "font",
+              "at": "dead ahead in the centre",
+              "desc": "a low carved stone font glowing faint amber from the still water in its bowl, its rim thick with moss and small ferns",
+              "puzzle": true,
+              "label": "The reading-console"
+            },
+            {
+              "id": "diverter",
+              "at": "just right of centre",
+              "desc": "a squat stone housing with a long iron lever, linked by an iron rod to a vane that stands IN an open copper chute running along the landing's rim, emptying straight into the mouth of a flume just below \u2014 lever, rod, vane and chute one connected machine",
+              "dial": true,
+              "label": "The S3 diverter lever"
+            },
+            {
+              "id": "on_bridge",
+              "at": "to the right",
+              "desc": "set round at the viewer's right side, with a broad stretch of plain wall between it and the wall directly behind the viewer: a short rope-and-plank bridge running level from this landing to the lit arched threshold of a hall cut into the wall close by, made fast at both ends; a curtain of water \u2014 one of the well's 2 streams \u2014 drops out of the tangle overhead and comes down THROUGH it, so its planks are plainly BEHIND the water and nothing could cross it",
+              "door": {
+                "direction": "open",
+                "to": "boss"
+              },
+              "label": "Rope bridge across to the engine-hall",
+              "motion": {
+                "moves": true,
+                "vigour": "steady and unbroken",
+                "phrase": "the curtain of water pouring steadily down through the bridge to the hall, its edges shifting"
+              },
+              "animate": {
+                "motion": "the curtain of water pouring steadily down through the bridge to the hall, its edges shifting",
+                "loop": "crossfade"
+              }
+            }
+          ],
+          "atmosphere": "It is NIGHT, the same deep night everywhere in this world: no daylight, no dawn, no dusk. Iron lanterns hang on chains from the ropes overhead, several of them, each a warm pool of light; between them the pale glow-moss shows on the wet stone. The engine still RUNS by the Assay's own craft \u2014 its fires burn and its water moves \u2014 but no one has tended it in generations. The valley's living green is TAKING IT BACK: roots split the dressed stone, creepers hang in long swags off the gutters, ferns fill every joint, moss coats the wheels and rails, and patches of faintly glowing pale blue-green moss show in the damp. The menace is in the MACHINERY, never in the plants, which are lush and alive: iron grading sieves with toothed rims, brass scale-pans hanging on chains, hinged rejection chutes, iron sorting-baskets, calipers and clamps \u2014 cold, exact, built to measure and reject. Every surface is busy: wooden flumes on timber trestles and green-copper gutters carried along the walls on little stone arches like a miniature aqueduct run in every direction; here and there a great timber water wheel twice a man's height stands in the path of a flume, its buckets brimming; ropes are strung back and forth across from iron rings in one wall to iron rings in the opposite wall, hung with pulleys, chains, counterweights and baskets. ALL of the Assay's water is HELD \u2014 it runs inside flumes, gutters, pipes and wheel buckets, and passes from one channel to the next only as a short spill of less than a body's height, lip straight into mouth. The view is CLOSE and CLOSED, and this slab is a PERCH: it juts out alone from the far wall with the tangle of ropes, flumes and hanging baskets pressing in on three sides at arm's length and the wall only at its back; overhead the underside of the level above is crowded with flumes and roots, so no sky can be seen; below, nothing but the dark tangle under its edge. Deep RUST bleeds orange-brown from every iron pin, cramp and bracket. Palette: cold night blue-black stone, deep wet green, verdigris copper; firelight is the only warm, fully saturated colour, apart from the Assay's amber glow in its fonts and basins. Cinematic, dense and richly detailed, fine natural film grain.",
+          "negatives": "No people, no figures, no creatures, no lettering, no captions, no text, no numbers, no signage. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere \u2014 everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. Fantastical and wondrous, NOT a horror scene: no skulls, no bones, no gore, no cobwebs, no bodies, nothing lurking. No daylight and no dusk light anywhere. The landing has NO way up and NO way down \u2014 only the two bridges leave it. EXACTLY 1 fall of water drops free through open air in this picture \u2014 the curtain across the bridge to the hall \u2014 and NO OTHERS. Every other drop of water runs inside a flume, gutter, pipe or wheel bucket, or passes as a short spill of less than a body's height from one channel's lip straight into the next channel's mouth. Each curtain of water falls squarely THROUGH the crossing it covers, never beside or behind it, and a crossing with no curtain has no water on it or directly above it. Every bridge is made fast at BOTH ends \u2014 nothing ends in mid-air. Each lever, its rod and its vane are one connected machine standing in its chute.",
+          "continuity": [],
+          "soundBed": "a small landing on the far side of the well, the water parting on stone in front of you",
+          "styleLight": "a long night exposure lit only by the fires and glows described, no daylight",
+          "states": {
+            "wet_back_bridge": {
+              "change": "where the falling water lands on the ways off this landing",
+              "constraints": "Rope bridge across to the junction: a curtain of water \u2014 one of the well's 2 streams \u2014 now drops out of the tangle overhead and comes down THROUGH it, so its planks are plainly BEHIND the water and nothing could cross it. Rope bridge across to the engine-hall: its curtain is GONE \u2014 the stream has been turned aside into the tangle and out of sight \u2014 and its planks run dry. EXACTLY 1 fall of water drops free through open air in this picture \u2014 the curtain through the bridge to the junction \u2014 and NO OTHERS. Nothing else in the picture moves, changes, is added or is taken away \u2014 same scene, same camera, same objects, same light.",
+              "elements": {
+                "back_bridge": {
+                  "motion": {
+                    "moves": true,
+                    "phrase": "the curtain of water pouring steadily down through the bridge to the junction, its edges shifting"
+                  }
+                },
+                "on_bridge": {
+                  "motion": null
+                }
+              },
+              "_why": "lever configurations 1110, 0110, 1111, 0111 (cave_engine/water_states.py \u2014 regenerate, do not hand-edit)"
+            }
+          }
+        },
+        "seam": {
+          "stage": "blurred",
+          "band": "sky",
+          "ratio": 0.0,
+          "delta": 0.0,
+          "needsWork": false,
+          "accepted": false,
+          "seamBandRun": 0.0,
+          "at": "2026-09-21T00:16:59"
+        }
+      },
+      "unlockedWhen": true,
+      "onSolve": [
+        {
+          "set": "station3_solved"
+        },
+        {
+          "inc": "rooms_solved"
+        }
+      ],
+      "designNote": "PUZZLE (verified). Dataset reliquary_phials. TYPE 3 CONSOLE-CHECK (summarise by cluster) \u2014 for puzzle-type variety; the student writes the pipeline, the check verifies. starterCode seeds: km <- kmeans(reliquary_phials[,c('clarity','mineral','resin','ash')], centers=3, nstart=25). TASK: compute the mean resin of each family and assign to `answer` the SIZE (number of phials) of the family with the highest average resin. Model soln: d <- cbind(reliquary_phials, cluster=km$cluster); tab <- aggregate(resin~cluster, d, mean); win <- tab$cluster[which.max(tab$resin)]; answer <- sum(km$cluster==win). check.requires: ['answer']; check.expr: answer == 6. ANSWER: 6 (highest-resin family mean 68.1 vs 28.3 vs 21.8; it is the size-6 family). HINT: cluster, then average resin within each family and look at how big the winning family is. Solving UNLOCKS diverter S3 -> D3. Lower shaft. NOTE the backtracker: throwing S3 opens the way to the boss and seals the way back; after the boss the player RETURNS here to throw S3 again (puzzle.json states 4->5). NEW ART.",
+      "plannedHotspots": [
+        {
+          "type": "ambient",
+          "label": "The water on the ways out",
+          "noElement": true,
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "variants": [
+            {
+              "state": "wet_back_bridge",
+              "box": [
+                0,
+                0,
+                1,
+                1
+              ],
+              "when": {
+                "any": [
+                  {
+                    "all": [
+                      {
+                        "eq": [
+                          "d1",
+                          "thrown"
+                        ]
+                      },
+                      {
+                        "eq": [
+                          "d2",
+                          "thrown"
+                        ]
+                      },
+                      {
+                        "eq": [
+                          "d3",
+                          "thrown"
+                        ]
+                      },
+                      {
+                        "eq": [
+                          "d4",
+                          "shut"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "all": [
+                      {
+                        "eq": [
+                          "d1",
+                          "shut"
+                        ]
+                      },
+                      {
+                        "eq": [
+                          "d2",
+                          "thrown"
+                        ]
+                      },
+                      {
+                        "eq": [
+                          "d3",
+                          "thrown"
+                        ]
+                      },
+                      {
+                        "eq": [
+                          "d4",
+                          "shut"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "all": [
+                      {
+                        "eq": [
+                          "d1",
+                          "thrown"
+                        ]
+                      },
+                      {
+                        "eq": [
+                          "d2",
+                          "thrown"
+                        ]
+                      },
+                      {
+                        "eq": [
+                          "d3",
+                          "thrown"
+                        ]
+                      },
+                      {
+                        "eq": [
+                          "d4",
+                          "thrown"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "all": [
+                      {
+                        "eq": [
+                          "d1",
+                          "shut"
+                        ]
+                      },
+                      {
+                        "eq": [
+                          "d2",
+                          "thrown"
+                        ]
+                      },
+                      {
+                        "eq": [
+                          "d3",
+                          "thrown"
+                        ]
+                      },
+                      {
+                        "eq": [
+                          "d4",
+                          "thrown"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ],
+          "note": "Full-scene water-state carrier, generated by cave_engine/water_states.py. The BASE art is the view the player ARRIVES in (on_bridge wet); each variant is another picture of the same landing with the water moved. Keep in lockstep with the door gates \u2014 both come from the router."
+        },
+        {
+          "type": "puzzle",
+          "label": "The reading-console",
+          "note": "TYPE 3 console-check: answer == 6 (size of the highest-mean-resin family)"
+        },
+        {
+          "type": "dial",
+          "label": "The S3 diverter lever",
+          "note": "flips diverter D3 (starts '|', throws to '/'); thrown twice across the solution (the backtracker)",
+          "key": "d3",
+          "states": [
+            {
+              "value": "shut",
+              "label": "Leave the S3 gate shut"
+            },
+            {
+              "value": "thrown",
+              "label": "Throw the S3 gate"
+            }
+          ],
+          "availableWhen": {
+            "solved": "station3"
+          },
+          "lockedBody": "The lever will not move. Whatever holds it is waiting on the reading at this landing's console.",
+          "hint": "Throw it, and somewhere below the water changes its course."
+        },
+        {
+          "type": "door",
+          "label": "Rope bridge across to the junction",
+          "direction": "open",
+          "note": "ACROSS -> station1 (same level)",
+          "to": "station1",
+          "availableWhen": {
+            "all": [
+              {
+                "eq": [
+                  "d2",
+                  "thrown"
+                ]
+              },
+              {
+                "eq": [
+                  "d3",
+                  "shut"
+                ]
+              }
+            ]
+          },
+          "lockedBody": "Water is pouring straight across it. Nothing crosses while it runs \u2014 the stream has to be sent somewhere else first.",
+          "_waterGate": "generated by cave_engine/wire_maze.py from span H-1-0 (dry in 4 of 16 lever configurations) \u2014 regenerate, do not hand-edit"
+        },
+        {
+          "type": "door",
+          "label": "Rope bridge across to the engine-hall",
+          "direction": "open",
+          "note": "ACROSS -> boss (same level; open, water-gated)",
+          "to": "boss",
+          "availableWhen": {
+            "eq": [
+              "d3",
+              "thrown"
+            ]
+          },
+          "lockedBody": "Water is pouring straight across it. Nothing crosses while it runs \u2014 the stream has to be sent somewhere else first.",
+          "_waterGate": "generated by cave_engine/wire_maze.py from span H-1-1 (dry in 8 of 16 lever configurations) \u2014 regenerate, do not hand-edit"
+        }
+      ],
+      "mapPos": {
+        "c": 1,
+        "r": 1
+      },
+      "panorama": "station3/scene.png",
+      "builtFrom": "l1_station3_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      }
+    },
+    {
+      "key": "boss",
+      "title": "The engine-hall",
+      "entry": {
+        "title": "The engine-hall",
+        "text": "One more short bridge across the well, to the great hall at the far reach of the gallery \u2014 the Assay's masterwork, the whole engine grinding around you. Here they laid their final conceit for the greedy: it hands you every measure at once and dares you to trust the reading as it comes. A warning is cut into the wall, though it reads more like a taunt."
+      },
+      "technique": "flat clustering \u2014 k-means (the deciding assignment / choosing k)",
+      "puzzleType": 2,
+      "isBoss": true,
+      "built": true,
+      "debrief": "The last decision was the hardest \u2014 the one assignment that only makes sense once you have seen how all the others fall. Setting it turned the whole machine over to its final, sorted state, and the floor below opened.",
+      "authoring": {
+        "tag": "boss",
+        "scenePrompt": "This is a seamless 360-degree panorama from the middle of a vaulted engine-hall cut back into the rock beside a tight stone well. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stretch of soot-blackened rock wall of the hall, dark and even, with nothing fixed to it, the floor running unbroken across its foot: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. To the left, set round at the viewer's left side, with a broad stretch of plain wall between it and the wall directly behind the viewer: through the arched threshold of the hall, a short rope-and-plank bridge running level out to a small landing close by, made fast at both ends; no falling water touches it: its planks run clear and dry; just left of centre, the great SLUICE: a wide flat wall of water pouring from a raised stone gate into a deep stone trough and draining through barred openings in the trough's floor, a slow bank of vapour rolling off its face across the hall floor, an immense flat wall of water, slow-looking because of its scale, with vapour rolling off its face; dead ahead in the centre, the master font on a stepped plinth, glowing amber, and on its rim this hall's signature: 5 brass measuring cups \u2014 4 small and matched, the 5th far larger and standing apart \u2014 and no others; just right of centre, a great iron hand-wheel on a brass drum, from which a heavy chain runs up the wall and along the vault to the sluice's raised gate \u2014 wheel, chain and gate plainly ONE machine; to the right, set round at the viewer's right side, with a broad stretch of plain wall between it and the wall directly behind the viewer: a tall standing stone covered in rows of shallow scored marks and cup-hollows worn past reading, a torch in an iron bracket bolted beside it. It is NIGHT, the same deep night everywhere in this world: no daylight, no dawn, no dusk. The hottest room in the world: a great furnace glows deep amber behind iron grilles in the wall behind the master font, and ranks of torches burn along every pier, firelight on wet brass everywhere. The engine still RUNS by the Assay's own craft \u2014 its fires burn and its water moves \u2014 but no one has tended it in generations. The valley's living green is TAKING IT BACK: roots split the dressed stone, creepers hang in long swags off the gutters, ferns fill every joint, moss coats the rails and fittings, and patches of faintly glowing pale blue-green moss show in the damp. The menace is in the MACHINERY, never in the plants, which are lush and alive: iron grading sieves with toothed rims, brass scale-pans hanging on chains, hinged rejection chutes, iron sorting-baskets, calipers and clamps \u2014 cold, exact, built to measure and reject. ALL of the Assay's water is HELD \u2014 it runs inside flumes, gutters, pipes and wheel buckets, and passes from one channel to the next only as a short spill of less than a body's height, lip straight into mouth. The view is CLOSE and CLOSED: the ribbed stone vault of the hall is the ceiling, roots hanging down between its ribs; the well is seen only as a close firelit gap back through the arched threshold. BLACK scorch and soot on the vault; heavy dull BRASS on every fitting below. Palette: cold night blue-black stone, deep wet green, verdigris copper; firelight is the only warm, fully saturated colour, apart from the Assay's amber glow in its fonts and basins. Cinematic, dense and richly detailed, fine natural film grain. No people, no figures, no creatures, no lettering, no captions, no text, no numbers, no signage. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere \u2014 everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. Fantastical and wondrous, NOT a horror scene: no skulls, no bones, no gore, no cobwebs, no bodies, nothing lurking. No daylight and no dusk light anywhere. This is the ONLY room with a true roof \u2014 a ribbed stone vault. EXACTLY 1 fall of water drops free through open air in this picture \u2014 the sluice pouring into its trough \u2014 and NO OTHERS. Every other drop of water runs inside a flume, gutter, pipe or wheel bucket, or passes as a short spill of less than a body's height from one channel's lip straight into the next channel's mouth. The hand-wheel's chain runs unbroken to the sluice gate and nowhere else; there is ONE sluice gate and ONE great wheel in this hall. The bridge outside the threshold is made fast at BOTH ends. Shot on a full-frame DSLR at 24mm, f/8, a long night exposure lit only by the fires and glows described, no daylight, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above \u2014 no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a plain stretch of soot-blackened rock wall of the hall, dark and even, with nothing fixed to it, the floor running unbroken across its foot, with no visible seam, join, or repetition.",
+        "sceneSpec": {
+          "room": "boss",
+          "setting": "the middle of a vaulted engine-hall cut back into the rock beside a tight stone well",
+          "interior": true,
+          "seam": "a plain stretch of soot-blackened rock wall of the hall, dark and even, with nothing fixed to it, the floor running unbroken across its foot",
+          "seamOccluder": "a massive engaged stone column standing against the hall's rear wall, floor to vault",
+          "elements": [
+            {
+              "id": "back_bridge",
+              "at": "to the left",
+              "desc": "set round at the viewer's left side, with a broad stretch of plain wall between it and the wall directly behind the viewer: through the arched threshold of the hall, a short rope-and-plank bridge running level out to a small landing close by, made fast at both ends; no falling water touches it: its planks run clear and dry",
+              "door": {
+                "direction": "open",
+                "to": "station3"
+              },
+              "label": "Rope bridge back across to the gallery"
+            },
+            {
+              "id": "sluice_wall",
+              "at": "just left of centre",
+              "desc": "the great SLUICE: a wide flat wall of water pouring from a raised stone gate into a deep stone trough and draining through barred openings in the trough's floor, a slow bank of vapour rolling off its face across the hall floor",
+              "animate": {
+                "motion": "the wide sheet of the great sluice pouring steadily down into its trough with a slow bank of vapour rolling off its face across the hall floor",
+                "loop": "crossfade"
+              },
+              "motion": {
+                "moves": true,
+                "vigour": "an immense flat wall of water, slow-looking because of its scale, with vapour rolling off its face",
+                "phrase": "the wide sheet of the great sluice pouring steadily down into its trough with a slow bank of vapour rolling off its face across the hall floor"
+              },
+              "sound": {
+                "source": "a great sluice pouring a wall of water into a stone trough, with vapour rolling across the floor",
+                "character": "vast, low and continuous \u2014 felt as much as heard, the engine at full work"
+              }
+            },
+            {
+              "id": "master_font",
+              "at": "dead ahead in the centre",
+              "desc": "the master font on a stepped plinth, glowing amber, and on its rim this hall's signature: 5 brass measuring cups \u2014 4 small and matched, the 5th far larger and standing apart \u2014 and no others",
+              "puzzle": true,
+              "label": "The master console"
+            },
+            {
+              "id": "wheel",
+              "at": "just right of centre",
+              "desc": "a great iron hand-wheel on a brass drum, from which a heavy chain runs up the wall and along the vault to the sluice's raised gate \u2014 wheel, chain and gate plainly ONE machine",
+              "dial": true,
+              "label": "The great S4 diverter wheel"
+            },
+            {
+              "id": "warning_stone",
+              "at": "to the right",
+              "desc": "set round at the viewer's right side, with a broad stretch of plain wall between it and the wall directly behind the viewer: a tall standing stone covered in rows of shallow scored marks and cup-hollows worn past reading, a torch in an iron bracket bolted beside it",
+              "clue": true,
+              "label": "The Assay's warning-stone"
+            }
+          ],
+          "atmosphere": "It is NIGHT, the same deep night everywhere in this world: no daylight, no dawn, no dusk. The hottest room in the world: a great furnace glows deep amber behind iron grilles in the wall behind the master font, and ranks of torches burn along every pier, firelight on wet brass everywhere. The engine still RUNS by the Assay's own craft \u2014 its fires burn and its water moves \u2014 but no one has tended it in generations. The valley's living green is TAKING IT BACK: roots split the dressed stone, creepers hang in long swags off the gutters, ferns fill every joint, moss coats the rails and fittings, and patches of faintly glowing pale blue-green moss show in the damp. The menace is in the MACHINERY, never in the plants, which are lush and alive: iron grading sieves with toothed rims, brass scale-pans hanging on chains, hinged rejection chutes, iron sorting-baskets, calipers and clamps \u2014 cold, exact, built to measure and reject. ALL of the Assay's water is HELD \u2014 it runs inside flumes, gutters, pipes and wheel buckets, and passes from one channel to the next only as a short spill of less than a body's height, lip straight into mouth. The view is CLOSE and CLOSED: the ribbed stone vault of the hall is the ceiling, roots hanging down between its ribs; the well is seen only as a close firelit gap back through the arched threshold. BLACK scorch and soot on the vault; heavy dull BRASS on every fitting below. Palette: cold night blue-black stone, deep wet green, verdigris copper; firelight is the only warm, fully saturated colour, apart from the Assay's amber glow in its fonts and basins. Cinematic, dense and richly detailed, fine natural film grain.",
+          "negatives": "No people, no figures, no creatures, no lettering, no captions, no text, no numbers, no signage. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere \u2014 everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. Fantastical and wondrous, NOT a horror scene: no skulls, no bones, no gore, no cobwebs, no bodies, nothing lurking. No daylight and no dusk light anywhere. This is the ONLY room with a true roof \u2014 a ribbed stone vault. EXACTLY 1 fall of water drops free through open air in this picture \u2014 the sluice pouring into its trough \u2014 and NO OTHERS. Every other drop of water runs inside a flume, gutter, pipe or wheel bucket, or passes as a short spill of less than a body's height from one channel's lip straight into the next channel's mouth. The hand-wheel's chain runs unbroken to the sluice gate and nowhere else; there is ONE sluice gate and ONE great wheel in this hall. The bridge outside the threshold is made fast at BOTH ends.",
+          "continuity": [],
+          "soundBed": "the engine-hall: the biggest water in the world, machinery and stone, a low room tone under it",
+          "styleLight": "a long night exposure lit only by the fires and glows described, no daylight"
+        },
+        "seam": {
+          "stage": "screened",
+          "band": "sky",
+          "ratio": 1.5,
+          "delta": 2.89,
+          "needsWork": false,
+          "accepted": false,
+          "seamBandRun": 0.0,
+          "at": "2026-09-21T00:34:25"
+        }
+      },
+      "unlockedWhen": {
+        "allSolved": [
+          "station1",
+          "station2",
+          "station3"
+        ]
+      },
+      "onSolve": [
+        {
+          "set": "boss_solved"
+        },
+        {
+          "inc": "rooms_solved"
+        }
+      ],
+      "deliverable": {
+        "type": "figure",
+        "submitCodec": true
+      },
+      "designNote": "BOSS PUZZLE (verified; the SCALING TRAP). isBoss, puzzleType 2, deliverable figure + submitCodec. Dataset reliquary_phials, using ALL FIVE measures incl. weight. NAIVE (tempting, WRONG): kmeans(reliquary_phials[,c('clarity','mineral','resin','ash','weight')], centers=3, nstart=25) \u2014 weight (grains, thousands) drowns everything, ARI 0.07. CORRECT: kmeans(scale(reliquary_phials[,c('clarity','mineral','resin','ash','weight')]), centers=3, nstart=25). Q: 'Cluster the phials using ALL five measurements into 3 families. Which phial ends up in the same family as JASPER?' ANSWER: Selenite (scaled -> Jasper's true family A = Amber/Cinnabar/Onyx/Selenite/Verdigris; seed-robust in base R). DECOY (the trap): Antimony \u2014 Jasper's UNSCALED weight-band mate, what you get if you forget to scale. FILLER DISTRACTORS: Bloodstone, Galena, Chrysolite, Ochre (family B/C). DO NOT offer Onyx (in family A AND Jasper's weight band -> ambiguous). unlockedWhen allSolved [station1,station2,station3]. Solving UNLOCKS the final diverter (S4 -> D4). Throwing S4 gives 'no visible change' alone (puzzle.json) \u2014 the player must deduce that returning to S3 and re-throwing it opens the descent. NEW ART.",
+      "plannedHotspots": [
+        {
+          "type": "puzzle",
+          "label": "The master console",
+          "note": "scale() all 5 then kmeans(k=3): Jasper's family-mate = Selenite (decoy Antimony = unscaled)"
+        },
+        {
+          "type": "dial",
+          "label": "The great S4 diverter wheel",
+          "note": "flips diverter D4 (starts '/', throws to '|'; shifts 2 columns); no visible change until S3 is re-thrown",
+          "key": "d4",
+          "states": [
+            {
+              "value": "shut",
+              "label": "Leave the S4 gate shut"
+            },
+            {
+              "value": "thrown",
+              "label": "Throw the S4 gate"
+            }
+          ],
+          "availableWhen": {
+            "solved": "boss"
+          },
+          "lockedBody": "The lever will not move. Whatever holds it is waiting on the reading at this landing's console.",
+          "hint": "Throw it, and somewhere below the water changes its course."
+        },
+        {
+          "type": "clue",
+          "label": "The Assay's warning-stone",
+          "note": "a taunt that carries the clue: 'Our weights we keep in grains, our virtues in tenths \u2014 and we let the grains decide. Weigh as we weighed, and the vault is yours.' i.e. weight runs to thousands where every other measure runs to tens; unless you put them on equal footing (scale), weight alone dictates the sort"
+        },
+        {
+          "type": "door",
+          "label": "Rope bridge back across to the gallery",
+          "direction": "open",
+          "note": "ACROSS -> station3 (the ONLY way in or out of the hall)",
+          "to": "station3",
+          "availableWhen": {
+            "eq": [
+              "d3",
+              "thrown"
+            ]
+          },
+          "lockedBody": "Water is pouring straight across it. Nothing crosses while it runs \u2014 the stream has to be sent somewhere else first.",
+          "_waterGate": "generated by cave_engine/wire_maze.py from span H-1-1 (dry in 8 of 16 lever configurations) \u2014 regenerate, do not hand-edit"
+        }
+      ],
+      "mapPos": {
+        "c": 2,
+        "r": 1
+      },
+      "panorama": "boss/scene.png",
+      "builtFrom": "l1_boss_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      }
+    },
+    {
+      "key": "basin",
+      "title": "The drowned floor",
+      "entry": {
+        "title": "The drowned floor",
+        "text": "The long descent drops you into the risen flood on the cistern floor \u2014 knee-deep already and climbing \u2014 and there it is: the Assay's sorting engine laid bare, three great basins standing out of the water and the falling threads gathered into them. Across the flood the vault stands sealed, the Wellheart behind it. The gates you threw on the way down are still set. Learn what they decide before the water takes the floor."
+      },
+      "phase": "escape",
+      "technique": "flat clustering \u2014 k-means (recognition: read the clusters)",
+      "puzzleType": 0,
+      "built": true,
+      "debrief": "The floor was the analysis made physical. The same two threads fell every time; the only thing you changed was how the gates above were set \u2014 and each setting sorted them differently: two basins one way, two other basins another, or both threads into one. So the number of groups was never a property of the water. It was a property of the settings, the question the machine was asking of it. That is k in k-means: not something the data hands you, but something you choose, and a different choice gives you a different, equally real grouping. Notice too that two of the settings made the SAME sort \u2014 once the second gate was thrown, the first stopped mattering at all.",
+      "authoring": {
+        "tag": "basin",
+        "scenePrompt": "This is a seamless 360-degree panorama from the middle of the drowned floor at the foot of a tight stone well, standing knee-deep in still black water. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stretch of black wet stone wall at the well's foot, dark and even, with nothing fixed to it, the flood running unbroken across its foot: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. To the left, set round at the viewer's left side, with a broad stretch of plain wall between it and the wall directly behind the viewer: a long ladder-and-plank descent hanging down the wall from the dark tangle above, its foot lashed to iron rings in a stone ledge a step clear of the flood; no falling water touches it: its rungs and planks run clear and dry; just left of centre, the knee-deep black flood running across the whole floor, mirroring the amber glow, lapping the outside of the basins' rims, a slow heavy heave, lapping and settling \u2014 a rising flood, not a current; dead ahead in the centre, THREE great round stone basins standing out of the flood in one line running left to right, each a broad drum of masonry with a thick rim at chest height, brimming with water lit deep amber from within \u2014 EXACTLY 3. Furthest LEFT and set plainly APART, with open flood between it and the next, the OUTER basin; then the MIDDLE basin; then, furthest right and nearest the vault pillar, the NEAR basin. EXACTLY 2 thin threads of water fall free out of the dark above \u2014 and in this view BOTH come down side by side into the NEAR basin, each entering inside its rim and striking its surface with its own rings; the outer and middle basins stand still and unfed, plainly holding water but with nothing falling into them; just right of centre, set into the face of the great pillar at chest height, an arm's length from the vault door's near jamb, a tall brass-and-stone reckoning frame \u2014 a plain grid of shallow square sockets, with plain carved lever-marks down its left edge and three small carved basin drums across its top; carvings only, no lettering, no numerals; to the right, set round at the viewer's right side, with a broad stretch of plain wall between it and the wall directly behind the viewer: in the face of that same pillar, a huge closed stone vault door, a single slab flush in its carved jambs, its foot drowned in the flood, shut fast. It is NIGHT, the same deep night everywhere in this world: no daylight, no dawn, no dusk. The three basins glow deep amber from within and that glow, doubled in the black water, is the main light; a few torches gutter on the great pillar by the vault. The engine still RUNS by the Assay's own craft \u2014 its fires burn and its water moves \u2014 but no one has tended it in generations. Overhead, the well closes into a dark, DRY tangle of old timber trestles, empty flumes and hanging ropes and roots, no water in any of it; the only water that moves in this chamber is the 2 threads and the flood. Moss and ferns grow thick on every ledge above the waterline, and patches of faintly glowing pale blue-green moss show on the wall. Pale SALT bloom creeps up every stone out of the water. Palette: cold night blue-black stone, deep wet green, verdigris copper; firelight is the only warm, fully saturated colour, apart from the Assay's amber glow in its fonts and basins. Cinematic, dense and richly detailed, fine natural film grain. No people, no figures, no creatures, no lettering, no captions, no text, no numbers, no signage. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere \u2014 everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. Fantastical and wondrous, NOT a horror scene: no skulls, no bones, no gore, no cobwebs, no bodies, nothing lurking. No daylight and no dusk light anywhere. There are EXACTLY 3 stone basins and EXACTLY 2 threads of water falling free in this whole picture and NO OTHERS \u2014 no fourth basin, no extra pool, trough or tank, and no other falling or spilling water. The three basins stand in ONE line running LEFT TO RIGHT across the floor, the leftmost set plainly APART from the other two. Each thread falls wholly INTO a basin's rim: none lands on the flood, none between two basins, none shared. The flood laps the OUTSIDE of the basins' rims and does not spill in; it is ONE surface at ONE level. The vault door is SHUT. No lettering or numerals on the reckoning frame. The two threads stay crisp, separate and countable. Shot on a full-frame DSLR at 24mm, f/8, a long night exposure lit only by the glowing basins and the few torches described, no daylight, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above \u2014 no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a plain stretch of black wet stone wall at the well's foot, dark and even, with nothing fixed to it, the flood running unbroken across its foot, with no visible seam, join, or repetition.",
+        "sceneSpec": {
+          "room": "basin",
+          "setting": "the middle of the drowned floor at the foot of a tight stone well, standing knee-deep in still black water",
+          "interior": true,
+          "seam": "a plain stretch of black wet stone wall at the well's foot, dark and even, with nothing fixed to it, the flood running unbroken across its foot",
+          "seamOccluder": "a plain squared buttress of black stone engaged in the wall",
+          "elements": [
+            {
+              "id": "descent",
+              "at": "to the left",
+              "desc": "set round at the viewer's left side, with a broad stretch of plain wall between it and the wall directly behind the viewer: a long ladder-and-plank descent hanging down the wall from the dark tangle above, its foot lashed to iron rings in a stone ledge a step clear of the flood; no falling water touches it: its rungs and planks run clear and dry",
+              "door": {
+                "direction": "open",
+                "to": "station2"
+              },
+              "label": "The descent back up the column"
+            },
+            {
+              "id": "flood",
+              "at": "just left of centre",
+              "desc": "the knee-deep black flood running across the whole floor, mirroring the amber glow, lapping the outside of the basins' rims",
+              "animate": {
+                "motion": "the knee-deep black flood heaving and lapping slowly against the stonework, its mirror reflections stretching and settling",
+                "loop": "boomerang"
+              },
+              "motion": {
+                "moves": true,
+                "vigour": "a slow heavy heave, lapping and settling \u2014 a rising flood, not a current",
+                "phrase": "the knee-deep black flood heaving and lapping slowly against the stonework, its mirror reflections stretching and settling"
+              },
+              "sound": {
+                "source": "a knee-deep flood heaving against stonework, with two threads of water falling into stone basins",
+                "character": "cavernous and reverberant: slow lapping close at hand, two falls landing in water further off"
+              }
+            },
+            {
+              "id": "pools",
+              "at": "dead ahead in the centre",
+              "desc": "THREE great round stone basins standing out of the flood in one line running left to right, each a broad drum of masonry with a thick rim at chest height, brimming with water lit deep amber from within \u2014 EXACTLY 3. Furthest LEFT and set plainly APART, with open flood between it and the next, the OUTER basin; then the MIDDLE basin; then, furthest right and nearest the vault pillar, the NEAR basin. EXACTLY 2 thin threads of water fall free out of the dark above \u2014 and in this view BOTH come down side by side into the NEAR basin, each entering inside its rim and striking its surface with its own rings; the outer and middle basins stand still and unfed, plainly holding water but with nothing falling into them",
+              "clue": true,
+              "label": "The gathered basins",
+              "rigid": "the three stone basins, their rims and lit surfaces, and both falling threads of water"
+            },
+            {
+              "id": "frame",
+              "at": "just right of centre",
+              "desc": "set into the face of the great pillar at chest height, an arm's length from the vault door's near jamb, a tall brass-and-stone reckoning frame \u2014 a plain grid of shallow square sockets, with plain carved lever-marks down its left edge and three small carved basin drums across its top; carvings only, no lettering, no numerals",
+              "label": "The reckoning frame",
+              "grid": true,
+              "judgeNote": "The frame is SET-DRESSING: the grid modal renders its rows and columns as text, so the carved wall does not have to be readable as a matrix. Do NOT count its sockets or rows, and do not reject a render for having the 'wrong' number of them."
+            },
+            {
+              "id": "vault",
+              "at": "to the right",
+              "desc": "set round at the viewer's right side, with a broad stretch of plain wall between it and the wall directly behind the viewer: in the face of that same pillar, a huge closed stone vault door, a single slab flush in its carved jambs, its foot drowned in the flood, shut fast",
+              "door": {
+                "direction": "forward"
+              },
+              "label": "The vault door - the way home"
+            }
+          ],
+          "atmosphere": "It is NIGHT, the same deep night everywhere in this world: no daylight, no dawn, no dusk. The three basins glow deep amber from within and that glow, doubled in the black water, is the main light; a few torches gutter on the great pillar by the vault. The engine still RUNS by the Assay's own craft \u2014 its fires burn and its water moves \u2014 but no one has tended it in generations. Overhead, the well closes into a dark, DRY tangle of old timber trestles, empty flumes and hanging ropes and roots, no water in any of it; the only water that moves in this chamber is the 2 threads and the flood. Moss and ferns grow thick on every ledge above the waterline, and patches of faintly glowing pale blue-green moss show on the wall. Pale SALT bloom creeps up every stone out of the water. Palette: cold night blue-black stone, deep wet green, verdigris copper; firelight is the only warm, fully saturated colour, apart from the Assay's amber glow in its fonts and basins. Cinematic, dense and richly detailed, fine natural film grain.",
+          "negatives": "No people, no figures, no creatures, no lettering, no captions, no text, no numbers, no signage. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere \u2014 everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. Fantastical and wondrous, NOT a horror scene: no skulls, no bones, no gore, no cobwebs, no bodies, nothing lurking. No daylight and no dusk light anywhere. There are EXACTLY 3 stone basins and EXACTLY 2 threads of water falling free in this whole picture and NO OTHERS \u2014 no fourth basin, no extra pool, trough or tank, and no other falling or spilling water. The three basins stand in ONE line running LEFT TO RIGHT across the floor, the leftmost set plainly APART from the other two. Each thread falls wholly INTO a basin's rim: none lands on the flood, none between two basins, none shared. The flood laps the OUTSIDE of the basins' rims and does not spill in; it is ONE surface at ONE level. The vault door is SHUT. No lettering or numerals on the reckoning frame. The two threads stay crisp, separate and countable.",
+          "continuity": [],
+          "rigid": "the three stone basins, their rims and lit surfaces, and both falling threads of water",
+          "states": {
+            "outer_near": {
+              "change": "where the two falling threads land \u2014 which basins they fall into",
+              "constraints": "Exactly one thread into the OUTER basin and exactly one into the NEAR basin; the MIDDLE basin receives nothing. Nothing else in the chamber moves, changes or is added.",
+              "elements": {
+                "pools": {
+                  "desc": "THREE great round stone basins standing out of the flood in one line running left to right, each a broad drum of masonry with a thick rim at chest height, brimming with water lit deep amber from within \u2014 EXACTLY 3. Furthest LEFT and set plainly APART, with open flood between it and the next, the OUTER basin; then the MIDDLE basin; then, furthest right and nearest the vault pillar, the NEAR basin. EXACTLY 2 thin threads of water fall free out of the dark above \u2014 and in this view ONE comes down into the OUTER basin and the OTHER into the NEAR basin, each entering inside its own basin's rim with its own rings; the MIDDLE basin stands still and unfed, plainly holding water but with nothing falling into it"
+                }
+              },
+              "_why": "S1 shut, S2 shut (cave_engine/basin_sort.py)."
+            },
+            "middle_near": {
+              "change": "where the two falling threads land \u2014 which basins they fall into",
+              "constraints": "Exactly one thread into the MIDDLE basin and exactly one into the NEAR basin; the OUTER basin receives nothing. Nothing else in the chamber moves, changes or is added.",
+              "elements": {
+                "pools": {
+                  "desc": "THREE great round stone basins standing out of the flood in one line running left to right, each a broad drum of masonry with a thick rim at chest height, brimming with water lit deep amber from within \u2014 EXACTLY 3. Furthest LEFT and set plainly APART, with open flood between it and the next, the OUTER basin; then the MIDDLE basin; then, furthest right and nearest the vault pillar, the NEAR basin. EXACTLY 2 thin threads of water fall free out of the dark above \u2014 and in this view ONE comes down into the MIDDLE basin and the OTHER into the NEAR basin, each entering inside its own basin's rim with its own rings; the OUTER basin stands still and unfed, plainly holding water but with nothing falling into it"
+                }
+              },
+              "_why": "S1 thrown, S2 shut (cave_engine/basin_sort.py)."
+            }
+          },
+          "soundBed": "the drowned floor of the cistern: a vast wet room, water lapping around you, the falls landing in the basins",
+          "styleLight": "a long night exposure lit only by the glowing basins and the few torches described, no daylight"
+        },
+        "seam": {
+          "stage": "blurred",
+          "band": "sky",
+          "ratio": 0.0,
+          "delta": 0.0,
+          "needsWork": false,
+          "accepted": false,
+          "seamBandRun": 0.0,
+          "at": "2026-09-21T08:27:05"
+        }
+      },
+      "unlockedWhen": true,
+      "designNote": "ESCAPE (phase:escape; data-free). REDESIGNED 2026-09-20 (Lucas): SETTING -> SORT, a `grid`, not a keypad. Three basins on the floor (lanes -1/0/1 of the engine; EVERY lane is a basin, nothing pours into the dark). The two upper levers S1/S2 decide where the two threads land: shut/shut -> outer+near; thrown/shut -> middle+near; S2 thrown -> near alone, both threads together, whatever S1 does. Four settings, three sorts, two settings sharing one sort (once S2 is thrown S1 stops mattering). The two k=2 sorts differ only in WHICH basins run, so counting alone cannot solve it. The player may climb back up and re-throw freely: every basin configuration is reachable from every other (BFS-checked). Mapping + invariants: cave_engine/basin_sort.py. Ungraded, not in the codec. Way-home vault door requires the grid; endsEscape.",
+      "plannedHotspots": [
+        {
+          "type": "ambient",
+          "label": "The fall of the threads",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "variants": [
+            {
+              "state": "outer_near",
+              "box": [
+                0,
+                0,
+                1,
+                1
+              ],
+              "when": {
+                "all": [
+                  {
+                    "eq": [
+                      "d1",
+                      "shut"
+                    ]
+                  },
+                  {
+                    "eq": [
+                      "d2",
+                      "shut"
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "state": "middle_near",
+              "box": [
+                0,
+                0,
+                1,
+                1
+              ],
+              "when": {
+                "all": [
+                  {
+                    "eq": [
+                      "d1",
+                      "thrown"
+                    ]
+                  },
+                  {
+                    "eq": [
+                      "d2",
+                      "shut"
+                    ]
+                  }
+                ]
+              }
+            }
+          ],
+          "note": "Full-scene state carrier (cf. beacons fenwatch/night_wash). No variant matches when S2 is thrown, so the BASE art (both threads into the near basin) shows exactly then \u2014 the base is correct in every basin configuration, whatever route the player took. Panoramas are filled by the variants pipeline from sceneSpec.states.",
+          "noElement": true
+        },
+        {
+          "type": "clue",
+          "label": "The gathered basins",
+          "note": "the three basins and where the two threads land \u2014 which basins run changes with the upper gates (outer+near / middle+near / near alone). Read WHICH basins run, not how many."
+        },
+        {
+          "type": "grid",
+          "label": "The reckoning frame",
+          "prompt": "<p>A brass frame stands against the vault: the settings of the two upper gates down one side, the sorts this floor can make across the top.</p><p>Set each gate-setting against the sort it makes on this floor. The engine is still running; you may go up and look again as often as you like.</p>",
+          "items": [
+            {
+              "key": "s00",
+              "label": "S1 shut, S2 shut"
+            },
+            {
+              "key": "s01",
+              "label": "S1 shut, S2 thrown"
+            },
+            {
+              "key": "s10",
+              "label": "S1 thrown, S2 shut"
+            },
+            {
+              "key": "s11",
+              "label": "S1 thrown, S2 thrown"
+            }
+          ],
+          "buckets": [
+            {
+              "key": "outer_near",
+              "label": "The outer basin and the near basin, one thread into each"
+            },
+            {
+              "key": "middle_near",
+              "label": "The middle basin and the near basin, one thread into each"
+            },
+            {
+              "key": "near_alone",
+              "label": "The near basin alone, both threads falling together"
+            },
+            {
+              "key": "outer_middle",
+              "label": "The outer basin and the middle basin, one thread into each"
+            },
+            {
+              "key": "all_three",
+              "label": "All three basins, one thread into each"
+            }
+          ],
+          "answer": {
+            "s00": "outer_near",
+            "s01": "near_alone",
+            "s10": "middle_near",
+            "s11": "near_alone"
+          },
+          "maxAttempts": 0,
+          "endsEscape": true,
+          "feedback": {
+            "correct": "The frame settles, every setting against its sort, and the vault gives.",
+            "wrong": "The frame will not settle. One of those settings does not make that sort.",
+            "out": ""
+          },
+          "note": "ESCAPE \u2014 setting -> sort. GENERATED by cave_engine/basin_sort.py build_grid(); regenerate, never hand-edit. 3 real sorts + 2 provably unreachable decoys (5^4 = 625 blind assignments). maxAttempts stays 0: a cap on an endsEscape grid is a hard soft-lock."
+        },
+        {
+          "type": "door",
+          "label": "The descent back up the column",
+          "direction": "open",
+          "note": "UP -> station2 (the way you came down)",
+          "to": "station2",
+          "availableWhen": {
+            "any": [
+              {
+                "eq": [
+                  "d3",
+                  "thrown"
+                ]
+              },
+              {
+                "eq": [
+                  "d4",
+                  "thrown"
+                ]
+              }
+            ]
+          },
+          "lockedBody": "Water is pouring straight across it. Nothing crosses while it runs \u2014 the stream has to be sent somewhere else first.",
+          "_waterGate": "generated by cave_engine/wire_maze.py from span V-2-0 (dry in 12 of 16 lever configurations) \u2014 regenerate, do not hand-edit"
+        },
+        {
+          "type": "door",
+          "label": "The vault door - the way home",
+          "direction": "forward",
+          "note": "the CLOSED stone gate; requires the reckoning frame (grid) solved; endsEscape -> escapeDone",
+          "requires": "frame",
+          "endsEscape": true
+        }
+      ],
+      "mapPos": {
+        "c": 0,
+        "r": 3
+      },
+      "panorama": "basin/scene.png",
+      "builtFrom": "l1_basin_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      }
+    }
+  ],
+  "worldPlatePrompt": "A single establishing world-bible frame of the Sorting Engine, built by the Assay, an order of alchemist-villains: one close, crowded view across a single level partway down a TIGHT stone well only a few body-lengths across, from one landing to the next. It is NIGHT, one deep night: no daylight, no dusk, no sky anywhere in the frame \u2014 overhead the underside of the level above is packed with flumes, ropes and hanging roots, and below the landings the drop is hidden by planks and apparatus. Everything is lit by fire: iron cressets in wall brackets, lanterns hung on chains, torches on every post, warm and close against cold blue-black stone. The engine still RUNS by the Assay's own craft \u2014 its fires burn and its water moves \u2014 but no one has tended it in generations, and the valley's green is taking it back: roots split the dressed stone, creepers hang in long swags off the gutters, ferns fill every joint, moss coats every wheel and rail, and patches of faintly glowing pale blue-green moss show in the damp. Wooden flumes on timber trestles and green-copper gutters carried on little stone arches like a miniature aqueduct run in every direction, every drop of water HELD in its channel; a great timber water wheel stands in the path of one flume; ropes run back and forth across the well from iron rings in one wall to iron rings in the other, hung with pulleys, chains, counterweights and iron sorting-baskets. The menace is in the MACHINERY \u2014 iron grading sieves with toothed rims, brass scale-pans hanging on chains over the drop, hinged rejection chutes that tip into the dark, calipers and clamps \u2014 cold, exact, built to measure and reject; the plants are lush and alive. Palette: cold night blue-black stone, deep wet green, verdigris copper, and warm firelight as the only warm, fully saturated colour apart from the Assay's amber glow in its fonts. Fantastical and wondrous, NOT a horror scene: no skulls, no bones, no gore, no cobwebs. Cinematic, dense and richly detailed, fine natural film grain. No people, no figures, no lettering, no captions, no text, no numbers.",
+  "worldPlate": "_world/plate.png",
+  "cover": "cover.png"
+}

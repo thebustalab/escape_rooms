@@ -70,13 +70,13 @@
 // A bare `./variant_resolve.js` import is NOT refreshed by bumping the <script> tag's ?v, so a changed
 // helper module (e.g. a new export) leaves browsers on a stale cached copy → "doesn't provide an export
 // named X" SyntaxError → blank page (the 2026-08-05 airship regression). Bump all three together.
-import { WebRConsole } from "./webr-console.js?v=105";
-import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers } from "./variant_resolve.js?v=105";   // Phase 3: per-hotspot state variants; monorail switch-door nav
-import * as PQ from "./puzzle_queue.js?v=105";   // dynamic puzzle queue: location-independent puzzle serving
-import { particleCount } from "./particles.js?v=105";   // ambient-particle vocabulary + per-kind field density
-import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=105";
-import { condHolds } from "./cond.js?v=105";   // ledger + elevation-map card DOM
-import * as RIDE from "./ride.js?v=105";   // THE RIDE (subway): express lever + clip-sequence planner
+import { WebRConsole } from "./webr-console.js?v=106";
+import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers } from "./variant_resolve.js?v=106";   // Phase 3: per-hotspot state variants; monorail switch-door nav
+import * as PQ from "./puzzle_queue.js?v=106";   // dynamic puzzle queue: location-independent puzzle serving
+import { particleCount } from "./particles.js?v=106";   // ambient-particle vocabulary + per-kind field density
+import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=106";
+import { condHolds } from "./cond.js?v=106";   // ledger + elevation-map card DOM
+import * as RIDE from "./ride.js?v=106";   // THE RIDE (subway): express lever + clip-sequence planner
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 
@@ -666,12 +666,28 @@ function updateNotebookChip() {
 // (2026-08-27). Pickup art should be authored square; this is the other half of the fix, and it is worth
 // having anyway: nine plates at 120px are arrangeable but not READABLE, and the comparison the escape
 // asks for needs the detail. Click a tile (as opposed to dragging it) and it opens full size.
-function openTileLightbox(src, caption) {
+// `stack` (optional): every tile sharing the clicked tile's cell, bottom first, as [{image, overlay}]. A
+// stack opens AS A STACK at full size — the overlay puzzles (subway's line maps laid on the survey sheet,
+// Alaska's masks) are only readable enlarged, and opening just the clicked tile would show a line map with
+// no grid under it (found 2026-09-19: the grid letters are ~1px in a 120px tile).
+function openTileLightbox(src, caption, stack) {
   const box = document.createElement("div");
   box.className = "nblightbox";
-  const img = document.createElement("img");
-  img.src = src; img.alt = caption || "";
-  box.appendChild(img);
+  if (stack && stack.length > 1) {
+    const st = document.createElement("div");
+    st.className = "nbstack";
+    stack.forEach((t, i) => {
+      const img = document.createElement("img");
+      img.src = t.image; img.alt = i ? "" : (caption || "");
+      if (t.overlay) img.className = "overlay";
+      st.appendChild(img);
+    });
+    box.appendChild(st);
+  } else {
+    const img = document.createElement("img");
+    img.src = src; img.alt = caption || "";
+    box.appendChild(img);
+  }
   if (caption) {
     const cap = document.createElement("div"); cap.className = "nbcap"; cap.textContent = caption;
     box.appendChild(cap);
@@ -763,8 +779,23 @@ function openNotebook() {
     };
     sizeBoard();
 
+    const tiles = new Map();            // caseFile entry -> its tile, so a click can gather the whole cell
+    // Everything in `e`'s cell, bottom first: opaque tiles under overlays (a sheet laid on last must not
+    // hide the maps on it), and within each group the board's own stacking order.
+    const cellStack = e => imgEntries
+      .filter(o => o.pos.col === e.pos.col && o.pos.row === e.pos.row)
+      .map(o => ({ image: o.image, overlay: !!o.overlay, z: +(tiles.get(o).style.zIndex || 0) }))
+      .sort((a, b) => (a.overlay - b.overlay) || (a.z - b.z));
+    // On the board too: an opaque tile dropped onto overlays slides UNDER them.
+    const settleZ = e => {
+      if (e.overlay) return;
+      const lays = imgEntries.filter(o => o !== e && o.overlay && o.pos.col === e.pos.col && o.pos.row === e.pos.row);
+      if (lays.length) tiles.get(e).style.zIndex = String(Math.min(...lays.map(o => +(tiles.get(o).style.zIndex || 0))) - 1);
+    };
+
     imgEntries.forEach(e => {
       const t = document.createElement("img");
+      tiles.set(e, t);
       t.className = "nbtile" + (e.overlay ? " overlay" : "");
       t.src = e.image; t.alt = nbStrip(e.text); if (e.text) t.title = nbStrip(e.text);
       t.draggable = false;
@@ -786,11 +817,11 @@ function openNotebook() {
           // make the lightbox unreachable on a trackpad or a touchscreen.
           if (Math.abs(ev2.clientX - sx) < 5 && Math.abs(ev2.clientY - sy) < 5) {
             place();
-            openTileLightbox(e.image, nbStrip(e.text) || e.source || "");
+            openTileLightbox(e.image, nbStrip(e.text) || e.source || "", cellStack(e));
             return;
           }
           e.pos = nbSnap(ol + ev2.clientX - sx, ot + ev2.clientY - sy, NB_CELL, gridCols, gridRows() - 1);
-          place(); sizeBoard();
+          place(); sizeBoard(); settleZ(e);
         };
         t.addEventListener("pointermove", move);
         t.addEventListener("pointerup", up);
@@ -2271,6 +2302,11 @@ function arriveRide(plan) {
   riding = null;
   delete gameState.ride_segment;
   gameState[RIDE.atKey(SCENARIO.ride, plan.line)] = plan.toRoom;   // the platform door now opens here
+  // A completed run marks its LINE as ridden (`rode_<line>` = "1"). Subway's escape lock is gated on every
+  // line being ridden (Lucas, 2026-09-19): the answer is read off the stacked line maps, which the player can
+  // only hold by riding every line, so the lock should not open before that. Gate with
+  // {"all": [{"eq": ["rode_<line>", "1"]}, ...]}.
+  gameState["rode_" + plan.line] = "1";
   const tail = log[log.length - 1] === plan.arrival.state ? [] : [plan.arrival.state];
   lastRide = { from: plan.from, to: plan.to, toRoom: plan.toRoom, log: log.concat(tail) };
   _keepStage = true;
@@ -2284,6 +2320,7 @@ window.PanoRide = {
   segment: () => (riding ? gameState.ride_segment || null : null),
   at: line => (SCENARIO && SCENARIO.ride ? gameState[RIDE.atKey(SCENARIO.ride, line)] : undefined),
   last: () => lastRide,
+  rode: line => gameState["rode_" + line] === "1",
 };
 
 function openMapview(h) {
@@ -2986,6 +3023,8 @@ function openElevmap(h) {
 // once. Non-primary gates (e.g. an escape lock beside a graded puzzle) just open their own `requires`
 // door. Re-render with the open image once the primary gate is solved; keep facing where you were.
 function solveRoom(result, h, qIndex) {
+  // Which doors were ALREADY open, so the toast below can tell whether this solve opened anything.
+  const openBefore = openDoorIds(room);
   if (h && h.id) solvedGates.add(gateKey(room.key, h.id));
   // DYNAMIC QUEUE: record against the ladder rung, not the room. Do this BEFORE the completion
   // check below, which asks the queue whether the objective is finished.
@@ -3031,8 +3070,15 @@ function solveRoom(result, h, qIndex) {
   }
   if (SCENARIO.stonePortals && isPrimary && !portalUnlocked(room))
     toast("The portal wakes — stars kindle beyond the arch.");
-  else
+  // Only announce a door when this solve actually OPENED one (2026-09-19, Lucas, canyon playtest). In an open
+  // maze every passage is already walkable, so after a junction puzzle "The door is open. Look for the way
+  // through." pointed at nothing new. A linear room still gets it, because its forward door was shut until now.
+  else if ([...openDoorIds(room)].some(id => !openBefore.has(id)))
     toast(isPrimary ? "The door is open. Look for the way through." : "The lock releases — a way opens.");
+}
+// Ids of the doors in room `r` that are showing and walkable right now.
+function openDoorIds(r) {
+  return new Set((r.hotspots || []).filter(d => d.type === "door" && isShown(d) && doorIsOpen(d, r)).map(d => d.id));
 }
 
 function goThrough() {

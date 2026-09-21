@@ -1,8 +1,0 @@
-I'm passing the worker's PARK decision.
-
-- **The worker's reading holds up.** I measured the clip directly. In the parts of the hall that shouldn't move (the rock and panel band, and the flood door), the shift between frame 0 and frames 10 to 60 is zero pixels in both directions. Side-by-side crops of the panel and rock at frames 0 and 30 look identical. The only change there is from the shaft pour and the spray. Over the whole frame the difference is about 12–15 grey levels, compared with about 3–5 in the hall regions, so the churning flood across the lower half is what the camera gate is picking up. The camera doesn't appear to move.
-- **Parking is the right call.** The loop can't accept the clip or overrule the gate. New art is turned off for this job (max_generations 0), and the review note rules out softening the wording. So the next step is Lucas watching the clip.
-- **It breaks none of the rejection rules.** It doesn't propose a settings change or lean on a zero return (the return is 0.41). It doesn't accept the clip or touch scenario.json, and it doesn't hand-write an art prompt. Its fallback option actually moves toward a bounded mover, keeping the rough water to a band in front of the arch torrent and the shaft pour.
-- **One small mismatch:** the figures the worker quotes (6.50 px shift, median 6.54 vs mean 12.29) aren't in the gate report I was given. They don't change the conclusion, because my own measurement agrees.
-
-VERDICT: PASS

@@ -43,6 +43,8 @@ import re
 from PIL import Image, ImageDraw, ImageFont
 
 ROOMS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "rooms")
+TOOLS_ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", ".."))
+ART_QC_DIR = os.path.join(TOOLS_ROOT, "temp", "art_qc")
 
 
 def candidates(base, room):
@@ -157,7 +159,7 @@ def _main():
                          "hotspot result needed one)")
     a = ap.parse_args()
     if a.files:
-        out = a.out or "/home/bustalab/Documents/Tools/temp/art_qc/files"
+        out = a.out or os.path.join(ART_QC_DIR, "files")
         made, labels = strips(a.files, out, a.strips, labels=a.labels,
                               burn_labels=True, stack=a.stack)
         print("panels (%s):" % ("top -> bottom" if a.stack else "left -> right"))
@@ -173,14 +175,14 @@ def _main():
     base = os.path.join(ROOMS, a.chapter, a.scenario)
     doc = json.load(open(os.path.join(base, "scenario.json"), encoding="utf-8"))
     if a.grid:
-        out = "/home/bustalab/Documents/Tools/temp/art_qc/grid_%s_%s.png" % (a.scenario, a.room)
+        out = os.path.join(ART_QC_DIR, "grid_%s_%s.png" % (a.scenario, a.room))
         os.makedirs(os.path.dirname(out), exist_ok=True)
         print(grid_overlay(os.path.join(base, a.room, "scene.png"), out))
         return 0
     paths = candidates(base, a.room)
     if not paths:
         raise SystemExit("no candidates for %s" % a.room)
-    out = a.out or os.path.join("/home/bustalab/Documents/Tools/temp/art_qc", a.scenario, a.room)
+    out = a.out or os.path.join(ART_QC_DIR, a.scenario, a.room)
     made, labels = strips(paths, out, a.strips)
 
     print("candidates (left -> right in every strip):")

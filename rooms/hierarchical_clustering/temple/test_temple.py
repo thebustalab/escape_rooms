@@ -21,6 +21,7 @@ Failure modes it guards:
   - the escape's `when` stops matching the key its dial sets, so the payoff art never fires.
 """
 import importlib.util
+import hashlib
 import json
 import os
 import re
@@ -74,6 +75,28 @@ def main():
     drawn = set().union(*esc.STATUES.values())
     check(drawn == set(figmod.ORDER),
           "every figure type is used by some shrine (no dead glyphs): %s" % sorted(set(figmod.ORDER) - drawn))
+
+    print("== the painted figure tiles are the ones we checked ==")
+    # WHY A CHECKSUM (2026-09-20). The plates stopped being drawn shapes and became pasted paintings,
+    # one file per figure TYPE, shared by every shrine that owns it. That is what makes "the same frog"
+    # literally the same pixels. It also means a regenerated tile silently changes the evidence in up to
+    # four plates at once, so the bytes are pinned: regenerate deliberately, look at all twelve, and
+    # update MANIFEST.json in the same commit.
+    tdir = os.path.join(HERE, "figures", "tiles")
+    man_path = os.path.join(tdir, "MANIFEST.json")
+    check(os.path.isfile(man_path), "the figure tiles carry a checksum manifest")
+    if os.path.isfile(man_path):
+        man = json.load(open(man_path))["tiles"]
+        check(set(man) == set(figmod.ORDER),
+              "a tile exists for every figure type: missing %s" % sorted(set(figmod.ORDER) - set(man)))
+        for name, want in sorted(man.items()):
+            p = os.path.join(tdir, name + ".png")
+            if not os.path.isfile(p):
+                check(False, "tile %s is on disk" % name)
+                continue
+            got = hashlib.sha1(open(p, "rb").read()).hexdigest()
+            check(got == want,
+                  "tile %s matches the manifest (regenerated art? re-check it, then update MANIFEST.json)" % name)
 
     print("== the nameless niche stays out of the register ==")
     nameless = planned.get("The nameless niche")

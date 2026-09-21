@@ -315,3 +315,28 @@ def test_seam_backdrop_naming_forbidden_structure_does_not_warn(tmp_path):
 def test_bulky_structure_on_the_edge_slot_warns_alone(tmp_path):
     els = [{"id": "gate", "at": "on the far right", "desc": "a stone archway onto the street"}]
     assert len(_outer_warns(tmp_path, els, "edge.json")) == 1
+
+
+class MotionFieldMigration(unittest.TestCase):
+    """`animate` alone renders a still and then reports NO MOVER — the silent gap that nearly shipped
+    19 waterfalls views with no authored cinemagraph subject (2026-09-20)."""
+
+    ANIMATE_ONLY = {"id": "fall", "at": "dead ahead in the centre", "label": "A fall",
+                    "desc": "a fall of water", "animate": {"motion": "the water falling", "loop": "crossfade"}}
+
+    def test_animate_without_motion_fails_on_an_unbuilt_room(self):
+        f, _, _ = _run(_scen([_room("r1", [dict(self.ANIMATE_ONLY)])]))
+        self.assertTrue(any("no `motion:" in x for x in f), f)
+
+    def test_animate_without_motion_only_warns_once_the_art_is_built(self):
+        room = _room("r1", [dict(self.ANIMATE_ONLY)])
+        room["built"] = True
+        f, w, _ = _run(_scen([room]))
+        self.assertFalse(any("no `motion:" in x for x in f), f)
+        self.assertTrue(any("no `motion:" in x for x in w), w)
+
+    def test_animate_plus_motion_is_clean(self):
+        el = dict(self.ANIMATE_ONLY)
+        el["motion"] = {"moves": True, "phrase": "the water falling", "vigour": "heavy and unbroken"}
+        f, w, _ = _run(_scen([_room("r1", [el])]))
+        self.assertFalse(any("no `motion:" in x for x in f + w), (f, w))

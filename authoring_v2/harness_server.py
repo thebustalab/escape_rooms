@@ -2521,6 +2521,18 @@ def _run_gen_room_pano(slot, base, room_key, prompt, size, quality, idx):
     with open(ptmp, "w", encoding="utf-8") as f:
         f.write(prompt)
     ref = _world_plate_abs(base)   # world plate = shared continuity reference (via /images/edits). NEITHER
+    # PER-ROOM OPT-OUT (2026-09-21, flat_clustering/waterfalls). The plate rides every room at the model's
+    # default fidelity and drags its lighting with it (AGENTS.md -> THE IMAGE MODEL). The guide has always
+    # said "a deep-dark or bright room may want to skip the reference", but nothing honoured it: the plate
+    # was passed unconditionally. A room whose spec sets `worldPlateRef: false` now generates WITHOUT it —
+    # waterfalls' starlit catwalk (the only sky room) and its fire-free spillway and sump, which the plate
+    # pulled warm on the first run. Absent or true: unchanged behaviour.
+    try:
+        _node = next((r for r in _load_scenario(base).get("rooms", []) if r.get("key") == room_key), {}) or {}
+        if ((_node.get("authoring") or {}).get("sceneSpec") or {}).get("worldPlateRef") is False:
+            ref = None
+    except Exception:
+        pass                                      # never let the opt-out check block a generation
     ref_args = ["--ref", ref] if ref else []   # gpt-image-2 NOR gpt-image-2.5 accepts `input_fidelity` (both
                                                # 400 with invalid_input_fidelity_model, measured 2026-09-09) —
                                                # omit it; the ref always rides at the model's default

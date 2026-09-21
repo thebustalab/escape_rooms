@@ -1,2 +1,0 @@
-DECISION: RENDER
-WHY: This job is for the flooded state. Its still (scene_flooded.png) was replaced by hand at 14:24 with one that shows a raging flood, and its seam is already staged. The spec's flooded movers are the churning water, the torrent through the arch and the shaft pour, each with fast wording, and still_as pins the panel's lit cells. No clip has been made from this still yet: the newest flooded candidate, ri1_flooded_2, is from 14:17. So the spec and prompt are right, and the review note asks for exactly one render with the wording left alone.
