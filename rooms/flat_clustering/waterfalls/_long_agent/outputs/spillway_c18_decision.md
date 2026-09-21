@@ -1,0 +1,2 @@
+DECISION: RENDER
+WHY: The spec already has two bounded movers, and each has its vigour written in: the ropes of water gushing into one floor channel, and the single stream falling through the hatch. `render_motion_prompt` builds a clean prompt of about 50 words from the spec. That covers the "motion prompt: NONE" in the brief, because the spec is now where the prompt comes from. No clip exists yet, so render once at the defaults.

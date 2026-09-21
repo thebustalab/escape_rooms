@@ -451,7 +451,9 @@ code { background:#0a1620; padding:1px 5px; border-radius:4px; }
 
 /* ---- Deduction ledger (#9) — the classification escape -------------------------------------------- */
 /* A locked group goes read-only and green: the ONLY feedback the ledger ever gives is at group level. */
-.ledger { border-collapse:separate; border-spacing:4px 5px; margin:6px auto 4px; width:100%; }
+/* Scoped to TABLE: the hotspot marker also carries class "ledger" (its type), and a bare .ledger rule
+   stretched the Crown marker to width:100% in play. */
+table.ledger { border-collapse:separate; border-spacing:4px 5px; margin:6px auto 4px; width:100%; }
 .ledger th.rowlab { text-align:right; white-space:nowrap; color:#e8eef2; font-weight:600; font-size:14px; padding-right:4px; }
 .ledger select.verdict { background:rgba(0,0,0,.35); color:#e8eef2; border:1px solid rgba(255,216,140,.4);
   border-radius:7px; padding:4px 8px; font:inherit; font-size:14px; min-width:150px; }

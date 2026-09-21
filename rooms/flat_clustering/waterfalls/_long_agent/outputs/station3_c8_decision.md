@@ -1,0 +1,4 @@
+No clip exists for this room yet, and the spec is ready to render as it stands. It has two bounded movers, each with its vigour written into the art: the spill parting on the stone wedge, and the curtain of water falling through the bridge to the engine-hall. From that spec, `render_motion_prompt` builds a clean 53-word prompt in the house form. `scene.png` was regenerated today at 12:21, so there's a current still to render from.
+
+DECISION: RENDER
+WHY: The spec already has two bounded movers with their vigour authored, it renders to a clean motion prompt, and no clip exists yet, so the next step is one render at 3072 with end guide 0.70.

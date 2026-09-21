@@ -1,0 +1,2 @@
+DECISION: HOLD
+WHY: The ri3 clip is recorded in state and passed every gate. The camera is still. Glitch breadth is 0.125 raw and 0.062 normalised, well under the 0.70 line. The dead gate did not fire (ratio 9.7). A peak of 9.17 is in the range measured for live cyclic movers (8.06–9.35). The near-zero return fits the two water streams flowing in a cycle rather than a dead clip, and no metric can confirm that, so the clip goes to Lucas's eye.

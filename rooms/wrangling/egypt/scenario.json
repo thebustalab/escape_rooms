@@ -5073,20 +5073,20 @@
           "label": "The great reading-desk",
           "starterCode": "# The tally as the merchant would have it — the naive average, island by island.\nwine_cargo |>\n  group_by(region) |>\n  summarise(mean_quality = mean(quality_score)) |>\n  arrange(desc(mean_quality))",
           "question": {
-            "prompt": "The ledgers set the trouble down plainly: the islands do not ship the same grapes. Chios sends mostly its noble varieties and Thasos mostly its common ones, so a plain average flatters the famous name and tells you about the packing, not the ground.<br><br>The tally on the desk is the merchant's version, and it is the one you wrote in the market. <b>Repair it so that every grape has an equal say in each island's figure</b> — then say which island truly makes the better wine.",
+            "prompt": "The ledgers make a troubling thing clear: the islands each grow a different collection of grapes. Chios sends mostly its noble varieties and Thasos mostly its common ones, so a plain average flatters those islands that grow mostly high quality varieties and tells you about what each island exports, not the ground of the island itself and that ground's potential.<br><br>On the desk is what you wrote in the market. <b>Repair it so that not only each region is grouped, but every grape varietal also gets its own say within each island's figure</b> — then say which island truly makes the better wine, even if it mainly ships out lesser varieties.",
             "options": [
-              "Chios — 6.26",
-              "Kos — 6.83",
-              "Thasos — 7.43",
-              "Rhodes — 6.52",
-              "Chios — 7.28",
-              "Aminean — 7.81",
-              "no change — Chios still leads"
+              "Chios",
+              "Kos",
+              "Thasos",
+              "Rhodes",
+              "Helvola",
+              "Aminean",
+              "Duracina"
             ],
             "correct": 2,
             "maxAttempts": 4,
             "feedback": {
-              "correct": "Correct — noted in your field notebook: give every grape an equal say and Thasos leads at 7.43, with Chios falling to last at 6.26.",
+              "correct": "Correct — noted in your field notebook: give every grape an equal say and Thasos leads, with Chios falling to last.",
               "wrong": [
                 "Work it in two stages. Take one average for each island-and-grape pairing first, so a common grape and a noble one each contribute a single figure.",
                 "Then release the grouping and average those per-pairing figures within each island — every grape now counts once, however many jars of it were packed.",
@@ -5138,40 +5138,41 @@
           "type": "door",
           "label": "The bronze doors",
           "box": [
-            0.1769,
-            0.4011,
-            0.2605,
-            0.7739
+            0.1064,
+            0.3093,
+            0.19,
+            0.6821
           ],
           "direction": "back",
-          "to": "canopic"
+          "to": "canopic",
+          "boxSource": "moved:testplay"
         },
         {
           "id": "great_ledger",
           "type": "puzzle",
           "label": "The great reading-desk",
           "box": [
-            0.3852,
-            0.6138,
-            0.6218,
-            0.786
+            0.3755,
+            0.5026,
+            0.6121,
+            0.6748
           ],
           "starterCode": "wine_cargo %>%\n  group_by(region) %>%\n  summarize(mean_quality = mean(quality_score))",
           "question": {
             "prompt": "The ledgers make a troubling thing clear: the islands each grow a different collection of grapes. Chios sends mostly its noble varieties and Thasos mostly its common ones, so a plain average flatters those islands that grow mostly high quality varieties and tells you about what each island exports, not the ground of the island itself and that ground's potential.<br><br>On the desk is what you wrote in the market. <b>Repair it so that not only each region is grouped, but every grape varietal also gets its own say within each island's figure</b> — then say which island truly makes the better wine, even if it mainly ships out lesser varieties.",
             "options": [
-              "Chios — 6.26",
-              "Kos — 6.83",
-              "Thasos — 7.43",
-              "Rhodes — 6.52",
-              "Chios — 7.28",
-              "Aminean — 7.81",
-              "no change — Chios still leads"
+              "Chios",
+              "Kos",
+              "Thasos",
+              "Rhodes",
+              "Helvola",
+              "Aminean",
+              "Duracina"
             ],
             "correct": 2,
             "maxAttempts": 4,
             "feedback": {
-              "correct": "Correct — noted in your field notebook: give every grape an equal say and Thasos leads at 7.43, with Chios falling to last at 6.26.",
+              "correct": "Correct — noted in your field notebook: give every grape an equal say and Thasos leads, with Chios falling to last.",
               "wrong": [
                 "Work it in two stages. Take one average for each island-and-grape pairing first, so a common grape and a noble one each contribute a single figure.",
                 "Then release the grouping and average those per-pairing figures within each island — every grape now counts once, however many jars of it were packed.",
@@ -5182,7 +5183,8 @@
           "solveSfx": {
             "src": "audio/solve_library_great_ledger_1.mp3",
             "volume": 0
-          }
+          },
+          "boxSource": "moved:testplay"
         },
         {
           "id": "night_wash",

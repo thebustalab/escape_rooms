@@ -1,2 +1,0 @@
-DECISION: RENDER
-WHY: Both waterfall curtains (over the down-ladder and through the bridge) are already authored as bounded movers, each with `motion.moves`, `vigour` and `phrase`. The station1 still was regenerated this morning (08:27) from the current spec, and no clip exists yet. "Motion prompt: NONE" is the same known display gap noted on catwalk's held clip: the renderer builds the prompt from the two `motion.phrase` fields, so nothing needs authoring before the one render at 3072.

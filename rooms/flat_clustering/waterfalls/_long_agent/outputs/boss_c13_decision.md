@@ -1,0 +1,2 @@
+DECISION: RENDER
+WHY: The spec already has exactly one bounded mover: the sluice sheet pouring into its trough, with vapour off its face. It has depicted vigour in its `desc` and its own `motion.phrase`, so `render_motion_prompt` will build the motion prompt from the spec even though none is set yet. No clip exists, so the next step is one render at 3072 with end guide 0.70.

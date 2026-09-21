@@ -547,6 +547,25 @@ FLAT_CLUSTERING_HEIST_KEY <- list(
   }
 )
 
+# flat_clustering / waterfalls (scenario id 10): "Where the Waters Divide" — k-means down a drowned
+# alchemical shaft. Four GRADED rooms in room order: station1 (MCQ, largest of 3 families = 10 phials,
+# index 3), station2 (pick-the-point, the elbow at k = 3), station3 (console-check, size of the
+# resin-richest family = 6), boss (MCQ, the scaling trap: Jasper's kin = Selenite, index 2; Antimony at
+# index 0 is the unscaled decoy). Pick and check rooms encode a solve as answer = 1, so
+# correct = c(3, 1, 1, 2). The basin's reckoning-frame escape is ungraded. Pinned by
+# rooms/flat_clustering/waterfalls/test_waterfalls.py.
+FLAT_CLUSTERING_WATERFALLS_KEY <- list(
+  scenario_id = 10,
+  correct = c(3, 1, 1, 2),
+  score_step = function(correct, answer, attempts) {
+    if (answer != correct) return(0)
+    if (attempts <= 1) return(10)
+    if (attempts == 2) return(7)
+    if (attempts == 3) return(5)
+    3
+  }
+)
+
 # embeddings / submarine (scenario id 22): "The Sounding" — text-embedding retrieval over a ship
 # archive, played from the two ends of a crippled salvage submarine.
 #
@@ -823,5 +842,20 @@ if (identical(environment(), globalenv()) && sys.nframe() == 0) {
   cat("Pano heist grade — points:", hg20$points, "|", hg20$detail, "\n")
   if (!isTRUE(hg20$valid && hg20$points == 40)) {
     stop("REGRESSION: pano heist grade wrong — expected 40 pts for one branch solved first-try")
+  }
+
+  # Regression: pano scenario id 10 (flat_clustering/waterfalls) — MCQ, pick, check, MCQ boss.
+  wsteps10 <- list(list(answer = 3, attempts = 1), list(answer = 1, attempts = 1),
+                   list(answer = 1, attempts = 1), list(answer = 2, attempts = 1))
+  wcode10 <- encode_code(version = 2, scenario_id = 10, steps = wsteps10, student_id = "waterfalls_test")
+  wd10 <- decode_code(wcode10, "waterfalls_test")
+  wok10 <- wd10$valid && wd10$scenario_id == 10 &&
+    identical(wd10$answers, c(3L, 1L, 1L, 2L)) && identical(wd10$attempts, c(1L, 1L, 1L, 1L))
+  cat("Pano round-trip OK id 10 (should be TRUE):", wok10, "\n")
+  if (!wok10) stop("REGRESSION: pano round-trip failed (id 10 waterfalls)")
+  wg10 <- grade_one(wcode10, "waterfalls_test", FLAT_CLUSTERING_WATERFALLS_KEY)
+  cat("Pano waterfalls grade — points:", wg10$points, "|", wg10$detail, "\n")
+  if (!isTRUE(wg10$valid && wg10$points == 40)) {
+    stop("REGRESSION: pano waterfalls grade wrong — expected 40 pts for an all-first-try solve")
   }
 }

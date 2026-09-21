@@ -1,0 +1,2 @@
+DECISION: HOLD
+WHY: The clip passes every gate. The glitch breadth is 0.146, well under the 0.70 threshold. The dead check shows ratio 13.74 and peak 12.54, well above its 1.75 and 0.45 floors. The return of 0.03 is the known dead-or-cyclic ambiguity that should be escalated, never used to reject, and both movers here are pouring water, which is cyclic flow. So the clip goes to Lucas's eye rather than another authoring or render step.

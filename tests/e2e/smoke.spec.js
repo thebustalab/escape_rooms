@@ -29,6 +29,8 @@ const SCENARIOS = [
   // scenario — the briefing's two role doors each set `state.role` via `onPass` and close the other,
   // so "does a role-gated start load and attach hotspots" is a question about the shared engine.
   { name: "heist", path: "/escape_rooms/rooms/flat_clustering/heist/play.html" },
+  // waterfalls: in_development, covered from WIRING (2026-09-21) — base art walkthrough before variants.
+  { name: "waterfalls", path: "/escape_rooms/rooms/flat_clustering/waterfalls/play.html" },
 ];
 
 for (const sc of SCENARIOS) {

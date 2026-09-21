@@ -1,0 +1,2 @@
+DECISION: HOLD
+WHY: The first 3072 clip passes every gate. Glitch breadth is 0.292 (0.188 normalised), well below the 0.70 rejection threshold on both readings. The dead check reads ratio 8.21, so the clip is not frozen. The zero return is the expected result for a steadily pouring sluice, since a cyclic flow never goes out and comes back, and the pipeline says a zero return is flagged for review, never rejected. The next step is Lucas's eye on the clip, not another render or a new still.
