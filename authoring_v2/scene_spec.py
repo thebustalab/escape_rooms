@@ -101,6 +101,37 @@ EQUIRECT = ("This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the
             "outside it or from across it")
 
 
+# FULL-SPHERE rooms (2026-09-21, clouds' Eye — the first dome test). A normal room is a 360 x ~120 degree BAND:
+# no sky straight up, no floor straight down, which is why the planetarium conversion leaves a smeared rosette
+# at the dome's centre (rooms/final/deep_space/notes.md -> Domemaster conversion). A spec with
+# `fullSphere: true` is generated at 2:1 and must depict the WHOLE sphere, so the projection sentence changes:
+# the top edge is the single point straight overhead and the bottom edge the single point straight below.
+# Every other clause (seam anchor, edge discipline) still applies — the left/right wrap is unchanged.
+EQUIRECT_SPHERE = ("This is a FULL-SPHERE EQUIRECTANGULAR panorama at 2:1, covering every direction at once: "
+                   "left to right is a full 360-degree turn, and top to bottom runs from STRAIGHT UP to STRAIGHT "
+                   "DOWN. The ENTIRE TOP EDGE of the image is the one single point directly overhead (the zenith), "
+                   "stretched across the width, so whatever is overhead smears smoothly along the top; the ENTIRE "
+                   "BOTTOM EDGE is the one single point directly below (the nadir). The horizon runs level across "
+                   "the exact middle of the image. It is NOT a flat photograph, and there is no single-vanishing-"
+                   "point composition")
+FULL_SPHERE_SIZE = "3072x1536"
+
+
+def is_full_sphere(spec):
+    return bool((spec or {}).get("fullSphere"))
+
+
+def pano_size(spec, default="3072x1024"):
+    """The generation size a room's art must use: 2:1 for a full-sphere room, else the house band size."""
+    return FULL_SPHERE_SIZE if is_full_sphere(spec) else default
+
+
+def wrap_for(spec):
+    """The viewer `wrap` a room's committed art needs. Full sphere: the whole 180 degrees vertically, with
+    `sphere:true` telling the player to skip its viewport fit and allow looking up and down."""
+    return {"haov": 360, "vaov": 180, "vOffset": 0, "sphere": True} if is_full_sphere(spec) else None
+
+
 # ---- the two clauses added for gpt-image-2.5-sunburst (2026-09-09) -------------------------------
 # Both go BEFORE `seam_tail`, never after: rule 5 puts the seam anchor last deliberately and it is the
 # biggest single lever on seam quality. Appending anything after it demotes it to mid-prompt.
@@ -152,7 +183,7 @@ def render_prompt(spec):
     quality. gpt-image describes the far-left and far-right as one surface instead of two clashing objects."""
     setting = spec.get("setting", "the centre of the room")
     seam = _seam_anchor(spec)
-    intro = f"This is a seamless 360-degree panorama from {setting}. {EQUIRECT}."
+    intro = f"This is a seamless 360-degree panorama from {setting}. {EQUIRECT_SPHERE if is_full_sphere(spec) else EQUIRECT}."
     seam_head = (f"Directly behind the viewer, split across the extreme left and extreme right edges, is "
                  f"{seam}: the far-left edge and the far-right edge are the two halves of this one surface "
                  f"and must match exactly in colour, texture, and lighting, joining into a single continuous, "

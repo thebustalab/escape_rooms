@@ -1,142 +1,46 @@
 {
-  "status": "working",
+  "status": "awaiting_review",
   "retry_count": 0,
-  "started": "2026-09-21T16:05:26.343527+00:00",
-  "last_cycle": "2026-09-21T16:52:36.600443+00:00",
-  "cycles_completed": 18,
+  "started": "2026-09-21T21:54:21.476913+00:00",
+  "last_cycle": "2026-09-21T22:08:28.732072+00:00",
+  "cycles_completed": 3,
   "rooms": {
-    "station2": {
-      "art_generated": 1,
+    "station1": {
       "history": [
+        {
+          "cycle": 1,
+          "decision": "RENDER",
+          "why": "No cine_all_clear.mp4 exists yet. In the all_clear still, the curtains over both crossings are gone, as the state requires. The state spec gives the up-ladder element a motion phrase for a bounded flame mover, and the image shows a large lit cresset right beside that ladder on the left. The ledger lists flame as one of the strongest mover types, so the spec and prompt are right as they stand."
+        },
         {
           "cycle": 3,
-          "decision": "RENDER",
-          "why": "The spec already has two bounded movers, each with its vigour written into the art: the heavy water column through the descent (left of centre) and the steady curtain through the bridge (right). Each also has its own motion.phrase, so render_motion_prompt builds the motion prompt from the spec even though no prompt .txt exists. No clip has been rendered yet, so the next step is one render at 3072 with end guide 0.70."
-        },
-        {
-          "cycle": 5,
           "decision": "HOLD",
-          "why": "The ri3 clip is recorded in state and passed every gate. The camera is still. Glitch breadth is 0.125 raw and 0.062 normalised, well under the 0.70 line. The dead gate did not fire (ratio 9.7). A peak of 9.17 is in the range measured for live cyclic movers (8.06–9.35). The near-zero return fits the two water streams flowing in a cycle rather than a dead clip, and no metric can confirm that, so the clip goes to Lucas's eye."
+          "why": "The cycle-1 all_clear render (seed 4242) passed the camera, glitch and frozen-render gates, and the zero loop reading can't tell cyclic flame flicker from a dead clip, so it needs Lucas's eye."
         }
       ],
       "attempts": 1,
       "last_gate": {
         "camera": "still",
-        "return": 0.02,
-        "peak": 9.17,
+        "return": 0.01,
+        "peak": 6.83,
         "glitch": {
-          "spike": 3.5,
-          "breadth": 0.125,
-          "at_pct": 79.2,
-          "frames": 73,
-          "breadth_normalised": 0.062
-        },
-        "dead": {
-          "ratio": 9.7,
-          "peak": 10.21,
-          "dead": false
-        },
-        "note": "no out-and-back: dead, or cyclic flow. NEEDS AN EYE — this measure has called three good clips dead."
-      },
-      "clip": "/home/bustalab/Documents/Tools/temp/cine/_art_prompt_exp/waterfalls/station2_motion_ri3_looped.mp4",
-      "held": true,
-      "staged": "/home/bustalab/Documents/Tools/websites/thebustalab.github.io/escape_rooms/rooms/flat_clustering/waterfalls/_scratch/cine_cand/station2/base__ri3.mp4"
-    },
-    "station3": {
-      "art_generated": 1,
-      "history": [
-        {
-          "cycle": 8,
-          "decision": "RENDER",
-          "why": "The spec already has two bounded movers with their vigour authored, it renders to a clean motion prompt, and no clip exists yet, so the next step is one render at 3072 with end guide 0.70."
-        },
-        {
-          "cycle": 10,
-          "decision": "HOLD",
-          "why": "The clip passes every gate. The glitch breadth is 0.146, well under the 0.70 threshold. The dead check shows ratio 13.74 and peak 12.54, well above its 1.75 and 0.45 floors. The return of 0.03 is the known dead-or-cyclic ambiguity that should be escalated, never used to reject, and both movers here are pouring water, which is cyclic flow. So the clip goes to Lucas's eye rather than another authoring or render step."
-        }
-      ],
-      "attempts": 1,
-      "last_gate": {
-        "camera": "still",
-        "return": 0.03,
-        "peak": 8.89,
-        "glitch": {
-          "spike": 3.29,
-          "breadth": 0.146,
-          "at_pct": 31.9,
-          "frames": 73,
-          "breadth_normalised": 0.062
-        },
-        "dead": {
-          "ratio": 13.74,
-          "peak": 12.54,
-          "dead": false
-        },
-        "note": "no out-and-back: dead, or cyclic flow. NEEDS AN EYE — this measure has called three good clips dead."
-      },
-      "clip": "/home/bustalab/Documents/Tools/temp/cine/_art_prompt_exp/waterfalls/station3_motion_ri8_looped.mp4",
-      "held": true,
-      "staged": "/home/bustalab/Documents/Tools/websites/thebustalab.github.io/escape_rooms/rooms/flat_clustering/waterfalls/_scratch/cine_cand/station3/base__ri8.mp4"
-    },
-    "boss": {
-      "art_generated": 1,
-      "history": [
-        {
-          "cycle": 13,
-          "decision": "RENDER",
-          "why": "The spec already has exactly one bounded mover: the sluice sheet pouring into its trough, with vapour off its face. It has depicted vigour in its desc and its own motion.phrase, so render_motion_prompt will build the motion prompt from the spec even though none is set yet. No clip exists, so the next step is one render at 3072 with end guide 0.70."
-        },
-        {
-          "cycle": 15,
-          "decision": "HOLD",
-          "why": "The first 3072 clip passes every gate. Glitch breadth is 0.292 (0.188 normalised), well below the 0.70 rejection threshold on both readings. The dead check reads ratio 8.21, so the clip is not frozen. The zero return is the expected result for a steadily pouring sluice, since a cyclic flow never goes out and comes back, and the pipeline says a zero return is flagged for review, never rejected. The next step is Lucas's eye on the clip, not another render or a new still."
-        }
-      ],
-      "attempts": 1,
-      "last_gate": {
-        "camera": "still",
-        "return": 0.0,
-        "peak": 7.2,
-        "glitch": {
-          "spike": 4.02,
-          "breadth": 0.292,
-          "at_pct": 31.9,
+          "spike": 4.77,
+          "breadth": 0.167,
+          "at_pct": 1.4,
           "frames": 73,
           "breadth_normalised": 0.188
         },
         "dead": {
-          "ratio": 8.21,
-          "peak": 8.95,
+          "ratio": 10.29,
+          "peak": 12.45,
           "dead": false
         },
         "note": "no out-and-back: dead, or cyclic flow. NEEDS AN EYE — this measure has called three good clips dead."
       },
-      "clip": "/home/bustalab/Documents/Tools/temp/cine/_art_prompt_exp/waterfalls/boss_motion_ri13_looped.mp4",
+      "clip": "/home/bustalab/Documents/Tools/temp/cine/_art_prompt_exp/waterfalls/station1_motion_ri1_all_clear_looped.mp4",
       "held": true,
-      "staged": "/home/bustalab/Documents/Tools/websites/thebustalab.github.io/escape_rooms/rooms/flat_clustering/waterfalls/_scratch/cine_cand/boss/base__ri13.mp4"
-    },
-    "spillway": {
-      "art_generated": 1,
-      "history": [
-        {
-          "cycle": 18,
-          "decision": "RENDER",
-          "why": "The spec already has two bounded movers, and each has its vigour written in: the ropes of water gushing into one floor channel, and the single stream falling through the hatch. render_motion_prompt builds a clean prompt of about 50 words from the spec. That covers the \"motion prompt: NONE\" in the brief, because the spec is now where the prompt comes from. No clip exists yet, so render once at the defaults."
-        }
-      ],
-      "attempts": 1
-    },
-    "sump": {
-      "needs_still": true,
-      "spec_edited_at": 1790006726.3838038
+      "staged": "/home/bustalab/Documents/Tools/websites/thebustalab.github.io/escape_rooms/rooms/flat_clustering/waterfalls/_scratch/cine_cand/station1/all_clear__ri1.mp4"
     }
   },
-  "generations": 4,
-  "render_polls": 0,
-  "pending_render": {
-    "room": "spillway",
-    "raw": "/home/bustalab/Documents/Tools/temp/cine/_art_prompt_exp/waterfalls/spillway_motion_ri18.mp4",
-    "log": "/home/bustalab/Documents/Tools/websites/thebustalab.github.io/escape_rooms/rooms/flat_clustering/waterfalls/_long_agent/outputs/spillway_ri18_render.log"
-  }
+  "render_polls": 0
 }

@@ -12,8 +12,10 @@ halves because the scenario has two networks about different entities:
 
   A. THE GRADED LADDER, against the shipped CSV — the four rung answers plus the boss staying in
      lockstep with the data. The scenario's whole argument is that volume is not importance, so the
-     guards are: the busiest station is removable with no structural effect, and the sole articulation
-     point is the twentieth-busiest of twenty.
+     guards are: the busiest station (the CROWN) is removable with no structural effect, and the sole
+     articulation point (WHISTLEGATE) is the QUIETEST of the twelve. (Corrected 2026-09-22: this line
+     used to read "the twentieth-busiest of twenty", a v1 figure from the retired 20-station ledger.
+     The shipped CSV has twelve stations and test_ladder asserts rank == 12 of 12.)
 
   B. THE ESCAPE, against the verified placement in `_scratch/tianshan_coverage.json` — the four fires
      and every village's `seen_by`. The ledger's `answer` fields are authored by hand from that
@@ -22,8 +24,11 @@ halves because the scenario has two networks about different entities:
 
 Failure modes it guards:
   - the CSV changes and a rung's verified answer stops being the single clean winner;
-  - the shortcut (busiest = Kingsmuster) and the boss (articulation point = Whistlegate) stop being
-    DIFFERENT stations, which is the entire taught trap;
+  - the shortcut (busiest = the Crown) and the boss (articulation point = Whistlegate) stop being
+    DIFFERENT stations, which is the entire taught trap; (Corrected 2026-09-22: this used to name
+    "Kingsmuster" as the busiest — a v1 station that no longer exists. test_ladder asserts the Crown,
+    and the check at the end of test_puzzles() actively FAILS if the string "Kingsmuster" (or
+    Slatecrag, Ossfell, depot, twentieth) survives anywhere in player-facing scenario.json text.)
   - the placement is re-searched and the four fires change, but the wired ledger answers do not;
   - a village appears that no fire reaches, or a second set of four also covers everything, or one of
     the four becomes redundant — any of which makes the escape unsolvable or multiply-solvable;

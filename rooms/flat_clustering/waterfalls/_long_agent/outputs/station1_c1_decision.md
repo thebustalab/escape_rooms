@@ -1,0 +1,4 @@
+I've checked the all_clear image against the state spec. Both crossings are dry, as the spec requires, and a lit cresset burns beside the ladder going up, which is a bounded mover. No all_clear clip exists yet.
+
+DECISION: RENDER
+WHY: No `cine_all_clear.mp4` exists yet. In the `all_clear` still, the curtains over both crossings are gone, as the state requires. The state spec gives the up-ladder element a motion phrase for a bounded flame mover, and the image shows a large lit cresset right beside that ladder on the left. The ledger lists flame as one of the strongest mover types, so the spec and prompt are right as they stand.

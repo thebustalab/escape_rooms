@@ -220,8 +220,11 @@ def test_malformed_animate_and_variants_are_named_fails(tmp_path):
 
 def test_well_formed_art_fields_still_pass(tmp_path):
     p = tmp_path / "ok.json"
+    # well formed since 2026-09-20 means `animate` AND `motion`: the live motion path reads
+    # `element.motion`, and `animate` alone is the silent no-mover drift the rule above catches.
     p.write_text(json.dumps(_spec_with({
         "animate": {"motion": "the fire surging", "loop": "boomerang"},
+        "motion": {"moves": True, "vigour": "a steady surge", "phrase": "the fire surging"},
         "variants": [{"state": "lit", "when": {"eq": ["k", "v"]}, "reveal": "identical but lit"}]})))
     fails, _w, _r, _o = vs.check_scenario(str(p))
     assert not [f for f in fails if "animate" in f or "variants" in f], fails

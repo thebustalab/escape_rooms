@@ -1,5 +1,5 @@
 // room_edit_core.js — shared authoring core for the 360 room editor.
-// Phase 0 of the hub-and-spoke plan (notes/hub_and_spoke_plan.md): one home for the fetch helpers,
+// Phase 0 of the hub-and-spoke plan (notes/z_archive/hub_and_spoke_plan.md): one home for the fetch helpers,
 // node/draft load, room save, and the live cinemagraph compositor that reproject_test.html (the future
 // hub) — and, in a later phase, hotspots_edit.html — share. Plain script (no ES modules) to match how the
 // authoring pages load scripts; exposes window.RoomEditCore.

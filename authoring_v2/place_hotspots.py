@@ -3,7 +3,7 @@
 
 Runs `localizer.py` per room and writes the results onto each room's `plannedHotspots` as draft boxes,
 matched by the spec element's own `label`. Explicitly DRAFT: Lucas drags them in the test play, and his
-corrections are the first real ground truth (see `notes/scenario_pipeline_vision.md` → *Who should place
+corrections are the first real ground truth (see `notes/z_archive/scenario_pipeline_vision.md` → *Who should place
 hotspots*). Nothing here is treated as final.
 
 THE COLLAPSE CHECK, and why it exists. Grounding DINO — the localizer's default engine — was run on

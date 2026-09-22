@@ -270,7 +270,7 @@ def build_grid():
         "buckets": [{"key": k, "label": lbl} for k, lbl, _ in BUCKETS],
         "answer": answer,
         "maxAttempts": 0,
-        "endsEscape": True,
+        # NOT endsEscape (2026-09-21): solving opens the vault; the vault DOOR ends it (_scratch/wiring/vault_open.py).
         "feedback": {"correct": "The frame settles, every setting against its sort, and the vault gives.",
                      "wrong": "The frame will not settle. One of those settings does not make that sort.",
                      "out": ""},

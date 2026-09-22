@@ -122,7 +122,7 @@ def _gen_with_refs(a, prompt, refs):
     # No mask → the whole frame is generated fresh, guided by the reference(s) for backdrop/style
     # continuity while the prompt drives this room's composition. input_fidelity defaults to the
     # API default ("low") so the plate guides the WORLD, not the exact pixels — send "high" only
-    # to hew closely to the reference. Up to 16 refs (OpenAI cap); repeated "image" form field.
+    # to hew closely to the reference. Up to 16 refs (OpenAI cap); `image[]` form field when more than one.
     import requests
     if len(refs) > 16:
         sys.exit(f"too many reference images ({len(refs)}); OpenAI allows at most 16.")
@@ -131,7 +131,10 @@ def _gen_with_refs(a, prompt, refs):
         sys.exit("reference image(s) not found: " + ", ".join(missing))
     fhs = [open(p, "rb") for p in refs]
     try:
-        files = [("image", (os.path.basename(p), fh, "image/png")) for p, fh in zip(refs, fhs)]
+        # One ref is sent as `image`; several must be `image[]` — the API now rejects a repeated `image` field with
+        # 400 "Duplicate parameter" (hit 2026-09-21 on the first two-reference edit). Single-ref calls unchanged.
+        field = "image" if len(refs) == 1 else "image[]"
+        files = [(field, (os.path.basename(p), fh, "image/png")) for p, fh in zip(refs, fhs)]
         data = {"model": a.model, "prompt": prompt, "size": a.size, "quality": a.quality}
         if getattr(a, "input_fidelity", None):
             data["input_fidelity"] = a.input_fidelity

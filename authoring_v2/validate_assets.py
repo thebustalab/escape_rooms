@@ -26,6 +26,11 @@ Per rooms/<chapter>/<scenario>/scenario.json, for every BUILT room:
   - MISS  a one-way passage: a forward/open door A->B with no return door back to A in B (or a door
           targeting a missing/unbuilt room). The ART half (inverse geometry both ends) stays an eyeball check.
 
+  R SANDBOX
+  - FAIL  a student-facing package (dplyr, ggplot2, tidyr, rstatix) is in `packages` but never attached
+          by `setup`. The console INSTALLS `packages` and only `setup` runs library(), so the package's
+          functions — and dplyr's %>% — do not exist for the student (subway, 2026-09-21).
+
   CONTENT / TESTS (per scenario — generic conventions, promoted from the per-scenario tests 2026-07-29)
   - MISS  a clue hotspot renders blank — no body, no committed image, no pickup (opens an empty modal)
   - MISS  a `dial` with no `states` — the card renders a gauge and NO buttons, so the control is inert and
@@ -159,6 +164,24 @@ def pickup_tile_shape(scen, d):
                            "SQUARE, so this loses its edges on the board; author pickup art square"
                            % (r["key"], h.get("id"), size[0], size[1], ar))
     return out
+
+
+# Packages whose functions students call BARE in their own code. The rest (readr, igraph, ggiraph,
+# ggrepel, network, ggnetwork) are support packages reached via `::` or by scenario helpers, so they may
+# legitimately be installed without being attached.
+STUDENT_FACING_PACKAGES = ("dplyr", "ggplot2", "tidyr", "rstatix")
+
+
+def packages_not_attached(scen):
+    """webr-console.js installs `packages` but only `setup` attaches anything. A student-facing package
+    listed without a matching library() call is installed and invisible: subway shipped with no setup at
+    all, so `%>%` itself was "could not find function" in its first puzzle (2026-09-21)."""
+    import re
+    setup = scen.get("setup") or ""
+    attached = set(re.findall(r"(?:library|require)\(\s*['\"]?([A-Za-z0-9.]+)", setup))
+    return ["package '%s' is installed but never attached — add library(%s) to `setup`, or students get "
+            "\"could not find function\" for it" % (p, p)
+            for p in (scen.get("packages") or []) if p in STUDENT_FACING_PACKAGES and p not in attached]
 
 
 def dials_without_states(scen):
@@ -359,6 +382,7 @@ def check_scenario(path):
         misses.append("no test_<name>.py (pins answers to the CSV + decoder lockstep — a ready scenario needs one)")
     misses.extend(door_reciprocity(scen))                # topology: every passage has a return door
     misses.extend(door_labels_undecided(scen))           # a roamable world owes a doorLabels decision
+    fails.extend(packages_not_attached(scen))            # installed-but-unattached R packages
     misses.extend(dials_without_states(scen))            # a stateless dial is an inert control
     misses.extend(pickup_tile_shape(scen, d))            # notebook board tiles are square-cropped
     _cm, _cf = clip_state_pairing(scen)                  # a full-scene state whose motion doesn't match it

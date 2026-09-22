@@ -12,7 +12,7 @@ MEASURED against Lucas's own hand-drawn boxes on `wrangling/egypt/pharos`:
     harbour_below "beam_on_ship" derived [0.634,0.323,0.919,0.449]  vs authored [0.636,0.295,0.915,0.449]  IoU 0.80
 
 i.e. IoU 0.89 and 0.80 — better than the vision-based hotspot localisation measured in
-`notes/scenario_pipeline_vision.md` (0.83 on a prominent object, 0.39 and 0.21 on harder ones, two
+`notes/z_archive/scenario_pipeline_vision.md` (0.83 on a prominent object, 0.39 and 0.21 on harder ones, two
 outright misses), and with no API cost.
 
 TWO SHAPES OF CHANGE, AND WHY THE MASK MATTERS MORE THAN THE BOX

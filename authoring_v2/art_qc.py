@@ -10,7 +10,7 @@ tall, which is genuinely below what can be resolved.
 So the failure was not "an agent cannot see art defects" — it was reviewing at the wrong scale. This is
 the same lesson the cinemagraph work already learned twice: a region averaged into a whole-frame view
 disappears (mean vs p95), and "small objects need a coarse pass then crop-and-zoom"
-(`notes/scenario_pipeline_vision.md`).
+(`notes/z_archive/scenario_pipeline_vision.md`).
 
 WHAT THIS DOES. Cuts each candidate into vertical strips at NATIVE resolution and lays the candidates
 SIDE BY SIDE within each strip. Two properties matter:

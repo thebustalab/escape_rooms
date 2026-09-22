@@ -17,11 +17,13 @@
  * `addStatusEl()`, `plotControls(opts)`, `resetSession()`, `resetControl(opts)`, `.ready`, `.webR`.
  */
 import { WebR } from "https://webr.r-wasm.org/latest/webr.mjs";
-import { VIEW_R_SHIM, VIEW_R_DRAIN, fromR, viewTableHTML, ensureViewStyles } from "./webr_view.js?v=108";
-import { codeToRun, selectionNote } from "./code_sel.js?v=108";
-import { PLOT_ASPECTS, PLOT_DEFAULT_ASPECT, PLOT_LIMITS, PLOT_CTL_CSS, plotGeometry } from "./plot_size.js?v=108";
-import { RESET_R_SHIM, RESET_R_CALL, RESET_CTL_CSS, RESET_LABEL, RESET_CONFIRM_LABEL, RESET_CONFIRM_MS, nextConfirmState } from "./webr_reset.js?v=108";
-import { explainError, looksLikeOrphanLayer } from "./r_diagnose.js?v=108";
+import { VIEW_R_SHIM, VIEW_R_DRAIN, fromR, viewTableHTML, ensureViewStyles } from "./webr_view.js?v=113";
+import { codeToRun, selectionNote } from "./code_sel.js?v=113";
+import { PLOT_ASPECTS, PLOT_DEFAULT_ASPECT, PLOT_LIMITS, PLOT_CTL_CSS, plotGeometry } from "./plot_size.js?v=113";
+import { RESET_R_SHIM, RESET_R_CALL, RESET_CTL_CSS, RESET_LABEL, RESET_CONFIRM_LABEL, RESET_CONFIRM_MS, nextConfirmState } from "./webr_reset.js?v=113";
+import { explainError, looksLikeOrphanLayer } from "./r_diagnose.js?v=113";
+import { R_BIOC_REPOS, BASE_PACKAGES, ANALYSIS_PACKAGES, BIOC_PACKAGES, resolvePackages } from "./r_packages.js?v=113";
+import { MATRIX_ANALYSIS_R_SHIM } from "./r_matrix_analysis.js?v=113";
 
 const errText = e => (e && e.message ? e.message : String(e));
 
@@ -171,10 +173,44 @@ export class WebRConsole {
       this.webR = new WebR({ interactive: false });
       await this.webR.init();
 
-      const pkgs = this.config.packages || [];
-      if (pkgs.length) {
-        this.setStatus("Installing R packages: " + pkgs.join(", ") + " …");
-        await this.webR.installPackages(pkgs, { quiet: true });
+      /*
+       * Packages come from shared/r_packages.js, NOT from the caller — that file is the one list, so
+       * the rooms, the book's cells and the sandbox can no longer drift apart. A consumer's own
+       * `packages` is now ADDITIVE: it names only what is special to that page.
+       *
+       * THREE installs, and the split is load-bearing rather than tidiness:
+       *
+       *   1. BASE + the caller's extras, from WebR's DEFAULT repo. Required — if this fails the
+       *      session is useless, so the error propagates and the boot fails loudly.
+       *   2. ANALYSIS, also from the default repo, best-effort.
+       *   3. BIOC (ggtree), the ONLY call that passes `repos`.
+       *
+       * Why not one call with `repos` set for all of it: `repos` REPLACES WebR's default, so a broad
+       * install through the r-universe mirrors pulls binaries built with a different toolchain than
+       * the ones already in the image. Tried in a real browser on 2026-09-22 and it produced a
+       * mixed-ABI library from an install that reported success — `FactoMineR::PCA` died on
+       * "could not load dynamic lib mvtnorm.so" and base `parallel` stopped loading. Splitting it
+       * fixed both AND was faster (10.3 s + 8.5 s against 24.8 s). Do not recombine these.
+       *
+       * Stages 2 and 3 are BEST-EFFORT on purpose. They are the slow, most-likely-to-flake half and
+       * they serve exactly one function; letting a Bioconductor mirror hiccup brick every escape room
+       * would be a far worse failure than runMatrixAnalysis being unavailable for one session. The
+       * console still boots and the student gets a plain line saying which verb is missing.
+       */
+      const extraPkgs = (this.config.packages || []).filter(p => !resolvePackages().includes(p));
+      const required = [...BASE_PACKAGES, ...extraPkgs];
+      this.setStatus("Installing R packages: " + required.join(", ") + " …");
+      await this.webR.installPackages(required, { quiet: true });
+
+      let analysisOk = true;
+      try {
+        this.setStatus("Installing analysis packages …");
+        await this.webR.installPackages(ANALYSIS_PACKAGES, { quiet: true });
+        this.setStatus("Installing ggtree (this is the slow bit) …");
+        await this.webR.installPackages(BIOC_PACKAGES, { repos: R_BIOC_REPOS, quiet: true });
+      } catch (e) {
+        analysisOk = false;
+        console.warn("[webr-console] analysis packages unavailable:", errText(e));
       }
 
       for (const ds of (this.config.datasets || [])) {
@@ -201,6 +237,26 @@ export class WebRConsole {
       // view() goes in BEFORE the caller's setup, so a scenario/page that wants its own wins.
       await this.webR.evalRVoid(VIEW_R_SHIM);
 
+      /*
+       * runMatrixAnalysis() — the analysis verb the course teaches. Defined here rather than in any
+       * one surface's setup so the rooms, the book's cells and the sandbox all get the SAME function;
+       * a student who learned it in chapter 7 must find it in a room. Generated from phylochemistry.R
+       * by authoring_v2/gen_r_matrix_analysis.py — see shared/r_matrix_analysis.js.
+       *
+       * Skipped if its packages did not install, and a failure is swallowed either way: this is one
+       * verb, and it must not be able to stop a room from booting. Above RESET_R_SHIM so that
+       * "reset session" restores it (that shim snapshots the global environment as it stands here).
+       */
+      if (analysisOk) {
+        try {
+          this.setStatus("Loading runMatrixAnalysis() …");
+          await this.webR.evalRVoid(MATRIX_ANALYSIS_R_SHIM);
+        } catch (e) {
+          analysisOk = false;
+          console.warn("[webr-console] runMatrixAnalysis unavailable:", errText(e));
+        }
+      }
+
       if (this.config.setup) {
         this.setStatus("Preparing session…");
         await this.webR.evalRVoid(this.config.setup);
@@ -216,7 +272,9 @@ export class WebRConsole {
 
       this.ready = true;
       this.resetCtls.forEach(b => { b.disabled = false; });
-      this.setStatus("R is ready. Type code below and press Run.");
+      this.setStatus(analysisOk
+        ? "R is ready. Type code below and press Run."
+        : "R is ready, but runMatrixAnalysis() could not load — reload the page to try again.");
     })().catch(err => {
       this.booting = null;
       this.webR = null;

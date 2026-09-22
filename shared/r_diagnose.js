@@ -35,7 +35,7 @@
  *
  * PURE — no DOM, no WebR. Tested in Node (`tests/r_diagnose.test.mjs`).
  */
-import { tokenizeR } from "./r_highlight.js?v=108";
+import { tokenizeR } from "./r_highlight.js?v=113";
 
 const OPENERS = { "(": ")", "[": "]", "{": "}" };
 const CLOSERS = { ")": "(", "]": "[", "}": "{" };
@@ -480,6 +480,12 @@ export function explainError(text, ctx) {
     // A %...% OPERATOR, not a function — `%<%` is the pipe with its arrow turned round. The generic
     // "check the spelling or it lives in another package" is the wrong advice for this: there is no
     // package, and the student needs the right operator, not a hunt.
+    // The pipe spelled CORRECTLY but missing means dplyr is not attached — the nearest-match branch
+    // below would otherwise tell the student to use exactly what they typed (subway, 2026-09-21).
+    if (m[1] === "%>%") {
+      return hint("The pipe %>% is spelled correctly, but the package that provides it (dplyr) is not loaded here. Load it first, then run your code again.",
+                  "library(dplyr)");
+    }
     const near = didYouMean(m[1], ["%>%", "%in%"]);
     if (near === "%>%") {
       return hint(`R has no operator called ${m[1]}. The pipe is %>% — its arrow points forward, toward the next step.`);

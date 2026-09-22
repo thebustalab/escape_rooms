@@ -6,13 +6,14 @@ authority: reference
 
 The **scene spec** is the single structured input the automated art pipeline derives everything from — the
 gpt-image prompt, the cinemagraph batch jobs, and the hotspot stubs all fall out of it (see
-`scene_spec.py`; design + phasing in `notes/art_pipeline.md`). The spec-author is **Claude**: given a room
+`scene_spec.py`; design + phasing in `notes/z_archive/art_pipeline.md`, archived). The spec-author is **Claude**: given a room
 network and a description of vibes, Claude drafts **one spec per room** following the rules below.
 
 ## Inputs → output
 - **Inputs:** the room network (which rooms, how they connect via doors), a description of the world/vibes,
-  and each room's role/story beat. (For a full CHEM 5725 scenario these come from `escape_room_puzzles` +
-  `escape_room_story`.)
+  and each room's role/story beat. (For a full CHEM 5725 scenario these come from `escape_room_puzzles`
+  (ladder + dataset) then `escape_room_concept`, which owns the world, the narrative and the room graph —
+  it absorbed the retired `escape_room_story` and `escape_room_design` skills on 2026-09-03.)
 - **Output:** a JSON object `{"worldPlate": "<prompt>", roomKey: spec, ...}` for the whole scenario, ready for
   `POST /api/save-scene-specs`. **`worldPlate`** (optional, scenario-level) is a "world-bible" establishing-image
   prompt — pack the key elements + palette into one frame, written **TIME-NEUTRAL** (soft even daylight, neither
@@ -408,8 +409,11 @@ one room at a time makes the template the path of least resistance every single 
 room should arrive from the bearing the player actually travelled. Beacons said "from the south" in every
 room; only three of its nine legs were southerly, and the legs ranged from under 4 km to 15 km with one
 1,490 m ascent. Approach direction and leg character are free differentiation that the topology has
-already decided for you. (`escape_room_scene_validator` checks passage *pairing*; bearing is on the
-spec-author.)
+already decided for you. (Door *topology* — every door's `to` exists, every non-start room has a `back`
+door, no gateless room with a `forward` door — is checked by `validate_scenes.py`, run on its own or via
+the enforced `authoring_v2/preflight.py` pre-art gate; that script and `escape_room_concept` took over
+from the retired `escape_room_scene_validator` skill. **Bearing is on the spec-author: no checker
+verifies it.**)
 
 **Art fidelity is not a puzzle-leak vector, and treating it as one is expensive** (Lucas, 2026-09-02).
 Beacons deliberately flattened its views so no player could read the coverage answer off a painting. That

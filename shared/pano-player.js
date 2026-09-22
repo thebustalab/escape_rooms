@@ -70,13 +70,14 @@
 // A bare `./variant_resolve.js` import is NOT refreshed by bumping the <script> tag's ?v, so a changed
 // helper module (e.g. a new export) leaves browsers on a stale cached copy → "doesn't provide an export
 // named X" SyntaxError → blank page (the 2026-08-05 airship regression). Bump all three together.
-import { WebRConsole } from "./webr-console.js?v=108";
-import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers } from "./variant_resolve.js?v=108";   // Phase 3: per-hotspot state variants; monorail switch-door nav
-import * as PQ from "./puzzle_queue.js?v=108";   // dynamic puzzle queue: location-independent puzzle serving
-import { particleCount } from "./particles.js?v=108";   // ambient-particle vocabulary + per-kind field density
-import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=108";
-import { condHolds } from "./cond.js?v=108";   // ledger + elevation-map card DOM
-import * as RIDE from "./ride.js?v=108";   // THE RIDE (subway): express lever + clip-sequence planner
+import { WebRConsole } from "./webr-console.js?v=113";
+import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers } from "./variant_resolve.js?v=113";   // Phase 3: per-hotspot state variants; monorail switch-door nav
+import * as PQ from "./puzzle_queue.js?v=113";   // dynamic puzzle queue: location-independent puzzle serving
+import * as CP from "./corr_panel.js?v=113";   // lower-triangle layout of the grid gate (clouds correlation panel)
+import { particleCount } from "./particles.js?v=113";   // ambient-particle vocabulary + per-kind field density
+import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=113";
+import { condHolds } from "./cond.js?v=113";   // ledger + elevation-map card DOM
+import * as RIDE from "./ride.js?v=113";   // THE RIDE (subway): express lever + clip-sequence planner
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 
@@ -107,6 +108,7 @@ root.innerHTML = `
     <button id="skipChip" style="display:none;position:absolute;bottom:10px;left:50%;transform:translateX(-50%);z-index:20;background:rgba(0,0,0,.42);padding:5px 12px;border-radius:14px;border:1px solid rgba(255,216,140,.35);font:12px system-ui;color:rgba(255,216,140,.92);cursor:pointer;user-select:none" title="Open your submission — you can come back to it as often as you like">Prepare submission / skip the ungraded escape phase →</button>
     <div id="hud"><span id="hudroom"></span></div>
     <div id="motifHud"></div>
+    <div id="headingHud" style="display:none"><div class="hdgDial"><div class="hdgNeedle"></div></div><span class="hdgText"></span></div>
 
     <button class="arrow l" id="prev">‹</button>
     <button class="arrow r" id="next">›</button>
@@ -759,7 +761,7 @@ function openNotebook() {
   if (!caseFile.length) {
     d.innerHTML = `<p style="opacity:.75">Your notebook is empty. Solve a room's puzzle and its answer is noted here automatically; pick up a clue to add it yourself.</p>`;
     d.appendChild(nbScratchSection());   // the pad is available from the very start, empty case file or not
-    openModal("🗒 Field notebook", d);
+    openModal("🗒 Field notebook", d, null, null, "wide");
     return;
   }
   const imgEntries = caseFile.filter(e => e.image);
@@ -855,7 +857,7 @@ function openNotebook() {
     d.appendChild(sec);
   }
   d.appendChild(nbScratchSection());
-  openModal("🗒 Field notebook", d);
+  openModal("🗒 Field notebook", d, null, null, "wide");
 }
 
 // ---- DYNAMIC WRAP FIT (2026-08-31) -------------------------------------------------------------
@@ -901,6 +903,9 @@ function viewportVFov(hfov) {
 // point: if the viewer and the hotspot projection ever used different vaov values, every marker would
 // sit at the wrong height.
 function fitWrap(c) {
+  // A FULL-SPHERE room (`wrap.sphere`, 2026-09-21 — clouds' Eye, the first dome test) covers the whole 180
+  // degrees; its vaov is a fact about the image, not a viewport choice, so it is never fitted.
+  if (c && c.sphere) return c;
   if (!c || !wrapFitOn()) return c;
   const ceiling = c.vaovMax || WRAP_FIT_MAX;
   const v = Math.max(WRAP_FIT_MIN, Math.min(ceiling, viewportVFov(c.hfov || 110)));
@@ -1076,7 +1081,7 @@ function renderDoorLabels() {
 // room NAMES only — no hotspots (Lucas, 2026-09-15): the harness draws a dot per puzzle/clue/switch on
 // this same graph, and shipping those would spoil every room at a glance. The renderer is the shared
 // `map_graph.js` (window.MapGraph, a classic script like codec.js/debrief.js — NOT an ES import, so the
-// authoring harness can load the same file). Plan + phases: notes/player_map_plan.md.
+// authoring harness can load the same file). Plan + phases: notes/z_archive/player_map_plan.md (archived).
 //
 // Default ON; only an explicit `playerMap: false` turns it off — the same posture as `fitWrap`. It is
 // `playerMap`, not `map`, because `map` is already a puzzle `type` (pick-a-point) and `"map": false` in a
@@ -1124,7 +1129,7 @@ function openMap() {
   d.innerHTML = `<svg class="mapsvg" viewBox="0 0 ${g.W} ${g.H}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Map of the rooms you have visited">${g.html}</svg>`
     + `<div class="maplegend"><span class="mk-cur"></span> where you are`
     + `<span class="mk-unknown"></span> somewhere you have not been yet</div>`;
-  openModal("🗺 Map", d);
+  openModal("🗺 Map", d, null, null, "wide");
 }
 
 // --- Three-phase portals (opt-in: SCENARIO.stonePortals) --------------------------------------------
@@ -1168,6 +1173,7 @@ function startRoom(i) {
     if (h && h.type === "dial" && h.resetOnEnter) gameState[h.key || h.id] = h.default;
   });
   applyFx();                         // setting-matched environment overlays (scenario.fx + room.fx)
+  applyHeading();                    // the vessel's bearing in this room, if the room declares one
   // Re-entry: a room already solved (reached again via a back door) opens in its solved state —
   // open panorama, forward door live, puzzle short-circuits as done.
   solved = !!(room.key && solvedRooms.has(room.key));
@@ -1336,6 +1342,25 @@ function updateMotif() {
 }
 function healMotif() {
   if (motifOn()) $("#motifHud").classList.add("resolved");   // per-kind: lesion fades, vitals steadies + strengthens
+}
+
+// heading — the vessel's bearing in this room (2026-09-21, clouds / THE SHADOW CITY). Opt-in: `room.heading` is a
+// compass bearing in degrees (0 = north, clockwise). A small dial under the top-right HUD turns its needle to
+// that bearing and prints it, so a scenario whose PLACES are directions (clouds' ring of headings round the
+// city, two of them a quarter-turn apart) lets the player FEEL the angle between rooms instead of being told.
+// Absent ⇒ hidden, so every other scenario is unchanged. Pure display: nothing gates on it.
+export function headingText(deg) {
+  const d = ((Math.round(Number(deg)) % 360) + 360) % 360;
+  return String(d).padStart(3, "0") + "°";
+}
+function applyHeading() {
+  const hud = $("#headingHud"); if (!hud) return;
+  const deg = room && room.heading;
+  if (deg === undefined || deg === null || isNaN(Number(deg))) { hud.style.display = "none"; return; }
+  hud.style.display = "";
+  hud.querySelector(".hdgNeedle").style.transform = `rotate(${Number(deg)}deg)`;
+  hud.querySelector(".hdgText").textContent = headingText(deg);
+  hud.title = "Heading " + headingText(deg);
 }
 
 // fx — setting-matched environment overlays over the room (opt-in: scenario.fx and/or room.fx, an array
@@ -1647,7 +1672,9 @@ function _renderViewer(img, yaw = 0, dynamic = false, bare = false) {   // bare:
     haov: c.haov, vaov: c.vaov, vOffset: c.vOffset || 0,
     hfov: f, pitch: p, yaw,
     autoLoad: true, showControls: false, autoRotate: 0,
-    draggable: false, mouseZoom: false, doubleClickZoom: false,
+    // A full-sphere room is the one place looking UP matters (the sky IS the scene), so it alone is
+    // draggable; every other room keeps the yaw-only arrows (see the comment above).
+    draggable: !!c.sphere, mouseZoom: false, doubleClickZoom: false,
     keyboardZoom: false, disableKeyboardCtrl: true,
     hotSpots: hotSpots,
     backgroundColor: [0.02, 0.05, 0.09],
@@ -1972,7 +1999,16 @@ function correctResult(h) {
 // (close the modal, then solveRoom with the correct result) with no answering required.
 const devSolveThunk = (h, qIndex) => () => { closeModal(); solveRoom(correctResult(h), h, qIndex); };
 
-function openModal(title, node, onDevSolve, tpLabelOf) {
+/*
+ * `size` — "wide" for the full-bleed box, anything else (the default) for a snug, content-sized one.
+ * Added 2026-09-22: every popup shared one 97vw box, so a one-sentence clue filled the screen. Pass
+ * "wide" whenever the body holds the WebR console, a plot, the notebook collage, the map, or a
+ * width:100% table (ledger / elevation map) — those measure or fill their container. The console one
+ * is not cosmetic: student plot geometry is measured from the pane, so a narrow puzzle modal silently
+ * shrinks the figures that go into a submission.
+ */
+function openModal(title, node, onDevSolve, tpLabelOf, size) {
+  document.querySelector("#modal .mbox").classList.toggle("wide", size === "wide");
   $("#mtitle").textContent = title;
   // The modal title is the hotspot's `label` — player-facing on every single open, so it is editable
   // too. `tpLabelOf` is the hotspot it came from; callers that pass none get a plain title.
@@ -2354,7 +2390,7 @@ function openMapview(h) {
     c.textContent = (state != null ? (dialLabel(h, state) + " — ") : "") + h.caption;
     d.appendChild(c);
   }
-  openModal(h.label || "The chart", d, null, h);
+  openModal(h.label || "The chart", d, null, h, "wide");
 }
 
 // Pick-a-point-on-the-plot puzzle (used by the escape "map on the wall"). `h.map` =
@@ -2364,7 +2400,7 @@ function openMapview(h) {
 // its point. Ungraded (escape phase) — clicking the correct point's box solves the room.
 function openMapPuzzle(h, qIndex) {
   if (viewer) resumeYaw = viewer.getYaw();
-  openModal(h.label || "The survey chart", buildMapCard(h.map, (result) => { closeModal(); solveRoom(result, h, qIndex); }), devSolveThunk(h, qIndex), h);
+  openModal(h.label || "The survey chart", buildMapCard(h.map, (result) => { closeModal(); solveRoom(result, h, qIndex); }), devSolveThunk(h, qIndex), h, "wide");
 }
 function buildMapCard(map, onSolved) {
   const card = document.createElement("div"); card.className = "mapcard";
@@ -2421,7 +2457,7 @@ function openPuzzle(h, qIndex) {
   const pid = gateKey(room.key, h.id);   // per-room attempt-count key (ids repeat across rooms)
   right.appendChild(h.check ? buildCheckCard(h.check, onSolved, pid, h) : buildQuestion(h.question, onSolved, pid));
   grid.appendChild(left); grid.appendChild(right);
-  openModal(h.label || "Puzzle", grid, devSolveThunk(h, qIndex), h);
+  openModal(h.label || "Puzzle", grid, devSolveThunk(h, qIndex), h, "wide");
 }
 
 // multiple-choice card — gate is the *product* of running the analysis
@@ -2676,7 +2712,7 @@ function openPickPuzzle(h, qIndex) {
   const pid = gateKey(room.key, h.id);            // per-room attempt-count key (ids repeat across rooms)
   right.appendChild(buildPickCard(h.pick, onSolved, pid, h));
   grid.appendChild(left); grid.appendChild(right);
-  openModal(h.label || "Puzzle", grid, devSolveThunk(h, qIndex), h);
+  openModal(h.label || "Puzzle", grid, devSolveThunk(h, qIndex), h, "wide");
 }
 function buildPickCard(pick, onSolved, pid, h) {
   const maxA = pick.maxAttempts || 4; let attempts = attemptCounts.get(pid) || 0;
@@ -2918,6 +2954,7 @@ function openGrid(h) {
   openModal(h.label || "Panel", buildGridCard(h, (result) => { closeModal(); solveRoom(result, h); }), devSolveThunk(h), h);
 }
 function buildGridCard(h, onSolved) {
+  if (h.layout === "lowerTriangle") return buildTriangleCard(h, onSolved);
   const items = h.items || [], buckets = h.buckets || [], answer = h.answer || {};
   const maxA = h.maxAttempts || 0;                 // 0 = unlimited (ungraded escape)
   const fbk = h.feedback || {};
@@ -2962,6 +2999,67 @@ function buildGridCard(h, onSolved) {
   return card;
 }
 
+// The correlation panel: a `grid` with layout:"lowerTriangle" (see corr_panel.js for the why). One cell per
+// pair of `axes`, laid out as the lower triangle of the matrix; clicking a cell cycles it through `buckets`
+// (drawn as a flat / rising / falling line), every cell starting on the first. Same check, same feedback
+// keys and same attempt counting as the plain grid, so nothing downstream can tell the difference.
+function buildTriangleCard(h, onSolved) {
+  const axes = h.axes || [], buckets = h.buckets || [], answer = h.answer || {};
+  const items = (h.items && h.items.length) ? h.items : CP.triangleItems(axes);
+  const maxA = h.maxAttempts || 0;
+  const fbk = h.feedback || {};
+  const pid = gateKey(room.key, h.id);
+  let attempts = attemptCounts.get(pid) || 0;
+  const sel = CP.initialSelection(items, buckets);
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const bLabel = k => ((buckets.find(b => b.key === k) || {}).label || k);
+  const face = k => CP.glyphSvg(k) || `<span class="trilab">${esc(bLabel(k))}</span>`;
+  const byRC = {};
+  items.forEach(it => { byRC[`${it.row},${it.col}`] = it; });
+  let rows = "";
+  for (let i = 1; i < axes.length; i++) {
+    rows += `<tr><th class="rowlab">${esc(axes[i].label)}</th>`;
+    for (let j = 0; j < axes.length - 1; j++) {
+      const it = byRC[`${i},${j}`];
+      rows += it
+        ? `<td><button class="tricell" data-item="${esc(it.key)}" aria-label="${esc(it.label)}: ${esc(bLabel(sel[it.key]))}">${face(sel[it.key])}</button></td>`
+        : `<td class="triblank"></td>`;
+    }
+    rows += `</tr>`;
+  }
+  const card = document.createElement("div"); card.className = "qcard gridcard tricard";
+  card.innerHTML =
+    (h.prompt ? `<div class="qprompt">${h.prompt}</div>` : "") +
+    `<table class="gridsel tri"><thead><tr><th></th>` +
+      axes.slice(0, -1).map(a => `<th>${esc(a.label)}</th>`).join("") + `</tr></thead><tbody>${rows}</tbody></table>` +
+    `<div class="trilegend">` + buckets.map(b => `<span>${face(b.key)} ${esc(b.label)}</span>`).join("") + `</div>` +
+    `<div class="qfeedback"></div><button class="qsubmit">${esc(h.submitLabel || "Set the panel")}</button>`;
+  const fb = card.querySelector(".qfeedback"), sub = card.querySelector(".qsubmit");
+  card.querySelectorAll(".tricell").forEach(btn => btn.addEventListener("click", () => {
+    const k = btn.dataset.item;
+    sel[k] = CP.cycleBucket(buckets, sel[k]);
+    btn.innerHTML = face(sel[k]);
+    btn.dataset.state = sel[k];
+    btn.setAttribute("aria-label", (items.find(it => it.key === k) || {}).label + ": " + bLabel(sel[k]));
+    fb.className = "qfeedback"; fb.innerHTML = "";
+  }));
+  card.querySelectorAll(".tricell").forEach(btn => { btn.dataset.state = sel[btn.dataset.item]; });
+  sub.addEventListener("click", () => {
+    attempts++; attemptCounts.set(pid, attempts);
+    if (CP.isSolved(items, sel, answer)) {
+      fb.className = "qfeedback ok"; fb.innerHTML = fbk.correct || "The panel settles.";
+      card.querySelectorAll("button").forEach(b => b.disabled = true);
+      setTimeout(() => onSolved({ answer: 1, attempts }), 900);
+    } else if (maxA && attempts >= maxA) {
+      fb.className = "qfeedback out"; fb.innerHTML = fbk.out || "The panel goes dark.";
+      card.querySelectorAll("button").forEach(b => b.disabled = true);
+    } else {
+      fb.className = "qfeedback no"; fb.innerHTML = fbk.wrong || "The panel will not settle.";
+    }
+  });
+  return card;
+}
+
 // ---- Deduction ledger (#9) — the CLASSIFICATION escape ---------------------------------------------
 // Root: Return of the Obra Dinn's crew book. Rows are entities, each with a <select> naming the group
 // you assign it to. THE SOUL IS THE CONFIRMATION RULE: the ledger never confirms a single row. It
@@ -3003,7 +3101,7 @@ function openLedger(h) {
     { label: "Shown while the ledger is still locked (lockedBody)", get: () => h.lockedBody || "",
       set: v => { h.lockedBody = v; return save(); } },
   ]);
-  openModal(h.label || "Ledger", lcard, devSolveThunk(h));
+  openModal(h.label || "Ledger", lcard, devSolveThunk(h), null, "wide");
 }
 
 // ---- Elevation map — the draggable transcription surface -------------------------------------------
@@ -3026,7 +3124,7 @@ function openLedger(h) {
 // used to tell the player when a node is sitting where their reading says — the map grades nothing.
 function openElevmap(h) {
   if (viewer) resumeYaw = viewer.getYaw();
-  openModal(h.label || "The map", buildElevmapCard(h, { gameState }));
+  openModal(h.label || "The map", buildElevmapCard(h, { gameState }), null, null, "wide");
 }
 
 // A GATE (puzzle/lock hotspot `h`) was solved. Mark the gate. If it's the room's PRIMARY gate, advance
@@ -3042,6 +3140,10 @@ function solveRoom(result, h, qIndex) {
   if (qIndex != null && PQ.usesQueue(SCENARIO) && !queueSolved.has(qIndex)) {
     queueSolved.add(qIndex);
     queueResults.set(qIndex, result || { answer: 1, attempts: 1 });
+    // Expose ladder progress as world state, so ordinary gates can wait for the WHOLE ladder:
+    // {gte:["queue_solved", N]}. {solved: roomKey} cannot express this — a room holding one queue slot
+    // counts as solved after its FIRST rung, which would open clouds' Eye three readings early.
+    gameState.queue_solved = queueSolved.size;
   }
   // Optional solve / door-open sting: per-puzzle `solveSfx`, falling back to room then scenario level.
   const ss = (h && h.solveSfx) || room.solveSfx || SCENARIO.solveSfx;

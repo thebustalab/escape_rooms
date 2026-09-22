@@ -649,7 +649,7 @@ git add -A && git commit -m "whatever changed" && git push</pre>
     // Fields bind to the in-memory doc on `oninput` (so a repaint keeps unsaved text) and PERSIST on
     // `change` (blur), so leaving a field saves it. Each map edit also syncs into the matching
     // standalone step editor (entry-cards / finish step) so those + Save-all never show stale text —
-    // the standalone editors are transitional and get removed in Phase 4 (see notes/harness_reorder_plan.md).
+    // the standalone editors are transitional and get removed in Phase 4 (see notes/z_archive/harness_reorder_plan.md).
     function wireMapNode(el, room, isFirst, isTerminal) {
       const key = room.key, st = el.querySelector(".mnStatus"), box = el.querySelector(".mnstory");
       const ok = m => { st.innerHTML = `<span class="ok2">${esc(m)}</span>`; };

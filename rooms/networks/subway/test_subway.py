@@ -375,11 +375,35 @@ if lock:
           "and its wrong-feedback gives NO partial information — the pair cannot be binary-searched")
     # The entry convention has to be READABLE IN-WORLD or the player has the pair and not the order.
     # This is the Egypt playtest failure mode and no other check in this repo catches it.
+    #
+    # CARRIED TEXT, not `body`. A `pickup` clue is read TWICE: in the room (`body`) and afterwards from
+    # the notebook (`pickup`), and the two are separate strings that a hand-edit can easily desync — which
+    # is exactly what happened on 2026-09-22, when the convention was added to `body` alone and the copy
+    # the player actually carries to the lock did not have it. Assert on what they are holding when they
+    # type the answer, i.e. `pickup` where there is one.
+    carried = lambda h: str(h.get("pickup") or h.get("body") or "")
     cards = [h for h in rooms["ochre_hall"]["hotspots"]
-             if h.get("type") == "clue" and re.search(r"lower letter", str(h.get("body")), re.I)]
+             if h.get("type") == "clue" and re.search(r"lower letter", carried(h), re.I)]
     check(bool(cards),
-          "some clue in ochre_hall states the filing convention (both references, one entry, lower "
-          "letter first) — without it the escape is unsolvable with the right answer in hand")
+          "the filing convention (both references, one entry, lower letter first) is in the CARRIED text "
+          "of an ochre_hall clue — without it the escape is unsolvable with the right answer in hand")
+    # "Unused" is the word the standing orders use for the target, and it has an obvious wrong reading:
+    # the stretches past the last interchange on the woad and weld lines cannot be ridden, so a player
+    # naturally reads THOSE stations as the disused ones (Lucas, playtest 2026-09-22). The orders must
+    # therefore DEFINE unused by the property that actually identifies a ghost — absent from every map —
+    # rather than leaving it to be inferred from where the train will take you.
+    defined = [h for h in rooms["ochre_hall"]["hotspots"]
+               if h.get("type") == "clue" and re.search(r"no map", carried(h), re.I)]
+    check(bool(defined),
+          "an ochre_hall clue DEFINES 'unused' as appearing on no map — otherwise the unreachable ends "
+          "of the woad and weld lines read as the answer")
+    # And the reason those stretches cannot be ridden has to be sayable in-world, or the single-direction
+    # lever is itself evidence for the wrong reading.
+    closed = [h for h in rooms["ochre_hall"]["hotspots"]
+              if h.get("type") == "clue" and re.search(r"through running", carried(h), re.I)]
+    check(bool(closed),
+          "an ochre_hall clue explains why the far ends of those lines cannot be ridden (no through "
+          "running), so 'the train will not go there' stops reading as 'disused'")
     sheets = [h for h in rooms["ochre_hall"]["hotspots"]
               if h.get("type") == "clue" and h.get("image")]
     check(bool(sheets), "and the carried survey sheet is present as a clue image")

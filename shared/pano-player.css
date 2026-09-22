@@ -132,6 +132,17 @@ button.ghost { background:transparent; color:var(--ink); border:1px solid var(--
   26%{ opacity:.4; transform:scale(.92); } 40%{ opacity:.7; transform:scale(1); } }
 .motif-vitals.resolved .vitals { animation-duration:1.15s; box-shadow:0 0 15px 5px rgba(90,240,150,.6); } /* steadies + strengthens */
 @media (prefers-reduced-motion: reduce){ #motifHud .lesion, #motifHud .vitals { animation:none !important; } }
+/* heading dial (room.heading) — under the motif emblem, top right. A needle, not a rose: one direction, read at a glance. */
+#headingHud { position:absolute; top:62px; right:14px; z-index:19; display:flex; align-items:center; gap:7px;
+  flex-direction:row-reverse; pointer-events:none; font:600 12px system-ui; color:rgba(232,238,242,.92);
+  text-shadow:0 1px 3px rgba(0,0,0,.7); letter-spacing:.04em; }
+#headingHud .hdgDial { position:relative; width:34px; height:34px; border-radius:50%;
+  border:1.5px solid rgba(232,238,242,.55); background:rgba(0,0,0,.35); }
+#headingHud .hdgDial::before { content:""; position:absolute; top:2px; left:50%; width:2px; height:4px; margin-left:-1px;
+  background:rgba(232,238,242,.7); }                                   /* the north tick */
+#headingHud .hdgNeedle { position:absolute; left:50%; top:4px; bottom:50%; width:2px; margin-left:-1px;
+  background:#ffd88c; border-radius:1px; transform-origin:50% 100%; transition:transform .6s ease; }
+@media (prefers-reduced-motion: reduce){ #headingHud .hdgNeedle { transition:none; } }
 
 /* fx — a small library of setting-matched environment overlays over the room (opt-in: scenario.fx / room.fx,
    an array). Deliberately gentle, never a horror strobe. */
@@ -170,7 +181,20 @@ button.ghost { background:transparent; color:var(--ink); border:1px solid var(--
 .fx-flood { background:linear-gradient(0deg, rgba(40,90,105,.30) 0%, rgba(40,90,105,.16) 16%, rgba(60,110,125,.05) 30%, transparent 40%);
   transform-origin:50% 100%; animation:fxFlood 9s ease-in-out infinite; }
 @keyframes fxFlood { 0%,100%{ opacity:.75; transform:scaleY(1); } 50%{ opacity:1; transform:scaleY(1.12); } }
-@media (prefers-reduced-motion: reduce){ .fx-flicker, .fx-frost, .fx-godrays, .fx-rain, .fx-dust, .fx-haze, .fx-flood { animation:none !important; } }
+/* "lightning" (2026-09-21, clouds / THE SHADOW CITY) — a storm flashing somewhere OFF to one side: a soft
+   white-violet wash from the right edge (the outboard eyewall in clouds' ring rooms), a quick double pulse
+   then a long dark. PHOTOSENSITIVITY: two pulses ~0.4 s apart inside an 11 s cycle is far below the
+   three-flashes-a-second threshold, peak opacity is capped low, and reduced-motion turns it off entirely
+   (no flash, not a frozen bright frame — hence opacity:0 below). Gate it with {fx:"lightning", when:…}
+   so the storm can calm on a story beat. Use "lightningLeft" when the storm is on the other side. */
+.fx-lightning, .fx-lightningLeft { opacity:0; animation:fxLightning 11s linear infinite; }
+.fx-lightning { background:radial-gradient(90% 120% at 108% 40%, rgba(226,222,255,.55), rgba(200,190,255,.16) 45%, transparent 75%); }
+.fx-lightningLeft { background:radial-gradient(90% 120% at -8% 40%, rgba(226,222,255,.55), rgba(200,190,255,.16) 45%, transparent 75%);
+  animation-delay:-4s; }
+@keyframes fxLightning { 0%,61%{ opacity:0; } 62%{ opacity:.55; } 63.2%{ opacity:.08; } 65.5%{ opacity:.42; }
+  68%{ opacity:.12; } 72%,100%{ opacity:0; } }
+@media (prefers-reduced-motion: reduce){ .fx-flicker, .fx-frost, .fx-godrays, .fx-rain, .fx-dust, .fx-haze, .fx-flood { animation:none !important; }
+  .fx-lightning, .fx-lightningLeft { animation:none !important; opacity:0 !important; } }
 
 /* tactile dial — a brass gauge face with a needle that swings to the chosen sigil */
 .dialface { position:relative; width:150px; height:88px; margin:4px auto 12px;
@@ -260,8 +284,20 @@ button.ghost { background:transparent; color:var(--ink); border:1px solid var(--
    OVERLAY scrolls — centring here would clip the top of an over-tall box beyond reach */
 #modal { position:fixed; inset:0; z-index:20; display:none; align-items:flex-start; justify-content:center; background:rgba(3,8,13,.72); padding:12px; overflow-y:auto; }
 #modal.open { display:flex; }
-/* near-full-screen; no max-height so the box grows with a large plot instead of clipping it */
-.mbox { position:relative; background:var(--panel); border:1px solid var(--line); border-radius:14px; width:97vw; max-width:1700px; overflow:visible; padding:16px 18px; }
+/* SIZING: snug by default, wide only where the content needs it (2026-09-22, Lucas playtest).
+   Every in-play popup shares this ONE box — openModal never used to vary it, so a one-sentence clue
+   got the same 97vw slab as a two-pane WebR puzzle, which read as a bug. Default is now content-driven
+   between a comfortable reading minimum and a single-column maximum; `openModal(..., "wide")` restores
+   the old full-bleed box for the things that genuinely need it (the console's two-pane split, plots,
+   the notebook collage, the map, the ledger and elevation tables).
+   DO NOT make `wide` the default again: the console pane's width is MEASURED to size student plots
+   (shared/AGENTS.md → "Plots are sized from the PANE they land in"), so a puzzle modal that is not
+   wide silently produces smaller submission figures.
+   No max-height either way, so the box grows with a large plot instead of clipping it; the OVERLAY
+   scrolls (#modal is align-items:flex-start on purpose — centring would clip an over-tall box). */
+.mbox { position:relative; background:var(--panel); border:1px solid var(--line); border-radius:14px; width:fit-content; min-width:min(460px, 92vw); max-width:min(97vw, 760px); overflow:visible; padding:16px 18px; }
+/* the old behaviour, now opt-in. min-width:0 so fit-content's floor cannot fight the 97vw. */
+.mbox.wide { width:97vw; min-width:0; max-width:1700px; }
 .mbox .mclose { position:absolute; top:8px; right:10px; z-index:2; background:transparent; border:0; color:var(--ink); opacity:.55; font-size:20px; line-height:1; cursor:pointer; padding:4px 8px; }
 .mbox .mclose:hover { opacity:1; }
 /* test-play only — the "Solve" shortcut, tucked just left of the ✕ close (see isTestPlay in the player) */
@@ -449,6 +485,19 @@ code { background:#0a1620; padding:1px 5px; border-radius:4px; }
 #subWork .swrun { margin: 0; }
 #subWork .swstat { font-size: 12px; opacity: .8; }
 
+/* correlation panel — grid layout:"lowerTriangle" (clouds). Cells cycle flat / up / down; empty upper-right cells stay blank. */
+.gridsel.tri { margin:8px auto 4px; border-spacing:6px; }
+.gridsel.tri th { font-size:13px; color:#e8eef2; font-weight:600; padding:0 4px; }
+.gridsel.tri td.triblank { background:none; }
+.gridsel.tri .tricell { width:46px; height:46px; border-radius:8px; border:1px solid rgba(255,216,140,.45);
+  background:rgba(0,0,0,.35); color:#e8eef2; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0; }
+.gridsel.tri .tricell:hover:not(:disabled) { border-color:var(--amber); }
+.gridsel.tri .tricell[data-state="up"] { color:#9fe6b4; }
+.gridsel.tri .tricell[data-state="down"] { color:#ffb3a1; }
+.tricard .trilegend { display:flex; gap:14px; justify-content:center; font-size:12px; color:rgba(232,238,242,.8); margin:4px 0 2px; }
+.tricard .trilegend span { display:inline-flex; align-items:center; gap:3px; }
+.tricard .trilegend svg { width:18px; height:18px; }
+
 /* ---- Deduction ledger (#9) — the classification escape -------------------------------------------- */
 /* A locked group goes read-only and green: the ONLY feedback the ledger ever gives is at group level. */
 /* Scoped to TABLE: the hotspot marker also carries class "ledger" (its type), and a bare .ledger rule
@@ -510,7 +559,7 @@ table.ledger { border-collapse:separate; border-spacing:4px 5px; margin:6px auto
 /* a hotspot being dragged in test play */
 .hsmark.tpdragging { opacity:.55; cursor:grabbing; }
 
-/* ── the in-game MAP (2026-09-15; notes/player_map_plan.md) ─────────────────────────────────────
+/* ── the in-game MAP (2026-09-15; notes/z_archive/player_map_plan.md) ─────────────────────────────────────
    A read-only fog-of-war map opened from the 🗺 chip above the field notebook. Rendered by the shared
    shared/map_graph.js in its "player" mode: CONNECTIVITY AND ROOM NAMES ONLY (Lucas). The harness draws
    the same graph with a coloured dot per puzzle/clue/switch — none of that reaches here, and the

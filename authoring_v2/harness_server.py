@@ -74,7 +74,7 @@ PANO_QUALITY = "xhigh"
 MAX_PANO_CANDIDATES = 3    # build-world level 1: up to this many candidate panos per room in _scratch (l1_<room>_<n>.png)
 MAX_PLATE_CANDIDATES = 8   # world-plate candidates per generate call (the plate fixes every room's look — worth choosing)
 # V2 harness (authoring_v2/) runs on :8752 so it can sit alongside the production :8751 harness while
-# the image-pipeline V2 upgrades are built (see notes/image_pipeline_v2.md). Both share the same rooms/
+# the image-pipeline V2 upgrades are built (see notes/z_archive/image_pipeline_v2.md). Both share the same rooms/
 # tree (ESCAPE_ROOT/..), so run only one at a time when authoring the SAME scenario.
 PORT = 8752
 # Cinemagraph generation runs as a DETACHED script (long ~5 min GPU job that pauses lm_server) — the
@@ -620,7 +620,7 @@ def _launch_batch(base):
 
 # --- Scene spec (automated art pipeline, Phase 1) ----------------------------------------------------------
 # One structured spec per room -> the gpt-image prompt + the cinemagraph batch jobs + the hotspot stubs all
-# derive from it (see authoring_v2/scene_spec.py + notes/art_pipeline.md). These endpoints expose the
+# derive from it (see authoring_v2/scene_spec.py + notes/z_archive/art_pipeline.md). These endpoints expose the
 # derivations so BOTH the harness UI and a future "build world" orchestrator call the same code.
 
 def _spec_derivations(spec):
@@ -1128,6 +1128,7 @@ def _scenario_state(base):
             "cover": doc.get("cover", ""), "title": doc.get("title", ""),
             "subtitle": doc.get("subtitle", ""), "ambient": doc.get("ambient", ""),
             "openingStory": doc.get("story", ""), "enterLabel": doc.get("enterLabel", ""),   # scenario narrative (spec `story`)
+            "escapeBrief": doc.get("escapeBrief", ""),   # AUTHOR-facing: how the escape works, in a few sentences (tab 1 card, 2026-09-21)
             "analysisFinish": doc.get("done") or None, "escapeFinish": doc.get("escapeDone") or None,
             "debrief": doc.get("debrief") or None,               # "how this world worked": {title?, intro?} scenario-level
             "status": doc.get("status", "in_development"),       # finish & publish step
@@ -1786,7 +1787,12 @@ def _commit_node(room_key, written, seed_wrap=None, base=None, draft=None, image
     if "scene_open.png" in written:
         fields["panoramaOpen"] = "%s/scene_open.png" % room_key
     node = next((r for r in _load_scenario(base).get("rooms", []) if r.get("key") == room_key), None)
-    if d_wrap:
+    # A FULL-SPHERE room's wrap is not a draft decision: its art covers the whole 180 degrees, and any other
+    # vaov would squash it and misplace every hotspot. So the spec's sphere wrap wins over any draft/seed.
+    sphere_wrap = scene_spec.wrap_for(((node or {}).get("authoring") or {}).get("sceneSpec"))
+    if sphere_wrap:
+        fields["wrap"] = sphere_wrap
+    elif d_wrap:
         fields["wrap"] = d_wrap
     elif node is not None and not node.get("wrap"):
         fields["wrap"] = seed_wrap or dict(HOUSE_WRAP)
@@ -2529,8 +2535,13 @@ def _run_gen_room_pano(slot, base, room_key, prompt, size, quality, idx):
     # pulled warm on the first run. Absent or true: unchanged behaviour.
     try:
         _node = next((r for r in _load_scenario(base).get("rooms", []) if r.get("key") == room_key), {}) or {}
-        if ((_node.get("authoring") or {}).get("sceneSpec") or {}).get("worldPlateRef") is False:
+        _wpr = ((_node.get("authoring") or {}).get("sceneSpec") or {}).get("worldPlateRef")
+        if _wpr is False:
             ref = None
+        # A STRING names an alternative plate under the scenario folder (2026-09-21, clouds): the smear and
+        # half-light copied the plate's city building-for-building, so they ride a copy with the city blurred out.
+        elif isinstance(_wpr, str) and os.path.exists(os.path.join(base, _wpr)):
+            ref = os.path.join(base, _wpr)
     except Exception:
         pass                                      # never let the opt-out check block a generation
     ref_args = ["--ref", ref] if ref else []   # gpt-image-2 NOR gpt-image-2.5 accepts `input_fidelity` (both
@@ -2539,6 +2550,20 @@ def _run_gen_room_pano(slot, base, room_key, prompt, size, quality, idx):
     try:
         subprocess.run(["python3", GEN, "gen", "--prompt-file", ptmp, "--out", out,
                         "--quality", quality, "--size", size, *ref_args], check=True, capture_output=True, text=True, env=gen_env())
+        # FULL-SPHERE rooms: the model draws the horizon ~27% down, never on the midline (clouds' Eye, 6/6 draws,
+        # 2026-09-21), so level it before anyone judges the candidate. The raw draw is kept in z_sphere_raw/.
+        try:
+            _sspec = ((_node.get("authoring") or {}).get("sceneSpec") or {})
+            if scene_spec.is_full_sphere(_sspec):
+                import sphere_horizon
+                from PIL import Image as _Im
+                import numpy as _np
+                rawdir = os.path.join(scratch, "z_sphere_raw"); os.makedirs(rawdir, exist_ok=True)
+                shutil.copy2(out, os.path.join(rawdir, os.path.basename(out)))
+                _lv, _h = sphere_horizon.level(_np.asarray(_Im.open(out).convert("RGB")))
+                _Im.fromarray(_lv).save(out)
+        except Exception as e:  # noqa: BLE001 — never lose a paid-for draw to the levelling step
+            print("sphere_horizon failed for", out, e, flush=True)
         with LOCK:
             JOBS[slot]["outputs"].append(os.path.basename(out)); JOBS[slot]["done"] = 1
     except subprocess.CalledProcessError as e:
@@ -4887,7 +4912,9 @@ class H(http.server.SimpleHTTPRequestHandler):
                     prompt = (((node or {}).get("authoring") or {}).get("scenePrompt") or "").strip()
                 if not prompt:
                     return self._json({"ok": False, "error": "room %s has neither a sceneSpec nor a scenePrompt" % rk}, 400)
-                size = req.get("size", "3072x1024")
+                # A full-sphere room (spec `fullSphere`, clouds' Eye) is generated at 2:1; everything else at
+                # the house 3:1 band. An explicit `size` in the request still wins.
+                size = req.get("size") or scene_spec.pano_size(_spec)
                 ok_size, size_err = _valid_size(size)
                 if not ok_size:
                     return self._json({"ok": False, "error": size_err}, 400)

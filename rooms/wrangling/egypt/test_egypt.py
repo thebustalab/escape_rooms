@@ -105,12 +105,19 @@ def main():
           f"the confound survives: Chios premium-heavy, Thasos common-heavy ({mix['Chios']:.0f}% / {mix['Thasos']:.0f}%)")
 
     print("== wired option text matches the data ==")
-    for rk, want in (("deck", "red — averaging 0.66"),
-                     ("market_boast", "Chios — 7.28"),
-                     ("library", "Thasos — 7.43")):
+    # The option label must NAME the right answer. A trailing value suffix
+    # ("Chios — 7.28") is OPTIONAL and carried only where the puzzle resolves to a
+    # single absolute number; where it does not, the bare name is correct and the
+    # suffix is deliberately stripped, because printing the value hands over half
+    # the answer (Lucas, 2026-09-22 — `library`/the boss is the worked case).
+    def names(option, answer):
+        return option.split("\u2014")[0].strip() == answer
+    for rk, want in (("deck", "red"),
+                     ("market_boast", "Chios"),
+                     ("library", "Thasos")):
         p = one(rk, "puzzle"); q = p["question"]
-        check(q["options"][q["correct"]] == want,
-              f"{rk} correct option == {want!r} (got {q['options'][q['correct']]!r})")
+        check(names(q["options"][q["correct"]], want),
+              f"{rk} correct option names {want!r} (got {q['options'][q['correct']]!r})")
         check(len(q["options"]) >= 6, f"{rk} has >=6 options (got {len(q['options'])})")
         check("reveal" not in q.get("feedback", {}), f"{rk} has no `reveal`")
     pick = one("market_price", "puzzle")["pick"]

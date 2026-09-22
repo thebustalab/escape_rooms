@@ -27,9 +27,12 @@ import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 fails = []
+checks = 0
 
 
 def check(cond, msg):
+    global checks
+    checks += 1
     print(("  ok  " if cond else "FAIL  ") + msg)
     if not cond:
         fails.append(msg)
@@ -239,5 +242,5 @@ for rk in ("j_c1", "j_c2", "j_c4", "j_c7"):
     check(not re.search(r"cutree|dist\(|hclust|group_by|filter\(", q["prompt"]),
           "%s prompt leaks no method" % rk)
 
-print("\n%s — %d check(s), %d failure(s)" % ("FAILED" if fails else "ALL PASS", 0, len(fails)))
+print("\n%s — %d check(s), %d failure(s)" % ("FAILED" if fails else "ALL PASS", checks, len(fails)))
 sys.exit(1 if fails else 0)

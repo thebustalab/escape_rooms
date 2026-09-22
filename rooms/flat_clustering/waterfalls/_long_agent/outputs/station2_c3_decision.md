@@ -1,2 +1,0 @@
-DECISION: RENDER
-WHY: The spec already has two bounded movers, each with its vigour written into the art: the heavy water column through the descent (left of centre) and the steady curtain through the bridge (right). Each also has its own `motion.phrase`, so `render_motion_prompt` builds the motion prompt from the spec even though no prompt `.txt` exists. No clip has been rendered yet, so the next step is one render at 3072 with end guide 0.70.

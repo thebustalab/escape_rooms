@@ -3,7 +3,7 @@
 // window.MapGraph) AND under node (module.exports) — which lets tests/map_graph.test.js drive the layout
 // and edge geometry headless.
 //
-// Moved here from authoring_v2/ui/net_graph.js on 2026-09-15 (plan: notes/player_map_plan.md, Phase 1).
+// Moved here from authoring_v2/ui/net_graph.js on 2026-09-15 (plan: notes/z_archive/player_map_plan.md, Phase 1).
 // It had to move: `authoring_v2/` is gitignored and never reaches GitHub Pages, so a module living there
 // can never be loaded by a student. `shared/` is the player's runtime. The harness now imports THIS copy,
 // so there is one layout algorithm rather than two that drift.

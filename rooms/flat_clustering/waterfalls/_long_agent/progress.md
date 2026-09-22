@@ -1,82 +1,27 @@
 # Room iteration — flat_clustering/waterfalls
 
-Started 2026-09-21T16:05:26.343675+00:00.
-- **2026-09-21 16:05 UTC** — station2: art generation started (l1_station2_2), generation 1/10. No Claude call spent.
-- **2026-09-21 16:06 UTC** — station2: waiting on the art generation (poll 1/40). No Claude call spent.
-- **2026-09-21 16:06 UTC** — station2: new art committed from l1_station2_2.png and seam-staged (station2        tonal step 14.8x -> BLURRED -> 0.0x  (run 0.030 -> 0.000) | boxes re-placing in the background (station2_boxes.log)). NOT accepted — that is Lucas's call in the stills tab.
-- **2026-09-21 16:08 UTC** — station2: render launched at end guide 0.70.
-- **2026-09-21 16:08 UTC** — station2: waiting on the render (poll 1/40). No Claude call spent.
-- **2026-09-21 16:09 UTC** — station2: waiting on the render (poll 2/40). No Claude call spent.
-- **2026-09-21 16:09 UTC** — station2: waiting on the render (poll 3/40). No Claude call spent.
-- **2026-09-21 16:10 UTC** — station2: waiting on the render (poll 4/40). No Claude call spent.
-- **2026-09-21 16:10 UTC** — station2: waiting on the render (poll 5/40). No Claude call spent.
-- **2026-09-21 16:11 UTC** — station2: waiting on the render (poll 6/40). No Claude call spent.
-- **2026-09-21 16:11 UTC** — station2: waiting on the render (poll 7/40). No Claude call spent.
-- **2026-09-21 16:12 UTC** — station2: waiting on the render (poll 8/40). No Claude call spent.
-- **2026-09-21 16:12 UTC** — station2: waiting on the render (poll 9/40). No Claude call spent.
-- **2026-09-21 16:13 UTC** — station2: waiting on the render (poll 10/40). No Claude call spent.
-- **2026-09-21 16:13 UTC** — station2: waiting on the render (poll 11/40). No Claude call spent.
-- **2026-09-21 16:14 UTC** — station2: waiting on the render (poll 12/40). No Claude call spent.
-- **2026-09-21 16:14 UTC** — station2: waiting on the render (poll 13/40). No Claude call spent.
-- **2026-09-21 16:15 UTC** — station2: waiting on the render (poll 14/40). No Claude call spent.
-- **2026-09-21 16:15 UTC** — station2: waiting on the render (poll 15/40). No Claude call spent.
-- **2026-09-21 16:16 UTC** — station2: waiting on the loop bake (poll 16/40). No Claude call spent.
-- **2026-09-21 16:16 UTC** — station2: waiting on the loop bake (poll 17/40). No Claude call spent.
-- **2026-09-21 16:17 UTC** — station2: the loop bake is still growing (5242928 bytes). Waiting for it to settle. No Claude call spent.
-- **2026-09-21 16:17 UTC** — station2: the loop bake is still growing (7260459 bytes). Waiting for it to settle. No Claude call spent.
-- **2026-09-21 16:19 UTC** — station2: gated — {"camera": "still", "return": 0.02, "peak": 9.17, "glitch": {"spike": 3.5, "breadth": 0.125, "at_pct": 79.2, "frames": 73, "breadth_normalised": 0.062}, "dead": {"ratio": 9.7, "peak": 10.21, "dead": false}, "note": "no out-and-back: dead, or cyclic flow. NEEDS AN EYE \u2014 this measure has called three good clips dead."}
-- **2026-09-21 16:20 UTC** — station2: HELD for Lucas's eye — The ri3 clip is recorded in state and passed every gate. The camera is still. Glitch breadth is 0.125 raw and 0.062 normalised, well under the 0.70 line. The dead gate did not fire (ratio 9.7). A peak of 9.17 is in the range measured for live cyclic movers (8.06–9.35). The near-zero return fits the two water streams flowing in a cycle rather than a dead clip, and no metric can confirm that, so the clip goes to Lucas's eye.. NOT accepted. Staged into the harness pool as base__ri3.mp4.
-- **2026-09-21 16:20 UTC** — station3: art generation started (l1_station3_2), generation 2/10. No Claude call spent.
-- **2026-09-21 16:21 UTC** — station3: waiting on the art generation (poll 1/40). No Claude call spent.
-- **2026-09-21 16:21 UTC** — station3: new art committed from l1_station3_2.png and seam-staged (station3        mid 1.2x/2.9  run 0.006  ->  clean, done | boxes re-placing in the background (station3_boxes.log)). NOT accepted — that is Lucas's call in the stills tab.
-- **2026-09-21 16:22 UTC** — station3: render launched at end guide 0.70.
-- **2026-09-21 16:23 UTC** — station3: waiting on the render (poll 1/40). No Claude call spent.
-- **2026-09-21 16:24 UTC** — station3: waiting on the render (poll 2/40). No Claude call spent.
-- **2026-09-21 16:24 UTC** — station3: waiting on the render (poll 3/40). No Claude call spent.
-- **2026-09-21 16:25 UTC** — station3: waiting on the render (poll 4/40). No Claude call spent.
-- **2026-09-21 16:25 UTC** — station3: waiting on the render (poll 5/40). No Claude call spent.
-- **2026-09-21 16:26 UTC** — station3: waiting on the render (poll 6/40). No Claude call spent.
-- **2026-09-21 16:26 UTC** — station3: waiting on the render (poll 7/40). No Claude call spent.
-- **2026-09-21 16:27 UTC** — station3: waiting on the render (poll 8/40). No Claude call spent.
-- **2026-09-21 16:27 UTC** — station3: waiting on the render (poll 9/40). No Claude call spent.
-- **2026-09-21 16:28 UTC** — station3: waiting on the render (poll 10/40). No Claude call spent.
-- **2026-09-21 16:28 UTC** — station3: waiting on the render (poll 11/40). No Claude call spent.
-- **2026-09-21 16:29 UTC** — station3: waiting on the render (poll 12/40). No Claude call spent.
-- **2026-09-21 16:29 UTC** — station3: waiting on the render (poll 13/40). No Claude call spent.
-- **2026-09-21 16:30 UTC** — station3: waiting on the render (poll 14/40). No Claude call spent.
-- **2026-09-21 16:30 UTC** — station3: waiting on the render (poll 15/40). No Claude call spent.
-- **2026-09-21 16:31 UTC** — station3: waiting on the loop bake (poll 16/40). No Claude call spent.
-- **2026-09-21 16:31 UTC** — station3: waiting on the loop bake (poll 17/40). No Claude call spent.
-- **2026-09-21 16:32 UTC** — station3: the loop bake is still growing (6291504 bytes). Waiting for it to settle. No Claude call spent.
-- **2026-09-21 16:32 UTC** — station3: the loop bake is still growing (7199749 bytes). Waiting for it to settle. No Claude call spent.
-- **2026-09-21 16:34 UTC** — station3: gated — {"camera": "still", "return": 0.03, "peak": 8.89, "glitch": {"spike": 3.29, "breadth": 0.146, "at_pct": 31.9, "frames": 73, "breadth_normalised": 0.062}, "dead": {"ratio": 13.74, "peak": 12.54, "dead": false}, "note": "no out-and-back: dead, or cyclic flow. NEEDS AN EYE \u2014 this measure has called three good clips dead."}
-- **2026-09-21 16:35 UTC** — station3: HELD for Lucas's eye — The clip passes every gate. The glitch breadth is 0.146, well under the 0.70 threshold. The dead check shows ratio 13.74 and peak 12.54, well above its 1.75 and 0.45 floors. The return of 0.03 is the known dead-or-cyclic ambiguity that should be escalated, never used to reject, and both movers here are pouring water, which is cyclic flow. So the clip goes to Lucas's eye rather than another authoring or render step.. NOT accepted. Staged into the harness pool as base__ri8.mp4.
-- **2026-09-21 16:35 UTC** — boss: art generation started (l1_boss_2), generation 3/10. No Claude call spent.
-- **2026-09-21 16:36 UTC** — boss: waiting on the art generation (poll 1/40). No Claude call spent.
-- **2026-09-21 16:36 UTC** — boss: new art committed from l1_boss_2.png and seam-staged (boss            mid 1.1x/2.4  run 0.016  ->  clean, done | boxes re-placing in the background (boss_boxes.log)). NOT accepted — that is Lucas's call in the stills tab.
-- **2026-09-21 16:37 UTC** — boss: render launched at end guide 0.70.
-- **2026-09-21 16:38 UTC** — boss: waiting on the render (poll 1/40). No Claude call spent.
-- **2026-09-21 16:38 UTC** — boss: waiting on the render (poll 2/40). No Claude call spent.
-- **2026-09-21 16:39 UTC** — boss: waiting on the render (poll 3/40). No Claude call spent.
-- **2026-09-21 16:39 UTC** — boss: waiting on the render (poll 4/40). No Claude call spent.
-- **2026-09-21 16:40 UTC** — boss: waiting on the render (poll 5/40). No Claude call spent.
-- **2026-09-21 16:40 UTC** — boss: waiting on the render (poll 6/40). No Claude call spent.
-- **2026-09-21 16:41 UTC** — boss: waiting on the render (poll 7/40). No Claude call spent.
-- **2026-09-21 16:42 UTC** — boss: waiting on the render (poll 8/40). No Claude call spent.
-- **2026-09-21 16:42 UTC** — boss: waiting on the render (poll 9/40). No Claude call spent.
-- **2026-09-21 16:43 UTC** — boss: waiting on the render (poll 10/40). No Claude call spent.
-- **2026-09-21 16:43 UTC** — boss: waiting on the render (poll 11/40). No Claude call spent.
-- **2026-09-21 16:44 UTC** — boss: waiting on the render (poll 12/40). No Claude call spent.
-- **2026-09-21 16:44 UTC** — boss: waiting on the render (poll 13/40). No Claude call spent.
-- **2026-09-21 16:45 UTC** — boss: waiting on the render (poll 14/40). No Claude call spent.
-- **2026-09-21 16:45 UTC** — boss: waiting on the render (poll 15/40). No Claude call spent.
-- **2026-09-21 16:46 UTC** — boss: waiting on the loop bake (poll 16/40). No Claude call spent.
-- **2026-09-21 16:46 UTC** — boss: waiting on the loop bake (poll 17/40). No Claude call spent.
-- **2026-09-21 16:47 UTC** — boss: the loop bake is still growing (48 bytes). Waiting for it to settle. No Claude call spent.
-- **2026-09-21 16:47 UTC** — boss: the loop bake is still growing (6127809 bytes). Waiting for it to settle. No Claude call spent.
-- **2026-09-21 16:48 UTC** — boss: gated — {"camera": "still", "return": 0.0, "peak": 7.2, "glitch": {"spike": 4.02, "breadth": 0.292, "at_pct": 31.9, "frames": 73, "breadth_normalised": 0.188}, "dead": {"ratio": 8.21, "peak": 8.95, "dead": false}, "note": "no out-and-back: dead, or cyclic flow. NEEDS AN EYE \u2014 this measure has called three good clips dead."}
-- **2026-09-21 16:49 UTC** — boss: HELD for Lucas's eye — The first 3072 clip passes every gate. Glitch breadth is 0.292 (0.188 normalised), well below the 0.70 rejection threshold on both readings. The dead check reads ratio 8.21, so the clip is not frozen. The zero return is the expected result for a steadily pouring sluice, since a cyclic flow never goes out and comes back, and the pipeline says a zero return is flagged for review, never rejected. The next step is Lucas's eye on the clip, not another render or a new still.. NOT accepted. Staged into the harness pool as base__ri13.mp4.
-- **2026-09-21 16:50 UTC** — spillway: art generation started (l1_spillway_2), generation 4/10. No Claude call spent.
-- **2026-09-21 16:50 UTC** — spillway: waiting on the art generation (poll 1/40). No Claude call spent.
-- **2026-09-21 16:51 UTC** — spillway: new art committed from l1_spillway_2.png and seam-staged (spillway        mid 2.8x/7.0  run 0.010  ->  clean, done | boxes re-placing in the background (spillway_boxes.log)). NOT accepted — that is Lucas's call in the stills tab.
-- **2026-09-21 16:52 UTC** — spillway: render launched at end guide 0.70.
+Started 2026-09-21T21:54:21.477076+00:00.
+- **2026-09-21 21:55 UTC** — station1: render launched at end guide 0.70.
+- **2026-09-21 21:56 UTC** — station1: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-21 21:56 UTC** — station1: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-21 21:57 UTC** — station1: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-21 21:57 UTC** — station1: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-21 21:58 UTC** — station1: waiting on the render (poll 5/40). No Claude call spent.
+- **2026-09-21 21:58 UTC** — station1: waiting on the render (poll 6/40). No Claude call spent.
+- **2026-09-21 21:59 UTC** — station1: waiting on the render (poll 7/40). No Claude call spent.
+- **2026-09-21 21:59 UTC** — station1: waiting on the render (poll 8/40). No Claude call spent.
+- **2026-09-21 22:00 UTC** — station1: waiting on the render (poll 9/40). No Claude call spent.
+- **2026-09-21 22:00 UTC** — station1: waiting on the render (poll 10/40). No Claude call spent.
+- **2026-09-21 22:01 UTC** — station1: waiting on the render (poll 11/40). No Claude call spent.
+- **2026-09-21 22:01 UTC** — station1: waiting on the render (poll 12/40). No Claude call spent.
+- **2026-09-21 22:02 UTC** — station1: waiting on the render (poll 13/40). No Claude call spent.
+- **2026-09-21 22:02 UTC** — station1: waiting on the render (poll 14/40). No Claude call spent.
+- **2026-09-21 22:03 UTC** — station1: waiting on the render (poll 15/40). No Claude call spent.
+- **2026-09-21 22:03 UTC** — station1: waiting on the loop bake (poll 16/40). No Claude call spent.
+- **2026-09-21 22:04 UTC** — station1: waiting on the loop bake (poll 17/40). No Claude call spent.
+- **2026-09-21 22:04 UTC** — station1: the loop bake is still growing (48 bytes). Waiting for it to settle. No Claude call spent.
+- **2026-09-21 22:05 UTC** — station1: the loop bake is still growing (5568609 bytes). Waiting for it to settle. No Claude call spent.
+- **2026-09-21 22:06 UTC** — station1: gated — {"camera": "still", "return": 0.01, "peak": 6.83, "glitch": {"spike": 4.77, "breadth": 0.167, "at_pct": 1.4, "frames": 73, "breadth_normalised": 0.188}, "dead": {"ratio": 10.29, "peak": 12.45, "dead": false}, "note": "no out-and-back: dead, or cyclic flow. NEEDS AN EYE \u2014 this measure has called three good clips dead."}
+- **2026-09-21 22:07 UTC** — station1: HELD for Lucas's eye — The cycle-1 all_clear render (seed 4242) passed the camera, glitch and frozen-render gates, and the zero loop reading can't tell cyclic flame flicker from a dead clip, so it needs Lucas's eye.. NOT accepted. Staged into the harness pool as all_clear__ri1.mp4.
+- **2026-09-21 22:08 UTC** — 360 page published with 22 room(s): http://127.0.0.1:8752/cine360_waterfalls.html
+- **2026-09-21 22:08 UTC** — Every room is held or parked. HELD (need Lucas's eye): ['station1']. STILL-ONLY by authoring: none. 360 page published with 22 room(s): http://127.0.0.1:8752/cine360_waterfalls.html. Nothing here is accepted — metrics may reject and must never approve.

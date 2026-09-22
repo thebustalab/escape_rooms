@@ -134,3 +134,24 @@ def test_non_door_hotspots_are_not_counted_as_exits():
         {"id": "d0", "type": "door", "to": "r0"}, {"id": "d1", "type": "door", "to": "r1"},
         {"id": "p0", "type": "puzzle"}, {"id": "p1", "type": "clue"}, {"id": "p2", "type": "dial"}]}]}
     assert va.door_labels_undecided(scen) == []
+
+
+# ## packages_not_attached
+# Subway (2026-09-21) listed dplyr/ggplot2/igraph but had NO `setup`, so nothing was attached and `%>%`
+# was "could not find function" in its first puzzle. webr-console installs `packages`; only `setup`
+# runs library(). Student-facing packages must be attached; support packages need not be.
+
+def test_unattached_student_package_is_flagged():
+    scen = {"packages": ["dplyr", "ggplot2", "tidyr"], "setup": "suppressMessages({library(dplyr)})"}
+    flagged = va.packages_not_attached(scen)
+    assert any("'ggplot2'" in m for m in flagged) and any("'tidyr'" in m for m in flagged)
+    assert not any("'dplyr'" in m for m in flagged)
+
+
+def test_missing_setup_flags_everything_student_facing():
+    assert len(va.packages_not_attached({"packages": ["dplyr", "ggplot2"]})) == 2
+
+
+def test_support_packages_may_stay_unattached():
+    scen = {"packages": ["dplyr", "readr", "igraph", "ggiraph"], "setup": "library(dplyr)"}
+    assert va.packages_not_attached(scen) == []
