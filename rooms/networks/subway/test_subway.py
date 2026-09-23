@@ -146,10 +146,35 @@ check([g for _, g in joiners] == ["XAN_1815", "XAN_2781"],
       "rung 3 as well as rung 2" % (joiners[0][0], joiners[1][0]))
 
 print("\n-- rung 3: the taught trap (module + abundance) --")
-# The pigment module is what the player recovers from the correlation structure: the boss's own
-# neighbourhood. Deriving it that way rather than hard-coding a gene list is the point — if the
-# structure changes, the module changes with it and the trap has to survive the change.
-module = neighbours("XAN_1192") | {"XAN_1192"}
+# The pigment module is what the player recovers from the correlation structure. Derive it the way the
+# PROMPT instructs — "the largest group of co-expressed genes" — i.e. the largest CONNECTED COMPONENT at
+# the cutoff, and assert that group is uniquely the largest. It used to be derived as the boss's own
+# ego network (neighbours("XAN_1192")), which happens to coincide today because the boss touches all
+# seven other members; but that made the test agree with the answer by construction. A re-seeded CSV
+# that grew the component a hop further, or let another component overtake it, would change both the
+# rung-3 and rung-4 answers while this file stayed green.
+def component(seed):
+    seen, stack = {seed}, [seed]
+    while stack:
+        for nb in neighbours(stack.pop()):
+            if nb not in seen:
+                seen.add(nb)
+                stack.append(nb)
+    return seen
+
+comps, unseen = [], set(genes)
+while unseen:
+    c = component(next(iter(unseen)))
+    comps.append(c)
+    unseen -= c
+comps.sort(key=len, reverse=True)
+check(len(comps[0]) > len(comps[1]),
+      "the largest connected group is unique — %d genes vs %d for the next biggest, so "
+      "'the largest group of co-expressed genes' has ONE answer (component sizes %s)"
+      % (len(comps[0]), len(comps[1]), sorted((len(c) for c in comps), reverse=True)))
+module = comps[0]
+check("XAN_1192" in module,
+      "the regulator sits inside that largest group — rungs 3 and 4 both read from it")
 loudest = max(module, key=lambda g: mean[g])
 runner = max(module - {loudest}, key=lambda g: mean[g])
 check(loudest == "XAN_1815",
@@ -185,15 +210,31 @@ check(mean["XAN_3514"] / mean["XAN_1192"] > 50,
       % (mean["XAN_3514"] / mean["XAN_1192"]))
 
 print("\n-- the ladder escalates: one new move per rung, no plateau --")
-# Each rung's move, as the analysis a player must add to the previous one. Named here so a future
-# re-skin cannot quietly collapse two rungs onto the same move.
-moves = ["pairwise correlation",
-         "correlation + a threshold, applied one-vs-all",
-         "threshold + module membership + abundance",
-         "threshold + module membership + degree"]
-check(len(set(moves)) == len(moves), "no two rungs run the same analysis")
-for i in range(1, len(moves)):
-    check(moves[i] != moves[i - 1], "rung %d is not a re-skin of rung %d" % (i + 1, i))
+# This block used to compare four prose strings written a few lines above it, so it asserted that four
+# literals in this file differ from each other and could never fail. Replaced 2026-09-22 with checks
+# that bind to the DATA: each rung's answer must be out of reach of the previous rung's method, which
+# is what "one new move per rung, no plateau" actually means.
+answers = ["XAN_4574", "XAN_6246", "XAN_1815", "XAN_1192"]
+check(len(set(answers)) == 4, "no two rungs answer the same gene (%s)" % answers)
+
+# rung 1's move (argmax |r| against the probe) must NOT also land rung 2, 3 or 4.
+r1 = max((g for g in genes if g != "XAN_4418"), key=lambda g: abs(R["XAN_4418"][g]))
+check(r1 == "XAN_4574" and r1 not in answers[1:],
+      "rung 1's move (nearest neighbour of the probe) reaches only rung 1's answer")
+
+# rung 2's move (degree, one-vs-all) must not land rung 3's answer — abundance is the new move there.
+by_degree = sorted(genes, key=degree)
+check(by_degree[0] == "XAN_6246" and by_degree[0] != answers[2],
+      "rung 2's move (rank by degree) does not reach rung 3's answer")
+
+# rung 3's move (abundance inside the module) must NOT land the boss — this is the taught trap, and it
+# is the single most important non-plateau in the ladder.
+check(max(module, key=lambda g: mean[g]) != "XAN_1192",
+      "rung 3's move (most abundant in the module) does NOT reach the boss — the trap is live")
+
+# rung 4's move (degree inside the module) must not be answerable by rung 3's.
+check(max(module, key=degree) != max(module, key=lambda g: mean[g]),
+      "rung 4's move (most connected in the module) disagrees with rung 3's — the boss corrects it")
 check(len(doc["puzzleQueue"]) == 4, "the queue is 4 rungs long (%d)" % len(doc["puzzleQueue"]))
 for i, want in enumerate(["XAN_4574", "XAN_6246", "XAN_1815", "XAN_1192"]):
     note = doc["puzzleQueue"][i].get("note", "")
@@ -321,7 +362,10 @@ for i, want in enumerate(WINNER):
         check(opts[ci] == want,
               "rung %d keys to %s, which is what the data gives (option %d of %d)"
               % (i + 1, want, ci, len(opts)))
-    check(len(opts) >= 6, "rung %d has >=6 options (%d)" % (i + 1, len(opts)))
+    # >=6 DATA-DERIVED DISTRACTORS is the rule, so >=7 options counting the right one. This read
+    # `>= 6` until 2026-09-22, which would have let a rung ship with five distractors.
+    check(len(opts) >= 7,
+          "rung %d has >=6 distractors, i.e. >=7 options (%d)" % (i + 1, len(opts)))
     check(len(set(opts)) == len(opts), "rung %d has no duplicate option text" % (i + 1))
     # Every distractor must be a REAL gene from the dataset — a "plausible wrong analysis" result, not
     # invented noise. This is the cheapest guard against a typo'd gene name nobody can ever select.

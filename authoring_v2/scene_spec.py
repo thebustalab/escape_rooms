@@ -285,6 +285,15 @@ def to_hotspots(spec):
             out.append({**base, "type": "puzzle"})
         elif e.get("dial"):
             out.append({**base, "type": "dial"})     # world-state control, the ENGINE's own mechanic (openDial)
+        elif e.get("lever"):
+            out.append({**base, "type": "lever"})    # RIDE control (shared/ride.js), added 2026-09-22. `lever`
+            # was already an engine type and networks/subway's cab controls are built as levers, but there was
+            # no spec role that emitted one — so those five elements were specced `dial: true` and the planned
+            # manifest disagreed with the built hotspot on TYPE. `_attach_planned_content` matches on
+            # (type, slug(label)), so the planned dial matched nothing and a "Place all hotspots" rebuild
+            # would have created a dial beside the lever. ride.js engages ONLY on a `lever`, so that rebuild
+            # would have killed the trains. Prefer `lever: true` when the control drives a RIDE; `dial: true`
+            # when it sets a world-state the engine reads back (openDial).
         elif e.get("switch"):
             out.append({**base, "type": "switch"})   # generic world-state control; NOTE the engine has no
             # `switch` handler — a switch hotspot is inert until it is reclassified (every trees drive-lever
