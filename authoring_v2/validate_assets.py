@@ -66,7 +66,7 @@ try to ship it. Referenced paths are checked with any `?v=` cache-buster / `#fra
 
 Usage: validate_assets.py [chapter/scenario ...]   (no args = every scenario)
 """
-import json, os, struct, sys, glob
+import json, os, re, struct, sys, glob
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOMS = os.path.join(HERE, "..", "rooms")
@@ -302,6 +302,72 @@ def clip_state_pairing(scen):
     return misses, fails
 
 
+# `_attach_planned_content` (harness_server.py) copies every field of a `plannedHotspots` entry onto the
+# placed hotspot it matches on (type, slug(label)) — and it runs on EVERY commit path, not just the
+# first. So once a room is built, the planned manifest is not a historical record: it is a live
+# overwrite that fires again each time anyone touches the room in the harness. A planned entry left
+# describing a SUPERSEDED design silently reverts the shipped one.
+#
+# Found 2026-09-22 auditing networks/subway, where the drift had gone unnoticed through three earlier
+# audits. The cab ride controls were built as `lever` (shared/ride.js engages on nothing else) while
+# their planned twins still described the abandoned `dial` design; the five cab platform doors were
+# planned against a `dest_<line>` game-state key that no longer exists; and the two escape clues were
+# planned with their pre-trim bodies, one of which carries the filing convention the escape cannot be
+# solved without. Every other validator was green, and the JS suite was green, because none of them
+# simulates the commit.
+#
+# Generic error class -> central check, per the audit's own rule. Cheap: it is the same dict walk the
+# harness does, run as a dry run.
+_PLANNED_SKIP = {"box", "id", "type", "label", "note"}
+
+
+def _hs_slug(s):
+    """MUST mirror harness_server._slug and hotspots_edit.html's `slug`."""
+    s = re.sub(r"[^a-z0-9]+", "_", str(s or "").lower()).strip("_")
+    return s or "obj"
+
+
+def planned_placed_drift(scen):
+    """Dry-run the harness's planned->placed attach; report anything it would CHANGE."""
+    out = []
+    for r in scen.get("rooms", []):
+        placed = r.get("hotspots") or []
+        planned = r.get("plannedHotspots") or []
+        if not r.get("built") or not placed or not planned:
+            continue
+        idx = {}
+        for p in planned:
+            if isinstance(p, dict):
+                idx[(p.get("type"), _hs_slug(p.get("label")))] = p
+        seen = set()
+        for h in placed:
+            if not isinstance(h, dict):
+                continue
+            key = (h.get("type"), _hs_slug(h.get("label")))
+            p = idx.get(key)
+            if not p:
+                continue
+            seen.add(key)
+            for k, v in p.items():
+                if k in _PLANNED_SKIP or k.startswith("_"):
+                    continue
+                if h.get(k) != v:
+                    out.append("room %r hotspot %r: a harness re-commit would OVERWRITE `%s` from "
+                               "plannedHotspots — the planned manifest still describes a superseded "
+                               "design. Sync the planned entry to the built one (or delete it)."
+                               % (r.get("key"), h.get("label"), k))
+        # a planned entry with no placed twin is re-CREATED by _commit_planned_hotspots if it has a box
+        for key, p in idx.items():
+            if key in seen or p.get("noElement"):
+                continue
+            out.append("room %r: plannedHotspots still lists %s %r with no placed counterpart — a "
+                       "re-commit would %s. Delete it, or mark `noElement: true` if it is a deliberate "
+                       "no-object hotspot."
+                       % (r.get("key"), p.get("type"), p.get("label"),
+                          "RE-CREATE it (it carries a box)" if p.get("box") else "report it as boxless"))
+    return out
+
+
 def check_scenario(path):
     d = os.path.dirname(path)
     scen = json.load(open(path, encoding="utf-8"))
@@ -384,6 +450,12 @@ def check_scenario(path):
     misses.extend(door_labels_undecided(scen))           # a roamable world owes a doorLabels decision
     fails.extend(packages_not_attached(scen))            # installed-but-unattached R packages
     misses.extend(dials_without_states(scen))            # a stateless dial is an inert control
+    advisories = planned_placed_drift(scen)              # planned manifest would revert the built room
+    # ADVISORY, NOT GATING (2026-09-22). The check is new and it immediately found the same drift in
+    # four ALREADY-PUBLISHED scenarios (alaska, hospital, airship, trees). Gating on it straight away
+    # would have failed the deploy pre-flight for rooms that are live and working, which is not a
+    # thing to spring on a release. Promote it to `misses` once those four are synced — the drift is
+    # real in every one of them, it just isn't tonight's emergency.
     misses.extend(pickup_tile_shape(scen, d))            # notebook board tiles are square-cropped
     _cm, _cf = clip_state_pairing(scen)                  # a full-scene state whose motion doesn't match it
     misses.extend(_cm); fails.extend(_cf)
@@ -394,7 +466,7 @@ def check_scenario(path):
         fp = rel.split("?")[0].split("#")[0]
         if not os.path.isfile(os.path.join(d, fp)):
             fails.append(f"{label}: missing file '{rel}'")
-    return fails, misses, ready
+    return fails, misses, ready, advisories
 
 def main():
     want = sys.argv[1:]
@@ -403,7 +475,9 @@ def main():
         rel = os.path.relpath(p, ROOMS).replace(os.sep + "scenario.json", "")
         if want and rel not in want:
             continue
-        fails, misses, ready = check_scenario(p)
+        fails, misses, ready, advisories = check_scenario(p)
+        for a in advisories:
+            print(f"DRIFT {rel}: {a}")
         if not fails and not misses:
             print(f"PASS  {rel}" + ("" if ready else "  (in-dev)"))
             continue

@@ -1,5 +1,5 @@
 {
-  "status": "in_development",
+  "status": "ready",
   "chapter": "networks",
   "scenario": "subway",
   "id": 21,
@@ -97,7 +97,7 @@
       "note": "RUNG 3 · module + abundance. THE TAUGHT TRAP. ANSWER XAN_1815 (1434 units vs 245 for the next in module, 5.9x) — which has DEGREE 1. This is the method the works has re-seeded by for nine seasons while the colour thinned, and rung 4 is its correction. Correct index 5.",
       "starterCode": "lichen_expression",
       "question": {
-        "prompt": "Your company grows each season's crop from a patch of the previous year's crop. The standard protocol says to choose the patch from this year's crop based in part on the following steps: (i) find the largest group of co-expressed genes (using the same 0.75 rule as before), then (ii) find the gene within that group that has the highest average expression. In the current data set, which gene do those steps lead to?",
+        "prompt": "Your company grows each season's crop from a patch of the previous year's crop. The standard protocol says to choose the patch from this year's crop based in part on the following steps: (i) find the largest connected group of co-expressed genes (using the same 0.75 rule as before — start at any gene and follow correlations above 0.75 from gene to gene, so two genes belong to the same group if a chain of correlations links them), then (ii) find the gene within that group that has the highest average expression. In the current data set, which gene do those steps lead to?",
         "options": [
           "XAN_3514",
           "XAN_1192",
@@ -112,7 +112,7 @@
         "feedback": {
           "correct": "Correct — noted in your field notebook: those steps lead to XAN_1815, the gene with the highest average expression in the largest co-expression group at ~1434 units.",
           "wrong": [
-            "Find the module first: the largest group of genes co-expressed with one another above 0.75. Only then compare average expression, and only within that group.",
+            "Find the module first: the largest CONNECTED group. Start at any gene, follow every correlation above 0.75 to its partners, then follow theirs, until nothing new joins — that whole chain is one group, and two genes belong to it even if they are not directly correlated with each other. Only then compare average expression, and only within that group.",
             "Stay inside the module. The highest-expressed genes in the whole dataset run above 5000 units and are not members of it; if your answer is one of those, you ranked across every gene instead of within the group.",
             "Inside the module it is not close: the winner averages around 1400 units where the next one down is under 250."
           ]
@@ -124,7 +124,7 @@
       "note": "RUNG 4 · BOSS. module + network position. ANSWER XAN_1192 — the LOWEST-expressed gene in the dataset (71.5 units, rank 24 of 24), co-expressed with EVERY other member of its module (degree 7 vs 4 for the next). Decoy XAN_3514: loudest in the transcriptome at 5644 units, degree 3, and not even in the module. Correct index 3.",
       "starterCode": "lichen_expression",
       "question": {
-        "prompt": "For the past nine seasons, each crop has had progressively less pigment than the previous ones. This year, your team is going to try a new strategy, based on the following steps: (i) find the largest group of co-expressed genes (using the same 0.75 rule as before), then (ii) find the gene within that group that is connected to the highest number of other genes. In the current data set, which gene do those steps lead to?",
+        "prompt": "For the past nine seasons, each crop has had progressively less pigment than the previous ones. This year, your team is going to try a new strategy, based on the following steps: (i) find the largest connected group of co-expressed genes (using the same 0.75 rule as before — start at any gene and follow correlations above 0.75 from gene to gene, so two genes belong to the same group if a chain of correlations links them), then (ii) find the gene within that group that is connected to the highest number of other genes. In the current data set, which gene do those steps lead to?",
         "options": [
           "XAN_3514",
           "XAN_1815",
@@ -361,7 +361,8 @@
           "image": "survey/sheet.png",
           "body": "A map, weighted flat and gone brown along the folds. Every station currently in use in the network. A reference border runs the margins: A to L across, 1 to 10 up. The map shows only live stations. Pencilled along one margin in a different hand: no through running past Logwood Quay on the woad, or past Cropping Yard on the weld — tunnel works, no date given. The stations out that way are still staffed and still on this sheet; there is simply no train to take you to them.",
           "pickup": "A map, weighted flat and gone brown along the folds. Every station currently in use in the network. A reference border runs the margins: A to L across, 1 to 10 up. The map shows only live stations. Pencilled along one margin in a different hand: no through running past Logwood Quay on the woad, or past Cropping Yard on the weld — tunnel works, no date given. The stations out that way are still staffed and still on this sheet; there is simply no train to take you to them.",
-          "boxNote": "the flat linen sheet lying on the right of the desk top — measured by eye on raw l1_ochre_hall_3 (box_grid), 2026-09-18"
+          "boxNote": "the flat linen sheet lying on the right of the desk top — measured by eye on raw l1_ochre_hall_3 (box_grid), 2026-09-18",
+          "noElement": true
         },
         {
           "id": "filing_card",
@@ -376,7 +377,8 @@
           "boxSource": "moved:testplay",
           "body": "The most recent standing orders in the ledger: (i) find the gene that controls pigment abundance, and (ii) locate the unused stations so we can have more area to grow lichen! Unused means a platform that appears on NO map and NO line card: the trains still run past it, but it was cut from the record and stands empty. A station that is merely off the timetable is not unused — it is printed on the survey sheet and it is somebody's workplace. Once you find the new spots, enter their locations into the Master Station List using the map coordinates. Both references go in as ONE entry, no space between them, lower letter first — a pair at C2 and H7 is filed C2H7, never H7C2.",
           "pickup": "The most recent standing orders in the ledger: (i) find the gene that controls pigment abundance, and (ii) locate the unused stations so we can have more area to grow lichen! Unused means a platform that appears on NO map and NO line card: the trains still run past it, but it was cut from the record and stands empty. A station that is merely off the timetable is not unused — it is printed on the survey sheet and it is somebody's workplace. Once you find the new spots, enter their locations into the Master Station List using the map coordinates. Both references go in as ONE entry, no space between them, lower letter first — a pair at C2 and H7 is filed C2H7, never H7C2.",
-          "boxNote": "no card is drawn distinctly; boxed at the routing frame's foot, where the body says it is slipped — measured by eye on raw l1_ochre_hall_3 (box_grid), 2026-09-18"
+          "boxNote": "no card is drawn distinctly; boxed at the routing frame's foot, where the body says it is slipped — measured by eye on raw l1_ochre_hall_3 (box_grid), 2026-09-18",
+          "noElement": true
         },
         {
           "id": "clip_base",
@@ -1033,8 +1035,7 @@
         {
           "src": "audio/platform_drip.mp3",
           "mode": "loop",
-          "volume": 0.14,
-          "needsReplacement": true
+          "volume": 0.14
         }
       ],
       "mapPos": {
@@ -2459,8 +2460,7 @@
         {
           "src": "audio/platform_drip.mp3",
           "mode": "loop",
-          "volume": 0.13,
-          "needsReplacement": true
+          "volume": 0.13
         }
       ],
       "mapPos": {
@@ -2690,8 +2690,7 @@
         {
           "src": "audio/platform_drip.mp3",
           "mode": "loop",
-          "volume": 0.26,
-          "needsReplacement": true
+          "volume": 0.26
         }
       ],
       "mapPos": {
@@ -2921,8 +2920,7 @@
         {
           "src": "audio/platform_drip.mp3",
           "mode": "loop",
-          "volume": 0.24,
-          "needsReplacement": true
+          "volume": 0.24
         }
       ],
       "mapPos": {

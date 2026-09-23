@@ -536,7 +536,7 @@
           ],
           "starterCode": "alaska_lake_data",
           "pick": {
-            "prompt": "Everyone flew to North_Killeak — the high-chloride lake — but the beacon still transmits, so the pilot is still alive. Where are they?",
+            "prompt": "Everyone flew to North_Killeak, the high-chloride lake, but the beacon still transmits — so the pilot is alive, and not there. The beacon company's manual on the wall tells you what kind of place someone would have to reach to last this long. Using alaska_lake_data, work out which lake best matches that, and click it.",
             "plotCode": "p <- ggplot(dplyr::distinct(alaska_lake_data, lake, water_temp),\n            aes(reorder(lake, water_temp), water_temp)) +\n     ggiraph::geom_col_interactive(aes(data_id = lake, tooltip = lake)) +\n     coord_flip() +\n     labs(x = NULL, y = \"Water temperature (°C)\")",
             "answer": "Lava_Lake",
             "width": 6,

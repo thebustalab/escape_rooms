@@ -3994,7 +3994,7 @@
             "volume": 0.7
           },
           "pick": {
-            "prompt": "The report blamed the busiest station, and the numbers agreed with it. Now look at the ledger's shape rather than its numbers: draw the whole march as a network. Which station holds its two halves together? Assign your plot to <code>p</code> and click that station on your chart.",
+            "prompt": "The report blamed the busiest station, and the numbers agreed with it — but traffic is not the same as importance. Draw the whole march as a network and find its <b>articulation point</b>: the one station that, if it were removed, would split the network into two disconnected halves. Assign your plot to <code>p</code> and click that station on your chart.",
             "plotCode": "net <- buildNetwork(dispatch_ledger)\np <- ggplot() +\n  geom_segment(data = net$edges, aes(x = x, y = y, xend = xend, yend = yend), colour = \"grey40\") +\n  geom_point(data = net$nodes, aes(x = x, y = y), size = 3) +\n  theme_void()",
             "answer": "Whistlegate",
             "idColumn": "node_name",
@@ -4002,7 +4002,7 @@
             "width": 6,
             "height": 5.5,
             "maxAttempts": 4,
-            "hint": "Look at the shape, not the thickness of the lines: which station, if it were gone, would leave two separate groups behind?",
+            "hint": "Build the network from the ledger, then test each station in turn — remove it and see whether the rest stays connected.",
             "feedback": {
               "correct": "Correct — noted in your field notebook: Whistlegate holds the march together. Without it the south (eight stations) and the north (three) cannot reach each other, though it carries the least traffic of all twelve.",
               "wrong": [
@@ -4381,7 +4381,7 @@
             "volume": 0.7
           },
           "pick": {
-            "prompt": "The report blamed the busiest station, and the numbers agreed with it. Now look at the ledger's shape rather than its numbers: draw the whole march as a network. Which station holds its two halves together? Assign your plot to <code>p</code> and click that station on your chart.",
+            "prompt": "The report blamed the busiest station, and the numbers agreed with it — but traffic is not the same as importance. Draw the whole march as a network and find its <b>articulation point</b>: the one station that, if it were removed, would split the network into two disconnected halves. Assign your plot to <code>p</code> and click that station on your chart.",
             "plotCode": "net <- buildNetwork(dispatch_ledger)\np <- ggplot() +\n  geom_segment(data = net$edges, aes(x = x, y = y, xend = xend, yend = yend), colour = \"grey40\") +\n  geom_point(data = net$nodes, aes(x = x, y = y), size = 3) +\n  theme_void()",
             "answer": "Whistlegate",
             "idColumn": "node_name",
@@ -4389,7 +4389,7 @@
             "width": 6,
             "height": 5.5,
             "maxAttempts": 4,
-            "hint": "Look at the shape, not the thickness of the lines: which station, if it were gone, would leave two separate groups behind?",
+            "hint": "Build the network from the ledger, then test each station in turn — remove it and see whether the rest stays connected.",
             "feedback": {
               "correct": "Correct — noted in your field notebook: Whistlegate holds the march together. Without it the south (eight stations) and the north (three) cannot reach each other, though it carries the least traffic of all twelve.",
               "wrong": [
