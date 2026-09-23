@@ -31,3 +31,6 @@ Started 2026-09-22T03:26:42.517116+00:00.
 - **2026-09-23 02:56 UTC** — ap_pileup: art generation started (l1_ap_pileup_2), generation 1/4. No Claude call spent.
 - **2026-09-23 02:57 UTC** — ap_pileup: new art committed from l1_ap_pileup_2.png and seam-staged (ap_pileup       sky 2.3x/2.2  run 0.009  ->  clean, done | boxes re-placing in the background (ap_pileup_boxes.log)). NOT accepted — that is Lucas's call in the stills tab.
 - **2026-09-23 03:03 UTC** — ap_pileup: render launched at end guide 0.70.
+- **2026-09-23 03:04 UTC** — ap_pileup: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-23 03:05 UTC** — ap_pileup: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-23 03:06 UTC** — ap_pileup: waiting on the render (poll 3/40). No Claude call spent.
