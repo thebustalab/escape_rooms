@@ -400,16 +400,20 @@ WRANGLING_TREES_KEY <- list(
 # temple — "The Register of the Gods" (hierarchical clustering, id 18). Four graded rooms in room order:
 # sun_gallery (nearest kin -> Longshadow), lamp_hall (cut + summarise -> the balm family), sealed_cell
 # (classify the unknown -> the drink family), inner_vault (BOSS, wing vs chemistry -> Deepwell + Palewall).
-# 0-BASED, like every other key here: `grade_one` compares this straight against the decoded answer,
-# which IS the codec's 0-based selected index. This key was written 1-BASED by mistake (c(3,4,1,2)) and
-# graded EVERY answer wrong; fixed to c(2,3,0,1) on 2026-08-28 to match scenario.json. It went unnoticed
-# because validate_keys was skipping the comparison for this scenario entirely — see validate_keys.py's
-# note on the `None` slot. temple is still in_development, so nobody was graded with it.
+# ALL FOUR ARE c(1) BECAUSE NONE OF THEM IS AN MCQ ANY MORE (2026-09-23). Lucas: as many puzzles as
+# possible should be click-the-plot, and failing that check-my-answer. sun_gallery became a `pick`
+# (plot each shrine's distance from Ninestep, click the nearest) and the other three became console
+# `check`s; a pick room and a check room both encode answer = 1, the "solved" byte, so the whole vector
+# is 1s and the "always the same slot" WARN does not apply (validate_keys counts that over MCQ rooms
+# only). The previous MCQ key was c(2,3,0,1) — 0-based; it had earlier been written 1-BASED by mistake
+# (c(3,4,1,2)), graded EVERY answer wrong, and went unnoticed because validate_keys was skipping the
+# comparison for this scenario entirely (see validate_keys.py's note on the `None` slot). temple is
+# still in_development, so nobody has ever been graded with either key.
 # The altar's `ledger` is the ungraded ESCAPE and is deliberately NOT in this vector (the engine only
 # records type=="puzzle").
 HIERARCHICAL_CLUSTERING_TEMPLE_KEY <- list(
   scenario_id = 18,
-  correct = c(2, 3, 0, 1),
+  correct = c(1, 1, 1, 1),
   score_step = function(correct, answer, attempts) {
     if (answer != correct) return(0)
     if (attempts <= 1) return(10)

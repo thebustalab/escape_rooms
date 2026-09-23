@@ -296,26 +296,22 @@
             0.728
           ],
           "boxSource": "draft:localizer",
-          "question": {
-            "prompt": "He drew for sister shrines from a single jar, so the offering laid down at Ninestep is kin to the offering at exactly one other shrine. Which shrine is it?",
-            "options": [
-              "Deepwell",
-              "Brokenarch",
-              "Longshadow",
-              "Palewall",
-              "Highgate",
-              "Redsill",
-              "Lastcourt",
-              "Quietfloor"
-            ],
-            "correct": 2,
+          "pick": {
+            "prompt": "The keeper drew for sister shrines from one jar, so two shrines that took the same offering left the same residues behind in their vessels. Using <code>temple_votive_residues</code>, measure how far every other shrine's residues sit from Ninestep's, plot that distance for all eight shrines, assign your plot to <code>p</code>, and click the shrine that sits nearest to Ninestep.",
+            "plotCode": "dm <- as.matrix(dist(temple_votive_residues[, 3:8]))\nrownames(dm) <- colnames(dm) <- temple_votive_residues$shrine\nnear <- data.frame(shrine = colnames(dm), distance = as.numeric(dm[\"Ninestep\", ]))\nnear <- near[near$shrine != \"Ninestep\", ]\np <- ggplot(near, aes(x = distance, y = shrine)) + geom_point(size = 3)",
+            "answer": "Longshadow",
+            "idColumn": "shrine",
+            "idNoun": "shrine",
+            "width": 6.5,
+            "height": 4.5,
             "maxAttempts": 4,
+            "hint": "The six residue measurements are columns 3 to 8. <code>dist()</code> on those columns gives every pairwise distance at once — name the rows with <code>shrine</code>, take the Ninestep row, and plot it.",
             "feedback": {
-              "correct": "Correct — noted: Ninestep's nearest kin is Longshadow.",
+              "correct": "Correct — noted: Ninestep's sister shrine is Longshadow. Their six residues sit 3.2 apart, where the next nearest shrine, Deepwell, is 5.7 away.",
               "wrong": [
-                "Every shrine is six numbers. Two shrines are kin when those six sets of numbers sit closest together — so measure the distance from Ninestep to each of the others.",
-                "`dist()` on the six residue columns gives you every pairwise distance at once; read the row for Ninestep and take its smallest entry.",
-                "Three shrines sit close to Ninestep and five sit far away. Among the close three, one is clearly nearer than the rest — that is the sister, not merely a near neighbour."
+                "Every shrine is six residue measurements. Two shrines are sisters when those six numbers sit closest together, so work out the distance from Ninestep to each of the other eight and compare them.",
+                "<code>dist(temple_votive_residues[, 3:8])</code> gives all the pairwise distances in one go. Put the shrine names on it with <code>rownames()</code>, pull out the Ninestep row, and plot distance against shrine.",
+                "Three shrines sit close to Ninestep and five sit far away. Among the close three, one is clearly nearer than the other two — that is the sister, not merely a near neighbour."
               ]
             }
           }
@@ -334,7 +330,7 @@
           ],
           "boxSource": "review:agent-vision",
           "boxNote": "localiser boxed the pillar left of the niche; measured onto the crimson niche, figures and vessels",
-          "pickup": "The crimson niche: see the plate."
+          "pickup": "The crimson shrine."
         },
         {
           "type": "clue",
@@ -350,7 +346,7 @@
           ],
           "boxSource": "review:agent-vision",
           "boxNote": "localiser cut off the spindle-whorl and banner; measured onto the whole orange niche",
-          "pickup": "The orange niche: see the plate."
+          "pickup": "The orange shrine."
         },
         {
           "type": "door",
@@ -490,7 +486,7 @@
           ],
           "image": "figures/ninestep.png",
           "body": "",
-          "pickup": "The crimson niche: see the plate.",
+          "pickup": "The crimson shrine.",
           "boxSource": "review:agent-vision",
           "boxNote": "localiser boxed the pillar left of the niche; measured onto the crimson niche, figures and vessels"
         },
@@ -506,7 +502,7 @@
           ],
           "image": "figures/longshadow.png",
           "body": "",
-          "pickup": "The orange niche: see the plate.",
+          "pickup": "The orange shrine.",
           "boxSource": "review:agent-vision",
           "boxNote": "localiser cut off the spindle-whorl and banner; measured onto the whole orange niche"
         },
@@ -521,34 +517,30 @@
             0.7515
           ],
           "starterCode": "temple_votive_residues",
-          "question": {
-            "prompt": "He drew for sister shrines from a single jar, so the offering laid down at Ninestep is kin to the offering at exactly one other shrine. Which shrine is it?",
-            "options": [
-              "Deepwell",
-              "Brokenarch",
-              "Longshadow",
-              "Palewall",
-              "Highgate",
-              "Redsill",
-              "Lastcourt",
-              "Quietfloor"
-            ],
-            "correct": 2,
-            "maxAttempts": 4,
-            "feedback": {
-              "correct": "Correct — noted: Ninestep's nearest kin is Longshadow.",
-              "wrong": [
-                "Every shrine is six numbers. Two shrines are kin when those six sets of numbers sit closest together — so measure the distance from Ninestep to each of the others.",
-                "`dist()` on the six residue columns gives you every pairwise distance at once; read the row for Ninestep and take its smallest entry.",
-                "Three shrines sit close to Ninestep and five sit far away. Among the close three, one is clearly nearer than the rest — that is the sister, not merely a near neighbour."
-              ]
-            }
-          },
           "solveSfx": {
             "src": "audio/solve_sun_gallery.mp3",
             "volume": 0
           },
-          "boxSource": "moved:testplay"
+          "boxSource": "moved:testplay",
+          "pick": {
+            "prompt": "The keeper drew for sister shrines from one jar, so two shrines that took the same offering left the same residues behind in their vessels. Using <code>temple_votive_residues</code>, measure how far every other shrine's residues sit from Ninestep's, plot that distance for all eight shrines, assign your plot to <code>p</code>, and click the shrine that sits nearest to Ninestep.",
+            "plotCode": "dm <- as.matrix(dist(temple_votive_residues[, 3:8]))\nrownames(dm) <- colnames(dm) <- temple_votive_residues$shrine\nnear <- data.frame(shrine = colnames(dm), distance = as.numeric(dm[\"Ninestep\", ]))\nnear <- near[near$shrine != \"Ninestep\", ]\np <- ggplot(near, aes(x = distance, y = shrine)) + geom_point(size = 3)",
+            "answer": "Longshadow",
+            "idColumn": "shrine",
+            "idNoun": "shrine",
+            "width": 6.5,
+            "height": 4.5,
+            "maxAttempts": 4,
+            "hint": "The six residue measurements are columns 3 to 8. <code>dist()</code> on those columns gives every pairwise distance at once — name the rows with <code>shrine</code>, take the Ninestep row, and plot it.",
+            "feedback": {
+              "correct": "Correct — noted: Ninestep's sister shrine is Longshadow. Their six residues sit 3.2 apart, where the next nearest shrine, Deepwell, is 5.7 away.",
+              "wrong": [
+                "Every shrine is six residue measurements. Two shrines are sisters when those six numbers sit closest together, so work out the distance from Ninestep to each of the other eight and compare them.",
+                "<code>dist(temple_votive_residues[, 3:8])</code> gives all the pairwise distances in one go. Put the shrine names on it with <code>rownames()</code>, pull out the Ninestep row, and plot distance against shrine.",
+                "Three shrines sit close to Ninestep and five sit far away. Among the close three, one is clearly nearer than the other two — that is the sister, not merely a near neighbour."
+              ]
+            }
+          }
         },
         {
           "id": "back_stair",
@@ -637,7 +629,7 @@
           ],
           "boxSource": "review:agent-vision",
           "boxNote": "localiser boxed the left pillar and missed the macaw; measured onto the whole magenta niche",
-          "pickup": "The magenta niche: see the plate."
+          "pickup": "The magenta shrine."
         },
         {
           "type": "clue",
@@ -653,7 +645,7 @@
           ],
           "boxSource": "review:agent-vision",
           "boxNote": "localiser sat half on the outer pillar and clipped the bee and vessels; measured onto the violet niche",
-          "pickup": "The violet niche: see the plate."
+          "pickup": "The violet shrine."
         },
         {
           "type": "door",
@@ -768,7 +760,7 @@
           ],
           "image": "figures/brokenarch.png",
           "body": "",
-          "pickup": "The magenta niche: see the plate.",
+          "pickup": "The magenta shrine.",
           "boxSource": "review:agent-vision",
           "boxNote": "localiser boxed the left pillar and missed the macaw; measured onto the whole magenta niche"
         },
@@ -795,7 +787,7 @@
           ],
           "image": "figures/palewall.png",
           "body": "",
-          "pickup": "The violet niche: see the plate.",
+          "pickup": "The violet shrine.",
           "boxSource": "review:agent-vision",
           "boxNote": "localiser sat half on the outer pillar and clipped the bee and vessels; measured onto the violet niche"
         },
@@ -1052,14 +1044,14 @@
           "type": "door",
           "label": "The hatch to the lamp hall",
           "box": [
-            0.44,
-            0.355,
-            0.51,
-            0.7
+            0.4382,
+            0.4121,
+            0.5082,
+            0.7571
           ],
           "direction": "open",
           "to": "lamp_hall",
-          "boxSource": "review:agent-vision",
+          "boxSource": "moved:testplay",
           "boxNote": "localiser boxed the wall left of it; measured onto the daylit hatch dead ahead"
         },
         {
@@ -1067,14 +1059,14 @@
           "type": "door",
           "label": "The hatch to the cistern",
           "box": [
-            0.597,
-            0.325,
-            0.668,
-            0.7
+            0.5939,
+            0.3763,
+            0.6649,
+            0.7513
           ],
           "direction": "open",
           "to": "cistern_stair",
-          "boxSource": "review:agent-vision",
+          "boxSource": "moved:testplay",
           "boxNote": "was a stub rectangle over wall; measured onto the blue-lit hatch with the wet steps"
         },
         {
@@ -1082,14 +1074,14 @@
           "type": "door",
           "label": "The hatch to the inner vault",
           "box": [
-            0.726,
-            0.205,
-            0.856,
-            0.72
+            0.7385,
+            0.231,
+            0.8685,
+            0.746
           ],
           "direction": "open",
           "to": "inner_vault",
-          "boxSource": "review:agent-vision",
+          "boxSource": "moved:testplay",
           "boxNote": "was a stub rectangle; measured onto the carved-lintel doorway"
         },
         {
@@ -1146,7 +1138,24 @@
             0.85
           ],
           "boxSource": "review:agent-vision",
-          "boxNote": "localiser missed the wax block, knife and lamp reservoirs; measured onto the whole bench top"
+          "boxNote": "localiser missed the wax block, knife and lamp reservoirs; measured onto the whole bench top",
+          "check": {
+            "prompt": "One block of beeswax is left in the stores and nine shrines want it, so it has to go where it is actually burned. Cluster the nine shrines of <code>temple_votive_residues</code> on their residues, cut that clustering into three families, work out which family burns the most beeswax on average, and assign the names of the shrines in that family to <code>answer</code>.",
+            "requires": [
+              "answer"
+            ],
+            "expr": "local({ a <- tolower(trimws(as.character(unlist(answer)))); length(a) == 3 && setequal(a, c(\"redsill\", \"highgate\", \"palewall\")) })",
+            "maxAttempts": 4,
+            "hint": "<code>cutree(hclust(dist(temple_votive_residues[, 3:8])), k = 3)</code> gives a family label per shrine. Add it to the table, group by it, and take the mean of <code>beeswax</code>.",
+            "feedback": {
+              "correct": "Correct — noted: the beeswax belongs to Redsill, Highgate and Palewall. Their mean is 44.7, against 11.8 and 7.0 for the other two families.",
+              "wrong": [
+                "Cut the nine shrines into their three families first, then ask one number of each family rather than of each shrine.",
+                "<code>hclust(dist(temple_votive_residues[, 3:8]))</code> builds the tree and <code>cutree(..., k = 3)</code> cuts it into three families. Group the shrines by that label and take the mean of <code>beeswax</code> for each.",
+                "One family's average is several times either of the others, so it is not a close call. <code>answer</code> wants the three shrine names in that family, not the family's number or its mean."
+              ]
+            }
+          }
         },
         {
           "type": "clue",
@@ -1315,7 +1324,7 @@
           ],
           "image": "figures/deepwell.png",
           "body": "",
-          "pickup": "The yellow niche: see the plate.",
+          "pickup": "The yellow shrine.",
           "boxSource": "review:agent-vision",
           "boxNote": "localiser boxed the pillar left of the niche; measured onto the yellow niche"
         },
@@ -1331,7 +1340,7 @@
           ],
           "image": "figures/redsill.png",
           "body": "",
-          "pickup": "The white niche: see the plate.",
+          "pickup": "The white shrine.",
           "boxSource": "review:agent-vision",
           "boxNote": "localiser boxed a pillar top far to the left; measured onto the white niche (frog, shell, paddle)"
         },
@@ -1346,34 +1355,30 @@
             0.85
           ],
           "starterCode": "temple_votive_residues",
-          "question": {
-            "prompt": "One block of beeswax is left and nine shrines want it. It cannot go everywhere. Which family of shrines actually burns the stuff?",
-            "options": [
-              "the family of Ninestep, Longshadow, Brokenarch and Deepwell",
-              "the family of Quietfloor and Lastcourt",
-              "Palewall alone — it holds the most of any single shrine",
-              "the family of Redsill, Highgate and Palewall",
-              "the largest family, whichever it is",
-              "the East wing",
-              "no family burns meaningfully more than another"
-            ],
-            "correct": 3,
-            "maxAttempts": 4,
-            "feedback": {
-              "correct": "Correct — noted: the beeswax belongs to Redsill, Highgate and Palewall.",
-              "wrong": [
-                "Cut the nine shrines into their three families first, then ask one number of each family rather than of each shrine.",
-                "`cutree()` the clustering into 3 gives you a family label per shrine; group by that label and take the mean of the beeswax column.",
-                "One family's average is several times either of the others — it is not a close call, so if two look similar you have probably grouped by something other than the residues."
-              ]
-            }
-          },
           "solveSfx": {
             "src": "audio/solve_lamp_hall.mp3",
-            "volume": 0.07
+            "volume": 0.44,
+            "needsReplacement": true
           },
           "boxSource": "review:agent-vision",
-          "boxNote": "localiser missed the wax block, knife and lamp reservoirs; measured onto the whole bench top"
+          "boxNote": "localiser missed the wax block, knife and lamp reservoirs; measured onto the whole bench top",
+          "check": {
+            "prompt": "One block of beeswax is left in the stores and nine shrines want it, so it has to go where it is actually burned. Cluster the nine shrines of <code>temple_votive_residues</code> on their residues, cut that clustering into three families, work out which family burns the most beeswax on average, and assign the names of the shrines in that family to <code>answer</code>.",
+            "requires": [
+              "answer"
+            ],
+            "expr": "local({ a <- tolower(trimws(as.character(unlist(answer)))); length(a) == 3 && setequal(a, c(\"redsill\", \"highgate\", \"palewall\")) })",
+            "maxAttempts": 4,
+            "hint": "<code>cutree(hclust(dist(temple_votive_residues[, 3:8])), k = 3)</code> gives a family label per shrine. Add it to the table, group by it, and take the mean of <code>beeswax</code>.",
+            "feedback": {
+              "correct": "Correct — noted: the beeswax belongs to Redsill, Highgate and Palewall. Their mean is 44.7, against 11.8 and 7.0 for the other two families.",
+              "wrong": [
+                "Cut the nine shrines into their three families first, then ask one number of each family rather than of each shrine.",
+                "<code>hclust(dist(temple_votive_residues[, 3:8]))</code> builds the tree and <code>cutree(..., k = 3)</code> cuts it into three families. Group the shrines by that label and take the mean of <code>beeswax</code> for each.",
+                "One family's average is several times either of the others, so it is not a close call. <code>answer</code> wants the three shrine names in that family, not the family's number or its mean."
+              ]
+            }
+          }
         },
         {
           "id": "niche_highgate",
@@ -1387,7 +1392,7 @@
           ],
           "image": "figures/highgate.png",
           "body": "",
-          "pickup": "The deep blue niche: see the plate.",
+          "pickup": "The deep blue shrine.",
           "boxSource": "review:agent-vision",
           "boxNote": "localiser boxed the pillar and missed the censer; measured onto the deep blue niche"
         },
@@ -1431,7 +1436,7 @@
       "sfx": [
         {
           "src": "audio/lamp_hall_jungle_through_wall.mp3",
-          "volume": 0.12,
+          "volume": 0.11,
           "mode": "loop"
         }
       ],
@@ -1463,7 +1468,7 @@
           ],
           "boxSource": "review:agent-vision",
           "boxNote": "was a stub over blank wall; measured onto the black niche",
-          "pickup": "The black niche: see the plate."
+          "pickup": "The black shrine."
         },
         {
           "type": "clue",
@@ -1479,7 +1484,7 @@
           ],
           "boxSource": "review:agent-vision",
           "boxNote": "localiser boxed the left pillar and missed the bee; measured onto the turquoise niche",
-          "pickup": "The turquoise niche: see the plate."
+          "pickup": "The turquoise shrine."
         },
         {
           "type": "door",
@@ -1610,15 +1615,15 @@
           "type": "clue",
           "label": "The black niche",
           "box": [
-            0.167,
-            0.12,
-            0.268,
-            0.52
+            0.1485,
+            0.111,
+            0.2495,
+            0.511
           ],
           "image": "figures/quietfloor.png",
           "body": "",
-          "pickup": "The black niche: see the plate.",
-          "boxSource": "review:agent-vision",
+          "pickup": "The black shrine.",
+          "boxSource": "moved:testplay",
           "boxNote": "2026-09-20, re-measured on the FULL cistern redraw: the black-bannered niche with its brazier, spindle-whorl and censer"
         },
         {
@@ -1627,7 +1632,7 @@
           "label": "the square well of the cistern with one clean column of whit",
           "box": [
             0.3,
-            0.0,
+            0,
             0.465,
             0.85
           ],
@@ -1646,7 +1651,7 @@
           ],
           "image": "figures/lastcourt.png",
           "body": "",
-          "pickup": "The turquoise niche: see the plate.",
+          "pickup": "The turquoise shrine.",
           "boxSource": "review:agent-vision",
           "boxNote": "2026-09-20, re-measured on the FULL cistern redraw: the turquoise-bannered niche with the monkey, macaw and bee"
         },
@@ -1743,25 +1748,20 @@
           ],
           "boxSource": "review:agent-vision",
           "boxNote": "localiser boxed only the glass pane; measured onto the flat stone with pane and scraping-sherd",
-          "question": {
-            "prompt": "The cell behind the slab has a lamp nobody has fed in living memory, and a bowl thick with what was last poured into it. No register can be called whole while a shrine is missing from it. Which family of shrines does this one belong with?",
-            "options": [
-              "the family of Quietfloor and Lastcourt",
-              "the family of Ninestep, Longshadow, Brokenarch and Deepwell",
-              "the family of Redsill, Highgate and Palewall",
-              "a family of its own — it matches nothing here",
-              "closest to Ninestep",
-              "closest to Palewall",
-              "there is not enough left in the bowl to say"
+          "check": {
+            "prompt": "The cell behind the slab holds a cold lamp and a bowl still thick with what was last poured into it, and the Closing cannot be written while a shrine is missing from the register. That bowl has been scraped into a single row on the bench as <code>unknown_shrine</code>; add it to the nine shrines of <code>temple_votive_residues</code>, cluster all ten together, and assign to <code>answer</code> the names of the shrines whose family it falls inside.",
+            "requires": [
+              "answer"
             ],
-            "correct": 0,
+            "expr": "local({ a <- tolower(trimws(as.character(unlist(answer)))); a <- setdiff(a, c(\"unmarked_cell\", \"unmarked cell\")); length(a) == 2 && setequal(a, c(\"quietfloor\", \"lastcourt\")) })",
             "maxAttempts": 4,
+            "hint": "<code>rbind()</code> the unknown row onto the nine, then run the same distance-and-clustering you used before and read off which shrines it lands beside.",
             "feedback": {
-              "correct": "Correct — noted: the nameless cell belongs with Quietfloor and Lastcourt.",
+              "correct": "Correct — noted: the nameless cell belongs with Quietfloor and Lastcourt. Its residues sit 2.4 from each of them, and more than 60 from every other shrine in the temple.",
               "wrong": [
-                "Put the unknown into the same table as the nine and cluster the lot together — it will fall inside one of the existing groups.",
-                "`rbind()` the unknown row onto the nine, then run the same distance-and-clustering you used before and see which shrines it lands beside.",
-                "Its nearest single shrine and the family that shrine belongs to are the same answer here — the next-nearest family is many times further away."
+                "Put the unknown into the same table as the nine and cluster the lot together — it will fall inside one of the three families you already know.",
+                "<code>rbind(temple_votive_residues, unknown_shrine)</code>, then <code>cutree(hclust(dist(.[, 3:8])), k = 3)</code> on the combined table. Find the unknown's label and list the other shrines that share it.",
+                "It is not a close call — the family it joins sits about 2.4 away and everything else is more than 60 away. <code>answer</code> wants the shrine names it joins, not the unknown's own name."
               ]
             }
           }
@@ -1927,34 +1927,29 @@
             0.8
           ],
           "starterCode": "temple_votive_residues\nunknown_shrine",
-          "question": {
-            "prompt": "The cell behind the slab has a lamp nobody has fed in living memory, and a bowl thick with what was last poured into it. No register can be called whole while a shrine is missing from it. Which family of shrines does this one belong with?",
-            "options": [
-              "the family of Quietfloor and Lastcourt",
-              "the family of Ninestep, Longshadow, Brokenarch and Deepwell",
-              "the family of Redsill, Highgate and Palewall",
-              "a family of its own — it matches nothing here",
-              "closest to Ninestep",
-              "closest to Palewall",
-              "there is not enough left in the bowl to say"
-            ],
-            "correct": 0,
-            "maxAttempts": 4,
-            "feedback": {
-              "correct": "Correct — noted: the nameless cell belongs with Quietfloor and Lastcourt.",
-              "wrong": [
-                "Put the unknown into the same table as the nine and cluster the lot together — it will fall inside one of the existing groups.",
-                "`rbind()` the unknown row onto the nine, then run the same distance-and-clustering you used before and see which shrines it lands beside.",
-                "Its nearest single shrine and the family that shrine belongs to are the same answer here — the next-nearest family is many times further away."
-              ]
-            }
-          },
           "solveSfx": {
             "src": "audio/solve_sealed_cell.mp3",
             "volume": 0
           },
           "boxSource": "review:agent-vision",
-          "boxNote": "localiser boxed only the glass pane; measured onto the flat stone with pane and scraping-sherd"
+          "boxNote": "localiser boxed only the glass pane; measured onto the flat stone with pane and scraping-sherd",
+          "check": {
+            "prompt": "The cell behind the slab holds a cold lamp and a bowl still thick with what was last poured into it, and the Closing cannot be written while a shrine is missing from the register. That bowl has been scraped into a single row on the bench as <code>unknown_shrine</code>; add it to the nine shrines of <code>temple_votive_residues</code>, cluster all ten together, and assign to <code>answer</code> the names of the shrines whose family it falls inside.",
+            "requires": [
+              "answer"
+            ],
+            "expr": "local({ a <- tolower(trimws(as.character(unlist(answer)))); a <- setdiff(a, c(\"unmarked_cell\", \"unmarked cell\")); length(a) == 2 && setequal(a, c(\"quietfloor\", \"lastcourt\")) })",
+            "maxAttempts": 4,
+            "hint": "<code>rbind()</code> the unknown row onto the nine, then run the same distance-and-clustering you used before and read off which shrines it lands beside.",
+            "feedback": {
+              "correct": "Correct — noted: the nameless cell belongs with Quietfloor and Lastcourt. Its residues sit 2.4 from each of them, and more than 60 from every other shrine in the temple.",
+              "wrong": [
+                "Put the unknown into the same table as the nine and cluster the lot together — it will fall inside one of the three families you already know.",
+                "<code>rbind(temple_votive_residues, unknown_shrine)</code>, then <code>cutree(hclust(dist(.[, 3:8])), k = 3)</code> on the combined table. Find the unknown's label and list the other shrines that share it.",
+                "It is not a close call — the family it joins sits about 2.4 away and everything else is more than 60 away. <code>answer</code> wants the shrine names it joins, not the unknown's own name."
+              ]
+            }
+          }
         },
         {
           "id": "empty_niche",
@@ -2044,13 +2039,30 @@
             0.62,
             0.77
           ],
-          "boxSource": "draft:localizer"
+          "boxSource": "draft:localizer",
+          "check": {
+            "prompt": "Four hundred years ago, all the shrines in a given wing — the East wing, the West wing or the North wing — were given the same offering. Some shrines have been moved since, and both the carving on the wall of this room and the wing listed in your dataset record every shrine's current location. But a shrine that was moved still receives the offering it always did — it is a shrine to the same god, after all. So the question is: which two shrines have been moved?<br><br>Cluster the nine shrines of <code>temple_votive_residues</code> into three families based on their residues, then compare that clustering against the wing assignments listed in the dataset. The two shrines that were moved are the ones their residues give away: they do not match the other shrines standing in the same wing as them. Assign both shrine names to <code>answer</code>.",
+            "requires": [
+              "answer"
+            ],
+            "expr": "local({ a <- tolower(trimws(as.character(unlist(answer)))); length(a) == 2 && setequal(a, c(\"deepwell\", \"palewall\")) })",
+            "maxAttempts": 4,
+            "hint": "Everything you need is in <code>temple_votive_residues</code> — the wall is only the same list in stone. <code>cutree()</code> into 3 gives each shrine's family from the residues; set that against the <code>wing</code> column and look for the shrine in each wing that does not match the rest of its wing.",
+            "feedback": {
+              "correct": "Correct — noted: Deepwell and Palewall are the two that moved, and they moved past each other. Deepwell stands in the West wing but its residues are the East wing's copal and rubber; Palewall stands in the East wing but its residues are the West wing's beeswax and seed oil. The other seven shrines still stand where their offering says they belong.",
+              "wrong": [
+                "Work out each shrine's family from the residues, then set that beside the wing it is filed under. In two of the three wings, one shrine's offering does not match the others standing with it — those are the shrines that moved. You do not have to read anything off the wall; the wing is a column in the table.",
+                "<code>cutree(hclust(dist(temple_votive_residues[, 3:8])), k = 3)</code> gives the family. Compare it against the <code>wing</code> column wing by wing: the East wing holds three shrines of one family and one of another, and the West wing holds two of one and one of another. The North wing is undisturbed.",
+                "There are two, and they swapped: one now stands in the West but was supplied with the East jar, and one now stands in the East but was supplied with the West jar. <code>answer</code> wants both shrine names — not a single name, and not a wing."
+              ]
+            }
+          }
         },
         {
           "type": "clue",
           "label": "The keeper's wing-register",
           "note": "THE MISDIRECTION. Lists the shrines by wing, formally and authoritatively. Say what it IS and how old it is; never that it is wrong.",
-          "body": "Not his: cut into the wall four centuries before him, deep and formal, and never once corrected. It files every shrine in the temple under the wing it stands in — <b>East:</b> Ninestep, Longshadow, Brokenarch, Palewall. <b>West:</b> Deepwell, Redsill, Highgate. <b>North:</b> Quietfloor, Lastcourt. The same three letters are cut beside every shrine's name in the storeroom ledgers, which is why nobody has ever had cause to doubt it.",
+          "body": "A great register cut deep into the wall in three formal columns, each column a list of shrines marked by their banner colours, the marks cut square and official and worn shallow by four hundred years of hands. It is the keeper's own record of where every shrine stands today — accurate, and no help at all with which shrines belong together, because a shrine that was moved kept its offering. The same filing is already in your hands: <code>temple_votive_residues</code> gives every shrine's wing in its <code>wing</code> column, beside the residues.",
           "box": [
             0.19,
             0.07,
@@ -2229,7 +2241,7 @@
             0.365,
             0.675
           ],
-          "body": "A collection of shrine figurines and their banners.",
+          "body": "A great register cut deep into the wall in three formal columns, each column a list of shrines marked by their banner colours, the marks cut square and official and worn shallow by four hundred years of hands. It is the keeper's own record of where every shrine stands today — accurate, and no help at all with which shrines belong together, because a shrine that was moved kept its offering. The same filing is already in your hands: <code>temple_votive_residues</code> gives every shrine's wing in its <code>wing</code> column, beside the residues.",
           "boxSource": "review:agent-vision",
           "boxNote": "localiser missed the third column; measured onto the whole three-column register"
         },
@@ -2249,34 +2261,12 @@
           "type": "puzzle",
           "label": "The vault reading-table",
           "box": [
-            0.38,
-            0.626,
-            0.62,
-            0.77
+            0.3576,
+            0.6473,
+            0.5976,
+            0.7913
           ],
           "starterCode": "temple_votive_residues",
-          "question": {
-            "prompt": "The register cut into this wall files every shrine under its wing, and it has stood here four hundred years. Your vessels tell a different story about some of them. Which shrines does the stone put in the wrong company?",
-            "options": [
-              "Deepwell alone",
-              "Deepwell and Palewall",
-              "Palewall alone",
-              "Deepwell and Brokenarch",
-              "Palewall and Redsill",
-              "Quietfloor and Lastcourt",
-              "none — the wings are right"
-            ],
-            "correct": 1,
-            "maxAttempts": 4,
-            "feedback": {
-              "correct": "Correct — noted: Deepwell and Palewall are filed against their own residues.",
-              "wrong": [
-                "Work out each shrine's family from the residues, then set that beside the wing the stone gives it, and look for the disagreements.",
-                "`cutree()` into 3 for the chemical family, then compare that label against the `wing` column shrine by shrine.",
-                "Most shrines agree with their wing, which is exactly why the stone is tempting. You are looking for the few that do not — and there is more than one."
-              ]
-            }
-          },
           "deliverable": {
             "type": "figure",
             "submitCodec": true
@@ -2285,7 +2275,24 @@
             "src": "audio/solve_inner_vault.mp3",
             "volume": 0.24
           },
-          "boxSource": "draft:localizer"
+          "boxSource": "moved:testplay",
+          "check": {
+            "prompt": "Four hundred years ago, all the shrines in a given wing — the East wing, the West wing or the North wing — were given the same offering. Some shrines have been moved since, and both the carving on the wall of this room and the wing listed in your dataset record every shrine's current location. But a shrine that was moved still receives the offering it always did — it is a shrine to the same god, after all. So the question is: which two shrines have been moved?<br><br>Cluster the nine shrines of <code>temple_votive_residues</code> into three families based on their residues, then compare that clustering against the wing assignments listed in the dataset. The two shrines that were moved are the ones their residues give away: they do not match the other shrines standing in the same wing as them. Assign both shrine names to <code>answer</code>.",
+            "requires": [
+              "answer"
+            ],
+            "expr": "local({ a <- tolower(trimws(as.character(unlist(answer)))); length(a) == 2 && setequal(a, c(\"deepwell\", \"palewall\")) })",
+            "maxAttempts": 4,
+            "hint": "Everything you need is in <code>temple_votive_residues</code> — the wall is only the same list in stone. <code>cutree()</code> into 3 gives each shrine's family from the residues; set that against the <code>wing</code> column and look for the shrine in each wing that does not match the rest of its wing.",
+            "feedback": {
+              "correct": "Correct — noted: Deepwell and Palewall are the two that moved, and they moved past each other. Deepwell stands in the West wing but its residues are the East wing's copal and rubber; Palewall stands in the East wing but its residues are the West wing's beeswax and seed oil. The other seven shrines still stand where their offering says they belong.",
+              "wrong": [
+                "Work out each shrine's family from the residues, then set that beside the wing it is filed under. In two of the three wings, one shrine's offering does not match the others standing with it — those are the shrines that moved. You do not have to read anything off the wall; the wing is a column in the table.",
+                "<code>cutree(hclust(dist(temple_votive_residues[, 3:8])), k = 3)</code> gives the family. Compare it against the <code>wing</code> column wing by wing: the East wing holds three shrines of one family and one of another, and the West wing holds two of one and one of another. The North wing is undisturbed.",
+                "There are two, and they swapped: one now stands in the West but was supplied with the East jar, and one now stands in the East but was supplied with the West jar. <code>answer</code> wants both shrine names — not a single name, and not a wing."
+              ]
+            }
+          }
         },
         {
           "id": "back_crawl_vault",
@@ -2394,7 +2401,7 @@
       "sfx": [
         {
           "src": "audio/close_stone_tone.mp3",
-          "volume": 1.0,
+          "volume": 0.36,
           "mode": "loop"
         }
       ],
