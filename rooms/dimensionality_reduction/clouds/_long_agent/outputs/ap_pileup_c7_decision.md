@@ -1,0 +1,15 @@
+I read the four authority files, then checked this room's actual state against them.
+
+**What I found**
+
+- The spec *does* declare a mover — `torn_cloud` at `just left of centre`, vigour "fast and steady", phrase *"torn cloud streaming close past the wing struts and parting around them"*.
+- `render_prompt(current spec)` is **byte-identical** to the committed `scenePrompt`, so the art is not stale — this still *is* what that spec produced. And it did not produce the mover: at left-of-centre there are no near torn rags of cloud and no wing struts, just the distant cumulus floor under the city. The 10,407-character prompt (≈2,600 of it the city clause) buried the 40-word cloud clause.
+- The phrase also breaks the **no-travel rule**: "streaming past … parting around them" is net travel, and clouds drifting are named in the judgements as one of the two things the two-ended loop provably animates *in place or not at all* (2026-08-30, gulls and clouds).
+
+So there is no depicted, animatable bounded mover, and rendering as-is would spend a DGX render re-discovering a settled result.
+
+**The precedent that decides it:** `cockpit`, in this same scenario, uses the sampler globe's bloom at this same `at` — and HELD first render (camera still, return 0.28, peak 10.17, glitch 0.146, dead false). That globe is **already prominently depicted in ap_pileup's committed still at x≈0.36**, bounded by hard glass so it physically cannot travel. I'm copying cockpit's proven vigour and phrase verbatim rather than inventing new ones, and adding a singularity guard because `nose` also names the globe. The runner matches fragments on `at`, so this merges over `torn_cloud` in place; `animate` and `sound` are supplied explicitly so the old travel phrase cannot survive in the legacy block. No `plannedHotspot` references `torn_cloud`, so the id change is safe.
+
+DECISION: AUTHOR_MOVER
+SPEC: {"id": "sampler", "at": "just left of centre", "desc": "close at hand, on the left of the dash - the glider's ONE and only sampler globe, the same one named on the dash and drawn exactly once: a clear glass SAMPLER globe the size of a head, holding one captured cloud-garden bloom, a knot of pale luminous mist glowing and turning slowly inside the glass, its filaments curling and uncurling", "motion": {"moves": true, "vigour": "slow and calm, a gentle drift and pulse", "phrase": "the captured cloud-garden bloom drifting, turning and pulsing slowly inside its glass sampler globe"}, "animate": {"motion": "the captured cloud-garden bloom drifting, turning and pulsing slowly inside its glass sampler globe", "loop": "crossfade"}, "sound": {"source": "a glass sampler globe on the dash with a living bloom inside", "character": "a faint, glassy, humming chime"}}
+WHY: The committed still provably failed to depict the authored torn-cloud mover and its phrase names forbidden net travel, so the room has no animatable bounded mover — replaced with the sampler globe's bloom, which this scenario's `cockpit` room already held on first render at this exact position and which is already visible in this still.

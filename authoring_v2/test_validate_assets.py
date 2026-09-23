@@ -61,7 +61,7 @@ def _solve_misses(gate):
     with tempfile.TemporaryDirectory() as d:
         path = os.path.join(d, "scenario.json")
         json.dump(scen, open(path, "w", encoding="utf-8"))
-        _fails, misses, _ready = va.check_scenario(path)
+        _fails, misses, _ready, _advisories = va.check_scenario(path)
     return [m for m in misses if "solveSfx" in m]
 
 
@@ -155,3 +155,65 @@ def test_missing_setup_flags_everything_student_facing():
 def test_support_packages_may_stay_unattached():
     scen = {"packages": ["dplyr", "readr", "igraph", "ggiraph"], "setup": "library(dplyr)"}
     assert va.packages_not_attached(scen) == []
+
+
+# --- planned_placed_drift: the planned manifest is a LIVE OVERWRITE, not a record (2026-09-22) -------
+# `harness_server._attach_planned_content` copies every field of a `plannedHotspots` entry onto the
+# placed hotspot it matches on (type, slug(label)) — and it runs on EVERY commit path, not only the
+# first. So a planned entry left describing a SUPERSEDED design silently reverts the shipped one, days
+# or weeks later, the next time anyone touches that room in the harness.
+#
+# Found auditing networks/subway, where it had survived three earlier audits because nothing simulates
+# the commit: the cab ride controls were built as `lever` (shared/ride.js engages on nothing else)
+# while their planned twins still described the abandoned `dial` design; the five cab platform doors
+# were planned against a `dest_<line>` game-state key that no longer existed; and the two escape clues
+# were planned with their pre-trim bodies, one of which carries the filing convention the escape cannot
+# be solved without. Every other validator was green and the JS suite was green.
+#
+# The check is a dry run of that same attach. These tests pin its two halves.
+
+def _drift(room):
+    return va.planned_placed_drift({"rooms": [room]})
+
+
+def _built(planned, placed):
+    return {"key": "r1", "built": True, "plannedHotspots": planned, "hotspots": placed}
+
+
+def test_a_planned_field_that_would_overwrite_the_built_one_is_reported():
+    out = _drift(_built(
+        [{"type": "door", "label": "The platform door", "to": "old_room"}],
+        [{"id": "d", "type": "door", "label": "The platform door", "to": "new_room"}]))
+    assert out and "`to`" in out[0], out
+
+
+def test_a_planned_entry_matching_the_built_one_is_silent():
+    hs = {"type": "door", "label": "The platform door", "to": "r2"}
+    assert _drift(_built([dict(hs)], [dict(hs, id="d")])) == []
+
+
+def test_placement_only_fields_are_not_drift():
+    # box/id/label/type/note are _PLANNED_SKIP — the harness never copies them, so neither do we.
+    assert _drift(_built(
+        [{"type": "clue", "label": "A thing", "box": [0, 0, 1, 1], "note": "planned note", "body": "x"}],
+        [{"id": "c", "type": "clue", "label": "A thing", "box": [0.2, 0.2, 0.3, 0.3], "body": "x"}])) == []
+
+
+def test_a_planned_entry_with_no_placed_twin_is_reported():
+    out = _drift(_built(
+        [{"type": "clue", "label": "A deleted clue", "box": [0, 0, 1, 1], "body": "x"}],
+        [{"id": "d", "type": "door", "label": "A door", "to": "r2"}]))
+    assert out and "RE-CREATE" in out[0], out
+
+
+def test_noElement_is_the_honest_opt_out():
+    assert _drift(_built(
+        [{"type": "clue", "label": "No object of its own", "noElement": True, "body": "x"}],
+        [{"id": "d", "type": "door", "label": "A door", "to": "r2"}])) == []
+
+
+def test_an_unbuilt_room_is_not_checked():
+    r = _built([{"type": "door", "label": "A door", "to": "old"}],
+               [{"id": "d", "type": "door", "label": "A door", "to": "new"}])
+    r["built"] = False
+    assert va.planned_placed_drift({"rooms": [r]}) == []
