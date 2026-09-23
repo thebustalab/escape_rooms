@@ -41,3 +41,4 @@ Started 2026-09-22T03:26:42.517116+00:00.
 - **2026-09-23 03:11 UTC** — ap_pileup: waiting on the loop bake (poll 8/40). No Claude call spent.
 - **2026-09-23 03:12 UTC** — ap_pileup: waiting on the loop bake (poll 9/40). No Claude call spent.
 - **2026-09-23 03:13 UTC** — ap_pileup: the loop bake is still growing (4674521 bytes). Waiting for it to settle. No Claude call spent.
+- **2026-09-23 03:15 UTC** — ap_pileup: gated — {"camera": "still", "return": 0.08, "peak": 13.56, "glitch": {"spike": 26.72, "breadth": 0.146, "at_pct": 94.4, "frames": 73, "breadth_normalised": 0.146}, "dead": {"ratio": 20.59, "peak": 18.03, "dead": false}}
