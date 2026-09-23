@@ -12,7 +12,7 @@ network and a description of vibes, Claude drafts **one spec per room** followin
 ## Inputs → output
 - **Inputs:** the room network (which rooms, how they connect via doors), a description of the world/vibes,
   and each room's role/story beat. (For a full CHEM 5725 scenario these come from `escape_room_puzzles`
-  (ladder + dataset) then `escape_room_concept`, which owns the world, the narrative and the room graph —
+  (ladder + dataset) then `escape_room_blueprint`, which owns the world, the narrative and the room graph —
   it absorbed the retired `escape_room_story` and `escape_room_design` skills on 2026-09-03.)
 - **Output:** a JSON object `{"worldPlate": "<prompt>", roomKey: spec, ...}` for the whole scenario, ready for
   `POST /api/save-scene-specs`. **`worldPlate`** (optional, scenario-level) is a "world-bible" establishing-image
@@ -32,8 +32,32 @@ network and a description of vibes, Claude drafts **one spec per room** followin
   "seamOccluder": "a riveted iron stanchion, floor to ceiling",  // the object the SECOND-PASS occluder repair stands on the seam (rule 5a). Not rendered into the prompt.
   "elements": [           // ORDERED left → right as they sweep around the 360
     { "id": "boiler", "at": "on the far left", "desc": "a riveted boiler, its firebox door ajar",
-      "animate": { "motion": "the firebox glowing and flickering", "loop": "boomerang" } }
-    // one role per element: animate | puzzle:true | switch:true | door:{direction,to[,opensOnto]} | clue:true | lock:true | grid:true | dial:true
+      "motion": { "moves": true,
+                  "vigour": "the firebox door ajar and the fire in it burning hard",   // appended to desc -> the ART prompt
+                  "phrase": "the firebox glowing and flickering behind the open door", // -> the MOTION prompt
+                  "still_as": "" },                                                    // set instead when this element must NOT move
+      "sound":  { "source": "the open firebox", "character": "a low roar with the crack of settling coals",
+                  "prominence": "hero" }                                               // -> the SOUND BRIEF only, never the art prompt
+    }
+    // one role per element: puzzle:true | switch:true | door:{direction,to[,opensOnto]} | clue:true | lock:true | grid:true | dial:true
+  ],
+  "soundBed": "what the PLACE sounds like — exposure, enclosure, what the weather does here",
+  "rigid": "the things that must stay dead still",
+  "stillOnly": false,                 // true = this room gets no clip at all
+  "atmosphere": "...", "negatives": "...",
+  "states": { "<state>": { "change": "...", "light": "...", "constraints": "...",
+                           "soundBed": "...", "elements": { "<id>": { "look": "...", "motion": {...} } } } }
+}
+```
+
+**`motion` is the live field; `animate` is not.** `render_prompt` reads `motion.vigour`,
+`render_motion_prompt` reads `motion.phrase`, `render_sound_brief` reads `sound` — and none of them
+reads `animate`. **An element that declares only `animate` renders with no vigour in the still and no
+phrase in the clip.** `motion.moves:false` puts the element's noun on the rigid list. `sound` must never reach the art
+prompt — "a steady rope of water, loud" in an IMAGE prompt is the bug this separation exists to stop.
+
+
+```jsonc
     // label           = the IN-WORLD name ("The customs writing-desk"). Set it on anything the player opens:
     //                   it is the play-time MODAL TITLE, and the key pre-art `plannedHotspots` content
     //                   slug-matches on when it attaches at commit. Omitted ⇒ falls back to desc[:60].
@@ -191,10 +215,11 @@ own bore" becomes reliable only when it is also "there are EXACTLY 4 tunnel mout
    prose order AND the approximate hotspot x-position, so spread them across the whole ring.
    **Seven is the real ceiling, so plan the ring around what actually needs a BOX.** The default approx
    box is 0.16 wide while adjacent positions sit 0.12–0.16 apart, so neighbouring boxes already abut —
-   an eighth position would not separate anything. This list used to name eight phrases for these seven
+   an eighth position would not separate anything. **Any other position name you meet is an alias, not a
+   slot.** (Historically eight names mapped onto these seven
    places ("to the centre-right" was a second name for 0.64, and there was no name for 0.36's left-hand
    twin), which reads as an extra slot that does not exist and lands two elements on one x. Only elements
-   that need a box — a gameplay hotspot, or an `animate` motion subject — genuinely conflict; backdrop
+   that need a box — a gameplay hotspot — genuinely conflict; backdrop
    and scenery may share a position freely, and `validate_scenes` only warns when both sides need a box.
    A room wanting more than seven distinct places is usually one where a global architectural fact (side
    arches, a gallery running right round) belongs in `setting` rather than in an element of its own.
@@ -209,16 +234,12 @@ own bore" becomes reliable only when it is also "there are EXACTLY 4 tunnel mout
    boarded through its own sliding door" — NOT "a boarding door, with a car waiting beyond it": the latter
    makes the model render the door and the vehicle as two separate objects (trees stations, 2026-08). One
    object: the vehicle, boarded through its own door.
-3. **Animatable objects — declare them up front, framed to move.** Flag `animate:{motion, loop}`.
-   **⚠️ `animate` NO LONGER CREATES A HOTSPOT (2026-09-02).** Motion is now baked over the WHOLE panorama,
-   per (room, world-state), by `cinemagraph_tools/cine_scenario.py` from an authored `authoring.motionSpec`
-   — not as a per-object box clip. So `animate` is now purely the SOURCE TEXT for that motion spec: keep
-   declaring what moves and how, but expect no `ambient` carrier and no queued job per object. The two
-   carriers that DO still exist are the full-scene variant carrier (box `[0,0,1,1]`, created by the
-   harness) and an `animate` element that also declares `variants` — that one keeps its carrier because a
-   BOXED state variant needs somewhere to hang.
-   Everything below about framing an object to move still applies: it is what the motion spec is written
-   from, and a thing framed so it cannot move still will not move. Frame the
+3. **Movers — declare them up front, framed to move.** Declare a mover with
+   `motion:{moves, vigour, phrase}` on its element (schema above). **Motion is baked over the WHOLE
+   panorama, per (room, world-state), by `room_iterate`** — never as a per-object box clip, so a mover
+   gets no `ambient` carrier and no queued job of its own. The one carrier that does exist is the
+   full-scene variant carrier (box `[0,0,1,1]`, created by the harness).
+   Frame the
    object so it CAN move: "a lantern **on a chain**" (not fixed to a post), "steam **venting**", "a flag",
    "bubbling liquid", "drifting embers". Name ONE physical motion + a pace. Prefer **movement over
    brightness** — "twinkling lights" barely moves; give it a carrier ("steam drifting past the indicator
@@ -319,7 +340,7 @@ own bore" becomes reliable only when it is also "there are EXACTLY 4 tunnel mout
    `opensOnto`: an alternate look that shows when `when` holds (`pickActiveVariants`). Each one with a
    `reveal` is queued as a variant job by *Place all hotspots* and rendered in the normal art batch, so
    payoff art (the Pharos lamp swinging its beam onto the player's ship) can't be forgotten. Put it on an
-   `animate` element when it should carry art but no player marker — an `ambient` hotspot is exactly that.
+   element carrying `motion` when it should have art but no player marker.
 7. **Atmosphere** — a vivid closing line: light, mood, materials, haze/grain. **Negatives** — default
    "No people, no lettering, no captions, no text".
 
@@ -329,7 +350,7 @@ own bore" becomes reliable only when it is also "there are EXACTLY 4 tunnel mout
 2. Per room — generate art from the rendered prompt → judge it → commit. Generation is cheap and runs
    unattended, so per-room art cost is not a reason to cut rooms. Two ways to run it, both owned by the `escape_room_stills` skill:
    **by hand** (generate, review the candidates with `art_qc.py` at NATIVE resolution, commit), or
-   **unattended** via the `stills_iterate` long_agent loop, which does the same thing overnight for a
+   **unattended** via `room_iterate` (`escape_room_art_pipeline`), which does the same thing overnight for a
    whole scenario and leaves an accept queue. Neither ever marks art accepted — that stays human.
    (Continuity: use the world plate / room-reference for rooms that must match a seen landmark.)
 2a. **SEAM STAGE — `seam_stage.py` (screen → blur → occlude → accept).** Required, and required HERE:
@@ -339,14 +360,13 @@ own bore" becomes reliable only when it is also "there are EXACTLY 4 tunnel mout
 2b. **DRAFT THE BOXES — `place_hotspots.py` (gpt-4o localizer).** Grid-on-image + the generation prompt
    for left-to-right ordering; refuses to write a run whose predictions collapse. Produces
    `boxSource: draft:localizer`, which step 4 then corrects.
-3. `POST /api/apply-spec-all {chapter, scenario}` — materialises approximate hotspots + queues every animated
-   element's cinemagraph **and every door open-view** (as a state-tagged door-open variant) across the scenario.
+3. `POST /api/apply-spec-all {chapter, scenario}` — materialises approximate hotspots **and every door
+   open-view** (as a state-tagged door-open variant) across the scenario.
 4. Per room (HUMAN box-review — the deliberate human step): nudge/resize the rough boxes in the hub flat
    editor; draw wrap boxes for any seam object.
-5. Bake the motion: `cinemagraph_tools/cine_scenario.py` walks every (room, world-state) and renders the
-   WHOLE panorama from that state's `motionSpec` — including the night variants, which carry their own
-   motion. (The old per-hotspot 5-candidate box batch is retired; `wrangling/egypt` was the first scenario
-   with zero box clips, and `networks/beacons` was authored this way from the start.)
+5. Bake the motion: **`room_iterate` renders one clip per (room, world-state)** over the WHOLE panorama,
+   from the spec's `motion` fields and each `states.<state>` overlay — night variants included, since they
+   carry their own motion.
 
 ## Worked example
 `authoring_v2/scene_specs/airship_boss.json` — the airship engine room, built from its real prompt + ambient
@@ -411,8 +431,7 @@ room; only three of its nine legs were southerly, and the legs ranged from under
 1,490 m ascent. Approach direction and leg character are free differentiation that the topology has
 already decided for you. (Door *topology* — every door's `to` exists, every non-start room has a `back`
 door, no gateless room with a `forward` door — is checked by `validate_scenes.py`, run on its own or via
-the enforced `authoring_v2/preflight.py` pre-art gate; that script and `escape_room_concept` took over
-from the retired `escape_room_scene_validator` skill. **Bearing is on the spec-author: no checker
+the enforced `authoring_v2/preflight.py` pre-art gate. **Bearing is on the spec-author: no checker
 verifies it.**)
 
 **Art fidelity is not a puzzle-leak vector, and treating it as one is expensive** (Lucas, 2026-09-02).

@@ -1,9 +1,9 @@
 {
-  "status": "working",
+  "status": "awaiting_review",
   "retry_count": 0,
   "started": "2026-09-22T03:26:42.516900+00:00",
-  "last_cycle": "2026-09-23T03:49:05.632853+00:00",
-  "cycles_completed": 16,
+  "last_cycle": "2026-09-23T05:28:00.403691+00:00",
+  "cycles_completed": 31,
   "rooms": {
     "cockpit": {
       "history": [
@@ -127,18 +127,150 @@
           "cycle": 16,
           "decision": "RENDER",
           "why": "The c13 re-authoring worked — the regenerated still now visibly depicts exactly one bounded, tethered drogue kite with its line and rippling tail, the art prompt is byte-identical to the current spec so the still cannot predate its own motion prompt, the spec-derived motion prompt is 34 words and travel-free, and no clip exists yet, so the next step is the one render at end guide 0.70."
+        },
+        {
+          "cycle": 18,
+          "decision": "HOLD",
+          "why": "The single render cleared every reject-only gate with wide margins — camera still, glitch breadth 0.125 on both readings against a both-must-fire 0.70, dead gate clear at ratio 16.19 / peak 17.49, and return 0.09 above the 0.05 floor and far from the 0.00 dead signature — so the art, the vigour and the spec-derived motion prompt have done their job and the only step left is Lucas's eye."
         }
       ],
       "art_generated": 1,
-      "attempts": 1
+      "attempts": 1,
+      "last_gate": {
+        "camera": "still",
+        "return": 0.09,
+        "peak": 5.94,
+        "glitch": {
+          "spike": 22.75,
+          "breadth": 0.125,
+          "at_pct": 68.1,
+          "frames": 73,
+          "breadth_normalised": 0.125
+        },
+        "dead": {
+          "ratio": 16.19,
+          "peak": 17.49,
+          "dead": false
+        }
+      },
+      "clip": "/home/bustalab/Documents/Tools/temp/cine/_art_prompt_exp/clouds/ap_stillstand_motion_ri16_looped.mp4",
+      "held": true,
+      "staged": "/home/bustalab/Documents/Tools/websites/thebustalab.github.io/escape_rooms/rooms/dimensionality_reduction/clouds/_scratch/cine_cand/ap_stillstand/base__ri16.mp4"
+    },
+    "ap_smear": {
+      "history": [
+        {
+          "cycle": 19,
+          "decision": "RENDER",
+          "why": "The spec carries one bounded, depicted mover with authored vigour, the motion prompt renders correctly from it, the committed still matches the current spec prompt exactly, and no clip exists yet."
+        },
+        {
+          "cycle": 21,
+          "decision": "HOLD",
+          "why": "The single render at the settled recipe cleared the camera, glitch and dead gates with wide margins and returned a non-ambiguous 0.13 from a spec whose one bounded depicted mover matches the committed still exactly, so the only remaining step is Lucas's judgement."
+        }
+      ],
+      "attempts": 1,
+      "last_gate": {
+        "camera": "still",
+        "return": 0.13,
+        "peak": 6.13,
+        "glitch": {
+          "spike": 3.23,
+          "breadth": 0.021,
+          "at_pct": 79.2,
+          "frames": 73,
+          "breadth_normalised": 0.0
+        },
+        "dead": {
+          "ratio": 10.54,
+          "peak": 7.64,
+          "dead": false
+        }
+      },
+      "clip": "/home/bustalab/Documents/Tools/temp/cine/_art_prompt_exp/clouds/ap_smear_motion_ri19_looped.mp4",
+      "held": true,
+      "staged": "/home/bustalab/Documents/Tools/websites/thebustalab.github.io/escape_rooms/rooms/dimensionality_reduction/clouds/_scratch/cine_cand/ap_smear/base__ri19.mp4"
+    },
+    "ap_halflight": {
+      "history": [
+        {
+          "cycle": 22,
+          "decision": "RENDER",
+          "why": "The spec carries one bounded mover with authored vigour that the committed still visibly depicts, the committed art prompt is byte-identical to the current spec's render_prompt so the art cannot be stale, the spec-derived motion prompt is well-formed and travel-free, and no clip exists yet — so the only remaining step is the single render at end guide 0.70."
+        },
+        {
+          "cycle": 24,
+          "decision": "HOLD",
+          "why": "The single render at the settled recipe came from a spec whose one bounded mover the committed art demonstrably depicts, and it cleared every reject-only gate with margin — camera still, glitch below threshold on both readings, not dead, return 0.36 — with motion localised to the named funnel, so the only remaining step is Lucas's eye, which no metric may pre-empt."
+        }
+      ],
+      "attempts": 1,
+      "last_gate": {
+        "camera": "one object moving (camera still)",
+        "return": 0.36,
+        "peak": 8.41,
+        "glitch": {
+          "spike": 9.94,
+          "breadth": 0.479,
+          "at_pct": 68.1,
+          "frames": 73,
+          "breadth_normalised": 0.5
+        },
+        "dead": {
+          "ratio": 12.17,
+          "peak": 7.49,
+          "dead": false
+        }
+      },
+      "clip": "/home/bustalab/Documents/Tools/temp/cine/_art_prompt_exp/clouds/ap_halflight_motion_ri22_looped.mp4",
+      "held": true,
+      "staged": "/home/bustalab/Documents/Tools/websites/thebustalab.github.io/escape_rooms/rooms/dimensionality_reduction/clouds/_scratch/cine_cand/ap_halflight/base__ri22.mp4"
+    },
+    "ap_backwind": {
+      "history": [
+        {
+          "cycle": 25,
+          "decision": "RENDER",
+          "why": "The committed still already depicts a bounded, authored-vigour mover — the derelict glider's torn membrane wing — and the spec renders a compliant 30-word oscillatory motion prompt, so the only thing missing is the one render."
+        },
+        {
+          "cycle": 29,
+          "decision": "PIN_NON_MOVERS",
+          "why": "Frames 18 and 36 show the video model unfurling the viewer's OWN frame-filling foreground membrane wings into one full-width ochre sail instead of flapping the derelict's small torn wing they share a description with, so the remedy is the step-6.2 rigid clause naming those wings alone — typed as the string scene_spec requires, rendering a 57-word motion prompt and a byte-identical art prompt."
+        },
+        {
+          "cycle": 30,
+          "decision": "RENDER",
+          "why": "The cycle-29 rigid clause is on disk and renders a safe 57-word motion prompt against a byte-identical art prompt, but the only clip and gate report that exist are ri25's from before the pin — so the pin has never been tested and the single remaining step is the one render."
+        }
+      ],
+      "attempts": 2,
+      "last_gate": {
+        "camera": "still",
+        "return": 0.53,
+        "peak": 12.22,
+        "glitch": {
+          "spike": 13.55,
+          "breadth": 0.125,
+          "at_pct": 45.8,
+          "frames": 73,
+          "breadth_normalised": 0.104
+        },
+        "dead": {
+          "ratio": 15.24,
+          "peak": 17.27,
+          "dead": false
+        }
+      },
+      "clip": "/home/bustalab/Documents/Tools/temp/cine/_art_prompt_exp/clouds/ap_backwind_motion_ri30_looped.mp4",
+      "retries": 2,
+      "held": true,
+      "held_note": "final render cleared every gate; the render budget (2) ran out at the same moment. NOT accepted.",
+      "staged": "/home/bustalab/Documents/Tools/websites/thebustalab.github.io/escape_rooms/rooms/dimensionality_reduction/clouds/_scratch/cine_cand/ap_backwind/base__ri30.mp4"
     }
   },
-  "render_polls": 10,
+  "render_polls": 0,
   "generations": 2,
-  "pending_render": {
-    "room": "ap_stillstand",
-    "raw": "/home/bustalab/Documents/Tools/temp/cine/_art_prompt_exp/clouds/ap_stillstand_motion_ri16.mp4",
-    "log": "/home/bustalab/Documents/Tools/websites/thebustalab.github.io/escape_rooms/rooms/dimensionality_reduction/clouds/_long_agent/outputs/ap_stillstand_ri16_render.log"
-  },
-  "looped_size": 4103239
+  "last_eval": "I checked the frames, the room's records, and the code path rather than the worker's description.\n\n## What holds up\n\n**The defect is real.** I pulled frames 0 and 36 myself. Frame 0 is the clean committed scene. Frame 36 carries a huge ochre torn-sailcloth structure running the full 3072 px, burying the eyewall, the derelict glider and both wings. It is not in the still. The worker's account of why the gates missed it is correct: `return 0.69` is high *because* the intruder arrives and leaves, and the glitch detector's 0.125 breadth caught only the onset edge of a slow growth.\n\n**The history check is accurate.** `ap_backwind_c27_evaluation.md` exists and ends `VERDICT: FAIL` — cycle 27's HOLD really was rejected by an evaluator that pulled frames. The \"Tried already\" list I was handed omits it.\n\n**The remedy is the right rung.** `exp_art_prompt.motion_prompt` resolves this room's prompt from `authoring.sceneSpec` (there is no `art_prompt_motion/clouds/ap_backwind.txt`), and the `rigid` switch is documented in-code as \"the ESCALATION for a room where something that should be still is moving (pipeline step 6.2)\". That is this failure. No reject criterion trips: no settings change, the proposed mover stays the bounded derelict wing, deadness is never invoked, and I confirmed the art-side `scene_spec.render_prompt` is byte-identical with `rigid` added — the panorama is genuinely untouched.\n\n## Why it still can't be acted on\n\nThe SPEC payload is a **list**. `scene_spec.py:482` doe"
 }

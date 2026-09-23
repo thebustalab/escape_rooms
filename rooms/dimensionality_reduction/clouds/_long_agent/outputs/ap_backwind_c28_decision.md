@@ -1,0 +1,11 @@
+I read the four authority files, then checked the room's own records — and found that cycle 27's HOLD was **rejected by the evaluator**, which had pulled frames rather than trusting the metrics. I verified that independently.
+
+**Frame 0** (the committed still) is clean. **Frame 36** shows a huge ochre torn-sailcloth structure spanning the entire 3072 px width, burying the city, the eyewall and both wings. It is not in the still at all. The gates missed it by construction: `return 0.69` is high *because* the intruder arrives and leaves (out-and-back reads as a healthy return), the glitch detector caught only the onset edge at 2.8% of a 55-frame growth, and the camera genuinely is still — a frame-filling object moved, not the camera.
+
+The cause is visible in the art. The committed still depicts the derelict's torn membrane wing correctly — bounded, well inside the right third. But directly beneath it, the **viewer's own two translucent membrane wings** fill the foreground edge to edge, in the same material and answering to the same words. The motion prompt says "the derelict glider's torn membrane wing flapping and billowing"; the model grabbed the frame-filling pair instead and joined them into one sail.
+
+That is the wrong thing moving, not too much motion and not a dead room — so the fix ladder's second rung applies, not a re-author. I confirmed the rigid clause renders at **64 words** (canon's safe register is the 61-word case; the camera-drift failure was 176) and that `render_prompt` comes back **byte-identical**, so the panorama is untouched and no reviewed art is discarded.
+
+DECISION: PIN_NON_MOVERS
+SPEC: {"rigid": ["the viewer's own glider's two wide translucent membrane wings spread across the foreground", "its dark shell nose and dash"]}
+WHY: The clip's frame-filling ochre sail is the video model animating the viewer's OWN foreground membrane wings instead of the derelict's small torn one they share a description with, so the remedy is the scalpel rigid clause on those two foreground items — it leaves the art prompt byte-identical and re-renders only the clip.
