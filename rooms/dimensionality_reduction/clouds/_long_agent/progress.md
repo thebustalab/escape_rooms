@@ -43,3 +43,12 @@ Started 2026-09-22T03:26:42.517116+00:00.
 - **2026-09-23 03:13 UTC** — ap_pileup: the loop bake is still growing (4674521 bytes). Waiting for it to settle. No Claude call spent.
 - **2026-09-23 03:15 UTC** — ap_pileup: gated — {"camera": "still", "return": 0.08, "peak": 13.56, "glitch": {"spike": 26.72, "breadth": 0.146, "at_pct": 94.4, "frames": 73, "breadth_normalised": 0.146}, "dead": {"ratio": 20.59, "peak": 18.03, "dead": false}}
 - **2026-09-23 03:18 UTC** — ap_pileup: HELD for Lucas's eye — The rendered clip cleared all three reject-only gates — camera still, glitch breadth 0.146 on both readings against a 0.70 both-must-fire threshold, dead gate clear at ratio 20.59 / peak 18.03, and return 0.08 above the 0.05 ambiguity floor — so there is nothing to reject and the only remaining step is Lucas's eye.. NOT accepted. Staged into the harness pool as base__ri10.mp4.
+- **2026-09-23 03:30 UTC** — ap_stillstand: AUTHOR_MOVER applied. Both prompts re-rendered from the one spec. The ART prompt changed, so the still must be regenerated first.
+- **2026-09-23 03:31 UTC** — ap_stillstand: art generation started (l1_ap_stillstand_2), generation 2/4. No Claude call spent.
+- **2026-09-23 03:32 UTC** — ap_stillstand: new art committed from l1_ap_stillstand_2.png and seam-staged (ap_stillstand   tonal step 7.2x -> BLURRED -> 0.0x  (run 0.012 -> 0.000) | boxes re-placing in the background (ap_stillstand_boxes.log)). NOT accepted — that is Lucas's call in the stills tab.
+- **2026-09-23 03:38 UTC** — ap_stillstand: render launched at end guide 0.70.
+- **2026-09-23 03:39 UTC** — ap_stillstand: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-23 03:40 UTC** — ap_stillstand: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-23 03:41 UTC** — ap_stillstand: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-23 03:43 UTC** — ap_stillstand: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-23 03:44 UTC** — ap_stillstand: waiting on the render (poll 5/40). No Claude call spent.
