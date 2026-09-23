@@ -27,3 +27,7 @@ Started 2026-09-22T03:26:42.517116+00:00.
 - **2026-09-23 02:36 UTC** — ap_grainrun: the loop bake is still growing (4807682 bytes). Waiting for it to settle. No Claude call spent.
 - **2026-09-23 02:38 UTC** — ap_grainrun: gated — {"camera": "one object moving (camera still)", "return": 0.24, "peak": 8.02, "glitch": {"spike": 2.78, "breadth": 0.0, "at_pct": 2.8, "frames": 73, "breadth_normalised": 0.0}, "dead": {"ratio": 15.3, "peak": 7.2, "dead": false}}
 - **2026-09-23 02:43 UTC** — ap_grainrun: HELD for Lucas's eye — The clip renders at the settled recipe from a spec whose single bounded mover the committed art depicts, and it clears every reject-only gate — camera still, glitch breadth 0.0 on both readings, dead ratio 15.3 with peak 7.2, return 0.24 in the band of already-shipped clips — so there is no defect to act on and the only remaining step is Lucas's eye.. NOT accepted. Staged into the harness pool as base__ri4.mp4.
+- **2026-09-23 02:55 UTC** — ap_pileup: AUTHOR_MOVER applied. Both prompts re-rendered from the one spec. The ART prompt changed, so the still must be regenerated first.
+- **2026-09-23 02:56 UTC** — ap_pileup: art generation started (l1_ap_pileup_2), generation 1/4. No Claude call spent.
+- **2026-09-23 02:57 UTC** — ap_pileup: new art committed from l1_ap_pileup_2.png and seam-staged (ap_pileup       sky 2.3x/2.2  run 0.009  ->  clean, done | boxes re-placing in the background (ap_pileup_boxes.log)). NOT accepted — that is Lucas's call in the stills tab.
+- **2026-09-23 03:03 UTC** — ap_pileup: render launched at end guide 0.70.
