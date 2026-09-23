@@ -2,8 +2,8 @@
   "status": "working",
   "retry_count": 0,
   "started": "2026-09-22T03:26:42.516900+00:00",
-  "last_cycle": "2026-09-23T03:15:29.136735+00:00",
-  "cycles_completed": 11,
+  "last_cycle": "2026-09-23T03:18:50.701052+00:00",
+  "cycles_completed": 12,
   "rooms": {
     "cockpit": {
       "history": [
@@ -86,6 +86,11 @@
           "cycle": 10,
           "decision": "RENDER",
           "why": "The regenerated still now visibly depicts the spec's one bounded mover — a glass-enclosed bloom at x=0.36, singular despite the nose doubling risk — the committed art prompt is byte-identical to the current spec so the art cannot be stale, the spec-derived motion prompt is well-formed and travel-free, and no clip has been rendered yet."
+        },
+        {
+          "cycle": 12,
+          "decision": "HOLD",
+          "why": "The rendered clip cleared all three reject-only gates — camera still, glitch breadth 0.146 on both readings against a 0.70 both-must-fire threshold, dead gate clear at ratio 20.59 / peak 18.03, and return 0.08 above the 0.05 ambiguity floor — so there is nothing to reject and the only remaining step is Lucas's eye."
         }
       ],
       "art_generated": 1,
@@ -107,7 +112,9 @@
           "dead": false
         }
       },
-      "clip": "/home/bustalab/Documents/Tools/temp/cine/_art_prompt_exp/clouds/ap_pileup_motion_ri10_looped.mp4"
+      "clip": "/home/bustalab/Documents/Tools/temp/cine/_art_prompt_exp/clouds/ap_pileup_motion_ri10_looped.mp4",
+      "held": true,
+      "staged": "/home/bustalab/Documents/Tools/websites/thebustalab.github.io/escape_rooms/rooms/dimensionality_reduction/clouds/_scratch/cine_cand/ap_pileup/base__ri10.mp4"
     }
   },
   "render_polls": 0,
