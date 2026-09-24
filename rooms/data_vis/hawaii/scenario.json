@@ -696,6 +696,25 @@
   },
   "debrief": {
     "title": "How this world worked",
-    "intro": "This scenario was all about taking a big table of readings, filtering it down to a certain subset, plotting the results, and interpreting them. Here is how each room, and the escape, was teaching that."
-  }
+    "intro": "Everything in this scenario was one technique in costume: filtering — cutting a wide survey table down to the rows a question is actually about, then plotting them or testing them against a line. Here is what you actually did, with the story taken back off."
+  },
+  "ladderPlain": [
+    {
+      "room": "room1",
+      "text": "In the first puzzle you narrowed hawaii_aquifers — one row per well per analyte, 106 wells across nine analytes — down to the aquifer_1 rows, then plotted abundance against analyte and looked for which analyte sits highest. dissolved_solids runs into the many hundreds there, up to about 340, well clear of chloride and everything else. Before a threshold can mean anything you have to be able to read the chart: which axis carries what, and where \"highest\" actually is on it."
+    },
+    {
+      "room": "room2",
+      "text": "In the second puzzle you filtered on two conditions at once — aquifer_code == \"aquifer_1\" and analyte == \"SO4\" — and read off the single largest value: Moanalua_Wells_Pump_3, at 19 mg/L. That is the highest sulfate anywhere in aquifer_1, and it sits just under the 20 mg/L watch line, so it is one to keep an eye on rather than act on."
+    },
+    {
+      "room": "room3",
+      "text": "In the third puzzle you repaired your colleague's pipeline — each single = inside filter() becomes a double ==, and Cl needs quotes around it — then filtered the aquifer_6 chloride rows down to abundance > 250 and read off the well_name that survived: KEEI_B, at 280 mg/L. It is the only aquifer_6 well over the alarm line; the next highest chloride in that aquifer is 210. This is filtering with a fixed standard attached, which is where a number becomes a decision."
+    },
+    {
+      "room": "boss",
+      "text": "In the last puzzle you filtered down to KEEI_B's own rows, kept the Na row, and tested it against a second line: sodium 180 mg/L, above 150. Chloride can climb for several reasons, so the 280 mg/L chloride reading on its own does not name a cause; sodium is the other dominant ion in seawater, and the two of them elevated together at the same well are the signature of seawater reaching the aquifer. Two thresholds at one well, and the diagnosis follows from the data."
+    }
+  ],
+  "escapeBrief": "To get out you read the four artworks as filters, with no data table and no console. In each one, mixed red, green and blue dots meet a divider and only some colours come out the bottom, and the three digits branded into the divider say which of red, green and blue got through — 010 for green in the lab, 100 for red in the jungle, 001 for blue at the coast. The piece beside the valve has green and blue at the bottom and its divider left blank, so the code is 011, and that turns the shut-off valve. A filter is exactly that: state a condition per column, and only what satisfies it comes through."
 }

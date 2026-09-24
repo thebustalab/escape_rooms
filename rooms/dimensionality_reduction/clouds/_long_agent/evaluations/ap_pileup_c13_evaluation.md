@@ -1,0 +1,15 @@
+I checked every load-bearing claim against the files rather than the write-up.
+
+**Verified independently:**
+
+- **Movers** — `scenario.json` → `ap_pileup.authoring.sceneSpec` has exactly two elements with a `motion` block: `city` ("brightening and dimming in place") and `eyewall` ("lightning rippling slowly through the storm cloud"). `sampler`, `nose`, `on_round`, `seam_left`, `seam_right` all carry `motion: NONE` — the retired sampler bloom is genuinely gone from the spec, not merely unmentioned. Both movers are bounded light-only, not frame-filling.
+- **Motion prompt** — I imported `scene_spec` and rendered it for all three rooms. `ap_pileup` produces a 38-word prompt that is *string-equal* to `cockpit`'s and `ap_grainrun`'s: `locked-off static camera… Only those move; everything else stays perfectly still. Seamless natural loop.` Identity confirmed by comparison, not by eye.
+- **The stale `.txt` is unreachable** — `exp_art_prompt.motion_prompt()` returns from the spec first and only falls through to `art_prompt_motion/clouds/ap_pileup.txt` if the spec yields nothing. That file does still hold the retired sampler-bloom prompt, so this mattered; it cannot reach the renderer here. The worker read this correctly.
+- **The still** — I looked at `scene.png` (3072×1024, written today 07:47). It shows the HEIGHT composition the current spec asks for: city overhead in the upper left seen from beneath, low horizon, storm body below, storm wall right with white-blue lightning plainly in it, dash sharp across the foreground with globe/pane/override, grey palette carried in the art with colour confined to the city. Both movers are visibly present in the frame. `worldPlateRef` = `_world/plate_lower.png`, matching `heightPass.height: "lower"`.
+- **Freshness** — `_start_generation` renders the art prompt from the sceneSpec at generation time, not from the stored copy, so the stale cached `scenePrompt` is a red herring. It is equally stale on `cockpit` and `ap_grainrun`, which both reached RENDER→HOLD today from this same state. `needs_still` is clear.
+
+**One imprecision, not disqualifying:** the worker says "no clip exists." Clips *do* exist on disk — `ap_pileup_motion_ri10` (seed 4242, Sep 22, recorded in `.cine_published.json`) and a `citystorm_s4711` staged Sep 23. Both predate today's spec rewrite, today's `plate_lower.png`, and today's regenerated still, so no clip exists *of this still* — which is the fact that governs. `cockpit` and `ap_grainrun` carried the same kind of superseded published clip and were rendered anyway. The runner's own state field reads "none yet."
+
+**Reject conditions:** no settings change (RENDER uses the plan's pinned seed 4711 / end guide 0.70 unaltered); mover is bounded, not frame-filling; no zero-return reasoning; nothing accepted and nothing written to committed art or hotspots; no hand-written prompt; not an AUTHOR_MOVER. None hold.
+
+VERDICT: PASS

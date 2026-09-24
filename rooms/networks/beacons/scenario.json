@@ -39,8 +39,8 @@
     }
   ],
   "debrief": {
-    "title": "How the Harrows worked",
-    "intro": "This world was built to argue one thing: that importance is not a quantity a node has, but a property of what a set of them covers. You met the claim twice, on two different networks over the same ground — once on paper, in a book of dispatches, and once by eye, on a range where the only record of what can see what is the walking you did yourself."
+    "title": "How this world worked",
+    "intro": "Everything in this scenario was one technique in costume: network analysis - describing a set of things by which of them are connected to which, rather than by how much each one carries. You did it twice over, on two different networks laid across the same mountains: one handed to you as a table of dispatches, and one that only existed once you went out and observed it."
   },
   "_designNotes": {
     "phase": "escape_room_design is the next phase — scenes, door graph, plannedHotspots, cover.",
@@ -157,7 +157,7 @@
           "boxNote": "localiser boxed the window ledge above the desk; measured onto the open ledger on the desk top",
           "starterCode": "dispatch_ledger",
           "check": {
-            "prompt": "The ledgers from this watchpost are open on the desk: a count of every dispatch that passed between two stations of the network this season. Before anything else, see what the correspondence actually looks like. Which single link — one station writing to another — carries the most dispatches? Assign that link's row of the ledger to an object called answer, then click \"Check my answer\".",
+            "prompt": "The ledgers from this station are open on the desk: a count of every dispatch that passed between two stations of the network this season. Before anything else, see what the correspondence actually looks like. Which single link — one station writing to another — carries the most dispatches? Assign that link's row of the ledger to an object called answer, then click \"Check my answer\".",
             "requires": [
               "answer"
             ],
@@ -496,7 +496,7 @@
           "boxNote": "localiser boxed the window ledge above the desk; measured onto the open ledger on the desk top",
           "starterCode": "dispatch_ledger",
           "check": {
-            "prompt": "The ledgers from this watchpost are open on the desk: a count of every dispatch that passed between two stations of the network this season. Before anything else, see what the correspondence actually looks like. Which single link — one station writing to another — carries the most dispatches? Assign that link's row of the ledger to an object called answer, then click \"Check my answer\".",
+            "prompt": "The ledgers from this station are open on the desk: a count of every dispatch that passed between two stations of the network this season. Before anything else, see what the correspondence actually looks like. Which single link — one station writing to another — carries the most dispatches? Assign that link's row of the ledger to an object called answer, then click \"Check my answer\".",
             "requires": [
               "answer"
             ],
@@ -3013,7 +3013,7 @@
           },
           "lockedBody": "The filed report is here on the slab, but you have not read enough of the ledger to test it yet. Finish the readings below first.",
           "pick": {
-            "prompt": "The filed report in your hand blames the busiest station in the network for hoarding fire wood - the fuel the beacons use. Which watchstation is that? Counting everything a station sends and everything it receives, which station handles the most dispatches overall? Plot it, assign your plot to p, and click that station on your chart.",
+            "prompt": "The filed report in your hand blames the busiest station in the network for hoarding firewood — the fuel the beacons use. Which station is that? Counting everything a station sends and everything it receives, which station handles the most dispatches overall? Plot it, assign your plot to p, and click that station on your chart.",
             "plotCode": "both <- dplyr::bind_rows(dplyr::transmute(dispatch_ledger, station = origin, dispatches),\n                         dplyr::transmute(dispatch_ledger, station = destination, dispatches))\ntotals <- dplyr::summarise(dplyr::group_by(both, station), total = sum(dispatches))\np <- ggplot(totals, aes(reorder(station, total), total)) +\n     geom_col() +\n     coord_flip() +\n     labs(x = NULL, y = \"Dispatches sent and received\")",
             "answer": "Crown",
             "idColumn": "station",
@@ -3396,7 +3396,7 @@
           },
           "lockedBody": "The filed report is here on the slab, but you have not read enough of the ledger to test it yet. Finish the readings below first.",
           "pick": {
-            "prompt": "The filed report in your hand blames the busiest station in the network for hoarding fire wood - the fuel the beacons use. Which watchstation is that? Counting everything a station sends and everything it receives, which station handles the most dispatches overall? Plot it, assign your plot to p, and click that station on your chart.",
+            "prompt": "The filed report in your hand blames the busiest station in the network for hoarding firewood — the fuel the beacons use. Which station is that? Counting everything a station sends and everything it receives, which station handles the most dispatches overall? Plot it, assign your plot to p, and click that station on your chart.",
             "plotCode": "both <- dplyr::bind_rows(dplyr::transmute(dispatch_ledger, station = origin, dispatches),\n                         dplyr::transmute(dispatch_ledger, station = destination, dispatches))\ntotals <- dplyr::summarise(dplyr::group_by(both, station), total = sum(dispatches))\np <- ggplot(totals, aes(reorder(station, total), total)) +\n     geom_col() +\n     coord_flip() +\n     labs(x = NULL, y = \"Dispatches sent and received\")",
             "answer": "Crown",
             "idColumn": "station",
@@ -6186,5 +6186,24 @@
   "coverPrompt": "Minimalist stylised thumbnail poster: the bold dark silhouette of a squat round stone watchtower on a bare ridge, against a clear deep-blue high-altitude sky, with one thin column of smoke rising straight from it; behind and above, the hard white silhouette of a snowfield and glacier; three tiny points of warm fire-light strung along the darker ridgeline far below. One high-contrast silhouette, iconic and uncluttered, minimal detail, strong negative space, single centred focal subject. Flat limited palette: deep cobalt, blinding white, deep slate blue-grey, one warm ember orange. Soft film grain, painterly but clean. No people, no text, no lettering, no logos. Square composition.",
   "ambient": "snow",
   "worldPlate": "_world/plate.png",
-  "cover": "cover.png"
+  "cover": "cover.png",
+  "ladderPlain": [
+    {
+      "room": "fenwatch",
+      "text": "In the first puzzle you read dispatch_ledger as what it is: an edge list, one row per link, each row naming an origin station, a destination station, and how many dispatches went that way. You sorted the rows by dispatches and kept the single heaviest one - Anvil to Ladder, 2,604 dispatches. Nothing was computed for you, and every puzzle after this one was built from these same rows."
+    },
+    {
+      "room": "sisters",
+      "text": "In the second puzzle you used direction. You totalled dispatches for each station twice, once as the origin and once as the destination, plotted sending against receiving, and picked out the station whose two totals are furthest apart: Fenwatch, which sends 1,975 dispatches and receives 202. A measure that ignores which way an edge points cannot see that at all."
+    },
+    {
+      "room": "anvil",
+      "text": "In the third puzzle you measured volume. Adding up every dispatch a station sends and every dispatch it receives puts Crown on top at 8,075, well clear of Ladder's 6,789, and that agreed with the filed report, which blamed the busiest station on the network. The answer is right and the measurement is sound; the last puzzle is about what it does not measure."
+    },
+    {
+      "room": "whistlegate",
+      "text": "In the last puzzle you stopped counting and drew the network: every station a node, every row of dispatch_ledger an edge. Then you asked which single station, taken out, leaves the rest in two pieces that cannot reach each other - the articulation point. It is Whistlegate, which carries less traffic than any of the twelve stations, 807 dispatches against Crown's 8,075. Take Crown out and the drawing barely changes; take Whistlegate out and the eight southern stations and the three northern ones can no longer reach each other. Traffic is a quantity a station has, and holding a network together is a property of where a station sits, so the totals you ranked in the third puzzle had no way of finding it."
+    }
+  ],
+  "escapeBrief": "To get out you decided which four beacons to light. There is no data table for this one: the only record of which of the twenty-two villages a tower overlooks is the line you ruled yourself, through the spyglass, from each summit onto the survey sheet. The fuel runs to four fires, and the four have to leave no village without a fire in sight - the Spindle, the Hood, the Ladder and the Broken Tooth. The Anvil, the highest tower you walked all day and overlooking thirteen villages, is in none of it, because every village it can see is already covered by those four; the Broken Tooth overlooks three villages and cannot be dropped, because one of its three is in sight of no other tower in the set. The last puzzle asked what stops being connected when one station is taken out of a network, and the escape asks the same question the other way round - what comes within reach as towers are added. Both times the answer belongs to the set and to where its members sit, not to any quantity you could rank the towers by."
 }

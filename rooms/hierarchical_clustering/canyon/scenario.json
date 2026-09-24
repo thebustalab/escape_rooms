@@ -39,7 +39,7 @@
   "coverPrompt": "Minimalist stylised thumbnail poster of a lone red slot-canyon: a single narrow cleft in dark sandstone opening downward into a branching gorge, water flowing through it deep below, a cool teal storm-sky above. One bold high-contrast silhouette, iconic and uncluttered, minimal detail. Flat limited palette: deep teal, icy blue. Soft film grain, painterly but clean, strong negative space, single centred focal subject. No people, no text, no lettering, no logos. Square composition.",
   "debrief": {
     "title": "How this world worked",
-    "intro": "The whole canyon was one skill in disguise: sorting many things into a nested tree of families by how alike they are. Each junction taught one move of hierarchical clustering, and the escape was the move made physical — reading the true branching structure of the land and cutting it into groups."
+    "intro": "Everything in this scenario was one technique in costume: hierarchical clustering — sorting things into a nested tree of groups by how alike their measurements are. Here is what you actually did, with the story taken back off."
   },
   "rooms": [
     {
@@ -2530,7 +2530,7 @@
               "correct": "Correct — noted in your field notebook: the sulfate family averages 61 sulfate against 8 everywhere else, and Bitterwell runs with it.",
               "wrong": [
                 "Cluster the six mineral columns as before, then cut the tree into four groups and take the average sulfate within each one.",
-                "`cutree(..., 4)` gives each spring a family number; `group_by()` that number and `summarise()` the mean of the sulfate column.",
+                "Adding `parameters = c(4)` to the same `runMatrixAnalysis()` call gives each spring a family number in a `cluster` column; `group_by()` that column and `summarise()` the mean of the sulfate column.",
                 "One family's average is many times every other's, so which family wins is not in doubt. The care is in its membership — check whether the springs the cut puts together are the same springs the forks put together."
               ]
             }
@@ -2629,7 +2629,7 @@
               "correct": "Correct — noted in your field notebook: the sulfate family averages 61 sulfate against 8 everywhere else, and Bitterwell runs with it.",
               "wrong": [
                 "Cluster the six mineral columns as before, then cut the tree into four groups and take the average sulfate within each one.",
-                "`cutree(..., 4)` gives each spring a family number; `group_by()` that number and `summarise()` the mean of the sulfate column.",
+                "Adding `parameters = c(4)` to the same `runMatrixAnalysis()` call gives each spring a family number in a `cluster` column; `group_by()` that column and `summarise()` the mean of the sulfate column.",
                 "One family's average is many times every other's, so which family wins is not in doubt. The care is in its membership — check whether the springs the cut puts together are the same springs the forks put together."
               ]
             }
@@ -3549,7 +3549,7 @@
               "correct": "Correct — noted in your field notebook: Bitterwell and Saltglass each run down one fork and belong to another.",
               "wrong": [
                 "Give every spring its family from the water, then set that beside the fork it runs down, and look for the rows where the two disagree.",
-                "`cutree(..., 4)` for the family, the `fork` column for the makers' grouping — put them side by side and the mismatches stand out.",
+                "`parameters = c(4)` for the family, the `fork` column for the makers' grouping — put them side by side and the mismatches stand out.",
                 "Most springs agree with the carving. More than one does not. A spring can run down one fork and still be tapping the same stratum as a family in another."
               ]
             }
@@ -3698,7 +3698,7 @@
               "correct": "Correct — noted in your field notebook: Bitterwell and Saltglass each run down one fork and belong to another.",
               "wrong": [
                 "Give every spring its family from the water, then set that beside the fork it runs down, and look for the rows where the two disagree.",
-                "`cutree(..., 4)` for the family, the `fork` column for the makers' grouping — put them side by side and the mismatches stand out.",
+                "`parameters = c(4)` for the family, the `fork` column for the makers' grouping — put them side by side and the mismatches stand out.",
                 "Most springs agree with the carving. More than one does not. A spring can run down one fork and still be tapping the same stratum as a family in another."
               ]
             }
@@ -3836,5 +3836,24 @@
   },
   "fitWrap": true,
   "cover": "cover.png",
-  "doorLabels": true
+  "doorLabels": true,
+  "ladderPlain": [
+    {
+      "room": "j_c1",
+      "text": "In the first puzzle you measured how far apart the springs were, using all of their water measurements at once rather than one at a time, and read off the pair that sat closest together. Every puzzle after this one was built on those pairwise distances."
+    },
+    {
+      "room": "j_c2",
+      "text": "In the second puzzle you added a spring whose source was unrecorded to the springs you already knew and clustered them all together, so that its own water chemistry decided which family it joined rather than where you happened to collect it."
+    },
+    {
+      "room": "j_c4",
+      "text": "In the third puzzle you turned those distances into a tree, cut the tree into families of springs, and took one number for each family — the step that turns a picture of what resembles what into an answer you can act on."
+    },
+    {
+      "room": "j_c7",
+      "text": "In the last puzzle you clustered the springs once more and set each spring's family against the fork it rises in, which is how the makers' carved map groups them. Most springs agree with the map. Two do not, and it is the water chemistry that settles it: the map records which side of the canyon a spring comes out of, not which source it is fed from. That is how you knew which two the map had placed apart from their own kin."
+    }
+  ],
+  "escapeBrief": "To get out you drew the tree yourself — hanging every junction you had walked at its own elevation on the map board — and then read that tree at a given flood-gate height, counting how many tributaries fell into each group. Cutting a tree at a chosen height and counting what lands in each group is exactly what you asked R to do in the third puzzle, done here with your hands and no data at all."
 }

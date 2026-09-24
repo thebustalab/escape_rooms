@@ -765,12 +765,31 @@
   },
   "debrief": {
     "title": "How this world worked",
-    "intro": "The key move in this scenario was unlocking the helicopter door in order to rescue the lost pilot. Accomplishing that required performing a real-world version of the coding task taught and tested in this scenario: filtering."
+    "intro": "Everything in this scenario was one technique in costume: filtering — cutting a wide table down to the rows that meet a condition, then plotting what is left so the answer is visible at a glance. Here is what you actually did, with the story taken back off."
   },
   "ambient": "snow",
   "fx": [
     "frost"
   ],
   "cover": "cover.png",
-  "coverPrompt": "Minimalist stylised thumbnail poster of a lone Arctic field research station — a small dark cabin with a single glowing amber window — on a vast empty snowfield beside a frozen lake at blue dusk. Designed to read clearly as a small thumbnail: one bold, simple, high-contrast silhouette, iconic and uncluttered, minimal fine detail. Flat, limited palette: deep teal, icy blue, and one warm amber glow. Gentle falling snow, soft film grain, painterly but clean with simple geometric shapes. Strong negative space of snow and twilight sky, single centred focal subject. Quiet, cold, atmospheric. No people, no text, no lettering, no logos. Square composition."
+  "coverPrompt": "Minimalist stylised thumbnail poster of a lone Arctic field research station — a small dark cabin with a single glowing amber window — on a vast empty snowfield beside a frozen lake at blue dusk. Designed to read clearly as a small thumbnail: one bold, simple, high-contrast silhouette, iconic and uncluttered, minimal fine detail. Flat, limited palette: deep teal, icy blue, and one warm amber glow. Gentle falling snow, soft film grain, painterly but clean with simple geometric shapes. Strong negative space of snow and twilight sky, single centred focal subject. Quiet, cold, atmospheric. No people, no text, no lettering, no logos. Square composition.",
+  "ladderPlain": [
+    {
+      "room": "room1",
+      "text": "In the first puzzle you took the whole alaska_lake_data table — twenty lakes, one row per lake per measured element — kept only the rows where pH was above 8, and counted the distinct lakes left standing. Exactly one clears that line: North_Killeak_Lake, at pH 8.04, with the next lake down at 7.82."
+    },
+    {
+      "room": "room2",
+      "text": "In the second puzzle you filtered on two conditions at once — park == \"NOAT\" and element == \"Mg\" — and ranked what survived: Feniak_Lake carries the most magnesium in the Noatak preserve, 7.66 mg/L, two and a half times the next NOAT lake. Both conditions do real work here, because the biggest magnesium reading in the whole dataset belongs to North_Killeak_Lake, which sits in BELA rather than NOAT."
+    },
+    {
+      "room": "room3",
+      "text": "In the third puzzle you filtered to the chloride rows and plotted all twenty lakes as one bar each, then read the answer off the picture rather than the table: North_Killeak_Lake's bar towers over the rest at 337 mg/L, more than three times the next lake. Twenty numbers are awkward to scan by eye; one chart makes the outlier instant."
+    },
+    {
+      "room": "boss",
+      "text": "In the last puzzle you plotted a different column — water_temp, one bar per lake — and clicked the warmest, Lava_Lake at about 20°C. Two columns point at two different lakes: chloride points at North_Killeak_Lake, which is where the search party flew, and water temperature points at Lava_Lake. The beacon manual is what settles which of the two is the evidence — a beacon still transmitting means the pilot is alive, and staying alive out on the tundra takes warmth, not chemistry — so water_temp is the column the question is really about. Deciding which column a question turns on is the whole move."
+    }
+  ],
+  "escapeBrief": "To get out you worked Claire's tail-number board by hand, with no data table and no console. Each of her three glass templates blanks out every cell on the board that fails its own condition, and laid over the board one after another they leave exactly one tail number, N0KR, still showing through all three — the keypad code. That is filter() done with your hands: apply a condition, then another, then another to the same set of rows, and whatever is still standing at the end is your answer."
 }

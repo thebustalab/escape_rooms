@@ -1,0 +1,10 @@
+I've read the four authority docs, the room's spec, the job state and the committed still.
+
+**What I found.** `ap_pileup`'s spec is already on the approved HEIGHT×CLOUD recipe: two movers with authored vigour — `city` (brightening/dimming in place) and `eyewall` (lightning rippling through the storm) — and no retired hero mover carries a `motion` block. `scene_spec.render_motion_prompt` returns a 38-word prompt **byte-identical** to the one Lucas approved on `cockpit` at seed 4711, purely oscillatory, no travel. The "current motion prompt" quoted in the brief is the stale `art_prompt_motion/clouds/ap_pileup.txt` sampler-bloom fallback; `exp_art_prompt.motion_prompt` reaches the `.txt` only when the spec declares no mover, so it is unreachable here and is not a reason to act.
+
+The still is fresh from this spec (regenerated today 07:47, `art_generated: 1`, `needs_still` clear, seam blurred, `worldPlateRef` = `plate_lower.png`), and it depicts both movers plainly: the lit city bounded in the upper left seen from beneath, white-blue lightning in the charcoal storm wall on the right, dash sharp in the foreground. Grey palette is in the art — no filter wanted. `cockpit` and `ap_grainrun` reached RENDER from exactly this state and both went on to HOLD; the cached `scenePrompt` is stale on all three rooms, so that field is not a freshness signal.
+
+Nothing to re-author, nothing to soften, nothing mis-moving, and no clip exists.
+
+DECISION: RENDER
+WHY: The spec carries the two approved bounded light movers with authored vigour, its rendered motion prompt is identical to the 38-word cockpit prompt Lucas approved at seed 4711, the still is fresh from this spec and visibly depicts the lit city upper-left and lightning in the storm wall with the dash sharp in front, and no clip exists yet.

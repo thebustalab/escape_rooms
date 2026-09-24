@@ -3485,6 +3485,25 @@
   "cover": "cover.png",
   "debrief": {
     "title": "How this world worked",
-    "intro": "The whole day's round was one skill wearing a forest for a costume: group_by + summarise — sort many things into piles by a shared trait, then read one number off each pile. Every station binned the census a different way and read one summary from it; every cable car was a collection someone had already sorted, waiting only to be recognised; and the vault opened when you matched each line to the trait it was grouped by. Here is how each part embodied the wrangling."
-  }
+    "intro": "This scenario was one technique wearing a forest: group_by and summarise — sort many records into piles by a shared column, then read a single number off each pile. Here is what you actually did, with the story taken back off."
+  },
+  "ladderPlain": [
+    {
+      "room": "station1",
+      "text": "In the first puzzle you grouped the 6,000 trees in the forest_census table by species and took one average per group — the mean trunk_girth_cm — then read off the largest. Bloomspire is the widest-growing species at about 36 cm mean girth, ahead of Ghostplane at about 33. One grouping column, one number per group, and the answer is the group with the biggest number."
+    },
+    {
+      "room": "station2",
+      "text": "In the second puzzle you made the same move on different columns: you grouped the trees by vigor and took the mean bark_glow of each class. Radiant glows brightest at about 80, clear of Thriving at 55, Waning at 30 and Husk at 6. The census also carries crown_height_m sitting right beside bark_glow, so part of the exercise was summarising only the column the question actually named."
+    },
+    {
+      "room": "station3",
+      "text": "In the third puzzle you grouped the census by grove and took the mean vitality_index of each of the four groves, every tree counting once. Cragside comes out highest at 66.5, with Sunspire Heights at 56.2, Mistfen Reach at 55.3 and Hollowdeep at 52.6. That is the average over individual trees: each grove's figure is pulled toward whichever species it happens to hold most of."
+    },
+    {
+      "room": "boss",
+      "text": "In the last puzzle you answered the same question with the species given equal weight instead. You grouped by grove and species together, took the mean vitality_index of each of the twelve grove-and-species pairings inside a grove, then averaged those twelve figures up to the grove. On that footing Sunspire Heights leads at 64.2 and Cragside sits second at 58.5 — a different grove from the third puzzle's answer, because the two averages weight different things. The third puzzle's average weights every tree equally; this one weights every species equally. Cragside is packed with the six species that run vigorous wherever they grow (Coralmaple, Ironcrown Oak, Duskmaple, Goldfan Ginko, Bloomspire, Emberoak, all around 66) and holds almost none of the other six (all around 49), while Sunspire Heights is stocked the opposite way. So counting trees tells you about each grove's planting mix, and counting species tells you how well a given species does on that ground — which is what this last puzzle asked for."
+    }
+  ],
+  "escapeBrief": "To get out you ran group_by from the other end. The gate panel listed the three cable cars down one side — square, circle, triangle — and three traits across the other, and one press per line said which trait that car's collection had been sorted by: the square car's beetle trays were laid out by colour, the circle car's cones by size, the triangle car's shells by shape. No console and no data table, just a pile somebody had already grouped and the job of naming the column they grouped it by. All day you had supplied the grouping and computed the summary; here you were handed the result and had to recover the grouping."
 }

@@ -182,7 +182,9 @@ def decoder_keys(text):
 
 def main():
     keys = decoder_keys(DECODER.read_text())
-    scenarios = sorted(ROOT.glob(ROOMS_GLOB))
+    # SCRATCH DIRS ARE SKIPPED (2026-09-23, Lucas). A chapter or scenario directory whose name starts with "_" is scratch -- a probe, a spike, an experiment an agent left behind -- not a scenario anyone will grade or ship. `rooms/generation/_motion_probe` carried id 998 (deliberately outside the codec range) and turned this check RED, which would have blocked a deploy on work nobody intended to publish. Underscore-prefixed paths are now skipped everywhere a scenario is discovered.
+    scenarios = [p for p in sorted(ROOT.glob(ROOMS_GLOB))
+                 if not any(part.startswith("_") for part in p.relative_to(ROOT).parts)]
     # Optional `chapter/scenario` filters (2026-08-28). Default is UNCHANGED — every scenario, exit 1 on
     # any failure — because that is the pre-push guard the canon tells you to run. The filter exists so a
     # go/no-go check can ask the narrower question "are the scenarios students will actually open sound?"

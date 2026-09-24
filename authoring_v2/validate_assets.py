@@ -473,6 +473,9 @@ def main():
     any_bad = False
     for p in sorted(glob.glob(os.path.join(ROOMS, "*", "*", "scenario.json"))):
         rel = os.path.relpath(p, ROOMS).replace(os.sep + "scenario.json", "")
+        # SCRATCH DIRS ARE SKIPPED (2026-09-23, Lucas). A chapter or scenario directory whose name starts with "_" is scratch -- a probe, a spike, an experiment an agent left behind -- not a scenario anyone will grade or ship. `rooms/generation/_motion_probe` carried id 998 (deliberately outside the codec range) and turned this check RED, which would have blocked a deploy on work nobody intended to publish. Underscore-prefixed paths are now skipped everywhere a scenario is discovered.
+        if any(part.startswith("_") for part in rel.split(os.sep)):
+            continue
         if want and rel not in want:
             continue
         fails, misses, ready, advisories = check_scenario(p)

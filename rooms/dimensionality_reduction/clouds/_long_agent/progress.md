@@ -1,116 +1,77 @@
 # Room iteration — dimensionality_reduction/clouds
 
-Started 2026-09-22T03:26:42.517116+00:00.
-- **2026-09-23 02:05 UTC** — cockpit: render launched at end guide 0.70.
-- **2026-09-23 02:06 UTC** — cockpit: waiting on the render (poll 1/40). No Claude call spent.
-- **2026-09-23 02:07 UTC** — cockpit: waiting on the render (poll 2/40). No Claude call spent.
-- **2026-09-23 02:08 UTC** — cockpit: waiting on the render (poll 3/40). No Claude call spent.
-- **2026-09-23 02:09 UTC** — cockpit: waiting on the render (poll 4/40). No Claude call spent.
-- **2026-09-23 02:10 UTC** — cockpit: waiting on the render (poll 5/40). No Claude call spent.
-- **2026-09-23 02:11 UTC** — cockpit: waiting on the render (poll 6/40). No Claude call spent.
-- **2026-09-23 02:12 UTC** — cockpit: waiting on the render (poll 7/40). No Claude call spent.
-- **2026-09-23 02:13 UTC** — cockpit: waiting on the render (poll 8/40). No Claude call spent.
-- **2026-09-23 02:14 UTC** — cockpit: waiting on the loop bake (poll 9/40). No Claude call spent.
-- **2026-09-23 02:15 UTC** — cockpit: the loop bake is still growing (4367947 bytes). Waiting for it to settle. No Claude call spent.
-- **2026-09-23 02:17 UTC** — cockpit: gated — {"camera": "still", "return": 0.28, "peak": 10.17, "glitch": {"spike": 30.94, "breadth": 0.146, "at_pct": 83.3, "frames": 73, "breadth_normalised": 0.146}, "dead": {"ratio": 24.16, "peak": 17.74, "dead": false}}
-- **2026-09-23 02:21 UTC** — cockpit: HELD for Lucas's eye — The single render cleared the camera, glitch and dead gates with wide margins and returned a healthy non-ambiguous 0.28, so the spec, the still and the spec-derived motion prompt have done their job and the only step left is the human eye, which no metric may pre-empt.. NOT accepted. Staged into the harness pool as base__ri1.mp4.
-- **2026-09-23 02:26 UTC** — ap_grainrun: render launched at end guide 0.70.
-- **2026-09-23 02:27 UTC** — ap_grainrun: waiting on the render (poll 1/40). No Claude call spent.
-- **2026-09-23 02:28 UTC** — ap_grainrun: waiting on the render (poll 2/40). No Claude call spent.
-- **2026-09-23 02:29 UTC** — ap_grainrun: waiting on the render (poll 3/40). No Claude call spent.
-- **2026-09-23 02:30 UTC** — ap_grainrun: waiting on the render (poll 4/40). No Claude call spent.
-- **2026-09-23 02:31 UTC** — ap_grainrun: waiting on the render (poll 5/40). No Claude call spent.
-- **2026-09-23 02:32 UTC** — ap_grainrun: waiting on the render (poll 6/40). No Claude call spent.
-- **2026-09-23 02:33 UTC** — ap_grainrun: waiting on the render (poll 7/40). No Claude call spent.
-- **2026-09-23 02:34 UTC** — ap_grainrun: waiting on the loop bake (poll 8/40). No Claude call spent.
-- **2026-09-23 02:35 UTC** — ap_grainrun: waiting on the loop bake (poll 9/40). No Claude call spent.
-- **2026-09-23 02:36 UTC** — ap_grainrun: the loop bake is still growing (4807682 bytes). Waiting for it to settle. No Claude call spent.
-- **2026-09-23 02:38 UTC** — ap_grainrun: gated — {"camera": "one object moving (camera still)", "return": 0.24, "peak": 8.02, "glitch": {"spike": 2.78, "breadth": 0.0, "at_pct": 2.8, "frames": 73, "breadth_normalised": 0.0}, "dead": {"ratio": 15.3, "peak": 7.2, "dead": false}}
-- **2026-09-23 02:43 UTC** — ap_grainrun: HELD for Lucas's eye — The clip renders at the settled recipe from a spec whose single bounded mover the committed art depicts, and it clears every reject-only gate — camera still, glitch breadth 0.0 on both readings, dead ratio 15.3 with peak 7.2, return 0.24 in the band of already-shipped clips — so there is no defect to act on and the only remaining step is Lucas's eye.. NOT accepted. Staged into the harness pool as base__ri4.mp4.
-- **2026-09-23 02:55 UTC** — ap_pileup: AUTHOR_MOVER applied. Both prompts re-rendered from the one spec. The ART prompt changed, so the still must be regenerated first.
-- **2026-09-23 02:56 UTC** — ap_pileup: art generation started (l1_ap_pileup_2), generation 1/4. No Claude call spent.
-- **2026-09-23 02:57 UTC** — ap_pileup: new art committed from l1_ap_pileup_2.png and seam-staged (ap_pileup       sky 2.3x/2.2  run 0.009  ->  clean, done | boxes re-placing in the background (ap_pileup_boxes.log)). NOT accepted — that is Lucas's call in the stills tab.
-- **2026-09-23 03:03 UTC** — ap_pileup: render launched at end guide 0.70.
-- **2026-09-23 03:04 UTC** — ap_pileup: waiting on the render (poll 1/40). No Claude call spent.
-- **2026-09-23 03:05 UTC** — ap_pileup: waiting on the render (poll 2/40). No Claude call spent.
-- **2026-09-23 03:06 UTC** — ap_pileup: waiting on the render (poll 3/40). No Claude call spent.
-- **2026-09-23 03:07 UTC** — ap_pileup: waiting on the render (poll 4/40). No Claude call spent.
-- **2026-09-23 03:08 UTC** — ap_pileup: waiting on the render (poll 5/40). No Claude call spent.
-- **2026-09-23 03:09 UTC** — ap_pileup: waiting on the render (poll 6/40). No Claude call spent.
-- **2026-09-23 03:10 UTC** — ap_pileup: waiting on the render (poll 7/40). No Claude call spent.
-- **2026-09-23 03:11 UTC** — ap_pileup: waiting on the loop bake (poll 8/40). No Claude call spent.
-- **2026-09-23 03:12 UTC** — ap_pileup: waiting on the loop bake (poll 9/40). No Claude call spent.
-- **2026-09-23 03:13 UTC** — ap_pileup: the loop bake is still growing (4674521 bytes). Waiting for it to settle. No Claude call spent.
-- **2026-09-23 03:15 UTC** — ap_pileup: gated — {"camera": "still", "return": 0.08, "peak": 13.56, "glitch": {"spike": 26.72, "breadth": 0.146, "at_pct": 94.4, "frames": 73, "breadth_normalised": 0.146}, "dead": {"ratio": 20.59, "peak": 18.03, "dead": false}}
-- **2026-09-23 03:18 UTC** — ap_pileup: HELD for Lucas's eye — The rendered clip cleared all three reject-only gates — camera still, glitch breadth 0.146 on both readings against a 0.70 both-must-fire threshold, dead gate clear at ratio 20.59 / peak 18.03, and return 0.08 above the 0.05 ambiguity floor — so there is nothing to reject and the only remaining step is Lucas's eye.. NOT accepted. Staged into the harness pool as base__ri10.mp4.
-- **2026-09-23 03:30 UTC** — ap_stillstand: AUTHOR_MOVER applied. Both prompts re-rendered from the one spec. The ART prompt changed, so the still must be regenerated first.
-- **2026-09-23 03:31 UTC** — ap_stillstand: art generation started (l1_ap_stillstand_2), generation 2/4. No Claude call spent.
-- **2026-09-23 03:32 UTC** — ap_stillstand: new art committed from l1_ap_stillstand_2.png and seam-staged (ap_stillstand   tonal step 7.2x -> BLURRED -> 0.0x  (run 0.012 -> 0.000) | boxes re-placing in the background (ap_stillstand_boxes.log)). NOT accepted — that is Lucas's call in the stills tab.
-- **2026-09-23 03:38 UTC** — ap_stillstand: render launched at end guide 0.70.
-- **2026-09-23 03:39 UTC** — ap_stillstand: waiting on the render (poll 1/40). No Claude call spent.
-- **2026-09-23 03:40 UTC** — ap_stillstand: waiting on the render (poll 2/40). No Claude call spent.
-- **2026-09-23 03:41 UTC** — ap_stillstand: waiting on the render (poll 3/40). No Claude call spent.
-- **2026-09-23 03:43 UTC** — ap_stillstand: waiting on the render (poll 4/40). No Claude call spent.
-- **2026-09-23 03:44 UTC** — ap_stillstand: waiting on the render (poll 5/40). No Claude call spent.
-- **2026-09-23 03:45 UTC** — ap_stillstand: waiting on the render (poll 6/40). No Claude call spent.
-- **2026-09-23 03:46 UTC** — ap_stillstand: waiting on the render (poll 7/40). No Claude call spent.
-- **2026-09-23 03:47 UTC** — ap_stillstand: waiting on the loop bake (poll 8/40). No Claude call spent.
-- **2026-09-23 03:48 UTC** — ap_stillstand: waiting on the loop bake (poll 9/40). No Claude call spent.
-- **2026-09-23 03:49 UTC** — ap_stillstand: the loop bake is still growing (4103239 bytes). Waiting for it to settle. No Claude call spent.
-- **2026-09-23 03:50 UTC** — ap_stillstand: gated — {"camera": "still", "return": 0.09, "peak": 5.94, "glitch": {"spike": 22.75, "breadth": 0.125, "at_pct": 68.1, "frames": 73, "breadth_normalised": 0.125}, "dead": {"ratio": 16.19, "peak": 17.49, "dead": false}}
-- **2026-09-23 03:54 UTC** — ap_stillstand: HELD for Lucas's eye — The single render cleared every reject-only gate with wide margins — camera still, glitch breadth 0.125 on both readings against a both-must-fire 0.70, dead gate clear at ratio 16.19 / peak 17.49, and return 0.09 above the 0.05 floor and far from the 0.00 dead signature — so the art, the vigour and the spec-derived motion prompt have done their job and the only step left is Lucas's eye.. NOT accepted. Staged into the harness pool as base__ri16.mp4.
-- **2026-09-23 04:00 UTC** — ap_smear: render launched at end guide 0.70.
-- **2026-09-23 04:01 UTC** — ap_smear: waiting on the render (poll 1/40). No Claude call spent.
-- **2026-09-23 04:02 UTC** — ap_smear: waiting on the render (poll 2/40). No Claude call spent.
-- **2026-09-23 04:03 UTC** — ap_smear: waiting on the render (poll 3/40). No Claude call spent.
-- **2026-09-23 04:04 UTC** — ap_smear: waiting on the render (poll 4/40). No Claude call spent.
-- **2026-09-23 04:05 UTC** — ap_smear: waiting on the render (poll 5/40). No Claude call spent.
-- **2026-09-23 04:06 UTC** — ap_smear: waiting on the render (poll 6/40). No Claude call spent.
-- **2026-09-23 04:07 UTC** — ap_smear: waiting on the render (poll 7/40). No Claude call spent.
-- **2026-09-23 04:08 UTC** — ap_smear: waiting on the loop bake (poll 8/40). No Claude call spent.
-- **2026-09-23 04:09 UTC** — ap_smear: the loop bake is still growing (48 bytes). Waiting for it to settle. No Claude call spent.
-- **2026-09-23 04:10 UTC** — ap_smear: the loop bake is still growing (4510953 bytes). Waiting for it to settle. No Claude call spent.
-- **2026-09-23 04:12 UTC** — ap_smear: gated — {"camera": "still", "return": 0.13, "peak": 6.13, "glitch": {"spike": 3.23, "breadth": 0.021, "at_pct": 79.2, "frames": 73, "breadth_normalised": 0.0}, "dead": {"ratio": 10.54, "peak": 7.64, "dead": false}}
-- **2026-09-23 04:16 UTC** — ap_smear: HELD for Lucas's eye — The single render at the settled recipe cleared the camera, glitch and dead gates with wide margins and returned a non-ambiguous 0.13 from a spec whose one bounded depicted mover matches the committed still exactly, so the only remaining step is Lucas's judgement.. NOT accepted. Staged into the harness pool as base__ri19.mp4.
-- **2026-09-23 04:21 UTC** — ap_halflight: render launched at end guide 0.70.
-- **2026-09-23 04:22 UTC** — ap_halflight: waiting on the render (poll 1/40). No Claude call spent.
-- **2026-09-23 04:23 UTC** — ap_halflight: waiting on the render (poll 2/40). No Claude call spent.
-- **2026-09-23 04:24 UTC** — ap_halflight: waiting on the render (poll 3/40). No Claude call spent.
-- **2026-09-23 04:25 UTC** — ap_halflight: waiting on the render (poll 4/40). No Claude call spent.
-- **2026-09-23 04:26 UTC** — ap_halflight: waiting on the render (poll 5/40). No Claude call spent.
-- **2026-09-23 04:27 UTC** — ap_halflight: waiting on the render (poll 6/40). No Claude call spent.
-- **2026-09-23 04:28 UTC** — ap_halflight: waiting on the render (poll 7/40). No Claude call spent.
-- **2026-09-23 04:29 UTC** — ap_halflight: waiting on the loop bake (poll 8/40). No Claude call spent.
-- **2026-09-23 04:30 UTC** — ap_halflight: waiting on the loop bake (poll 9/40). No Claude call spent.
-- **2026-09-23 04:32 UTC** — ap_halflight: the loop bake is still growing (4524710 bytes). Waiting for it to settle. No Claude call spent.
-- **2026-09-23 04:33 UTC** — ap_halflight: gated — {"camera": "one object moving (camera still)", "return": 0.36, "peak": 8.41, "glitch": {"spike": 9.94, "breadth": 0.479, "at_pct": 68.1, "frames": 73, "breadth_normalised": 0.5}, "dead": {"ratio": 12.17, "peak": 7.49, "dead": false}}
-- **2026-09-23 04:38 UTC** — ap_halflight: HELD for Lucas's eye — The single render at the settled recipe came from a spec whose one bounded mover the committed art demonstrably depicts, and it cleared every reject-only gate with margin — camera still, glitch below threshold on both readings, not dead, return 0.36 — with motion localised to the named funnel, so the only remaining step is Lucas's eye, which no metric may pre-empt.. NOT accepted. Staged into the harness pool as base__ri22.mp4.
-- **2026-09-23 04:43 UTC** — ap_backwind: render launched at end guide 0.70.
-- **2026-09-23 04:44 UTC** — ap_backwind: waiting on the render (poll 1/40). No Claude call spent.
-- **2026-09-23 04:45 UTC** — ap_backwind: waiting on the render (poll 2/40). No Claude call spent.
-- **2026-09-23 04:46 UTC** — ap_backwind: waiting on the render (poll 3/40). No Claude call spent.
-- **2026-09-23 04:47 UTC** — ap_backwind: waiting on the render (poll 4/40). No Claude call spent.
-- **2026-09-23 04:48 UTC** — ap_backwind: waiting on the render (poll 5/40). No Claude call spent.
-- **2026-09-23 04:49 UTC** — ap_backwind: waiting on the render (poll 6/40). No Claude call spent.
-- **2026-09-23 04:50 UTC** — ap_backwind: waiting on the render (poll 7/40). No Claude call spent.
-- **2026-09-23 04:51 UTC** — ap_backwind: waiting on the loop bake (poll 8/40). No Claude call spent.
-- **2026-09-23 04:52 UTC** — ap_backwind: the loop bake is still growing (5244768 bytes). Waiting for it to settle. No Claude call spent.
-- **2026-09-23 04:53 UTC** — ap_backwind: gated — {"camera": "one object moving (camera still)", "return": 0.69, "peak": 17.84, "glitch": {"spike": 16.85, "breadth": 0.125, "at_pct": 2.8, "frames": 73, "breadth_normalised": 0.125}, "dead": {"ratio": 8.5, "peak": 12.17, "dead": false}}
-- **2026-09-23 04:57 UTC** — ap_backwind: decision not acted on (HOLD, verdict FAIL).
-- **2026-09-23 05:04 UTC** — ap_backwind: decision not acted on (PIN_NON_MOVERS, verdict REVIEW).
-- **2026-09-23 05:09 UTC** — ap_backwind: PIN_NON_MOVERS applied. The art prompt is unchanged, so the committed still still matches — only the clip needs re-rendering.
-- **2026-09-23 05:14 UTC** — ap_backwind: render launched at end guide 0.70.
-- **2026-09-23 05:15 UTC** — ap_backwind: waiting on the render (poll 1/40). No Claude call spent.
-- **2026-09-23 05:16 UTC** — ap_backwind: waiting on the render (poll 2/40). No Claude call spent.
-- **2026-09-23 05:17 UTC** — ap_backwind: waiting on the render (poll 3/40). No Claude call spent.
-- **2026-09-23 05:18 UTC** — ap_backwind: waiting on the render (poll 4/40). No Claude call spent.
-- **2026-09-23 05:19 UTC** — ap_backwind: waiting on the render (poll 5/40). No Claude call spent.
-- **2026-09-23 05:20 UTC** — ap_backwind: waiting on the render (poll 6/40). No Claude call spent.
-- **2026-09-23 05:21 UTC** — ap_backwind: waiting on the render (poll 7/40). No Claude call spent.
-- **2026-09-23 05:22 UTC** — ap_backwind: waiting on the loop bake (poll 8/40). No Claude call spent.
-- **2026-09-23 05:23 UTC** — ap_backwind: waiting on the loop bake (poll 9/40). No Claude call spent.
-- **2026-09-23 05:24 UTC** — ap_backwind: the loop bake is still growing (4958498 bytes). Waiting for it to settle. No Claude call spent.
-- **2026-09-23 05:26 UTC** — ap_backwind: gated — {"camera": "still", "return": 0.53, "peak": 12.22, "glitch": {"spike": 13.55, "breadth": 0.125, "at_pct": 45.8, "frames": 73, "breadth_normalised": 0.104}, "dead": {"ratio": 15.24, "peak": 17.27, "dead": false}}
-- **2026-09-23 05:27 UTC** — ap_backwind: HELD — its last render cleared every gate, and the render budget ran out on the same cycle. NOT accepted.
-- **2026-09-23 05:28 UTC** — 360 page published with 7 room(s): http://127.0.0.1:8752/cine360_clouds.html
-- **2026-09-23 05:28 UTC** — Every room is held or parked. HELD (need Lucas's eye): ['cockpit', 'ap_grainrun', 'ap_pileup', 'ap_stillstand', 'ap_smear', 'ap_halflight', 'ap_backwind']. STILL-ONLY by authoring: none. 360 page published with 7 room(s): http://127.0.0.1:8752/cine360_clouds.html. Nothing here is accepted — metrics may reject and must never approve.
+Started 2026-09-24T00:40:42.101349+00:00.
+- **2026-09-24 02:00 UTC** — room_iterate crashed: ValueError: could not convert string to float: '2026-09-24T00:40:51.465887+00:00'. Full traceback in state.json -> last_error.
+- **2026-09-24 11:00 UTC** — cockpit: art generation started (l1_cockpit_2), generation 1/12. No Claude call spent.
+- **2026-09-24 11:00 UTC** — cockpit: waiting on the art generation (poll 1/40). No Claude call spent.
+- **2026-09-24 11:01 UTC** — cockpit: new art committed from l1_cockpit_2.png and seam-staged (cockpit         ground 3.1x/1.6  run 0.008  ->  clean, done | boxes re-placing in the background (cockpit_boxes.log)). NOT accepted — that is Lucas's call in the stills tab.
+- **2026-09-24 11:06 UTC** — cockpit: render launched at end guide 0.70.
+- **2026-09-24 11:06 UTC** — cockpit: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-24 11:07 UTC** — cockpit: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-24 11:08 UTC** — cockpit: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-24 11:08 UTC** — cockpit: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-24 11:09 UTC** — cockpit: waiting on the render (poll 5/40). No Claude call spent.
+- **2026-09-24 11:09 UTC** — cockpit: waiting on the render (poll 6/40). No Claude call spent.
+- **2026-09-24 11:10 UTC** — cockpit: waiting on the render (poll 7/40). No Claude call spent.
+- **2026-09-24 11:10 UTC** — cockpit: waiting on the render (poll 8/40). No Claude call spent.
+- **2026-09-24 11:11 UTC** — cockpit: waiting on the render (poll 9/40). No Claude call spent.
+- **2026-09-24 11:11 UTC** — cockpit: waiting on the render (poll 10/40). No Claude call spent.
+- **2026-09-24 11:12 UTC** — cockpit: waiting on the render (poll 11/40). No Claude call spent.
+- **2026-09-24 11:12 UTC** — cockpit: waiting on the render (poll 12/40). No Claude call spent.
+- **2026-09-24 11:13 UTC** — cockpit: waiting on the render (poll 13/40). No Claude call spent.
+- **2026-09-24 11:13 UTC** — cockpit: waiting on the render (poll 14/40). No Claude call spent.
+- **2026-09-24 11:14 UTC** — cockpit: waiting on the render (poll 15/40). No Claude call spent.
+- **2026-09-24 11:14 UTC** — cockpit: waiting on the loop bake (poll 16/40). No Claude call spent.
+- **2026-09-24 11:15 UTC** — cockpit: waiting on the loop bake (poll 17/40). No Claude call spent.
+- **2026-09-24 11:15 UTC** — cockpit: waiting on the loop bake (poll 18/40). No Claude call spent.
+- **2026-09-24 11:16 UTC** — cockpit: the loop bake is still growing (3708256 bytes). Waiting for it to settle. No Claude call spent.
+- **2026-09-24 11:17 UTC** — cockpit: gated — {"camera": "still", "return": 0.48, "peak": 12.94, "glitch": {"spike": 54.56, "breadth": 0.5, "at_pct": 87.5, "frames": 73, "breadth_normalised": 0.708}, "dead": {"ratio": 8.03, "peak": 9.45, "dead": false}}
+- **2026-09-24 11:22 UTC** — cockpit: HELD for Lucas's eye — The clip renders from the current spec at the pinned seed 4711 / end guide 0.70 and clears every gate — camera still, raw glitch breadth 0.50 against a both-readings-≥0.70 rule, return 0.48, not dead — with the filmstrip showing motion confined to the city and the storm while the dash stays sharp, so it belongs in front of Lucas's eye rather than back in the loop.. NOT accepted. Staged into the harness pool as base__ri3.mp4.
+- **2026-09-24 11:23 UTC** — ap_grainrun: art generation started (l1_ap_grainrun_3), generation 2/12. No Claude call spent.
+- **2026-09-24 11:23 UTC** — ap_grainrun: waiting on the art generation (poll 1/40). No Claude call spent.
+- **2026-09-24 11:24 UTC** — ap_grainrun: new art committed from l1_ap_grainrun_3.png and seam-staged (ap_grainrun     tonal step 21.4x -> BLURRED -> 0.0x  (run 0.000 -> 0.000) | boxes re-placing in the background (ap_grainrun_boxes.log)). NOT accepted — that is Lucas's call in the stills tab.
+- **2026-09-24 11:31 UTC** — ap_grainrun: render launched at end guide 0.70.
+- **2026-09-24 11:31 UTC** — ap_grainrun: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-24 11:32 UTC** — ap_grainrun: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-24 11:32 UTC** — ap_grainrun: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-24 11:33 UTC** — ap_grainrun: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-24 11:33 UTC** — ap_grainrun: waiting on the render (poll 5/40). No Claude call spent.
+- **2026-09-24 11:34 UTC** — ap_grainrun: waiting on the render (poll 6/40). No Claude call spent.
+- **2026-09-24 11:34 UTC** — ap_grainrun: waiting on the render (poll 7/40). No Claude call spent.
+- **2026-09-24 11:35 UTC** — ap_grainrun: waiting on the render (poll 8/40). No Claude call spent.
+- **2026-09-24 11:35 UTC** — ap_grainrun: waiting on the render (poll 9/40). No Claude call spent.
+- **2026-09-24 11:36 UTC** — ap_grainrun: waiting on the render (poll 10/40). No Claude call spent.
+- **2026-09-24 11:36 UTC** — ap_grainrun: waiting on the render (poll 11/40). No Claude call spent.
+- **2026-09-24 11:37 UTC** — ap_grainrun: waiting on the render (poll 12/40). No Claude call spent.
+- **2026-09-24 11:37 UTC** — ap_grainrun: waiting on the render (poll 13/40). No Claude call spent.
+- **2026-09-24 11:38 UTC** — ap_grainrun: waiting on the render (poll 14/40). No Claude call spent.
+- **2026-09-24 11:38 UTC** — ap_grainrun: waiting on the render (poll 15/40). No Claude call spent.
+- **2026-09-24 11:39 UTC** — ap_grainrun: waiting on the loop bake (poll 16/40). No Claude call spent.
+- **2026-09-24 11:39 UTC** — ap_grainrun: waiting on the loop bake (poll 17/40). No Claude call spent.
+- **2026-09-24 11:40 UTC** — ap_grainrun: the loop bake is still growing (2200100 bytes). Waiting for it to settle. No Claude call spent.
+- **2026-09-24 11:41 UTC** — ap_grainrun: gated — {"camera": "still", "return": 0.65, "peak": 11.05, "glitch": {"spike": 23.23, "breadth": 0.521, "at_pct": 94.4, "frames": 73, "breadth_normalised": 0.875}, "dead": {"ratio": 13.97, "peak": 12.11, "dead": false}}
+- **2026-09-24 11:46 UTC** — ap_grainrun: HELD for Lucas's eye — The clip is a fresh, complete bake of the current spec at the approved recipe and seed 4711 with the exact 38-word cockpit-approved motion prompt, and it cleared the camera, return, dead and glitch gates — the single high normalised-breadth reading is the known light-mover false positive that the both-readings rule correctly declines to convict on — so it goes to Lucas's eye unaccepted.. NOT accepted. Staged into the harness pool as base__ri8.mp4.
+- **2026-09-24 11:46 UTC** — ap_pileup: art generation started (l1_ap_pileup_3), generation 3/12. No Claude call spent.
+- **2026-09-24 11:47 UTC** — ap_pileup: waiting on the art generation (poll 1/40). No Claude call spent.
+- **2026-09-24 11:47 UTC** — ap_pileup: new art committed from l1_ap_pileup_3.png and seam-staged (ap_pileup       tonal step 14.6x -> BLURRED -> 0.0x  (run 0.011 -> 0.000) | boxes re-placing in the background (ap_pileup_boxes.log)). NOT accepted — that is Lucas's call in the stills tab.
+- **2026-09-24 11:54 UTC** — ap_pileup: render launched at end guide 0.70.
+- **2026-09-24 11:55 UTC** — ap_pileup: waiting on the render (poll 1/40). No Claude call spent.
+- **2026-09-24 11:55 UTC** — ap_pileup: waiting on the render (poll 2/40). No Claude call spent.
+- **2026-09-24 11:56 UTC** — ap_pileup: waiting on the render (poll 3/40). No Claude call spent.
+- **2026-09-24 11:56 UTC** — ap_pileup: waiting on the render (poll 4/40). No Claude call spent.
+- **2026-09-24 11:57 UTC** — ap_pileup: waiting on the render (poll 5/40). No Claude call spent.
+- **2026-09-24 11:57 UTC** — ap_pileup: waiting on the render (poll 6/40). No Claude call spent.
+- **2026-09-24 11:58 UTC** — ap_pileup: waiting on the render (poll 7/40). No Claude call spent.
+- **2026-09-24 11:58 UTC** — ap_pileup: waiting on the render (poll 8/40). No Claude call spent.
+- **2026-09-24 11:59 UTC** — ap_pileup: waiting on the render (poll 9/40). No Claude call spent.
+- **2026-09-24 12:00 UTC** — ap_pileup: waiting on the render (poll 10/40). No Claude call spent.
+- **2026-09-24 12:00 UTC** — ap_pileup: waiting on the render (poll 11/40). No Claude call spent.
+- **2026-09-24 12:01 UTC** — ap_pileup: waiting on the render (poll 12/40). No Claude call spent.
+- **2026-09-24 12:01 UTC** — ap_pileup: waiting on the render (poll 13/40). No Claude call spent.
+- **2026-09-24 12:02 UTC** — ap_pileup: waiting on the render (poll 14/40). No Claude call spent.
+- **2026-09-24 12:02 UTC** — ap_pileup: waiting on the render (poll 15/40). No Claude call spent.
+- **2026-09-24 12:03 UTC** — ap_pileup: waiting on the loop bake (poll 16/40). No Claude call spent.
+- **2026-09-24 12:03 UTC** — ap_pileup: waiting on the loop bake (poll 17/40). No Claude call spent.
+- **2026-09-24 12:04 UTC** — ap_pileup: the loop bake is still growing (48 bytes). Waiting for it to settle. No Claude call spent.
+- **2026-09-24 12:04 UTC** — ap_pileup: the loop bake is still growing (3446460 bytes). Waiting for it to settle. No Claude call spent.
+- **2026-09-24 12:06 UTC** — ap_pileup: gated — {"camera": "still", "return": 0.05, "peak": 5.87, "glitch": {"spike": 60.66, "breadth": 0.396, "at_pct": 27.8, "frames": 73, "breadth_normalised": 0.917}, "dead": {"ratio": 7.19, "peak": 8.75, "dead": false}}

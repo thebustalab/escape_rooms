@@ -9,12 +9,12 @@
   "story": "This city's dye district made colors for two hundred years. When the trade died, the railway beneath the district went dark, but the lichen emerged: orange and grey-green, creeping across the old tile. Your biotechnology company scrapes the lichen off the tunnel walls and sells it on today's boutique pigment market. You have two jobs today. First, work out which gene in the lichen's genome controls pigment abundance. Then, find somewhere new to grow the lichen: places on the network that no train has stopped at in decades. Ride the lines. Keep your eyes open.",
   "enterLabel": "Start the shift",
   "done": {
-    "title": "The assay is filed",
-    "body": "The regulator is named, and it is the quietest gene on the wall — nine seasons of selecting on the heaviest growth were nine seasons of selecting on a bystander. Your company can breed for colour again, now that it knows which gene to select on."
+    "title": "The gene is discovered!",
+    "body": "You've named the key gene, excellent! Nine seasons wasted, but hopefully our company can breed for color again, now that it knows which gene to select on. Now, can you find the locations of new stations in which to grow lichen?"
   },
   "escapeDone": {
-    "title": "There is a great deal of wall down there",
-    "body": "Two platforms that were on no map are on the record, fixed off nothing but five route cards laid over one survey sheet, and the dark platforms you ran through on the way. The standing order was bigger than the growing face; it is bigger again now. Two hundred years of trade, and the record was still short by two."
+    "title": "There is a great deal of wall down there!",
+    "body": "Two platforms that were on no map are on the record, fixed off nothing but five route cards laid over one survey sheet, and the dark platforms you ran through on the way. Great job!"
   },
   "music": "audio/subway_theme.mp3",
   "musicVolume": 0.15,
@@ -148,8 +148,8 @@
     }
   ],
   "debrief": {
-    "title": "How this railway worked",
-    "intro": "Two networks, and they had nothing to do with each other. The genes' network you built yourself — correlate, threshold, read. The rails' network was handed to you as observed fact, one line at a time, off the route card in each cab you drove, and it only showed its gaps once every card lay on the sheet together. Both times the loudest thing was not the most connected thing."
+    "title": "How this world worked",
+    "intro": "Everything in this scenario was one technique in costume: network analysis - describing a set of things by which of them are connected to which, rather than by how much each one carries. You did it twice over, on two networks that share nothing but this shift: one you built yourself out of correlations between gene expression readings, and one you could only observe by riding every line on the railway."
   },
   "worldPlatePrompt": "A wide establishing view inside a Victorian underground railway that stood derelict for a century and is now being worked again as a lichen farm. TIME-NEUTRAL soft even underground light, neither dawn nor dusk, no daylight in this frame. THE CROP IS THE ARCHITECTURE, AND THIS IS THE MOST IMPORTANT THING IN THE FRAME: the lichen grows ON THE FABRIC OF THE TUNNEL ITSELF, not in containers — thick living sheets of flat orange rosettes and swollen grey-green crusts spreading across the glazed wall tile, climbing the pilasters and furring the brick soffits of the arches overhead, so the walls themselves are visibly alive and shaggy with it. It is a crop growing on a building. Galvanised racking and plastic trays of cut crust stand about as the HARVEST TAKEN OFF THOSE WALLS — the product, never the source. Nothing is cultivated in a tray. THE FABRIC UNDER IT IS OLD AND DAMAGED: glazed brick and tile in ochre, saffron and dirty cream, much of it crazed, chipped or missing with the bedding mortar showing through; paint peeling in sheets off cast-iron columns; rust and water stains bleeding down; perished cable looped on old porcelain insulators; sooted segmental brick arches; granite platform edges worn hollow. A CREW WORKS HERE NOW, VISIBLY AND WELL: cheap bright LED work-lamps on yellow flex strung along the arches, duckboards laid over the wet, cable ties and gaffer tape, a kettle and enamel mugs on a plank shelf, a coat on a hook, and notices, work rotas, tally sheets and curling postcards tacked and taped to the tile with chalked marks and scratched tallies beside them. Repairs done with ingenuity — a propped timber, a patched panel, a hose run into a channel. TWO COLOUR TEMPERATURES, AND BOTH MUST BE STRONGLY PRESENT — this must NOT be a monochrome amber or sepia picture. WARM: pools of amber lamplight around the work-lamps and the crew's corner. COLD: everywhere the lamps do not reach, a distinct COLD BLUE-GREEN DAMP — wet black tile going blue in the shadow, green-black standing water, cold blue-green light down the tunnel mouths and in the depths of the arches, the chill of a place with a river behind the wall. The cold blue-green should occupy at least as much of the frame as the warm amber, and the two should meet in clear contrast rather than blending into brown. Damp air, faint haze, film grain. Photographic and beautiful. THE MOOD IS WARM, PURPOSEFUL AND CHARACTERFUL — a magnificent run-down place that a good crew has taken on and made theirs. It is emphatically NOT eerie, NOT spooky, NOT creepy, NOT haunted, NOT menacing, NOT post-apocalyptic and NOT an abandoned ruin. Dark and dirty in places, and still plainly and warmly worked in. No cobwebs, no gloom for its own sake, no horror atmosphere of any kind. No large blank empty wall areas — every surface carries the marks and clutter of a working place. No people, no lettering, no captions, no text, no signage or readable writing of any kind anywhere. No sepia monochrome, no uniform brown or orange cast over the whole image.",
   "coverPrompt": "A bold, graphic, MID-TO-HIGH-KEY square poster in flat vector-poster shapes. A single Victorian underground railway arch seen head-on and filling most of the frame, its opening a LARGE GLOWING field of warm amber lamplight — the brightest thing in the picture and the first thing the eye finds. Growing across that glowing arch, in strong flat silhouette, a bold band of LICHEN: fat round orange rosettes and a ragged grey-green crust spreading in from the arch's rim and over the tilework, deliberately oversized and simplified so it still reads at the size of a postage stamp. Two rails run out of the arch toward the viewer as two clean converging lines. The surround is a cool blue-green tile field, MID-TONE — clearly darker than the arch but never black. Three values only: bright amber, mid blue-green, and the orange crop. Big simple shapes, few of them, strong edges. NOT a dark or murky picture: no near-black fields, no deep shadow, no gloom, nothing dim, and no photographic haze — this is a printed poster, not a photograph of a tunnel. Square. No people, no lettering, no captions, no text, no logos.",
@@ -6688,5 +6688,25 @@
         "home": "ochre_hall"
       }
     }
-  }
+  },
+  "ladderPlain": [
+    {
+      "room": "car_madder",
+      "text": "In the first puzzle you worked from lichen_expression, the crop's gene expression record: two hundred samples, twenty-four genes, one expression reading for each. You correlated every gene against the reference gene XAN_4418 across all two hundred samples and took the largest correlation by magnitude - XAN_4574, at 0.83, where every other gene in the dataset falls below 0.1. One pair of genes at a time, which is where a co-expression network starts."
+    },
+    {
+      "room": "car_woad",
+      "text": "In the second puzzle you turned those pairwise correlations into a network by fixing a cutoff: two genes count as co-expressed when the magnitude of their correlation is above 0.75. Counting partners under that rule, XAN_6246 has none at all - its strongest correlation with anything in the dataset is 0.103 - which is exactly what your company wanted in a control gene."
+    },
+    {
+      "room": "car_weld",
+      "text": "In the third puzzle you ran the standard protocol your company re-seeds the crop by. You found the largest connected group of co-expressed genes - following correlations above 0.75 from gene to gene, so two genes belong to the same group when a chain of correlations links them and not only when they are correlated directly - and then took the member of that group with the highest average expression: XAN_1815, at about 1,434 units, nearly six times the next gene inside the group. Both steps are exactly as written and the answer is exactly what they give. The last puzzle is about what the second step is measuring."
+    },
+    {
+      "room": "car_verdigris",
+      "text": "In the last puzzle you kept the same group of eight genes and changed only how you ranked its members: by position rather than by abundance, counting how many other members of the group each gene is co-expressed with above 0.75. That gives XAN_1192, which is co-expressed with all seven of the others where the next gene down reaches only four. XAN_1192 is the quietest gene in the whole record at about 72 units, last of twenty-four, so the abundance ranking of the third puzzle puts it at the bottom; and XAN_3514, the loudest gene in the record at about 5,644 units, is co-expressed with only three genes and is not a member of the group at all. Nine seasons of re-seeding from the most abundant gene in the group, rather than the most connected one, is why the colour kept thinning."
+    }
+  ],
+  "escapeBrief": "To get out you filed the two stations that no record held. This second network was nothing you computed: its connections are the five lines, and the only way to observe one was to ride it, reading that line's stops off the route card taped up in the cab. Halliwell lies on the madder, woad and weld lines - three lines, as many as Ochre Steps, the grandest station on the network - and Cold Harbour lies on the verdigris and the lampblack, and the trains run through both without stopping, so neither is printed on any route card and neither is on the operator's survey sheet of live stations. You can only reach them by riding all five lines and catching the platform going past that nothing on paper accounts for, then reading its square off the grid in the margin of the sheet: E5 and I4, entered together into the Master Station List. That is the last puzzle performed instead of computed - a station's standing read off what connects to it rather than off any quantity - and the one station the record does treat as important turned out to be nothing more than where you went to file the report.",
+  "worldPlate": "_world/plate.png"
 }

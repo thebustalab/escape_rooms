@@ -40,8 +40,8 @@
   "worldPlatePrompt": "A world-bible establishing plate for a LIVING, KEPT jungle temple, deep in rainforest, at harsh equatorial midday. This sanctuary was tended every day until a month ago, when its keeper died: it is swept, maintained and in use — NOT a ruin. Nothing has collapsed, there is no rubble, nothing is growing through the floor, and the forest is cut hard back and stops at the wall. One frame holding the whole world's vocabulary: massive warm honey-and-ochre limestone masonry, close-jointed and clean, its carved faces still crisp and still holding traces of painted plaster; a gallery of shallow shrine niches cut along the wall, each hung with a single banner of strong flat colour; small carved stone and clay votive figures standing in tidy rows on wiped niche ledges; lamps with trimmed wicks and shallow offering bowls set square before them, recently used and now cold; stoppered resin jars stacked in order along the floor; a low rough service crawl-way cut behind the wall at floor level — the one unfinished thing, its dust worn into a smooth path by daily passing; and hard white shafts of sunlight falling straight down through openings in the canopy far above, striking the floor in sharp bright pools. LIGHT: harsh, flat and OVERHEAD, high noon, hard-edged shafts and short shadows. Deliberately NOT golden hour, NOT dusk, NOT dawn, NOT lamplit — no warm amber wash anywhere, no firelight, no brass glow. PALETTE: RICH AND LUMINOUS, not grey and not washed-out — warm honey stone, deep wet greens in the forest beyond, real blue in the sky and in the shadows, clear water. The nine banners are the only PURE, fully saturated colour in the frame and nothing else competes with them for chroma, but everything else is still full of colour and light. Humid air, drifting spore and dust in the light shafts, water beading on stone. Painterly, cinematic, subtle film grain. No people, no lettering, no captions, no text, no readable writing, no signage, no UI.",
   "coverPrompt": "Stylised thumbnail poster of a single shrine niche cut into a clean-jointed wall of warm honey-coloured limestone, swept and well kept, the mortar sound and the stone tended — NOT ruined, NO roots, NO vines, NO cracks, nothing overgrown. One crimson banner hangs above the niche, the only fully saturated colour in the frame. On the niche ledge stand three small carved votive figures in a row, clearly different from one another: a squat frog, a spiral sea shell, and a round-bellied stoppered rain-jar, each carved and painted in terracotta and pale limestone with traces of old pigment. A hard bar of overhead noon sun falls across the ledge, with deep warm shade to either side; a lit clay lamp and a shallow offering bowl sit before the figures. Rich, luminous and colourful, never washed out and never grey. No people, no lettering, no captions, no text, no readable writing, no signage, no UI.",
   "debrief": {
-    "title": "",
-    "intro": ""
+    "title": "How this world worked",
+    "intro": "Everything in this scenario was one technique in costume: hierarchical clustering — sorting things into a nested tree of groups by how alike their measurements are. Here is what you actually did, with the story taken back off."
   },
   "rooms": [
     {
@@ -1146,12 +1146,12 @@
             ],
             "expr": "local({ a <- tolower(trimws(as.character(unlist(answer)))); length(a) == 3 && setequal(a, c(\"redsill\", \"highgate\", \"palewall\")) })",
             "maxAttempts": 4,
-            "hint": "<code>cutree(hclust(dist(temple_votive_residues[, 3:8])), k = 3)</code> gives a family label per shrine. Add it to the table, group by it, and take the mean of <code>beeswax</code>.",
+            "hint": "Add <code>parameters = c(3)</code> to the same <code>runMatrixAnalysis()</code> call you used before and it returns a <code>cluster</code> column, one family label per shrine. Keep the tips, group by that column, and take the mean of <code>beeswax</code>.",
             "feedback": {
               "correct": "Correct — noted: the beeswax belongs to Redsill, Highgate and Palewall. Their mean is 44.7, against 11.8 and 7.0 for the other two families.",
               "wrong": [
                 "Cut the nine shrines into their three families first, then ask one number of each family rather than of each shrine.",
-                "<code>hclust(dist(temple_votive_residues[, 3:8]))</code> builds the tree and <code>cutree(..., k = 3)</code> cuts it into three families. Group the shrines by that label and take the mean of <code>beeswax</code> for each.",
+                "<code>runMatrixAnalysis()</code> with <code>parameters = c(3)</code> cuts the tree into three families and hands back a <code>cluster</code> column. Keep the rows where <code>isTip</code> is true, group by <code>cluster</code>, and take the mean of <code>beeswax</code> for each.",
                 "One family's average is several times either of the others, so it is not a close call. <code>answer</code> wants the three shrine names in that family, not the family's number or its mean."
               ]
             }
@@ -1369,12 +1369,12 @@
             ],
             "expr": "local({ a <- tolower(trimws(as.character(unlist(answer)))); length(a) == 3 && setequal(a, c(\"redsill\", \"highgate\", \"palewall\")) })",
             "maxAttempts": 4,
-            "hint": "<code>cutree(hclust(dist(temple_votive_residues[, 3:8])), k = 3)</code> gives a family label per shrine. Add it to the table, group by it, and take the mean of <code>beeswax</code>.",
+            "hint": "Add <code>parameters = c(3)</code> to the same <code>runMatrixAnalysis()</code> call you used before and it returns a <code>cluster</code> column, one family label per shrine. Keep the tips, group by that column, and take the mean of <code>beeswax</code>.",
             "feedback": {
               "correct": "Correct — noted: the beeswax belongs to Redsill, Highgate and Palewall. Their mean is 44.7, against 11.8 and 7.0 for the other two families.",
               "wrong": [
                 "Cut the nine shrines into their three families first, then ask one number of each family rather than of each shrine.",
-                "<code>hclust(dist(temple_votive_residues[, 3:8]))</code> builds the tree and <code>cutree(..., k = 3)</code> cuts it into three families. Group the shrines by that label and take the mean of <code>beeswax</code> for each.",
+                "<code>runMatrixAnalysis()</code> with <code>parameters = c(3)</code> cuts the tree into three families and hands back a <code>cluster</code> column. Keep the rows where <code>isTip</code> is true, group by <code>cluster</code>, and take the mean of <code>beeswax</code> for each.",
                 "One family's average is several times either of the others, so it is not a close call. <code>answer</code> wants the three shrine names in that family, not the family's number or its mean."
               ]
             }
@@ -1760,7 +1760,7 @@
               "correct": "Correct — noted: the nameless cell belongs with Quietfloor and Lastcourt. Its residues sit 2.4 from each of them, and more than 60 from every other shrine in the temple.",
               "wrong": [
                 "Put the unknown into the same table as the nine and cluster the lot together — it will fall inside one of the three families you already know.",
-                "<code>rbind(temple_votive_residues, unknown_shrine)</code>, then <code>cutree(hclust(dist(.[, 3:8])), k = 3)</code> on the combined table. Find the unknown's label and list the other shrines that share it.",
+                "<code>rbind(temple_votive_residues, unknown_shrine)</code>, then run the same <code>runMatrixAnalysis()</code> on the combined table with <code>parameters = c(3)</code>. Find the unknown's <code>cluster</code> and list the other shrines that share it.",
                 "It is not a close call — the family it joins sits about 2.4 away and everything else is more than 60 away. <code>answer</code> wants the shrine names it joins, not the unknown's own name."
               ]
             }
@@ -1945,7 +1945,7 @@
               "correct": "Correct — noted: the nameless cell belongs with Quietfloor and Lastcourt. Its residues sit 2.4 from each of them, and more than 60 from every other shrine in the temple.",
               "wrong": [
                 "Put the unknown into the same table as the nine and cluster the lot together — it will fall inside one of the three families you already know.",
-                "<code>rbind(temple_votive_residues, unknown_shrine)</code>, then <code>cutree(hclust(dist(.[, 3:8])), k = 3)</code> on the combined table. Find the unknown's label and list the other shrines that share it.",
+                "<code>rbind(temple_votive_residues, unknown_shrine)</code>, then run the same <code>runMatrixAnalysis()</code> on the combined table with <code>parameters = c(3)</code>. Find the unknown's <code>cluster</code> and list the other shrines that share it.",
                 "It is not a close call — the family it joins sits about 2.4 away and everything else is more than 60 away. <code>answer</code> wants the shrine names it joins, not the unknown's own name."
               ]
             }
@@ -2047,12 +2047,12 @@
             ],
             "expr": "local({ a <- tolower(trimws(as.character(unlist(answer)))); length(a) == 2 && setequal(a, c(\"deepwell\", \"palewall\")) })",
             "maxAttempts": 4,
-            "hint": "Everything you need is in <code>temple_votive_residues</code> — the wall is only the same list in stone. <code>cutree()</code> into 3 gives each shrine's family from the residues; set that against the <code>wing</code> column and look for the shrine in each wing that does not match the rest of its wing.",
+            "hint": "Everything you need is in <code>temple_votive_residues</code> — the wall is only the same list in stone. <code>parameters = c(3)</code> gives each shrine's family from the residues, as a <code>cluster</code> column; set that against the <code>wing</code> column and look for the shrine in each wing that does not match the rest of its wing.",
             "feedback": {
               "correct": "Correct — noted: Deepwell and Palewall are the two that moved, and they moved past each other. Deepwell stands in the West wing but its residues are the East wing's copal and rubber; Palewall stands in the East wing but its residues are the West wing's beeswax and seed oil. The other seven shrines still stand where their offering says they belong.",
               "wrong": [
                 "Work out each shrine's family from the residues, then set that beside the wing it is filed under. In two of the three wings, one shrine's offering does not match the others standing with it — those are the shrines that moved. You do not have to read anything off the wall; the wing is a column in the table.",
-                "<code>cutree(hclust(dist(temple_votive_residues[, 3:8])), k = 3)</code> gives the family. Compare it against the <code>wing</code> column wing by wing: the East wing holds three shrines of one family and one of another, and the West wing holds two of one and one of another. The North wing is undisturbed.",
+                "<code>runMatrixAnalysis()</code> with <code>parameters = c(3)</code> gives the family, as a <code>cluster</code> column. Compare it against the <code>wing</code> column wing by wing: the East wing holds three shrines of one family and one of another, and the West wing holds two of one and one of another. The North wing is undisturbed.",
                 "There are two, and they swapped: one now stands in the West but was supplied with the East jar, and one now stands in the East but was supplied with the West jar. <code>answer</code> wants both shrine names — not a single name, and not a wing."
               ]
             }
@@ -2283,12 +2283,12 @@
             ],
             "expr": "local({ a <- tolower(trimws(as.character(unlist(answer)))); length(a) == 2 && setequal(a, c(\"deepwell\", \"palewall\")) })",
             "maxAttempts": 4,
-            "hint": "Everything you need is in <code>temple_votive_residues</code> — the wall is only the same list in stone. <code>cutree()</code> into 3 gives each shrine's family from the residues; set that against the <code>wing</code> column and look for the shrine in each wing that does not match the rest of its wing.",
+            "hint": "Everything you need is in <code>temple_votive_residues</code> — the wall is only the same list in stone. <code>parameters = c(3)</code> gives each shrine's family from the residues, as a <code>cluster</code> column; set that against the <code>wing</code> column and look for the shrine in each wing that does not match the rest of its wing.",
             "feedback": {
               "correct": "Correct — noted: Deepwell and Palewall are the two that moved, and they moved past each other. Deepwell stands in the West wing but its residues are the East wing's copal and rubber; Palewall stands in the East wing but its residues are the West wing's beeswax and seed oil. The other seven shrines still stand where their offering says they belong.",
               "wrong": [
                 "Work out each shrine's family from the residues, then set that beside the wing it is filed under. In two of the three wings, one shrine's offering does not match the others standing with it — those are the shrines that moved. You do not have to read anything off the wall; the wing is a column in the table.",
-                "<code>cutree(hclust(dist(temple_votive_residues[, 3:8])), k = 3)</code> gives the family. Compare it against the <code>wing</code> column wing by wing: the East wing holds three shrines of one family and one of another, and the West wing holds two of one and one of another. The North wing is undisturbed.",
+                "<code>runMatrixAnalysis()</code> with <code>parameters = c(3)</code> gives the family, as a <code>cluster</code> column. Compare it against the <code>wing</code> column wing by wing: the East wing holds three shrines of one family and one of another, and the West wing holds two of one and one of another. The North wing is undisturbed.",
                 "There are two, and they swapped: one now stands in the West but was supplied with the East jar, and one now stands in the East but was supplied with the West jar. <code>answer</code> wants both shrine names — not a single name, and not a wing."
               ]
             }
@@ -2845,5 +2845,24 @@
     }
   ],
   "cover": "cover.png",
-  "worldPlate": "_world/plate.png"
+  "worldPlate": "_world/plate.png",
+  "ladderPlain": [
+    {
+      "room": "sun_gallery",
+      "text": "In the first puzzle you measured how far apart the shrines were, using all six residue measurements at once rather than one at a time, and found the shrine whose residues sat closest to Ninestep's. Every puzzle after this one was built on those pairwise distances."
+    },
+    {
+      "room": "lamp_hall",
+      "text": "In the second puzzle you turned those distances into a tree, cut the tree into three families of shrines, and took one average for each family — the mean beeswax — so you could say which family the last block of wax belonged to."
+    },
+    {
+      "room": "sealed_cell",
+      "text": "In the third puzzle you added the sealed cell's bowl, which carries no name, to the nine known shrines and clustered all ten together, so that the cell's own residues decided which family it joined rather than where in the temple it was found."
+    },
+    {
+      "room": "inner_vault",
+      "text": "In the last puzzle you clustered the shrines once more and set each shrine's family against the wing column, which records where that shrine stands in the temple today. For seven of the nine the two agree. For Deepwell and Palewall they disagree, and it is the residues that settle it: a shrine's offering follows the god it serves, while its wing only records where it has ended up. That is how you knew those two were the ones that had been moved."
+    }
+  ],
+  "escapeBrief": "To get out you sorted the nine shrines into their three families a second time, with no data table and no console — using only the figures carved on each shrine's plate. It is the same judgement the clustering made for you in the puzzles: deciding what belongs with what by comparing every shrine against every other, rather than by which room you found it in."
 }

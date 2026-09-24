@@ -1,20 +1,16 @@
-Verified independently rather than on the worker's word:
+I checked the worker's claims against the files rather than its description. Every one holds.
 
-**Disk checks — all confirmed**
-- `cockpit_motion_ri1.params.json` matches the canonical recipe exactly: `3072x1024, end_guide 0.70, cfg 2.0, steps 8, length 73, seed 4242`. One render, no settings drift.
-- `cockpit_ri1_render.log` reproduces the gate block verbatim and ends with the runner's own line: *"survived gates — needs Lucas's eye"* plus *"NOTE: no clip here is accepted. Metrics reject; the eye decides."*
-- Cycle 1 was RENDER; this is the first post-render cycle. The mover has genuinely been rendered.
+**Verified independently:**
 
-**Frames — looked at them myself** (frames 0/30/60 of the looped clip)
-- Camera is locked: composition, dash rim, wing edges and city silhouette register pixel-for-pixel across the loop. Consistent with `frame0_corr 0.974`, landmark drift 0 px.
-- Motion energy is regional, not frame-filling. Column bands left→right read `1.06, 1.25, 8.14, 11.5, 6.33, 1.46, 1.07, 0.91` — everything lives in the centre-left, over the sampler globe and the cloud-gardens immediately above it. The city (left third) and the eyewall/lightning shelf (right third) are effectively static at ~1.0. No boil, no global churn, no structure tearing.
+- **Spec movers** — the cockpit sceneSpec carries motion on exactly two elements: `city` ("brightening and dimming in place") and `eyewall` ("lightning rippling slowly through the storm cloud"). `sampler` has a sound block only, no motion; none of the other retired heroes appear. That is the human-mandated pair, not a re-author.
+- **Motion prompt** — I resolved it myself through exp_art_prompt.motion_prompt rather than trusting the quote. It comes back byte-identical to what the worker reported, 38 words, spec-derived. There is no art_prompt_motion/clouds/cockpit.txt override, so nothing hand-written is shadowing the spec. Both phrases are pure light modulation; no travel verbs.
+- **Still freshness** — spec edited 06:59:39, scene.png written 07:01:05, scenario.json 07:01:06. The still post-dates its own motion prompt, so the "no clip animates a stale still" criterion is satisfied.
+- **The image itself** — I looked at it. The lit city heap fills the left with the colour living in the buildings (filament, honeycomb, stained glass, the three shadow kinds), lightning crawls the eyewall ledge on the right, the palette is grey elsewhere, and the dash, sampler globe, reading-pane and the triangle of dark override cells are all sharp in the foreground. Both movers are genuinely depicted.
+- **heightPass** is `level` / `cloud: false` on `_world/plate.png`, matching worldPlateRef — so this is a room that should show full lightning and city, and does.
+- **Settings** — seed 4711 and end guide 0.70 are already pinned in plan.json. The worker reports them; it does not propose changing them or anything else.
 
-**Against the reject list**
-- No settings change proposed. No mover proposed at all, so neither the frame-filling nor the never-rendered-AUTHOR_MOVER bar applies.
-- Return is 0.28, not zero; the worker treats it as non-ambiguous and does not re-author off it — correct handling of that measure.
-- HOLD accepts nothing and writes nothing into `scenario.json`.
-- No hand-written art prompt; the motion prompt resolves from `sampler.motion.phrase` in the spec, and the brief's "NONE" is correctly read as the absent `.txt` fallback.
+**Against the reject list:** no settings change, no frame-filling re-author (the two movers are the approved recipe, each bounded to its own half and light-only), no zero-return reasoning (no clip exists at all), no acceptance and no write to committed art or hotspots, no hand-written prompt, and not AUTHOR_MOVER on an unrendered mover.
 
-The one thing worth naming for Lucas when he looks: the moving region is somewhat wider than the globe alone — the white cloud-garden blooms drifting above the dash move with it. That is in-world (they're living mist in the spec) and bounded, but it's a judgement only the eye can settle, which is exactly what HOLD hands over. No metric here licenses pre-empting it.
+One note that does not block this cycle: stale hand-written motion txt files still sit in art_prompt_motion/clouds for ap_backwind, ap_pileup and ap_stillstand. The spec wins over them while those specs carry motion, but they are worth clearing before those rooms come up.
 
 VERDICT: PASS

@@ -6403,7 +6403,26 @@
   "boardCols": 3,
   "debrief": {
     "title": "How this world worked",
-    "intro": "The whole day in Alexandria was one skill wearing a harbor for a costume: group_by + summarise. The scenario asks you to sort many things into piles by a shared trait, then read one number off each pile. Every room binned your cargo a different way and read one summary from it; the Library showed you what happens when the piles are not built fairly; and the bronze door at the top of the lighthouse opened only when you grouped a collection you had gathered yourself, three different ways, and read the right figure off each. Here is how each part embodied the wrangling."
+    "intro": "This scenario was one technique wearing a harbor: group_by and summarise — sort many records into piles by a shared column, then read a single number off each pile. Here is what you actually did, with the story taken back off."
   },
-  "audited": true
+  "audited": true,
+  "ladderPlain": [
+    {
+      "room": "deck",
+      "text": "In the first puzzle you grouped the 4,000 amphorae in the wine_cargo table by type — red and white — and took the mean sulphates of each group. Red averages 0.66 and white 0.49, so red is the more heavily sulfured half of the hold. Two groups, one number each, and nothing more than that."
+    },
+    {
+      "room": "market_price",
+      "text": "In the second puzzle you made the same move with six groups instead of two: you grouped the cargo by varietal and took the mean alcohol of each grape, then answered by clicking the grape's bar on the plot. Argitis stands clear at 13.8%, ahead of Aminean at 12.3%. The bar chart is simply the group summary drawn — one bar per pile, height equal to that pile's average."
+    },
+    {
+      "room": "market_boast",
+      "text": "In the third puzzle you grouped the cargo by region and took the mean quality_score of each of the four islands, every amphora in the hold counting once. Chios comes out highest at 7.28, ahead of Kos at 6.78, Rhodes at 6.47 and Thasos at 6.44. That is the average over individual jars: each island's figure is pulled toward whichever grapes it shipped most of."
+    },
+    {
+      "room": "library",
+      "text": "In the last puzzle you answered the same question with the grapes given equal weight instead. You grouped by region and varietal together, took the mean quality_score of each of the six island-and-grape pairings within an island, then averaged those six figures up to the island. On that footing Thasos leads at 7.43, Kos is 6.84, Rhodes 6.53, and Chios comes last at 6.26 — a different island from the third puzzle's answer, because the two averages weight different things. The third puzzle's average weights every amphora equally; this one weights every varietal equally. Chios ships mostly Apian, Eugenia and Aminean, the three grapes that score around 7.8 anywhere, and almost none of the others; Thasos ships mostly Argitis, Duracina and Helvola, the three that score around 5.77. So counting jars tells you about each island's shipping mix, and counting grapes tells you how well a given grape does on that island's ground — which is what this last puzzle asked for."
+    }
+  ],
+  "escapeBrief": "To get out you grouped a collection you had assembled yourself. Nine merchant's seals, picked up one at a time across the port, each carrying a color, a shape, a size and a tally numeral; the bronze board named three figures — ▲ 17, ⦀ 5, ▼ 10 — and for each you had to press the one trait that produces it. Group the seals by size and the large ones total 17 (3 + 6 + 8): that is ▲, the greatest pile total. Group them by shape and there are five round seals: that is ⦀, the tally. Group them by color and the reds total 10 (1 + 2 + 3 + 4), the smallest of the three colors: that is ▼. Same group-and-summarise you had been writing at the console all day, in clay and bronze, except that here the grouping column was the thing you had to supply."
 }

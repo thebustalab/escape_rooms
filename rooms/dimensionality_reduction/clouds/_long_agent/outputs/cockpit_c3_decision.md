@@ -1,11 +1,12 @@
-Everything checks out against the authority docs. Verified on disk:
+I've read the four authority documents and inspected the room. Here is the state I verified:
 
-- **The clip exists and was rendered once** at the canonical recipe — `3072x1024, end guide 0.70, cfg 2.0, 8 steps, 73 frames, seed 4242` (`cockpit_motion_ri1.params.json`), crossfade + seam repair applied.
-- **The motion prompt is spec-derived, not NONE.** `scene_spec.render_motion_prompt` resolves it from `sampler.motion.phrase`: 31 words, one bounded mover, purely oscillatory (drifting/turning/pulsing inside a fixed globe) — no travel. The brief's "NONE" is the absent `.txt` fallback, which is the correct state now the spec is the source of truth.
-- **All three gates clear**, not marginally: camera `still` (frame0_corr 0.974, landmark drift 0 px); glitch breadth 0.146 on *both* readings against the 0.70 two-reading threshold (`spike` 30.94 is reported, never enforced); dead gate `false` with ratio 24.16 against a <1.75 floor and peak 17.74 against <0.45.
-- **Return 0.28 is non-zero**, so the ambiguity escalation doesn't fire — and it sits right where `market_price` ships at 0.23. The runner's own verdict line already reads *"survived gates — needs Lucas's eye."*
+- **Spec carries two authored movers**, both matching the human guidance exactly: `city` (brightening and dimming in place) and `eyewall` (lightning rippling through the storm). Each has `motion.{moves,vigour,phrase}`; the retired heroes (sampler bloom, drogue kite, etc.) are gone — `sampler` now carries only a `sound` block, no motion.
+- **The motion prompt resolves from the spec**, 38 words, house form, both phrases joined, closing on "Only those move": *"locked-off static camera, zero camera movement. The floating city brightening and dimming in place, its lit buildings swelling and fading; lightning rippling slowly through the storm cloud. Only those move; everything else stays perfectly still. Seamless natural loop."* Both movers are purely oscillatory light — the no-travel rule is satisfied by construction.
+- **The still is current and depicts both movers.** `scene.png` was committed 07:01 today from the rewritten spec (spec edit 06:59:39), seam-staged clean at band run 0.008. Looking at it: the lit city heap fills the left, white-blue lightning crawls the eyewall on the right, grey palette written in, and the dash/sampler/reading-pane/override sit sharp in the foreground.
+- **Seed 4711 and end guide 0.70 are already pinned** in `plan.json`, matching Lucas's approved recipe.
+- **No clip exists for this generation** — gate report is `{}`, nothing tried. The `.cine_published.json` entry for cockpit predates today's rewrite.
 
-No lever applies. There is no evidence of over-liveliness (no metric measures it, and canon forbids rejecting a clip off sampled stills — that fails toward false rejection), the mover is bounded at ~1.5% of frame with vigour already authored soft, nothing is known to be moving that shouldn't be, and re-rolling is not mine to propose.
+Both movers are light-modulation, each bounded to its own half of the frame — the same category as `heist/a_vault`'s caged lamp, which Lucas accepted, and not `hood`'s frame-filling drifting cloud sea. Nothing here calls for re-authoring, and the guidance forbids it regardless.
 
-DECISION: HOLD
-WHY: The single render cleared the camera, glitch and dead gates with wide margins and returned a healthy non-ambiguous 0.28, so the spec, the still and the spec-derived motion prompt have done their job and the only step left is the human eye, which no metric may pre-empt.
+DECISION: RENDER
+WHY: The spec carries the two approved light movers with authored vigour, the spec-derived motion prompt renders clean at 38 words with no travel, the still is fresh from this spec and visibly depicts both, and no clip exists yet at the pinned seed 4711 / end guide 0.70.

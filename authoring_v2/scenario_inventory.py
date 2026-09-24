@@ -23,7 +23,12 @@ def build_inventory():
     """Pure build of the inventory dict (no file write) — returns (inventory_dict, duplicate_ids).
     Used both by main() to write scenario_inventory.json and by validate_assets.py to check it's fresh."""
     scenarios, ids = [], {}
+    # Scratch dirs (a leading "_") are skipped, same as both validators (2026-09-23, Lucas).
+    # A probe must never be catalogued as a scenario: it would be handed a real slot here and
+    # could push `next_free_id` past an id that is actually free.
     for p in sorted(ROOT.glob("rooms/*/*/scenario.json")):
+        if any(part.startswith("_") for part in p.relative_to(ROOT).parts):
+            continue
         try:
             d = json.loads(p.read_text())
         except Exception as e:

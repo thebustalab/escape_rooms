@@ -10,7 +10,25 @@
  *   player is already large and this is self-contained. Loaded as a classic script before the player
  *   (like codec.js), exposing window.EscapeDebrief.
  *
+ * TWO SHAPES. The LADDER shape (preferred, Lucas 2026-09-23) is one world plate plus a numbered,
+ * PLAIN-LANGUAGE line per puzzle rung saying what the player actually did, then the escape in the same
+ * register. It fires whenever `scenario.ladderPlain` is a non-empty array. Everything else still gets
+ * the older room-by-room GALLERY, so the scenarios not yet converted keep rendering exactly as before —
+ * six of them are shipped and student-facing, and a hard cutover would have blanked all six.
+ *
+ * WHY THE LADDER SHAPE. A row per room re-tells the story in the story's own voice, which is the one
+ * thing a debrief must not do: the student has just finished the fiction and needs to be told, flatly,
+ * which analysis they performed. So the rung lines are deliberately unthemed — no shrines, no springs,
+ * just "you filtered, you grouped, you cut the tree into three" — and where a rung carries a taught
+ * trap the line says so positively: the answer was right, and a later rung shows what it hid.
+ *
  * DATA IT READS
+ *   scenario.ladderPlain : [ { room?, text } | string ]   the plain rung lines, in ladder order
+ *   scenario.escapeBrief : string                    the escape, in the same plain register. NOTE this
+ *                      field used to be author-only ("for us, not the player"); it became PLAYER-FACING
+ *                      on 2026-09-23 at Lucas's call, and the harness label changed with it. Anything
+ *                      written there is now read by students.
+ *   scenario.worldPlate  : string                    the shared backdrop, shown once at the top
  *   scenario.debrief : { title?, intro? }            screen heading + an optional lead paragraph
  *   room.debrief     : string | { heading?, body }   per BUILT room — the text shown beside that
  *                      room's scene. The escape room's debrief is where the escape is framed as the
@@ -69,11 +87,55 @@
     }
   }
 
+  // Normalise scenario.ladderPlain into [{ text }] — tolerates bare strings and drops empties.
+  function ladderLines(scenario) {
+    var raw = scenario && scenario.ladderPlain;
+    if (!Array.isArray(raw)) return [];
+    var out = [];
+    for (var i = 0; i < raw.length; i++) {
+      var e = raw[i];
+      var t = (typeof e === "string") ? e : ((e && (e.text || e.body)) || "");
+      t = (t || "").trim();
+      if (t) out.push({ text: t });
+    }
+    return out;
+  }
+
+  // THE LADDER SHAPE — world plate, then one plain numbered line per rung, then the escape.
+  function renderLadder(bodyEl, scenario, lines) {
+    var debrief = scenario.debrief || {};
+    if (debrief.intro) {
+      var intro = el("p", "dbintro"); intro.textContent = debrief.intro; bodyEl.appendChild(intro);
+    }
+    // The plate, or the COVER if the scenario has none. The three oldest scenarios (alaska, hawaii,
+    // hospital) predate the world-plate convention entirely, and the ladder shape has only this one
+    // image — without a fallback their debrief would open on nothing at all, which is worse than the
+    // gallery it replaced. Any scenario built since has a plate and never reaches the fallback.
+    var plate = scenario.worldPlate || scenario.cover;
+    if (plate) {
+      var img = el("img", "dbplate");
+      img.src = plate; img.alt = scenario.title || ""; img.loading = "lazy";
+      bodyEl.appendChild(img);
+    }
+    var h = el("h3", "dbladderh"); h.textContent = "What you did"; bodyEl.appendChild(h);
+    var ol = el("ol", "dbladder");
+    lines.forEach(function (l) { var li = el("li"); li.textContent = l.text; ol.appendChild(li); });
+    bodyEl.appendChild(ol);
+    var esc = (scenario.escapeBrief || "").trim();
+    if (esc) {
+      var h2 = el("h3", "dbladderh"); h2.textContent = "And to get out"; bodyEl.appendChild(h2);
+      var p = el("p", "dbescape"); p.textContent = esc; bodyEl.appendChild(p);
+    }
+  }
+
   // Build the debrief content into bodyEl. helpers = { isBuilt, phaseOf } supplied by the player.
   function renderGallery(bodyEl, scenario, helpers) {
     bodyEl.innerHTML = "";
     var debrief = scenario.debrief || {};
     var isBuilt = helpers.isBuilt;
+
+    var lines = ladderLines(scenario);
+    if (lines.length) { renderLadder(bodyEl, scenario, lines); return; }
 
     if (debrief.intro) {
       var intro = el("p", "dbintro"); intro.textContent = debrief.intro; bodyEl.appendChild(intro);

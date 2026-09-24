@@ -1165,6 +1165,25 @@
   "boardCols": 3,
   "debrief": {
     "title": "How this world worked",
-    "intro": "One dataset, read four different ways — pivoted, plotted, heat-mapped, and faceted — until the numbers named a diagnosis and saved a life. Here is how each room taught a different way of looking at data, and how the escape was the same skill."
-  }
+    "intro": "Everything in this scenario was one set of patient measurements read four different ways: pivoted into columns, plotted as a relationship, heat-mapped as a whole profile, and faceted into groups. Here is what you actually did, with the story taken back off."
+  },
+  "ladderPlain": [
+    {
+      "room": "room1",
+      "text": "In the first puzzle you reshaped metabolomics_hospital with pivot_wider so that every metabolite became its own column, then plotted 2-aminoisobutyric acid against choline for all 20 patients and ran a straight line through them. The points sit almost exactly on that line, which is what makes the quick, cheap choline assay a trustworthy stand-in for the slow, expensive one."
+    },
+    {
+      "room": "room2",
+      "text": "In the second puzzle you added Elias's panel to the 20 patients, scaled each metabolite so that no one high-concentration marker could dominate, and drew a heatmap — metabolite across, patient up, colour for the scaled level. Reading row against row, patient 54's band of colour mirrors Elias's across the whole panel, highs and lows alike, so patient 54 is the case to reason from. (Creatinine was still out at the lab at this point, so it was not yet in the panel.)"
+    },
+    {
+      "room": "room3",
+      "text": "In the third puzzle you plotted p-cresyl sulfate against indoxyl sulfate and then drew the same plot again faceted by patient_status, healthy in one panel and kidney_disease in the other. Pooled into a single panel the two toxins look tightly linked, at about r = 0.95; inside each group on its own the cloud is nearly shapeless. The faceted panels are the evidence, and they say the pooled line comes mostly from the two groups sitting at different levels rather than from a link that holds within either group — this is Simpson's paradox, and it is why a single trend is always worth splitting by group before you believe it."
+    },
+    {
+      "room": "boss",
+      "text": "In the last puzzle Elias's renal assay came back, so you compared his complete panel against the 20-patient cohort one marker at a time — asking how far above the cohort's average each of the five syndrome markers sat, in standard deviations, since the five run on wildly different scales. Creatinine is the marker where he stands far outside the cohort, higher than any patient in it, which names renal strain and so Nephrocidin."
+    }
+  ],
+  "escapeBrief": "To get out you did this chapter's signature move by hand, with no dataset and no console. Each of the nine postcards is tagged with three things — the month, how far out the place was, and how long the sender stayed — and the editor's note fixes which two of the three the layout is about: month running down the page from the first of summer to the tail end, remoteness running across from roadside to backcountry, and length of stay explicitly not part of the story. Arranged that way the nine cards fill the 3×3 grid, and the highlighted middle row — July, from roadside to backcountry — carries the postage-stamp digits 7, 2 and 9. That is faceting: pick the two variables that carry the question, split on them, set the one that does not aside, and the pattern lines up where you can read it straight off."
 }
