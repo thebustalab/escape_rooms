@@ -848,6 +848,22 @@ def _puzzle_prompt_get(h):
     return (kind, cont[fld] if kind else None)
 
 
+def _puzzle_options(h):
+    """(options, correctIndex) of an MCQ puzzle hotspot, or ([], None) for a puzzle that has no answer
+    list (a live-R `check`, a pick-a-point, a map). Read-only — the console's Puzzles tab shows the
+    options beside the prompt so the whole ladder can be read the way a student meets it, and nothing
+    here is editable through the harness (a distractor set is verified against the CSV by
+    escape_room_puzzles, not nudged in a browser). `correct` is only reported when it actually indexes
+    the list, so a stale or half-authored key reads as "no correct answer marked" rather than silently
+    highlighting option 0."""
+    q = h.get("question") if isinstance(h, dict) else None
+    if not isinstance(q, dict) or not isinstance(q.get("options"), list):
+        return ([], None)
+    opts = ["" if o is None else str(o) for o in q["options"]]
+    c = q.get("correct")
+    return (opts, c if isinstance(c, int) and not isinstance(c, bool) and 0 <= c < len(opts) else None)
+
+
 def _puzzle_prompt_set(spot, text):
     """Write `text` back into the exact field _puzzle_prompt_get read from (in-place). Raises for a stub."""
     kind, cont, fld = _puzzle_prompt_loc(spot)
@@ -857,10 +873,54 @@ def _puzzle_prompt_set(spot, text):
     return kind
 
 
+def _puzzle_queue(doc):
+    """The scenario-level DYNAMIC PUZZLE QUEUE (`shared/puzzle_queue.js`), flattened for the console's
+    Puzzles tab. A queue scenario pins no puzzle to a room: every `queue: true` hotspot is a SLOT that
+    serves the next unsolved rung, so the whole ladder lives in `SCENARIO.puzzleQueue` and the rooms carry
+    none of it. Without this the tab reported `networks/subway` as four rooms with "no prompt written yet"
+    while all four of its prompts were fully authored (Lucas, 2026-09-25).
+
+    Same item shape as `_room_puzzle_prompts`, with `source: "puzzleQueue"` and the queue index. That index
+    IS the rung number and is load-bearing beyond display: the codec keys queue results by queue index, so
+    step k is always entry k for every student (which is the only reason a roamed ladder can be graded at
+    all). An entry with no prompt yet is still emitted, with `kind: None` — a half-authored rung is
+    something the tab must show, not hide."""
+    out = []
+    for i, p in enumerate(doc.get("puzzleQueue") or []):
+        if not isinstance(p, dict):
+            continue
+        kind, text = _puzzle_prompt_get(p)
+        opts, corr = _puzzle_options(p)
+        out.append({"source": "puzzleQueue", "index": i, "id": None,
+                    "label": p.get("label") or ("rung %d" % (i + 1)),
+                    "kind": kind, "prompt": text or "", "options": opts, "correct": corr})
+    return out
+
+
+def _room_queue_slots(room):
+    """How many of this room's hotspots are queue SLOTS (`queue: true`). A slot owns no puzzle — it serves
+    whatever rung the player is up to — so the Puzzles tab must report it as a slot and NOT as a room with
+    an unwritten prompt.
+
+    Committed slots, PLUS any planned slot with no committed counterpart (matched on label slug, the same
+    pairing _room_puzzle_prompts uses). Deliberately NOT "committed wins outright once the room has any
+    committed hotspot": a room mid-build carries committed DOORS from box placement long before its puzzle
+    is materialised, and that rule made `dimensionality_reduction/clouds` report zero slots while its
+    cockpit's slot sat in plannedHotspots."""
+    slug = lambda x: re.sub(r"[^a-z0-9]+", "-", str(x or "").lower()).strip("-")
+    committed = [h for h in (room.get("hotspots") or []) if isinstance(h, dict) and h.get("queue")]
+    seen = {slug(h.get("label")) for h in committed}
+    planned = [h for h in (room.get("plannedHotspots") or [])
+               if isinstance(h, dict) and h.get("queue") and slug(h.get("label")) not in seen]
+    return len(committed) + len(planned)
+
+
 def _room_puzzle_prompts(room):
     """Every editable puzzle prompt in a room, in authoring order, for the story flow. Committed hotspots are
     the live truth; a plannedHotspot is only surfaced when no committed puzzle of the same label(slug) exists
-    yet (an unbuilt room). Each item carries (source, index) so the editor can write it straight back."""
+    yet (an unbuilt room). Each item carries (source, index) so the editor can write it straight back.
+    `options`/`correct` ride along for MCQ puzzles (empty list / None otherwise) — additive fields for the
+    console's Puzzles tab; the story-flow editor keys off (source, index) and ignores them."""
     slug = lambda s: re.sub(r"[^a-z0-9]+", "-", str(s or "").lower()).strip("-")
     out, seen = [], set()
     for i, h in enumerate(room.get("hotspots") or []):
@@ -869,8 +929,10 @@ def _room_puzzle_prompts(room):
         kind, text = _puzzle_prompt_get(h)
         if kind is None:
             continue
+        opts, corr = _puzzle_options(h)
         out.append({"source": "hotspots", "index": i, "id": h.get("id"),
-                    "label": h.get("label") or h.get("id") or "puzzle", "kind": kind, "prompt": text})
+                    "label": h.get("label") or h.get("id") or "puzzle", "kind": kind, "prompt": text,
+                    "options": opts, "correct": corr})
         seen.add(slug(h.get("label")))
     for i, h in enumerate(room.get("plannedHotspots") or []):
         if h.get("type") != "puzzle" or slug(h.get("label")) in seen:
@@ -878,8 +940,10 @@ def _room_puzzle_prompts(room):
         kind, text = _puzzle_prompt_get(h)
         if kind is None:
             continue
+        opts, corr = _puzzle_options(h)
         out.append({"source": "plannedHotspots", "index": i, "id": h.get("id"),
-                    "label": h.get("label") or "puzzle", "kind": kind, "prompt": text, "planned": True})
+                    "label": h.get("label") or "puzzle", "kind": kind, "prompt": text,
+                    "options": opts, "correct": corr, "planned": True})
     return out
 
 
@@ -1101,6 +1165,7 @@ def _scenario_state(base):
             "hotspots": len(hs),
             "entry": r.get("entry") or None,                             # per-room entry card {title,text} (spec story.entries)
             "puzzlePrompts": _room_puzzle_prompts(r),                     # editable puzzle prompts, in order, for the story flow
+            "queueSlots": _room_queue_slots(r),                           # `queue:true` hotspots: they serve the scenario queue, they own no puzzle
             "clues": _room_clues(r),                                      # editable clue bodies, in order, for the story flow
             "lockedMessages": _room_locked_messages(r),                   # editable out-of-order/locked nav messages (lockedBody) for the story flow
             "debrief": r.get("debrief") or "",                           # "how this world worked" paragraph for this room
@@ -1122,7 +1187,13 @@ def _scenario_state(base):
                       for p in planned if p.get("type") == "door"],
         })
     return {"rooms": rooms, "batch": _batch_status(base), "queued": len(_batch_read_queue(base)),
+            "puzzleQueue": _puzzle_queue(doc),                   # the location-independent ladder, when a scenario uses one
             "worldPlate": bool(_world_plate_abs(base)),          # the shared continuity reference, generated first in step 2
+            # VIEWING ONLY — tells the card to show _world/plate_display.png instead of plate.png. It is
+            # deliberately a SEPARATE flag from `worldPlate` (which still means "this scenario has a
+            # generation plate"), so no caller can mistake the collage for a reference. See
+            # _world_plate_display_abs for why the two must never be merged.
+            "worldPlateDisplay": bool(_world_plate_display_abs(base)),
             "worldPlatePrompt": doc.get("worldPlatePrompt", ""),
             "coverPrompt": doc.get("coverPrompt", ""),           # scenario cover + landing (authored in the spec bundle's `cover`)
             "cover": doc.get("cover", ""), "title": doc.get("title", ""),
@@ -2020,11 +2091,14 @@ def _run_generate(slot, tag, prompt, n, quality, size, ref=None, input_fidelity=
         f.write(prompt)
     # Phase 2 world-plate: when a reference plate is set, gen routes through /images/edits so the
     # scene inherits the plate's backdrop/style (see generate_scene.py cmd_gen --ref).
+    # `ref` may be ONE path (a room-context crop) or a LIST (the room's `authoring.plateRefs`, 2026-09-25) —
+    # --ref is repeatable, so several are passed as several flags, never merged into a collage.
     ref_args = []
-    if ref:
-        ref_args += ["--ref", ref]
-        if input_fidelity:
-            ref_args += ["--input-fidelity", input_fidelity]
+    refs = [ref] if isinstance(ref, str) else list(ref or [])
+    for p in refs:
+        ref_args += ["--ref", p]
+    if refs and input_fidelity:
+        ref_args += ["--input-fidelity", input_fidelity]
     start = _reserve(prefix, n)
     for i in range(n):
         out = os.path.join(SCENE, f"{prefix}{start + i}.png")
@@ -2492,13 +2566,66 @@ def _cover_candidates(base):
     filter the gallery used to apply client-side over /api/scenes; it lives here now so the committed
     cover can be byte-matched out of the list without shipping the bytes to the browser."""
     scratch = os.path.join(base, "_scratch")
+    dropped = set(_cover_dismissed(base))     # hand-retired candidates — still on disk, just not offered
     out = []
     for p in glob.glob(os.path.join(scratch, "gpt_cover_*.png")):
         name = os.path.basename(p)
         if "_open" in name or "_x2" in name:
             continue
+        if name in dropped:
+            continue
         out.append((os.path.getmtime(p), name))
     return [n for _m, n in sorted(out, reverse=True)]
+
+
+def _cover_dismissed_path(base):
+    """Ledger of cover candidates retired by hand: `<scenario>/_scratch/cover_dismissed.json`.
+
+    THIS FILE IS MEANT TO BE EDITED BY HAND. There is no un-dismiss button and there is not going to
+    be one — Lucas, 2026-09-25: "I would just ask an agent to put it back." So the format is the
+    dumbest thing that could work, `{"dismissed": ["gpt_cover_1234.png", ...]}`, and putting a cover
+    back in the tab means deleting its line from that list. Nothing else reads it.
+
+    DISMISSED IS NOT DELETED. The PNG stays in `_scratch` untouched; this only stops `_cover_candidates`
+    from listing it. That is the whole difference from `/api/delete-plate-candidate`, which moves the
+    file. Mirrors `_cine_dismissed_path`, which solved the same problem one tab over (2026-09-08).
+
+    It sits in `_scratch` beside the candidates so it travels with the pool, and is not named
+    `gpt_cover_*.png`, so `_cover_candidates`' own glob cannot pick it up as a candidate.
+    """
+    return os.path.join(base, "_scratch", "cover_dismissed.json")
+
+
+def _cover_dismissed(base):
+    """[name, ...] of hand-retired cover candidates. Missing or corrupt reads as nothing dismissed —
+    a ledger this file invites people to edit by hand must never take the tab down when they typo it."""
+    p = _cover_dismissed_path(base)
+    if not os.path.isfile(p):
+        return []
+    try:
+        d = json.load(open(p, encoding="utf-8"))
+    except Exception:  # noqa: BLE001
+        return []
+    names = d.get("dismissed") if isinstance(d, dict) else d
+    return [str(n) for n in names if n] if isinstance(names, (list, tuple)) else []
+
+
+def _cover_dismiss(base, name):
+    """Record one cover candidate as dismissed, idempotently. Returns the stored basename.
+
+    Idempotent because the button is in a grid that redraws from the server: a double-click, or a
+    dismiss racing a refresh, must not write the name twice. Deliberately does NOT check that the file
+    exists — dismissing something already gone is a no-op worth recording, not an error."""
+    name = os.path.basename(str(name or "").strip())
+    if not name:
+        raise ValueError("need image")
+    names = _cover_dismissed(base)
+    if name not in names:
+        names.append(name)
+    p = _cover_dismissed_path(base)
+    os.makedirs(os.path.dirname(p), exist_ok=True)
+    json.dump({"dismissed": names}, open(p, "w", encoding="utf-8"), indent=1)
+    return name
 
 
 def _next_pano_idx(base, room_key):
@@ -2526,27 +2653,35 @@ def _run_gen_room_pano(slot, base, room_key, prompt, size, quality, idx):
     ptmp = os.path.join(scratch, ".l1prompt_%s.txt" % room_key)
     with open(ptmp, "w", encoding="utf-8") as f:
         f.write(prompt)
-    ref = _world_plate_abs(base)   # world plate = shared continuity reference (via /images/edits). NEITHER
+    try:
+        _node = next((r for r in _load_scenario(base).get("rooms", []) if r.get("key") == room_key), {}) or {}
+    except Exception:
+        _node = {}                                # never let a spec read block a generation
+    # The room's reference LIST — `authoring.plateRefs` if it names one, else exactly [the world plate],
+    # which is the shared continuity reference every room has ridden since Phase 2. See _plate_refs_abs
+    # for WHY a list: a scenario with local geometry (libertalia's dive, its hoist) needs several aerials
+    # and must not merge them into a collage, which the model draws AS a collage.
+    refs = _plate_refs_abs(base, room_key, node=_node)
+    _wpr = ((_node.get("authoring") or {}).get("sceneSpec") or {}).get("worldPlateRef")
     # PER-ROOM OPT-OUT (2026-09-21, flat_clustering/waterfalls). The plate rides every room at the model's
     # default fidelity and drags its lighting with it (AGENTS.md -> THE IMAGE MODEL). The guide has always
     # said "a deep-dark or bright room may want to skip the reference", but nothing honoured it: the plate
     # was passed unconditionally. A room whose spec sets `worldPlateRef: false` now generates WITHOUT it —
     # waterfalls' starlit catwalk (the only sky room) and its fire-free spillway and sump, which the plate
-    # pulled warm on the first run. Absent or true: unchanged behaviour.
-    try:
-        _node = next((r for r in _load_scenario(base).get("rooms", []) if r.get("key") == room_key), {}) or {}
-        _wpr = ((_node.get("authoring") or {}).get("sceneSpec") or {}).get("worldPlateRef")
-        if _wpr is False:
-            ref = None
-        # A STRING names an alternative plate under the scenario folder (2026-09-21, clouds): the smear and
-        # half-light copied the plate's city building-for-building, so they ride a copy with the city blurred out.
-        elif isinstance(_wpr, str) and os.path.exists(os.path.join(base, _wpr)):
-            ref = os.path.join(base, _wpr)
-    except Exception:
-        pass                                      # never let the opt-out check block a generation
-    ref_args = ["--ref", ref] if ref else []   # gpt-image-2 NOR gpt-image-2.5 accepts `input_fidelity` (both
-                                               # 400 with invalid_input_fidelity_model, measured 2026-09-09) —
-                                               # omit it; the ref always rides at the model's default
+    # pulled warm on the first run. Absent or true: unchanged behaviour. It still WINS over `plateRefs`:
+    # a room marked "must not ride a reference" must not reacquire one by the side door.
+    if _wpr is False:
+        refs = []
+    # A STRING names an alternative plate under the scenario folder (2026-09-21, clouds): the smear and
+    # half-light copied the plate's city building-for-building, so they ride a copy with the city blurred out.
+    # That is the OLD single-plate override, so an explicit `plateRefs` — newer and room-specific — beats it.
+    # With `plateRefs` absent (every scenario predating 2026-09-25) this chain is the old one exactly.
+    elif not (_node.get("authoring") or {}).get("plateRefs") \
+            and isinstance(_wpr, str) and os.path.exists(os.path.join(base, _wpr)):
+        refs = [os.path.join(base, _wpr)]
+    ref_args = [a for p in refs for a in ("--ref", p)]   # NEITHER gpt-image-2 nor gpt-image-2.5 accepts
+                                               # `input_fidelity` (both 400 with invalid_input_fidelity_model,
+                                               # measured 2026-09-09) — omit it; refs ride at the model's default
     try:
         subprocess.run(["python3", GEN, "gen", "--prompt-file", ptmp, "--out", out,
                         "--quality", quality, "--size", size, *ref_args], check=True, capture_output=True, text=True, env=gen_env())
@@ -3780,6 +3915,104 @@ def _world_plate_abs(base):
     return p if os.path.isfile(p) else None
 
 
+def _world_plate_display_abs(base):
+    """Absolute path to the OPTIONAL `<scenario>/_world/plate_display.png`, or None. VIEWING ONLY.
+
+    ################################################################################################
+    #  NEVER PASS THIS FILE TO A GENERATION. It is not a second plate; it is a PICTURE OF THE       #
+    #  PLATES. If you are here to "tidy up the two plate files into one", STOP — merging them is    #
+    #  the exact bug this pair exists to prevent, and it will be silent.                            #
+    ################################################################################################
+
+    WHY TWO FILES (Lucas, 2026-09-25, generation/libertalia). A scenario can now have several aerials:
+    the master plate plus the local plates a complex transition rides (see `_plate_refs_abs`). Lucas
+    wants the harness CARD to show them all at once — a collage, several views in one row, which is a
+    fine thing to LOOK at and judge continuity from. It is an actively harmful thing to GENERATE from:
+    the model reads a strip of N panels as ONE SCENE THAT CONTAINS N PANELS and dutifully draws the
+    strip. That is the same failure `_plate_refs_abs` was built to avoid by passing N separate refs.
+
+    So the collage gets its own name and is reachable from exactly one place — `_world_plate_card_abs`,
+    which only the harness's world-plate CARD calls. Generation resolves references through
+    `_plate_refs_abs` -> `_world_plate_abs`, which knows only `plate.png` and the per-room `plateRefs`,
+    and NOTHING in this file routes plate_display.png into either. Keep it that way: if a future change
+    makes `_world_plate_abs` (or `_plate_refs_abs`, or a room's `plateRefs` default) fall back to the
+    display file, every room in the scenario starts drawing a panel strip. test_display_plate.py pins
+    both halves — that the card prefers it, and that the generation resolvers never return it.
+
+    OPTIONAL by design: absent is the normal case, and every scenario predating this has no such file.
+    """
+    p = os.path.join(base, "_world", "plate_display.png")
+    return p if os.path.isfile(p) else None
+
+
+def _world_plate_card_abs(base):
+    """What the harness's world-plate CARD should show: the display collage if one exists, else the
+    plate itself. The ONLY caller allowed to prefer plate_display.png — see `_world_plate_display_abs`
+    for why generation must never reach this function."""
+    return _world_plate_display_abs(base) or _world_plate_abs(base)
+
+
+MAX_PLATE_REFS = 16     # OpenAI's ceiling on reference images per /images/edits call; generate_scene.py
+                         # `_gen_with_refs` exits on more, so cap HERE rather than lose the whole draw.
+
+
+def _plate_refs_abs(base, room_key, node=None):
+    """The reference images ONE room's generation should ride, as absolute paths (possibly empty).
+
+    WHY THIS EXISTS (2026-09-25, generation/libertalia). A scenario can now legitimately have MORE THAN
+    ONE aerial: the master plate for the whole island PLUS local plates for the bits of geometry a
+    complex transition has to stay consistent about (libertalia's dive descent; its hoist run). Until
+    now the harness passed exactly one reference — `_world_plate_abs(base)` — even though
+    `generate_scene.py` has accepted up to 16 since 2026-09-21 (`_gen_with_refs`, posted as `image[]`).
+    That left only two ways to use several plates, and both are bad: drop the global anchor, or merge
+    the plates into one collage. THE COLLAGE IS THE ACTIVELY HARMFUL ONE — the model reads a strip of N
+    panels as one scene that CONTAINS N panels, and dutifully draws the strip. Passing them as N
+    separate refs is what the endpoint is for.
+
+    A room names its own list in `room.authoring.plateRefs`: paths RELATIVE TO THE SCENARIO DIRECTORY,
+    e.g. ["_world/plate.png", "_world/locals/dive_a.png"]. It sits directly in `authoring` — not in
+    `authoring.sceneSpec` alongside `worldPlateRef` — because a room does NOT need a sceneSpec to be
+    generated: libertalia's seventeen rooms carry `scenePrompt` and no spec at all, and a reference
+    list the one scenario that needed it could not reach would be useless.
+
+    ABSENT OR EMPTY -> exactly [the world plate]: today's behaviour, unchanged, for every scenario that
+    predates this. A listed file that does not exist is DROPPED WITH A WARNING, never raised — a stale
+    path in a spec must cost you that one local plate, not an eight-hour overnight run. If every entry
+    is missing we fall back to the plate rather than generating with no anchor at all.
+    """
+    if node is None:
+        try:
+            node = next((r for r in _load_scenario(base).get("rooms", []) if r.get("key") == room_key), {}) or {}
+        except Exception:                        # noqa: BLE001 — never let a spec read block a generation
+            node = {}
+    want = (node.get("authoring") or {}).get("plateRefs")
+    out = []
+    if isinstance(want, (list, tuple)):
+        seen = set()
+        for rel in want:
+            rel = str(rel or "").strip()
+            if not rel:
+                continue
+            p = os.path.join(base, rel)
+            if not os.path.isfile(p):
+                print("plateRefs: %s/%s — no such file, dropped: %s" % (
+                    os.path.basename(base.rstrip(os.sep)), room_key, rel), flush=True)
+                continue
+            if p in seen:
+                continue
+            seen.add(p)
+            out.append(p)
+        if len(out) > MAX_PLATE_REFS:
+            print("plateRefs: %s/%s — %d refs, capped at %d (OpenAI's limit); dropped: %s" % (
+                os.path.basename(base.rstrip(os.sep)), room_key, len(out), MAX_PLATE_REFS,
+                ", ".join(os.path.basename(p) for p in out[MAX_PLATE_REFS:])), flush=True)
+            out = out[:MAX_PLATE_REFS]
+    if out:
+        return out
+    p = _world_plate_abs(base)
+    return [p] if p else []
+
+
 def _set_world_plate(image, base):
     """Copy a chosen _scratch candidate to <scenario>/_world/plate.png (a stable, pushable name)
     and point `scenario.worldPlate` at it. Mirrors _set_cover: churny candidates stay in
@@ -4313,8 +4546,11 @@ class H(http.server.SimpleHTTPRequestHandler):
                     ref = _room_ref_crop(COMMIT_BASE, slot)
                     if not ref:
                         return self._json({"ok": False, "error": "no room reference — this room needs an incoming door (or a marked refFrom) whose source room has a committed scene"}, 400)
-                elif req.get("worldPlate"):        # Phase 2: reference the scenario's world plate
-                    ref = _world_plate_abs(COMMIT_BASE)
+                elif req.get("worldPlate"):        # Phase 2: reference the scenario's world plate(s).
+                    # `slot` IS the room key here (it is what _room_ref_crop keys on above), so this
+                    # honours the room's own `authoring.plateRefs`; with none set it returns exactly
+                    # [the world plate] — i.e. what this branch has always sent.
+                    ref = _plate_refs_abs(COMMIT_BASE, slot)
                     if not ref:
                         return self._json({"ok": False, "error": "no world plate set for this scenario — set one first"}, 400)
                 if not _start(slot, "generate",
@@ -5333,6 +5569,17 @@ class H(http.server.SimpleHTTPRequestHandler):
                 except ValueError as ve:
                     return self._json({"ok": False, "error": str(ve)}, 400)
                 return self._json({"ok": True, "cover": cover})
+            if route == "/api/cover-dismiss":    # drop a cover candidate from the tab — the file STAYS on disk
+                req = self._body()
+                try:
+                    base = _scenario_base(req.get("chapter"), req.get("scenario"))
+                    name = _cover_dismiss(base, req.get("image"))
+                except ValueError as ve:
+                    return self._json({"ok": False, "error": str(ve)}, 400)
+                # Idempotent: dismissing a name already in the ledger is a 200, not a 409. The grid
+                # redraws from the server, so a double-click or a dismiss racing a refresh must not
+                # surface an error for work that is already done.
+                return self._json({"ok": True, "image": name})
             if route == "/api/set-world-plate":
                 req = self._body()
                 try:

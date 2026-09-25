@@ -100,6 +100,97 @@ consistency/
 decoder/
 tests/
 
+# PER-SCENARIO TEST SUITES. `rooms/<chapter>/<scenario>/test_<name>.py` re-derives every rung's answer
+# from the CSV, so each one spells its scenario's answers out in plain text — subway's names all four
+# genes in its module docstring. They are authoring/CI files: nothing in any `play.html`, `scenario.json`
+# or `shared/*` fetches them, and `run_all_tests.py` finds them on DISK, not over HTTP. They were being
+# published: all thirteen were live and fetchable on 2026-09-25 (verified with curl, every one a 200),
+# because the 2026-09-04 "publish play-required only" pass ignored the authoring DIRECTORIES but never
+# the test files that sit inside `rooms/`. `tests/` and `authoring_v2/` were already covered; this is
+# the third home.
+# NOTE (as everywhere in this file): .gitignore does NOT untrack an already-committed file. Clearing the
+# whole backlog at once — this block, the five ignored root directories, subway's answer-key map and the
+# 2026-09-25 third pass below — is ONE command on the Mac, in the escape_rooms repo (the same re-apply
+# incantation already written at the top of this file):
+#     git rm -r --cached . && git add . && git commit -m "publish play-required files only"
+# Verified 2026-09-25 against the LIVE GitHub tree before these rules were written: it removes 639 files
+# (121 MB) and leaves 791 — media, data CSVs, scenario.json, play.html, shared/, the audio CREDITS files
+# and two infrastructure files. The only play-SHAPED file it removes is subway's network_map.png, which
+# is an answer key and is meant to go. Disk files are untouched; the next deploy's bulk staging carries
+# the deletions to the live site.
+rooms/**/test_*.py
+
+# --- PUBLISH PLAY-REQUIRED ONLY: the third pass (2026-09-25, Lucas) ---
+# The 2026-08-06 and 2026-09-04 passes covered authoring RECORDS and authoring DIRECTORIES at the repo
+# root. Neither reached the authoring output that accumulates INSIDE `rooms/`, so an audit against the
+# live GitHub tree found 471 more files (118 MB) still published, none of them fetched by any player.
+# Everything below was checked against every `scenario.json`, `play.html` and `shared/*.js` first.
+
+# ALL PYTHON UNDER rooms/. The player's engine is WebR — it runs R, and fetches no Python, ever. So
+# every .py here is authoring: dataset builders, figure/tile/seal makers, `_motion_specs.py`,
+# waterfalls' `cave_engine/` package, and the per-scenario `test_*.py` (which get their own block below
+# because they leak ANSWERS, a sharper problem than footprint).
+#
+# THE REGENERATORS STAY WHERE THEY ARE — they are NOT moved to `_scratch/` (Lucas, 2026-09-25, having
+# asked whether moving would break anything: it would). Every one of them anchors on
+# `os.path.dirname(__file__)` and five also walk `../`, so relocating a script one directory deeper
+# silently changes where it reads and writes — wrong-output-path failures, not errors. And the
+# versioning outcome is identical either way: in this repo, unpublished means unversioned, because the
+# git history lives only on the Mac. Ignoring them in place keeps them working, keeps Syncthing
+# carrying them to both machines, and costs nothing that moving them would have saved.
+rooms/**/*.py
+
+# AGENT + PROBE WORKING DIRECTORIES. `_long_agent/` is room_iterate's run state (plan, progress,
+# per-cycle evaluations and decisions, render logs) and `_motion_probe*/` are motion parameter sweeps.
+# 238 files, 118 MB — nearly the whole of the overrun. The root AGENTS.md left `_long_agent/` explicitly
+# undecided ("whether it belongs in .gitignore beside _scratch/ is undecided"); it is decided here.
+# NOTE they are invisible on the WEBSITE either way — GitHub Pages will not serve a path segment
+# starting with `_` — but the repo is PUBLIC, so they are browsable on github.com. That accident is
+# probably why this went unnoticed; it is not a safeguard to rely on.
+**/_long_agent/
+**/_motion_probe*/
+
+# PER-ROOM AUTHORING RECORDS dropped beside the art they describe: the art judge's verdict on a still
+# (`scene.judge.json`, `cine_<state>.judge.json`), the cinemagraph candidate ledger (`*.cand.json`),
+# the repair-mask and patch records (`*.mask.json`, `*.patches.json`), the publish ledger
+# (`.cine_published.json`), and the scene-spec bundle (authoring INPUT — the engine reads
+# scenario.json, which the spec is compiled into).
+# NB: gitignore has NO trailing comments — a `#` only starts a comment at the START of a line. These
+# five patterns were written with trailing comments first time round and silently matched nothing,
+# which the check-ignore pass against the live tree caught. Keep comments on their own lines.
+**/*.judge.json
+**/*.cand.json
+**/*.mask.json
+**/*.patches.json
+**/.cine_published.json
+**/scene_specs_*.json
+
+# AUTHORING PAGES living in a scenario directory. Verified unreferenced by any `play.html` or
+# `scenario.json`: waterfalls' `puzzle_editor.html` is a visual authoring tool, and its
+# `player_map.html` was demoted to authoring-only on 2026-09-20 when it stopped being a player hotspot.
+**/puzzle_editor.html
+**/player_map.html
+
+# The scenario inventory is authoring output (scenario_inventory.py writes it). No runtime consumer:
+# nothing in rooms/, shared/ or the surrounding site fetches it.
+rooms/scenario_inventory.json
+
+# PLAYWRIGHT OUTPUT outside tests/. `tests/test-results/` was already ignored; two more copies exist
+# at the repo root and under shared/, left by a run started from the wrong directory.
+**/test-results/
+
+# FOUR ONE-OFF AUTHORING INPUTS, named explicitly rather than by pattern because each is the only file
+# of its kind and a broad rule here could later swallow real play data. Each was checked against the
+# CURRENT scenario.json, play.html and shared/*.js: none is fetched. The only things that mention them
+# are AGENTS.md, notes.md, the builder scripts that write them, the test files, and stale .bak copies.
+rooms/data_vis/alaska/escape_grids/grids.json
+rooms/data_vis2/airship/nest/codes.json
+rooms/flat_clustering/waterfalls/puzzle.json
+rooms/hierarchical_clustering/temple/figures/tiles/MANIFEST.json
+
+# DELIBERATELY STILL PUBLISHED: `**/CREDITS.md` (audio attribution). It is a record rather than play
+# content, but publishing an attribution file for CC-licensed audio is the point of having one.
+
 # ANSWER-KEY MAP RENDERS. `network_map.png` is subway's answer key — it draws the lines, both ghost
 # stations and the marked hops, and a player who sees it has solved the escape. Verified 2026-09-07
 # that nothing references it as a played asset (it appears in scenario.json only inside prose design

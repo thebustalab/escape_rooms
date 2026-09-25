@@ -40,10 +40,10 @@
   "puzzleQueue": [
     {
       "label": "The driving desk — the reference pair",
-      "note": "RUNG 1 · pairwise correlation. ANSWER XAN_4574 (|r| 0.832 vs 0.079 for the runner-up, 10.5x). The probe is deliberately a SATELLITE pair — probing inside the pigment module would return XAN_1192 and spoil the boss. Correct index 2.",
-      "starterCode": "lichen_expression",
+      "note": "RUNG 1 · pairwise similarity. ANSWER XAN_4574 (similarity 9.09 vs 4.74 for the runner-up; two unrelated genes floor at 4.15, so the winner sits 4.94 above the floor and the runner-up 0.59 — 8.3x). The probe is deliberately a SATELLITE pair — probing inside the pigment module would return XAN_1192 and spoil the boss. Correct index 2.",
+      "starterCode": "lichen_expression %>%\n  select(gene_id, lichen_isolate, expression_normalized) %>%\n  pivot_wider(names_from = \"lichen_isolate\", values_from = \"expression_normalized\") -> lichen_expression_wide\n\nlichen_expression_wide",
       "question": {
-        "prompt": "Your company keeps one gene in mind as a reference: <code>XAN_4418</code>. Its behaviour is well understood.<br><br>The sheets under the clip on this desk are the gene expression records from the whole lichen crop: two hundred samples, twenty-four genes, one expression level reading for each.<br><br><b>Which gene is most similar to XAN_4418 across the samples?</b>",
+        "prompt": "Your company keeps one gene in mind as a reference: <code>XAN_4418</code>. Its behaviour is well understood.<br><br>The sheets under the clip on this desk are the gene expression records from the whole lichen crop: two hundred isolates, twenty-four genes, one reading for each — and beside every reading, the same figure put on a common footing across all of them, so that one gene can be compared against another directly.<br><br><b>Which gene is most similar to XAN_4418 across the isolates?</b>",
         "options": [
           "XAN_1815",
           "XAN_1770",
@@ -56,21 +56,21 @@
         "correct": 2,
         "maxAttempts": 3,
         "feedback": {
-          "correct": "Correct — noted in your field notebook: XAN_4574 tracks the reference gene XAN_4418, |r| 0.83.",
+          "correct": "Correct — noted in your field notebook: XAN_4574 tracks the reference gene XAN_4418, similarity 9.1 where two unrelated genes score about 4.2.",
           "wrong": [
-            "Correlate every other gene's expression against XAN_4418's across all two hundred samples, then rank by the size of the correlation — its sign does not matter here, only its magnitude.",
-            "One pair stands well clear of the rest: the winner is above 0.8 while every other gene falls below 0.1. If your answer sits somewhere in that crowd below 0.1, you have picked something out of the noise.",
-            "Check you correlated against XAN_4418 itself. The strongest pair anywhere in this dataset does not involve XAN_4418 at all, and two of the options belong to it."
+            "Build the distance matrix the way the chapter does: <code>runMatrixAnalysis()</code> with <code>analysis = \"dist\"</code> and <code>output_format = \"long\"</code>, which gives one row per pair of genes. The genes are what you are comparing, so <code>gene_id</code> is what goes in <code>columns_w_sample_ID_info</code>, and the two hundred isolate columns carry the values.",
+            "Keep only the rows involving XAN_4418 — it can sit on either side, because a long distance table lists every pair both ways — and then <code>arrange()</code> by distance. Nearest is most similar: the two run in opposite directions, which is what <code>similarity = 1 / (1 + distance) * 100</code> is for.",
+            "Check you compared against XAN_4418 itself. The closest pair anywhere in this dataset does not involve XAN_4418 at all, and two of the options belong to it."
           ]
         }
       }
     },
     {
       "label": "The driving desk — the control gene",
-      "note": "RUNG 2 · threshold + one-vs-all. ANSWER XAN_6246, the sole isolate at |r|>0.75 (its strongest tie to anything is 0.103). THE THRESHOLD IS STATED IN THE PROMPT ON PURPOSE — the answer is stable only over |r| 0.15-0.7569; at 0.76 XAN_1815 and XAN_2781 also become isolates and the rung has three answers. NO HINT MAY SUGGEST A CUTOFF ABOVE 0.75. Correct index 0.",
-      "starterCode": "lichen_expression",
+      "note": "RUNG 2 · threshold + one-vs-all. ANSWER XAN_6246, the sole isolate at similarity>7.8 (its strongest tie to anything is 4.46, against a 4.15 floor). THE THRESHOLD IS STATED IN THE PROMPT ON PURPOSE — the ladder is intact only over similarity 7.2-7.925: above 7.925 XAN_1815 (the TAUGHT TRAP) becomes an isolate too and rungs 2 AND 3 both break; below ~7.2 the module closes into a clique and rung 4's degree winner TIES. 7.8 sits 0.115 clear of the nearest real edge below it and 0.125 below the ceiling. NO HINT MAY SUGGEST A CUTOFF OUTSIDE THAT BAND. Correct index 0.",
+      "starterCode": "lichen_expression %>%\n  select(gene_id, lichen_isolate, expression_normalized) %>%\n  pivot_wider(names_from = \"lichen_isolate\", values_from = \"expression_normalized\") -> lichen_expression_wide\n\nlichen_expression_wide",
       "question": {
-        "prompt": "Before your company will trust an assay it wants a control: a gene that is not correlated with any other gene in the dataset. Suppose two genes count as co-expressed here when the magnitude of their similarity exceeds 0.75.<br><br><b>Which gene has no co-expression partners at all?</b>",
+        "prompt": "Before your company will trust an assay it wants a control: a gene that is not co-expressed with any other gene in the crop. Suppose two genes count as co-expressed here when their <b>similarity</b> is above <b>7.8</b>.<br><br><b>Which gene has no co-expression partners at all?</b>",
         "options": [
           "XAN_6246",
           "XAN_1770",
@@ -83,21 +83,21 @@
         "correct": 0,
         "maxAttempts": 3,
         "feedback": {
-          "correct": "Correct — noted in your field notebook: XAN_6246 is the control gene, with no partners at |r| > 0.75.",
+          "correct": "Certified — XAN_6246 is the control: its closest relative anywhere in the crop scores 4.5, against a floor of 4.2. Noted in your field notebook.",
           "wrong": [
-            "For each gene, count how many of the other twenty-three it is co-expressed with at a magnitude above 0.75. The control is the one whose count comes out at zero.",
-            "Several genes have exactly one partner, and one partner is not the same as none — if your answer has a single strong tie, it is a near miss rather than the control.",
-            "Hold the threshold at 0.75 as given. The control is isolated by a wide margin — its strongest tie to anything is barely above 0.1 — while several other genes sit just the other side of the line and would drift in and out if you moved it."
+            "Start from the same long distance table, then turn the distances into similarities: <code>mutate(similarity = 1 / (1 + distance) * 100)</code>. Keep only the pairs above 7.8 — those kept pairs ARE the network.",
+            "Now find the gene that appears in none of them. <code>setdiff()</code> between every <code>gene_id</code> and the genes still named in the kept pairs will name it, or group the kept pairs by gene and see which of the twenty-four never shows up. Nine genes have exactly one partner, and one partner is not the same as none.",
+            "Hold the threshold at 7.8 as given. The control stands apart by a wide margin — its closest relative anywhere scores 4.5, against a floor of about 4.2 — while the next-loneliest gene sits at 7.9 and would cross the line if you moved it."
           ]
         }
       }
     },
     {
       "label": "The driving desk — the standard protocol",
-      "note": "RUNG 3 · module + abundance. THE TAUGHT TRAP. ANSWER XAN_1815 (1434 units vs 245 for the next in module, 5.9x) — which has DEGREE 1. This is the method the works has re-seeded by for nine seasons while the colour thinned, and rung 4 is its correction. Correct index 5.",
-      "starterCode": "lichen_expression",
+      "note": "RUNG 3 · module + abundance. THE TAUGHT TRAP. ANSWER XAN_1815 (1434 units vs 245 for the next in module, 5.9x) — which has DEGREE 1. Abundance is read from `expression`, NOT from `expression_normalized`, which is centred and carries no abundance at all. This is the method the works has re-seeded by for nine seasons while the colour thinned, and rung 4 is its correction. Correct index 5.",
+      "starterCode": "lichen_expression %>%\n  select(gene_id, lichen_isolate, expression_normalized) %>%\n  pivot_wider(names_from = \"lichen_isolate\", values_from = \"expression_normalized\") -> lichen_expression_wide\n\nlichen_expression_wide",
       "question": {
-        "prompt": "Your company grows each season's crop from a patch of the previous year's crop. The standard protocol says to choose the patch from this year's crop based in part on the following steps: (i) find the largest connected group of co-expressed genes (using the same 0.75 rule as before — start at any gene and follow correlations above 0.75 from gene to gene, so two genes belong to the same group if a chain of correlations links them), then (ii) find the gene within that group that has the highest average expression. In the current data set, which gene do those steps lead to?",
+        "prompt": "Your company grows each season's crop from a patch of the previous year's crop. The standard protocol says to choose the patch from this year's crop based in part on the following steps: (i) find the largest connected group of co-expressed genes (using the same rule as before — start at any gene and follow similarities above 7.8 from gene to gene, so two genes belong to the same group if a chain of links joins them), then (ii) find the gene within that group that has the highest average expression. In the current data set, which gene do those steps lead to?",
         "options": [
           "XAN_3514",
           "XAN_1192",
@@ -112,19 +112,19 @@
         "feedback": {
           "correct": "Correct — noted in your field notebook: those steps lead to XAN_1815, the gene with the highest average expression in the largest co-expression group at ~1434 units.",
           "wrong": [
-            "Find the module first: the largest CONNECTED group. Start at any gene, follow every correlation above 0.75 to its partners, then follow theirs, until nothing new joins — that whole chain is one group, and two genes belong to it even if they are not directly correlated with each other. Only then compare average expression, and only within that group.",
-            "Stay inside the module. The highest-expressed genes in the whole dataset run above 5000 units and are not members of it; if your answer is one of those, you ranked across every gene instead of within the group.",
-            "Inside the module it is not close: the winner averages around 1400 units where the next one down is under 250."
+            "Draw it. <code>buildNetwork()</code> wants a plain edge list — two node columns and a weight — so build the pairs above 7.8, drop the <code>distance</code> column, and hand the remaining three columns to <code>edgelist</code>. Then plot <code>net$edges</code> with <code>geom_segment()</code> and <code>net$nodes</code> with <code>geom_point()</code>, and add <code>geom_text(aes(label = node_name))</code> so every gene is named. Watch the third column: whatever sits there is taken as the weight, so leaving <code>distance</code> in draws the LEAST similar pairs as the strongest links.",
+            "The largest clump on that picture is the group, and you can read its members straight off it — eight genes, where the next-biggest clump has only five, so there is nothing to agonise over. With those names in hand, go back to <code>lichen_expression</code>, keep those genes, group by <code>gene_id</code> and take the mean of <code>expression</code>. Rank on <code>expression</code>, NOT on <code>expression_normalized</code>: the normalised figures were only ever for measuring distance, they are centred, and every gene averages about zero on them.",
+            "Stay inside the group. The loudest genes in the whole crop run above 5000 units and are not members of it — if your answer is one of those, you ranked across every gene instead of within the clump. Inside it the winner is not close: around 1400 units where the next one down is under 250."
           ]
         }
       }
     },
     {
       "label": "The driving desk — the regulator",
-      "note": "RUNG 4 · BOSS. module + network position. ANSWER XAN_1192 — the LOWEST-expressed gene in the dataset (71.5 units, rank 24 of 24), co-expressed with EVERY other member of its module (degree 7 vs 4 for the next). Decoy XAN_3514: loudest in the transcriptome at 5644 units, degree 3, and not even in the module. Correct index 3.",
-      "starterCode": "lichen_expression",
+      "note": "RUNG 4 · BOSS. module + network position. ANSWER XAN_1192 — the LOWEST-expressed gene in the dataset (71.5 units, rank 24 of 24), co-expressed with EVERY other member of its module (degree 7 vs 5 for the next at similarity>7.8). Decoy XAN_3514: loudest in the transcriptome at 5644 units, degree 3, and not even in the module. Correct index 3.",
+      "starterCode": "lichen_expression %>%\n  select(gene_id, lichen_isolate, expression_normalized) %>%\n  pivot_wider(names_from = \"lichen_isolate\", values_from = \"expression_normalized\") -> lichen_expression_wide\n\nlichen_expression_wide",
       "question": {
-        "prompt": "For the past nine seasons, each crop has had progressively less pigment than the previous ones. This year, your team is going to try a new strategy, based on the following steps: (i) find the largest connected group of co-expressed genes (using the same 0.75 rule as before — start at any gene and follow correlations above 0.75 from gene to gene, so two genes belong to the same group if a chain of correlations links them), then (ii) find the gene within that group that is connected to the highest number of other genes. In the current data set, which gene do those steps lead to?",
+        "prompt": "For the past nine seasons, each crop has had progressively less pigment than the previous ones. This year, your team is going to try a new strategy, based on the following steps: (i) find the largest connected group of co-expressed genes (using the same rule as before — start at any gene and follow similarities above 7.8 from gene to gene, so two genes belong to the same group if a chain of links joins them), then (ii) find the gene within that group that is connected to the highest number of other genes. In the current data set, which gene do those steps lead to?",
         "options": [
           "XAN_3514",
           "XAN_1815",
@@ -139,9 +139,9 @@
         "feedback": {
           "correct": "Correct — noted in your field notebook: those steps lead to XAN_1192, which regulates pigment production — the quietest gene in the whole record at ~72 units, yet connected to every other gene in its group.",
           "wrong": [
-            "Work inside the pigment module again, but rank its members by position rather than by size: for each one, count how many other members it is co-expressed with above 0.75.",
-            "The regulator is tied to every other member of its module and nothing else in the block comes close. Abundance will never find it — it is the quietest gene in the entire record.",
-            "If your answer is the loudest gene in the crop record, that is the bystander this whole assay exists to rule out: it runs at more than seventy times the regulator and is not even a member of the module."
+            "Same group as before, ranked by position rather than by size. Keep the pairs above 7.8 where BOTH genes are members of the group, then count how many times each gene appears — that count is how many of the others it is co-expressed with.",
+            "The regulator is tied to every other member of its group, where the next gene down reaches only five. Abundance will never find it — it is the quietest gene in the entire record.",
+            "If your answer is the loudest gene in the crop record, that is the bystander this whole assay exists to rule out: it runs at more than seventy times the regulator and is not even a member of the group."
           ]
         }
       }
@@ -149,7 +149,7 @@
   ],
   "debrief": {
     "title": "How this world worked",
-    "intro": "Everything in this scenario was one technique in costume: network analysis - describing a set of things by which of them are connected to which, rather than by how much each one carries. You did it twice over, on two networks that share nothing but this shift: one you built yourself out of correlations between gene expression readings, and one you could only observe by riding every line on the railway."
+    "intro": "Everything in this scenario was one technique in costume: network analysis - describing a set of things by which of them are connected to which, rather than by how much each one carries. You did it twice over, on two networks that share nothing but this shift: one you built yourself out of the distances between gene expression readings, and one you could only observe by riding every line on the railway."
   },
   "worldPlatePrompt": "A wide establishing view inside a Victorian underground railway that stood derelict for a century and is now being worked again as a lichen farm. TIME-NEUTRAL soft even underground light, neither dawn nor dusk, no daylight in this frame. THE CROP IS THE ARCHITECTURE, AND THIS IS THE MOST IMPORTANT THING IN THE FRAME: the lichen grows ON THE FABRIC OF THE TUNNEL ITSELF, not in containers — thick living sheets of flat orange rosettes and swollen grey-green crusts spreading across the glazed wall tile, climbing the pilasters and furring the brick soffits of the arches overhead, so the walls themselves are visibly alive and shaggy with it. It is a crop growing on a building. Galvanised racking and plastic trays of cut crust stand about as the HARVEST TAKEN OFF THOSE WALLS — the product, never the source. Nothing is cultivated in a tray. THE FABRIC UNDER IT IS OLD AND DAMAGED: glazed brick and tile in ochre, saffron and dirty cream, much of it crazed, chipped or missing with the bedding mortar showing through; paint peeling in sheets off cast-iron columns; rust and water stains bleeding down; perished cable looped on old porcelain insulators; sooted segmental brick arches; granite platform edges worn hollow. A CREW WORKS HERE NOW, VISIBLY AND WELL: cheap bright LED work-lamps on yellow flex strung along the arches, duckboards laid over the wet, cable ties and gaffer tape, a kettle and enamel mugs on a plank shelf, a coat on a hook, and notices, work rotas, tally sheets and curling postcards tacked and taped to the tile with chalked marks and scratched tallies beside them. Repairs done with ingenuity — a propped timber, a patched panel, a hose run into a channel. TWO COLOUR TEMPERATURES, AND BOTH MUST BE STRONGLY PRESENT — this must NOT be a monochrome amber or sepia picture. WARM: pools of amber lamplight around the work-lamps and the crew's corner. COLD: everywhere the lamps do not reach, a distinct COLD BLUE-GREEN DAMP — wet black tile going blue in the shadow, green-black standing water, cold blue-green light down the tunnel mouths and in the depths of the arches, the chill of a place with a river behind the wall. The cold blue-green should occupy at least as much of the frame as the warm amber, and the two should meet in clear contrast rather than blending into brown. Damp air, faint haze, film grain. Photographic and beautiful. THE MOOD IS WARM, PURPOSEFUL AND CHARACTERFUL — a magnificent run-down place that a good crew has taken on and made theirs. It is emphatically NOT eerie, NOT spooky, NOT creepy, NOT haunted, NOT menacing, NOT post-apocalyptic and NOT an abandoned ruin. Dark and dirty in places, and still plainly and warmly worked in. No cobwebs, no gloom for its own sake, no horror atmosphere of any kind. No large blank empty wall areas — every surface carries the marks and clutter of a working place. No people, no lettering, no captions, no text, no signage or readable writing of any kind anywhere. No sepia monochrome, no uniform brown or orange cast over the whole image.",
   "coverPrompt": "A bold, graphic, MID-TO-HIGH-KEY square poster in flat vector-poster shapes. A single Victorian underground railway arch seen head-on and filling most of the frame, its opening a LARGE GLOWING field of warm amber lamplight — the brightest thing in the picture and the first thing the eye finds. Growing across that glowing arch, in strong flat silhouette, a bold band of LICHEN: fat round orange rosettes and a ragged grey-green crust spreading in from the arch's rim and over the tilework, deliberately oversized and simplified so it still reads at the size of a postage stamp. Two rails run out of the arch toward the viewer as two clean converging lines. The surround is a cool blue-green tile field, MID-TONE — clearly darker than the arch but never black. Three values only: bright amber, mid blue-green, and the orange crop. Big simple shapes, few of them, strong edges. NOT a dark or murky picture: no near-black fields, no deep shadow, no gloom, nothing dim, and no photographic haze — this is a printed poster, not a photograph of a tunnel. Square. No people, no lettering, no captions, no text, no logos.",
@@ -3475,7 +3475,7 @@
           "lockedBody": "The lever will not move. The line is dead until the desk is energised."
         }
       ],
-      "debrief": "The madder line. Every run you made on it was an edge you observed rather than computed — handed to you as a fact, by having been there. That is the difference between this network and the one you built out of correlations at the driving desk: the genes' edges you derived and thresholded; the rails' edges you simply rode.",
+      "debrief": "The madder line. Every run you made on it was an edge you observed rather than computed — handed to you as a fact, by having been there. That is the difference between this network and the one you built out of similarities at the driving desk: the genes' edges you derived and thresholded; the rails' edges you simply rode.",
       "hotspots": [
         {
           "id": "line_map",
@@ -4093,7 +4093,7 @@
           "lockedBody": "The lever will not move. The line is dead until the desk is energised."
         }
       ],
-      "debrief": "The woad line. Every run you made on it was an edge you observed rather than computed — handed to you as a fact, by having been there. That is the difference between this network and the one you built out of correlations at the driving desk: the genes' edges you derived and thresholded; the rails' edges you simply rode.",
+      "debrief": "The woad line. Every run you made on it was an edge you observed rather than computed — handed to you as a fact, by having been there. That is the difference between this network and the one you built out of similarities at the driving desk: the genes' edges you derived and thresholded; the rails' edges you simply rode.",
       "hotspots": [
         {
           "id": "line_map",
@@ -4727,7 +4727,7 @@
           "lockedBody": "The lever will not move. The line is dead until the desk is energised."
         }
       ],
-      "debrief": "The weld line. Every run you made on it was an edge you observed rather than computed — handed to you as a fact, by having been there. That is the difference between this network and the one you built out of correlations at the driving desk: the genes' edges you derived and thresholded; the rails' edges you simply rode.",
+      "debrief": "The weld line. Every run you made on it was an edge you observed rather than computed — handed to you as a fact, by having been there. That is the difference between this network and the one you built out of similarities at the driving desk: the genes' edges you derived and thresholded; the rails' edges you simply rode.",
       "hotspots": [
         {
           "id": "line_map",
@@ -5356,7 +5356,7 @@
           "lockedBody": "The lever will not move. The line is dead until the desk is energised."
         }
       ],
-      "debrief": "The verdigris line. Every run you made on it was an edge you observed rather than computed — handed to you as a fact, by having been there. That is the difference between this network and the one you built out of correlations at the driving desk: the genes' edges you derived and thresholded; the rails' edges you simply rode.",
+      "debrief": "The verdigris line. Every run you made on it was an edge you observed rather than computed — handed to you as a fact, by having been there. That is the difference between this network and the one you built out of similarities at the driving desk: the genes' edges you derived and thresholded; the rails' edges you simply rode.",
       "hotspots": [
         {
           "id": "line_map",
@@ -5999,7 +5999,7 @@
           "hint": "The direction lever. Throw it up-line or down-line and the train runs through to the next station it stops at."
         }
       ],
-      "debrief": "The lampblack line. Every run you made on it was an edge you observed rather than computed — handed to you as a fact, by having been there. That is the difference between this network and the one you built out of correlations at the driving desk: the genes' edges you derived and thresholded; the rails' edges you simply rode.",
+      "debrief": "The lampblack line. Every run you made on it was an edge you observed rather than computed — handed to you as a fact, by having been there. That is the difference between this network and the one you built out of similarities at the driving desk: the genes' edges you derived and thresholded; the rails' edges you simply rode.",
       "hotspots": [
         {
           "id": "line_map",
@@ -6572,7 +6572,7 @@
   ],
   "_designNotes": {
     "phase": "tab 1 authored 2026-09-06 from the settled puzzle + story phases in notes.md",
-    "ladder": "Verified, and re-derived on every run by test_subway.py. Cutoff |r|>0.75; the threshold rung is stable over 0.15-0.7569 only (the old 0.72-0.78 claim was wrong above 0.7569 — see puzzleQueue[1]). XAN_4574 / XAN_6246 / XAN_1815 / XAN_1192.",
+    "ladder": "Verified, and re-derived on every run by test_subway.py. METRIC CHANGED 2026-09-25 (Lucas), twice in one day. First from |r|>0.75 to the CHAPTER'S pipeline — distance, then similarity = 1/(1+distance)*100 — because chapter 7 never teaches correlation. Then the NORMALISATION MOVED INTO THE DATA, because a gene network needs the GENES standardised while they sit in the ROWS and `scale_variance` can only reach the columns: no argument a student could pass would do it, and requiring them to hand-scale before pivoting was a step the book does not teach. So lichen_expression now ships `expression_normalized` beside `expression` — standardised gene-wise, then isolate-wise, ONE pass. The second pass is the point: it leaves every isolate column at exactly mean 0 / sd 1, so `scale_variance` is a NO-OP and a student who passes TRUE, FALSE or nothing at all gets the same answer (verified in R, agreement to ~1e-7, limited only by the CSV's 6 d.p.). CUTOFF: SIMILARITY > 7.8. Band 7.2-7.925, BOTH edges live — above it XAN_1815 (the trap) becomes a second isolate and rungs 2 and 3 break together; below it the module closes into a clique and rung 4's degree lead TIES. 7.8 sits 0.115 clear of the nearest real edge below and 0.125 below the ceiling. Columns renamed for the same reason the normalisation moved: `sample_id`->`lichen_isolate` and `gene`->`gene_id`, so that passing gene_id to columns_w_sample_ID_info reads as the deliberate act it is instead of looking like a mistake next to a column called sample_id. ABUNDANCE (rung 3) is read from `expression`; `expression_normalized` is centred and carries none. XAN_4574 / XAN_6246 / XAN_1815 / XAN_1192.",
     "escape": "Two ghost stations, Halliwell E5 + Cold Harbour I4, entered together in one lock at ochre_hall. Verified by _scratch/ghost3_two_ghosts.py + draw_network_map.py, and re-derived from the layout by test_subway.py. WIRED 2026-09-07: answer 'E5I4' (lower letter first, the convention the filing_card states in-world), endsEscape:true rather than phase:'escape' because ochre_hall is also the lampblack boarding platform and the player's first room. UNCAPPED attempts on purpose (ungraded escape; running out darkens the keypad with no recovery) though the plotting guess-space is 1 in 10, so a cap stays a live question. GATE CORRECTED 2026-09-22: the lock IS gated, but not the way this note said. The live availableWhen on the traffic_desk lock is {all:[{eq:[rode_madder,'1']},{eq:[rode_woad,'1']},{eq:[rode_weld,'1']},{eq:[rode_verdigris,'1']},{eq:[rode_lampblack,'1']}]} — five equalities, one per line, each set by shared/pano-player.js when that line's ride completes. There is NO `sightings` counter anywhere in the scenario and none was ever wired; the planned {gte:[sightings,5]} gate was dropped along with the live sighting click when THE RIDE was built (2026-09-18). The superseded wording is kept as the record: 'The lock's real gate, availableWhen {gte:[sightings,5]}, is NOT wired: sightings come from the ride.' NO PLOTTING SURFACE IS NEEDED — the 2026-08-12 grid-reference decision uses the existing lock with no new widget; the player plots off the carried sheet themselves.",
     "gating": "By LINE, not by room. lampblack live from the start; the other four open as rungs are solved. Tickets grant passage only, never information — NO LINE MAP IS EVER ISSUED. (That rule is intact and the carried survey sheet does not break it: the sheet shows served STATIONS in surveyed position with the LINES ERASED, so it gives away no route and no ghost. It is the escape's instrument, not a line map.)",
     "ride": "BUILT 2026-09-18 (Lucas). Baked transit sequence, not a transit room; canon is shared/AGENTS.md — 'THE RIDE'. SUPERSEDES the 2026-09-08 note quoted at the end of this field. WHAT SHIPPED: `scenario.ride` carries the whole config (loops {hop,tunnel,pass}, loopSeconds 2.5, crossfade 0.4, ghosts [Halliwell, Cold Harbour], up/down labels, and per-line {cab, stops, berths, home}); the five cab `selector` hotspots are typed `lever`, one per line; the pure planner is shared/ride.js (availableDirections / planRide / leverOptions / currentStation / rideSeconds) and the sequencer is startRide / arriveRide in shared/pano-player.js. Where the train stands is gameState.at_<line>, set by the new door field `onPass` on each berth's boarding door and rewritten on arrival; the cab's platform_door is an ordinary switch-door keyed {eq:[at_<line>, berth]}. Tests: tests/ride.test.mjs (planner) and tests/e2e/subway_ride.spec.js (the whole ride in a browser). TWO PIECES OF THE OLD PLAN WERE DROPPED RATHER THAN BUILT: (a) there is NO live click target and no sightings counter — a ghost stop is simply a `ghost`-state segment the player rides through, and a completed run sets `rode_<line>`, which is what now gates the escape lock (see _designNotes.escape); (b) there are no 10 separately baked loops — each segment reuses the cab's own full-scene cinemagraph whose `state` matches, falling back to that state's still when the clip is missing. THE 2026-09-08 NOTE, KEPT AS THE RECORD: 'NEW ENGINE WORK, still open, and Lucas's own. Baked transit sequence, not a transit room. See notes.md \"THE RIDE\". Its WIREABLE pieces are placed: every dial carries its dest_<line> stop list, and each cab's platform door carries nav variants {state, when:{eq:[dest_<line>, room]}, to} for every destination its line serves (nav variants need no panorama, so this works before any door-open art). What remains is the sequencer, a live click target during the empty-station segment, the 10 baked loops, and one line gating the escape lock.'",
@@ -6692,19 +6692,19 @@
   "ladderPlain": [
     {
       "room": "car_madder",
-      "text": "In the first puzzle you worked from lichen_expression, the crop's gene expression record: two hundred samples, twenty-four genes, one expression reading for each. You correlated every gene against the reference gene XAN_4418 across all two hundred samples and took the largest correlation by magnitude - XAN_4574, at 0.83, where every other gene in the dataset falls below 0.1. One pair of genes at a time, which is where a co-expression network starts."
+      "text": "In the first puzzle you worked from lichen_expression, the crop's gene expression record: two hundred lichen isolates, twenty-four genes, one reading for each, and beside every reading the same figure put on a common footing across all of them. You laid the genes out as the rows, measured the distance between every pair of them across all two hundred isolates, and turned those distances into similarities - a small distance means two genes behave alike, so similarity runs the opposite way to distance. The gene closest to the reference gene XAN_4418 was XAN_4574, at a similarity of 9.1, where two genes with no relationship at all score about 4.2 and every other gene in the record sits within about 0.6 of that floor. One pair of genes at a time, which is where a co-expression network starts."
     },
     {
       "room": "car_woad",
-      "text": "In the second puzzle you turned those pairwise correlations into a network by fixing a cutoff: two genes count as co-expressed when the magnitude of their correlation is above 0.75. Counting partners under that rule, XAN_6246 has none at all - its strongest correlation with anything in the dataset is 0.103 - which is exactly what your company wanted in a control gene."
+      "text": "In the second puzzle you turned those pairwise similarities into a network by fixing a cutoff: two genes count as co-expressed when their similarity is above 7.8. Counting partners under that rule, XAN_6246 has none at all - its best score against anything in the record is 4.5, barely off the floor - which is exactly what your company wanted in a control gene. Note that the network is a consequence of the cutoff you chose, not a fact about the genes: move it and the picture changes."
     },
     {
       "room": "car_weld",
-      "text": "In the third puzzle you ran the standard protocol your company re-seeds the crop by. You found the largest connected group of co-expressed genes - following correlations above 0.75 from gene to gene, so two genes belong to the same group when a chain of correlations links them and not only when they are correlated directly - and then took the member of that group with the highest average expression: XAN_1815, at about 1,434 units, nearly six times the next gene inside the group. Both steps are exactly as written and the answer is exactly what they give. The last puzzle is about what the second step is measuring."
+      "text": "In the third puzzle you ran the standard protocol your company re-seeds the crop by. You found the largest connected group of co-expressed genes - following similarities above 7.8 from gene to gene, so two genes belong to the same group when a chain of links joins them and not only when they are linked directly - and then took the member of that group with the highest average expression, reading that off the real expression figures rather than the normalised ones: XAN_1815, at about 1,434 units, nearly six times the next gene inside the group. Both steps are exactly as written and the answer is exactly what they give. The last puzzle is about what the second step is measuring."
     },
     {
       "room": "car_verdigris",
-      "text": "In the last puzzle you kept the same group of eight genes and changed only how you ranked its members: by position rather than by abundance, counting how many other members of the group each gene is co-expressed with above 0.75. That gives XAN_1192, which is co-expressed with all seven of the others where the next gene down reaches only four. XAN_1192 is the quietest gene in the whole record at about 72 units, last of twenty-four, so the abundance ranking of the third puzzle puts it at the bottom; and XAN_3514, the loudest gene in the record at about 5,644 units, is co-expressed with only three genes and is not a member of the group at all. Nine seasons of re-seeding from the most abundant gene in the group, rather than the most connected one, is why the colour kept thinning."
+      "text": "In the last puzzle you kept the same group of eight genes and changed only how you ranked its members: by position rather than by abundance, counting how many other members of the group each gene is co-expressed with above 7.8. That gives XAN_1192, which is co-expressed with all seven of the others where the next gene down reaches only five. XAN_1192 is the quietest gene in the whole record at about 72 units, last of twenty-four, so the abundance ranking of the third puzzle puts it at the bottom; and XAN_3514, the loudest gene in the record at about 5,644 units, is co-expressed with only three genes and is not a member of the group at all. Nine seasons of re-seeding from the most abundant gene in the group, rather than the most connected one, is why the colour kept thinning."
     }
   ],
   "escapeBrief": "To get out you filed the two stations that no record held. This second network was nothing you computed: its connections are the five lines, and the only way to observe one was to ride it, reading that line's stops off the route card taped up in the cab. Halliwell lies on the madder, woad and weld lines - three lines, as many as Ochre Steps, the grandest station on the network - and Cold Harbour lies on the verdigris and the lampblack, and the trains run through both without stopping, so neither is printed on any route card and neither is on the operator's survey sheet of live stations. You can only reach them by riding all five lines and catching the platform going past that nothing on paper accounts for, then reading its square off the grid in the margin of the sheet: E5 and I4, entered together into the Master Station List. That is the last puzzle performed instead of computed - a station's standing read off what connects to it rather than off any quantity - and the one station the record does treat as important turned out to be nothing more than where you went to file the report.",

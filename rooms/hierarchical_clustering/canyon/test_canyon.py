@@ -7,9 +7,13 @@ scenario — the places where a correct answer and a correct board can still shi
 Run: python3 test_canyon.py   (stdlib only.)
 
 Failure modes it guards:
-  - a puzzle's `correct` index stops pointing at the option the DATA supports. The option list is prose,
-    so a reorder during editing silently re-keys the room while every validator stays green;
-  - the decoder drifts from `question.correct` — graded submissions then mis-score in silence;
+  - a puzzle's grader stops accepting the answer the DATA supports. The accepted names live inside an R
+    string comparison, so a rename or a dropped literal during editing silently re-keys the room while
+    every validator stays green;
+  - the decoder drifts from the rungs' ANSWER FORM — graded submissions then mis-score in silence. All
+    four rungs became console `check`s on 2026-09-24 and a check encodes answer = 1, so the key is
+    c(1, 1, 1, 1); the MCQ-era c(3, 2, 1, 0) scored an all-first-try solve 10/40;
+  - a grader stops NORMALISING the student's text, and fails a right answer typed `lime hollow`;
   - a BENCHMARK's carved number stops matching the elevmap node the player copies it onto. The numbers
     are authored in two places (the clue body and the node `answer`) and only agree by hand;
   - a benchmark's `onPickup` key stops matching the node's `requires` — the node then never unlocks and
@@ -50,18 +54,35 @@ by = {r["spring"]: r for r in springs}
 def gate(room, kind="puzzle"):
     return next(h for h in rooms[room]["hotspots"] if h.get("type") == kind)
 
+GRADED = ("j_c1", "j_c2", "j_c4", "j_c7")   # the four codec-carrying rungs, in room order
 
-def chosen(room):
-    q = gate(room)["question"]
-    return q["options"][q["correct"]]
+
+NORM = lambda s: re.sub(r"[ _-]", "", str(s)).lower()
+SPRING_N = {NORM(r["spring"]): r["spring"] for r in springs}   # the 18 carved springs; NOT the unknown
+
+
+def keyed(room):
+    """The spring names a console `check` accepts, recovered from its R `expr`.
+
+    A check has no option list, so "the option the room keys to" becomes "the names the grader
+    accepts". Every double-quoted literal in the expr that IS one of the 18 springs counts (the
+    gsub pattern and the unknown's own name are not, which is what drops j_c2's `setdiff` term).
+    The expr's own `length(a) == N` pins HOW MANY, so a literal quietly dropped during editing
+    fails the count here rather than shipping a grader that accepts a shorter set.
+    """
+    expr = gate(room)["check"]["expr"]
+    named = [SPRING_N[l] for l in re.findall(r'"([^"]*)"', expr) if l in SPRING_N]
+    m = re.search(r"length\(a\) == (\d+)", expr)
+    return named, (int(m.group(1)) if m else 1)
 
 
 print("\n-- the answer the DATA supports is the option the room keys to --")
 
 # rung 1: nearest neighbour of Dripstone
 d = sorted((math.dist(vec(r), vec(by["Dripstone"])), r["spring"]) for r in springs if r["spring"] != "Dripstone")
-check(chosen("j_c1") == d[0][1], "j_c1 keys to Dripstone's nearest kin (%s, d=%.2f; runner-up %s d=%.2f)"
-      % (d[0][1], d[0][0], d[1][1], d[1][0]))
+c1, n1 = keyed("j_c1")
+check(c1 == [d[0][1]] and n1 == 1, "j_c1 keys to Dripstone's nearest kin (%s, d=%.2f; runner-up %s d=%.2f) — grader accepts %s"
+      % (d[0][1], d[0][0], d[1][1], d[1][0], c1))
 check(d[1][0] / d[0][0] > 1.10, "j_c1 has a single clean winner (margin %.0f%%, needs >10%%)"
       % (100 * (d[1][0] - d[0][0]) / d[0][0]))
 
@@ -69,8 +90,16 @@ check(d[1][0] / d[0][0] > 1.10, "j_c1 has a single clean winner (margin %.0f%%, 
 near = sorted((math.dist(vec(r), vec(unknown)), r["spring"], r["fork"]) for r in springs)
 check(near[0][2] == "North_Branch" and by[near[0][1]]["silica"] > "50",
       "j_c2: Unmarked_Spring's nearest neighbours are North Branch silica springs (%s d=%.2f)" % (near[0][1], near[0][0]))
-check("silica" in chosen("j_c2").lower() and "North Branch" in chosen("j_c2"),
-      "j_c2 keys to the silica / North Branch family — %r" % chosen("j_c2"))
+# The group the unknown joins is data-derived the way the room's own feedback states it: one column,
+# `silica`, separates that family from every other spring by a wide margin (61+ against 13 and below).
+sil_hi = sorted(r["spring"] for r in springs if float(r["silica"]) > 50)
+check(float(unknown["silica"]) > 50 and max(float(r["silica"]) for r in springs if r["spring"] not in sil_hi) < 50,
+      "j_c2: silica splits the unknown's family cleanly (%s reads %s, the next spring down reads %s)"
+      % (len(sil_hi), min(float(by[m]["silica"]) for m in sil_hi),
+         max(float(r["silica"]) for r in springs if r["spring"] not in sil_hi)))
+c2, n2 = keyed("j_c2")
+check(sorted(c2) == sil_hi and n2 == len(sil_hi),
+      "j_c2's grader accepts exactly the silica family %s (expr names %s, wants %d)" % (sil_hi, sorted(c2), n2))
 
 # rung 3: the k=4 sulfate family, and it must INCLUDE Bitterwell (that is the whole point)
 FAMILIES = {"carbonate": ["Dripstone", "Palegate", "Lime_Hollow", "Chalkseep"],
@@ -81,21 +110,37 @@ means = {k: sum(float(by[m]["sulfate"]) for m in v) / len(v) for k, v in FAMILIE
 top = max(means, key=means.get)
 check(top == "sulfate", "j_c4: the sulfate family has the highest mean sulfate (%.1f vs next %.1f)"
       % (means["sulfate"], sorted(means.values())[-2]))
-check("Bitterwell" in chosen("j_c4"), "j_c4's keyed option NAMES Bitterwell — the cluster-vs-fork distinction")
+c4, n4 = keyed("j_c4")
+check(sorted(c4) == sorted(FAMILIES[top]) and n4 == len(FAMILIES[top]),
+      "j_c4's grader accepts exactly the sulfate family %s (expr names %s, wants %d)"
+      % (sorted(FAMILIES[top]), sorted(c4), n4))
+check("Bitterwell" in c4, "j_c4's keyed answer NAMES Bitterwell — the cluster-vs-fork distinction")
+# A check has no distractor list, so the taught trap has to be guarded from the other side: the
+# group-by-fork shortcut must still be TEMPTING in the data, and the grader must REJECT it.
 fork_east = [r for r in springs if r["fork"] == "East_Fork"]
-check(any("East Fork" in o and "Bitterwell" not in o for o in gate("j_c4")["question"]["options"]),
-      "j_c4 offers the group-by-fork mistake as a distractor (East Fork alone, mean %.1f — nearly identical)"
-      % (sum(float(r["sulfate"]) for r in fork_east) / len(fork_east)))
+east_mean = sum(float(r["sulfate"]) for r in fork_east) / len(fork_east)
+check(abs(east_mean - means["sulfate"]) / means["sulfate"] < 0.15,
+      "j_c4: the group-by-fork shortcut is still tempting (East Fork alone means %.1f against the cluster's %.1f)"
+      % (east_mean, means["sulfate"]))
+check({NORM(x) for x in c4} != {NORM(r["spring"]) for r in fork_east},
+      "j_c4's grader REJECTS the East Fork fork-group — the shortcut is marked wrong, not merely offered")
 
 # boss: the two springs whose fork and chemistry disagree
 fam_of = {m: k for k, v in FAMILIES.items() for m in v}
 FORK_FAM = {"West_Fork": "carbonate", "East_Fork": "sulfate", "North_Branch": "silica", "South_Branch": "saline"}
 outliers = sorted(r["spring"] for r in springs if fam_of[r["spring"]] != FORK_FAM[r["fork"]])
 check(outliers == ["Bitterwell", "Saltglass"], "boss: the data's outliers are %s" % outliers)
-check(all(o in chosen("j_c7") for o in outliers), "j_c7 keys to the option naming BOTH outliers — %r" % chosen("j_c7"))
+c7, n7 = keyed("j_c7")
+check(sorted(c7) == outliers and n7 == len(outliers),
+      "j_c7's grader accepts BOTH outliers and only those (expr names %s, wants %d)" % (sorted(c7), n7))
 
 print("\n-- decoder lockstep --")
-expected = [gate(k)["question"]["correct"] for k in ("j_c1", "j_c2", "j_c4", "j_c7")]
+# ANSWER FORM drives the key. A console check reports answer = 1 on solve (shared/pano-player.js,
+# `onSolved({ answer: 1, attempts })`), so every graded rung keys to 1. If a rung ever goes back to
+# MCQ this first check fails — which is the signal to re-derive the key, not to relax the test.
+check(all("check" in gate(k) for k in GRADED), "every graded rung is a console check (%s)"
+      % [next(iter([f for f in ("check", "question", "pick") if f in gate(k)]), "?") for k in GRADED])
+expected = [1] * len(GRADED)
 rsrc = open(os.path.join(HERE, "..", "..", "..", "decoder", "decode_codes.R"), encoding="utf-8").read()
 block = rsrc[rsrc.index("HIERARCHICAL_CLUSTERING_CANYON_KEY"):][:400]
 key_vec = [int(x) for x in re.search(r"correct = c\(([^)]*)\)", block).group(1).split(",")]
@@ -103,7 +148,8 @@ check(key_vec == expected, "decode_codes.R correct = c(%s) matches scenario.json
       % (", ".join(map(str, key_vec)), expected))
 check(int(re.search(r"scenario_id = (\d+)", block).group(1)) == doc["id"],
       "decoder key scenario_id matches the scenario's id (%s)" % doc["id"])
-check(len(set(expected)) > 1, "the correct index is not the same slot in every room (%s)" % expected)
+check(len(key_vec) == len(GRADED), "the decoder key has one slot per graded rung (%d for %d)"
+      % (len(key_vec), len(GRADED)))
 
 print("\n-- the benchmarks the player copies onto the map --")
 elev = next(h for h in rooms["undercroft"]["hotspots"] if h.get("id") == "lit_canyon_map")
@@ -226,16 +272,31 @@ wallmap = next((h for h in rooms["j_c7"]["hotspots"] if h.get("id") == "carved_w
 check(wallmap is not None and bool(wallmap.get("body")), "j_c7 still carries the carved wall-map clue, with a body")
 check(not any(o in (wallmap.get("body") or "") for o in outliers),
       "the carved wall-map does NOT name either outlier — a trap must tempt BEFORE the answer")
-check(any(re.search(r"map is right", o) for o in gate("j_c7")["question"]["options"]),
-      "the boss offers 'the carved map is right' — the distractor the wall-map exists to make tempting")
+# With no option list there is no "the carved map is right" distractor to offer, so the boss has to
+# invoke the trap in its own prompt — it sets the carved map against the chemistry and asks for the
+# disagreement. Without that sentence the wall-map is scenery and the trap never fires.
+bossq = gate("j_c7")["check"]["prompt"]
+check("map" in bossq and "<code>fork</code>" in bossq,
+      "the boss prompt sets the carved map / `fork` against the chemistry — the trap the wall-map baits")
+check(not any(o in bossq for o in outliers), "the boss prompt does not name either outlier")
 
 print("\n-- shipped-content invariants --")
-for rk in ("j_c1", "j_c2", "j_c4", "j_c7"):
-    q = gate(rk)["question"]
-    check(len(q["options"]) >= 6, "%s has >=6 options (%d)" % (rk, len(q["options"])))
-    check(len(set(q["options"])) == len(q["options"]), "%s has no duplicate option text" % rk)
-    check(0 <= q["correct"] < len(q["options"]), "%s correct index in range" % rk)
-    check("reveal" not in q.get("feedback", {}), "%s has no reveal" % rk)
+for rk in GRADED:
+    q = gate(rk)["check"]
+    check(q.get("requires") == ["answer"], "%s grades on `answer` (%r)" % (rk, q.get("requires")))
+    check(isinstance(q.get("maxAttempts"), int) and q["maxAttempts"] >= 1,
+          "%s states an attempt budget (%r)" % (rk, q.get("maxAttempts")))
+    # The MCQ-era ">=6 data-derived distractors" rule has no option list to land on. Its console
+    # equivalent is the escalating wrong-feedback ladder — one rung per attempt the student can burn.
+    wrong = (q.get("feedback") or {}).get("wrong") or []
+    check(len(wrong) >= q["maxAttempts"] - 1,
+          "%s has a wrong-feedback rung for each burnable attempt (%d for %d)" % (rk, len(wrong), q["maxAttempts"]))
+    check(len(set(wrong)) == len(wrong), "%s has no duplicate wrong-feedback text" % rk)
+    check("reveal" not in (q.get("feedback") or {}), "%s has no reveal" % rk)
+    # A grader that compares raw text fails a RIGHT answer typed `lime hollow` or `Lime hollow`.
+    check("tolower(" in q["expr"] and 'gsub("[ _-]"' in q["expr"],
+          "%s's grader lowercases and strips separators before comparing" % rk)
+    check(keyed(rk)[0], "%s's grader names at least one real spring" % rk)
     starter = gate(rk).get("starterCode", "")
     check(all(ln.strip() in ("canyon_water_chem", "unknown_spring") for ln in starter.splitlines() if ln.strip()),
           "%s starterCode is bare data-object names only (%r)" % (rk, starter))

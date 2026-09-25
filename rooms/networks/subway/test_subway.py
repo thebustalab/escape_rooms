@@ -71,79 +71,162 @@ def pend(msg):
 
 
 # ── the data ─────────────────────────────────────────────────────────────────────────────────────
+# COLUMNS RENAMED 2026-09-25 (Lucas): sample_id -> lichen_isolate, gene -> gene_id. The room asks the
+# player to pass `gene_id` to runMatrixAnalysis's `columns_w_sample_ID_info`, which is correct — the
+# genes ARE the samples of this analysis — but beside a column literally called `sample_id` it reads
+# like a mistake. The names now say which axis is which.
 rows = list(csv.DictReader(open(os.path.join(HERE, "data", "lichen_expression.csv"), encoding="utf-8")))
-expr = {}
+expr, norm = {}, {}
 for r in rows:
-    expr.setdefault(r["gene"], {})[r["sample_id"]] = float(r["expression"])
+    expr.setdefault(r["gene_id"], {})[r["lichen_isolate"]] = float(r["expression"])
+    norm.setdefault(r["gene_id"], {})[r["lichen_isolate"]] = float(r["expression_normalized"])
 genes = sorted(expr)
-samples = sorted({r["sample_id"] for r in rows})
+samples = sorted({r["lichen_isolate"] for r in rows})
 
-CUTOFF = 0.75
+# THE METRIC IS THE CHAPTER'S, NOT PEARSON'S (2026-09-25, Lucas). The room used to be graded on
+# |r| > 0.75, but chapter 7 never teaches correlation: it teaches distance -> similarity
+# (1 / (1 + distance) * 100) -> threshold -> network, and a student who followed the chapter could not
+# reach any of these answers. The ladder is now stated and graded in that vocabulary, cutoff
+# SIMILARITY > 7.8. Recomputed here rather than assumed, because the whole point of this file is to
+# re-derive what the player derives.
+#
+# THE NORMALISATION LIVES IN THE DATA, and that is not a convenience — it is forced. A gene network puts
+# the GENES in the rows, and `scale_variance` scales COLUMNS, so no argument a student could pass will
+# put the genes on a common footing; unscaled, one gene averages 5644 units and another 71, and distance
+# then sees abundance and nothing else. Requiring a hand-rolled scaling step before the pivot would be
+# asking for a move chapter 7 does not teach. So `expression_normalized` ships in the CSV, standardised
+# gene-wise and then isolate-wise in ONE pass — the second pass leaves every isolate column at exactly
+# mean 0 / sd 1, which makes `scale_variance` a NO-OP, so TRUE, FALSE and the default all agree. Pinned
+# below. This file therefore reads `expression_normalized` for the network and `expression` for
+# abundance, exactly as the player does.
+CUTOFF = 7.8
 doc = json.load(open(os.path.join(HERE, "scenario.json"), encoding="utf-8"))
 rooms = {r["key"]: r for r in doc["rooms"]}
 
 
-def pearson(a, b):
-    xa = [expr[a][s] for s in samples]
-    xb = [expr[b][s] for s in samples]
-    n = len(xa)
-    ma, mb = sum(xa) / n, sum(xb) / n
-    cov = sum((x - ma) * (y - mb) for x, y in zip(xa, xb))
-    sa = math.sqrt(sum((x - ma) ** 2 for x in xa))
-    sb = math.sqrt(sum((y - mb) ** 2 for y in xb))
-    return cov / (sa * sb)
+# The player's network is built from the SHIPPED normalised column, not from anything recomputed here.
+# Reading it straight off disk is the point: if the CSV were ever regenerated wrongly, this file must
+# fail rather than quietly re-derive a correct matrix of its own.
+Z = {g: [norm[g][s] for s in samples] for g in genes}
 
 
-R = {a: {b: pearson(a, b) for b in genes if b != a} for a in genes}
+def similarity(a, b):
+    d = math.sqrt(sum((x - y) ** 2 for x, y in zip(Z[a], Z[b])))
+    return 1 / (1 + d) * 100
+
+
+R = {a: {b: similarity(a, b) for b in genes if b != a} for a in genes}
+# THE FLOOR IS MEASURED, NOT DERIVED. Two genes with no relationship sit near 1/(1+sqrt(2(n-1))), but
+# the one-pass normalisation leaves the gene rows at sd ~0.98 rather than exactly 1, so the analytic
+# value (4.77) is not the floor this data actually has (4.15). Rung 1's and rung 2's hints quote the
+# real one, so the real one is what gets pinned.
+FLOOR = min(min(v.values()) for v in R.values())
 mean = {g: statistics.mean(expr[g].values()) for g in genes}
 
 
 def degree(g, cutoff=CUTOFF):
-    return sum(1 for h, r in R[g].items() if abs(r) > cutoff)
+    return sum(1 for h, r in R[g].items() if r > cutoff)
 
 
 def neighbours(g, cutoff=CUTOFF):
-    return {h for h, r in R[g].items() if abs(r) > cutoff}
+    return {h for h, r in R[g].items() if r > cutoff}
 
 
 print("networks/subway — the shape the DATA has to keep")
-print("\n-- rung 1: the reference pair (pairwise correlation) --")
-ranked = sorted(((abs(r), h) for h, r in R["XAN_4418"].items()), reverse=True)
+print("\n-- the shipped normalisation: what makes scale_variance a no-op --")
+# THE ONE INVARIANT THE WHOLE ARRANGEMENT RESTS ON. `expression_normalized` is standardised gene-wise
+# and THEN isolate-wise. The second pass is not tidiness: it leaves every isolate COLUMN at mean 0 and
+# sd 1, which is precisely the condition under which runMatrixAnalysis's `scale_variance = TRUE`
+# (the DEFAULT for dist) changes nothing. That is what lets the room state one threshold and have it be
+# right whether the player passes TRUE, passes FALSE, or passes nothing — which is the reason the room
+# needs no step chapter 7 has not taught. Break this and the stated 7.8 silently stops being the right
+# number for half the class.
+# The ISOLATE axis is the one that must be EXACT — it went last, and it is the axis scale_variance
+# touches. The GENE axis is standardised first and is then nudged by that final pass, so it lands close
+# to but not exactly on mean 0 / sd 1; that is harmless (the metric only needs the genes COMPARABLE, not
+# unit-variance) and is why the two tolerances differ by four orders of magnitude. Do not "fix" the gene
+# tolerance by iterating the normalisation to convergence: that was tried, and the extra sweeps compress
+# the structure until the usable band narrows from 0.72 wide to 0.51.
+iso_cols = [[norm[g][sm] for g in genes] for sm in samples]
+iso_mean = max(abs(statistics.mean(v)) for v in iso_cols)
+iso_sd = max(abs(statistics.stdev(v) - 1) for v in iso_cols)
+check(iso_mean < 1e-4 and iso_sd < 1e-4,
+      "every isolate COLUMN is centred and scaled (worst |mean| %.2e, worst |sd-1| %.2e) — this is the "
+      "no-op condition, and it is what makes scale_variance irrelevant" % (iso_mean, iso_sd))
+gene_rows = [[norm[g][sm] for sm in samples] for g in genes]
+gene_sd = [statistics.stdev(v) for v in gene_rows]
+# The gene axis is guarded by RATIO, not by distance from 1. What matters is that no gene's spread
+# dominates the distance calculation; after the final isolate pass the rows land at sd 0.78 to 1.21, a
+# 1.5x spread, against the 80x spread in raw ABUNDANCE that made unnormalised distance useless. The
+# bound is what the metric actually needs.
+check(max(gene_sd) / min(gene_sd) < 2.0,
+      "and no GENE row dominates the distances — row spreads run %.3f to %.3f, a %.2fx range, against "
+      "the 80x range in raw abundance that made unnormalised distance unusable"
+      % (min(gene_sd), max(gene_sd), max(gene_sd) / min(gene_sd)))
+# ...and abundance must NOT be readable from it, or rung 3 could be answered off the wrong column.
+nm = {g: statistics.mean(norm[g].values()) for g in genes}
+check(max(abs(v) for v in nm.values()) < 0.05,
+      "expression_normalized carries NO abundance — every gene averages ~0 on it (largest %.4f), so "
+      "rung 3 has to go back to `expression`" % max(abs(v) for v in nm.values()))
+
+print("\n-- rung 1: the reference pair (pairwise similarity) --")
+ranked = sorted(((r, h) for h, r in R["XAN_4418"].items()), reverse=True)
 check(ranked[0][1] == "XAN_4574",
-      "XAN_4418's tightest partner is XAN_4574 (|r| %.3f; runner-up %s at %.3f)"
+      "XAN_4418's closest partner is XAN_4574 (similarity %.2f; runner-up %s at %.2f)"
       % (ranked[0][0], ranked[1][1], ranked[1][0]))
-check(ranked[0][0] / ranked[1][0] > 5,
-      "the winner clears the runner-up by >5x (%.1fx) — one clean winner, not a near-tie"
-      % (ranked[0][0] / ranked[1][0]))
+# MEASURE THE MARGIN ABOVE THE FLOOR, not as a raw ratio. 1/(1+d) is strongly compressive, so a pair at
+# r 0.83 and a pair at r 0.08 score 10.90 and 4.96 — a ratio of only 2.2x that badly understates the
+# separation, because 4.48 of both numbers is the score two UNRELATED genes get. Against the floor the
+# gap is what it always was: the winner is 13x further above it than the runner-up.
+w, ru = ranked[0][0] - FLOOR, ranked[1][0] - FLOOR
+check(w / ru > 5,
+      "the winner clears the runner-up by >5x measured above the no-relationship floor of %.2f "
+      "(%.2f vs %.2f above it, %.1fx) — one clean winner, not a near-tie" % (FLOOR, w, ru, w / ru))
 check("XAN_1192" not in (ranked[0][1],),
       "the probe is a SATELLITE pair — it does not hand the player the boss (XAN_1192)")
 
 print("\n-- rung 2: the control strand (threshold + one-vs-all) --")
 isolates = [g for g in genes if degree(g) == 0]
-check(isolates == ["XAN_6246"], "XAN_6246 is the SOLE isolate at |r|>%.2f (%s)" % (CUTOFF, isolates))
-# THE STABLE BAND IS 0.15-0.75, NOT 0.72-0.78 (found 2026-09-07 by this test; the queue note and
-# notes.md both claimed the wider band and both were corrected). XAN_6246's strongest tie to anything
-# is |r| 0.10, so it is isolated under any sane cutoff; but the next-weakest genes sit at 0.7569
-# (XAN_1815 — the TAUGHT TRAP) and 0.7590 (XAN_2781), so at 0.76 the room has THREE isolates and no
-# single answer. The rung is safe because its prompt states |r|>0.75 explicitly — that is the whole
-# point of the rung — but any hint that nudges a player to "about 0.8" breaks it, which is why the
-# ceiling is pinned here.
-best = {g: max(abs(v) for v in R[g].values()) for g in genes}
-for c in (0.15, 0.40, 0.60, 0.72, 0.74, 0.75):
-    check([g for g in genes if degree(g, c) == 0] == ["XAN_6246"],
-          "still the sole isolate at cutoff %.2f — stable across the band the prompt lives in" % c)
-check(best["XAN_6246"] < 0.2,
-      "XAN_6246's strongest tie to anything is |r| %.3f — isolated by a mile, not by a hair"
-      % best["XAN_6246"])
+check(isolates == ["XAN_6246"], "XAN_6246 is the SOLE isolate at similarity>%.1f (%s)" % (CUTOFF, isolates))
+# THE BAND HAS TWO EDGES AND THEY FAIL DIFFERENTLY — this is why the prompt states the threshold
+# outright. The ladder is whole only for a cutoff in roughly 8.48 .. 9.23 (similarity), and 9 is chosen
+# to sit clear of both edges.
+#   ABOVE the ceiling: XAN_1815 (the TAUGHT TRAP) and XAN_2781 become isolates too, so rung 2 has THREE
+#     answers and rung 3's module loses its most abundant member — both rungs break at once.
+#   BELOW the floor: the module closes into a clique, every member reaches degree 7, and rung 4's
+#     regulator has no strict lead — the BOSS loses its single answer, silently.
+# So no hint may nudge a player off the stated 9 in EITHER direction. (Under the old |r| grading the
+# equivalent band was 0.15-0.7569 and only the upper edge was live; the lower edge is new, and is the
+# reason 8.5 — which Lucas first suggested — is too close to the cliff.)
+best = {g: max(R[g].values()) for g in genes}
+check(best["XAN_6246"] < FLOOR + 0.5,
+      "XAN_6246's strongest tie to anything scores %.2f against a no-relationship floor of %.2f — "
+      "isolated by a mile, not by a hair" % (best["XAN_6246"], FLOOR))
 ceiling = min(best[g] for g in genes if g != "XAN_6246")
-check(0.75 < ceiling < 0.76,
+check(CUTOFF < ceiling,
       "the band's CEILING is %.4f (the next-weakest gene's best tie) — above it the room gains a "
-      "second isolate, so no hint may suggest a cutoff over 0.75" % ceiling)
+      "second isolate, so no hint may suggest a cutoff over it" % ceiling)
 joiners = sorted((best[g], g) for g in genes if g != "XAN_6246")[:2]
 check([g for _, g in joiners] == ["XAN_1815", "XAN_2781"],
       "and the first two genes to join the isolates above the ceiling are XAN_1815 (%.4f) and "
       "XAN_2781 (%.4f) — the first of them is the TAUGHT TRAP, so a too-high cutoff would muddy "
       "rung 3 as well as rung 2" % (joiners[0][0], joiners[1][0]))
+check(ceiling - CUTOFF > 0.1,
+      "the stated cutoff of %.1f clears that ceiling by %.3f — comfortably more than any rounding"
+      % (CUTOFF, ceiling - CUTOFF))
+# THE LOWER EDGE, found by walking down rather than asserted: below it the pigment module closes into a
+# clique and rung 4's regulator has no strict degree lead. Nothing in rung 2 notices, which is exactly
+# why it is pinned here — the boss would break silently.
+_all_sims = sorted({R[a][b] for a in genes for b in R[a]})
+def _boss_lead_strict(c):
+    mods = [g for g in genes if degree(g, c) > 0]
+    d = sorted((degree(g, c) for g in mods), reverse=True)
+    return len(d) > 1 and degree("XAN_1192", c) == d[0] and d[0] > d[1]
+_floor_edge = max([v for v in _all_sims if v < CUTOFF and not _boss_lead_strict(v)] or [0])
+check(CUTOFF - _floor_edge > 0.1,
+      "and it clears the BAND'S LOWER EDGE (%.3f, where the module becomes a clique and the boss's "
+      "degree lead ties) by %.3f — the boss breaks silently below it, so no hint may push a player down "
+      "there either" % (_floor_edge, CUTOFF - _floor_edge))
 
 print("\n-- rung 3: the taught trap (module + abundance) --")
 # The pigment module is what the player recovers from the correlation structure. Derive it the way the
@@ -218,7 +301,7 @@ answers = ["XAN_4574", "XAN_6246", "XAN_1815", "XAN_1192"]
 check(len(set(answers)) == 4, "no two rungs answer the same gene (%s)" % answers)
 
 # rung 1's move (argmax |r| against the probe) must NOT also land rung 2, 3 or 4.
-r1 = max((g for g in genes if g != "XAN_4418"), key=lambda g: abs(R["XAN_4418"][g]))
+r1 = max((g for g in genes if g != "XAN_4418"), key=lambda g: R["XAN_4418"][g])
 check(r1 == "XAN_4574" and r1 not in answers[1:],
       "rung 1's move (nearest neighbour of the probe) reaches only rung 1's answer")
 
@@ -381,11 +464,35 @@ for i, want in enumerate(WINNER):
     bad = [w for w in (fb.get("wrong") or [])
            if re.search(r"\b(left|right|leftmost|rightmost|furthest (?:to the )?(?:left|right))\b", w, re.I)]
     check(not bad, "rung %d's hints use no left/right language (%d offender(s))" % (i + 1, len(bad)))
-    check((queue[i].get("starterCode") or "").strip() == "lichen_expression",
-          "rung %d's starterCode is the bare data-object name only (%r)"
-          % (i + 1, queue[i].get("starterCode")))
+    # STARTER CODE: the PREP, never the ANALYSIS (Lucas, 2026-09-25). It used to be the bare object
+    # name, `lichen_expression`. That was right while the room was graded on correlation, where the
+    # first move is a one-liner; it is wrong now that the room is graded in the chapter's vocabulary,
+    # because the prep has two steps a student cannot be expected to guess and CANNOT get wrong without
+    # silently shifting the stated threshold: the genes have to become the ROWS (they are what is being
+    # compared, and the obvious pivot puts the samples there), and each gene has to be z-scored FIRST,
+    # along an axis `scale_variance` cannot reach — it scales the sample columns, not the gene rows, so
+    # the default TRUE moves the whole similarity scale and the stated 9 stops being the right number.
+    # So the prep is given, identically on every rung, and the analysis is still entirely the player's.
+    st = (queue[i].get("starterCode") or "")
+    for frag in ("expression_normalized", "pivot_wider", 'names_from = "lichen_isolate"',
+                 "lichen_expression_wide"):
+        check(frag in st, "rung %d's starterCode carries the prep step %r" % (i + 1, frag))
+    # It stops at the PIVOT. runMatrixAnalysis, the similarity conversion, the threshold and reading the
+    # network are all the player's, and all of them are chapter 7 verbatim.
+    check(not re.search(r"runMatrixAnalysis|similarity|1 */ *\(1 *\+|filter\(|scale\(", st),
+          "rung %d's starterCode stops at the PIVOT — the distance call, the similarity conversion, the "
+          "threshold and reading the network are the player's work" % (i + 1))
+    check(st == (queue[0].get("starterCode") or ""),
+          "rung %d's starterCode is identical to rung 1's — the prep is the same on every rung, so a "
+          "player who edited it on one cab is not fighting a different block on the next" % (i + 1))
     check(not re.search(r"cor\(|filter\(|group_by|arrange\(|ggplot|aes\(", q.get("prompt", "")),
           "rung %d's prompt leaks no code" % (i + 1))
+    # THE STATED THRESHOLD MUST BE THE ONE THIS FILE GRADES AT. Rungs 2, 3 and 4 all name it in prose;
+    # if an edit moved the number in a prompt without moving CUTOFF here, every check above would stay
+    # green while the room asked for a graph nobody derives. Rung 1 states no threshold and is exempt.
+    if i > 0:
+        check(("above %g" % CUTOFF) in q.get("prompt", "") or ("above <b>%g</b>" % CUTOFF) in q.get("prompt", ""),
+              "rung %d's prompt states the threshold this file grades at (%g)" % (i + 1, CUTOFF))
 
 print("\n-- the taught trap survives contact with the ladder --")
 if len(queue) == 4:

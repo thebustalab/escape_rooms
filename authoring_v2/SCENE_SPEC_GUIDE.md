@@ -12,7 +12,9 @@ network and a description of vibes, Claude drafts **one spec per room** followin
 ## Inputs → output
 - **Inputs:** the room network (which rooms, how they connect via doors), a description of the world/vibes,
   and each room's role/story beat. (For a full CHEM 5725 scenario these come from `escape_room_puzzles`
-  (ladder + dataset) then `escape_room_blueprint`, which owns the world, the narrative and the room graph —
+  (ladder + dataset) then step 3 — `escape_room_blueprint` (the premise and the beats) and
+  `escape_room_network` (the room graph, the gates and the transitions) — and step 4,
+  `escape_room_geography` (the geography, the world plate, the cover and the landing text) —
   it absorbed the retired `escape_room_story` and `escape_room_design` skills on 2026-09-03.)
 - **Output:** a JSON object `{"worldPlate": "<prompt>", roomKey: spec, ...}` for the whole scenario, ready for
   `POST /api/save-scene-specs`. **`worldPlate`** (optional, scenario-level) is a "world-bible" establishing-image

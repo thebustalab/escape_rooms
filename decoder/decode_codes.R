@@ -428,9 +428,14 @@ HIERARCHICAL_CLUSTERING_TEMPLE_KEY <- list(
 # junctions j_c3/j_c5/j_c6 carry a benchmark clue and a fork but no puzzle, and `works` is the ungraded
 # escape objective, so none of those four rooms takes a codec slot. Indices deliberately descend 3,2,1,0
 # rather than repeating a slot. Added 2026-09-01 at wiring.
+# 2026-09-24: all four rungs became console `check`s (Lucas's answer-form order: pick > check > MCQ).
+# A check encodes answer = 1, so the whole vector is 1s. The previous MCQ key was c(3, 2, 1, 0).
+# NOT a pick anywhere: j_c1 is the only rung whose answer is a single named spring, and its margin is
+# 1.12x (Lime_Hollow 0.108 against Chalkseep 0.121) — two points that close would be unclickable on a
+# plot whose axis runs to 7. A pick needs a VISUAL margin, not merely a numeric one.
 HIERARCHICAL_CLUSTERING_CANYON_KEY <- list(
   scenario_id = 14,
-  correct = c(3, 2, 1, 0),
+  correct = c(1, 1, 1, 1),
   score_step = function(correct, answer, attempts) {
     if (answer != correct) return(0)
     if (attempts <= 1) return(10)
@@ -771,16 +776,20 @@ if (identical(environment(), globalenv()) && sys.nframe() == 0) {
     stop("REGRESSION: pano spa grade wrong — expected 40 pts for an all-first-try solve")
   }
 
-  # Regression: pano scenario id 14 (hierarchical_clustering/canyon) — 4 graded MCQ rooms, correct
-  # indices c(3, 2, 1, 0). A full-marks solve answers each room's correct option on the first try.
-  csteps14 <- list(list(answer = 3, attempts = 1),
-                   list(answer = 2, attempts = 1),
+  # Regression: pano scenario id 14 (hierarchical_clustering/canyon) — 4 graded rooms, all console
+  # `check`s since 2026-09-24, so every step encodes answer = 1 and the key is c(1, 1, 1, 1). A
+  # full-marks solve passes each room's check on the first try.
+  # WAS c(3, 2, 1, 0) — the MCQ-era vector. When the rungs became checks the KEY was updated and the
+  # scenario shipped correct, but this block was not, so the self-test minted an MCQ-era path, scored
+  # it 10/40 and halted here — taking every later regression (ids 21, 19, 20, 10) down with it.
+  csteps14 <- list(list(answer = 1, attempts = 1),
                    list(answer = 1, attempts = 1),
-                   list(answer = 0, attempts = 1))
+                   list(answer = 1, attempts = 1),
+                   list(answer = 1, attempts = 1))
   ccode14 <- encode_code(version = 1, scenario_id = 14, steps = csteps14, student_id = "canyon_test")
   cd14 <- decode_code(ccode14, "canyon_test")
   cok14 <- cd14$valid && cd14$scenario_id == 14 &&
-    identical(cd14$answers, c(3L, 2L, 1L, 0L)) && identical(cd14$attempts, c(1L, 1L, 1L, 1L))
+    identical(cd14$answers, c(1L, 1L, 1L, 1L)) && identical(cd14$attempts, c(1L, 1L, 1L, 1L))
   cat("Pano round-trip OK id 14 (should be TRUE):", cok14, "\n")
   if (!cok14) stop("REGRESSION: pano round-trip failed (id 14 canyon)")
   cg14 <- grade_one(ccode14, "canyon_test", HIERARCHICAL_CLUSTERING_CANYON_KEY)

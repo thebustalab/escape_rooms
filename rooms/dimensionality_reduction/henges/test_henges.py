@@ -8,6 +8,9 @@ stone-cipher escape code, and the decoder key. Run: python3 test_henges.py
 
 Needs numpy (PCA/eigendecomposition); numpy is available on this box. The rest is stdlib.
 
+PC SIGNS ARE PINNED BY CONVENTION in `pca()` — read the note there before adding any check of the form
+`score > k`. Without it this file passes on Linux/MKL and fails on the Mac/Accelerate (2026-09-25).
+
 Failure modes it guards:
   - the CSV changes and a room's verified answer (PC1 outlier / scree % / PC1 driver / PC2 mushroom marker)
     silently stops matching the wired puzzle;
@@ -39,6 +42,16 @@ def pca(rows):
     U, S, Vt = np.linalg.svd(Z, full_matrices=False)
     eig = S**2 / (n - 1)
     ve = 100 * eig / eig.sum()
+    # THE SIGN OF A PRINCIPAL COMPONENT IS ARBITRARY. Z = U S Vt and Z = (-U) S (-Vt) are the same
+    # decomposition, so which way a PC points is decided by the LAPACK backend, not by the data:
+    # numpy on MKL (this box) and numpy on Accelerate (the Mac) legitimately disagree. `prcomp` in R
+    # is free to differ again. Any check of the FORM `score > k` therefore passes on one machine and
+    # fails on the other — which is exactly what happened to the mushroom/PC2 trap check on 2026-09-25,
+    # green here and red on the Mac's deploy. Pin a convention instead: make the largest-magnitude
+    # loading of each PC positive. It is arbitrary too, but it is the SAME arbitrary answer everywhere.
+    flip = np.sign(Vt[np.arange(Vt.shape[0]), np.argmax(np.abs(Vt), axis=1)])
+    flip[flip == 0] = 1
+    U, Vt = U * flip, Vt * flip[:, None]
     scores = U * S                                   # = Z @ Vt.T
     load = Vt.T                                       # rows=properties, cols=PCs
     return scores, load, ve
@@ -63,7 +76,8 @@ def main():
     check(pc1_driver == "potency", f"PC1 driver is potency (got {pc1_driver})")
     check(pc2_driver == "luminance", f"PC2 driver is luminance (got {pc2_driver})")
     check(abs(mush_pc1) < 0.5, f"TRAP: mushrooms mid-pack on PC1 (mean {mush_pc1:.2f})")
-    check(mush_pc2 > 1.0, f"TRAP: mushrooms extreme on PC2 (mean {mush_pc2:.2f})")
+    # Direction is meaningless (see pca()'s sign note) — "extreme" is the claim, so measure magnitude.
+    check(abs(mush_pc2) > 1.0, f"TRAP: mushrooms extreme on PC2 (mean {mush_pc2:.2f})")
 
     # ---- wired puzzle content matches the data ----
     scen = json.load(open(SCEN, encoding="utf-8"))

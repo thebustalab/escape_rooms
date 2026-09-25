@@ -1409,32 +1409,26 @@
           "boxSource": "review:agent",
           "id": "table_c1",
           "starterCode": "canyon_water_chem",
-          "question": {
-            "prompt": "The old surveyors sorted these springs by the fork they run down. You are here to sort them by their water. Start with the one they named first: which spring's water is most like Dripstone's?",
-            "options": [
-              "Chalkseep",
-              "Palegate",
-              "Bitterwell",
-              "Lime_Hollow",
-              "Saltglass",
-              "Sulphur_Step",
-              "Brimstone_Font",
-              "Glasswater"
-            ],
-            "correct": 3,
-            "maxAttempts": 4,
-            "feedback": {
-              "correct": "Correct — noted in your field notebook: Dripstone's nearest kin is Lime_Hollow.",
-              "wrong": [
-                "Each spring is six numbers — the six dissolved classes. Two springs are kin when those six numbers sit closest together, so measure the distance from Dripstone to every other spring.",
-                "`dist()` on the six mineral columns gives every pairwise distance at once; read Dripstone's row and take its smallest entry.",
-                "Three springs sit close to Dripstone and the rest sit a long way off. Among those three, one is clearly nearer than the other two — that is the kin, not merely a neighbour."
-              ]
-            }
-          },
           "solveSfx": {
             "src": "audio/solve_stone_slot.mp3",
             "volume": 0.43758254650883743
+          },
+          "check": {
+            "prompt": "The old surveyors grouped these springs by the fork they run down. You are here to group them by their water instead, starting with the spring they named first. Using the six chemistry columns — <code>carbonate</code>, <code>sulfate</code>, <code>chloride</code>, <code>silica</code>, <code>iron_oxide</code> and <code>salts</code> — work out which spring's water is the shortest distance from Dripstone's, and assign that spring's name to <code>answer</code>.",
+            "requires": [
+              "answer"
+            ],
+            "expr": "tolower(trimws(gsub(\"[ _-]\", \"\", as.character(unlist(answer))[1]))) == \"limehollow\"",
+            "maxAttempts": 4,
+            "hint": "<code>dist()</code> on the six chemistry columns gives every pairwise distance at once. Name the rows with <code>spring</code>, read the Dripstone row, and take its smallest entry.",
+            "feedback": {
+              "correct": "Correct — noted: Lime_Hollow. Its water sits 0.11 from Dripstone's across the six columns, just ahead of Chalkseep at 0.12.",
+              "wrong": [
+                "Each spring is six numbers. Two springs are closest when those six sets of numbers sit nearest together, so measure the distance from Dripstone to each of the other seventeen and take the smallest.",
+                "Scale the six columns first, then <code>dist()</code> them. Put the spring names on with <code>rownames()</code>, pull out the Dripstone row, and sort it.",
+                "This one is close: the nearest two springs are only about a tenth apart from each other, so read the numbers rather than trusting a glance at a plot. <code>answer</code> wants one spring name."
+              ]
+            }
           }
         },
         {
@@ -1519,32 +1513,26 @@
           ],
           "boxSource": "moved:testplay",
           "starterCode": "canyon_water_chem",
-          "question": {
-            "prompt": "The old surveyors sorted these springs by the fork they run down. You are here to sort them by their water. Start with the one they named first: which spring's water is most like Dripstone's?",
-            "options": [
-              "Chalkseep",
-              "Palegate",
-              "Bitterwell",
-              "Lime_Hollow",
-              "Saltglass",
-              "Sulphur_Step",
-              "Brimstone_Font",
-              "Glasswater"
-            ],
-            "correct": 3,
-            "maxAttempts": 4,
-            "feedback": {
-              "correct": "Correct — noted in your field notebook: Dripstone's nearest kin is Lime_Hollow.",
-              "wrong": [
-                "Each spring is six numbers — the six dissolved classes. Two springs are kin when those six numbers sit closest together, so measure the distance from Dripstone to every other spring.",
-                "`dist()` on the six mineral columns gives every pairwise distance at once; read Dripstone's row and take its smallest entry.",
-                "Three springs sit close to Dripstone and the rest sit a long way off. Among those three, one is clearly nearer than the other two — that is the kin, not merely a neighbour."
-              ]
-            }
-          },
           "solveSfx": {
             "src": "audio/solve_stone_slot.mp3",
             "volume": 0.43758254650883743
+          },
+          "check": {
+            "prompt": "The old surveyors grouped these springs by the fork they run down. You are here to group them by their water instead, starting with the spring they named first. Using the six chemistry columns — <code>carbonate</code>, <code>sulfate</code>, <code>chloride</code>, <code>silica</code>, <code>iron_oxide</code> and <code>salts</code> — work out which spring's water is the shortest distance from Dripstone's, and assign that spring's name to <code>answer</code>.",
+            "requires": [
+              "answer"
+            ],
+            "expr": "tolower(trimws(gsub(\"[ _-]\", \"\", as.character(unlist(answer))[1]))) == \"limehollow\"",
+            "maxAttempts": 4,
+            "hint": "<code>dist()</code> on the six chemistry columns gives every pairwise distance at once. Name the rows with <code>spring</code>, read the Dripstone row, and take its smallest entry.",
+            "feedback": {
+              "correct": "Correct — noted: Lime_Hollow. Its water sits 0.11 from Dripstone's across the six columns, just ahead of Chalkseep at 0.12.",
+              "wrong": [
+                "Each spring is six numbers. Two springs are closest when those six sets of numbers sit nearest together, so measure the distance from Dripstone to each of the other seventeen and take the smallest.",
+                "Scale the six columns first, then <code>dist()</code> them. Put the spring names on with <code>rownames()</code>, pull out the Dripstone row, and sort it.",
+                "This one is close: the nearest two springs are only about a tenth apart from each other, so read the numbers rather than trusting a glance at a plot. <code>answer</code> wants one spring name."
+              ]
+            }
           }
         },
         {
@@ -1800,29 +1788,6 @@
           "boxSource": "review:agent",
           "id": "table_c2",
           "starterCode": "canyon_water_chem\nunknown_spring",
-          "question": {
-            "prompt": "A spring runs out of the rock above this junction with no name carved anywhere near it. Someone sampled it anyway and left the reading behind. Which of the canyon's families does the Unmarked Spring belong to?",
-            "options": [
-              "The carbonate springs of the West Fork",
-              "The sulfate springs of the East Fork",
-              "The silica springs of the North Branch",
-              "The saline springs of the South Branch",
-              "It stands with Saltglass, apart from the four",
-              "It is a family of its own",
-              "It is nearest to Bitterwell",
-              "The reading cannot place it"
-            ],
-            "correct": 2,
-            "maxAttempts": 4,
-            "feedback": {
-              "correct": "Correct — noted in your field notebook: the Unmarked Spring is silica water, kin to the North Branch springs.",
-              "wrong": [
-                "The unknown reading has the same six columns as the survey. Stack it onto the bottom of the table and the whole set can be sorted together.",
-                "`rbind()` the two tables, then cluster the six mineral columns as before — the unknown will attach itself to whichever family it belongs in.",
-                "Look at which named springs it lands beside, then at what dominates their water. One class runs far higher in that group than in any other."
-              ]
-            }
-          },
           "availableWhen": {
             "solved": "j_c1"
           },
@@ -1830,6 +1795,23 @@
           "solveSfx": {
             "src": "audio/solve_stone_slot.mp3",
             "volume": 0.43758254650883743
+          },
+          "check": {
+            "prompt": "A spring runs out of the rock above this junction with no name carved anywhere near it, and someone sampled it anyway. Add the <code>unknown_spring</code> row to the others, cluster all nineteen springs on the same six chemistry columns, cut that clustering into four groups, and assign to <code>answer</code> the names of the springs that end up in the same group as Unmarked_Spring.",
+            "requires": [
+              "answer"
+            ],
+            "expr": "local({ a <- tolower(trimws(gsub(\"[ _-]\", \"\", as.character(unlist(answer))))); a <- setdiff(a, \"unmarkedspring\"); length(a) == 4 && setequal(a, c(\"glasswater\",\"flintrun\",\"obsidianweep\",\"silverglass\")) })",
+            "maxAttempts": 4,
+            "hint": "<code>rbind()</code> the unknown row onto the others, then run the same clustering on the combined table with <code>parameters = c(4)</code> and read off the <code>cluster</code> its row lands in.",
+            "feedback": {
+              "correct": "Correct — noted: the unmarked spring belongs with Glasswater, Flintrun, Obsidian_Weep and Silverglass. Its <code>silica</code> reads 62 where every spring outside that group reads under 15.",
+              "wrong": [
+                "Put the unknown into the same table as the others and cluster the lot together — its own six readings will place it in one of the four groups.",
+                "<code>rbind(canyon_water_chem, unknown_spring)</code>, then cluster with <code>parameters = c(4)</code>. Find the <code>cluster</code> value on the Unmarked_Spring row and list the other springs that share it.",
+                "It is not a close call — one column separates that group from everything else by a wide margin. <code>answer</code> wants the four spring names it joins, not the unknown's own name."
+              ]
+            }
           }
         },
         {
@@ -1900,29 +1882,6 @@
           ],
           "boxSource": "review:agent",
           "starterCode": "canyon_water_chem\nunknown_spring",
-          "question": {
-            "prompt": "A spring runs out of the rock above this junction with no name carved anywhere near it. Someone sampled it anyway and left the reading behind. Which of the canyon's families does the Unmarked Spring belong to?",
-            "options": [
-              "The carbonate springs of the West Fork",
-              "The sulfate springs of the East Fork",
-              "The silica springs of the North Branch",
-              "The saline springs of the South Branch",
-              "It stands with Saltglass, apart from the four",
-              "It is a family of its own",
-              "It is nearest to Bitterwell",
-              "The reading cannot place it"
-            ],
-            "correct": 2,
-            "maxAttempts": 4,
-            "feedback": {
-              "correct": "Correct — noted in your field notebook: the Unmarked Spring is silica water, kin to the North Branch springs.",
-              "wrong": [
-                "The unknown reading has the same six columns as the survey. Stack it onto the bottom of the table and the whole set can be sorted together.",
-                "`rbind()` the two tables, then cluster the six mineral columns as before — the unknown will attach itself to whichever family it belongs in.",
-                "Look at which named springs it lands beside, then at what dominates their water. One class runs far higher in that group than in any other."
-              ]
-            }
-          },
           "availableWhen": {
             "solved": "j_c1"
           },
@@ -1930,6 +1889,23 @@
           "solveSfx": {
             "src": "audio/solve_stone_slot.mp3",
             "volume": 0.43758254650883743
+          },
+          "check": {
+            "prompt": "A spring runs out of the rock above this junction with no name carved anywhere near it, and someone sampled it anyway. Add the <code>unknown_spring</code> row to the others, cluster all nineteen springs on the same six chemistry columns, cut that clustering into four groups, and assign to <code>answer</code> the names of the springs that end up in the same group as Unmarked_Spring.",
+            "requires": [
+              "answer"
+            ],
+            "expr": "local({ a <- tolower(trimws(gsub(\"[ _-]\", \"\", as.character(unlist(answer))))); a <- setdiff(a, \"unmarkedspring\"); length(a) == 4 && setequal(a, c(\"glasswater\",\"flintrun\",\"obsidianweep\",\"silverglass\")) })",
+            "maxAttempts": 4,
+            "hint": "<code>rbind()</code> the unknown row onto the others, then run the same clustering on the combined table with <code>parameters = c(4)</code> and read off the <code>cluster</code> its row lands in.",
+            "feedback": {
+              "correct": "Correct — noted: the unmarked spring belongs with Glasswater, Flintrun, Obsidian_Weep and Silverglass. Its <code>silica</code> reads 62 where every spring outside that group reads under 15.",
+              "wrong": [
+                "Put the unknown into the same table as the others and cluster the lot together — its own six readings will place it in one of the four groups.",
+                "<code>rbind(canyon_water_chem, unknown_spring)</code>, then cluster with <code>parameters = c(4)</code>. Find the <code>cluster</code> value on the Unmarked_Spring row and list the other springs that share it.",
+                "It is not a close call — one column separates that group from everything else by a wide margin. <code>answer</code> wants the four spring names it joins, not the unknown's own name."
+              ]
+            }
           }
         },
         {
@@ -2513,28 +2489,6 @@
           "boxSource": "review:agent",
           "id": "table_c4",
           "starterCode": "canyon_water_chem",
-          "question": {
-            "prompt": "The water here comes up bitter enough to taste from the bank. Sort the whole survey into four families by their water. Which family carries the most sulfate on average, and which springs make it up?",
-            "options": [
-              "The carbonate family — Dripstone, Palegate, Lime_Hollow, Chalkseep",
-              "The sulfate family — Brimstone_Font, Sulphur_Step, Cinderpool, Matchhead_Spring and Bitterwell",
-              "The East Fork springs — Brimstone_Font, Sulphur_Step, Cinderpool, Matchhead_Spring",
-              "The silica family — Glasswater, Flintrun, Obsidian_Weep, Silverglass",
-              "The saline family — Saltglass, Brineseep, Saltmouth, Tidewell, Pillar_Brine",
-              "Cinderpool by itself, the single highest reading in the survey",
-              "Whichever family has the most springs in it"
-            ],
-            "correct": 1,
-            "maxAttempts": 4,
-            "feedback": {
-              "correct": "Correct — noted in your field notebook: the sulfate family averages 61 sulfate against 8 everywhere else, and Bitterwell runs with it.",
-              "wrong": [
-                "Cluster the six mineral columns as before, then cut the tree into four groups and take the average sulfate within each one.",
-                "Adding `parameters = c(4)` to the same `runMatrixAnalysis()` call gives each spring a family number in a `cluster` column; `group_by()` that column and `summarise()` the mean of the sulfate column.",
-                "One family's average is many times every other's, so which family wins is not in doubt. The care is in its membership — check whether the springs the cut puts together are the same springs the forks put together."
-              ]
-            }
-          },
           "availableWhen": {
             "solved": "j_c2"
           },
@@ -2542,6 +2496,23 @@
           "solveSfx": {
             "src": "audio/solve_stone_slot.mp3",
             "volume": 0.43758254650883743
+          },
+          "check": {
+            "prompt": "The water here comes up bitter enough to taste from the bank, and the survey ought to say which springs share that. Cluster the springs into four groups on the six chemistry columns, take the mean <code>sulfate</code> of each group, and assign to <code>answer</code> the names of the springs in the group whose mean is highest.",
+            "requires": [
+              "answer"
+            ],
+            "expr": "local({ a <- tolower(trimws(gsub(\"[ _-]\", \"\", as.character(unlist(answer))))); length(a) == 5 && setequal(a, c(\"brimstonefont\",\"sulphurstep\",\"cinderpool\",\"matchheadspring\",\"bitterwell\")) })",
+            "maxAttempts": 4,
+            "hint": "Cluster with <code>parameters = c(4)</code> to get a <code>cluster</code> column, then <code>group_by(cluster)</code> and take the mean of <code>sulfate</code> for each.",
+            "feedback": {
+              "correct": "Correct — noted: Brimstone_Font, Sulphur_Step, Cinderpool, Matchhead_Spring and Bitterwell. Their mean <code>sulfate</code> is 61, against about 8 for each of the other three groups.",
+              "wrong": [
+                "Cut the springs into their four groups first, then ask one number of each group rather than of each spring.",
+                "<code>parameters = c(4)</code> gives a <code>cluster</code> column; group by it and take <code>mean(sulfate)</code>. One group's mean is many times the others.",
+                "It is not close — one group averages about 61 and the rest about 8. <code>answer</code> wants the spring names in that group, not its cluster number or its mean."
+              ]
+            }
           }
         },
         {
@@ -2612,28 +2583,6 @@
           ],
           "boxSource": "moved:testplay",
           "starterCode": "canyon_water_chem",
-          "question": {
-            "prompt": "The water here comes up bitter enough to taste from the bank. Sort the whole survey into four families by their water. Which family carries the most sulfate on average, and which springs make it up?",
-            "options": [
-              "The carbonate family — Dripstone, Palegate, Lime_Hollow, Chalkseep",
-              "The sulfate family — Brimstone_Font, Sulphur_Step, Cinderpool, Matchhead_Spring and Bitterwell",
-              "The East Fork springs — Brimstone_Font, Sulphur_Step, Cinderpool, Matchhead_Spring",
-              "The silica family — Glasswater, Flintrun, Obsidian_Weep, Silverglass",
-              "The saline family — Saltglass, Brineseep, Saltmouth, Tidewell, Pillar_Brine",
-              "Cinderpool by itself, the single highest reading in the survey",
-              "Whichever family has the most springs in it"
-            ],
-            "correct": 1,
-            "maxAttempts": 4,
-            "feedback": {
-              "correct": "Correct — noted in your field notebook: the sulfate family averages 61 sulfate against 8 everywhere else, and Bitterwell runs with it.",
-              "wrong": [
-                "Cluster the six mineral columns as before, then cut the tree into four groups and take the average sulfate within each one.",
-                "Adding `parameters = c(4)` to the same `runMatrixAnalysis()` call gives each spring a family number in a `cluster` column; `group_by()` that column and `summarise()` the mean of the sulfate column.",
-                "One family's average is many times every other's, so which family wins is not in doubt. The care is in its membership — check whether the springs the cut puts together are the same springs the forks put together."
-              ]
-            }
-          },
           "availableWhen": {
             "solved": "j_c2"
           },
@@ -2641,6 +2590,23 @@
           "solveSfx": {
             "src": "audio/solve_stone_slot.mp3",
             "volume": 0.43758254650883743
+          },
+          "check": {
+            "prompt": "The water here comes up bitter enough to taste from the bank, and the survey ought to say which springs share that. Cluster the springs into four groups on the six chemistry columns, take the mean <code>sulfate</code> of each group, and assign to <code>answer</code> the names of the springs in the group whose mean is highest.",
+            "requires": [
+              "answer"
+            ],
+            "expr": "local({ a <- tolower(trimws(gsub(\"[ _-]\", \"\", as.character(unlist(answer))))); length(a) == 5 && setequal(a, c(\"brimstonefont\",\"sulphurstep\",\"cinderpool\",\"matchheadspring\",\"bitterwell\")) })",
+            "maxAttempts": 4,
+            "hint": "Cluster with <code>parameters = c(4)</code> to get a <code>cluster</code> column, then <code>group_by(cluster)</code> and take the mean of <code>sulfate</code> for each.",
+            "feedback": {
+              "correct": "Correct — noted: Brimstone_Font, Sulphur_Step, Cinderpool, Matchhead_Spring and Bitterwell. Their mean <code>sulfate</code> is 61, against about 8 for each of the other three groups.",
+              "wrong": [
+                "Cut the springs into their four groups first, then ask one number of each group rather than of each spring.",
+                "<code>parameters = c(4)</code> gives a <code>cluster</code> column; group by it and take <code>mean(sulfate)</code>. One group's mean is many times the others.",
+                "It is not close — one group averages about 61 and the rest about 8. <code>answer</code> wants the spring names in that group, not its cluster number or its mean."
+              ]
+            }
           }
         },
         {
@@ -3532,28 +3498,6 @@
           "boxSource": "review:agent",
           "id": "table_c7",
           "starterCode": "canyon_water_chem",
-          "question": {
-            "prompt": "The makers cut their own map of the canyon into the wall behind you, every spring set into the branch of the fork it runs down. You have the water itself. Which springs does the carved map put in the wrong company?",
-            "options": [
-              "Bitterwell and Saltglass",
-              "Bitterwell only",
-              "Saltglass only",
-              "Bitterwell and Brimstone_Font",
-              "Saltglass and Brineseep",
-              "Chalkseep and Palegate",
-              "None — the carved map is right"
-            ],
-            "correct": 0,
-            "maxAttempts": 4,
-            "feedback": {
-              "correct": "Correct — noted in your field notebook: Bitterwell and Saltglass each run down one fork and belong to another.",
-              "wrong": [
-                "Give every spring its family from the water, then set that beside the fork it runs down, and look for the rows where the two disagree.",
-                "`parameters = c(4)` for the family, the `fork` column for the makers' grouping — put them side by side and the mismatches stand out.",
-                "Most springs agree with the carving. More than one does not. A spring can run down one fork and still be tapping the same stratum as a family in another."
-              ]
-            }
-          },
           "availableWhen": {
             "allSolved": [
               "j_c1",
@@ -3565,6 +3509,23 @@
           "solveSfx": {
             "src": "audio/solve_storm_breaks.mp3",
             "volume": 0.5
+          },
+          "check": {
+            "prompt": "The makers cut their own map into the wall behind you, every spring set into the branch of the fork it runs down — and that same grouping is the <code>fork</code> column of your table. Cluster the springs into four groups on the six chemistry columns, compare each spring's group against its <code>fork</code>, and assign to <code>answer</code> the names of the two springs whose water groups them with a different set of springs than their <code>fork</code> does.",
+            "requires": [
+              "answer"
+            ],
+            "expr": "local({ a <- tolower(trimws(gsub(\"[ _-]\", \"\", as.character(unlist(answer))))); length(a) == 2 && setequal(a, c(\"bitterwell\",\"saltglass\")) })",
+            "maxAttempts": 4,
+            "hint": "Cluster with <code>parameters = c(4)</code> for the chemistry grouping, then set that <code>cluster</code> against the <code>fork</code> column spring by spring and look for the springs that do not match the rest of their fork.",
+            "feedback": {
+              "correct": "Correct — noted: Bitterwell and Saltglass. Bitterwell is carved under the West_Fork but its water groups with the East_Fork sulfate springs; Saltglass is carved under the North_Branch but its water groups with the South_Branch salt springs.",
+              "wrong": [
+                "Work out each spring's group from the six chemistry columns, then set that beside its <code>fork</code>. In two of the four forks, one spring's water does not match the others carved alongside it.",
+                "<code>parameters = c(4)</code> gives the chemistry grouping; compare it against <code>fork</code>. Sixteen of the eighteen agree, which is exactly why the carved map is tempting.",
+                "There are two, in different forks. <code>answer</code> wants both spring names — not one, and not a fork."
+              ]
+            }
           }
         },
         {
@@ -3681,28 +3642,6 @@
           ],
           "boxSource": "moved:testplay",
           "starterCode": "canyon_water_chem",
-          "question": {
-            "prompt": "The makers cut their own map of the canyon into the wall behind you, every spring set into the branch of the fork it runs down. You have the water itself. Which springs does the carved map put in the wrong company?",
-            "options": [
-              "Bitterwell and Saltglass",
-              "Bitterwell only",
-              "Saltglass only",
-              "Bitterwell and Brimstone_Font",
-              "Saltglass and Brineseep",
-              "Chalkseep and Palegate",
-              "None — the carved map is right"
-            ],
-            "correct": 0,
-            "maxAttempts": 4,
-            "feedback": {
-              "correct": "Correct — noted in your field notebook: Bitterwell and Saltglass each run down one fork and belong to another.",
-              "wrong": [
-                "Give every spring its family from the water, then set that beside the fork it runs down, and look for the rows where the two disagree.",
-                "`parameters = c(4)` for the family, the `fork` column for the makers' grouping — put them side by side and the mismatches stand out.",
-                "Most springs agree with the carving. More than one does not. A spring can run down one fork and still be tapping the same stratum as a family in another."
-              ]
-            }
-          },
           "availableWhen": {
             "allSolved": [
               "j_c1",
@@ -3714,6 +3653,23 @@
           "solveSfx": {
             "src": "audio/solve_storm_breaks.mp3",
             "volume": 0.5
+          },
+          "check": {
+            "prompt": "The makers cut their own map into the wall behind you, every spring set into the branch of the fork it runs down — and that same grouping is the <code>fork</code> column of your table. Cluster the springs into four groups on the six chemistry columns, compare each spring's group against its <code>fork</code>, and assign to <code>answer</code> the names of the two springs whose water groups them with a different set of springs than their <code>fork</code> does.",
+            "requires": [
+              "answer"
+            ],
+            "expr": "local({ a <- tolower(trimws(gsub(\"[ _-]\", \"\", as.character(unlist(answer))))); length(a) == 2 && setequal(a, c(\"bitterwell\",\"saltglass\")) })",
+            "maxAttempts": 4,
+            "hint": "Cluster with <code>parameters = c(4)</code> for the chemistry grouping, then set that <code>cluster</code> against the <code>fork</code> column spring by spring and look for the springs that do not match the rest of their fork.",
+            "feedback": {
+              "correct": "Correct — noted: Bitterwell and Saltglass. Bitterwell is carved under the West_Fork but its water groups with the East_Fork sulfate springs; Saltglass is carved under the North_Branch but its water groups with the South_Branch salt springs.",
+              "wrong": [
+                "Work out each spring's group from the six chemistry columns, then set that beside its <code>fork</code>. In two of the four forks, one spring's water does not match the others carved alongside it.",
+                "<code>parameters = c(4)</code> gives the chemistry grouping; compare it against <code>fork</code>. Sixteen of the eighteen agree, which is exactly why the carved map is tempting.",
+                "There are two, in different forks. <code>answer</code> wants both spring names — not one, and not a fork."
+              ]
+            }
           }
         },
         {

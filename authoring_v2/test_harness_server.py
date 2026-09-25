@@ -764,6 +764,77 @@ def test_set_cover_copies_and_patches():
     _with_rooms_root(body)
 
 
+def test_cover_dismiss_hides_the_candidate_but_keeps_the_file():
+    """DISMISSED IS NOT DELETED (2026-09-25). The × on a cover candidate drops it from the tab and
+    leaves the PNG in _scratch — the difference from delete-plate-candidate, which moves the file.
+    Mirrors the clip candidates' `_cine_dismiss` ledger one tab over."""
+    def body(tmp):
+        _write_scenario("data_vis", "x", {"rooms": [{"key": "room1", "built": False}]})
+        hs._select_scenario("data_vis", "x")
+        base = hs.COMMIT_BASE
+        paths = {}
+        for n in (1, 2, 3):
+            paths[n] = os.path.join(hs.SCENE, "gpt_cover_%d.png" % n)
+            with open(paths[n], "wb") as f:
+                f.write(b"\x89PNG\r\n\x1a\n" + bytes([n]) * 20)
+        assert sorted(hs._cover_candidates(base)) == ["gpt_cover_1.png", "gpt_cover_2.png", "gpt_cover_3.png"]
+        assert hs._cover_dismissed(base) == []                   # no ledger yet -> nothing dismissed
+
+        assert hs._cover_dismiss(base, "gpt_cover_2.png") == "gpt_cover_2.png"
+        assert sorted(hs._cover_candidates(base)) == ["gpt_cover_1.png", "gpt_cover_3.png"]
+        assert os.path.isfile(paths[2]), "a dismissed cover must STAY on disk — this is not a delete"
+        assert hs._cover_dismissed(base) == ["gpt_cover_2.png"]
+
+        # the ledger is plain, hand-editable JSON, because there is no un-dismiss button by design
+        with open(hs._cover_dismissed_path(base), encoding="utf-8") as f:
+            assert json.load(f) == {"dismissed": ["gpt_cover_2.png"]}
+        # ...and editing it by hand is how a cover comes back
+        with open(hs._cover_dismissed_path(base), "w", encoding="utf-8") as f:
+            json.dump({"dismissed": []}, f)
+        assert sorted(hs._cover_candidates(base)) == ["gpt_cover_1.png", "gpt_cover_2.png", "gpt_cover_3.png"]
+    _with_rooms_root(body)
+
+
+def test_cover_dismiss_is_idempotent_and_survives_a_bad_ledger():
+    """The grid redraws from the server, so a double-click or a dismiss racing a refresh must write the
+    name once and not raise. And a ledger this file invites people to edit by hand must never take the
+    tab down when they typo it — a corrupt read is 'nothing dismissed', not an exception."""
+    def body(tmp):
+        _write_scenario("data_vis", "x", {"rooms": [{"key": "room1", "built": False}]})
+        hs._select_scenario("data_vis", "x")
+        base = hs.COMMIT_BASE
+        for n in (1, 2):
+            with open(os.path.join(hs.SCENE, "gpt_cover_%d.png" % n), "wb") as f:
+                f.write(b"\x89PNG\r\n\x1a\n" + bytes([n]) * 20)
+        for _ in range(3):                                        # idempotent: three calls, one entry
+            hs._cover_dismiss(base, "gpt_cover_1.png")
+        assert hs._cover_dismissed(base) == ["gpt_cover_1.png"]
+        assert hs._cover_candidates(base) == ["gpt_cover_2.png"]
+        # dismissing a name that is not on disk is a recorded no-op, not an error
+        hs._cover_dismiss(base, "gpt_cover_never_existed.png")
+        assert "gpt_cover_never_existed.png" in hs._cover_dismissed(base)
+        # a path-y name is confined to its basename, so the ledger cannot name a file outside _scratch
+        assert hs._cover_dismiss(base, "../../gpt_cover_2.png") == "gpt_cover_2.png"
+        assert hs._cover_candidates(base) == []
+        for bad in ("", "   ", None):
+            try:
+                hs._cover_dismiss(base, bad)
+                raise AssertionError("should reject %r" % (bad,))
+            except ValueError:
+                pass
+        # a hand-mangled ledger degrades to "nothing dismissed" rather than emptying the tab
+        for junk in ("{not json", '{"dismissed": "gpt_cover_1.png"}', "[]", "null"):
+            with open(hs._cover_dismissed_path(base), "w", encoding="utf-8") as f:
+                f.write(junk)
+            assert hs._cover_dismissed(base) == [], junk
+            assert sorted(hs._cover_candidates(base)) == ["gpt_cover_1.png", "gpt_cover_2.png"], junk
+        # a bare list is accepted too — the shape a hand-editor is most likely to leave behind
+        with open(hs._cover_dismissed_path(base), "w", encoding="utf-8") as f:
+            json.dump(["gpt_cover_1.png"], f)
+        assert hs._cover_candidates(base) == ["gpt_cover_2.png"]
+    _with_rooms_root(body)
+
+
 def test_set_world_plate_copies_and_patches():
     """Phase 2: set-world-plate copies a _scratch candidate to <scenario>/_world/plate.png and points
     scenario.worldPlate at it; _world_plate_abs reports None until it exists, then the path. A name
@@ -2615,3 +2686,93 @@ def test_sound_briefs_carries_music_states_and_live_committed_levels(tmp_path):
     doc["rooms"][0]["sfx"]["volume"] = 0.2            # what /api/save-mix does
     (base / "scenario.json").write_text(_json.dumps(doc))
     assert hs._sound_briefs(str(base))["rooms"][0]["committed"][0]["volume"] == 0.2
+
+
+def test_puzzle_prompts_carry_the_mcq_answer_list():
+    """`puzzlePrompts` carries each MCQ's full option list and its key, so the console's Puzzles tab can
+    show the ladder the way a student meets it without re-reading scenario.json. A non-MCQ puzzle reports
+    an empty list, and `correct` is only reported when it actually indexes the options — a missing,
+    out-of-range or boolean key must read as "none marked", never silently highlight option 0."""
+    with tempfile.TemporaryDirectory() as base:
+        doc = {"rooms": [
+            {"key": "r1", "hotspots": [
+                {"id": "p1", "type": "puzzle", "label": "Panel",
+                 "question": {"prompt": "Which?", "options": ["a", "b", "c"], "correct": 2}},
+            ]},
+            {"key": "r2", "hotspots": [
+                {"id": "p2", "type": "puzzle", "label": "Console", "check": {"prompt": "Filter it."}},
+                {"id": "p3", "type": "puzzle", "label": "Bad key",
+                 "question": {"prompt": "Which?", "options": ["a", "b"], "correct": 7}},
+                {"id": "p4", "type": "puzzle", "label": "No key",
+                 "question": {"prompt": "Which?", "options": ["a", "b"]}},
+                {"id": "p5", "type": "puzzle", "label": "Bool key",
+                 "question": {"prompt": "Which?", "options": ["a", "b"], "correct": True}},
+            ]},
+            {"key": "r3", "plannedHotspots": [   # unbuilt room — the planned stub carries options too
+                {"type": "puzzle", "label": "Beacon",
+                 "question": {"prompt": "Warmest?", "options": ["x", "y"], "correct": 1}},
+            ]},
+        ]}
+        with open(os.path.join(base, "scenario.json"), "w") as f:
+            json.dump(doc, f)
+        pp = {r["key"]: r["puzzlePrompts"] for r in hs._scenario_state(base)["rooms"]}
+        assert pp["r1"][0]["options"] == ["a", "b", "c"] and pp["r1"][0]["correct"] == 2
+        byl = {x["label"]: x for x in pp["r2"]}
+        assert byl["Console"]["options"] == [] and byl["Console"]["correct"] is None
+        assert byl["Bad key"]["correct"] is None      # out of range
+        assert byl["No key"]["correct"] is None       # absent
+        assert byl["Bool key"]["correct"] is None     # True is an int in Python; it is not a key
+        assert pp["r3"][0]["options"] == ["x", "y"] and pp["r3"][0]["correct"] == 1
+
+
+def test_scenario_state_surfaces_the_dynamic_puzzle_queue():
+    """A queue scenario (networks/subway) pins no puzzle to a room: the ladder lives in
+    `SCENARIO.puzzleQueue` and each `queue: true` hotspot is a SLOT serving the next unsolved rung. The
+    console's Puzzles tab therefore needs BOTH the flattened queue and a per-room slot count — reading the
+    rooms alone reported subway as four rooms with an unwritten prompt while all four prompts existed.
+    A planned slot still counts for a room that has committed hotspots but has not materialised its puzzle
+    yet (`dimensionality_reduction/clouds`: a committed door beside a planned slot)."""
+    with tempfile.TemporaryDirectory() as base:
+        doc = {"puzzleQueue": [
+                   {"label": "Rung one", "question": {"prompt": "Which?", "options": ["a", "b"], "correct": 1}},
+                   {"label": "Rung two", "check": {"prompt": "Filter it."}},
+                   {"label": "Rung three"},                      # authored slot, prompt not written yet
+               ],
+               "rooms": [
+                   {"key": "car_a", "hotspots": [
+                       {"id": "desk", "type": "puzzle", "label": "Control desk", "queue": True}]},
+                   {"key": "cockpit", "hotspots": [            # part-built: a committed DOOR, planned slot
+                       {"id": "to_next", "type": "door", "label": "Onward"}],
+                    "plannedHotspots": [
+                       {"type": "puzzle", "label": "The survey console", "queue": True}]},
+                   {"key": "plain", "hotspots": [
+                       {"id": "p", "type": "puzzle", "label": "Own puzzle",
+                        "question": {"prompt": "Mine.", "options": ["x", "y"], "correct": 0}}]},
+               ]}
+        with open(os.path.join(base, "scenario.json"), "w") as f:
+            json.dump(doc, f)
+        st = hs._scenario_state(base)
+        q = st["puzzleQueue"]
+        assert [x["index"] for x in q] == [0, 1, 2]              # the index IS the rung, and the codec's step
+        assert q[0]["kind"] == "mcq" and q[0]["options"] == ["a", "b"] and q[0]["correct"] == 1
+        assert q[1]["kind"] == "check" and q[1]["options"] == []
+        assert q[2]["kind"] is None and q[2]["prompt"] == ""     # a half-authored rung is shown, not hidden
+        assert all(x["source"] == "puzzleQueue" for x in q)
+        slots = {r["key"]: r["queueSlots"] for r in st["rooms"]}
+        assert slots == {"car_a": 1, "cockpit": 1, "plain": 0}
+        # a slot owns no puzzle, so it must contribute no room-level prompt
+        pp = {r["key"]: r["puzzlePrompts"] for r in st["rooms"]}
+        assert pp["car_a"] == [] and pp["cockpit"] == [] and len(pp["plain"]) == 1
+
+
+def test_queue_slot_count_ignores_a_planned_stub_already_committed():
+    """A planned slot whose committed counterpart exists must not be counted twice — the pairing is on the
+    label slug, the same rule _room_puzzle_prompts uses for prompts."""
+    with tempfile.TemporaryDirectory() as base:
+        doc = {"rooms": [{"key": "car", 
+                          "hotspots": [{"id": "desk", "type": "puzzle", "label": "Control desk", "queue": True}],
+                          "plannedHotspots": [{"type": "puzzle", "label": "Control desk", "queue": True},
+                                              {"type": "puzzle", "label": "Second desk", "queue": True}]}]}
+        with open(os.path.join(base, "scenario.json"), "w") as f:
+            json.dump(doc, f)
+        assert hs._scenario_state(base)["rooms"][0]["queueSlots"] == 2   # committed desk + the un-built second

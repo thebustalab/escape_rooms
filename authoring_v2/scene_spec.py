@@ -460,6 +460,13 @@ def render_motion_prompt(spec, rigid=False):
 
     Short by default and that is deliberate: re-describing the scene is a documented cause of
     drift, and a 288-word spec-style prompt did not outperform a ~30-word one at full resolution.
+
+    AUTHOR EACH `motion.phrase` AS A FINITE-VERB CLAUSE ("the city brightens and dims"), never as a
+    participial noun phrase ("the city brightening and dimming"). The participle form measurably
+    weakens the effect — on clouds it lost an approved colour swing across seven rooms and returned
+    lightning alone, restored by the verb form alone (2026-09-24; cinemagraph_ledger.md → MOTION
+    PROMPT GRAMMAR). This function joins the phrases verbatim, so the mood you author is the mood the
+    model gets.
     `rigid=True` is the ESCALATION for a room where something that should be still is moving — it
     names the non-movers, which is what the shipping motion specs have always done.
     """
@@ -468,8 +475,17 @@ def render_motion_prompt(spec, rigid=False):
         return None
     phrases = [ (e["motion"].get("phrase") or element_desc(e)).strip().rstrip(".") for e in ms ]
     only = "Only those move" if len(phrases) > 1 else "Only that moves"
-    parts = [MOTION_HEAD, _period(_cap("; ".join(phrases))),
-             f"{only}; everything else stays perfectly still.", MOTION_TAIL]
+    # `motionClosing` REPLACES the blanket suppressor (2026-09-23/24, clouds). The default sentence
+    # forbids everything that is not a named mover, and on clouds/cockpit that is what killed the effect
+    # Lucas had approved: the clip he liked said "the glider's dash and nose stay perfectly fixed while
+    # the world beyond rocks very slightly", which PERMITS the city to swing in colour, and the spec-
+    # derived prompt replaced that permission with "everything else stays perfectly still" and returned
+    # lightning alone. A room whose whole subject moves needs to say what is pinned, not what is not.
+    # Authored per spec; absent = the blanket clause, unchanged for every other scenario.
+    closing = (spec or {}).get("motionClosing")
+    closing = closing.strip() if isinstance(closing, str) and closing.strip() else \
+        f"{only}; everything else stays perfectly still."
+    parts = [MOTION_HEAD, _period(_cap("; ".join(phrases))), _period(closing), MOTION_TAIL]
     if rigid:
         # AUTHORED, never auto-summarised. Truncating each non-mover's `desc` to a head noun was
         # tried on 2026-09-13 and produced "ridge path arriving at the platform from, at the head of

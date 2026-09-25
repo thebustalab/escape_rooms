@@ -12,10 +12,18 @@ older hotspot-crop clips (288x512 and similar) — see the note at the end.
 
 ## Measurement
 
+> **Every GATE in this directory has an index card in `Tools/gate_validation/gates/`** — what it
+> measures, its thresholds, the clips it was calibrated on and its known failure modes, one file per
+> gate: `camera.md`, `dead.md`, `glitch.md`, `return.md`, `colour_drift.md`, `night_metrics.md` (plus
+> `seam_wrap.md` / `seam_band.md` for the `authoring_v2/` seam gates). **The card and the code are
+> edited in the SAME change** — a card whose `**Source:**` no longer resolves is a confident wrong
+> answer, and `gate_validation/test_revalidate_contract.py` fails if one does.
+> **Never change a gate without running `gate_validation/revalidate.py` before and after.**
+
 | tool | what it answers | notes |
 |---|---|---|
 | `loop_table.py` | how big is the loop jump, and is there a better cut point | returns the ABSOLUTE jump AND the ratio to the mean adjacent-frame step. **Report both** — they can move in opposite directions (see judgements). Also tabulates the best junction at each minimum loop length; validated by recovering the exact period of a 5x-repeated clip |
-| `colour_drift.py` | does the scene warm/brighten across the clip | written after Lucas caught a 14.6-unit swing no other metric could see. Under ~2 is unnoticeable |
+| `colour_drift.py` | does the scene warm/brighten across the clip — **→ doc: `gate_validation/gates/colour_drift.md`** | written after Lucas caught a 14.6-unit swing no other metric could see. Under ~2 is unnoticeable |
 | `motion_mask.py` | per-pixel temporal std -> a motion map | `sample_frames()` derives its stride from the ACTUAL frame count; a fixed 73 silently sampled only the first third of a longer clip |
 
 ## Production
@@ -26,7 +34,7 @@ older hotspot-crop clips (288x512 and similar) — see the note at the end.
 | `make_boomerang.py` | builds forward+reverse `_boom.mp4` copies. The only loop mode that permits TRAVELLING motion |
 | `add_to_viewer.py` | registers a clip in a 360 test viewer: copy, matching still, motion map, menu entry. Holds an exclusive lock across read-modify-write |
 | `auto_register.py` | watches render folders and registers new clips as they land; skips renders that failed the frame-0 check |
-| `cine_return_check.py` | **the only measure that is correct at FULL resolution.** Traces \|frame_t - frame_0\|: alive clips arc out and come back, dead ones drift one way and never return. Run it on the RAW render — a crossfade forces the return and makes every looped clip score well |
+| `cine_return_check.py` | **→ doc: `gate_validation/gates/return.md`.** **The only measure that is correct at FULL resolution.** Traces \|frame_t - frame_0\|: alive clips arc out and come back, dead ones drift one way and never return. Run it on the RAW render — a crossfade forces the return and makes every looped clip score well |
 | `sync_viewer.py` | rebuilds `cine360_endguide.html` from `cine360_test.html`, keeping its own clip list, so player changes never have to be made twice |
 | `queue_drained.sh` | waits for ComfyUI's queue to be genuinely empty. Chaining on "the previous script exited" is wrong — a script that hits its poll timeout exits while its renders are still queued |
 | `auto_mask.py` | picks the post-processing mask threshold by OBJECT SOLIDITY, not by percentile. Also fills interior holes, which is what lets a high threshold and complete objects coexist. `drop_small` is the SECOND axis — a region-size cut that removes isolated speckle a percentile can never see (default off) |
@@ -40,9 +48,9 @@ older hotspot-crop clips (288x512 and similar) — see the note at the end.
 
 | tool | what it does |
 |---|---|
-| `cine_room.py` | **The shipping pipeline for ONE room**, steps 3-5 of `notes/cinemagraph_pipeline.md`: render once at 3072x1024 in the working band, bake the loop, run the reject-only gates, write a verdict JSON. Never prompts, never polls, **never approves** — survivors are staged for Lucas's eye. Drives the `cine_room` observer row and is the render step `room_iterate` shells out to. `--rolls` caps the glitch re-roll (the loop passes 0 and owns the roll itself, because each roll lands under a new tag while the loop polls one fixed path) |
-| `test_cine_room_gate.py` | Pins the glitch gate: the a_vault FALSE POSITIVE that a light-sweep room produced, the whistlegate counter-example, and the both-readings rule. **Tuned for zero false positives, not maximum catch** — read its header before re-tuning |
-| `recalibrate_glitch_threshold.py` | Re-derives the glitch threshold against Lucas's labelled clips, writing `../notes/glitch_threshold_calibration.csv`. **Run it whenever `cine_glitch_check` changes** — the threshold is calibrated, not chosen, and carrying an old number across a measure change is how a clip Lucas had already accepted came to be auto-rejected |
+| `cine_room.py` | **Runs the gates — camera + return (unguarded import, `:55`) and glitch + dead (`:64`, `:84`). → docs: `gate_validation/gates/{camera,return,glitch,dead}.md`.** **The shipping pipeline for ONE room**, steps 3-5 of `notes/cinemagraph_pipeline.md`: render once at 3072x1024 in the working band, bake the loop, run the reject-only gates, write a verdict JSON. Never prompts, never polls, **never approves** — survivors are staged for Lucas's eye. Drives the `cine_room` observer row and is the render step `room_iterate` shells out to. `--rolls` caps the glitch re-roll (the loop passes 0 and owns the roll itself, because each roll lands under a new tag while the loop polls one fixed path) |
+| `test_cine_room_gate.py` | **Reads its clips from `gate_validation/fixtures/glitch/` (frozen, 2026-09-24), NOT from `temp/` — a skip here is a failure.** Pins the glitch gate: the a_vault FALSE POSITIVE that a light-sweep room produced, the whistlegate counter-example, and the both-readings rule. **Tuned for zero false positives, not maximum catch** — read its header before re-tuning |
+| `recalibrate_glitch_threshold.py` | **→ doc: `gate_validation/gates/glitch.md`.** Re-derives the glitch threshold against Lucas's labelled clips, writing `../notes/glitch_threshold_calibration.csv`. **Run it whenever `cine_glitch_check` changes** — the threshold is calibrated, not chosen, and carrying an old number across a measure change is how a clip Lucas had already accepted came to be auto-rejected |
 | `test_motion_prompt_source.py` | Pins that the **sceneSpec is the single source of truth** for the motion prompt and `.txt` is only a fallback, plus multi-mover handling |
 
 **The motion prompt comes from the SPEC now.** `exp_art_prompt.motion_prompt` resolves

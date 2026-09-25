@@ -3,41 +3,1034 @@
   "scenario": "libertalia",
   "id": 23,
   "title": "Libertalia",
-  "subtitle": "",
-  "story": "",
-  "enterLabel": "Enter →",
+  "subtitle": "Generation · Markov chains (order, context, and what fluency hides)",
+  "story": "Nine people kept journals on this island, and every one of them swears they reached Libertalia — the pirate republic where no one is any other person's property. Shares in the land it stands on would be worth a fortune in London, so Mr Silas Wrenn, Under-Secretary for Distant Anchorages, would like to know whether Libertalia is real, and where.\n\nYou are the ninth in a line of bird naturalists sent out here. Officially you are here to settle which of your eight predecessors first named each of this island's new species. Privately, Wrenn has hired you to find Libertalia.\n\nThe islanders are out on the water for the day. What is left ashore is nine houses, nine journals, and nine parrots who have heard nothing in their lives but their owners talking. Every journal describes the place — the run of the coast, the water, the landmarks. Not one of them gives the position.\n\nSo: cross the island, settle the priority of eight men's discoveries — and work out which of the nine actually went.",
+  "enterLabel": "Go ashore →",
   "done": {
-    "title": "Complete",
-    "body": "Nice work — you've finished this scenario."
+    "title": "Priority, settled",
+    "body": "The unsigned page is Brandt's — not because his hand matches, but because the words do. Seventeen of them, in that order, appear in one journal on this island and in no other. You have been reading a machine that got so good at sounding like a man that it stopped composing and started copying, and the moment it did, it told you whose voice it had learned. Write it up. The birds can be cited; the method cannot be argued with."
   },
   "packages": [],
   "datasets": [],
   "setup": "",
   "state": {
-    "rooms_solved": 0
+    "rooms_solved": 0,
+    "tide": "low",
+    "phase": "dawn_low",
+    "have_oars": false,
+    "have_ninth_document": false,
+    "lighthouse_open": false
   },
   "rooms": [
     {
-      "key": "room1",
-      "title": "Room 1",
+      "key": "careenage",
+      "title": "The careenage",
       "technique": "",
       "puzzleType": 1,
       "built": false,
       "authoring": {
-        "tag": "room1",
+        "tag": "careenage",
+        "scenePrompt": "",
+        "doorPrompt": ""
+      },
+      "unlockedWhen": true,
+      "onSolve": [],
+      "mapPos": {
+        "c": 0,
+        "r": 1
+      },
+      "island": "1 · the anchorage village",
+      "role": "arrival",
+      "designNote": "[1 · the anchorage village | arrival] ARRIVAL. A ship hove down on the sand; the communal aviary slung in her rigging. TWO BIRDS IN ONE CAGE teach the mechanic with no instructions. Mover: the swinging wicker cage.",
+      "hotspots": [
+        {
+          "id": "to_boat_shed",
+          "type": "door",
+          "label": "to boat_shed",
+          "box": [
+            0.45,
+            0.45,
+            0.55,
+            0.65
+          ],
+          "direction": "open",
+          "to": "boat_shed"
+        },
+        {
+          "id": "to_net_house",
+          "type": "door",
+          "label": "to net_house",
+          "box": [
+            0.45,
+            0.45,
+            0.55,
+            0.65
+          ],
+          "direction": "open",
+          "to": "net_house"
+        },
+        {
+          "id": "to_chart_table",
+          "type": "door",
+          "label": "to chart_table",
+          "box": [
+            0.45,
+            0.45,
+            0.55,
+            0.65
+          ],
+          "direction": "open",
+          "to": "chart_table"
+        },
+        {
+          "id": "to_describers_shelf",
+          "type": "door",
+          "label": "to describers_shelf",
+          "box": [
+            0.45,
+            0.45,
+            0.55,
+            0.65
+          ],
+          "direction": "open",
+          "to": "describers_shelf"
+        }
+      ]
+    },
+    {
+      "key": "boat_shed",
+      "title": "Boat shed",
+      "technique": "",
+      "puzzleType": 1,
+      "built": false,
+      "authoring": {
+        "tag": "boat_shed",
+        "scenePrompt": "",
+        "doorPrompt": ""
+      },
+      "unlockedWhen": true,
+      "onSolve": [],
+      "mapPos": {
+        "c": 0,
+        "r": 0
+      },
+      "island": "1 · the anchorage village",
+      "role": "dwelling",
+      "designNote": "[1 · the anchorage village | dwelling] DWELLING. Bobbing outrigger under a patched lateen sail.",
+      "hotspots": [
+        {
+          "id": "to_careenage",
+          "type": "door",
+          "label": "to careenage",
+          "box": [
+            0.45,
+            0.45,
+            0.55,
+            0.65
+          ],
+          "direction": "open",
+          "to": "careenage"
+        }
+      ]
+    },
+    {
+      "key": "net_house",
+      "title": "Net house",
+      "technique": "",
+      "puzzleType": 1,
+      "built": false,
+      "authoring": {
+        "tag": "net_house",
+        "scenePrompt": "",
+        "doorPrompt": ""
+      },
+      "unlockedWhen": true,
+      "onSolve": [],
+      "mapPos": {
+        "c": 0,
+        "r": 2
+      },
+      "island": "1 · the anchorage village",
+      "role": "dwelling",
+      "designNote": "[1 · the anchorage village | dwelling] DWELLING. Mover: drops falling from a hauled seine net.",
+      "hotspots": [
+        {
+          "id": "to_careenage",
+          "type": "door",
+          "label": "to careenage",
+          "box": [
+            0.45,
+            0.45,
+            0.55,
+            0.65
+          ],
+          "direction": "open",
+          "to": "careenage"
+        }
+      ]
+    },
+    {
+      "key": "chart_table",
+      "title": "The chart table",
+      "technique": "",
+      "puzzleType": 1,
+      "built": false,
+      "authoring": {
+        "tag": "chart_table",
+        "scenePrompt": "",
+        "doorPrompt": ""
+      },
+      "unlockedWhen": true,
+      "onSolve": [],
+      "mapPos": {
+        "c": 0,
+        "r": 3
+      },
+      "island": "1 · the anchorage village",
+      "role": "ESCAPE",
+      "designNote": "[1 · the anchorage village | ESCAPE] THE ESCAPE. Reachable at the very start ON PURPOSE — you see the job before you can do it — but NOT reachable again until the boss is solved, because the oars are locked in the lighthouse.",
+      "hotspots": [
+        {
+          "id": "to_careenage",
+          "type": "door",
+          "label": "to careenage",
+          "box": [
+            0.45,
+            0.45,
+            0.55,
+            0.65
+          ],
+          "direction": "open",
+          "to": "careenage"
+        }
+      ],
+      "plannedHotspots": [
+        {
+          "type": "lock",
+          "label": "The chart table",
+          "note": "THE ESCAPE GATE, and ONLY the gate. Carried here rather than on a committed hotspot because chart_table has no escape object yet — the mechanic, the prompt and the answer are step 6 (escape_room_content). Same pre-art pattern as wrangling/egypt's `quay` skiff door. `_attach_planned_content` copies every field but box/id/type/label/note onto the placed hotspot, so availableWhen + lockedBody ride onto whatever object step 6 puts here. THE TYPE IS A PLACEHOLDER: `lock` is the corpus's ungraded escape gate (cf. networks/subway ochre_hall), but AGENTS.md says the escape is elicited from the ninth bird, so step 6 may reclassify — if it does, change the type HERE too, because the planned<->spec match is on (type, slug(label)).",
+          "availableWhen": {
+            "eq": [
+              "have_ninth_document",
+              true
+            ]
+          },
+          "lockedBody": "Nine charts on the table and every one of them a different sea. Eight of these men wrote down where they had been; the ninth is the one they threw overboard, and until you are holding his page there is nothing here to lay against the others."
+        }
+      ]
+    },
+    {
+      "key": "describers_shelf",
+      "title": "The describers' shelf",
+      "technique": "",
+      "puzzleType": 1,
+      "built": false,
+      "authoring": {
+        "tag": "describers_shelf",
         "scenePrompt": "",
         "doorPrompt": ""
       },
       "unlockedWhen": true,
       "onSolve": [
         {
-          "set": "room1_solved"
+          "set": "describers_shelf_solved"
         },
         {
           "inc": "rooms_solved"
         }
       ],
-      "designNote": "New scenario's first room."
+      "mapPos": {
+        "c": 1,
+        "r": 1
+      },
+      "island": "1 · the anchorage village",
+      "role": "RUNG 1",
+      "designNote": "[1 · the anchorage village | RUNG 1] RUNG 1 — 'culmen' -> curved. *** THE TIDE TABLE IS HERE: until it is read you do not know when the flats are safe and the crossing refuses you. ***",
+      "hotspots": [
+        {
+          "id": "to_careenage",
+          "type": "door",
+          "label": "to careenage",
+          "box": [
+            0.45,
+            0.45,
+            0.55,
+            0.65
+          ],
+          "direction": "open",
+          "to": "careenage"
+        },
+        {
+          "id": "to_bar_wreck",
+          "type": "door",
+          "label": "to bar_wreck",
+          "box": [
+            0.45,
+            0.45,
+            0.55,
+            0.65
+          ],
+          "direction": "open",
+          "to": "bar_wreck",
+          "availableWhen": {
+            "all": [
+              {
+                "solved": "describers_shelf"
+              },
+              {
+                "any": [
+                  {
+                    "eq": [
+                      "tide",
+                      "low"
+                    ]
+                  },
+                  {
+                    "eq": [
+                      "have_oars",
+                      true
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "lockedBody": "Out past the quay the flats run grey and shining all the way to the rock, and you have no way of knowing how long they stay that way — the water comes back over them faster than anyone walks. Somebody on this shelf kept a table of it. Read that first.",
+          "note": "GATE — RUNG 1. The tide table: until the shelf is read you do not know when the flats are safe, so the crossing refuses you. The second clause (low water OR the carryable oars) is the flats' standing rule and is defence-in-depth here — island 1 is unreachable at high water without the oars, so a player can never be standing here at high water and oarless."
+        }
+      ]
+    },
+    {
+      "key": "bar_wreck",
+      "title": "The wreck on the bar",
+      "technique": "",
+      "puzzleType": 1,
+      "built": false,
+      "authoring": {
+        "tag": "bar_wreck",
+        "scenePrompt": "",
+        "doorPrompt": ""
+      },
+      "unlockedWhen": true,
+      "onSolve": [],
+      "mapPos": {
+        "c": 2,
+        "r": 1
+      },
+      "island": "CROSSING A · the flats",
+      "role": "dwelling / crossing",
+      "designNote": "[CROSSING A · the flats | dwelling + crossing] DWELLING + THE CROSSING. GAP A is tidal flats: WALK at low water. At HIGH water the flats are sea, but the wreck stands proud on its sandbar, the stilt house on its poles and the salt hut on its rise — so you ROW BETWEEN THEM. *** THE BOAT LIES AT THE BLADES SHORE, by the drying frames, NOT here (fixed 2026-09-25, audit B3) *** — the escape comes from the blades side, so a boat moored mid-flats could not be boarded. It has NO OARS: the carryable oars are locked in the lighthouse. Mover: sea foam sliding on black rock.",
+      "hotspots": [
+        {
+          "id": "to_describers_shelf",
+          "type": "door",
+          "label": "to describers_shelf",
+          "box": [
+            0.45,
+            0.45,
+            0.55,
+            0.65
+          ],
+          "direction": "open",
+          "to": "describers_shelf",
+          "availableWhen": {
+            "any": [
+              {
+                "eq": [
+                  "tide",
+                  "low"
+                ]
+              },
+              {
+                "eq": [
+                  "have_oars",
+                  true
+                ]
+              }
+            ]
+          },
+          "lockedBody": "Sea where the sand was, and the bar just clear of it. Nothing crosses this without a boat under you and a pair of oars in the rowlocks.",
+          "note": "GATE — THE FLATS. Walk at low water; row at high, which needs the carryable oars from the lighthouse. No rung-1 clause: bar_wreck is only reachable THROUGH the gated crossing, so the tide table is already read by anyone standing here."
+        },
+        {
+          "id": "to_stilt_house",
+          "type": "door",
+          "label": "to stilt_house",
+          "box": [
+            0.45,
+            0.45,
+            0.55,
+            0.65
+          ],
+          "direction": "open",
+          "to": "stilt_house"
+        },
+        {
+          "id": "to_salt_hut",
+          "type": "door",
+          "label": "to salt_hut",
+          "box": [
+            0.45,
+            0.45,
+            0.55,
+            0.65
+          ],
+          "direction": "open",
+          "to": "salt_hut"
+        },
+        {
+          "id": "to_drying_frames",
+          "type": "door",
+          "label": "to drying_frames",
+          "box": [
+            0.45,
+            0.45,
+            0.55,
+            0.65
+          ],
+          "direction": "open",
+          "to": "drying_frames",
+          "availableWhen": {
+            "any": [
+              {
+                "eq": [
+                  "tide",
+                  "low"
+                ]
+              },
+              {
+                "eq": [
+                  "have_oars",
+                  true
+                ]
+              }
+            ]
+          },
+          "lockedBody": "Sea where the sand was, and the bar just clear of it. Nothing crosses this without a boat under you and a pair of oars in the rowlocks.",
+          "note": "GATE — THE FLATS, leg 2. Same rule as leg 1: walk at low, row at high with the oars."
+        }
+      ]
+    },
+    {
+      "key": "stilt_house",
+      "title": "The stilt house",
+      "technique": "",
+      "puzzleType": 1,
+      "built": false,
+      "authoring": {
+        "tag": "stilt_house",
+        "scenePrompt": "",
+        "doorPrompt": ""
+      },
+      "unlockedWhen": true,
+      "onSolve": [],
+      "mapPos": {
+        "c": 2,
+        "r": 0
+      },
+      "island": "CROSSING A · the flats",
+      "role": "dwelling",
+      "designNote": "[CROSSING A · the flats | dwelling] DWELLING. Mover: a rock-rimmed tidal pool fretted into wind chop.",
+      "hotspots": [
+        {
+          "id": "to_bar_wreck",
+          "type": "door",
+          "label": "to bar_wreck",
+          "box": [
+            0.45,
+            0.45,
+            0.55,
+            0.65
+          ],
+          "direction": "open",
+          "to": "bar_wreck"
+        }
+      ]
+    },
+    {
+      "key": "salt_hut",
+      "title": "The salt hut",
+      "technique": "",
+      "puzzleType": 1,
+      "built": false,
+      "authoring": {
+        "tag": "salt_hut",
+        "scenePrompt": "",
+        "doorPrompt": ""
+      },
+      "unlockedWhen": true,
+      "onSolve": [],
+      "mapPos": {
+        "c": 2,
+        "r": 2
+      },
+      "island": "CROSSING A · the flats",
+      "role": "dwelling",
+      "designNote": "[CROSSING A · the flats | dwelling] DWELLING. Mover: dry salt streaming off a raked heap.",
+      "hotspots": [
+        {
+          "id": "to_bar_wreck",
+          "type": "door",
+          "label": "to bar_wreck",
+          "box": [
+            0.45,
+            0.45,
+            0.55,
+            0.65
+          ],
+          "direction": "open",
+          "to": "bar_wreck"
+        }
+      ]
+    },
+    {
+      "key": "drying_frames",
+      "title": "The drying frames",
+      "technique": "",
+      "puzzleType": 1,
+      "built": false,
+      "authoring": {
+        "tag": "drying_frames",
+        "scenePrompt": "",
+        "doorPrompt": "",
+        "plateRefs": [
+          "_world/plate.png",
+          "_world/locals/hoist_a1_seaward.png",
+          "_world/locals/hoist_a2_alongflats.png",
+          "_world/locals/hoist_a3_highbehind.png"
+        ]
+      },
+      "unlockedWhen": true,
+      "onSolve": [
+        {
+          "set": "drying_frames_solved"
+        },
+        {
+          "inc": "rooms_solved"
+        }
+      ],
+      "mapPos": {
+        "c": 3,
+        "r": 1
+      },
+      "island": "2 · the blades",
+      "role": "RUNG 2",
+      "designNote": "[2 · the blades (foot) | RUNG 2] RUNG 2 — below -> olive -> comma. *** AT THE FOOT OF THE BLADES, not on top (moved 2026-09-25 after audit B2). *** A windy terrace of drying racks on the sand at the base of the rock. It MUST be below the hoist: rung 2's gate is that THE HOIST LEVER IS DEAD until it is solved, and you cannot gate the ride from a room the ride is needed to reach. Mover: skins and feathers stirring on lines. THE FLATS BOAT LIES HERE, drawn up on the sand — afloat and oarless once the tide is in.",
+      "hotspots": [
+        {
+          "id": "to_bar_wreck",
+          "type": "door",
+          "label": "to bar_wreck",
+          "box": [
+            0.45,
+            0.45,
+            0.55,
+            0.65
+          ],
+          "direction": "open",
+          "to": "bar_wreck",
+          "availableWhen": {
+            "any": [
+              {
+                "eq": [
+                  "tide",
+                  "low"
+                ]
+              },
+              {
+                "eq": [
+                  "have_oars",
+                  true
+                ]
+              }
+            ]
+          },
+          "lockedBody": "The flats you walked in across are gone — grey water now, with the racks standing in it and the wreck a long way off. The boat is here and floating, drawn up where you left it. The rowlocks are empty. Somebody put the oars away, and there is only one door on these islands that locks.",
+          "note": "GATE — THE FLATS, from the blades shore. THE BINDING ONE: after rung 3 turns the tide the player backtracks to here, finds the flats under water and the boat oarless, and learns that the way home runs through the boss. The flats boat lies at THIS room (audit B3, 2026-09-25)."
+        },
+        {
+          "id": "to_lookout_perch",
+          "type": "door",
+          "label": "to lookout_perch",
+          "box": [
+            0.45,
+            0.45,
+            0.55,
+            0.65
+          ],
+          "direction": "open",
+          "to": "lookout_perch"
+        },
+        {
+          "id": "to_hoist_house",
+          "type": "door",
+          "label": "to hoist_house",
+          "box": [
+            0.45,
+            0.45,
+            0.55,
+            0.65
+          ],
+          "direction": "open",
+          "to": "hoist_house",
+          "availableWhen": {
+            "solved": "drying_frames"
+          },
+          "lockedBody": "The lever will not shift. The drum is pinned, the counterweight sits chocked in its cradle, and the hoist is dead rope until the work at these frames is finished.",
+          "note": "GATE — RUNG 2. The hoist lever is dead until the frames are read. The hoist is the only way up the blades (audit B2), so this gate is on the spine. The ride DOWN is never refused."
+        }
+      ]
+    },
+    {
+      "key": "lookout_perch",
+      "title": "The lookout perch",
+      "technique": "",
+      "puzzleType": 1,
+      "built": false,
+      "authoring": {
+        "tag": "lookout_perch",
+        "scenePrompt": "",
+        "doorPrompt": ""
+      },
+      "unlockedWhen": true,
+      "onSolve": [],
+      "mapPos": {
+        "c": 3,
+        "r": 0
+      },
+      "island": "2 · the blades",
+      "role": "dwelling",
+      "designNote": "[2 · the blades | dwelling] DWELLING. Mover: a traveller's palm fan thrashing.",
+      "hotspots": [
+        {
+          "id": "to_drying_frames",
+          "type": "door",
+          "label": "to drying_frames",
+          "box": [
+            0.45,
+            0.45,
+            0.55,
+            0.65
+          ],
+          "direction": "open",
+          "to": "drying_frames"
+        }
+      ]
+    },
+    {
+      "key": "hoist_house",
+      "title": "The hoist house",
+      "technique": "",
+      "puzzleType": 1,
+      "built": false,
+      "authoring": {
+        "tag": "hoist_house",
+        "scenePrompt": "",
+        "doorPrompt": "",
+        "plateRefs": [
+          "_world/plate.png",
+          "_world/locals/hoist_a1_seaward.png",
+          "_world/locals/hoist_a2_alongflats.png",
+          "_world/locals/hoist_a3_highbehind.png"
+        ]
+      },
+      "unlockedWhen": true,
+      "onSolve": [],
+      "mapPos": {
+        "c": 3,
+        "r": 2
+      },
+      "island": "2 · the blades",
+      "role": "dwelling",
+      "designNote": "[2 · the blades | transition + dwelling] THE HOIST — a ROOM ON THE SPINE and the only way up the blades. EVERYONE RIDES IT. Its lever is dead until RUNG 2 is solved. Stands at the FLATS end of the blades. Mover: the spoked timber hoist wheel spinning.",
+      "hotspots": [
+        {
+          "id": "to_drying_frames",
+          "type": "door",
+          "label": "to drying_frames",
+          "box": [
+            0.45,
+            0.45,
+            0.55,
+            0.65
+          ],
+          "direction": "open",
+          "to": "drying_frames"
+        },
+        {
+          "id": "to_baobab",
+          "type": "door",
+          "label": "up the walkway to the baobab",
+          "box": [
+            0.45,
+            0.45,
+            0.55,
+            0.65
+          ],
+          "direction": "open",
+          "to": "baobab"
+        }
+      ]
+    },
+    {
+      "key": "baobab",
+      "title": "The baobab",
+      "technique": "",
+      "puzzleType": 1,
+      "built": false,
+      "authoring": {
+        "tag": "baobab",
+        "scenePrompt": "",
+        "doorPrompt": ""
+      },
+      "unlockedWhen": true,
+      "onSolve": [],
+      "mapPos": {
+        "c": 3,
+        "r": 3
+      },
+      "island": "2 · the blades",
+      "role": "dwelling",
+      "designNote": "[2 · the blades (top) | dwelling + spine] DWELLING, and ON THE SPINE — the way from the hoist landing to the spring house runs past it. Mover: vegetation. Do NOT put a light-dapple mover here with its canopy in frame; the model animates the source, not the pattern.",
+      "hotspots": [
+        {
+          "id": "to_hoist_house",
+          "type": "door",
+          "label": "back to the hoist landing",
+          "box": [
+            0.45,
+            0.45,
+            0.55,
+            0.65
+          ],
+          "direction": "open",
+          "to": "hoist_house"
+        },
+        {
+          "id": "to_spring_house",
+          "type": "door",
+          "label": "down the cleft to the spring house",
+          "box": [
+            0.45,
+            0.45,
+            0.55,
+            0.65
+          ],
+          "direction": "open",
+          "to": "spring_house"
+        }
+      ]
+    },
+    {
+      "key": "spring_house",
+      "title": "The spring house",
+      "technique": "",
+      "puzzleType": 1,
+      "built": false,
+      "authoring": {
+        "tag": "spring_house",
+        "scenePrompt": "",
+        "doorPrompt": ""
+      },
+      "unlockedWhen": true,
+      "onSolve": [
+        {
+          "set": "spring_house_solved"
+        },
+        {
+          "inc": "rooms_solved"
+        },
+        {
+          "set": "tide",
+          "to": "high"
+        },
+        {
+          "set": "phase",
+          "to": "cumulus_high"
+        }
+      ],
+      "mapPos": {
+        "c": 4,
+        "r": 1
+      },
+      "island": "2 · the blades",
+      "role": "RUNG 3",
+      "designNote": "[2 · the blades | RUNG 3] RUNG 3 — order 5, 64 contexts. The freshwater cave, and the way DOWN off the blades to the channel. *** SOLVING RUNG 3 TURNS THE TIDE *** and the world goes to cumulus/high.",
+      "hotspots": [
+        {
+          "id": "to_careened_cabin",
+          "type": "door",
+          "label": "down to the boat",
+          "box": [
+            0.45,
+            0.45,
+            0.55,
+            0.65
+          ],
+          "direction": "open",
+          "to": "the_crossing",
+          "availableWhen": {
+            "eq": [
+              "tide",
+              "high"
+            ]
+          },
+          "lockedBody": "The channel below the cave mouth is a trench of drained mud, and the boat lies over on her bilge in the bottom of it with her keel showing. Nothing crosses until the sea comes back.",
+          "note": "GATE — RUNG 3. The channel is a drained mud trench until the tide turns; solving rung 3 IN THIS ROOM sets tide=high and the door opens under the player's feet. (Hotspot id names careened_cabin for historical reasons — audit M1; `to` is the_crossing and is correct.)"
+        },
+        {
+          "id": "to_baobab",
+          "type": "door",
+          "label": "back up the cleft",
+          "box": [
+            0.45,
+            0.45,
+            0.55,
+            0.65
+          ],
+          "direction": "open",
+          "to": "baobab"
+        }
+      ]
+    },
+    {
+      "key": "careened_cabin",
+      "title": "The careened cabin",
+      "technique": "",
+      "puzzleType": 1,
+      "built": false,
+      "authoring": {
+        "tag": "careened_cabin",
+        "scenePrompt": "",
+        "doorPrompt": "",
+        "plateRefs": [
+          "_world/plate.png",
+          "_world/locals/dive_a.png",
+          "_world/locals/dive_b.png"
+        ]
+      },
+      "unlockedWhen": true,
+      "onSolve": [],
+      "mapPos": {
+        "c": 5,
+        "r": 1
+      },
+      "island": "3 · the cabin island",
+      "role": "dwelling (THE NINTH)",
+      "designNote": "[3 · the cabin island | dwelling (THE NINTH)] THE NINTH DWELLING, now on ITS OWN ISLAND (2026-09-25 — the aerials kept drawing it as a land mass and Lucas agreed it should be one; a footnote in a channel is nothing, an island is a place). His bird is here; his document is NOT — an empty stand. Reached by the FIXED-OAR BOAT across the channel. Islands 3 and 4 are joined by a ROCK BAR that stands above water at every tide, so once you are across the channel both are freely reachable.",
+      "hotspots": [
+        {
+          "id": "to_spring_house",
+          "type": "door",
+          "label": "the boat",
+          "box": [
+            0.45,
+            0.45,
+            0.55,
+            0.65
+          ],
+          "direction": "open",
+          "to": "the_crossing",
+          "availableWhen": {
+            "eq": [
+              "tide",
+              "high"
+            ]
+          },
+          "lockedBody": "No water under her. She sits on the mud with her oars shipped and goes nowhere.",
+          "note": "GATE — the channel's far shore. Defence-in-depth: the tide never falls again once rung 3 turns it, and island 3 is only reachable after that, so this can never bind. Stated anyway so the channel carries ONE rule on BOTH shores. (Hotspot id names spring_house — audit M1; `to` is the_crossing and is correct.) THE OARS IN THIS BOAT ARE FIXED, which is what makes the channel always crossable both ways and is the keystone of the no-strand invariant."
+        },
+        {
+          "id": "to_the_drop",
+          "type": "door",
+          "label": "to the_drop",
+          "box": [
+            0.45,
+            0.45,
+            0.55,
+            0.65
+          ],
+          "direction": "open",
+          "to": "the_drop"
+        },
+        {
+          "id": "to_lantern_room",
+          "type": "door",
+          "label": "to lantern_room",
+          "box": [
+            0.45,
+            0.45,
+            0.55,
+            0.65
+          ],
+          "direction": "open",
+          "to": "lantern_room"
+        }
+      ]
+    },
+    {
+      "key": "the_drop",
+      "title": "The drop",
+      "technique": "",
+      "puzzleType": 1,
+      "built": false,
+      "authoring": {
+        "tag": "the_drop",
+        "scenePrompt": "",
+        "doorPrompt": "",
+        "plateRefs": [
+          "_world/plate.png",
+          "_world/locals/dive_a.png",
+          "_world/locals/dive_b.png"
+        ]
+      },
+      "unlockedWhen": true,
+      "onSolve": [
+        {
+          "set": "have_ninth_document"
+        }
+      ],
+      "mapPos": {
+        "c": 5,
+        "r": 2
+      },
+      "island": "3 · the cabin island",
+      "role": "THE DIVE",
+      "designNote": "[3 · the cabin island | THE DIVE] THE DIVE. The chest holds the NINTH DOCUMENT, thrown into the sea by the others. Load-bearing: the discriminator is only checkable with the paper in hand. *** WIRED 2026-09-25 (audit B4): onSolve sets have_ninth_document, which is what the escape gate at chart_table reads. CAVEAT — pano-player fires onSolve only when a room's PRIMARY GATE is solved (its first puzzle/lock/grid/ledger hotspot). the_drop has no such hotspot yet, so this effect is inert until step 6 gives the chest a gate. That is true of all five onSolve blocks in this file; it is load-bearing here because the_drop is the one that is not a graded rung and so is easiest to leave gateless. ***",
+      "hotspots": [
+        {
+          "id": "to_careened_cabin",
+          "type": "door",
+          "label": "to careened_cabin",
+          "box": [
+            0.45,
+            0.45,
+            0.55,
+            0.65
+          ],
+          "direction": "open",
+          "to": "careened_cabin"
+        }
+      ]
+    },
+    {
+      "key": "lantern_room",
+      "title": "The lantern room",
+      "technique": "",
+      "puzzleType": 1,
+      "built": false,
+      "authoring": {
+        "tag": "lantern_room",
+        "scenePrompt": "",
+        "doorPrompt": ""
+      },
+      "unlockedWhen": true,
+      "onSolve": [
+        {
+          "set": "lantern_room_solved"
+        },
+        {
+          "inc": "rooms_solved"
+        },
+        {
+          "set": "lighthouse_open"
+        },
+        {
+          "set": "have_oars"
+        },
+        {
+          "set": "phase",
+          "to": "golden_high"
+        }
+      ],
+      "mapPos": {
+        "c": 6,
+        "r": 1
+      },
+      "island": "4 · the drowned side",
+      "role": "BOSS",
+      "designNote": "[4 · the drowned side | BOSS] BOSS — generate at order 5 from 'five times . a'; the passage is unique to ONE journal. Answer: Brandt. *** SOLVING THE BOSS OPENS THE LIGHTHOUSE DOOR, AND THE CARRYABLE OARS ARE INSIDE *** (Lucas, 2026-09-25). The keeper's own store: the unsigned page and the oars together. Until it is open the player CANNOT return to island 1, which is what gives every room exactly TWO states instead of three and removes the need for any contrivance.",
+      "hotspots": [
+        {
+          "id": "to_careened_cabin",
+          "type": "door",
+          "label": "to careened_cabin",
+          "box": [
+            0.45,
+            0.45,
+            0.55,
+            0.65
+          ],
+          "direction": "open",
+          "to": "careened_cabin"
+        }
+      ]
+    },
+    {
+      "key": "the_crossing",
+      "title": "The crossing",
+      "technique": "",
+      "puzzleType": 1,
+      "built": false,
+      "authoring": {
+        "tag": "the_crossing",
+        "scenePrompt": "",
+        "doorPrompt": ""
+      },
+      "unlockedWhen": true,
+      "onSolve": [],
+      "mapPos": {
+        "c": 5,
+        "r": 0
+      },
+      "island": "CROSSING B · the channel",
+      "role": "transition",
+      "designNote": "[CROSSING B · the channel | transition] TRANSITION SCENE, NO GRADED PUZZLE — the fixed-oar boat halfway across the channel, on the pattern of `wrangling/egypt`'s skiff (Lucas, 2026-09-25: \"no big animation, just a room with a clip\"). Reached from the spring-house cave mouth once RUNG 3 is solved; lands on the cabin island. THIS SCENE CARRIES THE TURN OF THE ARC — you solve rung 3 in the dark of the cave and come out into a changed world, so this is the FIRST room seen at cumulus/high water. THE OARS HERE ARE FIXED IN THEIR ROWLOCKS and cannot be taken, which is what makes the channel always crossable and the flats not. IT ALSO PLANTS THE BOSS: from midway you see the LIGHTHOUSE standing on the point ahead — the building you cannot get into yet, holding the oars you do not yet know you need. Mover: the swell under the hull, the near-field water, and the boat's own slow rise and fall. NOT a travel sequence — one still, one looping clip.",
+      "hotspots": [
+        {
+          "id": "to_spring_house",
+          "type": "door",
+          "label": "back to the cave mouth",
+          "box": [
+            0.05,
+            0.45,
+            0.15,
+            0.65
+          ],
+          "direction": "back",
+          "to": "spring_house"
+        },
+        {
+          "id": "to_careened_cabin",
+          "type": "door",
+          "label": "the cabin island landing",
+          "box": [
+            0.45,
+            0.45,
+            0.55,
+            0.65
+          ],
+          "direction": "open",
+          "to": "careened_cabin"
+        }
+      ]
     }
-  ]
+  ],
+  "states": {
+    "cumulus_high": {
+      "label": "High water, cumulus"
+    },
+    "golden_high": {
+      "label": "High water, golden hour"
+    }
+  },
+  "escapeDone": {
+    "title": "A position, and who to believe",
+    "body": "You row back over flats you walked across this morning, with a wet journal and a bearing no document on this island contains. Eight birds could only ever give you their own page. The ninth went further — because the man who taught it had been further — and the others threw his book in the sea for saying so.\n\nWrenn will have his answer, and the shareholders theirs. Whether a republic that only one honest man ever reached should be recognised is not a question a naturalist is paid to settle. You mark the chart, and you let the Crown decide what it has bought."
+  },
+  "worldPlatePrompt": "A single establishing world-bible row for LIBERTALIA: an island complex on the Madagascar coast, in five frames left to right — the whole chain from the air at dawn at low water; the approach from the sea; the deep channel and the cabin island at high water with the sea floor readable through the water; the rock bar running on to the drowned headland; and the whole chain again at golden hour looking back to the lighthouse. FOUR ISLANDS IN A LINE: a village along a stone quay; wide tidal flats crossed by a line of withy stakes; a mass of colossal grey limestone tsingy blades with rope walkways between their summits and a cargo hoist running the full height at their flats end; a small rocky island carrying one weathered cabin; and a low headland riddled with sea caves with a squat stone lighthouse on its point and a blowhole beside it. Hard equatorial light, saturated colour, turquoise shallows over reef, painterly, cinematic, fine film grain. No people, no lettering.",
+  "coverPrompt": "Minimalist stylised thumbnail poster, seen square-on and flat: the silhouette of a single parrot on a perch, facing right, rendered in hard black against a band of saturated dawn sky — rose below, deep blue above. Behind the bird, very small and far off at the horizon line, the black sawtooth silhouette of a range of limestone tsingy blades with one thin rope walkway slung between two of them. Bold, graphic, very few elements, high contrast, poster-like, no gradients except the sky band. No text, no lettering, no letters, no numbers, no border.",
+  "escapeBrief": "To escape you have to name a position that is written nowhere on this island. All nine journals describe Libertalia and all nine claim first-hand experience, so the papers alone cannot distinguish which is accurate and which is false. THREE of the nine share one geography almost word for word — they were copied from the same forged chart, and that is the trap: three agreeing accounts look like corroboration and are actually one account repeated. Of the six that are unique, five are honest and wrong. ONE is true, and its author is the man the others dismiss as a fantasist.\n\nThe discriminator is the birds. Each parrot has heard nothing in its life but its owner talking, so eight of them can only ever give you back their owner's own page — prompt them and they recite, and you can check what they say against the paper in your hand. ONE bird goes further than its page can account for, because the man who taught it had actually been to Libertalia and ranted about it constantly in his isolation, in the bird's hearing. That is the only test that separates a true account from a fluent one, and it is the same test the ladder taught you: a model that is only reproducing its source can be caught hallucinating the moment you ask it for something the source does not contain.\n\nThe journal of the man who actually went to Libertalia is not in his house. The others threw it into the sea, and it is in a chest on the bottom beside the cabin island — so the dive is not scenery, it is how you get the paper you need to run the test in the first place. The last characteristic of the position exists only in that ninth bird. It must be ELICITED, not chosen from a list: you type an opening and the bird continues it. Identifying which bird to ask may be legible from the documents; getting the answer out of it still has to be done.",
+  "ladderPlain": [],
+  "cover": "cover.png"
 }
