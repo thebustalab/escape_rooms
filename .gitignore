@@ -32,9 +32,14 @@ tests/playwright-report/
 # panoramas/cinemagraphs/audio/images, data CSVs, shared engine) belong on the
 # public site. NOT decoder/ — it holds the answer keys and is ignored below.
 # Authoring records, build caches, backups, and history-tier dirs do not.
-# NOTE: .gitignore does NOT untrack already-committed files — after this syncs to the Mac,
-# run once in the escape_rooms repo:  git rm -r --cached . && git add . && git commit
-# (re-applies these rules; disk files are untouched, git just stops tracking the ignored ones.)
+# NOTE: .gitignore does NOT untrack already-committed files. DONE 2026-09-29: ~420 tracked-but-ignored
+# files were untracked on the Mac, disk left untouched. Use the TARGETED form below rather than
+# rebuilding the whole tracked set — it touches only files the rules above already cover:
+#     git ls-files -i -c --exclude-standard            # review this list FIRST
+#     git ls-files -i -c --exclude-standard -z | xargs -0 git rm --cached --
+# Checked before it ran: nothing the player fetches was in the list. Three groups look like play assets
+# and are not — the temple tile PNGs and canyon's poster/proxy previews are authoring inputs, and
+# subway's network_map.png is the ANSWER KEY (see its own block below). Re-run line one to check drift.
 
 # Design records + authoring docs (root/**/AGENTS.md already ignored above)
 **/notes.md
