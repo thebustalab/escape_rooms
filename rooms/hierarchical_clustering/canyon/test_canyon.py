@@ -199,24 +199,70 @@ for m in (_map, next(h for h in rooms["undercroft"]["hotspots"] if h.get("id") =
         check((n["answer"] - m["axis"]["min"]) % m["axis"]["step"] == 0,
               "%s: junction %s at %s sits on the %s drag step" % (m["id"], n["id"], n["answer"], m["axis"]["step"]))
 check(_map["waterline"]["start"] == MID, "the waterline starts at the dark row, %s" % MID)
-# The escape is a GRID over the dark row's four cells (Lucas, 2026-09-18): each cell takes a group size,
-# or stays dark when the cut leaves fewer groups than cells — exactly as the lit bottom row shows 4 4 and two
-# dark cells. Four cells for three groups also means the panel no longer gives away the group count.
-panel_grid = next(h for h in rooms["undercroft"]["hotspots"] if h.get("id") == "calibration_panel")
-check(panel_grid.get("type") == "grid", "the escape panel is a grid, not a code lock")
-def as_cells(sizes, n=4):
-    return [str(x) for x in sizes] + ["dark"] * (n - len(sizes))
-items = [it["key"] for it in panel_grid["items"]]
-check(len(items) == 4, "the grid has the panel's four cells")
-check([panel_grid["answer"][k] for k in items] == as_cells(cut(MID)),
-      "the dark row %s -> %s, and the grid answer reads %s"
-      % (MID, as_cells(cut(MID)), [panel_grid["answer"][k] for k in items]))
-buckets = {b["key"] for b in panel_grid["buckets"]}
-check(set(panel_grid["answer"].values()) <= buckets, "every answer value is a column the player can pick")
-check({"dark", "1", "2", "3", "4"} <= buckets, "the columns offer every size the panel could need, plus dark")
+# The escape is a four-digit NUMBER LOCK over the dark row's four cells (Lucas, 2026-09-28). It was a
+# `grid` of dropdowns from 2026-09-18 until then; the dropdowns read as confusing in playtest, and the
+# panel in the art is literally three rows of numerals, so the player now reads numbers and types
+# numbers. Each digit is a group size at that cut, and a cell the cut never reaches reads 0 — which the
+# lit BOTTOM row teaches by showing 4 4 0 0 where the top row shows 2 2 2 2. Four digits for three
+# groups also means the lock's length still does not give away the group count.
+panel_lock = next(h for h in rooms["undercroft"]["hotspots"] if h.get("id") == "calibration_panel")
+check(panel_lock.get("type") == "lock", "the escape panel is a number lock, not a grid")
+def as_code(sizes, n=4):
+    return "".join(str(x) for x in sizes) + "0" * (n - len(sizes))
+check(panel_lock.get("length") == 4, "the lock takes the panel's four cells")
+check(panel_lock["answer"] == as_code(cut(MID)),
+      "the dark row %s -> %s, and the lock answer reads %s"
+      % (MID, as_code(cut(MID)), panel_lock["answer"]))
+check(len(panel_lock["answer"]) == 4 and panel_lock["answer"].isdigit(),
+      "the answer is four digits, so its length cannot leak that the cut leaves three groups")
+# THE REFERENCE ROWS MUST RIDE ON THE LOCK ITSELF. The clue that used to carry them (`control_panel`)
+# is hidden the moment the hall floods, which is exactly when the lock appears — so before 2026-09-28
+# the room took the key away at the instant it handed you the lock (found by Lucas in playtest).
+ref = panel_lock.get("reference") or {}
+refrows = {r["label"]: r["cells"] for r in ref.get("rows", [])}
+check(len(refrows) == 3, "the lock prints all three of the panel's rows, so the flood cannot hide them")
+for r in ROWS:
+    check(str(r) in refrows, "the lock's reference states row %s" % r)
+check(re.sub(r"\D", "", refrows[str(HIGH)]) == as_code(cut(HIGH)),
+      "reference top row %s reads %s" % (HIGH, as_code(cut(HIGH))))
+check(re.sub(r"\D", "", refrows[str(LOW)]) == as_code(cut(LOW)),
+      "reference bottom row %s reads %s (this is what teaches 0 = a dark cell)"
+      % (LOW, as_code(cut(LOW))))
+check(not re.sub(r"\D", "", refrows[str(MID)]),
+      "the reference leaves the dark row %s empty — it is the one being asked for" % MID)
+check(next(r for r in ref["rows"] if r["label"] == str(MID)).get("blank") is True,
+      "the dark row is flagged blank, so the player can see which row they are filling")
 check(HIGH > MID > LOW, "the panel lists its rows by height, so the dark row %s is the MIDDLE one" % MID)
 check(any(str(HIGH) in (h.get("body") or "") for h in rooms["undercroft"]["hotspots"]),
       "the control panel clue states the lit rows the player generalises from")
+
+print("\n-- every benchmark pickup names its junction, not just a number --")
+# Lucas, playtest 2026-09-28: "high benchmark = high confluence? can the pickup clues get titles
+# according to their full location name?" They could not: `pickup: true` logs the clue BODY, and every
+# body read "Carved into the stone are the numbers 1400." with nothing naming the junction. The notebook
+# therefore held seven anonymous numbers — and c1 and c5 are BOTH 1400, so two entries were literally
+# identical while the escape needs all seven placed on the right nodes. Each pickup is now an explicit
+# string built from the elevmap's OWN node label plus the height, so a notebook line pairs with a map
+# node by eye.
+_emap = next(h for h in rooms["undercroft"]["hotspots"] if h.get("type") == "elevmap")
+_nodes = {n["id"]: n for n in _emap["nodes"]}
+_picks = {}
+for _rk, _r in rooms.items():
+    for _h in _r.get("hotspots", []) or []:
+        _set = (_h.get("onPickup") or {}).get("set", "")
+        _m = re.match(r"^(c\d)_read$", _set)
+        if _m:
+            _picks[_m.group(1)] = _h.get("pickup")
+check(len(_picks) == len(_nodes), "every map node has a benchmark pickup (%d of %d)" % (len(_picks), len(_nodes)))
+for _nid, _node in sorted(_nodes.items()):
+    _pk = _picks.get(_nid)
+    check(isinstance(_pk, str), "%s's pickup is an explicit string, not `true` (the body alone is anonymous)" % _nid)
+    if not isinstance(_pk, str):
+        continue
+    check(_node["label"] in _pk, "%s's pickup carries the map's own node label %r" % (_nid, _node["label"]))
+    check(str(_node["answer"]) in _pk, "%s's pickup states its height %s" % (_nid, _node["answer"]))
+check(len(set(_picks.values())) == len(_picks),
+      "all %d pickups are distinct — c1 and c5 are both 1400 m, so the height alone would collide" % len(_picks))
 
 print("\n-- the hall is ONE room in two states: dry cold open, flooded escape --")
 # Merged 2026-09-18 (Lucas): the old `works` escape room was this hall after the boss, and showed up as a

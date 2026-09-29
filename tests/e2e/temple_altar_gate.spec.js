@@ -36,12 +36,22 @@
 //
 // The assertions below key on `.ledgercard` rendering and on reading the `ledger`-typed hotspot out of
 // scenario.json, so either half of the regression turns this spec red. Mutation-checked both ways.
+//
+// REPAIRED 2026-09-26 (publish audit). This spec solved each room by checking the MCQ radio at
+// `puzzle.question.correct`. The 2026-09-23 rework converted temple to one `pick` + three `check`, so
+// `question` no longer exists and this file threw on `p.question.correct` on EVERY run from that day —
+// i.e. the gate chain it is the named pin for had been unguarded for three days. It now types the same
+// student-shaped R as `temple_playthrough.spec.js`, from the shared `lib/temple_answers.js`, and solves
+// in LADDER order (the puzzles' own `availableWhen` chain, which post-dates the original spec too: the
+// old order solved the boss FIRST, which the chain now refuses).
 const { test, expect } = require("@playwright/test");
+const { ANSWERS, LADDER } = require("./lib/temple_answers");
 
 const URL = "/escape_rooms/rooms/hierarchical_clustering/temple/play.html";
-const GRADED = ["sun_gallery", "lamp_hall", "sealed_cell", "inner_vault"];
+const GRADED = LADDER;
 
 test("temple: sealed altar stair, then the whole finale — register, flame, fires, bridge", async ({ page }) => {
+  test.setTimeout(900_000);   // WebR boot + four real analyses in the browser
   const errors = [];
   page.on("pageerror", (e) => errors.push(String(e)));
   // The variant art is proven by a NETWORK REQUEST, not by pixels: compositeVariants `_loadImg`s the
@@ -64,9 +74,12 @@ test("temple: sealed altar stair, then the whole finale — register, flame, fir
         // index of each door AMONG THE DOOR MARKERS, which is how the spec has to click them
         doors: (r.hotspots || []).filter((h) => h.type === "door")
           .map((h, i) => ({ id: h.id, i, to: h.to })),
+        // engine type, not an MCQ index: temple is one `pick` + three `check` since 2026-09-23.
         puzzle: (() => {
           const p = hs.find((h) => h.type === "puzzle");
-          return p ? { id: p.id, correct: p.question.correct } : null;
+          if (!p) return null;
+          const engine = p.pick ? "pick" : p.check ? "check" : p.question ? "mcq" : null;
+          return { id: p.id, engine, answer: p.pick ? p.pick.answer : null };
         })(),
         altar: (() => {
           const a = (r.hotspots || []).find((h) => h.id === "to_altar");
@@ -86,13 +99,31 @@ test("temple: sealed altar stair, then the whole finale — register, flame, fir
     await mark(doorId).dispatchEvent("click");
     if (expectTitle) await expect(page.locator("#hudroom")).toHaveText(expectTitle, { timeout: 15_000 });
   };
+  // Type the room's solving R on the live WebR session and Run it. The first run boots WebR, which is
+  // why the enable/output waits are minutes rather than seconds.
+  const runCode = async (code) => {
+    await expect(page.locator("#run-btn")).toBeEnabled({ timeout: 180_000 });
+    await page.locator("#code-input").fill(code);
+    await page.locator("#webr-output").evaluate((el) => (el.innerHTML = ""));
+    await page.locator("#run-btn").click();
+    await expect(page.locator("#webr-output .webr-out, #webr-output canvas.webr-plot"))
+      .not.toHaveCount(0, { timeout: 180_000 });
+  };
   const solve = async (roomKey) => {
     const p = plan.rooms[roomKey].puzzle;
+    expect(p.engine, `${roomKey} has no recognised puzzle engine`).toBeTruthy();
     await mark(p.id).dispatchEvent("click");
     await expect(page.locator("#modal.open")).toBeVisible();
-    await page.locator("#modal input[type=radio]").nth(p.correct).check();
-    await page.locator("#modal .qsubmit").click();
-    await expect(page.locator("#modal .qfeedback.ok")).toBeVisible({ timeout: 15_000 });
+    await runCode(ANSWERS[roomKey]);
+    if (p.engine === "pick") {
+      const holder = page.locator("#modal .pickholder");
+      await page.locator("#modal .qsubmit").click();          // "Draw the clickable chart"
+      await expect(holder.locator("[data-id]")).not.toHaveCount(0, { timeout: 180_000 });
+      await holder.locator(`[data-id="${p.answer}"]`).first().dispatchEvent("click");
+    } else {
+      await page.locator("#modal .qsubmit").click();
+    }
+    await expect(page.locator("#modal .qfeedback.ok")).toBeVisible({ timeout: 30_000 });
     // the solve fires on a ~900ms timeout AFTER the tick — waiting for the auto-close is the signal
     await expect(page.locator("#modal.open")).toBeHidden({ timeout: 15_000 });
   };
@@ -113,20 +144,26 @@ test("temple: sealed altar stair, then the whole finale — register, flame, fir
   // sealed: the open-stair art must not have been fetched at all yet
   expect(openArtHits).toEqual([]);
 
-  // --- 2. solve all four, in an order that walks the real door graph -------------------------------
-  await solve("inner_vault");
+  // --- 2. solve all four, in LADDER order, walking the real door graph ------------------------------
+  // Every door is open, so the order is set by the puzzles' own `availableWhen` chain (2026-09-24):
+  // nearest -> orphan -> cut -> wings. The pre-rework version of this spec solved the boss FIRST, which
+  // the chain now refuses. Route back out of the vault, round the east wing, then down and across.
   await walk("inner_vault", "back_crawl_vault", plan.rooms.root_crawl.title);
-  await walk("root_crawl", "hatch_lamps", plan.rooms.lamp_hall.title);
-  await solve("lamp_hall");
-  await walk("lamp_hall", "back_crawl_lamps", plan.rooms.root_crawl.title);
-  await walk("root_crawl", "hatch_cistern", plan.rooms.cistern_stair.title);
-  await walk("cistern_stair", "down_stair", plan.rooms.sealed_cell.title);
-  await solve("sealed_cell");
-  await walk("sealed_cell", "back_cistern", plan.rooms.cistern_stair.title);
-  await walk("cistern_stair", "back_crawl_cistern", plan.rooms.root_crawl.title);
   await walk("root_crawl", "hatch_stair", plan.rooms.gate_stair.title);
   await walk("gate_stair", "gallery_door", plan.rooms.sun_gallery.title);
-  await solve("sun_gallery");
+  await solve("sun_gallery");                                     // rung 1 — PICK
+  await walk("sun_gallery", "back_stair", plan.rooms.gate_stair.title);
+  await walk("gate_stair", "crawl_hatch", plan.rooms.root_crawl.title);
+  await walk("root_crawl", "hatch_cistern", plan.rooms.cistern_stair.title);
+  await walk("cistern_stair", "down_stair", plan.rooms.sealed_cell.title);
+  await solve("sealed_cell");                                     // rung 2 — CHECK
+  await walk("sealed_cell", "back_cistern", plan.rooms.cistern_stair.title);
+  await walk("cistern_stair", "back_crawl_cistern", plan.rooms.root_crawl.title);
+  await walk("root_crawl", "hatch_lamps", plan.rooms.lamp_hall.title);
+  await solve("lamp_hall");                                       // rung 3 — CHECK
+  await walk("lamp_hall", "back_crawl_lamps", plan.rooms.root_crawl.title);
+  await walk("root_crawl", "hatch_vault", plan.rooms.inner_vault.title);
+  await solve("inner_vault");                                     // boss — CHECK
 
   // The fourth solve completes the ANALYSIS objective, so the engine shows the analysis-finish card over
   // the room. That card only appears at all because the scenario now has a pending escape (the bridge is
@@ -137,9 +174,7 @@ test("temple: sealed altar stair, then the whole finale — register, flame, fir
   await expect(page.locator("#done.open")).toBeHidden();
 
   // --- 3. the gate RELEASES, and the ART follows ---------------------------------------------------
-  await walk("sun_gallery", "back_stair", plan.rooms.gate_stair.title);
-  await walk("gate_stair", "crawl_hatch", plan.rooms.root_crawl.title);
-  await walk("root_crawl", "hatch_vault", plan.rooms.inner_vault.title);
+  // The boss is IN the vault, so we are already standing in front of the stair that just unsealed.
   const altar2 = mark("to_altar");
   await expect(altar2).toHaveClass(/open/, { timeout: 15_000 });
   // the variant composited — the open-stair art is now being loaded and stamped over the sealed base

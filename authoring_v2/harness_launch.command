@@ -37,8 +37,9 @@ if [ -z "$HOST2" ]; then
 fi
 SSH_OPTS="${HARNESS_SSH_OPTS:-}"                       # e.g. HARNESS_SSH_OPTS='-J host1'  if you must hop via host1
 REMOTE_ENSURE="/home/bustalab/Documents/Tools/websites/thebustalab.github.io/escape_rooms/authoring_v2/serve_harness.sh"
-URL="http://localhost:8752/build_world_v3.html"   # the clip-review console (v3, 2026-09-15); v2 gallery and the full
-                                                  # console stay reachable at their own URLs on the same server.
+URL="http://localhost:8752/build_world_v3.html"   # THE review console. v2 was retired and archived on
+                                                  # 2026-09-29; build_world.html (v1) is still reachable
+                                                  # at its own URL on the same server.
 # Dedicated control socket for OUR tunnel — kept separate from your ~/.ssh/config multiplexing so the
 # tunnel can never silently attach to some other master connection (that was the "no tunnel" bug).
 CTRL="$HOME/.ssh/cm-harness.sock"

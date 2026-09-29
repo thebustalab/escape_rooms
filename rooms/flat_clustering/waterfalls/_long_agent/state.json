@@ -1,46 +1,46 @@
 {
   "status": "awaiting_review",
   "retry_count": 0,
-  "started": "2026-09-21T21:54:21.476913+00:00",
-  "last_cycle": "2026-09-21T22:08:28.732072+00:00",
+  "started": "2026-09-27T18:50:08.069314+00:00",
+  "last_cycle": "2026-09-27T19:09:06.913293+00:00",
   "cycles_completed": 3,
   "rooms": {
-    "station1": {
+    "basin": {
       "history": [
         {
           "cycle": 1,
           "decision": "RENDER",
-          "why": "No cine_all_clear.mp4 exists yet. In the all_clear still, the curtains over both crossings are gone, as the state requires. The state spec gives the up-ladder element a motion phrase for a bounded flame mover, and the image shows a large lit cresset right beside that ladder on the left. The ledger lists flame as one of the strongest mover types, so the spec and prompt are right as they stand."
+          "why": "No clip for vault_open_middle_near is filed against the room, the state's still is correct and current, and its spec already carries two bounded movers with authored vigour plus a two-item rigid pin — a configuration that cleared every gate on the sibling vault_open state today at the canon recipe."
         },
         {
           "cycle": 3,
           "decision": "HOLD",
-          "why": "The cycle-1 all_clear render (seed 4242) passed the camera, glitch and frozen-render gates, and the zero loop reading can't tell cyclic flame flicker from a dead clip, so it needs Lucas's eye."
+          "why": "The vault_open_middle_near clip was rendered this cycle at the canon recipe from the correct state still and survived every gate — camera still with 0 px landmark drift, glitch breadth 0.062/0.021 against a 0.70 both-readings threshold, non-zero return 0.15 and dead false — so it queues Lucas's eye, which is the only step that may accept it."
         }
       ],
       "attempts": 1,
       "last_gate": {
         "camera": "still",
-        "return": 0.01,
-        "peak": 6.83,
+        "return": 0.15,
+        "peak": 7.34,
         "glitch": {
-          "spike": 4.77,
-          "breadth": 0.167,
+          "spike": 3.25,
+          "breadth": 0.062,
           "at_pct": 1.4,
           "frames": 73,
-          "breadth_normalised": 0.188
+          "breadth_normalised": 0.021
         },
         "dead": {
-          "ratio": 10.29,
-          "peak": 12.45,
+          "ratio": 12.31,
+          "peak": 4.61,
           "dead": false
-        },
-        "note": "no out-and-back: dead, or cyclic flow. NEEDS AN EYE — this measure has called three good clips dead."
+        }
       },
-      "clip": "/home/bustalab/Documents/Tools/temp/cine/_art_prompt_exp/waterfalls/station1_motion_ri1_all_clear_looped.mp4",
+      "clip": "/home/bustalab/Documents/Tools/temp/cine/_art_prompt_exp/waterfalls/basin_motion_ri1_vault_open_middle_near_2_looped.mp4",
       "held": true,
-      "staged": "/home/bustalab/Documents/Tools/websites/thebustalab.github.io/escape_rooms/rooms/flat_clustering/waterfalls/_scratch/cine_cand/station1/all_clear__ri1.mp4"
+      "staged": "/home/bustalab/Documents/Tools/websites/thebustalab.github.io/escape_rooms/rooms/flat_clustering/waterfalls/_scratch/cine_cand/basin/vault_open_middle_near__ri1_vault_open_middle_near_2.mp4"
     }
   },
+  "review_note": "THIS IS A STATE RUN for state 'vault_open_middle_near'. Render the clip for <room>/scene_vault_open_middle_near.png — the water-state view — and NOT the base scene. NO clip for this state exists anywhere in this scenario yet. The committed cine_base.mp4 is the BASE (arrival) clip only; it does not cover this state. DO NOT HOLD OR PARK because a base clip exists, because the base still was already rendered, or because notes.md says Lucas approved base art — he asked for these state clips explicitly (2026-09-26). max_generations is 0: render only, never regenerate a still.",
   "render_polls": 0
 }

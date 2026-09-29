@@ -25,6 +25,13 @@ Per rooms/<chapter>/<scenario>/scenario.json, for every BUILT room:
   DOORS (topology — the scriptable half of the scene-validator's bidirectional-passage check)
   - MISS  a one-way passage: a forward/open door A->B with no return door back to A in B (or a door
           targeting a missing/unbuilt room). The ART half (inverse geometry both ends) stays an eyeball check.
+          OPT-OUT: some one-way passages are the STORY — canyon's rickety ladder peels off the wall and
+          drops into the dark behind the player, which is why `undercroft` is a one-visit prologue. Set
+          `oneWay: "<why>"` on that door to acknowledge it and the check passes. A prose reason is
+          required (not `true`) so the next reader learns why instead of re-litigating it, and a `oneWay`
+          door that LATER gains a return route is reported as a stale acknowledgement. Added 2026-09-26:
+          before this, a deliberate one-way passage made the scenario un-promotable, because a `ready`
+          scenario must be clean and there was no way to say "yes, on purpose".
 
   R SANDBOX
   - FAIL  a student-facing package (dplyr, ggplot2, tidyr, rstatix) is in `packages` but never attached
@@ -255,8 +262,23 @@ def door_reciprocity(scen):
                 return ts
             has_return = any(r["key"] in _door_targets(x) for x in tdoors) or \
                          any(x.get("direction") in ("back", "open") and not x.get("to") and not x.get("variants") for x in tdoors)
-            if not has_return:
-                out.append(f"one-way passage: '{r['key']}'->'{to}' has no return door back to '{r['key']}' in '{to}'")
+            ack = h.get("oneWay")
+            if ack is not None and not (isinstance(ack, str) and ack.strip()):
+                # `oneWay: true` silences the check without recording WHY, which is exactly the state
+                # this opt-out exists to prevent. Demand the sentence.
+                out.append(f"door '{r['key']}'->'{to}' sets `oneWay` to {ack!r} — it must be a PROSE "
+                           f"reason, so the next reader learns why the passage is one-way")
+                continue
+            if ack and has_return:
+                # A STALE acknowledgement is its own bug: the door was declared deliberately one-way,
+                # then a return route appeared and nobody revisited the note. Report it rather than
+                # letting a dead opt-out sit in the file looking load-bearing.
+                out.append(f"door '{r['key']}'->'{to}' is marked `oneWay` but '{to}' DOES have a return "
+                           f"door back to '{r['key']}' — the acknowledgement is stale; delete it")
+                continue
+            if not has_return and not ack:
+                out.append(f"one-way passage: '{r['key']}'->'{to}' has no return door back to '{r['key']}' in '{to}' "
+                           f"(if this is deliberate, set `oneWay: \"<why>\"` on the door to acknowledge it)")
     return out
 
 def clip_state_pairing(scen):

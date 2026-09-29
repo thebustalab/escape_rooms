@@ -39,6 +39,11 @@ if (window.SFX_MIXER && window.PanoMixer) (function () {
     #sfxMixer .flag:hover{border-color:#ffb4b4;color:#ffd0d0}
     #sfxMixer .flag.on{background:#4a1c1c;color:#ffd0d0;border-color:#ff9a9a}
     #sfxMixer .mrow.flagged label{color:#ff9a9a}
+    #sfxMixer .link{display:block;width:100%;margin-top:3px;font-size:10px;padding:2px 6px;cursor:pointer;
+      background:#12232f;color:#9fb6c6;border:1px solid rgba(255,255,255,.14);border-radius:6px;text-align:left}
+    #sfxMixer .link:hover{border-color:#8fd0ff;color:#d6ecff}
+    #sfxMixer .link.on{background:#123247;color:#d6ecff;border-color:#8fd0ff}
+    #sfxMixer .mrow.linked label{color:#8fd0ff}
     #sfxMixer .balance{display:block;width:100%;text-align:center;margin:12px 0 2px;background:#12232f;color:#ffd88c;
       border:1px solid rgba(255,216,140,.4);border-radius:8px;padding:9px;font:600 12px/1.2 system-ui,sans-serif;cursor:pointer}
     #sfxMixer .balance:hover{background:#1a3040;border-color:#ffd88c}
@@ -98,11 +103,22 @@ if (window.SFX_MIXER && window.PanoMixer) (function () {
   const markMusic = v => { touched.music = v; refreshSave(); };
   const markLayer = (src, v) => {
     const key = M.current(); if (!key || !src) return;
-    (touched.rooms[key] = touched.rooms[key] || {})[src] = v; refreshSave();
+    (touched.rooms[key] = touched.rooms[key] || {})[src] = v;
+    // OPT-IN link: write the same value into every OTHER room that uses this file. The save payload
+    // is already {room: {src: volume}}, so propagation needs no server change and stays surgical —
+    // each room keeps every other field of its own layer.
+    if (LINKED[src]) linkedRooms(src, "layer").forEach(r => {
+      if (r.key !== key) (touched.rooms[r.key] = touched.rooms[r.key] || {})[src] = v;
+    });
+    refreshSave();
   };
   const markSolve = (src, v) => {                    // solve / door stings live in solveSfx, not sfx
     const key = M.current(); if (!key || !src) return;
-    (touched.solve[key] = touched.solve[key] || {})[src] = v; refreshSave();
+    (touched.solve[key] = touched.solve[key] || {})[src] = v;
+    if (LINKED[src]) linkedRooms(src, "solve").forEach(r => {
+      if (r.key !== key) (touched.solve[r.key] = touched.solve[r.key] || {})[src] = v;
+    });
+    refreshSave();
   };
   const nTouched = () => (touched.music != null ? 1 : 0) +
     Object.keys(touched.flags).length +
@@ -179,6 +195,49 @@ if (window.SFX_MIXER && window.PanoMixer) (function () {
     row.appendChild(b);
   }
 
+  // ---- OPT-IN "same level in every room" link (2026-09-28, Lucas) ----------------------------------
+  // Volumes are saved PER ROOM, per file — `_apply_mix` is deliberately surgical — so moving a slider
+  // has never affected another room that plays the same recording. Lucas asked for that to be possible
+  // but explicitly OPT-IN, and opt-in is the right default: reusing one recording at two distances is a
+  // deliberate technique (waterfalls' catwalk and station1 beds are the same weir recorded away from it
+  // and at its base), and a silent global write would also change rooms you are not listening to.
+  //
+  // Sticky per SRC for the session, exactly like the ⚑ flag next to it, so you can link a sound once
+  // and then balance it by ear. Nothing is written until Save, so a link is always undoable.
+  const LINKED = {};                           // src -> true while linked
+  const linkedRooms = (src, kind) => (M.roomsUsing ? M.roomsUsing(src, kind) : []);
+
+  function linkButton(src, row, kind) {
+    if (!src) return;
+    const rooms = linkedRooms(src, kind);
+    if (rooms.length < 2) return;              // nothing to link to — no control, no clutter
+    const b = document.createElement("button");
+    b.className = "link";
+    const paint = () => {
+      const on = !!LINKED[src];
+      b.classList.toggle("on", on);
+      b.textContent = on ? `\u21d4 linked \u00b7 ${rooms.length} rooms` : `\u21d4 link \u00b7 ${rooms.length} rooms`;
+      b.title = (on ? "Linked: moving this slider sets the same volume in "
+                    : "Click to link: moving this slider will set the same volume in ")
+              + rooms.map(r => r.title || r.key).join(", ")
+              + ". Nothing is written until you Save.";
+      row.classList.toggle("linked", on);
+    };
+    b.onclick = () => {
+      LINKED[src] = !LINKED[src];
+      if (!LINKED[src]) delete LINKED[src];
+      // Linking ADOPTS the current value immediately, so the rooms agree from the moment you link
+      // rather than only after the next nudge — otherwise "linked" would be a lie until you moved it.
+      if (LINKED[src]) {
+        const inp = row.querySelector("input");
+        if (inp) inp.dispatchEvent(new Event("input"));
+      }
+      paint();
+    };
+    paint();
+    row.appendChild(b);
+  }
+
   // ---- perceived-loudness auto-balance -------------------------------------------------------------
   // The heavy lifting (measuring LUFS with ffmpeg, computing reduce-only targets) is done server-side by
   // the harness — SAME implementation the agent's wire-time pass uses (harness_server._apply_balance) —
@@ -245,6 +304,7 @@ if (window.SFX_MIXER && window.PanoMixer) (function () {
         const row = slider(l.label, l.mode, l.vol, v => { M.setLayerVolume(l.i, v); markLayer(l.src, v); });
         if (l.src) BAL.push({ src: l.src, inp: row.querySelector("input") });
         flagButton(l.src, row);
+        linkButton(l.src, row, "layer");
         if (l.mode === "interval") {          // interval one-shots: a test button (like the solve/door sounds)
           const b = document.createElement("button"); b.className = "fire"; b.title = l.src;
           b.textContent = "▶ test " + l.label;
@@ -269,6 +329,7 @@ if (window.SFX_MIXER && window.PanoMixer) (function () {
         const row = slider(s.label, "one-shot", vol0, v => { live = v; markSolve(s.src, v); });
         if (s.src) BAL.push({ src: s.src, inp: row.querySelector("input") });
         flagButton(s.src, row);
+        linkButton(s.src, row, "solve");
         const b = document.createElement("button"); b.className = "fire"; b.title = s.src;
         b.textContent = "▶ test " + s.label;
         b.onclick = () => M.fireSolve(s.src, live);          // preview at the current slider value

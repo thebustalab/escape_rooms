@@ -5,7 +5,7 @@
   "id": 14,
   "title": "The Confluence",
   "subtitle": "Hierarchical Clustering · hclust + cutree + summarise",
-  "story": "You came down into the red canyon to map its springs, and the flood season came early. Sheltering, you find a stair into a drowned hall the old makers left behind — their floodworks, a single bronze flood door, shut fast, that leads up to safety, an engraved panel no living hand has set, and a map of the whole canyon with every height left blank. A ladder climbs from the hall to the high springs. The makers built this place to be run by someone who could read the canyon as they did — its waters sorted into families, its channels into one branching tree. Climb, and roam the whole canyon: read the springs at each junction to learn which waters are kin, and mark each junction's height on your map as you pass it. Then come back down to the hall and read the shape of the land itself — before the water climbs to meet you.",
+  "story": "You came down into the red canyon to survey its springs, but now the flood season has come early. You shelter in an underground hall the canyon's makers left behind. Even that place is not safe from the flood though, a the bronze flood door that leads to true safety is shut tight. You do find a strange engraved panel and a map of the whole canyon system with the height of every stream confluence left blank. A ladder climbs from the hall to the high springs. Climb and roam: survey the springs at each junction to learn which waters are kin, and note each junction's height as you pass. Then, come back down to the hall and read the shape of the land itself — before the water climbs to meet you.",
   "enterLabel": "Climb into the canyon →",
   "done": {
     "title": "The map lied",
@@ -294,8 +294,8 @@
           ],
           "boxSource": "review:agent-vision",
           "id": "control_panel",
-          "body": "Numerals are cut into the panel: 1325 = 2 2 2 2; 1150 = _ _ _ _; 975 = 4 4",
-          "pickup": "Numerals are cut into the panel:\n\n1325 = 2 2 2 2; 1150 = _ _ _ _; 975 = 4 4",
+          "body": "Numerals are cut into the panel: 1325 = 2 2 2 2; 1150 = _ _ _ _; 975 = 4 4 0 0",
+          "pickup": "Numerals are cut into the panel:\n\n1325 = 2 2 2 2; 1150 = _ _ _ _; 975 = 4 4 0 0",
           "shownWhen": {
             "not": {
               "solved": "j_c7"
@@ -545,7 +545,7 @@
         },
         {
           "id": "calibration_panel",
-          "type": "grid",
+          "type": "lock",
           "label": "The calibration panel",
           "box": [
             0.397,
@@ -565,64 +565,35 @@
             ]
           },
           "lockedBody": "The cells stay dark. The panel is keyed to the canyon's own heights, and your map is not filled in yet: some of its junctions still have no height marked.",
-          "items": [
-            {
-              "key": "cell1",
-              "label": "1st cell"
-            },
-            {
-              "key": "cell2",
-              "label": "2nd cell"
-            },
-            {
-              "key": "cell3",
-              "label": "3rd cell"
-            },
-            {
-              "key": "cell4",
-              "label": "4th cell"
-            }
-          ],
-          "buckets": [
-            {
-              "key": "dark",
-              "label": "dark"
-            },
-            {
-              "key": "1",
-              "label": "1"
-            },
-            {
-              "key": "2",
-              "label": "2"
-            },
-            {
-              "key": "3",
-              "label": "3"
-            },
-            {
-              "key": "4",
-              "label": "4"
-            }
-          ],
-          "answer": {
-            "cell1": "2",
-            "cell2": "2",
-            "cell3": "4",
-            "cell4": "dark"
+          "answer": "2240",
+          "length": 4,
+          "maxAttempts": 0,
+          "reference": {
+            "caption": "Cut into the plate above the cells",
+            "rows": [
+              {
+                "label": "1325",
+                "cells": "2 2 2 2"
+              },
+              {
+                "label": "1150",
+                "cells": "_ _ _ _",
+                "blank": true
+              },
+              {
+                "label": "975",
+                "cells": "4 4 0 0"
+              }
+            ]
           },
-          "submitLabel": "Set the row",
           "feedback": {
             "correct": "The cells light one after another, and somewhere above you a bolt draws back.",
-            "wrong": "The panel holds. The row stays dark.",
-            "incomplete": "Set all four cells first. A cell with no group stays dark."
+            "wrong": "The panel holds. The row stays dark."
           },
           "solveSfx": {
             "src": "audio/solve_bronze_door.mp3",
             "volume": 0.34
-          },
-          "note": "answer 2 · 2 · 4 · dark (the 1150 cut: left splits 2,2, right stays 4; the 4th cell has no group)",
-          "noElement": true
+          }
         },
         {
           "type": "door",
@@ -695,12 +666,12 @@
       "sfx": [
         {
           "src": "audio/canyon_cave_hall.mp3",
-          "volume": 0.2,
+          "volume": 0.06,
           "mode": "loop"
         },
         {
           "src": "audio/canyon_drip_cave.mp3",
-          "volume": 0.25,
+          "volume": 0.28,
           "mode": "loop",
           "states": [
             "base"
@@ -755,8 +726,8 @@
             0.52
           ],
           "boxSource": "review:agent-vision",
-          "body": "Numerals are cut into the panel: 1325 = 2 2 2 2; 1150 = _ _ _ _; 975 = 4 4",
-          "pickup": "Numerals are cut into the panel:\n\n1325 = 2 2 2 2; 1150 = _ _ _ _; 975 = 4 4",
+          "body": "Numerals are cut into the panel: 1325 = 2 2 2 2; 1150 = _ _ _ _; 975 = 4 4 0 0",
+          "pickup": "Numerals are cut into the panel:\n\n1325 = 2 2 2 2; 1150 = _ _ _ _; 975 = 4 4 0 0",
           "boxNote": "re-measured on the four-cell panel, 2026-09-18",
           "shownWhen": {
             "not": {
@@ -871,7 +842,8 @@
             "not": {
               "solved": "j_c7"
             }
-          }
+          },
+          "oneWay": "Deliberate, and it is the prologue: the rickety ladder peels off the wall and drops into the dark behind the player, so the dry hall is a ONE-VISIT opening scene. j_c1 keeps the shaft as a CLUE, not a door, because a depicted passage with no hotspot reads as a bug. The player returns to this same room at the end by j_c7's stair, and finds it flooded. Do NOT 'fix' this by adding a return door."
         },
         {
           "id": "trunk_arch",
@@ -1026,7 +998,7 @@
         },
         {
           "id": "calibration_panel",
-          "type": "grid",
+          "type": "lock",
           "label": "The calibration panel",
           "box": [
             0.397,
@@ -1046,57 +1018,30 @@
             ]
           },
           "lockedBody": "The cells stay dark. The panel is keyed to the canyon's own heights, and your map is not filled in yet: some of its junctions still have no height marked.",
-          "items": [
-            {
-              "key": "cell1",
-              "label": "1st cell"
-            },
-            {
-              "key": "cell2",
-              "label": "2nd cell"
-            },
-            {
-              "key": "cell3",
-              "label": "3rd cell"
-            },
-            {
-              "key": "cell4",
-              "label": "4th cell"
-            }
-          ],
-          "buckets": [
-            {
-              "key": "dark",
-              "label": "dark"
-            },
-            {
-              "key": "1",
-              "label": "1"
-            },
-            {
-              "key": "2",
-              "label": "2"
-            },
-            {
-              "key": "3",
-              "label": "3"
-            },
-            {
-              "key": "4",
-              "label": "4"
-            }
-          ],
-          "answer": {
-            "cell1": "2",
-            "cell2": "2",
-            "cell3": "4",
-            "cell4": "dark"
+          "answer": "2240",
+          "length": 4,
+          "maxAttempts": 0,
+          "reference": {
+            "caption": "Cut into the plate above the cells",
+            "rows": [
+              {
+                "label": "1325",
+                "cells": "2 2 2 2"
+              },
+              {
+                "label": "1150",
+                "cells": "_ _ _ _",
+                "blank": true
+              },
+              {
+                "label": "975",
+                "cells": "4 4 0 0"
+              }
+            ]
           },
-          "submitLabel": "Set the row",
           "feedback": {
             "correct": "The cells light one after another, and somewhere above you a bolt draws back.",
-            "wrong": "The panel holds. The row stays dark.",
-            "incomplete": "Set all four cells first. A cell with no group stays dark."
+            "wrong": "The panel holds. The row stays dark."
           },
           "solveSfx": {
             "src": "audio/solve_bronze_door.mp3",
@@ -1391,10 +1336,10 @@
       },
       "entry": {
         "title": "The ladder breaks",
-        "text": "You are most of the way up when the rung under your boot lets go. The whole ladder peels off the wall behind you and drops into the dark, and you hear it hit water a long time later. The hall is shut. Whatever way out of this canyon there is, it is upstream of you now.",
+        "text": "You are most of the way up when the rung under your boot lets go. The whole ladder peels off the wall behind you and drops into the dark, and you hear it hit water down below. The hall is shut. Whatever way out of this canyon there is, it is downstream of you now.",
         "button": "Turn and face the canyon"
       },
-      "designNote": "PUZZLE (Read-the-tree / nearest relative). CODE (WebR-safe base R, NO ggtree): m<-canyon_water_chem; hc<-hclust(dist(m[,3:8]),method='ward.D2'); plot(hc,labels=m$spring). Q: 'Which spring is most chemically similar to Dripstone?' ANSWER: Lime_Hollow (d 2.45; runner-up Chalkseep 2.83; 15%% margin). DISTRACTORS(>=6): Chalkseep, Palegate, Brimstone_Font, Glasswater, Brineseep, Bitterwell. Benchmark height 1400. NEW ART.",
+      "designNote": "PUZZLE (Read-the-tree / nearest relative). CODE (WebR-safe base R, NO ggtree): m<-canyon_water_chem; hc<-hclust(dist(m[,3:8]),method='ward.D2'); plot(hc,labels=m$spring). Q: 'Which spring is most chemically similar to Dripstone?' ANSWER: Lime_Hollow (d 2.45; runner-up Chalkseep 2.83; 15%% margin). DISTRACTORS(>=6): Chalkseep, Palegate, Brimstone_Font, Glasswater, Brineseep, Bitterwell. Benchmark height 1400. NEW ART. SHIPPED PATH (corrected 2026-09-28): the base-R snippet above is the ORIGINAL design record and is NOT what ships — this room's hints teach runMatrixAnalysis(analysis='hclust', parameters=c(4)) and the returned cluster column. Base R still runs and gives the same answers; it is a second route, not the taught one. ggtree IS attached in every room since 2026-09-28, so the book's ggtree()+geom_tiplab() works here.",
       "plannedHotspots": [
         {
           "type": "puzzle",
@@ -1434,7 +1379,7 @@
         {
           "type": "clue",
           "label": "The high benchmark",
-          "pickup": true,
+          "pickup": "c1 · high confluence — 1400 m",
           "note": "confluence height 1400 — mark it on the map (escape)",
           "onPickup": {
             "set": "c1_read"
@@ -1491,7 +1436,7 @@
       "sfx": [
         {
           "src": "audio/canyon_waterfall.mp3",
-          "volume": 0.2,
+          "volume": 0.11,
           "mode": "loop"
         },
         {
@@ -1545,7 +1490,7 @@
             0.222,
             0.8346
           ],
-          "pickup": true,
+          "pickup": "c1 · high confluence — 1400 m",
           "onPickup": {
             "set": "c1_read"
           },
@@ -1773,7 +1718,7 @@
         }
       },
       "entry": null,
-      "designNote": "PUZZLE (Classify-the-Unknown; wood_smoke style). CODE: all<-rbind(canyon_water_chem,unknown_spring); hc<-hclust(dist(all[,3:8]),method='ward.D2'); plot(hc,labels=all$spring). Q: 'Which family does Unmarked_Spring join?' ANSWER: the SILICA / North_Branch family (Glasswater/Flintrun/Obsidian_Weep/Silverglass). DISTRACTORS: carbonate/West, sulfate/East, saline/South, 'its own new group', 'closest to Bitterwell', 'cannot tell'. Benchmark height 1375. NEW ART.",
+      "designNote": "PUZZLE (Classify-the-Unknown; wood_smoke style). CODE: all<-rbind(canyon_water_chem,unknown_spring); hc<-hclust(dist(all[,3:8]),method='ward.D2'); plot(hc,labels=all$spring). Q: 'Which family does Unmarked_Spring join?' ANSWER: the SILICA / North_Branch family (Glasswater/Flintrun/Obsidian_Weep/Silverglass). DISTRACTORS: carbonate/West, sulfate/East, saline/South, 'its own new group', 'closest to Bitterwell', 'cannot tell'. Benchmark height 1375. NEW ART. SHIPPED PATH (corrected 2026-09-28): the base-R snippet above is the ORIGINAL design record and is NOT what ships — this room's hints teach runMatrixAnalysis(analysis='hclust', parameters=c(4)) and the returned cluster column. Base R still runs and gives the same answers; it is a second route, not the taught one. ggtree IS attached in every room since 2026-09-28, so the book's ggtree()+geom_tiplab() works here.",
       "plannedHotspots": [
         {
           "type": "puzzle",
@@ -1791,7 +1736,7 @@
           "availableWhen": {
             "solved": "j_c1"
           },
-          "lockedBody": "You have the sample in your hand, but nothing yet to hold it against. Read a family you already know first.",
+          "lockedBody": "You have the water sample in your hand, but nothing yet to hold it against. Solve another puzzle first.",
           "solveSfx": {
             "src": "audio/solve_stone_slot.mp3",
             "volume": 0.43758254650883743
@@ -1817,7 +1762,7 @@
         {
           "type": "clue",
           "label": "The orphan benchmark",
-          "pickup": true,
+          "pickup": "c2 · orphan junction — 1375 m",
           "note": "confluence height 1375 — mark it on the map (escape)",
           "onPickup": {
             "set": "c2_read"
@@ -1885,7 +1830,7 @@
           "availableWhen": {
             "solved": "j_c1"
           },
-          "lockedBody": "You have the sample in your hand, but nothing yet to hold it against. Read a family you already know first.",
+          "lockedBody": "You have the water sample in your hand, but nothing yet to hold it against. Solve another puzzle first.",
           "solveSfx": {
             "src": "audio/solve_stone_slot.mp3",
             "volume": 0.43758254650883743
@@ -1918,7 +1863,7 @@
             0.31,
             0.8
           ],
-          "pickup": true,
+          "pickup": "c2 · orphan junction — 1375 m",
           "onPickup": {
             "set": "c2_read"
           },
@@ -2132,7 +2077,7 @@
         {
           "type": "clue",
           "label": "The left-fork benchmark",
-          "pickup": true,
+          "pickup": "c3 · left fork — 1050 m",
           "note": "confluence height 1050 — mark it on the map (escape)",
           "onPickup": {
             "set": "c3_read"
@@ -2225,7 +2170,7 @@
             0.5139,
             0.7397
           ],
-          "pickup": true,
+          "pickup": "c3 · left fork — 1050 m",
           "onPickup": {
             "set": "c3_read"
           },
@@ -2251,10 +2196,10 @@
           "type": "door",
           "label": "The climb to the orphan junction",
           "box": [
-            0.5863,
-            0.3074,
-            0.6863,
-            0.6074
+            0.6198,
+            0.285,
+            0.7198,
+            0.585
           ],
           "to": "j_c2",
           "boxSource": "moved:testplay",
@@ -2474,7 +2419,7 @@
         }
       },
       "entry": null,
-      "designNote": "PUZZLE (Cut + summarise — the chapter expansion). CODE: m<-canyon_water_chem; m$cluster<-cutree(hclust(dist(m[,3:8]),method='ward.D2'),4); m %>% group_by(cluster) %>% summarise(meanSO4=mean(sulfate)). Q: 'Cut into 4 families; which has the highest average sulfate?' ANSWER: the SULFATE family (East + Bitterwell), mean SO4 61.0 vs 8.0/8.0/7.8 — dominant. DISTRACTORS: carbonate, silica, saline families, 'the single highest sample', 'the largest cluster', 'the chloride family'. Benchmark height 1425. NEW ART.",
+      "designNote": "PUZZLE (Cut + summarise — the chapter expansion). CODE: m<-canyon_water_chem; m$cluster<-cutree(hclust(dist(m[,3:8]),method='ward.D2'),4); m %>% group_by(cluster) %>% summarise(meanSO4=mean(sulfate)). Q: 'Cut into 4 families; which has the highest average sulfate?' ANSWER: the SULFATE family (East + Bitterwell), mean SO4 61.0 vs 8.0/8.0/7.8 — dominant. DISTRACTORS: carbonate, silica, saline families, 'the single highest sample', 'the largest cluster', 'the chloride family'. Benchmark height 1425. NEW ART. SHIPPED PATH (corrected 2026-09-28): the base-R snippet above is the ORIGINAL design record and is NOT what ships — this room's hints teach runMatrixAnalysis(analysis='hclust', parameters=c(4)) and the returned cluster column. Base R still runs and gives the same answers; it is a second route, not the taught one. ggtree IS attached in every room since 2026-09-28, so the book's ggtree()+geom_tiplab() works here.",
       "plannedHotspots": [
         {
           "type": "puzzle",
@@ -2492,7 +2437,7 @@
           "availableWhen": {
             "solved": "j_c2"
           },
-          "lockedBody": "The bitter water is not going anywhere. There is a junction upstream you have not finished reading.",
+          "lockedBody": "The bitter water is not going anywhere. There is a junction elsewhere you have not finished surveying.",
           "solveSfx": {
             "src": "audio/solve_stone_slot.mp3",
             "volume": 0.43758254650883743
@@ -2518,7 +2463,7 @@
         {
           "type": "clue",
           "label": "The bitter benchmark",
-          "pickup": true,
+          "pickup": "c4 · bitter confluence — 1425 m",
           "note": "confluence height 1425 — mark it on the map (escape)",
           "onPickup": {
             "set": "c4_read"
@@ -2586,7 +2531,7 @@
           "availableWhen": {
             "solved": "j_c2"
           },
-          "lockedBody": "The bitter water is not going anywhere. There is a junction upstream you have not finished reading.",
+          "lockedBody": "The bitter water is not going anywhere. There is a junction elsewhere you have not finished surveying.",
           "solveSfx": {
             "src": "audio/solve_stone_slot.mp3",
             "volume": 0.43758254650883743
@@ -2619,7 +2564,7 @@
             0.292,
             0.802
           ],
-          "pickup": true,
+          "pickup": "c4 · bitter confluence — 1425 m",
           "onPickup": {
             "set": "c4_read"
           },
@@ -2839,7 +2784,7 @@
         {
           "type": "clue",
           "label": "The still-pool benchmark",
-          "pickup": true,
+          "pickup": "c5 · still pool — 1400 m",
           "note": "confluence height 1400 — mark it on the map (escape)",
           "onPickup": {
             "set": "c5_read"
@@ -2902,7 +2847,7 @@
             0.537,
             0.928
           ],
-          "pickup": true,
+          "pickup": "c5 · still pool — 1400 m",
           "onPickup": {
             "set": "c5_read"
           },
@@ -3116,7 +3061,7 @@
         {
           "type": "clue",
           "label": "The right-fork benchmark",
-          "pickup": true,
+          "pickup": "c6 · right fork — 1200 m",
           "note": "confluence height 1200 — mark it on the map (escape)",
           "onPickup": {
             "set": "c6_read"
@@ -3209,7 +3154,7 @@
             0.5192,
             0.7297
           ],
-          "pickup": true,
+          "pickup": "c6 · right fork — 1200 m",
           "onPickup": {
             "set": "c6_read"
           },
@@ -3483,7 +3428,7 @@
         }
       },
       "entry": null,
-      "designNote": "BOSS PUZZLE (misdirection: adjacency vs data). Sited at the trunk (root of the tree). CODE: m<-canyon_water_chem; m$cluster<-cutree(hclust(dist(m[,3:8]),method='ward.D2'),4); m %>% arrange(cluster) # compare cluster vs fork. TEMPTING(wrong)=trust the carved map / group by fork. CORRECT: Bitterwell (West->sulfate) AND Saltglass (North->saline). DELIVERABLE figure + submitCodec. HINT CLUE = the carved wall-map (two names sit wrong) — NOT removable and NOT foldable into the wrong-hints: the distractor \"none, the map is right\" refers to it, and a taught trap has to be tempting BEFORE the answer, not revealed after it. Distinct from the escape's reading surface, which is the `elevmap` in `works`. DISTRACTORS: only Bitterwell; only Saltglass; Bitterwell+Brimstone; Saltglass+Brineseep; a within-fork pair; 'none, the map is right'. unlockedWhen allSolved [j_c1,j_c2,j_c4]. Benchmark height 850. NEW ART.",
+      "designNote": "BOSS PUZZLE (misdirection: adjacency vs data). Sited at the trunk (root of the tree). CODE: m<-canyon_water_chem; m$cluster<-cutree(hclust(dist(m[,3:8]),method='ward.D2'),4); m %>% arrange(cluster) # compare cluster vs fork. TEMPTING(wrong)=trust the carved map / group by fork. CORRECT: Bitterwell (West->sulfate) AND Saltglass (North->saline). DELIVERABLE figure + submitCodec. HINT CLUE = the carved wall-map (two names sit wrong) — NOT removable and NOT foldable into the wrong-hints: the distractor \"none, the map is right\" refers to it, and a taught trap has to be tempting BEFORE the answer, not revealed after it. Distinct from the escape's reading surface, which is the `elevmap` in `works`. DISTRACTORS: only Bitterwell; only Saltglass; Bitterwell+Brimstone; Saltglass+Brineseep; a within-fork pair; 'none, the map is right'. unlockedWhen allSolved [j_c1,j_c2,j_c4]. Benchmark height 850. NEW ART. SHIPPED PATH (corrected 2026-09-28): the base-R snippet above is the ORIGINAL design record and is NOT what ships — this room's hints teach runMatrixAnalysis(analysis='hclust', parameters=c(4)) and the returned cluster column. Base R still runs and gives the same answers; it is a second route, not the taught one. ggtree IS attached in every room since 2026-09-28, so the book's ggtree()+geom_tiplab() works here.",
       "plannedHotspots": [
         {
           "type": "puzzle",
@@ -3545,7 +3490,7 @@
         {
           "type": "clue",
           "label": "The trunk benchmark",
-          "pickup": true,
+          "pickup": "c7 · the trunk — 850 m",
           "note": "confluence height 850 — mark it on the map (escape)",
           "onPickup": {
             "set": "c7_read"
@@ -3620,12 +3565,12 @@
       "sfx": [
         {
           "src": "audio/canyon_deepfall.mp3",
-          "volume": 0.2,
+          "volume": 0.65,
           "mode": "loop"
         },
         {
           "src": "audio/canyon_cave_hall.mp3",
-          "volume": 0.1,
+          "volume": 0.36,
           "mode": "loop"
         }
       ],
@@ -3695,7 +3640,7 @@
             0.6085,
             0.807
           ],
-          "pickup": true,
+          "pickup": "c7 · the trunk — 850 m",
           "onPickup": {
             "set": "c7_read"
           },
@@ -3769,6 +3714,12 @@
         }
       ],
       "fx": [
+        {
+          "fx": "rain",
+          "when": {
+            "solved": "j_c2"
+          }
+        },
         {
           "fx": "flood",
           "when": {

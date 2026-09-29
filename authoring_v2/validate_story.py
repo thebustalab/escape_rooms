@@ -28,7 +28,9 @@ TWO CHECKS, and the first one is the point:
      diffed against that snapshot: a distinctive term that WAS in the vetted opening, is NOT in the
      current one, and is STILL used downstream is a genuine orphan — the exact shape of the temple
      "Closing" break. Near-zero false positives, because it keys on an actual edit rather than guessing
-     which nouns need establishing.
+     which nouns need establishing. Both sides are compared through `word_forms()` (2026-09-29) so a
+     reword to an inflected form is not a drop — and a drop is still caught when the room says it in
+     another form. Ordinary English is stopped by COMMON; nameable words deliberately are not.
 
   2b. DEFINITE REFERENCE (advisory only). `the <Capitalised…>` whose words never appear in the opening.
      Tried as a FAIL first and it was far too blunt — it flags "the Noatak", "the Tukey", "the Anchor",
@@ -59,16 +61,104 @@ TIME_WORDS = {"dawn", "daybreak", "sunrise", "morning", "midday", "noon", "zenit
 STOPHEADS = {"East", "West", "North", "South", "Register", "Registers"}
 
 # Ordinary words that survive the 4-letter filter and would otherwise make every reword look like a
-# dropped term. Only DISTINCTIVE vocabulary should gate a build.
+# dropped term. Only DISTINCTIVE vocabulary should gate a build. The test is WORLD-BUILDING MEANING:
+# a word belongs here only if a room saying it establishes nothing — if the opening never has to
+# introduce it because every English speaker already has it. Anything a scenario could plausibly have
+# named (`glass`, `ledger`, `tarn`, `chain`, `stair`) stays OUT, however plain it looks.
+# Inflections are handled by word_forms(), so only the base form is listed.
 COMMON = {"that", "this", "with", "from", "have", "here", "your", "them", "they", "when", "what",
           "which", "were", "will", "been", "into", "each", "then", "than", "some", "only", "over",
           "must", "more", "most", "both", "every", "still", "there", "their", "would", "could",
           "before", "after", "until", "while", "these", "those", "where", "about", "again", "last",
-          "left", "long", "take", "takes", "does", "said", "says", "one", "two", "the"}
+          "left", "long", "take", "takes", "does", "said", "says", "one", "two", "the",
+          # 2026-09-29 additions. Every one was observed FAILING somewhere in the corpus on text that
+          # establishes nothing; `north` (22 hits, door labels) and `back` (19) were the top two.
+          # bare compass points and sides — ordinary scenery, not names. The definite-reference check
+          # already treats them so (STOPHEADS), and door labels are built out of them.
+          "north", "south", "east", "west", "northern", "southern", "eastern", "western", "right",
+          # counting words — "four villages" in an opening is not a term the rooms lean on
+          "three", "four", "five", "six", "seven", "eight", "nine", "first", "second", "third",
+          "single", "other", "others", "another", "same", "next", "many", "much",
+          # ordinary verbs, in any inflection (word_forms covers -s/-ed/-ing)
+          "back", "went", "goes", "come", "find", "hold", "know", "look", "made", "make", "give",
+          "want", "need", "seen", "lie", "gets", "hand", "mark", "reach", "sort", "colour", "color",
+          # function words and quantifiers
+          "just", "like", "also", "once", "onto", "upon", "very", "being", "having", "cannot",
+          "because", "everything", "anything", "nothing", "something", "never", "always", "ever",
+          "even", "thing", "away", "down", "through", "actually", "really", "almost", "enough",
+          "least", "though", "without", "within", "since",
+          # plain sensory adjectives a room can use without the opening having introduced them
+          "dark", "warm",
+          # irregular pasts of the verbs above — word_forms() deliberately does no irregulars, so
+          # they have to be listed by hand or the same ordinary verb fails in its past tense
+          "came", "gave", "took", "knew", "told", "found", "held", "kept", "gone", "done"}
+# DELIBERATELY NOT HERE, though they look ordinary: `open`, `close`, `keep`, `well`, `post`, `tree`,
+# `family`, `party`, `report`, `spring`, `chain`, `glass`, `station`, `ledger`. Each can BE the thing a
+# scenario names — "close" would have swallowed temple's *the Closing*, the break this gate was built
+# for. When the ordinary sense is the only one in play, the finding is cheap to read past; a stoplisted
+# name is invisible forever.
 
 
 def strip_html(t):
     return re.sub(r"<[^>]+>", " ", str(t or ""))
+
+
+def word_forms(w):
+    """The set of base forms a word could be an inflection of — the light, dependency-free stemmer
+    the dropped-terms check compares through (2026-09-29).
+
+    WHY. The check was exact-word, so a reword from "ridge" to "ridges" read as a dropped term and
+    the gate cried wolf: `ridge`/`ridges`, `valley`/`valleys`, `fire`/`fires` produced 30+ of the
+    corpus's 170 FAILs. A word counts as present in the opening if ANY of its forms is.
+
+    THE RULE — regular English inflections only, and only these:
+      -ies -> -y            (families -> family)
+      -sses/-shes/-ches/-xes/-zes -> drop the -es   (glasses -> glass, watches -> watch)
+      -s   -> drop it       (ridges -> ridge, fires -> fire; never after ss/us/is)
+      -ed  -> drop -ed and -d, and un-double a final consonant   (walked -> walk, filed -> file)
+      -ing -> drop -ing, try a restored -e, un-double   (holding -> hold, firing -> fire)
+    Nothing else. No irregulars ("went" is not "go"), no derivational endings (-ly, -ness, -er,
+    -ion): those change what a word MEANS, and a stemmer that over-collapses hides the orphan this
+    gate exists to catch. Every form is kept as an ALTERNATIVE rather than a single canonical stem,
+    so the collapse is never forced; a match needs the two words' form sets to actually overlap.
+    Short results are dropped (< 3 letters) so "ring" cannot become "r".
+    """
+    w = re.sub(r"'s$", "", w.lower().strip("'"))
+    forms = {w}
+
+    def add(s):
+        if len(s) >= 3:
+            forms.add(s)
+
+    def undouble(s):
+        if len(s) >= 4 and s[-1] == s[-2] and s[-1] not in "lsz":
+            add(s[:-1])
+
+    if len(w) >= 5 and w.endswith("ies"):
+        add(w[:-3] + "y")
+    if len(w) >= 5 and w.endswith(("sses", "shes", "ches", "xes", "zes")):
+        add(w[:-2])
+    if len(w) >= 4 and w.endswith("s") and not w.endswith(("ss", "us", "is")):
+        add(w[:-1])
+    if len(w) >= 5 and w.endswith("ed"):
+        add(w[:-2])
+        add(w[:-1])
+        undouble(w[:-2])
+    if len(w) >= 6 and w.endswith("ing"):
+        add(w[:-3])
+        add(w[:-3] + "e")
+        undouble(w[:-3])
+    return forms
+
+
+def forms_of_all(words):
+    out = set()
+    for w in words:
+        out |= word_forms(w)
+    return out
+
+
+COMMON_FORMS = forms_of_all(COMMON)
 
 
 def walk_text(doc):
@@ -147,12 +237,33 @@ def check_scenario(path):
     snap = os.path.join(os.path.dirname(path), ".vetted_story.txt")
     if os.path.isfile(snap):
         old = set(w.lower() for w in re.findall(r"[A-Za-z']{4,}", strip_html(open(snap, encoding="utf-8").read())))
-        dropped = {w for w in old - land_words if w not in COMMON}
+        # Compared through word_forms(), so a reword to an inflected form ("ridge" -> "ridges") is
+        # NOT a drop, and an ordinary word is stopped whichever form it is in ("backs" -> "back").
+        land_forms = forms_of_all(land_words)
+        dropped = {w for w in old
+                   if not (word_forms(w) & land_forms) and not (word_forms(w) & COMMON_FORMS)}
+        # One finding per TERM, not per spelling: "ledger" and "ledgers" were both in the vetted
+        # opening and would otherwise each report the same downstream line.
+        classes = []                                     # [(label, forms)]
+        for w in sorted(dropped, key=lambda x: (len(x), x)):
+            for i, (lab, fs) in enumerate(classes):
+                if fs & word_forms(w):
+                    classes[i] = (lab, fs | word_forms(w))
+                    break
+            else:
+                classes.append((w, word_forms(w)))
         for p_, raw in items:
-            for w in sorted(dropped):
-                if re.search(r"\b%s\b" % re.escape(w), strip_html(raw), re.I):
-                    fails.append('%s: still says "%s", which the VETTED opening had and the current '
-                                 "opening no longer establishes." % (p_, w))
+            text = strip_html(raw)
+            here = {}                                    # base form -> the surface word that used it
+            for t in re.findall(r"[A-Za-z']+", text):
+                for f in word_forms(t):
+                    here.setdefault(f, t.lower())
+            for w, fs in sorted(classes):
+                hit = next((here[f] for f in sorted(fs) if f in here), None)
+                if hit:
+                    said = '"%s"' % w if hit == w else '"%s" (as "%s")' % (w, hit)
+                    fails.append("%s: still says %s, which the VETTED opening had and the current "
+                                 "opening no longer establishes." % (p_, said))
     else:
         warns.append("no .vetted_story.txt snapshot — run with --accept once the landing card is "
                      "settled, so later edits can be diffed against it")
@@ -182,7 +293,18 @@ def check_scenario(path):
         if odd and land_times:
             warns.append("%s: says %s, but the landing story's clock is %s"
                          % (p, "/".join(sorted(odd)), "/".join(sorted(land_times))))
-    return fails, warns, len(items)
+    # A hotspot that is listed in BOTH `hotspots` and `plannedHotspots` under the same id is walked
+    # twice, so the identical line was printed twice. Same path + same term = one place to fix.
+    return dedupe(fails), dedupe(warns), len(items)
+
+
+def dedupe(lines):
+    out, seen = [], set()
+    for l in lines:
+        if l not in seen:
+            seen.add(l)
+            out.append(l)
+    return out
 
 
 def accept(rel):

@@ -8,6 +8,17 @@ Regression for the monorail SWITCH-DOOR (2026-08-05): a car's single door routes
 state, so its return path lives on a state VARIANT's `to`, not the base `to` (which points onward). The
 check must read variant targets, or it flags every switch-door car as a one-way passage (false positive);
 but it must STILL catch a genuinely one-way passage (a room you can enter with no way back).
+
+Regression for the DELIBERATE one-way passage (2026-09-26). Some one-way passages are the STORY, not a
+bug: `hierarchical_clustering/canyon`'s rickety ladder peels off the wall behind the player, which is what
+makes its opening hall a one-visit prologue, and the canon says in three places not to "fix" it by adding
+a door. WHAT BROKE: the check had no opt-out, and a `ready` scenario must validate clean — so canyon was
+**un-promotable**, with the only routes being to silence the whole check or to break the fiction. Neither
+is acceptable, and the state persisted because it only bites at the moment of publishing, long after the
+design is settled. THE FIX: a door may carry `oneWay:"<why>"`. THE SIGNATURE these tests key on — the
+acknowledgement must be PROSE (a bare `True` silences the check while recording nothing, which is the very
+state the opt-out exists to prevent), and an acknowledgement that goes STALE (the target later gains a
+return door) is itself reported, so a dead opt-out cannot sit in the file looking load-bearing.
 """
 import json, os, sys, tempfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -45,6 +56,56 @@ def test_plain_back_door_return_still_works():
     # the ordinary (non-switch) return: an explicit back door naming the source
     car_door = {"id": "cd", "type": "door", "direction": "back", "to": "station1"}
     assert _scen(car_door) == []
+
+
+# --- the `oneWay` opt-out: a deliberate one-way passage (canyon's ladder, 2026-09-26) ---
+
+def _one_way(station_door, car_door):
+    """All door_reciprocity messages for a station1 -> car_sq passage, so the oneWay branches
+    (which do NOT contain the phrase 'one-way passage') are visible too."""
+    return va.door_reciprocity({"rooms": [
+        {"key": "station1", "built": True, "hotspots": [station_door]},
+        {"key": "car_sq", "built": True, "hotspots": car_door},
+    ]})
+
+
+_ONWARD = {"id": "sd", "type": "door", "direction": "forward", "to": "car_sq"}
+
+
+def test_a_prose_oneWay_reason_satisfies_the_check():
+    # canyon's case: the ladder drops away behind the player, so there IS no return door by design
+    d = dict(_ONWARD, oneWay="The ladder peels off the wall and falls; the hall is a one-visit prologue.")
+    assert _one_way(d, []) == []
+
+
+def test_without_the_opt_out_it_is_still_flagged():
+    # the opt-out must not weaken the default: an unacknowledged one-way passage stays a finding
+    msgs = _one_way(dict(_ONWARD), [])
+    assert any("one-way passage" in m for m in msgs)
+    assert any("oneWay" in m for m in msgs), "the finding should name the opt-out so the fix is findable"
+
+
+def test_a_bare_true_is_rejected():
+    # `oneWay: true` silences the check without recording WHY — the state the opt-out exists to prevent
+    msgs = _one_way(dict(_ONWARD, oneWay=True), [])
+    assert any("PROSE" in m for m in msgs)
+    assert not any("one-way passage" in m for m in msgs), "reject the bad ack, don't ALSO report the passage"
+
+
+def test_an_empty_reason_is_rejected():
+    assert any("PROSE" in m for m in _one_way(dict(_ONWARD, oneWay="   "), []))
+
+
+def test_a_stale_acknowledgement_is_reported():
+    # the target LATER gained a return door — the ack is now dead and must not sit there looking real
+    d = dict(_ONWARD, oneWay="the ladder falls away behind the player")
+    msgs = _one_way(d, [{"id": "rd", "type": "door", "direction": "back", "to": "station1"}])
+    assert any("stale" in m for m in msgs)
+
+
+def test_an_unacknowledged_two_way_passage_is_still_silent():
+    # the ordinary case must not have been disturbed by the opt-out branches
+    assert _one_way(dict(_ONWARD), [{"id": "rd", "type": "door", "direction": "back", "to": "station1"}]) == []
 
 
 if __name__ == "__main__":

@@ -745,7 +745,7 @@ def _apply_spec_all(base):
 _REVIEW_FLAGS = {"hotspotsReviewed", "cinemagraphsVerified"}
 
 
-def _accept_still(base, room_key, accepted, note="", state=None):
+def _accept_still(base, room_key, accepted, note="", state=None, by=""):
     """Set (or clear) the HUMAN accept on a room's still — `authoring.seam.accepted`.
 
     This is the one flag no automation may write. `seam_stage.py` records stage/band/ratio/delta/
@@ -788,7 +788,13 @@ def _accept_still(base, room_key, accepted, note="", state=None):
 
         if accepted:
             rec["accepted"] = True
-            rec["acceptedBy"] = "lucas %s" % datetime.date.today().isoformat()
+            # PROVENANCE (2026-09-29). A hand-click in the harness stamps "lucas <date>". An agent
+            # acting on Lucas's spoken instruction stamps "lucas via agent <date>" (harness_cli.py
+            # passes `by`). Both are HIS judgement — the distinction is kept so a later reader can
+            # tell which, and so an accept that appeared without an instruction is visible. No
+            # unattended loop may write this flag at all; see notes/v3_only_harness.md.
+            who = re.sub(r"[^a-z ]", "", str(by or "lucas").lower()).strip() or "lucas"
+            rec["acceptedBy"] = "%s %s" % (who, datetime.date.today().isoformat())
             if note:
                 rec["humanNote"] = note
         else:
@@ -4252,7 +4258,13 @@ class H(http.server.SimpleHTTPRequestHandler):
             except ValueError:
                 return self._json({"error": "bad scenario"}, 400)
             d = os.path.join(base, "_scratch", "audio")
-            files = sorted(os.path.basename(p) for p in glob.glob(os.path.join(d, "*.mp3")))
+            # `<name>_full.mp3` is the WHOLE pull, kept beside the shipped cut on purpose
+            # (Utilities/sound_pull/AGENTS.md -> "And keep the whole pull"). It must never be
+            # offered as a candidate: both consumers match on a bare prefix, so without this every
+            # room listed each sound twice and the second copy was an unclipped, unfaded,
+            # multi-minute source that "Add" would wire straight in as a 15 s bed.
+            files = sorted(os.path.basename(p) for p in glob.glob(os.path.join(d, "*.mp3"))
+                           if not os.path.basename(p).endswith("_full.mp3"))
             return self._json({"files": files})
         if route == "/api/motion-map":        # where a baked clip actually moves, as a PNG the UI overlays
             # Rendered on demand and cached beside the clip in _scratch (gitignored), keyed on the clip's
@@ -5053,7 +5065,8 @@ class H(http.server.SimpleHTTPRequestHandler):
                     base = _scenario_base(req.get("chapter"), req.get("scenario"))
                     return self._json({"ok": True, **_accept_still(
                         base, rk, bool(req.get("accepted", True)),
-                        req.get("note") or "", req.get("state") or None)})
+                        req.get("note") or "", req.get("state") or None,
+                        req.get("by") or "")})
                 except ValueError as ve:
                     return self._json({"ok": False, "error": str(ve)}, 400)
             if route == "/api/set-review-flag":       # per-room review checkmark (hotspotsReviewed / cinemagraphsVerified)

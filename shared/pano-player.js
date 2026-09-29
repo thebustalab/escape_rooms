@@ -70,14 +70,14 @@
 // A bare `./variant_resolve.js` import is NOT refreshed by bumping the <script> tag's ?v, so a changed
 // helper module (e.g. a new export) leaves browsers on a stale cached copy → "doesn't provide an export
 // named X" SyntaxError → blank page (the 2026-08-05 airship regression). Bump all three together.
-import { WebRConsole } from "./webr-console.js?v=115";
-import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers } from "./variant_resolve.js?v=115";   // Phase 3: per-hotspot state variants; monorail switch-door nav
-import * as PQ from "./puzzle_queue.js?v=115";   // dynamic puzzle queue: location-independent puzzle serving
-import * as CP from "./corr_panel.js?v=115";   // lower-triangle layout of the grid gate (clouds correlation panel)
-import { particleCount } from "./particles.js?v=115";   // ambient-particle vocabulary + per-kind field density
-import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=115";
-import { condHolds } from "./cond.js?v=115";   // ledger + elevation-map card DOM
-import * as RIDE from "./ride.js?v=115";   // THE RIDE (subway): express lever + clip-sequence planner
+import { WebRConsole } from "./webr-console.js?v=116";
+import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers } from "./variant_resolve.js?v=116";   // Phase 3: per-hotspot state variants; monorail switch-door nav
+import * as PQ from "./puzzle_queue.js?v=116";   // dynamic puzzle queue: location-independent puzzle serving
+import * as CP from "./corr_panel.js?v=116";   // lower-triangle layout of the grid gate (clouds correlation panel)
+import { particleCount } from "./particles.js?v=116";   // ambient-particle vocabulary + per-kind field density
+import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=116";
+import { condHolds } from "./cond.js?v=116";   // ledger + elevation-map card DOM
+import * as RIDE from "./ride.js?v=116";   // THE RIDE (subway): express lever + clip-sequence planner
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 
@@ -617,6 +617,31 @@ window.PanoMixer = {
     if (!out.length) add("solve", room.solveSfx || SCENARIO.solveSfx);   // room with no gate-level sting
     return out;
   },
+  // Which BUILT rooms actually reference `src`. Exists so the test-play mixer can offer an OPT-IN
+  // "link across rooms" control on a sound used in more than one room (Lucas, 2026-09-28). Deliberately
+  // NOT automatic: several scenarios reuse ONE recording at different distances on purpose — waterfalls
+  // puts the same weir on the catwalk and at its base so one well reads as one body of water heard from
+  // two heights — and forcing those to a single level throws that away.
+  //
+  // `kind` is "layer" (a room's `sfx` ambience list) or "solve" (a sting a gate, the room, or a dial
+  // DEFINES). A room that merely inherits the scenario-level sting is excluded on purpose: it does not
+  // own that value, and harness_server._apply_mix refuses to write one for exactly that reason, so
+  // counting it here would promise the user a room the save would then skip.
+  roomsUsing: (src, kind) => {
+    if (!SCENARIO || !src) return [];
+    const srcOf = ss => (typeof ss === "string" ? ss : (ss && ss.src) || null);
+    const defines = (r) => {
+      if (kind === "layer") {
+        const s0 = r.sfx, ls = Array.isArray(s0) ? s0 : (s0 ? [s0] : []);
+        return ls.some(l => srcOf(l) === src);
+      }
+      if (srcOf(r.solveSfx) === src) return true;
+      return (r.hotspots || []).some(h => srcOf(h.solveSfx) === src ||
+                                          (h.type === "dial" && srcOf(h.sfx) === src));
+    };
+    return SCENARIO.rooms.filter(isBuilt).filter(defines)
+                         .map(r => ({ key: r.key, title: r.title || r.key }));
+  },
   fireSolve: (src, volume) => playOneShot(src, volume),
   hasMusic: () => !!music,
   musicSrc: () => (SCENARIO && SCENARIO.music) || null,   // for the mixer's amplitude auto-balance
@@ -1013,12 +1038,21 @@ function doorNav(h) {
 function doorIsOpen(h, r) {
   if (h.availableWhen != null && !condOK(h.availableWhen)) return false;  // cross-room door gate (e.g. cured) — 2026-07-31
   const dir = doorNav(h).direction;                            // effective direction (a switch-door's active variant may override)
-  if (dir === "open") return true;                             // maze passage: always walkable (entry on first visit)
-  if (dir === "back") return true;                             // back doors always live
+  // AN EXPLICIT `requires` OUTRANKS THE DIRECTION (2026-09-26). It used to sit BELOW the `open`/`back`
+  // short-circuits, so a door that was both `direction:"open"` and `requires:[...]` returned true before
+  // its gates were ever read — the `requires` was silently dead. That is not a hypothetical: all four of
+  // flat_clustering/heist's handshake doors are open-world doors gated on the partner's spoken token, and
+  // every one of them let a solo player walk straight through, which unmade the two-player scenario
+  // entirely. Caught in a browser by tests/e2e/heist_playthrough.spec.js.
+  // `requires` is OPT-IN and heist is the only scenario in the corpus that puts it on a non-forward door,
+  // so nothing else changes: every other `requires` door is `direction:"forward"`, where this check
+  // already ran. An author who wants an always-walkable passage simply does not write `requires`.
   if (h.requires != null) {                                    // gate on specific gate(s) in THIS room
     const ids = Array.isArray(h.requires) ? h.requires : [h.requires];
     return ids.every(id => solvedGates.has(gateKey(r.key, id)));
   }
+  if (dir === "open") return true;                             // maze passage: always walkable (entry on first visit)
+  if (dir === "back") return true;                             // back doors always live
   return isPrimarySolved(r);                                    // legacy: the room's primary gate
 }
 
@@ -1772,9 +1806,13 @@ function handleDoor(h) {
     if (isTestPlay()) toast("Test-play: locked door bypassed.");
     else if (h.availableWhen != null && !condOK(h.availableWhen))
       return toast(h.lockedBody || "Not yet — something else must be done first.");  // diegetic cross-room gate (e.g. too queasy to climb)
-    else return toast((SCENARIO.stonePortals && portalAwakened(room))
+    // A `requires` door may also carry a `lockedBody` (2026-09-26): its gate can be something other
+    // than this room's own puzzle — heist's handshake doors wait on a token the PARTNER speaks — and
+    // the generic "solve the puzzle first" is then simply wrong. Falls through to the generic line
+    // when no lockedBody is authored, so every existing door reads exactly as it did.
+    else return toast(h.lockedBody || ((SCENARIO.stonePortals && portalAwakened(room))
       ? "The portal is awake, but sealed — key the stones to open it."
-      : "The door won't budge — solve the puzzle first.");
+      : "The door won't budge — solve the puzzle first."));
   }
   if (h.endsEscape) return showEscapeDone();                  // a terminal escape exit inside any room
   passed();
@@ -2656,6 +2694,42 @@ async function renderStudentPickSvg(webR, pick) {
 .er_make_interactive <- function(p, idcol) {
   if (!inherits(p, "ggplot")) stop("not a ggplot")
   ns <- asNamespace("ggiraph")
+  # ---- TREES (ggtree) take a different route entirely (2026-09-28) --------------------------------
+  # Swapping geoms cannot work on a ggtree plot, for two reasons found by inspecting a real one:
+  #   1. the TIP LABELS -- the things a student actually wants to click -- are 'GeomTextGGtree', a
+  #      ggtree-specific geom, and ggiraph has no 'GeomInteractiveTextGGtree' twin for it; and
+  #   2. the only twinnable layers are the two 'GeomSegment' BRANCH layers, so the generic path would
+  #      happily make branches clickable as if they were samples -- exactly the edges-not-nodes bug
+  #      the note further down warns about.
+  # So for a tree we ignore every existing layer and add ONE interactive point layer sitting on the
+  # tip coordinates, one mark per tip. The tree still LOOKS like the book's tree; the points are a
+  # visible, clickable target on each tip (alpha 0.32 -- deliberately painted, because a fully
+  # transparent SVG mark is not reliably hit-testable under 'pointer-events: visiblePainted').
+  # Detected by DATA SHAPE, not by class(p): 'isTip' is the tidytree marker and survives any '+'.
+  tree_tips <- function(p) {
+    d <- p$data
+    if (!is.data.frame(d) || !all(c("isTip", "x", "y") %in% names(d))) return(NULL)
+    tips <- d[which(d$isTip %in% TRUE), , drop = FALSE]
+    if (!nrow(tips)) return(NULL)
+    # The hclust frame does NOT carry the author's id column: runMatrixAnalysis renames a single
+    # 'columns_w_sample_ID_info' to 'sample_unique_ID', and ggtree copies it into 'label'. Both hold
+    # the sample name, so either satisfies a pick whose answer is that name.
+    col <- if (idcol %in% names(tips) && any(nzchar(as.character(tips[[idcol]])), na.rm = TRUE)) idcol
+           else if ("label" %in% names(tips)) "label"
+           else if ("sample_unique_ID" %in% names(tips)) "sample_unique_ID"
+           else return(NULL)
+    tips$.er_id <- as.character(tips[[col]])
+    tips <- tips[!is.na(tips$.er_id) & nzchar(tips$.er_id), , drop = FALSE]
+    if (nrow(tips)) tips else NULL
+  }
+  .er_tips <- tree_tips(p)
+  if (!is.null(.er_tips)) {
+    return(p + ggiraph::geom_point_interactive(
+      data = .er_tips,
+      ggplot2::aes(x = x, y = y, data_id = .er_id, tooltip = .er_id),
+      inherit.aes = FALSE, size = 3.2, alpha = 0.32, colour = "#1f6feb"))
+  }
+  # ---- everything else: swap each layer's geom for its ggiraph twin ------------------------------
   twin <- function(geom) {
     cand <- paste0("GeomInteractive", sub("^Geom", "", class(geom)[1]))
     if (exists(cand, envir = ns, inherits = FALSE)) get(cand, envir = ns) else NULL
@@ -2839,8 +2913,38 @@ function buildLockCard(h, onSolved) {
   const pid = gateKey(room.key, h.id);           // per-room attempt-count key (ids repeat across rooms)
   let attempts = attemptCounts.get(pid) || 0;
   const card = document.createElement("div"); card.className = "qcard";
+  /*
+   * Optional `reference` block, rendered ABOVE the input (added 2026-09-28 for canyon's escape).
+   *
+   * Locks show NO prompt by design — the absence of instructions IS the puzzle — and that stays the
+   * default. This is not a prompt: it is the WORLD's own legend, the numerals a player can see carved
+   * on the thing they are standing in front of. Canyon's panel is three rows of numbers in the art,
+   * two lit and one dark, and the dark one is what you fill in. Before this, those numerals lived
+   * only on a clue that was hidden the moment the hall flooded — so the room took the key away at the
+   * exact moment it handed you the lock (found by Lucas in playtest).
+   *
+   * Schema: reference: { caption?, rows: [ { label, cells, blank? } ] }. `blank: true` dims a row —
+   * it is the one being asked for. Nothing here says what to DO; it only shows what is written.
+   */
+  const refHtml = (() => {
+    const ref = h.reference;
+    if (!ref || !Array.isArray(ref.rows) || !ref.rows.length) return "";
+    const rows = ref.rows.map(r =>
+      `<div style="display:flex;gap:14px;justify-content:center;align-items:baseline;` +
+      `opacity:${r.blank ? ".62" : "1"}">` +
+      `<span style="min-width:3.2em;text-align:right;color:#c9a869">${escHtml(r.label)}</span>` +
+      `<span style="letter-spacing:6px;color:#ffd88c">${escHtml(r.cells)}</span></div>`
+    ).join("");
+    return `<div style="font:600 15px/1.7 ui-monospace,Menlo,Consolas,monospace;margin:2px 0 14px;` +
+           `padding:10px 8px;border-radius:8px;background:rgba(0,0,0,.28);` +
+           `border:1px solid rgba(255,216,140,.18)">` +
+           (ref.caption ? `<div style="font:400 12px/1.5 system-ui,sans-serif;text-align:center;` +
+                          `color:#b9a988;margin-bottom:8px">${escHtml(ref.caption)}</div>` : "") +
+           rows + `</div>`;
+  })();
   // Deliberately NO prompt text — the absence of instructions IS the puzzle (Myst/Riven ethos).
   card.innerHTML =
+    refHtml +
     `<div style="text-align:center;margin:6px 0 12px">
        <input id="lockInput" maxlength="${len}" autocomplete="off" spellcheck="false"
          placeholder="${"·".repeat(len)}"

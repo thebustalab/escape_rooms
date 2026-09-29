@@ -17,13 +17,13 @@
  * `addStatusEl()`, `plotControls(opts)`, `resetSession()`, `resetControl(opts)`, `.ready`, `.webR`.
  */
 import { WebR } from "https://webr.r-wasm.org/latest/webr.mjs";
-import { VIEW_R_SHIM, VIEW_R_DRAIN, fromR, viewTableHTML, ensureViewStyles } from "./webr_view.js?v=115";
-import { codeToRun, selectionNote } from "./code_sel.js?v=115";
-import { PLOT_ASPECTS, PLOT_DEFAULT_ASPECT, PLOT_LIMITS, PLOT_CTL_CSS, plotGeometry } from "./plot_size.js?v=115";
-import { RESET_R_SHIM, RESET_R_CALL, RESET_CTL_CSS, RESET_LABEL, RESET_CONFIRM_LABEL, RESET_CONFIRM_MS, nextConfirmState } from "./webr_reset.js?v=115";
-import { explainError, looksLikeOrphanLayer } from "./r_diagnose.js?v=115";
-import { R_BIOC_REPOS, BASE_PACKAGES, ANALYSIS_PACKAGES, BIOC_PACKAGES, resolvePackages } from "./r_packages.js?v=115";
-import { MATRIX_ANALYSIS_R_SHIM } from "./r_matrix_analysis.js?v=115";
+import { VIEW_R_SHIM, VIEW_R_DRAIN, fromR, viewTableHTML, ensureViewStyles } from "./webr_view.js?v=116";
+import { codeToRun, selectionNote } from "./code_sel.js?v=116";
+import { PLOT_ASPECTS, PLOT_DEFAULT_ASPECT, PLOT_LIMITS, PLOT_CTL_CSS, plotGeometry } from "./plot_size.js?v=116";
+import { RESET_R_SHIM, RESET_R_CALL, RESET_CTL_CSS, RESET_LABEL, RESET_CONFIRM_LABEL, RESET_CONFIRM_MS, nextConfirmState } from "./webr_reset.js?v=116";
+import { explainError, looksLikeOrphanLayer } from "./r_diagnose.js?v=116";
+import { R_BIOC_REPOS, BASE_PACKAGES, ANALYSIS_PACKAGES, BIOC_PACKAGES, resolvePackages } from "./r_packages.js?v=116";
+import { MATRIX_ANALYSIS_R_SHIM } from "./r_matrix_analysis.js?v=116";
 
 const errText = e => (e && e.message ? e.message : String(e));
 
@@ -254,6 +254,34 @@ export class WebRConsole {
         } catch (e) {
           analysisOk = false;
           console.warn("[webr-console] runMatrixAnalysis unavailable:", errText(e));
+        }
+      }
+
+      /*
+       * ATTACH ggtree (2026-09-28). It is INSTALLED on every surface already — the hclust branch of
+       * runMatrixAnalysis calls `ggtree::fortify()` — but until now nothing attached it, so a student
+       * typing the book's own chapter-8 line, `ggtree(out) + geom_tiplab()`, got "could not find
+       * function \"ggtree\"" in a room whilst the identical line worked in RStudio and in the book.
+       * That is exactly the book/room drift `r_packages.js` exists to prevent; it slipped through
+       * because the shim only ever needed `fortify()`, which it namespace-qualifies.
+       *
+       * Why attach rather than alias: chapter 8 uses `ggtree`, `geom_tiplab` and `geom_tippoint`, and
+       * an alias list would silently fall behind the next verb the book reaches for.
+       *
+       * The masking this causes (`collapse` over dplyr's, `expand` over tidyr's) is NOT new: the
+       * desktop toolkit attaches ggtree the same way (phylochemistry.R ~line 301 `library()`s every
+       * CRAN + Bioconductor package), so this makes a room MATCH the environment the book is written
+       * in rather than inventing a new one.
+       *
+       * Its own try/catch inside the analysisOk guard, deliberately: a ggtree attach failure must not
+       * take runMatrixAnalysis down with it, and must not brick the boot. Above RESET_R_SHIM so
+       * "reset session" keeps it; before the caller's setup so a scenario that wants otherwise wins.
+       */
+      if (analysisOk) {
+        try {
+          await this.webR.evalRVoid("suppressMessages(suppressWarnings(library(ggtree)))");
+        } catch (e) {
+          console.warn("[webr-console] ggtree could not be attached:", errText(e));
         }
       }
 

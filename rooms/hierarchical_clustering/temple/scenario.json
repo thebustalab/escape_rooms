@@ -4,8 +4,8 @@
   "scenario": "temple",
   "id": 18,
   "title": "The Register of the Gods",
-  "subtitle": "Hierarchical Clustering · hclust + cutree + summarise",
-  "story": "You are an apprentice to the keeper at the Temple of the Gods. The keeper died of a fever last month and with him were lost two important registers: which offering each shrine takes, and which god each shrine serves. According to custom, a temple whose keeper dies is closed forever — its fires never relit — unless the registers exist. You have until midday, when the sun is at its zenith and the shafts of light through the roof stand straight and touch the altar, to rebuild them. The evidence is still here — the residues in every vessel, the figures standing in every niche. Rebuild both registers, light the ring of fires at the altar so the temple is seen to be kept, and then cross the canopy bridge to the temple beyond and tell them the registers are in hand.",
+  "subtitle": "Hierarchical Clustering · distances + cutting the tree + group summaries",
+  "story": "You are an apprentice to the keeper at the Temple of the Gods. The keeper died of a fever last month and with him were lost two important registers: which offering each shrine takes, and which god each shrine serves. According to custom, a temple whose keeper dies is closed forever — its fires never relit — unless the registers exist. You have until midday, when the sun is at its zenith and the shafts of light through the roof stand straight and touch the altar, to rebuild those registers. The evidence is still here — the residues in every vessel, the figures standing in every niche. Rebuild both registers, light the ring of fires at the altar so the temple is seen to be kept, and then cross the canopy bridge to the temple beyond and tell them the temple will remain open.",
   "enterLabel": "Begin before midday →",
   "done": {
     "title": "The practical register is whole",
@@ -35,7 +35,7 @@
   ],
   "ambient": "rays",
   "music": "audio/eagle_feather_soul_of_the_earth.mp3",
-  "musicVolume": 0.15,
+  "musicVolume": 0.22,
   "fx": [],
   "worldPlatePrompt": "A world-bible establishing plate for a LIVING, KEPT jungle temple, deep in rainforest, at harsh equatorial midday. This sanctuary was tended every day until a month ago, when its keeper died: it is swept, maintained and in use — NOT a ruin. Nothing has collapsed, there is no rubble, nothing is growing through the floor, and the forest is cut hard back and stops at the wall. One frame holding the whole world's vocabulary: massive warm honey-and-ochre limestone masonry, close-jointed and clean, its carved faces still crisp and still holding traces of painted plaster; a gallery of shallow shrine niches cut along the wall, each hung with a single banner of strong flat colour; small carved stone and clay votive figures standing in tidy rows on wiped niche ledges; lamps with trimmed wicks and shallow offering bowls set square before them, recently used and now cold; stoppered resin jars stacked in order along the floor; a low rough service crawl-way cut behind the wall at floor level — the one unfinished thing, its dust worn into a smooth path by daily passing; and hard white shafts of sunlight falling straight down through openings in the canopy far above, striking the floor in sharp bright pools. LIGHT: harsh, flat and OVERHEAD, high noon, hard-edged shafts and short shadows. Deliberately NOT golden hour, NOT dusk, NOT dawn, NOT lamplit — no warm amber wash anywhere, no firelight, no brass glow. PALETTE: RICH AND LUMINOUS, not grey and not washed-out — warm honey stone, deep wet greens in the forest beyond, real blue in the sky and in the shadows, clear water. The nine banners are the only PURE, fully saturated colour in the frame and nothing else competes with them for chroma, but everything else is still full of colour and light. Humid air, drifting spore and dust in the light shafts, water beading on stone. Painterly, cinematic, subtle film grain. No people, no lettering, no captions, no text, no readable writing, no signage, no UI.",
   "coverPrompt": "Stylised thumbnail poster of a single shrine niche cut into a clean-jointed wall of warm honey-coloured limestone, swept and well kept, the mortar sound and the stone tended — NOT ruined, NO roots, NO vines, NO cracks, nothing overgrown. One crimson banner hangs above the niche, the only fully saturated colour in the frame. On the niche ledge stand three small carved votive figures in a row, clearly different from one another: a squat frog, a spiral sea shell, and a round-bellied stoppered rain-jar, each carved and painted in terracotta and pale limestone with traces of old pigment. A hard bar of overhead noon sun falls across the ledge, with deep warm shade to either side; a lit clay lamp and a shallow offering bowl sit before the figures. Rich, luminous and colourful, never washed out and never grey. No people, no lettering, no captions, no text, no readable writing, no signage, no UI.",
@@ -57,7 +57,7 @@
           "type": "clue",
           "label": "The unlabelled stores",
           "note": "The season's offerings, every jar unlabelled — this is WHY rung 1 matters (the keeper drew for sister shrines from one jar). Flavour + motivation; no answer here.",
-          "body": "Jars to the roof, and not one label on any of them. What each shrine actually took is still crusted inside its own vessels, though, and every one has been scraped and measured — six substances, shrine by shrine.<br><br>That is the whole of the practical register: shrines that took the same offering leave the same residues, so shrines that belong together are the ones whose six numbers sit close together.<br><br>Here is what <code>str(temple_votive_residues)</code> shows — the shape of the record:<pre style=\"white-space:pre;overflow-x:auto;font:12px/1.45 ui-monospace,Menlo,Consolas,monospace;background:#08131c;color:#cfe6d8;padding:8px 10px;border-radius:6px;margin:8px 0 0\">tibble [9 x 8] (S3: tbl_df/tbl/data.frame)\n $ shrine      : chr [1:9] \"Ninestep\" \"Longshadow\" \"Brokenarch\" \"Deepwell\" ...\n $ wing        : chr [1:9] \"East\" \"East\" \"East\" \"West\" ...\n $ copal       : num [1:9] 38 36 42 34 6 5 7 5 6\n $ rubber_latex: num [1:9] 30 32 26 34 5 6 4 6 5\n $ cacao       : num [1:9] 6 5 7 6 7 6 8 46 43\n $ agave       : num [1:9] 5 6 4 5 4 5 5 30 33\n $ beeswax     : num [1:9] 12 12 11 12 45 42 47 7 7\n $ seed_oil    : num [1:9] 9 9 10 9 33 36 29 6 6</pre>",
+          "body": "Jars upon jars, but not one label on any of them. What each shrine actually required is only indicated by what is crusted inside its own vessels. Every one has been scraped and measured — six substances, shrine by shrine.<br><br>That is the whole of the practical register: shrines that took the same offering contain the same residues, so shrines that belong together are the ones whose six numbers sit close together.<br><br>",
           "box": [
             0.378,
             0.375,
@@ -205,7 +205,7 @@
             0.466,
             0.575
           ],
-          "body": "Jars upon jars, but not one label on any of them. What each shrine actually required is only indicated by what is crusted inside its own vessels. Every one has been scraped and measured — six substances, shrine by shrine.<br><br>That is the whole of the practical register: shrines that took the same offering leave the same residues, so shrines that belong together are the ones whose six numbers sit close together.<br><br>Here is what <code>str(temple_votive_residues)</code> shows — the shape of the record:<pre style=\"white-space:pre;overflow-x:auto;font:12px/1.45 ui-monospace,Menlo,Consolas,monospace;background:#08131c;color:#cfe6d8;padding:8px 10px;border-radius:6px;margin:8px 0 0\">tibble [9 x 8] (S3: tbl_df/tbl/data.frame) $ shrine : chr [1:9] \"Ninestep\" \"Longshadow\" \"Brokenarch\" \"Deepwell\" ... $ wing : chr [1:9] \"East\" \"East\" \"East\" \"West\" ... $ copal : num [1:9] 38 36 42 34 6 5 7 5 6 $ rubber_latex: num [1:9] 30 32 26 34 5 6 4 6 5 $ cacao : num [1:9] 6 5 7 6 7 6 8 46 43 $ agave : num [1:9] 5 6 4 5 4 5 5 30 33 $ beeswax : num [1:9] 12 12 11 12 45 42 47 7 7 $ seed_oil : num [1:9] 9 9 10 9 33 36 29 6 6</pre>",
+          "body": "Jars upon jars, but not one label on any of them. What each shrine actually required is only indicated by what is crusted inside its own vessels. Every one has been scraped and measured — six substances, shrine by shrine.<br><br>That is the whole of the practical register: shrines that took the same offering contain the same residues, so shrines that belong together are the ones whose six numbers sit close together.<br><br>",
           "boxSource": "review:agent-vision",
           "boxNote": "localiser boxed the top of two jars; measured onto the whole stacked jar-and-gourd cluster left of the stair"
         },
@@ -273,6 +273,12 @@
           "mode": "interval",
           "gapMin": 14,
           "gapMax": 32
+        },
+        {
+          "src": "audio/jungle_stream_water.mp3",
+          "volume": 0.17,
+          "mode": "loop",
+          "note": "Water for the outer stair (Lucas, 2026-09-28). Same recording as the cistern's water."
         }
       ]
     },
@@ -288,30 +294,30 @@
         {
           "type": "puzzle",
           "label": "The gallery reading-table",
-          "note": "RUNG 1 — nearest relative of Ninestep -> Longshadow (d 3.16; runner-up Deepwell 79% further). Distractors: Deepwell, Brokenarch, Redsill, Highgate, Palewall, Quietfloor, Lastcourt.",
+          "note": "RUNG 1 — nearest relative of Ninestep -> Longshadow (d 3.16; runner-up Brokenarch 90% further, Deepwell 137%). Distractors: Deepwell, Brokenarch, Redsill, Highgate, Palewall, Quietfloor, Lastcourt.",
           "box": [
             0.3976,
             0.632,
             0.6024,
             0.728
           ],
-          "boxSource": "draft:localizer",
+          "boxSource": "moved:testplay",
           "pick": {
-            "prompt": "The keeper drew for sister shrines from one jar, so two shrines that took the same offering left the same residues behind in their vessels. Using <code>temple_votive_residues</code>, measure how far every other shrine's residues sit from Ninestep's, plot that distance for all eight shrines, assign your plot to <code>p</code>, and click the shrine that sits nearest to Ninestep.",
-            "plotCode": "dm <- as.matrix(dist(temple_votive_residues[, 3:8]))\nrownames(dm) <- colnames(dm) <- temple_votive_residues$shrine\nnear <- data.frame(shrine = colnames(dm), distance = as.numeric(dm[\"Ninestep\", ]))\nnear <- near[near$shrine != \"Ninestep\", ]\np <- ggplot(near, aes(x = distance, y = shrine)) + geom_point(size = 3)",
+            "prompt": "The keeper drew offerings for sister shrines from one jar, so two shrines that took the same offering left the same residues behind in their vessels. Using <code>temple_votive_residues</code>, build the tree of all nine shrines, assign your plot to <code>p</code>, and click the shrine that joins Ninestep first.",
+            "plotCode": "runMatrixAnalysis(\n  data = temple_votive_residues,\n  analysis = \"hclust\",\n  scale_variance = TRUE,\n  tree_method = \"linkage_dendrogram\",\n  agglomeration_method = \"ward.D2\",\n  columns_w_values_for_single_analyte = colnames(temple_votive_residues)[3:8],\n  columns_w_sample_ID_info = \"shrine\"\n) -> shrine_tree\n\np <- ggtree(shrine_tree) + geom_tiplab()",
             "answer": "Longshadow",
             "idColumn": "shrine",
             "idNoun": "shrine",
             "width": 6.5,
             "height": 4.5,
             "maxAttempts": 4,
-            "hint": "The six residue measurements are columns 3 to 8. <code>dist()</code> on those columns gives every pairwise distance at once — name the rows with <code>shrine</code>, take the Ninestep row, and plot it.",
+            "hint": "The six residue measurements are columns 3 to 8. Feed them to <code>runMatrixAnalysis()</code> with <code>analysis = \"hclust\"</code>, naming <code>shrine</code> as the sample ID, then draw the result with <code>ggtree()</code> and <code>geom_tiplab()</code> — the same pair the chapter uses. Sister shrines are the two tips that join each other before either joins anything else.",
             "feedback": {
-              "correct": "Correct — noted: Ninestep's sister shrine is Longshadow. Their six residues sit 3.2 apart, where the next nearest shrine, Deepwell, is 5.7 away.",
+              "correct": "Correct — noted: Ninestep's sister shrine is Longshadow. Their six residues sit 3.2 apart, where the next nearest shrine, Brokenarch, is 6.0 away.",
               "wrong": [
-                "Every shrine is six residue measurements. Two shrines are sisters when those six numbers sit closest together, so work out the distance from Ninestep to each of the other eight and compare them.",
-                "<code>dist(temple_votive_residues[, 3:8])</code> gives all the pairwise distances in one go. Put the shrine names on it with <code>rownames()</code>, pull out the Ninestep row, and plot distance against shrine.",
-                "Three shrines sit close to Ninestep and five sit far away. Among the close three, one is clearly nearer than the other two — that is the sister, not merely a near neighbour."
+                "Every shrine is six residue measurements, and a tree joins the closest pair first. Build the tree of all nine and look at what Ninestep joins before it joins anything else.",
+                "<code>runMatrixAnalysis(data = temple_votive_residues, analysis = \"hclust\", scale_variance = TRUE, tree_method = \"linkage_dendrogram\", columns_w_values_for_single_analyte = colnames(temple_votive_residues)[3:8], columns_w_sample_ID_info = \"shrine\")</code> returns the tree; hand it to <code>ggtree()</code> and add <code>geom_tiplab()</code> to read the names. <code>agglomeration_method</code> is the linkage rule — set it to <code>\"ward.D2\"</code> as the chapter does; for this question the pair that joins first is the same whichever rule you pick.",
+                "Three shrines sit close to Ninestep and five sit far away. Among the close three, one joins it before the other two do — that is the sister, not merely a near neighbour."
               ]
             }
           }
@@ -371,7 +377,7 @@
             0.801,
             0.628
           ],
-          "boxSource": "draft:localizer"
+          "boxSource": "moved:testplay"
         }
       ],
       "authoring": {
@@ -519,25 +525,25 @@
           "starterCode": "temple_votive_residues",
           "solveSfx": {
             "src": "audio/solve_sun_gallery.mp3",
-            "volume": 0
+            "volume": 0.3594109124618348
           },
           "boxSource": "moved:testplay",
           "pick": {
-            "prompt": "The keeper drew for sister shrines from one jar, so two shrines that took the same offering left the same residues behind in their vessels. Using <code>temple_votive_residues</code>, measure how far every other shrine's residues sit from Ninestep's, plot that distance for all eight shrines, assign your plot to <code>p</code>, and click the shrine that sits nearest to Ninestep.",
-            "plotCode": "dm <- as.matrix(dist(temple_votive_residues[, 3:8]))\nrownames(dm) <- colnames(dm) <- temple_votive_residues$shrine\nnear <- data.frame(shrine = colnames(dm), distance = as.numeric(dm[\"Ninestep\", ]))\nnear <- near[near$shrine != \"Ninestep\", ]\np <- ggplot(near, aes(x = distance, y = shrine)) + geom_point(size = 3)",
+            "prompt": "The keeper drew offerings for sister shrines from one jar, so two shrines that took the same offering left the same residues behind in their vessels. Using <code>temple_votive_residues</code>, build the tree of all nine shrines, assign your plot to <code>p</code>, and click the shrine that joins Ninestep first.",
+            "plotCode": "runMatrixAnalysis(\n  data = temple_votive_residues,\n  analysis = \"hclust\",\n  scale_variance = TRUE,\n  tree_method = \"linkage_dendrogram\",\n  agglomeration_method = \"ward.D2\",\n  columns_w_values_for_single_analyte = colnames(temple_votive_residues)[3:8],\n  columns_w_sample_ID_info = \"shrine\"\n) -> shrine_tree\n\np <- ggtree(shrine_tree) + geom_tiplab()",
             "answer": "Longshadow",
             "idColumn": "shrine",
             "idNoun": "shrine",
             "width": 6.5,
             "height": 4.5,
             "maxAttempts": 4,
-            "hint": "The six residue measurements are columns 3 to 8. <code>dist()</code> on those columns gives every pairwise distance at once — name the rows with <code>shrine</code>, take the Ninestep row, and plot it.",
+            "hint": "The six residue measurements are columns 3 to 8. Feed them to <code>runMatrixAnalysis()</code> with <code>analysis = \"hclust\"</code>, naming <code>shrine</code> as the sample ID, then draw the result with <code>ggtree()</code> and <code>geom_tiplab()</code> — the same pair the chapter uses. Sister shrines are the two tips that join each other before either joins anything else.",
             "feedback": {
-              "correct": "Correct — noted: Ninestep's sister shrine is Longshadow. Their six residues sit 3.2 apart, where the next nearest shrine, Deepwell, is 5.7 away.",
+              "correct": "Correct — noted: Ninestep's sister shrine is Longshadow. Their six residues sit 3.2 apart, where the next nearest shrine, Brokenarch, is 6.0 away.",
               "wrong": [
-                "Every shrine is six residue measurements. Two shrines are sisters when those six numbers sit closest together, so work out the distance from Ninestep to each of the other eight and compare them.",
-                "<code>dist(temple_votive_residues[, 3:8])</code> gives all the pairwise distances in one go. Put the shrine names on it with <code>rownames()</code>, pull out the Ninestep row, and plot distance against shrine.",
-                "Three shrines sit close to Ninestep and five sit far away. Among the close three, one is clearly nearer than the other two — that is the sister, not merely a near neighbour."
+                "Every shrine is six residue measurements, and a tree joins the closest pair first. Build the tree of all nine and look at what Ninestep joins before it joins anything else.",
+                "<code>runMatrixAnalysis(data = temple_votive_residues, analysis = \"hclust\", scale_variance = TRUE, tree_method = \"linkage_dendrogram\", columns_w_values_for_single_analyte = colnames(temple_votive_residues)[3:8], columns_w_sample_ID_info = \"shrine\")</code> returns the tree; hand it to <code>ggtree()</code> and add <code>geom_tiplab()</code> to read the names. <code>agglomeration_method</code> is the linkage rule — set it to <code>\"ward.D2\"</code> as the chapter does; for this question the pair that joins first is the same whichever rule you pick.",
+                "Three shrines sit close to Ninestep and five sit far away. Among the close three, one joins it before the other two do — that is the sister, not merely a near neighbour."
               ]
             }
           }
@@ -596,9 +602,9 @@
       "sfx": [
         {
           "src": "audio/sun_gallery_jungle_muffled.mp3",
-          "volume": 0.06,
+          "volume": 0.13,
           "mode": "loop",
-          "needsReplacement": true
+          "note": "Replaced 2026-09-28: Peruvian Amazon birds+frogs (freesound 653743, CC0), low-passed to 1200 Hz for 'through the wall' and crossfade-looped. The old recording under this name was the one flagged needsReplacement."
         }
       ],
       "entry": {
@@ -657,7 +663,7 @@
             0.826,
             0.76
           ],
-          "boxSource": "review:agent-vision",
+          "boxSource": "moved:testplay",
           "boxNote": "localiser boxed the blank right wall; measured onto the corridor running back to the sun"
         }
       ],
@@ -831,12 +837,12 @@
       "sfx": [
         {
           "src": "audio/stone_room_tone.mp3",
-          "volume": 0.18,
+          "volume": 0.13,
           "mode": "loop"
         },
         {
           "src": "audio/long_gallery_insects.mp3",
-          "volume": 0.08,
+          "volume": 0.01,
           "mode": "interval",
           "gapMin": 18,
           "gapMax": 40
@@ -879,7 +885,7 @@
             0.51,
             0.7
           ],
-          "boxSource": "review:agent-vision",
+          "boxSource": "moved:testplay",
           "boxNote": "localiser boxed the wall left of it; measured onto the daylit hatch dead ahead"
         },
         {
@@ -892,7 +898,7 @@
             0.668,
             0.7
           ],
-          "boxSource": "review:agent-vision",
+          "boxSource": "moved:testplay",
           "boxNote": "was a stub rectangle over wall; measured onto the blue-lit hatch with the wet steps"
         },
         {
@@ -905,7 +911,7 @@
             0.856,
             0.72
           ],
-          "boxSource": "review:agent-vision",
+          "boxSource": "moved:testplay",
           "boxNote": "was a stub rectangle; measured onto the carved-lintel doorway"
         }
       ],
@@ -1109,7 +1115,7 @@
       "sfx": [
         {
           "src": "audio/close_stone_tone.mp3",
-          "volume": 0.64,
+          "volume": 0.39910875896982145,
           "mode": "loop"
         }
       ],
@@ -1166,7 +1172,7 @@
           "label": "The yellow niche",
           "note": "Deepwell — seed-pod, monkey, bee. LEDGER evidence.",
           "image": "figures/deepwell.png",
-          "body": "Three votive figures on the ledge under the yellow banner, and nothing anywhere in the niche to say which god they stood for.",
+          "body": "",
           "box": [
             0.155,
             0.26,
@@ -1174,14 +1180,15 @@
             0.605
           ],
           "boxSource": "review:agent-vision",
-          "boxNote": "localiser boxed the pillar left of the niche; measured onto the yellow niche"
+          "boxNote": "localiser boxed the pillar left of the niche; measured onto the yellow niche",
+          "pickup": "The yellow shrine."
         },
         {
           "type": "clue",
           "label": "The white niche",
           "note": "Redsill — frog, shell, paddle. LEDGER evidence.",
           "image": "figures/redsill.png",
-          "body": "Three votive figures on the ledge under the white banner, and nothing anywhere in the niche to say which god they stood for.",
+          "body": "",
           "box": [
             0.46,
             0.255,
@@ -1189,14 +1196,15 @@
             0.605
           ],
           "boxSource": "review:agent-vision",
-          "boxNote": "localiser boxed a pillar top far to the left; measured onto the white niche (frog, shell, paddle)"
+          "boxNote": "localiser boxed a pillar top far to the left; measured onto the white niche (frog, shell, paddle)",
+          "pickup": "The white shrine."
         },
         {
           "type": "clue",
           "label": "The deep blue niche",
           "note": "Highgate — maize-cake, spindle-whorl, censer. LEDGER evidence.",
           "image": "figures/highgate.png",
-          "body": "Three votive figures on the ledge under the deep blue banner, and nothing anywhere in the niche to say which god they stood for.",
+          "body": "",
           "box": [
             0.668,
             0.275,
@@ -1204,7 +1212,8 @@
             0.605
           ],
           "boxSource": "review:agent-vision",
-          "boxNote": "localiser boxed the pillar and missed the censer; measured onto the deep blue niche"
+          "boxNote": "localiser boxed the pillar and missed the censer; measured onto the deep blue niche",
+          "pickup": "The deep blue shrine."
         },
         {
           "type": "door",
@@ -1361,7 +1370,7 @@
           "starterCode": "temple_votive_residues",
           "solveSfx": {
             "src": "audio/solve_lamp_hall.mp3",
-            "volume": 0.44,
+            "volume": 0.43210695746625644,
             "needsReplacement": true
           },
           "boxSource": "review:agent-vision",
@@ -1443,9 +1452,10 @@
       ],
       "sfx": [
         {
-          "src": "audio/lamp_hall_jungle_through_wall.mp3",
-          "volume": 0.11,
-          "mode": "loop"
+          "src": "audio/lamp_hall_jungle_beyond.mp3",
+          "volume": 0.12,
+          "mode": "loop",
+          "note": "New bed 2026-09-28: Royal Belum rainforest, West Malaysia (freesound 724054, CC0), low-passed to 800 Hz — deeper inside the stone than the sun gallery — and crossfade-looped. Replaces the interim close_stone_tone, and the jungle-waterfall recording that used to sit here has moved to the water rooms."
         }
       ],
       "entry": {
@@ -1474,8 +1484,8 @@
             0.295,
             0.605
           ],
-          "boxSource": "review:agent-vision",
-          "boxNote": "was a stub over blank wall; measured onto the black niche",
+          "boxSource": "moved:testplay",
+          "boxNote": "2026-09-20, re-measured on the FULL cistern redraw: the black-bannered niche with its brazier, spindle-whorl and censer",
           "pickup": "The black shrine."
         },
         {
@@ -1491,7 +1501,7 @@
             0.605
           ],
           "boxSource": "review:agent-vision",
-          "boxNote": "localiser boxed the left pillar and missed the bee; measured onto the turquoise niche",
+          "boxNote": "2026-09-20, re-measured on the FULL cistern redraw: the turquoise-bannered niche with the monkey, macaw and bee",
           "pickup": "The turquoise shrine."
         },
         {
@@ -1505,7 +1515,7 @@
             0.725
           ],
           "boxSource": "review:agent-vision",
-          "boxNote": "localiser boxed only the hatch's top corner; measured onto the whole low hatch"
+          "boxNote": "2026-09-20, re-measured on the FULL cistern redraw: the dark service passage doorway right of the turquoise niche"
         },
         {
           "type": "door",
@@ -1518,7 +1528,7 @@
             0.875
           ],
           "boxSource": "review:agent-vision",
-          "boxNote": "localiser boxed a strip of steps and wet floor; measured onto the whole stairwell"
+          "boxNote": "2026-09-20, re-measured on the FULL cistern redraw: the stairwell dropping through the floor between the two pillars"
         }
       ],
       "authoring": {
@@ -1717,10 +1727,10 @@
       ],
       "sfx": [
         {
-          "src": "audio/cistern_stair_water_drip.mp3",
-          "volume": 0.71,
+          "src": "audio/jungle_stream_water.mp3",
+          "volume": 0.24,
           "mode": "loop",
-          "needsReplacement": true
+          "note": "Was cistern_stair_water_drip.mp3, flagged for replacement. Now the jungle-stream bed (Lucas, 2026-09-28)."
         },
         {
           "src": "audio/cistern_stair_drip_single.mp3",
@@ -1763,7 +1773,7 @@
             ],
             "expr": "local({ a <- tolower(trimws(as.character(unlist(answer)))); a <- setdiff(a, c(\"unmarked_cell\", \"unmarked cell\")); length(a) == 2 && setequal(a, c(\"quietfloor\", \"lastcourt\")) })",
             "maxAttempts": 4,
-            "hint": "<code>rbind()</code> the unknown row onto the nine, then run the same distance-and-clustering you used before and read off which shrines it lands beside.",
+            "hint": "<code>rbind()</code> the unknown row onto the nine, then run the same <code>runMatrixAnalysis()</code> call you used before on the combined table, this time with <code>parameters = c(3)</code> so it hands back a <code>cluster</code> column. Keep the tips and read off which shrines share the unknown's.",
             "feedback": {
               "correct": "Correct — noted: the nameless cell belongs with Quietfloor and Lastcourt. Its residues sit 2.4 from each of them, and more than 60 from every other shrine in the temple.",
               "wrong": [
@@ -1782,7 +1792,7 @@
           "type": "clue",
           "label": "The nameless niche",
           "note": "The forgotten shrine itself — no banner, no figures, a cold lamp and a bowl of hardened residue. The thing rung 2 samples. Deliberately carries NO ledger evidence: with no figures it cannot be placed in the Register of the Gods, which is the point of it.",
-          "body": "No banner over it, no figures on the ledge, and a lamp nobody has fed in living memory. Only the bowl is still thick with what was last poured into it, so this shrine can be scraped like any other — one row, the same six substances as the rest, on the bench as <code>unknown_shrine</code>.",
+          "body": "No banner over it, no figures on the ledge, and a lamp nobody has fed in living memory. Whoever walled this cell up left the shrine itself unnamed.",
           "box": [
             0.452,
             0.25,
@@ -1802,7 +1812,7 @@
             0.852,
             0.8
           ],
-          "boxSource": "review:agent-vision",
+          "boxSource": "moved:testplay",
           "boxNote": "localiser boxed ceiling and cut the lower steps; measured onto the stairwell climbing out"
         }
       ],
@@ -1941,7 +1951,7 @@
           "starterCode": "temple_votive_residues\nunknown_shrine",
           "solveSfx": {
             "src": "audio/solve_sealed_cell.mp3",
-            "volume": 0
+            "volume": 0.2265120231246223
           },
           "boxSource": "review:agent-vision",
           "boxNote": "localiser boxed only the glass pane; measured onto the flat stone with pane and scraping-sherd",
@@ -1952,7 +1962,7 @@
             ],
             "expr": "local({ a <- tolower(trimws(as.character(unlist(answer)))); a <- setdiff(a, c(\"unmarked_cell\", \"unmarked cell\")); length(a) == 2 && setequal(a, c(\"quietfloor\", \"lastcourt\")) })",
             "maxAttempts": 4,
-            "hint": "<code>rbind()</code> the unknown row onto the nine, then run the same distance-and-clustering you used before and read off which shrines it lands beside.",
+            "hint": "<code>rbind()</code> the unknown row onto the nine, then run the same <code>runMatrixAnalysis()</code> call you used before on the combined table, this time with <code>parameters = c(3)</code> so it hands back a <code>cluster</code> column. Keep the tips and read off which shrines share the unknown's.",
             "feedback": {
               "correct": "Correct — noted: the nameless cell belongs with Quietfloor and Lastcourt. Its residues sit 2.4 from each of them, and more than 60 from every other shrine in the temple.",
               "wrong": [
@@ -1977,7 +1987,7 @@
             0.528,
             0.56
           ],
-          "body": "No banner over it, no figures on the ledge, and a lamp nobody has fed in living memory. Only the bowl is still thick with what was last poured into it, so this shrine can be scraped like any other — one row, the same six substances as the rest, on the bench as <code>unknown_shrine</code>.",
+          "body": "No banner over it, no figures on the ledge, and a lamp nobody has fed in living memory. Whoever walled this cell up left the shrine itself unnamed.",
           "boxSource": "review:agent-vision",
           "boxNote": "localiser boxed a carved pillar; measured onto the bannerless niche with cold lamp and bowl"
         },
@@ -2055,7 +2065,7 @@
             0.62,
             0.77
           ],
-          "boxSource": "draft:localizer",
+          "boxSource": "moved:testplay",
           "check": {
             "prompt": "Four hundred years ago, all the shrines in a given wing — the East wing, the West wing or the North wing — were given the same offering. Some shrines have been moved since, and both the carving on the wall of this room and the wing listed in your dataset record every shrine's current location. But a shrine that was moved still receives the offering it always did — it is a shrine to the same god, after all. So the question is: which two shrines have been moved?<br><br>Cluster the nine shrines of <code>temple_votive_residues</code> into three families based on their residues, then compare that clustering against the wing assignments listed in the dataset. The two shrines that were moved are the ones their residues give away: they do not match the other shrines standing in the same wing as them. Assign both shrine names to <code>answer</code>.",
             "requires": [
@@ -2086,7 +2096,7 @@
           "type": "clue",
           "label": "The keeper's wing-register",
           "note": "THE MISDIRECTION. Lists the shrines by wing, formally and authoritatively. Say what it IS and how old it is; never that it is wrong.",
-          "body": "A great register cut deep into the wall in three formal columns, each column a list of shrines marked by their banner colours, the marks cut square and official and worn shallow by four hundred years of hands. It is the keeper's own record of where every shrine stands today — accurate, and no help at all with which shrines belong together, because a shrine that was moved kept its offering. The same filing is already in your hands: <code>temple_votive_residues</code> gives every shrine's wing in its <code>wing</code> column, beside the residues.",
+          "body": "A great register cut deep into the wall in three formal columns, each column a list of shrines marked by their banner colours, the marks cut square and official and worn shallow by four hundred years of hands. It is the keeper's own record of where every shrine stands today.",
           "box": [
             0.19,
             0.07,
@@ -2265,7 +2275,7 @@
             0.365,
             0.675
           ],
-          "body": "A great register cut deep into the wall in three formal columns, each column a list of shrines marked by their banner colours, the marks cut square and official and worn shallow by four hundred years of hands. It is the keeper's own record of where every shrine stands today — accurate, and no help at all with which shrines belong together, because a shrine that was moved kept its offering. The same filing is already in your hands: <code>temple_votive_residues</code> gives every shrine's wing in its <code>wing</code> column, beside the residues.",
+          "body": "A great register cut deep into the wall in three formal columns, each column a list of shrines marked by their banner colours, the marks cut square and official and worn shallow by four hundred years of hands. It is the keeper's own record of where every shrine stands today.",
           "boxSource": "review:agent-vision",
           "boxNote": "localiser missed the third column; measured onto the whole three-column register"
         },
@@ -2331,14 +2341,14 @@
           "type": "door",
           "label": "The hatch back from the vault",
           "box": [
-            0.572,
-            0.445,
-            0.675,
-            0.74
+            0.5768,
+            0.449,
+            0.6798,
+            0.744
           ],
           "direction": "back",
           "to": "root_crawl",
-          "boxSource": "review:agent-vision",
+          "boxSource": "moved:testplay",
           "boxNote": "localiser boxed wall above the hatch; measured onto the carved sun-disc hatch"
         },
         {
@@ -2464,7 +2474,65 @@
             0.66
           ],
           "boxSource": "review:agent-vision",
-          "boxNote": "localiser boxed five plaques and blank stone; measured onto the register-stone with all nine plaques"
+          "boxNote": "localiser boxed five plaques and blank stone; measured onto the register-stone with all nine plaques",
+          "feedback": {
+            "correct": "Every group closes. The register is whole — and the channel around you is still dry, with the flame you carried up out of the cell still burning in your hand.",
+            "partial": "That group holds together. The others do not — yet.",
+            "wrong": "Nothing closes. A god's shrines share most of their figures with each other, and share almost nothing with any other god's. One figure in common means nothing."
+          },
+          "prompt": "Nine plaques, one for each shrine's banner. Set each beside the god that shrine served. The old rubric is cut above the columns: <em>the Rain is known by the rain-jar, the Ember by the censer, the Canopy by the seed-pod</em> — but no god gave every one of its shrines the same figures, so the rubric will name a group for you, never build one. A group is only confirmed when every shrine in it is right — and nothing else is claiming to be one of them.",
+          "rows": [
+            {
+              "id": "crimson",
+              "label": "The crimson banner",
+              "answer": "the Rain"
+            },
+            {
+              "id": "white",
+              "label": "The white banner",
+              "answer": "the Rain"
+            },
+            {
+              "id": "orange",
+              "label": "The orange banner",
+              "answer": "the Ember"
+            },
+            {
+              "id": "deep_blue",
+              "label": "The deep blue banner",
+              "answer": "the Ember"
+            },
+            {
+              "id": "black",
+              "label": "The black banner",
+              "answer": "the Ember"
+            },
+            {
+              "id": "magenta",
+              "label": "The magenta banner",
+              "answer": "the Canopy"
+            },
+            {
+              "id": "yellow",
+              "label": "The yellow banner",
+              "answer": "the Canopy"
+            },
+            {
+              "id": "violet",
+              "label": "The violet banner",
+              "answer": "the Canopy"
+            },
+            {
+              "id": "turquoise",
+              "label": "The turquoise banner",
+              "answer": "the Canopy"
+            }
+          ],
+          "options": [
+            "the Rain",
+            "the Ember",
+            "the Canopy"
+          ]
         },
         {
           "type": "dial",
@@ -2478,7 +2546,15 @@
             0.7
           ],
           "boxSource": "review:agent-vision",
-          "boxNote": "was a stub over the distant jungle; measured onto the flame cup on its pivoted arm"
+          "boxNote": "was a stub over the distant jungle; measured onto the flame cup on its pivoted arm",
+          "lockedBody": "Not yet. A keeper lights the ring when both registers are whole, and the sacred one is still blank.",
+          "hint": "The flame you carried up out of the sealed cell, burning in a stone cup on a pivoted arm at the head of the channel. The arm is free. Tip it, and the fire runs into the ring.",
+          "states": [
+            {
+              "value": "lit",
+              "label": "Tip the flame into the channel"
+            }
+          ]
         },
         {
           "type": "door",
@@ -2689,7 +2765,7 @@
             0.564,
             0.66
           ],
-          "prompt": "Nine plaques, one for each shrine's banner. Set each beside the god that shrine served. A group is only confirmed when every shrine in it is right — and nothing else is claiming to be one of them.",
+          "prompt": "Nine plaques, one for each shrine's banner. Set each beside the god that shrine served. The old rubric is cut above the columns: <em>the Rain is known by the rain-jar, the Ember by the censer, the Canopy by the seed-pod</em> — but no god gave every one of its shrines the same figures, so the rubric will name a group for you, never build one. A group is only confirmed when every shrine in it is right — and nothing else is claiming to be one of them.",
           "options": [
             "the Rain",
             "the Ember",
@@ -2748,7 +2824,11 @@
             "wrong": "Nothing closes. A god's shrines share most of their figures with each other, and share almost nothing with any other god's. One figure in common means nothing."
           },
           "boxSource": "review:agent-vision",
-          "boxNote": "localiser boxed five plaques and blank stone; measured onto the register-stone with all nine plaques"
+          "boxNote": "localiser boxed five plaques and blank stone; measured onto the register-stone with all nine plaques",
+          "solveSfx": {
+            "src": "audio/solve_register_gods.mp3",
+            "volume": 0.31195450306555433
+          }
         },
         {
           "id": "flame_dial",
@@ -2780,14 +2860,14 @@
           "type": "door",
           "label": "The stair back down",
           "box": [
-            0.612,
-            0.56,
-            0.662,
-            0.715
+            0.6135,
+            0.5734,
+            0.6635,
+            0.7284
           ],
           "direction": "back",
           "to": "inner_vault",
-          "boxSource": "review:agent-vision",
+          "boxSource": "moved:testplay",
           "boxNote": "localiser boxed the pillar left of it; measured onto the dark stair opening"
         },
         {
@@ -2864,7 +2944,7 @@
         },
         {
           "src": "audio/sun_altar_distant_thunder.mp3",
-          "volume": 0.38,
+          "volume": 0.11209629512869142,
           "mode": "interval",
           "gapMin": 25,
           "gapMax": 60

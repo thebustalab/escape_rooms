@@ -30,6 +30,10 @@
 #   8-11. the GRADING GATE wiring (2026-09-25): a failing gate blocks and names its bypass, a passing
 #      one lets the push through, SKIP_GRADING_GATE=1 bypasses it, and — the regression that matters —
 #      SKIP_SIZE_CHECK=1 no longer bypasses it, because the hook's two jobs are now independent.
+#   12-15. the CREDENTIAL / PRIVATE-PATH SCAN wiring (2026-09-26, githooks/scan_diff.py): a diff adding
+#      a credential-shaped literal blocks and names its bypass, a clean diff passes silently,
+#      SKIP_SECRET_SCAN=1 bypasses it, and a repo with no scan_diff.py skips the job entirely (cases
+#      1-11 above already prove this, since none of those throwaway repos carry the scanner).
 #
 # Run:  bash tests/test_pre_push_hook.sh
 # Sparse files (truncate -s) keep this fast: git records the real size, packs to nothing.
@@ -144,6 +148,30 @@ check "SKIP_SIZE_CHECK does NOT bypass the grading gate" 1 "$RC" "$OUT" "grading
 OUT=$( (cd "$G" && echo "refs/heads/main $(git -C "$G" rev-parse HEAD) refs/heads/main $(git -C "$G" rev-parse origin/main)" \
         | SKIP_GRADING_GATE=1 bash "$HOOK" origin fake-url) 2>&1 ); RC=$?
 check "SKIP_GRADING_GATE=1 bypasses the gate" 0 "$RC"
+
+# --- 12-15: the CREDENTIAL / PRIVATE-PATH SCAN wiring (2026-09-26) ---------------
+# Same "stub it in" shape as the grading gate above: copy the REAL scan_diff.py into a throwaway
+# repo that carries a githooks/ dir, so the wiring is tested end-to-end against the real scanner,
+# not a stand-in for it.
+S=$(new_repo scanned)
+mkdir -p "$S/githooks"
+cp "$(dirname "$HOOK")/scan_diff.py" "$S/githooks/scan_diff.py"
+
+echo 'ACCESS_TOKEN = "sk-FAKE1234567890abcdefFAKE"' > "$S/config.py"
+git -C "$S" add config.py; git -C "$S" commit -qm "add a fake credential"
+run_hook "$S" "$(git -C "$S" rev-parse HEAD)" "$(git -C "$S" rev-parse origin/main)"
+check "a credential-shaped literal blocks the push" 1 "$RC" "$OUT" "BLOCKED"
+check "...and points at the bypass"                 1 "$RC" "$OUT" "SKIP_SECRET_SCAN=1"
+
+OUT=$( (cd "$S" && echo "refs/heads/main $(git -C "$S" rev-parse HEAD) refs/heads/main $(git -C "$S" rev-parse origin/main)" \
+        | SKIP_SECRET_SCAN=1 bash "$HOOK" origin fake-url) 2>&1 ); RC=$?
+check "SKIP_SECRET_SCAN=1 bypasses the scan" 0 "$RC"
+
+git -C "$S" checkout -q -b clean-branch origin/main
+echo 'print("hello world")' > "$S/hello.py"
+git -C "$S" add hello.py; git -C "$S" commit -qm "clean commit"
+run_hook "$S" "$(git -C "$S" rev-parse HEAD)" "$(git -C "$S" rev-parse origin/main)"
+check "a clean diff passes the scan" 0 "$RC"
 
 echo
 echo "$pass passed, $fail failed"

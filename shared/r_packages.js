@@ -91,7 +91,13 @@ export const ANALYSIS_PACKAGES = [
 /**
  * The Bioconductor set — installed SEPARATELY, with `R_BIOC_REPOS`. Only `ggtree`, and it is not
  * optional: the `hclust` branch calls `ggtree::fortify()` to turn the tree into the tidy frame the
- * whole course plots from. Confirmed working in a headless browser on 2026-09-22 (the smoke test's
+ * whole course plots from.
+ *
+ * ggtree is ALSO THE ONE PACKAGE HERE THAT IS ATTACHED, not merely installed (2026-09-28) — see the
+ * attach block in `webr-console.js`. Everything in ANALYSIS_PACKAGES is namespace-qualified inside
+ * the shim and stays off the search path, but the BOOK writes bare `ggtree(out) + geom_tiplab()` in
+ * chapter 8, so leaving it unattached meant the course's own code failed in a room. That is the drift
+ * this file exists to prevent, so ggtree is attached to match the desktop toolkit. Confirmed working in a headless browser on 2026-09-22 (the smoke test's
  * `ggtree_fortify` case), which closes the "still owed: a browser smoke test" note that sat in the
  * root AGENTS.md from 2026-08-26.
  */

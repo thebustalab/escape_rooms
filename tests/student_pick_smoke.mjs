@@ -45,10 +45,24 @@ const results = await page.evaluate(async ({ port, picks }) => {
   let have = false;
   try { have = await webR.evalRBoolean('requireNamespace("ggiraph", quietly = TRUE)'); } catch (e) {}
   if (!have) await webR.installPackages(["ggiraph"], { quiet: true });
+  // ape + ggtree are for the TREE case below. ggtree is Bioconductor, so it needs the same repo list
+  // webr-console.js uses; it is the slow install here (~10s) and the reason this test is not in CI.
+  await webR.installPackages(["tidyr", "ape"], { quiet: true });
+  let haveTree = false;
+  try { haveTree = await webR.evalRBoolean('requireNamespace("ggtree", quietly = TRUE)'); } catch (e) {}
+  if (!haveTree) {
+    try {
+      await webR.installPackages(["ggtree"], { quiet: true,
+        repos: ["https://repo.r-wasm.org", "https://bioc.r-universe.dev", "https://cran.r-universe.dev"] });
+    } catch (e) { /* the tree case will report its own failure */ }
+  }
   // Mirror the scenario `setup`: the student's console session has these attached, so `p <- ggplot(...)`
   // resolves bare ggplot()/aes()/filter() (the engine relies on this — libraries aren't re-attached when
   // the student's plot code runs, only inside the render block).
   await webR.evalRVoid(`suppressMessages({ library(dplyr); library(ggplot2); library(readr) })`);
+  // ggtree is ATTACHED on every real surface since 2026-09-28 (webr-console.js), so the student writes
+  // bare `ggtree(...)`. Mirror that here or the tree case would not match what a room actually does.
+  try { await webR.evalRVoid(`suppressWarnings(suppressMessages(library(ggtree)))`); } catch (e) {}
 
   // VERBATIM renderStudentPickSvg() R block from shared/pano-player.js — reads `p` from the session.
   const renderStudent = async (idcolJson) => {
@@ -56,6 +70,31 @@ const results = await page.evaluate(async ({ port, picks }) => {
 .er_make_interactive <- function(p, idcol) {
   if (!inherits(p, "ggplot")) stop("not a ggplot")
   ns <- asNamespace("ggiraph")
+  # ---- TREES (ggtree) take a different route entirely (2026-09-28) --------------------------------
+  # A ggtree plot cannot be tagged by swapping geoms: its TIP LABELS are 'GeomTextGGtree', which has no
+  # ggiraph twin, and its only twinnable layers are the two 'GeomSegment' branch layers -- tagging those
+  # would make BRANCHES clickable as if they were samples. So add ONE interactive point layer on the
+  # tips instead. Detected by DATA SHAPE ('isTip'), not class(p), so it survives any '+'.
+  tree_tips <- function(p) {
+    d <- p$data
+    if (!is.data.frame(d) || !all(c("isTip", "x", "y") %in% names(d))) return(NULL)
+    tips <- d[which(d$isTip %in% TRUE), , drop = FALSE]
+    if (!nrow(tips)) return(NULL)
+    col <- if (idcol %in% names(tips) && any(nzchar(as.character(tips[[idcol]])), na.rm = TRUE)) idcol
+           else if ("label" %in% names(tips)) "label"
+           else if ("sample_unique_ID" %in% names(tips)) "sample_unique_ID"
+           else return(NULL)
+    tips$.er_id <- as.character(tips[[col]])
+    tips <- tips[!is.na(tips$.er_id) & nzchar(tips$.er_id), , drop = FALSE]
+    if (nrow(tips)) tips else NULL
+  }
+  .er_tips <- tree_tips(p)
+  if (!is.null(.er_tips)) {
+    return(p + ggiraph::geom_point_interactive(
+      data = .er_tips,
+      ggplot2::aes(x = x, y = y, data_id = .er_id, tooltip = .er_id),
+      inherit.aes = FALSE, size = 3.2, alpha = 0.32, colour = "#1f6feb"))
+  }
   twin <- function(geom) {
     cand <- paste0("GeomInteractive", sub("^Geom", "", class(geom)[1]))
     if (exists(cand, envir = ns, inherits = FALSE)) get(cand, envir = ns) else NULL
@@ -108,6 +147,16 @@ paste(readLines(.er_f), collapse = "\\n") }`;
     { name: "aes INSIDE the geom",          code: `p <- ggplot(dplyr::filter(alaska_lake_data, element=="Cl")) + geom_col(aes(reorder(lake, mg_per_L), mg_per_L)) + coord_flip()`, want: "North_Killeak_Lake" },
     { name: "geom_point scatter",           code: `p <- ggplot(dplyr::distinct(alaska_lake_data, lake, water_temp), aes(water_temp, lake)) + geom_point()`, want: "Lava_Lake" },
     { name: "piped |> into ggplot",         code: `p <- alaska_lake_data |> dplyr::filter(element=="Cl") |> ggplot(aes(lake, mg_per_L)) + geom_col()`, want: "North_Killeak_Lake" },
+    // THE TREE CASE (2026-09-28). A clustering room's student plots a dendrogram, and before this the
+    // picker refused it: ggtree's tip labels are GeomTextGGtree (no ggiraph twin) and its only twinnable
+    // layers are the branch segments. The tree branch of .er_make_interactive tags the TIPS instead.
+    // Note `lake` is NOT a column of a fortified tree frame — it becomes `label` — so this also pins the
+    // id fallback that makes a pick whose answer is a lake name still gradeable.
+    { name: "ggtree dendrogram (tips tagged)", want: "North_Killeak_Lake", code: `
+      .w <- tidyr::pivot_wider(dplyr::select(alaska_lake_data, lake, element, mg_per_L),
+                               names_from = element, values_from = mg_per_L)
+      .m <- as.data.frame(.w[, setdiff(names(.w), "lake")]); rownames(.m) <- .w$lake
+      p <- ggtree(ape::as.phylo(hclust(dist(scale(.m))))) + geom_tiplab()` },
   ];
   for (const s of STYLES) {
     try { await webR.evalRVoid(s.code); const ids = idsFrom(await renderStudent(JSON.stringify("lake")));

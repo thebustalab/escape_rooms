@@ -11,9 +11,9 @@ The **music** (`canyon_confluence_theme.mp3`) is NOT CC0 — it is a YouTube upl
 
 | file | freesound source | uploader | licence | used in |
 |------|------------------|----------|---------|---------|
-| `canyon_cave_hall.mp3`     | https://freesound.org/people/fonografico/sounds/636105/   | fonografico   | CC0 | undercroft, works, j_c7 — enclosed stone-hall tone |
+| `canyon_cave_hall.mp3`     | https://freesound.org/people/fonografico/sounds/636105/   | fonografico   | CC0 | undercroft (both states), j_c7 — enclosed stone-hall tone |
 | `canyon_waterfall.mp3`     | https://freesound.org/people/kwahmah_02/sounds/274259/    | kwahmah_02    | CC0 | j_c1 only — a thin bright spring fall, all spray and no bottom (0.1% of its energy below 200 Hz), which is right high in the canyon and wrong at the trunk |
-| `canyon_deepfall.mp3`      | https://freesound.org/people/KevinT1001/sounds/379905/    | KevinT1001    | CC0 | j_c7 + works — the deep bed where every water has arrived. 71% of its energy below 200 Hz against the other fall's 0.1%; Lucas asked for "more low frequencies" and the two recordings differ by ~30 dB in that band |
+| `canyon_deepfall.mp3`      | https://freesound.org/people/KevinT1001/sounds/379905/    | KevinT1001    | CC0 | j_c7 + undercroft's FLOODED state — the deep bed where every water has arrived. 71% of its energy below 200 Hz against the other fall's 0.1%; Lucas asked for "more low frequencies" and the two recordings differ by ~30 dB in that band |
 | `canyon_stream_gentle.mp3` | https://freesound.org/people/BurghRecords/sounds/446019/  | BurghRecords  | CC0 | j_c2, j_c3, j_c4, j_c5, j_c6, j_c7 — running water bed |
 | `canyon_slot_wind.mp3`     | https://freesound.org/people/dhallcomposer/sounds/697217/ | dhallcomposer | CC0 | j_c1–j_c4, j_c6 — thin wind down the open slot |
 | `canyon_drip_cave.mp3`     | https://freesound.org/people/Sclolex/sounds/177958/       | Sclolex       | CC0 | undercroft, j_c5 — sparse drips over a bed |
@@ -22,13 +22,14 @@ The **music** (`canyon_confluence_theme.mp3`) is NOT CC0 — it is a YouTube upl
 
 | file | source | uploader | licence | used in |
 |---|---|---|---|---|
-| `solve_bronze_door.mp3` | https://freesound.org/people/lolamadeus/sounds/161228/ ("large metal door opening", 4.9 s) | lolamadeus | **NOT YET VERIFIED — see below** | undercroft `calibration_panel` (the escape grid): the bolt draws back and the bronze flood door swings open |
+| `solve_bronze_door.mp3` | https://freesound.org/people/lolamadeus/sounds/161228/ ("large metal door opening", 4.9 s) | lolamadeus | **CC0** (verified 2026-09-26) | undercroft `calibration_panel` (the escape grid): the bolt draws back and the bronze flood door swings open |
 
 Reused from `wrangling/egypt` (its `solve_pharos_bronze_door_v2.mp3`, same bytes), because the escape door is now a
 riveted bronze door rather than a sluice. Volume 0.34 = the old sluice sting's 0.41 less the 1.6 dB it measures louder
-(mean −19.5 vs −21.1 dBFS). **The licence was never recorded when egypt pulled it, and freesound was down (502) on
-2026-09-18.** This file is CC0-only by rule, so re-check the licence: if it is not CC0, either credit it here as
-Attribution or swap in a CC0 metal-door sound. `solve_sluice.mp3` is kept on disk, now unused.
+(mean −19.5 vs −21.1 dBFS). **Licence VERIFIED CC0 on 2026-09-26** (freesound 161228, "Large Metal Lift Door Opening.wav", lolamadeus) —
+it had been unrecorded since egypt pulled it, and freesound was down (502) at the 2026-09-18 check.
+No swap or Attribution credit is owed. `wrangling/egypt` ships the same bytes as
+`solve_pharos_bronze_door_v2.mp3` and is covered by the same verdict.
 
 ## Levels
 
@@ -62,7 +63,7 @@ would overlap it with itself. `interval` is for a SHORT one-shot.
 |------|------------------|----------|---------|----------|
 | `solve_stone_slot.mp3`   | https://freesound.org/people/PostProdDog/sounds/578490/   | PostProdDog   | CC0 | j_c1, j_c2, j_c4 — the stone slot grinds open (same-type gates share a sting) |
 | `solve_storm_breaks.mp3` | https://freesound.org/people/bastipictures/sounds/243782/ | bastipictures | CC0 | j_c7, the boss — solving it is what brings the storm |
-| `solve_sluice.mp3`       | https://freesound.org/people/rivernile7/sounds/380363/    | rivernile7    | CC0 | works — the lock releases and the sluice runs |
+| `solve_sluice.mp3`       | https://freesound.org/people/rivernile7/sounds/380363/    | rivernile7    | CC0 | **UNUSED** — archived to `_scratch/orphaned_media/audio/` 2026-09-26. Was the old `works` room's sting; that room was merged into `undercroft` 2026-09-18 and the escape became a bronze door |
 
 Each was trimmed to its own event and loudness-normalised to **I=-18 LUFS / TP=-1.5 dBTP**, then capped
 against the music by `auto_balance.py` (reduce-only). Two Attribution-licensed candidates were rejected
@@ -73,3 +74,22 @@ public site and the standing rule is CC0 only.
 **Temple's stone solve stings were deliberately NOT reused** even though canyon is its sibling: two of
 them are wired at `volume 0.0` (silent) and two run 9-28 s, which is a bed, not a sting. Worth fixing in
 temple; not worth importing here.
+
+## The `works` room is gone (2026-09-18)
+
+Rows above used to name a separate `works` room. It was merged into `undercroft`, which now carries BOTH
+world states — dry before the boss, flooded after — so its sound splits by `states` rather than by room:
+drip on the base state, deep fall on the flooded one, cave hall on both. See `../AGENTS.md` → *The hall
+is ONE room in two world states*. The archived room is in `../z_archive/works_room_merged_2026-09-18/`.
+
+## Archived audio (2026-09-26)
+
+Two files were present on disk but referenced by nothing, and `audio/` is published to a PUBLIC GitHub
+Pages site, so both moved to `../_scratch/orphaned_media/audio/` (gitignored — still on disk, still
+synced to the Mac, never pushed):
+
+- `solve_sluice.mp3` — superseded by `solve_bronze_door.mp3` at the 2026-09-18 door swap.
+- `ben_harper_winter_is_for_lovers.mp3` (27 MB) — an unused music candidate, and a **commercial
+  copyrighted track**. Nothing in `scenario.json` ever referenced it; the scenario's music is
+  `canyon_confluence_theme.mp3`. It should never have reached a public repo, which is exactly the
+  class of thing the publish-footprint scan is for.

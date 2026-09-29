@@ -202,3 +202,20 @@ rooms/hierarchical_clustering/temple/figures/tiles/MANIFEST.json
 # RESULTS do not — 416 MB of generated panoramas, which lives in Tools/temp instead (outside every
 # repo). This entry is belt-and-braces in case a run is ever pointed back here by accident.
 authoring_v2/model_probe/results/
+
+# CLIP-REVIEW GALLERY THUMBNAILS (2026-09-26). `cinemagraph_tools/stage_candidates.py` drops a
+# 1536-wide `proxy/<name>.mp4` and a `poster/<name>.jpg` beside every staged candidate so the review
+# gallery in the harness loads fast. The PLAYER fetches neither — it plays the full `cine_<state>.mp4`
+# — and `harness_server.py` deletes them alongside the candidate they belong to, so they must stay in
+# place rather than being archived: moving them breaks the gallery and the cleanup path. Ignore, don't
+# move. Found during canyon's publish audit: 2.9 MB across its eight rooms, and canyon is currently the
+# only scenario carrying them, so this closes the class before it spreads.
+**/poster/
+**/proxy/
+
+# FIGURE-TILE SOURCE ART (2026-09-26, temple publish audit). `figures/tiles/*.png` are the twelve painted
+# votive-figure tiles `prep_tiles.py` cuts out and `make_figures.py` pastes into the nine shrine PLATES.
+# The PLATES (`figures/<shrine>.png`) are clue images and DO ship; the tiles are build input only —
+# nothing in any scenario.json, play.html or shared/*.js fetches them (3.1 MB in temple alone). Their
+# MANIFEST.json was already ignored by name; this is the art beside it.
+**/figures/tiles/*.png

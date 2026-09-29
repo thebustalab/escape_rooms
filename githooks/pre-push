@@ -2,15 +2,21 @@
 #
 # pre-push — refuse to push anything that should not reach students.
 #
-# TWO INDEPENDENT JOBS, each with its own bypass, and skipping one never skips the other:
+# THREE INDEPENDENT JOBS, each with its own bypass, and skipping one never skips another:
 #   1. the oversize-blob check (below) — blobs GitHub will reject;
 #   2. the GRADING GATE (tests/grading_gate.sh) — the checks that pin a student's SCORE to the data.
 #      Added 2026-09-25 after canyon's decoder self-test and answer test both sat broken for a day
 #      with nothing on the path to publication running either; see that script's header. deploy.sh
 #      step 1 runs the SAME script, so a deploy catches it earlier and a hand-rolled `git push`
 #      cannot slip past. One script, two callers — two copies would drift, which is the bug itself.
+#   3. the CREDENTIAL / PRIVATE-PATH SCAN (githooks/scan_diff.py) — a content scan of the outgoing
+#      diff for credential-shaped strings and private paths/hostnames. Added 2026-09-26 as a
+#      deterministic BACKSTOP to the prose pre-publish checklists in public_tools/AGENTS.md and
+#      websites/thebustalab.github.io/AGENTS.md — those checklists are still the first line of
+#      defence; this catches the case where someone forgets to run them. Sibling hooks doing the
+#      same scan exist for the main website repo and for public_tools' per-tool repos.
 #
-# Why this exists (2026-08-31): a stage-everything commit swept in
+# Why the oversize check exists (2026-08-31): a stage-everything commit swept in
 # authoring_v2/ui/cine360/ — the 360-cinemagraph parameter-sweep bench, 2.1 GB of
 # experiment clips, three of them over 150 MB. GitHub's pre-receive hook rejected the
 # WHOLE push, so ~500 legitimate room files were blocked behind three R&D artefacts,
@@ -27,15 +33,20 @@
 # Override for a one-off push you have thought about:
 #     SKIP_SIZE_CHECK=1 git push        # the size check only
 #     SKIP_GRADING_GATE=1 git push      # the grading gate only
+#     SKIP_SECRET_SCAN=1 git push       # the credential/private-path scan only
 
 set -uo pipefail
 
 status=0
 
+# Git feeds the ref-update lines ("local_ref local_sha remote_ref remote_sha", one per pushed ref)
+# on stdin, and stdin can only be read once. Job 1 and job 3 both need to walk that list, so capture
+# it to a temp file up front rather than reading the pipe twice.
+REFS_TMP=$(mktemp)
+trap 'rm -f "$REFS_TMP"' EXIT
+cat >"$REFS_TMP"
+
 if [ "${SKIP_SIZE_CHECK:-}" = "1" ]; then
-    # Drain the ref list git is feeding us before moving on, or the writer takes a
-    # SIGPIPE (exit 141) instead of a clean 0.
-    cat >/dev/null 2>&1 || true
     echo "pre-push: size check skipped (SKIP_SIZE_CHECK=1)" >&2
 else
 
@@ -68,7 +79,7 @@ while read -r local_ref local_sha remote_ref remote_sha; do
         fi
     done < <(git rev-list --objects "${range[@]}" 2>/dev/null \
              | git cat-file --batch-check='%(objecttype) %(objectname) %(objectsize) %(rest)' 2>/dev/null)
-done
+done < "$REFS_TMP"
 
 if [ -n "$warnings" ]; then
     echo "" >&2
@@ -106,6 +117,32 @@ if [ -f "$GATE" ]; then
         echo "    SKIP_GRADING_GATE=1 git push" >&2
         echo "" >&2
         status=1
+    fi
+fi
+
+# ---------------------------------------------------------------- job 3: credential / private-path scan
+# Located from the repo root, same reasoning as the GATE lookup above (the hook is a symlink, so
+# dirname "$0" would resolve inside .git/hooks, not here).
+if [ "${SKIP_SECRET_SCAN:-}" = "1" ]; then
+    echo "pre-push: secret scan skipped (SKIP_SECRET_SCAN=1)" >&2
+else
+    SCANNER="$(git rev-parse --show-toplevel 2>/dev/null || pwd)/githooks/scan_diff.py"
+    ZERO=0000000000000000000000000000000000000000
+    EMPTY_TREE=4b825dc642cb6eb9a060e54bf8d69288fbee4904
+    if [ -f "$SCANNER" ]; then
+        while read -r local_ref local_sha remote_ref remote_sha; do
+            [ -z "${local_sha:-}" ] && continue
+            [ "$local_sha" = "$ZERO" ] && continue          # deleting a ref
+
+            base="${remote_sha:-$ZERO}"
+            if [ "$base" = "$ZERO" ]; then
+                base="$EMPTY_TREE"   # new branch — diff the whole thing as additions
+            fi
+
+            if ! git diff --unified=0 "$base" "$local_sha" 2>/dev/null | python3 "$SCANNER"; then
+                status=1
+            fi
+        done < "$REFS_TMP"
     fi
 fi
 

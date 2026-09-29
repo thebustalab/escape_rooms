@@ -162,9 +162,36 @@ button.ghost { background:transparent; color:var(--ink); border:1px solid var(--
   animation:fxRays 14s ease-in-out infinite; }
 @keyframes fxRays { 0%,100%{ opacity:.4; transform:translateX(-2%); } 50%{ opacity:.85; transform:translateX(2%); } }
 /* "rain" — thin slanted streaks falling; steady, not a downpour */
-.fx-rain { background:repeating-linear-gradient(103deg, rgba(200,220,255,0) 0 7px, rgba(200,220,255,.10) 7px 8px, rgba(200,220,255,0) 8px 14px);
-  opacity:.5; animation:fxRain .7s linear infinite; }
-@keyframes fxRain { 0%{ background-position:0 0; } 100%{ background-position:-44px 460px; } }
+/* Rebuilt 2026-09-28 (Lucas, canyon playtest: "it doesn't look that great"). The old rule was ONE
+   repeating-linear-gradient at a single angle, width, opacity and speed, at opacity .5 — which is a
+   moving stripe pattern, not rain. A single uniform grating reads as a screen door or moire, because
+   real rain never presents one spacing at one speed: depth is the whole effect.
+   So: THREE layers at different angles, spacings, opacities and — the part that carries it — different
+   speeds, so near drops outrun far ones and the eye reads parallax instead of a sliding texture. Each
+   layer is finer and fainter than the old single one; together they are still lighter overall (.42 vs
+   .5) yet read as much heavier weather. A top-weighted mask fades the fall toward the floor, so it does
+   not scrub flatly across the rock at the bottom of a slot canyon. */
+.fx-rain {
+  background:
+    repeating-linear-gradient(101deg, rgba(205,225,255,0) 0 5px, rgba(205,225,255,.13) 5px 6px, rgba(205,225,255,0) 6px 11px),
+    repeating-linear-gradient(104deg, rgba(195,215,245,0) 0 9px, rgba(195,215,245,.09) 9px 10px, rgba(195,215,245,0) 10px 19px),
+    repeating-linear-gradient( 99deg, rgba(215,235,255,0) 0 15px, rgba(215,235,255,.06) 15px 17px, rgba(215,235,255,0) 17px 32px);
+  opacity:.42;
+  -webkit-mask-image:linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,.92) 55%, rgba(0,0,0,.45) 100%);
+          mask-image:linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,.92) 55%, rgba(0,0,0,.45) 100%);
+  animation:fxRain .8s linear infinite;
+}
+/* ONE animation, three different DISTANCES — not three animations. Three @keyframes all animating
+   `background-position` would not layer: CSS resolves a property animated by several running animations
+   to the LAST one in the list, so the near and mid layers would simply be discarded and the whole thing
+   would fall back to a single sliding grating, which is the bug this rebuild exists to fix. Same period,
+   different travel per layer, is what produces the parallax: the near layer covers 560px while the far
+   one covers 300px, so it reads as visibly faster. */
+@keyframes fxRain {
+  0%   { background-position:    0    0,    0    0,    0    0; }
+  100% { background-position: -52px 560px, -34px 430px, -20px 300px; }
+}
+@media (prefers-reduced-motion: reduce){ .fx-rain { animation:none !important; opacity:.22; } }
 /* "dust" — faint motes drifting slowly upward through the light */
 .fx-dust { background:radial-gradient(1.5px 1.5px at 20% 30%, rgba(255,250,235,.5), transparent 60%),
     radial-gradient(1.5px 1.5px at 70% 60%, rgba(255,250,235,.35), transparent 60%),

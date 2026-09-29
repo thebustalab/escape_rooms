@@ -97,6 +97,7 @@ The joins that cost subway its rounds, all found by eye on generated art, none c
 | the rails under the train and the rails leaving the station | two separate railways in one picture, the train on a stub that reaches nothing |
 | the station's ORIENTATION — which wall the tunnel is in (subway ochre_verdigris, 2026-09-19) | the tunnel mouth drawn in the long wall ACROSS the track facing the viewer, and the train swinging round at an angle to meet it. The one-road clause alone did not fix it; stating the layout did: tunnel mouth in the END wall, platform edge + rails + train all parallel, receding to ONE vanishing point in that mouth, train broadside |
 | the train's WHEELS and the near rail, and the buffer stops and the train's road (subway ochre_verdigris r9, 2026-09-19) | the layout right, but the rail nearest the viewer ran IN FRONT of the wheels at a different level, and the buffer stops stood on a separate stub at another angle. Fixed by saying it outright: the wheels sit ON TOP of the rails, the near rail disappears UNDER them, the same rails carry on without a kink to end under buffer stops that straddle them |
+| the FLOOR under the viewer and the exit a `door` names (waterfalls, 2026-09-26) | a ladder and a bridge each drawn correctly and joined to nothing the player stands on — the ladder's foot in mid-air, the bridge starting on a shelf across a gap. The hand-written seam-safety prefix "set round at the viewer's <side>, with a broad stretch of plain wall between it and the wall directly behind the viewer" made *wall* the last-named thing, so by rule 0c the exit bound to the WALL, not to the shelf. Fixed by stating the join in DEPTH ORDER STARTING AT THE FLOOR UNDER THE VIEWER'S FEET, and anchoring the exit's near end to the standing surface by name |
 
 **Stating every join does not guarantee every draw keeps them.** ochre_verdigris r9 broke a join on a spec whose
 wording was identical to ochre_woad's, which passed first time. Once the joins are written, a failure is a
@@ -154,7 +155,10 @@ own bore" becomes reliable only when it is also "there are EXACTLY 4 tunnel mout
    while "the stone quay, with the ship moored alongside it" holds her at the quay. **Name the anchor
    first, then the subject, then the open space** — never the other way round. This is the same failure
    as 0a from the other side: 0a is two elements disagreeing about one region, 0c is one sentence
-   attaching a subject to the wrong half of itself.
+   attaching a subject to the wrong half of itself. **A seam-safety or edge-safety PREFIX is a named
+   thing too, and it is named LAST before the subject**, so a prefix ending "…plain wall" silently
+   rebinds the element to the wall (waterfalls, 2026-09-26) — if an element needs both an edge-safety
+   prefix and a floor join, **the floor join goes LAST**.
 0c-bis. **The equirectangular clause is EMITTED FOR YOU — do not write your own** (2026-09-07).
    `render_prompt` now appends a standard `EQUIRECT` sentence to every scene prompt in every scenario:
    the walls wrap continuously with strong barrel curvature, ceiling and floor bow across the frame,
@@ -201,6 +205,25 @@ own bore" becomes reliable only when it is also "there are EXACTLY 4 tunnel mout
    room per subject joined by a walk-across door — rather than re-rolling vantages. A panorama reliably
    renders one instance: subway's two-train station rooms failed on three different vantages while every
    one-train room succeeded, and the split fixed them in one pass.
+
+0g. **NAME THE STRUCTURE WITH ONE NOUN. A hybrid noun renders as a hybrid object** (2026-09-26,
+   `flat_clustering/waterfalls`). The route down to the drowned floor was authored as *"a long
+   ladder-and-plank descent"*, with *"its rungs and planks"* reinforcing it, in BOTH rooms it
+   connects. What came back was exactly what was asked for and useless: a flat slatted panel
+   standing upright that Lucas read as *"something that's like half a bridge and half a ladder —
+   which is it supposed to be?"*. The model does not pick one; it averages them. Decide which
+   structure it IS, name it once, and say what it is NOT in the same breath — *"a LONG TIMBER
+   LADDER: two long side rails with round rungs set between them, and nothing else: no planks, no
+   decking, no steps, no slatted panel"* — with the mirrored refusal in `negatives`. This applies
+   to any object serving a mechanic, because the mechanic decides the noun: a thing you CLIMB is a
+   ladder, a thing you WALK ACROSS is a bridge, and the player has to be able to tell at a glance
+   which one they are looking at.
+
+   **Where an object appears in two rooms, the room whose art is already ACCEPTED decides the
+   noun.** Here the basin end was drawn as an unambiguous timber ladder and Lucas had passed it, so
+   the wording was rewritten to match the picture and only the unaccepted room was regenerated.
+   Re-specifying to the accepted art costs one render; re-specifying away from it costs two and an
+   argument.
 
 0f. **A still bound for a cinemagraph must be explicitly SHARP.** Describing something as *sliding
    past* or *running* invites the model to paint the motion INTO the still as motion blur and smeared
@@ -322,6 +345,12 @@ own bore" becomes reliable only when it is also "there are EXACTLY 4 tunnel mout
    (or dead ahead), prefix its desc "standing well in from the edge of the frame, with plain wall between
    it and that edge", and give the outer slots only ONE thing each. `validate_scenes.py` warns on this
    ("bulky structure in the outer band").
+   **Do NOT run a linear feature along the rim an exit leaves from.** waterfalls' diverter chute was
+   traced along the shelf rim and rendered as a SECOND blocker between the player and the bridge that
+   leaves that same rim — a channel, gutter, rail, chute or pipe drawn along a departure edge reads as
+   a barrier across it, exactly like a rope swag. Give it a different edge, or state explicitly that
+   the floor runs open and clear between it and every crossing (which is what fixed waterfalls,
+   2026-09-26).
    **Describe each structure ONCE, and never list what must NOT appear.** A tunnel mouth written into both the
    track element and a separate end element rendered as two mouths (subway, 2026-09-17), and a seam clause
    reading "no stair, no shaft, no tunnel mouth, no arch" planted exactly those things at the join. State
@@ -441,3 +470,30 @@ Beacons deliberately flattened its views so no player could read the coverage an
 threat was never real — it needs a level of attention and of rendered fidelity that does not exist — and
 defending against it consumed the scenario's entire differentiation budget. **Puzzle data is protected by
 where it is wired, not by making the art vague.**
+
+## Making the ART carry DATA — readable gradients (2026-09-25/28, clouds)
+
+When a puzzle asks a player to READ a property off the picture (clouds' two openers: which
+traits co-vary), the scene spec has to be written against how this image model actually behaves.
+Seven sweeps of paired draws settled these; each was established by a failure first.
+
+- **A gradient needs SEPARATED items in a LINE.** The eye reads a ramp by comparing neighbours.
+  "One long line of towers, each clear of its neighbours, evenly spaced with open sky between
+  them" works; a **dense rank packed shoulder to shoulder does not** — that was tried on Lucas's
+  suggestion and destroyed the very property that made the first version readable.
+- **Never ask the line to SPAN THE VIEW.** "Running right across this side of the view from far
+  left to far right" makes the model draw a cityscape with the right buildings scattered through
+  it and no legible ramp. A **short self-contained ROW standing out from the city** reads; the
+  working wording is `rooms/dimensionality_reduction/clouds` → `ap_stillstand` city element.
+- **Two traits that are not perceptually separable are ONE trait.** Height + width read as "bigger"
+  and teach nothing. So do sphere→cylinder if defined as elongation: that is height over width
+  wearing a hat. Pair traits the eye can vary independently — height with OPENNESS (solid → pierced
+  lattice), or proportion (squat box → slender spire) with SHELL (swollen honeycomb → pitted ribs).
+- **If two axes must be independent, only ONE of them may ramp height.** Both openers originally
+  ramped it, which made height correlate with everything and collapsed the grid to a single axis.
+- **COLOUR AND BRIGHTNESS CANNOT CARRY DATA** in any room that gets a cinemagraph: the committed
+  motion swings both. Geometry only. State the survey line as one flat colour, equally lit.
+- **Counts are not reliable.** "Exactly nine towers" is asking a diffusion model to count. Drop the
+  number; the gradient reads without it.
+- **The model will not apply a rule city-wide.** It draws a controlled row of a dozen well; it will
+  not carry a trait across an entire panorama. Design the evidence as a SAMPLE, not a census.

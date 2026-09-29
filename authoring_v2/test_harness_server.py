@@ -2446,6 +2446,44 @@ def test_accept_still_sets_the_flag_and_stamps_who_and_when():
     _with_rooms_root(body)
 
 
+def test_accept_provenance_distinguishes_a_click_from_an_agent():
+    """WHO accepted must stay legible (2026-09-29).
+
+    A hand-click in the harness stamps "lucas <date>". An agent acting on Lucas's spoken instruction
+    goes through `harness_cli.py accept`, which passes `by="lucas via agent"` — still HIS judgement,
+    but a later reader can tell which, and an accept that appeared with nobody asking for it is
+    visible rather than indistinguishable. No unattended loop may write this flag at all; see
+    notes/v3_only_harness.md.
+    """
+    def body(tmp):
+        base = _mk_room_with_still(tmp, seam={"stage": "screened", "needsWork": False})
+
+        hs._accept_still(base, "hall", True, "")
+        rec = json.load(open(os.path.join(base, "scenario.json")))["rooms"][0]["authoring"]["seam"]
+        assert rec["acceptedBy"].startswith("lucas "), rec
+        assert "agent" not in rec["acceptedBy"]
+
+        hs._accept_still(base, "hall", True, "Lucas: accept the hall", by="lucas via agent")
+        rec = json.load(open(os.path.join(base, "scenario.json")))["rooms"][0]["authoring"]["seam"]
+        assert rec["acceptedBy"].startswith("lucas via agent "), rec
+        assert rec["humanNote"] == "Lucas: accept the hall"
+    _with_rooms_root(body)
+
+
+def test_accept_provenance_cannot_be_used_to_inject():
+    """`by` reaches scenario.json, so it is sanitised to letters and spaces, never trusted raw."""
+    def body(tmp):
+        base = _mk_room_with_still(tmp, seam={"stage": "screened", "needsWork": False})
+        hs._accept_still(base, "hall", True, "", by="../../evil\n{\"x\":1} 99")
+        rec = json.load(open(os.path.join(base, "scenario.json")))["rooms"][0]["authoring"]["seam"]
+        who = rec["acceptedBy"]
+        assert all(c.isalpha() or c in " -0123456789" for c in who), who
+        assert "/" not in who and "{" not in who and "\n" not in who
+
+
+    _with_rooms_root(body)
+
+
 def test_accepting_a_flagged_seam_requires_a_written_reason():
     """Lucas's eye outranks the metric in BOTH directions — the blur can score a perfect 0.0 while
     smearing the picture, and a huge ratio on a 2-level step in flat sky is invisible. So overriding
