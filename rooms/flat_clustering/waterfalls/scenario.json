@@ -208,12 +208,11 @@
           "crossfade": 4
         },
         {
-          "src": "audio/catwalk_oneshot_well_stone.mp3",
+          "src": "audio/catwalk_oneshot_stone_water.mp3",
           "mode": "interval",
-          "volume": 0.45,
+          "volume": 0.05,
           "gapMin": 11,
-          "gapMax": 24,
-          "needsReplacement": true
+          "gapMax": 24
         },
         {
           "src": "audio/catwalk_oneshot_rope_creak.mp3",
@@ -612,7 +611,7 @@
           "note": "kmeans(4 profiles,k=3) -> largest family = 10",
           "starterCode": "reliquary_phials",
           "question": {
-            "prompt": "The font will not release its lever to anyone who cannot sort as the Assay sorted. On the console lies their ledger of twenty-four stolen phials, each measured for the essence inside it &mdash; its clarity, its mineral, its resin and its ash. Let the phials fall into three families on those four measures alone. How many phials are in the largest family?",
+            "prompt": "The font will not release its lever to anyone who cannot sort as the Assay sorted. On the console lies their ledger of twenty-four stolen phials, each measured for the essence inside it — its clarity, its mineral, its resin and its ash. Use k-means to cluster the phials into three families on those four measures alone. How many phials are in the largest family?",
             "options": [
               "3 phials",
               "6 phials",
@@ -1005,7 +1004,7 @@
           ],
           "starterCode": "reliquary_phials",
           "question": {
-            "prompt": "The font will not release its lever to anyone who cannot sort as the Assay sorted. On the console lies their ledger of twenty-four stolen phials, each measured for the essence inside it &mdash; its clarity, its mineral, its resin and its ash. Let the phials fall into three families on those four measures alone. How many phials are in the largest family?",
+            "prompt": "The font will not release its lever to anyone who cannot sort as the Assay sorted. On the console lies their ledger of twenty-four stolen phials, each measured for the essence inside it — its clarity, its mineral, its resin and its ash. Use k-means to cluster the phials into three families on those four measures alone. How many phials are in the largest family?",
             "options": [
               "3 phials",
               "6 phials",
@@ -1167,56 +1166,6 @@
           }
         },
         {
-          "id": "wet_across_bridge_wash",
-          "type": "ambient",
-          "label": "Nightfall",
-          "box": [
-            0,
-            0,
-            1,
-            1
-          ],
-          "note": "Full-scene state variant. `ambient` is filtered out of rendering, so this carrier shows no marker and intercepts no clicks; it exists only to hold the variant art.",
-          "variants": [
-            {
-              "state": "wet_across_bridge",
-              "box": [
-                0,
-                0,
-                1,
-                1
-              ],
-              "prompt": "Keep this exact scene, composition, camera framing and every object precisely where it is, and change ONLY where the falling water lands on the ways off this landing: Ladder up to the catwalk: unchanged — it stays exactly as it is, dry, with no water on or near it. Ladder down to the lower landing: its curtain is GONE — the stream has been turned aside into the tangle and out of sight — and its rungs run dry. THE LADDER ITSELF REMAINS, exactly where it stands in the unchanged picture and exactly as it is built: with the water taken away it is now plainly visible and dry along its whole length. It is NOT removed, NOT replaced by rock, moss, a wall, a stair or anything else, and nothing new is built in its place — the only difference is that you can now see it clearly. Rope bridge across the shaft: keeps its curtain exactly as it is. EXACTLY 1 fall of water drops free through open air in this picture — the curtain through the bridge — and NO OTHERS. Nothing else in the picture moves, changes, is added or is taken away — same scene, same camera, same objects, same light.",
-              "panorama": "station1/scene_wet_across_bridge.png"
-            }
-          ]
-        },
-        {
-          "id": "all_clear_wash",
-          "type": "ambient",
-          "label": "Nightfall",
-          "box": [
-            0,
-            0,
-            1,
-            1
-          ],
-          "note": "Full-scene state variant. `ambient` is filtered out of rendering, so this carrier shows no marker and intercepts no clicks; it exists only to hold the variant art.",
-          "variants": [
-            {
-              "state": "all_clear",
-              "box": [
-                0,
-                0,
-                1,
-                1
-              ],
-              "prompt": "Keep this exact scene, composition, camera framing, lighting and every object precisely where it is, and change ONLY the falling water, as follows.\n\nON THE LEFT-HAND SIDE of the picture, roughly a quarter of the way in from the left edge, a curtain of water falls from the timberwork overhead straight down through the gap in the floor where the timber ladder descends, between the two squat posts that flank that gap. THAT CURTAIN IS GONE. The stream has been turned aside into the tangle overhead and out of sight. In its place the gap stands open and empty, the ladder's rails and rungs run clear and DRY down into the dark below, the timberwork above it is merely wet, and you can see straight down the open shaft. No water falls there.\n\nThe rope-and-plank bridge on the right-hand side is already dry and stays exactly as it is.\n\nNO water falls free through open air ANYWHERE in this picture. Water may still lie on the flagstones and run in the copper chute, but nothing drops through the air. Nothing else in the picture moves, changes, is added or is taken away — same scene, same camera, same objects, same light.",
-              "panorama": "station1/scene_all_clear.png"
-            }
-          ]
-        },
-        {
           "id": "clip_all_clear",
           "type": "ambient",
           "label": "Scene motion (all_clear)",
@@ -1277,7 +1226,7 @@
         {
           "src": "audio/station1_oneshot_rock_splash.mp3",
           "mode": "interval",
-          "volume": 0.14,
+          "volume": 0.07,
           "gapMin": 11,
           "gapMax": 24
         },
@@ -1538,7 +1487,7 @@
           "inc": "rooms_solved"
         }
       ],
-      "designNote": "PUZZLE (verified). Dataset reliquary_phials. TYPE 4 PICK-THE-POINT (click the elbow) — for puzzle-type variety. The student plots within-cluster spread vs k and CLICKS the elbow. starterCode: reliquary_phials. pick.plotCode (WebR, ggiraph): wss <- sapply(1:6, function(k) kmeans(reliquary_phials[,c('clarity','mineral','resin','ash')], centers=k, nstart=25)$tot.withinss); df <- data.frame(k=1:6, wss=wss); p <- ggplot(df, aes(k, wss)) + geom_line() + ggiraph::geom_point_interactive(aes(data_id=k, tooltip=k), size=4) + labs(x='number of families (k)', y='within-cluster spread'). pick.prompt: 'Adding families always tightens the clusters a little — but only up to a point. Plot the within-cluster spread against k and click the ELBOW: the k past which more families barely help.' ANSWER: the point at k=3 (WSS 37689 -> 11667 -> 966 [elbow] -> 810 -> 661 -> 543; the drop collapses after 3). Solving UNLOCKS diverter S2 -> D2. Mid shaft. NEW ART.",
+      "designNote": "PUZZLE (verified). Dataset reliquary_phials. TYPE 4 PICK-THE-POINT (click the elbow) — for puzzle-type variety. The student asks runMatrixAnalysis() for the elbow data, plots it, and CLICKS the elbow. starterCode: reliquary_phials. The student's own plot is what gets rendered clickable (pick.idColumn = \"k\"); pick.plotCode is the reference/fallback copy of that code. THE ELBOW DATA COMES FROM THE COURSE VERB (added to phylochemistry.R 2026-09-30): runMatrixAnalysis(data = reliquary_phials, analysis = \"kmeans\", parameters = \"elbow\", columns_w_values_for_single_analyte = c('clarity','mineral','resin','ash'), columns_w_sample_ID_info = c('phial')) returns one row per k with columns k and within_cluster_variance. Before that option existed this room silently demanded a hand-rolled sapply over tot.withinss, which the book never teaches — see chapter 10, 'Choosing k'. ANSWER: the point at k=3 (within-cluster variance 37689 -> 11666 -> 966 [elbow] -> 810 -> 661 -> 543; the drop collapses after 3; pinned by phylochemistry/test_runMatrixAnalysis_elbow.R). Solving UNLOCKS diverter S2 -> D2. Mid shaft.",
       "plannedHotspots": [
         {
           "type": "ambient",
@@ -2288,19 +2237,20 @@
           "starterCode": "reliquary_phials",
           "pick": {
             "prompt": "Deeper down, the engine asks a harder question: not how big a kind is, but how many kinds there truly are. Split the phials into more and more families and each split tightens them a little &mdash; but only up to a point, after which another family buys almost nothing. How many families does this ledger really hold? Click that number.",
-            "plotCode": "wss <- sapply(1:6, function(k) kmeans(reliquary_phials[, c(\"clarity\", \"mineral\", \"resin\", \"ash\")], centers = k, nstart = 25)$tot.withinss)\ndf <- data.frame(k = 1:6, wss = wss)\np <- ggplot(df, aes(k, wss)) +\n     geom_line() +\n     ggiraph::geom_point_interactive(aes(data_id = k, tooltip = k), size = 4) +\n     labs(x = \"number of families (k)\", y = \"spread within families\")",
+            "plotCode": "elbow <- runMatrixAnalysis(\n    data = reliquary_phials,\n    analysis = \"kmeans\",\n    parameters = \"elbow\",\n    columns_w_values_for_single_analyte = c(\"clarity\", \"mineral\", \"resin\", \"ash\"),\n    columns_w_sample_ID_info = c(\"phial\")\n)\n\np <- ggplot(elbow, aes(x = k, y = within_cluster_variance)) +\n     geom_line() +\n     geom_point(size = 4)",
             "answer": "3",
             "width": 6,
             "height": 5,
             "maxAttempts": 4,
-            "hint": "Find where the line stops falling steeply and flattens out.",
+            "hint": "Find where the line stops falling steeply and flattens out &mdash; that bend is the elbow.",
             "idColumn": "k",
             "idNoun": "number of families",
             "feedback": {
               "correct": "Correct &mdash; noted in your field notebook: the ledger holds 3 families; past three, another family barely tightens the sort.",
               "wrong": [
-                "Each point is the total spread within the families (<code>tot.withinss</code> from <code>kmeans()</code> on the four essence measures) for one choice of how many families. Look for the bend &mdash; the elbow &mdash; where the big drops stop.",
-                "Not where the spread is smallest (it always shrinks as you add families) and not at one family: pick the point after which the line goes nearly flat."
+                "Ask the console for the elbow itself: <code>runMatrixAnalysis(data = reliquary_phials, analysis = &quot;kmeans&quot;, parameters = &quot;elbow&quot;, columns_w_values_for_single_analyte = c(&quot;clarity&quot;, &quot;mineral&quot;, &quot;resin&quot;, &quot;ash&quot;), columns_w_sample_ID_info = c(&quot;phial&quot;))</code>. It hands back one row per candidate number of families &mdash; <code>k</code> and <code>within_cluster_variance</code>. Plot the second against the first, assign the plot to <code>p</code>, and draw it.",
+                "Each point is the total spread left inside the families once the phials are sorted that many ways. It always shrinks as you add families, so the smallest value is never the answer. Look for the BEND &mdash; where the big drops stop and the line goes nearly flat.",
+                "Not one family, and not the far end of the line. Pick the point just after the last steep fall &mdash; the number of families past which another one buys you almost nothing."
               ]
             }
           },
@@ -2315,10 +2265,10 @@
           "type": "dial",
           "label": "The S2 diverter lever",
           "box": [
-            0.51,
-            0.532,
-            0.55,
-            0.628
+            0.544,
+            0.5392,
+            0.584,
+            0.6352
           ],
           "key": "d2",
           "states": [
@@ -2336,7 +2286,7 @@
           },
           "lockedBody": "The lever will not move. Whatever holds it is waiting on the reading at this landing's console.",
           "hint": "Throw it, and somewhere below the water changes its course.",
-          "boxSource": "draft:localizer"
+          "boxSource": "moved:testplay"
         },
         {
           "id": "up_ladder",
@@ -2473,131 +2423,6 @@
           }
         },
         {
-          "id": "wet_descent_wash",
-          "type": "ambient",
-          "label": "Nightfall",
-          "box": [
-            0,
-            0,
-            1,
-            1
-          ],
-          "note": "Full-scene state variant. `ambient` is filtered out of rendering, so this carrier shows no marker and intercepts no clicks; it exists only to hold the variant art.",
-          "variants": [
-            {
-              "state": "wet_descent",
-              "box": [
-                0,
-                0,
-                1,
-                1
-              ],
-              "prompt": "Keep this exact scene, composition, camera framing and every object precisely where it is, and change ONLY where the falling water lands on the ways off this landing: Ladder up to the junction: unchanged — it stays exactly as it is, dry, with no water on or near it. The long descent to the drowned floor: keeps its curtain exactly as it is. Rope bridge across to the cast-off gallery: its curtain is GONE — the stream has been turned aside into the tangle and out of sight — and its planks run dry. THE BRIDGE ITSELF REMAINS, exactly where it stands in the unchanged picture and exactly as it is built: with the water taken away it is now plainly visible and dry along its whole length. It is NOT removed, NOT replaced by rock, moss, a wall, a stair or anything else, and nothing new is built in its place — the only difference is that you can now see it clearly. EXACTLY 1 fall of water drops free through open air in this picture — the curtain through the long descent — and NO OTHERS. Nothing else in the picture moves, changes, is added or is taken away — same scene, same camera, same objects, same light.",
-              "panorama": "station2/scene_wet_descent.png"
-            }
-          ]
-        },
-        {
-          "id": "wet_descent_up_ladder_wash",
-          "type": "ambient",
-          "label": "Nightfall",
-          "box": [
-            0,
-            0,
-            1,
-            1
-          ],
-          "note": "Full-scene state variant. `ambient` is filtered out of rendering, so this carrier shows no marker and intercepts no clicks; it exists only to hold the variant art.",
-          "variants": [
-            {
-              "state": "wet_descent_up_ladder",
-              "box": [
-                0,
-                0,
-                1,
-                1
-              ],
-              "prompt": "Keep this exact scene, composition, camera framing and every object precisely where it is, and change ONLY where the falling water lands on the ways off this landing: Ladder up to the junction: a curtain of water — one of the well's 2 streams — now drops out of the tangle overhead and comes down THROUGH it, so its rungs are plainly BEHIND the water and nothing could cross it. The long descent to the drowned floor: keeps its curtain exactly as it is. Rope bridge across to the cast-off gallery: its curtain is GONE — the stream has been turned aside into the tangle and out of sight — and its planks run dry. THE BRIDGE ITSELF REMAINS, exactly where it stands in the unchanged picture and exactly as it is built: with the water taken away it is now plainly visible and dry along its whole length. It is NOT removed, NOT replaced by rock, moss, a wall, a stair or anything else, and nothing new is built in its place — the only difference is that you can now see it clearly. EXACTLY 2 falls of water drop free through open air in this picture — the curtain through the long descent, the curtain through the ladder going up — and NO OTHERS. Nothing else in the picture moves, changes, is added or is taken away — same scene, same camera, same objects, same light.",
-              "panorama": "station2/scene_wet_descent_up_ladder.png"
-            }
-          ]
-        },
-        {
-          "id": "all_clear_wash",
-          "type": "ambient",
-          "label": "Nightfall",
-          "box": [
-            0,
-            0,
-            1,
-            1
-          ],
-          "note": "Full-scene state variant. `ambient` is filtered out of rendering, so this carrier shows no marker and intercepts no clicks; it exists only to hold the variant art.",
-          "variants": [
-            {
-              "state": "all_clear",
-              "box": [
-                0,
-                0,
-                1,
-                1
-              ],
-              "prompt": "Keep this exact scene, composition, camera framing and every object precisely where it is, and change ONLY where the falling water lands on the ways off this landing: Ladder up to the junction: unchanged — it stays exactly as it is, dry, with no water on or near it. The long descent to the drowned floor: its curtain is GONE — the stream has been turned aside into the tangle and out of sight — and its rungs run dry. THE LADDER ITSELF REMAINS, exactly where it stands in the unchanged picture and exactly as it is built: with the water taken away it is now plainly visible and dry along its whole length. It is NOT removed, NOT replaced by rock, moss, a wall, a stair or anything else, and nothing new is built in its place — the only difference is that you can now see it clearly. Rope bridge across to the cast-off gallery: its curtain is GONE — the stream has been turned aside into the tangle and out of sight — and its planks run dry. THE BRIDGE ITSELF REMAINS, exactly where it stands in the unchanged picture and exactly as it is built: with the water taken away it is now plainly visible and dry along its whole length. It is NOT removed, NOT replaced by rock, moss, a wall, a stair or anything else, and nothing new is built in its place — the only difference is that you can now see it clearly. NO water falls free through open air anywhere in this picture. Nothing else in the picture moves, changes, is added or is taken away — same scene, same camera, same objects, same light.",
-              "panorama": "station2/scene_all_clear.png"
-            }
-          ]
-        },
-        {
-          "id": "wet_across_bridge_wash",
-          "type": "ambient",
-          "label": "Nightfall",
-          "box": [
-            0,
-            0,
-            1,
-            1
-          ],
-          "note": "Full-scene state variant. `ambient` is filtered out of rendering, so this carrier shows no marker and intercepts no clicks; it exists only to hold the variant art.",
-          "variants": [
-            {
-              "state": "wet_across_bridge",
-              "box": [
-                0,
-                0,
-                1,
-                1
-              ],
-              "prompt": "Keep this exact scene, composition, camera framing, lighting and every object precisely where it is, and change ONLY the falling water, as follows.\n\nIN THE MIDDLE-LEFT of the picture, between the two squat timber posts that flank the gap in the landing's floor, a LONG TIMBER LADDER drops from the lip of that gap straight down the wall to the drowned floor far below. THAT LADDER MUST STILL BE THERE, exactly where it stands and exactly as it is built — two long side rails with round rungs set between them, and nothing else: no planks, no decking, no steps, no slatted panel, no stone stair. Do NOT paint rock, moss, wall or floor over it. Do NOT replace it with anything.\n\nWhat changes is only the water at that spot: the heavy column of water that was pouring down THROUGH that ladder is GONE, turned aside into the tangle overhead and out of sight. With the water taken away the ladder is now plainly visible along its whole length and DRY, the gap beside it stands open, and you can see down the shaft into the dark.\n\nON THE RIGHT-HAND SIDE, the rope-and-plank bridge keeps its curtain of water falling through it exactly as it is — do not touch it.\n\nEXACTLY 1 fall of water drops free through open air in this picture: the curtain through the bridge on the right, and NO OTHERS. Nothing else in the picture moves, changes, is added or is taken away — same scene, same camera, same objects, same light.",
-              "panorama": "station2/scene_wet_across_bridge.png"
-            }
-          ]
-        },
-        {
-          "id": "wet_up_ladder_wash",
-          "type": "ambient",
-          "label": "Nightfall",
-          "box": [
-            0,
-            0,
-            1,
-            1
-          ],
-          "note": "Full-scene state variant. `ambient` is filtered out of rendering, so this carrier shows no marker and intercepts no clicks; it exists only to hold the variant art.",
-          "variants": [
-            {
-              "state": "wet_up_ladder",
-              "box": [
-                0,
-                0,
-                1,
-                1
-              ],
-              "prompt": "Keep this exact scene, composition, camera framing and every object precisely where it is, and change ONLY where the falling water lands on the ways off this landing: Ladder up to the junction: a curtain of water — one of the well's 2 streams — now drops out of the tangle overhead and comes down THROUGH it, so its rungs are plainly BEHIND the water and nothing could cross it. The long descent to the drowned floor: its curtain is GONE — the stream has been turned aside into the tangle and out of sight — and its rungs run dry. THE LADDER ITSELF REMAINS, exactly where it stands in the unchanged picture and exactly as it is built: with the water taken away it is now plainly visible and dry along its whole length. It is NOT removed, NOT replaced by rock, moss, a wall, a stair or anything else, and nothing new is built in its place — the only difference is that you can now see it clearly. Rope bridge across to the cast-off gallery: its curtain is GONE — the stream has been turned aside into the tangle and out of sight — and its planks run dry. THE BRIDGE ITSELF REMAINS, exactly where it stands in the unchanged picture and exactly as it is built: with the water taken away it is now plainly visible and dry along its whole length. It is NOT removed, NOT replaced by rock, moss, a wall, a stair or anything else, and nothing new is built in its place — the only difference is that you can now see it clearly. EXACTLY 1 fall of water drops free through open air in this picture — the curtain through the ladder going up — and NO OTHERS. Nothing else in the picture moves, changes, is added or is taken away — same scene, same camera, same objects, same light.",
-              "panorama": "station2/scene_wet_up_ladder.png"
-            }
-          ]
-        },
-        {
           "id": "clip_all_clear",
           "type": "ambient",
           "label": "Scene motion (all_clear)",
@@ -2729,9 +2554,9 @@
           "gapMax": 24
         },
         {
-          "src": "audio/catwalk_oneshot_well_stone.mp3",
+          "src": "audio/catwalk_oneshot_stone_water.mp3",
           "mode": "interval",
-          "volume": 0.4,
+          "volume": 0.39,
           "gapMin": 17,
           "gapMax": 36
         }
@@ -3277,31 +3102,6 @@
           }
         },
         {
-          "id": "all_clear_wash",
-          "type": "ambient",
-          "label": "Nightfall",
-          "box": [
-            0,
-            0,
-            1,
-            1
-          ],
-          "note": "Full-scene state variant. `ambient` is filtered out of rendering, so this carrier shows no marker and intercepts no clicks; it exists only to hold the variant art.",
-          "variants": [
-            {
-              "state": "all_clear",
-              "box": [
-                0,
-                0,
-                1,
-                1
-              ],
-              "prompt": "Keep this exact scene, composition, camera framing and every object precisely where it is, and change ONLY where the falling water lands on the ways off this landing: Ladder down to the drowned sump: its curtain is GONE — the stream has been turned aside into the tangle and out of sight — and its rungs run dry. THE LADDER ITSELF REMAINS, exactly where it stands in the unchanged picture and exactly as it is built: with the water taken away it is now plainly visible and dry along its whole length. It is NOT removed, NOT replaced by rock, moss, a wall, a stair or anything else, and nothing new is built in its place — the only difference is that you can now see it clearly. Rope bridge back across to the second landing: unchanged — it stays exactly as it is, dry, with no water on or near it. NO water falls free through open air anywhere in this picture. Nothing else in the picture moves, changes, is added or is taken away — same scene, same camera, same objects, same light.",
-              "panorama": "spillway/scene_all_clear.png"
-            }
-          ]
-        },
-        {
           "id": "clip_all_clear",
           "type": "ambient",
           "label": "Scene motion (all_clear)",
@@ -3340,7 +3140,7 @@
         {
           "src": "audio/spillway_oneshot_drain_glug.mp3",
           "mode": "interval",
-          "volume": 0.45,
+          "volume": 0.15,
           "gapMin": 11,
           "gapMax": 24
         },
@@ -3897,7 +3697,7 @@
           "note": "TYPE 3 console-check: answer == 6 (size of the highest-mean-resin family)",
           "starterCode": "reliquary_phials",
           "check": {
-            "prompt": "This font measures as well as sorts. The Assay prized resin above every other essence, and kept one family of phials apart for having the most of it. Sort the phials into their three families on the four essence measures, find the family richest in resin on average, and assign the number of phials in that family to an object called <code>answer</code>. Then click \"Check my answer\".",
+            "prompt": "This font measures as well as sorts. The Assay prized resin above every other essence, and kept one family of phials apart for having the most of it. Using k-means, cluster the phials into their three families on the four essence measures, find the family richest in resin on average, and assign the number of phials in that family to an object called answer. Then click \"Check my answer\".",
             "requires": [
               "answer"
             ],
@@ -4179,7 +3979,7 @@
           ],
           "starterCode": "reliquary_phials",
           "check": {
-            "prompt": "This font measures as well as sorts. The Assay prized resin above every other essence, and kept one family of phials apart for having the most of it. Sort the phials into their three families on the four essence measures, find the family richest in resin on average, and assign the number of phials in that family to an object called <code>answer</code>. Then click \"Check my answer\".",
+            "prompt": "This font measures as well as sorts. The Assay prized resin above every other essence, and kept one family of phials apart for having the most of it. Using k-means, cluster the phials into their three families on the four essence measures, find the family richest in resin on average, and assign the number of phials in that family to an object called answer. Then click \"Check my answer\".",
             "requires": [
               "answer"
             ],
@@ -4206,10 +4006,10 @@
           "type": "dial",
           "label": "The S3 diverter lever",
           "box": [
-            0.584,
-            0.536,
-            0.616,
-            0.6
+            0.6242,
+            0.4981,
+            0.6562,
+            0.5621
           ],
           "key": "d3",
           "states": [
@@ -4227,7 +4027,7 @@
           },
           "lockedBody": "The lever will not move. Whatever holds it is waiting on the reading at this landing's console.",
           "hint": "Throw it, and somewhere below the water changes its course.",
-          "boxSource": "draft:localizer"
+          "boxSource": "moved:testplay"
         },
         {
           "id": "back_bridge",
@@ -4265,10 +4065,10 @@
           "type": "door",
           "label": "Rope bridge across to the engine-hall",
           "box": [
-            0.777,
-            0.372,
-            0.873,
-            0.756
+            0.784,
+            0.1363,
+            0.88,
+            0.5203
           ],
           "direction": "open",
           "to": "boss",
@@ -4279,7 +4079,7 @@
             ]
           },
           "lockedBody": "Water is pouring straight across it. Nothing crosses while it runs — the stream has to be sent somewhere else first.",
-          "boxSource": "draft:localizer"
+          "boxSource": "moved:testplay"
         },
         {
           "id": "clip_base",
@@ -4301,31 +4101,6 @@
             ],
             "video": "station3/cine_base.mp4"
           }
-        },
-        {
-          "id": "wet_back_bridge_wash",
-          "type": "ambient",
-          "label": "Nightfall",
-          "box": [
-            0,
-            0,
-            1,
-            1
-          ],
-          "note": "Full-scene state variant. `ambient` is filtered out of rendering, so this carrier shows no marker and intercepts no clicks; it exists only to hold the variant art.",
-          "variants": [
-            {
-              "state": "wet_back_bridge",
-              "box": [
-                0,
-                0,
-                1,
-                1
-              ],
-              "prompt": "Keep this exact scene, composition, camera framing and every object precisely where it is, and change ONLY where the falling water lands on the ways off this landing: Rope bridge across to the junction: a curtain of water — one of the well's 2 streams — now drops out of the tangle overhead and comes down THROUGH it, so its planks are plainly BEHIND the water and nothing could cross it. Rope bridge across to the engine-hall: its curtain is GONE — the stream has been turned aside into the tangle and out of sight — and its planks run dry. THE BRIDGE ITSELF REMAINS, exactly where it stands in the unchanged picture and exactly as it is built: with the water taken away it is now plainly visible and dry along its whole length. It is NOT removed, NOT replaced by rock, moss, a wall, a stair or anything else, and nothing new is built in its place — the only difference is that you can now see it clearly. EXACTLY 1 fall of water drops free through open air in this picture — the curtain through the bridge to the junction — and NO OTHERS. Nothing else in the picture moves, changes, is added or is taken away — same scene, same camera, same objects, same light.",
-              "panorama": "station3/scene_wet_back_bridge.png"
-            }
-          ]
         },
         {
           "id": "clip_wet_back_bridge",
@@ -4500,7 +4275,7 @@
           "note": "scale() all 5 then kmeans(k=3): Jasper's family-mate = Selenite (decoy Antimony = unscaled)",
           "starterCode": "reliquary_phials",
           "question": {
-            "prompt": "The engine-hall's console will turn the great wheel only for a complete sort. Here the Assay hand you everything they ever measured &mdash; the four essences and the weight of every phial besides &mdash; and demand the phials be sorted into their three families on all five at once. The console names a single phial, Jasper, and asks which of the others truly belongs in its family.",
+            "prompt": "The engine-hall's console will turn the great wheel only for a complete sort. Here the Assay hand you everything they ever measured — the four essences and the weight of every phial besides — and demand the phials be sorted into their three families on all five at once. The console names a single phial, Jasper, and asks which of the others, after the described clustering, truly belongs in its family.",
             "options": [
               "Antimony",
               "Galena",
@@ -4612,7 +4387,7 @@
           ],
           "starterCode": "reliquary_phials",
           "question": {
-            "prompt": "The engine-hall's console will turn the great wheel only for a complete sort. Here the Assay hand you everything they ever measured &mdash; the four essences and the weight of every phial besides &mdash; and demand the phials be sorted into their three families on all five at once. The console names a single phial, Jasper, and asks which of the others truly belongs in its family.",
+            "prompt": "The engine-hall's console will turn the great wheel only for a complete sort. Here the Assay hand you everything they ever measured — the four essences and the weight of every phial besides — and demand the phials be sorted into their three families on all five at once. The console names a single phial, Jasper, and asks which of the others, after the described clustering, truly belongs in its family.",
             "options": [
               "Antimony",
               "Galena",
@@ -4671,10 +4446,10 @@
           "type": "door",
           "label": "Rope bridge back across to the gallery",
           "box": [
-            0.08,
-            0.3,
-            0.2,
-            0.72
+            0.0886,
+            0.2899,
+            0.2086,
+            0.7099
           ],
           "direction": "open",
           "to": "station3",
@@ -4685,7 +4460,7 @@
             ]
           },
           "lockedBody": "Water is pouring straight across it. Nothing crosses while it runs — the stream has to be sent somewhere else first.",
-          "boxSource": "review:agent"
+          "boxSource": "moved:testplay"
         },
         {
           "id": "clip_base",
@@ -5442,15 +5217,15 @@
           "type": "door",
           "label": "The open vault — take the Wellheart",
           "box": [
-            0.7745,
-            0.1896,
-            0.8867,
-            0.8
+            0.7582,
+            0.1922,
+            0.8704,
+            0.8026
           ],
           "direction": "forward",
           "requires": "frame",
           "endsEscape": true,
-          "boxSource": "draft:localizer"
+          "boxSource": "moved:testplay"
         },
         {
           "id": "clip_base",
@@ -5588,26 +5363,26 @@
         {
           "src": "audio/basin_bed_cave_ambience.mp3",
           "mode": "loop",
-          "volume": 0.45,
+          "volume": 0.09,
           "crossfade": 4
         },
         {
           "src": "audio/basin_bed_waves_in_cavity.mp3",
           "mode": "loop",
-          "volume": 0.26,
+          "volume": 0.09,
           "crossfade": 4
         },
         {
           "src": "audio/basin_oneshot_single_drop.mp3",
           "mode": "interval",
-          "volume": 0.45,
+          "volume": 0.25,
           "gapMin": 11,
           "gapMax": 24
         },
         {
           "src": "audio/basin_oneshot_big_plop.mp3",
           "mode": "interval",
-          "volume": 0.4,
+          "volume": 0.26,
           "gapMin": 17,
           "gapMax": 36
         }

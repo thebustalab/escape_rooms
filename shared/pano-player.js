@@ -70,14 +70,14 @@
 // A bare `./variant_resolve.js` import is NOT refreshed by bumping the <script> tag's ?v, so a changed
 // helper module (e.g. a new export) leaves browsers on a stale cached copy → "doesn't provide an export
 // named X" SyntaxError → blank page (the 2026-08-05 airship regression). Bump all three together.
-import { WebRConsole } from "./webr-console.js?v=116";
-import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers } from "./variant_resolve.js?v=116";   // Phase 3: per-hotspot state variants; monorail switch-door nav
-import * as PQ from "./puzzle_queue.js?v=116";   // dynamic puzzle queue: location-independent puzzle serving
-import * as CP from "./corr_panel.js?v=116";   // lower-triangle layout of the grid gate (clouds correlation panel)
-import { particleCount } from "./particles.js?v=116";   // ambient-particle vocabulary + per-kind field density
-import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=116";
-import { condHolds } from "./cond.js?v=116";   // ledger + elevation-map card DOM
-import * as RIDE from "./ride.js?v=116";   // THE RIDE (subway): express lever + clip-sequence planner
+import { WebRConsole } from "./webr-console.js?v=117";
+import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers } from "./variant_resolve.js?v=117";   // Phase 3: per-hotspot state variants; monorail switch-door nav
+import * as PQ from "./puzzle_queue.js?v=117";   // dynamic puzzle queue: location-independent puzzle serving
+import * as CP from "./corr_panel.js?v=117";   // lower-triangle layout of the grid gate (clouds correlation panel)
+import { particleCount } from "./particles.js?v=117";   // ambient-particle vocabulary + per-kind field density
+import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=117";
+import { condHolds } from "./cond.js?v=117";   // ledger + elevation-map card DOM
+import * as RIDE from "./ride.js?v=117";   // THE RIDE (subway): express lever + clip-sequence planner
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 
@@ -3238,6 +3238,7 @@ function openElevmap(h) {
 function solveRoom(result, h, qIndex) {
   // Which doors were ALREADY open, so the toast below can tell whether this solve opened anything.
   const openBefore = openDoorIds(room);
+  const justSolved = !!(h && h.id && !solvedGates.has(gateKey(room.key, h.id)));   // first solve of THIS gate
   if (h && h.id) solvedGates.add(gateKey(room.key, h.id));
   // DYNAMIC QUEUE: record against the ladder rung, not the room. Do this BEFORE the completion
   // check below, which asks the queue whether the objective is finished.
@@ -3267,6 +3268,16 @@ function solveRoom(result, h, qIndex) {
     if (firstSolve) applyEffects(room.onSolve);        // world-state effects once (don't double-inc)
     solved = true;
   }
+  // PER-GATE world-state effects (2026-09-29). `room.onSolve` fires only for the PRIMARY gate, so a
+  // SECONDARY gate — heist's keypad locks, which sit beside the graded puzzle and open the door with it
+  // — could change nothing about the world. That made a whole class of state art unreachable: a variant
+  // `when` can test {solved: roomKey} (the primary) and {eq:[key,value]} (a dial), and a lock could feed
+  // neither, so "the door is open" was inexpressible as a world state and door-open art had to fall back
+  // to the per-door `openImage` compositor, which cannot animate. A gate now carries the SAME `onSolve`
+  // grammar clues already have on `onPickup` and doors on `onPass` ({set,to} / {inc,by}).
+  // Guarded on firstGateSolve so a re-entered gate cannot double-increment a counter; `solvedGates` was
+  // already written above, so `justSolved` is captured before that.
+  if (justSolved && h && h.onSolve) applyEffects(Array.isArray(h.onSolve) ? h.onSolve : [h.onSolve]);
   updateMotif();                                       // story-motif HUD (e.g. the lesion spreads)
   updateEnvironment();                                 // progressive heel lists further; sickness dim deepens/clears
   const openState = portalUnlocked(room);   // see startRoom: follow the forward door's actual open state (handles a door gated on a secondary lock)
