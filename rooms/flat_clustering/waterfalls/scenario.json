@@ -624,7 +624,7 @@
             "feedback": {
               "correct": "Correct &mdash; noted in your field notebook: sorted three ways on clarity, mineral, resin and ash, the largest family of phials holds 10.",
               "wrong": [
-                "Run <code>kmeans()</code> on the four essence columns only (<code>clarity</code>, <code>mineral</code>, <code>resin</code>, <code>ash</code>) with <code>centers = 3</code> and a generous <code>nstart</code>, then count the phials in each family with <code>table()</code> on the <code>$cluster</code> result.",
+                "Ask the console to cluster for you: <code>runMatrixAnalysis(data = reliquary_phials, analysis = &quot;kmeans&quot;, parameters = 3, columns_w_values_for_single_analyte = c(&quot;clarity&quot;, &quot;mineral&quot;, &quot;resin&quot;, &quot;ash&quot;), columns_w_sample_ID_info = c(&quot;phial&quot;))</code>. It hands back one row per phial with its cluster number &mdash; then count how many phials carry each number (<code>count(cluster)</code> or <code>table()</code> will do it).",
                 "Leave <code>weight</code> and the phial names out &mdash; the question is about the four essence measures. And you want three families, not two.",
                 "You want the number of phials in the biggest of the three families &mdash; not the number of families, and not the whole ledger."
               ]
@@ -1017,7 +1017,7 @@
             "feedback": {
               "correct": "Correct &mdash; noted in your field notebook: sorted three ways on clarity, mineral, resin and ash, the largest family of phials holds 10.",
               "wrong": [
-                "Run <code>kmeans()</code> on the four essence columns only (<code>clarity</code>, <code>mineral</code>, <code>resin</code>, <code>ash</code>) with <code>centers = 3</code> and a generous <code>nstart</code>, then count the phials in each family with <code>table()</code> on the <code>$cluster</code> result.",
+                "Ask the console to cluster for you: <code>runMatrixAnalysis(data = reliquary_phials, analysis = &quot;kmeans&quot;, parameters = 3, columns_w_values_for_single_analyte = c(&quot;clarity&quot;, &quot;mineral&quot;, &quot;resin&quot;, &quot;ash&quot;), columns_w_sample_ID_info = c(&quot;phial&quot;))</code>. It hands back one row per phial with its cluster number &mdash; then count how many phials carry each number (<code>count(cluster)</code> or <code>table()</code> will do it).",
                 "Leave <code>weight</code> and the phial names out &mdash; the question is about the four essence measures. And you want three families, not two.",
                 "You want the number of phials in the biggest of the three families &mdash; not the number of families, and not the whole ledger."
               ]
@@ -3706,8 +3706,8 @@
             "feedback": {
               "correct": "Correct &mdash; noted in your field notebook: the resin-rich family is the smallest, 6 phials, averaging about 68 resin against 28 and 22 for the others.",
               "wrong": [
-                "Start as before: <code>km &lt;- kmeans(reliquary_phials[, c(\"clarity\", \"mineral\", \"resin\", \"ash\")], centers = 3, nstart = 25)</code>. Then attach <code>km$cluster</code> to the data as a column so each phial knows its family.",
-                "Group by that family column and take <code>mean(resin)</code> in each; one family sits far above the other two.",
+                "Start as before, asking the console for three clusters on the four essence measures: <code>runMatrixAnalysis(data = reliquary_phials, analysis = &quot;kmeans&quot;, parameters = 3, columns_w_values_for_single_analyte = c(&quot;clarity&quot;, &quot;mineral&quot;, &quot;resin&quot;, &quot;ash&quot;), columns_w_sample_ID_info = c(&quot;phial&quot;))</code>. The result already carries each phial's cluster number beside its original measures, so there is nothing to join back.",
+                "Group by <code>cluster</code> and take <code>mean(resin)</code> in each (<code>group_by()</code> then <code>summarize()</code>); one family sits far above the other two.",
                 "<code>answer</code> is the COUNT of phials in the resin-richest family &mdash; not its average resin and not its family number (those numbers change between runs)."
               ]
             }
@@ -3988,8 +3988,8 @@
             "feedback": {
               "correct": "Correct &mdash; noted in your field notebook: the resin-rich family is the smallest, 6 phials, averaging about 68 resin against 28 and 22 for the others.",
               "wrong": [
-                "Start as before: <code>km &lt;- kmeans(reliquary_phials[, c(\"clarity\", \"mineral\", \"resin\", \"ash\")], centers = 3, nstart = 25)</code>. Then attach <code>km$cluster</code> to the data as a column so each phial knows its family.",
-                "Group by that family column and take <code>mean(resin)</code> in each; one family sits far above the other two.",
+                "Start as before, asking the console for three clusters on the four essence measures: <code>runMatrixAnalysis(data = reliquary_phials, analysis = &quot;kmeans&quot;, parameters = 3, columns_w_values_for_single_analyte = c(&quot;clarity&quot;, &quot;mineral&quot;, &quot;resin&quot;, &quot;ash&quot;), columns_w_sample_ID_info = c(&quot;phial&quot;))</code>. The result already carries each phial's cluster number beside its original measures, so there is nothing to join back.",
+                "Group by <code>cluster</code> and take <code>mean(resin)</code> in each (<code>group_by()</code> then <code>summarize()</code>); one family sits far above the other two.",
                 "<code>answer</code> is the COUNT of phials in the resin-richest family &mdash; not its average resin and not its family number (those numbers change between runs)."
               ]
             }
@@ -4272,9 +4272,9 @@
           "type": "puzzle",
           "label": "The master console",
           "note": "scale() all 5 then kmeans(k=3): Jasper's family-mate = Selenite (decoy Antimony = unscaled)",
-          "starterCode": "reliquary_phials",
+          "starterCode": "runMatrixAnalysis(\n    data = reliquary_phials,\n    analysis = \"kmeans\",\n    parameters = 3,\n    columns_w_values_for_single_analyte = c(\"clarity\", \"mineral\", \"resin\", \"ash\", \"weight\"),\n    columns_w_sample_ID_info = \"phial\",\n    scale_variance = FALSE\n)",
           "question": {
-            "prompt": "The engine-hall's console will turn the great wheel only for a complete sort. Here the Assay hand you everything they ever measured — the four essences and the weight of every phial besides — and demand the phials be sorted into their three families on all five at once. The console names a single phial, Jasper, and asks which of the others, after the described clustering, truly belongs in its family.",
+            "prompt": "The engine-hall's console will turn the great wheel only for a complete sort. Here the Assay hand you everything they ever measured — the four essences and the weight of every phial besides — and demand the phials be sorted into their three families on all five at once. A draft of that sort has been left on the console. The console names a single phial, Jasper, and asks which of the others truly belongs in its family.",
             "options": [
               "Antimony",
               "Galena",
@@ -4288,9 +4288,9 @@
             "feedback": {
               "correct": "Correct &mdash; noted in your field notebook: with every measure on an equal footing, Jasper falls with Selenite, its true kin.",
               "wrong": [
-                "Cluster on all five measures &mdash; <code>clarity</code>, <code>mineral</code>, <code>resin</code>, <code>ash</code> and <code>weight</code> &mdash; into three families with <code>kmeans()</code> and a generous <code>nstart</code>, then list the phials in Jasper's family.",
-                "Look at the numbers before you trust the sort. Weight is counted in grains and runs into the thousands; the essences run in tens. Clustered as they stand, weight alone decides every family and Jasper simply lands among the phials closest to it in weight. Put every measure on the same footing first &mdash; <code>scale()</code> the five columns &mdash; and cluster that.",
-                "Once scaled, read off Jasper's family number and see which of the offered phials carries the same one. Only one of them does."
+                "A draft sort is already on the console. Run it, then list the phials that share Jasper's cluster number. Check that it is clustering all five measures &mdash; <code>clarity</code>, <code>mineral</code>, <code>resin</code>, <code>ash</code> and <code>weight</code> &mdash; into three families.",
+                "Look at the numbers before you trust the sort. Weight is counted in grains and runs into the thousands; the essences run in tens. K-means works from distances, so a column in big numbers decides every family on its own, and Jasper simply lands among the phials closest to it in weight. Read the last line of the draft: <code>scale_variance = FALSE</code> tells the console to cluster the numbers exactly as they stand. Which way should that setting go when the columns are in such different units?",
+                "Once every measure is on the same footing, read off Jasper's family number and see which of the offered phials carries the same one. Only one of them does."
               ]
             }
           },
@@ -4384,9 +4384,9 @@
             0.58,
             0.7
           ],
-          "starterCode": "reliquary_phials",
+          "starterCode": "runMatrixAnalysis(\n    data = reliquary_phials,\n    analysis = \"kmeans\",\n    parameters = 3,\n    columns_w_values_for_single_analyte = c(\"clarity\", \"mineral\", \"resin\", \"ash\", \"weight\"),\n    columns_w_sample_ID_info = \"phial\",\n    scale_variance = FALSE\n)",
           "question": {
-            "prompt": "The engine-hall's console will turn the great wheel only for a complete sort. Here the Assay hand you everything they ever measured — the four essences and the weight of every phial besides — and demand the phials be sorted into their three families on all five at once. The console names a single phial, Jasper, and asks which of the others, after the described clustering, truly belongs in its family.",
+            "prompt": "The engine-hall's console will turn the great wheel only for a complete sort. Here the Assay hand you everything they ever measured — the four essences and the weight of every phial besides — and demand the phials be sorted into their three families on all five at once. A draft of that sort has been left on the console. The console names a single phial, Jasper, and asks which of the others truly belongs in its family.",
             "options": [
               "Antimony",
               "Galena",
@@ -4400,9 +4400,9 @@
             "feedback": {
               "correct": "Correct &mdash; noted in your field notebook: with every measure on an equal footing, Jasper falls with Selenite, its true kin.",
               "wrong": [
-                "Cluster on all five measures &mdash; <code>clarity</code>, <code>mineral</code>, <code>resin</code>, <code>ash</code> and <code>weight</code> &mdash; into three families with <code>kmeans()</code> and a generous <code>nstart</code>, then list the phials in Jasper's family.",
-                "Look at the numbers before you trust the sort. Weight is counted in grains and runs into the thousands; the essences run in tens. Clustered as they stand, weight alone decides every family and Jasper simply lands among the phials closest to it in weight. Put every measure on the same footing first &mdash; <code>scale()</code> the five columns &mdash; and cluster that.",
-                "Once scaled, read off Jasper's family number and see which of the offered phials carries the same one. Only one of them does."
+                "A draft sort is already on the console. Run it, then list the phials that share Jasper's cluster number. Check that it is clustering all five measures &mdash; <code>clarity</code>, <code>mineral</code>, <code>resin</code>, <code>ash</code> and <code>weight</code> &mdash; into three families.",
+                "Look at the numbers before you trust the sort. Weight is counted in grains and runs into the thousands; the essences run in tens. K-means works from distances, so a column in big numbers decides every family on its own, and Jasper simply lands among the phials closest to it in weight. Read the last line of the draft: <code>scale_variance = FALSE</code> tells the console to cluster the numbers exactly as they stand. Which way should that setting go when the columns are in such different units?",
+                "Once every measure is on the same footing, read off Jasper's family number and see which of the offered phials carries the same one. Only one of them does."
               ]
             }
           },
