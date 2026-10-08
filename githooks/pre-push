@@ -122,26 +122,24 @@ fi
 
 # ---------------------------------------------------------------- job 3: credential / private-path scan
 # Located from the repo root, same reasoning as the GATE lookup above (the hook is a symlink, so
-# dirname "$0" would resolve inside .git/hooks, not here).
+# dirname "$0" would resolve inside .git/hooks, not here). scan_diff.py --push walks every commit
+# in the range (added lines as path:line @commit, binary blobs, file names, commit/tag messages)
+# and fails closed when the range can't be computed; a missing scanner blocks too.
+# Regression test: python3 githooks/test_scan_diff.py.
 if [ "${SKIP_SECRET_SCAN:-}" = "1" ]; then
     echo "pre-push: secret scan skipped (SKIP_SECRET_SCAN=1)" >&2
 else
     SCANNER="$(git rev-parse --show-toplevel 2>/dev/null || pwd)/githooks/scan_diff.py"
     ZERO=0000000000000000000000000000000000000000
-    EMPTY_TREE=4b825dc642cb6eb9a060e54bf8d69288fbee4904
-    if [ -f "$SCANNER" ]; then
+    if [ ! -f "$SCANNER" ]; then
+        echo "pre-push: BLOCKED — githooks/scan_diff.py is missing, so nothing can be scanned." >&2
+        echo "Restore it (git checkout -- githooks/scan_diff.py) or bypass with SKIP_SECRET_SCAN=1." >&2
+        status=1
+    else
         while read -r local_ref local_sha remote_ref remote_sha; do
             [ -z "${local_sha:-}" ] && continue
             [ "$local_sha" = "$ZERO" ] && continue          # deleting a ref
-
-            base="${remote_sha:-$ZERO}"
-            if [ "$base" = "$ZERO" ]; then
-                base="$EMPTY_TREE"   # new branch — diff the whole thing as additions
-            fi
-
-            if ! git diff --unified=0 "$base" "$local_sha" 2>/dev/null | python3 "$SCANNER"; then
-                status=1
-            fi
+            python3 "$SCANNER" --push "$local_sha" "${remote_sha:-$ZERO}" "${1:-origin}" || status=1
         done < "$REFS_TMP"
     fi
 fi
