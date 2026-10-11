@@ -31,7 +31,7 @@ button.ghost { background:transparent; color:var(--ink); border:1px solid var(--
 #loading .loadcard { max-width:560px; padding:32px; position:relative; z-index:1; }
 
 /* ambient particles behind the card on the entry/submission screens
-   (scenario.ambient: fireflies | snow | embers | leaves | dust | rain | rays | none) */
+   (scenario.ambient: fireflies | snow | embers | leaves | dust | rain | rays | streams | bokeh | none) */
 .particles { position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:0; }
 /* fireflies — warm, drifting, pulsing */
 .firefly { position:absolute; border-radius:50%;
@@ -100,6 +100,43 @@ button.ghost { background:transparent; color:var(--ink); border:1px solid var(--
 @keyframes rayDrift2 { 0%,100%{ transform:rotate(var(--tilt)) translateX(0); } 50%{ transform:rotate(var(--tilt)) translateX(-13px); } }
 @keyframes rayDrift3 { 0%,100%{ transform:rotate(var(--tilt)) translateX(-7px); } 50%{ transform:rotate(var(--tilt)) translateX(11px); } }
 @media (prefers-reduced-motion: reduce){ .sunray { animation:none !important; opacity:.22; } }
+/* streams — threads of falling water off a ledge, with mist billowing at their feet (first consumer:
+   flat_clustering/waterfalls). The strand element STAYS PUT; a repeating stripe gradient scrolls down
+   inside it (`streamFlow`), so it reads as water pouring rather than a bar dropping. Each stripe layer's
+   period (140px / 90px), its background-size and its keyframe distance must agree or the loop visibly jumps. A mask
+   fades both ends so a thread emerges from the lip and dissolves into the spray, never a hard-ended bar.
+   Cool blue-white and screen-blended, kept at low opacity: this draws behind text. */
+.waterstrand { position:absolute; top:-4%; height:96%; border-radius:4px; mix-blend-mode:screen; filter:blur(.8px);
+  /* two stripe layers on different periods (140px / 90px) scroll at different speeds, so the surface
+     shimmers instead of ticking past like a ruler; the plain base keeps it a continuous thread */
+  background:
+    repeating-linear-gradient(to bottom, rgba(220,240,252,0) 0px, rgba(226,243,252,.55) 30px, rgba(220,240,252,0) 70px, rgba(220,240,252,.18) 110px, rgba(220,240,252,0) 140px),
+    repeating-linear-gradient(to bottom, rgba(210,234,248,0) 0px, rgba(214,238,250,.35) 22px, rgba(210,234,248,0) 50px, rgba(210,234,248,0) 90px),
+    linear-gradient(rgba(196,224,242,.22), rgba(196,224,242,.22));
+  background-size:100% 140px, 100% 90px, 100% 100%;
+  -webkit-mask-image:linear-gradient(to bottom, transparent 0%, #000 14%, #000 74%, transparent 100%);
+          mask-image:linear-gradient(to bottom, transparent 0%, #000 14%, #000 74%, transparent 100%);
+  will-change:background-position, transform; }
+@keyframes streamFlow { from{ background-position:0 0, 0 0, 0 0; } to{ background-position:0 140px, 0 90px, 0 0; } }
+@keyframes streamSway { 0%,100%{ transform:translateX(0) scaleX(1); } 50%{ transform:translateX(2px) scaleX(1.3); } }
+.mistpuff { position:absolute; border-radius:50%; filter:blur(14px); mix-blend-mode:screen;
+  background:radial-gradient(ellipse, rgba(228,242,252,.30) 0%, rgba(228,242,252,.10) 45%, rgba(228,242,252,0) 70%);
+  will-change:transform, opacity; }
+@keyframes mistBillow { 0%{ transform:translate(0,0) scale(.8); opacity:0; } 30%{ opacity:.75; }
+  100%{ transform:translate(var(--mx),-10vh) scale(1.5); opacity:0; } }
+@media (prefers-reduced-motion: reduce){ .waterstrand { animation:none !important; opacity:.3; } .mistpuff { animation:none !important; opacity:.35; } }
+/* bokeh — soft out-of-focus discs of city light (first consumer: flat_clustering/heist). Each disc is a
+   flat fill with a slightly brighter rim, which is what a real out-of-focus highlight looks like — a plain
+   radial fade reads as a firefly glow instead. Colour comes in as `--bk` (an "r,g,b" triple) and peak
+   opacity as `--bkpeak`, both set per disc by spawnParticles, so the spawner can tie dimness to size. */
+.bokeh { position:absolute; border-radius:50%; mix-blend-mode:screen;
+  background:radial-gradient(circle, rgba(var(--bk),.42) 0%, rgba(var(--bk),.34) 56%, rgba(var(--bk),.55) 66%, rgba(var(--bk),0) 71%);
+  will-change:transform, opacity; }
+@keyframes bokehBreathe { 0%,100%{ opacity:.06; } 50%{ opacity:var(--bkpeak); } }
+@keyframes bokehDrift  { 0%,100%{transform:translate(0,0)} 50%{transform:translate(26px,-12px)} }
+@keyframes bokehDrift2 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-22px,8px)} }
+@keyframes bokehDrift3 { 0%,100%{transform:translate(-8px,6px)} 50%{transform:translate(14px,-16px)} }
+@media (prefers-reduced-motion: reduce){ .bokeh { animation:none !important; opacity:.3; } }
 
 /* horizon heel — a slow nautical roll of the whole view (opt-in: scenario.heel). The roll oscillates
    ±1.3° around a BASE list angle `--heel-base` (default 0). For a PROGRESSIVE heel the player script
@@ -369,6 +406,9 @@ code { background:#0a1620; padding:1px 5px; border-radius:4px; }
 .gridsel { border-collapse:separate; border-spacing:6px; margin:6px auto 4px; }
 .gridsel th { font-size:12px; font-weight:600; color:var(--amber); padding:2px 6px; text-align:center; }
 .gridsel th.rowlab { text-align:right; white-space:nowrap; color:#e8eef2; }
+.gridsel th svg { display:block; margin:0 auto; min-width:96px; }    /* labelHtml pictograms */
+.gridsel td { text-align:center; }
+.gridsel th.rowlab s { text-decoration-thickness:2px; opacity:.75; }   /* struck = closed gate */
 .gridsel .cell { width:30px; height:30px; border-radius:7px; border:1px solid rgba(255,216,140,.4); background:rgba(0,0,0,.3); cursor:pointer; }
 .gridsel .cell:hover { border-color:var(--amber); }
 .gridsel .cell.on { background:var(--amber); border-color:var(--amber); box-shadow:0 0 8px rgba(255,216,140,.6); }

@@ -10,7 +10,7 @@
 // The supported values. Anything NOT in this set falls through to "fireflies" at render time — that is
 // deliberate (an unknown value still shows something rather than nothing), but it means a typo is silent,
 // which is why the harness authors this through a dropdown rather than free text.
-export const AMBIENT_KINDS = ["fireflies", "snow", "embers", "leaves", "dust", "rain", "rays", "none"];
+export const AMBIENT_KINDS = ["fireflies", "snow", "embers", "leaves", "dust", "rain", "rays", "streams", "bokeh", "none"];
 
 // Density is per-KIND, not one number, because the kinds are not the same size or shape:
 //   - dust  — the finest motes in the set; needs the most or it doesn't read as a haze at all.
@@ -22,6 +22,12 @@ export const AMBIENT_KINDS = ["fireflies", "snow", "embers", "leaves", "dust", "
 //             than dust: a streak is 10-24px long and plainly visible on its own, where a dust
 //             mote is 1.5-4px and only reads in a crowd. Fineness sets the density, not speed.
 //   - rays  — long blurred bars, not points; a handful reads as light, a crowd reads as a curtain
+//   - streams — falling ribbons of water (a waterfall's threads) plus a few mist puffs at their
+//             feet. Each strand is a whole column, so a dozen-odd reads as a fall where dozens would
+//             read as a bead curtain; sparser than everything but rays, which are wider still.
+//   - bokeh — big soft out-of-focus discs of city light (20-64px). Large and overlapping, so a modest
+//             field: more than the default points (it needs a few layers to read as depth) but far
+//             fewer than dust. First consumer: flat_clustering/heist (2026-10-07).
 //   - rest  — drifting points (fireflies / embers / leaves)
 // `big` = the full-height screens (landing + submission); false = the smaller interstitial card.
 // Kept in one place so the four call sites in pano-player.js can't drift apart.
@@ -30,6 +36,8 @@ export function particleCount(kind, big) {
   if (kind === "dust") return big ? 78 : 58;
   if (kind === "rain") return big ? 44 : 33;
   if (kind === "rays") return big ? 7 : 5;
+  if (kind === "streams") return big ? 16 : 12;
+  if (kind === "bokeh") return big ? 22 : 16;
   return big ? 18 : 14;
 }
 

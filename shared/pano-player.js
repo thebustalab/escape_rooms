@@ -70,14 +70,14 @@
 // A bare `./variant_resolve.js` import is NOT refreshed by bumping the <script> tag's ?v, so a changed
 // helper module (e.g. a new export) leaves browsers on a stale cached copy → "doesn't provide an export
 // named X" SyntaxError → blank page (the 2026-08-05 airship regression). Bump all three together.
-import { WebRConsole } from "./webr-console.js?v=119";
-import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers } from "./variant_resolve.js?v=119";   // Phase 3: per-hotspot state variants; monorail switch-door nav
-import * as PQ from "./puzzle_queue.js?v=119";   // dynamic puzzle queue: location-independent puzzle serving
-import * as CP from "./corr_panel.js?v=119";   // lower-triangle layout of the grid gate (clouds correlation panel)
-import { particleCount } from "./particles.js?v=119";   // ambient-particle vocabulary + per-kind field density
-import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=119";
-import { condHolds } from "./cond.js?v=119";   // ledger + elevation-map card DOM
-import * as RIDE from "./ride.js?v=119";   // THE RIDE (subway): express lever + clip-sequence planner
+import { WebRConsole } from "./webr-console.js?v=123";
+import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers } from "./variant_resolve.js?v=123";   // Phase 3: per-hotspot state variants; monorail switch-door nav
+import * as PQ from "./puzzle_queue.js?v=123";   // dynamic puzzle queue: location-independent puzzle serving
+import * as CP from "./corr_panel.js?v=123";   // lower-triangle layout of the grid gate (clouds correlation panel)
+import { particleCount } from "./particles.js?v=123";   // ambient-particle vocabulary + per-kind field density
+import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=123";
+import { condHolds } from "./cond.js?v=123";   // ledger + elevation-map card DOM
+import * as RIDE from "./ride.js?v=123";   // THE RIDE (subway): express lever + clip-sequence planner
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 
@@ -246,7 +246,7 @@ function init(data) {
   // (canyon sets it TRUE, already the default) — and it makes both documented switches real.
   window.SCENARIO = data;
   document.title = SCENARIO.title || "Escape room";
-  const ambient = SCENARIO.ambient || "fireflies";   // fireflies | snow | embers | leaves | dust | rays | none
+  const ambient = SCENARIO.ambient || "fireflies";   // fireflies | snow | embers | leaves | dust | rain | rays | streams | bokeh | none
   if (ambient !== "none") {
     spawnParticles($("#screen1"), ambient, particleCount(ambient, true));   // landing screen
     spawnParticles($("#loading"), ambient, particleCount(ambient, false));   // inter-room interstitial
@@ -1248,7 +1248,7 @@ window.addEventListener("resize", () => {
 });
 
 // Ambient particles behind the card on an entry screen, chosen by scenario.ambient
-// ("fireflies" | "snow" | "embers" | "leaves" | "dust" | "rays" | "none"); ANY other value falls through to fireflies.
+// ("fireflies" | "snow" | "embers" | "leaves" | "dust" | "rain" | "rays" | "streams" | "bokeh" | "none"); ANY other value falls through to fireflies.
 // Each particle gets a random position/size/timing (negative animation-delay starts it mid-cycle) so the field
 // moves organically. Decorative; GitHub-Pages-safe.
 // NB: these render ONLY on the landing screen, the per-room `entry` interstitial and the submission screen —
@@ -1256,6 +1256,9 @@ window.addEventListener("resize", () => {
 function spawnParticles(parent, kind, n) {
   if (!parent || parent.querySelector(".particles")) return;   // once per screen
   const layer = document.createElement("div"); layer.className = "particles";
+  // streams: 3-4 fall-lines spread across the width, kept clear of the very edges
+  const nFalls = 3 + Math.floor(Math.random() * 2);
+  const falls = Array.from({ length: nFalls }, (_, k) => 8 + (k + 0.5) * (84 / nFalls) + (Math.random() - 0.5) * 10);
   for (let i = 0; i < n; i++) {
     const f = document.createElement("span");
     if (kind === "snow") {
@@ -1305,6 +1308,36 @@ function spawnParticles(parent, kind, n) {
       f.style.height = len + "px";
       f.style.opacity = (0.16 + Math.random() * 0.26).toFixed(2);
       f.style.animation = `${drifts[i % drifts.length]} ${fd.toFixed(2)}s linear ${(-Math.random() * fd).toFixed(2)}s infinite`;
+    } else if (kind === "streams") {
+      // Threads of falling water, as off a ledge — waterfalls' landing. Strands are GROUPED around a few
+      // fall-lines (real water leaves a lip in bundles, not evenly spaced like rain), and every fourth
+      // particle is a mist puff billowing up at the foot of one of them. The strand itself never moves:
+      // its striped gradient scrolls down inside it, which reads as water flowing rather than a bar falling.
+      // Mist takes every 4th slot, so it must index the fall-lines by i/4 — `i % falls.length` would
+      // park every puff under ONE line (i = 3, 7, 11… are all ≡ 3 mod 4) and starve that line of strands.
+      const mist = i % 4 === 3;
+      const fall = mist ? falls[Math.floor(i / 4) % falls.length] : falls[(i - Math.floor(i / 4)) % falls.length];
+      if (mist) {
+        const size = (160 + Math.random() * 140).toFixed(0);    // 160-300px diffuse spray
+        const md = 6 + Math.random() * 5;                        // billow 6-11s
+        f.className = "mistpuff";
+        f.style.left = `calc(${(fall + (Math.random() - 0.5) * 6).toFixed(2)}% - ${size / 2}px)`;
+        f.style.top = (74 + Math.random() * 16).toFixed(2) + "%";
+        f.style.width = size + "px"; f.style.height = (size * 0.6).toFixed(0) + "px";
+        f.style.setProperty("--mx", ((Math.random() - 0.5) * 6).toFixed(2) + "vw");
+        f.style.animation = `mistBillow ${md.toFixed(1)}s ease-out ${(-Math.random() * md).toFixed(1)}s infinite`;
+      } else {
+        const w = (2 + Math.random() * 6).toFixed(1);           // 2-8px threads
+        const fd = 0.7 + Math.random() * 0.9;                    // one 140px stripe cycle every 0.7-1.6s
+        const sd = 3 + Math.random() * 4;                        // slow sway/swell 3-7s
+        f.className = "waterstrand";
+        f.style.left = (fall + (Math.random() - 0.5) * 7).toFixed(2) + "%";
+        f.style.width = w + "px";
+        f.style.opacity = (0.22 + Math.random() * 0.3).toFixed(2);
+        f.style.animation =
+          `streamFlow ${fd.toFixed(2)}s linear ${(-Math.random() * fd).toFixed(2)}s infinite, ` +
+          `streamSway ${sd.toFixed(1)}s ease-in-out ${(-Math.random() * sd).toFixed(1)}s infinite`;
+      }
     } else if (kind === "rays") {
       const drifts = ["rayDrift", "rayDrift2", "rayDrift3"];
       const tilt = (14 + Math.random() * 6).toFixed(1);       // 14–20deg: PARALLEL shafts, only a few deg apart
@@ -1318,6 +1351,27 @@ function spawnParticles(parent, kind, n) {
       f.style.animation =
         `${drifts[i % drifts.length]} ${fd.toFixed(1)}s ease-in-out ${(-Math.random() * fd).toFixed(1)}s infinite, ` +
         `rayBreathe ${bd.toFixed(1)}s ease-in-out ${(-Math.random() * bd).toFixed(1)}s infinite`;
+    } else if (kind === "bokeh") {
+      // Out-of-focus city lights, as seen through a lens racked to the foreground — heist's landing. Mostly
+      // warm gold/amber (streetlamps, chandeliers) with a few cool blue-white (shop signs, harbour lights).
+      // Depth is faked by tying blur and opacity to size: the BIG discs are the most out of focus, so they
+      // are the softest and the dimmest; small ones are crisper and brighter. They hang and wander slowly
+      // rather than fall or rise, and fade in and out as if lights were passing behind something.
+      const pal = ["255,214,140", "255,214,140", "255,214,140", "255,184,112", "176,204,255"];
+      const t = Math.random();                                 // 0 = near-focus, 1 = far out of focus
+      const size = (20 + t * 44).toFixed(0);                   // 20–64px discs
+      const fd = 28 + Math.random() * 22;                      // wander 28–50s
+      const bd = 6 + Math.random() * 7;                        // fade in/out 6–13s
+      f.className = "bokeh";
+      f.style.setProperty("--bk", pal[Math.floor(Math.random() * pal.length)]);
+      f.style.setProperty("--bkpeak", (0.55 - t * 0.25).toFixed(2));
+      f.style.left = `calc(${(Math.random() * 100).toFixed(2)}% - ${size / 2}px)`;
+      f.style.top = `calc(${(Math.random() * 100).toFixed(2)}% - ${size / 2}px)`;
+      f.style.width = f.style.height = size + "px";
+      f.style.filter = `blur(${(1 + t * 3.5).toFixed(1)}px)`;
+      f.style.animation =
+        `${["bokehDrift", "bokehDrift2", "bokehDrift3"][i % 3]} ${fd.toFixed(1)}s ease-in-out ${(-Math.random() * fd).toFixed(1)}s infinite, ` +
+        `bokehBreathe ${bd.toFixed(1)}s ease-in-out ${(-Math.random() * bd).toFixed(1)}s infinite`;
     } else if (kind === "embers") {
       const drifts = ["ffFloat", "ffFloat2", "ffFloat3"];
       const size = (2 + Math.random() * 3).toFixed(1);        // 2–5px sparks
@@ -2140,7 +2194,7 @@ function openClue(h) {
 // mechanic (2026-07-18). A `dial` writes gameState[key] among labelled states (no gate, no codec); a
 // `mapview` in a possibly-distant room shows the image mapped to the CURRENT dial state, so the same
 // chart re-reads differently as the dial is flipped. Cross-referencing the states IS the puzzle.
-//   dial    → { key, states:[{value,label}], hint? }
+//   dial    → { key, states:[{value,label}], hint?, restsCaption? }
 //   mapview → { key, images:{<state>:"path"}, caption?, empty? }
 function dialLabel(h, val) {
   const s = (h.states || []).find(x => x.value === val);
@@ -2163,8 +2217,12 @@ function openDial(h) {
     const cur = gameState[key];
     const idx = states.findIndex(s => s.value === cur);
     needle.style.transform = "translateX(-50%) rotate(" + (idx < 0 ? 0 : angleFor(idx)) + "deg)";
-    caption.textContent = (cur != null)
+    // `restsCaption: false` (per dial, 2026-10-06) drops the "rests on" line — the highlighted button already
+    // says where the dial sits — and shows the authored `hint` in its place. Needed where a dial ALWAYS has a
+    // value (a scenario `state` default, as on waterfalls' gates), or the hint can never appear at all.
+    caption.textContent = (cur != null && h.restsCaption !== false)
       ? ("The dial rests on " + dialLabel(h, cur) + ".")
+      : (cur != null) ? (h.hint || "")
       // The fallback must be WORLD-NEUTRAL. It used to say "somewhere in the ship" — written for airship,
       // and then shown verbatim in a jungle temple, which read as a bug to the player (2026-08-27).
       // Author a `hint` per dial; this is only the safety net.
@@ -3052,7 +3110,10 @@ function buildStoneLockCard(h, onSolved) {
 // `answer` (an object `{itemKey: bucketKey}`). Ungraded — never in the codec (like `lock`); solving it
 // solves the room (fires escapeDone in an escape-phase room). Recognition, not computation: the player
 // brings the grouping they inferred in-world (e.g. tree heights), no printed method. Schema:
-//   { type:"grid", box, label?, prompt?, items:[{key,label}], buckets:[{key,label}], answer:{}, maxAttempts?, feedback?:{correct,wrong,out} }
+//   { type:"grid", box, label?, prompt?, items:[{key,label,labelHtml?}], buckets:[{key,label,labelHtml?}], answer:{}, maxAttempts?, feedback?:{correct,wrong,out} }
+// `labelHtml` (optional, authored markup — same trust as `prompt`) replaces the visible header, e.g. an inline
+// SVG pictogram or <s>S1</s> for a closed gate; the plain `label` is still required and becomes the cell's
+// aria-label, so screen readers keep words. First consumer: flat_clustering/waterfalls' reckoning frame.
 function openGrid(h) {
   if (viewer) resumeYaw = viewer.getYaw();   // restore facing after the door swaps in on solve
   openModal(h.label || "Panel", buildGridCard(h, (result) => { closeModal(); solveRoom(result, h); }), devSolveThunk(h), h);
@@ -3070,8 +3131,8 @@ function buildGridCard(h, onSolved) {
   card.innerHTML =
     (h.prompt ? `<div class="qprompt">${h.prompt}</div>` : "") +
     `<table class="gridsel"><thead><tr><th></th>` +
-      buckets.map(b => `<th>${esc(b.label)}</th>`).join("") + `</tr></thead><tbody>` +
-      items.map(it => `<tr><th class="rowlab">${esc(it.label)}</th>` +
+      buckets.map(b => `<th>${b.labelHtml || esc(b.label)}</th>`).join("") + `</tr></thead><tbody>` +
+      items.map(it => `<tr><th class="rowlab">${it.labelHtml || esc(it.label)}</th>` +
         buckets.map(b => `<td><button class="cell" data-item="${esc(it.key)}" data-bucket="${esc(b.key)}" aria-label="${esc(it.label)}: ${esc(b.label)}"></button></td>`).join("") +
         `</tr>`).join("") +
     // `submitLabel` / `feedback.incomplete` default to the trees vault's wording (the first consumer);
