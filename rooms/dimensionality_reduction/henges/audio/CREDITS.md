@@ -12,10 +12,19 @@ Music bed (`drowned_henges_theme.mp3`) is credited separately in `scenario.json`
 | `saltflat_wind_vast.mp3`  | https://freesound.org/people/IanStarGem/sounds/478812/       | IanStarGem       | CC0 | saltflat — vast eerie wind bed |
 | `boss_dawn_birds.mp3`     | https://freesound.org/people/SamsterBirdies/sounds/578523/   | SamsterBirdies   | CC0 | boss — dawn chorus bed |
 | `stone_drone.mp3`         | https://freesound.org/people/bassimat/sounds/854857/         | bassimat         | CC0 | shared — sacred stone drone (the henge hum, in every room) |
-| `shimmer_crystal.mp3`     | https://freesound.org/people/newlocknew/sounds/772279/       | newlocknew       | CC0 | plains/saltflat — crystal shimmer (fireflies / glassy salt) |
+| `shimmer_crystal.mp3`     | https://freesound.org/people/newlocknew/sounds/772279/       | newlocknew       | CC0 | saltflat — ringing-silence bed (glassy salt); dropped from plains with the fireflies 2026-10-15 |
 | `solve_portal_awaken.mp3` | https://freesound.org/people/SkySpeira/sounds/848847/        | SkySpeira        | CC0 | solveSfx — scrying-basin solved, portal awakens (magical bell flourish) |
 | `solve_portal_open.mp3`   | https://freesound.org/people/GammaGool/sounds/735062/        | GammaGool        | CC0 | solveSfx — mark-stone keyed, arch opens (fast warp-in) |
 | `solve_way_home.mp3`      | https://freesound.org/people/Rvgerxini/sounds/554783/        | Rvgerxini        | CC0 | solveSfx — boss heart-stone, the way home (teleport) |
+| `mountain_fire_roar.mp3`  | https://freesound.org/people/florianreichelt/sounds/563764/  | florianreichelt  | CC0 | mountain — HERO: fire-bowl roar (bonfire flames; copied from beacons `crown_fires_distant`) |
+| `plains_banner_flap.mp3`  | https://freesound.org/people/felix.blume/sounds/187364/      | felix.blume      | CC0 | plains — HERO: the great crimson banner (flag flapping hard; from beacons `kiln_signal_flag`) |
+| `saltflat_juniper_crackle.mp3` | https://freesound.org/people/AlexanderChe/sounds/410404/ | AlexanderChe     | CC0 | saltflat — HERO: smouldering juniper on the salt hearth (from beacons `kiln_juniper_crackle`; quiet at source, wired at 1.0) |
+| `boss_cord_creak.mp3`     | https://freesound.org/people/gear_clinkz/sounds/547862/      | gear_clinkz      | CC0 | boss — HERO: herb-bundle cords creaking on the rack ("Rope under tension", 15 s cut from airship `bridge_bed_rope_creak`) |
+
+Hero-source layers added 2026-10-15 after the spec-v2 movers changed (fire bowl, banner, juniper smoke, herb rack).
+Beacons sources were verified CC0 on their own pages at pull time (`networks/beacons/_scratch/audio/CREDITS.md`).
+Boss also reuses `beach_waves_night.mp3` low as the swell at the cliff foot. `saltflat_wind_vast.mp3` is no
+longer wired (the saltflat brief is windless).
 
 ## Audition alternates (not pulled — swap in if a primary pick disappoints)
 - cold wind: https://freesound.org/people/IanStarGem/sounds/478812/ (also a cave/wind synth)
