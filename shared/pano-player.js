@@ -70,14 +70,14 @@
 // A bare `./variant_resolve.js` import is NOT refreshed by bumping the <script> tag's ?v, so a changed
 // helper module (e.g. a new export) leaves browsers on a stale cached copy → "doesn't provide an export
 // named X" SyntaxError → blank page (the 2026-08-05 airship regression). Bump all three together.
-import { WebRConsole } from "./webr-console.js?v=124";
-import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers } from "./variant_resolve.js?v=124";   // Phase 3: per-hotspot state variants; monorail switch-door nav
-import * as PQ from "./puzzle_queue.js?v=124";   // dynamic puzzle queue: location-independent puzzle serving
-import * as CP from "./corr_panel.js?v=124";   // lower-triangle layout of the grid gate (clouds correlation panel)
-import { particleCount } from "./particles.js?v=124";   // ambient-particle vocabulary + per-kind field density
-import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=124";
-import { condHolds } from "./cond.js?v=124";   // ledger + elevation-map card DOM
-import * as RIDE from "./ride.js?v=124";   // THE RIDE (subway): express lever + clip-sequence planner
+import { WebRConsole } from "./webr-console.js?v=125";
+import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers } from "./variant_resolve.js?v=125";   // Phase 3: per-hotspot state variants; monorail switch-door nav
+import * as PQ from "./puzzle_queue.js?v=125";   // dynamic puzzle queue: location-independent puzzle serving
+import * as CP from "./corr_panel.js?v=125";   // lower-triangle layout of the grid gate (clouds correlation panel)
+import { particleCount } from "./particles.js?v=125";   // ambient-particle vocabulary + per-kind field density
+import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=125";
+import { condHolds } from "./cond.js?v=125";   // ledger + elevation-map card DOM
+import * as RIDE from "./ride.js?v=125";   // THE RIDE (subway): express lever + clip-sequence planner
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 
@@ -958,13 +958,20 @@ const phaseOf = r => (r && r.phase) || "analysis";
 // early rooms and the last analysis puzzle in a later room, so completion — not position — is what ends
 // the objective. Returns false if there are no graded analysis rooms (an all-escape scenario never
 // "finishes analysis").
+// A room tagged `role` belongs to one player of a two-player scenario (heist: "A" front door, "B" back
+// door). Each player's analysis objective is THEIR branch only, so a room for the other role is not
+// counted once a role is chosen. Untagged rooms (every other scenario) always count. (2026-10-15)
+function roomInRole(r, role) {
+  return !r.role || !role || r.role === role;
+}
 function analysisComplete() {
   // DYNAMIC QUEUE: the objective is the LADDER, not the rooms. Which rooms served which rung
   // varies per student, and a queue scenario may leave puzzle-bearing slots unvisited entirely
   // once the ladder runs out — so room-completion is the wrong question to ask.
   if (PQ.usesQueue(SCENARIO)) return PQ.queueComplete(SCENARIO.puzzleQueue, queueSolved);
   const need = (SCENARIO.rooms || []).filter(r =>
-    isBuilt(r) && phaseOf(r) === "analysis" && (r.hotspots || []).some(h => h.type === "puzzle"));
+    isBuilt(r) && phaseOf(r) === "analysis" && roomInRole(r, gameState.role) &&
+    (r.hotspots || []).some(h => h.type === "puzzle"));
   return need.length > 0 && need.every(r => solvedRooms.has(r.key));
 }
 
@@ -1194,9 +1201,10 @@ function doorYaw(r) {
   return door ? boxToYP(door.box, c).yaw : 0;
 }
 
-function startRoom(i) {
+function startRoom(i, arriveYaw) {   // arriveYaw: keep the player's gaze (a portal transit); else face the forward door
   if (riding) cancelRide();          // a test-play jump mid-ride: drop the ride, don't arrive anywhere
-  stopRoomSfx();                     // stop the previous room's ambience + restore music volume
+  transiting = null;                 // ...and likewise a portal transit (its loop stops with the viewer rebuild)
+  stopRoomSfx();                   // stop the previous room's ambience + restore music volume
   roomIdx = i; room = SCENARIO.rooms[i];
   if (room && room.key) visitedRooms.add(room.key);   // mark entered (so a puzzle-less junction's entry card won't re-show)
   // A `dial` may declare `resetOnEnter` (+ its `default` value): entering the room returns the lever to that
@@ -1216,8 +1224,9 @@ function startRoom(i) {
              v => { room.title = v; return tpPersist("/api/room-patch", { roomKey: room.key, fields: { title: v } }); });
   const openState = portalUnlocked(room);   // open panorama once the room's FORWARD door is actually open (its gate solved) — generalised from `solved` 2026-07-31 so a door gated on a SECONDARY lock (airship room2's bridge hatch) opens the art at the right moment; a no-op where the forward door gates on the primary
   const img = basePanorama(room, openState);
-  buildViewer(img, doorYaw(room));   // face the forward (closed) door on entry
-  startRoomSfx(room);                // start this room's sound effect(s) (+ optional music duck)
+  buildViewer(img, arriveYaw != null ? arriveYaw : doorYaw(room));   // face the forward (closed) door on entry
+  preloadTransits(room);             // fetch this room's portal-transit clips now, so walking through doesn't wait
+  startRoomSfx(room);             // start this room's sound effect(s) (+ optional music duck)
   updateEnvironment();               // progressive heel/sickness reflect current state (persist across rooms)
 }
 
@@ -1481,7 +1490,8 @@ function applyFx() {
 // analysisComplete()'s "built analysis room with a graded puzzle" set. Absent fields ⇒ no-op (unchanged).
 function gradedAnalysisRooms() {
   return (SCENARIO.rooms || []).filter(r =>
-    isBuilt(r) && phaseOf(r) === "analysis" && (r.hotspots || []).some(h => h.type === "puzzle"));
+    isBuilt(r) && phaseOf(r) === "analysis" && roomInRole(r, gameState.role) &&
+    (r.hotspots || []).some(h => h.type === "puzzle"));
 }
 // pure (unit-testable): base list angle in deg for the current solve count
 function heelBaseDeg(heel, solvedA, totalA) {
@@ -1787,7 +1797,7 @@ $("#next").onclick = () => viewer && viewer.setYaw(viewer.getYaw() + TURN, 600);
 
 function onHotspot(evt, h) {   // Pannellum calls clickHandlerFunc(event, clickHandlerArgs)
   try {
-    if (riding) return;                               // THE RIDE: nothing is clickable until arrival
+    if (riding || transiting) return;                 // THE RIDE / a portal transit: nothing is clickable until arrival
     if (h.type === "clue") return openClue(h);
     if (h.type === "lever") {
       // THE RIDE's one cab control (scenario.ride). Gated like a dial; see openLever.
@@ -1851,7 +1861,9 @@ function handleDoor(h) {
   const passed = () => { if (Array.isArray(h.onPass)) applyEffects(h.onPass); };
   if (nav.direction === "back") {
     passed();
-    return navigateTo(resolveDoorTarget(h, "back"), false);   // back: no gate, no entry
+    const back = resolveDoorTarget(h, "back");
+    if (h.transit && back >= 0 && startTransit(h, back, false)) return;   // the forward transit's clip, reversed
+    return navigateTo(back, false);                            // back: no gate, no entry
   }
   if (!doorIsOpen(h, room)) {
     // Test-play only: authors walk through locked doors so they can check downstream rooms without
@@ -1868,11 +1880,17 @@ function handleDoor(h) {
       ? "The portal is awake, but sealed — key the stones to open it."
       : "The door won't budge — solve the puzzle first."));
   }
-  if (h.endsEscape) return showEscapeDone();                  // a terminal escape exit inside any room
+  if (h.endsEscape) {                                          // a terminal escape exit inside any room
+    if (h.transit && startTransit(h, -1, false, showEscapeDone)) return;   // the victory transit, then the card
+    return showEscapeDone();
+  }
   passed();
   if (nav.to) {                                               // explicit forward target (or the active variant's)
     const idx = SCENARIO.rooms.findIndex(r => r.key === nav.to && isBuilt(r));
-    if (idx >= 0) return navigateTo(idx, true);
+    if (idx >= 0) {
+      if (h.transit && startTransit(h, idx)) return;           // portal transit clip, then arrive (see startTransit)
+      return navigateTo(idx, true);
+    }
   }
   return goThrough();                                          // linear fallback (also boss → finish)
 }
@@ -1893,12 +1911,113 @@ function resolveDoorTarget(h, dir) {
 
 // Go to a room by index. `withEntry` shows the target's interstitial ONLY on a first visit — a
 // re-visited (already-solved) room, forward or back, never re-shows its entry text.
-function navigateTo(idx, withEntry) {
+function navigateTo(idx, withEntry, arriveYaw) {
   if (idx == null || idx < 0) return;
   const target = SCENARIO.rooms[idx];
   const firstVisit = !(target.key && (visitedRooms.has(target.key) || solvedRooms.has(target.key)));
-  if (withEntry && firstVisit) return showInterstitial(target, () => startRoom(idx));
-  startRoom(idx);
+  if (withEntry && firstVisit) return showInterstitial(target, () => startRoom(idx, arriveYaw));
+  startRoom(idx, arriveYaw);
+}
+
+// ---- PORTAL TRANSIT (henges, 2026-10-15) ------------------------------------------------------------
+// A door may carry `transit: {video, rollFrom, rollTo}`: ONE equirectangular travel clip (this
+// room's panorama → into the portal → the next room's panorama, rendered as chained two-ended segments)
+// played AS the panorama, so wherever the player is looking they are pulled through and arrive already
+// wrapped. The clip was rendered with each room's panorama rolled sideways so its arch sat at the centre;
+// `rollFrom`/`rollTo` are those rolls in DEGREES OF YAW (clip yaw = room yaw + roll). The transit viewer
+// starts at the player's yaw + rollFrom and the arrival room opens at the transit yaw − rollTo, so the gaze
+// never jumps (the arrival does NOT snap to doorYaw). The last TRANSIT_FADE s crossfade onto the real
+// arrival panorama, which hides the clip's small end-frame mismatch. Tap skips to the arrival.
+// prefers-reduced-motion, a missing clip or a refused play() all fall back to the plain walk-through.
+// A BACK door's transit is the forward clip reversed (its rolls swap: rollFrom = the forward rollTo).
+let transiting = null;
+const TRANSIT_FADE = 0.4;
+const _transitVideos = {};
+function _transitVideo(src) {
+  // A failed or slow load is not cached, so the next trip (or the walk-through's next room) tries again.
+  if (!_transitVideos[src]) _transitVideos[src] = _loadVideo(src).then(v => { if (v) v.loop = false; else delete _transitVideos[src]; return v; });
+  return _transitVideos[src];
+}
+function preloadTransits(r) {
+  (r && r.hotspots || []).forEach(h => { if (h && h.type === "door" && h.transit && h.transit.video) _transitVideo(h.transit.video); });
+}
+const _wrapYaw = y => ((((y + 180) % 360) + 360) % 360) - 180;
+// onArrive (the escape door): no room to arrive in — the clip's last frame stays up as the panorama (marker-less)
+// and onArrive runs instead of navigateTo; the fade target is `transit.endPanorama` if given (the clip already
+// ends on it, so it is optional).
+function startTransit(h, idx, withEntry = true, onArrive = null) {   // withEntry: as navigateTo (a back door passes false)
+  const t = h.transit;
+  if (!t || !t.video || transiting || riding) return false;
+  try { if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return false; } catch (e) {}
+  const target = idx >= 0 ? SCENARIO.rooms[idx] : null, from = room;
+  const rollFrom = +t.rollFrom || 0, rollTo = +t.rollTo || 0;
+  let yaw = 0; try { yaw = viewer.getYaw(); } catch (e) {}
+  const run = {};
+  transiting = run;
+  const walk = () => { if (transiting === run) { transiting = null; if (onArrive) onArrive(); else navigateTo(idx, withEntry); } };
+  // Fade onto the art the arrival room will actually show: its last active FULL-SCENE variant (an awakened
+  // room re-entered by a back door), else its base/open panorama.
+  const fullVar = target && activeVariants(target).filter(v => v && v.panorama && Array.isArray(v.box) && v.box.join() === "0,0,1,1").pop();
+  const endSrc = target ? (fullVar ? fullVar.panorama : basePanorama(target, portalUnlocked(target))) : (t.endPanorama || null);
+  Promise.all([_transitVideo(t.video), endSrc ? _loadImg(endSrc).catch(() => null) : Promise.resolve(null)])
+  .then(([video, endImg]) => {
+    if (transiting !== run || room !== from) return;
+    if (!video) return walk();
+    const W = video.videoWidth || 3072, H = video.videoHeight || 1024;
+    const cv = document.createElement("canvas"); cv.width = W; cv.height = H;
+    const ctx = cv.getContext("2d");
+    const dx = ((Math.round(rollTo / 360 * W) % W) + W) % W;
+    const drawEnd = a => {                     // the arrival panorama, rolled into the clip's coordinates
+      if (!endImg) return;
+      ctx.globalAlpha = a; ctx.drawImage(endImg, dx, 0, W, H); ctx.drawImage(endImg, dx - W, 0, W, H); ctx.globalAlpha = 1;
+    };
+    const stage = $("#pano");
+    let raf = 0, done = false, snd = null;
+    const finish = () => {
+      if (done || transiting !== run) return;
+      done = true; cancelAnimationFrame(raf); stage.removeEventListener("click", finish);
+      if (snd && !video.ended) {               // skipped: fade the track out rather than cut it dead
+        const a = snd, v0 = a.volume; let k = 0;
+        const iv = setInterval(() => { k++; a.volume = Math.max(0, v0 * (1 - k / 8)); if (k >= 8) { clearInterval(iv); a.pause(); } }, 40);
+      }
+      try { video.pause(); } catch (e) {}
+      drawEnd(1);
+      let y = yaw + rollFrom; try { y = viewer.getYaw(); } catch (e) {}
+      transiting = null;
+      if (onArrive) { try { viewer && viewer.setUpdate && viewer.setUpdate(true); } catch (e) {} return onArrive(); }   // stay on the last frame
+      _keepStage = true;                       // no dip to black between the clip's last frame and the room
+      navigateTo(idx, withEntry, _wrapYaw(y - rollTo));
+    };
+    const frame = () => {
+      if (transiting !== run || done) return;
+      if (video.readyState >= 2) ctx.drawImage(video, 0, 0, W, H);
+      const left = (video.duration || 0) - video.currentTime;
+      if (isFinite(left) && left < TRANSIT_FADE) drawEnd(1 - Math.max(0, left) / TRANSIT_FADE);
+      try { viewer && viewer.setUpdate && viewer.setUpdate(true); } catch (e) {}
+      if (video.ended) return finish();
+      raf = requestAnimationFrame(frame);
+    };
+    const go = () => {
+      if (transiting !== run) return;
+      ctx.drawImage(video, 0, 0, W, H);
+      _keepStage = true;
+      _renderViewer(cv, _wrapYaw(yaw + rollFrom), true, true);   // one dynamic, marker-less viewer for the clip
+      _cineStop = () => { cancelAnimationFrame(raf); try { video.pause(); } catch (e) {} };   // set AFTER _renderViewer
+      stage.addEventListener("click", finish);
+      video.play().then(() => {
+        raf = requestAnimationFrame(frame);
+        // `transit.sfx` (+ `sfxVolume`): one bespoke track timed to the clip, started with it. Its tail rings
+        // on into the arrival room; a skip fades it out with the clip. Gated by the sfx chip like any one-shot.
+        if (t.sfx && sfxOn) {
+          try { snd = new Audio(t.sfx); snd.volume = t.sfxVolume != null ? t.sfxVolume : 0.9; snd.play().catch(() => {}); } catch (e) {}
+        }
+      }).catch(() => finish());
+    };
+    if (video.currentTime > 0) { video.addEventListener("seeked", go, { once: true }); video.currentTime = 0; }   // a second trip
+    else go();
+  })
+  .catch(e => { console.error("portal transit failed; walking through", e); walk(); });
+  return true;
 }
 
 // ---- modal helpers ----
@@ -2013,7 +2132,7 @@ function tpSaveRoom(r) {
     const p = tpPlannedTwin(planned, placed, h);
     if (!p) return;
     ["question", "check", "pick", "feedback", "body", "label", "lockedBody", "prompt", "hint",
-     "pickup", "rows", "options", "states"].forEach(k => {
+     "pickup", "rows", "options", "states", "items", "buckets", "submitLabel"].forEach(k => {
       if (k in h) p[k] = JSON.parse(JSON.stringify(h[k]));
     });
   });
@@ -2464,6 +2583,12 @@ window.PanoRide = {
   at: line => (SCENARIO && SCENARIO.ride ? gameState[RIDE.atKey(SCENARIO.ride, line)] : undefined),
   last: () => lastRide,
   rode: line => gameState["rode_" + line] === "1",
+};
+// Read-only probe for the portal transit (tests / the author console), like PanoRide.
+window.PanoTransit = {
+  active: () => !!transiting,
+  room: () => (room ? room.key : null),
+  yaw: () => { try { return viewer ? viewer.getYaw() : null; } catch (e) { return null; } },
 };
 
 function openMapview(h) {
@@ -3139,6 +3264,29 @@ function buildGridCard(h, onSolved) {
     // canyon's floodgate panel is the second and says its own thing.
     `</tbody></table><div class="qfeedback"></div><button class="qsubmit">${esc(h.submitLabel || "Set the cache")}</button>`;
   const fb = card.querySelector(".qfeedback"), sub = card.querySelector(".qsubmit");
+  // Test play: the prompt and both axes' headers edit in place; the button text and every feedback line
+  // (seen only one at a time in play) sit in the authoring panel. Keys and the answer map are NOT
+  // editable here, so an edit can never re-key the grid. A `labelHtml` header is authored markup and
+  // stays read-only.
+  const tpSave = () => tpSaveRoom(room);
+  tpEditable(card.querySelector(".qprompt"), () => h.prompt || "", v => { h.prompt = v; return tpSave(); });
+  card.querySelectorAll("thead th").forEach((th, i) => {
+    const b = buckets[i - 1];
+    if (b && !b.labelHtml) tpEditable(th, () => b.label || "", v => { b.label = v; return tpSave(); });
+  });
+  card.querySelectorAll("th.rowlab").forEach((th, i) => {
+    const it = items[i];
+    if (it && !it.labelHtml) tpEditable(th, () => it.label || "", v => { it.label = v; return tpSave(); });
+  });
+  const fbRow = (label, k) => ({ label, get: () => (h.feedback && h.feedback[k]) || "",
+    set: v => { h.feedback = h.feedback || {}; h.feedback[k] = v; return tpSave(); } });
+  tpAuthorPanel(card, [
+    { label: "Submit button", get: () => h.submitLabel || "", set: v => { h.submitLabel = v; return tpSave(); } },
+    fbRow("On the correct answer", "correct"),
+    fbRow("On a wrong answer", "wrong"),
+    fbRow("When a row is left empty", "incomplete"),
+    fbRow("Out of attempts (only if maxAttempts is set)", "out"),
+  ]);
   card.querySelectorAll(".cell").forEach(btn => btn.addEventListener("click", () => {
     const it = btn.dataset.item;
     sel[it] = btn.dataset.bucket;
@@ -3406,12 +3554,20 @@ function finishAnalysis() {
   // submission screen leaves a way back into it), then go straight there.
   if (!hasEscapePhase() && !hasPendingEscape()) { showSubmitChip(); openSubmitPrep(); return; }
   // Escape phase exists → show the analysis finish card, offering to skip the (ungraded) escape.
-  $("#doneTitle").textContent = (SCENARIO.done && SCENARIO.done.title) ||
+  // `done.byRole[<role>]` overrides title/body per player (heist: each finish names the token the PARTNER
+  // needs, which must never reach the other player). In test-play an edit writes to whichever is shown.
+  const roleDone = (SCENARIO.done && SCENARIO.done.byRole && SCENARIO.done.byRole[gameState.role]) || null;
+  const doneField = (f) => (roleDone && roleDone[f]) || (SCENARIO.done && SCENARIO.done[f]) || "";
+  const setDone = (f, v) => {
+    if (roleDone) roleDone[f] = v; else SCENARIO.done = { ...(SCENARIO.done || {}), [f]: v };
+    return tpPersist("/api/scenario-patch", { fields: { done: SCENARIO.done } });
+  };
+  $("#doneTitle").textContent = doneField("title") ||
     ((SCENARIO.title || "Scenario") + " — analysis complete");
-  $("#doneBody").textContent = (SCENARIO.done && SCENARIO.done.body) ||
+  $("#doneBody").textContent = doneField("body") ||
     "Analysis complete — copy your submission code for Canvas, then close this and carry on.";
-  tpEditable($("#doneTitle"), () => (SCENARIO.done && SCENARIO.done.title) || "", v => { SCENARIO.done = { ...(SCENARIO.done || {}), title: v }; return tpPersist("/api/scenario-patch", { fields: { done: SCENARIO.done } }); });
-  tpEditable($("#doneBody"), () => (SCENARIO.done && SCENARIO.done.body) || "", v => { SCENARIO.done = { ...(SCENARIO.done || {}), body: v }; return tpPersist("/api/scenario-patch", { fields: { done: SCENARIO.done } }); });
+  tpEditable($("#doneTitle"), () => doneField("title"), v => setDone("title", v));
+  tpEditable($("#doneBody"), () => doneField("body"), v => setDone("body", v));
   $("#codeWrap").style.display = "none";                      // the code now lives on the submission-prep screen
   $("#continueOut").style.display = "none";
   $("#doneDebrief").style.display = "none";                   // "how this world worked" now lives on the submission screen

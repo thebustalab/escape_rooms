@@ -1,19 +1,29 @@
 {
-  "status": "in_development",
+  "status": "ready",
   "chapter": "flat_clustering",
   "scenario": "heist",
   "id": 20,
   "title": "Nobody Works Alone",
   "subtitle": "Operation Magpie",
-  "story": "Sixty robberies in three years. You work for The Service, a private detective agency that does not care who owns the stolen goods, but rather that somebody has learned to sell those stolen goods, and that nobody can say how many somebodies that is. One report says a single crew with a long reach. Another says the city is thick with thieving crews. You and your partner have until morning to settle it. You will work the case from opposite ends. One of you takes the front door and the scenes of the crimes themselves — how each place was entered, with what, and for how long. The other takes the back door and the disposal of the stolen goods — what left with each robbery, where the stolen goods surfaced, and through whose hands. When you each have your count, the number of thieving crews and the number of institutions that sell the stolen goods, meet aboard the Aurelia, and bring everything you picked up on the way.",
+  "story": "Sixty robberies in three years. You work for The Service, a private detective agency that does not care who owns the stolen goods, but rather that somebody has learned to steal and sell those goods. Even worse: nobody can say how many somebodies that is and how they fit together. You and your partner have until morning to settle it. You will work the case from opposite ends. One of you takes the front door and the scenes of the crimes themselves — how each place was entered, with what, and for how long. The other takes the back door and the resale of the stolen goods — what left with each robbery, where the stolen goods surfaced, and through which resellers. When you each have your count, the number of thieving crews and the number of resellers, meet aboard the Aurelia, and bring everything you picked up on the way. Which thieving crews work with which resellers?",
   "enterLabel": "Take your door",
   "done": {
     "title": "The count is made",
-    "body": "You have your number and your partner has theirs, and they are not the same number. Neither of you has made a mistake. That is the finding."
+    "body": "You have your number and your partner has theirs, and they are not the same number. Neither of you has made a mistake. That is the finding.",
+    "byRole": {
+      "A": {
+        "title": "The count is made",
+        "body": "Your half of the analysis is done. Your partner is working toward theirs, and their count will not match yours; neither of you has made a mistake. The bench printed one more line beneath the result: 4827."
+      },
+      "B": {
+        "title": "The count is made",
+        "body": "Your half of the analysis is done. Your partner is working toward theirs. As you leave, you notice that the desk turned up one more thing, a name on the passenger list: SABLE."
+      }
+    }
   },
   "escapeDone": {
-    "title": "Five hands, three tables",
-    "body": "Seated, the room read at a glance: two houses running two crews apiece, and one man who answers to nobody. You gave them that over the wire, and the water outside filled with lights. The count was never one number. It was a question about how far down you were willing to look."
+    "title": "Five thieving crews, three resellers",
+    "body": "Matched, the case read at a glance: two resellers running two thieving crews apiece, and one man who answers to the other. You gave them that over the wire, and the water outside filled with lights. Case closed!"
   },
   "packages": [
     "dplyr",
@@ -57,21 +67,6 @@
       "designNote": "SHARED START — both players begin here, together. No graded puzzle. The room states the two-part goal (front-load it; no character explains anything) and offers TWO EXITS. Taking one sets state.role and the other's availableWhen fails with a diegetic lockedBody. ART: new. SHARED between both roles — this art is seen by everyone.",
       "plannedHotspots": [
         {
-          "type": "clue",
-          "label": "The case wall",
-          "note": "the assignment: a run of burglaries, two lines of enquiry, meet back at the gala",
-          "body": "<p>Sixty jobs in three years, pinned in two columns and joined by nothing but the jobs themselves.</p><p>The left column is how each place was opened: heights, tools, how long the approach took, what hour it happened, how long the thieves stayed inside. The right column is how the goods came up again: how many days until they surfaced, how they were lotted, how they were recut, how many ports they passed through, what the haul was worth.</p><p>A hand has written across the foot of the board, twice, in the same ink: <em>how many?</em></p>",
-          "pickup": "Sixty jobs. Two columns of evidence: how each place was opened, and how the goods came up again.",
-          "box": [
-            0.3,
-            0.21,
-            0.428,
-            0.53
-          ],
-          "boxSource": "draft:localizer",
-          "id": "casewall"
-        },
-        {
           "type": "door",
           "direction": "open",
           "to": "a_opera",
@@ -102,7 +97,7 @@
           "type": "door",
           "direction": "open",
           "to": "b_pawnshop",
-          "label": "The back door — the disposal",
+          "label": "The back door — the resale",
           "onPass": [
             {
               "set": "role",
@@ -179,7 +174,7 @@
                 "direction": "open",
                 "to": "b_pawnshop"
               },
-              "label": "The back door — the disposal"
+              "label": "The back door — the resale"
             }
           ],
           "atmosphere": "dusk, blue-black shadow with warm sodium pooling at the windows, cigarette haze, oxblood leather and brass, painterly, cinematic, film grain",
@@ -213,20 +208,6 @@
       },
       "hotspots": [
         {
-          "id": "casewall",
-          "type": "clue",
-          "label": "The case wall",
-          "box": [
-            0.3138,
-            0.2306,
-            0.4418,
-            0.5506
-          ],
-          "body": "<p>Sixty jobs in three years, pinned in two columns and joined by nothing but the jobs themselves.</p><p>The left column is how each place was opened: heights, tools, how long the approach took, what hour it happened, how long the thieves stayed inside. The right column is how the goods came up again: how many days until they surfaced, how they were lotted, how they were recut, how many ports they passed through, what the haul was worth.</p><p>A hand has written across the foot of the board, twice, in the same ink: <em>how many?</em></p>",
-          "pickup": "Sixty jobs. Two columns of evidence: how each place was opened, and how the goods came up again.",
-          "boxSource": "draft:localizer"
-        },
-        {
           "id": "frontdoor",
           "type": "door",
           "label": "The front door — the scenes",
@@ -256,7 +237,7 @@
         {
           "id": "backdoor",
           "type": "door",
-          "label": "The back door — the disposal",
+          "label": "The back door — the resale",
           "box": [
             0.8039,
             0.285,
@@ -338,29 +319,6 @@
           "label": "The writing-slope terminal",
           "note": "k-means on the entry block",
           "starterCode": "case_file",
-          "question": {
-            "prompt": "The safe in the private box was emptied during the second act. The theater has kept it quiet so the seats below would not empty, which is why the performance is still running below you and why you have until the end of this act to solve this puzzle. On the writing-slope is the Service's case file: sixty jobs across three years, tonight's among them under its own name, the Thalberg Opera House. Every theft has been measured for the way the scene was entered. Organize the sixty into five groups based on the four entry measurements alone (entry_height_m, tool_score, approach_min and entry_hour) and find the one the Thalberg Opera House belongs with. How many jobs are in that group?",
-            "options": [
-              "8 jobs",
-              "10 jobs",
-              "11 jobs",
-              "13 jobs",
-              "18 jobs",
-              "20 jobs",
-              "29 jobs",
-              "60 jobs"
-            ],
-            "correct": 4,
-            "maxAttempts": 4,
-            "feedback": {
-              "correct": "Correct — noted in your field notebook: tonight's opera-house job belongs with the file's busiest hand, 18 jobs in all.",
-              "wrong": [
-                "Ask the console to cluster for you, on the four measures of the way in (the height of the entry, the tool damage, the length of the approach and the hour) into five groups: <code>runMatrixAnalysis(data = case_file, analysis = &quot;kmeans&quot;, parameters = c(n_clusters = 5), columns_w_values_for_single_analyte = c(&quot;entry_height_m&quot;, &quot;tool_score&quot;, &quot;approach_min&quot;, &quot;entry_hour&quot;), columns_w_sample_ID_info = &quot;job&quot;)</code>. It hands back one row per job with its cluster number. Count the rows in each group with <code>count(cluster)</code> or <code>table()</code>.",
-                "Anything recording what happened to the goods afterwards belongs to the other half of the case and sorts the same sixty jobs a different way entirely. Leave it out.",
-                "You want the number of rows in the one group tonight's job sits in — not the number of groups, not the runner-up, and not the whole file. It is also the largest of the five, which is the finding: this is not a copycat, it is the hand that has worked this city hardest."
-              ]
-            }
-          },
           "box": [
             0.426,
             0.684,
@@ -372,14 +330,32 @@
           "solveSfx": {
             "src": "audio/solve_wooden_door.mp3",
             "volume": 0.05
+          },
+          "pick": {
+            "prompt": "On the computer is the Service's case file: sixty jobs across three years, tonight's among them under its own name, the Thalberg Opera House. Every theft has been measured for the way the scene was entered. Cluster the sixty into five groups using the four entry measurements alone (entry_height_m, tool_score, approach_min and entry_hour), then count how many jobs fall in each group. Make a bar chart of those counts, assign it to <code>p</code>, draw the clickable chart, and click the bar for the group the Thalberg Opera House belongs to.",
+            "plotCode": "clusters <- runMatrixAnalysis(data = case_file, analysis = \"kmeans\", parameters = c(n_clusters = 5), columns_w_values_for_single_analyte = c(\"entry_height_m\", \"tool_score\", \"approach_min\", \"entry_hour\"), columns_w_sample_ID_info = \"job\")\ncounts <- clusters %>% group_by(cluster) %>% summarize(n = n())\np <- ggplot(counts, aes(x = factor(cluster), y = n)) + geom_col()",
+            "answer": "18",
+            "idColumn": "n",
+            "idNoun": "group",
+            "width": 6,
+            "height": 5,
+            "maxAttempts": 4,
+            "feedback": {
+              "correct": "Correct — noted in your field notebook: tonight's opera-house job belongs with the file's busiest thieving crew, 18 jobs in all.",
+              "wrong": [
+                "Ask the console to cluster for you, on the four measures of the way in (the height of the entry, the tool damage, the length of the approach and the hour), into five groups: <code>clusters &lt;- runMatrixAnalysis(data = case_file, analysis = &quot;kmeans&quot;, parameters = c(n_clusters = 5), columns_w_values_for_single_analyte = c(&quot;entry_height_m&quot;, &quot;tool_score&quot;, &quot;approach_min&quot;, &quot;entry_hour&quot;), columns_w_sample_ID_info = &quot;job&quot;)</code>. It hands back one row per job with its cluster number beside its measures. Then count the jobs in each group and plot them as bars: <code>counts &lt;- clusters %&gt;% group_by(cluster) %&gt;% summarize(n = n())<br>p &lt;- ggplot(counts, aes(x = factor(cluster), y = n)) + geom_col()</code>. Name the count column <code>n</code>, as in <code>summarize(n = n())</code>; that is what makes the bars clickable.",
+                "Anything recording what happened to the goods afterwards belongs to the other half of the case and sorts the same sixty jobs a different way entirely. Leave it out.",
+                "Find the Thalberg Opera House in your result and note its cluster number, then click that group's bar. Its group is also the largest of the five, which is the finding: this is not a copycat, it is the thieving crew that has worked this city hardest."
+              ]
+            }
           }
         },
         {
           "type": "clue",
           "label": "A monogrammed lighter",
-          "pickup": "A silver lighter from the opera box — a lion-in-shield crest struck deep into the flat of it, complete and easy to read.",
+          "pickup": "A monogrammed lighter — a token from the thieves, left behind at the scene.",
           "note": "TOKEN 1/5 — crew 1's. Bears a crisp, complete MARQUE. The only token A can place unaided; it teaches A what a legible mark looks like, so the other four read as ambiguous rather than as bad art.",
-          "body": "<p>Dropped into the fold of the seat cushion and still warm from a pocket: a slim silver lighter. The crest struck into the flat of it is complete and perfectly legible &mdash; a lion rearing upright inside a plain shield, every line of it sharp enough to read at arm's length. Whoever carries this does not mind who knows it.</p>",
+          "body": "<p>A monogrammed lighter — a token from the thieves, left behind at the scene.</p>",
           "box": [
             0.588,
             0.6895,
@@ -513,7 +489,7 @@
         "cinemagraphsVerified": true
       },
       "entry": {
-        "text": "The safe in the box was emptied during the second act. A servant found it in the interval and the theater has kept it quiet, so the performance is still running below you. You have until the curtain to say whether this theft belongs to the same pattern as the other sixty."
+        "text": "The safe in the opera house's royal box was emptied during the second act. A servant found it in the interval and the theater has kept it quiet, so the performance is still running below you. You have until the curtain falls to say whether this theft belongs to the same pattern as the other sixty."
       },
       "debrief": "The plainest thing k-means does: given groups, say which one a case belongs to. You had no labels, no key, and no idea yet how many groups there were — only the geometry of the entry measurements. That is clustering doing its actual job, assigning by resemblance.",
       "panorama": "a_opera/scene.png",
@@ -537,33 +513,28 @@
             0.7714
           ],
           "starterCode": "case_file",
-          "question": {
-            "prompt": "The safe in the private box was emptied during the second act. The theater has kept it quiet so the seats below would not empty, which is why the performance is still running below you and why you have until the end of this act to solve this puzzle. On the writing-slope is the Service's case file: sixty jobs across three years, tonight's among them under its own name, the Thalberg Opera House. Every theft has been measured for the way the scene was entered. Organize the sixty into five groups based on the four entry measurements alone (entry_height_m, tool_score, approach_min and entry_hour) and find the one the Thalberg Opera House belongs with. How many jobs are in that group?",
-            "options": [
-              "8 jobs",
-              "10 jobs",
-              "11 jobs",
-              "13 jobs",
-              "18 jobs",
-              "20 jobs",
-              "29 jobs",
-              "60 jobs"
-            ],
-            "correct": 4,
-            "maxAttempts": 4,
-            "feedback": {
-              "correct": "Correct — noted in your field notebook: tonight's opera-house job belongs with the file's busiest hand, 18 jobs in all.",
-              "wrong": [
-                "Ask the console to cluster for you, on the four measures of the way in (the height of the entry, the tool damage, the length of the approach and the hour) into five groups: <code>runMatrixAnalysis(data = case_file, analysis = &quot;kmeans&quot;, parameters = c(n_clusters = 5), columns_w_values_for_single_analyte = c(&quot;entry_height_m&quot;, &quot;tool_score&quot;, &quot;approach_min&quot;, &quot;entry_hour&quot;), columns_w_sample_ID_info = &quot;job&quot;)</code>. It hands back one row per job with its cluster number. Count the rows in each group with <code>count(cluster)</code> or <code>table()</code>.",
-                "Anything recording what happened to the goods afterwards belongs to the other half of the case and sorts the same sixty jobs a different way entirely. Leave it out.",
-                "You want the number of rows in the one group tonight's job sits in — not the number of groups, not the runner-up, and not the whole file. It is also the largest of the five, which is the finding: this is not a copycat, it is the hand that has worked this city hardest."
-              ]
-            }
-          },
           "boxSource": "draft:localizer",
           "solveSfx": {
             "src": "audio/solve_wooden_door.mp3",
             "volume": 0.05
+          },
+          "pick": {
+            "prompt": "On the computer is the Service's case file: sixty jobs across three years, tonight's among them under its own name, the Thalberg Opera House. Every theft has been measured for the way the scene was entered. Cluster the sixty into five groups using the four entry measurements alone (entry_height_m, tool_score, approach_min and entry_hour), then count how many jobs fall in each group. Make a bar chart of those counts, assign it to <code>p</code>, draw the clickable chart, and click the bar for the group the Thalberg Opera House belongs to.",
+            "plotCode": "clusters <- runMatrixAnalysis(data = case_file, analysis = \"kmeans\", parameters = c(n_clusters = 5), columns_w_values_for_single_analyte = c(\"entry_height_m\", \"tool_score\", \"approach_min\", \"entry_hour\"), columns_w_sample_ID_info = \"job\")\ncounts <- clusters %>% group_by(cluster) %>% summarize(n = n())\np <- ggplot(counts, aes(x = factor(cluster), y = n)) + geom_col()",
+            "answer": "18",
+            "idColumn": "n",
+            "idNoun": "group",
+            "width": 6,
+            "height": 5,
+            "maxAttempts": 4,
+            "feedback": {
+              "correct": "Correct — noted in your field notebook: tonight's opera-house job belongs with the file's busiest thieving crew, 18 jobs in all.",
+              "wrong": [
+                "Ask the console to cluster for you, on the four measures of the way in (the height of the entry, the tool damage, the length of the approach and the hour), into five groups: <code>clusters &lt;- runMatrixAnalysis(data = case_file, analysis = &quot;kmeans&quot;, parameters = c(n_clusters = 5), columns_w_values_for_single_analyte = c(&quot;entry_height_m&quot;, &quot;tool_score&quot;, &quot;approach_min&quot;, &quot;entry_hour&quot;), columns_w_sample_ID_info = &quot;job&quot;)</code>. It hands back one row per job with its cluster number beside its measures. Then count the jobs in each group and plot them as bars: <code>counts &lt;- clusters %&gt;% group_by(cluster) %&gt;% summarize(n = n())<br>p &lt;- ggplot(counts, aes(x = factor(cluster), y = n)) + geom_col()</code>. Name the count column <code>n</code>, as in <code>summarize(n = n())</code>; that is what makes the bars clickable.",
+                "Anything recording what happened to the goods afterwards belongs to the other half of the case and sorts the same sixty jobs a different way entirely. Leave it out.",
+                "Find the Thalberg Opera House in your result and note its cluster number, then click that group's bar. Its group is also the largest of the five, which is the finding: this is not a copycat, it is the thieving crew that has worked this city hardest."
+              ]
+            }
           }
         },
         {
@@ -576,8 +547,8 @@
             0.6114,
             0.7591
           ],
-          "pickup": "A token from the thieves, left behind at the scene.",
-          "body": "<p>A token from the thieves, left behind at the scene.</p>",
+          "pickup": "A monogrammed lighter — a token from the thieves, left behind at the scene.",
+          "body": "<p>A monogrammed lighter — a token from the thieves, left behind at the scene.</p>",
           "boxSource": "draft:localizer",
           "image": "figures/token_lighter.png",
           "imageNote": "Deterministic pickup plate (2026-09-30). The escape is solved by MARK-MATCHING, and the marks are thumbnail-sized inside a 3072x1024 panorama — several were illegible or absent there. The plate carries the evidence; the room keeps the object and the box. Same call as wrangling/egypt's seals and hierarchical_clustering/temple's votive figures. An image-carrying clue lands on the notebook's draggable IMAGE BOARD rather than the flat Clues list, which is where a five-token comparison wants to be. Generated by _scratch/make_plates.py."
@@ -653,7 +624,8 @@
       "mapPos": {
         "c": 1,
         "r": 0
-      }
+      },
+      "role": "A"
     },
     {
       "key": "a_townhouse",
@@ -671,28 +643,6 @@
           "label": "The dressing-table terminal",
           "note": "the elbow — how many hands?",
           "starterCode": "case_file",
-          "question": {
-            "prompt": "The seals are still on the door; nobody ever worked this house properly. Whoever came in went up the front of the building and through an upper window without laying a tool on it &mdash; nothing whatever like the forced ground-floor entry that opened the opera box &mdash; and the marks on the sash were made on two separate occasions by two different sets of hands. So the file's five parts are a clerk's convenience and not a finding, and the question is no longer which hand did which job. Across the whole file, how many distinct hands do the four entry measurements (<code>entry_height_m</code>, <code>tool_score</code>, <code>approach_min</code> and <code>entry_hour</code>) actually support?",
-            "options": [
-              "3 hands",
-              "4 hands",
-              "5 hands",
-              "6 hands",
-              "7 hands",
-              "8 hands",
-              "9 hands"
-            ],
-            "correct": 2,
-            "maxAttempts": 4,
-            "feedback": {
-              "correct": "Correct — noted in your field notebook: the entry evidence supports five distinct hands at work in the city.",
-              "wrong": [
-                "Ask the console for the elbow itself: <code>runMatrixAnalysis(data = case_file, analysis = &quot;kmeans&quot;, parameters = &quot;elbow&quot;, columns_w_values_for_single_analyte = c(&quot;entry_height_m&quot;, &quot;tool_score&quot;, &quot;approach_min&quot;, &quot;entry_hour&quot;), columns_w_sample_ID_info = &quot;job&quot;)</code>. It hands back one row per candidate number of groups, with <code>k</code> and <code>within_cluster_variance</code>. Plot the second against the first and read the shape of the curve.",
-                "The total always falls as you add groups, so the smallest total is never the criterion — at the far end every job is its own group and the total is nothing at all. What you are looking for is the last split that still buys a large reduction, after which the curve goes nearly flat.",
-                "The curve falls steeply, turns, and then crawls: past the turn, each further group takes less than a single unit off a total that started in the hundreds. Count the groups at the last steep step, not at the first flat one. Your partner is reading the same kind of plot off the disposal measurements and their curve turns somewhere else — that is not a contradiction, and neither of you is wrong."
-              ]
-            }
-          },
           "box": [
             0.5,
             0.649,
@@ -704,14 +654,32 @@
           "solveSfx": {
             "src": "audio/solve_wooden_door.mp3",
             "volume": 0.05
+          },
+          "pick": {
+            "prompt": "Whoever came in this house went up the front of the building and through an upper window without laying a tool on it — nothing whatever like the forced ground-floor entry that opened the opera box — and the marks on the sash were made on two separate occasions by two different thieving crews. Across the whole case file, how many distinct thieving crews do the four entry measurements (entry_height_m, tool_score, approach_min and entry_hour) actually suggest? Plot the elbow, assign the plot to <code>p</code>, draw the clickable chart, and click that number.",
+            "plotCode": "elbow <- runMatrixAnalysis(data = case_file, analysis = \"kmeans\", parameters = \"elbow\", columns_w_values_for_single_analyte = c(\"entry_height_m\", \"tool_score\", \"approach_min\", \"entry_hour\"), columns_w_sample_ID_info = \"job\")\np <- ggplot(elbow, aes(x = k, y = within_cluster_variance)) + geom_line() + geom_point(size = 4)",
+            "answer": "5",
+            "idColumn": "k",
+            "idNoun": "number of thieving crews",
+            "width": 6,
+            "height": 5,
+            "maxAttempts": 4,
+            "feedback": {
+              "correct": "Correct — noted in your field notebook: the entry evidence supports five distinct thieving crews at work in the city.",
+              "wrong": [
+                "Ask the console for the elbow itself: <code>elbow &lt;- runMatrixAnalysis(data = case_file, analysis = &quot;kmeans&quot;, parameters = &quot;elbow&quot;, columns_w_values_for_single_analyte = c(&quot;entry_height_m&quot;, &quot;tool_score&quot;, &quot;approach_min&quot;, &quot;entry_hour&quot;), columns_w_sample_ID_info = &quot;job&quot;)</code>. It hands back one row per candidate number of groups, with <code>k</code> and <code>within_cluster_variance</code>. Plot the second against the first and assign it to <code>p</code>: <code>p &lt;- ggplot(elbow, aes(x = k, y = within_cluster_variance)) + geom_line() + geom_point(size = 4)</code>. Then read the shape of the curve.",
+                "The within-cluster variance always falls as you add groups, so the smallest value is never the criterion — at the far end every job is its own group and there is no within-cluster variance left at all. What you are looking for is the last split that still buys a large reduction, after which the curve goes nearly flat.",
+                "The curve falls steeply, turns, and then crawls: past the turn, each further group takes less than a single unit off a within-cluster variance that started in the hundreds. Count the groups at the last steep step, not at the first flat one. Your partner is reading the same kind of plot off the disposal measurements and their curve turns somewhere else — that is not a contradiction, and neither of you is wrong."
+              ]
+            }
           }
         },
         {
           "type": "clue",
-          "label": "The house manager's card",
-          "pickup": "Behind the pier glass, a card: Mr Silas Whitlock, House Manager — appraisals, discreetly conducted.",
+          "label": "The casino manager's card",
+          "pickup": "Behind the pier glass, a card: Mr. Silas Whitlock, Casino Manager — appraisals, discreetly conducted.",
           "note": "MID-POINT TRADE — the NAME B needs for the casino's private room. Read it aloud to your partner.",
-          "body": "<p>Slipped behind the pier glass, face outward, the way a household keeps a card it expects to need again: <b>Mr Silas Whitlock</b>, House Manager. No address and no telephone &mdash; only the name, and a line of copperplate beneath it: <em>appraisals, discreetly conducted</em>.</p>",
+          "body": "<p>Slipped behind the pier glass, face outward.</p>",
           "box": [
             0.722,
             0.3795,
@@ -719,14 +687,16 @@
             0.4405
           ],
           "boxSource": "draft:localizer",
-          "id": "card"
+          "id": "card",
+          "image": "figures/clue_card.png?v=20261015b",
+          "imageNote": "Pickup plate (2026-10-15, Lucas: make the handshake clues images like the other clues). gpt-image generation via _scratch/make_plates.py; carries the exact token the partner keys, and deliberately no house device."
         },
         {
           "type": "clue",
-          "label": "A bone-coloured chip",
-          "pickup": "A bone-coloured gaming chip — no crest, no name, no value; one small fleur-de-lis pressed into the rim.",
+          "label": "A bone-colored chip",
+          "pickup": "A bone-colored chip — a token from the thieves, left behind at the scene.",
           "note": "TOKEN 2/5 — crew 2's. No crest anywhere. One small FLEUR-DE-LIS pressed into the rim. A can describe it; only B knows whose it is.",
-          "body": "<p>Trodden into the carpet pile under the dressing table, a gaming chip the colour of old bone. No crest on either face, no house name, no value marked anywhere on it. The only mark it carries at all is a small fleur-de-lis pressed into the rim, shallow, about the size of a fingernail.</p>",
+          "body": "<p>A bone-colored chip — a token from the thieves, left behind at the scene.</p>",
           "box": [
             0.235,
             0.8045,
@@ -835,7 +805,7 @@
               "at": "to the right",
               "desc": "a small pale ivory calling card wedged upright into the corner of the tall mirror's gilt frame at eye height, standing clear of the glass and catching the lamplight, its blank face plainly visible",
               "clue": true,
-              "label": "The house manager's card"
+              "label": "The casino manager's card"
             },
             {
               "id": "on",
@@ -867,7 +837,9 @@
         },
         "cinemagraphsVerified": true
       },
-      "entry": "Tonight's hand also did this house three weeks ago — the file lists it in the same series and nobody ever worked it properly. The seals are still on the door.",
+      "entry": {
+        "text": "The city's recent thefts also include a townhouse, and this one is nothing like the opera: no forced door, only a way in through an upper window."
+      },
       "debrief": "The elbow. Within-cluster variance always falls as you add clusters, so 'lowest variance' is not a criterion — it just counts rows. The elbow is where extra clusters stop buying you much, and reading it is a judgement, not an output. Yours said five.",
       "panorama": "a_townhouse/scene.png",
       "builtFrom": "l1_a_townhouse_1.png",
@@ -890,60 +862,58 @@
             0.7312
           ],
           "starterCode": "case_file",
-          "question": {
-            "prompt": "The seals are still on the door; nobody ever worked this house properly. Whoever came in went up the front of the building and through an upper window without laying a tool on it &mdash; nothing whatever like the forced ground-floor entry that opened the opera box &mdash; and the marks on the sash were made on two separate occasions by two different sets of hands. So the file's five parts are a clerk's convenience and not a finding, and the question is no longer which hand did which job. Across the whole file, how many distinct hands do the four entry measurements (<code>entry_height_m</code>, <code>tool_score</code>, <code>approach_min</code> and <code>entry_hour</code>) actually support?",
-            "options": [
-              "3 hands",
-              "4 hands",
-              "5 hands",
-              "6 hands",
-              "7 hands",
-              "8 hands",
-              "9 hands"
-            ],
-            "correct": 2,
-            "maxAttempts": 4,
-            "feedback": {
-              "correct": "Correct — noted in your field notebook: the entry evidence supports five distinct hands at work in the city.",
-              "wrong": [
-                "Ask the console for the elbow itself: <code>runMatrixAnalysis(data = case_file, analysis = &quot;kmeans&quot;, parameters = &quot;elbow&quot;, columns_w_values_for_single_analyte = c(&quot;entry_height_m&quot;, &quot;tool_score&quot;, &quot;approach_min&quot;, &quot;entry_hour&quot;), columns_w_sample_ID_info = &quot;job&quot;)</code>. It hands back one row per candidate number of groups, with <code>k</code> and <code>within_cluster_variance</code>. Plot the second against the first and read the shape of the curve.",
-                "The total always falls as you add groups, so the smallest total is never the criterion — at the far end every job is its own group and the total is nothing at all. What you are looking for is the last split that still buys a large reduction, after which the curve goes nearly flat.",
-                "The curve falls steeply, turns, and then crawls: past the turn, each further group takes less than a single unit off a total that started in the hundreds. Count the groups at the last steep step, not at the first flat one. Your partner is reading the same kind of plot off the disposal measurements and their curve turns somewhere else — that is not a contradiction, and neither of you is wrong."
-              ]
-            }
-          },
           "boxSource": "draft:localizer",
           "solveSfx": {
             "src": "audio/solve_wooden_door.mp3",
             "volume": 0.05
+          },
+          "pick": {
+            "prompt": "Whoever came in this house went up the front of the building and through an upper window without laying a tool on it — nothing whatever like the forced ground-floor entry that opened the opera box — and the marks on the sash were made on two separate occasions by two different thieving crews. Across the whole case file, how many distinct thieving crews do the four entry measurements (entry_height_m, tool_score, approach_min and entry_hour) actually suggest? Plot the elbow, assign the plot to <code>p</code>, draw the clickable chart, and click that number.",
+            "plotCode": "elbow <- runMatrixAnalysis(data = case_file, analysis = \"kmeans\", parameters = \"elbow\", columns_w_values_for_single_analyte = c(\"entry_height_m\", \"tool_score\", \"approach_min\", \"entry_hour\"), columns_w_sample_ID_info = \"job\")\np <- ggplot(elbow, aes(x = k, y = within_cluster_variance)) + geom_line() + geom_point(size = 4)",
+            "answer": "5",
+            "idColumn": "k",
+            "idNoun": "number of thieving crews",
+            "width": 6,
+            "height": 5,
+            "maxAttempts": 4,
+            "feedback": {
+              "correct": "Correct — noted in your field notebook: the entry evidence supports five distinct thieving crews at work in the city.",
+              "wrong": [
+                "Ask the console for the elbow itself: <code>elbow &lt;- runMatrixAnalysis(data = case_file, analysis = &quot;kmeans&quot;, parameters = &quot;elbow&quot;, columns_w_values_for_single_analyte = c(&quot;entry_height_m&quot;, &quot;tool_score&quot;, &quot;approach_min&quot;, &quot;entry_hour&quot;), columns_w_sample_ID_info = &quot;job&quot;)</code>. It hands back one row per candidate number of groups, with <code>k</code> and <code>within_cluster_variance</code>. Plot the second against the first and assign it to <code>p</code>: <code>p &lt;- ggplot(elbow, aes(x = k, y = within_cluster_variance)) + geom_line() + geom_point(size = 4)</code>. Then read the shape of the curve.",
+                "The within-cluster variance always falls as you add groups, so the smallest value is never the criterion — at the far end every job is its own group and there is no within-cluster variance left at all. What you are looking for is the last split that still buys a large reduction, after which the curve goes nearly flat.",
+                "The curve falls steeply, turns, and then crawls: past the turn, each further group takes less than a single unit off a within-cluster variance that started in the hundreds. Count the groups at the last steep step, not at the first flat one. Your partner is reading the same kind of plot off the disposal measurements and their curve turns somewhere else — that is not a contradiction, and neither of you is wrong."
+              ]
+            }
           }
         },
         {
           "id": "card",
           "type": "clue",
-          "label": "The house manager's card",
+          "label": "The casino manager's card",
           "box": [
             0.7369,
             0.4208,
             0.7569,
             0.4818
           ],
-          "pickup": "Behind the pier glass, a card: Mr Silas Whitlock, House Manager — appraisals, discreetly conducted.",
-          "body": "<p>Slipped behind the pier glass, face outward, the way a household keeps a card it expects to need again: <b>Mr Silas Whitlock</b>, House Manager. No address and no telephone &mdash; only the name, and a line of copperplate beneath it: <em>appraisals, discreetly conducted</em>.</p>",
-          "boxSource": "draft:localizer"
+          "pickup": "Behind the pier glass, a card: Mr. Silas Whitlock, Casino Manager — appraisals, discreetly conducted.",
+          "body": "<p>Slipped behind the pier glass, face outward.</p>",
+          "boxSource": "draft:localizer",
+          "image": "figures/clue_card.png?v=20261015b",
+          "imageNote": "Pickup plate (2026-10-15, Lucas: make the handshake clues images like the other clues). gpt-image generation via _scratch/make_plates.py; carries the exact token the partner keys, and deliberately no house device."
         },
         {
           "id": "chip",
           "type": "clue",
-          "label": "A bone-coloured chip",
+          "label": "A bone-colored chip",
           "box": [
             0.2415,
             0.8115,
             0.2743,
             0.8987
           ],
-          "pickup": "A token from the thieves, left behind at the scene.",
-          "body": "<p>A token from the thieves, left behind at the scene.</p>",
+          "pickup": "A bone-colored chip — a token from the thieves, left behind at the scene.",
+          "body": "<p>A bone-colored chip — a token from the thieves, left behind at the scene.</p>",
           "boxSource": "draft:localizer",
           "image": "figures/token_chip.png",
           "imageNote": "Deterministic pickup plate (2026-09-30). The escape is solved by MARK-MATCHING, and the marks are thumbnail-sized inside a 3072x1024 panorama — several were illegible or absent there. The plate carries the evidence; the room keeps the object and the box. Same call as wrangling/egypt's seals and hierarchical_clustering/temple's votive figures. An image-carrying clue lands on the notebook's draggable IMAGE BOARD rather than the flat Clues list, which is where a five-token comparison wants to be. Generated by _scratch/make_plates.py."
@@ -1019,12 +989,13 @@
       "mapPos": {
         "c": 2,
         "r": 0
-      }
+      },
+      "role": "A"
     },
     {
       "key": "a_gallery",
       "title": "The Gallery, After Hours",
-      "technique": "summarise by cluster",
+      "technique": "summarize by cluster",
       "puzzleType": 1,
       "phase": "analysis",
       "built": true,
@@ -1039,10 +1010,10 @@
           "id": "evidence_locker",
           "answer": "78451",
           "length": 5,
-          "lockedBody": "A steel press, Service property, with a keypad where the handle should be. Everything inside was booked in against the docket the consignment was filed under, and that number was never written down anywhere on this side of the case.",
+          "lockedBody": "A steel press, Service property, with a keypad where the handle should be. It opens to the number on its evidence ticket, and that ticket is not anywhere on this side of the case.",
           "feedback": {
             "correct": "The bolt goes back and the drawer runs out on its rollers: casts, photographs, and one sealed bag from a job you have never been to.",
-            "wrong": "The keypad clicks once and clears itself. That is not the docket.",
+            "wrong": "The keypad clicks once and clears itself. That is not the ticket number.",
             "out": ""
           },
           "box": [
@@ -1069,28 +1040,6 @@
           "label": "The conservator's terminal",
           "note": "summarise by cluster",
           "starterCode": "case_file",
-          "question": {
-            "prompt": "The vitrine in the long room stands open and empty, and whoever emptied it came in through the glazed barrel roof three storeys up. The Service keeps every cast, photograph and measurement it holds in the store behind you, because a group is only a number until you can say what its members have in common. Of the five hands you found in the file, sorted on the same four entry measurements (<code>entry_height_m</code>, <code>tool_score</code>, <code>approach_min</code> and <code>entry_hour</code>), one goes in higher than any of the others. How many jobs is that hand responsible for?",
-            "options": [
-              "5 jobs",
-              "8 jobs",
-              "9 jobs",
-              "10 jobs",
-              "11 jobs",
-              "13 jobs",
-              "18 jobs"
-            ],
-            "correct": 3,
-            "maxAttempts": 4,
-            "feedback": {
-              "correct": "Correct — noted in your field notebook: the crew that goes in highest is ten jobs strong.",
-              "wrong": [
-                "Group the sixty by their entry evidence as before. The result carries each job's cluster number beside its measures, so summarise within each group instead of reading single jobs: <code>group_by(cluster)</code>, then take the mean of each measurement. Heights are what you are after.",
-                "Compare group averages, not individual climbs: one spectacular entry does not make a hand, and this gallery's own roof is a single job among sixty. Two of the groups work at height and they are only a couple of metres apart, so read them carefully.",
-                "Take the group with the highest average entry, then count its rows. The answer is how many jobs that group holds — not its average height, not how many groups there are, and not the size of the busiest group, which is a different hand answering a different question."
-              ]
-            }
-          },
           "box": [
             0.5,
             0.5395,
@@ -1103,14 +1052,31 @@
             "src": "audio/a_gallery_shot_door_reverb.mp3",
             "volume": 0.09853516747143992
           },
-          "boxNote": "2026-10-04 pre-redraw: was boxSource=draft:localizer, box=[0.46, 0.65, 0.49, 0.746]; demoted so the placer re-drafts on the new art"
+          "boxNote": "2026-10-04 pre-redraw: was boxSource=draft:localizer, box=[0.46, 0.65, 0.49, 0.746]; demoted so the placer re-drafts on the new art",
+          "check": {
+            "prompt": "The enclosure in the long room stands open and empty, and whoever emptied it came in through the glazed barrel roof three stories up. Of the five thieving crews you found in the file, sorted on the same four entry measurements (entry_height_m, tool_score, approach_min and entry_hour), one goes in higher than any of the others. Assign the number of jobs that crew is responsible for to an object called <code>answer</code>, then click \"Check my answer\".",
+            "requires": [
+              "answer"
+            ],
+            "expr": "isTRUE(as.numeric(answer) == 10)",
+            "hint": "Cluster on the four entry measures, average the entry height within each group, then count the jobs in the group that goes in highest.",
+            "maxAttempts": 4,
+            "feedback": {
+              "correct": "Correct — noted in your field notebook: the crew that goes in highest is ten jobs strong.",
+              "wrong": [
+                "Group the sixty by their entry evidence as before. The result carries each job's cluster number beside its measures, so summarize within each group instead of reading single jobs: <code>group_by(cluster)</code>, then take the mean of each measurement. Heights are what you are after.",
+                "Compare group averages, not individual climbs: one spectacular entry does not make a thieving crew, and this gallery's own roof is a single job among sixty. Two of the groups work at height and they are only a couple of meters apart, so read them carefully.",
+                "Take the group with the highest average entry, count its rows, and assign that count to <code>answer</code>: not its average height, not how many groups there are, and not the size of the busiest group, which is a different thieving crew answering a different question."
+              ]
+            }
+          }
         },
         {
           "type": "clue",
           "label": "A hotel key fob",
-          "pickup": "From the Service's evidence locker, NOT from tonight's gallery job: a bagged hotel key fob from a different job three months ago — no name and no crest, only the number 3247 burned into the leather.",
+          "pickup": "A hotel key fob — a token from the thieves, left behind at an older scene and held in the evidence locker.",
           "note": "TOKEN 3/5 — crew 3's, EVIDENCE-BAGGED from a job A never visits (this room is the evidence store). Its only mark is a serial in one narrow band. A can read the number but cannot place it.",
-          "body": "<p>At the front of the run-out drawer, a sealed evidence bag &mdash; and it has nothing to do with tonight. The tag on it is from a different job, three months old, at a place you have never been; the bag is only here because this is where the Service stores what it holds. Whoever left it, it was not whoever worked this gallery.</p><p>Inside the bag, a hotel key fob: brass on a worn leather strap, no house name, no crest, nothing stamped on it anywhere but a number &mdash; <b>3247</b> &mdash; burned into the leather in a small neat figure.</p>",
+          "body": "<p>A hotel key fob — a token from the thieves, left behind at an older scene and held in the evidence locker.</p>",
           "box": [
             0.085,
             0.5,
@@ -1133,9 +1099,9 @@
         {
           "type": "clue",
           "label": "A book of matches",
-          "pickup": "From tonight's gallery job, on the conservator's trolley: a book of matches, the address burnt off — a fleur-de-lis blind-embossed inside the cover, no ink in it.",
+          "pickup": "A book of matches — a token from the thieves, left behind at the scene.",
           "note": "TOKEN 4/5 — crew 4's. The address is burnt away; what survives is a FLEUR-DE-LIS blind-embossed inside the cover.",
-          "body": "<p>On the conservator's trolley, where the contents of the vitrine were laid out and listed, a book of matches with its address burnt away to a brown crescent. Open the cover and one mark is left in the card: a fleur-de-lis, blind-embossed, no ink in it at all. You find it with a thumbnail before you see it.</p>",
+          "body": "<p>A book of matches — a token from the thieves, left behind at the scene.</p>",
           "box": [
             0.66,
             0.5995,
@@ -1180,7 +1146,7 @@
           ],
           "boxSource": "moved:testplay",
           "id": "on",
-          "lockedBody": "The locker holds. Your analysis is done and this door is not the thing stopping you — the consignment number is written on a docket your partner is looking at, and not anywhere in this building. Ask them for it.",
+          "lockedBody": "The locker holds. Your analysis is done and this door is not the thing stopping you — the locker's ticket number is in your partner's hands, not anywhere in this building. Ask them for it.",
           "boxNote": "2026-10-04 pre-redraw: was boxSource=draft:localizer, box=[0.836, 0.31, 0.884, 0.71]; demoted so the placer re-drafts on the new art"
         }
       ],
@@ -1309,8 +1275,10 @@
           "at": "2026-10-05T15:13:34"
         }
       },
-      "entry": "Two houses, two entirely different hands. Before you can say how many are working, you need what separates them — and every cast, mark and photograph the Service holds is in the museum's evidence store. The gallery itself was one of the twelve.",
-      "debrief": "Summarising by cluster is what makes a cluster mean something. A group number is arbitrary until you ask what its members have in common — here, that one crew goes in higher than any other. Clusters become findings only when you describe them.",
+      "entry": {
+        "text": "The city museum has been the subject of multiple robberies recently. Be sure to check their evidence locker as you pass through."
+      },
+      "debrief": "Summarizing by cluster is what makes a cluster mean something. A group number is arbitrary until you ask what its members have in common — here, that one crew goes in higher than any other. Clusters become findings only when you describe them.",
       "panorama": "a_gallery/scene.png",
       "builtFrom": "l1_a_gallery_2.png",
       "wrap": {
@@ -1333,10 +1301,10 @@
           ],
           "answer": "78451",
           "length": 5,
-          "lockedBody": "A steel press, Service property, with a keypad where the handle should be. Everything inside was booked in against the docket the consignment was filed under, and that number was never written down anywhere on this side of the case.",
+          "lockedBody": "A steel press, Service property, with a keypad where the handle should be. It opens to the number on its evidence ticket, and that ticket is not anywhere on this side of the case.",
           "feedback": {
             "correct": "The bolt goes back and the drawer runs out on its rollers: casts, photographs, and one sealed bag from a job you have never been to.",
-            "wrong": "The keypad clicks once and clears itself. That is not the docket.",
+            "wrong": "The keypad clicks once and clears itself. That is not the ticket number.",
             "out": ""
           },
           "boxSource": "moved:testplay",
@@ -1363,34 +1331,29 @@
             0.5958
           ],
           "starterCode": "case_file",
-          "question": {
-            "prompt": "The vitrine in the long room stands open and empty, and whoever emptied it came in through the glazed barrel roof three storeys up. The Service keeps every cast, photograph and measurement it holds in the store behind you, because a group is only a number until you can say what its members have in common. Of the five hands you found in the file, sorted on the same four entry measurements (<code>entry_height_m</code>, <code>tool_score</code>, <code>approach_min</code> and <code>entry_hour</code>), one goes in higher than any of the others. How many jobs is that hand responsible for?",
-            "options": [
-              "5 jobs",
-              "8 jobs",
-              "9 jobs",
-              "10 jobs",
-              "11 jobs",
-              "13 jobs",
-              "18 jobs"
-            ],
-            "correct": 3,
-            "maxAttempts": 4,
-            "feedback": {
-              "correct": "Correct — noted in your field notebook: the crew that goes in highest is ten jobs strong.",
-              "wrong": [
-                "Group the sixty by their entry evidence as before. The result carries each job's cluster number beside its measures, so summarise within each group instead of reading single jobs: <code>group_by(cluster)</code>, then take the mean of each measurement. Heights are what you are after.",
-                "Compare group averages, not individual climbs: one spectacular entry does not make a hand, and this gallery's own roof is a single job among sixty. Two of the groups work at height and they are only a couple of metres apart, so read them carefully.",
-                "Take the group with the highest average entry, then count its rows. The answer is how many jobs that group holds — not its average height, not how many groups there are, and not the size of the busiest group, which is a different hand answering a different question."
-              ]
-            }
-          },
           "boxSource": "moved:testplay",
           "solveSfx": {
             "src": "audio/a_gallery_shot_door_reverb.mp3",
             "volume": 0.09853516747143992
           },
-          "boxNote": "2026-10-04 pre-redraw: was boxSource=draft:localizer, box=[0.46, 0.65, 0.49, 0.746]; demoted so the placer re-drafts on the new art"
+          "boxNote": "2026-10-04 pre-redraw: was boxSource=draft:localizer, box=[0.46, 0.65, 0.49, 0.746]; demoted so the placer re-drafts on the new art",
+          "check": {
+            "prompt": "The enclosure in the long room stands open and empty, and whoever emptied it came in through the glazed barrel roof three stories up. Of the five thieving crews you found in the file, sorted on the same four entry measurements (entry_height_m, tool_score, approach_min and entry_hour), one goes in higher than any of the others. Assign the number of jobs that crew is responsible for to an object called <code>answer</code>, then click \"Check my answer\".",
+            "requires": [
+              "answer"
+            ],
+            "expr": "isTRUE(as.numeric(answer) == 10)",
+            "hint": "Cluster on the four entry measures, average the entry height within each group, then count the jobs in the group that goes in highest.",
+            "maxAttempts": 4,
+            "feedback": {
+              "correct": "Correct — noted in your field notebook: the crew that goes in highest is ten jobs strong.",
+              "wrong": [
+                "Group the sixty by their entry evidence as before. The result carries each job's cluster number beside its measures, so summarize within each group instead of reading single jobs: <code>group_by(cluster)</code>, then take the mean of each measurement. Heights are what you are after.",
+                "Compare group averages, not individual climbs: one spectacular entry does not make a thieving crew, and this gallery's own roof is a single job among sixty. Two of the groups work at height and they are only a couple of meters apart, so read them carefully.",
+                "Take the group with the highest average entry, count its rows, and assign that count to <code>answer</code>: not its average height, not how many groups there are, and not the size of the busiest group, which is a different thieving crew answering a different question."
+              ]
+            }
+          }
         },
         {
           "id": "fob",
@@ -1402,8 +1365,8 @@
             0.175,
             0.62
           ],
-          "pickup": "A token from the thieves, left behind at an older scene and held in the Service's evidence locker.",
-          "body": "<p>A token from the thieves, left behind at an older scene and held in the Service's evidence locker.</p>",
+          "pickup": "A hotel key fob — a token from the thieves, left behind at an older scene and held in the evidence locker.",
+          "body": "<p>A hotel key fob — a token from the thieves, left behind at an older scene and held in the evidence locker.</p>",
           "boxSource": "draft:pre-regen",
           "shownWhen": {
             "eq": [
@@ -1421,14 +1384,14 @@
           "type": "clue",
           "label": "A book of matches",
           "box": [
-            0.66,
-            0.5995,
-            0.68,
-            0.6605
+            0.678,
+            0.6028,
+            0.698,
+            0.6638
           ],
-          "pickup": "A token from the thieves, left behind at the scene.",
-          "body": "<p>A token from the thieves, left behind at the scene.</p>",
-          "boxSource": "draft:localizer",
+          "pickup": "A book of matches — a token from the thieves, left behind at the scene.",
+          "body": "<p>A book of matches — a token from the thieves, left behind at the scene.</p>",
+          "boxSource": "moved:testplay",
           "image": "figures/token_matches.png",
           "imageNote": "Deterministic pickup plate (2026-09-30). The escape is solved by MARK-MATCHING, and the marks are thumbnail-sized inside a 3072x1024 panorama — several were illegible or absent there. The plate carries the evidence; the room keeps the object and the box. Same call as wrangling/egypt's seals and hierarchical_clustering/temple's votive figures. An image-carrying clue lands on the notebook's draggable IMAGE BOARD rather than the flat Clues list, which is where a five-token comparison wants to be. Generated by _scratch/make_plates.py.",
           "boxNote": "2026-10-04 pre-redraw: was boxSource=draft:localizer, box=[0.52, 0.5, 0.56, 0.6]; demoted so the placer re-drafts on the new art"
@@ -1465,7 +1428,7 @@
             "evidence_locker"
           ],
           "boxSource": "moved:testplay",
-          "lockedBody": "The locker holds. Your analysis is done and this door is not the thing stopping you — the consignment number is written on a docket your partner is looking at, and not anywhere in this building. Ask them for it.",
+          "lockedBody": "The locker holds. Your analysis is done and this door is not the thing stopping you — the locker's ticket number is in your partner's hands, not anywhere in this building. Ask them for it.",
           "boxNote": "2026-10-04 pre-redraw: was boxSource=draft:localizer, box=[0.836, 0.31, 0.884, 0.71]; demoted so the placer re-drafts on the new art"
         },
         {
@@ -1561,7 +1524,8 @@
       "mapPos": {
         "c": 3,
         "r": 0
-      }
+      },
+      "role": "A"
     },
     {
       "key": "a_vault",
@@ -1580,7 +1544,7 @@
           "note": "the scaling trap (BOSS)",
           "starterCode": "runMatrixAnalysis(\n    data = case_file,\n    analysis = \"kmeans\",\n    parameters = c(n_clusters = 5),\n    columns_w_values_for_single_analyte = c(\"entry_height_m\", \"tool_score\", \"approach_min\", \"entry_hour\", \"minutes_inside\"),\n    columns_w_sample_ID_info = \"job\",\n    scale_variance = FALSE\n)",
           "question": {
-            "prompt": "The circular door stands open on its lugs, undamaged. Nothing here was forced, prised or broken; the largest haul in the file walked out through an open door last week and the strongroom has never been attributed to anybody. In the file it is one line like any other. The bench will sort the sixty into the five hands on everything the file records about how each place was entered, the time spent inside included, and a draft of that sort has been left on it. Which of these jobs was done by the same hand as the Ardsley Strongroom?",
+            "prompt": "The circular door stands open on its lugs, undamaged. Nothing here was forced, prised, or broken; the largest haul in the file walked out through an open door last week and the vault job has never been attributed to anybody. In the file it is one line like any other.\n\nYou've been working on this analysis, to sort the sixty jobs into the five thieving crews on everything the file records about how each place was entered, the time spent inside included, but something is wrong!\n\nFix the code and answer: which of these jobs was done by the same thieving crew as this vault, the \"Ardsley Strongroom\"?",
             "options": [
               "Aldwick Court",
               "Ashcombe Villa",
@@ -1593,11 +1557,11 @@
             "correct": 5,
             "maxAttempts": 4,
             "feedback": {
-              "correct": "Correct — noted in your field notebook: the Ardsley Strongroom was done by the same hand as Garsington Row. The bench prints a passage number with it — <b>4827</b> — against a vessel you have no business with. Read it to your partner; it is not for you.",
+              "correct": "Correct — noted in your field notebook: the Ardsley Strongroom was done by the same thieving crew as Garsington Row. The bench printed one more line beneath the result: <b>4827</b>.",
               "wrong": [
                 "A draft sort is already on the bench. Run it, find the Ardsley Strongroom's cluster number, then list every job that carries the same number and see which of the offered names is among them.",
                 "One of the entry measurements runs to hundreds while the rest sit in single figures, and k-means adds up squared differences, so a column in big numbers decides every group by itself. Read the last line of the draft: <code>scale_variance = FALSE</code> tells the bench to cluster the numbers exactly as they stand. Which way should that setting go when the columns are in such different units?",
-                "The hand you are looking for forces nothing, spends a long time on the approach and goes in at the small hours — and it is a small group. At least one name on this list matches the strongroom only on time spent inside, which is exactly what you get for not scaling."
+                "The thieving crew you are looking for forces nothing, spends a long time on the approach and goes in at the small hours — and it is a small group. At least one name on this list matches the strongroom only on time spent inside, which is exactly what you get for not scaling."
               ]
             }
           },
@@ -1617,9 +1581,9 @@
         {
           "type": "clue",
           "label": "A luggage tag",
-          "pickup": "A leather luggage tag — a crest struck into it once and worn nearly smooth, but the shield and its rearing beast still read.",
+          "pickup": "A luggage tag — a token from the thieves, left behind at the scene.",
           "note": "TOKEN 5/5 — crew 5's. The same MARQUE as the lighter, worn thin by handling — A can see there is a stamp but not read it.",
-          "body": "<p>Hanging from the handle of an emptied deposit case, a leather luggage tag gone soft with handling. Something was struck into it once and struck deep: a shield, and a rearing beast inside the shield. The surface has been rubbed almost smooth with handling, but not quite — tilted to the light, the beast still reads.</p>",
+          "body": "<p>A luggage tag — a token from the thieves, left behind at the scene.</p>",
           "box": [
             0.575,
             0.7045,
@@ -1652,7 +1616,7 @@
           "id": "gala_invitation",
           "answer": "SABLE",
           "length": 5,
-          "lockedBody": "A stiff engraved card propped on the keypad shelf: a gala aboard the Aurelia, from midnight until the tide turns, one passage per name. Where the name should be there is a blank slot and a row of keys, and the card will not come away from the shelf until the slot is filled.",
+          "lockedBody": "A stiff engraved card propped on the keypad shelf: a gala aboard the Aurelia, from midnight until morning, one passage per name. Where the name should be there is a blank slot and a row of keys, and the card will not come away from the shelf until the slot is filled.",
           "feedback": {
             "correct": "The slot takes it and the card stamps itself through with a thump: one passage, and the launch waiting at the water steps.",
             "wrong": "The card comes back unstamped.",
@@ -1795,11 +1759,21 @@
           "accepted": true,
           "seamBandRun": 0.044,
           "acceptedBy": "lucas 2026-09-19",
-          "humanNote": "lucas 2026-09-19 — reviewed all 10 rooms in the mobile 360 viewer (stills + staged cinemagraphs) and approved: \"all the art is good, including the scenes\". Recorded by agent on his explicit instruction; the eye that certified is his."
+          "humanNote": "lucas 2026-09-19 — reviewed all 10 rooms in the mobile 360 viewer (stills + staged cinemagraphs) and approved: \"all the art is good, including the scenes\". Recorded by agent on his explicit instruction; the eye that certified is his.",
+          "states": {
+            "vault_open": {
+              "accepted": true,
+              "acceptedBy": "lucas via agent 2026-10-15",
+              "humanNote": "Lucas, 2026-10-15, after the heist audit listed these unaccepted state variants: \"All art has my approval.\"",
+              "at": "2026-10-15T22:00:31"
+            }
+          }
         },
         "cinemagraphsVerified": true
       },
-      "entry": "You have a signature for each crew now. One of them forces nothing at all and is simply let in. The largest job in the file — the strongroom, last week — has never been attributed to anybody.",
+      "entry": {
+        "text": "You have a signature for each thieving crew now. One of them forces nothing at all and is simply let in. Still, the largest job in the file — the vault, last week — has never been attributed to anybody."
+      },
       "debrief": "The scaling trap. k-means measures straight-line distance, so a column in hundreds drowns columns in single digits — cluster the entry block raw and you group by how LONG they were inside rather than how they got in. Scaling is not tidying-up; it decides what the question was.",
       "panorama": "a_vault/scene.png",
       "builtFrom": "l1_a_vault_1.png",
@@ -1823,7 +1797,7 @@
           ],
           "starterCode": "runMatrixAnalysis(\n    data = case_file,\n    analysis = \"kmeans\",\n    parameters = c(n_clusters = 5),\n    columns_w_values_for_single_analyte = c(\"entry_height_m\", \"tool_score\", \"approach_min\", \"entry_hour\", \"minutes_inside\"),\n    columns_w_sample_ID_info = \"job\",\n    scale_variance = FALSE\n)",
           "question": {
-            "prompt": "The circular door stands open on its lugs, undamaged. Nothing here was forced, prised or broken; the largest haul in the file walked out through an open door last week and the strongroom has never been attributed to anybody. In the file it is one line like any other. The bench will sort the sixty into the five hands on everything the file records about how each place was entered, the time spent inside included, and a draft of that sort has been left on it. Which of these jobs was done by the same hand as the Ardsley Strongroom?",
+            "prompt": "The circular door stands open on its lugs, undamaged. Nothing here was forced, prised, or broken; the largest haul in the file walked out through an open door last week and the vault job has never been attributed to anybody. In the file it is one line like any other.\n\nYou've been working on this analysis, to sort the sixty jobs into the five thieving crews on everything the file records about how each place was entered, the time spent inside included, but something is wrong!\n\nFix the code and answer: which of these jobs was done by the same thieving crew as this vault, the \"Ardsley Strongroom\"?",
             "options": [
               "Aldwick Court",
               "Ashcombe Villa",
@@ -1836,11 +1810,11 @@
             "correct": 5,
             "maxAttempts": 4,
             "feedback": {
-              "correct": "Correct — noted in your field notebook: the Ardsley Strongroom was done by the same hand as Garsington Row. The bench prints a passage number with it — <b>4827</b> — against a vessel you have no business with. Read it to your partner; it is not for you.",
+              "correct": "Correct — noted in your field notebook: the Ardsley Strongroom was done by the same thieving crew as Garsington Row. The bench printed one more line beneath the result: <b>4827</b>.",
               "wrong": [
                 "A draft sort is already on the bench. Run it, find the Ardsley Strongroom's cluster number, then list every job that carries the same number and see which of the offered names is among them.",
                 "One of the entry measurements runs to hundreds while the rest sit in single figures, and k-means adds up squared differences, so a column in big numbers decides every group by itself. Read the last line of the draft: <code>scale_variance = FALSE</code> tells the bench to cluster the numbers exactly as they stand. Which way should that setting go when the columns are in such different units?",
-                "The hand you are looking for forces nothing, spends a long time on the approach and goes in at the small hours — and it is a small group. At least one name on this list matches the strongroom only on time spent inside, which is exactly what you get for not scaling."
+                "The thieving crew you are looking for forces nothing, spends a long time on the approach and goes in at the small hours — and it is a small group. At least one name on this list matches the strongroom only on time spent inside, which is exactly what you get for not scaling."
               ]
             }
           },
@@ -1860,8 +1834,8 @@
             0.631,
             0.811
           ],
-          "pickup": "A token from the thieves, left behind at the scene.",
-          "body": "<p>A token from the thieves, left behind at the scene.</p>",
+          "pickup": "A luggage tag — a token from the thieves, left behind at the scene.",
+          "body": "<p>A luggage tag — a token from the thieves, left behind at the scene.</p>",
           "boxSource": "draft:localizer",
           "image": "figures/token_tag.png",
           "imageNote": "Deterministic pickup plate (2026-09-30). The escape is solved by MARK-MATCHING, and the marks are thumbnail-sized inside a 3072x1024 panorama — several were illegible or absent there. The plate carries the evidence; the room keeps the object and the box. Same call as wrangling/egypt's seals and hierarchical_clustering/temple's votive figures. An image-carrying clue lands on the notebook's draggable IMAGE BOARD rather than the flat Clues list, which is where a five-token comparison wants to be. Generated by _scratch/make_plates.py."
@@ -1885,20 +1859,20 @@
           "type": "lock",
           "label": "The gala invitation",
           "box": [
-            0.6888,
-            0.5578,
-            0.7388,
-            0.7578
+            0.7218,
+            0.3738,
+            0.7718,
+            0.5738
           ],
           "answer": "SABLE",
           "length": 5,
-          "lockedBody": "A stiff engraved card propped on the keypad shelf: a gala aboard the Aurelia, from midnight until the tide turns, one passage per name. Where the name should be there is a blank slot and a row of keys, and the card will not come away from the shelf until the slot is filled.",
+          "lockedBody": "A stiff engraved card propped on the keypad shelf: a gala aboard the Aurelia, from midnight until morning, one passage per name. Where the name should be there is a blank slot and a row of keys, and the card will not come away from the shelf until the slot is filled.",
           "feedback": {
             "correct": "The slot takes it and the card stamps itself through with a thump: one passage, and the launch waiting at the water steps.",
             "wrong": "The card comes back unstamped.",
             "out": ""
           },
-          "boxSource": "draft:localizer",
+          "boxSource": "moved:testplay",
           "solveSfx": {
             "src": "audio/solve_brass_door.mp3",
             "volume": 0.08
@@ -1915,10 +1889,10 @@
           "type": "door",
           "label": "Aboard, to the gala",
           "box": [
-            0.7676,
-            0.1717,
-            0.8551,
-            0.779
+            0.7915,
+            0.1586,
+            0.879,
+            0.7659
           ],
           "direction": "open",
           "to": "gala",
@@ -1926,7 +1900,7 @@
             "console",
             "gala_invitation"
           ],
-          "boxSource": "draft:localizer",
+          "boxSource": "moved:testplay",
           "lockedBody": "The invitation is not in your name until it carries the passenger it was issued to. Your partner has that name off the manifest; you cannot get it from this room. Ask them."
         },
         {
@@ -2029,7 +2003,8 @@
       "mapPos": {
         "c": 4,
         "r": 0
-      }
+      },
+      "role": "A"
     },
     {
       "key": "b_pawnshop",
@@ -2047,28 +2022,6 @@
           "label": "The counter terminal",
           "note": "k-means on the disposal block",
           "starterCode": "case_file",
-          "question": {
-            "prompt": "Whatever leaves a crime scene has to surface somewhere, and for most of it the first stop is a counter like this one. The file runs to sixty jobs over three years. The Service has always suspected three brokers of selling stolen goods out of this city, but the Service has never once been able to say which theft went out through which broker.\n\nTake the four measurements the file records about disposal (days_to_surface, lot_size, recut_score and ports_used) — what became of the goods after they left the scene, not how the scene was entered — and sort the sixty jobs into those three routes. How many of the sixty went out through the busiest broker?",
-            "options": [
-              "9 jobs",
-              "16 jobs",
-              "22 jobs",
-              "24 jobs",
-              "29 jobs",
-              "38 jobs",
-              "all 60 jobs"
-            ],
-            "correct": 4,
-            "maxAttempts": 4,
-            "feedback": {
-              "correct": "Correct — noted in your field notebook: the busiest disposal channel moved 29 of the 60 jobs.",
-              "wrong": [
-                "The disposal evidence is four measures: days to surface, lot size, recut score and ports used. Ask the console to sort the sixty into three routes on those four: <code>runMatrixAnalysis(data = case_file, analysis = &quot;kmeans&quot;, parameters = c(n_clusters = 3), columns_w_values_for_single_analyte = c(&quot;days_to_surface&quot;, &quot;lot_size&quot;, &quot;recut_score&quot;, &quot;ports_used&quot;), columns_w_sample_ID_info = &quot;job&quot;)</code>, then count the rows in each cluster. The console puts measures recorded in very different units on a common footing by default, so leave <code>scale_variance</code> alone. What a haul was <i>worth</i> is not a disposal measure; leave the money out of it.",
-                "The three routes come out badly uneven. You want the count of the largest one — not the size of the file, and not the one just below it.",
-                "If your groups came out near 24 / 20 / 16, the money column is doing the grouping: unscaled, it runs to tens of thousands and drowns everything else, so the sort is by how much was taken rather than by how it moved. Leave the money out, and check that <code>scale_variance</code> has not been switched off."
-              ]
-            }
-          },
           "box": [
             0.502,
             0.604,
@@ -2080,14 +2033,32 @@
           "solveSfx": {
             "src": "audio/solve_wooden_door.mp3",
             "volume": 0.05
+          },
+          "pick": {
+            "prompt": "The Service has always suspected three resellers of selling stolen goods out of this city, but the Service has never once been able to say which thieves work with which reseller. Take the four measurements the file records about disposal (days_to_surface, lot_size, recut_score and ports_used) — what became of the goods after they left the scene, not how the scene was entered — and cluster the sixty jobs into those three resellers, then count how many jobs went through each. Make a bar chart of those counts, assign it to <code>p</code>, draw the clickable chart, and click the bar for the busiest reseller.",
+            "plotCode": "clusters <- runMatrixAnalysis(data = case_file, analysis = \"kmeans\", parameters = c(n_clusters = 3), columns_w_values_for_single_analyte = c(\"days_to_surface\", \"lot_size\", \"recut_score\", \"ports_used\"), columns_w_sample_ID_info = \"job\")\ncounts <- clusters %>% group_by(cluster) %>% summarize(n = n())\np <- ggplot(counts, aes(x = factor(cluster), y = n)) + geom_col()",
+            "answer": "29",
+            "idColumn": "n",
+            "idNoun": "reseller",
+            "width": 6,
+            "height": 5,
+            "maxAttempts": 4,
+            "feedback": {
+              "correct": "Correct — noted in your field notebook: the busiest reseller moved 29 of the 60 jobs.",
+              "wrong": [
+                "The disposal evidence is four measures: days to surface, lot size, recut score and ports used. Ask the console to sort the sixty into three resellers on those four: <code>clusters &lt;- runMatrixAnalysis(data = case_file, analysis = &quot;kmeans&quot;, parameters = c(n_clusters = 3), columns_w_values_for_single_analyte = c(&quot;days_to_surface&quot;, &quot;lot_size&quot;, &quot;recut_score&quot;, &quot;ports_used&quot;), columns_w_sample_ID_info = &quot;job&quot;)</code>, then count the jobs in each cluster and plot them as bars: <code>counts &lt;- clusters %&gt;% group_by(cluster) %&gt;% summarize(n = n())<br>p &lt;- ggplot(counts, aes(x = factor(cluster), y = n)) + geom_col()</code>. Name the count column <code>n</code>, as in <code>summarize(n = n())</code>; that is what makes the bars clickable. The console puts measures recorded in very different units on a common footing by default, so leave <code>scale_variance</code> alone. What a haul was <i>worth</i> is not a disposal measure; leave the money out of it.",
+                "The three resellers come out badly uneven. Click the tallest bar, not the one just below it.",
+                "If your groups came out near 24 / 20 / 16, the money column is doing the grouping: unscaled, it runs to tens of thousands and drowns everything else, so the sort is by how much was taken rather than by how it moved. Leave the money out, and check that <code>scale_variance</code> has not been switched off."
+              ]
+            }
           }
         },
         {
           "type": "clue",
-          "label": "The ledger under the counter",
+          "label": "The pawnbroker's ledger",
           "note": "ESTABLISHMENT 1/3 — the bone house. It stamps NO crest on anything. Its goods carry one small FLEUR-DE-LIS pressed into the surface, and nothing else. The stamp itself sits in the ledger.",
-          "body": "<p>The pledge ledger lies chained under the counter, still open at this week's trade. Nothing on the page is crested and nothing is named — this house signs for nothing it takes.</p><p>What it does instead is on every line: one small mark pressed into the paper beside each entry, a <b>fleur-de-lis</b> no bigger than a thumbnail, and nothing else beside it. The stamp that made them sits worn smooth in the gutter of the book. This broker's goods carry the same mark pressed into the metal, and no other.</p>",
-          "pickup": "The house that pawns through this shop stamps no crest and no marque — only one small fleur-de-lis pressed into the goods.",
+          "body": "<p>The pawnbroker's ledger.</p>",
+          "pickup": "The pawnbroker's ledger.",
           "box": [
             0.402,
             0.7,
@@ -2220,7 +2191,7 @@
         "cinemagraphsVerified": true
       },
       "entry": {
-        "text": "Anything that gets stolen has to surface for sale somewhere, and this is the nearest place it does. Everything sold over this counter is recorded in the ledger under it."
+        "text": "Anything that gets stolen has to surface for sale somewhere, and this is the nearest place it does. Everything sold over this counter is recorded in the pawnbroker's ledger."
       },
       "debrief": "The same move on the other half of the same table. Nothing about the method changed; only the columns did. Hold on to that — it is the whole scenario.",
       "panorama": "b_pawnshop/scene.png",
@@ -2244,46 +2215,42 @@
             0.732
           ],
           "starterCode": "case_file",
-          "question": {
-            "prompt": "Whatever leaves a crime scene has to surface somewhere, and for most of it the first stop is a counter like this one. The file runs to sixty jobs over three years. The Service has always suspected three brokers of selling stolen goods out of this city, but the Service has never once been able to say which theft went out through which broker.\n\nTake the four measurements the file records about disposal (days_to_surface, lot_size, recut_score and ports_used) — what became of the goods after they left the scene, not how the scene was entered — and sort the sixty jobs into those three routes. How many of the sixty went out through the busiest broker?",
-            "options": [
-              "9 jobs",
-              "16 jobs",
-              "22 jobs",
-              "24 jobs",
-              "29 jobs",
-              "38 jobs",
-              "all 60 jobs"
-            ],
-            "correct": 4,
-            "maxAttempts": 4,
-            "feedback": {
-              "correct": "Correct — noted in your field notebook: the busiest disposal channel moved 29 of the 60 jobs.",
-              "wrong": [
-                "The disposal evidence is four measures: days to surface, lot size, recut score and ports used. Ask the console to sort the sixty into three routes on those four: <code>runMatrixAnalysis(data = case_file, analysis = &quot;kmeans&quot;, parameters = c(n_clusters = 3), columns_w_values_for_single_analyte = c(&quot;days_to_surface&quot;, &quot;lot_size&quot;, &quot;recut_score&quot;, &quot;ports_used&quot;), columns_w_sample_ID_info = &quot;job&quot;)</code>, then count the rows in each cluster. The console puts measures recorded in very different units on a common footing by default, so leave <code>scale_variance</code> alone. What a haul was <i>worth</i> is not a disposal measure; leave the money out of it.",
-                "The three routes come out badly uneven. You want the count of the largest one — not the size of the file, and not the one just below it.",
-                "If your groups came out near 24 / 20 / 16, the money column is doing the grouping: unscaled, it runs to tens of thousands and drowns everything else, so the sort is by how much was taken rather than by how it moved. Leave the money out, and check that <code>scale_variance</code> has not been switched off."
-              ]
-            }
-          },
           "boxSource": "draft:localizer",
           "solveSfx": {
             "src": "audio/solve_wooden_door.mp3",
             "volume": 0.05
+          },
+          "pick": {
+            "prompt": "The Service has always suspected three resellers of selling stolen goods out of this city, but the Service has never once been able to say which thieves work with which reseller. Take the four measurements the file records about disposal (days_to_surface, lot_size, recut_score and ports_used) — what became of the goods after they left the scene, not how the scene was entered — and cluster the sixty jobs into those three resellers, then count how many jobs went through each. Make a bar chart of those counts, assign it to <code>p</code>, draw the clickable chart, and click the bar for the busiest reseller.",
+            "plotCode": "clusters <- runMatrixAnalysis(data = case_file, analysis = \"kmeans\", parameters = c(n_clusters = 3), columns_w_values_for_single_analyte = c(\"days_to_surface\", \"lot_size\", \"recut_score\", \"ports_used\"), columns_w_sample_ID_info = \"job\")\ncounts <- clusters %>% group_by(cluster) %>% summarize(n = n())\np <- ggplot(counts, aes(x = factor(cluster), y = n)) + geom_col()",
+            "answer": "29",
+            "idColumn": "n",
+            "idNoun": "reseller",
+            "width": 6,
+            "height": 5,
+            "maxAttempts": 4,
+            "feedback": {
+              "correct": "Correct — noted in your field notebook: the busiest reseller moved 29 of the 60 jobs.",
+              "wrong": [
+                "The disposal evidence is four measures: days to surface, lot size, recut score and ports used. Ask the console to sort the sixty into three resellers on those four: <code>clusters &lt;- runMatrixAnalysis(data = case_file, analysis = &quot;kmeans&quot;, parameters = c(n_clusters = 3), columns_w_values_for_single_analyte = c(&quot;days_to_surface&quot;, &quot;lot_size&quot;, &quot;recut_score&quot;, &quot;ports_used&quot;), columns_w_sample_ID_info = &quot;job&quot;)</code>, then count the jobs in each cluster and plot them as bars: <code>counts &lt;- clusters %&gt;% group_by(cluster) %&gt;% summarize(n = n())<br>p &lt;- ggplot(counts, aes(x = factor(cluster), y = n)) + geom_col()</code>. Name the count column <code>n</code>, as in <code>summarize(n = n())</code>; that is what makes the bars clickable. The console puts measures recorded in very different units on a common footing by default, so leave <code>scale_variance</code> alone. What a haul was <i>worth</i> is not a disposal measure; leave the money out of it.",
+                "The three resellers come out badly uneven. Click the tallest bar, not the one just below it.",
+                "If your groups came out near 24 / 20 / 16, the money column is doing the grouping: unscaled, it runs to tens of thousands and drowns everything else, so the sort is by how much was taken rather than by how it moved. Leave the money out, and check that <code>scale_variance</code> has not been switched off."
+              ]
+            }
           }
         },
         {
           "id": "ledger",
           "type": "clue",
-          "label": "The ledger under the counter",
+          "label": "The pawnbroker's ledger",
           "box": [
             0.402,
             0.7,
             0.466,
             0.796
           ],
-          "body": "<p>The pledge ledger lies chained under the counter, still open at this week's trade. Nothing on the page is crested and nothing is named — this house signs for nothing it takes.</p><p>What it does instead is on every line: one small mark pressed into the paper beside each entry, a <b>fleur-de-lis</b> no bigger than a thumbnail, and nothing else beside it. The stamp that made them sits worn smooth in the gutter of the book. This broker's goods carry the same small mark pressed into them &mdash; whatever else may be printed on a thing, look for the fleur-de-lis.</p>",
-          "pickup": "The house that pawns through this shop stamps no crest and no marque — only one small fleur-de-lis pressed into the goods.",
+          "body": "<p>The pawnbroker's ledger.</p>",
+          "pickup": "The pawnbroker's ledger.",
           "boxSource": "draft:localizer",
           "image": "figures/mark_fleur.png",
           "imageNote": "Deterministic pickup plate (2026-09-30). The escape is solved by MARK-MATCHING, and the marks are thumbnail-sized inside a 3072x1024 panorama — several were illegible or absent there. The plate carries the evidence; the room keeps the object and the box. Same call as wrangling/egypt's seals and hierarchical_clustering/temple's votive figures. An image-carrying clue lands on the notebook's draggable IMAGE BOARD rather than the flat Clues list, which is where a five-token comparison wants to be. Generated by _scratch/make_plates.py."
@@ -2359,7 +2326,8 @@
       "mapPos": {
         "c": 1,
         "r": 1
-      }
+      },
+      "role": "B"
     },
     {
       "key": "b_casino",
@@ -2379,11 +2347,11 @@
           "id": "private_room",
           "answer": "WHITLOCK",
           "length": 8,
-          "lockedBody": "<p>A padded door beside the cashier's cage, with a small keypad let into the frame. The man on it does not look at your hands and does not look at your money. The floor takes names: the way through here is opened for whoever the house's valuer is expecting, and for nobody else.</p>",
+          "lockedBody": "<p>A padded door beside the cashier's cage, with a small keypad nearby. </p>",
           "feedback": {
             "correct": "The keypad takes the name without comment. A bolt slides somewhere inside the frame and the padded door swings inward.",
-            "wrong": "The keypad swallows it. The man on the door does not look up.",
-            "out": "The keypad swallows it. The man on the door does not look up."
+            "wrong": "Nothing happens.",
+            "out": "Nothing happens."
           },
           "box": [
             0.8184,
@@ -2400,28 +2368,10 @@
         },
         {
           "type": "clue",
-          "label": "The marque above the cage",
-          "note": "ESTABLISHMENT 2/3 — the marque house. It stamps its MARQUE on everything it touches, the same mark worked in brass above the cage and struck into every rack beneath it.",
-          "body": "<p>Above the cashier's cage, worked in brass and a foot across, hangs this house's <b>marque</b>. The same mark is struck into the frame of every chip rack beneath it, into the lip of the counter, into the brass of the till drawer.</p><p>Whatever passes through these hands goes out wearing that marque. The house hides nothing and never has.</p>",
-          "pickup": "The house that settles through this casino strikes its own marque on everything it touches.",
-          "box": [
-            0.452,
-            0.2195,
-            0.548,
-            0.2805
-          ],
-          "boxSource": "review:agent-vision",
-          "id": "marque",
-          "boxNote": "Hand-measured on the 2026-09-30 two-door redraw at native resolution. The localiser put the keypad on the door handle and the door on the frame edge; these are the keypad plate and the door leaf respectively.",
-          "image": "figures/mark_lion.png",
-          "imageNote": "Deterministic pickup plate (2026-09-30). The escape is solved by MARK-MATCHING, and the marks are thumbnail-sized inside a 3072x1024 panorama — several were illegible or absent there. The plate carries the evidence; the room keeps the object and the box. Same call as wrangling/egypt's seals and hierarchical_clustering/temple's votive figures. An image-carrying clue lands on the notebook's draggable IMAGE BOARD rather than the flat Clues list, which is where a five-token comparison wants to be. Generated by _scratch/make_plates.py."
-        },
-        {
-          "type": "clue",
-          "label": "The cashier's docket",
-          "pickup": "Cage docket No. 78451 — one sealed case, going out by water.",
+          "label": "The museum evidence ticket",
+          "pickup": "In the casino cage, a ticket for the city museum's evidence locker: No. 78451.",
           "note": "MID-POINT TRADE — the NUMBER A needs for the museum evidence locker.",
-          "body": "<p>A carbon docket curls in the cage tray, a number struck hard across the head of it: <b>CONSIGNMENT DOCKET No. 78451</b>.</p><p>Underneath, in the cashier's hand: <i>one case, sealed, held against the account — to go out by water on the morning tide.</i> No name anywhere on it, at either end.</p>",
+          "body": "<p>A ticket in the cage tray, stamped <b>CITY MUSEUM — EVIDENCE LOCKER</b>, with one number on it: <b>No. 78451</b>.</p>",
           "box": [
             0.6,
             0.4,
@@ -2430,35 +2380,15 @@
           ],
           "boxSource": "review:agent-vision",
           "id": "docket",
-          "boxNote": "Hand-measured on the 2026-09-30 two-door redraw at native resolution. The localiser put the keypad on the door handle and the door on the frame edge; these are the keypad plate and the door leaf respectively."
+          "boxNote": "Hand-measured on the 2026-09-30 two-door redraw at native resolution. The localiser put the keypad on the door handle and the door on the frame edge; these are the keypad plate and the door leaf respectively.",
+          "image": "figures/clue_museum_ticket.png",
+          "imageNote": "Pickup plate (2026-10-15, Lucas: make the handshake clues images like the other clues). gpt-image generation via _scratch/make_plates.py; carries the exact token the partner keys, and deliberately no house device."
         },
         {
           "type": "puzzle",
           "label": "The cashier's terminal",
           "note": "the elbow — how many channels?",
           "starterCode": "case_file",
-          "question": {
-            "prompt": "<p>The cage settles for more than one buyer. Money comes across this counter and leaves again in several directions, and the three the Service has been working on rest on nothing sturdier than what the street says.</p><p>Put the street aside and ask the evidence. Looking only at the four disposal measurements (<code>days_to_surface</code>, <code>lot_size</code>, <code>recut_score</code> and <code>ports_used</code>), <b>how many separate channels does the file actually support?</b></p><p>Your partner is asking the same question of the other half of the same sixty jobs — how the places were entered. Their count is theirs to find and it answers a different question; this one is about what went out.</p>",
-            "options": [
-              "1 channel",
-              "2 channels",
-              "3 channels",
-              "4 channels",
-              "5 channels",
-              "6 channels",
-              "7 channels"
-            ],
-            "correct": 2,
-            "maxAttempts": 4,
-            "feedback": {
-              "correct": "Correct — noted in your field notebook: the disposal evidence supports 3 channels.",
-              "wrong": [
-                "Ask the console for the elbow of the four disposal measures: <code>runMatrixAnalysis(data = case_file, analysis = &quot;kmeans&quot;, parameters = &quot;elbow&quot;, columns_w_values_for_single_analyte = c(&quot;days_to_surface&quot;, &quot;lot_size&quot;, &quot;recut_score&quot;, &quot;ports_used&quot;), columns_w_sample_ID_info = &quot;job&quot;)</code>. It hands back one row per candidate number of channels, with <code>k</code> and <code>within_cluster_variance</code>. Plot the second against the first and look for where the fall stops being worth having.",
-                "Read the <i>drops</i>, not the values. The first split takes about four fifths of the spread out. The next takes most of what is left. After that, each further channel buys roughly one part in a hundred — you are splitting real channels into halves of themselves.",
-                "The spread left inside the groups runs 236, 46, 7, 5.4, 4.9, 4.4, 4.0, 3.7 as you go from one channel up to eight. Almost everything is bought early; the tail is flat. The bend is not in the tail."
-              ]
-            }
-          },
           "box": [
             0.484,
             0.3995,
@@ -2471,7 +2401,25 @@
             "src": "audio/solve_wooden_door.mp3",
             "volume": 0.05
           },
-          "boxNote": "Hand-measured on the 2026-09-30 two-door redraw at native resolution. The localiser put the keypad on the door handle and the door on the frame edge; these are the keypad plate and the door leaf respectively."
+          "boxNote": "Hand-measured on the 2026-09-30 two-door redraw at native resolution. The localiser put the keypad on the door handle and the door on the frame edge; these are the keypad plate and the door leaf respectively.",
+          "pick": {
+            "prompt": "Money comes across this counter and leaves again in several directions. Looking only at the four disposal measurements (days_to_surface, lot_size, recut_score and ports_used), answer: how many separate resellers does the case file actually suggest? Plot the elbow, assign the plot to <code>p</code>, draw the clickable chart, and click that number.",
+            "plotCode": "elbow <- runMatrixAnalysis(data = case_file, analysis = \"kmeans\", parameters = \"elbow\", columns_w_values_for_single_analyte = c(\"days_to_surface\", \"lot_size\", \"recut_score\", \"ports_used\"), columns_w_sample_ID_info = \"job\")\np <- ggplot(elbow, aes(x = k, y = within_cluster_variance)) + geom_line() + geom_point(size = 4)",
+            "answer": "3",
+            "idColumn": "k",
+            "idNoun": "number of resellers",
+            "width": 6,
+            "height": 5,
+            "maxAttempts": 4,
+            "feedback": {
+              "correct": "Correct — noted in your field notebook: the disposal evidence supports 3 resellers.",
+              "wrong": [
+                "Ask the console for the elbow of the four disposal measures: <code>elbow &lt;- runMatrixAnalysis(data = case_file, analysis = &quot;kmeans&quot;, parameters = &quot;elbow&quot;, columns_w_values_for_single_analyte = c(&quot;days_to_surface&quot;, &quot;lot_size&quot;, &quot;recut_score&quot;, &quot;ports_used&quot;), columns_w_sample_ID_info = &quot;job&quot;)</code>. It hands back one row per candidate number of resellers, with <code>k</code> and <code>within_cluster_variance</code>. Plot the second against the first and assign it to <code>p</code>: <code>p &lt;- ggplot(elbow, aes(x = k, y = within_cluster_variance)) + geom_line() + geom_point(size = 4)</code>. Then look for where the fall stops being worth having.",
+                "Read the <i>drops</i>, not the values. The first split takes about four fifths of the within-cluster variance out. The next takes most of what is left. After that, each further reseller buys roughly one part in a hundred — you are splitting real resellers into halves of themselves.",
+                "The within-cluster variance runs 236, 46, 7, 5.4, 4.9, 4.4, 4.0, 3.7 as you go from one reseller up to eight. Almost everything is bought early; the tail is flat. The bend is not in the tail."
+              ]
+            }
+          }
         },
         {
           "id": "the_way_back",
@@ -2505,7 +2453,7 @@
             "private_room"
           ],
           "boxSource": "review:agent-vision",
-          "lockedBody": "The padded door stays shut. You have your count, but the door takes the valuer's name and the only card bearing it is in a house your partner is standing in. Ask them for it.",
+          "lockedBody": "The padded door stays shut. You have your count, but the door takes the casino manager's name and the only card bearing it is in a house your partner is standing in. Ask them for it.",
           "boxNote": "Hand-measured on the 2026-09-30 two-door redraw at native resolution. The localiser put the keypad on the door handle and the door on the frame edge; these are the keypad plate and the door leaf respectively."
         }
       ],
@@ -2566,7 +2514,7 @@
               "at": "just right of centre",
               "desc": "a carbon docket curling in the cage tray, a consignment number struck across it",
               "clue": true,
-              "label": "The cashier's docket"
+              "label": "The museum evidence ticket"
             },
             {
               "id": "private",
@@ -2627,9 +2575,11 @@
               "ratio": 2.28,
               "delta": 1.9,
               "needsWork": false,
-              "accepted": false,
+              "accepted": true,
               "seamBandRun": 0.012,
-              "at": "2026-10-04T23:58:41"
+              "at": "2026-10-15T22:00:31",
+              "acceptedBy": "lucas via agent 2026-10-15",
+              "humanNote": "Lucas, 2026-10-15, after the heist audit listed these unaccepted state variants: \"All art has my approval.\""
             }
           }
         },
@@ -2639,7 +2589,9 @@
           "at": "2026-09-30T14:40:02"
         }
       },
-      "entry": "The ledger shows a run of pieces pledged and redeemed within the hour by a single buyer, and that buyer settles his account from the tables. The way you want is the padded door at the back of the floor, and it is not open to you.",
+      "entry": {
+        "text": "The second reseller The Service has always suspected operates through a casino. The way you want is through the padded door at the back of the casino, but it is not yet open to you."
+      },
       "debrief": "Your partner's elbow, on the disposal columns, said three. Neither of you misread the plot. The drop collapses after five on one feature block and after three on the other, because the two blocks describe the same world at two different heights.",
       "panorama": "b_casino/scene.png",
       "builtFrom": "l1_b_casino_2.png",
@@ -2663,11 +2615,11 @@
           ],
           "answer": "WHITLOCK",
           "length": 8,
-          "lockedBody": "<p>A padded door beside the cashier's cage, with a small keypad let into the frame. The man on it does not look at your hands and does not look at your money. The floor takes names: the way through here is opened for whoever the house's valuer is expecting, and for nobody else.</p>",
+          "lockedBody": "<p>A padded door beside the cashier's cage, with a small keypad nearby. </p>",
           "feedback": {
             "correct": "The keypad takes the name without comment. A bolt slides somewhere inside the frame and the padded door swings inward.",
-            "wrong": "The keypad swallows it. The man on the door does not look up.",
-            "out": "The keypad swallows it. The man on the door does not look up."
+            "wrong": "Nothing happens.",
+            "out": "Nothing happens."
           },
           "boxSource": "review:agent-vision",
           "solveSfx": {
@@ -2683,36 +2635,21 @@
           "boxNote": "Hand-measured on the 2026-09-30 two-door redraw at native resolution. The localiser put the keypad on the door handle and the door on the frame edge; these are the keypad plate and the door leaf respectively."
         },
         {
-          "id": "marque",
-          "type": "clue",
-          "label": "The marque above the cage",
-          "box": [
-            0.467,
-            0.203,
-            0.505,
-            0.321
-          ],
-          "body": "<p>Above the cashier's cage, worked in brass and a foot across, hangs this house's <b>marque</b>. The same mark is struck into the frame of every chip rack beneath it, into the lip of the counter, into the brass of the till drawer.</p><p>Whatever passes through these hands goes out wearing that marque &mdash; the lion upright, always inside its shield. The house hides nothing and never has.</p>",
-          "pickup": "The house that settles through this casino strikes its own marque on everything it touches.",
-          "boxSource": "review:agent-vision",
-          "boxNote": "Hand-measured on the 2026-09-30 two-door redraw at native resolution. The localiser put the keypad on the door handle and the door on the frame edge; these are the keypad plate and the door leaf respectively.",
-          "image": "figures/mark_lion.png",
-          "imageNote": "Deterministic pickup plate (2026-09-30). The escape is solved by MARK-MATCHING, and the marks are thumbnail-sized inside a 3072x1024 panorama — several were illegible or absent there. The plate carries the evidence; the room keeps the object and the box. Same call as wrangling/egypt's seals and hierarchical_clustering/temple's votive figures. An image-carrying clue lands on the notebook's draggable IMAGE BOARD rather than the flat Clues list, which is where a five-token comparison wants to be. Generated by _scratch/make_plates.py."
-        },
-        {
           "id": "docket",
           "type": "clue",
-          "label": "The cashier's docket",
+          "label": "The museum evidence ticket",
           "box": [
             0.5288,
             0.4773,
             0.5488,
             0.5383
           ],
-          "pickup": "Cage docket No. 78451 — one sealed case, going out by water.",
-          "body": "<p>A carbon docket curls in the cage tray, a number struck hard across the head of it: <b>CONSIGNMENT DOCKET No. 78451</b>.</p><p>Underneath, in the cashier's hand: <i>one case, sealed, held against the account — to go out by water on the morning tide.</i> No name anywhere on it, at either end.</p>",
+          "pickup": "In the casino cage, a ticket for the city museum's evidence locker: No. 78451.",
+          "body": "<p>A ticket in the cage tray, stamped <b>CITY MUSEUM — EVIDENCE LOCKER</b>, with one number on it: <b>No. 78451</b>.</p>",
           "boxSource": "review:agent-vision",
-          "boxNote": "Hand-measured on the 2026-09-30 two-door redraw at native resolution. The localiser put the keypad on the door handle and the door on the frame edge; these are the keypad plate and the door leaf respectively."
+          "boxNote": "Hand-measured on the 2026-09-30 two-door redraw at native resolution. The localiser put the keypad on the door handle and the door on the frame edge; these are the keypad plate and the door leaf respectively.",
+          "image": "figures/clue_museum_ticket.png",
+          "imageNote": "Pickup plate (2026-10-15, Lucas: make the handshake clues images like the other clues). gpt-image generation via _scratch/make_plates.py; carries the exact token the partner keys, and deliberately no house device."
         },
         {
           "id": "console",
@@ -2725,34 +2662,30 @@
             0.5225
           ],
           "starterCode": "case_file",
-          "question": {
-            "prompt": "<p>The cage settles for more than one buyer. Money comes across this counter and leaves again in several directions, and the three the Service has been working on rest on nothing sturdier than what the street says.</p><p>Put the street aside and ask the evidence. Looking only at the four disposal measurements (<code>days_to_surface</code>, <code>lot_size</code>, <code>recut_score</code> and <code>ports_used</code>), <b>how many separate channels does the file actually support?</b></p><p>Your partner is asking the same question of the other half of the same sixty jobs — how the places were entered. Their count is theirs to find and it answers a different question; this one is about what went out.</p>",
-            "options": [
-              "1 channel",
-              "2 channels",
-              "3 channels",
-              "4 channels",
-              "5 channels",
-              "6 channels",
-              "7 channels"
-            ],
-            "correct": 2,
-            "maxAttempts": 4,
-            "feedback": {
-              "correct": "Correct — noted in your field notebook: the disposal evidence supports 3 channels.",
-              "wrong": [
-                "Ask the console for the elbow of the four disposal measures: <code>runMatrixAnalysis(data = case_file, analysis = &quot;kmeans&quot;, parameters = &quot;elbow&quot;, columns_w_values_for_single_analyte = c(&quot;days_to_surface&quot;, &quot;lot_size&quot;, &quot;recut_score&quot;, &quot;ports_used&quot;), columns_w_sample_ID_info = &quot;job&quot;)</code>. It hands back one row per candidate number of channels, with <code>k</code> and <code>within_cluster_variance</code>. Plot the second against the first and look for where the fall stops being worth having.",
-                "Read the <i>drops</i>, not the values. The first split takes about four fifths of the spread out. The next takes most of what is left. After that, each further channel buys roughly one part in a hundred — you are splitting real channels into halves of themselves.",
-                "The spread left inside the groups runs 236, 46, 7, 5.4, 4.9, 4.4, 4.0, 3.7 as you go from one channel up to eight. Almost everything is bought early; the tail is flat. The bend is not in the tail."
-              ]
-            }
-          },
           "boxSource": "review:agent-vision",
           "solveSfx": {
             "src": "audio/solve_wooden_door.mp3",
             "volume": 0.05
           },
-          "boxNote": "Hand-measured on the 2026-09-30 two-door redraw at native resolution. The localiser put the keypad on the door handle and the door on the frame edge; these are the keypad plate and the door leaf respectively."
+          "boxNote": "Hand-measured on the 2026-09-30 two-door redraw at native resolution. The localiser put the keypad on the door handle and the door on the frame edge; these are the keypad plate and the door leaf respectively.",
+          "pick": {
+            "prompt": "Money comes across this counter and leaves again in several directions. Looking only at the four disposal measurements (days_to_surface, lot_size, recut_score and ports_used), answer: how many separate resellers does the case file actually suggest? Plot the elbow, assign the plot to <code>p</code>, draw the clickable chart, and click that number.",
+            "plotCode": "elbow <- runMatrixAnalysis(data = case_file, analysis = \"kmeans\", parameters = \"elbow\", columns_w_values_for_single_analyte = c(\"days_to_surface\", \"lot_size\", \"recut_score\", \"ports_used\"), columns_w_sample_ID_info = \"job\")\np <- ggplot(elbow, aes(x = k, y = within_cluster_variance)) + geom_line() + geom_point(size = 4)",
+            "answer": "3",
+            "idColumn": "k",
+            "idNoun": "number of resellers",
+            "width": 6,
+            "height": 5,
+            "maxAttempts": 4,
+            "feedback": {
+              "correct": "Correct — noted in your field notebook: the disposal evidence supports 3 resellers.",
+              "wrong": [
+                "Ask the console for the elbow of the four disposal measures: <code>elbow &lt;- runMatrixAnalysis(data = case_file, analysis = &quot;kmeans&quot;, parameters = &quot;elbow&quot;, columns_w_values_for_single_analyte = c(&quot;days_to_surface&quot;, &quot;lot_size&quot;, &quot;recut_score&quot;, &quot;ports_used&quot;), columns_w_sample_ID_info = &quot;job&quot;)</code>. It hands back one row per candidate number of resellers, with <code>k</code> and <code>within_cluster_variance</code>. Plot the second against the first and assign it to <code>p</code>: <code>p &lt;- ggplot(elbow, aes(x = k, y = within_cluster_variance)) + geom_line() + geom_point(size = 4)</code>. Then look for where the fall stops being worth having.",
+                "Read the <i>drops</i>, not the values. The first split takes about four fifths of the within-cluster variance out. The next takes most of what is left. After that, each further reseller buys roughly one part in a hundred — you are splitting real resellers into halves of themselves.",
+                "The within-cluster variance runs 236, 46, 7, 5.4, 4.9, 4.4, 4.0, 3.7 as you go from one reseller up to eight. Almost everything is bought early; the tail is flat. The bend is not in the tail."
+              ]
+            }
+          }
         },
         {
           "id": "the_way_back",
@@ -2774,10 +2707,10 @@
           "type": "door",
           "label": "On to the next call",
           "box": [
-            0.815,
-            0.249,
-            0.8753,
-            0.625
+            0.8304,
+            0.2743,
+            0.8907,
+            0.6503
           ],
           "direction": "open",
           "to": "b_docks",
@@ -2785,8 +2718,8 @@
             "console",
             "private_room"
           ],
-          "boxSource": "review:agent-vision",
-          "lockedBody": "The padded door stays shut. You have your count, but the door takes the valuer's name and the only card bearing it is in a house your partner is standing in. Ask them for it.",
+          "boxSource": "moved:testplay",
+          "lockedBody": "The padded door stays shut. You have your count, but the door takes the casino manager's name and the only card bearing it is in a house your partner is standing in. Ask them for it.",
           "boxNote": "Hand-measured on the 2026-09-30 two-door redraw at native resolution. The localiser put the keypad on the door handle and the door on the frame edge; these are the keypad plate and the door leaf respectively."
         },
         {
@@ -2882,12 +2815,13 @@
       "mapPos": {
         "c": 2,
         "r": 1
-      }
+      },
+      "role": "B"
     },
     {
       "key": "b_docks",
-      "title": "The Shipping Office",
-      "technique": "summarise by cluster",
+      "title": "The Shipping Yard",
+      "technique": "summarize by cluster",
       "puzzleType": 1,
       "phase": "analysis",
       "built": true,
@@ -2900,28 +2834,6 @@
           "label": "The clerk's terminal",
           "note": "summarise by cluster",
           "starterCode": "case_file",
-          "question": {
-            "prompt": "<p>Every consignment written up in this office routes on to the same vessel, but the office handles all three channels and they do not behave alike. One of them is in no hurry whatever: its goods go somewhere out of sight and stay there for months before any of it surfaces.</p><p>Of the three channels, sorted on the same four disposal measurements (<code>days_to_surface</code>, <code>lot_size</code>, <code>recut_score</code> and <code>ports_used</code>), take the one that <b>sits on its goods longest</b>. <b>How many of the sixty jobs belong to it?</b></p>",
-            "options": [
-              "12 jobs",
-              "16 jobs",
-              "20 jobs",
-              "22 jobs",
-              "24 jobs",
-              "29 jobs",
-              "38 jobs"
-            ],
-            "correct": 3,
-            "maxAttempts": 4,
-            "feedback": {
-              "correct": "Correct — noted in your field notebook: the channel that sits on goods longest, about 84 days, runs 22 of the 60 jobs.",
-              "wrong": [
-                "Group the sixty on the four disposal measures with the console again, using the number of channels you settled on at the cage. Then summarise each group in turn (<code>group_by(cluster)</code>, then the mean of <code>days_to_surface</code>) and compare. What is wanted is the number of jobs in the slow group, not the length of the wait.",
-                "The three channels average roughly twelve days, forty-six days and eighty-four days before goods surface. Only one of those is a channel that sits on things. Count its jobs — and note it is not the busiest channel, the one you counted at the pawnbroker's.",
-                "If the slow group you found holds around sixteen jobs, haul value has crept into the sort and, unscaled, is driving the split: every measure has to count equally, and haul value is not a measure of disposal. And if it holds around twelve, you have cut the block into more channels than it supports; use the number you settled on at the cage."
-              ]
-            }
-          },
           "box": [
             0.49,
             0.426,
@@ -2933,14 +2845,31 @@
           "solveSfx": {
             "src": "audio/solve_metal_hatch.mp3",
             "volume": 0.22186625822523107
+          },
+          "check": {
+            "prompt": "Every consignment that passes through this yard is well documented. So - the pawnbroker, the casino, and the shipping yard - three resellers, sorted on the same four disposal measurements (days_to_surface, lot_size, recut_score and ports_used), take the one that sits on its goods longest. Assign the number of jobs that belong to it to an object called <code>answer</code>, then click \"Check my answer\".",
+            "requires": [
+              "answer"
+            ],
+            "expr": "isTRUE(as.numeric(answer) == 22)",
+            "hint": "Cluster on the four disposal measures, average days_to_surface within each reseller, then count the jobs in the slowest one.",
+            "maxAttempts": 4,
+            "feedback": {
+              "correct": "Correct — noted in your field notebook: the reseller that sits on goods longest, about 84 days, runs 22 of the 60 jobs.",
+              "wrong": [
+                "Group the sixty on the four disposal measures with the console again, using the number of resellers you settled on at the cage. Then summarize each group in turn (<code>group_by(cluster)</code>, then the mean of <code>days_to_surface</code>) and compare. Then count the jobs in the slow group and assign that number to <code>answer</code>.",
+                "The three resellers average roughly twelve days, forty-six days and eighty-four days before goods surface. Only one of those is a reseller that sits on things. Count its jobs — and note it is not the busiest reseller, the one you counted at the pawnbroker's.",
+                "If the slow group you found holds around sixteen jobs, haul value has crept into the sort and, unscaled, is driving the split: every measure has to count equally, and haul value is not a measure of disposal. And if it holds around twelve, you have cut the block into more resellers than it supports; use the number you settled on at the cage."
+              ]
+            }
           }
         },
         {
           "type": "clue",
           "label": "The consignment board",
           "note": "ESTABLISHMENT 3/3 — the range house. It marks nothing, but NUMBERS everything it handles inside one narrow band, and the band is on the board.",
-          "body": "<p>A board of brass tallies hangs over the clerk's desk, one tally to a consignment gone out. Not one of them carries a crest, a marque or a name: this house marks the goods themselves with nothing at all.</p><p>What it does is number them. Every tally on the board is stamped with a figure, and every figure falls between <b>3200 and 3299</b> — the clerk works one hundred numbers and no others, and has for years.</p>",
-          "pickup": "The third house marks nothing, but numbers everything it handles between 3200 and 3299.",
+          "body": "<p>A board of brass tallies hangs over the clerk's desk, numbered 3200 to 3299.</p>",
+          "pickup": "A board of brass tallies hangs over the clerk's desk, numbered 3200 to 3299.",
           "box": [
             0.32,
             0.08,
@@ -3072,8 +3001,10 @@
         },
         "cinemagraphsVerified": true
       },
-      "entry": "The docket from the cage is a consignment note. The goods are not being sold in this city at all — they are leaving by water.",
-      "debrief": "The same summarise-by-cluster move on the channels: one house sits on goods far longer than the others. Note that you needed the grouping BEFORE you could compute the thing that characterises it. That order is not optional.",
+      "entry": {
+        "text": "Some of the stolen goods are never sold in this city at all. They leave by water, as consignments through the shipping yard."
+      },
+      "debrief": "The same summarize-by-cluster move on the resellers: one reseller sits on goods far longer than the others. Note that you needed the grouping BEFORE you could compute the thing that characterises it. That order is not optional.",
       "panorama": "b_docks/scene.png",
       "builtFrom": "l1_b_docks_2.png",
       "wrap": {
@@ -3095,32 +3026,27 @@
             0.5919
           ],
           "starterCode": "case_file",
-          "question": {
-            "prompt": "<p>Every consignment written up in this office routes on to the same vessel, but the office handles all three channels and they do not behave alike. One of them is in no hurry whatever: its goods go somewhere out of sight and stay there for months before any of it surfaces.</p><p>Of the three channels, sorted on the same four disposal measurements (<code>days_to_surface</code>, <code>lot_size</code>, <code>recut_score</code> and <code>ports_used</code>), take the one that <b>sits on its goods longest</b>. <b>How many of the sixty jobs belong to it?</b></p>",
-            "options": [
-              "12 jobs",
-              "16 jobs",
-              "20 jobs",
-              "22 jobs",
-              "24 jobs",
-              "29 jobs",
-              "38 jobs"
-            ],
-            "correct": 3,
-            "maxAttempts": 4,
-            "feedback": {
-              "correct": "Correct — noted in your field notebook: the channel that sits on goods longest, about 84 days, runs 22 of the 60 jobs.",
-              "wrong": [
-                "Group the sixty on the four disposal measures with the console again, using the number of channels you settled on at the cage. Then summarise each group in turn (<code>group_by(cluster)</code>, then the mean of <code>days_to_surface</code>) and compare. What is wanted is the number of jobs in the slow group, not the length of the wait.",
-                "The three channels average roughly twelve days, forty-six days and eighty-four days before goods surface. Only one of those is a channel that sits on things. Count its jobs — and note it is not the busiest channel, the one you counted at the pawnbroker's.",
-                "If the slow group you found holds around sixteen jobs, haul value has crept into the sort and, unscaled, is driving the split: every measure has to count equally, and haul value is not a measure of disposal. And if it holds around twelve, you have cut the block into more channels than it supports; use the number you settled on at the cage."
-              ]
-            }
-          },
           "boxSource": "draft:localizer",
           "solveSfx": {
             "src": "audio/solve_metal_hatch.mp3",
             "volume": 0.22186625822523107
+          },
+          "check": {
+            "prompt": "Every consignment that passes through this yard is well documented. So - the pawnbroker, the casino, and the shipping yard - three resellers, sorted on the same four disposal measurements (days_to_surface, lot_size, recut_score and ports_used), take the one that sits on its goods longest. Assign the number of jobs that belong to it to an object called <code>answer</code>, then click \"Check my answer\".",
+            "requires": [
+              "answer"
+            ],
+            "expr": "isTRUE(as.numeric(answer) == 22)",
+            "hint": "Cluster on the four disposal measures, average days_to_surface within each reseller, then count the jobs in the slowest one.",
+            "maxAttempts": 4,
+            "feedback": {
+              "correct": "Correct — noted in your field notebook: the reseller that sits on goods longest, about 84 days, runs 22 of the 60 jobs.",
+              "wrong": [
+                "Group the sixty on the four disposal measures with the console again, using the number of resellers you settled on at the cage. Then summarize each group in turn (<code>group_by(cluster)</code>, then the mean of <code>days_to_surface</code>) and compare. Then count the jobs in the slow group and assign that number to <code>answer</code>.",
+                "The three resellers average roughly twelve days, forty-six days and eighty-four days before goods surface. Only one of those is a reseller that sits on things. Count its jobs — and note it is not the busiest reseller, the one you counted at the pawnbroker's.",
+                "If the slow group you found holds around sixteen jobs, haul value has crept into the sort and, unscaled, is driving the split: every measure has to count equally, and haul value is not a measure of disposal. And if it holds around twelve, you have cut the block into more resellers than it supports; use the number you settled on at the cage."
+              ]
+            }
           }
         },
         {
@@ -3133,8 +3059,8 @@
             0.4319,
             0.4729
           ],
-          "body": "<p>A board of brass tallies hangs over the clerk's desk, one tally to a consignment gone out. Not one of them carries a crest, a marque or a name: this house puts no crest or marque of its own on the goods.</p><p>What it does is number them. Every tally on the board is stamped with a figure, and every figure falls between <b>3200 and 3299</b> — the clerk works one hundred numbers and no others, and has for years.</p>",
-          "pickup": "The third house adds no mark of its own, but numbers everything it handles between 3200 and 3299.",
+          "body": "<p>A board of brass tallies hangs over the clerk's desk, numbered 3200 to 3299.</p>",
+          "pickup": "A board of brass tallies hangs over the clerk's desk, numbered 3200 to 3299.",
           "boxSource": "draft:localizer",
           "image": "figures/mark_tally.png",
           "imageNote": "Deterministic pickup plate (2026-09-30). The escape is solved by MARK-MATCHING, and the marks are thumbnail-sized inside a 3072x1024 panorama — several were illegible or absent there. The plate carries the evidence; the room keeps the object and the box. Same call as wrangling/egypt's seals and hierarchical_clustering/temple's votive figures. An image-carrying clue lands on the notebook's draggable IMAGE BOARD rather than the flat Clues list, which is where a five-token comparison wants to be. Generated by _scratch/make_plates.py."
@@ -3210,7 +3136,8 @@
       "mapPos": {
         "c": 3,
         "r": 1
-      }
+      },
+      "role": "B"
     },
     {
       "key": "b_stateroom",
@@ -3229,23 +3156,24 @@
           "note": "the scaling trap (BOSS)",
           "starterCode": "runMatrixAnalysis(\n    data = case_file,\n    analysis = \"kmeans\",\n    parameters = c(n_clusters = 3),\n    columns_w_values_for_single_analyte = c(\"days_to_surface\", \"lot_size\", \"recut_score\", \"ports_used\", \"haul_value_gbp\"),\n    columns_w_sample_ID_info = \"job\",\n    scale_variance = FALSE\n)",
           "question": {
-            "prompt": "<p>The Ardsley Strongroom is the largest haul in the file and the only job in it where nothing whatever was forced — no damage, no tools, no entry anyone can point to. The stones still had to leave the city, and every paper in this stateroom says they left the way the rest of it does.</p><p>The desk will sort the sixty into the three channels on everything the file records about the goods, what each haul was worth included, and a draft of that sort has been left on it.</p><p>Of the jobs below, <b>whose goods went out through the same channel as the Ardsley Strongroom's?</b></p>",
+            "prompt": "The Ardsley Strongroom is the largest haul in the file and the only job in it where nothing whatever was forced — no damage, no tools, no entry anyone can point to. The stolen goods still had to leave the city, and every paper in this stateroom says they left the way the rest of it does.\n\nThe desk will sort the sixty into the three resellers on everything the file records about the goods, what each haul was worth included, and a draft of that sort has been left on it.\n\nOf the jobs below, whose goods went out through the same reseller as the Ardsley Strongroom's?",
             "options": [
               "Bramfield Place",
               "Cadogan Rise",
               "Carlisle Terrace",
               "Denholm House",
               "Edgeworth Hall",
-              "Lyndhurst Gate"
+              "Lyndhurst Gate",
+              "Nettlebed House"
             ],
             "correct": 5,
             "maxAttempts": 4,
             "feedback": {
-              "correct": "Correct — noted in your field notebook: Lyndhurst Gate's goods went out through the same channel as the Ardsley Strongroom's. The desk gives up one more thing — a name held on the passenger list, <b>SABLE</b>, with no passage number against it. Read it to your partner; it is not for you.",
+              "correct": "Correct — noted in your field notebook: Lyndhurst Gate's goods went out through the same reseller as the Ardsley Strongroom's. The desk turned up one more thing with the result, a name on the passenger list: <b>SABLE</b>.",
               "wrong": [
                 "A draft sort is already on the desk. Run it, find the Ardsley Strongroom's cluster number, then list every job that carries the same number and see which of the offered names is among them.",
                 "Haul value runs to tens of thousands while the other measures run to single digits and days, and k-means adds up squared differences, so left as it stands it decides the grouping by itself. Read the last line of the draft: <code>scale_variance = FALSE</code> tells the desk to cluster the numbers exactly as they stand. Which way should that setting go?",
-                "If the job you chose is another very large haul, you have sorted by how much was taken rather than by who moved it. Ardsley's channel is the quiet one: large lots, barely recut, out through almost no ports, and a middling wait, weeks rather than months, before anything surfaces. It is also the smallest of the three, nine jobs in all, and exactly one name on your list is in it."
+                "If the job you chose is another very large haul, you have sorted by how much was taken rather than by who moved it. Ardsley's reseller is the quiet one: large lots, barely recut, out through almost no ports, and a middling wait, weeks rather than months, before anything surfaces. It is also the smallest of the three, nine jobs in all, and exactly one name on your list is in it."
               ]
             }
           },
@@ -3262,22 +3190,6 @@
             "volume": 0.08
           },
           "boxNote": "2026-10-04 pre-redraw: was boxSource=draft:localizer, box=[0.4783, 0.5812, 0.5332, 0.6943]; demoted so the placer re-drafts on the new art"
-        },
-        {
-          "type": "clue",
-          "label": "The steward's table plan",
-          "pickup": "Three tables at the gala, one to a house; each guest is seated with whoever moves their goods.",
-          "note": "Three tables are laid for the gala, one per house, and the steward seats each guest at the table of whoever moves their goods. B carries this to the gala; it is why the seating plan is answerable at all.",
-          "body": "<p>The steward's plan is weighted flat on the desk: three tables laid for the gala, one to a house, and his standing instruction written across the foot of it — <i>every guest sits at the table of whoever moves their goods, whatever name is on the invitation.</i></p>",
-          "box": [
-            0.345,
-            0.5395,
-            0.385,
-            0.6005
-          ],
-          "boxSource": "draft:localizer",
-          "id": "plan",
-          "boxNote": "2026-10-04 pre-redraw: was boxSource=draft:localizer, box=[0.2184, 0.7357, 0.2811, 0.8555]; demoted so the placer re-drafts on the new art"
         },
         {
           "type": "door",
@@ -3452,9 +3364,11 @@
               "ratio": 4.68,
               "delta": 2.83,
               "needsWork": false,
-              "accepted": false,
+              "accepted": true,
               "seamBandRun": 0.015,
-              "at": "2026-10-05T18:20:57"
+              "at": "2026-10-15T22:00:31",
+              "acceptedBy": "lucas via agent 2026-10-15",
+              "humanNote": "Lucas, 2026-10-15, after the heist audit listed these unaccepted state variants: \"All art has my approval.\""
             }
           }
         },
@@ -3488,23 +3402,24 @@
           ],
           "starterCode": "runMatrixAnalysis(\n    data = case_file,\n    analysis = \"kmeans\",\n    parameters = c(n_clusters = 3),\n    columns_w_values_for_single_analyte = c(\"days_to_surface\", \"lot_size\", \"recut_score\", \"ports_used\", \"haul_value_gbp\"),\n    columns_w_sample_ID_info = \"job\",\n    scale_variance = FALSE\n)",
           "question": {
-            "prompt": "<p>The Ardsley Strongroom is the largest haul in the file and the only job in it where nothing whatever was forced — no damage, no tools, no entry anyone can point to. The stones still had to leave the city, and every paper in this stateroom says they left the way the rest of it does.</p><p>The desk will sort the sixty into the three channels on everything the file records about the goods, what each haul was worth included, and a draft of that sort has been left on it.</p><p>Of the jobs below, <b>whose goods went out through the same channel as the Ardsley Strongroom's?</b></p>",
+            "prompt": "The Ardsley Strongroom is the largest haul in the file and the only job in it where nothing whatever was forced — no damage, no tools, no entry anyone can point to. The stolen goods still had to leave the city, and every paper in this stateroom says they left the way the rest of it does.\n\nThe desk will sort the sixty into the three resellers on everything the file records about the goods, what each haul was worth included, and a draft of that sort has been left on it.\n\nOf the jobs below, whose goods went out through the same reseller as the Ardsley Strongroom's?",
             "options": [
               "Bramfield Place",
               "Cadogan Rise",
               "Carlisle Terrace",
               "Denholm House",
               "Edgeworth Hall",
-              "Lyndhurst Gate"
+              "Lyndhurst Gate",
+              "Nettlebed House"
             ],
             "correct": 5,
             "maxAttempts": 4,
             "feedback": {
-              "correct": "Correct — noted in your field notebook: Lyndhurst Gate's goods went out through the same channel as the Ardsley Strongroom's. The desk gives up one more thing — a name held on the passenger list, <b>SABLE</b>, with no passage number against it. Read it to your partner; it is not for you.",
+              "correct": "Correct — noted in your field notebook: Lyndhurst Gate's goods went out through the same reseller as the Ardsley Strongroom's. The desk turned up one more thing with the result, a name on the passenger list: <b>SABLE</b>.",
               "wrong": [
                 "A draft sort is already on the desk. Run it, find the Ardsley Strongroom's cluster number, then list every job that carries the same number and see which of the offered names is among them.",
                 "Haul value runs to tens of thousands while the other measures run to single digits and days, and k-means adds up squared differences, so left as it stands it decides the grouping by itself. Read the last line of the draft: <code>scale_variance = FALSE</code> tells the desk to cluster the numbers exactly as they stand. Which way should that setting go?",
-                "If the job you chose is another very large haul, you have sorted by how much was taken rather than by who moved it. Ardsley's channel is the quiet one: large lots, barely recut, out through almost no ports, and a middling wait, weeks rather than months, before anything surfaces. It is also the smallest of the three, nine jobs in all, and exactly one name on your list is in it."
+                "If the job you chose is another very large haul, you have sorted by how much was taken rather than by who moved it. Ardsley's reseller is the quiet one: large lots, barely recut, out through almost no ports, and a middling wait, weeks rather than months, before anything surfaces. It is also the smallest of the three, nine jobs in all, and exactly one name on your list is in it."
               ]
             }
           },
@@ -3514,21 +3429,6 @@
             "volume": 0.08
           },
           "boxNote": "2026-10-04 pre-redraw: was boxSource=draft:localizer, box=[0.4783, 0.5812, 0.5332, 0.6943]; demoted so the placer re-drafts on the new art"
-        },
-        {
-          "id": "plan",
-          "type": "clue",
-          "label": "The steward's table plan",
-          "box": [
-            0.345,
-            0.5395,
-            0.385,
-            0.6005
-          ],
-          "pickup": "Three tables at the gala, one to a house; each guest is seated with whoever moves their goods.",
-          "body": "<p>The steward's plan is weighted flat on the desk: three tables laid for the gala, one to a house, and his standing instruction written across the foot of it — <i>every guest sits at the table of whoever moves their goods, whatever name is on the invitation.</i></p>",
-          "boxSource": "draft:localizer",
-          "boxNote": "2026-10-04 pre-redraw: was boxSource=draft:localizer, box=[0.2184, 0.7357, 0.2811, 0.8555]; demoted so the placer re-drafts on the new art"
         },
         {
           "id": "back",
@@ -3689,7 +3589,8 @@
       "mapPos": {
         "c": 4,
         "r": 1
-      }
+      },
+      "role": "B"
     },
     {
       "key": "gala",
@@ -3704,43 +3605,43 @@
       "plannedHotspots": [
         {
           "type": "grid",
-          "label": "The seating plan",
+          "label": "The accusation",
           "note": "ESCAPE — 5 token cards into 3 tables, answer 2+2+1. endsEscape.",
-          "prompt": "<p>The steward's plan is laid out in brass: three tables ruled across it, and along the foot of it five things, each one carried off a scene and each one carrying a mark.</p><p>Three tables, one to a house. Every guest sits with whoever moves their goods.</p><p>One of you can see what is stamped on each piece. The other knows what each house stamps. Neither of you can seat this alone.</p>",
+          "prompt": "Which thieving crews worked with which resellers?",
           "items": [
             {
               "key": "lighter",
-              "label": "A monogrammed lighter"
+              "label": "The crew that left the monogrammed lighter"
             },
             {
               "key": "chip",
-              "label": "A bone-coloured chip"
+              "label": "The crew that left the bone-colored chip"
             },
             {
               "key": "fob",
-              "label": "A hotel key fob"
+              "label": "The crew that left the hotel key fob"
             },
             {
               "key": "matches",
-              "label": "A book of matches"
+              "label": "The crew that left the book of matches"
             },
             {
               "key": "tag",
-              "label": "A luggage tag"
+              "label": "The crew that left the luggage tag"
             }
           ],
           "buckets": [
             {
               "key": "broker",
-              "label": "The broker's table"
+              "label": "The pawnbroker"
             },
             {
               "key": "club",
-              "label": "The casino's table"
+              "label": "The casino"
             },
             {
               "key": "shipping",
-              "label": "The shipping table"
+              "label": "The shipping yard"
             }
           ],
           "answer": {
@@ -3752,9 +3653,10 @@
           },
           "maxAttempts": 0,
           "feedback": {
-            "correct": "The steward reads the plan back without comment and begins seating the room.",
-            "wrong": "The steward turns the plan round and sets it down again. Someone at that table does not belong there.",
-            "out": ""
+            "correct": "That's it: every crew is matched to its reseller.",
+            "wrong": "Not yet. At least one crew is matched to the wrong reseller.",
+            "out": "",
+            "incomplete": "Match every crew to a reseller first."
           },
           "box": [
             0.4424,
@@ -3768,7 +3670,8 @@
             "src": "audio/solve_exit_door.mp3",
             "volume": 0.10929272617698416
           },
-          "boxNote": "Hand-measured at native resolution on the 2026-09-30 fourth gala draw. The localiser put the arch box on the doorframe and a chair rather than the opening, and the plan box on the left third of the board; the companionway it got right. | demoted to draft:pre-regen 2026-09-30 before the gala redraw; re-measure by eye against the new art. | 2026-10-04 pre-redraw: was boxSource=draft:localizer, box=[0.4344, 0.262, 0.5656, 0.582]; demoted so the placer re-drafts on the new art"
+          "boxNote": "Hand-measured at native resolution on the 2026-09-30 fourth gala draw. The localiser put the arch box on the doorframe and a chair rather than the opening, and the plan box on the left third of the board; the companionway it got right. | demoted to draft:pre-regen 2026-09-30 before the gala redraw; re-measure by eye against the new art. | 2026-10-04 pre-redraw: was boxSource=draft:localizer, box=[0.4344, 0.262, 0.5656, 0.582]; demoted so the placer re-drafts on the new art",
+          "submitLabel": "Accuse!"
         },
         {
           "type": "door",
@@ -3819,7 +3722,7 @@
           "requires": [
             "plan"
           ],
-          "lockedBody": "The wireless room is through the arch and the shore watch is listening on the hour. You have nothing to give them yet — the plan on the easel is still unseated, five loose effects waiting beside it.",
+          "lockedBody": "The wireless room is through the arch and the shore watch is listening on the hour. You have nothing to give them yet: the five thieving crews are not yet matched to their resellers.",
           "note": "THE VICTORY DOOR. Opens only once the seating plan is solved; leads to the wireless room, where the escape actually ends.",
           "box": [
             0.31,
@@ -3924,8 +3827,10 @@
           "at": "2026-10-04T23:29:24"
         }
       },
-      "entry": "Sunrise, and the last of the party. Three years of the file is standing on this deck holding a glass, and your partner is coming up the other side with their pockets full.",
-      "debrief": "The lesson made physical. Five cards, three tables, and the arithmetic refusing to come out even — because k was never a property of the data. It was a property of the question each of you asked of it. And the tempting wrong seating, sorting the tokens by what they ARE instead of by what is stamped on them, is the scaling trap again with no numbers in it at all: group on the wrong feature and you get a wrong answer in exactly the right shape.",
+      "entry": {
+        "text": "Sunrise, and the last of the party. Criminals who have been on file for three years are standing on this deck holding a glass, and your partner is coming up the other side with their pockets full."
+      },
+      "debrief": "The lesson made physical. Five crews, three resellers, and the arithmetic refusing to come out even — because k was never a property of the data alone. It was a property of the columns each of you asked about. And the tempting wrong match, sorting the tokens by what they ARE instead of by what is stamped on them, is the scaling trap again with no numbers in it at all: group on the wrong feature and you get a wrong answer in exactly the right shape.",
       "panorama": "gala/scene.png",
       "builtFrom": "l1_gala_2.png",
       "wrap": {
@@ -3939,48 +3844,48 @@
         {
           "id": "plan",
           "type": "grid",
-          "label": "The seating plan",
+          "label": "The accusation",
           "box": [
             0.4133,
             0.2925,
             0.4645,
             0.5421
           ],
-          "prompt": "<p>The steward's plan is laid out in brass: three tables ruled across it, and along the foot of it five things, each one carried off a scene and each one carrying a mark.</p><p>Three tables, one to a house. Every guest sits with whoever moves their goods.</p><p>One of you can see what is stamped on each piece. The other knows what each house stamps. Neither of you can seat this alone.</p>",
+          "prompt": "Which thieving crews worked with which resellers?",
           "items": [
             {
               "key": "lighter",
-              "label": "A monogrammed lighter"
+              "label": "The crew that left the monogrammed lighter"
             },
             {
               "key": "chip",
-              "label": "A bone-coloured chip"
+              "label": "The crew that left the bone-colored chip"
             },
             {
               "key": "fob",
-              "label": "A hotel key fob"
+              "label": "The crew that left the hotel key fob"
             },
             {
               "key": "matches",
-              "label": "A book of matches"
+              "label": "The crew that left the book of matches"
             },
             {
               "key": "tag",
-              "label": "A luggage tag"
+              "label": "The crew that left the luggage tag"
             }
           ],
           "buckets": [
             {
               "key": "broker",
-              "label": "The broker's table"
+              "label": "The pawnbroker"
             },
             {
               "key": "club",
-              "label": "The casino's table"
+              "label": "The casino"
             },
             {
               "key": "shipping",
-              "label": "The shipping table"
+              "label": "The shipping yard"
             }
           ],
           "answer": {
@@ -3992,16 +3897,18 @@
           },
           "maxAttempts": 0,
           "feedback": {
-            "correct": "The steward reads the plan back without comment and begins seating the room.",
-            "wrong": "The steward turns the plan round and sets it down again. Someone at that table does not belong there.",
-            "out": ""
+            "correct": "That's it: every crew is matched to its reseller.",
+            "wrong": "Not yet. At least one crew is matched to the wrong reseller.",
+            "out": "",
+            "incomplete": "Match every crew to a reseller first."
           },
           "boxSource": "draft:localizer",
           "solveSfx": {
             "src": "audio/solve_exit_door.mp3",
             "volume": 0.10929272617698416
           },
-          "boxNote": "Hand-measured at native resolution on the 2026-09-30 fourth gala draw. The localiser put the arch box on the doorframe and a chair rather than the opening, and the plan box on the left third of the board; the companionway it got right. | demoted to draft:pre-regen 2026-09-30 before the gala redraw; re-measure by eye against the new art. | 2026-10-04 pre-redraw: was boxSource=draft:localizer, box=[0.4344, 0.262, 0.5656, 0.582]; demoted so the placer re-drafts on the new art"
+          "boxNote": "Hand-measured at native resolution on the 2026-09-30 fourth gala draw. The localiser put the arch box on the doorframe and a chair rather than the opening, and the plan box on the left third of the board; the companionway it got right. | demoted to draft:pre-regen 2026-09-30 before the gala redraw; re-measure by eye against the new art. | 2026-10-04 pre-redraw: was boxSource=draft:localizer, box=[0.4344, 0.262, 0.5656, 0.582]; demoted so the placer re-drafts on the new art",
+          "submitLabel": "Accuse!"
         },
         {
           "id": "companion",
@@ -4057,7 +3964,7 @@
           "requires": [
             "plan"
           ],
-          "lockedBody": "The wireless room is through the arch and the shore watch is listening on the hour. You have nothing to give them yet — the plan on the easel is still unseated, five loose effects waiting beside it.",
+          "lockedBody": "The wireless room is through the arch and the shore watch is listening on the hour. You have nothing to give them yet: the five thieving crews are not yet matched to their resellers.",
           "boxSource": "draft:localizer",
           "boxNote": "Hand-measured at native resolution on the 2026-09-30 fourth gala draw. The localiser put the arch box on the doorframe and a chair rather than the opening, and the plan box on the left third of the board; the companionway it got right. | demoted to draft:pre-regen 2026-09-30 before the gala redraw; re-measure by eye against the new art. | 2026-10-04 pre-redraw: was boxSource=draft:localizer, box=[0.276, 0.03, 0.3016, 0.35]; demoted so the placer re-drafts on the new art"
         },
@@ -4115,7 +4022,9 @@
       },
       "isBoss": false,
       "designNote": "THE VICTORY ROOM (Lucas, 2026-09-30). Reached ONLY from the gala, through the deckhouse archway, and only once the seating plan is solved — so both players walk in together, having agreed the seating out loud.\nENGINE: a `dial` flagged `endsEscape` — the player's own hand making the last gesture (the beacons dispatch-brazier pattern). NOT a lock and NOT a puzzle. Lifting the handset IS the whole act: there is deliberately no number to key, because this escape is recognition and a second gate would dilute the moment (Lucas's call).\nThrowing it sets `called_in = sent`, which swaps in the full-scene `called_in` variant and only THEN shows escapeDone — the engine waits for the variant to render precisely so the gesture's consequence is seen before the finish card covers it.\nART CONTRACT: the BASE is quiet, empty, gold water through the windows. The VARIANT must show three grey launches abreast plus a cutter beyond, every searchlight lit and raking in through the glass, and the handset off its cradle.\nUNGRADED — a dial never enters the codec, so the decoder key and the four-step code are unchanged.\nART: new. SHARED.",
-      "entry": "Through the arch the party drops away to nothing. One small room, all brass and black bakelite, the set already warm and the shore watch listening on the hour. Your partner comes in behind you and stands at your shoulder.",
+      "entry": {
+        "text": "You've figured out which thieving crews are working with which resellers! That's the last piece needed to call in arrests. Your partner comes in behind you and stands at your shoulder. Call in the crimes!"
+      },
       "debrief": "Nothing was computed in here. It had all been settled outside at the board; this room only spends it. That is what an escape is for — the moment a grouping you argued your way to stops being a number and becomes something you do.",
       "plannedHotspots": [
         {
@@ -4128,10 +4037,10 @@
             {
               "value": "sent",
               "label": "Lift the handset and give them the count",
-              "toast": "Five crews, three houses, and the names to go with them. Four minutes, they say."
+              "toast": "Five thieving crews, three resellers, and the names to go with them. Four minutes, they say."
             }
           ],
-          "hint": "The set is warm and the shore watch is listening on the hour. You have five crews, three houses and a seating plan that will stand up in front of anybody. Lift it.",
+          "hint": "The set is warm and the shore watch is listening on the hour. You have five thieving crews, three resellers and an accusation that will stand up in front of anybody. Lift it.",
           "note": "THE FINALE. endsEscape — throwing it ends the escape phase. No answer to key: the gesture is the whole mechanic.",
           "box": [
             0.3402,
@@ -4283,9 +4192,11 @@
               "ratio": 0.68,
               "delta": 0.98,
               "needsWork": false,
-              "accepted": false,
+              "accepted": true,
               "seamBandRun": 0.015,
-              "at": "2026-10-05T18:22:10"
+              "at": "2026-10-15T22:00:31",
+              "acceptedBy": "lucas via agent 2026-10-15",
+              "humanNote": "Lucas, 2026-10-15, after the heist audit listed these unaccepted state variants: \"All art has my approval.\""
             }
           },
           "acceptedBy": "lucas 2026-10-06",
@@ -4355,10 +4266,10 @@
             {
               "value": "sent",
               "label": "Lift the handset and give them the count",
-              "toast": "Five crews, three houses, and the names to go with them. Four minutes, they say."
+              "toast": "Five thieving crews, three resellers, and the names to go with them. Four minutes, they say."
             }
           ],
-          "hint": "The set is warm and the shore watch is listening on the hour. You have five crews, three houses and a seating plan that will stand up in front of anybody. Lift it.",
+          "hint": "The set is warm and the shore watch is listening on the hour. You have five thieving crews, three resellers and an accusation that will stand up in front of anybody. Lift it.",
           "boxSource": "moved:testplay",
           "boxNote": "Hand-measured at native resolution on the committed wireless art, 2026-09-30. place_hotspots could not place this room: apply_room_committed only saves when it writes a box onto the COMMITTED layer, and a hand-authored room has none, so a room with plannedHotspots and zero committed hotspots is unplaceable by --commit-boxes.",
           "solveSfx": {
@@ -4458,11 +4369,11 @@
     },
     {
       "room": "a_townhouse",
-      "text": "Front door, second puzzle. You stopped taking five groups for granted and asked how many the entry columns really support. You ran k-means for one group, two, three and onwards, plotted how much spread was left inside the groups each time, and read the elbow: past five groups, adding another one barely tightened anything. That is how you choose k."
+      "text": "Front door, second puzzle. You stopped taking five groups for granted and asked how many the entry columns really support. You ran k-means for one group, two, three and onwards, plotted the within-cluster variance each time, and read the elbow: past five groups, adding another one barely tightened anything. That is how you choose k."
     },
     {
       "room": "a_gallery",
-      "text": "Front door, third puzzle. You used the five groups as groupings for a summary. You took the mean entry height of each group, found the one sitting well above the rest, and counted its jobs: 10. Clustering finds the groups; summarising them tells you what makes each group different."
+      "text": "Front door, third puzzle. You used the five groups as groupings for a summary. You took the mean entry height of each group, found the one sitting well above the rest, and counted its jobs: 10. Clustering finds the groups; summarizing them tells you what makes each group different."
     },
     {
       "room": "a_vault",
@@ -4482,8 +4393,8 @@
     },
     {
       "room": "b_stateroom",
-      "text": "Back door, last puzzle. You clustered on all five disposal measurements, haul value included. Haul value is recorded in pounds and runs into the thousands, while the other four run in single figures and tens, so the draft sort on the desk, which left the columns unscaled, grouped the jobs largely by what they were worth, and put the Ardsley Strongroom with Edgeworth Hall. Once every column was scaled, all five counted equally and the Ardsley Strongroom's goods went out through the same channel as Lyndhurst Gate's. It is the same lesson as the front door's last puzzle, on the other half of the table."
+      "text": "Back door, last puzzle. You clustered on all five disposal measurements, haul value included. Haul value is recorded in pounds and runs into the thousands, while the other four run in single figures and tens, so the draft sort on the desk, which left the columns unscaled, grouped the jobs largely by what they were worth, and put the Ardsley Strongroom with Edgeworth Hall. Once every column was scaled, all five counted equally and the Ardsley Strongroom's goods went out through the same reseller as Lyndhurst Gate's. It is the same lesson as the front door's last puzzle, on the other half of the table."
     }
   ],
-  "escapeBrief": "To get out the two of you had to put both halves together. On the gala deck were five objects carried off the front-door scenes and three tables, one for each disposal channel. The front-door player could see the mark on each object; the back-door player knew which mark each channel uses: a lion in a shield for the casino, a fleur-de-lis for the broker, and no device at all, only a number, for the shipping house. Seating the five objects at the three tables meant saying out loud which of the five entry groups moves its goods through which of the three channels, and it came out uneven: two, two and one. So five and three were never competing answers. The five groups sit inside the three, and how many groups you find depends on which columns you cluster, not only on the data. With the plan seated, one of you lifted the telephone in the wireless room and called it in."
+  "escapeBrief": "To get out the two of you had to put both halves together. On the gala deck were five objects carried off the front-door scenes, one left by each thieving crew, and three resellers to match them to. The front-door player could see the mark on each object; the back-door player knew which mark each reseller uses: a lion in a shield for the casino, a fleur-de-lis for the pawnbroker, and no device at all, only a number, for the shipping yard. Matching the five crews to the three resellers meant saying out loud which of the five thieving crews sells its goods through which of the three resellers, and it came out uneven: two, two and one. So five and three were never competing answers. The five groups sit inside the three, and how many groups you find depends on which columns you cluster, not only on the data. With every crew matched, one of you lifted the telephone in the wireless room and called it in."
 }

@@ -20,6 +20,12 @@ Music bed (`drowned_henges_theme.mp3`) is credited separately in `scenario.json`
 | `plains_banner_flap.mp3`  | https://freesound.org/people/felix.blume/sounds/187364/      | felix.blume      | CC0 | plains — HERO: the great crimson banner (flag flapping hard; from beacons `kiln_signal_flag`) |
 | `saltflat_juniper_crackle.mp3` | https://freesound.org/people/AlexanderChe/sounds/410404/ | AlexanderChe     | CC0 | saltflat — HERO: smouldering juniper on the salt hearth (from beacons `kiln_juniper_crackle`; quiet at source, wired at 1.0) |
 | `boss_cord_creak.mp3`     | https://freesound.org/people/gear_clinkz/sounds/547862/      | gear_clinkz      | CC0 | boss — HERO: herb-bundle cords creaking on the rack ("Rope under tension", 15 s cut from airship `bridge_bed_rope_creak`) |
+| `portal_transit.mp3` (mix, layer 1) | https://freesound.org/people/JW_Audio/sounds/831805/ | JW_Audio | CC0 | portal transit — the suck-in (reverse shimmer sweep, played backwards) |
+| `portal_transit.mp3` (mix, layer 2) | https://freesound.org/people/Vrymaa/sounds/826131/ | Vrymaa | CC0 | portal transit — glassy cymbal swell under the whole jump |
+| `portal_transit.mp3` (mix, layer 3) | https://freesound.org/people/berkup/sounds/768664/ | berkup | CC0 | portal transit — the warp hum ("portal gate opening") |
+| `portal_transit.mp3` (mix, layer 4) | https://freesound.org/people/TGN.LiveOrganism/sounds/608428/ | TGN.LiveOrganism | CC0 | portal transit — arrival boom ("distant impact") |
+| `portal_transit.mp3` (mix, layer 5) | https://freesound.org/people/SkySpeira/sounds/844398/ | SkySpeira | CC0 | portal transit — arrival sparkle ("Mysterious Sparkle Flourish") |
+| `portal_escape.mp3` (mix) | the five `portal_transit.mp3` sources above, plus https://freesound.org/people/AudioPapkin/sounds/822419/ | AudioPapkin | CC0 | escape transit — "Riser Hit sfx 119" landing on the final reveal of the whole world |
 
 Hero-source layers added 2026-10-15 after the spec-v2 movers changed (fire bowl, banner, juniper smoke, herb rack).
 Beacons sources were verified CC0 on their own pages at pull time (`networks/beacons/_scratch/audio/CREDITS.md`).
