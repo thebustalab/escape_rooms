@@ -70,14 +70,14 @@
 // A bare `./variant_resolve.js` import is NOT refreshed by bumping the <script> tag's ?v, so a changed
 // helper module (e.g. a new export) leaves browsers on a stale cached copy → "doesn't provide an export
 // named X" SyntaxError → blank page (the 2026-08-05 airship regression). Bump all three together.
-import { WebRConsole } from "./webr-console.js?v=128";
-import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers } from "./variant_resolve.js?v=128";   // Phase 3: per-hotspot state variants; monorail switch-door nav
-import * as PQ from "./puzzle_queue.js?v=128";   // dynamic puzzle queue: location-independent puzzle serving
-import * as CP from "./corr_panel.js?v=128";   // lower-triangle layout of the grid gate (clouds correlation panel)
-import { particleCount } from "./particles.js?v=128";   // ambient-particle vocabulary + per-kind field density
-import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=128";
-import { condHolds } from "./cond.js?v=128";   // ledger + elevation-map card DOM
-import * as RIDE from "./ride.js?v=128";   // THE RIDE (subway): express lever + clip-sequence planner
+import { WebRConsole } from "./webr-console.js?v=129";
+import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers } from "./variant_resolve.js?v=129";   // Phase 3: per-hotspot state variants; monorail switch-door nav
+import * as PQ from "./puzzle_queue.js?v=129";   // dynamic puzzle queue: location-independent puzzle serving
+import * as CP from "./corr_panel.js?v=129";   // lower-triangle layout of the grid gate (clouds correlation panel)
+import { particleCount } from "./particles.js?v=129";   // ambient-particle vocabulary + per-kind field density
+import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=129";
+import { condHolds } from "./cond.js?v=129";   // ledger + elevation-map card DOM
+import * as RIDE from "./ride.js?v=129";   // THE RIDE (subway): express lever + clip-sequence planner
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 
@@ -3385,7 +3385,7 @@ function buildTriangleCard(h, onSolved) {
     (h.prompt ? `<div class="qprompt">${h.prompt}</div>` : "") +
     `<table class="gridsel tri"><thead><tr><th></th>` +
       axes.slice(0, -1).map(a => `<th>${esc(a.label)}</th>`).join("") + `</tr></thead><tbody>${rows}</tbody></table>` +
-    `<div class="trilegend">` + buckets.map(b => `<span>${face(b.key)} ${esc(b.label)}</span>`).join("") + `</div>` +
+    `<div class="trilegend">` + buckets.filter(b => !b.startOnly).map(b => `<span>${face(b.key)} ${esc(b.label)}</span>`).join("") + `</div>` +
     `<div class="qfeedback"></div><button class="qsubmit">${esc(h.submitLabel || "Set the panel")}</button>`;
   const fb = card.querySelector(".qfeedback"), sub = card.querySelector(".qsubmit");
   card.querySelectorAll(".tricell").forEach(btn => btn.addEventListener("click", () => {
@@ -3398,6 +3398,10 @@ function buildTriangleCard(h, onSolved) {
   }));
   card.querySelectorAll(".tricell").forEach(btn => { btn.dataset.state = sel[btn.dataset.item]; });
   sub.addEventListener("click", () => {
+    if (CP.isIncomplete(items, sel, buckets)) {   // a "?" left on the board: not an attempt
+      fb.className = "qfeedback no"; fb.innerHTML = fbk.incomplete || "Set every cell first.";
+      return;
+    }
     attempts++; attemptCounts.set(pid, attempts);
     if (CP.isSolved(items, sel, answer)) {
       fb.className = "qfeedback ok"; fb.innerHTML = fbk.correct || "The panel settles.";
@@ -3488,6 +3492,7 @@ function solveRoom(result, h, qIndex) {
   // Which doors were ALREADY open, so the toast below can tell whether this solve opened anything.
   const openBefore = openDoorIds(room);
   const justSolved = !!(h && h.id && !solvedGates.has(gateKey(room.key, h.id)));   // first solve of THIS gate
+  const newRung = qIndex != null && PQ.usesQueue(SCENARIO) && !queueSolved.has(qIndex);   // for advanceOnSolve below
   if (h && h.id) solvedGates.add(gateKey(room.key, h.id));
   // DYNAMIC QUEUE: record against the ladder rung, not the room. Do this BEFORE the completion
   // check below, which asks the queue whether the objective is finished.
@@ -3543,6 +3548,20 @@ function solveRoom(result, h, qIndex) {
   if (graded && phaseOf(room) === "analysis" && analysisComplete()) {
     toast("Analysis complete.");
     setTimeout(finishAnalysis, 650);
+    return;
+  }
+  // AUTO-ADVANCE (2026-10-16, clouds; PQ.advanceDoor): a slot with `advanceOnSolve` carries the player through
+  // its room's forward door once a new rung is recorded. Placed AFTER the analysis-finish return, so the last
+  // rung's submission/done card always wins. It goes through handleDoor, the same path as a click, so door
+  // gates, onPass and any `door.transit` clip all apply. The guard skips it if the player has already left,
+  // opened another modal, or started a ride/transit in the pause.
+  const adv = newRung ? PQ.advanceDoor(h, room) : null;
+  if (adv && isShown(adv) && doorIsOpen(adv, room)) {
+    const from = room.key;
+    toast(h.advanceToast || "The current carries you on.");
+    setTimeout(() => {
+      if (room.key === from && !$("#modal").classList.contains("open") && !riding && !transiting) handleDoor(adv);
+    }, h.advanceDelayMs != null ? h.advanceDelayMs : 1100);
     return;
   }
   if (SCENARIO.stonePortals && isPrimary && !portalUnlocked(room))

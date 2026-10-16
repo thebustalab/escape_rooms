@@ -183,7 +183,8 @@
           "label": "The survey console",
           "queue": true,
           "queueSeries": true,
-          "note": "QUEUE SLOT — serves the next unsolved rung of SCENARIO.puzzleQueue (P1 scores -> Emberbloom-01, P2 scree -> 44.2%, P3 loadings -> filament_length, P4 boss -> acidity), authored there."
+          "advanceOnSolve": true,
+          "note": "QUEUE SLOT on every ring dash — serves the next unsolved rung of SCENARIO.puzzleQueue (P1 scores -> Emberbloom-01, P2 scree -> 44.2%, P3 loadings -> filament_length, P4 boss -> acidity), authored there; a solve carries the glider through this room's oneWay door."
         },
         {
           "type": "door",
@@ -226,6 +227,7 @@
           "label": "The survey console",
           "queue": true,
           "queueSeries": true,
+          "advanceOnSolve": true,
           "queueEmptyBody": "The survey is charted. The reading-pane holds both of the city's great shadows, and asks nothing more.",
           "box": [
             0.425,
@@ -243,10 +245,10 @@
           "to": "ap_grainrun",
           "label": "Ride the current on round — to The long shadow",
           "box": [
-            0.4821,
-            0.3333,
-            0.6221,
-            0.5933
+            0.4778,
+            0.28,
+            0.6178,
+            0.54
           ],
           "boxSource": "moved:testplay",
           "boxNote": "COARSE box from the element's authored slot (to the right) for the 2026-09-24 test play; not measured against the art. Replace in the box pass.",
@@ -417,6 +419,14 @@
       "designNote": "OPENER (PC1) — the long shadow; settles height/glow/hue. Heading 034°. Edit the spec here (live); the 09-21 generator _scratch/shadow_city_specs.py is superseded.",
       "plannedHotspots": [
         {
+          "type": "puzzle",
+          "label": "The survey console",
+          "queue": true,
+          "queueSeries": true,
+          "advanceOnSolve": true,
+          "note": "QUEUE SLOT on every ring dash — serves the next unsolved rung of SCENARIO.puzzleQueue (P1 scores -> Emberbloom-01, P2 scree -> 44.2%, P3 loadings -> filament_length, P4 boss -> acidity), authored there; a solve carries the glider through this room's oneWay door."
+        },
+        {
           "type": "door",
           "label": "The Eye — into the city's heart",
           "direction": "open",
@@ -488,16 +498,33 @@
           "boxNote": "the clot of storm-cloud over the city's heart, measured by eye on scene.png (coordinate grid), 2026-10-16"
         },
         {
+          "id": "survey_console",
+          "type": "puzzle",
+          "label": "The survey console",
+          "queue": true,
+          "queueSeries": true,
+          "advanceOnSolve": true,
+          "queueEmptyBody": "The survey is charted. The reading-pane holds both of the city's great shadows, and asks nothing more.",
+          "box": [
+            0.419,
+            0.725,
+            0.581,
+            0.895
+          ],
+          "boxSource": "measured:agent-vision",
+          "boxNote": "the milky crystal reading-pane at the centre of the dash, measured by eye on ap_grainrun/scene.png (coordinate grid), 2026-10-16"
+        },
+        {
           "id": "to_ap_pileup",
           "type": "door",
           "direction": "open",
           "to": "ap_pileup",
           "label": "Ride the current on round — to The pile-up",
           "box": [
-            0.4688,
-            0.3442,
-            0.5688,
-            0.5442
+            0.461,
+            0.302,
+            0.561,
+            0.502
           ],
           "boxSource": "moved:testplay",
           "boxNote": "COARSE box from the element's authored slot (just right of centre) for the 2026-09-24 test play; not measured against the art. Replace in the box pass.",
@@ -660,6 +687,14 @@
       "designNote": "muddle. Heading 070°. Edit the spec here (live); the 09-21 generator _scratch/shadow_city_specs.py is superseded.",
       "plannedHotspots": [
         {
+          "type": "puzzle",
+          "label": "The survey console",
+          "queue": true,
+          "queueSeries": true,
+          "advanceOnSolve": true,
+          "note": "QUEUE SLOT on every ring dash — serves the next unsolved rung of SCENARIO.puzzleQueue (P1 scores -> Emberbloom-01, P2 scree -> 44.2%, P3 loadings -> filament_length, P4 boss -> acidity), authored there; a solve carries the glider through this room's oneWay door."
+        },
+        {
           "type": "door",
           "label": "Ride the current on round — to The crosswise shadow",
           "direction": "open",
@@ -695,18 +730,35 @@
       },
       "hotspots": [
         {
+          "id": "survey_console",
+          "type": "puzzle",
+          "label": "The survey console",
+          "queue": true,
+          "queueSeries": true,
+          "advanceOnSolve": true,
+          "queueEmptyBody": "The survey is charted. The reading-pane holds both of the city's great shadows, and asks nothing more.",
+          "box": [
+            0.435,
+            0.75,
+            0.563,
+            0.897
+          ],
+          "boxSource": "measured:agent-vision",
+          "boxNote": "the milky crystal reading-pane at the centre of the dash, measured by eye on ap_pileup/scene.png (coordinate grid), 2026-10-16"
+        },
+        {
           "id": "to_ap_stillstand",
           "type": "door",
           "direction": "open",
           "to": "ap_stillstand",
           "label": "Ride the current on round — to The crosswise shadow",
           "box": [
-            0.449,
-            0.3768,
-            0.549,
-            0.5768
+            0.4537,
+            0.3194,
+            0.5537,
+            0.5194
           ],
-          "boxSource": "draft:testplay",
+          "boxSource": "moved:testplay",
           "boxNote": "COARSE box from the element's authored slot (just right of centre) for the 2026-09-24 test play; not measured against the art. Replace in the box pass.",
           "_designNote": "FORWARD-ONLY RING (Lucas, 2026-09-25): this is the only door out of this room. The current carries the glider one way; to revisit a room you go all the way round.",
           "oneWay": "forward-only ring: the current carries the glider one way (Lucas, 2026-09-25)"
@@ -874,6 +926,14 @@
       "designNote": "OPENER (PC2) — the archive apart; settles spires. Heading 124°. Edit the spec here (live); the 09-21 generator _scratch/shadow_city_specs.py is superseded.",
       "plannedHotspots": [
         {
+          "type": "puzzle",
+          "label": "The survey console",
+          "queue": true,
+          "queueSeries": true,
+          "advanceOnSolve": true,
+          "note": "QUEUE SLOT on every ring dash — serves the next unsolved rung of SCENARIO.puzzleQueue (P1 scores -> Emberbloom-01, P2 scree -> 44.2%, P3 loadings -> filament_length, P4 boss -> acidity), authored there; a solve carries the glider through this room's oneWay door."
+        },
+        {
           "type": "door",
           "label": "The Eye — into the city's heart",
           "direction": "open",
@@ -945,16 +1005,33 @@
           "boxNote": "the clot of storm-cloud over the city's heart, measured by eye on scene.png (coordinate grid), 2026-10-16"
         },
         {
+          "id": "survey_console",
+          "type": "puzzle",
+          "label": "The survey console",
+          "queue": true,
+          "queueSeries": true,
+          "advanceOnSolve": true,
+          "queueEmptyBody": "The survey is charted. The reading-pane holds both of the city's great shadows, and asks nothing more.",
+          "box": [
+            0.419,
+            0.725,
+            0.581,
+            0.895
+          ],
+          "boxSource": "measured:agent-vision",
+          "boxNote": "the milky crystal reading-pane at the centre of the dash, measured by eye on ap_stillstand/scene.png (coordinate grid), 2026-10-16"
+        },
+        {
           "id": "to_ap_smear",
           "type": "door",
           "direction": "open",
           "to": "ap_smear",
           "label": "Ride the current on round — to The smear",
           "box": [
-            0.4631,
-            0.3001,
-            0.5631,
-            0.5001
+            0.4564,
+            0.3172,
+            0.5564,
+            0.5172
           ],
           "boxSource": "moved:testplay",
           "boxNote": "COARSE box from the element's authored slot (just right of centre) for the 2026-09-24 test play; not measured against the art. Replace in the box pass.",
@@ -1117,6 +1194,14 @@
       "designNote": "muddle. Heading 160°. Edit the spec here (live); the 09-21 generator _scratch/shadow_city_specs.py is superseded.",
       "plannedHotspots": [
         {
+          "type": "puzzle",
+          "label": "The survey console",
+          "queue": true,
+          "queueSeries": true,
+          "advanceOnSolve": true,
+          "note": "QUEUE SLOT on every ring dash — serves the next unsolved rung of SCENARIO.puzzleQueue (P1 scores -> Emberbloom-01, P2 scree -> 44.2%, P3 loadings -> filament_length, P4 boss -> acidity), authored there; a solve carries the glider through this room's oneWay door."
+        },
+        {
           "type": "door",
           "label": "Ride the current on round — to The half-light",
           "direction": "open",
@@ -1151,6 +1236,23 @@
         "pitch": -5
       },
       "hotspots": [
+        {
+          "id": "survey_console",
+          "type": "puzzle",
+          "label": "The survey console",
+          "queue": true,
+          "queueSeries": true,
+          "advanceOnSolve": true,
+          "queueEmptyBody": "The survey is charted. The reading-pane holds both of the city's great shadows, and asks nothing more.",
+          "box": [
+            0.42,
+            0.7,
+            0.576,
+            0.862
+          ],
+          "boxSource": "measured:agent-vision",
+          "boxNote": "the milky crystal reading-pane at the centre of the dash, measured by eye on ap_smear/scene.png (coordinate grid), 2026-10-16"
+        },
         {
           "id": "to_ap_halflight",
           "type": "door",
@@ -1324,6 +1426,14 @@
       "designNote": "half-resolve — the near miss. Heading 205°. Edit the spec here (live); the 09-21 generator _scratch/shadow_city_specs.py is superseded.",
       "plannedHotspots": [
         {
+          "type": "puzzle",
+          "label": "The survey console",
+          "queue": true,
+          "queueSeries": true,
+          "advanceOnSolve": true,
+          "note": "QUEUE SLOT on every ring dash — serves the next unsolved rung of SCENARIO.puzzleQueue (P1 scores -> Emberbloom-01, P2 scree -> 44.2%, P3 loadings -> filament_length, P4 boss -> acidity), authored there; a solve carries the glider through this room's oneWay door."
+        },
+        {
           "type": "door",
           "label": "Ride the current on round — to The backwind",
           "direction": "open",
@@ -1359,16 +1469,33 @@
       },
       "hotspots": [
         {
+          "id": "survey_console",
+          "type": "puzzle",
+          "label": "The survey console",
+          "queue": true,
+          "queueSeries": true,
+          "advanceOnSolve": true,
+          "queueEmptyBody": "The survey is charted. The reading-pane holds both of the city's great shadows, and asks nothing more.",
+          "box": [
+            0.42,
+            0.7,
+            0.574,
+            0.86
+          ],
+          "boxSource": "measured:agent-vision",
+          "boxNote": "the milky crystal reading-pane at the centre of the dash, measured by eye on ap_halflight/scene.png (coordinate grid), 2026-10-16"
+        },
+        {
           "id": "to_ap_backwind",
           "type": "door",
           "direction": "open",
           "to": "ap_backwind",
           "label": "Ride the current on round — to The backwind",
           "box": [
-            0.4849,
-            0.3702,
-            0.5849,
-            0.5702
+            0.4822,
+            0.3114,
+            0.5822,
+            0.5114
           ],
           "boxSource": "moved:testplay",
           "boxNote": "COARSE box from the element's authored slot (just right of centre) for the 2026-09-24 test play; not measured against the art. Replace in the box pass.",
@@ -1532,6 +1659,14 @@
       "designNote": "near-muddle + derelict. Heading 285°. Edit the spec here (live); the 09-21 generator _scratch/shadow_city_specs.py is superseded.",
       "plannedHotspots": [
         {
+          "type": "puzzle",
+          "label": "The survey console",
+          "queue": true,
+          "queueSeries": true,
+          "advanceOnSolve": true,
+          "note": "QUEUE SLOT on every ring dash — serves the next unsolved rung of SCENARIO.puzzleQueue (P1 scores -> Emberbloom-01, P2 scree -> 44.2%, P3 loadings -> filament_length, P4 boss -> acidity), authored there; a solve carries the glider through this room's oneWay door."
+        },
+        {
           "type": "door",
           "label": "Ride the current on round — to The seat",
           "direction": "open",
@@ -1567,16 +1702,33 @@
       },
       "hotspots": [
         {
+          "id": "survey_console",
+          "type": "puzzle",
+          "label": "The survey console",
+          "queue": true,
+          "queueSeries": true,
+          "advanceOnSolve": true,
+          "queueEmptyBody": "The survey is charted. The reading-pane holds both of the city's great shadows, and asks nothing more.",
+          "box": [
+            0.432,
+            0.745,
+            0.563,
+            0.89
+          ],
+          "boxSource": "measured:agent-vision",
+          "boxNote": "the milky crystal reading-pane at the centre of the dash, measured by eye on ap_backwind/scene.png (coordinate grid), 2026-10-16"
+        },
+        {
           "id": "to_cockpit",
           "type": "door",
           "direction": "open",
           "to": "cockpit",
           "label": "Ride the current on round — to The seat",
           "box": [
-            0.5092,
-            0.3669,
-            0.6092,
-            0.5669
+            0.5052,
+            0.3172,
+            0.6052,
+            0.5172
           ],
           "boxSource": "moved:testplay",
           "boxNote": "COARSE box from the element's authored slot (just right of centre) for the 2026-09-24 test play; not measured against the art. Replace in the box pass.",
@@ -1757,6 +1909,11 @@
           ],
           "buckets": [
             {
+              "key": "unset",
+              "label": "?",
+              "startOnly": true
+            },
+            {
               "key": "flat",
               "label": "Unrelated"
             },
@@ -1777,7 +1934,10 @@
             "openness|slenderness": "flat",
             "openness|roundness": "down"
           },
-          "submitLabel": "Key the override"
+          "submitLabel": "Key the override",
+          "feedback": {
+            "incomplete": "Every cell still showing ? needs a reading before the override will take it."
+          }
         },
         {
           "type": "dial",

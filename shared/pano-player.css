@@ -561,7 +561,7 @@ code { background:#0a1620; padding:1px 5px; border-radius:4px; }
 #subWork .swrun { margin: 0; }
 #subWork .swstat { font-size: 12px; opacity: .8; }
 
-/* correlation panel — grid layout:"lowerTriangle" (clouds). Cells cycle flat / up / down; empty upper-right cells stay blank. */
+/* correlation panel — grid layout:"lowerTriangle" (clouds). Cells start on "?" (startOnly) then cycle flat / up / down; empty upper-right cells stay blank. */
 .gridsel.tri { margin:8px auto 4px; border-spacing:6px; }
 .gridsel.tri th { font-size:13px; color:#e8eef2; font-weight:600; padding:0 4px; }
 .gridsel.tri td.triblank { background:none; }
@@ -570,6 +570,7 @@ code { background:#0a1620; padding:1px 5px; border-radius:4px; }
 .gridsel.tri .tricell:hover:not(:disabled) { border-color:var(--amber); }
 .gridsel.tri .tricell[data-state="up"] { color:#9fe6b4; }
 .gridsel.tri .tricell[data-state="down"] { color:#ffb3a1; }
+.gridsel.tri .tricell .trilab { font-size:20px; font-weight:700; color:rgba(232,238,242,.55); }  /* a startOnly "?" cell, not yet set */
 .tricard .trilegend { display:flex; gap:14px; justify-content:center; font-size:12px; color:rgba(232,238,242,.8); margin:4px 0 2px; }
 .tricard .trilegend span { display:inline-flex; align-items:center; gap:3px; }
 .tricard .trilegend svg { width:18px; height:18px; }

@@ -100,6 +100,20 @@ export function attemptKey(baseKey, hotspot, qIndex) {
   return (hotspot && hotspot.queue && hotspot.queueSeries && qIndex != null) ? `${baseKey}#q${qIndex}` : baseKey;
 }
 
+// AUTO-ADVANCE ON SOLVE (2026-10-16, clouds). A slot marked `advanceOnSolve: true` carries the player
+// through one of its room's doors after it records a NEW rung: the storm moves the glider on, the pilot does
+// not steer. Which door: the slot's `advanceDoor` id when authored, else the room's single door marked
+// `oneWay` (clouds' forward-only ring; the openers' Eye doors are not oneWay, so they never win). Anything
+// ambiguous or missing returns null and the solve closes in place, exactly as before. The caller still
+// checks the door is shown and open, and skips the advance when the solve has just finished the analysis.
+export function advanceDoor(slot, room) {
+  if (!slot || !slot.advanceOnSolve || !room) return null;
+  const doors = (room.hotspots || []).filter(d => d && d.type === "door");
+  if (slot.advanceDoor) return doors.find(d => d.id === slot.advanceDoor) || null;
+  const oneWay = doors.filter(d => d.oneWay);
+  return oneWay.length === 1 ? oneWay[0] : null;
+}
+
 // Does this scenario use the queue at all? Everything above is inert unless a queue is authored,
 // which is what keeps every existing scenario byte-for-byte unchanged.
 export function usesQueue(scenario) {

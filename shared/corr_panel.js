@@ -13,7 +13,10 @@
 //
 // Authoring: { type:"grid", layout:"lowerTriangle", axes:[{key,label}, ...], buckets:[{key,label}, ...],
 //              answer:{ "<rowKey>|<colKey>": bucketKey, ... }, items?: (derived when absent) }
-// The FIRST bucket is every cell's starting state ("all start flat"). Pure — no DOM, tested in Node.
+// The FIRST bucket is every cell's starting state. A bucket marked `startOnly: true` (clouds' "?", 2026-10-16) is
+// a not-yet-set state: cells start on it, cycling never returns to it, the legend omits it, and a board still
+// holding one is INCOMPLETE (the card says so without spending an attempt). Without it, the starting bucket is
+// itself an answer and most cells are right before the student touches them. Pure — no DOM, tested in Node.
 
 // Every lower-triangle pair, row-major: row i (1..N-1) against columns 0..i-1. Key "<row>|<col>".
 export function triangleItems(axes) {
@@ -27,12 +30,19 @@ export function triangleItems(axes) {
   return out;
 }
 
-// The bucket after `current` in `buckets`, wrapping. An unknown current restarts at the first bucket.
+// The bucket after `current` among the cyclable buckets (startOnly ones excluded), wrapping. A current that is
+// not cyclable (unknown, or the startOnly "?") moves to the first cyclable bucket.
 export function cycleBucket(buckets, current) {
-  const keys = (buckets || []).map(b => b.key);
+  const keys = (buckets || []).filter(b => !b.startOnly).map(b => b.key);
   if (!keys.length) return undefined;
   const i = keys.indexOf(current);
   return keys[(i + 1) % keys.length];
+}
+
+// True when any cell still sits on a startOnly bucket (or has no state at all).
+export function isIncomplete(items, sel, buckets) {
+  const startOnly = new Set((buckets || []).filter(b => b.startOnly).map(b => b.key));
+  return (items || []).some(it => sel[it.key] === undefined || startOnly.has(sel[it.key]));
 }
 
 // Starting selection: every cell on the first bucket.
