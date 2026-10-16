@@ -84,6 +84,22 @@ export function queueSteps(queue, results) {
   return out;
 }
 
+// SERIES SLOTS (2026-10-16, clouds). An ordinary slot serves one rung and is then spent: subway's desks
+// each energise one line, so a solved desk answers "already solved". A slot marked `queueSeries: true`
+// instead serves rung after rung from the same hotspot — clouds' single cockpit console carries the whole
+// ladder — so it is NOT spent by a solve; only an exhausted queue spends it (the caller then shows the
+// slot's `queueEmptyBody`). Opt-in, so every existing slot behaves exactly as before.
+export function isSeriesSlot(hotspot, scenario) {
+  return !!(hotspot && hotspot.queue && hotspot.queueSeries && usesQueue(scenario));
+}
+
+// The attempt-count key for one opening of a puzzle. A series slot shows a DIFFERENT rung each time, so
+// its attempts must be counted per rung: keyed by the slot alone, rung 2 would open with rung 1's attempts
+// already spent. Every other puzzle keeps its plain per-gate key.
+export function attemptKey(baseKey, hotspot, qIndex) {
+  return (hotspot && hotspot.queue && hotspot.queueSeries && qIndex != null) ? `${baseKey}#q${qIndex}` : baseKey;
+}
+
 // Does this scenario use the queue at all? Everything above is inert unless a queue is authored,
 // which is what keeps every existing scenario byte-for-byte unchanged.
 export function usesQueue(scenario) {

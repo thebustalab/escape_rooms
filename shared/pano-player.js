@@ -70,14 +70,14 @@
 // A bare `./variant_resolve.js` import is NOT refreshed by bumping the <script> tag's ?v, so a changed
 // helper module (e.g. a new export) leaves browsers on a stale cached copy → "doesn't provide an export
 // named X" SyntaxError → blank page (the 2026-08-05 airship regression). Bump all three together.
-import { WebRConsole } from "./webr-console.js?v=127";
-import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers } from "./variant_resolve.js?v=127";   // Phase 3: per-hotspot state variants; monorail switch-door nav
-import * as PQ from "./puzzle_queue.js?v=127";   // dynamic puzzle queue: location-independent puzzle serving
-import * as CP from "./corr_panel.js?v=127";   // lower-triangle layout of the grid gate (clouds correlation panel)
-import { particleCount } from "./particles.js?v=127";   // ambient-particle vocabulary + per-kind field density
-import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=127";
-import { condHolds } from "./cond.js?v=127";   // ledger + elevation-map card DOM
-import * as RIDE from "./ride.js?v=127";   // THE RIDE (subway): express lever + clip-sequence planner
+import { WebRConsole } from "./webr-console.js?v=128";
+import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers } from "./variant_resolve.js?v=128";   // Phase 3: per-hotspot state variants; monorail switch-door nav
+import * as PQ from "./puzzle_queue.js?v=128";   // dynamic puzzle queue: location-independent puzzle serving
+import * as CP from "./corr_panel.js?v=128";   // lower-triangle layout of the grid gate (clouds correlation panel)
+import { particleCount } from "./particles.js?v=128";   // ambient-particle vocabulary + per-kind field density
+import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=128";
+import { condHolds } from "./cond.js?v=128";   // ledger + elevation-map card DOM
+import * as RIDE from "./ride.js?v=128";   // THE RIDE (subway): express lever + clip-sequence planner
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 
@@ -1765,7 +1765,8 @@ function _renderViewer(img, yaw = 0, dynamic = false, bare = false) {   // bare:
     // re-authored or the viewer rebuilds mid-composite (cost a debugging round, 2026-08-27).
     let cssClass = "hsmark " + h.type + (h.id ? " hs-" + String(h.id).replace(/[^\w-]/g, "_") : "");
     if (h.type === "door") { cssClass += doorIsOpen(h, room) ? " open" : " locked"; if ((h.direction || "forward") === "forward" && portalAwakened(room)) cssClass += " awakened"; }
-    if ((h.type === "puzzle" || h.type === "lock" || h.type === "grid" || h.type === "ledger") && solvedGates.has(gateKey(room.key, h.id))) cssClass += " done";
+    if ((h.type === "puzzle" || h.type === "lock" || h.type === "grid" || h.type === "ledger") && solvedGates.has(gateKey(room.key, h.id))
+        && (!PQ.isSeriesSlot(h, SCENARIO) || PQ.queueComplete(SCENARIO.puzzleQueue, queueSolved))) cssClass += " done";   // a series slot is done only when the ladder is
     return { id: h.id, yaw, pitch, cssClass, clickHandlerFunc: onHotspot, clickHandlerArgs: h };
   });
   // (Awakened starfield is now baked into the texture by compositeAwakened — no DOM overlay hotspot.)
@@ -1824,7 +1825,8 @@ function onHotspot(evt, h) {   // Pannellum calls clickHandlerFunc(event, clickH
     }
     if (h.type === "mapview") return openMapview(h);
     if (h.type === "puzzle") {
-      if (solvedGates.has(gateKey(room.key, h.id))) return toast("You've already solved this one.");
+      // A SERIES queue slot is never spent by a solve, only by an exhausted queue (resolveSlot -> queueEmptyBody).
+      if (!PQ.isSeriesSlot(h, SCENARIO) && solvedGates.has(gateKey(room.key, h.id))) return toast("You've already solved this one.");
       if (!condOK(h.availableWhen)) return openLocked(h);   // maze: puzzle gated by availableWhen (undefined ⇒ open)
       // DYNAMIC QUEUE: a slot serves the NEXT unsolved rung of the ladder rather than a fixed
       // puzzle, so order comes from the queue and not from where the player happens to be.
@@ -2713,7 +2715,7 @@ function openPuzzle(h, qIndex) {
   left.appendChild(cb);                          // move the live console in
   const onSolved = (result) => { closeModal(); solveRoom(result, h, qIndex); };
   // A puzzle grades EITHER on the live R session (`check`) OR by multiple choice (`question`).
-  const pid = gateKey(room.key, h.id);   // per-room attempt-count key (ids repeat across rooms)
+  const pid = PQ.attemptKey(gateKey(room.key, h.id), h, qIndex);   // per-room attempt-count key (ids repeat across rooms); per rung on a series slot
   right.appendChild(h.check ? buildCheckCard(h.check, onSolved, pid, h) : buildQuestion(h.question, onSolved, pid));
   grid.appendChild(left); grid.appendChild(right);
   openModal(h.label || "Puzzle", grid, devSolveThunk(h, qIndex), h, "wide");
@@ -3004,7 +3006,7 @@ function openPickPuzzle(h, qIndex) {
   const right = document.createElement("div");    // prompt + interactive picker
   left.appendChild(cb);
   const onSolved = (result) => { closeModal(); solveRoom(result, h, qIndex); };
-  const pid = gateKey(room.key, h.id);            // per-room attempt-count key (ids repeat across rooms)
+  const pid = PQ.attemptKey(gateKey(room.key, h.id), h, qIndex);   // per-room attempt-count key; per rung on a series slot
   right.appendChild(buildPickCard(h.pick, onSolved, pid, h));
   grid.appendChild(left); grid.appendChild(right);
   openModal(h.label || "Puzzle", grid, devSolveThunk(h, qIndex), h, "wide");
