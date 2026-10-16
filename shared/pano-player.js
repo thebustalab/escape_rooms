@@ -70,14 +70,14 @@
 // A bare `./variant_resolve.js` import is NOT refreshed by bumping the <script> tag's ?v, so a changed
 // helper module (e.g. a new export) leaves browsers on a stale cached copy → "doesn't provide an export
 // named X" SyntaxError → blank page (the 2026-08-05 airship regression). Bump all three together.
-import { WebRConsole } from "./webr-console.js?v=125";
-import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers } from "./variant_resolve.js?v=125";   // Phase 3: per-hotspot state variants; monorail switch-door nav
-import * as PQ from "./puzzle_queue.js?v=125";   // dynamic puzzle queue: location-independent puzzle serving
-import * as CP from "./corr_panel.js?v=125";   // lower-triangle layout of the grid gate (clouds correlation panel)
-import { particleCount } from "./particles.js?v=125";   // ambient-particle vocabulary + per-kind field density
-import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=125";
-import { condHolds } from "./cond.js?v=125";   // ledger + elevation-map card DOM
-import * as RIDE from "./ride.js?v=125";   // THE RIDE (subway): express lever + clip-sequence planner
+import { WebRConsole } from "./webr-console.js?v=126";
+import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers } from "./variant_resolve.js?v=126";   // Phase 3: per-hotspot state variants; monorail switch-door nav
+import * as PQ from "./puzzle_queue.js?v=126";   // dynamic puzzle queue: location-independent puzzle serving
+import * as CP from "./corr_panel.js?v=126";   // lower-triangle layout of the grid gate (clouds correlation panel)
+import { particleCount } from "./particles.js?v=126";   // ambient-particle vocabulary + per-kind field density
+import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=126";
+import { condHolds } from "./cond.js?v=126";   // ledger + elevation-map card DOM
+import * as RIDE from "./ride.js?v=126";   // THE RIDE (subway): express lever + clip-sequence planner
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 
@@ -1251,7 +1251,7 @@ window.addEventListener("resize", () => {
     const a = (window.innerWidth || 1) / (window.innerHeight || 1);
     if (Math.abs(a - _lastAspect) / _lastAspect < 0.02) return;
     _lastAspect = a;
-    if (riding) return;                // the ride owns the viewer; arrival re-renders at the new fit anyway
+    if (riding || transiting) return;  // the ride / a portal transit owns the viewer; arrival re-renders at the new fit anyway
     if (room && viewer) rerenderCurrentRoom();
   }, 250);
 });
@@ -1650,8 +1650,9 @@ let _cineStop = null;   // tears down the current room's cinemagraph rAF + <vide
 function activeCinemagraphs(r) {
   return pickCinemagraphs(r.hotspots, fullSceneState(activeVariants(r)));
 }
-function startCinemagraph(baseUrl, cines, yaw) {
+function startCinemagraph(baseUrl, cines, yaw, live = () => true) {
   _loadImg(baseUrl).then(baseImg => {
+    if (!live()) return;                               // a newer view (another room, a portal transit) has taken over
     const W = baseImg.naturalWidth || baseImg.width, H = baseImg.naturalHeight || baseImg.height;
     const cv = document.createElement("canvas"); cv.width = W; cv.height = H;
     const ctx = cv.getContext("2d");
@@ -1703,16 +1704,26 @@ function startCinemagraph(baseUrl, cines, yaw) {
     };
     raf = requestAnimationFrame(draw);
     _cineStop = () => { cancelAnimationFrame(raf); vids.forEach(({ v }) => { try { v.pause(); v.removeAttribute("src"); v.load(); } catch (e) {} }); };
-  }).catch(e => { console.error("cinemagraph start failed", e); _renderViewer(baseUrl, yaw); });
+  }).catch(e => { console.error("cinemagraph start failed", e); if (live()) _renderViewer(baseUrl, yaw); });
 }
+// VIEW GENERATIONS. A room view is built asynchronously (composite the awakened stars, then the variants, then
+// load the clip) and only then handed to _renderViewer. On a slow connection that can land SECONDS later, after
+// the player has already walked into a portal transit (or another room), and it used to paint the stale room
+// over the live view: the transit's clip and sound kept running underneath an old picture (henges, 2026-10-15,
+// on a phone). Each buildViewer / transit takes a new generation; a continuation whose generation is no longer
+// current drops itself. Pinned by tests/e2e/portal_transit.spec.js ("a slow room redraw").
+let _viewGen = 0;
 function buildViewer(img, yaw = 0) {
   syncRoomSfx();   // the backdrop may have changed state (a solve flipping the scene to night) — follow it with sound
+  const gen = ++_viewGen, live = () => gen === _viewGen;
   const withCinemagraph = url => {
+    if (!live()) return;
     const cines = activeCinemagraphs(room);
     if (!cines.length) return _renderViewer(url, yaw);   // no cinemagraph → static render (all existing rooms)
-    startCinemagraph(url, cines, yaw);
+    startCinemagraph(url, cines, yaw, live);
   };
   const withVariants = url => {
+    if (!live()) return;
     const active = activeVariants(room);
     if (!active.length) return withCinemagraph(url);     // no variants → straight to cinemagraph check
     compositeVariants(url, active, withCinemagraph);
@@ -1938,9 +1949,28 @@ function _transitVideo(src) {
   if (!_transitVideos[src]) _transitVideos[src] = _loadVideo(src).then(v => { if (v) v.loop = false; else delete _transitVideos[src]; return v; });
   return _transitVideos[src];
 }
-function preloadTransits(r) {
-  (r && r.hotspots || []).forEach(h => { if (h && h.type === "door" && h.transit && h.transit.video) _transitVideo(h.transit.video); });
+// Only the CURRENT room's clips stay loaded: a released clip drops its buffer and decoder. Firefox (henges, 2026-10-15)
+// froze the LAST transit of a full playthrough on its first frame, sound still playing, with every earlier clip still
+// buffered; whether this or the background-video suspend below was the cause is unconfirmed (no WebGL in headless
+// Firefox here), so both are guarded.
+function _releaseTransitVideo(src) {
+  const p = _transitVideos[src]; delete _transitVideos[src];
+  if (p) p.then(v => { if (v && v !== (transiting && transiting.video)) { try { v.pause(); v.removeAttribute("src"); v.load(); } catch (e) {} } });
 }
+function preloadTransits(r) {
+  const want = new Set();
+  (r && r.hotspots || []).forEach(h => { if (h && h.type === "door" && h.transit && h.transit.video) want.add(h.transit.video); });
+  Object.keys(_transitVideos).forEach(src => { if (!want.has(src)) _releaseTransitVideo(src); });
+  want.forEach(src => _transitVideo(src));
+}
+// Firefox suspends the picture (not the sound) of a <video> it judges invisible, and a clip that is only ever drawn
+// into a canvas is never in the page. While a transit plays, its <video> sits in the page as a near-invisible 2 px
+// element so it counts as visible.
+function _showForDecode(v) {
+  v.style.cssText = "position:fixed;left:0;top:0;width:2px;height:2px;opacity:0.01;pointer-events:none;z-index:-1";
+  if (!v.isConnected) document.body.appendChild(v);
+}
+function _hideAfterDecode(v) { try { if (v && v.isConnected) v.remove(); } catch (e) {} }
 const _wrapYaw = y => ((((y + 180) % 360) + 360) % 360) - 180;
 // onArrive (the escape door): no room to arrive in — the clip's last frame stays up as the panorama (marker-less)
 // and onArrive runs instead of navigateTo; the fade target is `transit.endPanorama` if given (the clip already
@@ -1954,6 +1984,7 @@ function startTransit(h, idx, withEntry = true, onArrive = null) {   // withEntr
   let yaw = 0; try { yaw = viewer.getYaw(); } catch (e) {}
   const run = {};
   transiting = run;
+  ++_viewGen;                                  // any room view still being built must not paint over the transit
   const walk = () => { if (transiting === run) { transiting = null; if (onArrive) onArrive(); else navigateTo(idx, withEntry); } };
   // Fade onto the art the arrival room will actually show: its last active FULL-SCENE variant (an awakened
   // room re-entered by a back door), else its base/open panorama.
@@ -1963,6 +1994,7 @@ function startTransit(h, idx, withEntry = true, onArrive = null) {   // withEntr
   .then(([video, endImg]) => {
     if (transiting !== run || room !== from) return;
     if (!video) return walk();
+    run.video = video;
     const W = video.videoWidth || 3072, H = video.videoHeight || 1024;
     const cv = document.createElement("canvas"); cv.width = W; cv.height = H;
     const ctx = cv.getContext("2d");
@@ -1981,6 +2013,7 @@ function startTransit(h, idx, withEntry = true, onArrive = null) {   // withEntr
         const iv = setInterval(() => { k++; a.volume = Math.max(0, v0 * (1 - k / 8)); if (k >= 8) { clearInterval(iv); a.pause(); } }, 40);
       }
       try { video.pause(); } catch (e) {}
+      _hideAfterDecode(video);
       drawEnd(1);
       let y = yaw + rollFrom; try { y = viewer.getYaw(); } catch (e) {}
       transiting = null;
@@ -2002,8 +2035,9 @@ function startTransit(h, idx, withEntry = true, onArrive = null) {   // withEntr
       ctx.drawImage(video, 0, 0, W, H);
       _keepStage = true;
       _renderViewer(cv, _wrapYaw(yaw + rollFrom), true, true);   // one dynamic, marker-less viewer for the clip
-      _cineStop = () => { cancelAnimationFrame(raf); try { video.pause(); } catch (e) {} };   // set AFTER _renderViewer
+      _cineStop = () => { cancelAnimationFrame(raf); try { video.pause(); } catch (e) {} _hideAfterDecode(video); };   // set AFTER _renderViewer
       stage.addEventListener("click", finish);
+      _showForDecode(video);
       video.play().then(() => {
         raf = requestAnimationFrame(frame);
         // `transit.sfx` (+ `sfxVolume`): one bespoke track timed to the clip, started with it. Its tail rings
@@ -2587,6 +2621,7 @@ window.PanoRide = {
 // Read-only probe for the portal transit (tests / the author console), like PanoRide.
 window.PanoTransit = {
   active: () => !!transiting,
+  time: () => (transiting && transiting.video ? transiting.video.currentTime : null),   // clip playback position
   room: () => (room ? room.key : null),
   yaw: () => { try { return viewer ? viewer.getYaw() : null; } catch (e) { return null; } },
 };
