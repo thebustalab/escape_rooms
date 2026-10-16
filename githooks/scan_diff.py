@@ -67,7 +67,9 @@ PATTERNS = [
     (r"(?i)(?<![A-Za-z0-9])bustalab-desktop", "internal hostname (host2)"),
     (r"(?i)(?<![A-Za-z0-9])system76-pc", "internal hostname (host1)"),
     (r"(?i)(?<![A-Za-z0-9])spark-e5b5", "internal hostname (dgx)"),
-    (r"(?i)(?<![A-Za-z0-9])bustalab\.d\.umn\.edu", "internal hostname (host1)"),
+    # bustalab.d.umn.edu is deliberately NOT here (Lucas, 2026-10-16): it is the lab server's
+    # public name, already served in phylochemistry.R and analyzeGCMSdata6/7.R, which print the
+    # Shiny "Connect at" URL from it. The --identity tier still catches it via d.umn.edu.
     (r"(?<![0-9.])131\.212\.57\.\d{1,3}", "internal lab IP (131.212.57.0/24)"),
 ]
 # Random bytes in a binary blob match these two often enough to be noise; skip them there.
