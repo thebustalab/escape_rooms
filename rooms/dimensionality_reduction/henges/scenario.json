@@ -510,12 +510,12 @@
           "inc": "rooms_solved"
         }
       ],
-      "designNote": "GRADED — ROOM 1. TYPE 4 Pick-the-Point (ggiraph). TWO-GATE PORTAL: (a) AWAKEN by solving the analysis (arch -> dim starry), (b) UNLOCK by keying this henge's stone pattern (arch -> bright galaxy). STORY BEAT: which single ingredient is flung farthest along the great axis of spread (PC1). TASK: standardized PCA on the 9 numeric properties, plot scores (PC1 vs PC2), CLICK the point farthest along PC1. CODE (pick.plotCode): pc <- prcomp(dplyr::select(druid_ingredients, potency:ash_weight), scale.=TRUE); scores <- data.frame(pc$x, ingredient = druid_ingredients$ingredient); ggplot(scores, aes(PC1, PC2)) + ggiraph::geom_point_interactive(aes(data_id = ingredient, tooltip = ingredient)) + labs(x=\"PC1\", y=\"PC2\"). ANSWER: \"Deathwatch Scarab\" (|PC1|=4.50, +19% clear of Glasswing Beetle II 3.64). Distractors = the other 224 points. HINT: one point sits far past all the rest along the horizontal spread. Solving AWAKENS the forward arch; the STONE KEYPAD then unlocks it with MOUNTAIN PATTERN | | _ (up,up,down), answer \"||_\" — the keypad is INERT until awakened (\"this portal must be awakened first\"). Monolith stones spread rank 3/4 (~1 ft) -> scree; deterministic graphic -> notebook. Codec: pick encodes solved=1. NEW ART.",
+      "designNote": "GRADED — ROOM 1. TYPE 4 Pick-the-Point (ggiraph). TWO-GATE PORTAL: (a) AWAKEN by solving the analysis (arch -> dim starry), (b) UNLOCK by keying this henge's stone pattern (arch -> bright galaxy). STORY BEAT: which single ingredient is flung farthest along the great axis of spread (PC1). TASK: standardized PCA on the 9 numeric properties, plot scores (PC1 vs PC2), CLICK the point farthest along PC1. CODE (the book's, student-mode pick, idColumn ingredient): pca <- runMatrixAnalysis(data = druid_ingredients, analysis = \"pca\", columns_w_values_for_single_analyte = colnames(druid_ingredients)[4:12], columns_w_sample_ID_info = c(\"ingredient\",\"kind\")); p <- ggplot(pca, aes(x = Dim_1, y = Dim_2)) + geom_point(). ANSWER: \"Deathwatch Scarab\" (|Dim_1|=4.49, +24% clear of Glasswing Beetle II 3.63). Distractors = the other 224 points. HINT: one point sits far past all the rest along the horizontal spread. Solving AWAKENS the forward arch; the STONE KEYPAD then unlocks it with MOUNTAIN PATTERN | | _ (up,up,down), answer \"||_\" — the keypad is INERT until awakened (\"this portal must be awakened first\"). Monolith stones spread rank 3/4 (~1 ft) -> scree; deterministic graphic -> notebook. Codec: pick encodes solved=1. NEW ART.",
       "plannedHotspots": [
         {
           "type": "puzzle",
           "label": "The scrying basin",
-          "note": "Type 4 pick: PCA scores, click PC1 extreme -> Deathwatch Scarab (|PC1|=4.50, +19%)",
+          "note": "Type 4 pick: PCA scores, click PC1 extreme -> Deathwatch Scarab (|Dim_1|=4.49, +24%)",
           "box": [
             0.45,
             0.55,
@@ -524,22 +524,24 @@
           ],
           "boxSource": "draft:localizer",
           "pick": {
-            "prompt": "Run a PCA on all the ingredients and plot the scores. One specimen is flung far out along PC1 — the axis of greatest spread, the most singular thing in the whole set. Click it.",
-            "plotCode": "pc <- prcomp(dplyr::select(druid_ingredients, potency:ash_weight), scale. = TRUE)\nscores <- data.frame(pc$x, ingredient = druid_ingredients$ingredient)\np <- ggplot(scores, aes(PC1, PC2)) +\n     ggiraph::geom_point_interactive(aes(data_id = ingredient, tooltip = ingredient), size = 2, alpha = 0.85) +\n     labs(x = \"PC1\", y = \"PC2\")",
+            "prompt": "Run a PCA on all the ingredients and plot the samples, Dim_1 against Dim_2. One specimen is flung far out along the first principal component, Dim_1: the axis of greatest spread, and the most singular thing in the whole set. Click it.",
+            "plotCode": "pca <- runMatrixAnalysis(\n  data = druid_ingredients,\n  analysis = \"pca\",\n  columns_w_values_for_single_analyte = colnames(druid_ingredients)[4:12],\n  columns_w_sample_ID_info = c(\"ingredient\", \"kind\")\n)\np <- ggplot(pca, aes(x = Dim_1, y = Dim_2)) + geom_point()",
             "answer": "Deathwatch Scarab",
             "width": 6,
             "height": 5.5,
             "maxAttempts": 4,
-            "hint": "One point sits far past all the others along the horizontal PC1 axis — the single specimen flung farthest from the crowd. Click that one.",
+            "hint": "One point sits far past all the others along the horizontal Dim_1 axis — the single specimen flung farthest from the crowd. Click that one.",
             "feedback": {
-              "correct": "Correct — noted in your field notebook: the Deathwatch Scarab is flung farthest out along PC1, the most singular specimen in the set.",
+              "correct": "Correct — noted in your field notebook: the Deathwatch Scarab is flung farthest out along the first principal component, the most singular specimen in the set.",
               "wrong": [
-                "Run prcomp() on the nine numeric properties with scale. = TRUE, plot the scores, and look along the horizontal PC1 axis.",
-                "That's not the extreme — one point stands clear out past every other along PC1; click the single farthest one.",
-                "Look for the lone point far from the main cloud along PC1, not one near the middle."
+                "Run the PCA on the nine numeric properties (columns 4 to 12) and plot the samples: <code>pca &lt;- runMatrixAnalysis(data = druid_ingredients, analysis = &quot;pca&quot;, columns_w_values_for_single_analyte = colnames(druid_ingredients)[4:12], columns_w_sample_ID_info = c(&quot;ingredient&quot;, &quot;kind&quot;))</code>, then <code>p &lt;- ggplot(pca, aes(x = Dim_1, y = Dim_2)) + geom_point()</code>. Look along the horizontal Dim_1 axis.",
+                "That's not the extreme — one point stands clear out past every other along Dim_1; click the single farthest one.",
+                "Look for the lone point far from the main cloud along Dim_1, not one near the middle."
               ],
               "reveal": ""
-            }
+            },
+            "idColumn": "ingredient",
+            "idNoun": "ingredient"
           }
         },
         {
@@ -607,22 +609,24 @@
           ],
           "starterCode": "druid_ingredients",
           "pick": {
-            "prompt": "Run a PCA on all the ingredients and plot the scores. One specimen is flung far out along PC1 — the axis of greatest spread, the most singular thing in the whole set. Click it.",
-            "plotCode": "pc <- prcomp(dplyr::select(druid_ingredients, potency:ash_weight), scale. = TRUE)\nscores <- data.frame(pc$x, ingredient = druid_ingredients$ingredient)\np <- ggplot(scores, aes(PC1, PC2)) +\n     ggiraph::geom_point_interactive(aes(data_id = ingredient, tooltip = ingredient), size = 2, alpha = 0.85) +\n     labs(x = \"PC1\", y = \"PC2\")",
+            "prompt": "Run a PCA on all the ingredients and plot the samples, Dim_1 against Dim_2. One specimen is flung far out along the first principal component, Dim_1: the axis of greatest spread, and the most singular thing in the whole set. Click it.",
+            "plotCode": "pca <- runMatrixAnalysis(\n  data = druid_ingredients,\n  analysis = \"pca\",\n  columns_w_values_for_single_analyte = colnames(druid_ingredients)[4:12],\n  columns_w_sample_ID_info = c(\"ingredient\", \"kind\")\n)\np <- ggplot(pca, aes(x = Dim_1, y = Dim_2)) + geom_point()",
             "answer": "Deathwatch Scarab",
             "width": 6,
             "height": 5.5,
             "maxAttempts": 4,
-            "hint": "One point sits far past all the others along the horizontal PC1 axis — the single specimen flung farthest from the crowd. Click that one.",
+            "hint": "One point sits far past all the others along the horizontal Dim_1 axis — the single specimen flung farthest from the crowd. Click that one.",
             "feedback": {
-              "correct": "Correct — noted in your field notebook: the Deathwatch Scarab is flung farthest out along PC1, the most singular specimen in the set.",
+              "correct": "Correct — noted in your field notebook: the Deathwatch Scarab is flung farthest out along the first principal component, the most singular specimen in the set.",
               "wrong": [
-                "Run prcomp() on the nine numeric properties with scale. = TRUE, plot the scores, and look along the horizontal PC1 axis.",
-                "That's not the extreme — one point stands clear out past every other along PC1; click the single farthest one.",
-                "Look for the lone point far from the main cloud along PC1, not one near the middle."
+                "Run the PCA on the nine numeric properties (columns 4 to 12) and plot the samples: <code>pca &lt;- runMatrixAnalysis(data = druid_ingredients, analysis = &quot;pca&quot;, columns_w_values_for_single_analyte = colnames(druid_ingredients)[4:12], columns_w_sample_ID_info = c(&quot;ingredient&quot;, &quot;kind&quot;))</code>, then <code>p &lt;- ggplot(pca, aes(x = Dim_1, y = Dim_2)) + geom_point()</code>. Look along the horizontal Dim_1 axis.",
+                "That's not the extreme — one point stands clear out past every other along Dim_1; click the single farthest one.",
+                "Look for the lone point far from the main cloud along Dim_1, not one near the middle."
               ],
               "reveal": ""
-            }
+            },
+            "idColumn": "ingredient",
+            "idNoun": "ingredient"
           },
           "solveSfx": {
             "src": "audio/solve_portal_awaken.mp3",
@@ -931,12 +935,12 @@
           "inc": "rooms_solved"
         }
       ],
-      "designNote": "GRADED — ROOM 2. TYPE 1 Compute-the-Key (console check). TWO-GATE PORTAL (awaken by analysis, unlock by stone pattern). STORY BEAT: how much of the total spread lives on the great axis. TASK: standardized PCA; percent of total variance explained by PC1 -> `answer`. CODE: pc <- prcomp(dplyr::select(druid_ingredients, potency:ash_weight), scale.=TRUE); ve <- 100 * pc$sdev^2 / sum(pc$sdev^2); answer <- round(ve[1], 1). ANSWER: 25.0 (%) — PC1 25.0, PC2 17.8, PC3 12.7 (PC1/PC2=1.40). check: abs(answer - 25.0) < 0.6. HINT: square the sdevs, divide by their sum, take the first. (Alt framings: PC1+PC2 ~43, or #components to pass half = 3; pick ONE at wiring.) Solving AWAKENS the arch; STONE KEYPAD unlocks with PLAINS PATTERN _ _ | (down,down,up), answer \"__|\". Monolith stones spread rank 2/4 (~3 ft) -> scree; deterministic graphic -> notebook. NEW ART.",
+      "designNote": "GRADED — ROOM 2. TYPE 1 Compute-the-Key (console check). TWO-GATE PORTAL (awaken by analysis, unlock by stone pattern). STORY BEAT: how much of the total spread lives on the great axis. TASK: standardized PCA; percent of total variance explained by PC1 -> `answer`. CODE: pca_dim <- runMatrixAnalysis(data = druid_ingredients, analysis = \"pca_dim\", columns_w_values_for_single_analyte = colnames(druid_ingredients)[4:12], columns_w_sample_ID_info = c(\"ingredient\",\"kind\")); answer <- filter(pca_dim, principal_component == 1)$percent_variance_explained. ANSWER: 25.0 (%; 24.95 exact) — PC1 25.0, PC2 17.8, PC3 12.7 (PC1/PC2=1.40). check: abs(answer - 25.0) < 0.6. HINT: pca_dim reports percent_variance_explained per principal component; take component 1. (Alt framings: PC1+PC2 ~43, or #components to pass half = 3; pick ONE at wiring.) Solving AWAKENS the arch; STONE KEYPAD unlocks with PLAINS PATTERN _ _ | (down,down,up), answer \"__|\". Monolith stones spread rank 2/4 (~3 ft) -> scree; deterministic graphic -> notebook. NEW ART.",
       "plannedHotspots": [
         {
           "type": "puzzle",
           "label": "The scrying basin",
-          "note": "Type 1 check: PC1 variance % -> 25.0 (PC2 17.8, PC3 12.7)",
+          "note": "Type 1 check: pca_dim, principal component 1 -> 25.0% (PC2 17.8, PC3 12.7)",
           "box": [
             0.436,
             0.629,
@@ -945,19 +949,19 @@
           ],
           "boxSource": "draft:localizer",
           "check": {
-            "prompt": "From the scree, how much of the total variation does the first principal component (PC1) capture? Run the PCA and assign that percentage (a number from 0 to 100) to `answer`.",
+            "prompt": "From the scree, how much of the total variation does the first principal component capture? Run the PCA and assign that percentage (a number from 0 to 100) to `answer`.",
             "requires": [
               "answer"
             ],
             "expr": "abs(as.numeric(answer) - 25) <= 0.6",
             "maxAttempts": 4,
-            "hint": "Square the standard deviations (pc$sdev^2) to get each component's variance, divide by their total, times 100 — then take the first.",
+            "hint": "Run runMatrixAnalysis() with analysis = \"pca_dim\": it returns one row per principal component, with its percent_variance_explained. Take the value for principal component 1.",
             "feedback": {
-              "correct": "Correct — noted in your field notebook: PC1 captures 25% of the spread — a quarter of everything, and by far the greatest single view.",
+              "correct": "Correct — noted in your field notebook: the first principal component captures 25% of the spread — a quarter of everything, and by far the greatest single view.",
               "wrong": [
-                "Run prcomp(dplyr::select(druid_ingredients, potency:ash_weight), scale. = TRUE); the variances are pc$sdev^2.",
-                "You want PC1's SHARE of the total, as a percentage: 100 * pc$sdev^2 / sum(pc$sdev^2), then the first element.",
-                "That looks like a proportion or a different component — PC1's share is around a quarter of the whole."
+                "<code>pca_dim &lt;- runMatrixAnalysis(data = druid_ingredients, analysis = &quot;pca_dim&quot;, columns_w_values_for_single_analyte = colnames(druid_ingredients)[4:12], columns_w_sample_ID_info = c(&quot;ingredient&quot;, &quot;kind&quot;))</code> gives one row per principal component, with the percent of the variance each one explains.",
+                "You want the first component's share as a percentage, and pca_dim already reports it: <code>answer &lt;- filter(pca_dim, principal_component == 1)$percent_variance_explained</code>.",
+                "That looks like a proportion or a different component — the first component's share is around a quarter of the whole."
               ],
               "reveal": ""
             }
@@ -1031,19 +1035,19 @@
           ],
           "starterCode": "druid_ingredients",
           "check": {
-            "prompt": "From the scree, how much of the total variation does the first principal component (PC1) capture? Run the PCA and assign that percentage (a number from 0 to 100) to `answer`.",
+            "prompt": "From the scree, how much of the total variation does the first principal component capture? Run the PCA and assign that percentage (a number from 0 to 100) to `answer`.",
             "requires": [
               "answer"
             ],
             "expr": "abs(as.numeric(answer) - 25) <= 0.6",
             "maxAttempts": 4,
-            "hint": "Square the standard deviations (pc$sdev^2) to get each component's variance, divide by their total, times 100 — then take the first.",
+            "hint": "Run runMatrixAnalysis() with analysis = \"pca_dim\": it returns one row per principal component, with its percent_variance_explained. Take the value for principal component 1.",
             "feedback": {
-              "correct": "Correct — noted in your field notebook: PC1 captures 25% of the spread — a quarter of everything, and by far the greatest single view.",
+              "correct": "Correct — noted in your field notebook: the first principal component captures 25% of the spread — a quarter of everything, and by far the greatest single view.",
               "wrong": [
-                "Run prcomp(dplyr::select(druid_ingredients, potency:ash_weight), scale. = TRUE); the variances are pc$sdev^2.",
-                "You want PC1's SHARE of the total, as a percentage: 100 * pc$sdev^2 / sum(pc$sdev^2), then the first element.",
-                "That looks like a proportion or a different component — PC1's share is around a quarter of the whole."
+                "<code>pca_dim &lt;- runMatrixAnalysis(data = druid_ingredients, analysis = &quot;pca_dim&quot;, columns_w_values_for_single_analyte = colnames(druid_ingredients)[4:12], columns_w_sample_ID_info = c(&quot;ingredient&quot;, &quot;kind&quot;))</code> gives one row per principal component, with the percent of the variance each one explains.",
+                "You want the first component's share as a percentage, and pca_dim already reports it: <code>answer &lt;- filter(pca_dim, principal_component == 1)$percent_variance_explained</code>.",
+                "That looks like a proportion or a different component — the first component's share is around a quarter of the whole."
               ],
               "reveal": ""
             }
@@ -1353,12 +1357,12 @@
           "inc": "rooms_solved"
         }
       ],
-      "designNote": "GRADED — ROOM 3. TYPE 1 Compute-the-Key (console check). TWO-GATE PORTAL (awaken by analysis, unlock by stone pattern). STORY BEAT: what the great axis is built from — its strongest driver. TASK: standardized PCA; property with the largest |PC1 loading| -> `answer` (NAME). CODE: pc <- prcomp(dplyr::select(druid_ingredients, potency:ash_weight), scale.=TRUE); load <- pc$rotation[, \"PC1\"]; answer <- names(which.max(abs(load))). ANSWER: \"potency\" (0.582 > bitterness 0.477 > aroma_intensity 0.468 > volatility 0.423; +18%). check: answer == \"potency\". HINT: rotation matrix PC1 column; longest arrow drives it. Solving AWAKENS the arch; STONE KEYPAD unlocks with the SALTFLAT PATTERN _ | _ (down, up, down — mirror-symmetric, fitting the mirror henge), answer \"_|_\". Monolith stones spread rank 4/4 (TIGHTEST, touching) -> scree; deterministic graphic -> notebook. NEW ART.",
+      "designNote": "GRADED — ROOM 3. TYPE 1 Compute-the-Key (console check). TWO-GATE PORTAL (awaken by analysis, unlock by stone pattern). STORY BEAT: what the great axis is built from — its strongest driver. TASK: standardized PCA; property with the largest |PC1 loading| -> `answer` (NAME). CODE: pca_ord <- runMatrixAnalysis(data = druid_ingredients, analysis = \"pca_ord\", columns_w_values_for_single_analyte = colnames(druid_ingredients)[4:12], columns_w_sample_ID_info = c(\"ingredient\",\"kind\")); answer <- arrange(pca_ord, desc(abs(Dim_1)))$analyte[1]. ANSWER: \"potency\" (Dim_1 0.870 > bitterness 0.714 > aroma_intensity 0.700 > volatility 0.633; +22%). check: answer == \"potency\". HINT: the ordination plot's Dim_1 column; longest arrow drives it. Solving AWAKENS the arch; STONE KEYPAD unlocks with the SALTFLAT PATTERN _ | _ (down, up, down — mirror-symmetric, fitting the mirror henge), answer \"_|_\". Monolith stones spread rank 4/4 (TIGHTEST, touching) -> scree; deterministic graphic -> notebook. NEW ART.",
       "plannedHotspots": [
         {
           "type": "puzzle",
           "label": "The scrying basin",
-          "note": "Type 1 check: top |PC1 loading| -> 'potency' (0.582, +18%)",
+          "note": "Type 1 check: top |Dim_1| in pca_ord -> 'potency' (0.870, +22%)",
           "box": [
             0.4232,
             0.5598,
@@ -1367,19 +1371,19 @@
           ],
           "boxSource": "draft:localizer",
           "check": {
-            "prompt": "Which single measured property contributes most to PC1 — the trait the great axis of spread is built from? Run the PCA and assign that property's name (as a string) to `answer`.",
+            "prompt": "Which single measured property contributes most to the first principal component — the trait the great axis of spread is built from? Run the PCA ordination and assign that property's name (as a string) to `answer`.",
             "requires": [
               "answer"
             ],
             "expr": "tolower(as.character(answer)) == \"potency\"",
             "maxAttempts": 4,
-            "hint": "Look at the loadings — pc$rotation[, \"PC1\"]. The property with the largest magnitude (abs) is the driver.",
+            "hint": "Run runMatrixAnalysis() with analysis = \"pca_ord\" for the ordination plot: one row per property, with its Dim_1 and Dim_2 coordinates. The property with the largest Dim_1 by magnitude (abs) is the driver.",
             "feedback": {
-              "correct": "Correct — noted in your field notebook: potency is the strongest driver of PC1 (loading 0.58), the trait the great axis is built from.",
+              "correct": "Correct — noted in your field notebook: potency is the strongest driver of the first principal component (Dim_1 of 0.87), the trait the great axis is built from.",
               "wrong": [
-                "Run the PCA, then read the PC1 column of the loadings: pc$rotation[, \"PC1\"].",
-                "Take absolute values — which property has the largest |loading| on PC1? Try which.max(abs(pc$rotation[, \"PC1\"])).",
-                "Close in the ranking, but another property has a larger PC1 loading — check the whole PC1 column by magnitude."
+                "<code>pca_ord &lt;- runMatrixAnalysis(data = druid_ingredients, analysis = &quot;pca_ord&quot;, columns_w_values_for_single_analyte = colnames(druid_ingredients)[4:12], columns_w_sample_ID_info = c(&quot;ingredient&quot;, &quot;kind&quot;))</code>, then read its Dim_1 column.",
+                "Take absolute values — which property has the largest Dim_1 by magnitude? Try <code>arrange(pca_ord, desc(abs(Dim_1)))</code> and read the top row.",
+                "Close in the ranking, but another property has a larger Dim_1 — check the whole Dim_1 column by magnitude."
               ],
               "reveal": ""
             }
@@ -1450,19 +1454,19 @@
           ],
           "starterCode": "druid_ingredients",
           "check": {
-            "prompt": "Which single measured property contributes most to PC1 — the trait the great axis of spread is built from? Run the PCA and assign that property's name (as a string) to `answer`.",
+            "prompt": "Which single measured property contributes most to the first principal component — the trait the great axis of spread is built from? Run the PCA ordination and assign that property's name (as a string) to `answer`.",
             "requires": [
               "answer"
             ],
             "expr": "tolower(as.character(answer)) == \"potency\"",
             "maxAttempts": 4,
-            "hint": "Look at the loadings — pc$rotation[, \"PC1\"]. The property with the largest magnitude (abs) is the driver.",
+            "hint": "Run runMatrixAnalysis() with analysis = \"pca_ord\" for the ordination plot: one row per property, with its Dim_1 and Dim_2 coordinates. The property with the largest Dim_1 by magnitude (abs) is the driver.",
             "feedback": {
-              "correct": "Correct — noted in your field notebook: potency is the strongest driver of PC1 (loading 0.58), the trait the great axis is built from.",
+              "correct": "Correct — noted in your field notebook: potency is the strongest driver of the first principal component (Dim_1 of 0.87), the trait the great axis is built from.",
               "wrong": [
-                "Run the PCA, then read the PC1 column of the loadings: pc$rotation[, \"PC1\"].",
-                "Take absolute values — which property has the largest |loading| on PC1? Try which.max(abs(pc$rotation[, \"PC1\"])).",
-                "Close in the ranking, but another property has a larger PC1 loading — check the whole PC1 column by magnitude."
+                "<code>pca_ord &lt;- runMatrixAnalysis(data = druid_ingredients, analysis = &quot;pca_ord&quot;, columns_w_values_for_single_analyte = colnames(druid_ingredients)[4:12], columns_w_sample_ID_info = c(&quot;ingredient&quot;, &quot;kind&quot;))</code>, then read its Dim_1 column.",
+                "Take absolute values — which property has the largest Dim_1 by magnitude? Try <code>arrange(pca_ord, desc(abs(Dim_1)))</code> and read the top row.",
+                "Close in the ranking, but another property has a larger Dim_1 — check the whole Dim_1 column by magnitude."
               ],
               "reveal": ""
             }
@@ -1770,12 +1774,12 @@
         "type": "figure",
         "submitCodec": true
       },
-      "designNote": "GRADED BOSS + ESCAPE in ONE room (the great henge — no inner sanctum). isBoss, puzzleType 2, deliverable figure + submitCodec. The SUNRISE is the centred focal point of the scene. Great henge has NO fallen stones and NO pebble-monolith. STAGE 1 (analysis / AWAKEN) TYPE 3 Repair-the-Pipeline (console check): TRAP (PC1-fixation) — mushrooms do NOT separate on PC1 (mushroom PC1 mean 0.03, mid-pack; beetles own PC1); they separate on PC2 (mean 1.46), driver = luminance. Decoy = potency (PC1 driver from room 3). BROKEN CODE reads PC1's top loading (returns potency): pc <- prcomp(dplyr::select(druid_ingredients, potency:ash_weight), scale.=TRUE); load <- pc$rotation[, 'PC1']; answer <- names(which.max(abs(load))). FIX 'PC1' -> 'PC2'. ANSWER 'luminance' (0.625 > resin_content 0.533 > pigment 0.489; +15%). check: answer == 'luminance'. Solving AWAKENS the way-home arch (dim starfield) and mints the potion/cure. ANTI-FIXATION HINT now lives in THIS puzzle's hint + wrong-answer feedback (mushrooms sit mid-pack on the great axis; turn to the second view; read what it is built from) — the separate 'mushroom-sigil stone' was DROPPED 2026-07-25 (clutter); the basin plot already foreshadows it (green cluster gathered apart high on the vertical/PC2 axis). STAGE 2 (escape / UNLOCK): the heart-stone monolith is the ESCAPE stone-keypad (mode:stones, long display, NOT in codec) — styled like the other rooms' mark-stones but with NO pebbles; in their place a carved REVERSED scree-plot (bars shortest->tallest = ASCENDING) that carries BOTH the order-by-scree rule and the tightest->widest direction, + the glowing keypad symbol below. (The separate rising frieze was dropped 2026-07-26 — the reversed scree-plot conveys the direction.) Enter the four henge patterns in SCREE order (read off the four pebble-monoliths), ASCENDING tightest->widest = saltflat, mountain, plains, beach. answer = '_|_||___||_|' (len 12). Way-home door requires the heart-stone lock + endsEscape -> escapeDone. WIRING: set the way-home door to require the placed heart-stone lock + endsEscape. NEW ART.",
+      "designNote": "GRADED BOSS + ESCAPE in ONE room (the great henge — no inner sanctum). isBoss, puzzleType 2, deliverable figure + submitCodec. The SUNRISE is the centred focal point of the scene. Great henge has NO fallen stones and NO pebble-monolith. STAGE 1 (analysis / AWAKEN) TYPE 3 Repair-the-Pipeline (console check): TRAP (PC1-fixation) — mushrooms do NOT separate on PC1 (mushroom PC1 mean 0.03, mid-pack; beetles own PC1); they separate on PC2 (mean 1.46), driver = luminance. Decoy = potency (PC1 driver from room 3). BROKEN CODE sorts the ordination by Dim_1 (returns potency): pca_ord <- runMatrixAnalysis(data = druid_ingredients, analysis = \"pca_ord\", columns_w_values_for_single_analyte = colnames(druid_ingredients)[4:12], columns_w_sample_ID_info = c(\"ingredient\",\"kind\")); answer <- arrange(pca_ord, desc(abs(Dim_1)))$analyte[1]. FIX Dim_1 -> Dim_2. ANSWER 'luminance' (Dim_2 0.789 > resin_content 0.673 > pigment 0.618; +17%). check: answer == 'luminance'. Solving AWAKENS the way-home arch (dim starfield) and mints the potion/cure. ANTI-FIXATION HINT now lives in THIS puzzle's hint + wrong-answer feedback (mushrooms sit mid-pack on the great axis; turn to the second view; read what it is built from) — the separate 'mushroom-sigil stone' was DROPPED 2026-07-25 (clutter); the basin plot already foreshadows it (green cluster gathered apart high on the vertical/PC2 axis). STAGE 2 (escape / UNLOCK): the heart-stone monolith is the ESCAPE stone-keypad (mode:stones, long display, NOT in codec) — styled like the other rooms' mark-stones but with NO pebbles; in their place a carved REVERSED scree-plot (bars shortest->tallest = ASCENDING) that carries BOTH the order-by-scree rule and the tightest->widest direction, + the glowing keypad symbol below. (The separate rising frieze was dropped 2026-07-26 — the reversed scree-plot conveys the direction.) Enter the four henge patterns in SCREE order (read off the four pebble-monoliths), ASCENDING tightest->widest = saltflat, mountain, plains, beach. answer = '_|_||___||_|' (len 12). Way-home door requires the heart-stone lock + endsEscape -> escapeDone. WIRING: set the way-home door to require the placed heart-stone lock + endsEscape. NEW ART.",
       "plannedHotspots": [
         {
           "type": "puzzle",
           "label": "The great scrying basin",
-          "note": "Type 3 repair: fix PC1->PC2 -> 'luminance' (0.625); trap decoy = potency; AWAKENS the way-home arch. ANTI-FIXATION HINT lives here (hint/feedback): mushrooms mid-pack on PC1, gather on PC2",
+          "note": "Type 3 repair: fix Dim_1->Dim_2 in pca_ord -> 'luminance' (0.789); trap decoy = potency; AWAKENS the way-home arch. ANTI-FIXATION HINT lives here (hint/feedback): mushrooms mid-pack on PC1, gather on PC2",
           "box": [
             0.436,
             0.551,
@@ -1784,19 +1788,19 @@
           ],
           "boxSource": "draft:localizer",
           "check": {
-            "prompt": "The potion needs the property that sets the MUSHROOMS apart from every other ingredient. The code below reads the great axis (PC1) and returns potency — but the mushrooms don't separate on PC1. Fix it to read the axis that actually gathers the mushrooms, then assign that property's name to `answer`.",
+            "prompt": "The potion needs the property that sets the MUSHROOMS apart from every other ingredient. The code below reads the great axis (Dim_1, the first principal component) and returns potency — but the mushrooms don't separate on Dim_1. Fix it to read the axis that actually gathers the mushrooms, then assign that property's name to `answer`.",
             "requires": [
               "answer"
             ],
             "expr": "tolower(as.character(answer)) == \"luminance\"",
             "maxAttempts": 5,
-            "hint": "On PC1 the mushrooms sit mid-pack — they neither top nor bottom it; they gather on PC2 instead. Change the component the code reads from \"PC1\" to \"PC2\".",
+            "hint": "On Dim_1 the mushrooms sit mid-pack — they neither top nor bottom it; they gather on Dim_2 instead. Change the column the code sorts by from Dim_1 to Dim_2.",
             "feedback": {
-              "correct": "Correct — noted in your field notebook: the mushrooms answer to luminance, the driver of PC2 (loading 0.62) — their glow, not the great axis at all.",
+              "correct": "Correct — noted in your field notebook: the mushrooms answer to luminance, the driver of the second principal component (Dim_2 of 0.79) — their glow, not the great axis at all.",
               "wrong": [
-                "potency drives PC1, but check where the mushrooms sit on PC1 — they're middling, not extreme. Which axis separates them?",
-                "The mushrooms gather on the SECOND component — read pc$rotation[, \"PC2\"] instead of PC1.",
-                "Change \"PC1\" to \"PC2\" in the loadings line, then take names(which.max(abs(...))) of that."
+                "potency drives Dim_1, but check where the mushrooms sit on Dim_1 — they're middling, not extreme. Which axis separates them?",
+                "The mushrooms gather on the SECOND component — sort the ordination by Dim_2 instead of Dim_1.",
+                "Change Dim_1 to Dim_2 in the arrange() line, then take the top analyte."
               ],
               "reveal": ""
             }
@@ -1866,21 +1870,21 @@
             0.5385,
             0.6294
           ],
-          "starterCode": "pc <- prcomp(dplyr::select(druid_ingredients, potency:ash_weight), scale. = TRUE)\n\n# This is meant to find the property that marks out the MUSHROOMS.\n# It reads the great axis, PC1 — but do the mushrooms actually separate there?\nloadings <- pc$rotation[, \"PC1\"]\nanswer <- names(which.max(abs(loadings)))\nanswer",
+          "starterCode": "pca_ord <- runMatrixAnalysis(\n  data = druid_ingredients,\n  analysis = \"pca_ord\",\n  columns_w_values_for_single_analyte = colnames(druid_ingredients)[4:12],\n  columns_w_sample_ID_info = c(\"ingredient\", \"kind\")\n)\n\n# This is meant to find the property that marks out the MUSHROOMS.\n# It reads the great axis, Dim_1 — but do the mushrooms actually separate there?\nanswer <- arrange(pca_ord, desc(abs(Dim_1)))$analyte[1]\nanswer",
           "check": {
-            "prompt": "The potion needs the property that sets the MUSHROOMS apart from every other ingredient. The code below reads the great axis (PC1) and returns potency — but the mushrooms don't separate on PC1. Fix it to read the axis that actually gathers the mushrooms, then assign that property's name to `answer`.",
+            "prompt": "The potion needs the property that sets the MUSHROOMS apart from every other ingredient. The code below reads the great axis (Dim_1, the first principal component) and returns potency — but the mushrooms don't separate on Dim_1. Fix it to read the axis that actually gathers the mushrooms, then assign that property's name to `answer`.",
             "requires": [
               "answer"
             ],
             "expr": "tolower(as.character(answer)) == \"luminance\"",
             "maxAttempts": 5,
-            "hint": "On PC1 the mushrooms sit mid-pack — they neither top nor bottom it; they gather on PC2 instead. Change the component the code reads from \"PC1\" to \"PC2\".",
+            "hint": "On Dim_1 the mushrooms sit mid-pack — they neither top nor bottom it; they gather on Dim_2 instead. Change the column the code sorts by from Dim_1 to Dim_2.",
             "feedback": {
-              "correct": "Correct — noted in your field notebook: the mushrooms answer to luminance, the driver of PC2 (loading 0.62) — their glow, not the great axis at all.",
+              "correct": "Correct — noted in your field notebook: the mushrooms answer to luminance, the driver of the second principal component (Dim_2 of 0.79) — their glow, not the great axis at all.",
               "wrong": [
-                "potency drives PC1, but check where the mushrooms sit on PC1 — they're middling, not extreme. Which axis separates them?",
-                "The mushrooms gather on the SECOND component — read pc$rotation[, \"PC2\"] instead of PC1.",
-                "Change \"PC1\" to \"PC2\" in the loadings line, then take names(which.max(abs(...))) of that."
+                "potency drives Dim_1, but check where the mushrooms sit on Dim_1 — they're middling, not extreme. Which axis separates them?",
+                "The mushrooms gather on the SECOND component — sort the ordination by Dim_2 instead of Dim_1.",
+                "Change Dim_1 to Dim_2 in the arrange() line, then take the top analyte."
               ],
               "reveal": ""
             }
