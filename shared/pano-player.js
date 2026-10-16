@@ -70,14 +70,14 @@
 // A bare `./variant_resolve.js` import is NOT refreshed by bumping the <script> tag's ?v, so a changed
 // helper module (e.g. a new export) leaves browsers on a stale cached copy → "doesn't provide an export
 // named X" SyntaxError → blank page (the 2026-08-05 airship regression). Bump all three together.
-import { WebRConsole } from "./webr-console.js?v=126";
-import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers } from "./variant_resolve.js?v=126";   // Phase 3: per-hotspot state variants; monorail switch-door nav
-import * as PQ from "./puzzle_queue.js?v=126";   // dynamic puzzle queue: location-independent puzzle serving
-import * as CP from "./corr_panel.js?v=126";   // lower-triangle layout of the grid gate (clouds correlation panel)
-import { particleCount } from "./particles.js?v=126";   // ambient-particle vocabulary + per-kind field density
-import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=126";
-import { condHolds } from "./cond.js?v=126";   // ledger + elevation-map card DOM
-import * as RIDE from "./ride.js?v=126";   // THE RIDE (subway): express lever + clip-sequence planner
+import { WebRConsole } from "./webr-console.js?v=127";
+import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers } from "./variant_resolve.js?v=127";   // Phase 3: per-hotspot state variants; monorail switch-door nav
+import * as PQ from "./puzzle_queue.js?v=127";   // dynamic puzzle queue: location-independent puzzle serving
+import * as CP from "./corr_panel.js?v=127";   // lower-triangle layout of the grid gate (clouds correlation panel)
+import { particleCount } from "./particles.js?v=127";   // ambient-particle vocabulary + per-kind field density
+import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=127";
+import { condHolds } from "./cond.js?v=127";   // ledger + elevation-map card DOM
+import * as RIDE from "./ride.js?v=127";   // THE RIDE (subway): express lever + clip-sequence planner
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 
@@ -1949,10 +1949,8 @@ function _transitVideo(src) {
   if (!_transitVideos[src]) _transitVideos[src] = _loadVideo(src).then(v => { if (v) v.loop = false; else delete _transitVideos[src]; return v; });
   return _transitVideos[src];
 }
-// Only the CURRENT room's clips stay loaded: a released clip drops its buffer and decoder. Firefox (henges, 2026-10-15)
-// froze the LAST transit of a full playthrough on its first frame, sound still playing, with every earlier clip still
-// buffered; whether this or the background-video suspend below was the cause is unconfirmed (no WebGL in headless
-// Firefox here), so both are guarded.
+// Only the CURRENT room's clips stay loaded: a released clip drops its buffer and decoder, so a full playthrough does not
+// end up holding every 3072x1024 clip it has passed through.
 function _releaseTransitVideo(src) {
   const p = _transitVideos[src]; delete _transitVideos[src];
   if (p) p.then(v => { if (v && v !== (transiting && transiting.video)) { try { v.pause(); v.removeAttribute("src"); v.load(); } catch (e) {} } });
@@ -1963,7 +1961,7 @@ function preloadTransits(r) {
   Object.keys(_transitVideos).forEach(src => { if (!want.has(src)) _releaseTransitVideo(src); });
   want.forEach(src => _transitVideo(src));
 }
-// Firefox suspends the picture (not the sound) of a <video> it judges invisible, and a clip that is only ever drawn
+// Firefox can suspend the picture (not the sound) of a <video> it judges invisible, and a clip that is only ever drawn
 // into a canvas is never in the page. While a transit plays, its <video> sits in the page as a near-invisible 2 px
 // element so it counts as visible.
 function _showForDecode(v) {
@@ -2036,7 +2034,12 @@ function startTransit(h, idx, withEntry = true, onArrive = null) {   // withEntr
       _keepStage = true;
       _renderViewer(cv, _wrapYaw(yaw + rollFrom), true, true);   // one dynamic, marker-less viewer for the clip
       _cineStop = () => { cancelAnimationFrame(raf); try { video.pause(); } catch (e) {} _hideAfterDecode(video); };   // set AFTER _renderViewer
-      stage.addEventListener("click", finish);
+      // Arm tap-to-skip only AFTER the click that opened the portal has finished. When everything is already loaded
+      // (the escape: no arrival art to fetch) this code runs in a microtask DURING that click's dispatch, so a
+      // listener added now caught the very same click bubbling up to #pano and skipped the transit at once: the
+      // escape card opened over a frozen first frame while the sound played on (Lucas, 2026-10-16). Script-dispatched
+      // test clicks never showed it; tests/e2e/portal_transit.spec.js now walks through with a real mouse click.
+      setTimeout(() => { if (transiting === run && !done) stage.addEventListener("click", finish); }, 400);
       _showForDecode(video);
       video.play().then(() => {
         raf = requestAnimationFrame(frame);
