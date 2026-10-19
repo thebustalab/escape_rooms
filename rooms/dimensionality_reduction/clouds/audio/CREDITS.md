@@ -57,7 +57,7 @@ All CC0 (public domain), each verified on its own freesound page (title, descrip
 |---|---|---|---|
 | `solve_crystal_bell.mp3` | solve sting on every survey console | freesound 614833, *2022-01-14-crystal-bell-01.flac*, arseniiv (0:01.4) | Creative Commons 0 |
 | `solve_override_crystal.mp3` | solve sting when the Eye's override panel is keyed (a 4 s cut, 5.0-9.0 s, faded) | freesound 772279, *MUSCChim_Atonal Crystal Chime Texture 1_EM*, newlocknew (1:11) | Creative Commons 0 |
-| `climb_out.mp3` | the climb-out transit's track, mixed by `_scratch/climb_out/audio/mix_climb.sh` from: `storm_wind_drone.mp3` (above); freesound 826131, *Magic - Cymbal Swell 2*, Vrymaa; freesound 511870, *Riser Hit sfx 023.wav*, AudioPapkin (played REVERSED so it builds into the flash); freesound 614097, *Bells in deep space1.wav*, Jim-Bretherick | Creative Commons 0 |
+| `climb_out.mp3` | the climb-out transit's track, mixed by `_scratch/climb_out/audio/mix_climb.sh` from: `storm_wind_drone.mp3` (above); freesound 826131, *Magic - Cymbal Swell 2*, Vrymaa; freesound 511870, *Riser Hit sfx 023.wav*, AudioPapkin (played REVERSED so it builds into the flash); the look-back tail: freesound 864690, *Rotating Cinematic Wavetable Drone by MANTICE*, bassimat (from 0:30). Alternate tail on disk (`_scratch/audio/climb_out_pad_alt.mp3`): freesound 330392, *DeepSpacePad.wav*, Talan_pl. The first tail, freesound 614097 *Bells in deep space1.wav* (Jim-Bretherick), was dropped (Lucas: not cool) | Creative Commons 0 |
 
 The Eye's ambience reuses `storm_bed_wind.mp3` and `storm_thunder_distant.mp3` at low volume (the storm far off, under
 the music). Lucas: the Eye "shouldn't be silent", and the music continues there. Alternates pulled but not wired
