@@ -25,10 +25,14 @@
   /* ---------------- display ---------------- */
   body.display { overflow:hidden; cursor:none; }
   body.display.pointer { cursor:default; }
-  .layer { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0;
-           transition:opacity 2.5s ease; animation:pan 90s ease-in-out infinite alternate; }
+  /* The pan is a transform on the video inside a clipping frame, not an object-position animation:
+     transform runs on the compositor with sub-pixel steps, whereas object-position repaints the whole
+     frame on the main thread at whole-pixel offsets, which judders at projector resolution. */
+  .frame { position:absolute; top:0; left:0; width:100%; height:100%; overflow:hidden; container-type:size; }
+  .layer { position:absolute; top:0; left:0; height:100%; width:auto; min-width:100%; object-fit:cover; opacity:0;
+           transition:opacity 2.5s ease; animation:pan 90s ease-in-out infinite alternate; will-change:transform; }
   .layer.on { opacity:1; }
-  @keyframes pan { from { object-position:0% 50%; } to { object-position:100% 50%; } }
+  @keyframes pan { from { transform:translate3d(0,0,0); } to { transform:translate3d(calc(100cqw - 100%),0,0); } }
   #vignette { position:absolute; inset:0; pointer-events:none;
               background:radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,.65) 100%); }
   body.display #caption { position:absolute; left:3vw; bottom:3vh; font-style:italic; font-size:2.2vh; letter-spacing:.08em;
@@ -53,7 +57,7 @@
              box-shadow:-10px 0 40px rgba(0,0,0,.7); }
   body.display.sb-half #sandbox { display:block; width:50%; }
   body.display.sb-full #sandbox { display:block; width:100%; }
-  body.sb-half .layer { width:50%; }
+  body.sb-half .frame { width:50%; }
   body.display.sb-corner #sandbox { display:block; width:50%; height:50%; top:auto; right:auto; left:1.5vw; bottom:2vh;
                                     border:1px solid var(--line); border-radius:12px; box-shadow:0 10px 50px rgba(0,0,0,.8); }
   body.display.sb-corner #caption { opacity:0; }
@@ -114,7 +118,7 @@ if (ROLE === 'display') display(); else consoleUI();
 // =====================================================================================================
 function display() {
   document.body.innerHTML = `
-    <video class="layer" muted playsinline loop></video><video class="layer" muted playsinline loop></video>
+    <div class="frame"><video class="layer" muted playsinline loop></video></div><div class="frame"><video class="layer" muted playsinline loop></video></div>
     <div id="vignette"></div><div id="caption"></div>
     <div id="title"><div class="k">${esc(sc.subtitle || '')}</div><div class="t">${esc(sc.title)}</div><div class="s"></div></div>
     <iframe id="sandbox" title="R sandbox"></iframe>

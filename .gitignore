@@ -236,3 +236,14 @@ authoring_v2/model_probe/results/
 **/world_plates/**/*
 !**/world_plates/**/
 !**/world_plates/**/*.png
+
+# --- Two room_iterate jobs on one scenario (2026-10-19) ---
+# A split job's second instance dir (`_long_agent_<name>/`, Utilities/long_agent/split_room_iterate.py)
+# is run state exactly like `_long_agent/` above, and the cross-process write lock (authoring_v2/
+# scenario_lock.py) leaves a sidecar `.lock` beside scenario.json and the publish ledger, plus a hidden
+# temp file if a writer dies mid-write. None of it is play content.
+**/_long_agent_*/
+**/scenario.json.lock
+**/.cine_published.json.lock
+**/.scenario.json.*.tmp
+**/.cine_published.json.*.tmp
