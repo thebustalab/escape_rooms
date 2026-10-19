@@ -220,7 +220,8 @@ const queueSolved = new Set();         // queue indices already answered
 const queueResults = new Map();        // queue index -> { answer, attempts }
 const queueAssign = new Map();         // slotKey -> queue index (keeps a slot's puzzle stable)
 let mintedCode = null;               // the submission code, minted at analysis finish; shown on the submit-prep screen
-const submissionWork = new Map();      // room.key -> { title, code, figure(dataURL|null) } captured at solve, for the PDF
+const submissionWork = new Map();      // work key -> { roomKey, title, code, figure(dataURL|null) } captured at solve, for the PDF.
+                                       // Key = room.key, or "q:<rung>" for a puzzle-queue rung (several rungs can share a room).
 function escHtml(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
 // Attempts per puzzle hotspot, persisted across modal close/reopen within a session (hotspot id ->
 // count). A plain in-memory Map keeps this static / GitHub-Pages-safe (no server, no storage) and
@@ -3531,10 +3532,14 @@ function solveRoom(result, h, qIndex) {
   const prim = primaryGate(room);
   const isPrimary = !!(h && prim && h.id === prim.id);
   const graded = !!(h && h.type === "puzzle");        // locks are never graded / never in the codec
+  // A puzzle-queue rung is captured under its OWN key: several rungs can be solved in one room (clouds: fly a
+  // lap by hand and a console serves the next rung where the last was solved), and a per-room key kept only the
+  // first, so the PDF silently lost graded work (tests/e2e/clouds_submission_rungs.spec.js).
+  if (newRung && graded) captureSubmissionWork(room, h, "q:" + qIndex);
   if (isPrimary) {
     const firstSolve = !(room.key && solvedRooms.has(room.key));   // guard: never re-record on re-entry
     if (room.key) {
-      if (firstSolve && graded) { roomResults.set(room.key, result || { answer: 1, attempts: 1 }); captureSubmissionWork(room, h); }
+      if (firstSolve && graded) { roomResults.set(room.key, result || { answer: 1, attempts: 1 }); if (!newRung) captureSubmissionWork(room, h); }
       solvedRooms.add(room.key);                      // room completion for the graph evaluator
     }
     if (firstSolve) applyEffects(room.onSolve);        // world-state effects once (don't double-inc)
@@ -3688,7 +3693,7 @@ function showEscapeDone() {
 // A landing-style screen (ambient particles) with the student's minted code, every graded puzzle's code +
 // the figure it generated, and a one-click PDF of all figures + code. Reached from BOTH finishes (skip the
 // escape, or after solving it). Code + figure are captured per graded room at solve time (submissionWork).
-function captureSubmissionWork(r, h) {
+function captureSubmissionWork(r, h, key = r.key) {
   const ci = $("#code-input");
   const code = ci ? (ci.value || "").trim() : "";
   const out = $("#webr-output");
@@ -3698,8 +3703,14 @@ function captureSubmissionWork(r, h) {
   // once the student enters their x500 (see stampAllFigures). Figures aren't shown until then.
   let figureRaw = null;
   if (src) { try { figureRaw = src.toDataURL("image/png"); } catch (e) { figureRaw = null; } }
-  const question = (h && h.question && h.question.prompt) || (h && h.prompt) || "";   // carry the question forward
-  submissionWork.set(r.key, { title: r.title || r.key, code, figure: null, figureRaw, question });
+  // A queue rung's prompt lives on the ladder item (`puzzleQueue[i].pick|check|question.prompt`), not on the
+  // console hotspot that served it, so look there too or the rung's block reaches the PDF with no question.
+  const qi = /^q:(\d+)$/.test(key) ? +key.slice(2) : null;
+  const item = qi != null ? (SCENARIO.puzzleQueue || [])[qi] : null;
+  const itemPrompt = item ? ((item.question && item.question.prompt) || (item.check && item.check.prompt) ||
+                             (item.pick && item.pick.prompt) || item.prompt || "") : "";
+  const question = (h && h.question && h.question.prompt) || (h && h.prompt) || itemPrompt || "";   // carry the question forward
+  submissionWork.set(key, { roomKey: r.key, title: r.title || r.key, code, figure: null, figureRaw, question });
 }
 // ---- per-phase timing (human-facing only; NOT in the codec/decoder) ----
 // Format a duration in ms as "12m 34s" (or "1h 05m 39s" past an hour); "—" for a missing/invalid span.
@@ -3731,11 +3742,23 @@ function timingLines() {
     total: fmtDuration(t.totalMs),
   };
 }
+// The captured work in display order: room-keyed entries in scenario room order, then queue rungs in ladder
+// order. Each item is [key, work, room]. Shared by the submission screen and the PDF so they cannot disagree.
+function workEntries() {
+  const rooms = SCENARIO.rooms || [];
+  const out = rooms.filter(r => isBuilt(r) && phaseOf(r) === "analysis" && submissionWork.has(r.key))
+    .map(r => [r.key, submissionWork.get(r.key), r]);
+  [...submissionWork.keys()].filter(k => /^q:\d+$/.test(k)).sort((a, b) => +a.slice(2) - +b.slice(2)).forEach(k => {
+    const w = submissionWork.get(k);
+    out.push([k, w, rooms.find(r => r.key === w.roomKey) || { key: w.roomKey }]);
+  });
+  return out;
+}
 function renderSubmitWork() {
   const host = $("#subWork"); if (!host) return;
   host.innerHTML = "";
-  const rooms = (SCENARIO.rooms || []).filter(r => isBuilt(r) && phaseOf(r) === "analysis" && submissionWork.has(r.key));
-  if (!rooms.length) { host.innerHTML = `<div class="swnone">No puzzle code captured yet.</div>`; return; }
+  const entries = workEntries();
+  if (!entries.length) { host.innerHTML = `<div class="swnone">No puzzle code captured yet.</div>`; return; }
   const intro = document.createElement("div"); intro.className = "swintro";
   intro.textContent = "The R console from each puzzle in this scenario is shown below, pre-filled with the code you ran. You can refine that code, styling the plot, adding labels and colors, and more. Press Run to update the figure. At the end, use the download button to download a PDF of your work and submit it on Canvas.";
   host.appendChild(intro);
@@ -3747,8 +3770,7 @@ function renderSubmitWork() {
     `<span style="font-weight:600">Your times —</span> ` +
     `Analysis: ${escHtml(tl.analysis)} · Escape: ${escHtml(tl.escape)} · Total: ${escHtml(tl.total)}`;
   host.appendChild(timing);
-  rooms.forEach(r => {
-    const w = submissionWork.get(r.key);
+  entries.forEach(([key, w, r]) => {
     const div = document.createElement("div"); div.className = "swroom";
     const h = document.createElement("h3"); h.textContent = w.title || r.title || r.key; div.appendChild(h);
     if (w.question) {                                        // remind the student what they were asked
@@ -3767,7 +3789,7 @@ function renderSubmitWork() {
     const fig = w.figure || w.figureRaw;
     figWrap.innerHTML = fig ? `<img src="${fig}" alt="figure">` : `<div class="swnone">No figure yet — edit the code and Run.</div>`;
     div.appendChild(figWrap);
-    runBtn.onclick = () => runSubmitBlock(r.key, ta, figWrap, stat, runBtn);
+    runBtn.onclick = () => runSubmitBlock(key, ta, figWrap, stat, runBtn);
     host.appendChild(div);
   });
 }
@@ -3949,8 +3971,7 @@ function exportSubmissionPdf() {
   ensure(14); doc.text(`Analysis time: ${tl.analysis}`, M, y); y += 14;
   ensure(14); doc.text(`Escape time: ${tl.escape}`, M, y); y += 14;
   ensure(14); doc.text(`Total: ${tl.total}`, M, y); y += 16;
-  (SCENARIO.rooms || []).filter(r => isBuilt(r) && phaseOf(r) === "analysis" && submissionWork.has(r.key)).forEach(r => {
-    const w = submissionWork.get(r.key);
+  workEntries().forEach(([key, w, r]) => {
     ensure(26); doc.setFont("helvetica", "bold"); doc.setFontSize(13); doc.text(w.title || r.key, M, y); y += 18;
     if (w.question) {
       doc.setFont("helvetica", "italic"); doc.setFontSize(10);
