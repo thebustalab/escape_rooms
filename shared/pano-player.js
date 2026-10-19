@@ -70,14 +70,14 @@
 // A bare `./variant_resolve.js` import is NOT refreshed by bumping the <script> tag's ?v, so a changed
 // helper module (e.g. a new export) leaves browsers on a stale cached copy → "doesn't provide an export
 // named X" SyntaxError → blank page (the 2026-08-05 airship regression). Bump all three together.
-import { WebRConsole } from "./webr-console.js?v=130";
-import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers } from "./variant_resolve.js?v=130";   // Phase 3: per-hotspot state variants; monorail switch-door nav
-import * as PQ from "./puzzle_queue.js?v=130";   // dynamic puzzle queue: location-independent puzzle serving
-import * as CP from "./corr_panel.js?v=130";   // lower-triangle layout of the grid gate (clouds correlation panel)
-import { particleCount } from "./particles.js?v=130";   // ambient-particle vocabulary + per-kind field density
-import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=130";
-import { condHolds } from "./cond.js?v=130";   // ledger + elevation-map card DOM
-import * as RIDE from "./ride.js?v=130";   // THE RIDE (subway): express lever + clip-sequence planner
+import { WebRConsole } from "./webr-console.js?v=131";
+import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers } from "./variant_resolve.js?v=131";   // Phase 3: per-hotspot state variants; monorail switch-door nav
+import * as PQ from "./puzzle_queue.js?v=131";   // dynamic puzzle queue: location-independent puzzle serving
+import * as CP from "./corr_panel.js?v=131";   // lower-triangle layout of the grid gate (clouds correlation panel)
+import { particleCount } from "./particles.js?v=131";   // ambient-particle vocabulary + per-kind field density
+import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=131";
+import { condHolds } from "./cond.js?v=131";   // ledger + elevation-map card DOM
+import * as RIDE from "./ride.js?v=131";   // THE RIDE (subway): express lever + clip-sequence planner
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 
@@ -2932,8 +2932,9 @@ async function renderPickSvg(webR, pick) {
 async function renderStudentPickSvg(webR, pick) {
   const w = pick.width || 7, h = pick.height || 4.2;
   const idcol = JSON.stringify(pick.idColumn || "");
+  const ans = JSON.stringify(String(pick.answer ?? ""));
   const rcode = `{ suppressWarnings(suppressMessages({ library(ggplot2); library(ggiraph); library(dplyr) }))
-.er_make_interactive <- function(p, idcol) {
+.er_make_interactive <- function(p, idcol, ans = "") {
   if (!inherits(p, "ggplot")) stop("not a ggplot")
   ns <- asNamespace("ggiraph")
   # ---- TREES (ggtree) take a different route entirely (2026-09-28) --------------------------------
@@ -2976,12 +2977,15 @@ async function renderStudentPickSvg(webR, pick) {
     cand <- paste0("GeomInteractive", sub("^Geom", "", class(geom)[1]))
     if (exists(cand, envir = ns, inherits = FALSE)) get(cand, envir = ns) else NULL
   }
-  # The id column the student's plot actually carries. A summary the student BUILDS names its own key
-  # column (origin / station / destination...), so when idcol is absent from the layer's data, fall back
-  # to that data's first text column — in a one-row-per-entity summary, that is the entity (2026-09-16).
+  # The id column the student's plot actually carries. Students name their own columns: a summary key
+  # (origin / station...) or a count (summarize(group_size = n()) rather than n = n()). So when idcol is
+  # absent from the layer's data, use the column that holds the keyed ANSWER (a text one first), then
+  # the first text column; in a one-row-per-entity summary those are the entity / the measure clicked.
   pick_col <- function(d) {
     if (!is.data.frame(d) || idcol %in% names(d)) return(idcol)
     txt <- names(d)[vapply(d, function(x) is.character(x) || is.factor(x), logical(1))]
+    hit <- if (nzchar(ans)) names(d)[vapply(d, function(x) ans %in% as.character(x), logical(1))] else character(0)
+    if (length(hit)) { th <- intersect(txt, hit); return(if (length(th)) th[1] else hit[1]) }
     if (length(txt)) txt[1] else idcol
   }
   layer_df <- function(i) { ld <- p$layers[[i]]$data; if (is.data.frame(ld)) ld else p$data }
@@ -2990,8 +2994,12 @@ async function renderStudentPickSvg(webR, pick) {
   # as if it were a station (2026-09-16, beacons' boss). The fallback is for plots where no layer has idcol.
   has_id <- vapply(seq_along(p$layers), function(i) { d <- layer_df(i); is.data.frame(d) && idcol %in% names(d) }, logical(1))
   changed <- FALSE
+  lines <- integer(0)
   for (i in seq_along(p$layers)) {
     if (any(has_id) && !has_id[i]) next
+    # A line/path/step is ONE mark per group, so it can carry only one id: a geom_line()-only elbow plot
+    # had nothing per-point to click (2026-10-19). Leave lines as drawn; give them points below.
+    if (inherits(p$layers[[i]]$geom, "GeomPath")) { lines <- c(lines, i); next }
     g <- twin(p$layers[[i]]$geom)
     if (is.null(g)) next
     p$layers[[i]]$geom <- g
@@ -3001,10 +3009,23 @@ async function renderStudentPickSvg(webR, pick) {
     p$layers[[i]]$mapping <- if (is.null(m)) add else utils::modifyList(m, add)
     changed <- TRUE
   }
+  # Lines with no other clickable layer: add an interactive point at each vertex (painted, alpha 0.32,
+  # because a fully transparent SVG mark is not reliably hit-testable).
+  if (!changed) for (i in lines) {
+    ld <- p$layers[[i]]$data
+    col <- pick_col(layer_df(i))
+    add <- ggplot2::aes(data_id = !!rlang::sym(col), tooltip = !!rlang::sym(col))
+    m <- p$layers[[i]]$mapping
+    p <- p + ggiraph::geom_point_interactive(
+      mapping = if (is.null(m)) add else utils::modifyList(m, add),
+      data = if (is.data.frame(ld)) ld else NULL, inherit.aes = p$layers[[i]]$inherit.aes,
+      size = 3.2, alpha = 0.32, colour = "#1f6feb")
+    changed <- TRUE
+  }
   if (!changed) stop("no taggable layer")
   p
 }
-.er_p <- .er_make_interactive(p, ${idcol})
+.er_p <- .er_make_interactive(p, ${idcol}, ${ans})
 .er_f <- tempfile(fileext = ".svg")
 ggiraph::dsvg(file = .er_f, width = ${w}, height = ${h})
 print(.er_p); grDevices::dev.off()
