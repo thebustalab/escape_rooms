@@ -9,7 +9,8 @@ pull can fetch the wrong recording and the file's own measurements will not tell
 |---|---|---|---|
 | `storm_bed_wind.mp3` | the storm bed, every ring room | freesound 405601, *Howling Wind Ambience*, DBlover (1:25) | Creative Commons 0 |
 | `storm_bed_rumble_loop.mp3` | continuous rumble bed, every ring room | freesound 486558, *thunder.rumble.loop*, xUMR (0:04, a looping variant) | Creative Commons 0 |
-| `storm_wind_drone.mp3` | spare layer, not wired | freesound 719251, *wind drone effect*, cbrews (1:01) | Creative Commons 0 |
+| `storm_wind_drone.mp3` | a layer of the storm transit sting (below) | freesound 719251, *wind drone effect*, cbrews (1:01) | Creative Commons 0 |
+| `storm_transit.mp3` | the storm transit between ring rooms (2026-10-16), mixed only from the wind, wind-drone, rumble and distant-thunder files in this table, by `_scratch/storm_transit/audio/mix_transit.sh` | derived from the CC0 sources above | Creative Commons 0 |
 | ~~`storm_bed_thunder_rain.mp3`~~ | RETIRED 2026-09-25 — Lucas: "instead of rain we just need thunder and wind. No rain." Kept on disk in case a rain state is ever wanted | freesound 376810, Alex_hears_things | Creative Commons 0 |
 | `storm_thunder_distant.mp3` | interval layer — a distant roll every so often | freesound 581124, *Distant Thunder 3*, Fission9 (0:08) | Creative Commons 0 |
 

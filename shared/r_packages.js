@@ -104,9 +104,19 @@ export const ANALYSIS_PACKAGES = [
 export const BIOC_PACKAGES = ["ggtree"];
 
 /**
+ * The comparing-means test verbs (book ch.11) — `shapiroTest`, `tTest`, `anovaTest`, `dunnTest`,
+ * `pairwiseTTest` and the rest, all thin wrappers over rstatix — are defined on every surface from
+ * `STATS_TESTS_R_SHIM` (generated with the matrix shim, from phylochemistry.R). rstatix is installed in
+ * its OWN best-effort stage, separate from ANALYSIS_PACKAGES, so a failure here cannot cost a room
+ * runMatrixAnalysis and a ggtree failure cannot cost it the tests. It drags in car (and so lme4), which
+ * is the bulk of the extra boot time; whether the chain LOADS is checked by tests/matrix_analysis_smoke.mjs.
+ */
+export const STATS_PACKAGES = ["rstatix"];
+
+/**
  * Everything a session ends up with, in one call — for a caller that wants to know, and for the
  * tests. `webr-console.js` does the actual installing in three stages; see it for why.
  */
 export function resolvePackages(extra) {
-  return [...new Set([...BASE_PACKAGES, ...ANALYSIS_PACKAGES, ...BIOC_PACKAGES, ...(extra || [])])];
+  return [...new Set([...BASE_PACKAGES, ...ANALYSIS_PACKAGES, ...BIOC_PACKAGES, ...STATS_PACKAGES, ...(extra || [])])];
 }

@@ -70,14 +70,14 @@
 // A bare `./variant_resolve.js` import is NOT refreshed by bumping the <script> tag's ?v, so a changed
 // helper module (e.g. a new export) leaves browsers on a stale cached copy → "doesn't provide an export
 // named X" SyntaxError → blank page (the 2026-08-05 airship regression). Bump all three together.
-import { WebRConsole } from "./webr-console.js?v=129";
-import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers } from "./variant_resolve.js?v=129";   // Phase 3: per-hotspot state variants; monorail switch-door nav
-import * as PQ from "./puzzle_queue.js?v=129";   // dynamic puzzle queue: location-independent puzzle serving
-import * as CP from "./corr_panel.js?v=129";   // lower-triangle layout of the grid gate (clouds correlation panel)
-import { particleCount } from "./particles.js?v=129";   // ambient-particle vocabulary + per-kind field density
-import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=129";
-import { condHolds } from "./cond.js?v=129";   // ledger + elevation-map card DOM
-import * as RIDE from "./ride.js?v=129";   // THE RIDE (subway): express lever + clip-sequence planner
+import { WebRConsole } from "./webr-console.js?v=130";
+import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers } from "./variant_resolve.js?v=130";   // Phase 3: per-hotspot state variants; monorail switch-door nav
+import * as PQ from "./puzzle_queue.js?v=130";   // dynamic puzzle queue: location-independent puzzle serving
+import * as CP from "./corr_panel.js?v=130";   // lower-triangle layout of the grid gate (clouds correlation panel)
+import { particleCount } from "./particles.js?v=130";   // ambient-particle vocabulary + per-kind field density
+import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=130";
+import { condHolds } from "./cond.js?v=130";   // ledger + elevation-map card DOM
+import * as RIDE from "./ride.js?v=130";   // THE RIDE (subway): express lever + clip-sequence planner
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 
@@ -2021,8 +2021,25 @@ function startTransit(h, idx, withEntry = true, onArrive = null) {   // withEntr
       _keepStage = true;                       // no dip to black between the clip's last frame and the room
       navigateTo(idx, withEntry, _wrapYaw(y - rollTo));
     };
+    // `transit.look` (2026-10-18, clouds' climb-out): [{at, yaw?, pitch?, ms?}, ...] — at clip time `at` (s) the
+    // camera swings to that yaw/pitch (clip coordinates, degrees) over `ms`. A clip that cuts to a downward view
+    // must take the player's gaze with it, since a transit otherwise plays at whatever angle they happened to be
+    // looking. Absent ⇒ the player keeps full control of the view, as before.
+    const looks = Array.isArray(t.look) ? t.look.filter(k => k && isFinite(+k.at)) : [];
+    const lookFired = new Set();
+    const applyLooks = () => {
+      looks.forEach((k, i) => {
+        if (lookFired.has(i) || video.currentTime < +k.at) return;
+        lookFired.add(i);
+        try {
+          const p = k.pitch != null ? +k.pitch : viewer.getPitch(), y = k.yaw != null ? +k.yaw + rollFrom : viewer.getYaw();
+          viewer.lookAt(p, _wrapYaw(y), undefined, k.ms != null ? +k.ms : 800);
+        } catch (e) {}
+      });
+    };
     const frame = () => {
       if (transiting !== run || done) return;
+      if (looks.length) applyLooks();
       if (video.readyState >= 2) ctx.drawImage(video, 0, 0, W, H);
       const left = (video.duration || 0) - video.currentTime;
       if (isFinite(left) && left < TRANSIT_FADE) drawEnd(1 - Math.max(0, left) / TRANSIT_FADE);
@@ -2629,6 +2646,7 @@ window.PanoTransit = {
   time: () => (transiting && transiting.video ? transiting.video.currentTime : null),   // clip playback position
   room: () => (room ? room.key : null),
   yaw: () => { try { return viewer ? viewer.getYaw() : null; } catch (e) { return null; } },
+  pitch: () => { try { return viewer ? viewer.getPitch() : null; } catch (e) { return null; } },
 };
 
 function openMapview(h) {
@@ -3273,7 +3291,7 @@ function buildStoneLockCard(h, onSolved) {
 // (`buckets:[{key,label}]`). The player assigns each item to exactly one bucket (click a cell; one
 // selection per row; buckets may be shared). On submit, every item's chosen bucket must equal
 // `answer` (an object `{itemKey: bucketKey}`). Ungraded — never in the codec (like `lock`); solving it
-// solves the room (fires escapeDone in an escape-phase room). Recognition, not computation: the player
+// solves the room, and ends the escape only if the grid carries `endsEscape` (solveRoom). Recognition, not computation: the player
 // brings the grouping they inferred in-world (e.g. tree heights), no printed method. Schema:
 //   { type:"grid", box, label?, prompt?, items:[{key,label,labelHtml?}], buckets:[{key,label,labelHtml?}], answer:{}, maxAttempts?, feedback?:{correct,wrong,out} }
 // `labelHtml` (optional, authored markup — same trust as `prompt`) replaces the visible header, e.g. an inline

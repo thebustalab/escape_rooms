@@ -17,13 +17,13 @@
  * `addStatusEl()`, `plotControls(opts)`, `resetSession()`, `resetControl(opts)`, `.ready`, `.webR`.
  */
 import { WebR } from "https://webr.r-wasm.org/latest/webr.mjs";
-import { VIEW_R_SHIM, VIEW_R_DRAIN, fromR, viewTableHTML, ensureViewStyles } from "./webr_view.js?v=129";
-import { codeToRun, selectionNote } from "./code_sel.js?v=129";
-import { PLOT_ASPECTS, PLOT_DEFAULT_ASPECT, PLOT_LIMITS, PLOT_CTL_CSS, plotGeometry } from "./plot_size.js?v=129";
-import { RESET_R_SHIM, RESET_R_CALL, RESET_CTL_CSS, RESET_LABEL, RESET_CONFIRM_LABEL, RESET_CONFIRM_MS, nextConfirmState } from "./webr_reset.js?v=129";
-import { explainError, looksLikeOrphanLayer } from "./r_diagnose.js?v=129";
-import { R_BIOC_REPOS, BASE_PACKAGES, ANALYSIS_PACKAGES, BIOC_PACKAGES, resolvePackages } from "./r_packages.js?v=129";
-import { MATRIX_ANALYSIS_R_SHIM } from "./r_matrix_analysis.js?v=129";
+import { VIEW_R_SHIM, VIEW_R_DRAIN, fromR, viewTableHTML, ensureViewStyles } from "./webr_view.js?v=130";
+import { codeToRun, selectionNote } from "./code_sel.js?v=130";
+import { PLOT_ASPECTS, PLOT_DEFAULT_ASPECT, PLOT_LIMITS, PLOT_CTL_CSS, plotGeometry } from "./plot_size.js?v=130";
+import { RESET_R_SHIM, RESET_R_CALL, RESET_CTL_CSS, RESET_LABEL, RESET_CONFIRM_LABEL, RESET_CONFIRM_MS, nextConfirmState } from "./webr_reset.js?v=130";
+import { explainError, looksLikeOrphanLayer } from "./r_diagnose.js?v=130";
+import { R_BIOC_REPOS, BASE_PACKAGES, ANALYSIS_PACKAGES, BIOC_PACKAGES, STATS_PACKAGES, resolvePackages } from "./r_packages.js?v=130";
+import { MATRIX_ANALYSIS_R_SHIM, STATS_TESTS_R_SHIM } from "./r_matrix_analysis.js?v=130";
 
 const errText = e => (e && e.message ? e.message : String(e));
 
@@ -213,6 +213,17 @@ export class WebRConsole {
         console.warn("[webr-console] analysis packages unavailable:", errText(e));
       }
 
+      // The ch.11 test verbs' one package, in its OWN best-effort stage (see STATS_PACKAGES): a failure
+      // here must not cost runMatrixAnalysis, nor a ggtree failure cost the tests.
+      let statsOk = true;
+      try {
+        this.setStatus("Installing rstatix (the comparing-means tests) …");
+        await this.webR.installPackages(STATS_PACKAGES, { quiet: true });
+      } catch (e) {
+        statsOk = false;
+        console.warn("[webr-console] rstatix unavailable:", errText(e));
+      }
+
       for (const ds of (this.config.datasets || [])) {
         this.setStatus("Loading data: " + ds.name + " …");
         // Off the live site (test play on localhost, the e2e servers), prefer THIS checkout's copy of a
@@ -285,6 +296,20 @@ export class WebRConsole {
         }
       }
 
+      /*
+       * The comparing-means test verbs (book ch.11: shapiroTest, leveneTest, tTest, wilcoxTest,
+       * anovaTest, tukeyTest, kruskalTest, dunnTest, pairwiseTTest, pairwiseWilcoxTest), generated from
+       * phylochemistry.R with the matrix shim. Defined whether or not rstatix installed (a call then
+       * fails with R's own "no package called" line), and above RESET_R_SHIM so a reset keeps them;
+       * before the caller's setup, so a scenario that defines its own wins.
+       */
+      try {
+        await this.webR.evalRVoid(STATS_TESTS_R_SHIM);
+      } catch (e) {
+        statsOk = false;
+        console.warn("[webr-console] test verbs unavailable:", errText(e));
+      }
+
       if (this.config.setup) {
         this.setStatus("Preparing session…");
         await this.webR.evalRVoid(this.config.setup);
@@ -300,9 +325,10 @@ export class WebRConsole {
 
       this.ready = true;
       this.resetCtls.forEach(b => { b.disabled = false; });
-      this.setStatus(analysisOk
+      const missing = [analysisOk ? "" : "runMatrixAnalysis()", statsOk ? "" : "the comparing-means tests (tTest() and the rest)"].filter(Boolean);
+      this.setStatus(!missing.length
         ? "R is ready. Type code below and press Run."
-        : "R is ready, but runMatrixAnalysis() could not load — reload the page to try again.");
+        : "R is ready, but " + missing.join(" and ") + " could not load — reload the page to try again.");
     })().catch(err => {
       this.booting = null;
       this.webR = null;

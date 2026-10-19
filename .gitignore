@@ -229,3 +229,10 @@ authoring_v2/model_probe/results/
 
 # Wrap-join review strips (seam_join.py) — an eye-check artefact, never fetched at runtime.
 **/_seam/
+
+# world_plates/ generation records (logs, done markers, request json/jsonl/txt) are authoring-only and
+# carry this box's absolute paths — they tripped the pre-push private-path scan on 2026-10-18. The game
+# only fetches the plate PNGs, so publish those and nothing else.
+**/world_plates/**/*
+!**/world_plates/**/
+!**/world_plates/**/*.png

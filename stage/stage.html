@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<!--
+  Classroom stage: a projector DISPLAY plus an instructor CONSOLE for any escape-room scenario.
+  Prototype of the planetarium Dome/Console split (rooms/final/deep_space/notes.md), with no server:
+  both windows run in one browser on the instructor's laptop and talk over a BroadcastChannel.
+  It never touches the students' game.
+
+    stage.html?s=flat_clustering/heist                -> console (open this one)
+    stage.html?s=flat_clustering/heist&role=display   -> projector window (the console opens it)
+
+  All audio plays from the CONSOLE window, because that is the one that gets clicks (autoplay rules).
+  The display is visuals only: full-scene cinemagraphs, a clock, a title card, the WebR sandbox.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Stage</title>
+<style>
+  :root { --gold:#e8c77a; --ink:#f3ead6; --bg:#050505; --panel:#14110c; --line:rgba(232,199,122,.25); }
+  * { box-sizing:border-box; }
+  html, body { margin:0; height:100%; background:var(--bg); color:var(--ink); font:15px/1.45 Georgia, "Times New Roman", serif; }
+  button { font:inherit; cursor:pointer; }
+
+  /* ---------------- display ---------------- */
+  body.display { overflow:hidden; cursor:none; }
+  body.display.pointer { cursor:default; }
+  .layer { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0;
+           transition:opacity 2.5s ease; animation:pan 90s ease-in-out infinite alternate; }
+  .layer.on { opacity:1; }
+  @keyframes pan { from { object-position:0% 50%; } to { object-position:100% 50%; } }
+  #vignette { position:absolute; inset:0; pointer-events:none;
+              background:radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,.65) 100%); }
+  body.display #caption { position:absolute; left:3vw; bottom:3vh; font-style:italic; font-size:2.2vh; letter-spacing:.08em;
+             color:var(--ink); opacity:0; transition:opacity 2s; text-shadow:0 2px 8px #000; }
+  body.display #caption.on { opacity:.8; }
+  body.display #clock { position:absolute; right:3vw; bottom:2.5vh; font-size:11vh; font-variant-numeric:tabular-nums;
+           color:var(--gold); text-shadow:0 0 30px rgba(0,0,0,.9), 0 4px 12px #000; letter-spacing:.04em;
+           transition:opacity .8s, font-size .8s; }
+  body.display #clock.hidden { opacity:0; }
+  body.display #clock.low { color:#ff9d7a; }
+  body.display #clock.out { animation:blink 1.2s steps(2) infinite; }
+  @keyframes blink { 50% { opacity:.25; } }
+  body.display.sb-full #clock { font-size:5vh; bottom:auto; top:1.5vh; right:1.5vw; z-index:6; }
+  body.display #title { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+           background:radial-gradient(ellipse at center, rgba(0,0,0,.35), rgba(0,0,0,.8)); opacity:0;
+           transition:opacity 2s; pointer-events:none; text-align:center; }
+  body.display #title.on { opacity:1; }
+  body.display #title .k { font-size:2.4vh; letter-spacing:.5em; text-transform:uppercase; color:var(--gold); opacity:.85; }
+  body.display #title .t { font-size:10vh; margin:.15em 0; text-shadow:0 4px 30px #000; }
+  body.display #title .s { font-size:3vh; font-style:italic; opacity:.85; }
+  body.display #sandbox { position:absolute; top:0; right:0; height:100%; width:50%; border:0; background:#06111a; display:none; z-index:5;
+             box-shadow:-10px 0 40px rgba(0,0,0,.7); }
+  body.display.sb-half #sandbox { display:block; width:50%; }
+  body.display.sb-full #sandbox { display:block; width:100%; }
+  body.sb-half .layer { width:50%; }
+  body.display #black { position:absolute; inset:0; background:#000; opacity:0; pointer-events:none; transition:opacity 1.5s; z-index:9; }
+  body.display #black.on { opacity:1; }
+  body.display #hint { position:absolute; top:2vh; left:50%; transform:translateX(-50%); background:rgba(0,0,0,.7); padding:.6em 1.2em;
+          border:1px solid var(--line); border-radius:8px; font-size:16px; z-index:10; transition:opacity 1s; }
+
+  /* ---------------- console ---------------- */
+  body.console main { max-width:1100px; margin:0 auto; padding:18px 20px 40px; }
+  body.console h1 { font-size:22px; margin:0 0 4px; } body.console h1 span { color:var(--gold); }
+  .sub { opacity:.65; font-size:13px; margin:0 0 14px; }
+  .card { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:12px 14px; margin-bottom:12px; }
+  .card h2 { font-size:12px; letter-spacing:.2em; text-transform:uppercase; color:var(--gold); margin:0 0 10px; font-weight:normal; }
+  .row { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+  .btn { background:#221c12; color:var(--ink); border:1px solid var(--line); border-radius:8px; padding:8px 14px; }
+  .btn:hover { border-color:var(--gold); }
+  .btn.on { background:var(--gold); color:#1a1408; border-color:var(--gold); }
+  .btn.big { font-size:17px; padding:10px 20px; }
+  #cclock { font-size:44px; color:var(--gold); font-variant-numeric:tabular-nums; min-width:170px; }
+  input[type=number] { width:64px; background:#0d0b07; color:var(--ink); border:1px solid var(--line); border-radius:6px; padding:6px; font:inherit; }
+  input[type=range] { width:160px; accent-color:var(--gold); }
+  .rooms { display:grid; grid-template-columns:repeat(auto-fill, minmax(180px,1fr)); gap:8px; }
+  .room { position:relative; border:2px solid transparent; border-radius:8px; overflow:hidden; cursor:pointer; background:#000; padding:0; }
+  .room img { display:block; width:100%; aspect-ratio:3/1; object-fit:cover; }
+  .room span { position:absolute; left:0; right:0; bottom:0; padding:3px 6px; font-size:12px; background:linear-gradient(transparent, rgba(0,0,0,.85)); text-align:left; color:var(--ink); }
+  .room.on { border-color:var(--gold); }
+  #link { font-size:13px; } #link.ok { color:#9fe0a0; } #link.bad { color:#ff9d7a; }
+  .note { font-size:12.5px; opacity:.65; }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  @media (max-width:800px) { .grid2 { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+<script>
+(async () => {
+const P = new URLSearchParams(location.search);
+const S = (P.get('s') || 'flat_clustering/heist').replace(/[^a-z0-9_\/-]/gi, '');
+const ROLE = P.get('role') === 'display' ? 'display' : 'console';
+const BASE = `../rooms/${S}/`;
+const SANDBOX_URL = 'https://thebustalab.github.io/integrated_bioanalytics/sandbox.html';
+const chan = new BroadcastChannel('stage:' + S);
+document.body.className = ROLE;
+
+const sc = await (await fetch(BASE + 'scenario.json', { cache:'no-cache' })).json();
+// Rooms with a committed full-scene clip; a room without one falls back to its still.
+const ROOMS = sc.rooms.map(r => ({
+  key: r.key, title: r.title || r.key,
+  video: `${BASE}${r.key}/cine_base.mp4`,
+  poster: `${BASE}${r.key}/poster/cine_base.jpg`,
+  still: BASE + (r.panorama || `${r.key}/scene.png`),
+  sfx: r.sfx || [],
+}));
+document.title = (ROLE === 'console' ? 'Console · ' : 'Projector · ') + sc.title;
+
+if (ROLE === 'display') display(); else consoleUI();
+
+// =====================================================================================================
+function display() {
+  document.body.innerHTML = `
+    <video class="layer" muted playsinline loop></video><video class="layer" muted playsinline loop></video>
+    <div id="vignette"></div><div id="caption"></div>
+    <div id="title"><div class="k">${esc(sc.subtitle || '')}</div><div class="t">${esc(sc.title)}</div><div class="s"></div></div>
+    <iframe id="sandbox" title="R sandbox"></iframe>
+    <div id="clock" class="hidden">50:00</div><div id="black"></div>
+    <div id="hint">Waiting for the console… press F or double-click for full screen</div>`;
+  const layers = [...document.querySelectorAll('.layer')];
+  let front = 0, shownKey = null, st = null, hintTimer;
+  const $ = id => document.getElementById(id);
+
+  const fs = () => document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen().catch(() => {});
+  addEventListener('keydown', e => { if (e.key === 'f' || e.key === 'F') fs(); });
+  addEventListener('dblclick', fs);
+  addEventListener('mousemove', () => { document.body.classList.add('pointer'); clearTimeout(hintTimer);
+    hintTimer = setTimeout(() => document.body.classList.remove('pointer'), 2500); });
+  document.addEventListener('fullscreenchange', () => { if (document.fullscreenElement) $('hint').style.opacity = 0; });
+
+  function showRoom(key) {
+    if (key === shownKey) return;
+    const room = ROOMS.find(r => r.key === key); if (!room) return;
+    shownKey = key;
+    const next = layers[1 - front], prev = layers[front];
+    next.poster = room.poster;
+    next.onerror = () => { next.removeAttribute('src'); next.poster = room.still; swap(); };
+    next.src = room.video;
+    let done = false;
+    const swap = () => { if (done) return; done = true; next.classList.add('on'); prev.classList.remove('on'); front = 1 - front;
+      setTimeout(() => { if (!prev.classList.contains('on')) prev.pause(); }, 3000); };
+    next.oncanplay = () => { next.play().catch(() => {}); swap(); };
+    setTimeout(swap, 4000);   // slow network: show the poster rather than wait
+    $('caption').textContent = room.title;
+  }
+
+  function apply(s) {
+    st = s;
+    if (!apply.seen) { apply.seen = true; $('hint').textContent = 'Connected. Press F or double-click for full screen.';
+      setTimeout(() => { $('hint').style.opacity = 0; $('hint').style.pointerEvents = 'none'; }, 6000); }
+    showRoom(s.room);
+    $('caption').classList.toggle('on', !!s.caption && !s.titleCard);
+    $('title').classList.toggle('on', !!s.titleCard);
+    $('black').classList.toggle('on', !!s.black);
+    $('clock').classList.toggle('hidden', !s.clockShown);
+    document.body.classList.toggle('sb-half', s.sandbox === 'half');
+    document.body.classList.toggle('sb-full', s.sandbox === 'full');
+    if (s.sandbox !== 'off' && !$('sandbox').src) $('sandbox').src = SANDBOX_URL;  // load once, keep the R session alive
+    tick();
+  }
+  function tick() {
+    if (!st) return;
+    const ms = remaining(st.clock), el = $('clock');
+    el.textContent = fmt(ms);
+    el.classList.toggle('low', ms <= 5 * 60e3);
+    el.classList.toggle('out', ms <= 0 && st.clock.running);
+  }
+  setInterval(tick, 250);
+  chan.onmessage = e => { if (e.data.type === 'state') apply(e.data.state); };
+  setInterval(() => chan.postMessage({ type:'ping' }), 1500);
+  chan.postMessage({ type:'hello' });
+  showRoom(ROOMS[0].key);
+}
+
+// =====================================================================================================
+function consoleUI() {
+  const KEY = 'stage_state:' + S;
+  const defaults = { room: ROOMS[0].key, tour: true, tourSecs: 75, caption: true, titleCard: true, black: false,
+    clockShown: true, sandbox: 'off', music: false, musicVol: sc.musicVolume ?? 0.25, roomSfx: false, sfxVol: 0.6,
+    clock: { running: false, totalMs: 50 * 60e3, remainingMs: 50 * 60e3, endAt: 0 } };
+  let st = Object.assign({}, defaults, JSON.parse(localStorage.getItem(KEY) || '{}'));
+  st.music = false; st.roomSfx = false;   // audio needs a fresh click after any reload (autoplay rules)
+
+  document.body.innerHTML = `<main>
+    <h1>${esc(sc.title)} <span>· console</span></h1>
+    <p class="sub">${esc(sc.subtitle || '')} &nbsp;·&nbsp; <span id="link" class="bad">projector not open</span></p>
+    <div class="card"><div class="row">
+      <button class="btn big" id="open">Open projector window</button>
+      <span class="note">Drag it onto the projector, then press F (or double-click) inside it for full screen.</span>
+    </div></div>
+    <div class="grid2">
+      <div class="card"><h2>Clock</h2>
+        <div class="row"><div id="cclock"></div>
+          <button class="btn big" id="go">Start</button>
+          <button class="btn" id="m5">−5</button><button class="btn" id="p5">+5</button><button class="btn" id="p1">+1</button>
+        </div>
+        <div class="row" style="margin-top:8px">
+          <label>Reset to <input type="number" id="mins" min="1" max="240"> min</label>
+          <button class="btn" id="reset">Reset</button>
+          <button class="btn" id="cshow">Clock on projector</button>
+        </div></div>
+      <div class="card"><h2>Sound</h2>
+        <div class="row"><button class="btn" id="music">Theme music</button><input type="range" id="mvol" min="0" max="1" step="0.01"></div>
+        <div class="row" style="margin-top:8px"><button class="btn" id="sfx">Room sounds</button><input type="range" id="svol" min="0" max="1" step="0.01"></div>
+        <p class="note" style="margin:8px 0 0">${esc(sc.musicCredit?.text || '')}</p></div>
+    </div>
+    <div class="card"><h2>Screen</h2><div class="row">
+      <button class="btn" id="titleCard">Title card</button>
+      <button class="btn" id="caption">Room name</button>
+      <span style="width:14px"></span>
+      <span class="note">Sandbox:</span>
+      <button class="btn" data-sb="off">Off</button><button class="btn" data-sb="half">Half screen</button><button class="btn" data-sb="full">Full screen</button>
+      <span style="width:14px"></span>
+      <button class="btn" id="black">Blackout</button>
+    </div><p class="note" style="margin:8px 0 0">The sandbox loads R the first time you open it (about 30 s) and keeps its session when you hide it. To type in it, move the mouse onto the projector.</p></div>
+    <div class="card"><h2>Rooms</h2>
+      <div class="row" style="margin-bottom:10px"><button class="btn" id="tour">Slow tour</button>
+        <label class="note">every <input type="number" id="tsecs" min="15" max="600"> s</label></div>
+      <div class="rooms" id="rooms"></div></div>
+  </main>`;
+  const $ = id => document.getElementById(id);
+
+  // ---- persistence + broadcast
+  const send = () => { localStorage.setItem(KEY, JSON.stringify(st)); chan.postMessage({ type:'state', state: st }); render(); };
+  let lastPing = 0;
+  chan.onmessage = e => { if (e.data.type === 'hello') send(); if (e.data.type === 'ping' || e.data.type === 'hello') lastPing = Date.now(); };
+  setInterval(() => { const ok = Date.now() - lastPing < 4000; $('link').textContent = ok ? 'projector connected' : 'projector not open';
+    $('link').className = ok ? 'ok' : 'bad'; }, 1000);
+  let projWin = null;
+  $('open').onclick = () => { projWin = window.open(location.pathname + `?s=${encodeURIComponent(S)}&role=display`, 'stage_display_' + S, 'popup,width=1280,height=720'); };
+
+  // ---- clock
+  const C = () => st.clock;
+  $('mins').value = Math.round(C().totalMs / 60e3);
+  $('go').onclick = () => { const c = C();
+    if (c.running) { c.remainingMs = remaining(c); c.running = false; }
+    else { c.endAt = Date.now() + c.remainingMs; c.running = true; }
+    send(); };
+  const adj = d => { const c = C(); if (c.running) c.endAt += d; else c.remainingMs = Math.max(0, c.remainingMs + d); send(); };
+  $('m5').onclick = () => adj(-5 * 60e3); $('p5').onclick = () => adj(5 * 60e3); $('p1').onclick = () => adj(60e3);
+  $('reset').onclick = () => { const m = Math.max(1, +$('mins').value || 50) * 60e3;
+    st.clock = { running:false, totalMs:m, remainingMs:m, endAt:0 }; send(); };
+  $('cshow').onclick = () => { st.clockShown = !st.clockShown; send(); };
+  setInterval(() => { $('cclock').textContent = fmt(remaining(C())); }, 250);
+
+  // ---- screen toggles
+  for (const k of ['titleCard', 'caption', 'black']) $(k).onclick = () => { st[k] = !st[k]; send(); };
+  document.querySelectorAll('[data-sb]').forEach(b => b.onclick = () => { st.sandbox = b.dataset.sb; send(); });
+
+  // ---- rooms + tour
+  $('rooms').innerHTML = ROOMS.map(r => `<button class="room" data-k="${r.key}"><img src="${r.poster}" onerror="this.src='${r.still}'" alt=""><span>${esc(r.title)}</span></button>`).join('');
+  $('rooms').querySelectorAll('.room').forEach(b => b.onclick = () => { st.room = b.dataset.k; st.tour = false; st.titleCard = false; send(); });
+  $('tour').onclick = () => { st.tour = !st.tour; tourAt = Date.now(); send(); };
+  $('tsecs').value = st.tourSecs;
+  $('tsecs').onchange = () => { st.tourSecs = Math.max(15, +$('tsecs').value || 75); send(); };
+  let tourAt = Date.now();
+  setInterval(() => { if (!st.tour || Date.now() - tourAt < st.tourSecs * 1000) return;
+    tourAt = Date.now(); const i = ROOMS.findIndex(r => r.key === st.room);
+    st.room = ROOMS[(i + 1) % ROOMS.length].key; send(); }, 1000);
+
+  // ---- audio (lives here: this window gets the clicks)
+  const music = new Audio(BASE + (sc.music || '')); music.loop = true;
+  $('mvol').value = st.musicVol; $('svol').value = st.sfxVol;
+  $('music').onclick = () => { st.music = !st.music; send(); };
+  $('sfx').onclick = () => { st.roomSfx = !st.roomSfx; send(); };
+  $('mvol').oninput = () => { st.musicVol = +$('mvol').value; send(); };
+  $('svol').oninput = () => { st.sfxVol = +$('svol').value; send(); };
+  let bed = null, bedKey = null, shotTimer = null;
+  function fade(a, to, ms, then) { const from = a.volume, t0 = performance.now();
+    (function f(now) { const k = Math.min(1, (now - t0) / ms); a.volume = Math.min(1, Math.max(0, from + (to - from) * k));
+      if (k < 1) requestAnimationFrame(f); else then && then(); })(t0); }
+  function roomAudio() {
+    const want = st.roomSfx ? st.room : null;
+    const room = ROOMS.find(r => r.key === st.room);
+    const bedSpec = room?.sfx.find(x => x.mode === 'loop');
+    if (want !== bedKey) {
+      if (bed) { const old = bed; fade(old, 0, 2500, () => old.pause()); }
+      bed = null; bedKey = want; clearTimeout(shotTimer);
+      if (want && bedSpec) { bed = new Audio(BASE + bedSpec.src); bed.loop = true; bed.volume = 0; bed._v = bedSpec.volume;
+        bed.play().catch(() => {}); fade(bed, Math.min(1, bedSpec.volume * st.sfxVol), 3000); }
+      const shot = room?.sfx.find(x => x.mode === 'interval');
+      if (want && shot) { const fire = () => { if (bedKey !== want) return;
+          const a = new Audio(BASE + shot.src); a.volume = Math.min(1, shot.volume * st.sfxVol); a.play().catch(() => {});
+          shotTimer = setTimeout(fire, 1000 * (shot.gapMin + Math.random() * (shot.gapMax - shot.gapMin))); };
+        shotTimer = setTimeout(fire, 1000 * shot.gapMin); }
+    } else if (bed) bed.volume = Math.min(1, bed._v * st.sfxVol);
+  }
+  function render() {
+    for (const k of ['titleCard', 'caption', 'black', 'tour']) $(k).classList.toggle('on', !!st[k]);
+    $('cshow').classList.toggle('on', st.clockShown);
+    $('music').classList.toggle('on', st.music); $('sfx').classList.toggle('on', st.roomSfx);
+    $('go').textContent = C().running ? 'Pause' : (C().remainingMs < C().totalMs ? 'Resume' : 'Start');
+    document.querySelectorAll('[data-sb]').forEach(b => b.classList.toggle('on', b.dataset.sb === st.sandbox));
+    $('rooms').querySelectorAll('.room').forEach(b => b.classList.toggle('on', b.dataset.k === st.room));
+    music.volume = st.musicVol;
+    if (st.music && music.paused) music.play().catch(() => {}); if (!st.music && !music.paused) music.pause();
+    roomAudio();
+  }
+  send();
+}
+
+function remaining(c) { return Math.max(0, c.running ? c.endAt - Date.now() : c.remainingMs); }
+function fmt(ms) { const s = Math.ceil(ms / 1000), h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), x = s % 60;
+  return (h ? h + ':' + String(m).padStart(2, '0') : m) + ':' + String(x).padStart(2, '0'); }
+function esc(t) { return String(t).replace(/[&<>"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c])); }
+})();
+</script>
+</body>
+</html>
