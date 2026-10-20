@@ -15,6 +15,15 @@
  *          OR { starterCode, check:{prompt,requires,expr,hint,maxAttempts,feedback} }  (Phase 4: graded on
  *             the LIVE R session — expr is a single R logical run against the student's globalenv)
  *   clue   → { body }
+ *   plaque → { title, body, image?, credit? } — a WONDER PLAQUE (2026-10-19): information about the real
+ *            place/creature/structure a scenery room depicts. NOT puzzle material: never a gate, never
+ *            logged to the field notebook, never counted toward solve state, never a door's `requires`.
+ *            Distinct marker + brass plaque modal so students learn it is not a clue (openPlaque).
+ *   instrument → { kind, ...per-kind fields } — a READ-BY-EYE INSTRUMENT (2026-10-20) opened in a wide modal:
+ *            a painted still with code-drawn, physics-driven parts. Like a plaque it never gates, never
+ *            solves, never logs to the notebook; the player reads it and carries the number away.
+ *            kind "drawdown" (shared/drawdown.js) → { geometry:"<json path>", art:{board, peg?, spring?,
+ *            rod?, leverThrown?} } (paths relative to play.html). Unknown kinds open an apology card.
  *   door   → (box) + optional { direction:"forward"|"back", to:"<roomKey>", requires:"<gateId>"|[ids] }.
  *            forward (default): opens on its GATE — `requires` (a puzzle/lock hotspot id, or array) if
  *            set, else the room's PRIMARY gate — swaps to panoramaOpen, shows the target's entry,
@@ -70,14 +79,16 @@
 // A bare `./variant_resolve.js` import is NOT refreshed by bumping the <script> tag's ?v, so a changed
 // helper module (e.g. a new export) leaves browsers on a stale cached copy → "doesn't provide an export
 // named X" SyntaxError → blank page (the 2026-08-05 airship regression). Bump all three together.
-import { WebRConsole } from "./webr-console.js?v=132";
-import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers } from "./variant_resolve.js?v=132";   // Phase 3: per-hotspot state variants; monorail switch-door nav
-import * as PQ from "./puzzle_queue.js?v=132";   // dynamic puzzle queue: location-independent puzzle serving
-import * as CP from "./corr_panel.js?v=132";   // lower-triangle layout of the grid gate (clouds correlation panel)
-import { particleCount } from "./particles.js?v=132";   // ambient-particle vocabulary + per-kind field density
-import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=132";
-import { condHolds } from "./cond.js?v=132";   // ledger + elevation-map card DOM
-import * as RIDE from "./ride.js?v=132";   // THE RIDE (subway): express lever + clip-sequence planner
+import { WebRConsole } from "./webr-console.js?v=133";
+import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers } from "./variant_resolve.js?v=133";   // Phase 3: per-hotspot state variants; monorail switch-door nav
+import * as PQ from "./puzzle_queue.js?v=133";   // dynamic puzzle queue: location-independent puzzle serving
+import * as CP from "./corr_panel.js?v=133";   // lower-triangle layout of the grid gate (clouds correlation panel)
+import { particleCount } from "./particles.js?v=133";   // ambient-particle vocabulary + per-kind field density
+import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=133";
+import { condHolds } from "./cond.js?v=133";   // ledger + elevation-map card DOM
+import * as LIVE from "./live_session.js?v=133";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
+import * as RIDE from "./ride.js?v=133";
+import { mountDrawdown } from "./drawdown.js?v=133";   // the drawdown board instrument (diamonds escape)   // THE RIDE (subway): express lever + clip-sequence planner
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 
@@ -325,11 +336,15 @@ function init(data) {
     if (SCENARIO.heel) $("#pano").classList.add("heel");              // slow crash-heel of the horizon (opt-in)
     initMotif();                                                      // story-motif HUD (e.g. infection lesion)
     bootConsole();
+    if (liveMode()) LIVE.showHud($("#screen2"));                      // live scenario: class total, clock, what you carry
     if (music && musicOn) music.play().catch(() => {});   // Enter is the user gesture autoplay needs
     const named = startKey ? SCENARIO.rooms.findIndex(r => r.key === startKey && isBuilt(r)) : -1;
     const first = named >= 0 ? named
                              : SCENARIO.rooms.findIndex(r => isBuilt(r) && condOK(r.unlockedWhen));
-    if (first < 0) { finishAnalysis(); return; }   // nothing built to play yet
+    if (first < 0) {                               // nothing built to play yet
+      if (liveMode()) { toast("The island is still being built: no rooms yet."); return; }   // live has no finish/submission
+      finishAnalysis(); return;
+    }
     startRoom(first);
   };
   $("#enter").onclick = () => beginGame(null, null);
@@ -345,9 +360,14 @@ function init(data) {
       holder.appendChild(el);
     }
   }
+  // Live scenario: the join box sits above Enter and holds it back until the player has a callsign.
+  if (liveMode()) LIVE.mountJoin($("#enter"));
   setupMusic();
   setupSfxToggle();
 }
+// A LIVE scenario (scenario.live) is joined to the in-class session server (shared/live_session.js).
+// Off in harness test play, which has no session to join.
+const liveMode = () => !!(SCENARIO && SCENARIO.live) && !isTestPlay();
 
 // optional looping background music as ONE bottom-left chip: "♪ <credit link>: <on/off>".
 // The credit (scenario.musicCredit = { text, url }) links out; the trailing on/off word
@@ -1812,6 +1832,10 @@ function onHotspot(evt, h) {   // Pannellum calls clickHandlerFunc(event, clickH
   try {
     if (riding || transiting) return;                 // THE RIDE / a portal transit: nothing is clickable until arrival
     if (h.type === "clue") return openClue(h);
+    if (h.type === "plaque") return openPlaque(h);   // information only — no gate, no notebook
+    if (h.type === "instrument") return openInstrument(h);   // read by eye — no gate, no notebook
+    if (h.type === "station") return openStation(h);   // LIVE: the server deals a task of h.tier (never a gate)
+    if (h.type === "deliver") return deliverLoad(h);   // LIVE: unload what you carry into the class total
     if (h.type === "lever") {
       // THE RIDE's one cab control (scenario.ride). Gated like a dial; see openLever.
       if (!condOK(h.availableWhen)) return openLocked(h);
@@ -2189,7 +2213,7 @@ function tpSaveRoom(r) {
     const p = tpPlannedTwin(planned, placed, h);
     if (!p) return;
     ["question", "check", "pick", "feedback", "body", "label", "lockedBody", "prompt", "hint",
-     "pickup", "rows", "options", "states", "items", "buckets", "submitLabel"].forEach(k => {
+     "pickup", "rows", "options", "states", "items", "buckets", "submitLabel", "title", "credit"].forEach(k => {
       if (k in h) p[k] = JSON.parse(JSON.stringify(h[k]));
     });
   });
@@ -2276,6 +2300,7 @@ const devSolveThunk = (h, qIndex) => () => { closeModal(); solveRoom(correctResu
  * shrinks the figures that go into a submission.
  */
 function openModal(title, node, onDevSolve, tpLabelOf, size) {
+  modalTeardown();
   document.querySelector("#modal .mbox").classList.toggle("wide", size === "wide");
   $("#mtitle").textContent = title;
   // The modal title is the hotspot's `label` — player-facing on every single open, so it is editable
@@ -2296,7 +2321,11 @@ function openModal(title, node, onDevSolve, tpLabelOf, size) {
   $("#modal").classList.add("open");
 }
 $("#mback").onclick = closeModal;
-function closeModal() { unmountConsole(); $("#modal").classList.remove("open"); }
+function closeModal() { modalTeardown(); unmountConsole(); $("#modal").classList.remove("open"); }
+// A modal body that runs its own animation loop or audio (an instrument) registers its teardown here; it
+// runs when the modal closes or another modal replaces it.
+let _modalTeardown = null;
+function modalTeardown() { const f = _modalTeardown; _modalTeardown = null; if (f) { try { f(); } catch (e) { console.error(e); } } }
 function unmountConsole() { $("#console-holder").appendChild($("#console-block")); }
 
 // A clue modal. If the clue is flagged `pickup` (true, or a string = the exact text to log), it shows
@@ -2364,6 +2393,87 @@ function openClue(h) {
     d.appendChild(btn);
   }
   openModal(h.label || "Clue", d, null, h);
+}
+
+// A WONDER PLAQUE (2026-10-19, Lucas): teaches the real place/creature/structure a scenery room is built
+// on. It is deliberately NOT a clue — the course runs a zero-clue budget — so it never touches the field
+// notebook (no "Add to notebook", no logToNotebook), never solves or gates anything, and wears its own
+// brass-and-enamel frame so students learn on sight that it is not puzzle material. The title is rendered
+// INSIDE the card because `.mtitle` is hidden in the player. All text is real text (never baked into the
+// optional card image), and the image's alt is the title.
+function openPlaque(h) {
+  const card = document.createElement("div"); card.className = "plaquecard";
+  const kicker = document.createElement("div"); kicker.className = "plaquekicker";
+  kicker.textContent = "Wonder of the world";
+  card.appendChild(kicker);
+  if (h.image) {
+    const img = document.createElement("img"); img.className = "plaqueimg";
+    img.src = h.image; img.alt = h.title || h.label || "";
+    card.appendChild(img);
+  }
+  const title = document.createElement("h3"); title.className = "plaquetitle";
+  title.textContent = h.title || h.label || "";
+  card.appendChild(title);
+  tpEditable(title, () => h.title || "", v => { h.title = v; return tpSaveRoom(room); });
+  const body = document.createElement("p"); body.className = "plaquebody";
+  if (isTestPlay()) body.textContent = h.body || "";     // raw source, so an HTML edit round-trips
+  else body.innerHTML = h.body || "";
+  card.appendChild(body);
+  tpEditable(body, () => h.body || "", v => { h.body = v; return tpSaveRoom(room); });
+  if (h.credit || isTestPlay()) {
+    const credit = document.createElement("div"); credit.className = "plaquecredit";
+    credit.textContent = h.credit || "";
+    card.appendChild(credit);
+    tpEditable(credit, () => h.credit || "", v => { h.credit = v; return tpSaveRoom(room); });
+  }
+  openModal(h.title || h.label || "Plaque", card, null, h);
+}
+
+// A READ-BY-EYE INSTRUMENT (2026-10-20): a painted still with code-drawn, physics-driven parts in a wide
+// modal. Like a plaque it is never a gate, never a clue and never logged; the player reads a number off it.
+// `kind` picks the renderer; each kind's fields are documented in the header. Peg positions survive
+// closing and reopening within a visit (in memory only: nothing about an instrument is saved or graded).
+const INSTRUMENTS = { drawdown: mountDrawdown };
+// Opening zooms from the hotspot's marker into the close-up (settled design, notes §5 of diamonds), so the
+// student sees the board on the wall become the board in their hands. Skipped under reduced motion.
+function zoomFromHotspot(h) {
+  const box = document.querySelector("#modal .mbox");
+  const mk = document.querySelector(".hsmark.hs-" + String(h.id || "").replace(/[^\w-]/g, "_"));
+  if (!box || !mk || !box.animate || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const a = mk.getBoundingClientRect(), b = box.getBoundingClientRect();
+  if (!b.width || !b.height) return;
+  const dx = (a.left + a.width / 2) - (b.left + b.width / 2), dy = (a.top + a.height / 2) - (b.top + b.height / 2);
+  const k = Math.max(0.04, Math.min(0.3, (a.width * 4) / b.width));
+  box.animate([{ transform: `translate(${dx}px, ${dy}px) scale(${k})`, opacity: 0.3 },
+               { transform: "none", opacity: 1 }], { duration: 320, easing: "cubic-bezier(.2,.7,.2,1)" });
+}
+const _instrumentGeom = new Map(), _instrumentState = new Map();
+async function openInstrument(h) {
+  const card = document.createElement("div"); card.className = "instrumentcard " + (h.kind || "");
+  const mount = INSTRUMENTS[h.kind];
+  const sk = (room && room.key) + "/" + h.id;
+  openModal(h.label || "Instrument", card, null, h, "wide");
+  zoomFromHotspot(h);
+  if (!mount) {
+    const p = document.createElement("p"); p.textContent = "This instrument cannot be opened here.";
+    card.appendChild(p); console.error("instrument: unknown kind", h.kind);
+    return;
+  }
+  try {
+    let geometry = _instrumentGeom.get(h.geometry);
+    if (!geometry) {
+      geometry = await (await fetch(h.geometry)).json();
+      _instrumentGeom.set(h.geometry, geometry);
+    }
+    if (!card.isConnected) return;                       // closed while the geometry loaded
+    const inst = mount(card, { geometry, art: h.art || {}, pegs: _instrumentState.get(sk),
+                               onPegs: v => _instrumentState.set(sk, v) });
+    _modalTeardown = () => inst.destroy();
+  } catch (e) {
+    console.error("instrument failed to open", e);
+    const p = document.createElement("p"); p.textContent = "This instrument could not be loaded.";
+    card.appendChild(p);
+  }
 }
 
 // ---- dial (world-state control) + map-view (state-conditioned image) — the multiple-mappings
@@ -3076,11 +3186,35 @@ function buildPickCard(pick, onSolved, pid, h) {
     catch (e) { return false; }
   };
 
+  // LIVE task (`pick.liveGrade`): the answer is not in the browser, so every click goes to the server.
+  // No attempt limit; a wrong click starts the server's cooldown instead.
+  let liveBusy = false;
+  const liveClick = async (id) => {
+    if (liveBusy) return;
+    liveBusy = true;
+    try {
+      const r = await pick.liveGrade(id);
+      if (r.correct) {
+        done = true; holder.style.pointerEvents = "none";
+        fb.className = "qfeedback ok"; fb.textContent = r.feedback || "That's the one.";
+        setTimeout(() => onSolved(r), 1600);
+      } else if (r.error) {
+        done = true; holder.style.pointerEvents = "none";
+        fb.className = "qfeedback out"; fb.textContent = r.error;
+      } else {
+        fb.className = "qfeedback no";
+        fb.textContent = (r.feedback || "Not that one. Look again.") +
+          (r.cooldown_s ? " Try again in " + r.cooldown_s + " s." : "");
+      }
+    } finally { liveBusy = false; }
+  };
+
   const wireClicks = () => {
     holder.querySelectorAll("[data-id]").forEach(el => {
       el.style.cursor = "pointer";
       el.addEventListener("click", () => {
         if (done) return;
+        if (pick.liveGrade) return liveClick(el.getAttribute("data-id"));
         if (el.getAttribute("data-id") === pick.answer) {
           done = true; holder.style.pointerEvents = "none";
           fb.className = "qfeedback ok"; fb.innerHTML = fbk.correct || "That's the one.";
@@ -3143,7 +3277,11 @@ function buildPickCard(pick, onSolved, pid, h) {
   // NO auto-draw (either mode): the student presses Draw. In student mode they must first build the plot
   // in the console and assign it to `p`.
   // Restore end-state if attempts were exhausted earlier this session.
-  if (done && attempts >= maxA) {
+  if (pick.liveGrade) {
+    done = false;
+    fb.className = "qfeedback no";
+    fb.innerHTML = "Fill in the blanks (<code>___</code>) in the template, run it, then click “Draw the clickable chart” and click your answer on it.";
+  } else if (done && attempts >= maxA) {
     fb.className = "qfeedback out"; fb.innerHTML = fbk.reveal || pick.hint || "Out of attempts.";
   } else if (attempts > 0) {
     fb.className = "qfeedback no"; fb.innerHTML = `<span class="attempts">(${attempts} of ${maxA} attempts used)</span>`;
@@ -3153,6 +3291,61 @@ function buildPickCard(pick, onSolved, pid, h) {
     fb.className = "qfeedback no"; fb.innerHTML = "Press “Draw the chart”, then click your answer on it.";
   }
   return card;
+}
+
+// ---- LIVE stations and the delivery point (scenario.live; shared/live_session.js) ----
+// A `station` ({type:"station", tier:1|2|3, label}) asks the live server to DEAL a task of its tier and
+// opens it in the normal pick-the-point modal (template in the console, the student's own plot, click
+// the answer). The answer never reaches the browser: each click is checked by the server. A station is
+// never a gate and never graded (no codec slot); solving fills what the player CARRIES, and only the
+// `deliver` hotspot ({type:"deliver", label}) adds it to the class total. Neither touches solvedGates.
+async function openStation(h) {
+  if (!liveMode()) return toast("This station deals a task during the live class session.");
+  if (!LIVE.isJoined()) return toast("Join the session first.");
+  const r = await LIVE.deal(h.tier).catch(() => null);
+  if (!r) return toast("Can't reach the class session. Check your connection.");
+  if (!r.ok) return toast(r.j.error || "No task right now.");
+  const d = r.j;
+  const task = {
+    id: h.id, label: d.title || h.label, starterCode: d.starter_code || "",
+    pick: {
+      prompt: escHtml(d.question || ""), idColumn: d.idColumn, idNoun: h.idNoun,
+      liveGrade: async (choice) => {
+        const a = await LIVE.answer(d.deal_id, choice).catch(() => null);
+        if (!a) return { error: "Can't reach the class session. Close this and try the station again." };
+        if (!a.ok) return { error: a.j.error || "That task has expired. Close this and try the station again." };
+        if (a.j.correct && a.j.carrying) {
+          LIVE.noteCarrying(a.j.carrying);
+          const st = LIVE.state(), unit = (st && st.unit) || ["gourd", "gourds"];
+          // The pool's right_feedback (if any) says WHY it is right; the carry line is always ours.
+          a.j.feedback = (a.j.feedback ? a.j.feedback + " " : "Filled! ") +
+            "You're carrying " + a.j.carrying + " " + (a.j.carrying === 1 ? unit[0] : unit[1]) +
+            ". Take " + (a.j.carrying === 1 ? "it" : "them") + " back to the canoe.";
+        }
+        return a.j;
+      },
+    },
+  };
+  if (viewer) resumeYaw = viewer.getYaw();
+  $("#code-input").value = task.starterCode;
+  $("#webr-output").innerHTML = "";
+  if (rconsole && rconsole.ready) rconsole.webR.evalRVoid('suppressWarnings(if (exists("p")) rm(p))').catch(() => {});
+  const grid = document.createElement("div"); grid.className = "qa";
+  const left = document.createElement("div"), right = document.createElement("div");
+  left.appendChild($("#console-block"));
+  right.appendChild(buildPickCard(task.pick, () => closeModal(), "live:" + d.deal_id, task));
+  grid.appendChild(left); grid.appendChild(right);
+  openModal(task.label, grid, null, null, "wide");
+}
+async function deliverLoad(h) {
+  if (!liveMode()) return toast("Loads are delivered here during the live class session.");
+  if (!LIVE.isJoined()) return toast("Join the session first.");
+  const r = await LIVE.deliver().catch(() => null);
+  if (!r) return toast("Can't reach the class session. Check your connection.");
+  if (!r.ok) return toast(r.j.error || "Nothing to load.");
+  const st = LIVE.state(), unit = (st && st.unit) || ["gourd", "gourds"];
+  toast("Loaded " + r.j.delivered + " " + (r.j.delivered === 1 ? unit[0] : unit[1]) + ". " +
+        "The class has " + r.j.total + (st && st.goal ? " of " + st.goal : "") + ".");
 }
 
 // ---- combination lock (two-phase escape — the no-instructions synthesis gate) ----

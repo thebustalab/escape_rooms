@@ -270,6 +270,25 @@ button.ghost { background:transparent; color:var(--ink); border:1px solid var(--
   transform:translateX(-50%) rotate(0deg); transition:transform .5s cubic-bezier(.5,1.4,.5,1); border-radius:2px; }
 .dialface .hub { position:absolute; left:50%; bottom:4px; width:10px; height:10px; margin-left:-5px; border-radius:50%; background:#c99a3a; }
 @media (prefers-reduced-motion: reduce){ .dialface .needle { transition:none !important; } }
+
+/* Wonder plaque card (openPlaque, 2026-10-19) — a brass frame around an enamel field, deliberately unlike the
+   clue/puzzle cards: information about the real place, never a clue. Title is rendered in the card because
+   `.mtitle` is hidden in the player. */
+.plaquecard { max-width:560px; margin:2px auto 0; padding:16px 20px 14px; border-radius:10px;
+  background:radial-gradient(130% 120% at 50% 0%, #1d4a44 0%, #0f2b28 78%);
+  border:3px double #c9a35a; box-shadow:inset 0 0 0 1px rgba(233,207,150,.25), inset 0 6px 18px rgba(0,0,0,.45), 0 6px 24px rgba(0,0,0,.4);
+  color:#f1ead8; }
+.plaquekicker { font:600 11px/1.2 system-ui, sans-serif; letter-spacing:.18em; text-transform:uppercase; color:#d8b56e; text-align:center; margin-bottom:10px; }
+.plaqueimg { display:block; max-width:100%; max-height:42vh; margin:0 auto 12px; border-radius:6px; border:1px solid rgba(201,163,90,.55); }
+.plaquetitle { margin:0 0 8px; text-align:center; font:700 21px/1.25 Georgia, "Times New Roman", serif; color:#f3dca6; }
+.plaquebody { margin:0 0 10px; font:15px/1.6 Georgia, "Times New Roman", serif; }
+.plaquecredit { font-size:11px; opacity:.65; text-align:right; border-top:1px solid rgba(201,163,90,.3); padding-top:6px; }
+/* Read-by-eye instrument (openInstrument, 2026-10-20; the drawdown board is shared/drawdown.js). The canvas
+   letterboxes the still to its own aspect; max-height keeps a landscape phone from scrolling the modal, and
+   touch-action:none lets a peg drag without panning the page. */
+.instrumentcard { display:flex; justify-content:center; }
+.drawdowncanvas { display:block; width:100%; max-height:84vh; background:#0b0806; border-radius:8px;
+  touch-action:none; -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; }
 #loading #loadTitle { margin:0 0 10px; font-size:24px; color:var(--amber); }
 #loading #loadText { opacity:.9; white-space:pre-wrap; margin:0; }
 #loading #loadBtn { margin-top:20px; }
@@ -291,6 +310,15 @@ button.ghost { background:transparent; color:var(--ink); border:1px solid var(--
 .hsmark.door.locked { background:rgba(180,180,180,.18); border-color:rgba(200,200,200,.5); box-shadow:none; animation:none; }
 .hsmark.door.open { background:rgba(120,255,170,.30); border-color:#7dffaa; box-shadow:0 0 0 4px rgba(120,255,170,.14),0 0 20px rgba(120,255,170,.7); }
 .hsmark.puzzle.done { opacity:.5; box-shadow:none; animation:none; }
+/* LIVE scenarios: a `station` uses the default (puzzle) marker; the `deliver` point is teal, like the HUD's carrying line */
+.hsmark.deliver { background:rgba(110,230,215,.30); border-color:#8ff0e2; box-shadow:0 0 0 4px rgba(110,230,215,.14),0 0 20px rgba(110,230,215,.65); }
+/* Wonder plaque marker (2026-10-19): a small brass-edged enamel tablet with an "i", and NO pulse — a still,
+   square marker reads as "information", unlike the round pulsing clue/puzzle dots, so students learn on
+   sight that plaques are not puzzle material. Kept modest on purpose. */
+.hsmark.plaque { width:24px; height:24px; margin:-12px 0 0 -12px; border-radius:4px; animation:none;
+  background:rgba(22,58,54,.78); border:2px solid #c9a35a; box-shadow:0 0 0 3px rgba(201,163,90,.14), 0 0 10px rgba(201,163,90,.35);
+  display:flex; align-items:center; justify-content:center; }
+.hsmark.plaque::after { content:"i"; color:#e9cf96; font:italic 700 14px/1 Georgia, "Times New Roman", serif; pointer-events:none; }
 
 /* Door name-plates (SCENARIO.doorLabels) — the target room's title above an open door's marker.
    A child of the marker, so pannellum's own transform carries it as the player pans. `pointer-events:none`
