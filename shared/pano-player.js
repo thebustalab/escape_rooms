@@ -79,16 +79,16 @@
 // A bare `./variant_resolve.js` import is NOT refreshed by bumping the <script> tag's ?v, so a changed
 // helper module (e.g. a new export) leaves browsers on a stale cached copy → "doesn't provide an export
 // named X" SyntaxError → blank page (the 2026-08-05 airship regression). Bump all three together.
-import { WebRConsole } from "./webr-console.js?v=133";
-import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers } from "./variant_resolve.js?v=133";   // Phase 3: per-hotspot state variants; monorail switch-door nav
-import * as PQ from "./puzzle_queue.js?v=133";   // dynamic puzzle queue: location-independent puzzle serving
-import * as CP from "./corr_panel.js?v=133";   // lower-triangle layout of the grid gate (clouds correlation panel)
-import { particleCount } from "./particles.js?v=133";   // ambient-particle vocabulary + per-kind field density
-import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=133";
-import { condHolds } from "./cond.js?v=133";   // ledger + elevation-map card DOM
-import * as LIVE from "./live_session.js?v=133";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
-import * as RIDE from "./ride.js?v=133";
-import { mountDrawdown } from "./drawdown.js?v=133";   // the drawdown board instrument (diamonds escape)   // THE RIDE (subway): express lever + clip-sequence planner
+import { WebRConsole } from "./webr-console.js?v=135";
+import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers } from "./variant_resolve.js?v=135";   // Phase 3: per-hotspot state variants; monorail switch-door nav
+import * as PQ from "./puzzle_queue.js?v=135";   // dynamic puzzle queue: location-independent puzzle serving
+import * as CP from "./corr_panel.js?v=135";   // lower-triangle layout of the grid gate (clouds correlation panel)
+import { particleCount } from "./particles.js?v=135";   // ambient-particle vocabulary + per-kind field density
+import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=135";
+import { condHolds } from "./cond.js?v=135";   // ledger + elevation-map card DOM
+import * as LIVE from "./live_session.js?v=135";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
+import * as RIDE from "./ride.js?v=135";
+import { mountDrawdown } from "./drawdown.js?v=135";   // the drawdown board instrument (diamonds escape)   // THE RIDE (subway): express lever + clip-sequence planner
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 
@@ -372,9 +372,16 @@ const liveMode = () => !!(SCENARIO && SCENARIO.live) && !isTestPlay();
 // optional looping background music as ONE bottom-left chip: "♪ <credit link>: <on/off>".
 // The credit (scenario.musicCredit = { text, url }) links out; the trailing on/off word
 // toggles playback (remembered per browser).
+// LIVE MODE IS SILENT (2026-10-20, Lucas: "all sound comes through my console"). A student joined to a
+// live session plays no audio at all: the whole class in one room would be thirty unsynced copies of the
+// track. The console plays the music instead (authoring_v2/live_class/static/admin.html). This is the ONE
+// switch: setupMusic leaves `music` null and setupSfxToggle pins `sfxOn` false with both chips hidden, and
+// every other audio path (room layers, solve/dial stings, transit sfx) already checks one of those two;
+// instruments get `sound:false`. Pinned by tests/live_silent.mjs.
+const liveSilent = () => liveMode();
 function setupMusic() {
   const chip = $("#musicChip"), credit = $("#musicCredit"), state = $("#musicState");
-  if (!SCENARIO.music) { chip.style.display = "none"; return; }
+  if (!SCENARIO.music || liveSilent()) { chip.style.display = "none"; return; }
   music = new Audio(SCENARIO.music);
   music.loop = true;
   music.preload = "auto";
@@ -419,6 +426,7 @@ function updateMusicBtn() {
 // dripped key code) — turning sfx off would silence those too; none in the current data_vis scenarios.
 function setupSfxToggle() {
   const chip = $("#sfxChip"), state = $("#sfxState");
+  if (liveSilent()) { sfxOn = false; chip.style.display = "none"; return; }   // live: no sfx, no chip (see setupMusic)
   const rooms = SCENARIO.rooms || [];
   const anySfx = rooms.some(r => sfxListFor(r).length) ||
     rooms.some(r => r.solveSfx || (r.hotspots || []).some(h => h.solveSfx)) ||
@@ -2402,6 +2410,16 @@ function openClue(h) {
 // INSIDE the card because `.mtitle` is hidden in the player. All text is real text (never baked into the
 // optional card image), and the image's alt is the title.
 function openPlaque(h) {
+  // IMAGE-ONLY PLAQUE (voyage, Lucas 2026-10-20): an `image` with no `title` and no `body` is a card whose
+  // text is baked into the picture, so nothing else is drawn: no kicker, no title, no body, no modal title.
+  if (h.image && !h.title && !h.body) {
+    const card = document.createElement("div"); card.className = "plaquecard imageonly";
+    const img = document.createElement("img"); img.className = "plaqueimg";
+    img.src = h.image; img.alt = h.alt || h.label || "";
+    card.appendChild(img);
+    openModal("", card, null, null, "wide");
+    return;
+  }
   const card = document.createElement("div"); card.className = "plaquecard";
   const kicker = document.createElement("div"); kicker.className = "plaquekicker";
   kicker.textContent = "Wonder of the world";
@@ -2466,7 +2484,7 @@ async function openInstrument(h) {
       _instrumentGeom.set(h.geometry, geometry);
     }
     if (!card.isConnected) return;                       // closed while the geometry loaded
-    const inst = mount(card, { geometry, art: h.art || {}, pegs: _instrumentState.get(sk),
+    const inst = mount(card, { geometry, art: h.art || {}, pegs: _instrumentState.get(sk), sound: !liveSilent(),
                                onPegs: v => _instrumentState.set(sk, v) });
     _modalTeardown = () => inst.destroy();
   } catch (e) {

@@ -50,7 +50,8 @@
             0.525,
             0.5605
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "image": "plaques/the_valley_walls.png"
         },
         {
           "type": "door",
@@ -2080,9 +2081,11 @@
           "ratio": 1.13,
           "delta": 3.13,
           "needsWork": false,
-          "accepted": false,
+          "accepted": true,
           "seamBandRun": 0.006,
-          "at": "2026-10-20T11:07:37"
+          "at": "2026-10-20T14:11:40",
+          "acceptedBy": "lucas via agent 2026-10-20",
+          "humanNote": "Lucas, in chat 2026-10-20: \"Beach is accepted.\""
         },
         "boxesFrom": {
           "art": "0fa4475f0392",
@@ -2104,10 +2107,10 @@
           "type": "door",
           "label": "The path up the valley",
           "box": [
-            0.37,
-            0.504,
-            0.402,
-            0.568
+            0.3733,
+            0.4622,
+            0.432,
+            0.5976
           ],
           "direction": "open",
           "to": "stream",
@@ -2118,22 +2121,23 @@
           "type": "plaque",
           "label": "The valley walls",
           "box": [
-            0.475,
-            0.4995,
-            0.525,
-            0.5605
+            0.4523,
+            0.4717,
+            0.5117,
+            0.5963
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "image": "plaques/the_valley_walls.png"
         },
         {
           "id": "the_path_to_the_well",
           "type": "door",
           "label": "The path to the well",
           "box": [
-            0.576,
-            0.52,
-            0.624,
-            0.584
+            0.5492,
+            0.4386,
+            0.6279,
+            0.6357
           ],
           "direction": "open",
           "to": "well",
@@ -2144,32 +2148,86 @@
           "type": "deliver",
           "label": "The voyaging canoe",
           "box": [
-            0.5638,
-            0.4825,
-            0.7353,
-            0.5825
+            0.6675,
+            0.564,
+            0.839,
+            0.664
           ],
           "boxSource": "draft:skeleton"
+        },
+        {
+          "id": "clip_base",
+          "type": "ambient",
+          "label": "Scene motion (base)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/play-source.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "beach/cine_base.mp4"
+          }
+        }
+      ],
+      "sfx": [
+        {
+          "src": "audio/beach_bed_surf.mp3",
+          "mode": "loop",
+          "volume": 0.6
+        },
+        {
+          "src": "audio/beach_bed_pennant.mp3",
+          "mode": "loop",
+          "volume": 0.35
+        },
+        {
+          "src": "audio/beach_shot_seabirds.mp3",
+          "mode": "interval",
+          "volume": 0.8,
+          "gapMin": 14,
+          "gapMax": 35
         }
       ]
     },
     {
       "key": "well",
       "title": "The well in the ironwoods",
-      "built": false,
+      "built": true,
       "unlockedWhen": true,
       "designNote": "LEVEL 1 station (1 gourd). The server deals a scores-plot task; no puzzle content here.",
       "plannedHotspots": [
         {
           "type": "station",
           "tier": 1,
-          "label": "The coastal well"
+          "label": "The coastal well",
+          "box": [
+            0.3479,
+            0.4647,
+            0.4246,
+            0.5802
+          ],
+          "boxSource": "draft:skeleton"
         },
         {
           "type": "door",
           "direction": "back",
           "to": "beach",
-          "label": "Back to the beach"
+          "label": "Back to the beach",
+          "box": [
+            0.5576,
+            0.524,
+            0.6344,
+            0.62
+          ],
+          "boxSource": "draft:skeleton"
         }
       ],
       "authoring": {
@@ -4152,13 +4210,96 @@
         "plateRefs": [
           "beach/scene.png"
         ],
-        "scenePrompt": "This is a seamless 360-degree panorama from a small sandy clearing in the grove of ironwood and hala trees behind the black-sand beach at the mouth of Waipi\u02bbo Valley, with an old stone-lined well in it, open to the beach on one side. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stand of grey ironwood trunks over a floor of fallen brown needles, calm and even: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: grey ironwood trunks over a floor of brown needles, joining its other half cleanly at the seam directly behind you; just left of centre, set into the sand of the clearing close to the viewer, a round well lined with fitted grey stones, its low dry-stone rim at knee height, dark still water a little way down inside; EXACTLY two wooden posts stand in the sand on either side of the rim, a crossbar spans the opening between their tops, and from the crossbar three round brown water gourds hang on cords over the water, swaying a little on their cords; dead ahead in the centre, the sand of the clearing runs level straight ahead through a wide gap in the trees onto the back of the open black-sand beach, the sea beyond; off to the right along the sand, small and far, the double-hulled voyaging canoe with its furled sail; to the right, ironwood and hala trees closing round the clearing, their trunks close together, flecks of the gold-lit sea glinting between them; on the far right, the right half of the calm view directly behind the viewer: grey ironwood trunks over a floor of brown needles, joining its other half cleanly at the seam directly behind you. cool shade under the needles, quiet and close, the bright beach framed in the gap, painterly realism. No people, no figures, no lettering, signs or text anywhere (the one plain blank wooden plaque board, where described, carries no marks). Nothing modern: no pumps, pipes, concrete, fences, buildings, vehicles, power lines, roads or motorboats. No temple platforms, no graves or burial markers, no carved figures, no petroglyphs. The well is set INTO the sand, not raised on a platform; no bucket, no winch or windlass, no pump. The centre of the view is OPEN to the beach, not a wall of trees; the gap opens onto sand, not water. Shot on a full-frame DSLR at 24mm, f/8, late afternoon, about an hour before sunset: the sun has dropped behind the high cliffs at the head of the valley, so the valley floor and the beach lie in soft, cool, luminous shade, while warm gold light still falls high on the upper cliff faces against a clear deep-blue sky, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above \u2014 no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a plain stand of grey ironwood trunks over a floor of fallen brown needles, calm and even, with no visible seam, join, or repetition."
-      }
+        "scenePrompt": "This is a seamless 360-degree panorama from a small sandy clearing in the grove of ironwood and hala trees behind the black-sand beach at the mouth of Waipi\u02bbo Valley, with an old stone-lined well in it, open to the beach on one side. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stand of grey ironwood trunks over a floor of fallen brown needles, calm and even: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: grey ironwood trunks over a floor of brown needles, joining its other half cleanly at the seam directly behind you; just left of centre, set into the sand of the clearing close to the viewer, a round well lined with fitted grey stones, its low dry-stone rim at knee height, dark still water a little way down inside; EXACTLY two wooden posts stand in the sand on either side of the rim, a crossbar spans the opening between their tops, and from the crossbar three round brown water gourds hang on cords over the water, swaying a little on their cords; dead ahead in the centre, the sand of the clearing runs level straight ahead through a wide gap in the trees onto the back of the open black-sand beach, the sea beyond; off to the right along the sand, small and far, the double-hulled voyaging canoe with its furled sail; to the right, ironwood and hala trees closing round the clearing, their trunks close together, flecks of the gold-lit sea glinting between them; on the far right, the right half of the calm view directly behind the viewer: grey ironwood trunks over a floor of brown needles, joining its other half cleanly at the seam directly behind you. cool shade under the needles, quiet and close, the bright beach framed in the gap, painterly realism. No people, no figures, no lettering, signs or text anywhere (the one plain blank wooden plaque board, where described, carries no marks). Nothing modern: no pumps, pipes, concrete, fences, buildings, vehicles, power lines, roads or motorboats. No temple platforms, no graves or burial markers, no carved figures, no petroglyphs. The well is set INTO the sand, not raised on a platform; no bucket, no winch or windlass, no pump. The centre of the view is OPEN to the beach, not a wall of trees; the gap opens onto sand, not water. Shot on a full-frame DSLR at 24mm, f/8, late afternoon, about an hour before sunset: the sun has dropped behind the high cliffs at the head of the valley, so the valley floor and the beach lie in soft, cool, luminous shade, while warm gold light still falls high on the upper cliff faces against a clear deep-blue sky, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above \u2014 no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a plain stand of grey ironwood trunks over a floor of fallen brown needles, calm and even, with no visible seam, join, or repetition.",
+        "seam": {
+          "stage": "screened",
+          "band": "mid",
+          "ratio": 2.35,
+          "delta": 6.78,
+          "needsWork": false,
+          "accepted": false,
+          "seamBandRun": 0.011,
+          "at": "2026-10-20T14:16:09"
+        }
+      },
+      "panorama": "well/scene.png",
+      "builtFrom": "l1_well_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "hotspots": [
+        {
+          "id": "the_coastal_well",
+          "type": "station",
+          "label": "The coastal well",
+          "box": [
+            0.2295,
+            0.5687,
+            0.3062,
+            0.6842
+          ],
+          "tier": 1,
+          "boxSource": "draft:skeleton"
+        },
+        {
+          "id": "back_to_the_beach",
+          "type": "door",
+          "label": "Back to the beach",
+          "box": [
+            0.5367,
+            0.4894,
+            0.6135,
+            0.5854
+          ],
+          "direction": "back",
+          "to": "beach",
+          "boxSource": "draft:skeleton"
+        },
+        {
+          "id": "clip_base",
+          "type": "ambient",
+          "label": "Scene motion (base)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/play-source.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "well/cine_base.mp4"
+          }
+        }
+      ],
+      "sfx": [
+        {
+          "src": "audio/well_bed_grove_wind.mp3",
+          "mode": "loop",
+          "volume": 0.9
+        },
+        {
+          "src": "audio/well_shot_gourd_knock.mp3",
+          "mode": "interval",
+          "volume": 0.6,
+          "gapMin": 8,
+          "gapMax": 20
+        }
+      ]
     },
     {
       "key": "stream",
       "title": "The stream in the taro",
-      "built": false,
+      "built": true,
       "unlockedWhen": true,
       "designNote": "LEVEL 2 station (2 gourds). The server deals an ordination task; no puzzle content here.",
       "plannedHotspots": [
@@ -4166,23 +4307,52 @@
           "type": "door",
           "direction": "back",
           "to": "beach",
-          "label": "Back down to the beach"
+          "label": "Back down to the beach",
+          "box": [
+            0.135,
+            0.5,
+            0.2182,
+            0.756
+          ],
+          "boxSource": "draft:skeleton"
         },
         {
           "type": "plaque",
           "label": "The taro terraces",
-          "note": "wonder: at its peak the valley likely supported about 10,000 people on its taro"
+          "note": "wonder: at its peak the valley likely supported about 10,000 people on its taro",
+          "box": [
+            0.28,
+            0.55,
+            0.32,
+            0.75
+          ],
+          "boxSource": "draft:skeleton",
+          "image": "plaques/the_taro_terraces.png"
         },
         {
           "type": "station",
           "tier": 2,
-          "label": "The stream"
+          "label": "The stream",
+          "box": [
+            0.2864,
+            0.5437,
+            0.528,
+            0.6047
+          ],
+          "boxSource": "draft:skeleton"
         },
         {
           "type": "door",
           "direction": "open",
           "to": "spring",
-          "label": "Up to the spring"
+          "label": "Up to the spring",
+          "box": [
+            0.496,
+            0.4921,
+            0.504,
+            1.0
+          ],
+          "boxSource": "draft:skeleton"
         }
       ],
       "authoring": {
@@ -4197,7 +4367,7 @@
             {
               "id": "seam_left",
               "at": "on the far left",
-              "desc": "the left half of the calm view directly behind the viewer: flat flooded taro terraces running to the foot of a sheer green cliff, joining its other half cleanly at the seam directly behind you"
+              "desc": "the left half of the calm view directly behind the viewer: flat flooded taro terraces running to the foot of one shaded, densely wooded green cliff, its forested skyline high and level near the top of the frame, crossing the left edge of the frame at exactly the same height, in the same shade and the same unbroken green forest as where the cliff meets the right edge, with no sunlit rock face, no bare cliff wall, no ridge peak and no band of open sky below the skyline anywhere in the outermost 184 px, joining its other half cleanly at the seam directly behind you"
             },
             {
               "id": "path_down",
@@ -4207,7 +4377,7 @@
                 "direction": "back",
                 "to": "beach"
               },
-              "desc": "from under the viewer's feet, the earth path runs back down the flat valley floor between the terraces, beside the stream, toward the mouth of the valley, where a thin bright line of sea shows far off between the cliffs"
+              "desc": "from under the viewer's feet, the earth path runs back down the flat valley floor between the terraces, beside the stream, toward the mouth of the valley, where a thin bright line of sea shows far off in one narrow gap between the cliffs; that gap and its sunlit gold cliff faces sit roughly 450 to 900 px in from the left edge of the frame, beside the path, never nearer the edge than 450 px, standing well in from the edge of the frame, with the shaded, densely wooded green cliff and its high level forested skyline filling everything between them and that edge"
             },
             {
               "id": "taro_plaque",
@@ -4251,14 +4421,14 @@
             {
               "id": "seam_right",
               "at": "on the far right",
-              "desc": "the right half of the calm view directly behind the viewer: flat flooded taro terraces running to the foot of a sheer green cliff, joining its other half cleanly at the seam directly behind you"
+              "desc": "the right half of the calm view directly behind the viewer: flat flooded taro terraces running to the foot of one shaded, densely wooded green cliff, its forested skyline high and level near the top of the frame, crossing the right edge of the frame at exactly the same height, in the same shade and the same unbroken green forest as where the cliff meets the left edge, with no sunlit rock face, no bare cliff wall, no ridge peak, no waterfall and no band of open sky below the skyline anywhere in the outermost 184 px; the valley-head waterfall and every sunlit gold cliff face stand well in from the edge of the frame, at least 450 px from it, with the shaded, densely wooded green cliff between them and that edge; joining its other half cleanly at the seam directly behind you"
             }
           ],
           "soundBed": "the open valley floor: the stream chattering over stones, birdsong, a light breeze in the taro.",
           "rigid": "the terrace banks, the taro plants, the earth oven, the cliffs, the waterfall far away, the plaque",
           "atmosphere": "the valley floor in cool, even shade, the flooded terraces mirroring the sky, broad heart-shaped taro leaves, gold light high on the cliff tops, lush and still, painterly realism",
           "styleLight": "late afternoon, about an hour before sunset: the sun has dropped behind the high cliffs at the head of the valley, so the valley floor and the beach lie in soft, cool, luminous shade, while warm gold light still falls high on the upper cliff faces against a clear deep-blue sky",
-          "negatives": "No people, no figures, no lettering, signs or text anywhere (the one plain blank wooden plaque board, where described, carries no marks). Nothing modern: no pumps, pipes, concrete, fences, buildings, vehicles, power lines, roads or motorboats. No temple platforms, no graves or burial markers, no carved figures, no petroglyphs. The path is level with the stream bank and the terrace banks and does not cross water; the terraces are flat and flooded, not stepped up a hillside; nobody tends the oven.",
+          "negatives": "No people, no figures, no lettering, signs or text anywhere (the one plain blank wooden plaque board, where described, carries no marks). Nothing modern: no pumps, pipes, concrete, fences, buildings, vehicles, power lines, roads or motorboats. No temple platforms, no graves or burial markers, no carved figures, no petroglyphs. The path is level with the stream bank and the terrace banks and does not cross water; the terraces are flat and flooded, not stepped up a hillside; nobody tends the oven. The outermost 184 px at each side edge show only the flat flooded taro terraces, the terrace bank and the earth path in front, and behind them one shaded, densely wooded green cliff whose forested skyline is high and level and crosses both side edges at exactly the same height. Neither edge margin may contain a sunlit gold cliff face, a bare rock wall, a ridge peak, a cliff end or a stretch of open sky dropping below the skyline. The warm gold light on the cliffs stays well inboard of both margins. Where the left edge and the right edge of the frame meet behind the viewer, the cliff is one continuous shaded wooded ridge: its skyline, its forest and its foot sit at the same height on both edges, with the same clear sky above it, so the two edges join as a single unbroken cliff. The outermost 184 px at the left edge show no part of the valley-mouth vista: no sunlit gold cliff face, no bare rock wall, no receding cliff line and no open sky below the skyline; the vista to the sea, its sunlit cliff faces and their light sit well inboard, and the left edge shows only the shaded, densely wooded green cliff whose forested skyline is high and level at the same height as at the right edge, above the flat flooded taro terraces and the terrace bank. The sunlit valley-mouth vista, its gold cliff faces, the open sky above them and the light they cast stay at least 450 px in from the left edge; the outermost 184 px at the left edge show only the shaded, densely wooded green cliff, its forested skyline at the same height as at the right edge, above the flat flooded taro terraces, the terrace bank and the earth path. The valley-head waterfall, every sunlit gold cliff face and the open sky above them stay at least 450 px in from the right edge; the outermost 184 px at the right edge show only the shaded, densely wooded green cliff, its forested skyline at the same height as at the left edge, above the flat flooded taro terraces, the terrace bank and the earth path.",
           "states": {},
           "continuity": [],
           "scaffold": {
@@ -6183,13 +6353,104 @@
         "plateRefs": [
           "beach/scene.png"
         ],
-        "scenePrompt": "This is a seamless 360-degree panorama from the earth path along the bank of the clear stream in the middle of the flat floor of Waipi\u02bbo Valley, among flooded taro terraces, the great cliffs rising on both sides. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is flat flooded taro terraces running away to the foot of a sheer green cliff, calm and even: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: flat flooded taro terraces running to the foot of a sheer green cliff, joining its other half cleanly at the seam directly behind you; to the left, from under the viewer's feet, the earth path runs back down the flat valley floor between the terraces, beside the stream, toward the mouth of the valley, where a thin bright line of sea shows far off between the cliffs; just left of centre, on the path's edge beside the nearest terrace, a small plain blank board of dark koa wood with a pale carved border, on a single low post with a ring of white coral stones round its foot, its face bare, unlike anything else in the scene; dead ahead in the centre, right at the edge of the path, level with it, the stream itself: clear, cool, knee-deep water running quickly over dark smooth stones, with flooded taro terraces beyond its far bank; just right of centre, on the far bank of the stream, at the edge of a terrace, a low smoking earth oven: a round mound of earth and banana leaves heaped over hot stones, a thick column of pale smoke rising from it, curling as it climbs; to the right, from under the viewer's feet, the earth path runs straight on up the flat valley floor between the flooded taro terraces, beside the stream, toward the head of the valley, where one tall waterfall drops the whole height of the cliff; on the far right, the right half of the calm view directly behind the viewer: flat flooded taro terraces running to the foot of a sheer green cliff, joining its other half cleanly at the seam directly behind you. the valley floor in cool, even shade, the flooded terraces mirroring the sky, broad heart-shaped taro leaves, gold light high on the cliff tops, lush and still, painterly realism. No people, no figures, no lettering, signs or text anywhere (the one plain blank wooden plaque board, where described, carries no marks). Nothing modern: no pumps, pipes, concrete, fences, buildings, vehicles, power lines, roads or motorboats. No temple platforms, no graves or burial markers, no carved figures, no petroglyphs. The path is level with the stream bank and the terrace banks and does not cross water; the terraces are flat and flooded, not stepped up a hillside; nobody tends the oven. Shot on a full-frame DSLR at 24mm, f/8, late afternoon, about an hour before sunset: the sun has dropped behind the high cliffs at the head of the valley, so the valley floor and the beach lie in soft, cool, luminous shade, while warm gold light still falls high on the upper cliff faces against a clear deep-blue sky, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above \u2014 no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into flat flooded taro terraces running away to the foot of a sheer green cliff, calm and even, with no visible seam, join, or repetition."
-      }
+        "scenePrompt": "This is a seamless 360-degree panorama from the earth path along the bank of the clear stream in the middle of the flat floor of Waipi\u02bbo Valley, among flooded taro terraces, the great cliffs rising on both sides. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is flat flooded taro terraces running away to the foot of a sheer green cliff, calm and even: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: flat flooded taro terraces running to the foot of one shaded, densely wooded green cliff, its forested skyline high and level near the top of the frame, crossing the left edge of the frame at exactly the same height, in the same shade and the same unbroken green forest as where the cliff meets the right edge, with no sunlit rock face, no bare cliff wall, no ridge peak and no band of open sky below the skyline anywhere in the outermost 184 px, joining its other half cleanly at the seam directly behind you; to the left, from under the viewer's feet, the earth path runs back down the flat valley floor between the terraces, beside the stream, toward the mouth of the valley, where a thin bright line of sea shows far off in one narrow gap between the cliffs; that gap and its sunlit gold cliff faces sit roughly 450 to 900 px in from the left edge of the frame, beside the path, never nearer the edge than 450 px, standing well in from the edge of the frame, with the shaded, densely wooded green cliff and its high level forested skyline filling everything between them and that edge; just left of centre, on the path's edge beside the nearest terrace, a small plain blank board of dark koa wood with a pale carved border, on a single low post with a ring of white coral stones round its foot, its face bare, unlike anything else in the scene; dead ahead in the centre, right at the edge of the path, level with it, the stream itself: clear, cool, knee-deep water running quickly over dark smooth stones, with flooded taro terraces beyond its far bank; just right of centre, on the far bank of the stream, at the edge of a terrace, a low smoking earth oven: a round mound of earth and banana leaves heaped over hot stones, a thick column of pale smoke rising from it, curling as it climbs; to the right, from under the viewer's feet, the earth path runs straight on up the flat valley floor between the flooded taro terraces, beside the stream, toward the head of the valley, where one tall waterfall drops the whole height of the cliff; on the far right, the right half of the calm view directly behind the viewer: flat flooded taro terraces running to the foot of one shaded, densely wooded green cliff, its forested skyline high and level near the top of the frame, crossing the right edge of the frame at exactly the same height, in the same shade and the same unbroken green forest as where the cliff meets the left edge, with no sunlit rock face, no bare cliff wall, no ridge peak, no waterfall and no band of open sky below the skyline anywhere in the outermost 184 px; the valley-head waterfall and every sunlit gold cliff face stand well in from the edge of the frame, at least 450 px from it, with the shaded, densely wooded green cliff between them and that edge; joining its other half cleanly at the seam directly behind you. the valley floor in cool, even shade, the flooded terraces mirroring the sky, broad heart-shaped taro leaves, gold light high on the cliff tops, lush and still, painterly realism. No people, no figures, no lettering, signs or text anywhere (the one plain blank wooden plaque board, where described, carries no marks). Nothing modern: no pumps, pipes, concrete, fences, buildings, vehicles, power lines, roads or motorboats. No temple platforms, no graves or burial markers, no carved figures, no petroglyphs. The path is level with the stream bank and the terrace banks and does not cross water; the terraces are flat and flooded, not stepped up a hillside; nobody tends the oven. The outermost 184 px at each side edge show only the flat flooded taro terraces, the terrace bank and the earth path in front, and behind them one shaded, densely wooded green cliff whose forested skyline is high and level and crosses both side edges at exactly the same height. Neither edge margin may contain a sunlit gold cliff face, a bare rock wall, a ridge peak, a cliff end or a stretch of open sky dropping below the skyline. The warm gold light on the cliffs stays well inboard of both margins. Where the left edge and the right edge of the frame meet behind the viewer, the cliff is one continuous shaded wooded ridge: its skyline, its forest and its foot sit at the same height on both edges, with the same clear sky above it, so the two edges join as a single unbroken cliff. The outermost 184 px at the left edge show no part of the valley-mouth vista: no sunlit gold cliff face, no bare rock wall, no receding cliff line and no open sky below the skyline; the vista to the sea, its sunlit cliff faces and their light sit well inboard, and the left edge shows only the shaded, densely wooded green cliff whose forested skyline is high and level at the same height as at the right edge, above the flat flooded taro terraces and the terrace bank. The sunlit valley-mouth vista, its gold cliff faces, the open sky above them and the light they cast stay at least 450 px in from the left edge; the outermost 184 px at the left edge show only the shaded, densely wooded green cliff, its forested skyline at the same height as at the right edge, above the flat flooded taro terraces, the terrace bank and the earth path. The valley-head waterfall, every sunlit gold cliff face and the open sky above them stay at least 450 px in from the right edge; the outermost 184 px at the right edge show only the shaded, densely wooded green cliff, its forested skyline at the same height as at the left edge, above the flat flooded taro terraces, the terrace bank and the earth path. Shot on a full-frame DSLR at 24mm, f/8, late afternoon, about an hour before sunset: the sun has dropped behind the high cliffs at the head of the valley, so the valley floor and the beach lie in soft, cool, luminous shade, while warm gold light still falls high on the upper cliff faces against a clear deep-blue sky, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above \u2014 no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into flat flooded taro terraces running away to the foot of a sheer green cliff, calm and even, with no visible seam, join, or repetition.",
+        "seam": {
+          "stage": "screened",
+          "band": "sky",
+          "ratio": 2.21,
+          "delta": 3.26,
+          "needsWork": false,
+          "accepted": false,
+          "seamBandRun": 0.002,
+          "at": "2026-10-20T15:50:15"
+        },
+        "boxesFrom": {
+          "art": "2fa343ec21ae",
+          "at": "2026-10-20T15:52:17"
+        }
+      },
+      "sfx": [
+        {
+          "src": "audio/stream_bed_brook.mp3",
+          "mode": "loop",
+          "volume": 0.7
+        },
+        {
+          "src": "audio/stream_bed_oven_crackle.mp3",
+          "mode": "loop",
+          "volume": 0.35
+        }
+      ],
+      "panorama": "stream/scene.png",
+      "builtFrom": "l1_stream_2.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "hotspots": [
+        {
+          "id": "back_down_to_the_beach",
+          "type": "door",
+          "label": "Back down to the beach",
+          "box": [
+            0.135,
+            0.5,
+            0.2182,
+            0.756
+          ],
+          "direction": "back",
+          "to": "beach",
+          "boxSource": "draft:skeleton"
+        },
+        {
+          "id": "the_taro_terraces",
+          "type": "plaque",
+          "label": "The taro terraces",
+          "box": [
+            0.28,
+            0.55,
+            0.32,
+            0.75
+          ],
+          "boxSource": "draft:skeleton",
+          "image": "plaques/the_taro_terraces.png"
+        },
+        {
+          "id": "the_stream",
+          "type": "station",
+          "label": "The stream",
+          "box": [
+            0.2864,
+            0.5437,
+            0.528,
+            0.6047
+          ],
+          "tier": 2,
+          "boxSource": "draft:skeleton"
+        },
+        {
+          "id": "up_to_the_spring",
+          "type": "door",
+          "label": "Up to the spring",
+          "box": [
+            0.496,
+            0.4921,
+            0.504,
+            1.0
+          ],
+          "direction": "open",
+          "to": "spring",
+          "boxSource": "draft:skeleton"
+        }
+      ]
     },
     {
       "key": "spring",
       "title": "The spring under the falls",
-      "built": false,
+      "built": true,
       "unlockedWhen": true,
       "designNote": "LEVEL 3 station (3 gourds). The server deals a biplot task; no puzzle content here.",
       "plannedHotspots": [
@@ -6197,17 +6458,39 @@
           "type": "door",
           "direction": "back",
           "to": "stream",
-          "label": "Back down the valley"
+          "label": "Back down the valley",
+          "box": [
+            0.024,
+            0.698,
+            0.1968,
+            0.89
+          ],
+          "boxSource": "draft:skeleton"
         },
         {
           "type": "station",
           "tier": 3,
-          "label": "The spring"
+          "label": "The spring",
+          "box": [
+            0.1561,
+            0.5264,
+            0.4141,
+            0.6064
+          ],
+          "boxSource": "draft:skeleton"
         },
         {
           "type": "plaque",
           "label": "Where the river starts",
-          "note": "wonder: the river runs from the foot of the largest falls at the back of the valley to the sea"
+          "note": "wonder: the river runs from the foot of the largest falls at the back of the valley to the sea",
+          "image": "plaques/where_the_river_starts.png",
+          "box": [
+            0.62,
+            0.579,
+            0.65,
+            0.675
+          ],
+          "boxSource": "draft:skeleton"
         }
       ],
       "authoring": {
@@ -8203,13 +8486,92 @@
         "plateRefs": [
           "beach/scene.png"
         ],
-        "scenePrompt": "This is a seamless 360-degree panorama from a flat rock ledge at the edge of the clear pool at the head of Waipi\u02bbo Valley, where the largest waterfall drops the whole height of the cliff into it and the stream begins. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a jumble of mossy boulders and ferns on the valley floor below a sheer cliff, calm and even: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: mossy boulders and ferns on the valley floor below a sheer cliff, joining its other half cleanly at the seam directly behind you; to the left, the rock ledge under the viewer's feet joins the end of the earth path, which runs back down the flat green valley floor beside the young stream, toward the distant mouth of the valley; just left of centre, right at the edge of the ledge, the clear cold pool at the foot of the falls, its water so clean the stones on the bottom show; on its left-hand edge, beside the end of the path, the water slips over a low lip of dark rock to begin the stream; dead ahead in the centre, beyond the pool, one tall, full waterfall dropping the whole height of the sheer green cliff straight into the far side of the pool, a broad cloud of white spray at its foot, falling steadily; just right of centre, on the ledge a few steps to the right of the viewer, a small plain blank board of dark koa wood with a pale carved border, on a single low post with a ring of white coral stones round its foot, its face bare, unlike anything else in the scene; to the right, the sheer cliff curving round the head of the valley, hung with ferns and moss, wet and dark green, closing in the pool on this side; on the far right, the right half of the calm view directly behind the viewer: mossy boulders and ferns on the valley floor below a sheer cliff, joining its other half cleanly at the seam directly behind you. cool, damp and enclosed, the pool and the ledge in deep shade, gold light only high on the top of the falls and the rim of the cliff, fine mist in the air, ferns glistening, painterly realism. No people, no figures, no lettering, signs or text anywhere (the one plain blank wooden plaque board, where described, carries no marks). Nothing modern: no pumps, pipes, concrete, fences, buildings, vehicles, power lines, roads or motorboats. No temple platforms, no graves or burial markers, no carved figures, no petroglyphs. Only ONE waterfall into the pool; the ledge is level with the end of the path and the viewer stands on dry rock, not in the water. Shot on a full-frame DSLR at 24mm, f/8, late afternoon, about an hour before sunset: the sun has dropped behind the high cliffs at the head of the valley, so the valley floor and the beach lie in soft, cool, luminous shade, while warm gold light still falls high on the upper cliff faces against a clear deep-blue sky, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above \u2014 no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a jumble of mossy boulders and ferns on the valley floor below a sheer cliff, calm and even, with no visible seam, join, or repetition."
-      }
+        "scenePrompt": "This is a seamless 360-degree panorama from a flat rock ledge at the edge of the clear pool at the head of Waipi\u02bbo Valley, where the largest waterfall drops the whole height of the cliff into it and the stream begins. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a jumble of mossy boulders and ferns on the valley floor below a sheer cliff, calm and even: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: mossy boulders and ferns on the valley floor below a sheer cliff, joining its other half cleanly at the seam directly behind you; to the left, the rock ledge under the viewer's feet joins the end of the earth path, which runs back down the flat green valley floor beside the young stream, toward the distant mouth of the valley; just left of centre, right at the edge of the ledge, the clear cold pool at the foot of the falls, its water so clean the stones on the bottom show; on its left-hand edge, beside the end of the path, the water slips over a low lip of dark rock to begin the stream; dead ahead in the centre, beyond the pool, one tall, full waterfall dropping the whole height of the sheer green cliff straight into the far side of the pool, a broad cloud of white spray at its foot, falling steadily; just right of centre, on the ledge a few steps to the right of the viewer, a small plain blank board of dark koa wood with a pale carved border, on a single low post with a ring of white coral stones round its foot, its face bare, unlike anything else in the scene; to the right, the sheer cliff curving round the head of the valley, hung with ferns and moss, wet and dark green, closing in the pool on this side; on the far right, the right half of the calm view directly behind the viewer: mossy boulders and ferns on the valley floor below a sheer cliff, joining its other half cleanly at the seam directly behind you. cool, damp and enclosed, the pool and the ledge in deep shade, gold light only high on the top of the falls and the rim of the cliff, fine mist in the air, ferns glistening, painterly realism. No people, no figures, no lettering, signs or text anywhere (the one plain blank wooden plaque board, where described, carries no marks). Nothing modern: no pumps, pipes, concrete, fences, buildings, vehicles, power lines, roads or motorboats. No temple platforms, no graves or burial markers, no carved figures, no petroglyphs. Only ONE waterfall into the pool; the ledge is level with the end of the path and the viewer stands on dry rock, not in the water. Shot on a full-frame DSLR at 24mm, f/8, late afternoon, about an hour before sunset: the sun has dropped behind the high cliffs at the head of the valley, so the valley floor and the beach lie in soft, cool, luminous shade, while warm gold light still falls high on the upper cliff faces against a clear deep-blue sky, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above \u2014 no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a jumble of mossy boulders and ferns on the valley floor below a sheer cliff, calm and even, with no visible seam, join, or repetition.",
+        "seam": {
+          "stage": "screened",
+          "band": "sky",
+          "ratio": 2.05,
+          "delta": 4.23,
+          "needsWork": false,
+          "accepted": false,
+          "seamBandRun": 0.003,
+          "at": "2026-10-20T14:55:35"
+        }
+      },
+      "sfx": [
+        {
+          "src": "audio/spring_bed_falls_roar.mp3",
+          "mode": "loop",
+          "volume": 0.16365904351681873
+        },
+        {
+          "src": "audio/spring_bed_falls_splash.mp3",
+          "mode": "loop",
+          "volume": 0.22409904648748746
+        }
+      ],
+      "panorama": "spring/scene.png",
+      "builtFrom": "l1_spring_2.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "hotspots": [
+        {
+          "id": "back_down_the_valley",
+          "type": "door",
+          "label": "Back down the valley",
+          "box": [
+            0.024,
+            0.698,
+            0.1968,
+            0.89
+          ],
+          "direction": "back",
+          "to": "stream",
+          "boxSource": "draft:skeleton"
+        },
+        {
+          "id": "the_spring",
+          "type": "station",
+          "label": "The spring",
+          "box": [
+            0.1561,
+            0.5264,
+            0.4141,
+            0.6064
+          ],
+          "tier": 3,
+          "boxSource": "draft:skeleton"
+        },
+        {
+          "id": "where_the_river_starts",
+          "type": "plaque",
+          "label": "Where the river starts",
+          "box": [
+            0.62,
+            0.579,
+            0.65,
+            0.675
+          ],
+          "image": "plaques/where_the_river_starts.png",
+          "boxSource": "draft:skeleton"
+        }
+      ]
     }
   ],
   "_designNotes": {
     "buildState": "Rooms, graph and scene specs written by _scratch/build_scenario.py (step 4b, 2026-10-20). Live scenario: puzzles are dealt by the live-class server (authoring_v2/live_class/pool/voyage.json), never stored here. No codec id, no escape, ungraded. See notes.md."
   },
   "worldPlatePrompt": "One continuous single-frame view, from just off the beach, of Waipi\u02bbo Valley on the windward coast of Hawai\u02bbi Island: a deep, flat-floored valley about a mile wide between sheer green cliffs nearly two thousand feet high, ribbed with thin waterfalls; a wide black-sand beach at its mouth where a clear stream runs out to the sea; flooded taro terraces on the valley floor; groves of ironwood and hala trees behind the beach. Soft even daylight, neither dawn nor sunset. Painterly realism, lush deep greens, black sand, clear turquoise water at the stream mouth. No people, no text, nothing modern.",
-  "coverPrompt": "Minimalist stylised thumbnail poster: a Polynesian double-hulled voyaging canoe with a furled crab-claw sail, resting on a black-sand beach at the mouth of a deep green valley, one thin waterfall far back between the cliffs. One bold, simple, high-contrast silhouette that reads at thumbnail size; flat limited palette of deep green, black sand, turquoise sea and one warm amber glow of the low sun behind the valley. Strong negative space, single centred subject, soft film grain. No people, no text."
+  "coverPrompt": "Minimalist stylised thumbnail poster: a Polynesian double-hulled voyaging canoe with a furled crab-claw sail, resting on a black-sand beach at the mouth of a deep green valley, one thin waterfall far back between the cliffs. One bold, simple, high-contrast silhouette that reads at thumbnail size; flat limited palette of deep green, black sand, turquoise sea and one warm amber glow of the low sun behind the valley. Strong negative space, single centred subject, soft film grain. No people, no text.",
+  "music": "audio/forestal_tape.mp3",
+  "musicVolume": 0.25,
+  "musicCredit": {
+    "text": "Las Luces Primeras - Forestal Tape",
+    "url": "https://www.youtube.com/watch?v=OJUorlL1nIc"
+  }
 }

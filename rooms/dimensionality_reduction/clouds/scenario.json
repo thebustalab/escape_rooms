@@ -1,5 +1,5 @@
 {
-  "status": "in_development",
+  "status": "ready",
   "_designNotes": {
     "buildState": "Seven ring rooms have art, clips and sound; pre-art content written 2026-10-16 by _scratch/wire_content.py (see notes.md). The Eye has art, a clip, the keyed state and the climb-out transit on its release (2026-10-18)."
   },
@@ -11,8 +11,8 @@
   "story": "The storm has you. No matter how you bank, it will not let go, and it carries you round and round the city at its heart. And the city is wrong. It is deeper than the space it stands in, seven dimensions deep, and from out here you only ever see its shadows, strange colors, and phasing. From most angles, you see it as a heap of towers growing through one another. But by looking from the right headings, maybe it might make sense... Your orders: sample the cloud-gardens drifting through the storm to chart the city, then find the two headings at which the city's properties align and follow them. That is the only way out.",
   "enterLabel": "Take the controls",
   "done": {
-    "title": "The survey is charted",
-    "body": "Both of the city's great shadows lie charted on the console. Out in the eyewall the lightning stutters and stops, and on your dash the six dark cells around the override begin, faintly, to glow. Somewhere on the ring, over the city's heart, the cloud has parted."
+    "title": "The cloud gardens, understood.",
+    "body": "You've successfully analyzed the cloud gardens! Out in the eyewall the lightning stutters and stops, and on your dash the six dark cells around the override begin, faintly, to glow. Somewhere on the ring, over the city's heart, the cloud begins to part. Can you find your way out?"
   },
   "escapeDone": {
     "title": "Out of the storm",
@@ -533,12 +533,12 @@
           },
           "queueEmptyBody": "The survey is charted. The reading-pane holds both of the city's great shadows, and asks nothing more.",
           "box": [
-            0.419,
-            0.725,
-            0.581,
-            0.895
+            0.2636,
+            0.6405,
+            0.4256,
+            0.8105
           ],
-          "boxSource": "measured:agent-vision",
+          "boxSource": "moved:testplay",
           "boxNote": "the milky crystal reading-pane at the centre of the dash, measured by eye on ap_grainrun/scene.png (coordinate grid), 2026-10-16"
         },
         {
@@ -782,12 +782,12 @@
           },
           "queueEmptyBody": "The survey is charted. The reading-pane holds both of the city's great shadows, and asks nothing more.",
           "box": [
-            0.435,
-            0.75,
-            0.563,
-            0.897
+            0.3103,
+            0.6603,
+            0.4383,
+            0.8073
           ],
-          "boxSource": "measured:agent-vision",
+          "boxSource": "moved:testplay",
           "boxNote": "the milky crystal reading-pane at the centre of the dash, measured by eye on ap_pileup/scene.png (coordinate grid), 2026-10-16"
         },
         {
@@ -1074,12 +1074,12 @@
           },
           "queueEmptyBody": "The survey is charted. The reading-pane holds both of the city's great shadows, and asks nothing more.",
           "box": [
-            0.419,
-            0.725,
-            0.581,
-            0.895
+            0.2647,
+            0.6555,
+            0.4267,
+            0.8255
           ],
-          "boxSource": "measured:agent-vision",
+          "boxSource": "moved:testplay",
           "boxNote": "the milky crystal reading-pane at the centre of the dash, measured by eye on ap_stillstand/scene.png (coordinate grid), 2026-10-16"
         },
         {
@@ -1323,12 +1323,12 @@
           },
           "queueEmptyBody": "The survey is charted. The reading-pane holds both of the city's great shadows, and asks nothing more.",
           "box": [
-            0.42,
-            0.7,
-            0.576,
-            0.862
+            0.2747,
+            0.6051,
+            0.4307,
+            0.7671
           ],
-          "boxSource": "measured:agent-vision",
+          "boxSource": "moved:testplay",
           "boxNote": "the milky crystal reading-pane at the centre of the dash, measured by eye on ap_smear/scene.png (coordinate grid), 2026-10-16"
         },
         {
@@ -1572,12 +1572,12 @@
           },
           "queueEmptyBody": "The survey is charted. The reading-pane holds both of the city's great shadows, and asks nothing more.",
           "box": [
-            0.42,
-            0.7,
-            0.574,
-            0.86
+            0.2724,
+            0.5959,
+            0.4264,
+            0.7559
           ],
-          "boxSource": "measured:agent-vision",
+          "boxSource": "moved:testplay",
           "boxNote": "the milky crystal reading-pane at the centre of the dash, measured by eye on ap_halflight/scene.png (coordinate grid), 2026-10-16"
         },
         {
@@ -1822,12 +1822,12 @@
           },
           "queueEmptyBody": "The survey is charted. The reading-pane holds both of the city's great shadows, and asks nothing more.",
           "box": [
-            0.432,
-            0.745,
-            0.563,
-            0.89
+            0.3101,
+            0.628,
+            0.4411,
+            0.773
           ],
-          "boxSource": "measured:agent-vision",
+          "boxSource": "moved:testplay",
           "boxNote": "the milky crystal reading-pane at the centre of the dash, measured by eye on ap_backwind/scene.png (coordinate grid), 2026-10-16"
         },
         {
@@ -2418,22 +2418,22 @@
     },
     {
       "label": "The survey console",
-      "note": "RUNG 4 (boss) · PC1-fixation trap, repair. ANSWER acidity (Dim_2 0.904). Archive mean Dim_1 -0.27 (mid-pack), Dim_2 2.08. The broken starter returns filament_length (archive gap 0.08).",
-      "starterCode": "pca_ord <- runMatrixAnalysis(\n  data = cloud_gardens,\n  analysis = \"pca_ord\",\n  columns_w_values_for_single_analyte = colnames(cloud_gardens)[3:9],\n  columns_w_sample_ID_info = c(\"bloom\", \"district\")\n)\n\n# This is meant to find the property that marks out the ARCHIVE district.\n# It reads the first principal component, Dim_1, but do the archive blooms separate there?\nanswer <- arrange(pca_ord, desc(abs(Dim_1)))$analyte[1]\nanswer",
+      "note": "RUNG 4 (boss) · PC1-fixation trap, from scratch (starter is the bare data object, Lucas 2026-10-20). ANSWER acidity (Dim_2 0.904). Archive mean Dim_1 -0.27 (mid-pack), Dim_2 2.08. The trap answer is filament_length, the Dim_1 driver from rung 3 (archive gap 0.08).",
+      "starterCode": "cloud_gardens",
       "check": {
-        "prompt": "The override wakes only for the property that sets the ARCHIVE district apart from every other district. The code below reads the first principal component (Dim_1) and returns filament_length, but the archive blooms do not separate on Dim_1. Fix it to read the component that actually gathers the archive blooms, then assign that property's name to `answer`.",
+        "prompt": "The override wakes only for the property that sets the ARCHIVE district apart from every other district. Find the principal component along which the archive blooms separate from the rest, find the property that drives that component, and assign that property's name to `answer`.",
         "requires": [
           "answer"
         ],
         "expr": "tolower(as.character(answer)) == \"acidity\"",
         "maxAttempts": 5,
-        "hint": "On Dim_1 the archive blooms sit mid-pack; they gather on Dim_2 instead. Change the column the code sorts by from Dim_1 to Dim_2.",
+        "hint": "Plot the scores (analysis = \"pca\") colored by district and look at where the archive blooms sit on Dim_1 and on Dim_2. Then read the driver of whichever component separates them from the ordination (analysis = \"pca_ord\").",
         "feedback": {
           "correct": "Correct — noted in your field notebook: the archive district answers to acidity, the driver of the second principal component (Dim_2 of 0.90), not the first.",
           "wrong": [
-            "filament_length drives Dim_1, but check where the archive blooms sit on Dim_1: they are middling, not extreme. Which component separates them?",
-            "The archive blooms gather on the SECOND component. Sort the ordination by Dim_2 instead of Dim_1.",
-            "Change Dim_1 to Dim_2 in the arrange() line, then take the top analyte."
+            "Don't assume it is the first component. <code>pca_scores &lt;- runMatrixAnalysis(data = cloud_gardens, analysis = &quot;pca&quot;, columns_w_values_for_single_analyte = colnames(cloud_gardens)[3:9], columns_w_sample_ID_info = c(&quot;bloom&quot;, &quot;district&quot;))</code>, then plot Dim_1 against Dim_2 colored by district: where do the archive blooms sit?",
+            "On Dim_1 the archive blooms are middling, not extreme; they gather on the SECOND component. <code>pca_ord &lt;- runMatrixAnalysis(data = cloud_gardens, analysis = &quot;pca_ord&quot;, columns_w_values_for_single_analyte = colnames(cloud_gardens)[3:9], columns_w_sample_ID_info = c(&quot;bloom&quot;, &quot;district&quot;))</code>, then find its strongest Dim_2 driver.",
+            "Sort the ordination by Dim_2 magnitude, <code>arrange(pca_ord, desc(abs(Dim_2)))</code>, and assign the top analyte to <code>answer</code>."
           ]
         }
       }

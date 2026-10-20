@@ -17,13 +17,13 @@
  * `addStatusEl()`, `plotControls(opts)`, `resetSession()`, `resetControl(opts)`, `.ready`, `.webR`.
  */
 import { WebR } from "https://webr.r-wasm.org/latest/webr.mjs";
-import { VIEW_R_SHIM, VIEW_R_DRAIN, fromR, viewTableHTML, ensureViewStyles } from "./webr_view.js?v=133";
-import { codeToRun, selectionNote } from "./code_sel.js?v=133";
-import { PLOT_ASPECTS, PLOT_DEFAULT_ASPECT, PLOT_LIMITS, PLOT_CTL_CSS, plotGeometry } from "./plot_size.js?v=133";
-import { RESET_R_SHIM, RESET_R_CALL, RESET_CTL_CSS, RESET_LABEL, RESET_CONFIRM_LABEL, RESET_CONFIRM_MS, nextConfirmState } from "./webr_reset.js?v=133";
-import { explainError, looksLikeOrphanLayer } from "./r_diagnose.js?v=133";
-import { R_BIOC_REPOS, BASE_PACKAGES, ANALYSIS_PACKAGES, BIOC_PACKAGES, STATS_PACKAGES, resolvePackages } from "./r_packages.js?v=133";
-import { MATRIX_ANALYSIS_R_SHIM, STATS_TESTS_R_SHIM } from "./r_matrix_analysis.js?v=133";
+import { VIEW_R_SHIM, VIEW_R_DRAIN, fromR, viewTableHTML, ensureViewStyles } from "./webr_view.js?v=135";
+import { codeToRun, selectionNote } from "./code_sel.js?v=135";
+import { PLOT_ASPECTS, PLOT_DEFAULT_ASPECT, PLOT_LIMITS, PLOT_CTL_CSS, plotGeometry } from "./plot_size.js?v=135";
+import { RESET_R_SHIM, RESET_R_CALL, RESET_CTL_CSS, RESET_LABEL, RESET_CONFIRM_LABEL, RESET_CONFIRM_MS, nextConfirmState } from "./webr_reset.js?v=135";
+import { explainError, looksLikeOrphanLayer } from "./r_diagnose.js?v=135";
+import { R_BIOC_REPOS, BASE_PACKAGES, ANALYSIS_PACKAGES, BIOC_PACKAGES, STATS_PACKAGES, resolvePackages } from "./r_packages.js?v=135";
+import { MATRIX_ANALYSIS_R_SHIM, STATS_TESTS_R_SHIM, MODELS_R_SHIM } from "./r_matrix_analysis.js?v=135";
 
 const errText = e => (e && e.message ? e.message : String(e));
 
@@ -223,6 +223,9 @@ export class WebRConsole {
         statsOk = false;
         console.warn("[webr-console] rstatix unavailable:", errText(e));
       }
+      // The ch.12 regression verbs install nothing of their own (base R + tibble/dplyr); this flag
+      // only records whether their shim evaluated.
+      let modelsOk = true;
 
       for (const ds of (this.config.datasets || [])) {
         this.setStatus("Loading data: " + ds.name + " …");
@@ -310,6 +313,21 @@ export class WebRConsole {
         console.warn("[webr-console] test verbs unavailable:", errText(e));
       }
 
+      /*
+       * The regression verbs (book ch.12: buildModel2, predictWithModel), generated from
+       * phylochemistry.R with the other two shims and evaluated on their own, so a failure here cannot
+       * take runMatrixAnalysis or the test verbs down (and vice versa). They need only base R plus
+       * tibble/dplyr from the base stack; only model_type = "linear_regression" runs in the browser.
+       * Above RESET_R_SHIM so a reset keeps them; before the caller's setup, so a scenario that defines
+       * its own wins.
+       */
+      try {
+        await this.webR.evalRVoid(MODELS_R_SHIM);
+      } catch (e) {
+        modelsOk = false;
+        console.warn("[webr-console] regression verbs unavailable:", errText(e));
+      }
+
       if (this.config.setup) {
         this.setStatus("Preparing session…");
         await this.webR.evalRVoid(this.config.setup);
@@ -325,7 +343,7 @@ export class WebRConsole {
 
       this.ready = true;
       this.resetCtls.forEach(b => { b.disabled = false; });
-      const missing = [analysisOk ? "" : "runMatrixAnalysis()", statsOk ? "" : "the comparing-means tests (tTest() and the rest)"].filter(Boolean);
+      const missing = [analysisOk ? "" : "runMatrixAnalysis()", statsOk ? "" : "the comparing-means tests (tTest() and the rest)", modelsOk ? "" : "buildModel2() and predictWithModel()"].filter(Boolean);
       this.setStatus(!missing.length
         ? "R is ready. Type code below and press Run."
         : "R is ready, but " + missing.join(" and ") + " could not load — reload the page to try again.");

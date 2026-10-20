@@ -280,6 +280,8 @@ button.ghost { background:transparent; color:var(--ink); border:1px solid var(--
   color:#f1ead8; }
 .plaquekicker { font:600 11px/1.2 system-ui, sans-serif; letter-spacing:.18em; text-transform:uppercase; color:#d8b56e; text-align:center; margin-bottom:10px; }
 .plaqueimg { display:block; max-width:100%; max-height:42vh; margin:0 auto 12px; border-radius:6px; border:1px solid rgba(201,163,90,.55); }
+.plaquecard.imageonly { max-width:none; padding:0; background:none; border:none; box-shadow:none; }
+.plaquecard.imageonly .plaqueimg { max-height:78vh; margin:0 auto; border:none; }  /* text is in the image: let it be big enough to read */
 .plaquetitle { margin:0 0 8px; text-align:center; font:700 21px/1.25 Georgia, "Times New Roman", serif; color:#f3dca6; }
 .plaquebody { margin:0 0 10px; font:15px/1.6 Georgia, "Times New Roman", serif; }
 .plaquecredit { font-size:11px; opacity:.65; text-align:right; border-top:1px solid rgba(201,163,90,.3); padding-top:6px; }
@@ -594,7 +596,8 @@ code { background:#0a1620; padding:1px 5px; border-radius:4px; }
 .gridsel.tri th { font-size:13px; color:#e8eef2; font-weight:600; padding:0 4px; }
 .gridsel.tri td.triblank { background:none; }
 .gridsel.tri .tricell { width:46px; height:46px; border-radius:8px; border:1px solid rgba(255,216,140,.45);
-  background:rgba(0,0,0,.35); color:#e8eef2; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0; }
+  background:rgba(0,0,0,.35); color:#e8eef2; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0;
+  margin:0 auto; }  /* centred under its column label: a header wider than the cell left it hugging the left edge (Lucas, 2026-10-20) */
 .gridsel.tri .tricell:hover:not(:disabled) { border-color:var(--amber); }
 .gridsel.tri .tricell[data-state="up"] { color:#9fe6b4; }
 .gridsel.tri .tricell[data-state="down"] { color:#ffb3a1; }

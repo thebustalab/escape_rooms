@@ -1,5 +1,5 @@
 {
-  "status": "in_development",
+  "status": "ready",
   "chapter": "dimensionality_reduction",
   "scenario": "henges",
   "id": 11,
@@ -268,7 +268,8 @@
             "video": "beach/transit_to_mountain.mp4",
             "rollFrom": -91.523,
             "rollTo": 65.742,
-            "sfx": "audio/portal_transit.mp3"
+            "sfx": "audio/portal_transit.mp3",
+            "sfxVolume": 0.45
           }
         },
         {
@@ -672,7 +673,8 @@
             "video": "mountain/transit_to_plains.mp4",
             "rollFrom": -66.328,
             "rollTo": 66.328,
-            "sfx": "audio/portal_transit.mp3"
+            "sfx": "audio/portal_transit.mp3",
+            "sfxVolume": 0.45
           }
         },
         {
@@ -692,7 +694,8 @@
             "video": "mountain/transit_to_beach.mp4",
             "rollFrom": 65.742,
             "rollTo": -91.523,
-            "sfx": "audio/portal_transit.mp3"
+            "sfx": "audio/portal_transit.mp3",
+            "sfxVolume": 0.45
           }
         },
         {
@@ -1098,7 +1101,8 @@
             "video": "plains/transit_to_saltflat.mp4",
             "rollFrom": -38.555,
             "rollTo": 67.148,
-            "sfx": "audio/portal_transit.mp3"
+            "sfx": "audio/portal_transit.mp3",
+            "sfxVolume": 0.45
           }
         },
         {
@@ -1119,7 +1123,8 @@
             "video": "plains/transit_to_mountain.mp4",
             "rollFrom": 66.328,
             "rollTo": -66.328,
-            "sfx": "audio/portal_transit.mp3"
+            "sfx": "audio/portal_transit.mp3",
+            "sfxVolume": 0.45
           }
         },
         {
@@ -1515,7 +1520,8 @@
             "video": "saltflat/transit_to_boss.mp4",
             "rollFrom": -53.906,
             "rollTo": 69.609,
-            "sfx": "audio/portal_transit.mp3"
+            "sfx": "audio/portal_transit.mp3",
+            "sfxVolume": 0.45
           }
         },
         {
@@ -1535,7 +1541,8 @@
             "video": "saltflat/transit_to_plains.mp4",
             "rollFrom": 67.148,
             "rollTo": -38.555,
-            "sfx": "audio/portal_transit.mp3"
+            "sfx": "audio/portal_transit.mp3",
+            "sfxVolume": 0.45
           }
         },
         {
@@ -1870,21 +1877,21 @@
             0.5385,
             0.6294
           ],
-          "starterCode": "pca_ord <- runMatrixAnalysis(\n  data = druid_ingredients,\n  analysis = \"pca_ord\",\n  columns_w_values_for_single_analyte = colnames(druid_ingredients)[4:12],\n  columns_w_sample_ID_info = c(\"ingredient\", \"kind\")\n)\n\n# This is meant to find the property that marks out the MUSHROOMS.\n# It reads the great axis, Dim_1 — but do the mushrooms actually separate there?\nanswer <- arrange(pca_ord, desc(abs(Dim_1)))$analyte[1]\nanswer",
+          "starterCode": "druid_ingredients",
           "check": {
-            "prompt": "The potion needs the property that sets the MUSHROOMS apart from every other ingredient. The code below reads the great axis (Dim_1, the first principal component) and returns potency — but the mushrooms don't separate on Dim_1. Fix it to read the axis that actually gathers the mushrooms, then assign that property's name to `answer`.",
+            "prompt": "The potion needs the property that sets the MUSHROOMS apart from every other ingredient. Find the principal component along which the mushrooms separate from the rest, find the property that drives that component, and assign that property's name to `answer`.",
             "requires": [
               "answer"
             ],
             "expr": "tolower(as.character(answer)) == \"luminance\"",
             "maxAttempts": 5,
-            "hint": "On Dim_1 the mushrooms sit mid-pack — they neither top nor bottom it; they gather on Dim_2 instead. Change the column the code sorts by from Dim_1 to Dim_2.",
+            "hint": "Plot the scores (analysis = \"pca\") colored by kind and look at where the mushrooms sit on Dim_1 and on Dim_2. Then read the driver of whichever component separates them from the ordination (analysis = \"pca_ord\").",
             "feedback": {
               "correct": "Correct — noted in your field notebook: the mushrooms answer to luminance, the driver of the second principal component (Dim_2 of 0.79) — their glow, not the great axis at all.",
               "wrong": [
-                "potency drives Dim_1, but check where the mushrooms sit on Dim_1 — they're middling, not extreme. Which axis separates them?",
-                "The mushrooms gather on the SECOND component — sort the ordination by Dim_2 instead of Dim_1.",
-                "Change Dim_1 to Dim_2 in the arrange() line, then take the top analyte."
+                "Don't assume it is the great axis. <code>pca_scores &lt;- runMatrixAnalysis(data = druid_ingredients, analysis = &quot;pca&quot;, columns_w_values_for_single_analyte = colnames(druid_ingredients)[4:12], columns_w_sample_ID_info = c(&quot;ingredient&quot;, &quot;kind&quot;))</code>, then plot Dim_1 against Dim_2 colored by kind: where do the mushrooms sit?",
+                "On Dim_1 the mushrooms are middling, not extreme; they gather on the SECOND component. <code>pca_ord &lt;- runMatrixAnalysis(data = druid_ingredients, analysis = &quot;pca_ord&quot;, columns_w_values_for_single_analyte = colnames(druid_ingredients)[4:12], columns_w_sample_ID_info = c(&quot;ingredient&quot;, &quot;kind&quot;))</code>, then find its strongest Dim_2 driver.",
+                "Sort the ordination by Dim_2 magnitude, <code>arrange(pca_ord, desc(abs(Dim_2)))</code>, and assign the top analyte to <code>answer</code>."
               ],
               "reveal": ""
             }
@@ -1932,7 +1939,8 @@
             "video": "boss/transit_to_saltflat.mp4",
             "rollFrom": 69.609,
             "rollTo": -53.906,
-            "sfx": "audio/portal_transit.mp3"
+            "sfx": "audio/portal_transit.mp3",
+            "sfxVolume": 0.45
           }
         },
         {
@@ -1953,7 +1961,8 @@
             "video": "boss/transit_escape.mp4",
             "rollFrom": -43.594,
             "rollTo": 0,
-            "sfx": "audio/portal_escape.mp3"
+            "sfx": "audio/portal_escape.mp3",
+            "sfxVolume": 0.45
           }
         },
         {
