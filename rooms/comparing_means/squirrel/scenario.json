@@ -82,11 +82,11 @@
     },
     {
       "room": "lo_1b",
-      "text": "In the last puzzle you compared phosphorus between all fifteen pairs of gardens and applied the Holm correction, which removes the two pairs (Gemma-Ines and Dora-Zita) that cross p < 0.05 only about as often as fifteen tests would by chance, leaving both methods agreeing on two groups of three gardens."
+      "text": "In the last puzzle you compared phosphorus between all fifteen pairs of gardens and applied the default correction for multiple comparisons (Holm's method), which removes the two pairs (Gemma-Ines and Dora-Zita) that cross p < 0.05 only about as often as fifteen tests would by chance, leaving both methods agreeing on two groups of three gardens."
     }
   ],
   "escapeBrief": "Every terrace of the city grows one variety, and every cliff level has its own emblem carved above its gate locks: level 1, the anchor, pistachio with red leaves; level 2, the scallop shell, almond with orange leaves; level 3, the sheaf of wheat, walnut with yellow leaves; level 4, the bell, purple beech with purple leaves; level 5, the five-pointed star, stone pine with green needles. The gate locks made you read each garden's leaf color as you passed. Neither of you saw the whole cliff: the harbor player walked levels 1 to 3 and the lighthouse player levels 3 to 5, so each of you knew three of the five pairs, with the middle garden in common. The planting board asked for all five, one leaf color per emblem, among eight colors, three of which grow nowhere in the city, so the last two could not be guessed. Telling each other what you had seen is what set the seeds. With the board set and the full survey finished, the stair opened to your end's light, and the lever lit it.",
-  "ambient": "none",
+  "ambient": "snow",
   "worldPlatePrompt": "An AERIAL photograph of one long, narrow old ITALIAN city strung along a steep rocky SHORELINE like old Genoa stretched out along the coast: a single continuous face of tall, narrow, many-storeyed palazzi in faded ochre, salmon and slate-grey stucco with green shutters, stacked up a near-vertical sea cliff that rises sheer from the water, running for a long way along the shore. A photograph of a real place - NOT a map, NOT a diagram, no labels or borders.\n\nFIVE LEVELS FACING THE WATER: the city climbs the cliff in FIVE clear, stacked levels, stacked almost directly one above another like a tall Genoese palazzo wall, each a long continuous terrace running the whole length of the shore. Every level carries rooftop and terrace GARDENS of nut trees with vividly coloured foliage (gold, russet-red, spring-green, silvery grey-green), and arcaded loggias and balconies that look straight out over the water. Gardens are as prominent as buildings.\n\nTHE WAY UP AND DOWN: many tall, slender iron-and-glass LIFT TOWERS with small lit lift houses on top climb between the levels, each joined to a garden by a short iron footbridge at both ends; steep narrow stone stairways zigzag between some neighbouring levels.\n\nALONG THE TOP: on the clifftop above the highest level, a line of slender old stone bell towers and a narrow stone-lidded aqueduct on low arches run along the length of the city, carrying water to the gardens below.\n\nAt the water's edge: a narrow quay and small harbour at one end of the city, a lighthouse on a low rocky point at the other.\n\nPHOTOREALISTIC: a real aerial photograph, natural colour, true-to-life weathered stucco, stone and foliage, realistic scale, restrained light with deep natural shadows, NOT an illustration, NOT a fantasy painting, no glow or bloom, not oversaturated. Very high detail. No people, no lettering, no text, no signs.\n\nVIEW: from the air out over the sea near the harbour end, an oblique view along the whole length of the shoreline city to the lighthouse on its rocky point at the far end, all five levels reading as long stacked terraces of gardens, arcaded loggias and balconies above the water, the tall lift towers rising between them, the bell towers and aqueduct along the clifftop skyline, mountains beyond.\n\nA clear, cold late-autumn evening at blue hour: deep cobalt sky, a rose band low over the sea, warm lamps in the loggias, lift houses and stairway lamps.",
   "coverPrompt": "Minimalist stylised thumbnail poster: the flat silhouette of a steep cliff city stacked in five levels above a dark sea, one tall lift tower glowing amber, a few white snowflakes against a deep blue sky. Square. Bold, simple shapes that read at very small size. No people, no lettering, no text, no border.",
   "_designNotes": "Two players, two disjoint graphs, one codec id 13; no server sync. Built by _scratch/build_scenario.py — edit that and re-run, not this file, until wiring.",
@@ -233,7 +233,11 @@
               "to": true
             }
           ],
-          "note": "ESCAPE (lower), data-free, ungraded, openable from the start, NOT endsEscape: it opens the stair (with the boss). Never explained anywhere (Lucas 2026-10-18). The lower player has seen the emblem+leaf pairs of levels 1-3, the upper 3-5; level 3 links them. Three decoy colour columns (blue, pink, brown) grow on no level. maxAttempts 0 (a cap here would soft-lock)."
+          "note": "ESCAPE (lower), data-free, ungraded, openable from the start, NOT endsEscape: it opens the stair (with the boss). Never explained anywhere (Lucas 2026-10-18). The lower player has seen the emblem+leaf pairs of levels 1-3, the upper 3-5; level 3 links them. Three decoy colour columns (blue, pink, brown) grow on no level. maxAttempts 0 (a cap here would soft-lock).",
+          "solveSfx": {
+            "src": "audio/solve_board_door.mp3",
+            "volume": 0.2241771063549687
+          }
         },
         {
           "type": "ambient",
@@ -637,7 +641,11 @@
               "to": true
             }
           ],
-          "boxSource": "moved:testplay"
+          "boxSource": "moved:testplay",
+          "solveSfx": {
+            "src": "audio/solve_board_door.mp3",
+            "volume": 0.2241771063549687
+          }
         },
         {
           "id": "first_snow_wash",
@@ -716,7 +724,27 @@
         "r": 0
       },
       "panorama": "harbour/scene.png",
-      "builtFrom": "l1_harbour_3.png"
+      "builtFrom": "l1_harbour_3.png",
+      "sfx": [
+        {
+          "src": "audio/harbour_lapping.mp3",
+          "volume": 0.5
+        },
+        {
+          "src": "audio/shot_wave_slap.mp3",
+          "volume": 0.35,
+          "mode": "interval",
+          "gapMin": 6,
+          "gapMax": 14
+        },
+        {
+          "src": "audio/shot_hull_creak.mp3",
+          "volume": 0.3,
+          "mode": "interval",
+          "gapMin": 10,
+          "gapMax": 25
+        }
+      ]
     },
     {
       "key": "lo_1a",
@@ -781,7 +809,11 @@
               ]
             }
           },
-          "note": "RUNG 1 (two means), parametric player. Options from _scratch/soil_ladder_key.json, curated in final_options(); verify_ladder.py (6) re-derives them in R."
+          "note": "RUNG 1 (two means), parametric player. Options from _scratch/soil_ladder_key.json, curated in final_options(); verify_ladder.py (6) re-derives them in R.",
+          "solveSfx": {
+            "src": "audio/solve_soil_chime.mp3",
+            "volume": 0.2742150324214113
+          }
         },
         {
           "type": "lock",
@@ -797,7 +829,11 @@
               "to": true
             }
           ],
-          "note": "Type the colour of this garden's leaves. Teaches the leaf colour per level, which the escape (ordering the five varieties) depends on."
+          "note": "Type the colour of this garden's leaves. Teaches the leaf colour per level, which the escape (ordering the five varieties) depends on.",
+          "solveSfx": {
+            "src": "audio/solve_gate_unlock.mp3",
+            "volume": 0.7863054015126943
+          }
         },
         {
           "type": "clue",
@@ -2074,10 +2110,10 @@
           "type": "door",
           "label": "The lift up to level 2",
           "box": [
-            0.468,
-            0.39,
-            0.532,
-            0.87
+            0.4741,
+            0.3437,
+            0.5381,
+            0.8237
           ],
           "direction": "open",
           "to": "lo_2a",
@@ -2095,7 +2131,7 @@
             ]
           },
           "lockedBody": "The lift gate is shut and locked.",
-          "boxSource": "draft:localizer"
+          "boxSource": "moved:testplay"
         },
         {
           "id": "back",
@@ -2143,7 +2179,11 @@
               ]
             }
           },
-          "boxSource": "draft:localizer"
+          "boxSource": "draft:localizer",
+          "solveSfx": {
+            "src": "audio/solve_soil_chime.mp3",
+            "volume": 0.2742150324214113
+          }
         },
         {
           "id": "the_gate_lock",
@@ -2166,7 +2206,11 @@
               "to": true
             }
           ],
-          "boxSource": "moved:testplay"
+          "boxSource": "moved:testplay",
+          "solveSfx": {
+            "src": "audio/solve_gate_unlock.mp3",
+            "volume": 0.7863054015126943
+          }
         },
         {
           "id": "the_guild_card",
@@ -2259,7 +2303,17 @@
         "r": 0
       },
       "panorama": "lo_1a/scene.png",
-      "builtFrom": "l1_lo_1a_2.png"
+      "builtFrom": "l1_lo_1a_2.png",
+      "sfx": [
+        {
+          "src": "audio/sea_far_waves.mp3",
+          "volume": 0.45
+        },
+        {
+          "src": "audio/wind_light_snow.mp3",
+          "volume": 0.35
+        }
+      ]
     },
     {
       "key": "lo_2a",
@@ -3520,28 +3574,28 @@
           "type": "door",
           "label": "Along level 2",
           "box": [
-            0.0816,
-            0.336,
-            0.1584,
-            0.592
+            0.0805,
+            0.3331,
+            0.1573,
+            0.5891
           ],
           "direction": "open",
           "to": "lo_2b",
-          "boxSource": "draft:localizer"
+          "boxSource": "moved:testplay"
         },
         {
           "id": "the_lift_down_to_level_1",
           "type": "door",
           "label": "The lift down to level 1",
           "box": [
-            0.739,
-            0.068,
-            0.787,
-            0.356
+            0.7683,
+            0.2714,
+            0.8163,
+            0.5594
           ],
           "direction": "open",
           "to": "lo_1a",
-          "boxSource": "draft:localizer"
+          "boxSource": "moved:testplay"
         },
         {
           "id": "first_snow_wash",
@@ -3613,6 +3667,23 @@
             "video": "lo_2a/cine_first_snow.mp4",
             "state": "first_snow"
           }
+        }
+      ],
+      "sfx": [
+        {
+          "src": "audio/wind_cold_steady.mp3",
+          "volume": 0.4
+        },
+        {
+          "src": "audio/sea_far_waves.mp3",
+          "volume": 0.3
+        },
+        {
+          "src": "audio/shot_chain_creak.mp3",
+          "volume": 0.35,
+          "mode": "interval",
+          "gapMin": 6,
+          "gapMax": 15
         }
       ]
     },
@@ -3700,7 +3771,11 @@
             0.727,
             0.668
           ],
-          "boxSource": "draft:localizer"
+          "boxSource": "draft:localizer",
+          "solveSfx": {
+            "src": "audio/solve_soil_chime.mp3",
+            "volume": 0.2742150324214113
+          }
         },
         {
           "type": "lock",
@@ -3723,7 +3798,11 @@
             0.12,
             0.5305
           ],
-          "boxSource": "draft:localizer"
+          "boxSource": "draft:localizer",
+          "solveSfx": {
+            "src": "audio/solve_gate_unlock.mp3",
+            "volume": 0.7863054015126943
+          }
         },
         {
           "type": "ambient",
@@ -4934,10 +5013,10 @@
           "type": "door",
           "label": "The stairs up to level 3",
           "box": [
-            0.1406,
-            0.404,
-            0.1838,
-            0.98
+            0.1782,
+            0.2385,
+            0.2214,
+            0.8145
           ],
           "direction": "open",
           "to": "lo_3a",
@@ -4955,31 +5034,31 @@
             ]
           },
           "lockedBody": "The stair gate is shut and locked.",
-          "boxSource": "draft:localizer"
+          "boxSource": "moved:testplay"
         },
         {
           "id": "back",
           "type": "door",
           "label": "Back",
           "box": [
-            0.8706,
-            0.02,
-            0.8906,
-            0.164
+            0.8863,
+            0.4243,
+            0.9063,
+            0.5683
           ],
           "direction": "open",
           "to": "lo_2a",
-          "boxSource": "draft:localizer"
+          "boxSource": "moved:testplay"
         },
         {
           "id": "soil_reading_2",
           "type": "puzzle",
           "label": "Soil reading 2",
           "box": [
-            0.655,
-            0.54,
-            0.727,
-            0.668
+            0.6598,
+            0.5639,
+            0.7318,
+            0.6919
           ],
           "starterCode": "garden_soil",
           "question": {
@@ -5003,17 +5082,21 @@
               ]
             }
           },
-          "boxSource": "draft:localizer"
+          "boxSource": "moved:testplay",
+          "solveSfx": {
+            "src": "audio/solve_soil_chime.mp3",
+            "volume": 0.2742150324214113
+          }
         },
         {
           "id": "the_gate_lock",
           "type": "lock",
           "label": "The gate lock",
           "box": [
-            0.1,
-            0.4695,
-            0.12,
-            0.5305
+            0.1079,
+            0.4792,
+            0.1279,
+            0.5402
           ],
           "answer": "ORANGE",
           "availableWhen": {
@@ -5026,7 +5109,11 @@
               "to": true
             }
           ],
-          "boxSource": "draft:localizer"
+          "boxSource": "moved:testplay",
+          "solveSfx": {
+            "src": "audio/solve_gate_unlock.mp3",
+            "volume": 0.7863054015126943
+          }
         },
         {
           "id": "first_snow_wash",
@@ -5098,6 +5185,23 @@
             "video": "lo_2b/cine_first_snow.mp4",
             "state": "first_snow"
           }
+        }
+      ],
+      "sfx": [
+        {
+          "src": "audio/sea_far_waves.mp3",
+          "volume": 0.4
+        },
+        {
+          "src": "audio/wind_light_snow.mp3",
+          "volume": 0.25
+        },
+        {
+          "src": "audio/shot_linen_rustle.mp3",
+          "volume": 0.35,
+          "mode": "interval",
+          "gapMin": 5,
+          "gapMax": 12
         }
       ]
     },
@@ -5362,28 +5466,28 @@
           "type": "door",
           "label": "Toward the middle garden",
           "box": [
-            0.29,
-            0.41,
-            0.45,
-            0.89
+            0.3317,
+            0.2183,
+            0.4917,
+            0.6983
           ],
           "direction": "open",
           "to": "middle_lower",
-          "boxSource": "draft:localizer"
+          "boxSource": "moved:testplay"
         },
         {
           "id": "the_stairs_down_to_level_2",
           "type": "door",
           "label": "The stairs down to level 2",
           "box": [
-            0.553,
-            0.48,
-            0.697,
-            0.636
+            0.5389,
+            0.7121,
+            0.6829,
+            0.8681
           ],
           "direction": "open",
           "to": "lo_2b",
-          "boxSource": "draft:localizer"
+          "boxSource": "moved:testplay"
         },
         {
           "id": "first_snow_wash",
@@ -5455,6 +5559,20 @@
             "video": "lo_3a/cine_first_snow.mp4",
             "state": "first_snow"
           }
+        }
+      ],
+      "sfx": [
+        {
+          "src": "audio/wind_light_snow.mp3",
+          "volume": 0.4
+        },
+        {
+          "src": "audio/sea_far_waves.mp3",
+          "volume": 0.25
+        },
+        {
+          "src": "audio/smoulder_crackle.mp3",
+          "volume": 0.3
         }
       ]
     },
@@ -5543,7 +5661,11 @@
             0.5163,
             0.8647
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "solveSfx": {
+            "src": "audio/solve_soil_chime.mp3",
+            "volume": 0.2742150324214113
+          }
         },
         {
           "type": "lock",
@@ -5566,7 +5688,11 @@
             0.9,
             0.55
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "solveSfx": {
+            "src": "audio/solve_gate_unlock.mp3",
+            "volume": 0.7863054015126943
+          }
         },
         {
           "type": "ambient",
@@ -5827,10 +5953,10 @@
           "type": "door",
           "label": "The garden cart down two levels",
           "box": [
-            0.5403,
-            0.3974,
-            0.6811,
-            0.6827
+            0.579,
+            0.4452,
+            0.7198,
+            0.7305
           ],
           "direction": "open",
           "to": "lo_1b",
@@ -5848,31 +5974,31 @@
             ]
           },
           "lockedBody": "The cart's gate is shut and locked.",
-          "boxSource": "draft:skeleton"
+          "boxSource": "moved:testplay"
         },
         {
           "id": "back_along_the_terrace",
           "type": "door",
           "label": "Back along the terrace",
           "box": [
-            0.1695,
-            0.6015,
-            0.2153,
-            0.7237
+            0.0988,
+            0.4468,
+            0.1446,
+            0.569
           ],
           "direction": "open",
           "to": "lo_3a",
-          "boxSource": "draft:skeleton"
+          "boxSource": "moved:testplay"
         },
         {
           "id": "soil_reading_3",
           "type": "puzzle",
           "label": "Soil reading 3",
           "box": [
-            0.4357,
-            0.6011,
-            0.5163,
-            0.8647
+            0.4163,
+            0.4956,
+            0.4969,
+            0.7592
           ],
           "starterCode": "garden_soil",
           "question": {
@@ -5897,17 +6023,21 @@
               ]
             }
           },
-          "boxSource": "draft:skeleton"
+          "boxSource": "moved:testplay",
+          "solveSfx": {
+            "src": "audio/solve_soil_chime.mp3",
+            "volume": 0.2742150324214113
+          }
         },
         {
           "id": "the_gate_lock",
           "type": "lock",
           "label": "The gate lock",
           "box": [
-            0.85,
-            0.5,
-            0.9,
-            0.55
+            0.6692,
+            0.6011,
+            0.7192,
+            0.6511
           ],
           "answer": "YELLOW",
           "availableWhen": {
@@ -5920,7 +6050,11 @@
               "to": true
             }
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "moved:testplay",
+          "solveSfx": {
+            "src": "audio/solve_gate_unlock.mp3",
+            "volume": 0.7863054015126943
+          }
         },
         {
           "id": "first_snow_wash",
@@ -5993,6 +6127,20 @@
             "state": "first_snow"
           }
         }
+      ],
+      "sfx": [
+        {
+          "src": "audio/sea_far_waves.mp3",
+          "volume": 0.35
+        },
+        {
+          "src": "audio/wind_light_snow.mp3",
+          "volume": 0.35
+        },
+        {
+          "src": "audio/spout_pour.mp3",
+          "volume": 0.4
+        }
       ]
     },
     {
@@ -6038,7 +6186,7 @@
           "label": "The full soil survey",
           "starterCode": "garden_soil",
           "question": {
-            "prompt": "The full soil survey certifies phosphorus across all six gardens at once. Using the rows where <code>parameter</code> is phosphorus_mg_kg, compare <code>value</code> between every pair of the six gardens in the <code>garden</code> column (15 pairs) with pairwise Wilcoxon rank-sum tests, using the Holm correction for multiple comparisons. Which statement matches the corrected results?",
+            "prompt": "The full soil survey certifies phosphorus across all six gardens at once. Using the rows where <code>parameter</code> is phosphorus_mg_kg, compare <code>value</code> between every pair of the six gardens in the <code>garden</code> column (15 pairs) with pairwise Wilcoxon rank-sum tests, keeping the function's default correction for multiple comparisons. Which statement matches the corrected results?",
             "options": [
               "2 of 15 comparisons significant: Clelia-Dora, Dora-Gemma",
               "No pair differs (0 of 6 comparisons significant)",
@@ -6050,10 +6198,10 @@
             ],
             "correct": 5,
             "feedback": {
-              "correct": "Correct, noted in your field notebook: by pairwise Wilcoxon tests with the Holm correction, the gardens fall into two groups for phosphorus: Bice, Gemma and Ines are each higher than each of Clelia, Dora and Zita, and no pair within a group differs.",
+              "correct": "Correct, noted in your field notebook: by pairwise Wilcoxon tests with the correction for multiple comparisons, the gardens fall into two groups for phosphorus: Bice, Gemma and Ines are each higher than each of Clelia, Dora and Zita, and no pair within a group differs.",
               "wrong": [
                 "Keep only the rows where <code>parameter</code> is \"phosphorus_mg_kg\", then run <code>pairwiseWilcoxTest(value ~ garden)</code>. You should get 15 rows, one per pair of gardens.",
-                "Read <code>p.adj</code>, not <code>p</code>: that is the Holm-corrected value, the default. With 15 tests at once, a pair or two can dip below 0.05 by chance alone.",
+                "Read <code>p.adj</code>, not <code>p</code>: that is the value corrected for multiple comparisons, the default. With 15 tests at once, a pair or two can dip below 0.05 by chance alone.",
                 "To see which side of each significant pair is higher, find each garden's median: <code>group_by(garden) %&gt;% summarize(median = median(value))</code>."
               ]
             }
@@ -6069,7 +6217,11 @@
             0.2495,
             0.6615
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "solveSfx": {
+            "src": "audio/solve_soil_chime.mp3",
+            "volume": 0.2742150324214113
+          }
         },
         {
           "type": "ambient",
@@ -6305,42 +6457,42 @@
           "type": "door",
           "label": "The stairs up to level 2",
           "box": [
-            0.3005,
-            0.4204,
-            0.3405,
-            0.6761
+            0.3039,
+            0.3359,
+            0.3439,
+            0.5916
           ],
           "direction": "open",
           "to": "lo_2c",
-          "boxSource": "draft:skeleton"
+          "boxSource": "moved:testplay"
         },
         {
           "id": "the_garden_cart_up_two_levels",
           "type": "door",
           "label": "The garden cart up two levels",
           "box": [
-            0.477,
-            0.4598,
-            0.5836,
-            0.6539
+            0.4479,
+            0.3966,
+            0.5545,
+            0.5907
           ],
           "direction": "open",
           "to": "middle_lower",
-          "boxSource": "draft:skeleton"
+          "boxSource": "moved:testplay"
         },
         {
           "id": "the_full_soil_survey",
           "type": "puzzle",
           "label": "The full soil survey",
           "box": [
-            0.1496,
-            0.4816,
-            0.2495,
-            0.6615
+            0.1464,
+            0.4202,
+            0.2463,
+            0.6001
           ],
           "starterCode": "garden_soil",
           "question": {
-            "prompt": "The full soil survey certifies phosphorus across all six gardens at once. Using the rows where <code>parameter</code> is phosphorus_mg_kg, compare <code>value</code> between every pair of the six gardens in the <code>garden</code> column (15 pairs) with pairwise Wilcoxon rank-sum tests, using the Holm correction for multiple comparisons. Which statement matches the corrected results?",
+            "prompt": "The full soil survey certifies phosphorus across all six gardens at once. Using the rows where <code>parameter</code> is phosphorus_mg_kg, compare <code>value</code> between every pair of the six gardens in the <code>garden</code> column (15 pairs) with pairwise Wilcoxon rank-sum tests, keeping the function's default correction for multiple comparisons. Which statement matches the corrected results?",
             "options": [
               "2 of 15 comparisons significant: Clelia-Dora, Dora-Gemma",
               "No pair differs (0 of 6 comparisons significant)",
@@ -6352,10 +6504,10 @@
             ],
             "correct": 5,
             "feedback": {
-              "correct": "Correct, noted in your field notebook: by pairwise Wilcoxon tests with the Holm correction, the gardens fall into two groups for phosphorus: Bice, Gemma and Ines are each higher than each of Clelia, Dora and Zita, and no pair within a group differs.",
+              "correct": "Correct, noted in your field notebook: by pairwise Wilcoxon tests with the correction for multiple comparisons, the gardens fall into two groups for phosphorus: Bice, Gemma and Ines are each higher than each of Clelia, Dora and Zita, and no pair within a group differs.",
               "wrong": [
                 "Keep only the rows where <code>parameter</code> is \"phosphorus_mg_kg\", then run <code>pairwiseWilcoxTest(value ~ garden)</code>. You should get 15 rows, one per pair of gardens.",
-                "Read <code>p.adj</code>, not <code>p</code>: that is the Holm-corrected value, the default. With 15 tests at once, a pair or two can dip below 0.05 by chance alone.",
+                "Read <code>p.adj</code>, not <code>p</code>: that is the value corrected for multiple comparisons, the default. With 15 tests at once, a pair or two can dip below 0.05 by chance alone.",
                 "To see which side of each significant pair is higher, find each garden's median: <code>group_by(garden) %&gt;% summarize(median = median(value))</code>."
               ]
             }
@@ -6364,7 +6516,11 @@
             "solved": "middle_lower"
           },
           "lockedBody": "The full soil survey needs the middle garden's reading first.",
-          "boxSource": "draft:skeleton"
+          "boxSource": "moved:testplay",
+          "solveSfx": {
+            "src": "audio/solve_soil_chime.mp3",
+            "volume": 0.2742150324214113
+          }
         },
         {
           "id": "first_snow_wash",
@@ -6436,6 +6592,16 @@
             "video": "lo_1b/cine_first_snow.mp4",
             "state": "first_snow"
           }
+        }
+      ],
+      "sfx": [
+        {
+          "src": "audio/surf_heavy.mp3",
+          "volume": 0.44523701151948625
+        },
+        {
+          "src": "audio/sea_boom_muffled.mp3",
+          "volume": 0.4
         }
       ]
     },
@@ -6664,28 +6830,28 @@
           "type": "door",
           "label": "The lift down to level 1",
           "box": [
-            0.6215,
-            0.3167,
-            0.6579,
-            0.52
+            0.6445,
+            0.4313,
+            0.6809,
+            0.6346
           ],
           "direction": "open",
           "to": "lo_1c",
-          "boxSource": "draft:skeleton"
+          "boxSource": "moved:testplay"
         },
         {
           "id": "the_stairs_down_to_level_1",
           "type": "door",
           "label": "The stairs down to level 1",
           "box": [
-            0.2851,
-            0.5349,
-            0.3393,
-            0.625
+            0.238,
+            0.5721,
+            0.2922,
+            0.6622
           ],
           "direction": "open",
           "to": "lo_1b",
-          "boxSource": "draft:skeleton"
+          "boxSource": "moved:testplay"
         },
         {
           "id": "first_snow_wash",
@@ -6757,6 +6923,16 @@
             "video": "lo_2c/cine_first_snow.mp4",
             "state": "first_snow"
           }
+        }
+      ],
+      "sfx": [
+        {
+          "src": "audio/wind_light_snow.mp3",
+          "volume": 0.35
+        },
+        {
+          "src": "audio/laundry_flap.mp3",
+          "volume": 0.25
         }
       ]
     },
@@ -7035,14 +7211,14 @@
           "type": "door",
           "label": "The lift up to level 2",
           "box": [
-            0.3249,
-            0,
-            0.3449,
-            0.2514
+            0.2503,
+            0.463,
+            0.2703,
+            0.7144
           ],
           "direction": "open",
           "to": "lo_2c",
-          "boxSource": "draft:skeleton"
+          "boxSource": "moved:testplay"
         },
         {
           "id": "first_snow_wash",
@@ -7114,6 +7290,23 @@
             "video": "lo_1c/cine_first_snow.mp4",
             "state": "first_snow"
           }
+        }
+      ],
+      "sfx": [
+        {
+          "src": "audio/sea_far_waves.mp3",
+          "volume": 0.2
+        },
+        {
+          "src": "audio/lamp_flames.mp3",
+          "volume": 0.15
+        },
+        {
+          "src": "audio/shot_drip.mp3",
+          "volume": 0.22781969130477184,
+          "mode": "interval",
+          "gapMin": 6,
+          "gapMax": 14
         }
       ]
     },
@@ -7295,14 +7488,14 @@
           "type": "door",
           "label": "Down the spiral stair",
           "box": [
-            0.4571,
+            0.5048,
             0.5,
-            0.539,
+            0.5867,
             1
           ],
           "direction": "open",
           "to": "lo_lantern",
-          "boxSource": "draft:skeleton"
+          "boxSource": "moved:testplay"
         },
         {
           "id": "back_to_the_harbor_garden",
@@ -7339,6 +7532,19 @@
             "video": "lo_stair/cine_base.mp4"
           }
         }
+      ],
+      "sfx": [
+        {
+          "src": "audio/sea_boom_muffled.mp3",
+          "volume": 0.3
+        },
+        {
+          "src": "audio/shot_drip.mp3",
+          "volume": 0.22781969130477184,
+          "mode": "interval",
+          "gapMin": 4,
+          "gapMax": 10
+        }
       ]
     },
     {
@@ -7373,10 +7579,10 @@
           "label": "Back to the stair",
           "to": "lo_stair",
           "box": [
-            0.0,
+            0,
             0.3,
             0.1681,
-            1.0
+            1
           ],
           "boxSource": "draft:skeleton"
         }
@@ -7588,14 +7794,14 @@
           "type": "door",
           "label": "Back to the stair",
           "box": [
-            0.0,
-            0.3,
-            0.1681,
-            1.0
+            0.1227,
+            0.2808,
+            0.2908,
+            0.9808
           ],
           "direction": "open",
           "to": "lo_stair",
-          "boxSource": "draft:skeleton"
+          "boxSource": "moved:testplay"
         },
         {
           "id": "clip_base",
@@ -7617,6 +7823,16 @@
             ],
             "video": "lo_lantern/cine_base.mp4"
           }
+        }
+      ],
+      "sfx": [
+        {
+          "src": "audio/sea_stones_wash.mp3",
+          "volume": 0.45
+        },
+        {
+          "src": "audio/wind_light_snow.mp3",
+          "volume": 0.25
         }
       ]
     },
@@ -7773,7 +7989,11 @@
             0.4384,
             0.71
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "solveSfx": {
+            "src": "audio/solve_board_door.mp3",
+            "volume": 0.2241771063549687
+          }
         },
         {
           "type": "ambient",
@@ -7985,10 +8205,10 @@
           "type": "door",
           "label": "Into the lighthouse",
           "box": [
-            0.6038,
-            0.0907,
-            0.6748,
-            0.9066
+            0.5873,
+            0.5466,
+            0.6638,
+            0.8415
           ],
           "direction": "open",
           "to": "up_stair",
@@ -8006,7 +8226,7 @@
             ]
           },
           "lockedBody": "The lighthouse door is locked.",
-          "boxSource": "draft:skeleton"
+          "boxSource": "moved:testplay"
         },
         {
           "id": "up_the_rock_stair",
@@ -8027,10 +8247,10 @@
           "type": "grid",
           "label": "The planting board",
           "box": [
-            0.4125,
-            0.5705,
-            0.4384,
-            0.71
+            0.45,
+            0.6132,
+            0.4759,
+            0.7527
           ],
           "items": [
             {
@@ -8122,7 +8342,11 @@
               "to": true
             }
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "moved:testplay",
+          "solveSfx": {
+            "src": "audio/solve_board_door.mp3",
+            "volume": 0.2241771063549687
+          }
         },
         {
           "id": "first_snow_wash",
@@ -8194,6 +8418,16 @@
             "video": "lighthouse/cine_first_snow.mp4",
             "state": "first_snow"
           }
+        }
+      ],
+      "sfx": [
+        {
+          "src": "audio/surf_heavy.mp3",
+          "volume": 0.44523701151948625
+        },
+        {
+          "src": "audio/wind_cold_steady.mp3",
+          "volume": 0.35
         }
       ]
     },
@@ -8448,10 +8682,10 @@
           "type": "door",
           "label": "Up to the lighthouse garden",
           "box": [
-            0.7945,
-            0.2392,
-            0.8145,
-            0.3052
+            0.7784,
+            0.1988,
+            0.7984,
+            0.2648
           ],
           "direction": "open",
           "to": "up_5g",
@@ -8462,14 +8696,14 @@
           "type": "door",
           "label": "Down to the lighthouse",
           "box": [
-            0.1099,
-            0.6513,
-            0.1833,
-            0.8001
+            0.1834,
+            0.6084,
+            0.2568,
+            0.7572
           ],
           "direction": "open",
           "to": "lighthouse",
-          "boxSource": "draft:skeleton"
+          "boxSource": "moved:testplay"
         },
         {
           "id": "first_snow_wash",
@@ -8541,6 +8775,20 @@
             "video": "up_rock/cine_first_snow.mp4",
             "state": "first_snow"
           }
+        }
+      ],
+      "sfx": [
+        {
+          "src": "audio/wind_cold_steady.mp3",
+          "volume": 0.4
+        },
+        {
+          "src": "audio/sea_far_waves.mp3",
+          "volume": 0.3
+        },
+        {
+          "src": "audio/water_trickle.mp3",
+          "volume": 0.2
         }
       ]
     },
@@ -8839,10 +9087,10 @@
           "type": "door",
           "label": "Back along level 5",
           "box": [
-            0.8499,
-            0.3002,
-            0.9003,
-            0.3916
+            0.8481,
+            0.4124,
+            0.8985,
+            0.5038
           ],
           "direction": "open",
           "to": "up_5c",
@@ -8857,28 +9105,28 @@
           "type": "door",
           "label": "Down the rock stair",
           "box": [
-            0.3241,
-            0.5214,
-            0.3862,
-            0.6134
+            0.2795,
+            0.7282,
+            0.3416,
+            0.8202
           ],
           "direction": "open",
           "to": "up_rock",
-          "boxSource": "draft:skeleton"
+          "boxSource": "moved:testplay"
         },
         {
           "id": "along_level_5",
           "type": "door",
           "label": "Along level 5",
           "box": [
-            0.4744,
-            0.5312,
-            0.5789,
-            0.5922
+            0.7052,
+            0.4737,
+            0.8097,
+            0.5347
           ],
           "direction": "open",
           "to": "up_5a",
-          "boxSource": "draft:skeleton"
+          "boxSource": "moved:testplay"
         },
         {
           "id": "first_snow_wash",
@@ -8951,6 +9199,20 @@
             "state": "first_snow"
           }
         }
+      ],
+      "sfx": [
+        {
+          "src": "audio/wind_strong.mp3",
+          "volume": 0.5
+        },
+        {
+          "src": "audio/pennant_flap.mp3",
+          "volume": 0.35
+        },
+        {
+          "src": "audio/surf_heavy.mp3",
+          "volume": 0.2
+        }
       ]
     },
     {
@@ -9016,11 +9278,11 @@
               "No significant difference (p = 0.84): median Clelia 8.70 vs Ines 8.80",
               "Significant (p < 0.001): Ines is higher, median 46.6 vs 32.4",
               "No significant difference (p = 0.83): median Clelia 0.70 vs Ines 0.80",
-              "Significant (p < 0.001): Clelia is higher, median 24.0 vs 21.5",
               "No significant difference (p = 0.99): median Clelia 0.61 vs Ines 0.60",
+              "Significant (p < 0.001): Clelia is higher, median 24.0 vs 21.5",
               "No significant difference (p = 0.58): median Clelia 16.4 vs Ines 16.1"
             ],
-            "correct": 4,
+            "correct": 5,
             "feedback": {
               "correct": "Correct, noted in your field notebook: by Wilcoxon test, Clelia's soil moisture is significantly higher than Ines's (median 24.0 vs 21.5, p < 0.001).",
               "wrong": [
@@ -9037,7 +9299,11 @@
             0.6914,
             0.7666
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "solveSfx": {
+            "src": "audio/solve_soil_chime.mp3",
+            "volume": 0.2742150324214113
+          }
         },
         {
           "type": "lock",
@@ -9060,7 +9326,11 @@
             0.4,
             0.5505
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "solveSfx": {
+            "src": "audio/solve_gate_unlock.mp3",
+            "volume": 0.7863054015126943
+          }
         },
         {
           "type": "clue",
@@ -9321,10 +9591,10 @@
           "type": "door",
           "label": "The lift down to level 4",
           "box": [
-            0.3361,
-            0.5731,
-            0.3678,
-            0.6563
+            0.3508,
+            0.5346,
+            0.3825,
+            0.6178
           ],
           "direction": "open",
           "to": "up_4a",
@@ -9342,7 +9612,7 @@
             ]
           },
           "lockedBody": "The lift gate is shut and locked.",
-          "boxSource": "draft:skeleton"
+          "boxSource": "moved:testplay"
         },
         {
           "id": "back",
@@ -9363,10 +9633,10 @@
           "type": "puzzle",
           "label": "Soil reading 1",
           "box": [
-            0.5791,
-            0.6071,
-            0.6914,
-            0.7666
+            0.5563,
+            0.5514,
+            0.6686,
+            0.7109
           ],
           "starterCode": "garden_soil",
           "question": {
@@ -9376,11 +9646,11 @@
               "No significant difference (p = 0.84): median Clelia 8.70 vs Ines 8.80",
               "Significant (p < 0.001): Ines is higher, median 46.6 vs 32.4",
               "No significant difference (p = 0.83): median Clelia 0.70 vs Ines 0.80",
-              "Significant (p < 0.001): Clelia is higher, median 24.0 vs 21.5",
               "No significant difference (p = 0.99): median Clelia 0.61 vs Ines 0.60",
+              "Significant (p < 0.001): Clelia is higher, median 24.0 vs 21.5",
               "No significant difference (p = 0.58): median Clelia 16.4 vs Ines 16.1"
             ],
-            "correct": 4,
+            "correct": 5,
             "feedback": {
               "correct": "Correct, noted in your field notebook: by Wilcoxon test, Clelia's soil moisture is significantly higher than Ines's (median 24.0 vs 21.5, p < 0.001).",
               "wrong": [
@@ -9390,17 +9660,21 @@
               ]
             }
           },
-          "boxSource": "draft:skeleton"
+          "boxSource": "moved:testplay",
+          "solveSfx": {
+            "src": "audio/solve_soil_chime.mp3",
+            "volume": 0.2742150324214113
+          }
         },
         {
           "id": "the_gate_lock",
           "type": "lock",
           "label": "The gate lock",
           "box": [
-            0.38,
-            0.4895,
-            0.4,
-            0.5505
+            0.3925,
+            0.5044,
+            0.4125,
+            0.5654
           ],
           "answer": "GREEN",
           "availableWhen": {
@@ -9413,21 +9687,25 @@
               "to": true
             }
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "moved:testplay",
+          "solveSfx": {
+            "src": "audio/solve_gate_unlock.mp3",
+            "volume": 0.7863054015126943
+          }
         },
         {
           "id": "the_guild_card",
           "type": "clue",
           "label": "The guild card",
           "box": [
-            0.38,
-            0.5645,
-            0.4,
-            0.6255
+            0.394,
+            0.5941,
+            0.414,
+            0.6551
           ],
           "pickup": true,
           "body": "A keeper's card of the orchard guild. Every garden gate in the city opens to one word: the color of the leaves (or needles) on the trees of the garden it guards. Look at the trees, then set the letter rings.",
-          "boxSource": "draft:skeleton"
+          "boxSource": "moved:testplay"
         },
         {
           "id": "first_snow_wash",
@@ -9499,6 +9777,16 @@
             "video": "up_5a/cine_first_snow.mp4",
             "state": "first_snow"
           }
+        }
+      ],
+      "sfx": [
+        {
+          "src": "audio/wind_light_snow.mp3",
+          "volume": 0.35
+        },
+        {
+          "src": "audio/waterwheel_splash.mp3",
+          "volume": 0.4
         }
       ]
     },
@@ -9773,14 +10061,14 @@
           "type": "door",
           "label": "The lift up to level 5",
           "box": [
-            0.1423,
-            0.4114,
-            0.1672,
-            0.7405
+            0.1467,
+            0.3882,
+            0.1716,
+            0.7173
           ],
           "direction": "open",
           "to": "up_5a",
-          "boxSource": "draft:skeleton"
+          "boxSource": "moved:testplay"
         },
         {
           "id": "first_snow_wash",
@@ -9853,6 +10141,20 @@
             "state": "first_snow"
           }
         }
+      ],
+      "sfx": [
+        {
+          "src": "audio/sea_far_waves.mp3",
+          "volume": 0.25
+        },
+        {
+          "src": "audio/stove_crackle.mp3",
+          "volume": 0.4
+        },
+        {
+          "src": "audio/leaves_wind.mp3",
+          "volume": 0.25
+        }
       ]
     },
     {
@@ -9917,12 +10219,12 @@
               "No significant difference (p = 0.40): mean Bice 14.8 vs Zita 16.2",
               "No significant difference (p = 0.60): mean Bice 0.62 vs Zita 0.63",
               "No significant difference (p = 0.20): mean Bice 22.4 vs Zita 22.9",
-              "Significant (p < 0.001): Bice is higher, mean 46.0 vs 33.4",
-              "No significant difference (p = 0.96): mean Bice 8.47 vs Zita 8.51",
               "Significant (p < 0.01): Zita is higher, mean 40.4 vs 19.0",
+              "No significant difference (p = 0.96): mean Bice 8.47 vs Zita 8.51",
+              "Significant (p < 0.001): Bice is higher, mean 46.0 vs 33.4",
               "Significant (p < 0.001): Bice is higher, median 19.1 vs 12.9"
             ],
-            "correct": 5,
+            "correct": 3,
             "feedback": {
               "correct": "Correct, noted in your field notebook: by t-test, Zita's mean nitrate is significantly higher than Bice's (40.4 vs 19.0, p < 0.01).",
               "wrong": [
@@ -9939,7 +10241,11 @@
             0.5568,
             0.6315
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "solveSfx": {
+            "src": "audio/solve_soil_chime.mp3",
+            "volume": 0.2742150324214113
+          }
         },
         {
           "type": "lock",
@@ -9962,7 +10268,11 @@
             0.815,
             0.5805
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "solveSfx": {
+            "src": "audio/solve_gate_unlock.mp3",
+            "volume": 0.7863054015126943
+          }
         },
         {
           "type": "ambient",
@@ -10199,10 +10509,10 @@
           "type": "door",
           "label": "The stairs down to level 3",
           "box": [
-            0.728,
-            0.5507,
-            0.758,
-            0.6907
+            0.7387,
+            0.6593,
+            0.7687,
+            0.7993
           ],
           "direction": "open",
           "to": "up_3a",
@@ -10220,7 +10530,7 @@
             ]
           },
           "lockedBody": "The stair gate is shut and locked.",
-          "boxSource": "draft:skeleton"
+          "boxSource": "moved:testplay"
         },
         {
           "id": "back",
@@ -10253,12 +10563,12 @@
               "No significant difference (p = 0.40): mean Bice 14.8 vs Zita 16.2",
               "No significant difference (p = 0.60): mean Bice 0.62 vs Zita 0.63",
               "No significant difference (p = 0.20): mean Bice 22.4 vs Zita 22.9",
-              "Significant (p < 0.001): Bice is higher, mean 46.0 vs 33.4",
-              "No significant difference (p = 0.96): mean Bice 8.47 vs Zita 8.51",
               "Significant (p < 0.01): Zita is higher, mean 40.4 vs 19.0",
+              "No significant difference (p = 0.96): mean Bice 8.47 vs Zita 8.51",
+              "Significant (p < 0.001): Bice is higher, mean 46.0 vs 33.4",
               "Significant (p < 0.001): Bice is higher, median 19.1 vs 12.9"
             ],
-            "correct": 5,
+            "correct": 3,
             "feedback": {
               "correct": "Correct, noted in your field notebook: by t-test, Zita's mean nitrate is significantly higher than Bice's (40.4 vs 19.0, p < 0.01).",
               "wrong": [
@@ -10268,17 +10578,21 @@
               ]
             }
           },
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "solveSfx": {
+            "src": "audio/solve_soil_chime.mp3",
+            "volume": 0.2742150324214113
+          }
         },
         {
           "id": "the_gate_lock",
           "type": "lock",
           "label": "The gate lock",
           "box": [
-            0.795,
-            0.5195,
-            0.815,
-            0.5805
+            0.8024,
+            0.5231,
+            0.8224,
+            0.5841
           ],
           "answer": "PURPLE",
           "availableWhen": {
@@ -10291,7 +10605,11 @@
               "to": true
             }
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "moved:testplay",
+          "solveSfx": {
+            "src": "audio/solve_gate_unlock.mp3",
+            "volume": 0.7863054015126943
+          }
         },
         {
           "id": "first_snow_wash",
@@ -10363,6 +10681,16 @@
             "video": "up_4b/cine_first_snow.mp4",
             "state": "first_snow"
           }
+        }
+      ],
+      "sfx": [
+        {
+          "src": "audio/wind_light_snow.mp3",
+          "volume": 0.3
+        },
+        {
+          "src": "audio/leaves_wind.mp3",
+          "volume": 0.3
         }
       ]
     },
@@ -10635,28 +10963,28 @@
           "type": "door",
           "label": "Toward the middle garden",
           "box": [
-            0.3107,
-            0.484,
-            0.4007,
-            0.664
+            0.3228,
+            0.4174,
+            0.4128,
+            0.5974
           ],
           "direction": "open",
           "to": "middle_upper",
-          "boxSource": "draft:skeleton"
+          "boxSource": "moved:testplay"
         },
         {
           "id": "the_stairs_up_to_level_4",
           "type": "door",
           "label": "The stairs up to level 4",
           "box": [
-            0.4414,
-            0.1823,
-            0.5573,
-            0.803
+            0.453,
+            0,
+            0.5689,
+            0.6207
           ],
           "direction": "open",
           "to": "up_4b",
-          "boxSource": "draft:skeleton"
+          "boxSource": "moved:testplay"
         },
         {
           "id": "first_snow_wash",
@@ -10729,6 +11057,20 @@
             "state": "first_snow"
           }
         }
+      ],
+      "sfx": [
+        {
+          "src": "audio/fountain_splash.mp3",
+          "volume": 0.37246996579433544
+        },
+        {
+          "src": "audio/wind_light_snow.mp3",
+          "volume": 0.3
+        },
+        {
+          "src": "audio/sea_far_waves.mp3",
+          "volume": 0.2
+        }
       ]
     },
     {
@@ -10794,13 +11136,13 @@
             "options": [
               "No pair differs (0 of 6 comparisons significant)",
               "5 of 15 comparisons significant: Bice-Clelia, Clelia-Gemma, Clelia-Ines, Dora-Ines, Ines-Zita",
-              "Only leaf_mould stands apart: its value is lower than each of the other 3; the others do not differ from one another (3 of 6 comparisons significant)",
+              "6 of 15 comparisons significant: Bice-Clelia, Bice-Dora, Bice-Ines, Bice-Zita, Dora-Gemma, Gemma-Zita",
               "Every pair differs (all 6 comparisons significant)",
               "Two groups: each of coir_blend, leaf_mould is higher than each of pumice_loam, tuff_grit; no pair within a group differs (4 of 6 comparisons significant)",
               "No pair differs (0 of 15 comparisons significant)",
-              "6 of 15 comparisons significant: Bice-Clelia, Bice-Dora, Bice-Ines, Bice-Zita, Dora-Gemma, Gemma-Zita"
+              "Only leaf_mould stands apart: its value is lower than each of the other 3; the others do not differ from one another (3 of 6 comparisons significant)"
             ],
-            "correct": 2,
+            "correct": 6,
             "feedback": {
               "correct": "Correct, noted in your field notebook: by Kruskal-Wallis and Dunn, leaf_mould alone has a lower pH than the other three mixes, which do not differ.",
               "wrong": [
@@ -10817,7 +11159,11 @@
             0.5453,
             0.7549
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "solveSfx": {
+            "src": "audio/solve_soil_chime.mp3",
+            "volume": 0.2742150324214113
+          }
         },
         {
           "type": "lock",
@@ -10840,7 +11186,11 @@
             0.84,
             0.6205
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "solveSfx": {
+            "src": "audio/solve_gate_unlock.mp3",
+            "volume": 0.7863054015126943
+          }
         },
         {
           "type": "ambient",
@@ -11134,14 +11484,14 @@
           "type": "door",
           "label": "Back along the terrace",
           "box": [
-            0.135,
-            0.32,
-            0.2,
-            0.74
+            0.146,
+            0.3248,
+            0.211,
+            0.7448
           ],
           "direction": "open",
           "to": "up_3a",
-          "boxSource": "review:agent-vision",
+          "boxSource": "moved:testplay",
           "boxNote": "the open garden gateway on the left (hand-fixed 2026-10-20; draft:skeleton put it on the gatepost)"
         },
         {
@@ -11149,10 +11499,10 @@
           "type": "puzzle",
           "label": "Soil reading 3",
           "box": [
-            0.455,
-            0.6231,
-            0.5453,
-            0.7549
+            0.4427,
+            0.5629,
+            0.533,
+            0.6947
           ],
           "starterCode": "garden_soil",
           "question": {
@@ -11160,13 +11510,13 @@
             "options": [
               "No pair differs (0 of 6 comparisons significant)",
               "5 of 15 comparisons significant: Bice-Clelia, Clelia-Gemma, Clelia-Ines, Dora-Ines, Ines-Zita",
-              "Only leaf_mould stands apart: its value is lower than each of the other 3; the others do not differ from one another (3 of 6 comparisons significant)",
+              "6 of 15 comparisons significant: Bice-Clelia, Bice-Dora, Bice-Ines, Bice-Zita, Dora-Gemma, Gemma-Zita",
               "Every pair differs (all 6 comparisons significant)",
               "Two groups: each of coir_blend, leaf_mould is higher than each of pumice_loam, tuff_grit; no pair within a group differs (4 of 6 comparisons significant)",
               "No pair differs (0 of 15 comparisons significant)",
-              "6 of 15 comparisons significant: Bice-Clelia, Bice-Dora, Bice-Ines, Bice-Zita, Dora-Gemma, Gemma-Zita"
+              "Only leaf_mould stands apart: its value is lower than each of the other 3; the others do not differ from one another (3 of 6 comparisons significant)"
             ],
-            "correct": 2,
+            "correct": 6,
             "feedback": {
               "correct": "Correct, noted in your field notebook: by Kruskal-Wallis and Dunn, leaf_mould alone has a lower pH than the other three mixes, which do not differ.",
               "wrong": [
@@ -11176,7 +11526,11 @@
               ]
             }
           },
-          "boxSource": "draft:skeleton"
+          "boxSource": "moved:testplay",
+          "solveSfx": {
+            "src": "audio/solve_soil_chime.mp3",
+            "volume": 0.2742150324214113
+          }
         },
         {
           "id": "the_gate_lock",
@@ -11199,7 +11553,11 @@
               "to": true
             }
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "solveSfx": {
+            "src": "audio/solve_gate_unlock.mp3",
+            "volume": 0.7863054015126943
+          }
         },
         {
           "id": "clip_base",
@@ -11243,6 +11601,20 @@
             "video": "middle_upper/cine_first_snow.mp4",
             "state": "first_snow"
           }
+        }
+      ],
+      "sfx": [
+        {
+          "src": "audio/sea_far_waves.mp3",
+          "volume": 0.35
+        },
+        {
+          "src": "audio/wind_light_snow.mp3",
+          "volume": 0.35
+        },
+        {
+          "src": "audio/lamp_flames.mp3",
+          "volume": 0.12
         }
       ]
     },
@@ -11289,23 +11661,23 @@
           "label": "The full soil survey",
           "starterCode": "garden_soil",
           "question": {
-            "prompt": "The full soil survey certifies phosphorus across all six gardens at once. Using the rows where <code>parameter</code> is phosphorus_mg_kg, compare <code>value</code> between every pair of the six gardens in the <code>garden</code> column (15 pairs) with pairwise t-tests, using the default pooled standard deviation and the Holm correction for multiple comparisons. Which statement matches the corrected results?",
+            "prompt": "The full soil survey certifies phosphorus across all six gardens at once. Using the rows where <code>parameter</code> is phosphorus_mg_kg, compare <code>value</code> between every pair of the six gardens in the <code>garden</code> column (15 pairs) with pairwise t-tests, using the default pooled standard deviation and the default correction for multiple comparisons. Which statement matches the corrected results?",
             "options": [
               "No pair differs (0 of 15 comparisons significant)",
               "Two groups: each of Bice, Gemma, Ines is higher than each of Clelia, Dora, Zita, and also Dora-Zita, Gemma-Ines differ (11 of 15 comparisons significant)",
               "1 of 15 comparisons significant: Dora-Gemma",
               "5 of 15 comparisons significant: Bice-Clelia, Clelia-Gemma, Clelia-Ines, Dora-Ines, Ines-Zita",
               "1 of 15 comparisons significant: Dora-Zita",
-              "No pair differs (0 of 6 comparisons significant)",
               "Two groups: each of Bice, Gemma, Ines is higher than each of Clelia, Dora, Zita; no pair within a group differs (9 of 15 comparisons significant)",
+              "No pair differs (0 of 6 comparisons significant)",
               "Only Zita stands apart: its value is higher than each of the other 5; the others do not differ from one another (5 of 15 comparisons significant)"
             ],
-            "correct": 6,
+            "correct": 5,
             "feedback": {
-              "correct": "Correct, noted in your field notebook: by pairwise t-tests with the Holm correction, the gardens fall into two groups for phosphorus: Bice, Gemma and Ines are each higher than each of Clelia, Dora and Zita, and no pair within a group differs.",
+              "correct": "Correct, noted in your field notebook: by pairwise t-tests with the correction for multiple comparisons, the gardens fall into two groups for phosphorus: Bice, Gemma and Ines are each higher than each of Clelia, Dora and Zita, and no pair within a group differs.",
               "wrong": [
                 "Keep only the rows where <code>parameter</code> is \"phosphorus_mg_kg\", then run <code>pairwiseTTest(value ~ garden)</code>. You should get 15 rows, one per pair of gardens.",
-                "Read <code>p.adj</code>, not <code>p</code>: that is the Holm-corrected value, the default. With 15 tests at once, a pair or two can dip below 0.05 by chance alone.",
+                "Read <code>p.adj</code>, not <code>p</code>: that is the value corrected for multiple comparisons, the default. With 15 tests at once, a pair or two can dip below 0.05 by chance alone.",
                 "To see which side of each significant pair is higher, find each garden's mean: <code>group_by(garden) %&gt;% summarize(mean = mean(value))</code>."
               ]
             }
@@ -11321,7 +11693,11 @@
             0.1632,
             0.5663
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "solveSfx": {
+            "src": "audio/solve_soil_chime.mp3",
+            "volume": 0.2742150324214113
+          }
         },
         {
           "type": "ambient",
@@ -11558,14 +11934,14 @@
           "type": "door",
           "label": "The stairs down to level 4",
           "box": [
-            0.33,
-            0.5117,
-            0.35,
-            0.5727
+            0.2805,
+            0.6062,
+            0.3005,
+            0.6672
           ],
           "direction": "open",
           "to": "up_4c",
-          "boxSource": "draft:skeleton"
+          "boxSource": "moved:testplay"
         },
         {
           "id": "the_garden_cart_down_two_levels",
@@ -11593,23 +11969,23 @@
           ],
           "starterCode": "garden_soil",
           "question": {
-            "prompt": "The full soil survey certifies phosphorus across all six gardens at once. Using the rows where <code>parameter</code> is phosphorus_mg_kg, compare <code>value</code> between every pair of the six gardens in the <code>garden</code> column (15 pairs) with pairwise t-tests, using the default pooled standard deviation and the Holm correction for multiple comparisons. Which statement matches the corrected results?",
+            "prompt": "The full soil survey certifies phosphorus across all six gardens at once. Using the rows where <code>parameter</code> is phosphorus_mg_kg, compare <code>value</code> between every pair of the six gardens in the <code>garden</code> column (15 pairs) with pairwise t-tests, using the default pooled standard deviation and the default correction for multiple comparisons. Which statement matches the corrected results?",
             "options": [
               "No pair differs (0 of 15 comparisons significant)",
               "Two groups: each of Bice, Gemma, Ines is higher than each of Clelia, Dora, Zita, and also Dora-Zita, Gemma-Ines differ (11 of 15 comparisons significant)",
               "1 of 15 comparisons significant: Dora-Gemma",
               "5 of 15 comparisons significant: Bice-Clelia, Clelia-Gemma, Clelia-Ines, Dora-Ines, Ines-Zita",
               "1 of 15 comparisons significant: Dora-Zita",
-              "No pair differs (0 of 6 comparisons significant)",
               "Two groups: each of Bice, Gemma, Ines is higher than each of Clelia, Dora, Zita; no pair within a group differs (9 of 15 comparisons significant)",
+              "No pair differs (0 of 6 comparisons significant)",
               "Only Zita stands apart: its value is higher than each of the other 5; the others do not differ from one another (5 of 15 comparisons significant)"
             ],
-            "correct": 6,
+            "correct": 5,
             "feedback": {
-              "correct": "Correct, noted in your field notebook: by pairwise t-tests with the Holm correction, the gardens fall into two groups for phosphorus: Bice, Gemma and Ines are each higher than each of Clelia, Dora and Zita, and no pair within a group differs.",
+              "correct": "Correct, noted in your field notebook: by pairwise t-tests with the correction for multiple comparisons, the gardens fall into two groups for phosphorus: Bice, Gemma and Ines are each higher than each of Clelia, Dora and Zita, and no pair within a group differs.",
               "wrong": [
                 "Keep only the rows where <code>parameter</code> is \"phosphorus_mg_kg\", then run <code>pairwiseTTest(value ~ garden)</code>. You should get 15 rows, one per pair of gardens.",
-                "Read <code>p.adj</code>, not <code>p</code>: that is the Holm-corrected value, the default. With 15 tests at once, a pair or two can dip below 0.05 by chance alone.",
+                "Read <code>p.adj</code>, not <code>p</code>: that is the value corrected for multiple comparisons, the default. With 15 tests at once, a pair or two can dip below 0.05 by chance alone.",
                 "To see which side of each significant pair is higher, find each garden's mean: <code>group_by(garden) %&gt;% summarize(mean = mean(value))</code>."
               ]
             }
@@ -11618,7 +11994,11 @@
             "solved": "middle_upper"
           },
           "lockedBody": "The full soil survey needs the middle garden's reading first.",
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "solveSfx": {
+            "src": "audio/solve_soil_chime.mp3",
+            "volume": 0.2742150324214113
+          }
         },
         {
           "id": "first_snow_wash",
@@ -11690,6 +12070,16 @@
             "video": "up_5b/cine_first_snow.mp4",
             "state": "first_snow"
           }
+        }
+      ],
+      "sfx": [
+        {
+          "src": "audio/fire_basket_roar.mp3",
+          "volume": 0.45
+        },
+        {
+          "src": "audio/wind_light_snow.mp3",
+          "volume": 0.3
         }
       ]
     },
@@ -12054,6 +12444,20 @@
             "state": "first_snow"
           }
         }
+      ],
+      "sfx": [
+        {
+          "src": "audio/wind_muffled.mp3",
+          "volume": 0.35
+        },
+        {
+          "src": "audio/leaves_wind.mp3",
+          "volume": 0.25
+        },
+        {
+          "src": "audio/sea_far_waves.mp3",
+          "volume": 0.2
+        }
       ]
     },
     {
@@ -12198,7 +12602,10 @@
               "elements": {
                 "orchard": {
                   "look": "a thin layer of fresh snow now rests on top of the crowns and on the bed soil, and the dark green of the stone pines still shows bright and clear beneath and around it",
-                  "desc": "on the land side, their tall trunks rising from the ground past the lid's edge and their crowns spreading above it, stone pines with tall bare trunks and broad flat umbrella crowns of dark green needles hung with pine cones, unmistakably evergreen and dark green; the whole grove stands well in from the left edge of the frame: its leftmost crown, trunk, shrub or shadow begins no further left than about 900 px from the left edge of the 3072 px image, and the 900 px between the grove and that edge show only the open evening sky above the clifftop, the calm sea horizon, and the flat paved stone lid edge running away beneath"
+                  "desc": "on the land side, their tall trunks rising from the ground past the lid's edge and their crowns spreading above it, a small grove of four or five stone pines with tall bare trunks and broad flat umbrella crowns of dark green needles hung with pine cones, unmistakably evergreen; the whole grove, with every shrub, hedge and bush of its understory and its verge, stands well in from the edge of the frame, at least 600 px from the left edge, with the open sky above the clifftop, the calm sea horizon and the bare flat paved stone lid between it and that edge; the bare strip left of the grove holds only sky, sea and paving, with no pine, shrub or bush at all"
+                },
+                "charcoal": {
+                  "desc": "on the ground below the lid on the land side, standing well in from the left edge of the frame with bare open evening sky and sea horizon between it and that edge, a charcoal burners' clamp: a low dome-shaped mound of earth and turf, with only a few stone pines behind it, none of them near the left edge"
                 }
               },
               "_why": "Fires at the turn: carrier `when` = {solved: middle_<role>}. One edit step from the accepted base still, never a chain. Plate look: world_plates/shore_set_20261017/first_snow.png"
@@ -12294,7 +12701,7 @@
               "needsWork": false,
               "accepted": false,
               "seamBandRun": 0.0,
-              "at": "2026-10-20T20:50:24"
+              "at": "2026-10-20T23:55:43"
             }
           }
         },
@@ -12322,10 +12729,10 @@
           "type": "door",
           "label": "Home",
           "box": [
-            0.3283,
-            0.3918,
-            0.6163,
-            0.5198
+            0.3369,
+            0.3972,
+            0.6249,
+            0.5252
           ],
           "direction": "open",
           "to": "up_5g",
@@ -12336,14 +12743,14 @@
           "type": "door",
           "label": "The lift down to level 4",
           "box": [
-            0.673,
-            0.364,
-            0.6972,
-            0.5698
+            0.6948,
+            0.38,
+            0.719,
+            0.5858
           ],
           "direction": "open",
           "to": "up_4c",
-          "boxSource": "draft:skeleton"
+          "boxSource": "moved:testplay"
         },
         {
           "id": "first_snow_wash",
@@ -12393,6 +12800,42 @@
             ],
             "video": "up_5c/cine_base.mp4"
           }
+        },
+        {
+          "id": "clip_first_snow",
+          "type": "ambient",
+          "label": "Scene motion (first_snow)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/play-source.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "up_5c/cine_first_snow.mp4",
+            "state": "first_snow"
+          }
+        }
+      ],
+      "sfx": [
+        {
+          "src": "audio/wind_cold_steady.mp3",
+          "volume": 0.4
+        },
+        {
+          "src": "audio/water_trickle.mp3",
+          "volume": 0.3
+        },
+        {
+          "src": "audio/smoulder_crackle.mp3",
+          "volume": 0.3
         }
       ]
     },
@@ -12585,28 +13028,28 @@
           "type": "door",
           "label": "Up the spiral stair",
           "box": [
-            0.48,
-            0.4952,
-            0.51,
-            0.9903
+            0.6498,
+            0.1297,
+            0.6798,
+            0.6248
           ],
           "direction": "open",
           "to": "up_lamp",
-          "boxSource": "draft:skeleton"
+          "boxSource": "moved:testplay"
         },
         {
           "id": "back_out_to_the_point",
           "type": "door",
           "label": "Back out to the point",
           "box": [
-            0.2067,
-            0.2542,
-            0.2467,
-            0.8201
+            0.1392,
+            0.2534,
+            0.1792,
+            0.8193
           ],
           "direction": "open",
           "to": "lighthouse",
-          "boxSource": "draft:skeleton"
+          "boxSource": "moved:testplay"
         },
         {
           "id": "clip_base",
@@ -12628,6 +13071,23 @@
             ],
             "video": "up_stair/cine_base.mp4"
           }
+        }
+      ],
+      "sfx": [
+        {
+          "src": "audio/wind_muffled.mp3",
+          "volume": 0.4
+        },
+        {
+          "src": "audio/sea_boom_muffled.mp3",
+          "volume": 0.3
+        },
+        {
+          "src": "audio/shot_chain_creak.mp3",
+          "volume": 0.3,
+          "mode": "interval",
+          "gapMin": 8,
+          "gapMax": 18
         }
       ]
     },
@@ -12870,8 +13330,19 @@
             "video": "up_lamp/cine_base.mp4"
           }
         }
+      ],
+      "sfx": [
+        {
+          "src": "audio/wind_gale_glazing.mp3",
+          "volume": 0.45
+        },
+        {
+          "src": "audio/surf_heavy.mp3",
+          "volume": 0.2
+        }
       ]
     }
   ],
-  "cover": "cover.png"
+  "cover": "cover.png",
+  "doorLabels": true
 }
