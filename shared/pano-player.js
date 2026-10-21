@@ -79,16 +79,17 @@
 // A bare `./variant_resolve.js` import is NOT refreshed by bumping the <script> tag's ?v, so a changed
 // helper module (e.g. a new export) leaves browsers on a stale cached copy → "doesn't provide an export
 // named X" SyntaxError → blank page (the 2026-08-05 airship regression). Bump all three together.
-import { WebRConsole } from "./webr-console.js?v=135";
-import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers } from "./variant_resolve.js?v=135";   // Phase 3: per-hotspot state variants; monorail switch-door nav
-import * as PQ from "./puzzle_queue.js?v=135";   // dynamic puzzle queue: location-independent puzzle serving
-import * as CP from "./corr_panel.js?v=135";   // lower-triangle layout of the grid gate (clouds correlation panel)
-import { particleCount } from "./particles.js?v=135";   // ambient-particle vocabulary + per-kind field density
-import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=135";
-import { condHolds } from "./cond.js?v=135";   // ledger + elevation-map card DOM
-import * as LIVE from "./live_session.js?v=135";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
-import * as RIDE from "./ride.js?v=135";
-import { mountDrawdown } from "./drawdown.js?v=135";   // the drawdown board instrument (diamonds escape)   // THE RIDE (subway): express lever + clip-sequence planner
+import { WebRConsole } from "./webr-console.js?v=136";
+import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers } from "./variant_resolve.js?v=136";   // Phase 3: per-hotspot state variants; monorail switch-door nav
+import * as PQ from "./puzzle_queue.js?v=136";   // dynamic puzzle queue: location-independent puzzle serving
+import * as CP from "./corr_panel.js?v=136";   // lower-triangle layout of the grid gate (clouds correlation panel)
+import { particleCount } from "./particles.js?v=136";   // ambient-particle vocabulary + per-kind field density
+import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=136";
+import { condHolds } from "./cond.js?v=136";   // ledger + elevation-map card DOM
+import * as LIVE from "./live_session.js?v=136";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
+import * as RIDE from "./ride.js?v=136";
+import { mountPcaPlate } from "./pca_plate.js?v=136";   // the PCA plate instrument (voyage beach)
+import { mountDrawdown } from "./drawdown.js?v=136";   // the drawdown board instrument (diamonds escape)   // THE RIDE (subway): express lever + clip-sequence planner
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 
@@ -2451,7 +2452,7 @@ function openPlaque(h) {
 // modal. Like a plaque it is never a gate, never a clue and never logged; the player reads a number off it.
 // `kind` picks the renderer; each kind's fields are documented in the header. Peg positions survive
 // closing and reopening within a visit (in memory only: nothing about an instrument is saved or graded).
-const INSTRUMENTS = { drawdown: mountDrawdown };
+const INSTRUMENTS = { drawdown: mountDrawdown, pca_plate: mountPcaPlate };
 // Opening zooms from the hotspot's marker into the close-up (settled design, notes §5 of diamonds), so the
 // student sees the board on the wall become the board in their hands. Skipped under reduced motion.
 function zoomFromHotspot(h) {
@@ -3298,7 +3299,7 @@ function buildPickCard(pick, onSolved, pid, h) {
   if (pick.liveGrade) {
     done = false;
     fb.className = "qfeedback no";
-    fb.innerHTML = "Fill in the blanks (<code>___</code>) in the template, run it, then click “Draw the clickable chart” and click your answer on it.";
+    fb.innerHTML = "Write your code in the console, save your plot as <code>p</code> and run it, then click “Draw the clickable chart” and click your answer on it.";
   } else if (done && attempts >= maxA) {
     fb.className = "qfeedback out"; fb.innerHTML = fbk.reveal || pick.hint || "Out of attempts.";
   } else if (attempts > 0) {
@@ -3308,6 +3309,93 @@ function buildPickCard(pick, onSolved, pid, h) {
   } else {
     fb.className = "qfeedback no"; fb.innerHTML = "Press “Draw the chart”, then click your answer on it.";
   }
+  return card;
+}
+
+// LIVE "object" task (live server kind "object"): no plot to click. The student writes the code
+// themselves and the answer is the R object it makes (`task.objectName`). Check runs the server-sent
+// `checkCode` in their WebR, which returns a sign-proof fingerprint of that object (or a NO* sentinel,
+// caught here so a missing object costs no cooldown), and the server compares it with the key.
+function buildObjectCard(task, onSolved) {
+  const card = document.createElement("div"); card.className = "qcard";
+  card.innerHTML = `<div class="qprompt">${task.prompt}</div>
+     <div class="qfeedback no"></div>
+     <button class="qsubmit"></button>`;
+  const fb = card.querySelector(".qfeedback"), btn = card.querySelector(".qsubmit");
+  const name = escHtml(task.objectName || "your object");
+  btn.textContent = task.checkLabel || "Check my answer";
+  fb.innerHTML = `Write your code in the console, save the result as <code>${name}</code>, run it, then press “${escHtml(btn.textContent)}”.`;
+  const SENTINEL = {
+    NOOBJ: `There's no <code>${name}</code> yet. Save your result with <code>${name} &lt;- ...</code> and run it.`,
+    NOTDF: `<code>${name}</code> isn't a table. It should be the output of the analysis.`,
+    NODIM: `<code>${name}</code> has no <code>Dim_1</code> and <code>Dim_2</code> columns. Did the analysis run?`,
+  };
+  let done = false;
+  btn.addEventListener("click", async () => {
+    if (done) return;
+    if (!rconsole || !rconsole.ready) {
+      fb.className = "qfeedback no"; fb.textContent = "R is still starting. Give it a moment, then check again.";
+      return;
+    }
+    btn.disabled = true; const label = btn.textContent; btn.textContent = "checking…";
+    try {
+      let fpr;
+      try { fpr = await rconsole.webR.evalRString(task.checkCode); }
+      catch (e) { fpr = "NOOBJ"; }
+      if (SENTINEL[fpr]) { fb.className = "qfeedback no"; fb.innerHTML = SENTINEL[fpr]; return; }
+      const r = await task.liveGrade(fpr);
+      if (r.correct) {
+        done = true; btn.style.display = "none";
+        fb.className = "qfeedback ok"; fb.textContent = r.feedback || "That's it.";
+        setTimeout(() => onSolved(r), 1600);
+      } else if (r.error) {
+        done = true; btn.style.display = "none";
+        fb.className = "qfeedback out"; fb.textContent = r.error;
+      } else {
+        fb.className = "qfeedback no";
+        fb.textContent = (r.feedback || "Not quite. Check your code.") +
+          (r.cooldown_s ? " Try again in " + r.cooldown_s + " s." : "");
+      }
+    } finally { btn.disabled = false; btn.textContent = label; }
+  });
+  return card;
+}
+
+// LIVE multiple choice (pool kind "mcq", e.g. basic_math/bathhouse): no console, just the dealt options in
+// the server's shuffled order. The keyed answer never reaches the browser; liveGrade sends the option id.
+function buildLiveMcqCard(task, onSolved) {
+  const card = document.createElement("div"); card.className = "qcard";
+  const grp = "lq" + Math.round(performance.now());
+  card.innerHTML = `<div class="qprompt">${task.prompt}</div><div class="qopts"></div>
+     <div class="qfeedback"></div><button class="qsubmit" disabled>Check my answer</button>`;
+  const opts = card.querySelector(".qopts"), fb = card.querySelector(".qfeedback"), btn = card.querySelector(".qsubmit");
+  let sel = null, done = false;
+  (task.options || []).forEach(o => {
+    const l = document.createElement("label"); l.className = "qopt";
+    l.innerHTML = `<input type="radio" name="${grp}"><span></span>`;
+    l.querySelector("span").textContent = o.text;
+    l.querySelector("input").addEventListener("change", () => { sel = o.id; if (!done) btn.disabled = false; });
+    opts.appendChild(l);
+  });
+  btn.addEventListener("click", async () => {
+    if (done || sel === null) return;
+    btn.disabled = true; const label = btn.textContent; btn.textContent = "checking…";
+    try {
+      const r = await task.liveGrade(sel);
+      if (r.correct) {
+        done = true; btn.style.display = "none"; opts.style.pointerEvents = "none";
+        fb.className = "qfeedback ok"; fb.textContent = r.feedback || "That's it.";
+        setTimeout(() => onSolved(r), 1600);
+      } else if (r.error) {
+        done = true; btn.style.display = "none"; opts.style.pointerEvents = "none";
+        fb.className = "qfeedback out"; fb.textContent = r.error;
+      } else {
+        fb.className = "qfeedback no";
+        fb.textContent = (r.feedback || "Not quite. Try again.") +
+          (r.cooldown_s ? " Try again in " + r.cooldown_s + " s." : "");
+      }
+    } finally { btn.textContent = label; if (!done) btn.disabled = false; }
+  });
   return card;
 }
 
@@ -3324,11 +3412,18 @@ async function openStation(h) {
   if (!r) return toast("Can't reach the class session. Check your connection.");
   if (!r.ok) return toast(r.j.error || "No task right now.");
   const d = r.j;
-  const task = {
-    id: h.id, label: d.title || h.label, starterCode: d.starter_code || "",
-    pick: {
-      prompt: escHtml(d.question || ""), idColumn: d.idColumn, idNoun: h.idNoun,
-      liveGrade: async (choice) => {
+  const liveGrade = async (choice) => {
+        // ORIENTED pick (a PC's sign is arbitrary): say which mirror image this student's plot is, by
+        // running the server-sent probe on their own object, and send it with the click. A probe that
+        // can't tell (no object yet) is answered here, at no cooldown.
+        if (d.orient_code) {
+          let o;
+          try { o = await rconsole.webR.evalRString(d.orient_code); } catch (e) { o = "NOOBJ"; }
+          if (o !== "+" && o !== "-")
+            return { feedback: d.orient_help || ("Save your analysis as " + (d.object_name || "the object the task names") +
+                     " and run it (your plot is checked against it), then click again.") };
+          choice = choice + "|" + o;
+        }
         const a = await LIVE.answer(d.deal_id, choice).catch(() => null);
         if (!a) return { error: "Can't reach the class session. Close this and try the station again." };
         if (!a.ok) return { error: a.j.error || "That task has expired. Close this and try the station again." };
@@ -3338,20 +3433,37 @@ async function openStation(h) {
           // The pool's right_feedback (if any) says WHY it is right; the carry line is always ours.
           a.j.feedback = (a.j.feedback ? a.j.feedback + " " : "Filled! ") +
             "You're carrying " + a.j.carrying + " " + (a.j.carrying === 1 ? unit[0] : unit[1]) +
-            ". Take " + (a.j.carrying === 1 ? "it" : "them") + " back to the canoe.";
+            ". Take " + (a.j.carrying === 1 ? "it" : "them") + " back to " + ((st && st.deliver_to) || "the canoe") + ".";
         }
         return a.j;
-      },
-    },
+  };
+  if (d.kind === "mcq") {     // no R at all: the dealt options, checked by the server
+    if (viewer) resumeYaw = viewer.getYaw();
+    const card = buildLiveMcqCard({ prompt: escHtml(d.question || ""), options: d.options, liveGrade },
+                                  () => closeModal());
+    return openModal(d.title || h.label, card);
+  }
+  const isObject = d.kind === "object";
+  const task = {
+    id: h.id, label: d.title || h.label, starterCode: d.starter_code || "",
+    pick: { prompt: escHtml(d.question || ""), idColumn: d.idColumn, idNoun: h.idNoun, liveGrade },
+    object: { prompt: escHtml(d.question || ""), objectName: d.object_name, checkCode: d.check_code,
+              checkLabel: d.check_label, liveGrade },
   };
   if (viewer) resumeYaw = viewer.getYaw();
   $("#code-input").value = task.starterCode;
   $("#webr-output").innerHTML = "";
-  if (rconsole && rconsole.ready) rconsole.webR.evalRVoid('suppressWarnings(if (exists("p")) rm(p))').catch(() => {});
+  // a fresh task starts with no p and no leftover object from an earlier task (the object a task names:
+  // its answer, or what an oriented pick's probe reads), so neither can be answered from stale work
+  const stale = ["p"];
+  if (/^[A-Za-z][A-Za-z0-9._]*$/.test(d.object_name || "") && d.object_name !== "p") stale.push(d.object_name);
+  if (rconsole && rconsole.ready) for (const nm of stale)
+    rconsole.webR.evalRVoid(`suppressWarnings(if (exists("${nm}")) rm(${nm}))`).catch(() => {});
   const grid = document.createElement("div"); grid.className = "qa";
   const left = document.createElement("div"), right = document.createElement("div");
   left.appendChild($("#console-block"));
-  right.appendChild(buildPickCard(task.pick, () => closeModal(), "live:" + d.deal_id, task));
+  right.appendChild(isObject ? buildObjectCard(task.object, () => closeModal())
+    : buildPickCard(task.pick, () => closeModal(), "live:" + d.deal_id, task));
   grid.appendChild(left); grid.appendChild(right);
   openModal(task.label, grid, null, null, "wide");
 }
@@ -3362,7 +3474,7 @@ async function deliverLoad(h) {
   if (!r) return toast("Can't reach the class session. Check your connection.");
   if (!r.ok) return toast(r.j.error || "Nothing to load.");
   const st = LIVE.state(), unit = (st && st.unit) || ["gourd", "gourds"];
-  toast("Loaded " + r.j.delivered + " " + (r.j.delivered === 1 ? unit[0] : unit[1]) + ". " +
+  toast(((st && st.deliver_verb) || "Loaded") + " " + r.j.delivered + " " + (r.j.delivered === 1 ? unit[0] : unit[1]) + ". " +
         "The class has " + r.j.total + (st && st.goal ? " of " + st.goal : "") + ".");
 }
 

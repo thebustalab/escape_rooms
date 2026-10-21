@@ -1,0 +1,1633 @@
+{
+  "status": "in_development",
+  "chapter": "basic_math",
+  "scenario": "bathhouse",
+  "live": true,
+  "title": "The Spirit Bathhouse",
+  "subtitle": "Live class · Basic math (addition and subtraction)",
+  "story": "The great spirit bathhouse's biggest tub is filthy, and only bundles of magic bath herbs can clean it. Solve a sum in any room to pick up a herb bundle. Carry it to the big tub and drop it in, then go back for more until the class has filled it.",
+  "enterLabel": "Step onto the bridge →",
+  "packages": [],
+  "datasets": [],
+  "setup": "",
+  "state": {},
+  "_designNotes": {
+    "buildState": "Rooms, graph and scene specs written by _scratch/build_scenario.py (2026-10-20). Live scenario: puzzles are dealt by the live-class server (authoring_v2/live_class/pool/bathhouse.json), never stored here. Multiple choice, no R. No codec id, no escape, ungraded. See notes.md."
+  },
+  "worldPlatePrompt": "One continuous single-frame view at dusk of a colossal, whimsical spirit bathhouse in old Japan, built entirely of wood: red-lacquered pillars and beams, green-painted rails and panels, gold trim and gold ornaments, yellow paper screens, curved tiled roofs stacked storey on storey like a grand pagoda; hand-painted animated-film look, rich saturated colour, soft painterly detail, standing at the far end of a long arched wooden footbridge over a deep green ravine, flowering hedges at the ravine's edge to one side, a narrow wooden stair running down the outside wall to a small glowing door. No people, no text.",
+  "coverPrompt": "Minimalist stylised thumbnail poster: a towering many-roofed red, green and gold wooden bathhouse glowing with paper lanterns against a violet dusk sky, a small arched bridge leading to it. One bold, simple silhouette that reads at thumbnail size; flat limited palette of red, green, gold and violet. No people, no text.",
+  "rooms": [
+    {
+      "key": "bridge",
+      "title": "The bridge",
+      "built": true,
+      "unlockedWhen": true,
+      "designNote": "ARRIVAL. Station (1 herb bundle): the lantern-post basket. Doors to the atrium, the garden path and the boiler-room stairs.",
+      "plannedHotspots": [
+        {
+          "type": "door",
+          "direction": "open",
+          "to": "garden",
+          "label": "The path to the hidden garden",
+          "box": [
+            0.155,
+            0.42,
+            0.205,
+            0.66
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "station",
+          "tier": 1,
+          "label": "The basket by the lantern post",
+          "box": [
+            0.293,
+            0.52,
+            0.4,
+            0.82
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "to": "atrium",
+          "label": "The great doors of the bathhouse",
+          "box": [
+            0.4602,
+            0.3589,
+            0.5402,
+            0.5005
+          ],
+          "boxSource": "draft:skeleton"
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "to": "boiler",
+          "label": "The narrow stairs down",
+          "box": [
+            0.59,
+            0.47,
+            0.69,
+            0.72
+          ],
+          "boxSource": "moved:agent"
+        }
+      ],
+      "authoring": {
+        "sceneSpec": {
+          "room": "bridge",
+          "setting": "a long arched wooden footbridge over a deep green ravine, leading straight to the main doors of a colossal, whimsical spirit bathhouse in old Japan, built entirely of wood: red-lacquered pillars and beams, green-painted rails and panels, gold trim and gold ornaments, yellow paper screens, curved tiled roofs stacked storey on storey like a grand pagoda; hand-painted animated-film look, rich saturated colour, soft painterly detail",
+          "interior": false,
+          "indoor": false,
+          "seam": "the empty wooden bridge deck running away behind the viewer between its green railings toward a dusky town of low tiled roofs",
+          "seamOccluder": "one tall red-lacquered lantern post on the bridge railing with a glowing paper lantern",
+          "elements": [
+            {
+              "id": "seam_left",
+              "at": "on the far left",
+              "desc": "the left half of the calm view directly behind the viewer: the empty wooden bridge deck running away behind the viewer between its green railings toward a dusky town of low tiled roofs, joining its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "garden_path",
+              "at": "to the left",
+              "label": "The path to the hidden garden",
+              "door": {
+                "direction": "open",
+                "to": "garden"
+              },
+              "desc": "at the left-hand end of the bridge, a gap in the green railing opens onto a narrow earth path that leads off level along the ravine's edge into tall, flowering hedges"
+            },
+            {
+              "id": "herb_basket",
+              "at": "just left of centre",
+              "label": "The basket by the lantern post",
+              "station": 1,
+              "desc": "on the bridge deck beside a red lantern post, a round woven basket heaped with small bundles of green bath herbs tied with red string"
+            },
+            {
+              "id": "main_doors",
+              "at": "dead ahead in the centre",
+              "label": "The great doors of the bathhouse",
+              "door": {
+                "direction": "open",
+                "to": "atrium"
+              },
+              "desc": "the bridge deck runs straight ahead, level, to the bathhouse's great main doors: two tall red-lacquered doors standing wide open under a huge curved gold-trimmed roof, warm light pouring out; above them the colossal bathhouse rises storey after storey, red, green and gold, lit with lanterns, filling the sky"
+            },
+            {
+              "id": "boiler_stairs",
+              "at": "to the right",
+              "label": "The narrow stairs down",
+              "door": {
+                "direction": "open",
+                "to": "boiler"
+              },
+              "desc": "at the right-hand end of the bridge, a gap in the green railing where a very narrow, steep wooden staircase with a thin handrail starts at the deck and runs down along the outside wall of the bathhouse toward a small glowing door far below"
+            },
+            {
+              "id": "seam_right",
+              "at": "on the far right",
+              "desc": "the right half of the calm view directly behind the viewer: the empty wooden bridge deck running away behind the viewer between its green railings toward a dusky town of low tiled roofs, joining its other half cleanly at the seam directly behind you"
+            }
+          ],
+          "soundBed": "a high open bridge at dusk: wind over the ravine, distant water far below, faint music and chatter from the bathhouse.",
+          "rigid": "the bridge, its railings and lantern posts, the basket, the doors, the bathhouse",
+          "atmosphere": "grand and magical, the bathhouse towering and glowing against the violet dusk sky",
+          "styleLight": "early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red",
+          "negatives": "No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. Only ONE bridge; the bathhouse doors are open; the stairs go DOWN from the bridge, never up.",
+          "states": {},
+          "continuity": [],
+          "scaffold": {
+            "kind": "skeleton",
+            "layout": {
+              "surface": "court",
+              "word": "bridge deck",
+              "floor": "wooden bridge deck",
+              "size": [
+                2.0,
+                2.0,
+                9,
+                6
+              ],
+              "sides": {
+                "left": "railing",
+                "right": "railing",
+                "front": "houses",
+                "back": "drop"
+              },
+              "parts": [
+                [
+                  "door",
+                  "main_doors",
+                  {
+                    "w": 2.6,
+                    "h": 3.2,
+                    "say": "the open main doors, the bridge deck running level in over the threshold"
+                  }
+                ],
+                [
+                  "door",
+                  "garden_path",
+                  {
+                    "w": 1.2,
+                    "h": 2.2,
+                    "say": "the gap in the left railing, the deck running level onto the garden path"
+                  }
+                ],
+                [
+                  "stair_down",
+                  "boiler_stairs"
+                ],
+                [
+                  "prop",
+                  "herb_basket",
+                  {
+                    "size": [
+                      0.6,
+                      0.6,
+                      0.5
+                    ]
+                  }
+                ]
+              ]
+            }
+          },
+          "stillOnly": true
+        },
+        "plateRefs": [
+          "atrium/scene.png"
+        ],
+        "scenePrompt": "This is a seamless 360-degree panorama from a long arched wooden footbridge over a deep green ravine, leading straight to the main doors of a colossal, whimsical spirit bathhouse in old Japan, built entirely of wood: red-lacquered pillars and beams, green-painted rails and panels, gold trim and gold ornaments, yellow paper screens, curved tiled roofs stacked storey on storey like a grand pagoda; hand-painted animated-film look, rich saturated colour, soft painterly detail. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the empty wooden bridge deck running away behind the viewer between its green railings toward a dusky town of low tiled roofs: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: the empty wooden bridge deck running away behind the viewer between its green railings toward a dusky town of low tiled roofs, joining its other half cleanly at the seam directly behind you; to the left, at the left-hand end of the bridge, a gap in the green railing opens onto a narrow earth path that leads off level along the ravine's edge into tall, flowering hedges; just left of centre, on the bridge deck beside a red lantern post, a round woven basket heaped with small bundles of green bath herbs tied with red string; dead ahead in the centre, the bridge deck runs straight ahead, level, to the bathhouse's great main doors: two tall red-lacquered doors standing wide open under a huge curved gold-trimmed roof, warm light pouring out; above them the colossal bathhouse rises storey after storey, red, green and gold, lit with lanterns, filling the sky; to the right, at the right-hand end of the bridge, a gap in the green railing where a very narrow, steep wooden staircase with a thin handrail starts at the deck and runs down along the outside wall of the bathhouse toward a small glowing door far below; on the far right, the right half of the calm view directly behind the viewer: the empty wooden bridge deck running away behind the viewer between its green railings toward a dusky town of low tiled roofs, joining its other half cleanly at the seam directly behind you. grand and magical, the bathhouse towering and glowing against the violet dusk sky. No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. Only ONE bridge; the bathhouse doors are open; the stairs go DOWN from the bridge, never up. Shot on a full-frame DSLR at 24mm, f/8, early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into the empty wooden bridge deck running away behind the viewer between its green railings toward a dusky town of low tiled roofs, with no visible seam, join, or repetition.",
+        "seam": {
+          "stage": "blurred",
+          "band": "sky",
+          "ratio": 0.0,
+          "delta": 0.0,
+          "needsWork": false,
+          "accepted": true,
+          "seamBandRun": 0.0,
+          "at": "2026-10-20T20:34:54",
+          "acceptedBy": "lucas via agent 2026-10-20",
+          "humanNote": "Lucas 2026-10-20: 'Those rooms are all good.'"
+        }
+      },
+      "mapPos": {
+        "c": 1,
+        "r": 3
+      },
+      "panorama": "bridge/scene.png",
+      "builtFrom": "l1_bridge_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "hotspots": [
+        {
+          "id": "the_path_to_the_hidden_garden",
+          "type": "door",
+          "label": "The path to the hidden garden",
+          "box": [
+            0.155,
+            0.42,
+            0.205,
+            0.66
+          ],
+          "direction": "open",
+          "to": "garden",
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "the_basket_by_the_lantern_post",
+          "type": "station",
+          "label": "The basket by the lantern post",
+          "box": [
+            0.293,
+            0.52,
+            0.4,
+            0.82
+          ],
+          "tier": 1,
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "the_great_doors_of_the_bathhouse",
+          "type": "door",
+          "label": "The great doors of the bathhouse",
+          "box": [
+            0.4602,
+            0.3589,
+            0.5402,
+            0.5005
+          ],
+          "direction": "open",
+          "to": "atrium",
+          "boxSource": "draft:skeleton"
+        },
+        {
+          "id": "the_narrow_stairs_down",
+          "type": "door",
+          "label": "The narrow stairs down",
+          "box": [
+            0.59,
+            0.47,
+            0.69,
+            0.72
+          ],
+          "direction": "open",
+          "to": "boiler",
+          "boxSource": "moved:agent"
+        }
+      ]
+    },
+    {
+      "key": "garden",
+      "title": "The hidden flower garden",
+      "built": true,
+      "unlockedWhen": true,
+      "designNote": "Station (1 herb bundle): the bench basket. Back to the bridge only.",
+      "plannedHotspots": [
+        {
+          "type": "station",
+          "tier": 1,
+          "label": "The basket on the garden bench",
+          "box": [
+            0.21,
+            0.49,
+            0.37,
+            0.75
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "door",
+          "direction": "back",
+          "to": "bridge",
+          "label": "Back to the bridge",
+          "box": [
+            0.475,
+            0.28,
+            0.53,
+            0.78
+          ],
+          "boxSource": "moved:agent"
+        }
+      ],
+      "authoring": {
+        "sceneSpec": {
+          "room": "garden",
+          "setting": "a secret hollow inside tall flowering hedges at the edge of the ravine beside the bathhouse, full of beautiful flowers, a perfect hiding place",
+          "interior": false,
+          "indoor": false,
+          "seam": "a dense wall of tall flowering hedges, pink, white and yellow blossoms, calm and even",
+          "seamOccluder": "one tall flowering shrub covered in pale pink blossom",
+          "elements": [
+            {
+              "id": "seam_left",
+              "at": "on the far left",
+              "desc": "the left half of the calm view directly behind the viewer: a dense wall of tall flowering hedges, pink, white and yellow blossoms, calm and even, joining its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "flower_beds",
+              "at": "to the left",
+              "desc": "thick beds of flowers taller than a child: azaleas, peonies, hydrangeas and lilies in pink, red, white and purple"
+            },
+            {
+              "id": "bench_basket",
+              "at": "just left of centre",
+              "label": "The basket on the garden bench",
+              "station": 1,
+              "desc": "a small old wooden bench half hidden in the flowers, on it a woven basket of flower petals and small bundles of bath herbs tied with red string"
+            },
+            {
+              "id": "path_back",
+              "at": "dead ahead in the centre",
+              "label": "Back to the bridge",
+              "door": {
+                "direction": "back",
+                "to": "bridge"
+              },
+              "desc": "a narrow earth path leading out between the hedges, level, through a gap that frames the lantern-lit bridge and the huge glowing bathhouse beyond"
+            },
+            {
+              "id": "pond",
+              "at": "to the right",
+              "desc": "a tiny still pond with a few lily pads and a pale stone at its edge"
+            },
+            {
+              "id": "seam_right",
+              "at": "on the far right",
+              "desc": "the right half of the calm view directly behind the viewer: a dense wall of tall flowering hedges, pink, white and yellow blossoms, calm and even, joining its other half cleanly at the seam directly behind you"
+            }
+          ],
+          "soundBed": "a sheltered garden at dusk: crickets, a soft breeze in the leaves, the bathhouse very faint.",
+          "rigid": "the bench, the basket, the hedges, the pond, the stone",
+          "atmosphere": "secret, safe and peaceful, colours glowing in the last of the dusk light",
+          "styleLight": "early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red",
+          "negatives": "No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. The garden is open to the sky; no buildings inside it, only the bathhouse seen far off through the gap.",
+          "states": {},
+          "continuity": [],
+          "scaffold": {
+            "kind": "skeleton",
+            "layout": {
+              "surface": "court",
+              "word": "garden floor",
+              "floor": "earth path and grass",
+              "size": [
+                3,
+                3,
+                4,
+                3
+              ],
+              "sides": {
+                "left": "rock",
+                "right": "rock",
+                "front": "rock",
+                "back": "rock"
+              },
+              "parts": [
+                [
+                  "door",
+                  "path_back",
+                  {
+                    "w": 1.4,
+                    "h": 2.4,
+                    "say": "the gap in the hedges, the path running level out toward the bridge"
+                  }
+                ],
+                [
+                  "prop",
+                  "bench_basket",
+                  {
+                    "size": [
+                      1.2,
+                      0.5,
+                      0.5
+                    ]
+                  }
+                ]
+              ]
+            }
+          },
+          "stillOnly": true
+        },
+        "plateRefs": [
+          "atrium/scene.png"
+        ],
+        "scenePrompt": "This is a seamless 360-degree panorama from a secret hollow inside tall flowering hedges at the edge of the ravine beside the bathhouse, full of beautiful flowers, a perfect hiding place. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a dense wall of tall flowering hedges, pink, white and yellow blossoms, calm and even: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: a dense wall of tall flowering hedges, pink, white and yellow blossoms, calm and even, joining its other half cleanly at the seam directly behind you; to the left, thick beds of flowers taller than a child: azaleas, peonies, hydrangeas and lilies in pink, red, white and purple; just left of centre, a small old wooden bench half hidden in the flowers, on it a woven basket of flower petals and small bundles of bath herbs tied with red string; dead ahead in the centre, a narrow earth path leading out between the hedges, level, through a gap that frames the lantern-lit bridge and the huge glowing bathhouse beyond; to the right, a tiny still pond with a few lily pads and a pale stone at its edge; on the far right, the right half of the calm view directly behind the viewer: a dense wall of tall flowering hedges, pink, white and yellow blossoms, calm and even, joining its other half cleanly at the seam directly behind you. secret, safe and peaceful, colours glowing in the last of the dusk light. No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. The garden is open to the sky; no buildings inside it, only the bathhouse seen far off through the gap. Shot on a full-frame DSLR at 24mm, f/8, early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a dense wall of tall flowering hedges, pink, white and yellow blossoms, calm and even, with no visible seam, join, or repetition.",
+        "seam": {
+          "stage": "screened",
+          "band": "mid",
+          "ratio": 1.55,
+          "delta": 3.18,
+          "needsWork": false,
+          "accepted": true,
+          "seamBandRun": 0.014,
+          "at": "2026-10-20T20:34:54",
+          "acceptedBy": "lucas via agent 2026-10-20",
+          "humanNote": "Lucas 2026-10-20: 'Those rooms are all good.'"
+        }
+      },
+      "mapPos": {
+        "c": 0,
+        "r": 3
+      },
+      "panorama": "garden/scene.png",
+      "builtFrom": "l1_garden_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "hotspots": [
+        {
+          "id": "the_basket_on_the_garden_bench",
+          "type": "station",
+          "label": "The basket on the garden bench",
+          "box": [
+            0.21,
+            0.49,
+            0.37,
+            0.75
+          ],
+          "tier": 1,
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "back_to_the_bridge",
+          "type": "door",
+          "label": "Back to the bridge",
+          "box": [
+            0.475,
+            0.28,
+            0.53,
+            0.78
+          ],
+          "direction": "back",
+          "to": "bridge",
+          "boxSource": "moved:agent"
+        }
+      ]
+    },
+    {
+      "key": "boiler",
+      "title": "The boiler room",
+      "built": true,
+      "unlockedWhen": true,
+      "designNote": "Station (1 herb bundle): the wall of herb drawers. Doors: up the outside stairs to the bridge, up the inside stairs to the atrium.",
+      "plannedHotspots": [
+        {
+          "type": "door",
+          "direction": "back",
+          "to": "bridge",
+          "label": "Up the outside stairs to the bridge",
+          "box": [
+            0.135,
+            0.22,
+            0.215,
+            0.66
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "station",
+          "tier": 1,
+          "label": "The wall of herb drawers",
+          "box": [
+            0.218,
+            0.0,
+            0.378,
+            0.6
+          ],
+          "boxSource": "draft:skeleton"
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "to": "atrium",
+          "label": "Up the stairs to the atrium",
+          "box": [
+            0.69,
+            0.22,
+            0.77,
+            0.63
+          ],
+          "boxSource": "moved:agent"
+        }
+      ],
+      "authoring": {
+        "sceneSpec": {
+          "room": "boiler",
+          "setting": "the hot, cosy boiler room deep at the bottom of a colossal, whimsical spirit bathhouse in old Japan, built entirely of wood: red-lacquered pillars and beams, green-painted rails and panels, gold trim and gold ornaments, yellow paper screens, curved tiled roofs stacked storey on storey like a grand pagoda; hand-painted animated-film look, rich saturated colour, soft painterly detail",
+          "interior": true,
+          "indoor": true,
+          "seam": "a plain stretch of dark smoke-stained wooden wall, uniform and unbroken",
+          "seamOccluder": "a thick dark wooden roof post, floor to ceiling",
+          "elements": [
+            {
+              "id": "seam_left",
+              "at": "on the far left",
+              "desc": "the left half of the calm view directly behind the viewer: a plain stretch of dark smoke-stained wooden wall, uniform and unbroken, joining its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "outside_stairs",
+              "at": "to the left",
+              "label": "Up the outside stairs to the bridge",
+              "door": {
+                "direction": "back",
+                "to": "bridge"
+              },
+              "desc": "a small open wooden door, the floor running level over its sill to the foot of a steep narrow staircase climbing up outside into the dusk"
+            },
+            {
+              "id": "herb_drawers",
+              "at": "just left of centre",
+              "label": "The wall of herb drawers",
+              "station": 1,
+              "desc": "a towering wall of hundreds of small wooden drawers, floor to ceiling, each with a little brass pull, a few pulled open and spilling dried herbs"
+            },
+            {
+              "id": "furnace",
+              "at": "dead ahead in the centre",
+              "desc": "a huge black iron furnace with its round door open and a roaring orange fire inside, big pipes rising from it into the ceiling"
+            },
+            {
+              "id": "inside_stairs",
+              "at": "to the right",
+              "label": "Up the stairs to the atrium",
+              "door": {
+                "direction": "open",
+                "to": "atrium"
+              },
+              "desc": "a wooden staircase starting at the floor and climbing up through an opening in the ceiling toward warm lantern light"
+            },
+            {
+              "id": "seam_right",
+              "at": "on the far right",
+              "desc": "the right half of the calm view directly behind the viewer: a plain stretch of dark smoke-stained wooden wall, uniform and unbroken, joining its other half cleanly at the seam directly behind you"
+            }
+          ],
+          "soundBed": "a hot boiler room: the steady roar of the furnace fire, pipes ticking and hissing.",
+          "rigid": "the drawers, the furnace, the pipes, the stairs, the door",
+          "atmosphere": "very hot and steamy but cosy, orange firelight on dark wood and brass",
+          "styleLight": "early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red",
+          "negatives": "No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described.",
+          "states": {},
+          "continuity": [],
+          "scaffold": {
+            "kind": "skeleton",
+            "layout": {
+              "surface": "room",
+              "word": "floor",
+              "floor": "worn plank floor of the boiler room",
+              "size": [
+                4,
+                4,
+                4,
+                3
+              ],
+              "sides": {
+                "left": "houses",
+                "right": "houses",
+                "front": "houses",
+                "back": "houses"
+              },
+              "parts": [
+                [
+                  "door",
+                  "outside_stairs",
+                  {
+                    "w": 1.0,
+                    "h": 2.0,
+                    "say": "the small open door, the floor running level out to the foot of the outside stairs"
+                  }
+                ],
+                [
+                  "stair_up",
+                  "inside_stairs"
+                ],
+                [
+                  "prop",
+                  "furnace",
+                  {
+                    "size": [
+                      2.5,
+                      1.5,
+                      2.5
+                    ],
+                    "kind": "wall"
+                  }
+                ]
+              ]
+            }
+          },
+          "stillOnly": true
+        },
+        "plateRefs": [
+          "atrium/scene.png"
+        ],
+        "scenePrompt": "This is a seamless 360-degree panorama from the hot, cosy boiler room deep at the bottom of a colossal, whimsical spirit bathhouse in old Japan, built entirely of wood: red-lacquered pillars and beams, green-painted rails and panels, gold trim and gold ornaments, yellow paper screens, curved tiled roofs stacked storey on storey like a grand pagoda; hand-painted animated-film look, rich saturated colour, soft painterly detail. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stretch of dark smoke-stained wooden wall, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: a plain stretch of dark smoke-stained wooden wall, uniform and unbroken, joining its other half cleanly at the seam directly behind you; to the left, a small open wooden door, the floor running level over its sill to the foot of a steep narrow staircase climbing up outside into the dusk; just left of centre, a towering wall of hundreds of small wooden drawers, floor to ceiling, each with a little brass pull, a few pulled open and spilling dried herbs; dead ahead in the centre, a huge black iron furnace with its round door open and a roaring orange fire inside, big pipes rising from it into the ceiling; to the right, a wooden staircase starting at the floor and climbing up through an opening in the ceiling toward warm lantern light; on the far right, the right half of the calm view directly behind the viewer: a plain stretch of dark smoke-stained wooden wall, uniform and unbroken, joining its other half cleanly at the seam directly behind you. very hot and steamy but cosy, orange firelight on dark wood and brass. No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. Shot on a full-frame DSLR at 24mm, f/8, early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a plain stretch of dark smoke-stained wooden wall, uniform and unbroken, with no visible seam, join, or repetition.",
+        "seam": {
+          "stage": "blurred",
+          "band": "sky",
+          "ratio": 0.0,
+          "delta": 0.0,
+          "needsWork": false,
+          "accepted": true,
+          "seamBandRun": 0.0,
+          "at": "2026-10-20T20:34:54",
+          "acceptedBy": "lucas via agent 2026-10-20",
+          "humanNote": "Lucas 2026-10-20: 'Those rooms are all good.'"
+        }
+      },
+      "mapPos": {
+        "c": 2,
+        "r": 3
+      },
+      "panorama": "boiler/scene.png",
+      "builtFrom": "l1_boiler_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "hotspots": [
+        {
+          "id": "up_the_outside_stairs_to_the_bridge",
+          "type": "door",
+          "label": "Up the outside stairs to the bridge",
+          "box": [
+            0.135,
+            0.22,
+            0.215,
+            0.66
+          ],
+          "direction": "back",
+          "to": "bridge",
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "the_wall_of_herb_drawers",
+          "type": "station",
+          "label": "The wall of herb drawers",
+          "box": [
+            0.218,
+            0.0,
+            0.378,
+            0.6
+          ],
+          "tier": 1,
+          "boxSource": "draft:skeleton"
+        },
+        {
+          "id": "up_the_stairs_to_the_atrium",
+          "type": "door",
+          "label": "Up the stairs to the atrium",
+          "box": [
+            0.69,
+            0.22,
+            0.77,
+            0.63
+          ],
+          "direction": "open",
+          "to": "atrium",
+          "boxSource": "moved:agent"
+        }
+      ]
+    },
+    {
+      "key": "atrium",
+      "title": "The atrium",
+      "built": true,
+      "unlockedWhen": true,
+      "designNote": "HUB, drawn FIRST (no plate ref); every other room rides its accepted panorama. Station (1 herb bundle): the herb stand. Five doors.",
+      "plannedHotspots": [
+        {
+          "type": "door",
+          "direction": "back",
+          "to": "bridge",
+          "label": "Out to the bridge",
+          "box": [
+            0.14,
+            0.32,
+            0.23,
+            0.66
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "door",
+          "direction": "back",
+          "to": "boiler",
+          "label": "Down to the boiler room",
+          "box": [
+            0.3,
+            0.5,
+            0.355,
+            0.62
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "station",
+          "tier": 1,
+          "label": "The herb stand",
+          "box": [
+            0.4731,
+            0.6609,
+            0.5272,
+            0.8571
+          ],
+          "boxSource": "draft:skeleton"
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "to": "tub",
+          "label": "To the big tub",
+          "box": [
+            0.4658,
+            0.353,
+            0.5345,
+            0.5234
+          ],
+          "boxSource": "draft:skeleton"
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "to": "quarters",
+          "label": "Up the wooden stairs",
+          "box": [
+            0.6309,
+            0.5054,
+            0.6909,
+            0.6454
+          ],
+          "boxSource": "draft:skeleton"
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "to": "office",
+          "label": "The elevator",
+          "box": [
+            0.7598,
+            0.3768,
+            0.8398,
+            0.6232
+          ],
+          "boxSource": "draft:skeleton"
+        }
+      ],
+      "authoring": {
+        "sceneSpec": {
+          "room": "atrium",
+          "setting": "the grand central atrium of a colossal, whimsical spirit bathhouse in old Japan, built entirely of wood: red-lacquered pillars and beams, green-painted rails and panels, gold trim and gold ornaments, yellow paper screens, curved tiled roofs stacked storey on storey like a grand pagoda; hand-painted animated-film look, rich saturated colour, soft painterly detail, a tall open hall several storeys high with galleries all round",
+          "interior": true,
+          "indoor": true,
+          "seam": "a plain stretch of red-lacquered wooden wall with gold trim, uniform and unbroken",
+          "seamOccluder": "a tall round red-lacquered pillar, floor to ceiling",
+          "elements": [
+            {
+              "id": "seam_left",
+              "at": "on the far left",
+              "desc": "the left half of the calm view directly behind the viewer: a plain stretch of red-lacquered wooden wall with gold trim, uniform and unbroken, joining its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "main_doors",
+              "at": "to the left",
+              "label": "Out to the bridge",
+              "door": {
+                "direction": "back",
+                "to": "bridge"
+              },
+              "desc": "the great main doors standing open, the floor running level out over the threshold onto the lantern-lit bridge and the dusk beyond"
+            },
+            {
+              "id": "down_stairs",
+              "at": "just left of centre",
+              "label": "Down to the boiler room",
+              "door": {
+                "direction": "back",
+                "to": "boiler"
+              },
+              "desc": "the top of a wooden staircase going down from the floor through an opening, newel posts either side, orange firelight glowing up from below"
+            },
+            {
+              "id": "herb_stand",
+              "at": "dead ahead in the centre",
+              "label": "The herb stand",
+              "station": 1,
+              "desc": "close to the viewer on the floor, a small low red-lacquered stand holding a wide basket of herb bundles tied with red string, well clear of the doorway beyond it"
+            },
+            {
+              "id": "tub_doors",
+              "at": "dead ahead in the centre",
+              "label": "To the big tub",
+              "door": {
+                "direction": "open",
+                "to": "tub"
+              },
+              "desc": "a wide doorway hung with a short split cloth curtain, steam drifting out of it, the floor running level through it"
+            },
+            {
+              "id": "up_stairs",
+              "at": "just right of centre",
+              "label": "Up the wooden stairs",
+              "door": {
+                "direction": "open",
+                "to": "quarters"
+              },
+              "desc": "a broad wooden staircase starting at the floor and climbing to the first gallery"
+            },
+            {
+              "id": "elevator",
+              "at": "to the right",
+              "label": "The elevator",
+              "door": {
+                "direction": "open",
+                "to": "office"
+              },
+              "desc": "an old wooden-and-brass elevator cage with its folding gate open and its car waiting level with the floor"
+            },
+            {
+              "id": "seam_right",
+              "at": "on the far right",
+              "desc": "the right half of the calm view directly behind the viewer: a plain stretch of red-lacquered wooden wall with gold trim, uniform and unbroken, joining its other half cleanly at the seam directly behind you"
+            }
+          ],
+          "soundBed": "a huge busy wooden hall: echoing footsteps, distant chatter, steam hissing, a gong far off.",
+          "rigid": "the pillars, the galleries, the herb stand, the stairs, the elevator, the doors",
+          "atmosphere": "grand, warm and bustling-feeling though empty, steam curling under the lanterns",
+          "styleLight": "early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red",
+          "negatives": "No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. The hall is EMPTY of people and spirits.",
+          "states": {},
+          "continuity": [],
+          "scaffold": {
+            "kind": "skeleton",
+            "layout": {
+              "surface": "room",
+              "word": "floor",
+              "floor": "polished wooden floor of the atrium",
+              "size": [
+                6,
+                6,
+                6,
+                4
+              ],
+              "sides": {
+                "left": "houses",
+                "right": "houses",
+                "front": "houses",
+                "back": "houses"
+              },
+              "parts": [
+                [
+                  "door",
+                  "main_doors",
+                  {
+                    "w": 2.6,
+                    "h": 3.2,
+                    "say": "the open main doors, the floor running level out onto the bridge"
+                  }
+                ],
+                [
+                  "stair_down",
+                  "down_stairs"
+                ],
+                [
+                  "prop",
+                  "herb_stand",
+                  {
+                    "size": [
+                      0.7,
+                      0.7,
+                      0.8
+                    ],
+                    "dist": 2.2
+                  }
+                ],
+                [
+                  "door",
+                  "tub_doors",
+                  {
+                    "w": 2.4,
+                    "h": 2.6,
+                    "say": "the curtained doorway, the floor running level through it"
+                  }
+                ],
+                [
+                  "stair_up",
+                  "up_stairs"
+                ],
+                [
+                  "door",
+                  "elevator",
+                  {
+                    "w": 1.4,
+                    "h": 2.4,
+                    "say": "the open elevator car, its floor level with the atrium floor"
+                  }
+                ]
+              ]
+            }
+          },
+          "stillOnly": true,
+          "worldPlateRef": false
+        },
+        "scenePrompt": "This is a seamless 360-degree panorama from the grand central atrium of a colossal, whimsical spirit bathhouse in old Japan, built entirely of wood: red-lacquered pillars and beams, green-painted rails and panels, gold trim and gold ornaments, yellow paper screens, curved tiled roofs stacked storey on storey like a grand pagoda; hand-painted animated-film look, rich saturated colour, soft painterly detail, a tall open hall several storeys high with galleries all round. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stretch of red-lacquered wooden wall with gold trim, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: a plain stretch of red-lacquered wooden wall with gold trim, uniform and unbroken, joining its other half cleanly at the seam directly behind you; to the left, the great main doors standing open, the floor running level out over the threshold onto the lantern-lit bridge and the dusk beyond; just left of centre, the top of a wooden staircase going down from the floor through an opening, newel posts either side, orange firelight glowing up from below; dead ahead in the centre, close to the viewer on the floor, a small low red-lacquered stand holding a wide basket of herb bundles tied with red string, well clear of the doorway beyond it; dead ahead in the centre, a wide doorway hung with a short split cloth curtain, steam drifting out of it, the floor running level through it; just right of centre, a broad wooden staircase starting at the floor and climbing to the first gallery; to the right, an old wooden-and-brass elevator cage with its folding gate open and its car waiting level with the floor; on the far right, the right half of the calm view directly behind the viewer: a plain stretch of red-lacquered wooden wall with gold trim, uniform and unbroken, joining its other half cleanly at the seam directly behind you. grand, warm and bustling-feeling though empty, steam curling under the lanterns. No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. The hall is EMPTY of people and spirits. Shot on a full-frame DSLR at 24mm, f/8, early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a plain stretch of red-lacquered wooden wall with gold trim, uniform and unbroken, with no visible seam, join, or repetition.",
+        "seam": {
+          "stage": "blurred",
+          "band": "sky",
+          "ratio": 0.0,
+          "delta": 0.0,
+          "needsWork": false,
+          "accepted": true,
+          "seamBandRun": 0.0,
+          "at": "2026-10-20T19:10:03",
+          "acceptedBy": "lucas via agent 2026-10-20",
+          "humanNote": "Lucas 2026-10-20 on the atrium still: 'Excellent! Make all art and wire everything up'"
+        }
+      },
+      "mapPos": {
+        "c": 1,
+        "r": 2
+      },
+      "panorama": "atrium/scene.png",
+      "builtFrom": "l1_atrium_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "hotspots": [
+        {
+          "id": "out_to_the_bridge",
+          "type": "door",
+          "label": "Out to the bridge",
+          "box": [
+            0.14,
+            0.32,
+            0.23,
+            0.66
+          ],
+          "direction": "back",
+          "to": "bridge",
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "down_to_the_boiler_room",
+          "type": "door",
+          "label": "Down to the boiler room",
+          "box": [
+            0.3,
+            0.5,
+            0.355,
+            0.62
+          ],
+          "direction": "back",
+          "to": "boiler",
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "the_herb_stand",
+          "type": "station",
+          "label": "The herb stand",
+          "box": [
+            0.4731,
+            0.6609,
+            0.5272,
+            0.8571
+          ],
+          "tier": 1,
+          "boxSource": "draft:skeleton"
+        },
+        {
+          "id": "to_the_big_tub",
+          "type": "door",
+          "label": "To the big tub",
+          "box": [
+            0.4658,
+            0.353,
+            0.5345,
+            0.5234
+          ],
+          "direction": "open",
+          "to": "tub",
+          "boxSource": "draft:skeleton"
+        },
+        {
+          "id": "up_the_wooden_stairs",
+          "type": "door",
+          "label": "Up the wooden stairs",
+          "box": [
+            0.6309,
+            0.5054,
+            0.6909,
+            0.6454
+          ],
+          "direction": "open",
+          "to": "quarters",
+          "boxSource": "draft:skeleton"
+        },
+        {
+          "id": "the_elevator",
+          "type": "door",
+          "label": "The elevator",
+          "box": [
+            0.7598,
+            0.3768,
+            0.8398,
+            0.6232
+          ],
+          "direction": "open",
+          "to": "office",
+          "boxSource": "draft:skeleton"
+        }
+      ]
+    },
+    {
+      "key": "tub",
+      "title": "The big tub",
+      "built": true,
+      "unlockedWhen": true,
+      "designNote": "DELIVER point: the big dirty tub. No station. Back to the atrium only.",
+      "plannedHotspots": [
+        {
+          "type": "deliver",
+          "label": "The big tub",
+          "box": [
+            0.2998,
+            0.5131,
+            0.7006,
+            0.8481
+          ],
+          "boxSource": "draft:skeleton"
+        },
+        {
+          "type": "door",
+          "direction": "back",
+          "to": "atrium",
+          "label": "Back to the atrium",
+          "box": [
+            0.785,
+            0.25,
+            0.87,
+            0.58
+          ],
+          "boxSource": "moved:agent"
+        }
+      ],
+      "authoring": {
+        "sceneSpec": {
+          "room": "tub",
+          "setting": "the great bathing hall of a colossal, whimsical spirit bathhouse in old Japan, built entirely of wood: red-lacquered pillars and beams, green-painted rails and panels, gold trim and gold ornaments, yellow paper screens, curved tiled roofs stacked storey on storey like a grand pagoda; hand-painted animated-film look, rich saturated colour, soft painterly detail, built round one enormous wooden bathtub",
+          "interior": true,
+          "indoor": true,
+          "seam": "a plain stretch of green-painted wooden wall, uniform and unbroken",
+          "seamOccluder": "a square red-lacquered wooden post, floor to ceiling",
+          "elements": [
+            {
+              "id": "seam_left",
+              "at": "on the far left",
+              "desc": "the left half of the calm view directly behind the viewer: a plain stretch of green-painted wooden wall, uniform and unbroken, joining its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "big_tub",
+              "at": "dead ahead in the centre",
+              "label": "The big tub",
+              "deliver": true,
+              "desc": "an enormous sunken wooden bathtub, as big as a room, full of thick, muddy brown, filthy water with a grey scum on it, a few dead leaves floating, a big wooden scoop leaning on its rim"
+            },
+            {
+              "id": "curtain_door",
+              "at": "to the right",
+              "label": "Back to the atrium",
+              "door": {
+                "direction": "back",
+                "to": "atrium"
+              },
+              "desc": "the curtained doorway back into the atrium, the floor running level through it, lantern light beyond"
+            },
+            {
+              "id": "seam_right",
+              "at": "on the far right",
+              "desc": "the right half of the calm view directly behind the viewer: a plain stretch of green-painted wooden wall, uniform and unbroken, joining its other half cleanly at the seam directly behind you"
+            }
+          ],
+          "soundBed": "a big echoing bathing hall: slow drips, a gloopy bubble from the dirty water, steam.",
+          "rigid": "the tub, the scoop, the walls, the doorway",
+          "atmosphere": "gloomy and grimy, the lanterns dimmed by steam, a job that badly needs doing",
+          "styleLight": "early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red",
+          "negatives": "No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. The water is DIRTY brown, never clean or blue.",
+          "states": {},
+          "continuity": [],
+          "scaffold": {
+            "kind": "skeleton",
+            "layout": {
+              "surface": "room",
+              "word": "floor",
+              "floor": "wet wooden floor of the bathing hall",
+              "size": [
+                5,
+                5,
+                6,
+                3
+              ],
+              "sides": {
+                "left": "houses",
+                "right": "houses",
+                "front": "houses",
+                "back": "houses"
+              },
+              "parts": [
+                [
+                  "door",
+                  "curtain_door",
+                  {
+                    "w": 2.0,
+                    "h": 2.4,
+                    "say": "the curtained doorway, the floor running level back into the atrium"
+                  }
+                ],
+                [
+                  "prop",
+                  "big_tub",
+                  {
+                    "size": [
+                      4.0,
+                      3.0,
+                      0.6
+                    ]
+                  }
+                ]
+              ]
+            }
+          },
+          "stillOnly": true
+        },
+        "plateRefs": [
+          "atrium/scene.png"
+        ],
+        "scenePrompt": "This is a seamless 360-degree panorama from the great bathing hall of a colossal, whimsical spirit bathhouse in old Japan, built entirely of wood: red-lacquered pillars and beams, green-painted rails and panels, gold trim and gold ornaments, yellow paper screens, curved tiled roofs stacked storey on storey like a grand pagoda; hand-painted animated-film look, rich saturated colour, soft painterly detail, built round one enormous wooden bathtub. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stretch of green-painted wooden wall, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: a plain stretch of green-painted wooden wall, uniform and unbroken, joining its other half cleanly at the seam directly behind you; dead ahead in the centre, an enormous sunken wooden bathtub, as big as a room, full of thick, muddy brown, filthy water with a grey scum on it, a few dead leaves floating, a big wooden scoop leaning on its rim; to the right, the curtained doorway back into the atrium, the floor running level through it, lantern light beyond; on the far right, the right half of the calm view directly behind the viewer: a plain stretch of green-painted wooden wall, uniform and unbroken, joining its other half cleanly at the seam directly behind you. gloomy and grimy, the lanterns dimmed by steam, a job that badly needs doing. No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. The water is DIRTY brown, never clean or blue. Shot on a full-frame DSLR at 24mm, f/8, early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a plain stretch of green-painted wooden wall, uniform and unbroken, with no visible seam, join, or repetition.",
+        "seam": {
+          "stage": "screened",
+          "band": "ground",
+          "ratio": 1.82,
+          "delta": 2.05,
+          "needsWork": false,
+          "accepted": true,
+          "seamBandRun": 0.03,
+          "at": "2026-10-20T20:34:54",
+          "acceptedBy": "lucas via agent 2026-10-20",
+          "humanNote": "Lucas 2026-10-20: 'Those rooms are all good.'"
+        }
+      },
+      "mapPos": {
+        "c": 1,
+        "r": 1
+      },
+      "panorama": "tub/scene.png",
+      "builtFrom": "l1_tub_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "hotspots": [
+        {
+          "id": "the_big_tub",
+          "type": "deliver",
+          "label": "The big tub",
+          "box": [
+            0.2998,
+            0.5131,
+            0.7006,
+            0.8481
+          ],
+          "boxSource": "draft:skeleton"
+        },
+        {
+          "id": "back_to_the_atrium",
+          "type": "door",
+          "label": "Back to the atrium",
+          "box": [
+            0.785,
+            0.25,
+            0.87,
+            0.58
+          ],
+          "direction": "back",
+          "to": "atrium",
+          "boxSource": "moved:agent"
+        }
+      ]
+    },
+    {
+      "key": "quarters",
+      "title": "The sleeping quarters",
+      "built": true,
+      "unlockedWhen": true,
+      "designNote": "Station (1 herb bundle): the low table. Back down to the atrium only.",
+      "plannedHotspots": [
+        {
+          "type": "station",
+          "tier": 1,
+          "label": "The low table",
+          "box": [
+            0.195,
+            0.55,
+            0.37,
+            0.84
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "door",
+          "direction": "back",
+          "to": "atrium",
+          "label": "Down the stairs to the atrium",
+          "box": [
+            0.72,
+            0.4,
+            0.87,
+            0.66
+          ],
+          "boxSource": "moved:agent"
+        }
+      ],
+      "authoring": {
+        "sceneSpec": {
+          "room": "quarters",
+          "setting": "the cosy sleeping quarters for the bathhouse's workers, high up in a colossal, whimsical spirit bathhouse in old Japan, built entirely of wood: red-lacquered pillars and beams, green-painted rails and panels, gold trim and gold ornaments, yellow paper screens, curved tiled roofs stacked storey on storey like a grand pagoda; hand-painted animated-film look, rich saturated colour, soft painterly detail",
+          "interior": true,
+          "indoor": true,
+          "seam": "a plain stretch of pale wooden wall with paper screens, uniform and unbroken",
+          "seamOccluder": "a plain wooden post, floor to ceiling",
+          "elements": [
+            {
+              "id": "seam_left",
+              "at": "on the far left",
+              "desc": "the left half of the calm view directly behind the viewer: a plain stretch of pale wooden wall with paper screens, uniform and unbroken, joining its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "futons",
+              "at": "to the left",
+              "desc": "rows of rolled-up futons and folded quilts on the smooth wooden floor"
+            },
+            {
+              "id": "low_table",
+              "at": "just left of centre",
+              "label": "The low table",
+              "station": 1,
+              "desc": "a low wooden table with a small paper lantern and a basket of herb bundles tied with red string"
+            },
+            {
+              "id": "windows",
+              "at": "dead ahead in the centre",
+              "desc": "a long row of big open windows looking out over the violet dusk sky and a distant sea"
+            },
+            {
+              "id": "stairs_down",
+              "at": "to the right",
+              "label": "Down the stairs to the atrium",
+              "door": {
+                "direction": "back",
+                "to": "atrium"
+              },
+              "desc": "the top of a wooden staircase going down from the floor, newel posts either side, warm light rising from the atrium below"
+            },
+            {
+              "id": "seam_right",
+              "at": "on the far right",
+              "desc": "the right half of the calm view directly behind the viewer: a plain stretch of pale wooden wall with paper screens, uniform and unbroken, joining its other half cleanly at the seam directly behind you"
+            }
+          ],
+          "soundBed": "a quiet room high up: wind at the open windows, the bathhouse murmuring far below.",
+          "rigid": "the futons, the table, the windows, the stairs",
+          "atmosphere": "cosy, quiet and homely, the windows full of dusk",
+          "styleLight": "early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red",
+          "negatives": "No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described.",
+          "states": {},
+          "continuity": [],
+          "scaffold": {
+            "kind": "skeleton",
+            "layout": {
+              "surface": "room",
+              "word": "floor",
+              "floor": "smooth wooden floor of the sleeping room",
+              "size": [
+                4,
+                4,
+                4,
+                3
+              ],
+              "sides": {
+                "left": "houses",
+                "right": "houses",
+                "front": "houses",
+                "back": "houses"
+              },
+              "parts": [
+                [
+                  "slit",
+                  "windows",
+                  {
+                    "w": 4.0,
+                    "h": 1.6,
+                    "sill": 0.6
+                  }
+                ],
+                [
+                  "stair_down",
+                  "stairs_down"
+                ],
+                [
+                  "prop",
+                  "low_table",
+                  {
+                    "size": [
+                      1.2,
+                      0.8,
+                      0.4
+                    ]
+                  }
+                ]
+              ]
+            }
+          },
+          "stillOnly": true
+        },
+        "plateRefs": [
+          "atrium/scene.png"
+        ],
+        "scenePrompt": "This is a seamless 360-degree panorama from the cosy sleeping quarters for the bathhouse's workers, high up in a colossal, whimsical spirit bathhouse in old Japan, built entirely of wood: red-lacquered pillars and beams, green-painted rails and panels, gold trim and gold ornaments, yellow paper screens, curved tiled roofs stacked storey on storey like a grand pagoda; hand-painted animated-film look, rich saturated colour, soft painterly detail. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stretch of pale wooden wall with paper screens, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: a plain stretch of pale wooden wall with paper screens, uniform and unbroken, joining its other half cleanly at the seam directly behind you; to the left, rows of rolled-up futons and folded quilts on the smooth wooden floor; just left of centre, a low wooden table with a small paper lantern and a basket of herb bundles tied with red string; dead ahead in the centre, a long row of big open windows looking out over the violet dusk sky and a distant sea; to the right, the top of a wooden staircase going down from the floor, newel posts either side, warm light rising from the atrium below; on the far right, the right half of the calm view directly behind the viewer: a plain stretch of pale wooden wall with paper screens, uniform and unbroken, joining its other half cleanly at the seam directly behind you. cosy, quiet and homely, the windows full of dusk. No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. Shot on a full-frame DSLR at 24mm, f/8, early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a plain stretch of pale wooden wall with paper screens, uniform and unbroken, with no visible seam, join, or repetition.",
+        "seam": {
+          "stage": "blurred",
+          "band": "sky",
+          "ratio": 0.0,
+          "delta": 0.0,
+          "needsWork": false,
+          "accepted": true,
+          "seamBandRun": 0.0,
+          "at": "2026-10-20T20:34:54",
+          "acceptedBy": "lucas via agent 2026-10-20",
+          "humanNote": "Lucas 2026-10-20: 'Those rooms are all good.'"
+        }
+      },
+      "mapPos": {
+        "c": 0,
+        "r": 1
+      },
+      "panorama": "quarters/scene.png",
+      "builtFrom": "l1_quarters_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "hotspots": [
+        {
+          "id": "the_low_table",
+          "type": "station",
+          "label": "The low table",
+          "box": [
+            0.195,
+            0.55,
+            0.37,
+            0.84
+          ],
+          "tier": 1,
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "down_the_stairs_to_the_atrium",
+          "type": "door",
+          "label": "Down the stairs to the atrium",
+          "box": [
+            0.72,
+            0.4,
+            0.87,
+            0.66
+          ],
+          "direction": "back",
+          "to": "atrium",
+          "boxSource": "moved:agent"
+        }
+      ]
+    },
+    {
+      "key": "office",
+      "title": "The owner's office",
+      "built": true,
+      "unlockedWhen": true,
+      "designNote": "Station (1 herb bundle): the golden desk. At the top, up the elevator. Back to the atrium only.",
+      "plannedHotspots": [
+        {
+          "type": "station",
+          "tier": 1,
+          "label": "The golden desk",
+          "box": [
+            0.27,
+            0.62,
+            0.58,
+            0.93
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "door",
+          "direction": "back",
+          "to": "atrium",
+          "label": "The elevator down",
+          "box": [
+            0.775,
+            0.21,
+            0.87,
+            0.71
+          ],
+          "boxSource": "moved:agent"
+        }
+      ],
+      "authoring": {
+        "sceneSpec": {
+          "room": "office",
+          "setting": "the grand, dim private office of the bathhouse owner at the very top of a colossal, whimsical spirit bathhouse in old Japan, built entirely of wood: red-lacquered pillars and beams, green-painted rails and panels, gold trim and gold ornaments, yellow paper screens, curved tiled roofs stacked storey on storey like a grand pagoda; hand-painted animated-film look, rich saturated colour, soft painterly detail",
+          "interior": true,
+          "indoor": true,
+          "seam": "a plain stretch of dark wall of patterned gold-and-green tiles, uniform and unbroken",
+          "seamOccluder": "a tall gold-and-red lacquered pillar, floor to ceiling",
+          "elements": [
+            {
+              "id": "seam_left",
+              "at": "on the far left",
+              "desc": "the left half of the calm view directly behind the viewer: a plain stretch of dark wall of patterned gold-and-green tiles, uniform and unbroken, joining its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "fireplace",
+              "at": "to the left",
+              "desc": "a big ornate fireplace with a low glowing fire, gold ornaments and blue-and-white pottery on its mantel"
+            },
+            {
+              "id": "golden_desk",
+              "at": "just left of centre",
+              "label": "The golden desk",
+              "station": 1,
+              "desc": "a huge heavy desk inlaid with gold, on it a gold box of herb bundles tied with red string"
+            },
+            {
+              "id": "inner_door",
+              "at": "dead ahead in the centre",
+              "desc": "a tall ornate closed door with a large brass door knocker shaped like a round face with big staring eyes"
+            },
+            {
+              "id": "chandelier",
+              "at": "just right of centre",
+              "desc": "a glittering crystal-and-gold chandelier hanging low, its candles dim"
+            },
+            {
+              "id": "elevator_back",
+              "at": "to the right",
+              "label": "The elevator down",
+              "door": {
+                "direction": "back",
+                "to": "atrium"
+              },
+              "desc": "the brass elevator cage with its folding gate open, its car floor level with the office floor"
+            },
+            {
+              "id": "seam_right",
+              "at": "on the far right",
+              "desc": "the right half of the calm view directly behind the viewer: a plain stretch of dark wall of patterned gold-and-green tiles, uniform and unbroken, joining its other half cleanly at the seam directly behind you"
+            }
+          ],
+          "soundBed": "a hushed, heavy room: the fire crackling, a clock ticking, the chandelier faintly tinkling.",
+          "rigid": "the desk, the fireplace, the pottery, the door and knocker, the chandelier, the elevator",
+          "atmosphere": "opulent and a little spooky, gold glinting in dim firelight, beautiful tiles and lanterns",
+          "styleLight": "early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red",
+          "negatives": "No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. The door knocker is brass with eyes, not a living face.",
+          "states": {},
+          "continuity": [],
+          "scaffold": {
+            "kind": "skeleton",
+            "layout": {
+              "surface": "room",
+              "word": "floor",
+              "floor": "patterned tiled floor of the office",
+              "size": [
+                4,
+                4,
+                5,
+                3
+              ],
+              "sides": {
+                "left": "houses",
+                "right": "houses",
+                "front": "houses",
+                "back": "houses"
+              },
+              "parts": [
+                [
+                  "door",
+                  "elevator_back",
+                  {
+                    "w": 1.4,
+                    "h": 2.4,
+                    "say": "the open elevator car, its floor level with the office floor"
+                  }
+                ],
+                [
+                  "prop",
+                  "golden_desk",
+                  {
+                    "size": [
+                      2.0,
+                      1.0,
+                      0.8
+                    ]
+                  }
+                ]
+              ]
+            }
+          },
+          "stillOnly": true
+        },
+        "plateRefs": [
+          "atrium/scene.png"
+        ],
+        "scenePrompt": "This is a seamless 360-degree panorama from the grand, dim private office of the bathhouse owner at the very top of a colossal, whimsical spirit bathhouse in old Japan, built entirely of wood: red-lacquered pillars and beams, green-painted rails and panels, gold trim and gold ornaments, yellow paper screens, curved tiled roofs stacked storey on storey like a grand pagoda; hand-painted animated-film look, rich saturated colour, soft painterly detail. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stretch of dark wall of patterned gold-and-green tiles, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: a plain stretch of dark wall of patterned gold-and-green tiles, uniform and unbroken, joining its other half cleanly at the seam directly behind you; to the left, a big ornate fireplace with a low glowing fire, gold ornaments and blue-and-white pottery on its mantel; just left of centre, a huge heavy desk inlaid with gold, on it a gold box of herb bundles tied with red string; dead ahead in the centre, a tall ornate closed door with a large brass door knocker shaped like a round face with big staring eyes; just right of centre, a glittering crystal-and-gold chandelier hanging low, its candles dim; to the right, the brass elevator cage with its folding gate open, its car floor level with the office floor; on the far right, the right half of the calm view directly behind the viewer: a plain stretch of dark wall of patterned gold-and-green tiles, uniform and unbroken, joining its other half cleanly at the seam directly behind you. opulent and a little spooky, gold glinting in dim firelight, beautiful tiles and lanterns. No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. The door knocker is brass with eyes, not a living face. Shot on a full-frame DSLR at 24mm, f/8, early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a plain stretch of dark wall of patterned gold-and-green tiles, uniform and unbroken, with no visible seam, join, or repetition.",
+        "seam": {
+          "stage": "blurred",
+          "band": "sky",
+          "ratio": 0.0,
+          "delta": 0.0,
+          "needsWork": false,
+          "accepted": true,
+          "seamBandRun": 0.0,
+          "at": "2026-10-20T20:34:54",
+          "acceptedBy": "lucas via agent 2026-10-20",
+          "humanNote": "Lucas 2026-10-20: 'Those rooms are all good.'"
+        }
+      },
+      "mapPos": {
+        "c": 2,
+        "r": 1
+      },
+      "panorama": "office/scene.png",
+      "builtFrom": "l1_office_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "hotspots": [
+        {
+          "id": "the_golden_desk",
+          "type": "station",
+          "label": "The golden desk",
+          "box": [
+            0.27,
+            0.62,
+            0.58,
+            0.93
+          ],
+          "tier": 1,
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "the_elevator_down",
+          "type": "door",
+          "label": "The elevator down",
+          "box": [
+            0.775,
+            0.21,
+            0.87,
+            0.71
+          ],
+          "direction": "back",
+          "to": "atrium",
+          "boxSource": "moved:agent"
+        }
+      ]
+    }
+  ],
+  "doorLabels": false
+}
