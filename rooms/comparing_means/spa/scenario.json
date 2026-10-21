@@ -13,7 +13,7 @@
   },
   "escapeDone": {
     "title": "First tracks",
-    "body": "The five candles burn in their pattern and, far below, the door at the foot of the tower stair swings open. You step out onto the clifftop walk beside the aqueduct, the snow untouched, just as her lift clanks to a stop at the clifftop below — flawless, and first. Let her follow."
+    "body": "The five candles burn in their pattern and the five bells ring out across the white roofs. Far below, her lift clanks to a stop at the clifftop, and every bath in Calmarupe already reads true: flawless, and first. Let her find nothing."
   },
   "packages": [
     "dplyr",
@@ -985,11 +985,6 @@
           "inc": "rooms_solved"
         }
       ],
-      "entry": {
-        "title": "The cold plunge",
-        "text": "You leave the entry hall by the hidden stair and drop into the cold-plunge chamber, cut deep in the rock below the waterline, dark and close. Down at the harbor, Diana's lift has begun to climb one of the iron-and-glass towers up the cliff.",
-        "button": "Into the cold plunge →"
-      },
       "debrief": "Two cold plunges, one test. A t-test asks whether the gap between the two pools' mean temperatures is bigger than the noise within each; Shapiro and Levene both pass, so the t-test is the honest tool.",
       "plannedHotspots": [
         {
@@ -1488,11 +1483,6 @@
           "inc": "rooms_solved"
         }
       ],
-      "entry": {
-        "title": "The brine cave",
-        "text": "The plunge is certified. Up a spiral stair in the rock into green light — the sea cave at the waterline, the sea surging in under its iron gate, snow on the ledge outside. Her lift is higher; laughter carries across the water. Two brine baths here, fed by the sea. Make sure their chemistry is correct.",
-        "button": "Into the brine cave →"
-      },
       "debrief": "The brine readings are skewed, so a t-test would lie. Reading that from the Shapiro/Levene checks and switching to the non-parametric Wilcox test is the lesson: pick the test the data has earned.",
       "plannedHotspots": [
         {
@@ -2019,11 +2009,6 @@
           "inc": "rooms_solved"
         }
       ],
-      "entry": {
-        "title": "The warm hall",
-        "text": "One brine bath was off; caught. A long stair carries you up into the warm hall high in the cliff, its tall open arches pale over the snowy roofs and the sea, sunrise close. The lift nears the top. Four baths here — all can be checked via one panel.",
-        "button": "Into the warm hall →"
-      },
       "debrief": "Four baths, so a t-test won't do. ANOVA asks whether ANY of the four pH means differ; when it says yes, Tukey names WHICH one — the single drifted bath — without you fishing through every pair.",
       "plannedHotspots": [
         {
@@ -2178,10 +2163,10 @@
           "type": "door",
           "label": "The passage onward (lit yellow candle above)",
           "box": [
-            0.5421,
-            0.3038,
-            0.5919,
-            0.6105
+            0.5392,
+            0.2961,
+            0.589,
+            0.6028
           ],
           "direction": "forward",
           "to": "springs",
@@ -2636,11 +2621,6 @@
         "type": "figure",
         "submitCodec": true
       },
-      "entry": {
-        "title": "The clifftop springs",
-        "text": "The ladder brings you up through a hatch onto the clifftop terrace and the outdoor hot springs, steaming gold in the first sun. Diana is nearly at the door. Five pairs of pools in all — two close at hand, three further off along the terrace.",
-        "button": "Out to the springs →"
-      },
       "debrief": "Five pairs, five comparisons. Run that many tests and one will look significant by chance; the Holm correction strips out that false alarm, leaving only the pairs that truly differ — so you never 'fix' a spring that was fine.",
       "plannedHotspots": [
         {
@@ -2874,7 +2854,8 @@
                 "source": "the swinging lantern and the wind in the open arches",
                 "character": "a faint rhythmic creak of chain under a steady cold wind",
                 "prominence": "hero"
-              }
+              },
+              "label": "The open arch over the city"
             },
             {
               "id": "stair_back",
@@ -3171,11 +3152,6 @@
         "solved": "springs"
       },
       "onSolve": [],
-      "entry": {
-        "title": "The bell tower",
-        "text": "Every bath certified, honestly — nothing for Diana to find. The sun strikes the bell tower above the terrace; up in the belfry, beneath the five bells, five balance-candles stand dark. Go back, read each pair of candles, and pull the right cords.",
-        "button": "Up to the belfry →"
-      },
       "debrief": "No console in the belfry — just your eye. All morning you asked whether a difference was real; here you ask it of candlelight. A pair whose candles are plainly one massive, one tiny truly differ — pull that color's cord and light its candle; a pair whose candles all match does not — leave it dark. Recognising that, then finding each color's cord a room behind, is the whole comparison made physical.",
       "plannedHotspots": [
         {
@@ -3221,10 +3197,9 @@
             }
           ],
           "feedback": {
-            "correct": "The five candles burn in balance. Below you, a bolt draws back.",
-            "wrong": "The candles stand as they are, and the door at the foot of the tower stair stays shut."
+            "correct": "The five candles burn in balance, and above you the bells begin to ring. The open arch looks out over the whole city.",
+            "wrong": "The candles stand as they are. The balance isn't right yet."
           },
-          "endsEscape": true,
           "note": "ESCAPE lock. 5 balance-candles in the belfry: vermillion/square, blue/circle, yellow/diamond, green/triangle, purple/star. CORRECT = vermillion, yellow, purple LIT (their candle-pairs DIFFER); blue, green DARK (their pairs MATCH). Set by the bell-cords in earlier rooms: each pull rings its bell and lights its candle. -> escapeDone. Built on ENGINE #16 (bell-pull: cord dials, mode \"pull\") + #8 (this lock, mode \"state\"); opens when exactly the 'answer' candles are lit.",
           "box": [
             0.319,
@@ -3250,6 +3225,16 @@
           ],
           "boxSource": "draft:skeleton",
           "to": "springs"
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "label": "The open arch over the city",
+          "requires": "the_balance_candles_five_color_shape_candles_beneath_the_bells",
+          "lockedBody": "Not yet. Below the bells, the five candles still have to burn in balance.",
+          "endsEscape": true,
+          "note": "FINALE (two-step, Lucas 2026-10-21): the candle lock no longer ends the escape; solving it opens this arch. Its door.transit (art step, not yet rendered) starts on the belfry with the five candles lit, pulls out through the left arch past the tower with its bells swinging, and rises to a high aerial of the whole snowy city at sunrise, Diana's lift arriving at the clifftop; escapeDone opens over its last frame (henges/Seedfall pattern).",
+          "boxSource": "draft:skeleton"
         }
       ],
       "designNote": "ESCAPE — THE BELL TOWER (ungraded, no codec; fires escapeDone). The belfry of the clifftop campanile beside the springs terrace. FIVE plain bronze bells hang in one oak frame; their ropes ARE the bell-cords in the rooms below (mechanic #16 made literal). The READ-OUT is a row of FIVE balance-candles in an iron bracket beneath the bells, each a distinct COLOUR + SHAPE (colour-blind-safe: vermillion/square, blue/circle, yellow/diamond, green/triangle, purple/star), all initially UNLIT. The player recognises, by eye, which of the five candle-pairs seen in the earlier rooms DIFFER in size (vermillion, yellow, purple) vs MATCH (blue, green), then backtracks to pull each colour's cord (each sits one room before its pair): the pull rings that bell and LIGHTS that colour's candle. Light the differing three, leave the matched two dark. CORRECT = vermillion+yellow+purple lit. DATA-FREE (candles, not the water-chem). ENGINE #16 + #8, built 2026-10-20. Colour never load-bearing alone. No art exists for this room yet.",
@@ -3339,10 +3324,9 @@
             }
           ],
           "feedback": {
-            "correct": "The five candles burn in balance. Below you, a bolt draws back.",
-            "wrong": "The candles stand as they are, and the door at the foot of the tower stair stays shut."
+            "correct": "The five candles burn in balance, and above you the bells begin to ring. The open arch looks out over the whole city.",
+            "wrong": "The candles stand as they are. The balance isn't right yet."
           },
-          "endsEscape": true,
           "boxSource": "draft:skeleton",
           "solveSfx": {
             "src": "audio/solve_bell_tower_the_balance_candles_five_color_shape_candles_beneath_the_bells_bolt.mp3",
@@ -3383,6 +3367,22 @@
             ],
             "video": "bell_tower/cine_base.mp4"
           }
+        },
+        {
+          "id": "the_open_arch_over_the_city",
+          "type": "door",
+          "label": "The open arch over the city",
+          "box": [
+            0.12,
+            0.2,
+            0.27,
+            0.7
+          ],
+          "direction": "open",
+          "requires": "the_balance_candles_five_color_shape_candles_beneath_the_bells",
+          "lockedBody": "Not yet. Below the bells, the five candles still have to burn in balance.",
+          "endsEscape": true,
+          "boxSource": "agent:eyeballed"
         }
       ]
     }
@@ -3395,5 +3395,6 @@
   "musicCredit": {
     "text": "WaterSong Singing Bowl — singing bowls (YouTube)",
     "url": "https://www.youtube.com/watch?v=cXS3fBmnMNo"
-  }
+  },
+  "doorLabels": true
 }
