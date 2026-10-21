@@ -79,17 +79,18 @@
 // A bare `./variant_resolve.js` import is NOT refreshed by bumping the <script> tag's ?v, so a changed
 // helper module (e.g. a new export) leaves browsers on a stale cached copy → "doesn't provide an export
 // named X" SyntaxError → blank page (the 2026-08-05 airship regression). Bump all three together.
-import { WebRConsole } from "./webr-console.js?v=136";
-import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers } from "./variant_resolve.js?v=136";   // Phase 3: per-hotspot state variants; monorail switch-door nav
-import * as PQ from "./puzzle_queue.js?v=136";   // dynamic puzzle queue: location-independent puzzle serving
-import * as CP from "./corr_panel.js?v=136";   // lower-triangle layout of the grid gate (clouds correlation panel)
-import { particleCount } from "./particles.js?v=136";   // ambient-particle vocabulary + per-kind field density
-import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=136";
-import { condHolds } from "./cond.js?v=136";   // ledger + elevation-map card DOM
-import * as LIVE from "./live_session.js?v=136";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
-import * as RIDE from "./ride.js?v=136";
-import { mountPcaPlate } from "./pca_plate.js?v=136";   // the PCA plate instrument (voyage beach)
-import { mountDrawdown } from "./drawdown.js?v=136";   // the drawdown board instrument (diamonds escape)   // THE RIDE (subway): express lever + clip-sequence planner
+import { WebRConsole } from "./webr-console.js?v=137";
+import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers } from "./variant_resolve.js?v=137";   // Phase 3: per-hotspot state variants; monorail switch-door nav
+import * as PQ from "./puzzle_queue.js?v=137";   // dynamic puzzle queue: location-independent puzzle serving
+import * as CP from "./corr_panel.js?v=137";   // lower-triangle layout of the grid gate (clouds correlation panel)
+import { particleCount } from "./particles.js?v=137";   // ambient-particle vocabulary + per-kind field density
+import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=137";
+import { condHolds } from "./cond.js?v=137";   // ledger + elevation-map card DOM
+import * as LIVE from "./live_session.js?v=137";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
+import * as RIDE from "./ride.js?v=137";
+import { mountPcaPlate } from "./pca_plate.js?v=137";   // the PCA plate instrument (voyage beach)
+import { mountDrawdown } from "./drawdown.js?v=137";   // the drawdown board instrument (diamonds escape)   // THE RIDE (subway): express lever + clip-sequence planner
+import * as BELL from "./bell_pull.js?v=137";   // bell-pull (#16): dial mode:"pull" + lock mode:"state" (spa belfry)
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 
@@ -1795,6 +1796,7 @@ function _renderViewer(img, yaw = 0, dynamic = false, bare = false) {   // bare:
     // re-authored or the viewer rebuilds mid-composite (cost a debugging round, 2026-08-27).
     let cssClass = "hsmark " + h.type + (h.id ? " hs-" + String(h.id).replace(/[^\w-]/g, "_") : "");
     if (h.type === "door") { cssClass += doorIsOpen(h, room) ? " open" : " locked"; if ((h.direction || "forward") === "forward" && portalAwakened(room)) cssClass += " awakened"; }
+    if (h.type === "dial" && h.mode === "pull") cssClass += " pullcord" + (BELL.isOn(gameState, BELL.pullKey(h)) ? " pulled" : "");
     if ((h.type === "puzzle" || h.type === "lock" || h.type === "grid" || h.type === "ledger") && solvedGates.has(gateKey(room.key, h.id))
         && (!PQ.isSeriesSlot(h, SCENARIO) || PQ.queueComplete(SCENARIO.puzzleQueue, queueSolved))) cssClass += " done";   // a series slot is done only when the ladder is
     return { id: h.id, yaw, pitch, cssClass, clickHandlerFunc: onHotspot, clickHandlerArgs: h };
@@ -1855,6 +1857,7 @@ function onHotspot(evt, h) {   // Pannellum calls clickHandlerFunc(event, clickH
       // dial only becomes turnable once the lantern door's grid is solved. Undefined ⇒ always open, so
       // every existing mapview/mapping dial is unchanged.
       if (!condOK(h.availableWhen)) return openLocked(h);
+      if (h.mode === "pull") return pullCord(h);      // bell-pull (#16): one click toggles, no modal
       return openDial(h);
     }
     if (h.type === "mapview") return openMapview(h);
@@ -2577,6 +2580,31 @@ function openDial(h) {
   ]);
   openModal(h.label || "The dial", wrap, null, h);
   refresh();
+}
+// ---- bell-pull (#16, spa 2026-10-20) — a dial with `mode:"pull"` ---------------------------------------
+// One click on the cord IS the pull: no modal, it flips gameState[key] (lit ⇄ dark, so a wrong pull is undone
+// by pulling again), rings (authored `sfx`, else a synthesised bell, lower on the "off" pull) and toasts
+// `onToast`/`offToast`. The far effect is read elsewhere: a `lock` with `mode:"state"` (buildStateLockCard),
+// or any condition `{eq:[key, true]}`. The marker carries `pulled` while on, the cord's own local state.
+let _bellCtx = null;
+function pullCord(h) {
+  const key = BELL.pullKey(h);
+  const on = BELL.togglePull(gameState, key);
+  if (sfxOn) {
+    if (h.sfx) playOneShot(typeof h.sfx === "string" ? h.sfx : h.sfx.src, (typeof h.sfx === "object") ? h.sfx.volume : undefined);
+    else {
+      try {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (AC) { _bellCtx = _bellCtx || new AC(); if (_bellCtx.state === "suspended") _bellCtx.resume(); BELL.ringBell(_bellCtx, on); }
+      } catch (e) {}
+    }
+  }
+  const msg = BELL.pullToast(h, on);
+  if (msg) toast(msg);
+  if (h.id) document.querySelectorAll("#pano .hs-" + String(h.id).replace(/[^\w-]/g, "_"))
+    .forEach(el => el.classList.toggle("pulled", on));
+  // Same rule as a dial: if this room shows state art, re-render so it follows the pull at once.
+  if ((room.hotspots || []).some(h2 => h2 && Array.isArray(h2.variants) && h2.variants.length)) rerenderCurrentRoom();
 }
 // ---- THE RIDE (networks/subway, settled 2026-09-17) ------------------------------------------------
 // A cab's one control is a `lever` hotspot: {type:"lever", line, availableWhen?, lockedBody?, hint?, sfx?}.
@@ -3492,6 +3520,7 @@ function openLock(h) {
 }
 function buildLockCard(h, onSolved) {
   if (h.mode === "stones") return buildStoneLockCard(h, onSolved);
+  if (h.mode === "state") return buildStateLockCard(h, onSolved);
   const target = normalizeCode(h.answer || "");
   const len = h.length || (h.answer ? h.answer.length : 4);
   const maxA = h.maxAttempts || 0;               // 0 = unlimited (this is the ungraded escape puzzle)
@@ -3628,6 +3657,38 @@ function buildStoneLockCard(h, onSolved) {
   card.querySelector(".kclear").onclick = () => { entry = ""; clearFb(); render(); };
   card.querySelector(".ksubmit").onclick = submit;
   render();
+  return card;
+}
+
+// State lock (lock `mode:"state"`, bell-pull #16): no keypad and nothing to type. Opening it shows its `lamps`
+// lit or dark from gameState (engine-drawn, so it needs no art) and checks them against `answer`, the
+// comma list of lamp names that must be lit with every other lamp dark (shared/bell_pull.js). A match
+// reports { answer:1 } exactly like the text lock; a miss just shows the row, so the player goes and
+// re-pulls. Schema: { mode:"state", answer, lamps:[{name, key, label?, colour?, shape?}], feedback?:{correct,wrong} }.
+function buildStateLockCard(h, onSolved) {
+  const fbk = h.feedback || {};
+  const pid = gateKey(room.key, h.id);
+  const attempts = (attemptCounts.get(pid) || 0) + 1;   // each look at the lamps is one try
+  attemptCounts.set(pid, attempts);
+  const card = document.createElement("div"); card.className = "qcard statelock";
+  card.innerHTML = BELL.lampRowHtml(h, gameState) + `<div class="qfeedback"></div>`;
+  const fb = card.querySelector(".qfeedback");
+  const problems = BELL.lockProblems(h);
+  if (problems.length) console.warn("pano-player: state lock '" + h.id + "' is mis-authored:", problems);
+  if (BELL.statePatternHolds(h, gameState)) {
+    fb.className = "qfeedback ok"; fb.innerHTML = fbk.correct || "Everything stands in balance. The lock releases.";
+    setTimeout(() => onSolved({ answer: 1, attempts }), 900);
+  } else {
+    fb.className = "qfeedback no"; fb.innerHTML = fbk.wrong || "Nothing happens.";
+  }
+  tpAuthorPanel(card, [
+    { note: "Nothing to type: this lock opens when the lamps named in its answer are the lit ones. "
+          + "The answer and lamps are not editable here." },
+    { label: "When the pattern is right", get: () => (h.feedback && h.feedback.correct) || "",
+      set: v => { h.feedback = h.feedback || {}; h.feedback.correct = v; return tpSaveRoom(room); } },
+    { label: "When it is not", get: () => (h.feedback && h.feedback.wrong) || "",
+      set: v => { h.feedback = h.feedback || {}; h.feedback.wrong = v; return tpSaveRoom(room); } },
+  ]);
   return card;
 }
 

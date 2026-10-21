@@ -377,6 +377,16 @@ button.ghost { background:transparent; color:var(--ink); border:1px solid var(--
 .stonelock .stone { display:inline-block; border-radius:5px; }
 .stonelock .stone.stand { width:10px; height:30px; background:#e7d7b0; }
 .stonelock .stone.fall { width:30px; height:10px; background:#8fa0b4; }
+
+/* --- Bell-pull (#16): state lock read-out (lock mode:"state") + a pulled cord's marker --- */
+.statelock .lamprow { display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin:4px 0 12px;
+  padding:10px 8px 6px; border-radius:8px; background:rgba(0,0,0,.32); border:1px solid rgba(255,216,140,.18); }
+.statelock .lamp { margin:0; display:flex; flex-direction:column; align-items:center; width:72px; }
+.statelock .lamp figcaption { font:400 11px/1.3 system-ui, sans-serif; color:#b9a988; text-align:center; }
+.statelock .lamp.lit figcaption { color:#ffd88c; }
+.statelock .lampflame { animation:pulse 1.6s ease-in-out infinite; }
+/* a pulled cord keeps a solid warm fill (its own state, visible from the room it hangs in) */
+.hsmark.dial.pullcord.pulled { background:rgba(255,170,60,.78); border-color:#fff1c9; }
 /* NB: never animate `transform` here — Pannellum positions each hotspot via
    transform: translate(), and a transform animation overrides that, snapping the
    marker to the corner. Pulse opacity only. */
