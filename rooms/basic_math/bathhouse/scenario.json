@@ -778,7 +778,7 @@
         {
           "type": "door",
           "direction": "open",
-          "to": "office",
+          "to": "hallway",
           "label": "The elevator",
           "box": [
             0.7598,
@@ -856,7 +856,7 @@
               "label": "The elevator",
               "door": {
                 "direction": "open",
-                "to": "office"
+                "to": "hallway"
               },
               "desc": "an old wooden-and-brass elevator cage with its folding gate open and its car waiting level with the floor"
             },
@@ -1053,7 +1053,7 @@
             0.6232
           ],
           "direction": "open",
-          "to": "office",
+          "to": "hallway",
           "boxSource": "draft:skeleton"
         }
       ]
@@ -1132,7 +1132,18 @@
           "atmosphere": "gloomy and grimy, the lanterns dimmed by steam, a job that badly needs doing",
           "styleLight": "early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red",
           "negatives": "No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. The water is DIRTY brown, never clean or blue.",
-          "states": {},
+          "states": {
+            "clean": {
+              "change": "the big tub, its water and its wooden walls",
+              "elements": {
+                "big_tub": {
+                  "desc": "the enormous sunken wooden bathtub is now spotlessly, gleamingly clean: its curved wooden walls and rim scrubbed and freshly polished to a warm honey-gold shine, glossy and almost glowing, catching bright highlights from every lantern, every stain, grime streak and water mark gone; it is full to the brim with crystal-clear, sparkling pale green herbal bath water, gently steaming, a few fresh green herb sprigs floating on it, little glints of light dancing on the surface; the brown mud, the grey scum and the dead leaves are all gone"
+                }
+              },
+              "constraints": "Only the tub changes: it keeps its exact shape, size and place, and the scoop, the floor, the room's walls, the lanterns and the doorway stay exactly as they are. No people, no text.",
+              "stillOnly": true
+            }
+          },
           "continuity": [],
           "scaffold": {
             "kind": "skeleton",
@@ -1192,7 +1203,19 @@
           "seamBandRun": 0.03,
           "at": "2026-10-20T20:34:54",
           "acceptedBy": "lucas via agent 2026-10-20",
-          "humanNote": "Lucas 2026-10-20: 'Those rooms are all good.'"
+          "humanNote": "Lucas 2026-10-20: 'Those rooms are all good.'",
+          "states": {
+            "clean": {
+              "stage": "screened",
+              "band": "mid",
+              "ratio": 3.09,
+              "delta": 3.23,
+              "needsWork": false,
+              "accepted": false,
+              "seamBandRun": 0.008,
+              "at": "2026-10-22T20:36:31"
+            }
+          }
         }
       },
       "mapPos": {
@@ -1234,6 +1257,37 @@
           "direction": "back",
           "to": "atrium",
           "boxSource": "moved:agent"
+        },
+        {
+          "id": "clean_wash",
+          "type": "ambient",
+          "label": "Nightfall",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Full-scene state variant. `ambient` is filtered out of rendering, so this carrier shows no marker and intercepts no clicks; it exists only to hold the variant art.",
+          "variants": [
+            {
+              "state": "clean",
+              "box": [
+                0,
+                0,
+                1,
+                1
+              ],
+              "prompt": "Keep this exact scene, composition, camera framing and every object precisely where it is, and change ONLY the big tub, its water and its wooden walls: The enormous sunken wooden bathtub is now spotlessly, gleamingly clean: its curved wooden walls and rim scrubbed and freshly polished to a warm honey-gold shine, glossy and almost glowing, catching bright highlights from every lantern, every stain, grime streak and water mark gone; it is full to the brim with crystal-clear, sparkling pale green herbal bath water, gently steaming, a few fresh green herb sprigs floating on it, little glints of light dancing on the surface; the brown mud, the grey scum and the dead leaves are all gone. Only the tub changes: it keeps its exact shape, size and place, and the scoop, the floor, the room's walls, the lanterns and the doorway stay exactly as they are. No people, no text.",
+              "panorama": "tub/scene_clean.png",
+              "when": {
+                "eq": [
+                  "liveWon",
+                  true
+                ]
+              }
+            }
+          ]
         }
       ]
     },
@@ -1433,11 +1487,237 @@
       ]
     },
     {
+      "key": "hallway",
+      "title": "The guest hallway",
+      "built": true,
+      "unlockedWhen": true,
+      "designNote": "Station (LEVEL 2: a teen plus or minus a single digit, still 1 herb bundle): the bath token stall. Added 2026-10-22 between the atrium and the office. Doors: the elevator back down to the atrium, the stairs up to the office.",
+      "plannedHotspots": [
+        {
+          "type": "door",
+          "direction": "back",
+          "to": "atrium",
+          "label": "The elevator down to the atrium",
+          "box": [
+            0.133,
+            0.23,
+            0.218,
+            0.67
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "station",
+          "tier": 2,
+          "label": "The bath token stall",
+          "box": [
+            0.29,
+            0.27,
+            0.4,
+            0.7
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "to": "office",
+          "label": "Up the stairs to the owner's office",
+          "box": [
+            0.638,
+            0.31,
+            0.775,
+            0.665
+          ],
+          "boxSource": "moved:agent"
+        }
+      ],
+      "authoring": {
+        "sceneSpec": {
+          "room": "hallway",
+          "setting": "a long, narrow upper-floor corridor for the servants and guests of a colossal, whimsical spirit bathhouse in old Japan, built entirely of wood: red-lacquered pillars and beams, green-painted rails and panels, gold trim and gold ornaments, yellow paper screens, curved tiled roofs stacked storey on storey like a grand pagoda; hand-painted animated-film look, rich saturated colour, soft painterly detail, lined with sliding paper doors to guest rooms on both sides",
+          "interior": true,
+          "indoor": true,
+          "seam": "a plain stretch of row of closed sliding paper doors in dark wooden frames, uniform and unbroken",
+          "seamOccluder": "a square red-lacquered wooden post, floor to ceiling",
+          "elements": [
+            {
+              "id": "seam_left",
+              "at": "on the far left",
+              "desc": "the left half of the calm view directly behind the viewer: a plain stretch of row of closed sliding paper doors in dark wooden frames, uniform and unbroken, joining its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "elevator_down",
+              "at": "to the left",
+              "label": "The elevator down to the atrium",
+              "door": {
+                "direction": "back",
+                "to": "atrium"
+              },
+              "desc": "the brass elevator cage with its folding gate open, its car floor level with the corridor floor"
+            },
+            {
+              "id": "token_stall",
+              "at": "just left of centre",
+              "label": "The bath token stall",
+              "station": 2,
+              "desc": "a little wooden stall against the wall with a small counter under a short split cloth curtain, on the counter a tray of small wooden bath tokens on red cords and a basket of herb bundles tied with red string"
+            },
+            {
+              "id": "corridor",
+              "at": "dead ahead in the centre",
+              "desc": "the corridor running straight away from the viewer, level, between rows of sliding paper doors glowing yellow, paper lanterns hanging from the low beamed ceiling"
+            },
+            {
+              "id": "office_stairs",
+              "at": "to the right",
+              "label": "Up the stairs to the owner's office",
+              "door": {
+                "direction": "open",
+                "to": "office"
+              },
+              "desc": "a steep narrow staircase with gold-trimmed dark green walls, starting at the corridor floor and climbing up to a grand ornate door at the top"
+            },
+            {
+              "id": "seam_right",
+              "at": "on the far right",
+              "desc": "the right half of the calm view directly behind the viewer: a plain stretch of row of closed sliding paper doors in dark wooden frames, uniform and unbroken, joining its other half cleanly at the seam directly behind you"
+            }
+          ],
+          "soundBed": "a quiet upper corridor: soft footsteps on wood, paper doors sliding somewhere, the bathhouse humming below.",
+          "rigid": "the stall, the tokens, the paper doors, the lanterns, the elevator, the stairs",
+          "atmosphere": "warm, hushed and homely, lantern light glowing through the paper doors",
+          "styleLight": "early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red",
+          "negatives": "No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. The corridor is EMPTY; the stall has nobody behind it.",
+          "states": {},
+          "continuity": [],
+          "scaffold": {
+            "kind": "skeleton",
+            "layout": {
+              "surface": "room",
+              "word": "floor",
+              "floor": "smooth polished wooden floor of the corridor",
+              "size": [
+                2.5,
+                2.5,
+                8,
+                2.5
+              ],
+              "sides": {
+                "left": "houses",
+                "right": "houses",
+                "front": "houses",
+                "back": "houses"
+              },
+              "parts": [
+                [
+                  "door",
+                  "elevator_down",
+                  {
+                    "w": 1.4,
+                    "h": 2.4,
+                    "say": "the open elevator car, its floor level with the corridor floor"
+                  }
+                ],
+                [
+                  "prop",
+                  "token_stall",
+                  {
+                    "size": [
+                      1.4,
+                      0.7,
+                      1.2
+                    ],
+                    "kind": "wall"
+                  }
+                ],
+                [
+                  "stair_up",
+                  "office_stairs"
+                ]
+              ]
+            }
+          },
+          "stillOnly": true
+        },
+        "plateRefs": [
+          "atrium/scene.png"
+        ],
+        "scenePrompt": "This is a seamless 360-degree panorama from a long, narrow upper-floor corridor for the servants and guests of a colossal, whimsical spirit bathhouse in old Japan, built entirely of wood: red-lacquered pillars and beams, green-painted rails and panels, gold trim and gold ornaments, yellow paper screens, curved tiled roofs stacked storey on storey like a grand pagoda; hand-painted animated-film look, rich saturated colour, soft painterly detail, lined with sliding paper doors to guest rooms on both sides. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stretch of row of closed sliding paper doors in dark wooden frames, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: a plain stretch of row of closed sliding paper doors in dark wooden frames, uniform and unbroken, joining its other half cleanly at the seam directly behind you; to the left, the brass elevator cage with its folding gate open, its car floor level with the corridor floor; just left of centre, a little wooden stall against the wall with a small counter under a short split cloth curtain, on the counter a tray of small wooden bath tokens on red cords and a basket of herb bundles tied with red string; dead ahead in the centre, the corridor running straight away from the viewer, level, between rows of sliding paper doors glowing yellow, paper lanterns hanging from the low beamed ceiling; to the right, a steep narrow staircase with gold-trimmed dark green walls, starting at the corridor floor and climbing up to a grand ornate door at the top; on the far right, the right half of the calm view directly behind the viewer: a plain stretch of row of closed sliding paper doors in dark wooden frames, uniform and unbroken, joining its other half cleanly at the seam directly behind you. warm, hushed and homely, lantern light glowing through the paper doors. No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. The corridor is EMPTY; the stall has nobody behind it. Shot on a full-frame DSLR at 24mm, f/8, early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a plain stretch of row of closed sliding paper doors in dark wooden frames, uniform and unbroken, with no visible seam, join, or repetition.",
+        "seam": {
+          "stage": "blurred",
+          "band": "sky",
+          "ratio": 0.0,
+          "delta": 0.0,
+          "needsWork": false,
+          "accepted": false,
+          "seamBandRun": 0.0,
+          "at": "2026-10-22T20:27:06"
+        }
+      },
+      "mapPos": {
+        "c": 2,
+        "r": 2
+      },
+      "panorama": "hallway/scene.png",
+      "builtFrom": "l1_hallway_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "hotspots": [
+        {
+          "id": "the_elevator_down_to_the_atrium",
+          "type": "door",
+          "label": "The elevator down to the atrium",
+          "box": [
+            0.133,
+            0.23,
+            0.218,
+            0.67
+          ],
+          "direction": "back",
+          "to": "atrium",
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "the_bath_token_stall",
+          "type": "station",
+          "label": "The bath token stall",
+          "box": [
+            0.29,
+            0.27,
+            0.4,
+            0.7
+          ],
+          "tier": 2,
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "up_the_stairs_to_the_owner_s_office",
+          "type": "door",
+          "label": "Up the stairs to the owner's office",
+          "box": [
+            0.638,
+            0.31,
+            0.775,
+            0.665
+          ],
+          "direction": "open",
+          "to": "office",
+          "boxSource": "moved:agent"
+        }
+      ]
+    },
+    {
       "key": "office",
       "title": "The owner's office",
       "built": true,
       "unlockedWhen": true,
-      "designNote": "Station (1 herb bundle): the golden desk. At the top, up the elevator. Back to the atrium only.",
+      "designNote": "Station (1 herb bundle): the golden desk. At the top, past the hallway. Back down the elevator to the hallway only.",
       "plannedHotspots": [
         {
           "type": "station",
@@ -1454,7 +1734,7 @@
         {
           "type": "door",
           "direction": "back",
-          "to": "atrium",
+          "to": "hallway",
           "label": "The elevator down",
           "box": [
             0.775,
@@ -1507,7 +1787,7 @@
               "label": "The elevator down",
               "door": {
                 "direction": "back",
-                "to": "atrium"
+                "to": "hallway"
               },
               "desc": "the brass elevator cage with its folding gate open, its car floor level with the office floor"
             },
@@ -1623,7 +1903,7 @@
             0.71
           ],
           "direction": "back",
-          "to": "atrium",
+          "to": "hallway",
           "boxSource": "moved:agent"
         }
       ]
