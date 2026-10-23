@@ -20,7 +20,7 @@
 const POLL_MS = 2000;
 const STORE = "liveSession";        // localStorage: { pid, code }
 
-let st = null, stAt = 0, me = null, pollTimer = null, tickTimer = null, onChange = null;
+let st = null, stAt = 0, me = null, pollTimer = null, tickTimer = null, onChange = null, dismissedPhase = null;
 const $ = s => document.querySelector(s);
 
 async function api(path, body) {
@@ -69,6 +69,10 @@ function injectStyle() {
   #liveOverlay .card { max-width:520px; padding:22px 26px; border-radius:14px; background:rgba(0,0,0,.55);
     border:1px solid rgba(255,216,140,.35); color:#ffecc8; font:16px/1.45 system-ui; }
   #liveOverlay h2 { margin:0 0 8px; color:#ffd88c; font:700 26px system-ui; }
+  #liveOverlay .card { position:relative; }
+  #liveOverlay .lvX { position:absolute; top:6px; right:8px; display:none; width:34px; height:34px;
+    border:0; border-radius:17px; background:transparent; color:#ffd88c; font:700 22px system-ui; cursor:pointer; }
+  #liveOverlay .lvX:hover { background:rgba(255,216,140,.15); }
   #liveHud > * { white-space:nowrap; }
   @media (max-width:640px) {
     #liveHud { flex-wrap:wrap; justify-content:center; row-gap:3px; column-gap:10px; font-size:12px;
@@ -145,7 +149,10 @@ export function showHud(screen) {
     screen.appendChild(hud);
     const ov = document.createElement("div");
     ov.id = "liveOverlay";
-    ov.innerHTML = `<div class="card"><h2></h2><p></p></div>`;
+    ov.innerHTML = `<div class="card"><button class="lvX" aria-label="Close">&times;</button><h2></h2><p></p></div>`;
+    // The end cards (won, time's up) can be closed to look at the room (bathhouse: the clean tub); the
+    // card stays shut until the phase changes. Paused and rejoin cards have no X.
+    ov.querySelector(".lvX").onclick = () => { dismissedPhase = st && st.phase; overlay("hide"); };
     screen.appendChild(ov);
   }
   $("#liveHud").style.display = "flex";
@@ -171,10 +178,11 @@ function rejoinNeeded() {
   overlay("show", "Rejoin the session", "The class session was restarted. Reload the page and type the new code from the screen.");
 }
 
-function overlay(mode, title, body) {
+function overlay(mode, title, body, closable) {
   const ov = $("#liveOverlay");
   if (!ov) return;
   if (mode === "hide") { ov.style.display = "none"; return; }
+  ov.querySelector(".lvX").style.display = closable ? "block" : "none";
   ov.className = mode === "paused" ? "paused" : "";
   ov.querySelector("h2").textContent = title;
   ov.querySelector("p").textContent = body || "";
@@ -194,9 +202,11 @@ function render() {
   const carrying = st.me ? st.me.carrying || 0 : 0;
   hud.querySelector(".lhCarry").textContent = carrying ? "carrying " + plural(carrying, st.unit) : "";
   const ph = st.phase;
-  if (ph === "paused") overlay("paused", "Paused", "Eyes on the screen at the front.");
-  else if (ph === "won") overlay("show", "You did it", total + " / " + goal + (label ? " " + label : "") + ". Nice work, crew.");
-  else if (ph === "timeup") overlay("show", "Time's up", "The class got " + total + " / " + goal + (label ? " " + label : "") + ".");
+  if (dismissedPhase && dismissedPhase !== ph) dismissedPhase = null;    // a new phase brings its card back
+  if (dismissedPhase === ph) overlay("hide");
+  else if (ph === "paused") overlay("paused", "Paused", "Eyes on the screen at the front.");
+  else if (ph === "won") overlay("show", "You did it", total + " / " + goal + (label ? " " + label : "") + ". Nice work, crew.", true);
+  else if (ph === "timeup") overlay("show", "Time's up", "The class got " + total + " / " + goal + (label ? " " + label : "") + ".", true);
   else if (ph === "closed") overlay("show", "Session over", "Thanks for playing.");
   else if (!(me && st && !st.me)) overlay("hide");
   tick();

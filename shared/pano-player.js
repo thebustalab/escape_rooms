@@ -79,18 +79,18 @@
 // A bare `./variant_resolve.js` import is NOT refreshed by bumping the <script> tag's ?v, so a changed
 // helper module (e.g. a new export) leaves browsers on a stale cached copy → "doesn't provide an export
 // named X" SyntaxError → blank page (the 2026-08-05 airship regression). Bump all three together.
-import { WebRConsole } from "./webr-console.js?v=137";
-import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers } from "./variant_resolve.js?v=137";   // Phase 3: per-hotspot state variants; monorail switch-door nav
-import * as PQ from "./puzzle_queue.js?v=137";   // dynamic puzzle queue: location-independent puzzle serving
-import * as CP from "./corr_panel.js?v=137";   // lower-triangle layout of the grid gate (clouds correlation panel)
-import { particleCount } from "./particles.js?v=137";   // ambient-particle vocabulary + per-kind field density
-import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=137";
-import { condHolds } from "./cond.js?v=137";   // ledger + elevation-map card DOM
-import * as LIVE from "./live_session.js?v=137";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
-import * as RIDE from "./ride.js?v=137";
-import { mountPcaPlate } from "./pca_plate.js?v=137";   // the PCA plate instrument (voyage beach)
-import { mountDrawdown } from "./drawdown.js?v=137";   // the drawdown board instrument (diamonds escape)   // THE RIDE (subway): express lever + clip-sequence planner
-import * as BELL from "./bell_pull.js?v=137";   // bell-pull (#16): dial mode:"pull" + lock mode:"state" (spa belfry)
+import { WebRConsole } from "./webr-console.js?v=140";
+import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers, pickTransit } from "./variant_resolve.js?v=140";   // Phase 3: per-hotspot state variants; monorail switch-door nav
+import * as PQ from "./puzzle_queue.js?v=140";   // dynamic puzzle queue: location-independent puzzle serving
+import * as CP from "./corr_panel.js?v=140";   // lower-triangle layout of the grid gate (clouds correlation panel)
+import { particleCount } from "./particles.js?v=140";   // ambient-particle vocabulary + per-kind field density
+import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=140";
+import { condHolds } from "./cond.js?v=140";   // ledger + elevation-map card DOM
+import * as LIVE from "./live_session.js?v=140";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
+import * as RIDE from "./ride.js?v=140";
+import { mountPcaPlate } from "./pca_plate.js?v=140";   // the PCA plate instrument (voyage beach)
+import { mountDrawdown } from "./drawdown.js?v=140";   // the drawdown board instrument (diamonds escape)   // THE RIDE (subway): express lever + clip-sequence planner
+import * as BELL from "./bell_pull.js?v=140";   // bell-pull (#16): dial mode:"pull" + lock mode:"state" (spa belfry)
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 
@@ -339,6 +339,12 @@ function init(data) {
     initMotif();                                                      // story-motif HUD (e.g. infection lesion)
     bootConsole();
     if (liveMode()) LIVE.showHud($("#screen2"));                      // live scenario: class total, clock, what you carry
+    // Live: the class reaching its goal sets world state `liveWon`, so a hotspot variant `when:{eq:["liveWon",
+    // true]}` can show the payoff in the room (bathhouse: the tub runs clean). Re-render only on a change.
+    if (liveMode()) LIVE.onState(st => {
+      const won = !!(st && st.phase === "won");
+      if (!!gameState.liveWon !== won) { gameState.liveWon = won; rerenderCurrentRoom(); }
+    });
     if (music && musicOn) music.play().catch(() => {});   // Enter is the user gesture autoplay needs
     const named = startKey ? SCENARIO.rooms.findIndex(r => r.key === startKey && isBuilt(r)) : -1;
     const first = named >= 0 ? named
@@ -554,6 +560,9 @@ function _sfxCrossfade(src, vol, cfg) {
 let sfxLayers = [];        // [{cfg, handles:[…]}] — one per started layer of the active room
 let sfxScene;              // backdrop state the active layers were chosen for (undefined = none started)
 function roomSceneState(r) { try { return fullSceneState(activeVariants(r)); } catch (e) { return null; } }
+// A door's transit for the backdrop showing in room `r` (default: the room the player is leaving):
+// `transit.byState` carries other world states' clips (variant_resolve.js → pickTransit).
+function doorTransit(h, r = room) { return pickTransit(h && h.transit, r ? roomSceneState(r) : null); }
 function applySfxDuck() {
   let deepest = null;
   sfxLayers.forEach(({ cfg }) => {
@@ -1744,8 +1753,42 @@ function startCinemagraph(baseUrl, cines, yaw, live = () => true) {
 // on a phone). Each buildViewer / transit takes a new generation; a continuation whose generation is no longer
 // current drops itself. Pinned by tests/e2e/portal_transit.spec.js ("a slow room redraw").
 let _viewGen = 0;
+// SLOW STATE FADE (2026-10-22, Seedfall's first snow; opt-in by `SCENARIO.stateFadeMs`): when the room's whole-scene
+// state changes while the player stands in it (a solve bringing the snow), the old view is frozen as a picture over
+// the panorama (Pannellum's own render-to-image, which it uses for its scene fades), the new state is built under it,
+// and the picture fades out over stateFadeMs once the new view has loaded AND no modal or card is covering the scene,
+// so the change is seen rather than happening behind the answer box. Room entries and same-state rebuilds snap.
+let _lastScene = null;
+function stateFade() {
+  const ms = +SCENARIO.stateFadeMs || 0, key = room && room.key, st = roomSceneState(room), prev = _lastScene;
+  _lastScene = { key, state: st };
+  if (!ms || !viewer || !prev || prev.key !== key || prev.state === st) return;
+  try { if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return; } catch (e) {}
+  let url = null;
+  try {
+    const d = Math.PI / 180;
+    url = viewer.getRenderer().render(viewer.getPitch() * d, viewer.getYaw() * d, viewer.getHfov() * d, { returnImage: true });
+  } catch (e) {}
+  if (!url) return;
+  const old = viewer, r = $("#pano").getBoundingClientRect(), pic = new Image();
+  pic.className = "state-fade"; pic.src = url;
+  pic.style.cssText = `position:fixed;left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px;z-index:5;pointer-events:none;opacity:1`;
+  document.body.appendChild(pic);
+  const t0 = performance.now();
+  const go = () => {
+    if (!pic.isConnected) return;
+    let ready = false; try { ready = viewer !== old && viewer.isLoaded && viewer.isLoaded(); } catch (e) {}
+    const covered = $("#modal").classList.contains("open") || $("#loading").classList.contains("open");
+    if ((!ready && performance.now() - t0 < 8000) || covered) return setTimeout(go, 100);
+    pic.style.transition = `opacity ${ms}ms ease-in-out`;
+    requestAnimationFrame(() => requestAnimationFrame(() => { pic.style.opacity = "0"; }));
+    setTimeout(() => pic.remove(), ms + 150);
+  };
+  setTimeout(go, 100);
+}
 function buildViewer(img, yaw = 0) {
   syncRoomSfx();   // the backdrop may have changed state (a solve flipping the scene to night) — follow it with sound
+  stateFade();
   const gen = ++_viewGen, live = () => gen === _viewGen;
   const withCinemagraph = url => {
     if (!live()) return;
@@ -1982,6 +2025,7 @@ function navigateTo(idx, withEntry, arriveYaw) {
 // A BACK door's transit is the forward clip reversed (its rolls swap: rollFrom = the forward rollTo).
 let transiting = null;
 const TRANSIT_FADE = 0.4;
+const BACKOUT_HOLD_MS = 1000;   // the back-out finale's hold on its last (flat) frame before the escape card
 const _transitVideos = {};
 function _transitVideo(src) {
   // A failed or slow load is not cached, so the next trip (or the walk-through's next room) tries again.
@@ -1996,7 +2040,7 @@ function _releaseTransitVideo(src) {
 }
 function preloadTransits(r) {
   const want = new Set();
-  (r && r.hotspots || []).forEach(h => { if (h && h.type === "door" && h.transit && h.transit.video) want.add(h.transit.video); });
+  (r && r.hotspots || []).forEach(h => { const t = h && h.type === "door" ? doorTransit(h, r) : null; if (t && t.video) want.add(t.video); });
   Object.keys(_transitVideos).forEach(src => { if (!want.has(src)) _releaseTransitVideo(src); });
   want.forEach(src => _transitVideo(src));
 }
@@ -2009,13 +2053,89 @@ function _showForDecode(v) {
 }
 function _hideAfterDecode(v) { try { if (v && v.isConnected) v.remove(); } catch (e) {} }
 const _wrapYaw = y => ((((y + 180) % 360) + 360) % 360) - 180;
+// The BACK-OUT finale's un-wrap (Lucas, 2026-10-22): a WebGL overlay over the stage that draws the clip through a
+// projection blended from pannellum's own perspective view (s = 0: identical to the player's 360 view at their
+// yaw/pitch/hfov, same maths as pannellum 2.5.6's equirectangular shader) into the flat letterboxed strip centred on
+// the clip's heading (s = 1). Returns null without WebGL; the caller then falls back to the plain flat picture.
+function _backoutMorph(stage, wrap) {
+  const r = stage.getBoundingClientRect();
+  const el = document.createElement("canvas");
+  el.className = "transit-flat transit-backout";
+  el.style.cssText = `position:fixed;left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px;z-index:5;opacity:0;transition:opacity .25s linear;background:#000`;
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  el.width = Math.max(1, Math.round(r.width * dpr)); el.height = Math.max(1, Math.round(r.height * dpr));
+  let gl = null;
+  try { gl = el.getContext("webgl", { preserveDrawingBuffer: true }) || el.getContext("experimental-webgl", { preserveDrawingBuffer: true }); } catch (e) {}
+  if (!gl) return null;
+  const vs = "attribute vec2 p; varying vec2 v; void main(){ v = p; gl_Position = vec4(p, 0.0, 1.0); }";
+  const fs = [
+    "precision highp float;",
+    "varying vec2 v;",
+    "uniform sampler2D img;",
+    "uniform float aspect, f, yaw, pitch, h, vv, vo, s, sw, sh;",
+    "const float PI = 3.14159265358979;",
+    "void main(){",
+    // A: pannellum's rectilinear view (its psi = yaw, theta = pitch; roll is always 0 here)
+    "  float x = v.x * aspect, y = v.y;",
+    "  float a = f * cos(pitch) - y * sin(pitch);",
+    "  float root = sqrt(x * x + a * a);",
+    "  float lamA = atan(x / root, a / root) + yaw;",
+    "  float phiA = atan((y * cos(pitch) + f * sin(pitch)) / root);",
+    // B: the flat strip, letterboxed (u, w in [-1, 1] inside it)
+    "  float u = v.x / sw, w = v.y / sh;",
+    "  float lamB = u * h * PI;",
+    "  float phiB = (w * vv + vo) * PI * 0.5;",
+    "  float d = mod(lamA - lamB + PI, 2.0 * PI) - PI;",   // shortest way round, so a player facing away swings back
+    "  float lam = mod(lamB + d * (1.0 - s) + PI, 2.0 * PI) - PI;",
+    "  float phi = mix(phiA, phiB, s);",
+    "  vec2 c = vec2(lam / PI, phi / (PI * 0.5));",
+    "  vec3 col = vec3(0.02, 0.05, 0.09);",
+    "  if (c.x >= -h && c.x <= h && c.y >= -vv + vo && c.y <= vv + vo)",
+    "    col = texture2D(img, vec2((c.x + h) / (h * 2.0), (-c.y + vv + vo) / (vv * 2.0))).rgb;",
+    "  float outside = (abs(u) > 1.0 || abs(w) > 1.0) ? 1.0 : 0.0;",
+    "  gl_FragColor = vec4(col * (1.0 - outside * s), 1.0);",
+    "}"].join("\n");
+  const sh = (type, src) => { const o = gl.createShader(type); gl.shaderSource(o, src); gl.compileShader(o); return gl.getShaderParameter(o, gl.COMPILE_STATUS) ? o : null; };
+  const prog = gl.createProgram(), a = sh(gl.VERTEX_SHADER, vs), b = sh(gl.FRAGMENT_SHADER, fs);
+  if (!a || !b) return null;
+  gl.attachShader(prog, a); gl.attachShader(prog, b); gl.linkProgram(prog);
+  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return null;
+  gl.useProgram(prog);
+  const buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+  const loc = gl.getAttribLocation(prog, "p"); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+  const tex = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, tex);
+  [[gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE], [gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE], [gl.TEXTURE_MIN_FILTER, gl.LINEAR], [gl.TEXTURE_MAG_FILTER, gl.LINEAR]]
+    .forEach(([k, val]) => gl.texParameteri(gl.TEXTURE_2D, k, val));
+  const U = n => gl.getUniformLocation(prog, n);
+  const w = wrap || { haov: 360, vaov: 90 }, rad = Math.PI / 180;
+  const morph = {
+    el, s: 0,
+    // view: {yaw, pitch, hfov} in degrees, clip coordinates (read from the transit's pannellum viewer)
+    draw(src, s, view) {
+      morph.s = s; el.dataset.s = s.toFixed(3); el.dataset.t = (+src.currentTime || 0).toFixed(2);   // read by tests/e2e/portal_transit.spec.js
+      gl.viewport(0, 0, el.width, el.height);
+      try { gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, src); } catch (e) { return; }
+      const aspect = el.width / el.height, srcAspect = (src.videoWidth || src.width || 3) / (src.videoHeight || src.height || 1);
+      const vfov = 2 * Math.atan(Math.tan(view.hfov * rad / 2) / aspect);
+      gl.uniform1f(U("aspect"), aspect); gl.uniform1f(U("f"), 1 / Math.tan(vfov / 2));
+      gl.uniform1f(U("yaw"), view.yaw * rad); gl.uniform1f(U("pitch"), view.pitch * rad);
+      gl.uniform1f(U("h"), (w.haov || 360) / 360); gl.uniform1f(U("vv"), (w.vaov || 90) / 180); gl.uniform1f(U("vo"), (w.vOffset || 0) / 90);
+      gl.uniform1f(U("s"), s);
+      gl.uniform1f(U("sw"), aspect > srcAspect ? srcAspect / aspect : 1); gl.uniform1f(U("sh"), aspect > srcAspect ? 1 : aspect / srcAspect);
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    },
+  };
+  return morph;
+}
 // onArrive (the escape door): no room to arrive in — the clip's last frame stays up as the panorama (marker-less)
 // and onArrive runs instead of navigateTo; the fade target is `transit.endPanorama` if given (the clip already
 // ends on it, so it is optional).
 function startTransit(h, idx, withEntry = true, onArrive = null) {   // withEntry: as navigateTo (a back door passes false)
-  const t = h.transit;
+  const t = doorTransit(h);
   if (!t || !t.video || transiting || riding) return false;
   try { if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return false; } catch (e) {}
+  if (t.flat && !onArrive) return startFlatDoorTransit(h, idx, withEntry);   // an ordinary door's flat clip (below)
   const target = idx >= 0 ? SCENARIO.rooms[idx] : null, from = room;
   const rollFrom = +t.rollFrom || 0, rollTo = +t.rollTo || 0;
   let yaw = 0; try { yaw = viewer.getYaw(); } catch (e) {}
@@ -2054,7 +2174,15 @@ function startTransit(h, idx, withEntry = true, onArrive = null) {   // withEntr
       drawEnd(1);
       let y = yaw + rollFrom; try { y = viewer.getYaw(); } catch (e) {}
       transiting = null;
-      if (onArrive) { try { viewer && viewer.setUpdate && viewer.setUpdate(true); } catch (e) {} return onArrive(); }   // stay on the last frame
+      if (onArrive) {                          // stay on the last frame
+        try { viewer && viewer.setUpdate && viewer.setUpdate(true); } catch (e) {}
+        if (morph) {                           // the back-out: lay the frame fully flat, hold it, then the card
+          morph.draw(video, 1, view());
+          const hold = video.ended ? (t.holdMs != null ? +t.holdMs : BACKOUT_HOLD_MS) : 0;   // a skip goes straight to the card
+          if (hold > 0) { setTimeout(onArrive, hold); return; }
+        }
+        return onArrive();
+      }
       _keepStage = true;                       // no dip to black between the clip's last frame and the room
       navigateTo(idx, withEntry, _wrapYaw(y - rollTo));
     };
@@ -2074,13 +2202,43 @@ function startTransit(h, idx, withEntry = true, onArrive = null) {   // withEntr
         } catch (e) {}
       });
     };
+    // `transit.flat` on an escape door = the BACK-OUT finale (Lucas, 2026-10-22, Seedfall's lever pull-outs). The clip
+    // starts as the player's own 360 view and UN-WRAPS as it plays (`_backoutMorph`): by `morph[1]` of the clip
+    // (default 0.85) the whole strip lies flat and letterboxed, centred on the clip's heading, so a pull-back reads as
+    // a pull-back whichever way they faced. The last frame holds `holdMs` (default 1000) and then the escape card lands
+    // over it. No fade through black: fades belong to rides (startFlatDoorTransit). Without WebGL it falls back to
+    // the plain flat picture crossfading in. Anything else ignores the flag.
+    const flat = !!(t.flat && onArrive);
+    let flatEl = null, morph = null, view0 = null;
+    const view = () => {
+      if (view0) return view0;
+      try { view0 = { yaw: viewer.getYaw(), pitch: viewer.getPitch(), hfov: viewer.getHfov() }; } catch (e) { return { yaw: _wrapYaw(yaw + rollFrom), pitch: 0, hfov: 100 }; }
+      return view0;
+    };
+    const mA = Array.isArray(t.morph) && isFinite(+t.morph[0]) ? +t.morph[0] : 0;
+    const mB = Array.isArray(t.morph) && +t.morph[1] > mA ? +t.morph[1] : 0.85;
+    const morphAt = () => {
+      const d = video.duration || 0; if (!d || !isFinite(d)) return 0;
+      const x = Math.min(1, Math.max(0, (video.currentTime / d - mA) / (mB - mA)));
+      return x * x * (3 - 2 * x);
+    };
+    if (flat) morph = _backoutMorph($("#pano"), tpWrapCfg);
+    if (morph) flatEl = morph.el;
+    else if (flat) {
+      flatEl = document.createElement("div");
+      flatEl.className = "transit-flat";
+      flatEl.style.cssText = "position:fixed;inset:0;z-index:5;background:#000;opacity:0;transition:opacity .7s ease;display:flex;align-items:center;justify-content:center";
+      cv.style.cssText = `display:block;width:min(100vw, calc(100vh * ${W} / ${H}));height:auto`;
+      flatEl.appendChild(cv);
+    }
     const frame = () => {
       if (transiting !== run || done) return;
       if (looks.length) applyLooks();
       if (video.readyState >= 2) ctx.drawImage(video, 0, 0, W, H);
       const left = (video.duration || 0) - video.currentTime;
       if (isFinite(left) && left < TRANSIT_FADE) drawEnd(1 - Math.max(0, left) / TRANSIT_FADE);
-      try { viewer && viewer.setUpdate && viewer.setUpdate(true); } catch (e) {}
+      if (!flat) try { viewer && viewer.setUpdate && viewer.setUpdate(true); } catch (e) {}
+      if (morph && video.readyState >= 2) morph.draw(video, morphAt(), view());
       if (video.ended) return finish();
       raf = requestAnimationFrame(frame);
     };
@@ -2089,7 +2247,13 @@ function startTransit(h, idx, withEntry = true, onArrive = null) {   // withEntr
       ctx.drawImage(video, 0, 0, W, H);
       _keepStage = true;
       _renderViewer(cv, _wrapYaw(yaw + rollFrom), true, true);   // one dynamic, marker-less viewer for the clip
-      _cineStop = () => { cancelAnimationFrame(raf); try { video.pause(); } catch (e) {} _hideAfterDecode(video); };   // set AFTER _renderViewer
+      _cineStop = () => { cancelAnimationFrame(raf); try { video.pause(); } catch (e) {} _hideAfterDecode(video); if (flatEl) flatEl.remove(); };   // set AFTER _renderViewer
+      if (flatEl) {                              // the room viewer underneath is already the marker-less clip
+        document.body.appendChild(flatEl);
+        if (morph) morph.draw(video, 0, view());   // frame 0 at s = 0 is the player's own view: no visible change
+        requestAnimationFrame(() => { flatEl.style.opacity = "1"; });
+        setTimeout(() => { if (transiting === run && !done) flatEl.addEventListener("click", finish); }, 400);
+      }
       // Arm tap-to-skip only AFTER the click that opened the portal has finished. When everything is already loaded
       // (the escape: no arrival art to fetch) this code runs in a microtask DURING that click's dispatch, so a
       // listener added now caught the very same click bubbling up to #pano and skipped the transit at once: the
@@ -2110,6 +2274,83 @@ function startTransit(h, idx, withEntry = true, onArrive = null) {   // withEntr
     else go();
   })
   .catch(e => { console.error("portal transit failed; walking through", e); walk(); });
+  return true;
+}
+
+// `transit.flat` on an ORDINARY door (2026-10-22, Seedfall's garden carts): a flat third-person clip (a drone
+// following the cart down the cliff) played full screen with black bars, faded through black at both ends:
+// fade to black, the clip fades in already running (`skip` s in), fades to black `endEarly` s before its end,
+// then the arrival room fades in facing the door back to where the player came from. Timings tuned by Lucas in
+// authoring_v2/ui/cart_ride_proto/; a door may override any of them with `transit.timing`. The return door
+// carries a REVERSED copy of the clip (browsers cannot play video backwards reliably). No rolls: the clip is
+// not a panorama. Escape doors keep the letterboxed `flat` handling inside startTransit.
+const FLAT_DOOR_TIMING = { fadeOut: 500, skip: 0.3, fadeIn: 500, endEarly: 0.3, fadeClip: 500, fadeRoom: 500 };
+function startFlatDoorTransit(h, idx, withEntry) {
+  const t = doorTransit(h), target = idx >= 0 ? SCENARIO.rooms[idx] : null, from = room;
+  if (!target) return false;
+  const T = { ...FLAT_DOOR_TIMING, ...(t.timing || {}) };
+  const run = {};
+  transiting = run;
+  const veil = document.createElement("div");
+  veil.className = "transit-veil";            // under #loading (z 30), so a first-visit entry card shows above it
+  veil.style.cssText = "position:fixed;inset:0;z-index:6;background:#000;opacity:0;pointer-events:auto";
+  document.body.appendChild(veil);
+  const sleep = ms => new Promise(res => setTimeout(res, ms));
+  const fade = (to, ms) => {
+    veil.style.transition = `opacity ${ms}ms linear`;
+    requestAnimationFrame(() => requestAnimationFrame(() => { veil.style.opacity = String(to); }));
+    return sleep(ms + 40);
+  };
+  const back = (target.hotspots || []).find(d => d && d.type === "door" && d.to === (from && from.key) && Array.isArray(d.box));
+  const arriveYaw = back ? boxToYP(back.box, target.wrap || { haov: 360, vaov: 90 }).yaw : undefined;
+  let video = null;
+  const arrive = async () => {
+    if (video) { try { video.pause(); } catch (e) {} video.style.cssText = ""; _hideAfterDecode(video); }
+    if (transiting !== run) { veil.remove(); return; }
+    transiting = null;
+    navigateTo(idx, withEntry, arriveYaw);
+    // Hold the black until the arrival panorama has loaded or a first-visit entry card has opened above the
+    // veil. Timed by the WALL CLOCK, never by counting polls: on a loaded machine each 50 ms sleep ran ~130 ms
+    // and a "5 s" cap became 13 s of black (the e2e test caught it). #pano's opacity is no signal either: a
+    // re-visited room can swap in without ever hiding it.
+    const t0 = performance.now();
+    while (performance.now() - t0 < 4000) {
+      if ($("#loading").classList.contains("open")) break;
+      try { if (room === target && viewer && viewer.isLoaded && viewer.isLoaded()) break; } catch (e) {}
+      await sleep(50);
+    }
+    await fade(0, T.fadeRoom);
+    veil.remove();
+  };
+  (async () => {
+    const [v] = await Promise.all([_transitVideo(t.video).catch(() => null), fade(1, T.fadeOut)]);
+    if (transiting !== run || room !== from) return arrive();
+    if (!v) return arrive();                  // a missing clip: plain walk-through, still through black
+    video = v; run.video = v;
+    video.loop = false;
+    video.style.cssText = "position:fixed;inset:0;width:100vw;height:100vh;object-fit:contain;background:#000;z-index:5;pointer-events:none";
+    if (!video.isConnected) document.body.appendChild(video);
+    await new Promise(res => {
+      const want = Math.min(+T.skip || 0, Math.max(0, (video.duration || 1) - 1));
+      if (Math.abs(video.currentTime - want) < 0.05) return res();
+      video.addEventListener("seeked", res, { once: true }); setTimeout(res, 1500);
+      video.currentTime = want;
+    });
+    try { await video.play(); } catch (e) { return arrive(); }
+    const want = +T.skip || 0;                 // a seek on a not-yet-playing element can be dropped: re-apply it
+    if (video.currentTime < want - 0.05) { try { video.currentTime = want; } catch (e) {} }
+    await fade(0, T.fadeIn);
+    const outAt = () => (video.duration || 0) - (+T.endEarly || 0) - (+T.fadeClip || 0) / 1000;
+    // Wall-clock backstop: a clip that stalls (decoder suspended, network hiccup) must never strand the
+    // player behind the veil, so give up 3 s after the clip should have reached its fade-out.
+    const deadline = performance.now() + Math.max(0, outAt() - want) * 1000 + 3000;
+    while (transiting === run && !video.ended && !(video.currentTime >= outAt()) && performance.now() < deadline) {
+      if (video.paused) { try { await video.play(); } catch (e) { break; } }
+      await sleep(30);
+    }
+    await fade(1, T.fadeClip);
+    arrive();
+  })().catch(e => { console.error("flat transit failed; walking through", e); arrive(); });
   return true;
 }
 
@@ -3459,9 +3700,13 @@ async function openStation(h) {
           LIVE.noteCarrying(a.j.carrying);
           const st = LIVE.state(), unit = (st && st.unit) || ["gourd", "gourds"];
           // The pool's right_feedback (if any) says WHY it is right; the carry line is always ours.
+          const dest = (st && st.deliver_to) || "the canoe", them = a.j.carrying === 1 ? "it" : "them";
+          // A pool with carry_max (bathhouse: 3) lets loads stack: until the arms are full, say both options.
+          const room = st && st.carry_max && a.j.carry_full === false;
           a.j.feedback = (a.j.feedback ? a.j.feedback + " " : "Filled! ") +
             "You're carrying " + a.j.carrying + " " + (a.j.carrying === 1 ? unit[0] : unit[1]) +
-            ". Take " + (a.j.carrying === 1 ? "it" : "them") + " back to " + ((st && st.deliver_to) || "the canoe") + ".";
+            (room ? " (you can hold " + st.carry_max + "). Solve another, or take " + them + " to " + dest + "."
+                  : ". Take " + them + " back to " + dest + ".");
         }
         return a.j;
   };

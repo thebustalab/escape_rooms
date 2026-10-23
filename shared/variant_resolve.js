@@ -90,6 +90,17 @@ export function pickCinemagraphs(hotspots, sceneState) {
     .filter(c => (c.state || null) === (sceneState || null));
 }
 
+// A door's transit clip for the backdrop currently showing (2026-10-22, Seedfall's lifts). A ride is
+// filmed in one world state, so a door reachable both before and after a full-scene change (a lift the
+// player can ride back down after the first snow) carries the other state's clip under
+// `transit.byState: {first_snow: {video: "..."}}`. The entry's fields override the door's own; absent,
+// or a state with no entry, returns the door's transit unchanged, so every existing door is unaffected.
+export function pickTransit(transit, sceneState) {
+  if (!transit || !sceneState || !transit.byState || !transit.byState[sceneState]) return transit || null;
+  const { byState, ...base } = transit;
+  return { ...base, ...byState[sceneState] };
+}
+
 // --- Which room SOUND layers belong to the backdrop currently on screen (2026-09-16) -----------------
 //
 // The sound counterpart of pickCinemagraphs, with the default deliberately INVERTED. A clip carries one
