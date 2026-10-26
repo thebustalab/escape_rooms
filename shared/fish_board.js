@@ -1,14 +1,16 @@
 // The fish board — an engine INSTRUMENT (hotspot `type:"instrument"`, `kind:"fish_board"`), ported
 // 2026-10-26 from the harbour prototype rooms/comparing_means/harbour/_scratch/fish_board/fish_board.js.
 //
-// WHY: a five-act teaching demo for the comparing-means chapter that Lucas works on the projector with the
+// WHY: a four-act teaching demo for the comparing-means chapter that Lucas works on the projector with the
 // class, and students can return to between loads. The water is the population; a net is a random sample;
 // the boards show the catch; bronze dials and oil lamps show the real tests (fish_stats.js, pinned to R).
-// Nothing is staged: false positives turn up at their honest rate, which is the point of acts 2 and 5.
+// Nothing is staged: false positives turn up at their honest rate, which is the point of acts 2 and 4.
 // READ, never graded: no notebook, no gate, no answer, nothing saved.
 //
-//   1 Population and sample   2 Same water, two nets (Welch)   3 Is the catch normal? (Shapiro)
-//   4 Two waters (Welch vs Wilcox, picked by Shapiro)   5 Ten boats (45 pairs; the lever = Tukey / Dunn-Holm)
+//   1 Population and sample   2 Same water, two nets (Welch)
+//   3 Two waters (Welch vs Wilcox, picked by Shapiro)   4 Ten boats (45 pairs; the lever = Tukey / Dunn-Holm)
+// An "Is the catch normal?" act (Shapiro alone) was cut 2026-10-26 (Lucas: students grasp it); act 3 still
+// runs Shapiro on each catch to pick its road.
 //
 // All drawing is in BOARD coordinates (geometry imageW x imageH, the art's logical 1536 x 864 crop); one
 // letterbox transform maps them to the canvas. Geometry (the hotspot's `geometry` JSON):
@@ -20,9 +22,9 @@
 //
 //   const fb = mountFishBoard(hostEl, { geometry, art, pegs?, onPegs?(state), seed? });
 //   fb.setAct(n); fb.cast(); fb.castMany(k); fb.throwMonster(); fb.toggleLever(); fb.state();
-//   fb.leverClient() → client {x, y} of the act 5 lever; fb.ready (Promise); fb.destroy().
+//   fb.leverClient() → client {x, y} of the act 4 lever; fb.ready (Promise); fb.destroy().
 // The canvas carries the API as `canvas.fishBoard` for tests.
-import "./fish_stats.js?v=142";     // window.FishStats: the board's tests (Welch, Shapiro, Wilcox, Tukey, Dunn), pinned to R
+import "./fish_stats.js?v=143";     // window.FishStats: the board's tests (Welch, Shapiro, Wilcox, Tukey, Dunn), pinned to R
 
 const loadImg = (src) => new Promise((res) => {
   if (!src) return res(null);
@@ -30,7 +32,7 @@ const loadImg = (src) => new Promise((res) => {
   im.onload = () => res(im); im.onerror = () => res(null); im.src = src;
 });
 const SPRITES = ["board", "plank", "fish", "dial", "needle", "net", "lamp", "lever"];
-const ACT_NAMES = ["Population and sample", "Same water, two nets", "Is the catch normal?", "Two waters", "Ten boats"];
+const ACT_NAMES = ["Population and sample", "Same water, two nets", "Two waters", "Ten boats"];
 
 export function mountFishBoard(host, opts = {}) {
   const G = opts.geometry;
@@ -83,7 +85,7 @@ export function mountFishBoard(host, opts = {}) {
 
   // ---------- state ----------
   const st = {
-    act: Math.min(5, Math.max(1, Number(saved.act) || 1)),
+    act: Math.min(4, Math.max(1, Number(saved.act) || 1)),
     n: Number(saved.n) || 8,
     numbers: saved.numbers !== false,
     water: "open", waterA: "open", waterB: "mouth", water5: "open",
@@ -148,21 +150,21 @@ export function mountFishBoard(host, opts = {}) {
   const WATER_BOX = { x: 0, y: WATER_TOP, w: LW, h: LH - WATER_TOP };
   function boardRows() {
     switch (st.act) {
-      case 1: case 3: return [{ x: 40, y: 26, w: 1060, h: 250 }];
+      case 1: return [{ x: 40, y: 26, w: 1060, h: 250 }];
       case 2: return [{ x: 40, y: 16, w: 1060, h: 212 }, { x: 40, y: 240, w: 1060, h: 212 }];
-      case 4: return [{ x: 40, y: 10, w: 1060, h: 142 }, { x: 40, y: 160, w: 1060, h: 142 }];
-      case 5: { const out = []; for (let i = 0; i < 10; i++) out.push({ x: 40, y: 12 + i * 45, w: 880, h: 40 }); return out; }
+      case 3: return [{ x: 40, y: 10, w: 1060, h: 142 }, { x: 40, y: 160, w: 1060, h: 142 }];
+      case 4: { const out = []; for (let i = 0; i < 10; i++) out.push({ x: 40, y: 12 + i * 45, w: 880, h: 40 }); return out; }
     }
     return [];
   }
   const STRIP = (box) => Math.max(13, Math.min(28, box.h * 0.13));
   const stripTop = (box) => box.y + box.h - STRIP(box) - 5;
-  const lenX = (box, len) => { const x0 = box.x + box.w * (st.act === 5 ? 0.13 : 0.04), x1 = box.x + box.w - 16; return x0 + (len / MAXLEN) * (x1 - x0); };
+  const lenX = (box, len) => { const x0 = box.x + box.w * (st.act === 4 ? 0.13 : 0.04), x1 = box.x + box.w - 16; return x0 + (len / MAXLEN) * (x1 - x0); };
 
   // ---------- casting ----------
   function watersForAct() {
-    if (st.act === 4) return [st.waterA, st.waterB];
-    if (st.act === 5) return [st.water5];
+    if (st.act === 3) return [st.waterA, st.waterB];
+    if (st.act === 4) return [st.water5];
     return [st.water];
   }
   function releaseAll() { for (const k in WATERS) for (const f of WATERS[k].fish) f.caught = false; }
@@ -176,14 +178,14 @@ export function mountFishBoard(host, opts = {}) {
     releaseAll();
     st.monster = false;
     const n = st.n, rows = [];
-    if (st.act === 1 || st.act === 3) rows.push({ fish: netFrom(st.water, n), color: C_A, label: "Net", water: st.water });
+    if (st.act === 1) rows.push({ fish: netFrom(st.water, n), color: C_A, label: "Net", water: st.water });
     else if (st.act === 2) {
       rows.push({ fish: netFrom(st.water, n), color: C_A, label: "Net A", water: st.water });
       rows.push({ fish: netFrom(st.water, n), color: C_B, label: "Net B", water: st.water });
-    } else if (st.act === 4) {
+    } else if (st.act === 3) {
       rows.push({ fish: netFrom(st.waterA, n), color: C_A, label: WATERS[st.waterA].name, water: st.waterA });
       rows.push({ fish: netFrom(st.waterB, n), color: C_B, label: WATERS[st.waterB].name, water: st.waterB });
-    } else if (st.act === 5) {
+    } else if (st.act === 4) {
       const other = WATERS[st.water5].kind === "normal" ? "mouth" : "inlet";
       for (let b = 0; b < 10; b++) {
         const wk = st.elsewhere && b === 0 ? (st.water5 === other ? "open" : other) : st.water5;
@@ -194,11 +196,11 @@ export function mountFishBoard(host, opts = {}) {
     compute();
     st.flights = []; st.nets = [];
     if (animate) {
-      // Acts 1-4: each net rises out of the water, then its fish fly up onto the board. Act 5's ten boats
+      // Acts 1-3: each net rises out of the water, then its fish fly up onto the board. Act 4's ten boats
       // land straight from the water (ten nets at once would bury the lamps).
-      const now = performance.now(), useNets = st.act !== 5;
+      const now = performance.now(), useNets = st.act !== 4;
       rows.forEach((row, ri) => {
-        let t0 = now + (st.act === 5 ? ri * 40 : 0);
+        let t0 = now + (st.act === 4 ? ri * 40 : 0);
         if (useNets) { st.nets.push({ ri, t0: now + ri * 140, n: row.fish.length }); t0 = now + ri * 140 + RISE; }
         row.fish.forEach((f, k) => st.flights.push({ f, ri, t0: t0 + k * 45, dur: useNets ? 600 : 700, fromNet: useNets }));
       });
@@ -219,13 +221,9 @@ export function mountFishBoard(host, opts = {}) {
       st.result = w;
       T.sig = (T.sig || 0) + (w.p < 0.05 ? 1 : 0);
     } else if (st.act === 3) {
-      const sh = S.shapiro(L[0]);
-      st.result = sh;
-      T.flag = (T.flag || 0) + (sh.p < 0.05 ? 1 : 0);
+      st.result = compute3(L);
     } else if (st.act === 4) {
       st.result = compute4(L);
-    } else if (st.act === 5) {
-      st.result = compute5(L);
       const r = st.result;
       T.anyRaw = (T.anyRaw || 0) + (r.raw.some((p) => p < 0.05) ? 1 : 0);
       T.anyCor = (T.anyCor || 0) + (r.cor.some((p) => p < 0.05) ? 1 : 0);
@@ -234,12 +232,12 @@ export function mountFishBoard(host, opts = {}) {
     }
     updateTally();
   }
-  function compute4(L) {
+  function compute3(L) {
     const shA = S.shapiro(L[0]), shB = S.shapiro(L[1]);
     const road = shA.p < 0.05 || shB.p < 0.05 ? "rank" : "parametric";
     return { shA, shB, road, welch: S.welch(L[0], L[1]), wilcox: S.wilcox(L[0], L[1]) };
   }
-  function compute5(L) {
+  function compute4(L) {
     // The road is Lucas's choice here (a toggle), not ten Shapiro tests: with ten catches, one of them
     // fails Shapiro by chance often enough to flip the road mid-demo, which would bury the lesson.
     const road = st.road5;
@@ -254,11 +252,11 @@ export function mountFishBoard(host, opts = {}) {
     return { road, raw, cor, pairs };
   }
   function throwMonster() {
-    if (st.act !== 4 || !st.rows.length || st.monster) return;
+    if (st.act !== 3 || !st.rows.length || st.monster) return;
     const f = { len: 76, x: 0.5, y: 0.5, v: 0, ph: 0, caught: true, water: st.waterA, monster: true };
     st.rows[0].fish.push(f);
     st.monster = true;
-    st.result = compute4(st.rows.map((r) => r.fish.map((x) => x.len)));
+    st.result = compute3(st.rows.map((r) => r.fish.map((x) => x.len)));
     st.flights.push({ f, ri: 0, t0: performance.now(), dur: 900, fromTop: true });   // a passer-by throws it on
   }
 
@@ -332,7 +330,7 @@ export function mountFishBoard(host, opts = {}) {
   // ---------- the water (bottom) ----------
   function waterPanels() {
     const ws = watersForAct();
-    if (st.act === 5 && st.elsewhere && st.rows.length) {
+    if (st.act === 4 && st.elsewhere && st.rows.length) {
       const other = st.rows[0].water, w0 = Math.round(WATER_BOX.w * 0.76);
       return [{ key: st.water5, x: 0, y: WATER_BOX.y, w: w0 - 30, h: WATER_BOX.h },
         { key: other, x: w0 + 30, y: WATER_BOX.y, w: WATER_BOX.w - w0 - 30, h: WATER_BOX.h }];
@@ -377,7 +375,7 @@ export function mountFishBoard(host, opts = {}) {
       }
       ctx.restore();
       label(w.name, p.x + 18, p.y + 24, 24, "#fff1d0", "left", "italic");
-      if (st.drain && (st.act === 1 || st.act === 3)) label(`every fish here: mean ${w.trueMean.toFixed(1)} cm`, p.x + p.w - 18, p.y + 24, 20, "#fff1d0", "right");
+      if (st.drain && st.act === 1) label(`every fish here: mean ${w.trueMean.toFixed(1)} cm`, p.x + p.w - 18, p.y + 24, 20, "#fff1d0", "right");
     }
     return panels;
   }
@@ -390,7 +388,7 @@ export function mountFishBoard(host, opts = {}) {
   }
   function stackPositions(box, fish) {
     const bins = new Map(), out = new Map();
-    const small = st.act === 5;
+    const small = st.act === 4;
     const base = stripTop(box) - 3, avail = base - box.y - (small ? 2 : 26);
     const step = small ? 0 : Math.min(34, avail / Math.max(4, maxStack(fish)));
     const w = small ? 34 : Math.min(72, step * 2.4);
@@ -419,13 +417,13 @@ export function mountFishBoard(host, opts = {}) {
     return { landed, flying };
   };
   function drawBoards(now) {
-    const boxes = boardRows(), small = st.act === 5;
+    const boxes = boardRows(), small = st.act === 4;
     const { flying } = flightState(now);
     st.rows.forEach((row, ri) => {
       const box = boxes[ri]; if (!box) return;
       drawPlanks(box);
       drawScale(box, small);
-      if (st.drain && (st.act === 1 || st.act === 3)) drawPopulationShadow(box, st.water);
+      if (st.drain && st.act === 1) drawPopulationShadow(box, st.water);
       const { pos, w } = stackPositions(box, row.fish);
       for (const f of row.fish) {
         if (flying.has(f)) continue;
@@ -542,7 +540,7 @@ export function mountFishBoard(host, opts = {}) {
       if (st.numbers) engrave("p = " + fmtP(p), cx, ty + 76, Math.round(Math.max(15, W * 0.045)), "center");
     }
   }
-  // A terracotta oil lamp, lit or not (act 4's normality lamps, act 5's 45 pair lamps).
+  // A terracotta oil lamp, lit or not (act 3's normality lamps, act 4's 45 pair lamps).
   function lampSprite(cx, cy, w, on) {
     const im = IMG.lamp, h = (w * im.height) / im.width;
     ctx.save(); ctx.shadowColor = "rgba(20,10,0,.45)"; ctx.shadowBlur = 5; ctx.shadowOffsetY = 3;
@@ -585,14 +583,7 @@ export function mountFishBoard(host, opts = {}) {
     } else if (st.act === 2) {
       dial("p2", 1316, 30, 400, ready && r ? r.p : null, "Welch's t-test", "no difference found", "“significant”!");
       engrave("both nets: the same water", 1316, 380, 17, "center", "italic", "rgba(40,22,6,.9)");
-    } else if (st.act === 3) {
-      dial("p3", 1316, 24, 380, ready && r ? r.p : null, "Shapiro test", "could be normal", "not normal");
-      if (r && ready) {
-        const rank = r.p < 0.05;
-        roadSign(1218, 384, "parametric road", "Welch t · Tukey", !rank);
-        roadSign(1414, 384, "rank road", "Wilcox · Dunn", rank);
-      }
-    } else if (st.act === 4 && r) {
+    } else if (st.act === 3 && r) {
       const boxes = boardRows();
       [r.shA, r.shB].forEach((sh, i) => {
         const bx = boxes[i];
@@ -607,18 +598,11 @@ export function mountFishBoard(host, opts = {}) {
         dial("x4", 1390, 252, 250, r.wilcox.p, "Wilcox test", "no difference", "different", 392, park);
       }
       drawRankLine(ready);
-    } else if (st.act === 5 && r) {
+    } else if (st.act === 4 && r) {
       drawTriangle(ready);
     }
   }
-  function roadSign(x, y, title, sub, on) {
-    ctx.globalAlpha = on ? 1 : 0.4;
-    placard(x - 94, y - 34, 188, 68);
-    engrave(title, x, y - 10, 18, "center", "bold", on ? "rgba(40,22,6,.95)" : "rgba(60,40,20,.8)");
-    engrave(sub, x, y + 14, 15, "center", "italic");
-    ctx.globalAlpha = 1;
-  }
-  // Act 4: both catches nose to tail by size, coloured by net, rank tags, mean-rank wedges.
+  // Act 3: both catches nose to tail by size, coloured by net, rank tags, mean-rank wedges.
   function drawRankLine(ready) {
     const box = { x: 40, y: 312, w: 1060, h: 140 };
     drawPlanks(box);
@@ -641,7 +625,7 @@ export function mountFishBoard(host, opts = {}) {
       engrave("mean rank", x, box.y + 126, 13, "center", "italic");
     });
   }
-  // Act 5: 45 pair lamps in a triangle, lit when p < 0.05 (raw, or corrected with the lever).
+  // Act 4: 45 pair lamps in a triangle, lit when p < 0.05 (raw, or corrected with the lever).
   function drawTriangle(ready) {
     const r = st.result, x0 = 950, y0 = 18, cell = 44;
     const head = st.corrected ? (r.road === "parametric" ? "Tukey (corrected)" : "Dunn, Holm (corrected)") : (r.road === "parametric" ? "every pair, no correction" : "every pair (ranks), no correction");
@@ -671,7 +655,7 @@ export function mountFishBoard(host, opts = {}) {
       st.corrected ? "rgba(28,70,40,.95)" : "rgba(140,30,12,.95)");
   }
 
-  // The act 5 lever stands on the paving between the lamps and the count; click it to throw it.
+  // The act 4 lever stands on the paving between the lamps and the count; click it to throw it.
   const LEVER = { x: 1345, y: 322 };     // above the triangle's diagonal, clear of the lamps and the amphora
   const onLever = (p) => Math.abs(p.x - LEVER.x) < 50 && p.y > LEVER.y - 170 && p.y < LEVER.y + 45;
   let leverBtn = null;
@@ -679,8 +663,8 @@ export function mountFishBoard(host, opts = {}) {
     st.corrected = !st.corrected;
     if (leverBtn) leverBtn.textContent = st.corrected ? "Lever: corrected" : "Lever: no correction";
   }
-  cv.addEventListener("click", (ev) => { if (st.act === 5 && onLever(toBoard(ev))) toggleLever(); });
-  cv.addEventListener("mousemove", (ev) => { cv.style.cursor = st.act === 5 && onLever(toBoard(ev)) ? "pointer" : ""; });
+  cv.addEventListener("click", (ev) => { if (st.act === 4 && onLever(toBoard(ev))) toggleLever(); });
+  cv.addEventListener("mousemove", (ev) => { cv.style.cursor = st.act === 4 && onLever(toBoard(ev)) ? "pointer" : ""; });
 
   // ---------- frame loop ----------
   function frame(now) {
@@ -706,9 +690,8 @@ export function mountFishBoard(host, opts = {}) {
   const CAPTIONS = {
     1: "The harbor holds every fish: that is the population. A net brings up a sample, and its mean is our best guess at the harbor's mean. Cast again: every sample, and every sample mean, comes out a little different.",
     2: "Two nets in the same water, so the null hypothesis is true: there is no difference to find. The needle shows the Welch t-test's p-value. Keep casting, and about one cast in twenty still lands in the red.",
-    3: "Look at the catch, then test it. The Shapiro test asks whether a normal distribution could plausibly have produced this sample. Its answer picks the road: parametric tests, or rank tests.",
-    4: "Two waters. Check each catch for normality, then take the matching road. Welch's t-test compares the means against their spread; the Wilcox test lines every fish up by size and asks whether one net's fish tend to run larger.",
-    5: "Ten boats fishing the same water, so every difference is chance. Compare all 45 pairs with no correction and a couple of lamps light on most casts. Pull the lever to correct for the number of comparisons.",
+    3: "Two waters. Check each catch for normality, then take the matching road. Welch's t-test compares the means against their spread; the Wilcox test lines every fish up by size and asks whether one net's fish tend to run larger.",
+    4: "Ten boats fishing the same water, so every difference is chance. Compare all 45 pairs with no correction and a couple of lamps light on most casts. Pull the lever to correct for the number of comparisons.",
   };
   function waterSelect(val, onChange, keys = Object.keys(WATERS)) {
     const s = document.createElement("select");
@@ -726,19 +709,19 @@ export function mountFishBoard(host, opts = {}) {
     ctl.appendChild(btn("Cast the net", () => cast(true), true));
     ctl.appendChild(btn("Cast 20 times", () => castMany(20)));
     const nSel = document.createElement("select");
-    const sizes = st.act === 5 ? [5, 8, 15] : [5, 8, 15, 30];
+    const sizes = st.act === 4 ? [5, 8, 15] : [5, 8, 15, 30];
     if (!sizes.includes(st.n)) st.n = 8;
     for (const n of sizes) { const o = document.createElement("option"); o.value = n; o.textContent = n + " fish"; if (n === st.n) o.selected = true; nSel.appendChild(o); }
     nSel.onchange = () => { st.n = Number(nSel.value); remember(); resetAct(); };
     ctl.appendChild(labelled("Net size", nSel));
-    if (st.act === 1 || st.act === 2 || st.act === 3) ctl.appendChild(labelled("Water", waterSelect(st.water, (v) => { st.water = v; })));
-    if (st.act === 1 || st.act === 3) ctl.appendChild(check("Drain the harbor (show every fish)", st.drain, (v) => { st.drain = v; }));
-    if (st.act === 4) {
+    if (st.act === 1 || st.act === 2) ctl.appendChild(labelled("Water", waterSelect(st.water, (v) => { st.water = v; })));
+    if (st.act === 1) ctl.appendChild(check("Drain the harbor (show every fish)", st.drain, (v) => { st.drain = v; }));
+    if (st.act === 3) {
       ctl.appendChild(labelled("Net A", waterSelect(st.waterA, (v) => { st.waterA = v; })));
       ctl.appendChild(labelled("Net B", waterSelect(st.waterB, (v) => { st.waterB = v; })));
       ctl.appendChild(btn("Throw in a monster", throwMonster));
     }
-    if (st.act === 5) {
+    if (st.act === 4) {
       ctl.appendChild(labelled("Water", waterSelect(st.water5, (v) => { st.water5 = v; st.road5 = WATERS[v].kind === "normal" ? "parametric" : "rank"; buildControls(); }, ["open", "lake"])));
       const road = document.createElement("select");
       for (const [k, t] of [["parametric", "parametric road (Tukey)"], ["rank", "rank road (Dunn)"]]) { const o = document.createElement("option"); o.value = k; o.textContent = t; if (k === st.road5) o.selected = true; road.appendChild(o); }
@@ -759,9 +742,8 @@ export function mountFishBoard(host, opts = {}) {
     const T = st.tally[st.act] || {}, h = T.hauls || 0;
     if (st.act === 1) el.innerHTML = `casts <b>${h}</b>`;
     if (st.act === 2) el.innerHTML = `casts <b>${h}</b> · in the red <b>${T.sig || 0}</b> (${pct(T.sig || 0, h)})`;
-    if (st.act === 3) el.innerHTML = `casts <b>${h}</b> · flagged not normal <b>${T.flag || 0}</b> (${pct(T.flag || 0, h)})`;
-    if (st.act === 4) el.innerHTML = `casts <b>${h}</b>`;
-    if (st.act === 5) el.innerHTML = `casts <b>${h}</b> · any lamp lit: no correction <b>${pct(T.anyRaw || 0, h)}</b>, corrected <b>${pct(T.anyCor || 0, h)}</b> · lamps per cast <b>${h ? ((T.litRaw || 0) / h).toFixed(1) : "-"}</b> vs <b>${h ? ((T.litCor || 0) / h).toFixed(1) : "-"}</b>`;
+    if (st.act === 3) el.innerHTML = `casts <b>${h}</b>`;
+    if (st.act === 4) el.innerHTML = `casts <b>${h}</b> · any lamp lit: no correction <b>${pct(T.anyRaw || 0, h)}</b>, corrected <b>${pct(T.anyCor || 0, h)}</b> · lamps per cast <b>${h ? ((T.litRaw || 0) / h).toFixed(1) : "-"}</b> vs <b>${h ? ((T.litCor || 0) / h).toFixed(1) : "-"}</b>`;
   }
   function resetAct() {
     releaseAll(); st.rows = []; st.flights = []; st.nets = []; st.result = null; st.trail = [];
@@ -769,7 +751,7 @@ export function mountFishBoard(host, opts = {}) {
     updateTally();
   }
   function setAct(a) {
-    st.act = Math.min(5, Math.max(1, Number(a) || 1));
+    st.act = Math.min(4, Math.max(1, Number(a) || 1));
     tabs.querySelectorAll(".fishboardtab").forEach((t) => t.classList.toggle("on", Number(t.dataset.act) === st.act));
     caption.textContent = CAPTIONS[st.act];
     resetAct();
@@ -796,7 +778,7 @@ export function mountFishBoard(host, opts = {}) {
     act: () => st.act,
     state: () => st,
     isSettled: () => flightState(performance.now()).flying.size === 0,
-    // client coordinates of the act 5 lever's handle, for a real click in tests
+    // client coordinates of the act 4 lever's handle, for a real click in tests
     leverClient: () => { const r = cv.getBoundingClientRect();
       return { x: r.left + (LEVER.x * scale + ox) / dpr, y: r.top + ((LEVER.y - 80) * scale + oy) / dpr }; },
     destroy() {

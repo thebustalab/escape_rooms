@@ -15,7 +15,7 @@
 //                                         onPegs?(values), sound?, debug? });
 //   board.setPegs([...]); board.release(); board.clamp(); board.isSettled(); board.rodValueAt(i);
 //   board.olsAt(i); board.pegs(); board.released; board.ready (Promise); board.destroy();
-import { RodSim, ols } from "./drawdown_physics.js?v=142";
+import { RodSim, ols } from "./drawdown_physics.js?v=143";
 
 // Where things sit inside the peg sprite, as fractions of its height (measured from the prototype's
 // peg_k.png; the code-drawn fallback peg uses the same proportions). Geometry may override each

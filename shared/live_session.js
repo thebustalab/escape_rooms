@@ -20,7 +20,7 @@
  * No student data: callsigns only, never a name or x500.
  */
 
-import "./fish_stats.js?v=142";     // window.FishStats: the fish board's tests (Welch t), pinned to R
+import "./fish_stats.js?v=143";     // window.FishStats: the fish board's tests (Welch t), pinned to R
 
 const POLL_MS = 2000;
 const STORE = "liveSession";        // localStorage: { pid, code }
