@@ -4065,7 +4065,7 @@ async function openStation(h) {
         }
         return a.j;
   };
-  if (d.kind === "mcq") {     // no R at all: the dealt options, checked by the server
+  if (d.kind === "mcq" && !d.starter_code) {     // no R at all: the dealt options, checked by the server
     if (viewer) resumeYaw = viewer.getYaw();
     const card = buildLiveMcqCard({ prompt: escHtml(d.question || ""), options: d.options, liveGrade },
                                   () => closeModal());
@@ -4094,7 +4094,11 @@ async function openStation(h) {
   const grid = document.createElement("div"); grid.className = "qa";
   const left = document.createElement("div"), right = document.createElement("div");
   left.appendChild($("#console-block"));
-  right.appendChild(isObject ? buildObjectCard(task.object, () => closeModal())
+  // An R task answered by multiple choice (voyage, harbour since 2026-10-26: no clicking on the plot): the
+  // console on the left, the dealt options on the right; an oriented one sends its probe via liveGrade.
+  right.appendChild(d.kind === "mcq"
+    ? buildLiveMcqCard({ prompt: escHtml(d.question || ""), options: d.options, liveGrade }, () => closeModal())
+    : isObject ? buildObjectCard(task.object, () => closeModal())
     : buildPickCard(task.pick, () => closeModal(), "live:" + d.deal_id, task));
   grid.appendChild(left); grid.appendChild(right);
   openModal(task.label, grid, null, null, "wide");
