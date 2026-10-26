@@ -4,12 +4,12 @@
   "scenario": "spa",
   "id": 12,
   "title": "First Guest",
-  "subtitle": "Comparing Means Assignment · t-test, ANOVA, pairwise tests",
-  "story": "You own Calmarupe, the old bathhouse spa cut into the sea cliff at the foot of the city. The first snow fell in the night and now it is dawn, the morning after, and every roof above is white. Diana Volpe, your fiercest rival, is already stepping into one of the iron-and-glass lift towers at the harbor with her friends: your spa's first guests of the day, and the last people you want finding a flaw in your bathhouse. Certify the water in every bath before Diana's party arrives: the cold plunge, the brine cave, the warm hall, then the springs on the clifftop terrace. You start on the snowy harbor quay.",
+  "subtitle": "Comparing Means Assignment · t-test, Tukey, pairwise tests",
+  "story": "You own Calmarupe, the old bathhouse spa cut into the sea cliff at the foot of the city. The first snow fell in the night and now it is dawn, the morning after, and every roof above is white. Diana Volpe, your fiercest rival, is already stepping into one of the iron-and-glass lift towers at the harbor with her friends: your spa's first guests of the day, and the last people you want finding a flaw in your bathhouse. Certify the water in every bath before Diana's party arrives: the cold plunge, the brine cave, the warm hall, then the springs on the clifftop terrace.",
   "enterLabel": "Begin the morning rounds →",
   "done": {
-    "title": "The house reads true",
-    "body": "Every bath, certified — cold plunge to clifftop spring, nothing out of balance and nothing for Diana to find. Now to be gone before she steps out of the lift."
+    "title": "The bath are fixed!",
+    "body": "Every bath, assessed — cold plunge to clifftop spring, nothing out of balance and nothing for Diana to find. Now to be gone before she steps out of the lift."
   },
   "escapeDone": {
     "title": "First tracks",
@@ -40,7 +40,7 @@
   "coverPrompt": "Minimalist stylised thumbnail poster: the flat silhouette of a steep sea cliff at the first dawn after snow, fresh white on its ledges, one slender stone bell tower on the clifftop catching the first rose-gold sun, a soft plume of steam rising from a hot pool on the terrace beside it, and at the waterline far below one arched, barred sea-gate glowing warm amber, its light reflected in the calm dark sea. Square. Bold, simple shapes that read at very small size, strong negative space. Flat limited palette: deep teal, snow white, dawn rose and one warm amber glow. No people, no lettering, no text, no border.",
   "debrief": {
     "title": "How Calmarupe worked",
-    "intro": "Every room asked the question a bath-keeper asks each morning: is this difference real, or just the wobble of water? You certified each bath by choosing the honest test for its data, and the springs by refusing to cry wolf on every pool after the snow. Here is how each room embodied the comparison of means."
+    "intro": "This scenario was comparing means, testing whether a difference between groups of measurements is real or just ordinary variation, after checking which test suits the data and correcting when many comparisons are made at once. Here is what you did."
   },
   "rooms": [
     {
@@ -245,7 +245,7 @@
           "type": "plaque",
           "label": "The lift tower",
           "title": "Elevators as streets",
-          "body": "The City of Genoa climbs its hills so steeply that the city runs public elevators as ordinary transit, the way other cities run buses. The oldest, the Castelletto Levante, opened more than a century ago and lifts riders nearly sixty meters, from the lanes of the old town to a terrace looking out over the rooftops and the port. Its upper station still wears a stained-glass loggia. The iron-and-glass lift towers of this city are built on the same idea: let the elevator do the climbing.",
+          "body": "The City of Genoa, Italy climbs its hills so steeply that the city runs public elevators as ordinary transit, the way other cities run buses. The oldest, the Castelletto Levante, opened more than a century ago and lifts riders nearly sixty meters, from the lanes of the old town to a terrace looking out over the rooftops and the port. Its upper station still wears a stained-glass loggia. The iron-and-glass lift towers of this city are built on the same idea: let the elevator do the climbing.",
           "credit": "Visit Genoa (visitgenoa.it); AMT Genova",
           "box": [
             0.715,
@@ -273,7 +273,7 @@
           "type": "plaque",
           "label": "The lift tower",
           "title": "Elevators as streets",
-          "body": "The City of Genoa climbs its hills so steeply that the city runs public elevators as ordinary transit, the way other cities run buses. The oldest, the Castelletto Levante, opened more than a century ago and lifts riders nearly sixty meters, from the lanes of the old town to a terrace looking out over the rooftops and the port. Its upper station still wears a stained-glass loggia. The iron-and-glass lift towers of this city are built on the same idea: let the elevator do the climbing.",
+          "body": "The City of Genoa, Italy climbs its hills so steeply that the city runs public elevators as ordinary transit, the way other cities run buses. The oldest, the Castelletto Levante, opened more than a century ago and lifts riders nearly sixty meters, from the lanes of the old town to a terrace looking out over the rooftops and the port. Its upper station still wears a stained-glass loggia. The iron-and-glass lift towers of this city are built on the same idea: let the elevator do the climbing.",
           "credit": "Visit Genoa (visitgenoa.it); AMT Genova",
           "id": "lift_plaque",
           "box": [
@@ -1115,7 +1115,7 @@
           "boxSource": "moved:testplay",
           "solveSfx": {
             "src": "audio/solve_cold_plunge_the_plunge_control_panel_stone_slab.mp3",
-            "volume": 0.9
+            "volume": 0.61
           }
         },
         {
@@ -1206,7 +1206,7 @@
         {
           "src": "audio/cold_plunge_falling_water.mp3",
           "mode": "interval",
-          "volume": 0.25,
+          "volume": 0.09,
           "gapMin": 12,
           "gapMax": 32
         }
@@ -1491,7 +1491,7 @@
           "note": "saltwater x salinity_ppt -> Shapiro FAILS (skewed) -> Wilcox; brine_south saltier, significant (p=9e-4)",
           "starterCode": "spa_water_chem",
           "question": {
-            "prompt": "The brine baths spiked overnight and their salinity readings are jumpy. Is one brine bath genuinely over-salted — and which test is honest for data shaped like this?",
+            "prompt": "The saltwater baths spiked overnight and their salinity readings are jumpy. Is one saltwater bath genuinely over-salted — and which test is honest for data shaped like this?",
             "options": [
               "A t-test — significant, brine_south is saltier",
               "The two baths are not significantly different",
@@ -1589,7 +1589,7 @@
           ],
           "starterCode": "spa_water_chem",
           "question": {
-            "prompt": "The brine baths spiked overnight and their salinity readings are jumpy. Is one brine bath genuinely over-salted — and which test is honest for data shaped like this?",
+            "prompt": "The saltwater baths spiked overnight and their salinity readings are jumpy. Is one saltwater bath genuinely over-salted — and which test is honest for data shaped like this?",
             "options": [
               "A t-test — significant, brine_south is saltier",
               "The two baths are not significantly different",
@@ -1613,7 +1613,7 @@
           "boxSource": "draft:skeleton",
           "solveSfx": {
             "src": "audio/solve_saltwater_the_brine_control_panel_copper_door.mp3",
-            "volume": 0.9
+            "volume": 0.11
           }
         },
         {
@@ -1715,7 +1715,7 @@
     {
       "key": "warm_baths",
       "title": "The warm bathing hall",
-      "technique": "more than two means — ANOVA + Tukey",
+      "technique": "more than two means — Tukey",
       "puzzleType": 1,
       "authoring": {
         "tag": "warm_baths",
@@ -2009,12 +2009,12 @@
           "inc": "rooms_solved"
         }
       ],
-      "debrief": "Four baths, so a t-test won't do. ANOVA asks whether ANY of the four pH means differ; when it says yes, Tukey names WHICH one — the single drifted bath — without you fishing through every pair.",
+      "debrief": "Four baths, so a single t-test won't do. Tukey compares every pair of baths at once and corrects for the number of comparisons it makes, so it names the single drifted bath without you fishing through the pairs one by one.",
       "plannedHotspots": [
         {
           "type": "puzzle",
           "label": "The warm-bath control panel",
-          "note": "warm_bath x pH -> Shapiro/Levene pass -> ANOVA (sig) + Tukey -> warm_spruce is the odd bath",
+          "note": "warm_bath x pH -> Shapiro/Levene pass -> Tukey -> warm_spruce is the odd bath",
           "starterCode": "spa_water_chem",
           "question": {
             "prompt": "Four warm baths, and one of them has let its pH drift. Which single bath is out of line with the rest?",
@@ -2030,11 +2030,11 @@
             "correct": 1,
             "maxAttempts": 4,
             "feedback": {
-              "correct": "Certified — warm_spruce is the odd bath, its pH (~7.85) sitting well above the other three (~7.4). The Tukey follow-up pins it as the only one out of line.",
+              "correct": "Certified — warm_spruce is the odd bath, its pH (~7.85) sitting well above the other three (~7.4). The Tukey test pins it as the only one out of line.",
               "wrong": [
-                "Filter to bath_type == 'warm_bath' and parameter == 'pH'. With four baths, an ANOVA asks whether ANY of them differ.",
-                "ANOVA tells you something differs but not which — run a Tukey follow-up to name the single bath that stands apart.",
-                "Three of the baths sit together and agree; look for the one the follow-up flags against all the others."
+                "Filter to bath_type == 'warm_bath' and parameter == 'pH'. With four baths, go straight to a Tukey test: it compares every pair and corrects for the number of comparisons.",
+                "Check Shapiro within each bath and Levene across them (Tukey pools the spread), then read Tukey's adjusted p-values to name the single bath that stands apart.",
+                "Three of the baths sit together and agree; look for the one Tukey flags against all the others."
               ]
             }
           },
@@ -2094,7 +2094,7 @@
           "to": "saltwater"
         }
       ],
-      "designNote": "ROOM 4 — WARM HALL (high in the cliff face; four unglazed arches along its seaward side over the sea and the snowy city; four pools on a raised dais) — ANOVA + Tukey (puzzleType 1). Graded puzzle unchanged (warm_spruce is the odd bath). ESCAPE overlay: a YELLOW candle-group across the 4 baths, unlit (three small, one LARGE = DIFFER -> yellow balance-candle lit — the big-candle pool echoes the ANOVA odd-one-out); its cord is back in the COLD PLUNGE (yellow/diamond). This room HOLDS the PURPLE/star cord (for a springs pair). Onward: a panelled door onto the foot of a rock shaft, an iron ladder up to a hatch on the clifftop terrace. ART: all committed art for this room is Nordic-era and must be REPLACED against the shoreline plate (Lucas, 2026-10-17). The old image files and this room's committed `hotspots` (boxes measured on that art, still carrying Nordic-era labels) are left untouched until then — when the new art is committed, clear those `hotspots` and re-place from `plannedHotspots`, or the old and new doors will both exist.",
+      "designNote": "ROOM 4 — WARM HALL (high in the cliff face; four unglazed arches along its seaward side over the sea and the snowy city; four pools on a raised dais) — Tukey (puzzleType 1). Graded puzzle unchanged (warm_spruce is the odd bath). ESCAPE overlay: a YELLOW candle-group across the 4 baths, unlit (three small, one LARGE = DIFFER -> yellow balance-candle lit — the big-candle pool echoes the Tukey odd-one-out); its cord is back in the COLD PLUNGE (yellow/diamond). This room HOLDS the PURPLE/star cord (for a springs pair). Onward: a panelled door onto the foot of a rock shaft, an iron ladder up to a hatch on the clifftop terrace. ART: all committed art for this room is Nordic-era and must be REPLACED against the shoreline plate (Lucas, 2026-10-17). The old image files and this room's committed `hotspots` (boxes measured on that art, still carrying Nordic-era labels) are left untouched until then — when the new art is committed, clear those `hotspots` and re-place from `plannedHotspots`, or the old and new doors will both exist.",
       "wrap": {
         "haov": 360,
         "vaov": 90,
@@ -2128,18 +2128,18 @@
             "correct": 1,
             "maxAttempts": 4,
             "feedback": {
-              "correct": "Certified — warm_spruce is the odd bath, its pH (~7.85) sitting well above the other three (~7.4). The Tukey follow-up pins it as the only one out of line.",
+              "correct": "Certified — warm_spruce is the odd bath, its pH (~7.85) sitting well above the other three (~7.4). The Tukey test pins it as the only one out of line.",
               "wrong": [
-                "Filter to bath_type == 'warm_bath' and parameter == 'pH'. With four baths, an ANOVA asks whether ANY of them differ.",
-                "ANOVA tells you something differs but not which — run a Tukey follow-up to name the single bath that stands apart.",
-                "Three of the baths sit together and agree; look for the one the follow-up flags against all the others."
+                "Filter to bath_type == 'warm_bath' and parameter == 'pH'. With four baths, go straight to a Tukey test: it compares every pair and corrects for the number of comparisons.",
+                "Check Shapiro within each bath and Levene across them (Tukey pools the spread), then read Tukey's adjusted p-values to name the single bath that stands apart.",
+                "Three of the baths sit together and agree; look for the one Tukey flags against all the others."
               ]
             }
           },
           "boxSource": "draft:skeleton",
           "solveSfx": {
             "src": "audio/solve_warm_baths_the_warm_bath_control_panel_wooden_door.mp3",
-            "volume": 0.9
+            "volume": 0.17
           }
         },
         {
@@ -2213,24 +2213,24 @@
         {
           "src": "audio/warm_baths_pool_laps.mp3",
           "mode": "loop",
-          "volume": 0.5
+          "volume": 0.1
         },
         {
           "src": "audio/warm_baths_open_door_draught.mp3",
           "mode": "loop",
-          "volume": 0.25
+          "volume": 0.1
         },
         {
           "src": "audio/warm_baths_linen_rustle.mp3",
           "mode": "interval",
-          "volume": 0.25,
+          "volume": 0.09,
           "gapMin": 12,
           "gapMax": 32
         },
         {
           "src": "audio/warm_baths_fabric_flap.mp3",
           "mode": "interval",
-          "volume": 0.2,
+          "volume": 0.0,
           "gapMin": 12,
           "gapMax": 32
         }
@@ -2629,7 +2629,7 @@
           "note": "hot_spring x temperature_C; pairwiseTTest(value ~ bath) grouped by `pair`, Holm -> ember/aurora/frost differ; slate flips OUT under correction; gale n.s.",
           "starterCode": "spa_water_chem",
           "question": {
-            "prompt": "The five spring pairs all wobble after the storm. Which pools' two tubs are TRULY mismatched in temperature, once you account for testing all five pairs at once?",
+            "prompt": "The five hot spring pairs all wobble after the storm. Which hot springs' two tubs are TRULY mismatched in temperature, once you account for testing all five pairs at once?",
             "options": [
               "All five pairs differ",
               "None of the pairs differ",
@@ -2711,7 +2711,7 @@
           ],
           "starterCode": "spa_water_chem",
           "question": {
-            "prompt": "The five spring pairs all wobble after the storm. Which pools' two tubs are TRULY mismatched in temperature, once you account for testing all five pairs at once?",
+            "prompt": "The five hot spring pairs all wobble after the storm. Which hot springs' two tubs are TRULY mismatched in temperature, once you account for testing all five pairs at once?",
             "options": [
               "All five pairs differ",
               "None of the pairs differ",

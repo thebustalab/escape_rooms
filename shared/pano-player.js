@@ -32,6 +32,9 @@
  *            A door may ALSO carry `availableWhen` (+ diegetic `lockedBody`) — a cross-room condition
  *            ({solved:key}|{allSolved}|{gte}) that seals it regardless of direction until met (e.g. a
  *            mast the player is too queasy to climb until the cure has cycled). 2026-07-31.
+ *            ITEM DOORS (2026-10-24): `needsItem:"<item>"` (+ consumes/useBody/wrongItemBody/onUse) keeps
+ *            the door shut until the player picks that carried item on its card; gates and clues
+ *            `gives` items; catalogue in SCENARIO.items. Contract: shared/inventory.js.
  *   lock   → { answer, length?, maxAttempts?, feedback? } — a NO-INSTRUCTIONS keypad gate for the
  *            escape objective: matches a fixed, derivable code; not in the codec (two-phase design).
  *   dial   → { key, states:[{value,label}], hint? } — a world-state control; sets gameState[key]
@@ -79,18 +82,21 @@
 // A bare `./variant_resolve.js` import is NOT refreshed by bumping the <script> tag's ?v, so a changed
 // helper module (e.g. a new export) leaves browsers on a stale cached copy → "doesn't provide an export
 // named X" SyntaxError → blank page (the 2026-08-05 airship regression). Bump all three together.
-import { WebRConsole } from "./webr-console.js?v=140";
-import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers, pickTransit } from "./variant_resolve.js?v=140";   // Phase 3: per-hotspot state variants; monorail switch-door nav
-import * as PQ from "./puzzle_queue.js?v=140";   // dynamic puzzle queue: location-independent puzzle serving
-import * as CP from "./corr_panel.js?v=140";   // lower-triangle layout of the grid gate (clouds correlation panel)
-import { particleCount } from "./particles.js?v=140";   // ambient-particle vocabulary + per-kind field density
-import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=140";
-import { condHolds } from "./cond.js?v=140";   // ledger + elevation-map card DOM
-import * as LIVE from "./live_session.js?v=140";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
-import * as RIDE from "./ride.js?v=140";
-import { mountPcaPlate } from "./pca_plate.js?v=140";   // the PCA plate instrument (voyage beach)
-import { mountDrawdown } from "./drawdown.js?v=140";   // the drawdown board instrument (diamonds escape)   // THE RIDE (subway): express lever + clip-sequence planner
-import * as BELL from "./bell_pull.js?v=140";   // bell-pull (#16): dial mode:"pull" + lock mode:"state" (spa belfry)
+import { WebRConsole } from "./webr-console.js?v=142";
+import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers, pickTransit } from "./variant_resolve.js?v=142";   // Phase 3: per-hotspot state variants; monorail switch-door nav
+import * as PQ from "./puzzle_queue.js?v=142";   // dynamic puzzle queue: location-independent puzzle serving
+import * as CP from "./corr_panel.js?v=142";   // lower-triangle layout of the grid gate (clouds correlation panel)
+import { particleCount } from "./particles.js?v=142";
+import { mountLandingBackdrop } from "./landing_backdrop.js?v=142";   // landing text over a pan of the first room's clip   // ambient-particle vocabulary + per-kind field density
+import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=142";
+import { condHolds } from "./cond.js?v=142";   // ledger + elevation-map card DOM
+import * as LIVE from "./live_session.js?v=142";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
+import * as RIDE from "./ride.js?v=142";
+import { mountPcaPlate } from "./pca_plate.js?v=142";   // the PCA plate instrument (voyage beach)
+import { mountFishBoard } from "./fish_board.js?v=142";   // the fish board instrument (harbour berth)
+import { mountDrawdown } from "./drawdown.js?v=142";   // the drawdown board instrument (diamonds escape)   // THE RIDE (subway): express lever + clip-sequence planner
+import * as BELL from "./bell_pull.js?v=142";
+import * as INVY from "./inventory.js?v=142";   // carried items + the door that asks which to use (dunes)   // bell-pull (#16): dial mode:"pull" + lock mode:"state" (spa belfry)
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 
@@ -223,6 +229,9 @@ const visitedRooms = new Set();   // physically-entered rooms (incl. puzzle-less
 // room carry two independent gates (e.g. a graded puzzle AND a separate escape lock) — each door opens
 // on its own gate (`door.requires`), and only the room's PRIMARY graded gate records the codec.
 const solvedGates = new Set();
+// Carried items (keys, a rope) and the item doors already opened with them — see shared/inventory.js.
+// Session state like solvedGates: cleared on Enter, not persisted across a reload.
+const INV = INVY.createInventory();
 // Per-room result for the submission codec (Phase 5): key -> { answer, attempts }.
 // MCQ rooms store the chosen option index; console-check rooms store answer=1 (solved).
 const roomResults = new Map();
@@ -265,6 +274,9 @@ function init(data) {
     spawnParticles($("#screen1"), ambient, particleCount(ambient, true));   // landing screen
     spawnParticles($("#loading"), ambient, particleCount(ambient, false));   // inter-room interstitial
   }
+  // The landing card sits over a slow pan of the first room (its clip, else its still); the particles
+  // stay on top as an overlay because the backdrop is PREPENDED behind them. Stopped on Begin.
+  _stopLandingBackdrop = mountLandingBackdrop($("#screen1"), SCENARIO);
   $("#s1title").textContent = SCENARIO.title || "";
   $("#s1story").textContent = SCENARIO.story || "";
   tpEditable($("#s1title"), () => SCENARIO.title || "", v => { SCENARIO.title = v; return tpPersist("/api/scenario-patch", { fields: { title: v } }); });
@@ -314,6 +326,7 @@ function init(data) {
   // `enterButtons` behaves exactly as before. (embeddings/submarine, 2026-09-10.)
   const beginGame = (role, startKey) => {
     $("#screen1").classList.remove("active");
+    _stopLandingBackdrop(); _stopLandingBackdrop = () => {};
     $("#screen2").classList.add("active");
     gameState = JSON.parse(JSON.stringify(SCENARIO.state || {}));
     if (role) gameState.role = role;                                  // set by which landing button was taken
@@ -323,6 +336,7 @@ function init(data) {
     // would also open pre-explored. Session state, like everything else cleared in this block.
     visitedRooms.clear();
     solvedGates.clear();
+    INVY.resetInventory(INV);                                         // carried items + item doors opened
     attemptCounts.clear();
     queueSolved.clear(); queueResults.clear(); queueAssign.clear();   // dynamic puzzle queue
     analysisFinished = false; escapeFinished = false;                // fresh objective state
@@ -341,9 +355,12 @@ function init(data) {
     if (liveMode()) LIVE.showHud($("#screen2"));                      // live scenario: class total, clock, what you carry
     // Live: the class reaching its goal sets world state `liveWon`, so a hotspot variant `when:{eq:["liveWon",
     // true]}` can show the payoff in the room (bathhouse: the tub runs clean). Re-render only on a change.
+    // Each filled SINK sets `liveFilled_<id>` (bathhouse: liveFilled_bath_1), so a bath can show its water.
     if (liveMode()) LIVE.onState(st => {
       const won = !!(st && st.phase === "won");
       if (!!gameState.liveWon !== won) { gameState.liveWon = won; rerenderCurrentRoom(); }
+      markFilled((st && st.filled) || []);
+      renderPuzzleLabels();                  // payouts arrive with the first poll (idempotent)
     });
     if (music && musicOn) music.play().catch(() => {});   // Enter is the user gesture autoplay needs
     const named = startKey ? SCENARIO.rooms.findIndex(r => r.key === startKey && isBuilt(r)) : -1;
@@ -821,8 +838,84 @@ function nbScratchSection() {
   return sec;
 }
 
+// The CARRYING row at the top of the notebook: the items the player holds (shared/inventory.js). Read-only —
+// items are used by tapping a locked door, which asks which one to try.
+function nbCarryingSection() {
+  if (!INV.held.length) return null;
+  const sec = document.createElement("div");
+  sec.className = "nbcarry";
+  sec.style.cssText = "margin:0 0 14px";
+  sec.innerHTML = `<div style="font:600 12px system-ui;opacity:.6;margin:0 0 6px">Carrying</div>`;
+  const row = document.createElement("div");
+  row.style.cssText = "display:flex;flex-wrap:wrap;gap:8px";
+  INV.held.forEach(k => row.appendChild(itemTile(INVY.itemInfo(SCENARIO, k))));
+  sec.appendChild(row);
+  return sec;
+}
+// One item as a tile (image + name, or the name alone). Shared by the notebook row and the door card.
+function itemTile(info, asButton) {
+  const t = document.createElement(asButton ? "button" : "div");
+  t.className = "itemtile";
+  t.dataset.item = info.key;
+  t.style.cssText = "display:flex;flex-direction:column;align-items:center;gap:4px;min-width:84px;max-width:120px;" +
+    "padding:8px;border-radius:10px;border:1px solid rgba(255,216,140,.35);background:rgba(0,0,0,.28);" +
+    "color:inherit;font:13px/1.3 system-ui;text-align:center" + (asButton ? ";cursor:pointer" : "");
+  t.innerHTML = (info.image ? `<img src="${escHtml(info.image)}" alt="" style="width:64px;height:64px;object-fit:contain">` : "") +
+    `<span>${escHtml(info.name)}</span>`;
+  return t;
+}
+// Newly taken items: say so (the notebook's Carrying row is where they live).
+function announceItems(keys) {
+  if (!keys || !keys.length) return;
+  toast("You take " + keys.map(k => INVY.itemInfo(SCENARIO, k).name).join(" and ") + ".");
+}
+// THE DOOR THAT ASKS (Lucas, 2026-10-24): an item door that is otherwise ready opens a card showing what the
+// player carries; they pick one. Wrong → an in-world line on the card; right → the door unlocks for the
+// session, the room re-renders with it open (like any solved gate), and onUse effects run.
+function openItemDoor(h) {
+  const d = document.createElement("div");
+  d.className = "itemdoor";
+  const p = document.createElement("p");
+  p.innerHTML = h.lockedBody || "It's locked.";
+  d.appendChild(p);
+  const msg = document.createElement("p");
+  msg.className = "itemdoormsg";
+  msg.style.cssText = "min-height:1.3em;opacity:.85;font-style:italic";
+  if (!INV.held.length) {
+    msg.textContent = "You aren't carrying anything to try.";
+    d.appendChild(msg);
+    return openModal(h.label || "Locked", d, null, h);
+  }
+  const lab = document.createElement("div");
+  lab.style.cssText = "font:600 12px system-ui;opacity:.6;margin:4px 0 6px";
+  lab.textContent = "Use something you're carrying:";
+  d.appendChild(lab);
+  const row = document.createElement("div");
+  row.style.cssText = "display:flex;flex-wrap:wrap;gap:8px";
+  INV.held.slice().forEach(k => {
+    const info = INVY.itemInfo(SCENARIO, k);
+    const b = itemTile(info, true);
+    b.onclick = () => {
+      const res = INVY.useItem(INV, room.key, h, k, gameState);
+      if (!res.ok) { msg.textContent = h.wrongItemBody || ("The " + info.name.replace(/^the\s+/i, "") + " is no use here."); return; }
+      closeModal();
+      if (Array.isArray(h.onUse)) applyEffects(h.onUse);
+      let yaw = resumeYaw; try { yaw = viewer.getYaw(); } catch (e) {}
+      buildViewer(basePanorama(room, portalUnlocked(room)), yaw);   // the door now shows open, like a solved gate
+      applyFx();
+      toast(h.useBody || ("You use " + info.name + ". It opens."));
+    };
+    row.appendChild(b);
+  });
+  d.appendChild(row);
+  d.appendChild(msg);
+  openModal(h.label || "Locked", d, null, h);
+}
+
 function openNotebook() {
   const d = document.createElement("div");
+  const carry = nbCarryingSection();
+  if (carry) d.appendChild(carry);
   if (!caseFile.length) {
     d.innerHTML = `<p style="opacity:.75">Your notebook is empty. Solve a room's puzzle and its answer is noted here automatically; pick up a clue to add it yourself.</p>`;
     d.appendChild(nbScratchSection());   // the pad is available from the very start, empty case file or not
@@ -1082,8 +1175,13 @@ function doorNav(h) {
     variant: av,
   };
 }
-function doorIsOpen(h, r) {
+function doorIsOpen(h, r, ignoreItem) {
   if (h.availableWhen != null && !condOK(h.availableWhen)) return false;  // cross-room door gate (e.g. cured) — 2026-07-31
+  // ITEM DOOR (2026-10-24, dunes): shut until the player picks the right carried item on its card. Checked
+  // ABOVE the `open`/`back` short-circuits for the same reason `requires` is: puzzle-less rooms use
+  // direction:"open", and an item door there must not be walkable. `ignoreItem` asks "is the item the only
+  // thing missing?" — handleDoor offers the item card only then.
+  if (!ignoreItem && INVY.itemLocked(INV, r.key, h)) return false;
   const dir = doorNav(h).direction;                            // effective direction (a switch-door's active variant may override)
   // AN EXPLICIT `requires` OUTRANKS THE DIRECTION (2026-09-26). It used to sit BELOW the `open`/`back`
   // short-circuits, so a door that was both `direction:"open"` and `requires:[...]` returned true before
@@ -1152,6 +1250,50 @@ function renderDoorLabels() {
     if (!txt) return;
     const lab = document.createElement("div");
     lab.className = "doorname";
+    lab.textContent = txt;
+    el.appendChild(lab);
+  });
+}
+
+// --- Puzzle labels (opt-in: SCENARIO.puzzleLabels; live scenarios) ---------------------------------
+// Captions a live `station` marker with what solving it PAYS ("+2 herb bundles", "+1 bath token"), so a
+// player can choose where to go. The numbers are never authored in the scenario: the live server derives
+// them from the pool (`payouts` in /api/state, one row per tier/track/item) and the units from the pool's
+// own wording, so the pool stays the one source of truth. Before the first state poll (or off the live
+// server) there is nothing to say, so no caption; the onState hook re-runs this once state arrives.
+// Same idempotent child-of-the-marker pattern as the door plates. `?puzzlelabels=1|0` overrides per URL.
+function puzzleLabelsEnabled() {
+  const q = new URLSearchParams(location.search).get("puzzlelabels");
+  if (q === "1") return true;
+  if (q === "0") return false;
+  return !!(window.SCENARIO && SCENARIO.puzzleLabels);
+}
+function puzzleLabelText(h, st) {
+  if (!st || !Array.isArray(st.payouts)) return null;
+  const rows = st.payouts.filter(p => p.tier === h.tier && (p.track || "") === (h.track || ""));
+  if (!rows.length) return null;
+  return rows.map(p => {
+    const unit = p.item ? ((st.items || {})[p.item] || {}).unit : st.unit;
+    const u = Array.isArray(unit) && unit.length === 2 ? unit : ["point", "points"];
+    const n = p.min === p.max ? String(p.max) : p.min + "–" + p.max;
+    return "+" + n + " " + (p.max === 1 ? u[0] : u[1]);
+  }).join(" or ");
+}
+function renderPuzzleLabels() {
+  if (!puzzleLabelsEnabled() || !liveMode()) return;
+  const stage = $("#pano"); if (!stage || !room) return;
+  const st = LIVE.state();
+  stage.querySelectorAll(".hsmark.station").forEach(el => {
+    if (el.querySelector(".puzzlename")) return;            // already captioned
+    const idCls = [...el.classList].find(k => k.startsWith("hs-"));
+    if (!idCls) return;
+    const h = (room.hotspots || []).find(x => x.type === "station" &&
+      "hs-" + String(x.id).replace(/[^\w-]/g, "_") === idCls);
+    if (!h) return;
+    const txt = puzzleLabelText(h, st);
+    if (!txt) return;
+    const lab = document.createElement("div");
+    lab.className = "puzzlename";
     lab.textContent = txt;
     el.appendChild(lab);
   });
@@ -1682,6 +1824,7 @@ function compositeVariants(baseUrl, active, cb) {
 // cinemagraph's box region from its <video> (feathered), and feed the canvas to Pannellum with
 // dynamic:true so it re-uploads each frame. Everything else — pan, hotspots, doors, variants — is
 // unchanged. Inert for every room without a `cinemagraph` field (the vast majority).
+let _stopLandingBackdrop = () => {};   // set when the landing screen mounts its backdrop
 let _cineStop = null;   // tears down the current room's cinemagraph rAF + <video>s (set by startCinemagraph)
 // Only the clips belonging to the backdrop actually on screen. A full-scene variant (Egypt's `night`
 // wash) replaces the whole image, and a clip generated from the day scene would stamp day-lit motion
@@ -1762,6 +1905,7 @@ let _lastScene = null;
 function stateFade() {
   const ms = +SCENARIO.stateFadeMs || 0, key = room && room.key, st = roomSceneState(room), prev = _lastScene;
   _lastScene = { key, state: st };
+  if (_blackFade) { _blackFade = false; return; }        // a fade through black is already covering this change
   if (!ms || !viewer || !prev || prev.key !== key || prev.state === st) return;
   try { if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return; } catch (e) {}
   let url = null;
@@ -1785,6 +1929,34 @@ function stateFade() {
     setTimeout(() => pic.remove(), ms + 150);
   };
   setTimeout(go, 100);
+}
+// FADE THROUGH BLACK on a dial throw (opt-in per dial: `fadeBlackMs`; bathhouse's lake train, 2026-10-25,
+// Lucas: "fade out of one and into another"). The screen fades to black over ms, the room re-renders into its
+// new state under the black, and the black lifts once the NEW viewer has loaded and revealed. It replaces the
+// scenario's crossfade (stateFadeMs) for that one change, which `_blackFade` tells stateFade to skip.
+let _blackFade = false;
+function fadeThroughBlack(ms, change) {
+  let reduce = false;
+  try { reduce = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches); } catch (e) {}
+  if (reduce || !ms) return change();
+  const veil = document.createElement("div");
+  veil.className = "black-fade";
+  veil.style.cssText = `position:fixed;inset:0;background:#000;z-index:6;pointer-events:all;opacity:0;transition:opacity ${ms}ms ease-in-out`;
+  document.body.appendChild(veil);
+  requestAnimationFrame(() => requestAnimationFrame(() => { veil.style.opacity = "1"; }));
+  setTimeout(() => {
+    const old = viewer, t0 = performance.now();
+    _blackFade = true;
+    change();
+    const lift = () => {
+      let ready = false;
+      try { ready = viewer !== old && viewer.isLoaded && viewer.isLoaded() && $("#pano").style.opacity === "1"; } catch (e) {}
+      if (!ready && performance.now() - t0 < 8000) return setTimeout(lift, 100);
+      veil.style.opacity = "0";
+      setTimeout(() => veil.remove(), ms + 150);
+    };
+    setTimeout(lift, 150);
+  }, ms + 50);
 }
 function buildViewer(img, yaw = 0) {
   syncRoomSfx();   // the backdrop may have changed state (a solve flipping the scene to night) — follow it with sound
@@ -1868,6 +2040,7 @@ function _renderViewer(img, yaw = 0, dynamic = false, bare = false) {   // bare:
     stage.style.opacity = "1";               // fade up from black once the panorama is in
     tpEnableHotspotDrag();                   // markers only exist once pannellum has rendered them
     renderDoorLabels();                      // ...and so do the door name-plates
+    renderPuzzleLabels();                    // ...and the live stations' payout captions
     // If rebuilding the viewer interrupted the music (paused it, or reset it toward the start) while
     // it should be playing, resume from where it was — so the loop is continuous across a scene swap.
     if (music && musicOn && musicPos >= 0 && (music.paused || music.currentTime < musicPos - 1)) {
@@ -1963,6 +2136,7 @@ function handleDoor(h) {
     // solving each gate. isTestPlay() is set by shared/test_play.html; a real student run (play.html)
     // sets neither flag, so this bypass never fires for students — the door stays gated for them.
     if (isTestPlay()) toast("Test-play: locked door bypassed.");
+    else if (INVY.itemLocked(INV, room.key, h) && doorIsOpen(h, room, true)) return openItemDoor(h);
     else if (h.availableWhen != null && !condOK(h.availableWhen))
       return toast(h.lockedBody || "Not yet — something else must be done first.");  // diegetic cross-room gate (e.g. too queasy to climb)
     // A `requires` door may also carry a `lockedBody` (2026-09-26): its gate can be something other
@@ -2249,7 +2423,10 @@ function startTransit(h, idx, withEntry = true, onArrive = null) {   // withEntr
       _renderViewer(cv, _wrapYaw(yaw + rollFrom), true, true);   // one dynamic, marker-less viewer for the clip
       _cineStop = () => { cancelAnimationFrame(raf); try { video.pause(); } catch (e) {} _hideAfterDecode(video); if (flatEl) flatEl.remove(); };   // set AFTER _renderViewer
       if (flatEl) {                              // the room viewer underneath is already the marker-less clip
-        document.body.appendChild(flatEl);
+        // Inside #screen2, never on <body>: a fixed element makes its own stacking context, so on <body> this
+        // z-index 5 sat ABOVE the whole screen, #done included, and the escape card's buttons were dead
+        // (Seedfall, 2026-10-23; pinned by tests/e2e/squirrel_playthrough.spec.js, which clicks through to submission).
+        ($("#screen2") || document.body).appendChild(flatEl);
         if (morph) morph.draw(video, 0, view());   // frame 0 at s = 0 is the player's own view: no visible change
         requestAnimationFrame(() => { flatEl.style.opacity = "1"; });
         setTimeout(() => { if (transiting === run && !done) flatEl.addEventListener("click", finish); }, 400);
@@ -2308,20 +2485,31 @@ function startFlatDoorTransit(h, idx, withEntry) {
     if (video) { try { video.pause(); } catch (e) {} video.style.cssText = ""; _hideAfterDecode(video); }
     if (transiting !== run) { veil.remove(); return; }
     transiting = null;
+    const old = viewer;
     navigateTo(idx, withEntry, arriveYaw);
-    // Hold the black until the arrival panorama has loaded or a first-visit entry card has opened above the
-    // veil. Timed by the WALL CLOCK, never by counting polls: on a loaded machine each 50 ms sleep ran ~130 ms
-    // and a "5 s" cap became 13 s of black (the e2e test caught it). #pano's opacity is no signal either: a
-    // re-visited room can swap in without ever hiding it.
-    const t0 = performance.now();
+    // Hold the black until the ARRIVAL room's own viewer has loaded — `viewer !== old`, because the departure
+    // room's viewer stays up (its cinemagraph still running) until the arrival view is built asynchronously, and
+    // it reports isLoaded() at once: lifting the veil on it flashed the departure clip for a second before the
+    // arrival swapped in (squirrel, 2026-10-24). A first-visit entry card opens ABOVE the veil and the room is
+    // only started when it is dismissed, so the wait carries on under the card, and the cap's clock restarts
+    // while the card is open (reading it is not loading). Timed by the WALL CLOCK, never by counting polls: on
+    // a loaded machine each 50 ms sleep ran ~130 ms and a "5 s" cap became 13 s of black. #pano's opacity is no
+    // signal either: a re-visited room can swap in without ever hiding it.
+    let t0 = performance.now();
     while (performance.now() - t0 < 4000) {
-      if ($("#loading").classList.contains("open")) break;
-      try { if (room === target && viewer && viewer.isLoaded && viewer.isLoaded()) break; } catch (e) {}
+      if ($("#loading").classList.contains("open")) { t0 = performance.now(); await sleep(50); continue; }
+      try { if (room === target && viewer && viewer !== old && viewer.isLoaded && viewer.isLoaded()) break; } catch (e) {}
       await sleep(50);
     }
     await fade(0, T.fadeRoom);
     veil.remove();
   };
+  // Fetch the arrival art while the clip plays, so the room is ready the moment it ends (the browser cache
+  // then serves buildViewer's own load). Best effort: a failure here just means the normal load after arrival.
+  try {
+    [target.panorama, ...activeVariants(target).map(v => v.panorama)].filter(Boolean)
+      .forEach(src => _loadImg(src).catch(() => {}));
+  } catch (e) {}
   (async () => {
     const [v] = await Promise.all([_transitVideo(t.video).catch(() => null), fade(1, T.fadeOut)]);
     if (transiting !== run || room !== from) return arrive();
@@ -2626,6 +2814,24 @@ function openClue(h) {
   if (typeof h.pickup === "string") tpAuthorPanel(d, [
     { label: "Logged to the field notebook when picked up", get: () => h.pickup,
       set: v => { h.pickup = v; return tpSaveRoom(room); } }]);
+  if (h.gives) {                         // a carried THING (a key, a rope), not a notebook fact — see shared/inventory.js
+    const want = Array.isArray(h.gives) ? h.gives : [h.gives];
+    const btn = document.createElement("button"); btn.className = "qsubmit";
+    const tk = gateKey(room.key, "gives:" + (h.id || h.label || ""));   // taken once per session, even if since used up
+    const taken = () => pickedClues.has(tk);
+    const setTaken = () => { btn.textContent = "✓ Taken"; btn.disabled = true; };
+    if (taken()) setTaken();
+    else {
+      btn.textContent = "Take " + want.map(k => INVY.itemInfo(SCENARIO, k).name).join(" and ");
+      btn.onclick = () => {
+        if (taken()) return;
+        pickedClues.add(tk);
+        announceItems(INVY.grantItems(INV, h.gives, gameState));
+        setTaken();
+      };
+    }
+    d.appendChild(btn);
+  }
   if (h.pickup) {
     const gk = gateKey(room.key, h.id || h.label || "");
     const btn = document.createElement("button"); btn.className = "qsubmit";
@@ -2696,7 +2902,7 @@ function openPlaque(h) {
 // modal. Like a plaque it is never a gate, never a clue and never logged; the player reads a number off it.
 // `kind` picks the renderer; each kind's fields are documented in the header. Peg positions survive
 // closing and reopening within a visit (in memory only: nothing about an instrument is saved or graded).
-const INSTRUMENTS = { drawdown: mountDrawdown, pca_plate: mountPcaPlate };
+const INSTRUMENTS = { drawdown: mountDrawdown, pca_plate: mountPcaPlate, fish_board: mountFishBoard };
 // Opening zooms from the hotspot's marker into the close-up (settled design, notes §5 of diamonds), so the
 // student sees the board on the wall become the board in their hands. Skipped under reduced motion.
 function zoomFromHotspot(h) {
@@ -2797,7 +3003,8 @@ function openDial(h) {
       // leads) follows the lever immediately: a monorail door's open-view, or the Pharos lamp's beam swinging
       // onto the player's ship. Guarded so ordinary dial rooms (mapview only) are untouched.
       const hasVariantArt = (room.hotspots || []).some(h2 => h2 && Array.isArray(h2.variants) && h2.variants.length);
-      if (hasVariantArt) rerenderCurrentRoom();
+      if (hasVariantArt && h.fadeBlackMs && !h.endsEscape) { closeModal(); fadeThroughBlack(+h.fadeBlackMs, rerenderCurrentRoom); }
+      else if (hasVariantArt) rerenderCurrentRoom();
       // A dial flagged `endsEscape` IS the finale — the player's own hand performing the last gesture (the
       // Pharos beam). Let the sound land and the new state-variant actually render, THEN show the escape
       // finish; jumping straight there would hide the very image the gesture produces.
@@ -3668,8 +3875,152 @@ function buildLiveMcqCard(task, onSolved) {
   return card;
 }
 
+// LIVE sewing (pool kinds "stitch" and "ribbon"; bathhouse's cottage sewing table, 2026-10-26). Hands-on, still
+// server-checked: the deal carries the pattern (rows, per_row, grid) or the ribbon (length, cut, tape), never the
+// answer. STITCH: tap the cloth to sew (tap again to unpick), then key the total on the pad; sends
+// "<stitches per grid row>|<total>". RIBBON: move the scissors along the tape (tap/drag, or the arrows) and snip;
+// sends the mark. Wrong answers get the server's feedback and cooldown, as for mcq.
+function buildSewingCard(d, onSolved) {
+  const NS = "http://www.w3.org/2000/svg";
+  const mk = (tag, attrs, parent) => {
+    const e = document.createElementNS(NS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
+  };
+  const card = document.createElement("div"); card.className = "qcard sewcard";
+  card.innerHTML = `<div class="qprompt"></div><div class="sewboard"></div><div class="sewctl"></div>
+     <div class="qfeedback"></div><button class="qsubmit" disabled></button>`;
+  card.querySelector(".qprompt").textContent = d.question || "";
+  const board = card.querySelector(".sewboard"), ctl = card.querySelector(".sewctl");
+  const fb = card.querySelector(".qfeedback"), btn = card.querySelector(".qsubmit");
+  let done = false, choice = () => null;
+
+  if (d.kind === "stitch") {
+    const [R, C] = d.grid, cw = 90, rh = 80, pad = 30, side = 90;
+    const svg = mk("svg", { viewBox: `0 0 ${C * cw + pad * 2 + side} ${R * rh + pad * 2}`, class: "sewsvg" }, board);
+    mk("rect", { x: 4, y: 4, width: C * cw + pad * 2 - 8, height: R * rh + pad * 2 - 8, rx: 16, fill: "#efe2c6" }, svg);
+    const sewn = Array.from({ length: R }, () => Array(C).fill(false));
+    const rowLab = [];
+    const total = () => sewn.flat().filter(Boolean).length;
+    for (let r = 0; r < R; r++) {
+      rowLab.push(mk("text", { x: C * cw + pad * 2 + 12, y: pad + r * rh + rh / 2 + 10, class: "sewrow" }, svg));
+      for (let c = 0; c < C; c++) {
+        const x = pad + c * cw, y = pad + r * rh;
+        const g = mk("g", { class: "sewcell", "data-r": r, "data-c": c }, svg);
+        mk("rect", { x, y, width: cw, height: rh, fill: "transparent" }, g);   // the whole cell is the hit target
+        mk("circle", { cx: x + cw / 2, cy: y + rh / 2, r: 5, fill: "#c9b48d" }, g);
+        const st = mk("path", { d: `M ${x + 18} ${y + 16} L ${x + cw - 18} ${y + rh - 16} M ${x + 18} ${y + rh - 16} L ${x + cw - 18} ${y + 16}`,
+                                stroke: "#c0392b", "stroke-width": 9, "stroke-linecap": "round", visibility: "hidden" }, g);
+        g.addEventListener("click", () => {
+          if (done) return;
+          sewn[r][c] = !sewn[r][c];
+          st.setAttribute("visibility", sewn[r][c] ? "visible" : "hidden");
+          const n = sewn[r].filter(Boolean).length;
+          rowLab[r].textContent = n ? "= " + n : "";   // per row only: the total is the child's to work out
+          refresh();
+        });
+      }
+    }
+    const askRow = document.createElement("div"); askRow.className = "sewask";
+    askRow.innerHTML = `<span>How many stitches in all?</span><span class="sewnum"></span>`;
+    ctl.appendChild(askRow);
+    const num = askRow.querySelector(".sewnum");
+    let typed = "";
+    const padEl = document.createElement("div"); padEl.className = "sewpad";
+    ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "⌫"].forEach(k => {
+      const b = document.createElement("button"); b.type = "button"; b.textContent = k;
+      b.addEventListener("click", () => {
+        if (done) return;
+        typed = k === "⌫" ? typed.slice(0, -1) : (typed + k).replace(/^0+(?=\d)/, "").slice(0, 2);
+        num.textContent = typed; refresh();
+      });
+      padEl.appendChild(b);
+    });
+    ctl.appendChild(padEl);
+    const refresh = () => { if (!done) btn.disabled = !(typed && total()); };
+    btn.textContent = "Check my sewing";
+    choice = () => sewn.map(row => row.filter(Boolean).length).join(",") + "|" + typed;
+  } else {   // ribbon
+    const T = d.tape, L = d.length, unit = 50, x0 = 40, y = 90;
+    const svg = mk("svg", { viewBox: `0 0 ${T * unit + x0 * 2} 196`, class: "sewsvg ribbon" }, board);
+    mk("rect", { x: x0 - 12, y: y + 40, width: T * unit + 24, height: 54, rx: 5, fill: "#e8c84a" }, svg);
+    for (let i = 0; i <= T; i++) {
+      mk("line", { x1: x0 + i * unit, y1: y + 40, x2: x0 + i * unit, y2: y + 62, stroke: "#4a2f22", "stroke-width": 3 }, svg);
+      mk("text", { x: x0 + i * unit, y: y + 88, "text-anchor": "middle", class: "sewtick" }, svg).textContent = i;
+    }
+    const keep = mk("rect", { x: x0, y: y - 6, width: L * unit, height: 38, rx: 4, fill: "#3f7fbf" }, svg);
+    const off = mk("rect", { x: x0, y: y - 6, width: 0, height: 38, rx: 4, fill: "#3f7fbf", class: "sewoff" }, svg);
+    const arcs = mk("g", {}, svg);
+    const sc = mk("text", { y: y - 22, "text-anchor": "middle", class: "sewsc" }, svg); sc.textContent = "✂️";
+    const cutLine = mk("line", { y1: y - 16, y2: y + 40, stroke: "#fff", "stroke-width": 3, "stroke-dasharray": "5 5" }, svg);
+    let at = L;
+    const line = document.createElement("div"); line.className = "sewline"; ctl.appendChild(line);
+    const place = (m) => {
+      at = Math.max(0, Math.min(T, m));
+      const x = x0 + at * unit;
+      sc.setAttribute("x", x); cutLine.setAttribute("x1", x); cutLine.setAttribute("x2", x);
+      arcs.replaceChildren();
+      for (let k = 1; at < L && k <= L - at; k++) {   // the count back from the end, one hop per mark
+        const a = L - k;
+        mk("path", { d: `M ${x0 + (a + 1) * unit - 4} ${y - 8} q ${-unit / 2} -26 ${-unit + 8} 0`, stroke: "#ffd88c",
+                     "stroke-width": 3, fill: "none" }, arcs);
+      }
+      line.textContent = at === L ? "The scissors are at the end of the ribbon (" + L + ")."
+        : at < L ? "Scissors at " + at + ": that's " + (L - at) + " back from the end."
+                 : "Scissors at " + at + ": past the end of the ribbon.";
+    };
+    const fromEvent = (ev) => {
+      const p = svg.createSVGPoint(); p.x = ev.clientX; p.y = ev.clientY;
+      const q = p.matrixTransform(svg.getScreenCTM().inverse());
+      return Math.round((q.x - x0) / unit);
+    };
+    let dragging = false;
+    svg.addEventListener("pointerdown", ev => { if (done) return; dragging = true; svg.setPointerCapture(ev.pointerId); place(fromEvent(ev)); });
+    svg.addEventListener("pointermove", ev => { if (dragging && !done) place(fromEvent(ev)); });
+    svg.addEventListener("pointerup", () => { dragging = false; });
+    const steps = document.createElement("div"); steps.className = "sewsteps";
+    steps.innerHTML = `<button type="button" class="sewback">◀ back 1</button><button type="button" class="sewfwd">forward 1 ▶</button>`;
+    steps.querySelector(".sewback").addEventListener("click", () => { if (!done) place(at - 1); });
+    steps.querySelector(".sewfwd").addEventListener("click", () => { if (!done) place(at + 1); });
+    ctl.appendChild(steps);
+    place(L);
+    btn.textContent = "✂️ Snip here"; btn.disabled = false;
+    choice = () => String(at);
+    card._snipped = () => {      // the cut-off piece lifts away once the server says it's right
+      keep.setAttribute("width", at * unit);
+      off.setAttribute("x", x0 + at * unit); off.setAttribute("width", (L - at) * unit);
+      requestAnimationFrame(() => { off.style.transform = "translate(30px, -48px) rotate(-6deg)"; off.style.opacity = ".75"; });
+    };
+  }
+
+  btn.addEventListener("click", async () => {
+    const c = choice();
+    if (done || c === null) return;
+    btn.disabled = true; const label = btn.textContent; btn.textContent = "checking…";
+    try {
+      const r = await d.liveGrade(c);
+      if (r.correct) {
+        done = true; btn.style.display = "none"; card.classList.add("sewdone");
+        if (card._snipped) card._snipped();
+        fb.className = "qfeedback ok"; fb.textContent = r.feedback || "That's it.";
+        setTimeout(() => onSolved(r), 2200);
+      } else if (r.error) {
+        done = true; btn.style.display = "none";
+        fb.className = "qfeedback out"; fb.textContent = r.error;
+      } else {
+        fb.className = "qfeedback no";
+        fb.textContent = (r.feedback || "Not quite. Try again.") +
+          (r.cooldown_s ? " Try again in " + r.cooldown_s + " s." : "");
+      }
+    } finally { btn.textContent = label; if (!done) btn.disabled = false; }
+  });
+  return card;
+}
+
 // ---- LIVE stations and the delivery point (scenario.live; shared/live_session.js) ----
-// A `station` ({type:"station", tier:1|2|3, label}) asks the live server to DEAL a task of its tier and
+// A `station` ({type:"station", tier:1|2|3, track?, label}) asks the live server to DEAL a task of its tier
+// (and its track, when it names one) and
 // opens it in the normal pick-the-point modal (template in the console, the student's own plot, click
 // the answer). The answer never reaches the browser: each click is checked by the server. A station is
 // never a gate and never graded (no codec slot); solving fills what the player CARRIES, and only the
@@ -3677,7 +4028,7 @@ function buildLiveMcqCard(task, onSolved) {
 async function openStation(h) {
   if (!liveMode()) return toast("This station deals a task during the live class session.");
   if (!LIVE.isJoined()) return toast("Join the session first.");
-  const r = await LIVE.deal(h.tier).catch(() => null);
+  const r = await LIVE.deal(h.tier, h.track).catch(() => null);   // h.track: optional ("ord"); absent = default track
   if (!r) return toast("Can't reach the class session. Check your connection.");
   if (!r.ok) return toast(r.j.error || "No task right now.");
   const d = r.j;
@@ -3697,16 +4048,20 @@ async function openStation(h) {
         if (!a) return { error: "Can't reach the class session. Close this and try the station again." };
         if (!a.ok) return { error: a.j.error || "That task has expired. Close this and try the station again." };
         if (a.j.correct && a.j.carrying) {
-          LIVE.noteCarrying(a.j.carrying);
-          const st = LIVE.state(), unit = (st && st.unit) || ["gourd", "gourds"];
+          LIVE.noteCarrying(a.j.carrying, a.j.item);
+          const st = LIVE.state();
+          // A task may fill a SECOND item (bathhouse: a bath token), with its own unit, cap and destination.
+          const it = a.j.item && st && st.items && st.items[a.j.item];
+          const unit = (it ? it.unit : st && st.unit) || ["gourd", "gourds"];
+          const cap = it ? it.carry_max : st && st.carry_max;
           // The pool's right_feedback (if any) says WHY it is right; the carry line is always ours.
-          const dest = (st && st.deliver_to) || "the canoe", them = a.j.carrying === 1 ? "it" : "them";
-          // A pool with carry_max (bathhouse: 3) lets loads stack: until the arms are full, say both options.
-          const room = st && st.carry_max && a.j.carry_full === false;
+          const dest = (it ? it.deliver_to : st && st.deliver_to) || "the canoe", them = a.j.carrying === 1 ? "it" : "them";
+          // A pool with carry_max (bathhouse: 5) lets loads stack: until the arms are full, say both options.
+          const room = cap && a.j.carry_full === false;
           a.j.feedback = (a.j.feedback ? a.j.feedback + " " : "Filled! ") +
             "You're carrying " + a.j.carrying + " " + (a.j.carrying === 1 ? unit[0] : unit[1]) +
-            (room ? " (you can hold " + st.carry_max + "). Solve another, or take " + them + " to " + dest + "."
-                  : ". Take " + them + " back to " + dest + ".");
+            (room ? " (you can hold " + cap + "). Solve another, or take " + them + " to " + dest + "."
+                  : ". Take " + them + " to " + dest + ".");
         }
         return a.j;
   };
@@ -3715,6 +4070,10 @@ async function openStation(h) {
     const card = buildLiveMcqCard({ prompt: escHtml(d.question || ""), options: d.options, liveGrade },
                                   () => closeModal());
     return openModal(d.title || h.label, card);
+  }
+  if (d.kind === "stitch" || d.kind === "ribbon") {   // the sewing table: drawn widgets, checked by the server
+    if (viewer) resumeYaw = viewer.getYaw();
+    return openModal(d.title || h.label, buildSewingCard({ ...d, liveGrade }, () => closeModal()));
   }
   const isObject = d.kind === "object";
   const task = {
@@ -3740,12 +4099,26 @@ async function openStation(h) {
   grid.appendChild(left); grid.appendChild(right);
   openModal(task.label, grid, null, null, "wide");
 }
+function markFilled(ids) {
+  let changed = false;
+  for (const id of ids) {
+    const k = "liveFilled_" + id;
+    if (!gameState[k]) { gameState[k] = true; changed = true; }
+  }
+  if (changed) rerenderCurrentRoom();
+}
 async function deliverLoad(h) {
   if (!liveMode()) return toast("Loads are delivered here during the live class session.");
   if (!LIVE.isJoined()) return toast("Join the session first.");
-  const r = await LIVE.deliver().catch(() => null);
+  const r = await LIVE.deliver(h.sink).catch(() => null);
   if (!r) return toast("Can't reach the class session. Check your connection.");
   if (!r.ok) return toast(r.j.error || "Nothing to load.");
+  if (h.sink) {        // a SINK (bathhouse: a small bath), filled once with its cost in a second item
+    const st = LIVE.state();
+    markFilled(r.j.filled_all || []);
+    return toast("You filled " + (h.label || "it").replace(/\s*\(.*\)$/, "").toLowerCase() + "! " +
+      (r.j.phase === "won" ? "" : (st && st.total < st.goal) ? "Now keep cleaning the big tub." : ""));
+  }
   const st = LIVE.state(), unit = (st && st.unit) || ["gourd", "gourds"];
   toast(((st && st.deliver_verb) || "Loaded") + " " + r.j.delivered + " " + (r.j.delivered === 1 ? unit[0] : unit[1]) + ". " +
         "The class has " + r.j.total + (st && st.goal ? " of " + st.goal : "") + ".");
@@ -4205,6 +4578,7 @@ function solveRoom(result, h, qIndex) {
   // Guarded on firstGateSolve so a re-entered gate cannot double-increment a counter; `solvedGates` was
   // already written above, so `justSolved` is captured before that.
   if (justSolved && h && h.onSolve) applyEffects(Array.isArray(h.onSolve) ? h.onSolve : [h.onSolve]);
+  if (justSolved && h && h.gives) announceItems(INVY.grantItems(INV, h.gives, gameState));   // e.g. the drawer gives the store key
   updateMotif();                                       // story-motif HUD (e.g. the lesion spreads)
   updateEnvironment();                                 // progressive heel lists further; sickness dim deepens/clears
   const openState = portalUnlocked(room);   // see startRoom: follow the forward door's actual open state (handles a door gated on a secondary lock)

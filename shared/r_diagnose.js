@@ -35,7 +35,7 @@
  *
  * PURE — no DOM, no WebR. Tested in Node (`tests/r_diagnose.test.mjs`).
  */
-import { tokenizeR } from "./r_highlight.js?v=140";
+import { tokenizeR } from "./r_highlight.js?v=142";
 
 const OPENERS = { "(": ")", "[": "]", "{": "}" };
 const CLOSERS = { ")": "(", "]": "[", "}": "{" };
@@ -557,6 +557,34 @@ export function explainError(text, ctx) {
 
   if (/undefined columns selected|subscript out of bounds/i.test(text)) {
     return hint("You asked for a column or position that is not there.", "colnames(your_data)");
+  }
+
+  /*
+   * A two-sample test with its formula the wrong way round: `wilcoxTest(garden ~ value)`. rstatix runs
+   * the test inside purrr::map, so the headline webR keeps is only "Error in `map(., .f, data, formula,
+   * method, ...)`: In index: 1." — R's "Caused by: 'x' must be numeric" is the dropped half. Checked in
+   * native R (2026-10-25): t_test, wilcox_test and pairwise_wilcox_test all give exactly this headline
+   * for a reversed formula and for the same column on both sides, while a misspelled column, one group
+   * left after a filter, or a text measurement column each give a DIFFERENT headline, so this one is
+   * specific. Point at the student's own formula and the rule, never paste the swapped version.
+   */
+  if (/In index: \d+/.test(text)) {
+    const call = src.match(/\b(tTest|wilcoxTest|pairwiseTTest|pairwiseWilcoxTest|t_test|wilcox_test|pairwise_t_test|pairwise_wilcox_test)\s*\(([^)]*)\)/);
+    const f = call && call[2].match(/([\w.]+)\s*~\s*([\w.]+)/);
+    if (f || /map\(\.,\s*\.f,\s*data,\s*formula/.test(text)) {
+      const rule = "A test formula reads measurement ~ groups: the numeric column you measured goes on the " +
+                   "left of the ~, and the column that names the groups goes on the right.";
+      const piped = call && src.match(new RegExp("([\\w.]+)\\s*%>%\\s*" + call[1] + "\\s*\\("));
+      const look = piped ? `glimpse(${piped[1]})  # numeric columns show as <dbl> or <int>` : null;
+      if (f && f[1] === f[2]) {
+        return hint(`Your formula has ${f[1]} on both sides of the ~. ` + rule, look);
+      }
+      if (f) {
+        return hint(`The test could not run on the formula ${f[1]} ~ ${f[2]}. ` + rule +
+                    ` Check which of ${f[1]} and ${f[2]} holds the numbers.`, look);
+      }
+      return hint("The test could not run on its formula. " + rule);
+    }
   }
 
   // dplyr wraps failures from inside a verb like this, and again webR drops the "Caused by" detail.

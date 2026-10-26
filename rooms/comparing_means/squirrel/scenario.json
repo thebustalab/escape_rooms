@@ -1,11 +1,11 @@
 {
-  "status": "in_development",
+  "status": "ready",
   "chapter": "comparing_means",
   "scenario": "squirrel",
   "id": 13,
   "title": "Seedfall",
   "subtitle": "Two ends of a cliff city, one soil survey, and the first snow on the way.",
-  "story": "You and your partner tend rooftop orchards for the gardeners' guild of a city built five levels up a sea cliff. The first snow is coming. Before it does, every garden's soil must be certified, and the harbor lantern and the lighthouse lamp must be lit to tell the city its gardens are ready for winter.\n\nPlayer one starts in the harbor garden, at the foot of the cliff; player two starts at the lighthouse, at the city's far end. Certify the soil on your way to the middle garden, then walk home through the far gardens, finishing the full survey on the way. You each test the same survey a different way, so compare answers with your partner. Then light your end of the city.",
+  "story": "You and your partner tend rooftop orchards for the gardeners' guild of a city built five levels up a sea cliff. The first snow is coming. Before it does, every garden's soil must be certified, and the harbor lantern and the lighthouse lamp must be lit to tell the city its gardens are ready for winter. Player one starts in the harbor garden, at the foot of the cliff; player two starts at the lighthouse, at the city's far end. Certify the soil on your way to the middle garden, then walk home through the far gardens, finishing the full survey on the way. You each test the same survey a different way, so compare answers with your partner. Then light your end of the city.",
   "enterLabel": "Take your end of the city",
   "music": "audio/squirrel_theme.mp3",
   "musicVolume": 0.15,
@@ -41,7 +41,7 @@
   },
   "escapeDone": {
     "title": "Ready for winter",
-    "body": "The lever drops and the light catches. Across the city your partner is lighting the other end, and between the harbor lantern and the lighthouse lamp the snow settles on five levels of gardens, every bed certified and next spring's seed set. The city's gardens are ready for winter."
+    "body": "The lever drops and the light catches. Across the city your partner is lighting the other end, and between the harbor lantern and the lighthouse lamp the snow settles on five levels of gardens, every bed certified. The city's gardens are ready for winter."
   },
   "packages": [
     "dplyr",
@@ -65,7 +65,7 @@
   ],
   "debrief": {
     "title": "How the soil survey worked",
-    "intro": "You and your partner answered the same four questions about the same soil survey. At every step one of you compared means (t-tests, ANOVA) while the other compared ranks (Wilcoxon and Kruskal-Wallis tests), and you swapped methods along the way. Mostly the two methods agreed. Once, on skewed data, they pointed in opposite directions, and each was right about the question it asks."
+    "intro": "This scenario was comparing groups in two ways: by their means (t-tests and Tukey tests) and by their ranks (Wilcoxon and Dunn tests). You and your partner answered the same four questions about the same soil survey, one of you working with means while the other worked with ranks, and you swapped methods along the way. Mostly the two methods agreed. Once, on skewed data, they pointed in opposite directions, and each was right about the question it asks. Here is what you did."
   },
   "ladderPlain": [
     {
@@ -78,7 +78,7 @@
     },
     {
       "room": "middle_lower",
-      "text": "In the third puzzle you compared pH across the four soil mixes with an overall test followed by a pairwise follow-up (ANOVA then Tukey for one of you, Kruskal-Wallis then Dunn for the other), and both found leaf_mould alone more acidic than the other three."
+      "text": "In the third puzzle you compared pH across the four soil mixes with a test that compares every pair of mixes at once and corrects for the number of comparisons (Tukey for one of you, Dunn for the other), and both found leaf_mould alone more acidic than the other three."
     },
     {
       "room": "lo_1b",
@@ -452,9 +452,9 @@
           "ratio": 2.93,
           "delta": 6.29,
           "needsWork": false,
-          "accepted": false,
+          "accepted": true,
           "seamBandRun": 0.01,
-          "at": "2026-10-18T15:59:23",
+          "at": "2026-10-23T13:10:51",
           "states": {
             "first_snow": {
               "stage": "blurred",
@@ -462,11 +462,15 @@
               "ratio": 0.0,
               "delta": 0.0,
               "needsWork": false,
-              "accepted": false,
+              "accepted": true,
               "seamBandRun": 0.0,
-              "at": "2026-10-19T10:12:32"
+              "at": "2026-10-23T13:11:08",
+              "acceptedBy": "lucas via agent 2026-10-23",
+              "humanNote": "Lucas 2026-10-23: \"Please can you accept the seams for me?\" (after playing every room in the browser, clear and snow)"
             }
-          }
+          },
+          "acceptedBy": "lucas via agent 2026-10-23",
+          "humanNote": "Lucas 2026-10-23: \"Please can you accept the seams for me?\" (after playing every room in the browser)"
         },
         "boxesFrom": {
           "art": "b35995e82506",
@@ -744,7 +748,8 @@
           "gapMin": 10,
           "gapMax": 25
         }
-      ]
+      ],
+      "debrief": "Where you started and where you finished. The planting board asked for one leaf color per cliff level, but you had walked only three of the five levels, so it could be set only by talking to your partner. The whole survey worked the same way: two people, two kinds of test, and the full answer only when you put them together."
     },
     {
       "key": "lo_1a",
@@ -792,7 +797,7 @@
             "prompt": "The guild's first certificate compares the soil moisture of two gardens. Using the rows where <code>parameter</code> is moisture_pct, use a two-sample t-test to compare <code>value</code> between the gardens Clelia and Ines (the <code>garden</code> column). Is the difference significant, and which garden has the higher mean? Pick the statement that matches your result.",
             "options": [
               "No significant difference (p = 0.36): mean Clelia 16.0 vs Ines 16.5",
-              "No significant difference (p = 0.86): mean Clelia 0.61 vs Ines 0.61",
+              "No significant difference (p = 0.86): mean Clelia 0.61 vs Ines 0.615",
               "Significant (p < 0.001): Ines is higher, mean 47.4 vs 32.0",
               "No significant difference (p = 0.07): mean Clelia 12.7 vs Ines 14.6",
               "No significant difference (p = 0.93): mean Clelia 6.61 vs Ines 6.62",
@@ -839,7 +844,7 @@
           "type": "clue",
           "label": "The guild card",
           "pickup": true,
-          "body": "A keeper's card of the orchard guild. Every garden gate in the city opens to one word: the color of the leaves (or needles) on the trees of the garden it guards. Look at the trees, then set the letter rings.",
+          "body": "A keeper's card of the orchard guild. Every garden gate in the city opens with just one word: the color of the leaves (or needles) on the trees of the garden it guards.",
           "note": "PICKUP, first lock room only. Teaches the leaf-colour lock convention once; later locks are silent. Not a data clue (zero-clue budget allows escape-teaching pickups)."
         },
         {
@@ -2076,9 +2081,9 @@
           "ratio": 2.2,
           "delta": 2.0,
           "needsWork": false,
-          "accepted": false,
+          "accepted": true,
           "seamBandRun": 0.01,
-          "at": "2026-10-18T16:27:38",
+          "at": "2026-10-23T13:10:51",
           "states": {
             "first_snow": {
               "stage": "blurred",
@@ -2086,11 +2091,15 @@
               "ratio": 0.0,
               "delta": 0.0,
               "needsWork": false,
-              "accepted": false,
+              "accepted": true,
               "seamBandRun": 0.0,
-              "at": "2026-10-19T10:13:35"
+              "at": "2026-10-23T13:11:08",
+              "acceptedBy": "lucas via agent 2026-10-23",
+              "humanNote": "Lucas 2026-10-23: \"Please can you accept the seams for me?\" (after playing every room in the browser, clear and snow)"
             }
-          }
+          },
+          "acceptedBy": "lucas via agent 2026-10-23",
+          "humanNote": "Lucas 2026-10-23: \"Please can you accept the seams for me?\" (after playing every room in the browser)"
         },
         "boxesFrom": {
           "art": "08bf0efc8c64",
@@ -2171,7 +2180,7 @@
             "prompt": "The guild's first certificate compares the soil moisture of two gardens. Using the rows where <code>parameter</code> is moisture_pct, use a two-sample t-test to compare <code>value</code> between the gardens Clelia and Ines (the <code>garden</code> column). Is the difference significant, and which garden has the higher mean? Pick the statement that matches your result.",
             "options": [
               "No significant difference (p = 0.36): mean Clelia 16.0 vs Ines 16.5",
-              "No significant difference (p = 0.86): mean Clelia 0.61 vs Ines 0.61",
+              "No significant difference (p = 0.86): mean Clelia 0.61 vs Ines 0.615",
               "Significant (p < 0.001): Ines is higher, mean 47.4 vs 32.0",
               "No significant difference (p = 0.07): mean Clelia 12.7 vs Ines 14.6",
               "No significant difference (p = 0.93): mean Clelia 6.61 vs Ines 6.62",
@@ -2232,7 +2241,7 @@
             0.6331
           ],
           "pickup": true,
-          "body": "A keeper's card of the orchard guild. Every garden gate in the city opens to one word: the color of the leaves (or needles) on the trees of the garden it guards. Look at the trees, then set the letter rings.",
+          "body": "A keeper's card of the orchard guild. Every garden gate in the city opens with just one word: the color of the leaves (or needles) on the trees of the garden it guards.",
           "boxSource": "moved:testplay"
         },
         {
@@ -2322,7 +2331,8 @@
           "src": "audio/wind_light_snow.mp3",
           "volume": 0.35
         }
-      ]
+      ],
+      "debrief": "A t-test asks whether two group means differ by more than the spread of the readings would explain. Clelia averaged 24.0 percent moisture against 21.6 for Ines, a small gap but a consistent one, so the test called it significant. Your partner ran a Wilcoxon rank-sum test on the same gardens and reached the same verdict, because on roughly symmetric data the mean and the median tell the same story."
     },
     {
       "key": "lo_2a",
@@ -3543,9 +3553,9 @@
           "ratio": 0.0,
           "delta": 0.0,
           "needsWork": false,
-          "accepted": false,
+          "accepted": true,
           "seamBandRun": 0.0,
-          "at": "2026-10-18T17:21:37",
+          "at": "2026-10-23T13:10:51",
           "states": {
             "first_snow": {
               "stage": "blurred",
@@ -3553,11 +3563,15 @@
               "ratio": 0.0,
               "delta": 0.0,
               "needsWork": false,
-              "accepted": false,
+              "accepted": true,
               "seamBandRun": 0.0,
-              "at": "2026-10-19T10:14:23"
+              "at": "2026-10-23T13:11:08",
+              "acceptedBy": "lucas via agent 2026-10-23",
+              "humanNote": "Lucas 2026-10-23: \"Please can you accept the seams for me?\" (after playing every room in the browser, clear and snow)"
             }
-          }
+          },
+          "acceptedBy": "lucas via agent 2026-10-23",
+          "humanNote": "Lucas 2026-10-23: \"Please can you accept the seams for me?\" (after playing every room in the browser)"
         },
         "boxesFrom": {
           "art": "6b18c5aeb9dc",
@@ -3703,7 +3717,8 @@
           "gapMin": 6,
           "gapMax": 15
         }
-      ]
+      ],
+      "debrief": "No analysis here. The lift ride placed level 2 directly above level 1, and the trees on each terrace were worth remembering for the planting board."
     },
     {
       "key": "lo_2b",
@@ -3762,22 +3777,22 @@
           "label": "Soil reading 2",
           "starterCode": "garden_soil",
           "question": {
-            "prompt": "The second certificate is for nitrate, the nitrogen the orchard trees feed on. Using the rows where <code>parameter</code> is nitrate_mg_kg, use a Wilcoxon rank-sum test to compare <code>value</code> between the gardens Bice and Zita. Run it on the values as recorded: do not transform them or switch to a different test. Is the difference significant, and which garden has the higher median? Pick the statement that matches your result.",
+            "prompt": "The second certificate is for nitrate, the nitrogen the orchard trees feed on. Using the rows where <code>parameter</code> is nitrate_mg_kg, use a Wilcoxon rank-sum test to compare <code>value</code> between the gardens Bice and Zita. Run it on the values as recorded: do not transform them or switch to a different test. Is the difference significant, and whose values tend to run higher? Pick the statement that matches your result.",
             "options": [
-              "Significant (p < 0.001): Bice is higher, median 45.8 vs 34.1",
-              "No significant difference (p = 0.61): median Bice 0.62 vs Zita 0.65",
+              "Significant (p < 0.001): Bice is higher, median 45.75 vs 34.1",
+              "No significant difference (p = 0.61): median Bice 0.62 vs Zita 0.645",
               "No significant difference (p = 0.88): median Bice 8.00 vs Zita 8.60",
-              "Significant (p < 0.001): Bice is higher, median 19.1 vs 12.9",
+              "Significant (p < 0.001): Bice is higher, median 19.05 vs 12.95",
               "Significant (p < 0.01): Zita is higher, mean 40.4 vs 19.0",
               "No significant difference (p = 0.64): median Bice 8.00 vs Zita 7.30",
-              "No significant difference (p = 0.29): median Bice 22.6 vs Zita 22.9"
+              "No significant difference (p = 0.29): median Bice 22.55 vs Zita 22.9"
             ],
             "correct": 3,
             "feedback": {
-              "correct": "Correct, noted in your field notebook: by Wilcoxon test, Bice's median nitrate is significantly higher than Zita's (19.1 vs 12.9, p < 0.001).",
+              "correct": "Correct, noted in your field notebook: by Wilcoxon test, Bice's nitrate readings run significantly higher than Zita's (median 19.05 vs 12.95, p < 0.001).",
               "wrong": [
                 "Keep only the rows where <code>parameter</code> is \"nitrate_mg_kg\" and <code>garden</code> is Bice or Zita, then run <code>wilcoxTest(value ~ garden)</code>.",
-                "To see which garden is higher, find each garden's median: <code>group_by(garden) %&gt;% summarize(median = median(value))</code>. This question asks about the medians, not the means.",
+                "To see which garden is higher, find each garden's median: <code>group_by(garden) %&gt;% summarize(median = median(value))</code>. The Wilcoxon test asks whose values tend to run higher, and the medians are the usual way to report that.",
                 "Your partner's test on these same two gardens may point the other way. Answer for your own test: the Wilcoxon test and the medians."
               ]
             }
@@ -4995,9 +5010,9 @@
           "ratio": 0.0,
           "delta": 0.0,
           "needsWork": false,
-          "accepted": false,
+          "accepted": true,
           "seamBandRun": 0.0,
-          "at": "2026-10-18T17:25:30",
+          "at": "2026-10-23T13:10:51",
           "states": {
             "first_snow": {
               "stage": "screened",
@@ -5005,11 +5020,15 @@
               "ratio": 2.61,
               "delta": 2.82,
               "needsWork": false,
-              "accepted": false,
+              "accepted": true,
               "seamBandRun": 0.017,
-              "at": "2026-10-19T10:15:24"
+              "at": "2026-10-23T13:11:08",
+              "acceptedBy": "lucas via agent 2026-10-23",
+              "humanNote": "Lucas 2026-10-23: \"Please can you accept the seams for me?\" (after playing every room in the browser, clear and snow)"
             }
-          }
+          },
+          "acceptedBy": "lucas via agent 2026-10-23",
+          "humanNote": "Lucas 2026-10-23: \"Please can you accept the seams for me?\" (after playing every room in the browser)"
         }
       },
       "mapPos": {
@@ -5080,22 +5099,22 @@
           ],
           "starterCode": "garden_soil",
           "question": {
-            "prompt": "The second certificate is for nitrate, the nitrogen the orchard trees feed on. Using the rows where <code>parameter</code> is nitrate_mg_kg, use a Wilcoxon rank-sum test to compare <code>value</code> between the gardens Bice and Zita. Run it on the values as recorded: do not transform them or switch to a different test. Is the difference significant, and which garden has the higher median? Pick the statement that matches your result.",
+            "prompt": "The second certificate is for nitrate, the nitrogen the orchard trees feed on. Using the rows where <code>parameter</code> is nitrate_mg_kg, use a Wilcoxon rank-sum test to compare <code>value</code> between the gardens Bice and Zita. Run it on the values as recorded: do not transform them or switch to a different test. Is the difference significant, and whose values tend to run higher? Pick the statement that matches your result.",
             "options": [
-              "Significant (p < 0.001): Bice is higher, median 45.8 vs 34.1",
-              "No significant difference (p = 0.61): median Bice 0.62 vs Zita 0.65",
+              "Significant (p < 0.001): Bice is higher, median 45.75 vs 34.1",
+              "No significant difference (p = 0.61): median Bice 0.62 vs Zita 0.645",
               "No significant difference (p = 0.88): median Bice 8.00 vs Zita 8.60",
-              "Significant (p < 0.001): Bice is higher, median 19.1 vs 12.9",
+              "Significant (p < 0.001): Bice is higher, median 19.05 vs 12.95",
               "Significant (p < 0.01): Zita is higher, mean 40.4 vs 19.0",
               "No significant difference (p = 0.64): median Bice 8.00 vs Zita 7.30",
-              "No significant difference (p = 0.29): median Bice 22.6 vs Zita 22.9"
+              "No significant difference (p = 0.29): median Bice 22.55 vs Zita 22.9"
             ],
             "correct": 3,
             "feedback": {
-              "correct": "Correct, noted in your field notebook: by Wilcoxon test, Bice's median nitrate is significantly higher than Zita's (19.1 vs 12.9, p < 0.001).",
+              "correct": "Correct, noted in your field notebook: by Wilcoxon test, Bice's nitrate readings run significantly higher than Zita's (median 19.05 vs 12.95, p < 0.001).",
               "wrong": [
                 "Keep only the rows where <code>parameter</code> is \"nitrate_mg_kg\" and <code>garden</code> is Bice or Zita, then run <code>wilcoxTest(value ~ garden)</code>.",
-                "To see which garden is higher, find each garden's median: <code>group_by(garden) %&gt;% summarize(median = median(value))</code>. This question asks about the medians, not the means.",
+                "To see which garden is higher, find each garden's median: <code>group_by(garden) %&gt;% summarize(median = median(value))</code>. The Wilcoxon test asks whose values tend to run higher, and the medians are the usual way to report that.",
                 "Your partner's test on these same two gardens may point the other way. Answer for your own test: the Wilcoxon test and the medians."
               ]
             }
@@ -5221,7 +5240,8 @@
           "gapMin": 5,
           "gapMax": 12
         }
-      ]
+      ],
+      "debrief": "The designed disagreement. Your Wilcoxon test ranked every nitrate reading and found Bice higher in a typical bed (median 19.05 against 12.95). Your partner's t-test on the same numbers found Zita higher on average (mean 40.4 against 19.0). A few very high Zita readings pull its mean up but count as only a handful of high ranks. Both results are correct because they answer different questions, so on skewed data, decide which question you are asking before you choose the test."
     },
     {
       "key": "lo_3a",
@@ -5448,9 +5468,9 @@
           "ratio": 2.56,
           "delta": 4.36,
           "needsWork": false,
-          "accepted": false,
+          "accepted": true,
           "seamBandRun": 0.021,
-          "at": "2026-10-18T17:40:42",
+          "at": "2026-10-23T13:10:52",
           "states": {
             "first_snow": {
               "stage": "screened",
@@ -5458,11 +5478,15 @@
               "ratio": 1.21,
               "delta": 3.0,
               "needsWork": false,
-              "accepted": false,
+              "accepted": true,
               "seamBandRun": 0.02,
-              "at": "2026-10-19T10:16:40"
+              "at": "2026-10-23T13:11:08",
+              "acceptedBy": "lucas via agent 2026-10-23",
+              "humanNote": "Lucas 2026-10-23: \"Please can you accept the seams for me?\" (after playing every room in the browser, clear and snow)"
             }
-          }
+          },
+          "acceptedBy": "lucas via agent 2026-10-23",
+          "humanNote": "Lucas 2026-10-23: \"Please can you accept the seams for me?\" (after playing every room in the browser)"
         }
       },
       "mapPos": {
@@ -5592,7 +5616,8 @@
           "src": "audio/smoulder_crackle.mp3",
           "volume": 0.3
         }
-      ]
+      ],
+      "debrief": "No analysis here. The stairs placed level 3 above level 2, and level 3 is the one level you and your partner both walked."
     },
     {
       "key": "middle_lower",
@@ -5651,7 +5676,7 @@
           "label": "Soil reading 3",
           "starterCode": "garden_soil",
           "question": {
-            "prompt": "The middle garden mixes the soil for the whole city, so its certificate covers all four soil mixes. Using the rows where <code>parameter</code> is pH, compare <code>value</code> across the four groups in the <code>soil_mix</code> column with an ANOVA, then a Tukey test to compare every pair of mixes. Which statement matches the Tukey results?",
+            "prompt": "The middle garden mixes the soil for the whole city, so its certificate covers all four soil mixes. Using the rows where <code>parameter</code> is pH, compare <code>value</code> across the four groups in the <code>soil_mix</code> column with a Tukey test, which compares every pair of mixes. Which statement matches the Tukey results?",
             "options": [
               "5 of 15 comparisons significant: Bice-Clelia, Clelia-Gemma, Clelia-Ines, Dora-Ines, Ines-Zita",
               "Only coir_blend stands apart: its value is higher than each of the other 3; the others do not differ from one another (3 of 6 comparisons significant)",
@@ -5664,10 +5689,10 @@
             ],
             "correct": 6,
             "feedback": {
-              "correct": "Correct, noted in your field notebook: by ANOVA and Tukey, leaf_mould alone has a lower pH than the other three mixes, which do not differ.",
+              "correct": "Correct, noted in your field notebook: by Tukey test, leaf_mould alone has a lower pH than the other three mixes, which do not differ.",
               "wrong": [
-                "Keep only the rows where <code>parameter</code> is \"pH\", then run <code>anovaTest(value ~ soil_mix)</code>. It tells you whether any mix differs, not which.",
-                "Run <code>tukeyTest(value ~ soil_mix)</code> on the same rows. Each of its six rows is one pair of mixes; a <code>p.adj</code> below 0.05 means that pair differs.",
+                "Keep only the rows where <code>parameter</code> is \"pH\", then run <code>tukeyTest(value ~ soil_mix)</code> on them.",
+                "Each of its six rows is one pair of mixes; a <code>p.adj</code> below 0.05 means that pair differs. The test has already corrected for making six comparisons at once.",
                 "Group by <code>soil_mix</code>, not <code>garden</code>. To see which side of a pair is higher, find each mix's mean: <code>group_by(soil_mix) %&gt;% summarize(mean = mean(value))</code>."
               ]
             }
@@ -5931,9 +5956,9 @@
           "ratio": 0.92,
           "delta": 1.75,
           "needsWork": false,
-          "accepted": false,
+          "accepted": true,
           "seamBandRun": 0.011,
-          "at": "2026-10-19T07:39:06",
+          "at": "2026-10-23T13:10:52",
           "states": {
             "first_snow": {
               "stage": "screened",
@@ -5941,11 +5966,15 @@
               "ratio": 1.34,
               "delta": 2.49,
               "needsWork": false,
-              "accepted": false,
+              "accepted": true,
               "seamBandRun": 0.013,
-              "at": "2026-10-19T10:17:11"
+              "at": "2026-10-23T13:11:08",
+              "acceptedBy": "lucas via agent 2026-10-23",
+              "humanNote": "Lucas 2026-10-23: \"Please can you accept the seams for me?\" (after playing every room in the browser, clear and snow)"
             }
-          }
+          },
+          "acceptedBy": "lucas via agent 2026-10-23",
+          "humanNote": "Lucas 2026-10-23: \"Please can you accept the seams for me?\" (after playing every room in the browser)"
         },
         "boxesFrom": {
           "art": "796b5abdd6dd",
@@ -6024,7 +6053,7 @@
           ],
           "starterCode": "garden_soil",
           "question": {
-            "prompt": "The middle garden mixes the soil for the whole city, so its certificate covers all four soil mixes. Using the rows where <code>parameter</code> is pH, compare <code>value</code> across the four groups in the <code>soil_mix</code> column with an ANOVA, then a Tukey test to compare every pair of mixes. Which statement matches the Tukey results?",
+            "prompt": "The middle garden mixes the soil for the whole city, so its certificate covers all four soil mixes. Using the rows where <code>parameter</code> is pH, compare <code>value</code> across the four groups in the <code>soil_mix</code> column with a Tukey test, which compares every pair of mixes. Which statement matches the Tukey results?",
             "options": [
               "5 of 15 comparisons significant: Bice-Clelia, Clelia-Gemma, Clelia-Ines, Dora-Ines, Ines-Zita",
               "Only coir_blend stands apart: its value is higher than each of the other 3; the others do not differ from one another (3 of 6 comparisons significant)",
@@ -6037,10 +6066,10 @@
             ],
             "correct": 6,
             "feedback": {
-              "correct": "Correct, noted in your field notebook: by ANOVA and Tukey, leaf_mould alone has a lower pH than the other three mixes, which do not differ.",
+              "correct": "Correct, noted in your field notebook: by Tukey test, leaf_mould alone has a lower pH than the other three mixes, which do not differ.",
               "wrong": [
-                "Keep only the rows where <code>parameter</code> is \"pH\", then run <code>anovaTest(value ~ soil_mix)</code>. It tells you whether any mix differs, not which.",
-                "Run <code>tukeyTest(value ~ soil_mix)</code> on the same rows. Each of its six rows is one pair of mixes; a <code>p.adj</code> below 0.05 means that pair differs.",
+                "Keep only the rows where <code>parameter</code> is \"pH\", then run <code>tukeyTest(value ~ soil_mix)</code> on them.",
+                "Each of its six rows is one pair of mixes; a <code>p.adj</code> below 0.05 means that pair differs. The test has already corrected for making six comparisons at once.",
                 "Group by <code>soil_mix</code>, not <code>garden</code>. To see which side of a pair is higher, find each mix's mean: <code>group_by(soil_mix) %&gt;% summarize(mean = mean(value))</code>."
               ]
             }
@@ -6163,7 +6192,8 @@
           "src": "audio/spout_pour.mp3",
           "volume": 0.4
         }
-      ]
+      ],
+      "debrief": "With four soil mixes, running a separate t-test on every pair would multiply the chances of a false positive, so you used a Tukey test, which compares every pair while correcting for the number of comparisons: leaf_mould alone is more acidic than the other three. Your partner reached the same answer with a Dunn test. Solving it brought the first snow."
     },
     {
       "key": "lo_1b",
@@ -6208,7 +6238,7 @@
           "label": "The full soil survey",
           "starterCode": "garden_soil",
           "question": {
-            "prompt": "The full soil survey certifies phosphorus across all six gardens at once. Using the rows where <code>parameter</code> is phosphorus_mg_kg, compare <code>value</code> between every pair of the six gardens in the <code>garden</code> column (15 pairs) with pairwise Wilcoxon rank-sum tests, keeping the function's default correction for multiple comparisons. Which statement matches the corrected results?",
+            "prompt": "The full soil survey certifies phosphorus across all six gardens at once. Using the rows where parameter is phosphorus_mg_kg, compare value between every pair of the six gardens in the garden column (15 pairs) with pairwise Wilcoxon rank-sum tests, keeping the function's default correction for multiple comparisons. Which statement matches the corrected results?",
             "options": [
               "2 of 15 comparisons significant: Clelia-Dora, Dora-Gemma",
               "No pair differs (0 of 6 comparisons significant)",
@@ -6438,9 +6468,9 @@
           "ratio": 0.0,
           "delta": 0.0,
           "needsWork": false,
-          "accepted": false,
+          "accepted": true,
           "seamBandRun": 0.0,
-          "at": "2026-10-19T09:12:26",
+          "at": "2026-10-23T13:10:52",
           "states": {
             "first_snow": {
               "stage": "blurred",
@@ -6448,11 +6478,15 @@
               "ratio": 0.0,
               "delta": 0.0,
               "needsWork": false,
-              "accepted": false,
+              "accepted": true,
               "seamBandRun": 0.0,
-              "at": "2026-10-19T10:17:59"
+              "at": "2026-10-23T13:11:09",
+              "acceptedBy": "lucas via agent 2026-10-23",
+              "humanNote": "Lucas 2026-10-23: \"Please can you accept the seams for me?\" (after playing every room in the browser, clear and snow)"
             }
-          }
+          },
+          "acceptedBy": "lucas via agent 2026-10-23",
+          "humanNote": "Lucas 2026-10-23: \"Please can you accept the seams for me?\" (after playing every room in the browser)"
         },
         "boxesFrom": {
           "art": "0f4fc2129da1",
@@ -6518,7 +6552,7 @@
           ],
           "starterCode": "garden_soil",
           "question": {
-            "prompt": "The full soil survey certifies phosphorus across all six gardens at once. Using the rows where <code>parameter</code> is phosphorus_mg_kg, compare <code>value</code> between every pair of the six gardens in the <code>garden</code> column (15 pairs) with pairwise Wilcoxon rank-sum tests, keeping the function's default correction for multiple comparisons. Which statement matches the corrected results?",
+            "prompt": "The full soil survey certifies phosphorus across all six gardens at once. Using the rows where parameter is phosphorus_mg_kg, compare value between every pair of the six gardens in the garden column (15 pairs) with pairwise Wilcoxon rank-sum tests, keeping the function's default correction for multiple comparisons. Which statement matches the corrected results?",
             "options": [
               "2 of 15 comparisons significant: Clelia-Dora, Dora-Gemma",
               "No pair differs (0 of 6 comparisons significant)",
@@ -6629,7 +6663,8 @@
           "src": "audio/sea_boom_muffled.mp3",
           "volume": 0.4
         }
-      ]
+      ],
+      "debrief": "The full survey compared phosphorus between all fifteen pairs of gardens with Wilcoxon tests. Run fifteen tests and a few will cross p < 0.05 by chance alone, so the function applies a correction by default (Holm's method) that raises the bar for each comparison. Gemma-Ines and Dora-Zita fall away once it is applied, leaving two clean groups: Bice, Gemma and Ines above Clelia, Dora and Zita. Your partner's pairwise t-tests found the same two groups."
     },
     {
       "key": "lo_2c",
@@ -6820,9 +6855,9 @@
           "ratio": 1.34,
           "delta": 3.43,
           "needsWork": false,
-          "accepted": false,
+          "accepted": true,
           "seamBandRun": 0.009,
-          "at": "2026-10-18T22:08:05",
+          "at": "2026-10-23T13:10:52",
           "states": {
             "first_snow": {
               "stage": "screened",
@@ -6830,11 +6865,15 @@
               "ratio": 1.91,
               "delta": 3.79,
               "needsWork": false,
-              "accepted": false,
+              "accepted": true,
               "seamBandRun": 0.006,
-              "at": "2026-10-19T10:18:45"
+              "at": "2026-10-23T13:11:09",
+              "acceptedBy": "lucas via agent 2026-10-23",
+              "humanNote": "Lucas 2026-10-23: \"Please can you accept the seams for me?\" (after playing every room in the browser, clear and snow)"
             }
-          }
+          },
+          "acceptedBy": "lucas via agent 2026-10-23",
+          "humanNote": "Lucas 2026-10-23: \"Please can you accept the seams for me?\" (after playing every room in the browser)"
         }
       },
       "mapPos": {
@@ -6969,7 +7008,8 @@
           "src": "audio/laundry_flap.mp3",
           "volume": 0.25
         }
-      ]
+      ],
+      "debrief": "No analysis here. This is the walk home through the far gardens, now under snow."
     },
     {
       "key": "lo_1c",
@@ -7196,9 +7236,9 @@
           "ratio": 0.63,
           "delta": 1.69,
           "needsWork": false,
-          "accepted": false,
+          "accepted": true,
           "seamBandRun": 0.014,
-          "at": "2026-10-18T22:24:23",
+          "at": "2026-10-23T13:10:52",
           "states": {
             "first_snow": {
               "stage": "screened",
@@ -7206,11 +7246,15 @@
               "ratio": 1.09,
               "delta": 2.51,
               "needsWork": false,
-              "accepted": false,
+              "accepted": true,
               "seamBandRun": 0.027,
-              "at": "2026-10-19T10:19:31"
+              "at": "2026-10-23T13:11:09",
+              "acceptedBy": "lucas via agent 2026-10-23",
+              "humanNote": "Lucas 2026-10-23: \"Please can you accept the seams for me?\" (after playing every room in the browser, clear and snow)"
             }
-          }
+          },
+          "acceptedBy": "lucas via agent 2026-10-23",
+          "humanNote": "Lucas 2026-10-23: \"Please can you accept the seams for me?\" (after playing every room in the browser)"
         }
       },
       "mapPos": {
@@ -7352,7 +7396,8 @@
           "gapMin": 6,
           "gapMax": 14
         }
-      ]
+      ],
+      "debrief": "No analysis here. The last stretch of level 1 led you home to the planting board and the stair to the harbor lantern."
     },
     {
       "key": "lo_stair",
@@ -7508,9 +7553,11 @@
           "ratio": 0.0,
           "delta": 0.0,
           "needsWork": false,
-          "accepted": false,
+          "accepted": true,
           "seamBandRun": 0.0,
-          "at": "2026-10-18T22:41:48"
+          "at": "2026-10-23T13:10:52",
+          "acceptedBy": "lucas via agent 2026-10-23",
+          "humanNote": "Lucas 2026-10-23: \"Please can you accept the seams for me?\" (after playing every room in the browser)"
         }
       },
       "mapPos": {
@@ -7589,7 +7636,8 @@
           "gapMin": 4,
           "gapMax": 10
         }
-      ]
+      ],
+      "debrief": "The stair opened only when two things were done: the full survey certified and the planting board set. Your own analysis finished the first, and you needed your partner for the second."
     },
     {
       "key": "lo_lantern",
@@ -7796,9 +7844,11 @@
           "ratio": 2.87,
           "delta": 3.75,
           "needsWork": false,
-          "accepted": false,
+          "accepted": true,
           "seamBandRun": 0.021,
-          "at": "2026-10-19T09:10:25"
+          "at": "2026-10-23T13:10:52",
+          "acceptedBy": "lucas via agent 2026-10-23",
+          "humanNote": "Lucas 2026-10-23: \"Please can you accept the seams for me?\" (after playing every room in the browser)"
         },
         "boxesFrom": {
           "art": "680990267309",
@@ -7831,7 +7881,12 @@
           ],
           "direction": "open",
           "endsEscape": true,
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "transit": {
+            "video": "lo_lantern/transit_finale.mp4",
+            "flat": true,
+            "rollFrom": -5.2
+          }
         },
         {
           "id": "back_to_the_stair",
@@ -7878,7 +7933,8 @@
           "src": "audio/wind_light_snow.mp3",
           "volume": 0.25
         }
-      ]
+      ],
+      "debrief": "The harbor lantern tells the city its gardens are ready for winter. You lit it after answering four questions twice, with two methods that mostly agreed and, once, for good reason, did not."
     },
     {
       "key": "lighthouse",
@@ -8046,15 +8102,17 @@
           "variants": [
             {
               "state": "first_snow",
-              "when": {
-                "solved": "middle_upper"
-              },
               "box": [
                 0,
                 0,
                 1,
                 1
-              ]
+              ],
+              "prompt": "Keep this exact scene, composition, camera framing and every object precisely where it is, and change ONLY the weather, to the first snow of the year falling and beginning to settle: The same blue hour, a shade darker and softer under low grey-violet cloud; the warm lamplight glows brighter against the snow. Every wall, door, gate, lift tower, rail, stair and tree stays exactly where it is. A thin white layer settles on roofs, parapets, railings, paving, terrace soil and the tops of leaves; the far trees keep their own colour, readable through it. Large soft snowflakes fall gently through the whole scene.",
+              "panorama": "lighthouse/scene_first_snow.png",
+              "when": {
+                "solved": "middle_upper"
+              }
             }
           ]
         }
@@ -8209,9 +8267,9 @@
           "ratio": 2.1,
           "delta": 5.71,
           "needsWork": false,
-          "accepted": false,
+          "accepted": true,
           "seamBandRun": 0.028,
-          "at": "2026-10-19T09:37:13",
+          "at": "2026-10-23T13:10:52",
           "states": {
             "first_snow": {
               "stage": "blurred",
@@ -8219,11 +8277,15 @@
               "ratio": 0.0,
               "delta": 0.0,
               "needsWork": false,
-              "accepted": false,
+              "accepted": true,
               "seamBandRun": 0.0,
-              "at": "2026-10-19T10:20:20"
+              "at": "2026-10-23T13:11:09",
+              "acceptedBy": "lucas via agent 2026-10-23",
+              "humanNote": "Lucas 2026-10-23: \"Please can you accept the seams for me?\" (after playing every room in the browser, clear and snow)"
             }
-          }
+          },
+          "acceptedBy": "lucas via agent 2026-10-23",
+          "humanNote": "Lucas 2026-10-23: \"Please can you accept the seams for me?\" (after playing every room in the browser)"
         },
         "boxesFrom": {
           "art": "ecae0bb63a09",
@@ -8418,7 +8480,8 @@
                 "solved": "middle_upper"
               }
             }
-          ]
+          ],
+          "noElement": true
         },
         {
           "id": "clip_base",
@@ -8473,7 +8536,8 @@
           "src": "audio/wind_cold_steady.mp3",
           "volume": 0.35
         }
-      ]
+      ],
+      "debrief": "Where you started and where you finished. The planting board asked for one leaf color per cliff level, but you had walked only three of the five levels, so it could be set only by talking to your partner. The whole survey worked the same way: two people, two kinds of test, and the full answer only when you put them together."
     },
     {
       "key": "up_rock",
@@ -8520,15 +8584,17 @@
           "variants": [
             {
               "state": "first_snow",
-              "when": {
-                "solved": "middle_upper"
-              },
               "box": [
                 0,
                 0,
                 1,
                 1
-              ]
+              ],
+              "prompt": "Keep this exact scene, composition, camera framing and every object precisely where it is, and change ONLY the weather, to the first snow of the year falling and beginning to settle: The same blue hour, a shade darker and softer under low grey-violet cloud; the warm lamplight glows brighter against the snow. Every wall, door, gate, lift tower, rail, stair and tree stays exactly where it is. A thin white layer settles on roofs, parapets, railings, paving, terrace soil and the tops of leaves; the far trees keep their own colour, readable through it. Large soft snowflakes fall gently through the whole scene.",
+              "panorama": "up_rock/scene_first_snow.png",
+              "when": {
+                "solved": "middle_upper"
+              }
             }
           ]
         }
@@ -8686,9 +8752,9 @@
           "ratio": 0.0,
           "delta": 0.0,
           "needsWork": false,
-          "accepted": false,
+          "accepted": true,
           "seamBandRun": 0.0,
-          "at": "2026-10-20T18:34:21",
+          "at": "2026-10-23T13:10:52",
           "states": {
             "first_snow": {
               "stage": "blurred",
@@ -8696,11 +8762,15 @@
               "ratio": 0.0,
               "delta": 0.0,
               "needsWork": false,
-              "accepted": false,
+              "accepted": true,
               "seamBandRun": 0.0,
-              "at": "2026-10-20T20:49:21"
+              "at": "2026-10-23T13:11:09",
+              "acceptedBy": "lucas via agent 2026-10-23",
+              "humanNote": "Lucas 2026-10-23: \"Please can you accept the seams for me?\" (after playing every room in the browser, clear and snow)"
             }
-          }
+          },
+          "acceptedBy": "lucas via agent 2026-10-23",
+          "humanNote": "Lucas 2026-10-23: \"Please can you accept the seams for me?\" (after playing every room in the browser)"
         },
         "boxesFrom": {
           "art": "f232dd7f6aa8",
@@ -8775,7 +8845,8 @@
                 "solved": "middle_upper"
               }
             }
-          ]
+          ],
+          "noElement": true
         },
         {
           "id": "clip_base",
@@ -8834,7 +8905,8 @@
           "src": "audio/water_trickle.mp3",
           "volume": 0.2
         }
-      ]
+      ],
+      "debrief": "No analysis here. The rock stair links the lighthouse to the gardens of level 5, at the top of the city."
     },
     {
       "key": "up_5g",
@@ -9095,9 +9167,9 @@
           "ratio": 3.81,
           "delta": 3.5,
           "needsWork": false,
-          "accepted": false,
+          "accepted": true,
           "seamBandRun": 0.018,
-          "at": "2026-10-18T23:23:27",
+          "at": "2026-10-23T13:10:53",
           "states": {
             "first_snow": {
               "stage": "blurred",
@@ -9105,11 +9177,15 @@
               "ratio": 0.0,
               "delta": 0.0,
               "needsWork": false,
-              "accepted": false,
+              "accepted": true,
               "seamBandRun": 0.0,
-              "at": "2026-10-19T10:21:25"
+              "at": "2026-10-23T13:11:09",
+              "acceptedBy": "lucas via agent 2026-10-23",
+              "humanNote": "Lucas 2026-10-23: \"Please can you accept the seams for me?\" (after playing every room in the browser, clear and snow)"
             }
-          }
+          },
+          "acceptedBy": "lucas via agent 2026-10-23",
+          "humanNote": "Lucas 2026-10-23: \"Please can you accept the seams for me?\" (after playing every room in the browser)"
         }
       },
       "mapPos": {
@@ -9247,17 +9323,14 @@
       "sfx": [
         {
           "src": "audio/wind_strong.mp3",
-          "volume": 0.5
+          "volume": 0.48
         },
         {
           "src": "audio/pennant_flap.mp3",
           "volume": 0.35
-        },
-        {
-          "src": "audio/surf_heavy.mp3",
-          "volume": 0.2
         }
-      ]
+      ],
+      "debrief": "No analysis here. The lighthouse garden was the home of your loop through level 5, the first garden you entered and the last you passed on the way back."
     },
     {
       "key": "up_5a",
@@ -9316,19 +9389,19 @@
           "label": "Soil reading 1",
           "starterCode": "garden_soil",
           "question": {
-            "prompt": "The guild's first certificate compares the soil moisture of two gardens. Using the rows where <code>parameter</code> is moisture_pct, use a Wilcoxon rank-sum test to compare <code>value</code> between the gardens Clelia and Ines (the <code>garden</code> column). Is the difference significant, and which garden has the higher median? Pick the statement that matches your result.",
+            "prompt": "The guild's first certificate compares the soil moisture of two gardens. Using the rows where <code>parameter</code> is moisture_pct, use a Wilcoxon rank-sum test to compare <code>value</code> between the gardens Clelia and Ines (the <code>garden</code> column). Is the difference significant, and whose values tend to run higher? Pick the statement that matches your result.",
             "options": [
-              "No significant difference (p = 1.00): median Clelia 6.68 vs Ines 6.67",
+              "No significant difference (p = 1.00): median Clelia 6.685 vs Ines 6.665",
               "No significant difference (p = 0.84): median Clelia 8.70 vs Ines 8.80",
-              "Significant (p < 0.001): Ines is higher, median 46.6 vs 32.4",
+              "Significant (p < 0.001): Ines is higher, median 46.65 vs 32.4",
               "No significant difference (p = 0.83): median Clelia 0.70 vs Ines 0.80",
-              "No significant difference (p = 0.99): median Clelia 0.61 vs Ines 0.60",
+              "No significant difference (p = 0.99): median Clelia 0.615 vs Ines 0.605",
               "Significant (p < 0.001): Clelia is higher, median 24.0 vs 21.5",
-              "No significant difference (p = 0.58): median Clelia 16.4 vs Ines 16.1"
+              "No significant difference (p = 0.58): median Clelia 16.35 vs Ines 16.15"
             ],
             "correct": 5,
             "feedback": {
-              "correct": "Correct, noted in your field notebook: by Wilcoxon test, Clelia's soil moisture is significantly higher than Ines's (median 24.0 vs 21.5, p < 0.001).",
+              "correct": "Correct, noted in your field notebook: by Wilcoxon test, Clelia's soil moisture readings run significantly higher than Ines's (median 24.0 vs 21.5, p < 0.001).",
               "wrong": [
                 "Keep only the rows where <code>parameter</code> is \"moisture_pct\" and <code>garden</code> is Clelia or Ines, then run <code>wilcoxTest(value ~ garden)</code> on them.",
                 "The p-value says whether the difference is significant. To see which garden is higher, find each garden's median: <code>group_by(garden) %&gt;% summarize(median = median(value))</code>.",
@@ -9380,7 +9453,7 @@
           "type": "clue",
           "label": "The guild card",
           "pickup": true,
-          "body": "A keeper's card of the orchard guild. Every garden gate in the city opens to one word: the color of the leaves (or needles) on the trees of the garden it guards. Look at the trees, then set the letter rings.",
+          "body": "A keeper's card of the orchard guild. Every garden gate in the city opens with just one word: the color of the leaves (or needles) on the trees of the garden it guards.",
           "note": "PICKUP, first lock room only. Teaches the leaf-colour lock convention once; later locks are silent. Not a data clue (zero-clue budget allows escape-teaching pickups).",
           "box": [
             0.38,
@@ -9599,9 +9672,9 @@
           "ratio": 0.55,
           "delta": 1.02,
           "needsWork": false,
-          "accepted": false,
+          "accepted": true,
           "seamBandRun": 0.028,
-          "at": "2026-10-18T23:38:47",
+          "at": "2026-10-23T13:10:53",
           "states": {
             "first_snow": {
               "stage": "blurred",
@@ -9609,11 +9682,15 @@
               "ratio": 0.0,
               "delta": 0.0,
               "needsWork": false,
-              "accepted": false,
+              "accepted": true,
               "seamBandRun": 0.0,
-              "at": "2026-10-19T10:22:13"
+              "at": "2026-10-23T13:11:09",
+              "acceptedBy": "lucas via agent 2026-10-23",
+              "humanNote": "Lucas 2026-10-23: \"Please can you accept the seams for me?\" (after playing every room in the browser, clear and snow)"
             }
-          }
+          },
+          "acceptedBy": "lucas via agent 2026-10-23",
+          "humanNote": "Lucas 2026-10-23: \"Please can you accept the seams for me?\" (after playing every room in the browser)"
         }
       },
       "mapPos": {
@@ -9693,19 +9770,19 @@
           ],
           "starterCode": "garden_soil",
           "question": {
-            "prompt": "The guild's first certificate compares the soil moisture of two gardens. Using the rows where <code>parameter</code> is moisture_pct, use a Wilcoxon rank-sum test to compare <code>value</code> between the gardens Clelia and Ines (the <code>garden</code> column). Is the difference significant, and which garden has the higher median? Pick the statement that matches your result.",
+            "prompt": "The guild's first certificate compares the soil moisture of two gardens. Using the rows where <code>parameter</code> is moisture_pct, use a Wilcoxon rank-sum test to compare <code>value</code> between the gardens Clelia and Ines (the <code>garden</code> column). Is the difference significant, and whose values tend to run higher? Pick the statement that matches your result.",
             "options": [
-              "No significant difference (p = 1.00): median Clelia 6.68 vs Ines 6.67",
+              "No significant difference (p = 1.00): median Clelia 6.685 vs Ines 6.665",
               "No significant difference (p = 0.84): median Clelia 8.70 vs Ines 8.80",
-              "Significant (p < 0.001): Ines is higher, median 46.6 vs 32.4",
+              "Significant (p < 0.001): Ines is higher, median 46.65 vs 32.4",
               "No significant difference (p = 0.83): median Clelia 0.70 vs Ines 0.80",
-              "No significant difference (p = 0.99): median Clelia 0.61 vs Ines 0.60",
+              "No significant difference (p = 0.99): median Clelia 0.615 vs Ines 0.605",
               "Significant (p < 0.001): Clelia is higher, median 24.0 vs 21.5",
-              "No significant difference (p = 0.58): median Clelia 16.4 vs Ines 16.1"
+              "No significant difference (p = 0.58): median Clelia 16.35 vs Ines 16.15"
             ],
             "correct": 5,
             "feedback": {
-              "correct": "Correct, noted in your field notebook: by Wilcoxon test, Clelia's soil moisture is significantly higher than Ines's (median 24.0 vs 21.5, p < 0.001).",
+              "correct": "Correct, noted in your field notebook: by Wilcoxon test, Clelia's soil moisture readings run significantly higher than Ines's (median 24.0 vs 21.5, p < 0.001).",
               "wrong": [
                 "Keep only the rows where <code>parameter</code> is \"moisture_pct\" and <code>garden</code> is Clelia or Ines, then run <code>wilcoxTest(value ~ garden)</code> on them.",
                 "The p-value says whether the difference is significant. To see which garden is higher, find each garden's median: <code>group_by(garden) %&gt;% summarize(median = median(value))</code>.",
@@ -9757,7 +9834,7 @@
             0.6551
           ],
           "pickup": true,
-          "body": "A keeper's card of the orchard guild. Every garden gate in the city opens to one word: the color of the leaves (or needles) on the trees of the garden it guards. Look at the trees, then set the letter rings.",
+          "body": "A keeper's card of the orchard guild. Every garden gate in the city opens with just one word: the color of the leaves (or needles) on the trees of the garden it guards.",
           "boxSource": "moved:testplay"
         },
         {
@@ -9841,7 +9918,8 @@
           "src": "audio/waterwheel_splash.mp3",
           "volume": 0.12
         }
-      ]
+      ],
+      "debrief": "A Wilcoxon rank-sum test pools the readings from both gardens, ranks them, and asks whether one garden's ranks run consistently higher. Clelia's moisture ranks did, so Clelia is significantly wetter than Ines. Your partner's t-test on the means reached the same verdict, because on roughly symmetric data the mean and the median tell the same story."
     },
     {
       "key": "up_4a",
@@ -10064,9 +10142,9 @@
           "ratio": 0.0,
           "delta": 0.0,
           "needsWork": false,
-          "accepted": false,
+          "accepted": true,
           "seamBandRun": 0.0,
-          "at": "2026-10-18T23:54:24",
+          "at": "2026-10-23T13:10:53",
           "states": {
             "first_snow": {
               "stage": "blurred",
@@ -10074,11 +10152,15 @@
               "ratio": 0.0,
               "delta": 0.0,
               "needsWork": false,
-              "accepted": false,
+              "accepted": true,
               "seamBandRun": 0.0,
-              "at": "2026-10-19T10:22:46"
+              "at": "2026-10-23T13:11:09",
+              "acceptedBy": "lucas via agent 2026-10-23",
+              "humanNote": "Lucas 2026-10-23: \"Please can you accept the seams for me?\" (after playing every room in the browser, clear and snow)"
             }
-          }
+          },
+          "acceptedBy": "lucas via agent 2026-10-23",
+          "humanNote": "Lucas 2026-10-23: \"Please can you accept the seams for me?\" (after playing every room in the browser)"
         }
       },
       "mapPos": {
@@ -10207,17 +10289,14 @@
       "sfx": [
         {
           "src": "audio/sea_far_waves.mp3",
-          "volume": 0.25
+          "volume": 0.3
         },
         {
           "src": "audio/stove_crackle.mp3",
-          "volume": 0.4
-        },
-        {
-          "src": "audio/leaves_wind.mp3",
-          "volume": 0.25
+          "volume": 0.11
         }
-      ]
+      ],
+      "debrief": "No analysis here. The lift ride placed level 4 directly below level 5, and the trees on each terrace were worth remembering for the planting board."
     },
     {
       "key": "up_4b",
@@ -10284,7 +10363,7 @@
               "Significant (p < 0.01): Zita is higher, mean 40.4 vs 19.0",
               "No significant difference (p = 0.96): mean Bice 8.47 vs Zita 8.51",
               "Significant (p < 0.001): Bice is higher, mean 46.0 vs 33.4",
-              "Significant (p < 0.001): Bice is higher, median 19.1 vs 12.9"
+              "Significant (p < 0.001): Bice is higher, median 19.05 vs 12.95"
             ],
             "correct": 3,
             "feedback": {
@@ -10535,9 +10614,9 @@
           "ratio": 0.0,
           "delta": 0.0,
           "needsWork": false,
-          "accepted": false,
+          "accepted": true,
           "seamBandRun": 0.0,
-          "at": "2026-10-19T00:22:23",
+          "at": "2026-10-23T13:10:53",
           "states": {
             "first_snow": {
               "stage": "blurred",
@@ -10545,11 +10624,15 @@
               "ratio": 0.0,
               "delta": 0.0,
               "needsWork": false,
-              "accepted": false,
+              "accepted": true,
               "seamBandRun": 0.0,
-              "at": "2026-10-19T10:23:34"
+              "at": "2026-10-23T13:11:10",
+              "acceptedBy": "lucas via agent 2026-10-23",
+              "humanNote": "Lucas 2026-10-23: \"Please can you accept the seams for me?\" (after playing every room in the browser, clear and snow)"
             }
-          }
+          },
+          "acceptedBy": "lucas via agent 2026-10-23",
+          "humanNote": "Lucas 2026-10-23: \"Please can you accept the seams for me?\" (after playing every room in the browser)"
         }
       },
       "mapPos": {
@@ -10628,7 +10711,7 @@
               "Significant (p < 0.01): Zita is higher, mean 40.4 vs 19.0",
               "No significant difference (p = 0.96): mean Bice 8.47 vs Zita 8.51",
               "Significant (p < 0.001): Bice is higher, mean 46.0 vs 33.4",
-              "Significant (p < 0.001): Bice is higher, median 19.1 vs 12.9"
+              "Significant (p < 0.001): Bice is higher, median 19.05 vs 12.95"
             ],
             "correct": 3,
             "feedback": {
@@ -10748,13 +10831,10 @@
       "sfx": [
         {
           "src": "audio/wind_light_snow.mp3",
-          "volume": 0.3
-        },
-        {
-          "src": "audio/leaves_wind.mp3",
-          "volume": 0.3
+          "volume": 1.0
         }
-      ]
+      ],
+      "debrief": "The designed disagreement. Your t-test found Zita higher on average (mean 40.4 against 19.0 mg/kg nitrate). Your partner's Wilcoxon test ranked the same readings and found Bice higher in a typical bed (median 19.05 against 12.95). A few very high Zita readings pull its mean up but count as only a handful of high ranks. Both results are correct because they answer different questions, so on skewed data, decide which question you are asking before you choose the test."
     },
     {
       "key": "up_3a",
@@ -10985,9 +11065,9 @@
           "ratio": 2.5,
           "delta": 5.74,
           "needsWork": false,
-          "accepted": false,
+          "accepted": true,
           "seamBandRun": 0.005,
-          "at": "2026-10-19T00:53:07",
+          "at": "2026-10-23T13:10:53",
           "states": {
             "first_snow": {
               "stage": "blurred",
@@ -10995,11 +11075,15 @@
               "ratio": 0.0,
               "delta": 0.0,
               "needsWork": false,
-              "accepted": false,
+              "accepted": true,
               "seamBandRun": 0.0,
-              "at": "2026-10-19T10:24:22"
+              "at": "2026-10-23T13:11:10",
+              "acceptedBy": "lucas via agent 2026-10-23",
+              "humanNote": "Lucas 2026-10-23: \"Please can you accept the seams for me?\" (after playing every room in the browser, clear and snow)"
             }
-          }
+          },
+          "acceptedBy": "lucas via agent 2026-10-23",
+          "humanNote": "Lucas 2026-10-23: \"Please can you accept the seams for me?\" (after playing every room in the browser)"
         },
         "boxesFrom": {
           "art": "2e9997a7d994",
@@ -11133,7 +11217,8 @@
           "src": "audio/sea_far_waves.mp3",
           "volume": 0.2
         }
-      ]
+      ],
+      "debrief": "No analysis here. The stairs placed level 3 below level 4, and level 3 is the one level you and your partner both walked."
     },
     {
       "key": "middle_upper",
@@ -11194,7 +11279,7 @@
           "label": "Soil reading 3",
           "starterCode": "garden_soil",
           "question": {
-            "prompt": "The middle garden mixes the soil for the whole city, so its certificate covers all four soil mixes. Using the rows where <code>parameter</code> is pH, compare <code>value</code> across the four groups in the <code>soil_mix</code> column with a Kruskal-Wallis test, then a Dunn test to compare every pair of mixes. Which statement matches the Dunn results?",
+            "prompt": "The middle garden mixes the soil for the whole city, so its certificate covers all four soil mixes. Using the rows where <code>parameter</code> is pH, compare <code>value</code> across the four groups in the <code>soil_mix</code> column with a Dunn test, which compares every pair of mixes. Which statement matches the Dunn results?",
             "options": [
               "No pair differs (0 of 6 comparisons significant)",
               "5 of 15 comparisons significant: Bice-Clelia, Clelia-Gemma, Clelia-Ines, Dora-Ines, Ines-Zita",
@@ -11206,10 +11291,10 @@
             ],
             "correct": 6,
             "feedback": {
-              "correct": "Correct, noted in your field notebook: by Kruskal-Wallis and Dunn, leaf_mould alone has a lower pH than the other three mixes, which do not differ.",
+              "correct": "Correct, noted in your field notebook: by Dunn test, leaf_mould alone has a lower pH than the other three mixes, which do not differ.",
               "wrong": [
-                "Keep only the rows where <code>parameter</code> is \"pH\", then run <code>kruskalTest(value ~ soil_mix)</code>. It tells you whether any mix differs, not which.",
-                "Run <code>dunnTest(value ~ soil_mix)</code> on the same rows. Each of its six rows is one pair of mixes; a <code>p.adj</code> below 0.05 means that pair differs.",
+                "Keep only the rows where <code>parameter</code> is \"pH\", then run <code>dunnTest(value ~ soil_mix)</code> on them.",
+                "Each of its six rows is one pair of mixes; a <code>p.adj</code> below 0.05 means that pair differs. The test has already corrected for making six comparisons at once.",
                 "Group by <code>soil_mix</code>, not <code>garden</code>. To see which side of a pair is higher, find each mix's median: <code>group_by(soil_mix) %&gt;% summarize(median = median(value))</code>."
               ]
             }
@@ -11465,9 +11550,11 @@
           "ratio": 1.19,
           "delta": 3.06,
           "needsWork": false,
-          "accepted": false,
+          "accepted": true,
           "seamBandRun": 0.009,
-          "at": "2026-10-19T01:08:55"
+          "at": "2026-10-23T13:10:53",
+          "acceptedBy": "lucas via agent 2026-10-23",
+          "humanNote": "Lucas 2026-10-23: \"Please can you accept the seams for me?\" (after playing every room in the browser)"
         }
       },
       "mapPos": {
@@ -11572,7 +11659,7 @@
           ],
           "starterCode": "garden_soil",
           "question": {
-            "prompt": "The middle garden mixes the soil for the whole city, so its certificate covers all four soil mixes. Using the rows where <code>parameter</code> is pH, compare <code>value</code> across the four groups in the <code>soil_mix</code> column with a Kruskal-Wallis test, then a Dunn test to compare every pair of mixes. Which statement matches the Dunn results?",
+            "prompt": "The middle garden mixes the soil for the whole city, so its certificate covers all four soil mixes. Using the rows where <code>parameter</code> is pH, compare <code>value</code> across the four groups in the <code>soil_mix</code> column with a Dunn test, which compares every pair of mixes. Which statement matches the Dunn results?",
             "options": [
               "No pair differs (0 of 6 comparisons significant)",
               "5 of 15 comparisons significant: Bice-Clelia, Clelia-Gemma, Clelia-Ines, Dora-Ines, Ines-Zita",
@@ -11584,10 +11671,10 @@
             ],
             "correct": 6,
             "feedback": {
-              "correct": "Correct, noted in your field notebook: by Kruskal-Wallis and Dunn, leaf_mould alone has a lower pH than the other three mixes, which do not differ.",
+              "correct": "Correct, noted in your field notebook: by Dunn test, leaf_mould alone has a lower pH than the other three mixes, which do not differ.",
               "wrong": [
-                "Keep only the rows where <code>parameter</code> is \"pH\", then run <code>kruskalTest(value ~ soil_mix)</code>. It tells you whether any mix differs, not which.",
-                "Run <code>dunnTest(value ~ soil_mix)</code> on the same rows. Each of its six rows is one pair of mixes; a <code>p.adj</code> below 0.05 means that pair differs.",
+                "Keep only the rows where <code>parameter</code> is \"pH\", then run <code>dunnTest(value ~ soil_mix)</code> on them.",
+                "Each of its six rows is one pair of mixes; a <code>p.adj</code> below 0.05 means that pair differs. The test has already corrected for making six comparisons at once.",
                 "Group by <code>soil_mix</code>, not <code>garden</code>. To see which side of a pair is higher, find each mix's median: <code>group_by(soil_mix) %&gt;% summarize(median = median(value))</code>."
               ]
             }
@@ -11676,13 +11763,10 @@
         },
         {
           "src": "audio/wind_light_snow.mp3",
-          "volume": 0.35
-        },
-        {
-          "src": "audio/lamp_flames.mp3",
-          "volume": 0.12
+          "volume": 0.2
         }
-      ]
+      ],
+      "debrief": "With four soil mixes, testing every pair separately would multiply the chances of a false positive, so you used a Dunn test, which compares every pair on one shared ranking while correcting for the number of comparisons: leaf_mould alone is more acidic than the other three. Your partner reached the same answer with a Tukey test. Solving it brought the first snow."
     },
     {
       "key": "up_5b",
@@ -11727,7 +11811,7 @@
           "label": "The full soil survey",
           "starterCode": "garden_soil",
           "question": {
-            "prompt": "The full soil survey certifies phosphorus across all six gardens at once. Using the rows where <code>parameter</code> is phosphorus_mg_kg, compare <code>value</code> between every pair of the six gardens in the <code>garden</code> column (15 pairs) with pairwise t-tests, using the default pooled standard deviation and the default correction for multiple comparisons. Which statement matches the corrected results?",
+            "prompt": "The full soil survey certifies phosphorus across all six gardens at once. Using the rows where parameter is phosphorus_mg_kg, compare value between every pair of the six gardens in the garden column (15 pairs) with pairwise t-tests, using the default pooled standard deviation and the default correction for multiple comparisons. Which statement matches the corrected results?",
             "options": [
               "No pair differs (0 of 15 comparisons significant)",
               "Two groups: each of Bice, Gemma, Ines is higher than each of Clelia, Dora, Zita, and also Dora-Zita, Gemma-Ines differ (11 of 15 comparisons significant)",
@@ -11963,9 +12047,9 @@
           "ratio": 0.0,
           "delta": 0.0,
           "needsWork": false,
-          "accepted": false,
+          "accepted": true,
           "seamBandRun": 0.0,
-          "at": "2026-10-19T01:35:09",
+          "at": "2026-10-23T13:10:53",
           "states": {
             "first_snow": {
               "stage": "blurred",
@@ -11973,11 +12057,15 @@
               "ratio": 0.0,
               "delta": 0.0,
               "needsWork": false,
-              "accepted": false,
+              "accepted": true,
               "seamBandRun": 0.0,
-              "at": "2026-10-19T10:25:55"
+              "at": "2026-10-23T13:11:10",
+              "acceptedBy": "lucas via agent 2026-10-23",
+              "humanNote": "Lucas 2026-10-23: \"Please can you accept the seams for me?\" (after playing every room in the browser, clear and snow)"
             }
-          }
+          },
+          "acceptedBy": "lucas via agent 2026-10-23",
+          "humanNote": "Lucas 2026-10-23: \"Please can you accept the seams for me?\" (after playing every room in the browser)"
         }
       },
       "isBoss": true,
@@ -12039,7 +12127,7 @@
           ],
           "starterCode": "garden_soil",
           "question": {
-            "prompt": "The full soil survey certifies phosphorus across all six gardens at once. Using the rows where <code>parameter</code> is phosphorus_mg_kg, compare <code>value</code> between every pair of the six gardens in the <code>garden</code> column (15 pairs) with pairwise t-tests, using the default pooled standard deviation and the default correction for multiple comparisons. Which statement matches the corrected results?",
+            "prompt": "The full soil survey certifies phosphorus across all six gardens at once. Using the rows where parameter is phosphorus_mg_kg, compare value between every pair of the six gardens in the garden column (15 pairs) with pairwise t-tests, using the default pooled standard deviation and the default correction for multiple comparisons. Which statement matches the corrected results?",
             "options": [
               "No pair differs (0 of 15 comparisons significant)",
               "Two groups: each of Bice, Gemma, Ines is higher than each of Clelia, Dora, Zita, and also Dora-Zita, Gemma-Ines differ (11 of 15 comparisons significant)",
@@ -12151,7 +12239,8 @@
           "src": "audio/wind_light_snow.mp3",
           "volume": 0.3
         }
-      ]
+      ],
+      "debrief": "The full survey compared phosphorus between all fifteen pairs of gardens with t-tests. Run fifteen tests and a few will cross p < 0.05 by chance alone, so the function applies a correction by default (Holm's method) that raises the bar for each comparison. Gemma-Ines and Dora-Zita fall away once it is applied, leaving two clean groups: Bice, Gemma and Ines above Clelia, Dora and Zita. Your partner's pairwise Wilcoxon tests found the same two groups."
     },
     {
       "key": "up_4c",
@@ -12198,15 +12287,17 @@
           "variants": [
             {
               "state": "first_snow",
-              "when": {
-                "solved": "middle_upper"
-              },
               "box": [
                 0,
                 0,
                 1,
                 1
-              ]
+              ],
+              "prompt": "Keep this exact scene, composition, camera framing and every object precisely where it is, and change ONLY the weather, to the first snow of the year falling and beginning to settle: The same blue hour, a shade darker and softer under low grey-violet cloud; the warm lamplight glows brighter against the snow. A thin layer of fresh snow now rests on top of the crowns and on the bed soil, and the deep plum-purple of the purple beeches still shows bright and clear beneath and around it. A thin crust of snow gathering in the sag of the canvas. Every wall, door, gate, lift tower, rail, stair and tree stays exactly where it is. A thin white layer settles on roofs, parapets, railings, paving, terrace soil and the tops of leaves; the deep plum-purple foliage of this garden's purple beeches stays clearly readable through it. Large soft snowflakes fall gently through the whole scene.",
+              "panorama": "up_4c/scene_first_snow.png",
+              "when": {
+                "solved": "middle_upper"
+              }
             }
           ]
         }
@@ -12384,9 +12475,9 @@
           "ratio": 2.63,
           "delta": 6.41,
           "needsWork": false,
-          "accepted": false,
+          "accepted": true,
           "seamBandRun": 0.003,
-          "at": "2026-10-19T01:51:32",
+          "at": "2026-10-23T13:10:53",
           "states": {
             "first_snow": {
               "stage": "blurred",
@@ -12394,11 +12485,15 @@
               "ratio": 0.0,
               "delta": 0.0,
               "needsWork": false,
-              "accepted": false,
+              "accepted": true,
               "seamBandRun": 0.0,
-              "at": "2026-10-19T10:26:28"
+              "at": "2026-10-23T13:11:10",
+              "acceptedBy": "lucas via agent 2026-10-23",
+              "humanNote": "Lucas 2026-10-23: \"Please can you accept the seams for me?\" (after playing every room in the browser, clear and snow)"
             }
-          }
+          },
+          "acceptedBy": "lucas via agent 2026-10-23",
+          "humanNote": "Lucas 2026-10-23: \"Please can you accept the seams for me?\" (after playing every room in the browser)"
         }
       },
       "mapPos": {
@@ -12430,7 +12525,12 @@
           "boxSource": "moved:testplay",
           "transit": {
             "video": "up_4c/transit_lift.mp4",
-            "flat": true
+            "flat": true,
+            "byState": {
+              "first_snow": {
+                "video": "up_4c/transit_lift_snow.mp4"
+              }
+            }
           }
         },
         {
@@ -12473,7 +12573,8 @@
                 "solved": "middle_upper"
               }
             }
-          ]
+          ],
+          "noElement": true
         },
         {
           "id": "clip_base",
@@ -12532,7 +12633,8 @@
           "src": "audio/sea_far_waves.mp3",
           "volume": 0.2
         }
-      ]
+      ],
+      "debrief": "No analysis here. This is the walk home through the far gardens, now under snow."
     },
     {
       "key": "up_5c",
@@ -12579,15 +12681,17 @@
           "variants": [
             {
               "state": "first_snow",
-              "when": {
-                "solved": "middle_upper"
-              },
               "box": [
                 0,
                 0,
                 1,
                 1
-              ]
+              ],
+              "prompt": "Keep this exact scene, composition, camera framing and every object precisely where it is, and change ONLY the weather, to the first snow of the year falling and beginning to settle: The same blue hour, a shade darker and softer under low grey-violet cloud; the warm lamplight glows brighter against the snow. A thin layer of fresh snow now rests on top of the crowns and on the bed soil, and the dark green of the stone pines still shows bright and clear beneath and around it. Every wall, door, gate, lift tower, rail, stair and tree stays exactly where it is. A thin white layer settles on roofs, parapets, railings, paving, terrace soil and the tops of leaves; the dark green foliage of this garden's stone pines stays clearly readable through it. Large soft snowflakes fall gently through the whole scene.",
+              "panorama": "up_5c/scene_first_snow.png",
+              "when": {
+                "solved": "middle_upper"
+              }
             }
           ]
         }
@@ -12763,9 +12867,9 @@
           "ratio": 0.0,
           "delta": 0.0,
           "needsWork": false,
-          "accepted": false,
+          "accepted": true,
           "seamBandRun": 0.0,
-          "at": "2026-10-20T12:20:28",
+          "at": "2026-10-23T13:10:54",
           "states": {
             "first_snow": {
               "stage": "blurred",
@@ -12773,11 +12877,15 @@
               "ratio": 0.0,
               "delta": 0.0,
               "needsWork": false,
-              "accepted": false,
+              "accepted": true,
               "seamBandRun": 0.0,
-              "at": "2026-10-20T23:55:43"
+              "at": "2026-10-23T13:11:10",
+              "acceptedBy": "lucas via agent 2026-10-23",
+              "humanNote": "Lucas 2026-10-23: \"Please can you accept the seams for me?\" (after playing every room in the browser, clear and snow)"
             }
-          }
+          },
+          "acceptedBy": "lucas via agent 2026-10-23",
+          "humanNote": "Lucas 2026-10-23: \"Please can you accept the seams for me?\" (after playing every room in the browser)"
         },
         "boxesFrom": {
           "art": "d59b1ff4079a",
@@ -12827,7 +12935,12 @@
           "boxSource": "moved:testplay",
           "transit": {
             "video": "up_5c/transit_lift_reversed.mp4",
-            "flat": true
+            "flat": true,
+            "byState": {
+              "first_snow": {
+                "video": "up_5c/transit_lift_snow_reversed.mp4"
+              }
+            }
           }
         },
         {
@@ -12856,7 +12969,8 @@
                 "solved": "middle_upper"
               }
             }
-          ]
+          ],
+          "noElement": true
         },
         {
           "id": "clip_base",
@@ -12915,7 +13029,8 @@
           "src": "audio/smoulder_crackle.mp3",
           "volume": 0.3
         }
-      ]
+      ],
+      "debrief": "No analysis here. The last stretch of level 5 led you home to the planting board and the stair to the lighthouse lamp."
     },
     {
       "key": "up_stair",
@@ -13082,9 +13197,11 @@
           "ratio": 3.25,
           "delta": 3.45,
           "needsWork": false,
-          "accepted": false,
+          "accepted": true,
           "seamBandRun": 0.007,
-          "at": "2026-10-19T02:27:49"
+          "at": "2026-10-23T13:10:54",
+          "acceptedBy": "lucas via agent 2026-10-23",
+          "humanNote": "Lucas 2026-10-23: \"Please can you accept the seams for me?\" (after playing every room in the browser)"
         }
       },
       "mapPos": {
@@ -13167,7 +13284,8 @@
           "gapMin": 8,
           "gapMax": 18
         }
-      ]
+      ],
+      "debrief": "The stair opened only when two things were done: the full survey certified and the planting board set. Your own analysis finished the first, and you needed your partner for the second."
     },
     {
       "key": "up_lamp",
@@ -13340,9 +13458,11 @@
           "ratio": 1.56,
           "delta": 3.24,
           "needsWork": false,
-          "accepted": false,
+          "accepted": true,
           "seamBandRun": 0.056,
-          "at": "2026-10-19T02:44:19"
+          "at": "2026-10-23T13:10:54",
+          "acceptedBy": "lucas via agent 2026-10-23",
+          "humanNote": "Lucas 2026-10-23: \"Please can you accept the seams for me?\" (after playing every room in the browser)"
         }
       },
       "mapPos": {
@@ -13371,7 +13491,12 @@
           ],
           "direction": "open",
           "endsEscape": true,
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "transit": {
+            "video": "up_lamp/transit_finale.mp4",
+            "flat": true,
+            "rollFrom": 0
+          }
         },
         {
           "id": "back_to_the_stair",
@@ -13418,7 +13543,8 @@
           "src": "audio/surf_heavy.mp3",
           "volume": 0.2
         }
-      ]
+      ],
+      "debrief": "The lighthouse lamp tells the city its gardens are ready for winter. You lit it after answering four questions twice, with two methods that mostly agreed and, once, for good reason, did not."
     }
   ],
   "cover": "cover.png",

@@ -12,10 +12,15 @@
  *     refresh rejoins as the same callsign);
  *   - the HUD strip in the world: callsign, class total / goal, clock, "carrying N gourds";
  *   - polling /api/state every 2 s, and the paused / won / time-up / closed overlays;
- *   - the calls step 5's station and deliver hotspots make: deal(tier), answer(dealId, choice), deliver().
+ *   - the calls step 5's station and deliver hotspots make: deal(tier, track?), answer(dealId, choice), deliver(sink?);
+ *   - the whole-class experiment card (harbour, comparing means): when Lucas opens a round, the student
+ *     casts two nets on their own device (fish_stats.js, the fish board's Welch t), sees the catches and
+ *     the p, and sends ONLY that p. Shown over the landing screen too, so it works before Enter.
  * Answers never reach the browser: the server deals a task without its answer and checks every click.
  * No student data: callsigns only, never a name or x500.
  */
+
+import "./fish_stats.js?v=142";     // window.FishStats: the fish board's tests (Welch t), pinned to R
 
 const POLL_MS = 2000;
 const STORE = "liveSession";        // localStorage: { pid, code }
@@ -56,6 +61,7 @@ function injectStyle() {
     gap:14px; align-items:center; background:rgba(0,0,0,.5); border:1px solid rgba(255,216,140,.35);
     border-radius:16px; padding:6px 14px; font:14px system-ui; color:rgba(255,236,200,.95);
     user-select:none; }
+  body.liveHudOn #modal { padding-top:58px; }
   #liveHud b { color:#ffd88c; }
   #liveHud .lhClock { font:700 15px ui-monospace,Menlo,Consolas,monospace; }
   #liveHud .lhClock.low { color:#ff9b8a; }
@@ -74,10 +80,26 @@ function injectStyle() {
     border:0; border-radius:17px; background:transparent; color:#ffd88c; font:700 22px system-ui; cursor:pointer; }
   #liveOverlay .lvX:hover { background:rgba(255,216,140,.15); }
   #liveHud > * { white-space:nowrap; }
+  #liveCast { position:fixed; inset:0; z-index:70; display:none; align-items:center; justify-content:center;
+    background:rgba(4,10,16,.72); font:16px/1.45 system-ui; color:#ffecc8; }
+  #liveCast .card { position:relative; width:min(560px, calc(100% - 24px)); box-sizing:border-box; padding:18px 20px;
+    border-radius:14px; background:rgba(8,20,30,.92); border:1px solid rgba(255,216,140,.35); text-align:center; }
+  #liveCast h2 { margin:0 0 6px; color:#ffd88c; font:700 24px system-ui; }
+  #liveCast p { margin:6px 0; }
+  #liveCast button.go { font:700 20px system-ui; padding:10px 26px; border-radius:10px; border:0; margin:10px 0 4px;
+    background:#ffd88c; color:#10202c; cursor:pointer; }
+  #liveCast button.go:disabled { opacity:.5; cursor:default; }
+  #liveCast .lcX { position:absolute; top:6px; right:8px; width:34px; height:34px; border:0; border-radius:17px;
+    background:transparent; color:#ffd88c; font:700 22px system-ui; cursor:pointer; display:none; }
+  #liveCast svg { width:100%; height:auto; display:block; margin:8px 0; }
+  #liveCast .lcP { font:800 40px ui-monospace,Menlo,Consolas,monospace; color:#ffecc8; }
+  #liveCast .lcP.red { color:#ff8a7a; }
+  #liveCast .lcNote { font-size:14px; color:rgba(255,236,200,.8); }
   @media (max-width:640px) {
     #liveHud { flex-wrap:wrap; justify-content:center; row-gap:3px; column-gap:10px; font-size:12px;
       padding:5px 10px; width:max-content; max-width:calc(100% - 20px); box-sizing:border-box; }
     #liveBar { width:54px; }
+    body.liveHudOn #modal { padding-top:74px; }
   }
   `;
   document.head.appendChild(css);
@@ -156,6 +178,9 @@ export function showHud(screen) {
     screen.appendChild(ov);
   }
   $("#liveHud").style.display = "flex";
+  // The HUD floats over the top of the screen (z 25, above the modal's 20): push a modal's box below it so
+  // the HUD never covers the card's close X or its top row (the sewing table's cloth, 2026-10-26).
+  document.body.classList.add("liveHudOn");
   render();
   if (!tickTimer) tickTimer = setInterval(tick, 250);
 }
@@ -166,6 +191,7 @@ function startPolling() {
     if (!r.ok) return;
     st = r.j; stAt = Date.now();
     if (me && !st.me && st.phase !== "closed") rejoinNeeded();
+    renderCast();
     render();
     if (onChange) onChange(st);
   }).catch(() => {});
@@ -199,8 +225,12 @@ function render() {
   hud.querySelector(".lhMe").appendChild(b);
   hud.querySelector("#liveBar i").style.width = (goal ? Math.min(100, 100 * total / goal) : 0) + "%";
   hud.querySelector(".lhTotal").textContent = total + " / " + goal + (label ? " " + label : "");
-  const carrying = st.me ? st.me.carrying || 0 : 0;
-  hud.querySelector(".lhCarry").textContent = carrying ? "carrying " + plural(carrying, st.unit) : "";
+  // What you carry: the pool's own unit, then any second item (bathhouse: herb bundles, then bath tokens).
+  const carrying = st.me ? st.me.carrying || 0 : 0, heldItems = (st.me && st.me.held) || {}, bits = [];
+  if (carrying) bits.push(plural(carrying, st.unit));
+  for (const [k, n] of Object.entries(heldItems))
+    if (n) bits.push(plural(n, ((st.items || {})[k] || {}).unit));
+  hud.querySelector(".lhCarry").textContent = bits.length ? "carrying " + bits.join(" and ") : "";
   const ph = st.phase;
   if (dismissedPhase && dismissedPhase !== ph) dismissedPhase = null;    // a new phase brings its card back
   if (dismissedPhase === ph) overlay("hide");
@@ -230,12 +260,124 @@ function tick() {
 export const isJoined = () => !!me;
 export const state = () => st;
 export function onState(fn) { onChange = fn; }
-export async function deal(tier) { return api("deal", { pid: me && me.pid, tier }); }
+// `track` (optional): the station's track ("ord"); absent or "" deals from the pool's default track.
+export async function deal(tier, track) {
+  return api("deal", track ? { pid: me && me.pid, tier, track } : { pid: me && me.pid, tier });
+}
 export async function answer(dealId, choice) { return api("answer", { pid: me && me.pid, deal_id: dealId, choice }); }
 export async function skip() { return api("skip", { pid: me && me.pid }); }
-export async function deliver() {
-  const r = await api("deliver", { pid: me && me.pid });
-  if (r.ok && st) { st.total = r.j.total; if (st.me) st.me.carrying = 0; render(); }
+// `sink` (optional): a sink id (bathhouse: "bath_1") spends that sink's cost of a second item to fill it.
+export async function deliver(sink) {
+  const r = await api("deliver", sink ? { pid: me && me.pid, sink } : { pid: me && me.pid });
+  if (r.ok && st) {
+    st.total = r.j.total;
+    if (sink) { st.filled = r.j.filled_all || st.filled; if (st.me) (st.me.held = st.me.held || {})[r.j.item] = r.j.carrying; }
+    else if (st.me) st.me.carrying = 0;
+    render();
+  }
   return r;
 }
-export function noteCarrying(n) { if (st && st.me) { st.me.carrying = n; render(); } }
+export function noteCarrying(n, item) {
+  if (!(st && st.me)) return;
+  if (item) (st.me.held = st.me.held || {})[item] = n; else st.me.carrying = n;
+  render();
+}
+
+/* ---- the whole-class experiment: cast two nets, send the p ---- */
+// The waters match the fish board's normal waters (open harbor N(30, 5), harbor mouth N(35, 5)), so what a
+// student casts here is what Lucas showed on the projector. A cast is a fresh random draw every time.
+const CAST_WATERS = {
+  same: { a: ["Open harbor", 30], b: ["Open harbor", 30],
+          intro: "Both nets go into the same water, the open harbor. The fish there are all one population." },
+  two:  { a: ["Open harbor", 30], b: ["Harbor mouth", 35],
+          intro: "One net goes into the open harbor, the other into the harbor mouth." },
+};
+const CAST_SD = 5, ALPHA = 0.05;
+let castDone = null, castHidden = null;      // castDone: {round, a, b, p}; castHidden: round the student closed
+
+function castCard() {
+  injectStyle();
+  let el = $("#liveCast");
+  if (el) return el;
+  el = document.createElement("div");
+  el.id = "liveCast";
+  el.innerHTML = `<div class="card"><button class="lcX" aria-label="Close">&times;</button>
+    <h2>Cast your two nets</h2><div class="lcBody"></div></div>`;
+  el.querySelector(".lcX").onclick = () => { castHidden = st && st.exp && st.exp.round; el.style.display = "none"; };
+  document.body.appendChild(el);
+  return el;
+}
+
+function castSvg(a, b, names) {
+  const all = a.concat(b), lo = Math.floor(Math.min(...all, 15) / 5) * 5, hi = Math.ceil(Math.max(...all, 50) / 5) * 5;
+  const W = 520, x = v => 20 + (W - 40) * (v - lo) / (hi - lo);
+  const S = window.FishStats, rows = [[a, "#7fd3ff", names[0], 34], [b, "#ffb36b", names[1], 88]];
+  let g = "";
+  for (const [fish, col, name, y] of rows) {
+    g += `<text x="20" y="${y - 16}" fill="${col}" font-size="13">${name}</text>`;
+    for (const v of fish) g += `<circle cx="${x(v).toFixed(1)}" cy="${y}" r="6" fill="${col}" fill-opacity=".85"/>`;
+    const m = x(S.mean(fish));
+    g += `<line x1="${m}" x2="${m}" y1="${y - 11}" y2="${y + 11}" stroke="#fff" stroke-width="2.5"/>`;
+  }
+  let ax = `<line x1="20" x2="${W - 20}" y1="116" y2="116" stroke="#9aa6ae"/>`;
+  for (let v = lo; v <= hi; v += 5) ax += `<line x1="${x(v)}" x2="${x(v)}" y1="116" y2="121" stroke="#9aa6ae"/>` +
+    `<text x="${x(v)}" y="135" fill="#9aa6ae" font-size="11" text-anchor="middle">${v}</text>`;
+  ax += `<text x="${W / 2}" y="150" fill="#9aa6ae" font-size="11" text-anchor="middle">length (cm); white tick = net's mean</text>`;
+  return `<svg viewBox="0 0 ${W} 156" role="img" aria-label="Your two catches">${g}${ax}</svg>`;
+}
+
+function castResultHtml(c) {
+  const W = CAST_WATERS[c.water] || CAST_WATERS.same, red = c.p < ALPHA;
+  const pTxt = c.p < 0.001 ? "p < 0.001" : "p = " + c.p.toFixed(3);
+  return castSvg(c.a, c.b, ["Net A: " + W.a[0].toLowerCase(), "Net B: " + W.b[0].toLowerCase()]) +
+    `<div class="lcP${red ? " red" : ""}">${pTxt}</div>` +
+    `<p>${red ? "In the red: under 0.05, so this cast says the two nets differ." : "Not in the red: 0.05 or more, so this cast can't tell the two nets apart."}</p>` +
+    `<p class="lcNote">p is the probability of getting data this extreme if the fish in the two waters really have the same distribution.` +
+    ` Watch the screen to see every cast in the class.</p>`;
+}
+
+function renderCast() {
+  const e = st && st.exp;
+  const el = $("#liveCast");
+  if (!e || !e.open || !me || !st.me || castHidden === e.round || st.phase === "closed") {
+    if (el) el.style.display = "none";
+    return;
+  }
+  const card = castCard(), body = card.querySelector(".lcBody"), X = card.querySelector(".lcX");
+  const key = e.round + ":" + (castDone && castDone.round === e.round ? "done" : st.me.cast ? "sent" : "ready");
+  card.style.display = "flex";
+  if (body.dataset.key === key) return;            // nothing changed: leave the card alone between polls
+  body.dataset.key = key;
+  const W = CAST_WATERS[e.water] || CAST_WATERS.same;
+  if (castDone && castDone.round === e.round) {
+    body.innerHTML = castResultHtml(castDone);
+    X.style.display = "block";
+  } else if (st.me.cast) {                         // cast already (a refresh lost the picture)
+    body.innerHTML = `<p>You've cast this round. Watch the screen to see every cast in the class.</p>`;
+    X.style.display = "block";
+  } else {
+    body.innerHTML = `<p>${W.intro}</p><p>Each net brings up ${e.n} fish. Your device measures them and runs` +
+      ` Welch's t-test.</p><button class="go">Cast</button><p class="lcNote lcErr"></p>`;
+    X.style.display = "none";
+    body.querySelector(".go").onclick = ev => doCast(e, ev.target);
+  }
+}
+
+async function doCast(e, btn) {
+  btn.disabled = true;
+  const S = window.FishStats, R = S.rng(crypto.getRandomValues(new Uint32Array(1))[0]);
+  const W = CAST_WATERS[e.water] || CAST_WATERS.same;
+  const net = mu => Array.from({ length: e.n }, () => R.normal(mu, CAST_SD));
+  const a = net(W.a[1]), b = net(W.b[1]);
+  const p = S.welch(a, b).p;
+  const r = await api("cast", { pid: me && me.pid, round: e.round, p }).catch(() => ({ ok: false, j: {} }));
+  if (!r.ok) {
+    btn.disabled = false;
+    const err = $("#liveCast .lcErr");
+    if (err) err.textContent = r.j.error || "That didn't reach the class. Try again.";
+    return;
+  }
+  castDone = { round: e.round, water: e.water, a, b, p };
+  if (st && st.me) st.me.cast = true;
+  renderCast();
+}

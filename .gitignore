@@ -26,6 +26,12 @@ tests/playwright-report/
 # console's World-plate panel. Authoring-only: it is never fetched at play time, but it must stay on disk
 # (moving it breaks both the panel and the generation reference), so ignore it rather than archiving it.
 **/_world/
+# the world-check stamp (authoring_v2/world_check.py): a hash of the group's sceneSpecs + a note.
+# Authoring-only, never fetched at play time, and its 64-char hash trips the pre-push secret scan.
+**/.worldcheck_ok
+# Syncthing's in-progress transfer files (the tree is synced host2 <-> Mac). A half-copied one was
+# swept into a deploy commit on 2026-10-26, because deploy.sh stages everything.
+**/.syncthing.*.tmp
 
 # --- Keep the public repo to PLAY-REQUIRED assets only (2026-08-06) ---
 # Rule: only files the player fetches at runtime (scenario.json, play.html, referenced

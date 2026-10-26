@@ -1,0 +1,2363 @@
+{
+  "status": "in_development",
+  "chapter": "comparing_means",
+  "scenario": "harbour",
+  "live": true,
+  "title": "Salt for the Grain Ship",
+  "subtitle": "Live class · Comparing means",
+  "enterLabel": "Go down to the ship →",
+  "packages": [
+    "dplyr",
+    "ggplot2",
+    "rstatix",
+    "readr"
+  ],
+  "datasets": [
+    {
+      "name": "harbor_catch",
+      "url": "https://thebustalab.github.io/escape_rooms/rooms/comparing_means/harbour/data/harbor_catch.csv"
+    }
+  ],
+  "setup": "suppressMessages({library(dplyr); library(ggplot2); library(rstatix)})",
+  "state": {},
+  "_designNotes": {
+    "buildState": "Rooms, graph and scene specs written by _scratch/build_scenario.py (2026-10-25): the berth hub (grain ship = deliver, fish board = instrument), steps (L1), mole (L2), island (L3, by skiff). Live scenario: puzzles are dealt by the live-class server and never stored here. No codec id, no escape, ungraded."
+  },
+  "worldPlatePrompt": "One continuous single-frame view, from the city quay, of the Great Harbor of Ptolemaic Alexandria on the Egyptian coast: a long stone quay lined with warehouses and colonnades curving round a wide bay of teal water, merchant ships and fishing boats moored along it, and across the water, on its own small rock island, the Pharos lighthouse of Alexandria, a tall pale stone tower in three tiers, square, then eight-sided, then round. Clear bright morning light. Painterly realism, teal water, warm pale stone. No people, no text, nothing modern.",
+  "coverPrompt": "Minimalist stylised thumbnail poster: a broad ancient grain ship with a furled square sail moored at a pale stone quay, and far across teal water a tall three-tiered lighthouse on a small rock island. One bold, simple, high-contrast silhouette that reads at thumbnail size; flat limited palette of teal water, warm sandstone and one bright morning sky. Strong negative space, soft film grain. No people, no text.",
+  "story": "A grain ship sails from Alexandria on the morning tide, and her hold still needs salted fish; the whole class is her crew. Walk out to a fishing station, test the catch you are dealt in R, and answer from your own results to fill your barrels: one at the salting tables, two out on the fishing mole, three across the water on the lighthouse island. Carry each load back to the ship and stow it; the fish are invented, but every test is the real one.",
+  "rooms": [
+    {
+      "key": "berth",
+      "title": "The grain ship's berth",
+      "built": true,
+      "unlockedWhen": true,
+      "designNote": "HUB. The grain ship is the deliver point (carry-back: barrels count only once stowed in her hold); the fish board is the read-by-eye instrument (kind fish_board). The lighthouse is scenery only, never a hotspot.",
+      "plannedHotspots": [
+        {
+          "type": "door",
+          "direction": "open",
+          "to": "steps",
+          "label": "Along the quay to the salting tables",
+          "box": [
+            0.07,
+            0.45,
+            0.17,
+            0.53
+          ],
+          "boxSource": "review:agent-vision",
+          "boxNote": "hand-placed 2026-10-26 on the accepted still: the salting tables and barrels far along the quay on the left"
+        },
+        {
+          "type": "deliver",
+          "label": "The grain ship",
+          "box": [
+            0.2,
+            0.43,
+            0.47,
+            0.7
+          ],
+          "boxSource": "review:agent-vision",
+          "boxNote": "hand-placed 2026-10-26 on the accepted still: the whole moored ship with her plank"
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "to": "mole",
+          "label": "Out along the fishing mole",
+          "box": [
+            0.7,
+            0.475,
+            0.87,
+            0.585
+          ],
+          "boxSource": "review:agent-vision",
+          "boxNote": "hand-placed 2026-10-26 on the accepted still: the paved top of the mole running out, beyond the moored boats"
+        },
+        {
+          "type": "instrument",
+          "kind": "fish_board",
+          "label": "The fish board",
+          "box": [
+            0.735,
+            0.59,
+            0.94,
+            0.8
+          ],
+          "boxSource": "review:agent-vision",
+          "boxNote": "hand-placed 2026-10-26 on the accepted still: the trestle bench on the quay at the viewer's right",
+          "geometry": "instruments/fish_board/geometry.json",
+          "art": {
+            "board": "instruments/fish_board/board.jpg",
+            "plank": "instruments/fish_board/plank_s.png",
+            "fish": "instruments/fish_board/fish_s.png",
+            "dial": "instruments/fish_board/dial_s.png",
+            "needle": "instruments/fish_board/needle_s.png",
+            "net": "instruments/fish_board/net_s.png",
+            "lamp": "instruments/fish_board/lamp_s.png",
+            "lever": "instruments/fish_board/lever_s.png"
+          }
+        }
+      ],
+      "authoring": {
+        "sceneSpec": {
+          "room": "berth",
+          "setting": "the great stone quay of Alexandria's Great Harbor on a clear morning, where a broad grain ship lies moored alongside, loading for the morning tide",
+          "interior": false,
+          "indoor": false,
+          "seam": "the long plain sunlit stone face of a warehouse wall at the back of the quay, calm and even",
+          "seamOccluder": "one squat round stone mooring bollard standing on the quay",
+          "elements": [
+            {
+              "id": "seam_left",
+              "at": "on the far left",
+              "desc": "the left half of the calm view directly behind the viewer: the long plain sunlit stone face of a warehouse wall at the back of the quay, joining its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "salting_tables",
+              "at": "to the left",
+              "label": "Along the quay to the salting tables",
+              "door": {
+                "direction": "open",
+                "to": "steps"
+              },
+              "desc": "from the paving under the viewer, the quay runs on level along the harbor's edge, past the grain ship's stern, to where low wooden salting tables and lidded barrels stand under the white wall of a salt store, small with distance, warehouse fronts along the quay's back"
+            },
+            {
+              "id": "ship",
+              "at": "just left of centre",
+              "label": "The grain ship",
+              "deliver": true,
+              "desc": "close to the viewer, a broad-beamed wooden grain ship lies afloat in the harbor with her whole side against the quay, the quay's edge dropping a man's height sheer to the water and her waterline down in the harbor, her deck a little above the quay so a wide plank slopes up from the quay's edge to her deck, two heavy hawsers running from her bow and stern to stone bollards on the quay, her hull dark and tarred, her single great square sail furled along its yard, her hold hatch open amidships with a few empty barrels standing by it",
+              "motion": {
+                "moves": true,
+                "vigour": "a long red pennant streaming from her masthead in the sea breeze",
+                "phrase": "the long red pennant at the grain ship's masthead streams and ripples in the sea breeze, waves running along it from mast to tip"
+              },
+              "sound": {
+                "source": "the pennant and the ship's rigging in the breeze",
+                "character": "a soft flutter and the creak of rope and timber",
+                "prominence": "hero"
+              }
+            },
+            {
+              "id": "pharos",
+              "at": "dead ahead in the centre",
+              "desc": "the wide open harbor straight ahead, teal and glittering, and far across it, about a mile off, a small low rock island standing alone in the water and the Pharos lighthouse of Alexandria, a tall pale stone tower in three tiers, square, then eight-sided, then round rising high above it, a small fire smoking at its crown, open water all round the island"
+            },
+            {
+              "id": "mole",
+              "at": "just right of centre",
+              "label": "Out along the fishing mole",
+              "door": {
+                "direction": "open",
+                "to": "mole"
+              },
+              "desc": "a little way along the quay, a long straight stone mole runs out from the same quay into the harbor at the level of the quay, paved on top, open water on both sides, two small fishing boats moored along it, a mooring post standing at its far end well out in the bay"
+            },
+            {
+              "id": "fish_board",
+              "at": "to the right",
+              "label": "The fish board",
+              "instrument": "fish_board",
+              "desc": "a few strides from the viewer on the quay, standing square to the viewer, a long low fish-measuring table on two wooden trestles, its top one broad pale cedar board with a narrow blank bronze strip along its near edge and a square stop block at its left end, bare and empty, nothing on it"
+            },
+            {
+              "id": "seam_right",
+              "at": "on the far right",
+              "desc": "the right half of the calm view directly behind the viewer: the long plain sunlit stone face of a warehouse wall at the back of the quay, joining its other half cleanly at the seam directly behind you"
+            }
+          ],
+          "soundBed": "a busy stone harbor quay in the morning: water lapping at the quay wall, gulls, a light sea breeze.",
+          "rigid": "the quay, the warehouses, the ship's hull and mast, the plank, the mole, the fish board, the lighthouse",
+          "atmosphere": "Clear morning light off the water, crisp shadows across warm pale stone, the colors of Ptolemaic Alexandria: teal-green harbor water, warm pale sandstone and limestone, sun-bleached timber, white and ochre sails, red-brown terracotta, gulls and a light sea haze, painterly, cinematic, open and bright, subtle film grain",
+          "styleLight": "a clear bright morning, the sun well up in the east over the city: warm low light glancing off the water, crisp short shadows on pale stone, a clear pale-blue sky with a few high thin clouds",
+          "negatives": "No people, no figures, no animals except gulls, no lettering, signs, numerals or text anywhere. Nothing modern: no metal cranes, engines, concrete, electric lights, plastic or motorboats. No causeway, bridge or spit of land joins the lighthouse island to the city, and nothing built reaches it from the shore: open water all round the island. Only ONE lighthouse. The fish board's top is bare: no fish, no tools, no markings, no ruler ticks, graduations, engraved marks or numbers on its bronze strip. Only ONE large ship at this quay: the grain ship, afloat, never on land, her plank onto her deck, not into the water. The mole is straight and level with the quay, not a bridge or arches. The outermost 184 px at each side edge show only the long plain sunlit stone face of the warehouse wall, one flat wall square to the viewer with no corner, return or turning of the wall, above one unbroken run of plain pale quay paving. No barrels, crates, awnings, stalls, tables, trestles, bollards, palm trees or cast shadows of any of them stand within 184 px of either edge; the wall and paving are the same flat surface on both sides of the join. At the seam directly behind the viewer there is NO corner: the warehouse wall is one single flat plane square to the viewer, running straight and unbroken across the whole width of the image, with no convex or concave corner, no return, no turning face and no change in the wall's angle at either edge. The outermost 184 px at each side edge show only that flat sunlit stone wall above one unbroken run of plain pale quay paving, the same flat surface on both sides of the join. No trestle table, fish board, barrel, crate, stall, awning, bollard or warehouse annex stands within 184 px of either edge, and no cast shadow of any such object falls within it; every table, barrel and stall stands well in from the edge, with bare wall and bare paving between it and that edge. The outermost 184 px at each side edge show only one flat plain sunlit stone warehouse wall, a single plane square to the viewer, running straight across the whole width with NO corner: no convex or concave corner, no return, no turn of the wall, no diagonal where wall meets paving. Below it runs one unbroken flat level run of plain pale quay paving, its slab joints running square to the viewer, with no V-shaped or converging seam in the paving at the join. The fish-measuring table and its trestles, any barrels, amphorae, crates, canopies, awnings, stalls, salting tables and bollards, and the cast shadow of any of them, stand NOWHERE within 184 px of either edge; the fish board stands inboard of the right-hand margin, and the salting tables and their barrels stand inboard of the left-hand margin, small and far along the quay. The outermost 184 px at each side edge show only the one flat plain sunlit stone face of the warehouse wall, square to the viewer and running straight and unbroken across the edge, above one unbroken run of plain pale quay paving; the wall never turns, folds or returns round a convex or concave corner at the join. Absolutely no trestle, table, barrel, crate, awning, stall, bollard, palm tree, or any cast shadow of them within 184 px of either edge. The fish board stands only at its place right of centre, and no second table or trestle appears anywhere in the view.",
+          "states": {},
+          "continuity": [],
+          "scaffold": {
+            "kind": "skeleton",
+            "layout": {
+              "world": {
+                "eye": [
+                  0.0,
+                  2.0,
+                  -9.0
+                ],
+                "heading": -10.0,
+                "blocks": [
+                  [
+                    "walk",
+                    -320.0,
+                    420.0,
+                    0.0,
+                    2.0,
+                    -40.0,
+                    0.0,
+                    "quay"
+                  ],
+                  [
+                    "wall",
+                    -320.0,
+                    420.0,
+                    2.0,
+                    14.0,
+                    -90.0,
+                    -40.0,
+                    "warehouses"
+                  ],
+                  [
+                    "wall",
+                    20.0,
+                    66.0,
+                    0.0,
+                    6.0,
+                    2.0,
+                    13.0,
+                    "ship"
+                  ],
+                  [
+                    "rail",
+                    43.0,
+                    44.0,
+                    6.0,
+                    34.0,
+                    7.0,
+                    8.0,
+                    "ship_mast"
+                  ],
+                  [
+                    "walk",
+                    23.0,
+                    26.0,
+                    2.0,
+                    2.2,
+                    -0.5,
+                    3.0,
+                    "gangplank"
+                  ],
+                  [
+                    "wall",
+                    -11.0,
+                    -5.0,
+                    2.0,
+                    2.95,
+                    -13.0,
+                    -11.5,
+                    "fish_board"
+                  ],
+                  [
+                    "walk",
+                    104.0,
+                    112.0,
+                    -38.283,
+                    1.717,
+                    0.0,
+                    1.167,
+                    "harbor_steps"
+                  ],
+                  [
+                    "walk",
+                    104.0,
+                    112.0,
+                    -38.567,
+                    1.433,
+                    1.167,
+                    2.333,
+                    "harbor_steps"
+                  ],
+                  [
+                    "walk",
+                    104.0,
+                    112.0,
+                    -38.85,
+                    1.15,
+                    2.333,
+                    3.5,
+                    "harbor_steps"
+                  ],
+                  [
+                    "walk",
+                    104.0,
+                    112.0,
+                    -39.133,
+                    0.867,
+                    3.5,
+                    4.667,
+                    "harbor_steps"
+                  ],
+                  [
+                    "walk",
+                    104.0,
+                    112.0,
+                    -39.417,
+                    0.583,
+                    4.667,
+                    5.833,
+                    "harbor_steps"
+                  ],
+                  [
+                    "walk",
+                    104.0,
+                    112.0,
+                    -39.7,
+                    0.3,
+                    5.833,
+                    7.0,
+                    "harbor_steps"
+                  ],
+                  [
+                    "rail",
+                    103.88,
+                    104.12,
+                    2.0,
+                    3.15,
+                    0.08,
+                    0.32,
+                    "harbor_steps"
+                  ],
+                  [
+                    "rail",
+                    111.88,
+                    112.12,
+                    2.0,
+                    3.15,
+                    0.08,
+                    0.32,
+                    "harbor_steps"
+                  ],
+                  [
+                    "wall",
+                    114.0,
+                    126.0,
+                    2.0,
+                    2.95,
+                    -7.0,
+                    -3.0,
+                    "salting_tables"
+                  ],
+                  [
+                    "wall",
+                    128.0,
+                    132.0,
+                    2.0,
+                    3.1,
+                    -9.0,
+                    -5.0,
+                    "salt_barrels"
+                  ],
+                  [
+                    "walk",
+                    -167.0,
+                    -153.0,
+                    0.0,
+                    2.0,
+                    0.0,
+                    130.0,
+                    "mole"
+                  ],
+                  [
+                    "wall",
+                    -172.0,
+                    -168.0,
+                    0.0,
+                    1.6,
+                    86.0,
+                    101.0,
+                    "boats"
+                  ],
+                  [
+                    "wall",
+                    -172.0,
+                    -168.0,
+                    0.0,
+                    1.6,
+                    104.0,
+                    119.0,
+                    "boats"
+                  ],
+                  [
+                    "wall",
+                    -156.0,
+                    -155.0,
+                    2.0,
+                    2.7,
+                    126.0,
+                    127.0,
+                    "skiff_post"
+                  ],
+                  [
+                    "wall",
+                    -152.0,
+                    -149.0,
+                    0.0,
+                    0.9,
+                    120.0,
+                    129.0,
+                    "skiff"
+                  ],
+                  [
+                    "walk",
+                    -120.0,
+                    260.0,
+                    0.0,
+                    5.0,
+                    640.0,
+                    860.0,
+                    "island"
+                  ],
+                  [
+                    "walk",
+                    -40.0,
+                    -24.0,
+                    -40.0,
+                    4.217,
+                    638.0,
+                    640.0,
+                    "landing_steps"
+                  ],
+                  [
+                    "walk",
+                    -40.0,
+                    -24.0,
+                    -40.0,
+                    3.433,
+                    636.0,
+                    638.0,
+                    "landing_steps"
+                  ],
+                  [
+                    "walk",
+                    -40.0,
+                    -24.0,
+                    -40.0,
+                    2.65,
+                    634.0,
+                    636.0,
+                    "landing_steps"
+                  ],
+                  [
+                    "walk",
+                    -40.0,
+                    -24.0,
+                    -40.0,
+                    1.867,
+                    632.0,
+                    634.0,
+                    "landing_steps"
+                  ],
+                  [
+                    "walk",
+                    -40.0,
+                    -24.0,
+                    -40.0,
+                    1.083,
+                    630.0,
+                    632.0,
+                    "landing_steps"
+                  ],
+                  [
+                    "walk",
+                    -40.0,
+                    -24.0,
+                    -40.0,
+                    0.3,
+                    628.0,
+                    630.0,
+                    "landing_steps"
+                  ],
+                  [
+                    "tower",
+                    -115.0,
+                    -65.0,
+                    5.0,
+                    120.0,
+                    770.0,
+                    820.0,
+                    "pharos"
+                  ],
+                  [
+                    "wall",
+                    -70.0,
+                    -64.0,
+                    5.0,
+                    6.6,
+                    646.0,
+                    662.0,
+                    "beached_boats"
+                  ],
+                  [
+                    "wall",
+                    -84.0,
+                    -78.0,
+                    5.0,
+                    6.6,
+                    650.0,
+                    666.0,
+                    "beached_boats"
+                  ],
+                  [
+                    "wall",
+                    -96.0,
+                    -90.0,
+                    5.0,
+                    6.6,
+                    646.0,
+                    662.0,
+                    "beached_boats"
+                  ],
+                  [
+                    "wall",
+                    -110.0,
+                    -104.0,
+                    5.0,
+                    6.6,
+                    650.0,
+                    666.0,
+                    "beached_boats"
+                  ]
+                ],
+                "doors": [],
+                "joins": "Here: the stone quay under the viewer, running level left and right along the harbor; ahead and a little to the left, the grain ship lies moored against the same quay, a plank from the quay to her deck; to the left beyond her stern, the quay runs on level along the harbor to the harbor steps; ahead and to the right, a long stone mole runs out from the same quay into the harbor; on the right, a few strides off, a long measuring table on trestles stands on the quay; dead ahead across the water, the lighthouse stands on its island."
+              }
+            }
+          },
+          "worldPlateRef": false,
+          "motionClosing": "Only the pennant moves; the ship, the quay, the mole, the fish board and the lighthouse stay exactly where they are."
+        },
+        "scenePrompt": "This is a seamless 360-degree panorama from the great stone quay of Alexandria's Great Harbor on a clear morning, where a broad grain ship lies moored alongside, loading for the morning tide. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the long plain sunlit stone face of a warehouse wall at the back of the quay, calm and even: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: the long plain sunlit stone face of a warehouse wall at the back of the quay, joining its other half cleanly at the seam directly behind you; to the left, from the paving under the viewer, the quay runs on level along the harbor's edge, past the grain ship's stern, to where low wooden salting tables and lidded barrels stand under the white wall of a salt store, small with distance, warehouse fronts along the quay's back; just left of centre, close to the viewer, a broad-beamed wooden grain ship lies afloat in the harbor with her whole side against the quay, the quay's edge dropping a man's height sheer to the water and her waterline down in the harbor, her deck a little above the quay so a wide plank slopes up from the quay's edge to her deck, two heavy hawsers running from her bow and stern to stone bollards on the quay, her hull dark and tarred, her single great square sail furled along its yard, her hold hatch open amidships with a few empty barrels standing by it, a long red pennant streaming from her masthead in the sea breeze; dead ahead in the centre, the wide open harbor straight ahead, teal and glittering, and far across it, about a mile off, a small low rock island standing alone in the water and the Pharos lighthouse of Alexandria, a tall pale stone tower in three tiers, square, then eight-sided, then round rising high above it, a small fire smoking at its crown, open water all round the island; just right of centre, a little way along the quay, a long straight stone mole runs out from the same quay into the harbor at the level of the quay, paved on top, open water on both sides, two small fishing boats moored along it, a mooring post standing at its far end well out in the bay; to the right, a few strides from the viewer on the quay, standing square to the viewer, a long low fish-measuring table on two wooden trestles, its top one broad pale cedar board with a narrow blank bronze strip along its near edge and a square stop block at its left end, bare and empty, nothing on it; on the far right, the right half of the calm view directly behind the viewer: the long plain sunlit stone face of a warehouse wall at the back of the quay, joining its other half cleanly at the seam directly behind you. Clear morning light off the water, crisp shadows across warm pale stone, the colors of Ptolemaic Alexandria: teal-green harbor water, warm pale sandstone and limestone, sun-bleached timber, white and ochre sails, red-brown terracotta, gulls and a light sea haze, painterly, cinematic, open and bright, subtle film grain. No people, no figures, no animals except gulls, no lettering, signs, numerals or text anywhere. Nothing modern: no metal cranes, engines, concrete, electric lights, plastic or motorboats. No causeway, bridge or spit of land joins the lighthouse island to the city, and nothing built reaches it from the shore: open water all round the island. Only ONE lighthouse. The fish board's top is bare: no fish, no tools, no markings, no ruler ticks, graduations, engraved marks or numbers on its bronze strip. Only ONE large ship at this quay: the grain ship, afloat, never on land, her plank onto her deck, not into the water. The mole is straight and level with the quay, not a bridge or arches. The outermost 184 px at each side edge show only the long plain sunlit stone face of the warehouse wall, one flat wall square to the viewer with no corner, return or turning of the wall, above one unbroken run of plain pale quay paving. No barrels, crates, awnings, stalls, tables, trestles, bollards, palm trees or cast shadows of any of them stand within 184 px of either edge; the wall and paving are the same flat surface on both sides of the join. At the seam directly behind the viewer there is NO corner: the warehouse wall is one single flat plane square to the viewer, running straight and unbroken across the whole width of the image, with no convex or concave corner, no return, no turning face and no change in the wall's angle at either edge. The outermost 184 px at each side edge show only that flat sunlit stone wall above one unbroken run of plain pale quay paving, the same flat surface on both sides of the join. No trestle table, fish board, barrel, crate, stall, awning, bollard or warehouse annex stands within 184 px of either edge, and no cast shadow of any such object falls within it; every table, barrel and stall stands well in from the edge, with bare wall and bare paving between it and that edge. The outermost 184 px at each side edge show only one flat plain sunlit stone warehouse wall, a single plane square to the viewer, running straight across the whole width with NO corner: no convex or concave corner, no return, no turn of the wall, no diagonal where wall meets paving. Below it runs one unbroken flat level run of plain pale quay paving, its slab joints running square to the viewer, with no V-shaped or converging seam in the paving at the join. The fish-measuring table and its trestles, any barrels, amphorae, crates, canopies, awnings, stalls, salting tables and bollards, and the cast shadow of any of them, stand NOWHERE within 184 px of either edge; the fish board stands inboard of the right-hand margin, and the salting tables and their barrels stand inboard of the left-hand margin, small and far along the quay. The outermost 184 px at each side edge show only the one flat plain sunlit stone face of the warehouse wall, square to the viewer and running straight and unbroken across the edge, above one unbroken run of plain pale quay paving; the wall never turns, folds or returns round a convex or concave corner at the join. Absolutely no trestle, table, barrel, crate, awning, stall, bollard, palm tree, or any cast shadow of them within 184 px of either edge. The fish board stands only at its place right of centre, and no second table or trestle appears anywhere in the view. Shot on a full-frame DSLR at 24mm, f/8, a clear bright morning, the sun well up in the east over the city: warm low light glancing off the water, crisp short shadows on pale stone, a clear pale-blue sky with a few high thin clouds, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into the long plain sunlit stone face of a warehouse wall at the back of the quay, calm and even, with no visible seam, join, or repetition.",
+        "seam": {
+          "stage": "screened",
+          "band": "sky",
+          "ratio": 3.65,
+          "delta": 0.92,
+          "needsWork": false,
+          "accepted": true,
+          "seamBandRun": 0.011,
+          "at": "2026-10-25T22:38:42",
+          "acceptedBy": "lucas via agent 2026-10-25",
+          "humanNote": "Lucas 2026-10-25: 'it's fine with me as is' (the seam wall corner reads as a building corner behind the viewer; the fish board painted as a plain bench is fine, the instrument opens on its own art)"
+        },
+        "boxesFrom": {
+          "art": "f03cc64dce42",
+          "at": "2026-10-26T10:20:40"
+        }
+      },
+      "panorama": "berth/scene.png",
+      "builtFrom": "l1_berth_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "hotspots": [
+        {
+          "id": "along_the_quay_to_the_salting_tables",
+          "type": "door",
+          "label": "Along the quay to the salting tables",
+          "box": [
+            0.07,
+            0.45,
+            0.17,
+            0.53
+          ],
+          "direction": "open",
+          "to": "steps",
+          "boxSource": "review:agent-vision",
+          "boxNote": "hand-placed 2026-10-26 on the accepted still: the salting tables and barrels far along the quay on the left"
+        },
+        {
+          "id": "the_grain_ship",
+          "type": "deliver",
+          "label": "The grain ship",
+          "box": [
+            0.2,
+            0.43,
+            0.47,
+            0.7
+          ],
+          "boxSource": "review:agent-vision",
+          "boxNote": "hand-placed 2026-10-26 on the accepted still: the whole moored ship with her plank"
+        },
+        {
+          "id": "out_along_the_fishing_mole",
+          "type": "door",
+          "label": "Out along the fishing mole",
+          "box": [
+            0.7,
+            0.475,
+            0.87,
+            0.585
+          ],
+          "direction": "open",
+          "to": "mole",
+          "boxSource": "review:agent-vision",
+          "boxNote": "hand-placed 2026-10-26 on the accepted still: the paved top of the mole running out, beyond the moored boats"
+        },
+        {
+          "id": "the_fish_board",
+          "type": "instrument",
+          "label": "The fish board",
+          "box": [
+            0.735,
+            0.59,
+            0.94,
+            0.8
+          ],
+          "kind": "fish_board",
+          "boxSource": "review:agent-vision",
+          "boxNote": "hand-placed 2026-10-26 on the accepted still: the trestle bench on the quay at the viewer's right",
+          "geometry": "instruments/fish_board/geometry.json",
+          "art": {
+            "board": "instruments/fish_board/board.jpg",
+            "plank": "instruments/fish_board/plank_s.png",
+            "fish": "instruments/fish_board/fish_s.png",
+            "dial": "instruments/fish_board/dial_s.png",
+            "needle": "instruments/fish_board/needle_s.png",
+            "net": "instruments/fish_board/net_s.png",
+            "lamp": "instruments/fish_board/lamp_s.png",
+            "lever": "instruments/fish_board/lever_s.png"
+          }
+        },
+        {
+          "id": "clip_base",
+          "type": "ambient",
+          "label": "Scene motion (base)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/play-source.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "berth/cine_base.mp4"
+          }
+        }
+      ],
+      "sfx": [
+        {
+          "src": "audio/berth_bed_port_calm.mp3",
+          "mode": "loop",
+          "volume": 0.12
+        },
+        {
+          "src": "audio/berth_hull_creak.mp3",
+          "mode": "interval",
+          "volume": 0.3,
+          "gapMin": 10,
+          "gapMax": 25
+        },
+        {
+          "src": "audio/berth_gull_call.mp3",
+          "mode": "interval",
+          "volume": 0.14,
+          "gapMin": 14,
+          "gapMax": 34
+        }
+      ]
+    },
+    {
+      "key": "steps",
+      "title": "The salting tables",
+      "built": true,
+      "unlockedWhen": true,
+      "designNote": "LEVEL 1 station (1 barrel). The server deals a tier-1 task; no puzzle content here.",
+      "plannedHotspots": [
+        {
+          "type": "station",
+          "tier": 1,
+          "label": "The salting tables",
+          "box": [
+            0.153,
+            0.4,
+            0.34,
+            0.61
+          ],
+          "boxSource": "review:agent-vision",
+          "boxNote": "hand-placed 2026-10-26 on the accepted still: the salting tables and salt baskets on the left"
+        },
+        {
+          "type": "door",
+          "direction": "back",
+          "to": "berth",
+          "label": "Back along the quay to the grain ship",
+          "box": [
+            0.77,
+            0.25,
+            0.89,
+            0.56
+          ],
+          "boxSource": "review:agent-vision",
+          "boxNote": "hand-placed 2026-10-26 on the accepted still: the quay running back to the moored ship on the right"
+        }
+      ],
+      "authoring": {
+        "sceneSpec": {
+          "room": "steps",
+          "setting": "the salting yard on Alexandria's great stone quay, a short walk along the quay from the grain ship, under the white walls of a salt store, where a broad old fish-landing stair goes down into the harbor, on a clear morning",
+          "interior": false,
+          "indoor": false,
+          "seam": "the plain whitewashed wall of the salt store, sunlit, calm and even",
+          "seamOccluder": "one stack of three wooden salt crates standing on the quay",
+          "elements": [
+            {
+              "id": "seam_left",
+              "at": "on the far left",
+              "desc": "the left half of the calm view directly behind the viewer: the plain whitewashed wall of the salt store, joining its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "quay_on",
+              "at": "to the left",
+              "desc": "the quay running on a short way along the harbor's edge and ending at the high blank wall of a warehouse block standing across it, a closed timber gate in that wall, sacks of salt stacked in the shade of the salt store's colonnade along the quay's back"
+            },
+            {
+              "id": "salting_tables",
+              "at": "just left of centre",
+              "label": "The salting tables",
+              "station": 1,
+              "desc": "a few strides from the viewer at the quay's edge, a row of long low wooden salting tables on trestles standing on the paving beside the head of the stair, their tops scrubbed pale and sprinkled with coarse white salt, heaps of salt in shallow baskets beside them, and beyond them a neat stack of identical lidded wooden barrels"
+            },
+            {
+              "id": "harbor_steps",
+              "at": "dead ahead in the centre",
+              "desc": "a broad, shallow old stone stair, many steps wide, going down from the quay's edge into the clear teal water, its lower steps sunk under the water and green with weed, the quay wall standing sheer from the water on both sides of it, a heavy rope slung between two short posts across its top step, closing it",
+              "motion": {
+                "moves": true,
+                "vigour": "the water washing up over the lowest steps and drawing back",
+                "phrase": "the harbor water washes gently up over the lowest steps and draws back again, small ripples running along the stone"
+              },
+              "sound": {
+                "source": "the water on the steps",
+                "character": "a soft slap and gurgle against stone",
+                "prominence": "hero"
+              }
+            },
+            {
+              "id": "pharos",
+              "at": "just right of centre",
+              "desc": "across the open teal harbor, about a mile off, a small low rock island standing alone in the water, the Pharos lighthouse of Alexandria, a tall pale stone tower in three tiers, square, then eight-sided, then round small with distance on it, open water all round the island"
+            },
+            {
+              "id": "ship",
+              "at": "to the right",
+              "label": "Back along the quay to the grain ship",
+              "door": {
+                "direction": "back",
+                "to": "berth"
+              },
+              "desc": "from the paving under the viewer, the quay runs back level along the harbor's edge to the broad grain ship lying moored against it, her furled sail and tall mast standing over the quay"
+            },
+            {
+              "id": "seam_right",
+              "at": "on the far right",
+              "desc": "the right half of the calm view directly behind the viewer: the plain whitewashed wall of the salt store, joining its other half cleanly at the seam directly behind you"
+            }
+          ],
+          "soundBed": "a stone quay at the water's edge in the morning: water on stone, gulls overhead, a light breeze.",
+          "rigid": "the quay, the steps, the salting tables, the barrels, the warehouses, the ship, the lighthouse",
+          "atmosphere": "Clear morning light, the sun behind the viewer's right shoulder, glittering water, white salt and whitewash bright in the sun, the colors of Ptolemaic Alexandria: teal-green harbor water, warm pale sandstone and limestone, sun-bleached timber, white and ochre sails, red-brown terracotta, gulls and a light sea haze, painterly, cinematic, subtle film grain",
+          "styleLight": "a clear bright morning, the sun well up in the east over the city: warm low light glancing off the water, crisp short shadows on pale stone, a clear pale-blue sky with a few high thin clouds",
+          "negatives": "No people, no figures, no animals except gulls, no lettering, signs, numerals or text anywhere. Nothing modern: no metal cranes, engines, concrete, electric lights, plastic or motorboats. No causeway, bridge or spit of land joins the lighthouse island to the city, and nothing built reaches it from the shore: open water all round the island. Only ONE lighthouse. The salting tables are bare of fish: salt only, no fish, no knives, no blood. The stair goes down into the water and stops there: no boat, no ring, no fittings, the rope closing its top. The quay ends at the warehouse block's wall: no quay running on into the distance. All the barrels alike, lidded.",
+          "states": {},
+          "continuity": [],
+          "scaffold": {
+            "kind": "skeleton",
+            "layout": {
+              "world": {
+                "eye": [
+                  100.0,
+                  2.0,
+                  -4.0
+                ],
+                "heading": 30.0,
+                "blocks": [
+                  [
+                    "walk",
+                    -320.0,
+                    420.0,
+                    0.0,
+                    2.0,
+                    -40.0,
+                    0.0,
+                    "quay"
+                  ],
+                  [
+                    "wall",
+                    -320.0,
+                    420.0,
+                    2.0,
+                    14.0,
+                    -90.0,
+                    -40.0,
+                    "warehouses"
+                  ],
+                  [
+                    "wall",
+                    20.0,
+                    66.0,
+                    0.0,
+                    6.0,
+                    2.0,
+                    13.0,
+                    "ship"
+                  ],
+                  [
+                    "rail",
+                    43.0,
+                    44.0,
+                    6.0,
+                    34.0,
+                    7.0,
+                    8.0,
+                    "ship_mast"
+                  ],
+                  [
+                    "walk",
+                    23.0,
+                    26.0,
+                    2.0,
+                    2.2,
+                    -0.5,
+                    3.0,
+                    "gangplank"
+                  ],
+                  [
+                    "wall",
+                    -11.0,
+                    -5.0,
+                    2.0,
+                    2.95,
+                    -13.0,
+                    -11.5,
+                    "fish_board"
+                  ],
+                  [
+                    "walk",
+                    104.0,
+                    112.0,
+                    -38.283,
+                    1.717,
+                    0.0,
+                    1.167,
+                    "harbor_steps"
+                  ],
+                  [
+                    "walk",
+                    104.0,
+                    112.0,
+                    -38.567,
+                    1.433,
+                    1.167,
+                    2.333,
+                    "harbor_steps"
+                  ],
+                  [
+                    "walk",
+                    104.0,
+                    112.0,
+                    -38.85,
+                    1.15,
+                    2.333,
+                    3.5,
+                    "harbor_steps"
+                  ],
+                  [
+                    "walk",
+                    104.0,
+                    112.0,
+                    -39.133,
+                    0.867,
+                    3.5,
+                    4.667,
+                    "harbor_steps"
+                  ],
+                  [
+                    "walk",
+                    104.0,
+                    112.0,
+                    -39.417,
+                    0.583,
+                    4.667,
+                    5.833,
+                    "harbor_steps"
+                  ],
+                  [
+                    "walk",
+                    104.0,
+                    112.0,
+                    -39.7,
+                    0.3,
+                    5.833,
+                    7.0,
+                    "harbor_steps"
+                  ],
+                  [
+                    "rail",
+                    103.88,
+                    104.12,
+                    2.0,
+                    3.15,
+                    0.08,
+                    0.32,
+                    "harbor_steps"
+                  ],
+                  [
+                    "rail",
+                    111.88,
+                    112.12,
+                    2.0,
+                    3.15,
+                    0.08,
+                    0.32,
+                    "harbor_steps"
+                  ],
+                  [
+                    "wall",
+                    114.0,
+                    126.0,
+                    2.0,
+                    2.95,
+                    -7.0,
+                    -3.0,
+                    "salting_tables"
+                  ],
+                  [
+                    "wall",
+                    128.0,
+                    132.0,
+                    2.0,
+                    3.1,
+                    -9.0,
+                    -5.0,
+                    "salt_barrels"
+                  ],
+                  [
+                    "walk",
+                    -167.0,
+                    -153.0,
+                    0.0,
+                    2.0,
+                    0.0,
+                    130.0,
+                    "mole"
+                  ],
+                  [
+                    "wall",
+                    -172.0,
+                    -168.0,
+                    0.0,
+                    1.6,
+                    86.0,
+                    101.0,
+                    "boats"
+                  ],
+                  [
+                    "wall",
+                    -172.0,
+                    -168.0,
+                    0.0,
+                    1.6,
+                    104.0,
+                    119.0,
+                    "boats"
+                  ],
+                  [
+                    "wall",
+                    -156.0,
+                    -155.0,
+                    2.0,
+                    2.7,
+                    126.0,
+                    127.0,
+                    "skiff_post"
+                  ],
+                  [
+                    "wall",
+                    -152.0,
+                    -149.0,
+                    0.0,
+                    0.9,
+                    120.0,
+                    129.0,
+                    "skiff"
+                  ],
+                  [
+                    "walk",
+                    -120.0,
+                    260.0,
+                    0.0,
+                    5.0,
+                    640.0,
+                    860.0,
+                    "island"
+                  ],
+                  [
+                    "walk",
+                    -40.0,
+                    -24.0,
+                    -40.0,
+                    4.217,
+                    638.0,
+                    640.0,
+                    "landing_steps"
+                  ],
+                  [
+                    "walk",
+                    -40.0,
+                    -24.0,
+                    -40.0,
+                    3.433,
+                    636.0,
+                    638.0,
+                    "landing_steps"
+                  ],
+                  [
+                    "walk",
+                    -40.0,
+                    -24.0,
+                    -40.0,
+                    2.65,
+                    634.0,
+                    636.0,
+                    "landing_steps"
+                  ],
+                  [
+                    "walk",
+                    -40.0,
+                    -24.0,
+                    -40.0,
+                    1.867,
+                    632.0,
+                    634.0,
+                    "landing_steps"
+                  ],
+                  [
+                    "walk",
+                    -40.0,
+                    -24.0,
+                    -40.0,
+                    1.083,
+                    630.0,
+                    632.0,
+                    "landing_steps"
+                  ],
+                  [
+                    "walk",
+                    -40.0,
+                    -24.0,
+                    -40.0,
+                    0.3,
+                    628.0,
+                    630.0,
+                    "landing_steps"
+                  ],
+                  [
+                    "tower",
+                    -115.0,
+                    -65.0,
+                    5.0,
+                    120.0,
+                    770.0,
+                    820.0,
+                    "pharos"
+                  ],
+                  [
+                    "wall",
+                    -70.0,
+                    -64.0,
+                    5.0,
+                    6.6,
+                    646.0,
+                    662.0,
+                    "beached_boats"
+                  ],
+                  [
+                    "wall",
+                    -84.0,
+                    -78.0,
+                    5.0,
+                    6.6,
+                    650.0,
+                    666.0,
+                    "beached_boats"
+                  ],
+                  [
+                    "wall",
+                    -96.0,
+                    -90.0,
+                    5.0,
+                    6.6,
+                    646.0,
+                    662.0,
+                    "beached_boats"
+                  ],
+                  [
+                    "wall",
+                    -110.0,
+                    -104.0,
+                    5.0,
+                    6.6,
+                    650.0,
+                    666.0,
+                    "beached_boats"
+                  ]
+                ],
+                "doors": [],
+                "joins": "Here: the stone quay under the viewer; ahead and a little to the left, salting tables and barrels stand on the same quay at its edge; dead ahead, a flight of stone steps goes down from the quay edge into the water; on the right, the quay runs back level along the harbor to the grain ship at her mooring."
+              }
+            }
+          },
+          "worldPlateRef": false,
+          "motionClosing": "Only the water on the steps moves; the tables, the barrels, the quay, the ship and the lighthouse stay exactly where they are."
+        },
+        "scenePrompt": "This is a seamless 360-degree panorama from the salting yard on Alexandria's great stone quay, a short walk along the quay from the grain ship, under the white walls of a salt store, where a broad old fish-landing stair goes down into the harbor, on a clear morning. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the plain whitewashed wall of the salt store, sunlit, calm and even: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: the plain whitewashed wall of the salt store, joining its other half cleanly at the seam directly behind you; to the left, the quay running on a short way along the harbor's edge and ending at the high blank wall of a warehouse block standing across it, a closed timber gate in that wall, sacks of salt stacked in the shade of the salt store's colonnade along the quay's back; just left of centre, a few strides from the viewer at the quay's edge, a row of long low wooden salting tables on trestles standing on the paving beside the head of the stair, their tops scrubbed pale and sprinkled with coarse white salt, heaps of salt in shallow baskets beside them, and beyond them a neat stack of identical lidded wooden barrels; dead ahead in the centre, a broad, shallow old stone stair, many steps wide, going down from the quay's edge into the clear teal water, its lower steps sunk under the water and green with weed, the quay wall standing sheer from the water on both sides of it, a heavy rope slung between two short posts across its top step, closing it, the water washing up over the lowest steps and drawing back; just right of centre, across the open teal harbor, about a mile off, a small low rock island standing alone in the water, the Pharos lighthouse of Alexandria, a tall pale stone tower in three tiers, square, then eight-sided, then round small with distance on it, open water all round the island; to the right, from the paving under the viewer, the quay runs back level along the harbor's edge to the broad grain ship lying moored against it, her furled sail and tall mast standing over the quay; on the far right, the right half of the calm view directly behind the viewer: the plain whitewashed wall of the salt store, joining its other half cleanly at the seam directly behind you. Clear morning light, the sun behind the viewer's right shoulder, glittering water, white salt and whitewash bright in the sun, the colors of Ptolemaic Alexandria: teal-green harbor water, warm pale sandstone and limestone, sun-bleached timber, white and ochre sails, red-brown terracotta, gulls and a light sea haze, painterly, cinematic, subtle film grain. No people, no figures, no animals except gulls, no lettering, signs, numerals or text anywhere. Nothing modern: no metal cranes, engines, concrete, electric lights, plastic or motorboats. No causeway, bridge or spit of land joins the lighthouse island to the city, and nothing built reaches it from the shore: open water all round the island. Only ONE lighthouse. The salting tables are bare of fish: salt only, no fish, no knives, no blood. The stair goes down into the water and stops there: no boat, no ring, no fittings, the rope closing its top. The quay ends at the warehouse block's wall: no quay running on into the distance. All the barrels alike, lidded. Shot on a full-frame DSLR at 24mm, f/8, a clear bright morning, the sun well up in the east over the city: warm low light glancing off the water, crisp short shadows on pale stone, a clear pale-blue sky with a few high thin clouds, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into the plain whitewashed wall of the salt store, sunlit, calm and even, with no visible seam, join, or repetition.",
+        "seam": {
+          "stage": "screened",
+          "band": "sky",
+          "ratio": 2.56,
+          "delta": 0.93,
+          "needsWork": false,
+          "accepted": true,
+          "seamBandRun": 0.019,
+          "at": "2026-10-26T08:27:00",
+          "acceptedBy": "lucas via agent 2026-10-26",
+          "humanNote": "Lucas 2026-10-26: 'Those look good!' after viewing the four harbour clips on his phone"
+        },
+        "boxesFrom": {
+          "art": "43365de3bfaa",
+          "at": "2026-10-26T10:18:25"
+        }
+      },
+      "panorama": "steps/scene.png",
+      "builtFrom": "l1_steps_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "hotspots": [
+        {
+          "id": "the_salting_tables",
+          "type": "station",
+          "label": "The salting tables",
+          "box": [
+            0.153,
+            0.4,
+            0.34,
+            0.61
+          ],
+          "tier": 1,
+          "boxSource": "review:agent-vision",
+          "boxNote": "hand-placed 2026-10-26 on the accepted still: the salting tables and salt baskets on the left"
+        },
+        {
+          "id": "back_along_the_quay_to_the_grain_ship",
+          "type": "door",
+          "label": "Back along the quay to the grain ship",
+          "box": [
+            0.77,
+            0.25,
+            0.89,
+            0.56
+          ],
+          "direction": "back",
+          "to": "berth",
+          "boxSource": "review:agent-vision",
+          "boxNote": "hand-placed 2026-10-26 on the accepted still: the quay running back to the moored ship on the right"
+        },
+        {
+          "id": "clip_base",
+          "type": "ambient",
+          "label": "Scene motion (base)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/play-source.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "steps/cine_base.mp4"
+          }
+        }
+      ],
+      "sfx": [
+        {
+          "src": "audio/steps_bed_harbour_lapping.mp3",
+          "mode": "loop",
+          "volume": 0.5
+        },
+        {
+          "src": "audio/steps_wave_slap.mp3",
+          "mode": "interval",
+          "volume": 0.35,
+          "gapMin": 6,
+          "gapMax": 14
+        },
+        {
+          "src": "audio/steps_sea_gurgle.mp3",
+          "mode": "interval",
+          "volume": 0.25,
+          "gapMin": 12,
+          "gapMax": 32
+        }
+      ]
+    },
+    {
+      "key": "mole",
+      "title": "The fishing mole",
+      "built": true,
+      "unlockedWhen": true,
+      "designNote": "LEVEL 2 station (2 barrels). The server deals a tier-2 task; no puzzle content here.",
+      "plannedHotspots": [
+        {
+          "type": "station",
+          "tier": 2,
+          "label": "The fishing boats",
+          "box": [
+            0.15,
+            0.22,
+            0.39,
+            0.9
+          ],
+          "boxSource": "review:agent-vision",
+          "boxNote": "hand-placed 2026-10-26 on the accepted still: both moored fishing boats with their fish baskets"
+        },
+        {
+          "type": "door",
+          "direction": "back",
+          "to": "berth",
+          "label": "Back along the mole to the quay",
+          "box": [
+            0.48,
+            0.3536,
+            0.52,
+            0.9354
+          ],
+          "boxSource": "draft:skeleton"
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "to": "island",
+          "label": "The skiff to the island",
+          "box": [
+            0.615,
+            0.58,
+            0.82,
+            0.86
+          ],
+          "boxSource": "review:agent-vision",
+          "boxNote": "hand-placed 2026-10-26 on the accepted still: the mooring post and the skiff below it"
+        }
+      ],
+      "authoring": {
+        "sceneSpec": {
+          "room": "mole",
+          "setting": "near the far end of a long straight stone fishing mole running out from Alexandria's city quay into the Great Harbor on a clear morning, open water on both sides",
+          "interior": false,
+          "indoor": false,
+          "seam": "open teal harbor water under the morning sky, calm and even, the far shore a low faint line",
+          "seamOccluder": "one heavy coil of hawser rope lying on the mole's paving",
+          "elements": [
+            {
+              "id": "seam_left",
+              "at": "on the far left",
+              "desc": "the left half of the calm view directly behind the viewer: open teal harbor water under the morning sky, joining its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "harbor_east",
+              "at": "to the left",
+              "desc": "the wide harbor water, and along its far edge the city's long quay curving away east, warehouses, colonnades and white buildings low along the shore"
+            },
+            {
+              "id": "boats",
+              "at": "just left of centre",
+              "label": "The fishing boats",
+              "station": 2,
+              "desc": "close below the mole's edge on the viewer's left, two small wooden fishing boats afloat side by side against the mole, their lines made fast to iron rings in the mole's edge, their gunwales a little below the paving, their nets heaped in their bows, flat baskets of fresh silver fish on their thwarts, their short masts bare",
+              "motion": {
+                "moves": true,
+                "vigour": "the nearer boat rocking gently at her lines",
+                "phrase": "the nearer fishing boat rocks gently at her mooring lines on the small harbor swell, her mast tipping slowly side to side"
+              },
+              "sound": {
+                "source": "the boats at their lines",
+                "character": "a soft knock of wood and creak of rope",
+                "prominence": "hero"
+              }
+            },
+            {
+              "id": "mole",
+              "at": "dead ahead in the centre",
+              "label": "Back along the mole to the quay",
+              "door": {
+                "direction": "back",
+                "to": "berth"
+              },
+              "desc": "from the paving under the viewer, the paved top of the mole runs straight back level to the city quay, far off; there, small with distance, the broad grain ship lies moored against the quay with her tall mast, warehouses behind her"
+            },
+            {
+              "id": "skiff_post",
+              "at": "to the right",
+              "label": "The skiff to the island",
+              "door": {
+                "direction": "open",
+                "to": "island"
+              },
+              "desc": "at the mole's end a few strides from the viewer, a stout wooden mooring post with a line running down from it to the small harbor skiff waiting afloat in the water below the mole's edge, its two oars resting in their locks; beyond it, across half a mile of open water, a small low rock island standing alone, and on it, tall and plain against the sky, the Pharos lighthouse of Alexandria, a tall pale stone tower in three tiers, square, then eight-sided, then round, a thread of smoke at its crown"
+            },
+            {
+              "id": "seam_right",
+              "at": "on the far right",
+              "desc": "the right half of the calm view directly behind the viewer: open teal harbor water under the morning sky, joining its other half cleanly at the seam directly behind you"
+            }
+          ],
+          "soundBed": "out on a stone mole in a harbor: water slapping the mole's sides, a steady sea breeze, gulls.",
+          "rigid": "the mole, the mooring post, the skiff, the quay, the ship, the warehouses, the lighthouse",
+          "atmosphere": "Clear morning light, the sun low on the viewer's left over the city, open water glittering on both sides, the colors of Ptolemaic Alexandria: teal-green harbor water, warm pale sandstone and limestone, sun-bleached timber, white and ochre sails, red-brown terracotta, gulls and a light sea haze, painterly, cinematic, subtle film grain",
+          "styleLight": "a clear bright morning, the sun well up in the east over the city: warm low light glancing off the water, crisp short shadows on pale stone, a clear pale-blue sky with a few high thin clouds",
+          "negatives": "No people, no figures, no animals except gulls, no lettering, signs, numerals or text anywhere. Nothing modern: no metal cranes, engines, concrete, electric lights, plastic or motorboats. No causeway, bridge or spit of land joins the lighthouse island to the city, and nothing built reaches it from the shore: open water all round the island. Only ONE lighthouse. The mole is a straight paved stone pier at the level of the quay, not a bridge, no arches, and it stops well short of the island, open water between. Only TWO boats beside the mole, both afloat, none on the paving.",
+          "states": {},
+          "continuity": [],
+          "scaffold": {
+            "kind": "skeleton",
+            "layout": {
+              "world": {
+                "eye": [
+                  -160.0,
+                  2.0,
+                  124.0
+                ],
+                "heading": 150.0,
+                "blocks": [
+                  [
+                    "walk",
+                    -320.0,
+                    420.0,
+                    0.0,
+                    2.0,
+                    -40.0,
+                    0.0,
+                    "quay"
+                  ],
+                  [
+                    "wall",
+                    -320.0,
+                    420.0,
+                    2.0,
+                    14.0,
+                    -90.0,
+                    -40.0,
+                    "warehouses"
+                  ],
+                  [
+                    "wall",
+                    20.0,
+                    66.0,
+                    0.0,
+                    6.0,
+                    2.0,
+                    13.0,
+                    "ship"
+                  ],
+                  [
+                    "rail",
+                    43.0,
+                    44.0,
+                    6.0,
+                    34.0,
+                    7.0,
+                    8.0,
+                    "ship_mast"
+                  ],
+                  [
+                    "walk",
+                    23.0,
+                    26.0,
+                    2.0,
+                    2.2,
+                    -0.5,
+                    3.0,
+                    "gangplank"
+                  ],
+                  [
+                    "wall",
+                    -11.0,
+                    -5.0,
+                    2.0,
+                    2.95,
+                    -13.0,
+                    -11.5,
+                    "fish_board"
+                  ],
+                  [
+                    "walk",
+                    104.0,
+                    112.0,
+                    -38.283,
+                    1.717,
+                    0.0,
+                    1.167,
+                    "harbor_steps"
+                  ],
+                  [
+                    "walk",
+                    104.0,
+                    112.0,
+                    -38.567,
+                    1.433,
+                    1.167,
+                    2.333,
+                    "harbor_steps"
+                  ],
+                  [
+                    "walk",
+                    104.0,
+                    112.0,
+                    -38.85,
+                    1.15,
+                    2.333,
+                    3.5,
+                    "harbor_steps"
+                  ],
+                  [
+                    "walk",
+                    104.0,
+                    112.0,
+                    -39.133,
+                    0.867,
+                    3.5,
+                    4.667,
+                    "harbor_steps"
+                  ],
+                  [
+                    "walk",
+                    104.0,
+                    112.0,
+                    -39.417,
+                    0.583,
+                    4.667,
+                    5.833,
+                    "harbor_steps"
+                  ],
+                  [
+                    "walk",
+                    104.0,
+                    112.0,
+                    -39.7,
+                    0.3,
+                    5.833,
+                    7.0,
+                    "harbor_steps"
+                  ],
+                  [
+                    "rail",
+                    103.88,
+                    104.12,
+                    2.0,
+                    3.15,
+                    0.08,
+                    0.32,
+                    "harbor_steps"
+                  ],
+                  [
+                    "rail",
+                    111.88,
+                    112.12,
+                    2.0,
+                    3.15,
+                    0.08,
+                    0.32,
+                    "harbor_steps"
+                  ],
+                  [
+                    "wall",
+                    114.0,
+                    126.0,
+                    2.0,
+                    2.95,
+                    -7.0,
+                    -3.0,
+                    "salting_tables"
+                  ],
+                  [
+                    "wall",
+                    128.0,
+                    132.0,
+                    2.0,
+                    3.1,
+                    -9.0,
+                    -5.0,
+                    "salt_barrels"
+                  ],
+                  [
+                    "walk",
+                    -167.0,
+                    -153.0,
+                    0.0,
+                    2.0,
+                    0.0,
+                    130.0,
+                    "mole"
+                  ],
+                  [
+                    "wall",
+                    -172.0,
+                    -168.0,
+                    0.0,
+                    1.6,
+                    86.0,
+                    101.0,
+                    "boats"
+                  ],
+                  [
+                    "wall",
+                    -172.0,
+                    -168.0,
+                    0.0,
+                    1.6,
+                    104.0,
+                    119.0,
+                    "boats"
+                  ],
+                  [
+                    "wall",
+                    -156.0,
+                    -155.0,
+                    2.0,
+                    2.7,
+                    126.0,
+                    127.0,
+                    "skiff_post"
+                  ],
+                  [
+                    "wall",
+                    -152.0,
+                    -149.0,
+                    0.0,
+                    0.9,
+                    120.0,
+                    129.0,
+                    "skiff"
+                  ],
+                  [
+                    "walk",
+                    -120.0,
+                    260.0,
+                    0.0,
+                    5.0,
+                    640.0,
+                    860.0,
+                    "island"
+                  ],
+                  [
+                    "walk",
+                    -40.0,
+                    -24.0,
+                    -40.0,
+                    4.217,
+                    638.0,
+                    640.0,
+                    "landing_steps"
+                  ],
+                  [
+                    "walk",
+                    -40.0,
+                    -24.0,
+                    -40.0,
+                    3.433,
+                    636.0,
+                    638.0,
+                    "landing_steps"
+                  ],
+                  [
+                    "walk",
+                    -40.0,
+                    -24.0,
+                    -40.0,
+                    2.65,
+                    634.0,
+                    636.0,
+                    "landing_steps"
+                  ],
+                  [
+                    "walk",
+                    -40.0,
+                    -24.0,
+                    -40.0,
+                    1.867,
+                    632.0,
+                    634.0,
+                    "landing_steps"
+                  ],
+                  [
+                    "walk",
+                    -40.0,
+                    -24.0,
+                    -40.0,
+                    1.083,
+                    630.0,
+                    632.0,
+                    "landing_steps"
+                  ],
+                  [
+                    "walk",
+                    -40.0,
+                    -24.0,
+                    -40.0,
+                    0.3,
+                    628.0,
+                    630.0,
+                    "landing_steps"
+                  ],
+                  [
+                    "tower",
+                    -115.0,
+                    -65.0,
+                    5.0,
+                    120.0,
+                    770.0,
+                    820.0,
+                    "pharos"
+                  ],
+                  [
+                    "wall",
+                    -70.0,
+                    -64.0,
+                    5.0,
+                    6.6,
+                    646.0,
+                    662.0,
+                    "beached_boats"
+                  ],
+                  [
+                    "wall",
+                    -84.0,
+                    -78.0,
+                    5.0,
+                    6.6,
+                    650.0,
+                    666.0,
+                    "beached_boats"
+                  ],
+                  [
+                    "wall",
+                    -96.0,
+                    -90.0,
+                    5.0,
+                    6.6,
+                    646.0,
+                    662.0,
+                    "beached_boats"
+                  ],
+                  [
+                    "wall",
+                    -110.0,
+                    -104.0,
+                    5.0,
+                    6.6,
+                    650.0,
+                    666.0,
+                    "beached_boats"
+                  ]
+                ],
+                "doors": [],
+                "joins": "Here: the paved top of a long stone mole under the viewer, near its end, open water on both sides; dead ahead, the mole runs straight back level to the city quay, where the grain ship lies at her mooring; ahead and to the left, two fishing boats lie moored against the mole's side; on the right, at the mole's end, a mooring post where a small skiff waits in the water below, and beyond it across the water the lighthouse on its island."
+              }
+            }
+          },
+          "motionClosing": "Only the nearer boat moves; the mole, the post, the skiff, the quay, the ship and the lighthouse stay exactly where they are."
+        },
+        "plateRefs": [
+          "berth/scene.png"
+        ],
+        "scenePrompt": "This is a seamless 360-degree panorama from near the far end of a long straight stone fishing mole running out from Alexandria's city quay into the Great Harbor on a clear morning, open water on both sides. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is open teal harbor water under the morning sky, calm and even, the far shore a low faint line: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: open teal harbor water under the morning sky, joining its other half cleanly at the seam directly behind you; to the left, the wide harbor water, and along its far edge the city's long quay curving away east, warehouses, colonnades and white buildings low along the shore; just left of centre, close below the mole's edge on the viewer's left, two small wooden fishing boats afloat side by side against the mole, their lines made fast to iron rings in the mole's edge, their gunwales a little below the paving, their nets heaped in their bows, flat baskets of fresh silver fish on their thwarts, their short masts bare, the nearer boat rocking gently at her lines; dead ahead in the centre, from the paving under the viewer, the paved top of the mole runs straight back level to the city quay, far off; there, small with distance, the broad grain ship lies moored against the quay with her tall mast, warehouses behind her; to the right, at the mole's end a few strides from the viewer, a stout wooden mooring post with a line running down from it to the small harbor skiff waiting afloat in the water below the mole's edge, its two oars resting in their locks; beyond it, across half a mile of open water, a small low rock island standing alone, and on it, tall and plain against the sky, the Pharos lighthouse of Alexandria, a tall pale stone tower in three tiers, square, then eight-sided, then round, a thread of smoke at its crown; on the far right, the right half of the calm view directly behind the viewer: open teal harbor water under the morning sky, joining its other half cleanly at the seam directly behind you. Clear morning light, the sun low on the viewer's left over the city, open water glittering on both sides, the colors of Ptolemaic Alexandria: teal-green harbor water, warm pale sandstone and limestone, sun-bleached timber, white and ochre sails, red-brown terracotta, gulls and a light sea haze, painterly, cinematic, subtle film grain. No people, no figures, no animals except gulls, no lettering, signs, numerals or text anywhere. Nothing modern: no metal cranes, engines, concrete, electric lights, plastic or motorboats. No causeway, bridge or spit of land joins the lighthouse island to the city, and nothing built reaches it from the shore: open water all round the island. Only ONE lighthouse. The mole is a straight paved stone pier at the level of the quay, not a bridge, no arches, and it stops well short of the island, open water between. Only TWO boats beside the mole, both afloat, none on the paving. Shot on a full-frame DSLR at 24mm, f/8, a clear bright morning, the sun well up in the east over the city: warm low light glancing off the water, crisp short shadows on pale stone, a clear pale-blue sky with a few high thin clouds, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into open teal harbor water under the morning sky, calm and even, the far shore a low faint line, with no visible seam, join, or repetition.",
+        "seam": {
+          "stage": "blurred",
+          "band": "sky",
+          "ratio": 0.0,
+          "delta": 0.0,
+          "needsWork": false,
+          "accepted": true,
+          "seamBandRun": 0.0,
+          "at": "2026-10-26T08:27:00",
+          "acceptedBy": "lucas via agent 2026-10-26",
+          "humanNote": "Lucas 2026-10-26: 'Those look good!' after viewing the four harbour clips on his phone"
+        },
+        "boxesFrom": {
+          "art": "b0552dd0b2f0",
+          "at": "2026-10-26T10:19:08"
+        }
+      },
+      "panorama": "mole/scene.png",
+      "builtFrom": "l1_mole_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "hotspots": [
+        {
+          "id": "the_fishing_boats",
+          "type": "station",
+          "label": "The fishing boats",
+          "box": [
+            0.15,
+            0.22,
+            0.39,
+            0.9
+          ],
+          "tier": 2,
+          "boxSource": "review:agent-vision",
+          "boxNote": "hand-placed 2026-10-26 on the accepted still: both moored fishing boats with their fish baskets"
+        },
+        {
+          "id": "back_along_the_mole_to_the_quay",
+          "type": "door",
+          "label": "Back along the mole to the quay",
+          "box": [
+            0.48,
+            0.3536,
+            0.52,
+            0.9354
+          ],
+          "direction": "back",
+          "to": "berth",
+          "boxSource": "draft:skeleton"
+        },
+        {
+          "id": "the_skiff_to_the_island",
+          "type": "door",
+          "label": "The skiff to the island",
+          "box": [
+            0.615,
+            0.58,
+            0.82,
+            0.86
+          ],
+          "direction": "open",
+          "to": "island",
+          "boxSource": "review:agent-vision",
+          "boxNote": "hand-placed 2026-10-26 on the accepted still: the mooring post and the skiff below it"
+        },
+        {
+          "id": "clip_base",
+          "type": "ambient",
+          "label": "Scene motion (base)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/play-source.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "mole/cine_base.mp4"
+          }
+        }
+      ],
+      "sfx": [
+        {
+          "src": "audio/mole_bed_working_harbour.mp3",
+          "mode": "loop",
+          "volume": 1.0
+        },
+        {
+          "src": "audio/mole_bed_boat_bump.mp3",
+          "mode": "loop",
+          "volume": 0.4
+        },
+        {
+          "src": "audio/mole_hull_knock.mp3",
+          "mode": "interval",
+          "volume": 0.08,
+          "gapMin": 10,
+          "gapMax": 26
+        },
+        {
+          "src": "audio/mole_gull_far.mp3",
+          "mode": "interval",
+          "volume": 0.09,
+          "gapMin": 12,
+          "gapMax": 30
+        }
+      ]
+    },
+    {
+      "key": "island",
+      "title": "The Pharos landing",
+      "built": true,
+      "unlockedWhen": true,
+      "designNote": "LEVEL 3 station (3 barrels), the furthest: reached by the skiff from the mole's end. The lighthouse is scenery only, never a hotspot.",
+      "plannedHotspots": [
+        {
+          "type": "station",
+          "tier": 3,
+          "label": "The boats on the shore",
+          "box": [
+            0.13,
+            0.42,
+            0.39,
+            0.71
+          ],
+          "boxSource": "review:agent-vision",
+          "boxNote": "hand-placed 2026-10-26 on the accepted still: all four boats drawn up on the rock and their fish trays"
+        },
+        {
+          "type": "door",
+          "direction": "back",
+          "to": "mole",
+          "label": "The skiff back to the mole",
+          "box": [
+            0.42,
+            0.6,
+            0.59,
+            0.89
+          ],
+          "boxSource": "review:agent-vision",
+          "boxNote": "hand-placed 2026-10-26 on the accepted still: the landing steps with the ring and the skiff tied below"
+        }
+      ],
+      "authoring": {
+        "sceneSpec": {
+          "room": "island",
+          "setting": "the bare rock shore of the small island of the Pharos lighthouse in Alexandria's Great Harbor, at the top of the landing steps where the harbor skiff comes in, on a clear morning",
+          "interior": false,
+          "indoor": false,
+          "seam": "open sea beyond the island's bare pale rock, calm and even, under the morning sky",
+          "seamOccluder": "one weathered wooden mooring post standing on the rock",
+          "elements": [
+            {
+              "id": "seam_left",
+              "at": "on the far left",
+              "desc": "the left half of the calm view directly behind the viewer: open sea beyond the island's bare pale rock, joining its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "pharos",
+              "at": "to the left",
+              "desc": "close by on the island, towering over the viewer, the Pharos lighthouse of Alexandria: a huge pale stone tower in three tiers, square, then eight-sided, then round, rising from a blank walled base on the rock with no doors, a small fire burning at its crown",
+              "motion": {
+                "moves": true,
+                "vigour": "a thin plume of pale smoke drifting from it",
+                "phrase": "a thin plume of pale smoke rises from the lighthouse's crown fire and drifts away on the sea wind"
+              },
+              "sound": {
+                "source": "the wind round the tower and the surf on the rocks",
+                "character": "a low steady rush of wind and surf",
+                "prominence": "hero"
+              }
+            },
+            {
+              "id": "beached_boats",
+              "at": "just left of centre",
+              "label": "The boats on the shore",
+              "station": 3,
+              "desc": "a short walk along the island's shore, four small wooden fishing boats drawn up side by side with their keels resting on the flat pale rock, a short slope of rock running down from them to the water, their nets spread to dry over their gunwales, a row of wide wicker trays of fresh silver fish laid out on the rock in front of them"
+            },
+            {
+              "id": "landing_steps",
+              "at": "dead ahead in the centre",
+              "label": "The skiff back to the mole",
+              "door": {
+                "direction": "back",
+                "to": "mole"
+              },
+              "desc": "a few strides ahead, worn stone landing steps going down from the rock to the water, a small harbor skiff, the same one that waits at the mole, afloat at their foot with her bow against the lowest step and her line made fast to an iron ring in it; beyond, across a mile of open teal water, the city's long quay lies low and far off, a long straight mole running out from it, and among the ships at the quay the broad grain ship with her tall mast"
+            },
+            {
+              "id": "shore_west",
+              "at": "to the right",
+              "desc": "the island's low rocky shore running a short way along the water's edge and ending in a jumble of surf-broken rock at the water, a few tufts of sea grass, the open harbor beyond"
+            },
+            {
+              "id": "seam_right",
+              "at": "on the far right",
+              "desc": "the right half of the calm view directly behind the viewer: open sea beyond the island's bare pale rock, joining its other half cleanly at the seam directly behind you"
+            }
+          ],
+          "soundBed": "a bare rock island in a harbor: surf on the rocks, a steady sea wind, gulls wheeling.",
+          "rigid": "the rock, the lighthouse, the landing steps, the skiff, the beached boats, the far quay and ships",
+          "atmosphere": "Clear morning light, the sun on the viewer's left, the tower's pale stone bright against the sky, the colors of Ptolemaic Alexandria: teal-green harbor water, warm pale sandstone and limestone, sun-bleached timber, white and ochre sails, red-brown terracotta, gulls and a light sea haze, painterly, cinematic, subtle film grain",
+          "styleLight": "a clear bright morning, the sun well up in the east over the city: warm low light glancing off the water, crisp short shadows on pale stone, a clear pale-blue sky with a few high thin clouds",
+          "negatives": "No people, no figures, no animals except gulls, no lettering, signs, numerals or text anywhere. Nothing modern: no metal cranes, engines, concrete, electric lights, plastic or motorboats. No causeway, bridge or spit of land joins the lighthouse island to the city, and nothing built reaches it from the shore: open water all round the island. Only ONE lighthouse. The island is small and bare: no town, no houses, no trees on it, only the lighthouse and its walled base.",
+          "states": {},
+          "continuity": [],
+          "scaffold": {
+            "kind": "skeleton",
+            "layout": {
+              "world": {
+                "eye": [
+                  -32.0,
+                  5.0,
+                  676.0
+                ],
+                "heading": 200.0,
+                "blocks": [
+                  [
+                    "walk",
+                    -320.0,
+                    420.0,
+                    0.0,
+                    2.0,
+                    -40.0,
+                    0.0,
+                    "quay"
+                  ],
+                  [
+                    "wall",
+                    -320.0,
+                    420.0,
+                    2.0,
+                    14.0,
+                    -90.0,
+                    -40.0,
+                    "warehouses"
+                  ],
+                  [
+                    "wall",
+                    20.0,
+                    66.0,
+                    0.0,
+                    6.0,
+                    2.0,
+                    13.0,
+                    "ship"
+                  ],
+                  [
+                    "rail",
+                    43.0,
+                    44.0,
+                    6.0,
+                    34.0,
+                    7.0,
+                    8.0,
+                    "ship_mast"
+                  ],
+                  [
+                    "walk",
+                    23.0,
+                    26.0,
+                    2.0,
+                    2.2,
+                    -0.5,
+                    3.0,
+                    "gangplank"
+                  ],
+                  [
+                    "wall",
+                    -11.0,
+                    -5.0,
+                    2.0,
+                    2.95,
+                    -13.0,
+                    -11.5,
+                    "fish_board"
+                  ],
+                  [
+                    "walk",
+                    104.0,
+                    112.0,
+                    -38.283,
+                    1.717,
+                    0.0,
+                    1.167,
+                    "harbor_steps"
+                  ],
+                  [
+                    "walk",
+                    104.0,
+                    112.0,
+                    -38.567,
+                    1.433,
+                    1.167,
+                    2.333,
+                    "harbor_steps"
+                  ],
+                  [
+                    "walk",
+                    104.0,
+                    112.0,
+                    -38.85,
+                    1.15,
+                    2.333,
+                    3.5,
+                    "harbor_steps"
+                  ],
+                  [
+                    "walk",
+                    104.0,
+                    112.0,
+                    -39.133,
+                    0.867,
+                    3.5,
+                    4.667,
+                    "harbor_steps"
+                  ],
+                  [
+                    "walk",
+                    104.0,
+                    112.0,
+                    -39.417,
+                    0.583,
+                    4.667,
+                    5.833,
+                    "harbor_steps"
+                  ],
+                  [
+                    "walk",
+                    104.0,
+                    112.0,
+                    -39.7,
+                    0.3,
+                    5.833,
+                    7.0,
+                    "harbor_steps"
+                  ],
+                  [
+                    "rail",
+                    103.88,
+                    104.12,
+                    2.0,
+                    3.15,
+                    0.08,
+                    0.32,
+                    "harbor_steps"
+                  ],
+                  [
+                    "rail",
+                    111.88,
+                    112.12,
+                    2.0,
+                    3.15,
+                    0.08,
+                    0.32,
+                    "harbor_steps"
+                  ],
+                  [
+                    "wall",
+                    114.0,
+                    126.0,
+                    2.0,
+                    2.95,
+                    -7.0,
+                    -3.0,
+                    "salting_tables"
+                  ],
+                  [
+                    "wall",
+                    128.0,
+                    132.0,
+                    2.0,
+                    3.1,
+                    -9.0,
+                    -5.0,
+                    "salt_barrels"
+                  ],
+                  [
+                    "walk",
+                    -167.0,
+                    -153.0,
+                    0.0,
+                    2.0,
+                    0.0,
+                    130.0,
+                    "mole"
+                  ],
+                  [
+                    "wall",
+                    -172.0,
+                    -168.0,
+                    0.0,
+                    1.6,
+                    86.0,
+                    101.0,
+                    "boats"
+                  ],
+                  [
+                    "wall",
+                    -172.0,
+                    -168.0,
+                    0.0,
+                    1.6,
+                    104.0,
+                    119.0,
+                    "boats"
+                  ],
+                  [
+                    "wall",
+                    -156.0,
+                    -155.0,
+                    2.0,
+                    2.7,
+                    126.0,
+                    127.0,
+                    "skiff_post"
+                  ],
+                  [
+                    "wall",
+                    -152.0,
+                    -149.0,
+                    0.0,
+                    0.9,
+                    120.0,
+                    129.0,
+                    "skiff"
+                  ],
+                  [
+                    "walk",
+                    -120.0,
+                    260.0,
+                    0.0,
+                    5.0,
+                    640.0,
+                    860.0,
+                    "island"
+                  ],
+                  [
+                    "walk",
+                    -40.0,
+                    -24.0,
+                    -40.0,
+                    4.217,
+                    638.0,
+                    640.0,
+                    "landing_steps"
+                  ],
+                  [
+                    "walk",
+                    -40.0,
+                    -24.0,
+                    -40.0,
+                    3.433,
+                    636.0,
+                    638.0,
+                    "landing_steps"
+                  ],
+                  [
+                    "walk",
+                    -40.0,
+                    -24.0,
+                    -40.0,
+                    2.65,
+                    634.0,
+                    636.0,
+                    "landing_steps"
+                  ],
+                  [
+                    "walk",
+                    -40.0,
+                    -24.0,
+                    -40.0,
+                    1.867,
+                    632.0,
+                    634.0,
+                    "landing_steps"
+                  ],
+                  [
+                    "walk",
+                    -40.0,
+                    -24.0,
+                    -40.0,
+                    1.083,
+                    630.0,
+                    632.0,
+                    "landing_steps"
+                  ],
+                  [
+                    "walk",
+                    -40.0,
+                    -24.0,
+                    -40.0,
+                    0.3,
+                    628.0,
+                    630.0,
+                    "landing_steps"
+                  ],
+                  [
+                    "tower",
+                    -115.0,
+                    -65.0,
+                    5.0,
+                    120.0,
+                    770.0,
+                    820.0,
+                    "pharos"
+                  ],
+                  [
+                    "wall",
+                    -70.0,
+                    -64.0,
+                    5.0,
+                    6.6,
+                    646.0,
+                    662.0,
+                    "beached_boats"
+                  ],
+                  [
+                    "wall",
+                    -84.0,
+                    -78.0,
+                    5.0,
+                    6.6,
+                    650.0,
+                    666.0,
+                    "beached_boats"
+                  ],
+                  [
+                    "wall",
+                    -96.0,
+                    -90.0,
+                    5.0,
+                    6.6,
+                    646.0,
+                    662.0,
+                    "beached_boats"
+                  ],
+                  [
+                    "wall",
+                    -110.0,
+                    -104.0,
+                    5.0,
+                    6.6,
+                    650.0,
+                    666.0,
+                    "beached_boats"
+                  ]
+                ],
+                "doors": [],
+                "joins": "Here: the flat rock of the island under the viewer; dead ahead, stone landing steps go down to the water where the skiff comes in, and across the open harbor the city quay and its ships lie far off; ahead and to the left, four fishing boats are drawn up on the rock of the shore; on the left, the lighthouse towers over the island."
+              }
+            }
+          },
+          "motionClosing": "Only the lighthouse fire's smoke moves; the tower, the rock, the boats, the skiff and the far quay stay exactly where they are."
+        },
+        "plateRefs": [
+          "berth/scene.png"
+        ],
+        "scenePrompt": "This is a seamless 360-degree panorama from the bare rock shore of the small island of the Pharos lighthouse in Alexandria's Great Harbor, at the top of the landing steps where the harbor skiff comes in, on a clear morning. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is open sea beyond the island's bare pale rock, calm and even, under the morning sky: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: open sea beyond the island's bare pale rock, joining its other half cleanly at the seam directly behind you; to the left, close by on the island, towering over the viewer, the Pharos lighthouse of Alexandria: a huge pale stone tower in three tiers, square, then eight-sided, then round, rising from a blank walled base on the rock with no doors, a small fire burning at its crown, a thin plume of pale smoke drifting from it; just left of centre, a short walk along the island's shore, four small wooden fishing boats drawn up side by side with their keels resting on the flat pale rock, a short slope of rock running down from them to the water, their nets spread to dry over their gunwales, a row of wide wicker trays of fresh silver fish laid out on the rock in front of them; dead ahead in the centre, a few strides ahead, worn stone landing steps going down from the rock to the water, a small harbor skiff, the same one that waits at the mole, afloat at their foot with her bow against the lowest step and her line made fast to an iron ring in it; beyond, across a mile of open teal water, the city's long quay lies low and far off, a long straight mole running out from it, and among the ships at the quay the broad grain ship with her tall mast; to the right, the island's low rocky shore running a short way along the water's edge and ending in a jumble of surf-broken rock at the water, a few tufts of sea grass, the open harbor beyond; on the far right, the right half of the calm view directly behind the viewer: open sea beyond the island's bare pale rock, joining its other half cleanly at the seam directly behind you. Clear morning light, the sun on the viewer's left, the tower's pale stone bright against the sky, the colors of Ptolemaic Alexandria: teal-green harbor water, warm pale sandstone and limestone, sun-bleached timber, white and ochre sails, red-brown terracotta, gulls and a light sea haze, painterly, cinematic, subtle film grain. No people, no figures, no animals except gulls, no lettering, signs, numerals or text anywhere. Nothing modern: no metal cranes, engines, concrete, electric lights, plastic or motorboats. No causeway, bridge or spit of land joins the lighthouse island to the city, and nothing built reaches it from the shore: open water all round the island. Only ONE lighthouse. The island is small and bare: no town, no houses, no trees on it, only the lighthouse and its walled base. Shot on a full-frame DSLR at 24mm, f/8, a clear bright morning, the sun well up in the east over the city: warm low light glancing off the water, crisp short shadows on pale stone, a clear pale-blue sky with a few high thin clouds, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into open sea beyond the island's bare pale rock, calm and even, under the morning sky, with no visible seam, join, or repetition.",
+        "seam": {
+          "stage": "blurred",
+          "band": "sky",
+          "ratio": 0.0,
+          "delta": 0.0,
+          "needsWork": false,
+          "accepted": true,
+          "seamBandRun": 0.0,
+          "at": "2026-10-26T08:27:00",
+          "acceptedBy": "lucas via agent 2026-10-26",
+          "humanNote": "Lucas 2026-10-26: 'Those look good!' after viewing the four harbour clips on his phone"
+        },
+        "boxesFrom": {
+          "art": "a9387336ef90",
+          "at": "2026-10-26T10:20:00"
+        }
+      },
+      "panorama": "island/scene.png",
+      "builtFrom": "l1_island_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "hotspots": [
+        {
+          "id": "the_boats_on_the_shore",
+          "type": "station",
+          "label": "The boats on the shore",
+          "box": [
+            0.13,
+            0.42,
+            0.39,
+            0.71
+          ],
+          "tier": 3,
+          "boxSource": "review:agent-vision",
+          "boxNote": "hand-placed 2026-10-26 on the accepted still: all four boats drawn up on the rock and their fish trays"
+        },
+        {
+          "id": "the_skiff_back_to_the_mole",
+          "type": "door",
+          "label": "The skiff back to the mole",
+          "box": [
+            0.42,
+            0.6,
+            0.59,
+            0.89
+          ],
+          "direction": "back",
+          "to": "mole",
+          "boxSource": "review:agent-vision",
+          "boxNote": "hand-placed 2026-10-26 on the accepted still: the landing steps with the ring and the skiff tied below"
+        },
+        {
+          "id": "clip_base",
+          "type": "ambient",
+          "label": "Scene motion (base)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/play-source.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "island/cine_base.mp4"
+          }
+        }
+      ],
+      "sfx": [
+        {
+          "src": "audio/island_bed_tower_wind.mp3",
+          "mode": "loop",
+          "volume": 0.5
+        },
+        {
+          "src": "audio/island_bed_cliff_waves.mp3",
+          "mode": "loop",
+          "volume": 0.5
+        },
+        {
+          "src": "audio/island_gull_call.mp3",
+          "mode": "interval",
+          "volume": 0.15,
+          "gapMin": 12,
+          "gapMax": 32
+        }
+      ]
+    }
+  ]
+}

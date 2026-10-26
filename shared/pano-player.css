@@ -30,6 +30,12 @@ button.ghost { background:transparent; color:var(--ink); border:1px solid var(--
 #loading.open { opacity:1; visibility:visible; }
 #loading .loadcard { max-width:560px; padding:32px; position:relative; z-index:1; }
 
+/* landing backdrop (shared/landing_backdrop.js): the first room's clip panning behind the card, under a
+   scrim; the particles sit above it and the card above both. Fades in once the first frame is drawn. */
+.landingBackdrop { position:fixed; inset:0; z-index:0; pointer-events:none; opacity:0; transition:opacity 1.2s ease; }
+.landingBackdrop.shown { opacity:1; }
+.landingBackdrop canvas { position:absolute; inset:0; width:100%; height:100%; display:block; }
+.landingScrim { position:absolute; inset:0; background:radial-gradient(ellipse at center, rgba(4,10,16,.55) 0%, rgba(4,10,16,.78) 70%, rgba(4,10,16,.88) 100%); }
 /* ambient particles behind the card on the entry/submission screens
    (scenario.ambient: fireflies | snow | embers | leaves | dust | rain | rays | streams | bokeh | none) */
 .particles { position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:0; }
@@ -298,6 +304,20 @@ button.ghost { background:transparent; color:var(--ink); border:1px solid var(--
 .pcaplatecanvas { display:block; width:100%; max-height:78vh; background:#0b0806; border-radius:8px;
   touch-action:none; -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; }
 .pcaplatetip { position:absolute; display:none; pointer-events:none; background:#000c; color:#fff; padding:3px 7px; border-radius:4px; font-size:12px; white-space:nowrap; }
+/* The fish board (shared/fish_board.js, harbour): act tabs, an italic caption, the canvas, then the controls.
+   max-height: 70vh on a big screen (the projector), but never so tall that the tabs and controls leave a short laptop window. */
+.fishboard { display:flex; flex-direction:column; gap:6px; width:100%; }
+.fishboardtabs, .fishboardcontrols { display:flex; gap:6px 10px; align-items:center; justify-content:center; flex-wrap:wrap; }
+.fishboardtab, .fishboardcontrols button, .fishboardcontrols select { background:#3b2a14; color:#f3e6c4; border:1px solid #8a6a32;
+  border-radius:6px; padding:5px 10px; font:inherit; font-size:14px; cursor:pointer; }
+.fishboardtab { border-radius:16px; }
+.fishboardtab.on, .fishboardcontrols button.primary { background:linear-gradient(#a8742e,#7a5220); border-color:#e2b468; color:#fff6e0; }
+.fishboardcontrols label { color:#d8ccb0; font-size:14px; }
+.fishboardcaption { color:#e6d7b8; font-style:italic; font-size:14px; line-height:1.3; text-align:center; min-height:2.6em; }
+.fishboardtally { color:#d8ccb0; font-size:13px; }
+.fishboardtally b { color:#f3e6c4; font-weight:normal; }
+.fishboardcanvas { display:block; width:100%; max-height:min(70vh, calc(100vh - 240px)); background:#0b0806; border-radius:8px;
+  -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; }
 .drawdowncanvas { display:block; width:100%; max-height:84vh; background:#0b0806; border-radius:8px;
   touch-action:none; -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; }
 #loading #loadTitle { margin:0 0 10px; font-size:24px; color:var(--amber); }
@@ -341,6 +361,15 @@ button.ghost { background:transparent; color:var(--ink); border:1px solid var(--
   font:600 12px/1.25 system-ui,-apple-system,sans-serif; letter-spacing:.2px;
   color:rgba(255,236,190,.96); background:rgba(9,18,26,.78);
   border:1px solid rgba(255,216,140,.32); border-radius:999px; padding:3px 11px;
+  text-shadow:0 1px 3px rgba(0,0,0,.85); }
+
+/* Puzzle labels (SCENARIO.puzzleLabels) — what a live station pays, above its marker. Same plate as the
+   door name, in green so "where it goes" and "what it gives" don't read as one thing. */
+.puzzlename { position:absolute; left:50%; bottom:calc(100% + 9px); transform:translateX(-50%);
+  white-space:nowrap; pointer-events:none; user-select:none;
+  font:700 12px/1.25 system-ui,-apple-system,sans-serif; letter-spacing:.2px;
+  color:rgba(214,255,205,.97); background:rgba(9,26,14,.80);
+  border:1px solid rgba(150,230,140,.40); border-radius:999px; padding:3px 11px;
   text-shadow:0 1px 3px rgba(0,0,0,.85); }
 
 /* --- Three-phase portals (SCENARIO.stonePortals) --- */
@@ -455,7 +484,7 @@ code { background:#0a1620; padding:1px 5px; border-radius:4px; }
 .gridsel { border-collapse:separate; border-spacing:6px; margin:6px auto 4px; }
 .gridsel th { font-size:12px; font-weight:600; color:var(--amber); padding:2px 6px; text-align:center; }
 .gridsel th.rowlab { text-align:right; white-space:nowrap; color:#e8eef2; }
-.gridsel th svg { display:block; margin:0 auto; min-width:96px; }    /* labelHtml pictograms */
+.gridsel th svg { display:block; margin:0 auto; flex:none; }    /* labelHtml pictograms size from their own width attr (waterfalls 96px, squirrel 44px); a forced min-width:96px pushed squirrel's 8-column board past the modal's 760px cap */
 .gridsel td { text-align:center; }
 .gridsel th.rowlab s { text-decoration-thickness:2px; opacity:.75; }   /* struck = closed gate */
 .gridsel .cell { width:30px; height:30px; border-radius:7px; border:1px solid rgba(255,216,140,.4); background:rgba(0,0,0,.3); cursor:pointer; }
@@ -709,3 +738,19 @@ table.ledger { border-collapse:separate; border-spacing:4px 5px; margin:6px auto
 .maplegend span:first-child { margin-left:0; }
 .maplegend .mk-cur { border:2px solid var(--amber); }
 .maplegend .mk-unknown { border:1px dashed var(--ink); opacity:.5; }
+
+/* live sewing card (stitch rows / cutting ribbon; bathhouse cottage, 2026-10-26) */
+.sewsvg { width:100%; max-width:440px; height:auto; display:block; margin:4px auto 6px; touch-action:none; user-select:none; }
+.sewsvg.ribbon { max-width:none; overflow:visible; }
+.sewcell { cursor:pointer; }
+.sewrow { font-size:32px; font-weight:700; fill:var(--amber); }
+.sewtick { font-size:27px; font-weight:700; fill:#4a2f22; }
+.sewsc { font-size:56px; }
+.sewoff { transition:transform 1s ease, opacity 1s ease; transform-box:fill-box; }
+.sewline { font-size:15px; margin:4px 0; }
+.sewask { display:flex; align-items:center; gap:12px; font-size:16px; margin:6px 0; }
+.sewnum { min-width:56px; padding:6px 10px; border:1px solid var(--line); border-radius:8px; font-size:22px; font-weight:700; text-align:center; min-height:1.3em; }
+.sewpad { display:grid; grid-template-columns:repeat(6, 48px); gap:6px; margin:6px 0 4px; }
+.sewpad button { min-height:44px; font-size:20px; padding:0; }
+.sewsteps { display:flex; gap:12px; margin:6px 0; }
+.sewsteps button { min-height:48px; flex:1; max-width:180px; }
