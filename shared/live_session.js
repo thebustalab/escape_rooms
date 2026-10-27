@@ -18,17 +18,23 @@
  *     the p, and sends ONLY that p. Shown over the landing screen too, so it works before Enter.
  * Answers never reach the browser: the server deals a task without its answer and checks every click.
  * No student data: callsigns only, never a name or x500.
+ * SOLO (bathhouse only, 2026-10-27): a scenario with `solo` played where no live server answers (the public
+ * site) shows a setup form instead (minutes, herb bundles, baths to fill) and runs a one-player session in the
+ * browser (shared/live_solo.js), answering the same calls; everything below works unchanged on top of it.
  */
 
-import "./fish_stats.js?v=143";     // window.FishStats: the fish board's tests (Welch t), pinned to R
+import "./fish_stats.js?v=145";
+import { SoloSession } from "./live_solo.js?v=145";     // window.FishStats: the fish board's tests (Welch t), pinned to R
 
 const POLL_MS = 2000;
 const STORE = "liveSession";        // localStorage: { pid, code }
 
+let solo = null;                    // a SoloSession once a one-player game has started (no server)
 let st = null, stAt = 0, me = null, pollTimer = null, tickTimer = null, onChange = null, dismissedPhase = null;
 const $ = s => document.querySelector(s);
 
 async function api(path, body) {
+  if (solo) return solo.handle(path, body);
   const opts = body === undefined ? { cache: "no-store" }
     : { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) };
   const r = await fetch("/api/" + path, opts);
@@ -56,6 +62,11 @@ function injectStyle() {
   #liveJoin input { font:700 22px ui-monospace,Menlo,Consolas,monospace; letter-spacing:6px; width:7.2em;
     text-transform:uppercase; padding:8px 10px; border-radius:8px; border:2px solid rgba(255,216,140,.55);
     background:rgba(0,0,0,.35); color:#ffd88c; }
+  #liveSolo { margin:4px 0 12px; font:15px/1.4 system-ui; color:#ffecc8; }
+  #liveSolo .row { display:flex; flex-wrap:wrap; gap:10px 16px; align-items:center; margin:6px 0 10px; }
+  #liveSolo label { display:flex; gap:6px; align-items:center; }
+  #liveSolo input { font:700 18px ui-monospace,Menlo,Consolas,monospace; width:4.2em; padding:6px 8px; border-radius:8px;
+    border:2px solid rgba(255,216,140,.55); background:rgba(0,0,0,.35); color:#ffd88c; }
   #liveMsg { width:100%; min-height:1.3em; font:14px system-ui; color:rgba(255,216,140,.9); }
   #liveHud { position:absolute; top:10px; left:50%; transform:translateX(-50%); z-index:25; display:none;
     gap:14px; align-items:center; background:rgba(0,0,0,.5); border:1px solid rgba(255,216,140,.35);
@@ -112,8 +123,61 @@ function load() { try { return JSON.parse(localStorage.getItem(STORE) || "null")
  * Landing screen: put a join box above the Enter button and hold Enter back until the player has a
  * callsign. `enterBtn` is the player's own Enter button (its click handler is untouched).
  */
-export async function mountJoin(enterBtn) {
+export const isSolo = () => !!solo;
+
+/*
+ * SOLO setup (scenario.solo: {pool, minutes, goal, baths}): the player sets the length of the day, the herb
+ * bundles the big tub needs and how many small baths to fill, then starts. Bounds keep a typo from making an
+ * endless or instant game. `onSolo` lets the player turn its sound back on (a live class is silent).
+ */
+function mountSolo(enterBtn, scenario, onSolo) {
+  const cfg = scenario.solo || {};
+  const nSinks = Number.isInteger(cfg.maxBaths) ? cfg.maxBaths : 4;
+  const box = document.createElement("div");
+  box.id = "liveSolo";
+  box.innerHTML = `<div>Play on your own: choose your day.</div>
+    <div class="row">
+      <label>Minutes <input id="soloMinutes" type="number" min="1" max="60" value="${cfg.minutes || 12}"></label>
+      <label>Herb bundles <input id="soloGoal" type="number" min="1" max="500" value="${cfg.goal || 60}"></label>
+      <label>Baths to fill <input id="soloBaths" type="number" min="0" max="${nSinks}" value="${cfg.baths != null ? cfg.baths : 1}"></label>
+    </div>
+    <button id="soloGo">Start my day</button><div id="liveMsg"></div>`;
+  enterBtn.parentElement.insertBefore(box, enterBtn);
+  enterBtn.style.display = "none";
+  const msg = t => { $("#liveMsg").textContent = t || ""; };
+  const num = (id, lo, hi) => {
+    const v = Number($(id).value);
+    return Number.isInteger(v) && v >= lo && v <= hi ? v : null;
+  };
+  $("#soloGo").onclick = async () => {
+    const minutes = num("#soloMinutes", 1, 60), goal = num("#soloGoal", 1, 500), baths = num("#soloBaths", 0, nSinks);
+    if (minutes == null) return msg("Minutes: a whole number from 1 to 60.");
+    if (goal == null) return msg("Herb bundles: a whole number from 1 to 500.");
+    if (baths == null) return msg(`Baths to fill: a whole number from 0 to ${nSinks}.`);
+    $("#soloGo").disabled = true;
+    let pool;
+    try {
+      const r = await fetch(cfg.pool || "solo/pool.json", { cache: "no-store" });
+      pool = await r.json();
+    } catch (e) { $("#soloGo").disabled = false; return msg("Couldn't load the game. Check your connection and try again."); }
+    solo = new SoloSession(pool, { minutes, goal, baths });
+    me = { pid: "solo", callsign: "You" };
+    box.style.display = "none";
+    if (onSolo) onSolo();
+    startPolling();
+    enterBtn.style.display = "";
+    enterBtn.click();                          // straight into the world: the clock is already running
+  };
+}
+
+export async function mountJoin(enterBtn, scenario, onSolo) {
   injectStyle();
+  // SOLO: where no live server answers (the public site) a scenario with `solo` is played alone.
+  if (scenario && scenario.solo) {
+    let live = false;
+    try { const r = await api("state"); live = !!(r.j && r.j.phase); } catch (e) { live = false; }
+    if (!live) return mountSolo(enterBtn, scenario, onSolo);
+  }
   const box = document.createElement("div");
   box.id = "liveJoin";
   box.innerHTML = `<input id="liveCode" maxlength="4" autocomplete="off" autocapitalize="characters"
@@ -230,13 +294,16 @@ function render() {
   if (carrying) bits.push(plural(carrying, st.unit));
   for (const [k, n] of Object.entries(heldItems))
     if (n) bits.push(plural(n, ((st.items || {})[k] || {}).unit));
-  hud.querySelector(".lhCarry").textContent = bits.length ? "carrying " + bits.join(" and ") : "";
+  const bag = !!(st.me && st.me.backpack);   // the bathhouse backpack (2026-10-26): bigger caps, signed out once
+  hud.querySelector(".lhCarry").textContent = bits.length ? "carrying " + bits.join(" and ") + (bag ? " in your backpack" : "")
+                                                          : (bag ? "backpack on" : "");
   const ph = st.phase;
   if (dismissedPhase && dismissedPhase !== ph) dismissedPhase = null;    // a new phase brings its card back
   if (dismissedPhase === ph) overlay("hide");
   else if (ph === "paused") overlay("paused", "Paused", "Eyes on the screen at the front.");
-  else if (ph === "won") overlay("show", "You did it", total + " / " + goal + (label ? " " + label : "") + ". Nice work, crew.", true);
-  else if (ph === "timeup") overlay("show", "Time's up", "The class got " + total + " / " + goal + (label ? " " + label : "") + ".", true);
+  else if (ph === "won") overlay("show", "You did it", total + " / " + goal + (label ? " " + label : "") + ". " +
+                                 (st.won_text || "Nice work, crew."), true);   // won_text: e.g. where to escape to
+  else if (ph === "timeup") overlay("show", "Time's up", (st.solo ? "You got " : "The class got ") + total + " / " + goal + (label ? " " + label : "") + ".", true);
   else if (ph === "closed") overlay("show", "Session over", "Thanks for playing.");
   else if (!(me && st && !st.me)) overlay("hide");
   tick();
@@ -275,6 +342,12 @@ export async function deliver(sink) {
     else if (st.me) st.me.carrying = 0;
     render();
   }
+  return r;
+}
+// Check out a backpack (bathhouse's checkpoint tile wall): the server raises this player's caps.
+export async function backpack() {
+  const r = await api("backpack", { pid: me && me.pid });
+  if (r.ok && st && st.me) { st.me.backpack = true; st.me.caps = { ...(st.me.caps || {}), ...(r.j.caps || {}) }; render(); }
   return r;
 }
 export function noteCarrying(n, item) {

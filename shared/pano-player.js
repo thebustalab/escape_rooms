@@ -82,21 +82,21 @@
 // A bare `./variant_resolve.js` import is NOT refreshed by bumping the <script> tag's ?v, so a changed
 // helper module (e.g. a new export) leaves browsers on a stale cached copy → "doesn't provide an export
 // named X" SyntaxError → blank page (the 2026-08-05 airship regression). Bump all three together.
-import { WebRConsole } from "./webr-console.js?v=143";
-import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers, pickTransit } from "./variant_resolve.js?v=143";   // Phase 3: per-hotspot state variants; monorail switch-door nav
-import * as PQ from "./puzzle_queue.js?v=143";   // dynamic puzzle queue: location-independent puzzle serving
-import * as CP from "./corr_panel.js?v=143";   // lower-triangle layout of the grid gate (clouds correlation panel)
-import { particleCount } from "./particles.js?v=143";
-import { mountLandingBackdrop } from "./landing_backdrop.js?v=143";   // landing text over a pan of the first room's clip   // ambient-particle vocabulary + per-kind field density
-import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=143";
-import { condHolds } from "./cond.js?v=143";   // ledger + elevation-map card DOM
-import * as LIVE from "./live_session.js?v=143";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
-import * as RIDE from "./ride.js?v=143";
-import { mountPcaPlate } from "./pca_plate.js?v=143";   // the PCA plate instrument (voyage beach)
-import { mountFishBoard } from "./fish_board.js?v=143";   // the fish board instrument (harbour berth)
-import { mountDrawdown } from "./drawdown.js?v=143";   // the drawdown board instrument (diamonds escape)   // THE RIDE (subway): express lever + clip-sequence planner
-import * as BELL from "./bell_pull.js?v=143";
-import * as INVY from "./inventory.js?v=143";   // carried items + the door that asks which to use (dunes)   // bell-pull (#16): dial mode:"pull" + lock mode:"state" (spa belfry)
+import { WebRConsole } from "./webr-console.js?v=145";
+import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers, pickTransit } from "./variant_resolve.js?v=145";   // Phase 3: per-hotspot state variants; monorail switch-door nav
+import * as PQ from "./puzzle_queue.js?v=145";   // dynamic puzzle queue: location-independent puzzle serving
+import * as CP from "./corr_panel.js?v=145";   // lower-triangle layout of the grid gate (clouds correlation panel)
+import { particleCount } from "./particles.js?v=145";
+import { mountLandingBackdrop } from "./landing_backdrop.js?v=145";   // landing text over a pan of the first room's clip   // ambient-particle vocabulary + per-kind field density
+import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=145";
+import { condHolds } from "./cond.js?v=145";   // ledger + elevation-map card DOM
+import * as LIVE from "./live_session.js?v=145";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
+import * as RIDE from "./ride.js?v=145";
+import { mountPcaPlate } from "./pca_plate.js?v=145";   // the PCA plate instrument (voyage beach)
+import { mountFishBoard } from "./fish_board.js?v=145";   // the fish board instrument (harbour berth)
+import { mountDrawdown } from "./drawdown.js?v=145";   // the drawdown board instrument (diamonds escape)   // THE RIDE (subway): express lever + clip-sequence planner
+import * as BELL from "./bell_pull.js?v=145";
+import * as INVY from "./inventory.js?v=145";   // carried items + the door that asks which to use (dunes)   // bell-pull (#16): dial mode:"pull" + lock mode:"state" (spa belfry)
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 
@@ -386,7 +386,8 @@ function init(data) {
     }
   }
   // Live scenario: the join box sits above Enter and holds it back until the player has a callsign.
-  if (liveMode()) LIVE.mountJoin($("#enter"));
+  // SOLO (bathhouse): off the live server the player plays alone, with its own sound (setupMusic again).
+  if (liveMode()) LIVE.mountJoin($("#enter"), SCENARIO, () => { setupMusic(); setupSfxToggle(); });
   setupMusic();
   setupSfxToggle();
 }
@@ -403,7 +404,7 @@ const liveMode = () => !!(SCENARIO && SCENARIO.live) && !isTestPlay();
 // switch: setupMusic leaves `music` null and setupSfxToggle pins `sfxOn` false with both chips hidden, and
 // every other audio path (room layers, solve/dial stings, transit sfx) already checks one of those two;
 // instruments get `sound:false`. Pinned by tests/live_silent.mjs.
-const liveSilent = () => liveMode();
+const liveSilent = () => liveMode() && !LIVE.isSolo();   // a solo game (no class console) has its own sound
 function setupMusic() {
   const chip = $("#musicChip"), credit = $("#musicCredit"), state = $("#musicState");
   if (!SCENARIO.music || liveSilent()) { chip.style.display = "none"; return; }
@@ -2063,6 +2064,7 @@ function onHotspot(evt, h) {   // Pannellum calls clickHandlerFunc(event, clickH
     if (h.type === "instrument") return openInstrument(h);   // read by eye — no gate, no notebook
     if (h.type === "station") return openStation(h);   // LIVE: the server deals a task of h.tier (never a gate)
     if (h.type === "deliver") return deliverLoad(h);   // LIVE: unload what you carry into the class total
+    if (h.type === "backpack") return openBackpack(h); // LIVE: sign a tile, check out a bigger carry (bathhouse)
     if (h.type === "lever") {
       // THE RIDE's one cab control (scenario.ride). Gated like a dial; see openLever.
       if (!condOK(h.availableWhen)) return openLocked(h);
@@ -4053,7 +4055,9 @@ async function openStation(h) {
           // A task may fill a SECOND item (bathhouse: a bath token), with its own unit, cap and destination.
           const it = a.j.item && st && st.items && st.items[a.j.item];
           const unit = (it ? it.unit : st && st.unit) || ["gourd", "gourds"];
-          const cap = it ? it.carry_max : st && st.carry_max;
+          // this player's own cap: a checked-out backpack raises it (st.me.caps, keyed "" for the main unit)
+          const myCaps = (st && st.me && st.me.caps) || {};
+          const cap = myCaps[a.j.item || ""] || (it ? it.carry_max : st && st.carry_max);
           // The pool's right_feedback (if any) says WHY it is right; the carry line is always ours.
           const dest = (it ? it.deliver_to : st && st.deliver_to) || "the canoe", them = a.j.carrying === 1 ? "it" : "them";
           // A pool with carry_max (bathhouse: 5) lets loads stack: until the arms are full, say both options.
@@ -4102,6 +4106,67 @@ async function openStation(h) {
     : buildPickCard(task.pick, () => closeModal(), "live:" + d.deal_id, task));
   grid.appendChild(left); grid.appendChild(right);
   openModal(task.label, grid, null, null, "wide");
+}
+// THE BACKPACK (bathhouse's checkpoint room, 2026-10-26): a `backpack` hotspot is a wall of little tiles, one
+// per backpack. Signing one checks out a backpack, which raises what this player can carry (the pool's
+// `backpack` caps, held by the server or the solo session). With `askName` (bathhouse, Lucas 2026-10-27) the
+// player TYPES a name for the tile; it is kept in this browser's localStorage ONLY and is never sent anywhere
+// (the server gets the same bare checkout call). Without it the tile carries the anonymous callsign.
+const tileNameKey = () => "tileName:" + ((SCENARIO && SCENARIO.chapter) || "") + "/" + ((SCENARIO && SCENARIO.scenario) || "");
+function tileName() { try { return localStorage.getItem(tileNameKey()) || ""; } catch (e) { return ""; } }
+function openBackpack(h) {
+  if (!liveMode()) return toast("Backpacks are checked out during the live class session.");
+  if (!LIVE.isJoined()) return toast("Join the session first.");
+  const st = LIVE.state(), me = st && st.me;
+  const caps = (me && me.caps) || {};
+  const d = document.createElement("div");
+  const p = document.createElement("p");
+  const intro = h.body || "A wall of little tiles, one for each backpack. A red tile still has its backpack waiting; " +
+    "a white one has been turned to the wall by whoever took it.";
+  p.textContent = intro;
+  d.appendChild(p);
+  let nameIn = null;
+  if (h.askName && !(me && me.backpack)) {
+    nameIn = document.createElement("input");
+    nameIn.id = "tileName"; nameIn.maxLength = 24; nameIn.autocomplete = "off"; nameIn.placeholder = "Your name";
+    nameIn.value = tileName();
+    nameIn.style.cssText = "font:600 18px system-ui;padding:8px 10px;border-radius:8px;margin:4px 0 10px;width:min(100%,260px);" +
+      "border:2px solid rgba(255,216,140,.55);background:rgba(0,0,0,.35);color:#ffd88c";
+    const lab = document.createElement("p"); lab.textContent = "Write your name on a tile:";
+    d.appendChild(lab); d.appendChild(nameIn);
+  }
+  const btn = document.createElement("button"); btn.className = "qsubmit";
+  const done = (c) => {
+    const unit = (st && st.unit) || ["load", "loads"];
+    const bits = [c[""] ? c[""] + " " + unit[1] : ""].concat(Object.entries((st && st.items) || {})
+      .map(([k, v]) => c[k] ? c[k] + " " + (v.unit || [k, k])[1] : "")).filter(Boolean);
+    btn.disabled = true;
+    btn.textContent = "✓ Backpack on";
+    const q = document.createElement("p");
+    const who = (h.askName && tileName()) || (me && me.callsign) || "your name";
+    q.textContent = "Your tile is turned to the wall with " + who +
+      " on the back. Your backpack holds up to " + bits.join(" and ") + ".";
+    d.appendChild(q);
+  };
+  if (me && me.backpack) done(caps);
+  else {
+    btn.textContent = "Sign a tile and take a backpack";
+    btn.onclick = async () => {
+      if (nameIn) {                           // the typed name stays on this device: localStorage only
+        const nm = nameIn.value.trim();
+        if (!nm) { nameIn.focus(); return toast("Write your name on the tile first."); }
+        try { localStorage.setItem(tileNameKey(), nm); } catch (e) {}
+        nameIn.disabled = true;
+      }
+      btn.disabled = true;
+      const r = await LIVE.backpack().catch(() => null);
+      if (!r || !r.ok) { btn.disabled = false; return toast((r && r.j && r.j.error) || "Can't reach the class session."); }
+      done(r.j.caps || {});
+      toast("You've got a backpack!");
+    };
+  }
+  d.appendChild(btn);
+  openModal(h.label || "The tile wall", d, null, h);
 }
 function markFilled(ids) {
   let changed = false;
@@ -4697,7 +4762,7 @@ function finishAnalysis() {
 function showEscapeDone() {
   escapeFinished = true;                            // the escape is solved → debrief no longer needs a spoiler guard
   if (escapeFinishedTime == null) escapeFinishedTime = Date.now();   // stamp escape-phase end (once)
-  showSubmitChip();                                 // stays visible; label drops the now-moot "skip" half
+  if (!liveMode()) showSubmitChip();                // stays visible; label drops the now-moot "skip" half (live: nothing to submit)
   stopRoomSfx();                                    // silence the escape-room ambience on the finish card
   const e = SCENARIO.escapeDone || {};
   $("#doneTitle").textContent = e.title || "You escaped!";
@@ -4710,7 +4775,7 @@ function showEscapeDone() {
   $("#doneClose").onclick = () => $("#done").classList.remove("open");
   const toSub = $("#doneToSubmit");
   toSub.className = "";                           // default button style (the analysis card uses the chip style)
-  toSub.style.display = "";
+  toSub.style.display = liveMode() ? "none" : "";   // a live class has nothing to submit (bathhouse escape, 2026-10-26)
   toSub.textContent = "Prepare submission →";
   toSub.onclick = openSubmitPrep;
   $("#replay").style.display = "none";           // no play-again on the escape finish card (2026-07-28, Lucas)

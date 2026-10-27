@@ -11,7 +11,8 @@
   "datasets": [],
   "setup": "",
   "state": {
-    "train_line": "lake"
+    "train_line": "lake",
+    "boiler_hatch": false
   },
   "_designNotes": {
     "buildState": "Rooms, graph and scene specs written by _scratch/build_scenario.py (2026-10-20). Live scenario: puzzles are dealt by the live-class server (authoring_v2/live_class/pool/bathhouse.json), never stored here. Multiple choice, no R. No codec id, no escape, ungraded. See notes.md."
@@ -523,7 +524,7 @@
       "title": "The boiler room",
       "built": true,
       "unlockedWhen": true,
-      "designNote": "Station (1 herb bundle): the wall of herb drawers. Doors: up the outside stairs to the bridge, up the inside stairs to the atrium.",
+      "designNote": "Station (1 herb bundle): the wall of herb drawers. Doors: up the outside stairs to the bridge, up the inside stairs to the atrium, and (2026-10-26) the SECRET DOOR: a little green sliding door, locked with a one-digit code. The cue is on the drawer wall: 3 BLUE drawers open high up and 4 YELLOW drawers open low down; blue and yellow make green, so the green door opens with three plus four, seven. Behind it, the gear works.",
       "plannedHotspots": [
         {
           "type": "door",
@@ -543,12 +544,61 @@
           "tier": 1,
           "label": "The wall of herb drawers",
           "box": [
-            0.218,
-            0.0,
-            0.378,
-            0.6
+            0.25,
+            0.1,
+            0.395,
+            0.66
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "lock",
+          "label": "The little green door",
+          "answer": "7",
+          "length": 1,
+          "maxAttempts": 0,
+          "feedback": {
+            "correct": "Click, rumble, slide: the little green door rolls open.",
+            "wrong": "The little green door doesn't budge."
+          },
+          "onSolve": [
+            {
+              "set": "boiler_hatch",
+              "to": true
+            }
+          ],
+          "shownWhen": {
+            "ne": [
+              "boiler_hatch",
+              true
+            ]
+          },
+          "box": [
+            0.643,
+            0.44,
+            0.7,
+            0.635
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "to": "gearworks",
+          "label": "Through the little green door",
+          "shownWhen": {
+            "eq": [
+              "boiler_hatch",
+              true
+            ]
+          },
+          "box": [
+            0.643,
+            0.44,
+            0.7,
+            0.635
+          ],
+          "boxSource": "moved:agent"
         },
         {
           "type": "door",
@@ -556,10 +606,10 @@
           "to": "atrium",
           "label": "Up the stairs to the atrium",
           "box": [
-            0.69,
-            0.22,
-            0.77,
-            0.63
+            0.725,
+            0.15,
+            0.835,
+            0.65
           ],
           "boxSource": "moved:agent"
         }
@@ -593,12 +643,49 @@
               "at": "just left of centre",
               "label": "The wall of herb drawers",
               "station": 1,
-              "desc": "a towering wall of hundreds of small wooden drawers, floor to ceiling, each with a little brass pull, a few pulled open and spilling dried herbs"
+              "desc": "a towering wall of hundreds of small wooden drawers, floor to ceiling, each with a little brass pull, every drawer closed and plain dark brown wood EXCEPT seven: high up near the ceiling, EXACTLY THREE drawers pulled half open, their fronts painted bright sky BLUE; low down near the floor, EXACTLY FOUR drawers pulled half open, their fronts painted bright sunny YELLOW; the open drawers spill dried herbs"
             },
             {
               "id": "furnace",
               "at": "dead ahead in the centre",
               "desc": "a huge black iron furnace with its round door open and a roaring orange fire inside, big pipes rising from it into the ceiling"
+            },
+            {
+              "id": "green_door",
+              "at": "just right of centre",
+              "label": "The little green door",
+              "lock": {
+                "answer": "7",
+                "length": 1,
+                "feedback": {
+                  "correct": "Click, rumble, slide: the little green door rolls open.",
+                  "wrong": "The little green door doesn't budge."
+                },
+                "onSolve": [
+                  {
+                    "set": "boiler_hatch",
+                    "to": true
+                  }
+                ],
+                "shownWhen": {
+                  "ne": [
+                    "boiler_hatch",
+                    true
+                  ]
+                }
+              },
+              "door": {
+                "direction": "open",
+                "to": "gearworks",
+                "label": "Through the little green door",
+                "shownWhen": {
+                  "eq": [
+                    "boiler_hatch",
+                    true
+                  ]
+                }
+              },
+              "desc": "set low into the dark wooden wall, a small sliding wooden door about as tall as a child, its panel painted bright GRASS GREEN, shut, sitting in a wooden groove so it would slide sideways, with one small round brass finger-pull"
             },
             {
               "id": "inside_stairs",
@@ -617,11 +704,22 @@
             }
           ],
           "soundBed": "a hot boiler room: the steady roar of the furnace fire, pipes ticking and hissing.",
-          "rigid": "the drawers, the furnace, the pipes, the stairs, the door",
+          "rigid": "the drawers, the furnace, the pipes, the stairs, the door, the little green door",
           "atmosphere": "very hot and steamy but cosy, orange firelight on dark wood and brass",
           "styleLight": "early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red",
-          "negatives": "No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described.",
-          "states": {},
+          "negatives": "No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. Exactly three BLUE drawers high up and exactly four YELLOW drawers low down are open; every other drawer is closed plain wood. ONE small green door only.",
+          "states": {
+            "hatch_open": {
+              "change": "the little green sliding door only",
+              "elements": {
+                "green_door": {
+                  "desc": "the small green sliding wooden door has slid sideways in its groove and stands OPEN, revealing a low doorway, the floor running level through it into a warm golden glow beyond where big wooden and brass gear wheels can be glimpsed turning"
+                }
+              },
+              "constraints": "Only the little door changes: it keeps its size, colour and place in the wall, and the drawers (three blue high up, four yellow low down), the furnace, the stairs and everything else stay exactly as they are. No people, no text.",
+              "stillOnly": true
+            }
+          },
           "continuity": [],
           "scaffold": {
             "kind": "skeleton",
@@ -652,6 +750,15 @@
                   }
                 ],
                 [
+                  "door",
+                  "green_door",
+                  {
+                    "w": 0.8,
+                    "h": 1.2,
+                    "say": "the small green sliding door, shut, its sill level with the floor"
+                  }
+                ],
+                [
                   "stair_up",
                   "inside_stairs"
                 ],
@@ -675,18 +782,34 @@
         "plateRefs": [
           "atrium/scene.png"
         ],
-        "scenePrompt": "This is a seamless 360-degree panorama from the hot, cosy boiler room deep at the bottom of a colossal, whimsical spirit bathhouse in old Japan, built entirely of wood: red-lacquered pillars and beams, green-painted rails and panels, gold trim and gold ornaments, yellow paper screens, curved tiled roofs stacked storey on storey like a grand pagoda; hand-painted animated-film look, rich saturated colour, soft painterly detail. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stretch of dark smoke-stained wooden wall, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: a plain stretch of dark smoke-stained wooden wall, uniform and unbroken, joining its other half cleanly at the seam directly behind you; to the left, a small open wooden door, the floor running level over its sill to the foot of a steep narrow staircase climbing up outside into the dusk; just left of centre, a towering wall of hundreds of small wooden drawers, floor to ceiling, each with a little brass pull, a few pulled open and spilling dried herbs; dead ahead in the centre, a huge black iron furnace with its round door open and a roaring orange fire inside, big pipes rising from it into the ceiling; to the right, a wooden staircase starting at the floor and climbing up through an opening in the ceiling toward warm lantern light; on the far right, the right half of the calm view directly behind the viewer: a plain stretch of dark smoke-stained wooden wall, uniform and unbroken, joining its other half cleanly at the seam directly behind you. very hot and steamy but cosy, orange firelight on dark wood and brass. No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. Shot on a full-frame DSLR at 24mm, f/8, early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a plain stretch of dark smoke-stained wooden wall, uniform and unbroken, with no visible seam, join, or repetition.",
+        "scenePrompt": "This is a seamless 360-degree panorama from the hot, cosy boiler room deep at the bottom of a colossal, whimsical spirit bathhouse in old Japan, built entirely of wood: red-lacquered pillars and beams, green-painted rails and panels, gold trim and gold ornaments, yellow paper screens, curved tiled roofs stacked storey on storey like a grand pagoda; hand-painted animated-film look, rich saturated colour, soft painterly detail. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stretch of dark smoke-stained wooden wall, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: a plain stretch of dark smoke-stained wooden wall, uniform and unbroken, joining its other half cleanly at the seam directly behind you; to the left, a small open wooden door, the floor running level over its sill to the foot of a steep narrow staircase climbing up outside into the dusk; just left of centre, a towering wall of hundreds of small wooden drawers, floor to ceiling, each with a little brass pull, every drawer closed and plain dark brown wood EXCEPT seven: high up near the ceiling, EXACTLY THREE drawers pulled half open, their fronts painted bright sky BLUE; low down near the floor, EXACTLY FOUR drawers pulled half open, their fronts painted bright sunny YELLOW; the open drawers spill dried herbs; dead ahead in the centre, a huge black iron furnace with its round door open and a roaring orange fire inside, big pipes rising from it into the ceiling; just right of centre, set low into the dark wooden wall, a small sliding wooden door about as tall as a child, its panel painted bright GRASS GREEN, shut, sitting in a wooden groove so it would slide sideways, with one small round brass finger-pull; to the right, a wooden staircase starting at the floor and climbing up through an opening in the ceiling toward warm lantern light; on the far right, the right half of the calm view directly behind the viewer: a plain stretch of dark smoke-stained wooden wall, uniform and unbroken, joining its other half cleanly at the seam directly behind you. very hot and steamy but cosy, orange firelight on dark wood and brass. No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. Exactly three BLUE drawers high up and exactly four YELLOW drawers low down are open; every other drawer is closed plain wood. ONE small green door only. Shot on a full-frame DSLR at 24mm, f/8, early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a plain stretch of dark smoke-stained wooden wall, uniform and unbroken, with no visible seam, join, or repetition.",
         "seam": {
           "stage": "blurred",
           "band": "sky",
           "ratio": 0.0,
           "delta": 0.0,
           "needsWork": false,
-          "accepted": true,
+          "accepted": false,
           "seamBandRun": 0.0,
-          "at": "2026-10-20T20:34:54",
+          "at": "2026-10-26T22:38:45",
           "acceptedBy": "lucas via agent 2026-10-20",
-          "humanNote": "Lucas 2026-10-20: 'Those rooms are all good.'"
+          "humanNote": "Lucas 2026-10-20: 'Those rooms are all good.'",
+          "states": {
+            "hatch_open": {
+              "stage": "screened",
+              "band": "ground",
+              "ratio": 0.97,
+              "delta": 0.67,
+              "needsWork": false,
+              "accepted": false,
+              "seamBandRun": 0.02,
+              "at": "2026-10-26T22:42:53"
+            }
+          }
+        },
+        "boxesFrom": {
+          "art": "00a620c1c551",
+          "at": "2026-10-26T22:39:14"
         }
       },
       "mapPos": {
@@ -694,7 +817,7 @@
         "r": 3
       },
       "panorama": "boiler/scene.png",
-      "builtFrom": "l1_boiler_1.png",
+      "builtFrom": "l1_boiler_2.png",
       "wrap": {
         "haov": 360,
         "vaov": 90,
@@ -704,45 +827,127 @@
       },
       "hotspots": [
         {
+          "id": "the_wall_of_herb_drawers",
+          "type": "station",
+          "label": "The wall of herb drawers",
+          "tier": 1,
+          "box": [
+            0.25,
+            0.1,
+            0.395,
+            0.66
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "up_the_stairs_to_the_atrium",
+          "type": "door",
+          "label": "Up the stairs to the atrium",
+          "direction": "open",
+          "to": "atrium",
+          "box": [
+            0.725,
+            0.15,
+            0.835,
+            0.65
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
           "id": "up_the_outside_stairs_to_the_bridge",
           "type": "door",
           "label": "Up the outside stairs to the bridge",
+          "direction": "back",
+          "to": "bridge",
           "box": [
             0.135,
             0.22,
             0.215,
             0.66
           ],
-          "direction": "back",
-          "to": "bridge",
           "boxSource": "moved:agent"
         },
         {
-          "id": "the_wall_of_herb_drawers",
-          "type": "station",
-          "label": "The wall of herb drawers",
-          "box": [
-            0.218,
-            0.0,
-            0.378,
-            0.6
+          "type": "lock",
+          "label": "The little green door",
+          "answer": "7",
+          "length": 1,
+          "maxAttempts": 0,
+          "feedback": {
+            "correct": "Click, rumble, slide: the little green door rolls open.",
+            "wrong": "The little green door doesn't budge."
+          },
+          "onSolve": [
+            {
+              "set": "boiler_hatch",
+              "to": true
+            }
           ],
-          "tier": 1,
-          "boxSource": "draft:skeleton"
+          "shownWhen": {
+            "ne": [
+              "boiler_hatch",
+              true
+            ]
+          },
+          "box": [
+            0.643,
+            0.44,
+            0.7,
+            0.635
+          ],
+          "boxSource": "moved:agent",
+          "id": "the_little_green_door"
         },
         {
-          "id": "up_the_stairs_to_the_atrium",
           "type": "door",
-          "label": "Up the stairs to the atrium",
-          "box": [
-            0.69,
-            0.22,
-            0.77,
-            0.63
-          ],
+          "label": "Through the little green door",
           "direction": "open",
-          "to": "atrium",
-          "boxSource": "moved:agent"
+          "to": "gearworks",
+          "shownWhen": {
+            "eq": [
+              "boiler_hatch",
+              true
+            ]
+          },
+          "box": [
+            0.643,
+            0.44,
+            0.7,
+            0.635
+          ],
+          "boxSource": "moved:agent",
+          "id": "through_the_little_green_door"
+        },
+        {
+          "id": "hatch_wash",
+          "type": "ambient",
+          "label": "Nightfall",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Full-scene state variant. `ambient` is filtered out of rendering, so this carrier shows no marker and intercepts no clicks; it exists only to hold the variant art.",
+          "variants": [
+            {
+              "state": "hatch_open",
+              "box": [
+                0,
+                0,
+                1,
+                1
+              ],
+              "prompt": "Keep this exact scene, composition, camera framing and every object precisely where it is, and change ONLY the little green sliding door only: The small green sliding wooden door has slid sideways in its groove and stands OPEN, revealing a low doorway, the floor running level through it into a warm golden glow beyond where big wooden and brass gear wheels can be glimpsed turning. Only the little door changes: it keeps its size, colour and place in the wall, and the drawers (three blue high up, four yellow low down), the furnace, the stairs and everything else stay exactly as they are. No people, no text.",
+              "panorama": "boiler/scene_hatch_open.png",
+              "when": {
+                "eq": [
+                  "boiler_hatch",
+                  true
+                ]
+              }
+            }
+          ]
         }
       ]
     },
@@ -1375,8 +1580,27 @@
       "title": "The sleeping quarters",
       "built": true,
       "unlockedWhen": true,
-      "designNote": "Station (1 herb bundle): the low table. Back down to the atrium only.",
+      "designNote": "Station (1 herb bundle): the low table. Back down to the atrium only. THE ESCAPE (Lucas, 2026-10-26): once the class has won (liveWon), sleeping bags are laid out (state sleeping) and the sleeping bags become the victory click that ends the game.",
       "plannedHotspots": [
+        {
+          "type": "door",
+          "direction": "open",
+          "endsEscape": true,
+          "label": "Curl up in a sleeping bag",
+          "shownWhen": {
+            "eq": [
+              "liveWon",
+              true
+            ]
+          },
+          "box": [
+            0.46,
+            0.6,
+            0.73,
+            0.92
+          ],
+          "boxSource": "moved:agent"
+        },
         {
           "type": "station",
           "tier": 1,
@@ -1420,6 +1644,15 @@
             {
               "id": "futons",
               "at": "to the left",
+              "label": "Curl up in a sleeping bag",
+              "victory": {
+                "shownWhen": {
+                  "eq": [
+                    "liveWon",
+                    true
+                  ]
+                }
+              },
               "desc": "rows of rolled-up futons and folded quilts on the smooth wooden floor"
             },
             {
@@ -1455,7 +1688,18 @@
           "atmosphere": "cosy, quiet and homely, the windows full of dusk",
           "styleLight": "early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red",
           "negatives": "No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described.",
-          "states": {},
+          "states": {
+            "sleeping": {
+              "change": "the floor of the room: sleeping bags laid out",
+              "elements": {
+                "futons": {
+                  "desc": "the futons and quilts are now unrolled into a whole row of cosy sleeping bags laid out side by side across the smooth wooden floor, in soft red, green and gold, each with a plump white pillow, their tops folded back invitingly, ready for a long sleep"
+                }
+              },
+              "constraints": "The room, the low table and its basket, the windows, the stairs and the light stay exactly as they are; only the bedding on the floor changes. No people, no text.",
+              "stillOnly": true
+            }
+          },
           "continuity": [],
           "scaffold": {
             "kind": "skeleton",
@@ -1519,7 +1763,19 @@
           "seamBandRun": 0.0,
           "at": "2026-10-20T20:34:54",
           "acceptedBy": "lucas via agent 2026-10-20",
-          "humanNote": "Lucas 2026-10-20: 'Those rooms are all good.'"
+          "humanNote": "Lucas 2026-10-20: 'Those rooms are all good.'",
+          "states": {
+            "sleeping": {
+              "stage": "blurred",
+              "band": "sky",
+              "ratio": 0.0,
+              "delta": 0.0,
+              "needsWork": false,
+              "accepted": false,
+              "seamBandRun": 0.0,
+              "at": "2026-10-26T22:37:05"
+            }
+          }
         }
       },
       "mapPos": {
@@ -1562,6 +1818,57 @@
           "direction": "back",
           "to": "atrium",
           "boxSource": "moved:agent"
+        },
+        {
+          "id": "sleeping_wash",
+          "type": "ambient",
+          "label": "Nightfall",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Full-scene state variant. `ambient` is filtered out of rendering, so this carrier shows no marker and intercepts no clicks; it exists only to hold the variant art.",
+          "variants": [
+            {
+              "state": "sleeping",
+              "box": [
+                0,
+                0,
+                1,
+                1
+              ],
+              "prompt": "Keep this exact scene, composition, camera framing and every object precisely where it is, and change ONLY the floor of the room: sleeping bags laid out: The futons and quilts are now unrolled into a whole row of cosy sleeping bags laid out side by side across the smooth wooden floor, in soft red, green and gold, each with a plump white pillow, their tops folded back invitingly, ready for a long sleep. The room, the low table and its basket, the windows, the stairs and the light stay exactly as they are; only the bedding on the floor changes. No people, no text.",
+              "panorama": "quarters/scene_sleeping.png",
+              "when": {
+                "eq": [
+                  "liveWon",
+                  true
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "type": "door",
+          "label": "Curl up in a sleeping bag",
+          "direction": "open",
+          "endsEscape": true,
+          "shownWhen": {
+            "eq": [
+              "liveWon",
+              true
+            ]
+          },
+          "box": [
+            0.46,
+            0.6,
+            0.73,
+            0.92
+          ],
+          "boxSource": "moved:agent",
+          "id": "curl_up_in_a_sleeping_bag"
         }
       ]
     },
@@ -1570,7 +1877,7 @@
       "title": "The guest hallway",
       "built": true,
       "unlockedWhen": true,
-      "designNote": "Station (LEVEL 2, track stall: 2, 3 or 4 times 2, 3 or 4; pays 1 BATH TOKEN): the bath token stall. Doors: the elevator back down to the atrium, the stairs up to the dragon bedroom (2026-10-25).",
+      "designNote": "Station (LEVEL 2, track stall: 2, 3 or 4 times 2, 3 or 4; pays 1 BATH TOKEN): the bath token stall. Doors: the elevator back down to the atrium, the stairs up to the dragon bedroom (2026-10-25), down the corridor to the checkpoint room (2026-10-26).",
       "plannedHotspots": [
         {
           "type": "door",
@@ -1595,6 +1902,19 @@
             0.27,
             0.4,
             0.7
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "to": "checkpoint",
+          "label": "Down the corridor to the checkpoint room",
+          "box": [
+            0.45,
+            0.3,
+            0.55,
+            0.62
           ],
           "boxSource": "moved:agent"
         },
@@ -1647,6 +1967,11 @@
             {
               "id": "corridor",
               "at": "dead ahead in the centre",
+              "label": "Down the corridor to the checkpoint room",
+              "door": {
+                "direction": "open",
+                "to": "checkpoint"
+              },
               "desc": "the corridor running straight away from the viewer, level, between rows of sliding paper doors glowing yellow, paper lanterns hanging from the low beamed ceiling"
             },
             {
@@ -1791,6 +2116,20 @@
           "direction": "open",
           "to": "bedroom",
           "boxSource": "moved:agent"
+        },
+        {
+          "type": "door",
+          "label": "Down the corridor to the checkpoint room",
+          "direction": "open",
+          "to": "checkpoint",
+          "box": [
+            0.45,
+            0.3,
+            0.55,
+            0.62
+          ],
+          "boxSource": "moved:agent",
+          "id": "down_the_corridor_to_the_checkpoint_room"
         }
       ]
     },
@@ -5182,6 +5521,418 @@
           "track": "sewing"
         }
       ]
+    },
+    {
+      "key": "checkpoint",
+      "title": "The checkpoint room",
+      "built": true,
+      "unlockedWhen": true,
+      "designNote": "The TILE WALL: sign a tile, check out a backpack (carry up to 10 herb bundles and 10 bath tokens; pool `backpack`). No station. Back up the corridor to the hallway only.",
+      "plannedHotspots": [
+        {
+          "type": "door",
+          "direction": "back",
+          "to": "hallway",
+          "label": "Back up the corridor",
+          "box": [
+            0.155,
+            0.24,
+            0.255,
+            0.68
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "backpack",
+          "label": "The tile wall",
+          "askName": true,
+          "box": [
+            0.395,
+            0.24,
+            0.61,
+            0.58
+          ],
+          "boxSource": "moved:agent"
+        }
+      ],
+      "authoring": {
+        "sceneSpec": {
+          "room": "checkpoint",
+          "setting": "a small square room at the end of an upper-floor corridor of a colossal, whimsical spirit bathhouse in old Japan, built entirely of wood: red-lacquered pillars and beams, green-painted rails and panels, gold trim and gold ornaments, yellow paper screens, curved tiled roofs stacked storey on storey like a grand pagoda; hand-painted animated-film look, rich saturated colour, soft painterly detail, where workers sign out their gear",
+          "interior": true,
+          "indoor": true,
+          "seam": "a plain stretch of row of closed sliding paper doors in dark wooden frames, uniform and unbroken",
+          "seamOccluder": "a square red-lacquered wooden post, floor to ceiling",
+          "elements": [
+            {
+              "id": "seam_left",
+              "at": "on the far left",
+              "desc": "the left half of the calm view directly behind the viewer: a plain stretch of row of closed sliding paper doors in dark wooden frames, uniform and unbroken, joining its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "corridor_back",
+              "at": "to the left",
+              "label": "Back up the corridor",
+              "door": {
+                "direction": "back",
+                "to": "hallway"
+              },
+              "desc": "an open doorway, the floor running level through it into a long lantern-lit corridor lined with glowing paper doors"
+            },
+            {
+              "id": "tile_wall",
+              "at": "dead ahead in the centre",
+              "label": "The tile wall",
+              "backpack": true,
+              "askName": true,
+              "desc": "on the wall, a big dark wooden board hung with neat rows of small flat rectangular wooden tiles, each about the size of a hand, every one hanging from its own little brass peg; about half of them face out showing a bright glossy RED painted face, and the rest are flipped round to face the wall so their plain WHITE backs show; the tiles are blank, with no writing"
+            },
+            {
+              "id": "backpacks",
+              "at": "just right of centre",
+              "desc": "below a long shelf, a row of small sturdy canvas backpacks in faded red and green hanging from wooden hooks, buckles and straps neat"
+            },
+            {
+              "id": "bench",
+              "at": "to the right",
+              "desc": "a low wooden bench with a folded blanket and a lantern on it"
+            },
+            {
+              "id": "seam_right",
+              "at": "on the far right",
+              "desc": "the right half of the calm view directly behind the viewer: a plain stretch of row of closed sliding paper doors in dark wooden frames, uniform and unbroken, joining its other half cleanly at the seam directly behind you"
+            }
+          ],
+          "soundBed": "a quiet little room: tiles clicking gently on their pegs, the bathhouse humming far below.",
+          "rigid": "the tile board and its tiles, the backpacks and hooks, the shelf, the bench, the doorway",
+          "atmosphere": "tidy, warm and orderly, lantern light on red tiles and dark wood",
+          "styleLight": "early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red",
+          "negatives": "No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. The tiles carry NO writing, numbers or marks: plain red faces and plain white backs only.",
+          "states": {},
+          "continuity": [],
+          "scaffold": {
+            "kind": "skeleton",
+            "layout": {
+              "surface": "room",
+              "word": "floor",
+              "floor": "smooth polished wooden floor",
+              "size": [
+                3,
+                3,
+                3.5,
+                2.6
+              ],
+              "sides": {
+                "left": "houses",
+                "right": "houses",
+                "front": "houses",
+                "back": "houses"
+              },
+              "parts": [
+                [
+                  "door",
+                  "corridor_back",
+                  {
+                    "w": 1.4,
+                    "h": 2.4,
+                    "say": "the open doorway back into the corridor, the floor running level through it"
+                  }
+                ],
+                [
+                  "prop",
+                  "tile_wall",
+                  {
+                    "size": [
+                      2.0,
+                      0.1,
+                      1.4
+                    ],
+                    "kind": "wall"
+                  }
+                ],
+                [
+                  "prop",
+                  "backpacks",
+                  {
+                    "size": [
+                      1.6,
+                      0.4,
+                      1.0
+                    ],
+                    "kind": "wall"
+                  }
+                ]
+              ]
+            }
+          },
+          "stillOnly": true
+        },
+        "plateRefs": [
+          "atrium/scene.png"
+        ],
+        "scenePrompt": "This is a seamless 360-degree panorama from a small square room at the end of an upper-floor corridor of a colossal, whimsical spirit bathhouse in old Japan, built entirely of wood: red-lacquered pillars and beams, green-painted rails and panels, gold trim and gold ornaments, yellow paper screens, curved tiled roofs stacked storey on storey like a grand pagoda; hand-painted animated-film look, rich saturated colour, soft painterly detail, where workers sign out their gear. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stretch of row of closed sliding paper doors in dark wooden frames, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: a plain stretch of row of closed sliding paper doors in dark wooden frames, uniform and unbroken, joining its other half cleanly at the seam directly behind you; to the left, an open doorway, the floor running level through it into a long lantern-lit corridor lined with glowing paper doors; dead ahead in the centre, on the wall, a big dark wooden board hung with neat rows of small flat rectangular wooden tiles, each about the size of a hand, every one hanging from its own little brass peg; about half of them face out showing a bright glossy RED painted face, and the rest are flipped round to face the wall so their plain WHITE backs show; the tiles are blank, with no writing; just right of centre, below a long shelf, a row of small sturdy canvas backpacks in faded red and green hanging from wooden hooks, buckles and straps neat; to the right, a low wooden bench with a folded blanket and a lantern on it; on the far right, the right half of the calm view directly behind the viewer: a plain stretch of row of closed sliding paper doors in dark wooden frames, uniform and unbroken, joining its other half cleanly at the seam directly behind you. tidy, warm and orderly, lantern light on red tiles and dark wood. No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. The tiles carry NO writing, numbers or marks: plain red faces and plain white backs only. Shot on a full-frame DSLR at 24mm, f/8, early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a plain stretch of row of closed sliding paper doors in dark wooden frames, uniform and unbroken, with no visible seam, join, or repetition.",
+        "seam": {
+          "stage": "blurred",
+          "band": "sky",
+          "ratio": 0.0,
+          "delta": 0.0,
+          "needsWork": false,
+          "accepted": false,
+          "seamBandRun": 0.0,
+          "at": "2026-10-26T22:40:21"
+        }
+      },
+      "mapPos": {
+        "c": 3,
+        "r": 2
+      },
+      "panorama": "checkpoint/scene.png",
+      "builtFrom": "l1_checkpoint_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "hotspots": [
+        {
+          "id": "back_up_the_corridor",
+          "type": "door",
+          "label": "Back up the corridor",
+          "direction": "back",
+          "to": "hallway",
+          "box": [
+            0.155,
+            0.24,
+            0.255,
+            0.68
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "the_tile_wall",
+          "type": "backpack",
+          "label": "The tile wall",
+          "box": [
+            0.395,
+            0.24,
+            0.61,
+            0.58
+          ],
+          "boxSource": "moved:agent",
+          "askName": true
+        }
+      ]
+    },
+    {
+      "key": "gearworks",
+      "title": "The gear works",
+      "built": true,
+      "unlockedWhen": true,
+      "designNote": "Station (LEVEL 2, 2 herb bundles, track gears; 3 doors from the tub): the basket on the workbench. Back through the little green door to the boiler room only.",
+      "plannedHotspots": [
+        {
+          "type": "door",
+          "direction": "back",
+          "to": "boiler",
+          "label": "Back through the little green door",
+          "box": [
+            0.135,
+            0.2,
+            0.235,
+            0.65
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "station",
+          "tier": 2,
+          "label": "The basket on the workbench",
+          "track": "gears",
+          "box": [
+            0.59,
+            0.48,
+            0.78,
+            0.78
+          ],
+          "boxSource": "moved:agent"
+        }
+      ],
+      "authoring": {
+        "sceneSpec": {
+          "room": "gearworks",
+          "setting": "a secret low-ceilinged machine room hidden behind the boiler room deep at the bottom of a colossal, whimsical spirit bathhouse in old Japan, built entirely of wood: red-lacquered pillars and beams, green-painted rails and panels, gold trim and gold ornaments, yellow paper screens, curved tiled roofs stacked storey on storey like a grand pagoda; hand-painted animated-film look, rich saturated colour, soft painterly detail, full of the huge wooden and brass gear wheels that turn the whole bathhouse",
+          "interior": true,
+          "indoor": true,
+          "seam": "a plain stretch of dark wooden wall with brass rivets, uniform and unbroken",
+          "seamOccluder": "a thick dark wooden post, floor to ceiling",
+          "elements": [
+            {
+              "id": "seam_left",
+              "at": "on the far left",
+              "desc": "the left half of the calm view directly behind the viewer: a plain stretch of dark wooden wall with brass rivets, uniform and unbroken, joining its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "green_door_back",
+              "at": "to the left",
+              "label": "Back through the little green door",
+              "door": {
+                "direction": "back",
+                "to": "boiler"
+              },
+              "desc": "a small open sliding door with a bright green panel, slid aside, the floor running level through the low doorway into the orange firelight of the boiler room"
+            },
+            {
+              "id": "gear_wall",
+              "at": "just left of centre",
+              "desc": "a wall of interlocking wooden cog wheels of every size, their teeth meshing, brass hubs gleaming"
+            },
+            {
+              "id": "great_wheel",
+              "at": "dead ahead in the centre",
+              "desc": "one enormous upright gear wheel of dark wood and brass, taller than a house, its spokes and teeth lit gold by lanterns, leather belts and chains running from it up into the dark ceiling"
+            },
+            {
+              "id": "workbench",
+              "at": "just right of centre",
+              "label": "The basket on the workbench",
+              "station": 2,
+              "track": "gears",
+              "desc": "a sturdy wooden workbench scattered with brass cogs, springs and an oil can, on it a woven basket of herb bundles tied with red string"
+            },
+            {
+              "id": "crank",
+              "at": "to the right",
+              "desc": "a big brass crank handle on a wooden frame beside a row of smaller gears and a lantern on a hook"
+            },
+            {
+              "id": "seam_right",
+              "at": "on the far right",
+              "desc": "the right half of the calm view directly behind the viewer: a plain stretch of dark wooden wall with brass rivets, uniform and unbroken, joining its other half cleanly at the seam directly behind you"
+            }
+          ],
+          "soundBed": "a hidden machine room: slow wooden gears creaking and clunking, chains rattling, the furnace roaring through the wall.",
+          "rigid": "the gear wheels, the belts and chains, the workbench and basket, the crank, the little green door",
+          "atmosphere": "secret, warm and wondrous, gold lantern light on turning wood and brass",
+          "styleLight": "early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red",
+          "negatives": "No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. The gears are wood and brass, old-fashioned; nothing electric; ONE little green door only.",
+          "states": {},
+          "continuity": [],
+          "scaffold": {
+            "kind": "skeleton",
+            "layout": {
+              "surface": "room",
+              "word": "floor",
+              "floor": "worn plank floor",
+              "size": [
+                3.5,
+                3.5,
+                4,
+                2.8
+              ],
+              "sides": {
+                "left": "houses",
+                "right": "houses",
+                "front": "houses",
+                "back": "houses"
+              },
+              "parts": [
+                [
+                  "door",
+                  "green_door_back",
+                  {
+                    "w": 0.8,
+                    "h": 1.2,
+                    "say": "the small open green sliding door, the floor running level through it"
+                  }
+                ],
+                [
+                  "prop",
+                  "great_wheel",
+                  {
+                    "size": [
+                      3.0,
+                      0.6,
+                      3.0
+                    ],
+                    "kind": "wall"
+                  }
+                ],
+                [
+                  "prop",
+                  "workbench",
+                  {
+                    "size": [
+                      1.6,
+                      0.7,
+                      0.9
+                    ]
+                  }
+                ]
+              ]
+            }
+          },
+          "stillOnly": true
+        },
+        "plateRefs": [
+          "atrium/scene.png"
+        ],
+        "scenePrompt": "This is a seamless 360-degree panorama from a secret low-ceilinged machine room hidden behind the boiler room deep at the bottom of a colossal, whimsical spirit bathhouse in old Japan, built entirely of wood: red-lacquered pillars and beams, green-painted rails and panels, gold trim and gold ornaments, yellow paper screens, curved tiled roofs stacked storey on storey like a grand pagoda; hand-painted animated-film look, rich saturated colour, soft painterly detail, full of the huge wooden and brass gear wheels that turn the whole bathhouse. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stretch of dark wooden wall with brass rivets, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: a plain stretch of dark wooden wall with brass rivets, uniform and unbroken, joining its other half cleanly at the seam directly behind you; to the left, a small open sliding door with a bright green panel, slid aside, the floor running level through the low doorway into the orange firelight of the boiler room; just left of centre, a wall of interlocking wooden cog wheels of every size, their teeth meshing, brass hubs gleaming; dead ahead in the centre, one enormous upright gear wheel of dark wood and brass, taller than a house, its spokes and teeth lit gold by lanterns, leather belts and chains running from it up into the dark ceiling; just right of centre, a sturdy wooden workbench scattered with brass cogs, springs and an oil can, on it a woven basket of herb bundles tied with red string; to the right, a big brass crank handle on a wooden frame beside a row of smaller gears and a lantern on a hook; on the far right, the right half of the calm view directly behind the viewer: a plain stretch of dark wooden wall with brass rivets, uniform and unbroken, joining its other half cleanly at the seam directly behind you. secret, warm and wondrous, gold lantern light on turning wood and brass. No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. The gears are wood and brass, old-fashioned; nothing electric; ONE little green door only. Shot on a full-frame DSLR at 24mm, f/8, early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a plain stretch of dark wooden wall with brass rivets, uniform and unbroken, with no visible seam, join, or repetition.",
+        "seam": {
+          "stage": "screened",
+          "band": "sky",
+          "ratio": 1.97,
+          "delta": 1.83,
+          "needsWork": false,
+          "accepted": false,
+          "seamBandRun": 0.006,
+          "at": "2026-10-26T22:41:55"
+        }
+      },
+      "mapPos": {
+        "c": 3,
+        "r": 3
+      },
+      "panorama": "gearworks/scene.png",
+      "builtFrom": "l1_gearworks_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "hotspots": [
+        {
+          "id": "back_through_the_little_green_door",
+          "type": "door",
+          "label": "Back through the little green door",
+          "direction": "back",
+          "to": "boiler",
+          "box": [
+            0.135,
+            0.2,
+            0.235,
+            0.65
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "the_basket_on_the_workbench",
+          "type": "station",
+          "label": "The basket on the workbench",
+          "tier": 2,
+          "track": "gears",
+          "box": [
+            0.59,
+            0.48,
+            0.78,
+            0.78
+          ],
+          "boxSource": "moved:agent"
+        }
+      ]
     }
   ],
   "doorLabels": true,
@@ -5192,5 +5943,16 @@
   "musicCredit": {
     "text": "Cozy No Yume - hot-spring lofi ambience",
     "url": "https://www.youtube.com/watch?v=rzyw_9cAhcE"
+  },
+  "escapeDone": {
+    "title": "You completed your day!",
+    "body": "The big tub sparkles, and the whole crew curls up in cozy sleeping bags for a long, well-earned sleep. Good night, and great work!"
+  },
+  "solo": {
+    "pool": "solo/pool.json",
+    "minutes": 12,
+    "goal": 60,
+    "baths": 1,
+    "maxBaths": 4
   }
 }
