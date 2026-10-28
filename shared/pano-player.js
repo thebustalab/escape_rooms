@@ -82,21 +82,22 @@
 // A bare `./variant_resolve.js` import is NOT refreshed by bumping the <script> tag's ?v, so a changed
 // helper module (e.g. a new export) leaves browsers on a stale cached copy → "doesn't provide an export
 // named X" SyntaxError → blank page (the 2026-08-05 airship regression). Bump all three together.
-import { WebRConsole } from "./webr-console.js?v=146";
-import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers, pickTransit } from "./variant_resolve.js?v=146";   // Phase 3: per-hotspot state variants; monorail switch-door nav
-import * as PQ from "./puzzle_queue.js?v=146";   // dynamic puzzle queue: location-independent puzzle serving
-import * as CP from "./corr_panel.js?v=146";   // lower-triangle layout of the grid gate (clouds correlation panel)
-import { particleCount } from "./particles.js?v=146";
-import { mountLandingBackdrop } from "./landing_backdrop.js?v=146";   // landing text over a pan of the first room's clip   // ambient-particle vocabulary + per-kind field density
-import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=146";
-import { condHolds } from "./cond.js?v=146";   // ledger + elevation-map card DOM
-import * as LIVE from "./live_session.js?v=146";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
-import * as RIDE from "./ride.js?v=146";
-import { mountPcaPlate } from "./pca_plate.js?v=146";   // the PCA plate instrument (voyage beach)
-import { mountFishBoard } from "./fish_board.js?v=146";   // the fish board instrument (harbour berth)
-import { mountDrawdown } from "./drawdown.js?v=146";   // the drawdown board instrument (diamonds escape)   // THE RIDE (subway): express lever + clip-sequence planner
-import * as BELL from "./bell_pull.js?v=146";
-import * as INVY from "./inventory.js?v=146";   // carried items + the door that asks which to use (dunes)   // bell-pull (#16): dial mode:"pull" + lock mode:"state" (spa belfry)
+import { WebRConsole } from "./webr-console.js?v=147";
+import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers, pickTransit } from "./variant_resolve.js?v=147";   // Phase 3: per-hotspot state variants; monorail switch-door nav
+import * as PQ from "./puzzle_queue.js?v=147";   // dynamic puzzle queue: location-independent puzzle serving
+import * as CP from "./corr_panel.js?v=147";   // lower-triangle layout of the grid gate (clouds correlation panel)
+import { particleCount } from "./particles.js?v=147";
+import { mountLandingBackdrop } from "./landing_backdrop.js?v=147";   // landing text over a pan of the first room's clip   // ambient-particle vocabulary + per-kind field density
+import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=147";
+import { condHolds } from "./cond.js?v=147";   // ledger + elevation-map card DOM
+import * as LIVE from "./live_session.js?v=147";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
+import * as RIDE from "./ride.js?v=147";
+import { mountPcaPlate } from "./pca_plate.js?v=147";   // the PCA plate instrument (voyage beach)
+import { mountFishBoard } from "./fish_board.js?v=147";   // the fish board instrument (harbour berth)
+import { mountDrawdown } from "./drawdown.js?v=147";   // the drawdown board instrument (diamonds escape)   // THE RIDE (subway): express lever + clip-sequence planner
+import * as BELL from "./bell_pull.js?v=147";
+import * as INVY from "./inventory.js?v=147";   // carried items + the door that asks which to use (dunes)   // bell-pull (#16): dial mode:"pull" + lock mode:"state" (spa belfry)
+import { entryYaw } from "./entry_facing.js?v=147";   // face the way out on entering a room (every scenario)
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 
@@ -1384,7 +1385,20 @@ function doorYaw(r) {
   return door ? boxToYP(door.box, c).yaw : 0;
 }
 
-function startRoom(i, arriveYaw) {   // arriveYaw: keep the player's gaze (a portal transit); else face the forward door
+// The yaw to face on walking into room r from room `fromKey`: the way out (shared/entry_facing.js). Call after
+// roomIdx is set to r, since a legacy back door with no `to` resolves against the current room.
+function arrivalYaw(r, fromKey) {
+  const c = r.wrap || { haov: 360, vaov: 90 };
+  const doors = (r.hotspots || []).filter(h => h && h.type === "door" && Array.isArray(h.box));
+  return entryYaw(doors, fromKey, {
+    targetKey: h => { const j = resolveDoorTarget(h, doorNav(h).direction); return j >= 0 ? SCENARIO.rooms[j].key : null; },
+    isShown, yawOf: h => boxToYP(h.box, c).yaw, haov: c.haov, fallback: doorYaw(r),
+  });
+}
+
+// arriveYaw: keep the player's gaze (a portal transit). fromKey: the room walked in from by a door, so the
+// player faces the way out (arrivalYaw); with neither (game start, a ride, a jump) face the forward door.
+function startRoom(i, arriveYaw, fromKey) {
   if (riding) cancelRide();          // a test-play jump mid-ride: drop the ride, don't arrive anywhere
   transiting = null;                 // ...and likewise a portal transit (its loop stops with the viewer rebuild)
   stopRoomSfx();                   // stop the previous room's ambience + restore music volume
@@ -1407,7 +1421,7 @@ function startRoom(i, arriveYaw) {   // arriveYaw: keep the player's gaze (a por
              v => { room.title = v; return tpPersist("/api/room-patch", { roomKey: room.key, fields: { title: v } }); });
   const openState = portalUnlocked(room);   // open panorama once the room's FORWARD door is actually open (its gate solved) — generalised from `solved` 2026-07-31 so a door gated on a SECONDARY lock (airship room2's bridge hatch) opens the art at the right moment; a no-op where the forward door gates on the primary
   const img = basePanorama(room, openState);
-  buildViewer(img, arriveYaw != null ? arriveYaw : doorYaw(room));   // face the forward (closed) door on entry
+  buildViewer(img, arriveYaw != null ? arriveYaw : arrivalYaw(room, fromKey));   // the way out (or the forward door)
   preloadTransits(room);             // fetch this room's portal-transit clips now, so walking through doesn't wait
   startRoomSfx(room);             // start this room's sound effect(s) (+ optional music duck)
   updateEnvironment();               // progressive heel/sickness reflect current state (persist across rooms)
@@ -2056,6 +2070,23 @@ function _renderViewer(img, yaw = 0, dynamic = false, bare = false) {   // bare:
 const TURN = 45;
 $("#prev").onclick = () => viewer && viewer.setYaw(viewer.getYaw() - TURN, 600);
 $("#next").onclick = () => viewer && viewer.setYaw(viewer.getYaw() + TURN, 600);
+// Left/right arrow keys press the ‹ › buttons. Only when that button is actually the topmost thing
+// on screen (so a puzzle, notebook, map or lightbox over the room swallows the key) and focus is not
+// in a text field or the R console.
+document.addEventListener("keydown", e => {
+  if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+  if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey || e.defaultPrevented) return;
+  const t = e.target;
+  if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+  const btn = $(e.key === "ArrowLeft" ? "#prev" : "#next");
+  if (!btn || !viewer) return;
+  const r = btn.getBoundingClientRect();
+  if (!r.width || !r.height) return;
+  const top = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+  if (!top || !(top === btn || btn.contains(top))) return;
+  e.preventDefault();
+  btn.click();
+});
 
 function onHotspot(evt, h) {   // Pannellum calls clickHandlerFunc(event, clickHandlerArgs)
   try {
@@ -2133,7 +2164,7 @@ function handleDoor(h) {
     passed();
     const back = resolveDoorTarget(h, "back");
     if (h.transit && back >= 0 && startTransit(h, back, false)) return;   // the forward transit's clip, reversed
-    return navigateTo(back, false);                            // back: no gate, no entry
+    return navigateTo(back, false, undefined, room.key);       // back: no gate, no entry
   }
   if (!doorIsOpen(h, room)) {
     // Test-play only: authors walk through locked doors so they can check downstream rooms without
@@ -2160,7 +2191,7 @@ function handleDoor(h) {
     const idx = SCENARIO.rooms.findIndex(r => r.key === nav.to && isBuilt(r));
     if (idx >= 0) {
       if (h.transit && startTransit(h, idx)) return;           // portal transit clip, then arrive (see startTransit)
-      return navigateTo(idx, true);
+      return navigateTo(idx, true, undefined, room.key);
     }
     // the day's end (bathhouse, 2026-10-28) whose art is not drawn yet: end the day from where the player stands
     const end = SCENARIO.rooms.find(r => r.key === nav.to && r.outro);
@@ -2185,12 +2216,12 @@ function resolveDoorTarget(h, dir) {
 
 // Go to a room by index. `withEntry` shows the target's interstitial ONLY on a first visit — a
 // re-visited (already-solved) room, forward or back, never re-shows its entry text.
-function navigateTo(idx, withEntry, arriveYaw) {
+function navigateTo(idx, withEntry, arriveYaw, fromKey) {
   if (idx == null || idx < 0) return;
   const target = SCENARIO.rooms[idx];
   const firstVisit = !(target.key && (visitedRooms.has(target.key) || solvedRooms.has(target.key)));
-  if (withEntry && firstVisit) return showInterstitial(target, () => startRoom(idx, arriveYaw));
-  startRoom(idx, arriveYaw);
+  if (withEntry && firstVisit) return showInterstitial(target, () => startRoom(idx, arriveYaw, fromKey));
+  startRoom(idx, arriveYaw, fromKey);
 }
 
 // ---- PORTAL TRANSIT (henges, 2026-10-15) ------------------------------------------------------------
@@ -2323,7 +2354,7 @@ function startTransit(h, idx, withEntry = true, onArrive = null) {   // withEntr
   const run = {};
   transiting = run;
   ++_viewGen;                                  // any room view still being built must not paint over the transit
-  const walk = () => { if (transiting === run) { transiting = null; if (onArrive) onArrive(); else navigateTo(idx, withEntry); } };
+  const walk = () => { if (transiting === run) { transiting = null; if (onArrive) onArrive(); else navigateTo(idx, withEntry, undefined, from && from.key); } };
   // Fade onto the art the arrival room will actually show: its last active FULL-SCENE variant (an awakened
   // room re-entered by a back door), else its base/open panorama.
   const fullVar = target && activeVariants(target).filter(v => v && v.panorama && Array.isArray(v.box) && v.box.join() === "0,0,1,1").pop();
@@ -4788,7 +4819,7 @@ function goThrough() {
   const cur = phaseOf(room);
   const nextIdx = SCENARIO.rooms.findIndex(r =>
     isBuilt(r) && phaseOf(r) === cur && !solvedRooms.has(r.key) && condOK(r.unlockedWhen));
-  if (nextIdx >= 0) return showInterstitial(SCENARIO.rooms[nextIdx], () => startRoom(nextIdx));
+  if (nextIdx >= 0) { const from = room && room.key; return showInterstitial(SCENARIO.rooms[nextIdx], () => startRoom(nextIdx, undefined, from)); }
   if (cur === "escape") return showEscapeDone();
   // Analysis fallback: only finish if the objective is genuinely complete (all analysis puzzles solved).
   // The auto-trigger in solveRoom normally fires this first; guarding on analysisComplete() here stops a

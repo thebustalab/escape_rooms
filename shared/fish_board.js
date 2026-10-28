@@ -24,7 +24,7 @@
 //   fb.setAct(n); fb.cast(); fb.castMany(k); fb.throwMonster(); fb.toggleLever(); fb.state();
 //   fb.leverClient() → client {x, y} of the act 4 lever; fb.ready (Promise); fb.destroy().
 // The canvas carries the API as `canvas.fishBoard` for tests.
-import "./fish_stats.js?v=146";     // window.FishStats: the board's tests (Welch, Shapiro, Wilcox, Tukey, Dunn), pinned to R
+import "./fish_stats.js?v=147";     // window.FishStats: the board's tests (Welch, Shapiro, Wilcox, Tukey, Dunn), pinned to R
 
 const loadImg = (src) => new Promise((res) => {
   if (!src) return res(null);
