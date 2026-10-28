@@ -52,6 +52,21 @@ export function poolPayouts(pool) {
   });
 }
 
+// The restaurant (bathhouse, 2026-10-28): the menu entry whose track this is, else null (live_server.menu_dish).
+export function menuDish(pool, track) {
+  return ((pool.menu || {}).dishes || []).find(d => d.track === track) || null;
+}
+// The train tickets: are stops a and b joined by the ridden links, directly or through a chain (live_server.linked)?
+export function linked(links, a, b) {
+  const seen = new Set([a]), todo = [a];
+  while (todo.length) {
+    const x = todo.pop();
+    for (const [p, q] of links) for (const [u, v] of [[p, q], [q, p]])
+      if (u === x && !seen.has(v)) { seen.add(v); todo.push(v); }
+  }
+  return seen.has(b);
+}
+
 function publicPuzzle(p, dealId, order) {
   const out = { deal_id: dealId, tier: p.tier, kind: p.kind || "mcq", title: p.title, flavour: p.flavour || "",
                 question: p.question, image: p.image || null, starter_code: p.starter_code || null, hint: p.hint || null };
@@ -82,10 +97,11 @@ export class SoloSession {
     this.phase = "running";
     this.total = 0;
     this.filled = [];
+    this.served = [];                 // restaurant dishes sold out (live_server Session.served)
     this.feed = [];
     this.tierCounts = { 1: 0, 2: 0, 3: 0 };
     this.deal = null;                 // {id, puzzleId, order}
-    this.pl = { callsign: "You", points: 0, solved: new Set(), cooldownUntil: 0, carrying: 0, held: {}, backpack: false };
+    this.pl = { callsign: "You", points: 0, solved: new Set(), cooldownUntil: 0, carrying: 0, held: {}, backpack: false, links: [] };
   }
 
   // ---- the clock and the win (Session.tick / maybe_win) ----
@@ -134,10 +150,10 @@ export class SoloSession {
     return {
       phase: this.phase, remaining_s: Math.round(this.remaining()), duration_s: this.durationS,
       total: this.total, goal: this.goal, players: 1, feed: this.feed.slice(-8), tier_counts: { ...this.tierCounts },
-      blackout: false, exp: null, filled: [...this.filled],
+      blackout: false, exp: null, filled: [...this.filled], served: [...this.served],
       me: { callsign: pl.callsign, points: pl.points, solved: pl.solved.size,
             cooldown_s: Math.max(0, Math.round((pl.cooldownUntil - this.now()) / 1000)),
-            carrying: pl.carrying, held: { ...pl.held }, backpack: pl.backpack,
+            carrying: pl.carrying, held: { ...pl.held }, backpack: pl.backpack, links: pl.links.map(l => [...l]),
             caps: Object.fromEntries(["", ...Object.keys(P.items || {})].map(it => [it, this.cap(it)])), cast: false },
       goal_label: P.goal_label, unit: P.unit, carry_back: !!P.carry_back, carry_max: P.carry_max,
       deliver_to: P.deliver_to, deliver_verb: P.deliver_verb,
@@ -145,6 +161,8 @@ export class SoloSession {
         [k, { unit: v.unit, carry_max: v.carry_max, deliver_to: v.deliver_to }])),
       sinks: (P.sinks || []).map(s => ({ id: s.id, label: s.label, item: s.item, cost: s.cost })),
       win_sinks: this.winSinks, payouts: poolPayouts(P), backpack: !!P.backpack, won_text: P.won_text || null,
+      rides: P.rides || null,
+      menu: P.menu ? { seconds: P.menu.seconds, dishes: P.menu.dishes.map(d => ({ track: d.track, label: d.label })) } : null,
       solo: true,
     };
   }
@@ -165,13 +183,17 @@ export class SoloSession {
       const track = body.track || "";
       if (track && !this.tracks().includes(track)) return res({ error: "bad track" }, 400);
       const here = P.puzzles.filter(p => p.tier === tier && trackOf(p) === track);
+      const dish = track ? menuDish(P, track) : null;          // the restaurant: pays time, never a carry
+      if (dish && this.served.includes(track))
+        return res({ error: `The kitchen has run out of ${dish.label.toLowerCase()}.`, served: [...this.served] }, 409);
+      const carry = !!P.carry_back && !dish;
       const itemsHere = here.length ? [...new Set(here.map(itemOf))] : [""];
-      if (P.carry_back && itemsHere.every(it => this.carryFull(it))) {
+      if (carry && itemsHere.every(it => this.carryFull(it))) {
         const it = [...itemsHere].sort()[0];
         return res({ error: this.blockText(it) || "Deliver what you're carrying first.", carrying: this.held(it) }, 409);
       }
       this.deal = null;
-      const choices = here.filter(p => !pl.solved.has(p.id) && !(P.carry_back && this.carryFull(itemOf(p))));
+      const choices = here.filter(p => !pl.solved.has(p.id) && !(carry && this.carryFull(itemOf(p))));
       if (!here.length) return res({ error: `This station has no level ${tier} tasks in this game.` }, 409);
       if (!choices.length) {
         const where = this.tracks().length ? " here — try another level or another station" : " — try another level";
@@ -179,7 +201,7 @@ export class SoloSession {
       }
       const p = choices[Math.floor(Math.random() * choices.length)];
       const cfg = this.itemCfg(itemOf(p)), cap = this.cap(itemOf(p));
-      if (cap && P.carry_back && this.held(itemOf(p)) + pointsOf(p) > cap) {
+      if (cap && carry && this.held(itemOf(p)) + pointsOf(p) > cap) {
         const room = cap - this.held(itemOf(p)), unit = cfg.unit || ["load", "loads"];
         return res({ error: `This one is worth ${plural(pointsOf(p), unit)} and you only have room for ${room} more. ` +
                             `Take your ${unit[1]} to ${cfg.deliver_to || "the canoe"} first.`,
@@ -226,6 +248,17 @@ export class SoloSession {
       pl.solved.add(p.id);
       this.deal = null;
       this.tierCounts[p.tier] += 1;
+      const dish = menuDish(P, trackOf(p));
+      if (dish) {                       // the restaurant: a right answer buys time (Session.serve_dish)
+        if (this.served.includes(dish.track))
+          return res({ correct: true, points: 0, served_out: true, served: [...this.served],
+                       feedback: `Right! But someone else just ate the last of the ${dish.label.toLowerCase()}, so no extra time this time.` });
+        const secs = parseInt(P.menu.seconds, 10);
+        this.durationS += secs;
+        this.served.push(dish.track);
+        return res({ correct: true, points: 0, time_added: secs, served: [...this.served],
+                     remaining_s: Math.round(this.remaining()), feedback: p.right_feedback || "Delicious!" });
+      }
       if (it) pl.held[it] = (pl.held[it] || 0) + pts; else pl.carrying += pts;
       return res({ correct: true, points: pts, carrying: this.held(it), carry_full: this.carryFull(it), total: this.total,
                    ...(it ? { item: it } : {}), feedback: p.right_feedback || null });
@@ -272,6 +305,23 @@ export class SoloSession {
       pl.backpack = true;
       return res({ backpack: true, callsign: pl.callsign,
                    caps: Object.fromEntries(Object.keys(P.backpack.carry_max).map(it => [it, this.cap(it)])) });
+    }
+    if (route === "ride") {           // the lake train: a ticket links two stops for good (live_server /api/ride)
+      const R = P.rides;
+      if (!R) return res({ error: "not found" }, 404);
+      const a = body.from, b = body.to, stops = R.stops;
+      if (typeof a !== "string" || typeof b !== "string" || !(a in stops) || !(b in stops) || a === b)
+        return res({ error: "bad stop" }, 400);
+      const links = () => pl.links.map(l => [...l]);
+      if (linked(pl.links, a, b)) return res({ ok: true, spent: 0, links: links() });
+      if (this.held(R.item) < 1) {
+        const unit = this.itemCfg(R.item).unit;
+        return res({ error: `You need ${plural(1, unit)} to ride from ${stops[a]} to ${stops[b]}. ` +
+                            "Solve a puzzle at a ticket window to earn one.", links: links() }, 409);
+      }
+      pl.held[R.item] -= 1;
+      pl.links.push([a, b]);
+      return res({ ok: true, spent: 1, item: R.item, carrying: this.held(R.item), links: links() });
     }
     if (route === "skip") { this.deal = null; return res({ ok: true }); }
     return res({ error: "not found" }, 404);

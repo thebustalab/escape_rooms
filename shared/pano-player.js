@@ -82,21 +82,21 @@
 // A bare `./variant_resolve.js` import is NOT refreshed by bumping the <script> tag's ?v, so a changed
 // helper module (e.g. a new export) leaves browsers on a stale cached copy → "doesn't provide an export
 // named X" SyntaxError → blank page (the 2026-08-05 airship regression). Bump all three together.
-import { WebRConsole } from "./webr-console.js?v=145";
-import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers, pickTransit } from "./variant_resolve.js?v=145";   // Phase 3: per-hotspot state variants; monorail switch-door nav
-import * as PQ from "./puzzle_queue.js?v=145";   // dynamic puzzle queue: location-independent puzzle serving
-import * as CP from "./corr_panel.js?v=145";   // lower-triangle layout of the grid gate (clouds correlation panel)
-import { particleCount } from "./particles.js?v=145";
-import { mountLandingBackdrop } from "./landing_backdrop.js?v=145";   // landing text over a pan of the first room's clip   // ambient-particle vocabulary + per-kind field density
-import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=145";
-import { condHolds } from "./cond.js?v=145";   // ledger + elevation-map card DOM
-import * as LIVE from "./live_session.js?v=145";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
-import * as RIDE from "./ride.js?v=145";
-import { mountPcaPlate } from "./pca_plate.js?v=145";   // the PCA plate instrument (voyage beach)
-import { mountFishBoard } from "./fish_board.js?v=145";   // the fish board instrument (harbour berth)
-import { mountDrawdown } from "./drawdown.js?v=145";   // the drawdown board instrument (diamonds escape)   // THE RIDE (subway): express lever + clip-sequence planner
-import * as BELL from "./bell_pull.js?v=145";
-import * as INVY from "./inventory.js?v=145";   // carried items + the door that asks which to use (dunes)   // bell-pull (#16): dial mode:"pull" + lock mode:"state" (spa belfry)
+import { WebRConsole } from "./webr-console.js?v=146";
+import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers, pickTransit } from "./variant_resolve.js?v=146";   // Phase 3: per-hotspot state variants; monorail switch-door nav
+import * as PQ from "./puzzle_queue.js?v=146";   // dynamic puzzle queue: location-independent puzzle serving
+import * as CP from "./corr_panel.js?v=146";   // lower-triangle layout of the grid gate (clouds correlation panel)
+import { particleCount } from "./particles.js?v=146";
+import { mountLandingBackdrop } from "./landing_backdrop.js?v=146";   // landing text over a pan of the first room's clip   // ambient-particle vocabulary + per-kind field density
+import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=146";
+import { condHolds } from "./cond.js?v=146";   // ledger + elevation-map card DOM
+import * as LIVE from "./live_session.js?v=146";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
+import * as RIDE from "./ride.js?v=146";
+import { mountPcaPlate } from "./pca_plate.js?v=146";   // the PCA plate instrument (voyage beach)
+import { mountFishBoard } from "./fish_board.js?v=146";   // the fish board instrument (harbour berth)
+import { mountDrawdown } from "./drawdown.js?v=146";   // the drawdown board instrument (diamonds escape)   // THE RIDE (subway): express lever + clip-sequence planner
+import * as BELL from "./bell_pull.js?v=146";
+import * as INVY from "./inventory.js?v=146";   // carried items + the door that asks which to use (dunes)   // bell-pull (#16): dial mode:"pull" + lock mode:"state" (spa belfry)
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 
@@ -1411,6 +1411,7 @@ function startRoom(i, arriveYaw) {   // arriveYaw: keep the player's gaze (a por
   preloadTransits(room);             // fetch this room's portal-transit clips now, so walking through doesn't wait
   startRoomSfx(room);             // start this room's sound effect(s) (+ optional music duck)
   updateEnvironment();               // progressive heel/sickness reflect current state (persist across rooms)
+  if (room.outro) runOutro(room.outro);   // the day's end (bathhouse): look, fade to black, back to the start
 }
 
 // Re-render the current room's viewer in place (same room, no sfx churn, no entry card) — used when a
@@ -2065,6 +2066,7 @@ function onHotspot(evt, h) {   // Pannellum calls clickHandlerFunc(event, clickH
     if (h.type === "station") return openStation(h);   // LIVE: the server deals a task of h.tier (never a gate)
     if (h.type === "deliver") return deliverLoad(h);   // LIVE: unload what you carry into the class total
     if (h.type === "backpack") return openBackpack(h); // LIVE: sign a tile, check out a bigger carry (bathhouse)
+    if (h.type === "menu") return openMenu(h);         // LIVE: order a dish, solve its sum, the class clock gains time
     if (h.type === "lever") {
       // THE RIDE's one cab control (scenario.ride). Gated like a dial; see openLever.
       if (!condOK(h.availableWhen)) return openLocked(h);
@@ -2160,6 +2162,9 @@ function handleDoor(h) {
       if (h.transit && startTransit(h, idx)) return;           // portal transit clip, then arrive (see startTransit)
       return navigateTo(idx, true);
     }
+    // the day's end (bathhouse, 2026-10-28) whose art is not drawn yet: end the day from where the player stands
+    const end = SCENARIO.rooms.find(r => r.key === nav.to && r.outro);
+    if (end) return runOutro(end.outro);
   }
   return goThrough();                                          // linear fallback (also boss → finish)
 }
@@ -2993,11 +2998,22 @@ function openDial(h) {
   states.forEach(s => {
     const b = document.createElement("button"); b.className = "ghost"; b.dataset.v = s.value;
     b.textContent = s.label || s.value;
-    b.onclick = () => {
+    b.onclick = async () => {
+      // THE TRAIN TICKETS (bathhouse, Lucas 2026-10-28): a dial flagged `ride` is a train line. In a live (or solo)
+      // game, moving it from one stop to another asks the session first: free between stops this player has
+      // already linked, else it spends one ticket and links them for good; refused, the lever does not move.
+      let rideNote = "";
+      const from = gameState[key] != null ? gameState[key] : h.default;
+      if (h.ride && liveMode() && LIVE.isJoined() && from != null && from !== s.value) {
+        const r = await LIVE.ride(from, s.value).catch(() => null);
+        if (!r) return toast("Can't reach the class session. Check your connection.");
+        if (!r.ok) return toast(r.j.error || "You need a train ticket for that ride.");
+        if (r.j.spent) rideNote = " You used a train ticket: ride between these stops as often as you like now.";
+      }
       // A state may carry its own `toast` (2026-09-16): "The dial clicks to Put the torch to the brazier." read
       // badly on a ceremonial gesture. Absent keeps the stock line; an empty string suppresses it.
       const msg = (s.toast != null) ? s.toast : ("The dial clicks to " + (s.label || s.value) + ".");
-      gameState[key] = s.value; if (msg) toast(msg); refresh();
+      gameState[key] = s.value; if (msg || rideNote) toast((msg + rideNote).trim()); refresh();
       // A dial may carry `sfx` (path string or {src,volume}) — the lever/valve throw sound (a monorail
       // switch-door's clunk). One-shot on each throw. Absent ⇒ silent, so every existing dial is unchanged.
       if (h.sfx) playOneShot(typeof h.sfx === "string" ? h.sfx : h.sfx.src, (typeof h.sfx === "object") ? h.sfx.volume : undefined);
@@ -4106,6 +4122,77 @@ async function openStation(h) {
     : buildPickCard(task.pick, () => closeModal(), "live:" + d.deal_id, task));
   grid.appendChild(left); grid.appendChild(right);
   openModal(task.label, grid, null, null, "wide");
+}
+// THE RESTAURANT (bathhouse's city, Lucas 2026-10-28): a `menu` hotspot ({type:"menu", tier, label}) lists the
+// pool's `menu` dishes; ordering one deals a task from that dish's track at the hotspot's tier, through the same
+// station card. A right answer adds the menu's `seconds` to the class clock and sells the dish out for everyone.
+function openMenu(h) {
+  if (!liveMode()) return toast("The restaurant serves during the live class session.");
+  if (!LIVE.isJoined()) return toast("Join the session first.");
+  const st = LIVE.state(), menu = st && st.menu;
+  if (!menu || !Array.isArray(menu.dishes) || !menu.dishes.length) return toast("The kitchen is closed.");
+  const served = new Set((st && st.served) || []);
+  const mins = menu.seconds % 60 === 0 ? menu.seconds / 60 : null;
+  const gain = mins ? (mins + " extra minute" + (mins === 1 ? "" : "s")) : (menu.seconds + " extra seconds");
+  const d = document.createElement("div");
+  const p = document.createElement("p");
+  const left = menu.dishes.filter(x => !served.has(x.track)).length;
+  p.textContent = left
+    ? "Pick a dish and solve its sum. Each dish you finish puts " + gain + " on the clock, until the kitchen runs out."
+    : "The kitchen has run out of food. Every dish has been eaten!";
+  d.appendChild(p);
+  const row = document.createElement("div");
+  row.style.cssText = "display:flex;flex-direction:column;gap:8px;margin:10px 0";
+  for (const dish of menu.dishes) {
+    const b = document.createElement("button");
+    b.className = "qsubmit"; b.dataset.track = dish.track;
+    const out = served.has(dish.track);
+    b.textContent = dish.label + (out ? " (sold out)" : "");
+    b.disabled = out;
+    b.onclick = () => { closeModal(); openStation({ tier: h.tier || 1, track: dish.track, label: dish.label }); };
+    row.appendChild(b);
+  }
+  d.appendChild(row);
+  openModal(h.label || "The menu", d, null, h);
+}
+// THE DAY'S END (bathhouse, Lucas 2026-10-28): a room with `outro` {holdMs, fadeMs, textMs} is the last scene.
+// The player looks at it for holdMs, it fades slowly to black over fadeMs (the music with it), the
+// scenario's escapeDone title shows on the black for textMs, and the game returns to the start screen (a
+// reload: the landing). Test play stops on the black with the escape card instead of reloading the harness.
+let _outroTimer = null;
+function runOutro(o) {
+  clearTimeout(_outroTimer);
+  const hold = +o.holdMs || 4000, fade = +o.fadeMs || 6000, text = +o.textMs || 3500;
+  const veil = document.createElement("div");
+  veil.className = "outro-veil";
+  veil.style.cssText = `position:fixed;inset:0;background:#000;z-index:10000;opacity:0;pointer-events:all;` +
+    `transition:opacity ${fade}ms ease-in-out;display:flex;align-items:center;justify-content:center`;
+  const line = document.createElement("div");
+  line.className = "outro-line";
+  line.style.cssText = "color:#ffe6b0;font:600 30px system-ui;opacity:0;transition:opacity 1200ms ease-in-out;text-align:center";
+  line.textContent = (SCENARIO.escapeDone && SCENARIO.escapeDone.title) || "";
+  veil.appendChild(line);
+  _outroTimer = setTimeout(() => {
+    document.body.appendChild(veil);
+    requestAnimationFrame(() => requestAnimationFrame(() => { veil.style.opacity = "1"; }));
+    const m = (typeof music !== "undefined" && music) || null, v0 = m ? m.volume : 0, t0 = performance.now();
+    const ramp = () => {                       // the music fades out with the picture
+      if (!m) return;
+      const k = Math.min(1, (performance.now() - t0) / fade);
+      try { m.volume = v0 * (1 - k); } catch (e) {}
+      if (k < 1) requestAnimationFrame(ramp); else { musicOn = false; try { m.pause(); } catch (e) {} }   // off first, so nothing resumes it
+    };
+    ramp();
+    _outroTimer = setTimeout(() => {
+      stopRoomSfx();
+      escapeFinished = true;
+      line.style.opacity = "1";
+      _outroTimer = setTimeout(() => {
+        if (isTestPlay()) { veil.remove(); return showEscapeDone(); }
+        location.reload();                     // back to the start screen
+      }, text);
+    }, fade + 100);
+  }, hold);
 }
 // THE BACKPACK (bathhouse's checkpoint room, 2026-10-26): a `backpack` hotspot is a wall of little tiles, one
 // per backpack. Signing one checks out a backpack, which raises what this player can carry (the pool's

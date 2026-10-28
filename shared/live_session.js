@@ -23,8 +23,8 @@
  * browser (shared/live_solo.js), answering the same calls; everything below works unchanged on top of it.
  */
 
-import "./fish_stats.js?v=145";
-import { SoloSession } from "./live_solo.js?v=145";     // window.FishStats: the fish board's tests (Welch t), pinned to R
+import "./fish_stats.js?v=146";
+import { SoloSession } from "./live_solo.js?v=146";     // window.FishStats: the fish board's tests (Welch t), pinned to R
 
 const POLL_MS = 2000;
 const STORE = "liveSession";        // localStorage: { pid, code }
@@ -348,6 +348,17 @@ export async function deliver(sink) {
 export async function backpack() {
   const r = await api("backpack", { pid: me && me.pid });
   if (r.ok && st && st.me) { st.me.backpack = true; st.me.caps = { ...(st.me.caps || {}), ...(r.j.caps || {}) }; render(); }
+  return r;
+}
+// The lake train (bathhouse, 2026-10-28): ride from one stop to another. Free between stops this player has
+// already linked; otherwise it spends one ticket and links them for good. {ok, j:{spent, links}} or a refusal.
+export async function ride(from, to) {
+  const r = await api("ride", { pid: me && me.pid, from, to });
+  if (r.ok && st && st.me) {
+    st.me.links = r.j.links || st.me.links;
+    if (r.j.spent) (st.me.held = st.me.held || {})[r.j.item] = r.j.carrying;
+    render();
+  }
   return r;
 }
 export function noteCarrying(n, item) {

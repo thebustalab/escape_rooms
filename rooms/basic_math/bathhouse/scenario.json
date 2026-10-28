@@ -314,14 +314,14 @@
           "type": "door",
           "label": "Back across the bridge to the lake station",
           "box": [
-            0.94,
-            0.4,
-            0.995,
-            0.62
+            0.9418,
+            0.3515,
+            0.9968,
+            0.5715
           ],
           "direction": "open",
           "to": "stairs_top",
-          "boxSource": "moved:agent"
+          "boxSource": "moved:testplay"
         }
       ]
     },
@@ -1580,12 +1580,12 @@
       "title": "The sleeping quarters",
       "built": true,
       "unlockedWhen": true,
-      "designNote": "Station (1 herb bundle): the low table. Back down to the atrium only. THE ESCAPE (Lucas, 2026-10-26): once the class has won (liveWon), sleeping bags are laid out (state sleeping) and the sleeping bags become the victory click that ends the game.",
+      "designNote": "Station (1 herb bundle): the low table. Back down to the atrium only. THE ESCAPE (Lucas, 2026-10-26): once the class has won (liveWon), sleeping bags are laid out (state sleeping) and the sleeping bags become a door into the bedtime scene, which fades to black and ends the game (2026-10-28).",
       "plannedHotspots": [
         {
           "type": "door",
           "direction": "open",
-          "endsEscape": true,
+          "to": "bedtime",
           "label": "Curl up in a sleeping bag",
           "shownWhen": {
             "eq": [
@@ -1645,7 +1645,9 @@
               "id": "futons",
               "at": "to the left",
               "label": "Curl up in a sleeping bag",
-              "victory": {
+              "door": {
+                "direction": "open",
+                "to": "bedtime",
                 "shownWhen": {
                   "eq": [
                     "liveWon",
@@ -1854,7 +1856,6 @@
           "type": "door",
           "label": "Curl up in a sleeping bag",
           "direction": "open",
-          "endsEscape": true,
           "shownWhen": {
             "eq": [
               "liveWon",
@@ -1868,7 +1869,8 @@
             0.92
           ],
           "boxSource": "moved:agent",
-          "id": "curl_up_in_a_sleeping_bag"
+          "id": "curl_up_in_a_sleeping_bag",
+          "to": "bedtime"
         }
       ]
     },
@@ -3592,7 +3594,7 @@
       "title": "The top of the station stairs",
       "built": true,
       "unlockedWhen": true,
-      "designNote": "Station (LEVEL 2, 2 herb bundles; 3 doors from the tub): the basket on the stone post. Doors: back across the bridge, down the stairs to the station.",
+      "designNote": "Station (LEVEL 2, 2 herb bundles; 3 doors from the tub): the basket on the stone post. Doors: back across the bridge, down the stairs to the station, and (2026-10-28) up into the city's street of shops.",
       "plannedHotspots": [
         {
           "type": "door",
@@ -3600,10 +3602,10 @@
           "to": "bridge",
           "label": "Back across the bridge",
           "box": [
-            0.075,
-            0.36,
-            0.23,
-            0.65
+            0.07,
+            0.42,
+            0.2,
+            0.68
           ],
           "boxSource": "moved:agent"
         },
@@ -3612,10 +3614,10 @@
           "tier": 2,
           "label": "The basket on the stone post",
           "box": [
-            0.326,
-            0.53,
-            0.394,
-            0.87
+            0.305,
+            0.49,
+            0.38,
+            0.88
           ],
           "boxSource": "moved:agent"
         },
@@ -3625,10 +3627,23 @@
           "to": "station_stairs",
           "label": "Down the stairs to the station",
           "box": [
-            0.69,
-            0.56,
-            0.85,
-            0.83
+            0.52,
+            0.62,
+            0.66,
+            0.84
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "to": "city_street",
+          "label": "Into the city",
+          "box": [
+            0.72,
+            0.38,
+            0.88,
+            0.7
           ],
           "boxSource": "moved:agent"
         }
@@ -3671,13 +3686,23 @@
             },
             {
               "id": "stairs_down",
-              "at": "to the right",
+              "at": "just right of centre",
               "label": "Down the stairs to the station",
               "door": {
                 "direction": "open",
                 "to": "station_stairs"
               },
               "desc": "the top of a long wooden staircase with red railings and little lanterns, starting at the path and running steeply down the cliff face toward the lake"
+            },
+            {
+              "id": "city_street",
+              "at": "to the right",
+              "label": "Into the city",
+              "door": {
+                "direction": "open",
+                "to": "city_street"
+              },
+              "desc": "the mouth of a narrow stone-paved street running level off the cliff-top path into an old town of tall, narrow wooden shop-houses; every one of their first four storeys is an open shop or stall, warmly and brightly lit with paper lanterns, strings of lanterns criss-crossing above"
             },
             {
               "id": "seam_right",
@@ -3689,7 +3714,7 @@
           "rigid": "the bridge, the railing, the post and basket, the staircase, the lake, the rails, the station",
           "atmosphere": "wide, calm and magical, the whole lake glowing with the last of the dusk",
           "styleLight": "early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red",
-          "negatives": "No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. Only ONE bridge; the stairs go DOWN toward the lake, never up.",
+          "negatives": "No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. Only ONE bridge; the stairs go DOWN toward the lake, never up; the street into town is level.",
           "states": {},
           "continuity": [],
           "scaffold": {
@@ -3706,7 +3731,7 @@
               ],
               "sides": {
                 "left": "railing",
-                "right": "drop",
+                "right": "houses",
                 "front": "drop",
                 "back": "railing"
               },
@@ -3718,6 +3743,15 @@
                     "w": 2.0,
                     "h": 2.6,
                     "say": "the bridge deck running level away toward the bathhouse"
+                  }
+                ],
+                [
+                  "door",
+                  "city_street",
+                  {
+                    "w": 2.4,
+                    "h": 3.0,
+                    "say": "the mouth of the narrow street, the paving running level into it"
                   }
                 ],
                 [
@@ -3743,16 +3777,21 @@
         "plateRefs": [
           "atrium/scene.png"
         ],
-        "scenePrompt": "This is a seamless 360-degree panorama from the town end of the long arched wooden footbridge in front of a colossal, whimsical spirit bathhouse in old Japan, built entirely of wood: red-lacquered pillars and beams, green-painted rails and panels, gold trim and gold ornaments, yellow paper screens, curved tiled roofs stacked storey on storey like a grand pagoda; hand-painted animated-film look, rich saturated colour, soft painterly detail, where a wide shallow lake stretches away below the cliff. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a low green-painted wooden railing along the cliff top, a calm dusky sky above it: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: a low green-painted wooden railing along the cliff top, a calm dusky sky above it, joining its other half cleanly at the seam directly behind you; to the left, the wooden bridge deck running level away over the ravine to the huge glowing bathhouse, red, green and gold, lit with lanterns; just left of centre, a short square stone post by the railing, on it a woven basket of herb bundles tied with red string; dead ahead in the centre, far below, a vast still shallow lake reaching to the horizon, mirror-smooth, reflecting the violet sky; a single thin line of rails runs straight out across it just under the surface, and a tiny lit station sits at the water's edge at the foot of the cliff; to the right, the top of a long wooden staircase with red railings and little lanterns, starting at the path and running steeply down the cliff face toward the lake; on the far right, the right half of the calm view directly behind the viewer: a low green-painted wooden railing along the cliff top, a calm dusky sky above it, joining its other half cleanly at the seam directly behind you. wide, calm and magical, the whole lake glowing with the last of the dusk. No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. Only ONE bridge; the stairs go DOWN toward the lake, never up. Shot on a full-frame DSLR at 24mm, f/8, early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a low green-painted wooden railing along the cliff top, a calm dusky sky above it, with no visible seam, join, or repetition.",
+        "scenePrompt": "This is a seamless 360-degree panorama from the town end of the long arched wooden footbridge in front of a colossal, whimsical spirit bathhouse in old Japan, built entirely of wood: red-lacquered pillars and beams, green-painted rails and panels, gold trim and gold ornaments, yellow paper screens, curved tiled roofs stacked storey on storey like a grand pagoda; hand-painted animated-film look, rich saturated colour, soft painterly detail, where a wide shallow lake stretches away below the cliff. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a low green-painted wooden railing along the cliff top, a calm dusky sky above it: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: a low green-painted wooden railing along the cliff top, a calm dusky sky above it, joining its other half cleanly at the seam directly behind you; to the left, the wooden bridge deck running level away over the ravine to the huge glowing bathhouse, red, green and gold, lit with lanterns; just left of centre, a short square stone post by the railing, on it a woven basket of herb bundles tied with red string; dead ahead in the centre, far below, a vast still shallow lake reaching to the horizon, mirror-smooth, reflecting the violet sky; a single thin line of rails runs straight out across it just under the surface, and a tiny lit station sits at the water's edge at the foot of the cliff; just right of centre, the top of a long wooden staircase with red railings and little lanterns, starting at the path and running steeply down the cliff face toward the lake; to the right, the mouth of a narrow stone-paved street running level off the cliff-top path into an old town of tall, narrow wooden shop-houses; every one of their first four storeys is an open shop or stall, warmly and brightly lit with paper lanterns, strings of lanterns criss-crossing above; on the far right, the right half of the calm view directly behind the viewer: a low green-painted wooden railing along the cliff top, a calm dusky sky above it, joining its other half cleanly at the seam directly behind you. wide, calm and magical, the whole lake glowing with the last of the dusk. No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. Only ONE bridge; the stairs go DOWN toward the lake, never up; the street into town is level. Shot on a full-frame DSLR at 24mm, f/8, early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a low green-painted wooden railing along the cliff top, a calm dusky sky above it, with no visible seam, join, or repetition.",
         "seam": {
-          "stage": "blurred",
-          "band": "sky",
-          "ratio": 0.0,
-          "delta": 0.0,
+          "stage": "occluded",
+          "band": "ground",
+          "ratio": 11.65,
+          "delta": 18.78,
           "needsWork": false,
           "accepted": false,
-          "seamBandRun": 0.0,
-          "at": "2026-10-25T19:05:04"
+          "seamBandRun": 0.231,
+          "at": "2026-10-28T08:27:29",
+          "seamBandAt": [
+            0.8720703125,
+            0.9560546875
+          ],
+          "occluderMode": "sprite"
         }
       },
       "mapPos": {
@@ -3760,7 +3799,7 @@
         "r": 4
       },
       "panorama": "stairs_top/scene.png",
-      "builtFrom": "l1_stairs_top_1.png",
+      "builtFrom": "l1_stairs_top_2.png",
       "wrap": {
         "haov": 360,
         "vaov": 90,
@@ -3774,24 +3813,24 @@
           "type": "door",
           "label": "Back across the bridge",
           "box": [
-            0.075,
-            0.36,
-            0.23,
-            0.65
+            0.0716,
+            0.3516,
+            0.2016,
+            0.6116
           ],
           "direction": "back",
           "to": "bridge",
-          "boxSource": "moved:agent"
+          "boxSource": "moved:testplay"
         },
         {
           "id": "the_basket_on_the_stone_post",
           "type": "station",
           "label": "The basket on the stone post",
           "box": [
-            0.326,
-            0.53,
-            0.394,
-            0.87
+            0.305,
+            0.49,
+            0.38,
+            0.88
           ],
           "tier": 2,
           "boxSource": "moved:agent"
@@ -3801,14 +3840,28 @@
           "type": "door",
           "label": "Down the stairs to the station",
           "box": [
-            0.69,
-            0.56,
-            0.85,
-            0.83
+            0.52,
+            0.62,
+            0.66,
+            0.84
           ],
           "direction": "open",
           "to": "station_stairs",
           "boxSource": "moved:agent"
+        },
+        {
+          "id": "into_the_city",
+          "type": "door",
+          "label": "Into the city",
+          "direction": "open",
+          "to": "city_street",
+          "box": [
+            0.7646,
+            0.2992,
+            0.9246,
+            0.6192
+          ],
+          "boxSource": "moved:testplay"
         }
       ]
     },
@@ -4037,7 +4090,7 @@
       "title": "The lake station",
       "built": true,
       "unlockedWhen": true,
-      "designNote": "Station (LEVEL 2: a teen plus or minus a single digit, 2 herb bundles): the basket under the ticket window. Doors: up the stairs, onto the train.",
+      "designNote": "TICKET WINDOW (Lucas, 2026-10-28; level 2, track vocab_lake): a transport vocabulary question (English or Spanish), pays ONE TRAIN TICKET. Doors: up the stairs, onto the train.",
       "plannedHotspots": [
         {
           "type": "door",
@@ -4055,14 +4108,8 @@
         {
           "type": "station",
           "tier": 2,
-          "label": "The basket under the ticket window",
-          "box": [
-            0.255,
-            0.47,
-            0.305,
-            0.56
-          ],
-          "boxSource": "moved:agent"
+          "label": "The ticket window",
+          "track": "vocab_lake"
         },
         {
           "type": "door",
@@ -4105,8 +4152,9 @@
             {
               "id": "ticket_window",
               "at": "just left of centre",
-              "label": "The basket under the ticket window",
+              "label": "The ticket window",
               "station": 2,
+              "track": "vocab_lake",
               "desc": "a tiny wooden ticket booth with a little shuttered window, a basket of herb bundles tied with red string on its ledge"
             },
             {
@@ -4232,7 +4280,7 @@
         {
           "id": "the_basket_under_the_ticket_window",
           "type": "station",
-          "label": "The basket under the ticket window",
+          "label": "The ticket window",
           "box": [
             0.255,
             0.47,
@@ -4240,7 +4288,8 @@
             0.56
           ],
           "tier": 2,
-          "boxSource": "moved:agent"
+          "boxSource": "moved:agent",
+          "track": "vocab_lake"
         },
         {
           "id": "onto_the_train",
@@ -4263,7 +4312,7 @@
       "title": "The lake train",
       "built": true,
       "unlockedWhen": true,
-      "designNote": "Station (LEVEL 3: 2, 3 or 4 times 2, 3 or 4, 3 herb bundles): the basket on the seat. THE LINE SWITCH (dial train_line: lake / lonely / soggy, back and forth; 2026-10-25) sets where the one carriage door leads: the lake station, the lonely station or Soggy Bottom.",
+      "designNote": "Station (LEVEL 3: 2, 3 or 4 times 2, 3 or 4, 3 herb bundles): the basket on the seat. THE LINE SWITCH (dial train_line: lake / lonely / soggy, back and forth; 2026-10-25) sets where the one carriage door leads: the lake station, the lonely station or Soggy Bottom. TICKETS (2026-10-28): the switch is a `ride` dial: a ride between two stops not yet linked spends a train ticket and links them for good (pool `rides`).",
       "plannedHotspots": [
         {
           "type": "door",
@@ -4319,6 +4368,7 @@
           "label": "The line switch",
           "key": "train_line",
           "default": "lake",
+          "ride": true,
           "fadeBlackMs": 900,
           "states": [
             {
@@ -4337,7 +4387,7 @@
               "toast": "The train rolls on to Soggy Bottom."
             }
           ],
-          "hint": "Throw the switch to send the train along the line, then step out of the door.",
+          "hint": "Throw the switch to ride to another stop, then step out of the door. A new ride takes a train ticket; after that you can ride between those two stops for free.",
           "box": [
             0.66,
             0.47,
@@ -4614,7 +4664,7 @@
               "toast": "The train rolls on to Soggy Bottom."
             }
           ],
-          "hint": "Throw the switch to send the train along the line, then step out of the door.",
+          "hint": "Throw the switch to ride to another stop, then step out of the door. A new ride takes a train ticket; after that you can ride between those two stops for free.",
           "box": [
             0.66,
             0.47,
@@ -4623,7 +4673,8 @@
           ],
           "boxSource": "moved:agent",
           "id": "the_line_switch",
-          "fadeBlackMs": 900
+          "fadeBlackMs": 900,
+          "ride": true
         },
         {
           "id": "line_view",
@@ -4886,20 +4937,13 @@
       "title": "The lonely station",
       "built": true,
       "unlockedWhen": true,
-      "designNote": "Station (LEVEL 3, 3 herb bundles; 7 doors from the tub): the basket under the little shelter. Back onto the train only (the train's line switch on 'lonely').",
+      "designNote": "TICKET BASKET (Lucas, 2026-10-28; level 3, track vocab_lonely): a transport vocabulary question, pays ONE TRAIN TICKET; 7 doors from the tub. Back onto the train only (the train's line switch on 'lonely').",
       "plannedHotspots": [
         {
           "type": "station",
           "tier": 3,
-          "label": "The basket under the little shelter",
-          "track": "lonely",
-          "box": [
-            0.18,
-            0.5,
-            0.25,
-            0.62
-          ],
-          "boxSource": "moved:agent"
+          "label": "The ticket basket under the little shelter",
+          "track": "vocab_lonely"
         },
         {
           "type": "door",
@@ -4937,9 +4981,9 @@
             {
               "id": "shelter_basket",
               "at": "just left of centre",
-              "label": "The basket under the little shelter",
+              "label": "The ticket basket under the little shelter",
               "station": 3,
-              "track": "lonely",
+              "track": "vocab_lonely",
               "desc": "a tiny wooden shelter with a bench under its little roof, on the bench a woven basket of herb bundles tied with red string"
             },
             {
@@ -5069,7 +5113,7 @@
         {
           "id": "the_basket_under_the_little_shelter",
           "type": "station",
-          "label": "The basket under the little shelter",
+          "label": "The ticket basket under the little shelter",
           "box": [
             0.18,
             0.5,
@@ -5078,7 +5122,7 @@
           ],
           "tier": 3,
           "boxSource": "moved:agent",
-          "track": "lonely"
+          "track": "vocab_lonely"
         }
       ]
     },
@@ -5933,6 +5977,786 @@
           "boxSource": "moved:agent"
         }
       ]
+    },
+    {
+      "key": "city_street",
+      "title": "The street of shops",
+      "built": true,
+      "unlockedWhen": true,
+      "designNote": "Station (LEVEL 2, 2 herb bundles, track city; 4 doors from the tub): the sweet stall's basket. Doors: back out to the cliff top, into the lantern lane.",
+      "plannedHotspots": [
+        {
+          "type": "door",
+          "direction": "back",
+          "to": "stairs_top",
+          "label": "Back to the cliff top",
+          "box": [
+            0.115,
+            0.36,
+            0.23,
+            0.66
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "station",
+          "tier": 2,
+          "label": "The basket at the sweet stall",
+          "track": "city",
+          "box": [
+            0.32,
+            0.48,
+            0.4,
+            0.62
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "to": "city_lane",
+          "label": "Into the lantern lane",
+          "box": [
+            0.61,
+            0.3,
+            0.72,
+            0.64
+          ],
+          "boxSource": "moved:agent"
+        }
+      ],
+      "authoring": {
+        "sceneSpec": {
+          "room": "city_street",
+          "setting": "a narrow old stone-paved street in a magical old Japanese town at dusk, on the far side of the bridge from a colossal, whimsical spirit bathhouse in old Japan, built entirely of wood: red-lacquered pillars and beams, green-painted rails and panels, gold trim and gold ornaments, yellow paper screens, curved tiled roofs stacked storey on storey like a grand pagoda; hand-painted animated-film look, rich saturated colour, soft painterly detail, lined on both sides by tall, narrow wooden shop-houses five and six storeys high, leaning close together; on every one of their first four storeys the fronts are open shops and stalls, warmly and brightly lit, counters and shelves heaped with goods",
+          "interior": false,
+          "indoor": false,
+          "seam": "the closed dark wooden front of a tall shop-house, plain boards and shut shutters, calm and even",
+          "seamOccluder": "a tall red-lacquered lantern post with a glowing paper lantern",
+          "elements": [
+            {
+              "id": "seam_left",
+              "at": "on the far left",
+              "desc": "the left half of the calm view directly behind the viewer: the closed dark wooden front of a tall shop-house, plain boards and shut shutters, calm and even, joining its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "back_to_cliff",
+              "at": "to the left",
+              "label": "Back to the cliff top",
+              "door": {
+                "direction": "back",
+                "to": "stairs_top"
+              },
+              "desc": "the street opening out at its lower end onto the paved cliff top, the long lantern-lit bridge and the huge glowing bathhouse beyond it against the violet sky"
+            },
+            {
+              "id": "sweet_stall",
+              "at": "just left of centre",
+              "label": "The basket at the sweet stall",
+              "station": 2,
+              "track": "city",
+              "desc": "a little sweet shop's open counter at street level, trays of round colourful sweets in glass jars, and on the counter a woven basket of herb bundles tied with red string"
+            },
+            {
+              "id": "street_ahead",
+              "at": "dead ahead in the centre",
+              "desc": "the narrow street running on ahead between the shop-houses, strings of paper lanterns criss-crossing overhead from storey to storey; every storey up to the fourth is an open, brightly lit shop, one above another: paper fans, kites, masks, teapots, bolts of cloth"
+            },
+            {
+              "id": "lane_arch",
+              "at": "just right of centre",
+              "label": "Into the lantern lane",
+              "door": {
+                "direction": "open",
+                "to": "city_lane"
+              },
+              "desc": "a narrow side lane turning off between two shop-houses under a red wooden arch hung with lanterns, the paving running level into more warm light"
+            },
+            {
+              "id": "tall_house",
+              "at": "to the right",
+              "desc": "a tall shop-house front with a shop open on each of its four lower floors, little wooden balconies and steps between them, goods and lantern light spilling out"
+            },
+            {
+              "id": "seam_right",
+              "at": "on the far right",
+              "desc": "the right half of the calm view directly behind the viewer: the closed dark wooden front of a tall shop-house, plain boards and shut shutters, calm and even, joining its other half cleanly at the seam directly behind you"
+            }
+          ],
+          "soundBed": "a busy little town street at dusk: lanterns creaking, shop bells, sizzling food, far-off chatter.",
+          "rigid": "the shop-houses and their shop fronts, the lanterns and strings, the sweet stall and basket, the arch",
+          "atmosphere": "cozy, bustling and magical, every shop glowing warm and bright against the violet dusk",
+          "styleLight": "early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red",
+          "negatives": "No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. The street is EMPTY of people; shop goods have no labels or price tags.",
+          "states": {},
+          "continuity": [],
+          "scaffold": {
+            "kind": "skeleton",
+            "layout": {
+              "surface": "court",
+              "word": "street",
+              "floor": "stone-paved street",
+              "size": [
+                2,
+                2,
+                8,
+                4
+              ],
+              "sides": {
+                "left": "houses",
+                "right": "houses",
+                "front": "houses",
+                "back": "houses"
+              },
+              "parts": [
+                [
+                  "door",
+                  "back_to_cliff",
+                  {
+                    "w": 2.4,
+                    "h": 3.0,
+                    "say": "the open lower end of the street, the paving running level out onto the cliff top"
+                  }
+                ],
+                [
+                  "door",
+                  "lane_arch",
+                  {
+                    "w": 1.6,
+                    "h": 2.8,
+                    "say": "the arch over the side lane, the paving running level into it"
+                  }
+                ],
+                [
+                  "prop",
+                  "sweet_stall",
+                  {
+                    "size": [
+                      1.6,
+                      0.8,
+                      1.0
+                    ],
+                    "kind": "wall"
+                  }
+                ]
+              ]
+            }
+          },
+          "stillOnly": true
+        },
+        "plateRefs": [
+          "atrium/scene.png"
+        ],
+        "scenePrompt": "This is a seamless 360-degree panorama from a narrow old stone-paved street in a magical old Japanese town at dusk, on the far side of the bridge from a colossal, whimsical spirit bathhouse in old Japan, built entirely of wood: red-lacquered pillars and beams, green-painted rails and panels, gold trim and gold ornaments, yellow paper screens, curved tiled roofs stacked storey on storey like a grand pagoda; hand-painted animated-film look, rich saturated colour, soft painterly detail, lined on both sides by tall, narrow wooden shop-houses five and six storeys high, leaning close together; on every one of their first four storeys the fronts are open shops and stalls, warmly and brightly lit, counters and shelves heaped with goods. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the closed dark wooden front of a tall shop-house, plain boards and shut shutters, calm and even: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: the closed dark wooden front of a tall shop-house, plain boards and shut shutters, calm and even, joining its other half cleanly at the seam directly behind you; to the left, the street opening out at its lower end onto the paved cliff top, the long lantern-lit bridge and the huge glowing bathhouse beyond it against the violet sky; just left of centre, a little sweet shop's open counter at street level, trays of round colourful sweets in glass jars, and on the counter a woven basket of herb bundles tied with red string; dead ahead in the centre, the narrow street running on ahead between the shop-houses, strings of paper lanterns criss-crossing overhead from storey to storey; every storey up to the fourth is an open, brightly lit shop, one above another: paper fans, kites, masks, teapots, bolts of cloth; just right of centre, a narrow side lane turning off between two shop-houses under a red wooden arch hung with lanterns, the paving running level into more warm light; to the right, a tall shop-house front with a shop open on each of its four lower floors, little wooden balconies and steps between them, goods and lantern light spilling out; on the far right, the right half of the calm view directly behind the viewer: the closed dark wooden front of a tall shop-house, plain boards and shut shutters, calm and even, joining its other half cleanly at the seam directly behind you. cozy, bustling and magical, every shop glowing warm and bright against the violet dusk. No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. The street is EMPTY of people; shop goods have no labels or price tags. Shot on a full-frame DSLR at 24mm, f/8, early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into the closed dark wooden front of a tall shop-house, plain boards and shut shutters, calm and even, with no visible seam, join, or repetition.",
+        "seam": {
+          "stage": "screened",
+          "band": "sky",
+          "ratio": 2.45,
+          "delta": 4.18,
+          "needsWork": false,
+          "accepted": false,
+          "seamBandRun": 0.053,
+          "at": "2026-10-28T08:29:03"
+        }
+      },
+      "mapPos": {
+        "c": 0,
+        "r": 4
+      },
+      "panorama": "city_street/scene.png",
+      "builtFrom": "l1_city_street_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "hotspots": [
+        {
+          "id": "back_to_the_cliff_top",
+          "type": "door",
+          "label": "Back to the cliff top",
+          "box": [
+            0.115,
+            0.36,
+            0.23,
+            0.66
+          ],
+          "direction": "back",
+          "to": "stairs_top",
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "the_basket_at_the_sweet_stall",
+          "type": "station",
+          "label": "The basket at the sweet stall",
+          "box": [
+            0.32,
+            0.48,
+            0.4,
+            0.62
+          ],
+          "tier": 2,
+          "track": "city",
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "into_the_lantern_lane",
+          "type": "door",
+          "label": "Into the lantern lane",
+          "box": [
+            0.6162,
+            0.3642,
+            0.7262,
+            0.7042
+          ],
+          "direction": "open",
+          "to": "city_lane",
+          "boxSource": "moved:testplay"
+        }
+      ]
+    },
+    {
+      "key": "city_lane",
+      "title": "The lantern lane",
+      "built": true,
+      "unlockedWhen": true,
+      "designNote": "Station (LEVEL 2, 2 herb bundles, track city; 5 doors from the tub): the fan shop's basket. Doors: back to the street of shops, into the restaurant.",
+      "plannedHotspots": [
+        {
+          "type": "door",
+          "direction": "back",
+          "to": "city_street",
+          "label": "Back to the street of shops",
+          "box": [
+            0.125,
+            0.2,
+            0.21,
+            0.62
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "station",
+          "tier": 2,
+          "label": "The basket at the fan shop",
+          "track": "city",
+          "box": [
+            0.28,
+            0.3,
+            0.4,
+            0.72
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "to": "restaurant",
+          "label": "Into the restaurant",
+          "box": [
+            0.57,
+            0.26,
+            0.67,
+            0.62
+          ],
+          "boxSource": "moved:agent"
+        }
+      ],
+      "authoring": {
+        "sceneSpec": {
+          "room": "city_lane",
+          "setting": "a very narrow, winding lane deep in a magical old Japanese town at dusk, only a few steps wide, between tall wooden shop-houses whose first four storeys are open shops stacked one above another, each glowing warm gold, joined by little wooden stairs and walkways",
+          "interior": false,
+          "indoor": false,
+          "seam": "the closed dark wooden front of a tall shop-house, plain boards and shut shutters, calm and even",
+          "seamOccluder": "a tall red-lacquered lantern post with a glowing paper lantern",
+          "elements": [
+            {
+              "id": "seam_left",
+              "at": "on the far left",
+              "desc": "the left half of the calm view directly behind the viewer: the closed dark wooden front of a tall shop-house, plain boards and shut shutters, calm and even, joining its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "back_to_street",
+              "at": "to the left",
+              "label": "Back to the street of shops",
+              "door": {
+                "direction": "back",
+                "to": "city_street"
+              },
+              "desc": "the lane running back level under a red wooden lantern arch to the wider street of shops"
+            },
+            {
+              "id": "fan_shop",
+              "at": "just left of centre",
+              "label": "The basket at the fan shop",
+              "station": 2,
+              "track": "city",
+              "desc": "a fan and umbrella shop's open front, paper fans spread out across the wall, painted paper umbrellas, and on its counter a woven basket of herb bundles tied with red string"
+            },
+            {
+              "id": "lane_ahead",
+              "at": "dead ahead in the centre",
+              "desc": "the lane winding on ahead, shops open on four storeys on both sides, little wooden stairs and walkways between them, paper lanterns strung overhead"
+            },
+            {
+              "id": "restaurant_door",
+              "at": "just right of centre",
+              "label": "Into the restaurant",
+              "door": {
+                "direction": "open",
+                "to": "restaurant"
+              },
+              "desc": "a busy little restaurant's wide open front at street level, a short split cloth curtain hanging over its doorway, steam and warm golden light pouring out, the floor running level inside"
+            },
+            {
+              "id": "lantern_stall",
+              "at": "to the right",
+              "desc": "a stall hung all over with paper lanterns of every colour, glowing red, gold, green and white"
+            },
+            {
+              "id": "seam_right",
+              "at": "on the far right",
+              "desc": "the right half of the calm view directly behind the viewer: the closed dark wooden front of a tall shop-house, plain boards and shut shutters, calm and even, joining its other half cleanly at the seam directly behind you"
+            }
+          ],
+          "soundBed": "a narrow lane at dusk: lanterns swaying, a wind chime, pots clattering in the restaurant.",
+          "rigid": "the shop-houses, the stairs and walkways, the fan shop and basket, the restaurant front, the lanterns",
+          "atmosphere": "snug, warm and enchanting, the lane glowing like the inside of a lantern",
+          "styleLight": "early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red",
+          "negatives": "No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. The lane is EMPTY of people; the restaurant curtain is plain cloth with no writing.",
+          "states": {},
+          "continuity": [],
+          "scaffold": {
+            "kind": "skeleton",
+            "layout": {
+              "surface": "court",
+              "word": "lane",
+              "floor": "stone-paved lane",
+              "size": [
+                1.5,
+                1.5,
+                6,
+                4
+              ],
+              "sides": {
+                "left": "houses",
+                "right": "houses",
+                "front": "houses",
+                "back": "houses"
+              },
+              "parts": [
+                [
+                  "door",
+                  "back_to_street",
+                  {
+                    "w": 1.6,
+                    "h": 2.8,
+                    "say": "the arch back to the street, the paving running level under it"
+                  }
+                ],
+                [
+                  "door",
+                  "restaurant_door",
+                  {
+                    "w": 1.8,
+                    "h": 2.4,
+                    "say": "the restaurant's open front, its floor level with the lane"
+                  }
+                ],
+                [
+                  "prop",
+                  "fan_shop",
+                  {
+                    "size": [
+                      1.6,
+                      0.8,
+                      1.0
+                    ],
+                    "kind": "wall"
+                  }
+                ]
+              ]
+            }
+          },
+          "stillOnly": true
+        },
+        "plateRefs": [
+          "atrium/scene.png"
+        ],
+        "scenePrompt": "This is a seamless 360-degree panorama from a very narrow, winding lane deep in a magical old Japanese town at dusk, only a few steps wide, between tall wooden shop-houses whose first four storeys are open shops stacked one above another, each glowing warm gold, joined by little wooden stairs and walkways. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the closed dark wooden front of a tall shop-house, plain boards and shut shutters, calm and even: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: the closed dark wooden front of a tall shop-house, plain boards and shut shutters, calm and even, joining its other half cleanly at the seam directly behind you; to the left, the lane running back level under a red wooden lantern arch to the wider street of shops; just left of centre, a fan and umbrella shop's open front, paper fans spread out across the wall, painted paper umbrellas, and on its counter a woven basket of herb bundles tied with red string; dead ahead in the centre, the lane winding on ahead, shops open on four storeys on both sides, little wooden stairs and walkways between them, paper lanterns strung overhead; just right of centre, a busy little restaurant's wide open front at street level, a short split cloth curtain hanging over its doorway, steam and warm golden light pouring out, the floor running level inside; to the right, a stall hung all over with paper lanterns of every colour, glowing red, gold, green and white; on the far right, the right half of the calm view directly behind the viewer: the closed dark wooden front of a tall shop-house, plain boards and shut shutters, calm and even, joining its other half cleanly at the seam directly behind you. snug, warm and enchanting, the lane glowing like the inside of a lantern. No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. The lane is EMPTY of people; the restaurant curtain is plain cloth with no writing. Shot on a full-frame DSLR at 24mm, f/8, early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into the closed dark wooden front of a tall shop-house, plain boards and shut shutters, calm and even, with no visible seam, join, or repetition.",
+        "seam": {
+          "stage": "screened",
+          "band": "ground",
+          "ratio": 2.98,
+          "delta": 4.67,
+          "needsWork": false,
+          "accepted": false,
+          "seamBandRun": 0.069,
+          "at": "2026-10-28T08:30:37"
+        }
+      },
+      "mapPos": {
+        "c": 0,
+        "r": 5
+      },
+      "panorama": "city_lane/scene.png",
+      "builtFrom": "l1_city_lane_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "hotspots": [
+        {
+          "id": "back_to_the_street_of_shops",
+          "type": "door",
+          "label": "Back to the street of shops",
+          "box": [
+            0.125,
+            0.2,
+            0.21,
+            0.62
+          ],
+          "direction": "back",
+          "to": "city_street",
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "the_basket_at_the_fan_shop",
+          "type": "station",
+          "label": "The basket at the fan shop",
+          "box": [
+            0.28,
+            0.3,
+            0.4,
+            0.72
+          ],
+          "tier": 2,
+          "track": "city",
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "into_the_restaurant",
+          "type": "door",
+          "label": "Into the restaurant",
+          "box": [
+            0.5664,
+            0.3256,
+            0.6664,
+            0.6856
+          ],
+          "direction": "open",
+          "to": "restaurant",
+          "boxSource": "moved:testplay"
+        }
+      ]
+    },
+    {
+      "key": "restaurant",
+      "title": "The restaurant",
+      "built": true,
+      "unlockedWhen": true,
+      "designNote": "THE MENU (Lucas, 2026-10-28; pool `menu`, level 3; 6 doors from the tub): pick one of four dishes, solve a times-table sum about it, and the class clock gains ONE minute; each dish sells out once solved, so four extra minutes at most. No herb station. Back out to the lantern lane only.",
+      "plannedHotspots": [
+        {
+          "type": "door",
+          "direction": "back",
+          "to": "city_lane",
+          "label": "Back out to the lane",
+          "box": [
+            0.135,
+            0.24,
+            0.21,
+            0.68
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "menu",
+          "tier": 3,
+          "label": "The menu",
+          "box": [
+            0.41,
+            0.19,
+            0.585,
+            0.5
+          ],
+          "boxSource": "moved:agent"
+        }
+      ],
+      "authoring": {
+        "sceneSpec": {
+          "room": "restaurant",
+          "setting": "inside a small, busy, cozy old restaurant in a magical old Japanese town at dusk: dark wooden beams, red-lacquered posts, paper lanterns, steam rising everywhere",
+          "interior": true,
+          "indoor": true,
+          "seam": "a plain stretch of dark wooden wall hung with plain paper lanterns, uniform and unbroken",
+          "seamOccluder": "a square red-lacquered wooden post, floor to ceiling",
+          "elements": [
+            {
+              "id": "seam_left",
+              "at": "on the far left",
+              "desc": "the left half of the calm view directly behind the viewer: a plain stretch of dark wooden wall hung with plain paper lanterns, uniform and unbroken, joining its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "door_out",
+              "at": "to the left",
+              "label": "Back out to the lane",
+              "door": {
+                "direction": "back",
+                "to": "city_lane"
+              },
+              "desc": "the open front doorway with its short split cloth curtain, the lantern-lit lane outside, the floor running level out"
+            },
+            {
+              "id": "dresser",
+              "at": "just left of centre",
+              "desc": "a tall wooden dresser stacked with bowls, teacups and little teapots"
+            },
+            {
+              "id": "menu",
+              "at": "dead ahead in the centre",
+              "label": "The menu",
+              "menu": 3,
+              "desc": "a long wooden counter with steaming pots behind it, and on the wall above it a row of FOUR wooden boards hanging side by side, each painted with a picture of one dish: a bowl of noodle soup, a plate of dumplings, three rice balls, and fruit on skewers; pictures only, no writing"
+            },
+            {
+              "id": "tables",
+              "at": "just right of centre",
+              "desc": "low wooden tables with flat cushions, each laid with bowls, chopsticks and a little teapot"
+            },
+            {
+              "id": "kitchen",
+              "at": "to the right",
+              "desc": "a wide kitchen hatch, a huge steaming pot and tall stacks of round bamboo steamer baskets"
+            },
+            {
+              "id": "seam_right",
+              "at": "on the far right",
+              "desc": "the right half of the calm view directly behind the viewer: a plain stretch of dark wooden wall hung with plain paper lanterns, uniform and unbroken, joining its other half cleanly at the seam directly behind you"
+            }
+          ],
+          "soundBed": "a cozy little restaurant: pots bubbling, a kettle steaming, bowls clinking, the lane murmuring outside.",
+          "rigid": "the counter, the four menu boards, the dresser, the tables and cushions, the kitchen hatch, the doorway",
+          "atmosphere": "warm, steamy and inviting, lantern light glowing gold through the steam",
+          "styleLight": "early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red",
+          "negatives": "No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. No people or cooks; the menu boards show pictures of food only, never words or numbers.",
+          "states": {},
+          "continuity": [],
+          "scaffold": {
+            "kind": "skeleton",
+            "layout": {
+              "surface": "room",
+              "word": "floor",
+              "floor": "polished wooden floor",
+              "size": [
+                3,
+                3,
+                4,
+                2.6
+              ],
+              "sides": {
+                "left": "houses",
+                "right": "houses",
+                "front": "houses",
+                "back": "houses"
+              },
+              "parts": [
+                [
+                  "door",
+                  "door_out",
+                  {
+                    "w": 1.6,
+                    "h": 2.2,
+                    "say": "the open front doorway, the floor running level out to the lane"
+                  }
+                ],
+                [
+                  "prop",
+                  "menu",
+                  {
+                    "size": [
+                      3.0,
+                      0.6,
+                      1.0
+                    ],
+                    "kind": "wall"
+                  }
+                ],
+                [
+                  "prop",
+                  "tables",
+                  {
+                    "size": [
+                      1.4,
+                      1.0,
+                      0.4
+                    ]
+                  }
+                ]
+              ]
+            }
+          },
+          "stillOnly": true
+        },
+        "plateRefs": [
+          "atrium/scene.png"
+        ],
+        "scenePrompt": "This is a seamless 360-degree panorama from inside a small, busy, cozy old restaurant in a magical old Japanese town at dusk: dark wooden beams, red-lacquered posts, paper lanterns, steam rising everywhere. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stretch of dark wooden wall hung with plain paper lanterns, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: a plain stretch of dark wooden wall hung with plain paper lanterns, uniform and unbroken, joining its other half cleanly at the seam directly behind you; to the left, the open front doorway with its short split cloth curtain, the lantern-lit lane outside, the floor running level out; just left of centre, a tall wooden dresser stacked with bowls, teacups and little teapots; dead ahead in the centre, a long wooden counter with steaming pots behind it, and on the wall above it a row of FOUR wooden boards hanging side by side, each painted with a picture of one dish: a bowl of noodle soup, a plate of dumplings, three rice balls, and fruit on skewers; pictures only, no writing; just right of centre, low wooden tables with flat cushions, each laid with bowls, chopsticks and a little teapot; to the right, a wide kitchen hatch, a huge steaming pot and tall stacks of round bamboo steamer baskets; on the far right, the right half of the calm view directly behind the viewer: a plain stretch of dark wooden wall hung with plain paper lanterns, uniform and unbroken, joining its other half cleanly at the seam directly behind you. warm, steamy and inviting, lantern light glowing gold through the steam. No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. No people or cooks; the menu boards show pictures of food only, never words or numbers. Shot on a full-frame DSLR at 24mm, f/8, early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a plain stretch of dark wooden wall hung with plain paper lanterns, uniform and unbroken, with no visible seam, join, or repetition.",
+        "seam": {
+          "stage": "blurred",
+          "band": "sky",
+          "ratio": 0.0,
+          "delta": 0.0,
+          "needsWork": false,
+          "accepted": false,
+          "seamBandRun": 0.0,
+          "at": "2026-10-28T08:32:13"
+        }
+      },
+      "mapPos": {
+        "c": 0,
+        "r": 6
+      },
+      "panorama": "restaurant/scene.png",
+      "builtFrom": "l1_restaurant_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "hotspots": [
+        {
+          "id": "back_out_to_the_lane",
+          "type": "door",
+          "label": "Back out to the lane",
+          "box": [
+            0.135,
+            0.24,
+            0.21,
+            0.68
+          ],
+          "direction": "back",
+          "to": "city_lane",
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "the_menu",
+          "type": "menu",
+          "label": "The menu",
+          "box": [
+            0.41,
+            0.19,
+            0.585,
+            0.5
+          ],
+          "tier": 3,
+          "boxSource": "moved:agent"
+        }
+      ]
+    },
+    {
+      "key": "bedtime",
+      "title": "Good night",
+      "built": true,
+      "unlockedWhen": true,
+      "designNote": "THE DAY'S END: no hotspots. Looking up at the ceiling from a sleeping bag; the room's outro fades to black, shows the finish line and returns to the start screen.",
+      "plannedHotspots": [],
+      "authoring": {
+        "sceneSpec": {
+          "room": "bedtime",
+          "setting": "the view from lying flat on your back in a cosy sleeping bag on the floor of the sleeping quarters high up in a colossal, whimsical spirit bathhouse in old Japan, built entirely of wood: red-lacquered pillars and beams, green-painted rails and panels, gold trim and gold ornaments, yellow paper screens, curved tiled roofs stacked storey on storey like a grand pagoda; hand-painted animated-film look, rich saturated colour, soft painterly detail, looking STRAIGHT UP at the ceiling; the whole picture is the ceiling overhead, seen from below, with only the tops of the walls at its edges",
+          "interior": true,
+          "indoor": true,
+          "seam": "the top edge of a pale paper-screen wall meeting the ceiling, softly lit, calm and even",
+          "seamOccluder": "a dark wooden ceiling beam running overhead",
+          "elements": [
+            {
+              "id": "seam_left",
+              "at": "on the far left",
+              "desc": "the left half of the calm view directly behind the viewer: the top edge of a pale paper-screen wall meeting the ceiling, softly lit, calm and even, joining its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "wall_top_left",
+              "at": "to the left",
+              "desc": "the top of a pale paper-screen wall rising up into the ceiling at the edge of view, dimly lit"
+            },
+            {
+              "id": "lantern",
+              "at": "just left of centre",
+              "desc": "a round paper lantern hanging from a beam directly overhead, glowing a low sleepy amber"
+            },
+            {
+              "id": "ceiling",
+              "at": "dead ahead in the centre",
+              "desc": "directly overhead, the coffered wooden ceiling seen from below: square panels of dark polished wood framed by red-lacquered beams with gold trim, each panel painted with faint gold clouds, warm lantern light fading across it"
+            },
+            {
+              "id": "high_window",
+              "at": "just right of centre",
+              "desc": "high up in the wall, an open window showing a strip of deep blue night sky and a few soft stars"
+            },
+            {
+              "id": "quilt_edge",
+              "at": "to the right",
+              "desc": "at the very bottom edge of the view, close up, the soft folded top of a red-and-gold sleeping bag quilt"
+            },
+            {
+              "id": "seam_right",
+              "at": "on the far right",
+              "desc": "the right half of the calm view directly behind the viewer: the top edge of a pale paper-screen wall meeting the ceiling, softly lit, calm and even, joining its other half cleanly at the seam directly behind you"
+            }
+          ],
+          "soundBed": "a sleeping room at night: soft breathing, the wind at the windows, the bathhouse very quiet far below.",
+          "rigid": "the ceiling panels and beams, the lantern, the window, the walls",
+          "atmosphere": "drowsy, safe and peaceful, the light slowly fading",
+          "styleLight": "late at night: the paper lanterns turned down to a soft, sleepy amber glow, deep blue night at the windows, everything calm and dim and warm",
+          "negatives": "No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. No floor, no furniture and no other sleepers in view: only the ceiling seen from below.",
+          "states": {},
+          "continuity": [],
+          "noJoins": "the camera lies on its back and looks straight up at the ceiling; no doors, nothing to walk to",
+          "stillOnly": true
+        },
+        "plateRefs": [
+          "quarters/scene_sleeping.png"
+        ],
+        "scenePrompt": "This is a seamless 360-degree panorama from the view from lying flat on your back in a cosy sleeping bag on the floor of the sleeping quarters high up in a colossal, whimsical spirit bathhouse in old Japan, built entirely of wood: red-lacquered pillars and beams, green-painted rails and panels, gold trim and gold ornaments, yellow paper screens, curved tiled roofs stacked storey on storey like a grand pagoda; hand-painted animated-film look, rich saturated colour, soft painterly detail, looking STRAIGHT UP at the ceiling; the whole picture is the ceiling overhead, seen from below, with only the tops of the walls at its edges. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the top edge of a pale paper-screen wall meeting the ceiling, softly lit, calm and even: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: the top edge of a pale paper-screen wall meeting the ceiling, softly lit, calm and even, joining its other half cleanly at the seam directly behind you; to the left, the top of a pale paper-screen wall rising up into the ceiling at the edge of view, dimly lit; just left of centre, a round paper lantern hanging from a beam directly overhead, glowing a low sleepy amber; dead ahead in the centre, directly overhead, the coffered wooden ceiling seen from below: square panels of dark polished wood framed by red-lacquered beams with gold trim, each panel painted with faint gold clouds, warm lantern light fading across it; just right of centre, high up in the wall, an open window showing a strip of deep blue night sky and a few soft stars; to the right, at the very bottom edge of the view, close up, the soft folded top of a red-and-gold sleeping bag quilt; on the far right, the right half of the calm view directly behind the viewer: the top edge of a pale paper-screen wall meeting the ceiling, softly lit, calm and even, joining its other half cleanly at the seam directly behind you. drowsy, safe and peaceful, the light slowly fading. No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. No floor, no furniture and no other sleepers in view: only the ceiling seen from below. Shot on a full-frame DSLR at 24mm, f/8, late at night: the paper lanterns turned down to a soft, sleepy amber glow, deep blue night at the windows, everything calm and dim and warm, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into the top edge of a pale paper-screen wall meeting the ceiling, softly lit, calm and even, with no visible seam, join, or repetition.",
+        "seam": {
+          "stage": "screened",
+          "band": "sky",
+          "ratio": 3.26,
+          "delta": 2.08,
+          "needsWork": false,
+          "accepted": false,
+          "seamBandRun": 0.02,
+          "at": "2026-10-28T08:33:46"
+        }
+      },
+      "mapPos": {
+        "c": 0,
+        "r": 0
+      },
+      "outro": {
+        "holdMs": 4000,
+        "fadeMs": 7000,
+        "textMs": 3500
+      },
+      "panorama": "bedtime/scene.png",
+      "builtFrom": "l1_bedtime_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      }
     }
   ],
   "doorLabels": true,
