@@ -1,0 +1,99 @@
+{
+  "epoch": "1928-01-01T00:00",
+  "today": "1928-10-08T09:00",
+  "z0": 3.54,
+  "datum_start": 2.49,
+  "datum_tolerance": [
+    -0.13,
+    0.14
+  ],
+  "water_days": 70,
+  "haul_days": 3,
+  "daylight": [
+    7,
+    18
+  ],
+  "shafts": [
+    {
+      "id": "sun",
+      "period_h": 8766.0,
+      "phase": 2.9125
+    },
+    {
+      "id": "wind",
+      "period_h": 24.0,
+      "phase": 4.1888
+    },
+    {
+      "id": "moon",
+      "period_h": 708.7344,
+      "phase": 0.9727
+    },
+    {
+      "id": "nearfar",
+      "period_h": 512.88,
+      "phase": 3.6711
+    }
+  ],
+  "pulleys": [
+    {
+      "id": "p208",
+      "size": 2.08
+    },
+    {
+      "id": "p119",
+      "size": 1.19
+    },
+    {
+      "id": "p084",
+      "size": 0.84
+    },
+    {
+      "id": "p018",
+      "size": 0.18
+    }
+  ],
+  "true_arrangement": {
+    "moon": "p208",
+    "sun": "p119",
+    "nearfar": "p084",
+    "wind": "p018"
+  },
+  "logbook_schema": [
+    {
+      "when": "1928-02-11T10:00",
+      "depth_m": 0.4
+    }
+  ],
+  "logbook": [
+    {
+      "when": "1928-01-24T12:00",
+      "depth_m": 0.5
+    },
+    {
+      "when": "1928-02-19T14:00",
+      "depth_m": 1.0
+    },
+    {
+      "when": "1928-03-16T06:00",
+      "depth_m": 2.5
+    }
+  ],
+  "lore": [
+    "Mind the season: the bar keeps a summer and a winter, same as the town."
+  ],
+  "almanac_note": "The old hands' almanac gives the dark-moon and full-moon dates. The old hands go by the moon.",
+  "_numbers": "v6, 2026-10-22 (final_v6.py -> final_v6.json; rhythms, sizes, today and the accepted dates from final_v5.json). The lagoon smooths out the twice-daily tide: moon = the moon's month 29.5306 d, sun = the season 365.25 d, nearfar = the moon's near-and-far stretched to 21.37 d (game simplification; the real anomalistic month is 27.55 d), wind = the afternoon southerly 24 h. z0 is the TRUE datum (3.54 m, recentred from v5's 3.672 so a hand-set datum can be off by -0.13..+0.14 m and still give 7-9 Dec); datum_start is the knocked-out datum the machine is found at (its first 3-day window, 10-15 Nov, is 1 m under water in truth). The town holds the moon and sun pulleys (town_pulleys); the player chooses near-and-far vs wind for the other two, and sets the datum, from the logbook (three soundings on half-metre lines; the wrong order misses one by >= 1.1 m with any datum). The haul length is never stated: bar_length_m / sledge_m_per_day = haul_days. Only dry stretch before today + 110 d: 1928-12-07 19:00 -> 12-12 12:00; accepted departure dates 7, 8, 9 Dec. Asserted in test_model.mjs.",
+  "town_pulleys": {
+    "moon": "p208",
+    "sun": "p119"
+  },
+  "haul_clues": {
+    "bar_length_m": 1200,
+    "sledge_m_per_day": 400
+  },
+  "clue_images": {
+    "bar_tag": "../../clues/bar_tag.jpg",
+    "pace_note": "../../clues/pace_note.jpg"
+  }
+}

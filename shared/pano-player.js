@@ -24,6 +24,8 @@
  *            solves, never logs to the notebook; the player reads it and carries the number away.
  *            kind "drawdown" (shared/drawdown.js) → { geometry:"<json path>", art:{board, peg?, spring?,
  *            rod?, leverThrown?} } (paths relative to play.html). Unknown kinds open an apology card.
+ *            kind "tide" (shared/tide_machine.js, dunes) → { geometry, config:"<machine.json>", art:{board},
+ *            pulleys:{<itemKey>: <pulleyId>} } — only the pulleys the player CARRIES reach its shelf.
  *   door   → (box) + optional { direction:"forward"|"back", to:"<roomKey>", requires:"<gateId>"|[ids] }.
  *            forward (default): opens on its GATE — `requires` (a puzzle/lock hotspot id, or array) if
  *            set, else the room's PRIMARY gate — swaps to panoramaOpen, shows the target's entry,
@@ -82,22 +84,25 @@
 // A bare `./variant_resolve.js` import is NOT refreshed by bumping the <script> tag's ?v, so a changed
 // helper module (e.g. a new export) leaves browsers on a stale cached copy → "doesn't provide an export
 // named X" SyntaxError → blank page (the 2026-08-05 airship regression). Bump all three together.
-import { WebRConsole } from "./webr-console.js?v=147";
-import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers, pickTransit } from "./variant_resolve.js?v=147";   // Phase 3: per-hotspot state variants; monorail switch-door nav
-import * as PQ from "./puzzle_queue.js?v=147";   // dynamic puzzle queue: location-independent puzzle serving
-import * as CP from "./corr_panel.js?v=147";   // lower-triangle layout of the grid gate (clouds correlation panel)
-import { particleCount } from "./particles.js?v=147";
-import { mountLandingBackdrop } from "./landing_backdrop.js?v=147";   // landing text over a pan of the first room's clip   // ambient-particle vocabulary + per-kind field density
-import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=147";
-import { condHolds } from "./cond.js?v=147";   // ledger + elevation-map card DOM
-import * as LIVE from "./live_session.js?v=147";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
-import * as RIDE from "./ride.js?v=147";
-import { mountPcaPlate } from "./pca_plate.js?v=147";   // the PCA plate instrument (voyage beach)
-import { mountFishBoard } from "./fish_board.js?v=147";   // the fish board instrument (harbour berth)
-import { mountDrawdown } from "./drawdown.js?v=147";   // the drawdown board instrument (diamonds escape)   // THE RIDE (subway): express lever + clip-sequence planner
-import * as BELL from "./bell_pull.js?v=147";
-import * as INVY from "./inventory.js?v=147";   // carried items + the door that asks which to use (dunes)   // bell-pull (#16): dial mode:"pull" + lock mode:"state" (spa belfry)
-import { entryYaw } from "./entry_facing.js?v=147";   // face the way out on entering a room (every scenario)
+import { WebRConsole } from "./webr-console.js?v=148";
+import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers, pickTransit } from "./variant_resolve.js?v=148";   // Phase 3: per-hotspot state variants; monorail switch-door nav
+import * as PQ from "./puzzle_queue.js?v=148";   // dynamic puzzle queue: location-independent puzzle serving
+import * as CP from "./corr_panel.js?v=148";   // lower-triangle layout of the grid gate (clouds correlation panel)
+import { particleCount } from "./particles.js?v=148";
+import { mountLandingBackdrop } from "./landing_backdrop.js?v=148";   // landing text over a pan of the first room's clip   // ambient-particle vocabulary + per-kind field density
+import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=148";
+import { condHolds } from "./cond.js?v=148";   // ledger + elevation-map card DOM
+import * as LIVE from "./live_session.js?v=148";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
+import * as RIDE from "./ride.js?v=148";
+import { mountPcaPlate } from "./pca_plate.js?v=148";   // the PCA plate instrument (voyage beach)
+import { mountFishBoard } from "./fish_board.js?v=148";   // the fish board instrument (harbour berth)
+import { mountDrawdown } from "./drawdown.js?v=148";
+import { mountTide } from "./tide_machine.js?v=148";   // the tide machine instrument (dunes escape)
+   // the drawdown board instrument (diamonds escape)   // THE RIDE (subway): express lever + clip-sequence planner
+import * as BELL from "./bell_pull.js?v=148";
+import * as DATEB from "./date_board.js?v=148";   // date lock: lock mode:"date", two slide-levers (dunes departure board)
+import * as INVY from "./inventory.js?v=148";   // carried items + the door that asks which to use (dunes)   // bell-pull (#16): dial mode:"pull" + lock mode:"state" (spa belfry)
+import { entryYaw } from "./entry_facing.js?v=148";   // face the way out on entering a room (every scenario)
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 
@@ -2940,7 +2945,7 @@ function openPlaque(h) {
 // modal. Like a plaque it is never a gate, never a clue and never logged; the player reads a number off it.
 // `kind` picks the renderer; each kind's fields are documented in the header. Peg positions survive
 // closing and reopening within a visit (in memory only: nothing about an instrument is saved or graded).
-const INSTRUMENTS = { drawdown: mountDrawdown, pca_plate: mountPcaPlate, fish_board: mountFishBoard };
+const INSTRUMENTS = { drawdown: mountDrawdown, pca_plate: mountPcaPlate, fish_board: mountFishBoard, tide: mountTide };
 // Opening zooms from the hotspot's marker into the close-up (settled design, notes §5 of diamonds), so the
 // student sees the board on the wall become the board in their hands. Skipped under reduced motion.
 function zoomFromHotspot(h) {
@@ -2972,8 +2977,17 @@ async function openInstrument(h) {
       geometry = await (await fetch(h.geometry)).json();
       _instrumentGeom.set(h.geometry, geometry);
     }
+    // `config` (optional): a second JSON the instrument reads its numbers from (the tide machine's machine.json).
+    let config;
+    if (h.config) {
+      config = _instrumentGeom.get(h.config);
+      if (!config) { config = await (await fetch(h.config)).json(); _instrumentGeom.set(h.config, config); }
+    }
     if (!card.isConnected) return;                       // closed while the geometry loaded
-    const inst = mount(card, { geometry, art: h.art || {}, pegs: _instrumentState.get(sk), sound: !liveSilent(),
+    // `pulleys` (optional, {itemKey: partId}): parts that come from the player's CARRIED items (shared/inventory.js);
+    // only the ones held reach the instrument's shelf.
+    const held = h.pulleys ? Object.entries(h.pulleys).filter(([k]) => INV.held.includes(k)).map(([, pid]) => pid) : undefined;
+    const inst = mount(card, { geometry, config, held, art: h.art || {}, pegs: _instrumentState.get(sk), sound: !liveSilent(),
                                onPegs: v => _instrumentState.set(sk, v) });
     _modalTeardown = () => inst.destroy();
   } catch (e) {
@@ -4326,6 +4340,7 @@ function openLock(h) {
 function buildLockCard(h, onSolved) {
   if (h.mode === "stones") return buildStoneLockCard(h, onSolved);
   if (h.mode === "state") return buildStateLockCard(h, onSolved);
+  if (h.mode === "date") return buildDateLockCard(h, onSolved);
   const target = normalizeCode(h.answer || "");
   const len = h.length || (h.answer ? h.answer.length : 4);
   const maxA = h.maxAttempts || 0;               // 0 = unlimited (this is the ungraded escape puzzle)
@@ -4494,6 +4509,63 @@ function buildStateLockCard(h, onSolved) {
     { label: "When it is not", get: () => (h.feedback && h.feedback.wrong) || "",
       set: v => { h.feedback = h.feedback || {}; h.feedback.wrong = v; return tpSaveRoom(room); } },
   ]);
+  return card;
+}
+
+// Date lock (lock `mode:"date"`, dunes' departure board): two slide-levers, a day and a month, and a handle to post
+// the date. No prompt and nothing to type. Opens when the date set is in `accept` (shared/date_board.js, which also
+// fails a mis-authored list CLOSED); reports { answer:1 } like the text lock. The day lever's range follows the
+// month (no 31 November). Schema: { mode:"date", accept:[[day,month],...], year?, start?:[day,month],
+//                                   submitLabel?, feedback?:{correct,wrong} }.
+function buildDateLockCard(h, onSolved) {
+  const fbk = h.feedback || {};
+  const pid = gateKey(room.key, h.id);
+  let attempts = attemptCounts.get(pid) || 0;
+  const problems = DATEB.lockProblems(h);
+  if (problems.length) console.warn("pano-player: date lock '" + h.id + "' is mis-authored:", problems);
+  let { day, month } = DATEB.startDate(h);
+  const card = document.createElement("div"); card.className = "qcard datelock";
+  const lever = (cls, max, val) =>
+    `<input type="range" class="${cls}" min="1" max="${max}" step="1" value="${val}" ` +
+    `style="width:100%;accent-color:#9a9a92;height:30px;cursor:grab">`;
+  card.innerHTML =
+    `<div style="padding:14px 14px 6px;border-radius:8px;background:linear-gradient(#6f6e68,#5b5a55);` +
+    `border:1px solid rgba(0,0,0,.45);box-shadow:inset 0 1px 0 rgba(255,255,255,.12)">` +
+    `<div class="dateread" style="text-align:center;font:700 26px/1.4 Georgia,serif;letter-spacing:2px;` +
+    `color:#f1ead8;text-shadow:0 1px 0 #000;margin-bottom:10px"></div>` +
+    `<div style="display:grid;grid-template-columns:4.5em 1fr;gap:6px 10px;align-items:center;color:#e3dccb;` +
+    `font:600 13px/1.2 system-ui,sans-serif">` +
+    `<span>Day</span>${lever("dlday", DATEB.daysIn(month, h.year), day)}` +
+    `<span>Month</span>${lever("dlmonth", 12, month)}</div></div>` +
+    `<div class="qfeedback"></div><button class="qsubmit">${escHtml(h.submitLabel || "Post the date")}</button>`;
+  const dEl = card.querySelector(".dlday"), mEl = card.querySelector(".dlmonth");
+  const read = card.querySelector(".dateread"), fb = card.querySelector(".qfeedback"), sub = card.querySelector(".qsubmit");
+  const render = () => { read.textContent = DATEB.dateLabel(day, month); };
+  const clearFb = () => { fb.className = "qfeedback"; fb.innerHTML = ""; };
+  mEl.addEventListener("input", () => {
+    month = +mEl.value; dEl.max = DATEB.daysIn(month, h.year);
+    day = DATEB.clampDay(day, month, h.year); dEl.value = day; clearFb(); render();
+  });
+  dEl.addEventListener("input", () => { day = DATEB.clampDay(+dEl.value, month, h.year); clearFb(); render(); });
+  sub.addEventListener("click", () => {
+    attempts++; attemptCounts.set(pid, attempts);
+    if (DATEB.accepts(h, day, month)) {
+      fb.className = "qfeedback ok"; fb.innerHTML = fbk.correct || "The board takes the date.";
+      sub.disabled = dEl.disabled = mEl.disabled = true;
+      setTimeout(() => onSolved({ answer: 1, attempts }), 900);
+    } else {
+      fb.className = "qfeedback no"; fb.innerHTML = fbk.wrong || "Nothing happens.";
+    }
+  });
+  tpAuthorPanel(card, [
+    { note: "Nothing to type: two levers set a day and a month. The accepted dates are not editable here; "
+          + "they are pinned by the scenario's tests." },
+    { label: "When the date is right", get: () => (h.feedback && h.feedback.correct) || "",
+      set: v => { h.feedback = h.feedback || {}; h.feedback.correct = v; return tpSaveRoom(room); } },
+    { label: "When it is not", get: () => (h.feedback && h.feedback.wrong) || "",
+      set: v => { h.feedback = h.feedback || {}; h.feedback.wrong = v; return tpSaveRoom(room); } },
+  ]);
+  render();
   return card;
 }
 

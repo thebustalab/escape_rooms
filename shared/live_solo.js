@@ -15,6 +15,10 @@
  */
 
 export const WRONG_COOLDOWN_S = 8;      // live_server.WRONG_COOLDOWN_S
+// live_server.PRACTICE_PHASES / PRACTICE_NOTE: after the clock (or a win) stations still deal and answers are
+// still marked, but nothing counts.
+export const PRACTICE_PHASES = ["timeup", "won"];
+export const PRACTICE_NOTE = "Just for practice now: the game is over, so this one doesn't count.";
 const MAX_SEW_LEN = 64;
 
 const plural = (n, unit) => `${n} ${n === 1 ? unit[0] : unit[1]}`;
@@ -177,23 +181,25 @@ export class SoloSession {
     body = body || {};
 
     if (route === "deal") {
-      if (this.phase !== "running") return res({ error: "The day is over." }, 409);
+      const practice = PRACTICE_PHASES.includes(this.phase);
+      if (this.phase !== "running" && !practice) return res({ error: "The day is over." }, 409);
       const tier = parseInt(body.tier, 10);
       if (![1, 2, 3].includes(tier)) return res({ error: "bad tier" }, 400);
       const track = body.track || "";
       if (track && !this.tracks().includes(track)) return res({ error: "bad track" }, 400);
       const here = P.puzzles.filter(p => p.tier === tier && trackOf(p) === track);
       const dish = track ? menuDish(P, track) : null;          // the restaurant: pays time, never a carry
-      if (dish && this.served.includes(track))
+      if (dish && this.served.includes(track) && !practice)
         return res({ error: `The kitchen has run out of ${dish.label.toLowerCase()}.`, served: [...this.served] }, 409);
-      const carry = !!P.carry_back && !dish;
+      const carry = !!P.carry_back && !dish && !practice;
       const itemsHere = here.length ? [...new Set(here.map(itemOf))] : [""];
       if (carry && itemsHere.every(it => this.carryFull(it))) {
         const it = [...itemsHere].sort()[0];
         return res({ error: this.blockText(it) || "Deliver what you're carrying first.", carrying: this.held(it) }, 409);
       }
       this.deal = null;
-      const choices = here.filter(p => !pl.solved.has(p.id) && !(carry && this.carryFull(itemOf(p))));
+      let choices = here.filter(p => !pl.solved.has(p.id) && !(carry && this.carryFull(itemOf(p))));
+      if (!choices.length && practice) choices = here;      // practice may repeat a task already solved
       if (!here.length) return res({ error: `This station has no level ${tier} tasks in this game.` }, 409);
       if (!choices.length) {
         const where = this.tracks().length ? " here — try another level or another station" : " — try another level";
@@ -221,7 +227,8 @@ export class SoloSession {
     if (route === "answer") {
       const d = this.deal;
       if (!d || d.id !== body.deal_id) return res({ error: "That task has expired — try the station again." }, 409);
-      if (this.phase !== "running") return res({ error: "The day is over." }, 409);
+      const practice = PRACTICE_PHASES.includes(this.phase);
+      if (this.phase !== "running" && !practice) return res({ error: "The day is over." }, 409);
       const now = this.now();
       if (now < pl.cooldownUntil)
         return res({ correct: false, cooldown_s: Math.round((pl.cooldownUntil - now) / 1000),
@@ -243,6 +250,10 @@ export class SoloSession {
       if (!right) {
         pl.cooldownUntil = now + WRONG_COOLDOWN_S * 1000;
         return res({ correct: false, cooldown_s: WRONG_COOLDOWN_S, feedback: p.wrong_feedback || "Not that one. Look again." });
+      }
+      if (practice) {                   // right, but the clock is over: mark it and nothing else
+        this.deal = null;
+        return res({ correct: true, points: 0, practice: true, feedback: (p.right_feedback || "Right!") + " " + PRACTICE_NOTE });
       }
       const pts = pointsOf(p), it = itemOf(p);
       pl.solved.add(p.id);

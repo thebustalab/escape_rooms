@@ -23,8 +23,8 @@
  * browser (shared/live_solo.js), answering the same calls; everything below works unchanged on top of it.
  */
 
-import "./fish_stats.js?v=147";
-import { SoloSession } from "./live_solo.js?v=147";     // window.FishStats: the fish board's tests (Welch t), pinned to R
+import "./fish_stats.js?v=148";
+import { SoloSession } from "./live_solo.js?v=148";     // window.FishStats: the fish board's tests (Welch t), pinned to R
 
 const POLL_MS = 2000;
 const STORE = "liveSession";        // localStorage: { pid, code }
@@ -303,8 +303,11 @@ function render() {
   else if (ph === "paused") overlay("paused", "Paused", "Eyes on the screen at the front.");
   else if (ph === "won") overlay("show", "You did it", total + " / " + goal + (label ? " " + label : "") + ". " +
                                  (st.won_text || "Nice work, crew."), true);   // won_text: e.g. where to escape to
-  else if (ph === "timeup") overlay("show", "Time's up", (st.solo ? "You got " : "The class got ") + total + " / " + goal + (label ? " " + label : "") + ".", true);
-  else if (ph === "closed") overlay("show", "Session over", "Thanks for playing.");
+  // After the clock the stations stay open for practice (live_server.PRACTICE_PHASES), and a closed session's
+  // card can be dismissed, so a stuck student can still show their puzzle after class (Lucas, 2026-10-28).
+  else if (ph === "timeup") overlay("show", "Time's up", (st.solo ? "You got " : "The class got ") + total + " / " + goal + (label ? " " + label : "") +
+                                    ". You can keep practising: nothing counts now.", true);
+  else if (ph === "closed") overlay("show", "Session over", "Thanks for playing.", true);
   else if (!(me && st && !st.me)) overlay("hide");
   tick();
   // The player's own room-title pill (#hud) sits top-centre too: keep it just under this strip,
