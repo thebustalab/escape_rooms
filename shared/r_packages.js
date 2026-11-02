@@ -111,7 +111,8 @@ export const BIOC_PACKAGES = ["ggtree"];
  * runMatrixAnalysis and a ggtree failure cannot cost it the tests. It drags in car (and so lme4), which
  * is the bulk of the extra boot time; whether the chain LOADS is checked by tests/matrix_analysis_smoke.mjs.
  */
-export const STATS_PACKAGES = ["rstatix"];
+// emmeans: tukeyTest() on a fitted model; multcompView: pGroups(). Both in repo.r-wasm.org contrib/4.6 (2026-11-02).
+export const STATS_PACKAGES = ["rstatix", "emmeans", "multcompView"];
 
 /**
  * Everything a session ends up with, in one call — for a caller that wants to know, and for the
