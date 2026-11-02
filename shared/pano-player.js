@@ -84,25 +84,27 @@
 // A bare `./variant_resolve.js` import is NOT refreshed by bumping the <script> tag's ?v, so a changed
 // helper module (e.g. a new export) leaves browsers on a stale cached copy → "doesn't provide an export
 // named X" SyntaxError → blank page (the 2026-08-05 airship regression). Bump all three together.
-import { WebRConsole } from "./webr-console.js?v=148";
-import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers, pickTransit } from "./variant_resolve.js?v=148";   // Phase 3: per-hotspot state variants; monorail switch-door nav
-import * as PQ from "./puzzle_queue.js?v=148";   // dynamic puzzle queue: location-independent puzzle serving
-import * as CP from "./corr_panel.js?v=148";   // lower-triangle layout of the grid gate (clouds correlation panel)
-import { particleCount } from "./particles.js?v=148";
-import { mountLandingBackdrop } from "./landing_backdrop.js?v=148";   // landing text over a pan of the first room's clip   // ambient-particle vocabulary + per-kind field density
-import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=148";
-import { condHolds } from "./cond.js?v=148";   // ledger + elevation-map card DOM
-import * as LIVE from "./live_session.js?v=148";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
-import * as RIDE from "./ride.js?v=148";
-import { mountPcaPlate } from "./pca_plate.js?v=148";   // the PCA plate instrument (voyage beach)
-import { mountFishBoard } from "./fish_board.js?v=148";   // the fish board instrument (harbour berth)
-import { mountDrawdown } from "./drawdown.js?v=148";
-import { mountTide } from "./tide_machine.js?v=148";   // the tide machine instrument (dunes escape)
+import { WebRConsole } from "./webr-console.js?v=149";
+import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers, pickTransit } from "./variant_resolve.js?v=149";   // Phase 3: per-hotspot state variants; monorail switch-door nav
+import * as PQ from "./puzzle_queue.js?v=149";   // dynamic puzzle queue: location-independent puzzle serving
+import * as CP from "./corr_panel.js?v=149";   // lower-triangle layout of the grid gate (clouds correlation panel)
+import { particleCount } from "./particles.js?v=149";
+import { mountLandingBackdrop } from "./landing_backdrop.js?v=149";   // landing text over a pan of the first room's clip   // ambient-particle vocabulary + per-kind field density
+import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=149";
+import { condHolds } from "./cond.js?v=149";
+import { gridMatches } from "./grid_check.js?v=149";   // grid answer check; `partition:true` accepts any relabelling of the buckets   // ledger + elevation-map card DOM
+import * as LIVE from "./live_session.js?v=149";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
+import * as RIDE from "./ride.js?v=149";
+import { mountPcaPlate } from "./pca_plate.js?v=149";   // the PCA plate instrument (voyage beach)
+import { mountFishBoard } from "./fish_board.js?v=149";   // the fish board instrument (harbour berth)
+import { mountDrawdown } from "./drawdown.js?v=149";
+import { mountTide } from "./tide_machine.js?v=149";   // the tide machine instrument (dunes escape)
+import { mountVarianceMeter } from "./variance_meter.js?v=149";   // the variance meter instrument (anova cellars escape)
    // the drawdown board instrument (diamonds escape)   // THE RIDE (subway): express lever + clip-sequence planner
-import * as BELL from "./bell_pull.js?v=148";
-import * as DATEB from "./date_board.js?v=148";   // date lock: lock mode:"date", two slide-levers (dunes departure board)
-import * as INVY from "./inventory.js?v=148";   // carried items + the door that asks which to use (dunes)   // bell-pull (#16): dial mode:"pull" + lock mode:"state" (spa belfry)
-import { entryYaw } from "./entry_facing.js?v=148";   // face the way out on entering a room (every scenario)
+import * as BELL from "./bell_pull.js?v=149";
+import * as DATEB from "./date_board.js?v=149";   // date lock: lock mode:"date", two slide-levers (dunes departure board)
+import * as INVY from "./inventory.js?v=149";   // carried items + the door that asks which to use (dunes)   // bell-pull (#16): dial mode:"pull" + lock mode:"state" (spa belfry)
+import { entryYaw } from "./entry_facing.js?v=149";   // face the way out on entering a room (every scenario)
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 
@@ -1398,6 +1400,9 @@ function arrivalYaw(r, fromKey) {
   return entryYaw(doors, fromKey, {
     targetKey: h => { const j = resolveDoorTarget(h, doorNav(h).direction); return j >= 0 ? SCENARIO.rooms[j].key : null; },
     isShown, yawOf: h => boxToYP(h.box, c).yaw, haov: c.haov, fallback: doorYaw(r),
+    // a dead end faces what it holds (entry_facing.js): every shown, boxed, non-door, non-ambient hotspot
+    featureYaws: (r.hotspots || []).filter(h => h && h.type !== "door" && h.type !== "ambient"
+      && Array.isArray(h.box) && isShown(h)).map(h => boxToYP(h.box, c).yaw),
   });
 }
 
@@ -2945,7 +2950,8 @@ function openPlaque(h) {
 // modal. Like a plaque it is never a gate, never a clue and never logged; the player reads a number off it.
 // `kind` picks the renderer; each kind's fields are documented in the header. Peg positions survive
 // closing and reopening within a visit (in memory only: nothing about an instrument is saved or graded).
-const INSTRUMENTS = { drawdown: mountDrawdown, pca_plate: mountPcaPlate, fish_board: mountFishBoard, tide: mountTide };
+const INSTRUMENTS = { drawdown: mountDrawdown, pca_plate: mountPcaPlate, fish_board: mountFishBoard, tide: mountTide,
+                      variance_meter: mountVarianceMeter };
 // Opening zooms from the hotspot's marker into the close-up (settled design, notes §5 of diamonds), so the
 // student sees the board on the wall become the board in their hands. Skipped under reduced motion.
 function zoomFromHotspot(h) {
@@ -2987,7 +2993,8 @@ async function openInstrument(h) {
     // `pulleys` (optional, {itemKey: partId}): parts that come from the player's CARRIED items (shared/inventory.js);
     // only the ones held reach the instrument's shelf.
     const held = h.pulleys ? Object.entries(h.pulleys).filter(([k]) => INV.held.includes(k)).map(([, pid]) => pid) : undefined;
-    const inst = mount(card, { geometry, config, held, art: h.art || {}, pegs: _instrumentState.get(sk), sound: !liveSilent(),
+    // `params` (optional): per-hotspot settings the kind reads (the variance meter: utility, powered).
+    const inst = mount(card, { geometry, config, held, params: h.params || {}, art: h.art || {}, pegs: _instrumentState.get(sk), sound: !liveSilent(),
                                onPegs: v => _instrumentState.set(sk, v) });
     _modalTeardown = () => inst.destroy();
   } catch (e) {
@@ -4577,6 +4584,8 @@ function buildDateLockCard(h, onSolved) {
 // solves the room, and ends the escape only if the grid carries `endsEscape` (solveRoom). Recognition, not computation: the player
 // brings the grouping they inferred in-world (e.g. tree heights), no printed method. Schema:
 //   { type:"grid", box, label?, prompt?, items:[{key,label,labelHtml?}], buckets:[{key,label,labelHtml?}], answer:{}, maxAttempts?, feedback?:{correct,wrong,out} }
+// `partition:true` makes the buckets unlabelled groups: any relabelling of the keyed grouping (e.g. its mirror)
+// is accepted (shared/grid_check.js; anova/cellars' passage door).
 // `labelHtml` (optional, authored markup — same trust as `prompt`) replaces the visible header, e.g. an inline
 // SVG pictogram or <s>S1</s> for a closed gate; the plain `label` is still required and becomes the cell's
 // aria-label, so screen readers keep words. First consumer: flat_clustering/waterfalls' reckoning frame.
@@ -4638,7 +4647,7 @@ function buildGridCard(h, onSolved) {
   const submit = () => {
     if (items.some(it => !sel[it.key])) { fb.className = "qfeedback no"; fb.innerHTML = fbk.incomplete || "Place every kind first."; return; }
     attempts++; attemptCounts.set(pid, attempts);
-    if (items.every(it => sel[it.key] === answer[it.key])) {
+    if (gridMatches(items, sel, answer, !!h.partition)) {
       fb.className = "qfeedback ok"; fb.innerHTML = fbk.correct || "The cache-frame settles into place.";
       card.querySelectorAll("button").forEach(b => b.disabled = true);
       setTimeout(() => onSolved({ answer: 1, attempts }), 900);

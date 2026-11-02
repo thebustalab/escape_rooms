@@ -17,13 +17,13 @@
  * `addStatusEl()`, `plotControls(opts)`, `resetSession()`, `resetControl(opts)`, `.ready`, `.webR`.
  */
 import { WebR } from "https://webr.r-wasm.org/latest/webr.mjs";
-import { VIEW_R_SHIM, VIEW_R_DRAIN, fromR, viewTableHTML, ensureViewStyles } from "./webr_view.js?v=148";
-import { codeToRun, selectionNote } from "./code_sel.js?v=148";
-import { PLOT_ASPECTS, PLOT_DEFAULT_ASPECT, PLOT_LIMITS, PLOT_CTL_CSS, plotGeometry } from "./plot_size.js?v=148";
-import { RESET_R_SHIM, RESET_R_CALL, RESET_CTL_CSS, RESET_LABEL, RESET_CONFIRM_LABEL, RESET_CONFIRM_MS, nextConfirmState } from "./webr_reset.js?v=148";
-import { explainError, looksLikeOrphanLayer } from "./r_diagnose.js?v=148";
-import { R_BIOC_REPOS, BASE_PACKAGES, ANALYSIS_PACKAGES, BIOC_PACKAGES, STATS_PACKAGES, resolvePackages } from "./r_packages.js?v=148";
-import { MATRIX_ANALYSIS_R_SHIM, STATS_TESTS_R_SHIM, MODELS_R_SHIM } from "./r_matrix_analysis.js?v=148";
+import { VIEW_R_SHIM, VIEW_R_DRAIN, fromR, viewTableHTML, ensureViewStyles } from "./webr_view.js?v=149";
+import { codeToRun, selectionNote } from "./code_sel.js?v=149";
+import { PLOT_ASPECTS, PLOT_DEFAULT_ASPECT, PLOT_LIMITS, PLOT_CTL_CSS, plotGeometry } from "./plot_size.js?v=149";
+import { RESET_R_SHIM, RESET_R_CALL, RESET_CTL_CSS, RESET_LABEL, RESET_CONFIRM_LABEL, RESET_CONFIRM_MS, nextConfirmState } from "./webr_reset.js?v=149";
+import { explainError, looksLikeOrphanLayer } from "./r_diagnose.js?v=149";
+import { R_BIOC_REPOS, BASE_PACKAGES, ANALYSIS_PACKAGES, BIOC_PACKAGES, STATS_PACKAGES, resolvePackages } from "./r_packages.js?v=149";
+import { MATRIX_ANALYSIS_R_SHIM, STATS_TESTS_R_SHIM, MODELS_R_SHIM } from "./r_matrix_analysis.js?v=149";
 
 const errText = e => (e && e.message ? e.message : String(e));
 
@@ -314,7 +314,7 @@ export class WebRConsole {
       }
 
       /*
-       * The regression verbs (book ch.12: buildModel2, predictWithModel), generated from
+       * The regression verbs (book ch.12: buildModel, predictWithModel), generated from
        * phylochemistry.R with the other two shims and evaluated on their own, so a failure here cannot
        * take runMatrixAnalysis or the test verbs down (and vice versa). They need only base R plus
        * tibble/dplyr from the base stack; only model_type = "linear_regression" runs in the browser.
@@ -343,7 +343,7 @@ export class WebRConsole {
 
       this.ready = true;
       this.resetCtls.forEach(b => { b.disabled = false; });
-      const missing = [analysisOk ? "" : "runMatrixAnalysis()", statsOk ? "" : "the comparing-means tests (tTest() and the rest)", modelsOk ? "" : "buildModel2() and predictWithModel()"].filter(Boolean);
+      const missing = [analysisOk ? "" : "runMatrixAnalysis()", statsOk ? "" : "the comparing-means tests (tTest() and the rest)", modelsOk ? "" : "buildModel() and predictWithModel()"].filter(Boolean);
       this.setStatus(!missing.length
         ? "R is ready. Type code below and press Run."
         : "R is ready, but " + missing.join(" and ") + " could not load — reload the page to try again.");
