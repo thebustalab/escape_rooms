@@ -24,12 +24,13 @@ Blueprints: `cellars/notes.md` §9, `glasshouses/notes.md` §8.
 - **Plaques, one per scenario:** the **Sample Archive** (since 1843, CONFIRMED) in the cellars' **archive vault**;
   **Fisher & Mackenzie 1923** in the glasshouses' **study** (ANOVA claim still TENTATIVE: confirm from the paper
   before it is printed).
+- **Landing text** for both approved by Lucas and snapshotted (`validate_story.py --accept`); `coverPrompt` and
+  `worldPlatePrompt` authored in each `scenario.json`.
 - **Glasshouses starts in a cellars room** (Lucas, the spa ↔ squirrel pattern): its first room is one of the
   cellars scenario's rooms, re-lit to the glasshouses' foggy Saturday morning (an image edit of the committed
-  cellars art, never a fresh generation), gateless, with an open door into its own rooms. **The room is the cellars DRAWING ROOM** (front of house, no board,
-  off the passage, next to the entrance hall). Glasshouses route: drawing room → entrance hall (time-locked front
-  door, slave dial, timetable, main switch under the stair) → study (mantel clock, roster, Fisher plaque, clock
-  closet) → potting shed (heating board) → pot-culture house → big glasshouse.
+  cellars art, never a fresh generation), gateless, with an open door into its own rooms. **The room is the FOOT OF
+  THE CELLAR STAIR** (both players' start in cellars; changed from the drawing room at 4a, Lucas 2026-11-02, so a
+  player of either scenario recognises it). Route: *Room graphs* below.
 
 - **Weather and the outage (Lucas, 2026-11-01):** a **storm in the night**; a **supply line comes down near dawn**; the
   morning is the **still, foggy calm after it**. Aftermath detail in the art: wet glass, puddles, fallen branches.
@@ -43,7 +44,7 @@ Blueprints: `cellars/notes.md` §9, `glasshouses/notes.md` §8.
 - **Plate weather (Lucas):** the world plate is drawn in **light, thinning fog** so the mood carries through
   (accepting less crisp geography); rejected a clear after-storm reference plate.
 
-## Open
+## Skeleton and plates (step 3b, done and LOCKED 2026-11-01)
 
 - **World skeleton BUILT** (2026-11-01): `cellars/_scratch/world_skeleton/world.py` (shared by both scenarios; frame
   +Z north, +X WEST, recorded in its docstring). Checks exit non-zero (passage stacking, boards off the passage, clock
@@ -61,6 +62,27 @@ Blueprints: `cellars/notes.md` §9, `glasshouses/notes.md` §8.
   spent on from_north). **Lucas accepted round 3 from_north as it is** (frozen at `cellars/world_plates/master/from_north.png`)
   and **skipped the east view** (interiors only; the block model fixes the end-to-end order).
 
+## Room graphs (step 4a, Lucas 2026-11-02; sketches `cellars/_scratch/graph/draw_sketch.py`)
+
+- **cellars:** both players start at the locked cellar door, M in the entrance hall, C at the foot of the cellar
+  stair (voices only). Each goes east first (rungs 1-2: M drawing room, kitchen; C seed store, wash-house), then
+  west (rungs 3-4: M library, laboratory boss; C archive vault, boiler room boss). M walks through the study
+  (shared art with glasshouses). **Gates at rung 2, physical:** M's study key hangs on the kitchen key board;
+  C's far cellars stay black until C's lights come on. **Power, no sync:** the line is back but every circuit
+  tripped; at rung 2 M resets the house circuits at the kitchen switchboard (which also makes M's board live)
+  and C resets the cellar circuit in the wash-house. Escape panels: behind the library bookcase (M) and at the
+  archive vault end (C), each a travel clip into the passage stair, where they meet.
+- **glasshouses:** starts at the **foot of the cellar stair** (re-lit cellars art, the stair door now open, so
+  both scenarios share a room each player recognises); **the drawing room is dropped**. Route: hall → study
+  (rung 1; gives the potting-shed key) → **back garden, ONE outdoor room** (Lucas's exception to interiors:
+  fog, puddles, branches, the gate in the wall; the path turns east along the range front, because the glass
+  houses have no outside doors and are entered only through the potting shed, the range's head house) → potting shed (locked until the key; rung 2, power back, throw
+  the main switch under the hall stair) → pot-culture house (rung 3) → big glasshouse, possibly two rooms for
+  scale (boss at the far end) → back to the study closet (regulator) → out again through the garden and the range
+  to the **time-locked back gate onto the station lane**, just past the big glasshouse's far end: 135 (Lucas chose it
+  over the front door and the master clock). The gate's keypad is boxed in the far-end room, seen through its end
+  door; victory is a clip along the lane in fog. The front door is simply locked (the caretaker has the key).
+
 ## Sightlines (checkable)
 
 - No room sees another room; every window shows only pale fog.
@@ -68,4 +90,4 @@ Blueprints: `cellars/notes.md` §9, `glasshouses/notes.md` §8.
 - Nothing in any room reveals the passage: no pipe or cable visibly running only through the library,
   laboratory, boiler room and archive vault; the library bookcase does not read as a door until it opens.
 - The regulator is never visible until the study panelling opens (lit state only).
-- The time-locked front door is visible from the entrance hall.
+- The time-locked lane gate is visible through the end door of the big glasshouse's far end.

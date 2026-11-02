@@ -4,7 +4,7 @@
   "id": 28,
   "status": "in_development",
   "doorLabels": true,
-  "_designNotes": "Step-2 state (2026-11-01, session ANOVA): locked escape (escapeBrief), verified graded ladder in notes.md §5, data in data/. title/subtitle/story/enterLabel are STEP-2 DRAFTS, to be locked at step 3b (escape_room_geography). No rooms, no art; enterButtons land at step 4a. Step 3a (blueprint) in progress 2026-11-01: logline 'Shut In' chosen (notes.md §9).",
+  "_designNotes": "Step-2 state (2026-11-01, session ANOVA): locked escape (escapeBrief), verified graded ladder in notes.md §5, data in data/. title/subtitle/story/enterLabel are STEP-2 DRAFTS, to be locked at step 3b (escape_room_geography). No rooms, no art; enterButtons land at step 4a. Step 3a (blueprint) in progress 2026-11-01: logline 'Shut In' chosen (notes.md §9). Step 3b (geography) DONE 2026-11-01 and LOCKED: shared world in ../places_brief.md; world skeleton cellars/_scratch/world_skeleton/world.py; accepted aerials cellars/world_plates/master/ (master_sw = fog_in_bands, from_north); landing text vetted (.vetted_story.txt); coverPrompt and worldPlatePrompt authored. Next: step 4a escape_room_network.",
   "escapeBrief": "Two players, never in the same room. The power has failed in the fog. One player is in the cellars with the water board (mechanical, so it works in the dark); the other is on the main floor with the electrical switchboard, which wakes once they restore the mains. Both boards measure the same eight rooms, each room's load on a rail, and both are the variance meter: between, within, and the share explained, with a red line at 35%.\n\nEach board has the same eight room switches, so any grouping of the rooms can be set; the printed default groups them by wing, house against cellars. On electricity the wing clears the line (37%). On water it explains nothing (0%), while wet rooms against dry clear it (45%). Both players are right about their own board, and that is the trap: each obvious grouping is right for one utility and wrong for the building.\n\nExactly one grouping clears the line on both boards: the four rooms on the hidden service passage (library, laboratory, boiler room, archive vault), at 47% and 51%. The passage carries both the heating main and the heating cable, so those rooms draw more of both. Neither board points to it alone (15 and 17 groupings clear each line, and the passage tops neither), so the pair have to compare which groupings work on whose board. The passage door is a panel of the same eight switches; setting it to the passage rooms opens it, and that is the way out.\n\nThe echo is the interaction rung: the wing's effect depends on what you measure, and only a grouping that explains both holds.",
   "title": "Shut In",
   "subtitle": "Rothamsted Experimental Station, a foggy November morning in the late 1920s",
@@ -38,5 +38,580 @@
     "title": "Through the wall",
     "body": "The panel takes your pattern on both sides of the passage. The library bookcase swings open above, the cellar door gives below, and you meet halfway up a narrow stair inside the wall, with the heating main and the cable running down beside you. The four rooms that drew more of both water and power were the four on this stair. Neither board could have shown it alone."
   },
-  "coverPrompt": "Minimalist stylised thumbnail poster, square: the flat dark silhouette of an old gabled manor house with tall clustered chimneys, seen in cross-section like a doll's house, low fog lying in bands across its front; inside the thick wall between two rooms, one narrow stair climbs from a dark cellar to the floor above, and one warm amber glow from a single lamp halfway up the stair lights it. Bold, simple shapes that read at very small size, strong negative space. Flat limited palette: fog grey, soot black, old brick red and one warm amber glow. No people, no lettering, no text, no numbers, no border."
+  "coverPrompt": "Minimalist stylised thumbnail poster, square: the flat dark silhouette of an old gabled manor house with tall clustered chimneys, seen in cross-section like a doll's house, low fog lying in bands across its front; inside the thick wall between two rooms, one narrow stair climbs from a dark cellar to the floor above, and one warm amber glow from a single lamp halfway up the stair lights it. Bold, simple shapes that read at very small size, strong negative space. Flat limited palette: fog grey, soot black, old brick red and one warm amber glow. No people, no lettering, no text, no numbers, no border.",
+  "worldPlatePrompt": "A single continuous photograph, one frame: standing in the dim stone-flagged back passage of an old red-brick English manor house in the late 1920s, on a still November morning after a night of storm, looking through an open half-glazed back door down a wet gravel garden path between high old brick walls to a white-painted timber-and-iron glasshouse a long way off, half lost in low bands of pale fog. Inside, on the near walls: dark oak panelling, a whitewashed brick arch leading down to a cellar stair, a brass light switch and a dead electric bulb hanging dark, a small round electric wall clock, an oil lamp burning low on a shelf with one warm amber glow. Materials and condition: soft old red brick, dark oak, whitewash, worn stone flags, dark wet slate, brass, beaded and streaming glass, wet lawn, puddles, scattered leaves and small storm-broken twigs. Light: soft, flat and shadowless grey fog light from outside, with the single small amber lamp glow inside. Period-true: no modern fittings, no people, no text.",
+  "rooms": [
+    {
+      "key": "entrance_hall",
+      "title": "The entrance hall",
+      "technique": "",
+      "puzzleType": 0,
+      "phase": "analysis",
+      "built": false,
+      "unlockedWhen": true,
+      "role": "M",
+      "level": 0,
+      "designNote": "M's START (enterButtons M). Front of house, grey fog at the windows. The cellar-stair door under the main stair is locked (the caretaker took the key for the weekend, not knowing C was below); M can hear C through it. The front door is simply locked. No rung. Doors east to the drawing room, west to the Director's study (locked until the key). Shared art with glasshouses' hall (its lit state).",
+      "plannedHotspots": [
+        {
+          "type": "clue",
+          "label": "The cellar door",
+          "note": "Scenery with a line: locked from the stair side, voices carry through it. Not a gate."
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "label": "The drawing room",
+          "to": "drawing_room"
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "label": "The Director's study",
+          "to": "study",
+          "needsItem": "study_key",
+          "lockedBody": "The study door is locked. The Director keeps it locked when he is away.",
+          "useBody": "The key from the kitchen board turns, and the study door opens.",
+          "wrongItemBody": "That key doesn't fit the study door."
+        }
+      ],
+      "mapPos": {
+        "c": 3,
+        "r": 0
+      }
+    },
+    {
+      "key": "drawing_room",
+      "title": "The drawing room",
+      "technique": "one-way ANOVA and ges",
+      "puzzleType": 1,
+      "phase": "analysis",
+      "built": false,
+      "unlockedWhen": true,
+      "role": "M",
+      "level": 1,
+      "designNote": "M RUNG 1 at the window table: the weighing book (hay_yield, 48 plots). One-way ANOVA of nitrogen; read ges. ANSWER 0.397 (check, ± 0.005). Near-miss numbers: additive-model ges, the two-way's nitrogen row. On the board: 8.5 A, 14 gal/h (not a passage room, dry).",
+      "plannedHotspots": [
+        {
+          "type": "puzzle",
+          "label": "The weighing book",
+          "form": "check",
+          "note": "M R1. Answer ges 0.397. Prompt at step 6 (escape_room_content)."
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "label": "Back to the hall",
+          "to": "entrance_hall"
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "label": "Through to the kitchen",
+          "to": "kitchen"
+        }
+      ],
+      "mapPos": {
+        "c": 4,
+        "r": 0
+      }
+    },
+    {
+      "key": "kitchen",
+      "title": "The kitchen",
+      "technique": "comparing ges across factors",
+      "puzzleType": 1,
+      "phase": "analysis",
+      "built": false,
+      "unlockedWhen": true,
+      "role": "M",
+      "level": 2,
+      "designNote": "M RUNG 2: rank nitrogen, minerals, lime by ges from three one-way ANOVAs. ANSWER nitrogen > minerals > lime (check, ordered vector; maxAttempts low). The ELECTRICAL SWITCHBOARD hangs on the wall where the supply enters: the variance meter, dead until M resets the house circuits. Solving R2 frees the study key from the key board (the Director's housekeeper's board). Wet room (honest decoy).",
+      "plannedHotspots": [
+        {
+          "type": "puzzle",
+          "label": "The Director's draft",
+          "form": "check",
+          "note": "M R2. Ranking answer. Gives the study key (the key board).",
+          "availableWhen": {
+            "solved": "drawing_room"
+          },
+          "gives": "study_key"
+        },
+        {
+          "type": "dial",
+          "label": "The house circuits",
+          "key": "house_power",
+          "states": [
+            {
+              "value": true,
+              "label": "Reset the house circuits",
+              "toast": "The breakers hold. Lamps come on through the house, and the switchboard's needles lift."
+            }
+          ],
+          "hint": "The breakers on the switchboard have all tripped.",
+          "availableWhen": {
+            "solved": "kitchen"
+          },
+          "lockedBody": "The main switch is thrown, but the breakers trip straight back out.",
+          "note": "One-way. M resets the tripped house circuits at the switchboard; the main floor's lit state (lamps on) and the board's needles come alive. Before R2 the breakers trip back."
+        },
+        {
+          "type": "instrument",
+          "label": "The switchboard",
+          "kind": "variance_meter",
+          "params": {
+            "utility": "amps",
+            "powered": false
+          },
+          "shownWhen": {
+            "not": {
+              "eq": [
+                "house_power",
+                true
+              ]
+            }
+          },
+          "note": "ESCAPE INSTRUMENT (M), DEAD copy: shown until the house circuits are reset. Same box as the live copy; the engine's `powered` is a fixed flag, so two state-switched hotspots."
+        },
+        {
+          "type": "instrument",
+          "label": "The switchboard (live)",
+          "kind": "variance_meter",
+          "params": {
+            "utility": "amps"
+          },
+          "shownWhen": {
+            "eq": [
+              "house_power",
+              true
+            ]
+          },
+          "note": "ESCAPE INSTRUMENT (M), LIVE copy. Eight rails (amperes), the eight room switches, the between / within / share dials, red line at 35%; printed default grouping by wing; config data/switchboard.json."
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "label": "Back to the drawing room",
+          "to": "drawing_room"
+        }
+      ],
+      "mapPos": {
+        "c": 5,
+        "r": 0
+      }
+    },
+    {
+      "key": "study",
+      "title": "The Director's study",
+      "technique": "",
+      "puzzleType": 0,
+      "phase": "analysis",
+      "built": false,
+      "unlockedWhen": true,
+      "role": "M",
+      "level": 2,
+      "designNote": "Walk-through for M (no rung): the Director's desk, panelling, the mantel clock (glasshouses' props stay as dressing, no hotspots here). Shared art with glasshouses' study.",
+      "plannedHotspots": [
+        {
+          "type": "door",
+          "direction": "open",
+          "label": "Back to the hall",
+          "to": "entrance_hall"
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "label": "Into the library",
+          "to": "library"
+        }
+      ],
+      "mapPos": {
+        "c": 2,
+        "r": 0
+      }
+    },
+    {
+      "key": "library",
+      "title": "The library",
+      "technique": "two-way ANOVA and the interaction row",
+      "puzzleType": 1,
+      "phase": "analysis",
+      "built": false,
+      "unlockedWhen": true,
+      "role": "M",
+      "level": 3,
+      "designNote": "M RUNG 3: two-way nitrogen * lime on hay_yield; read the interaction row first. ANSWER interaction ges 0.435 (check, ± 0.005; nitrogen row 0.601, lime 0.338 are the near-misses). The tall bookcase on the west wall (the thick wall) does not read as a door. After M's boss, the passage panel is found behind one hinged shelf. Passage room (9.5 A, 28 gal/h).",
+      "plannedHotspots": [
+        {
+          "type": "puzzle",
+          "label": "The Director's trial ledger",
+          "form": "check",
+          "note": "M R3. Answer 0.435.",
+          "availableWhen": {
+            "solved": "kitchen"
+          }
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "label": "Back to the study",
+          "to": "study"
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "label": "Through to the laboratory",
+          "to": "laboratory"
+        },
+        {
+          "type": "grid",
+          "label": "The passage panel",
+          "partition": true,
+          "availableWhen": {
+            "solved": "laboratory"
+          },
+          "note": "ESCAPE (ungraded, never in the codec). Behind the bookcase. Eight room switches in two unlabelled columns, names word for word as on the boards; opens on the four passage rooms (library, laboratory, archive vault, boiler room) in either column. gridMatches partition:true (shared/grid_check.js)."
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "label": "Into the passage",
+          "to": "passage_stair",
+          "requires": "The passage panel",
+          "endsEscape": true,
+          "note": "Travel sequence (held back for the escape): the bookcase swings opens and the camera climbs onto the narrow stair inside the wall, where the two players meet. endsEscape; clip at step 5 (escape_room_transits)."
+        }
+      ],
+      "mapPos": {
+        "c": 1,
+        "r": 0
+      }
+    },
+    {
+      "key": "laboratory",
+      "title": "The laboratory",
+      "technique": "the interaction plot: where the main effect misleads",
+      "puzzleType": 1,
+      "phase": "analysis",
+      "built": false,
+      "unlockedWhen": true,
+      "role": "M",
+      "level": 4,
+      "designNote": "M BOSS (spectacle room: the tall laboratory wing, roof lantern, fog grey through it, the farmer's letter about his sour unlimed meadow). Bar of group means, unlimed plots: which nitrogen makes the most hay? ANSWER nitrate of soda (28.6 vs sulphate 21.5, none 15.1). Shortcut: sulphate of ammonia (best on average). Form: pick (idColumn nitrogen). Passage room (9.5 A, 46 gal/h); wet.",
+      "plannedHotspots": [
+        {
+          "type": "puzzle",
+          "label": "The farmer's letter",
+          "form": "pick",
+          "note": "M BOSS. Answer nitrate of soda.",
+          "availableWhen": {
+            "solved": "library"
+          }
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "label": "Back to the library",
+          "to": "library"
+        }
+      ],
+      "mapPos": {
+        "c": 0,
+        "r": 0
+      }
+    },
+    {
+      "key": "stair_foot",
+      "title": "The foot of the cellar stair",
+      "technique": "",
+      "puzzleType": 0,
+      "phase": "analysis",
+      "built": false,
+      "unlockedWhen": true,
+      "role": "C",
+      "level": 0,
+      "designNote": "C's START (enterButtons C). Torchlight only. The stair up to the locked door; voices carry through. Whitewashed brick vaults; a passage east to the seed store, west into blackness towards the archive vault. Shared with glasshouses (its START, the door open, re-lit).",
+      "plannedHotspots": [
+        {
+          "type": "clue",
+          "label": "The door at the top of the stair",
+          "note": "Scenery with a line: locked from the hall side; M's voice through it. Not a gate."
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "label": "The seed store",
+          "to": "seed_store"
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "label": "Towards the archive vault",
+          "to": "archive_vault",
+          "availableWhen": {
+            "eq": [
+              "cellar_lights",
+              true
+            ]
+          },
+          "lockedBody": "Beyond the torch's last reach the vaults are pitch black, and the floor drops away in steps you cannot see. Not without the lights."
+        }
+      ],
+      "mapPos": {
+        "c": 3,
+        "r": 1
+      }
+    },
+    {
+      "key": "seed_store",
+      "title": "The seed store",
+      "technique": "one-way ANOVA and ges",
+      "puzzleType": 1,
+      "phase": "analysis",
+      "built": false,
+      "unlockedWhen": true,
+      "role": "C",
+      "level": 1,
+      "designNote": "C RUNG 1 among the seed bins: the botanical survey (species_count, the same 48 plots). One-way ANOVA of nitrogen; ges. ANSWER 0.068 (check). Torch fades a step per solve. Not a passage room, dry (5.5 A, 10 gal/h).",
+      "plannedHotspots": [
+        {
+          "type": "puzzle",
+          "label": "The botanical survey",
+          "form": "check",
+          "note": "C R1. Answer ges 0.068."
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "label": "Back to the stair",
+          "to": "stair_foot"
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "label": "Through to the wash-house",
+          "to": "wash_house"
+        }
+      ],
+      "mapPos": {
+        "c": 4,
+        "r": 1
+      }
+    },
+    {
+      "key": "wash_house",
+      "title": "The wash-house",
+      "technique": "comparing ges across factors",
+      "puzzleType": 1,
+      "phase": "analysis",
+      "built": false,
+      "unlockedWhen": true,
+      "role": "C",
+      "level": 2,
+      "designNote": "C RUNG 2: rank the three treatments by ges. ANSWER lime > nitrogen > minerals (check, ordered). The WATER BOARD hangs where the mains water enters (mechanical, works in the dark): the variance meter in gallons an hour. The cellar circuit's isolator is beside it; after R2 C resets it and the cellars light up (ends the torch clock). Wet room (honest decoy).",
+      "plannedHotspots": [
+        {
+          "type": "puzzle",
+          "label": "The survey summary",
+          "form": "check",
+          "note": "C R2. Ranking answer.",
+          "availableWhen": {
+            "solved": "seed_store"
+          }
+        },
+        {
+          "type": "dial",
+          "label": "The cellar circuit",
+          "key": "cellar_lights",
+          "states": [
+            {
+              "value": true,
+              "label": "Reset the cellar circuit",
+              "toast": "The isolator holds. Bulbs flicker on along the vaults."
+            }
+          ],
+          "hint": "The cellar circuit's isolator has tripped.",
+          "availableWhen": {
+            "solved": "wash_house"
+          },
+          "lockedBody": "You throw the isolator. Somewhere a breaker snaps, and the dark comes straight back.",
+          "note": "One-way. C resets the cellar circuit; the cellars' lit state; opens the way west."
+        },
+        {
+          "type": "instrument",
+          "label": "The water board",
+          "kind": "variance_meter",
+          "params": {
+            "utility": "gallons"
+          },
+          "note": "ESCAPE INSTRUMENT (C). Eight rails (gallons an hour), the same room switches and dials, red line at 35%, printed default by wing. Mechanical: works in the dark."
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "label": "Back to the seed store",
+          "to": "seed_store"
+        }
+      ],
+      "mapPos": {
+        "c": 5,
+        "r": 1
+      }
+    },
+    {
+      "key": "archive_vault",
+      "title": "The archive vault",
+      "technique": "two-way ANOVA and the interaction row",
+      "puzzleType": 1,
+      "phase": "analysis",
+      "built": false,
+      "unlockedWhen": true,
+      "role": "C",
+      "level": 3,
+      "designNote": "C RUNG 3 among the shelves of wax-sealed sample jars (the Sample Archive, since 1843: the plaque's box ON the jars). Two-way nitrogen * lime on species_count; interaction ges 0.793 (check; nitrogen 0.585, lime 0.935 are near-misses). After C's boss, the passage panel at the vault's far (west) end. Directly under the library. Passage room (8.5 A, 24 gal/h).",
+      "plannedHotspots": [
+        {
+          "type": "puzzle",
+          "label": "The archive register",
+          "form": "check",
+          "note": "C R3. Answer 0.793.",
+          "availableWhen": {
+            "solved": "wash_house"
+          }
+        },
+        {
+          "type": "plaque",
+          "label": "The Sample Archive",
+          "plaque": true,
+          "note": "Wonder plaque: the Rothamsted Sample Archive, kept since 1843 (CONFIRMED, ../../research.md). Box ON the jar shelves, never on a sign. Text and card art at step 6. Information only."
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "label": "Back towards the stair",
+          "to": "stair_foot"
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "label": "Through to the boiler room",
+          "to": "boiler_room"
+        },
+        {
+          "type": "grid",
+          "label": "The passage panel",
+          "partition": true,
+          "availableWhen": {
+            "solved": "boiler_room"
+          },
+          "note": "ESCAPE (ungraded, never in the codec). At the vault's far end. Eight room switches in two unlabelled columns, names word for word as on the boards; opens on the four passage rooms (library, laboratory, archive vault, boiler room) in either column. gridMatches partition:true (shared/grid_check.js)."
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "label": "Into the passage",
+          "to": "passage_stair",
+          "requires": "The passage panel",
+          "endsEscape": true,
+          "note": "Travel sequence (held back for the escape): the panel at the vault's end swings opens and the camera climbs onto the narrow stair inside the wall, where the two players meet. endsEscape; clip at step 5 (escape_room_transits)."
+        }
+      ],
+      "mapPos": {
+        "c": 1,
+        "r": 1
+      }
+    },
+    {
+      "key": "boiler_room",
+      "title": "The boiler room",
+      "technique": "the interaction plot: where the main effect misleads",
+      "puzzleType": 1,
+      "phase": "analysis",
+      "built": false,
+      "unlockedWhen": true,
+      "role": "C",
+      "level": 4,
+      "designNote": "C BOSS (spectacle room: the great boiler under the laboratory, gauges, the heating main). Limed plots: which nitrogen leaves the most species? ANSWER sulphate of ammonia (27.9 vs nitrate 25.0, none 24.4); shortcut 'none' (best on average), and sulphate is WORST on average. Form: pick. Nothing may show a pipe or cable running only through the passage rooms. Passage room; wet.",
+      "plannedHotspots": [
+        {
+          "type": "puzzle",
+          "label": "The Director's second draft",
+          "form": "pick",
+          "note": "C BOSS. Answer sulphate of ammonia.",
+          "availableWhen": {
+            "solved": "archive_vault"
+          }
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "label": "Back to the archive vault",
+          "to": "archive_vault"
+        }
+      ],
+      "mapPos": {
+        "c": 0,
+        "r": 1
+      }
+    }
+  ],
+  "items": {
+    "study_key": {
+      "name": "the study key",
+      "image": "items/study_key.png"
+    }
+  },
+  "enterButtons": [
+    {
+      "label": "Player one: the main floor",
+      "role": "M",
+      "startRoom": "entrance_hall"
+    },
+    {
+      "label": "Player two: the cellars",
+      "role": "C",
+      "startRoom": "stair_foot"
+    }
+  ],
+  "ladderPlain": [
+    {
+      "room": "drawing_room",
+      "text": "Each of you ran a one-way ANOVA of nitrogen on the same 48 plots and read ges, the share of the variation it explains: about 40% of the hay yield, but only about 7% of the species count."
+    },
+    {
+      "room": "kitchen",
+      "text": "You ranked nitrogen, minerals and lime by ges from three one-way ANOVAs. The order depended on the measurement: nitrogen first for hay, lime first for species."
+    },
+    {
+      "room": "library",
+      "text": "You fitted nitrogen and lime together and read the interaction row first: a large interaction on both measurements, so neither treatment's effect could be read on its own."
+    },
+    {
+      "room": "laboratory",
+      "text": "You plotted group means within one kind of ground. The treatment that led on average did not lead there: nitrate of soda made the most hay on unlimed plots, and sulphate of ammonia kept the most species on limed plots."
+    }
+  ],
+  "_clusters": [
+    {
+      "key": "passage_stack",
+      "rooms": [
+        "library",
+        "laboratory",
+        "archive_vault",
+        "boiler_room"
+      ],
+      "aerial": "optional",
+      "why": "The four passage rooms, stacked in pairs either side of the thick wall; no room sees another, but the two escape clips run into the stair inside that wall, so the group skeleton fixes where it is."
+    },
+    {
+      "key": "stair_door",
+      "rooms": [
+        "entrance_hall",
+        "stair_foot"
+      ],
+      "aerial": "optional",
+      "why": "The two starts, either side of the one locked door; shared with glasshouses (whose start is the stair foot, door open)."
+    }
+  ]
 }

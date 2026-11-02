@@ -4,11 +4,11 @@
   "id": 29,
   "status": "in_development",
   "doorLabels": true,
-  "_designNotes": "Step-2 state (2026-11-01, session ANOVA): locked escape (escapeBrief), verified graded ladder in notes.md §6, data in data/pot_trial.csv. title/subtitle/story/enterLabel are STEP-2 DRAFTS, to be locked at step 3b (escape_room_geography). No rooms, no art. Step 3a (blueprint) 2026-11-01: logline 'The Last Train', Saturday morning, beats, lock escape verified; numbers reworked at step 3b (storm-felled line near dawn: dials 6:30/7:00, regulator 9:15, answer 135), ambience set (notes.md §8).",
-  "escapeBrief": "A storm in the night brought the supply line down near dawn, and every electric dial in the house stopped at 6:30: the player is never told, but the bulbs hang dark, the apparatus is dead and they move by torchlight. Mid-ladder they get the power back, and the dials pick up from where they stopped, so from then on every one reads 7:00. A dozen clocks agreeing is the trap: they agree because they share one master clock and stopped together.\n\nTwo clocks are not on the electric system. The keeper's weight-driven regulator, behind a secret door that opens only once the power is back, never stopped: its pendulum swings and it reads 9:15. A wind-up mantel clock has run down at 11:40, its pendulum still; the duty roster shows whose job it was to wind it, and a note shows they left early for the weekend.\n\nThe exit door's time-lock runs on the same circuit as the dials. After a power cut the dials have to be advanced by the minutes they lost, and the door opens when that advance is set. The answer is 135 (9:15 on the running regulator minus 7:00 on the dials), on a three-digit keypad. The door takes minutes, not a time, so copying any clock face does nothing: the player has to see why the dials are wrong together. That is the boss rung's move: the power cut has an effect on one kind of clock and none on the other, and the answer is the size of the effect where it applies.",
+  "_designNotes": "Step-2 state (2026-11-01, session ANOVA): locked escape (escapeBrief), verified graded ladder in notes.md §6, data in data/pot_trial.csv. title/subtitle/story/enterLabel are STEP-2 DRAFTS, to be locked at step 3b (escape_room_geography). No rooms, no art. Step 3a (blueprint) 2026-11-01: logline 'The Last Train', Saturday morning, beats, lock escape verified; numbers reworked at step 3b (storm-felled line near dawn: dials 6:30/7:00, regulator 9:15, answer 135), ambience set (notes.md §8). Step 3b (geography) DONE 2026-11-01 and LOCKED: shared world in ../places_brief.md; world skeleton cellars/_scratch/world_skeleton/world.py; accepted aerials cellars/world_plates/master/ (master_sw = fog_in_bands, from_north); landing text vetted (.vetted_story.txt); coverPrompt and worldPlatePrompt authored. Next: step 4a escape_room_network.",
+  "escapeBrief": "A storm in the night brought the supply line down near dawn, and every electric dial in the house stopped at 6:30: the player is never told, but the bulbs hang dark, the apparatus is dead and they move by torchlight. Mid-ladder they get the power back, and the dials pick up from where they stopped, so from then on every one reads 7:00. A dozen clocks agreeing is the trap: they agree because they share one master clock and stopped together.\n\nTwo clocks are not on the electric system. The keeper's weight-driven regulator, behind a secret door that opens only once the power is back, never stopped: its pendulum swings and it reads 9:15. A wind-up mantel clock has run down at 11:40, its pendulum still; the duty roster shows whose job it was to wind it, and a note shows they left early for the weekend.\n\nThe way out is the back gate from the glasshouse range to the station lane, just past the far end of the big glasshouse: the caretaker has locked the house for the weekend and taken the key. The gate's time-lock runs on the same circuit as the dials. After a power cut the dials have to be advanced by the minutes they lost, and the gate opens when that advance is set. The answer is 135 (9:15 on the running regulator minus 7:00 on the dials), on a three-digit keypad. The gate takes minutes, not a time, so copying any clock face does nothing: the player has to see why the dials are wrong together. That is the boss rung's move: the power cut has an effect on one kind of clock and none on the other, and the answer is the size of the effect where it applies.",
   "title": "The Last Train",
   "subtitle": "Rothamsted Experimental Station, a foggy November morning in the late 1920s",
-  "story": "You have one job before the morning train to London: finish the report on the barley pot trial in the glasshouses and take it with you. Forty-eight pots, each given a watering (sparing, moderate or generous), a soil (clay or sand), and potash or none. The Director's draft says soil makes no difference and every pot should be watered generously. Work out how much of the difference in grain each treatment explains, and whether the draft holds.\n\nA storm blew through in the night, and near dawn it brought the power line down. Every electric clock in the house stopped at the same moment, and the front door's time lock runs on the same circuit: it will not open until the clocks are set right. You do not know whether your train has already gone.",
+  "story": "You have one job before the morning train to London: finish the report on the barley pot trial in the glasshouses and take it with you. Forty-eight pots, each given a watering (sparing, moderate or generous), a soil (clay or sand), and potash or none. The Director's draft says soil makes no difference and every pot should be watered generously. Work out how much of the difference in grain each treatment explains, and whether the draft holds.\n\nA storm blew through in the night, and near dawn it brought the power line down. Every electric clock on the station stopped at the same moment. The caretaker has locked the house for the weekend and taken the key, so the only way out to the station lane is the back gate beyond the glasshouses, and its time lock runs on the same circuit as the clocks: it will not open until the clocks are set right. You do not know whether your train has already gone.",
   "enterLabel": "Start the report",
   "music": "audio/delius_late_swallows_fitzwilliam.mp3",
   "musicVolume": 0.15,
@@ -22,11 +22,422 @@
   },
   "done": {
     "title": "The report is finished",
-    "body": "Soil explains almost nothing on its own, yet it decides the watering: on clay, moderate watering gives the most grain, although generous watering wins on average. The Director's draft will need rewriting. Now get out of the house."
+    "body": "Soil explains almost nothing on its own, yet it decides the watering: on clay, moderate watering gives the most grain, although generous watering wins on average. The Director's draft will need rewriting. Now get to the station."
   },
   "escapeDone": {
     "title": "Set right",
-    "body": "The dials agreed with each other all morning, and they were wrong for the same reason: they stopped together when the line came down. You set them forward by the minutes they lost, the time lock clicks, and the front door opens onto the fog. The station is a short walk away, and there is still time for the train."
+    "body": "The dials agreed with each other all morning, and they were wrong for the same reason: they stopped together when the line came down. You set them forward by the minutes they lost, the time lock on the gate clicks, and it swings open onto the lane and the fog. The station is a short walk away, and there is still time for the train."
   },
-  "coverPrompt": "Minimalist stylised thumbnail poster, square: the flat silhouette of a tall Victorian glasshouse standing in pale fog, and in front of it one plain round electric wall clock with its hands stopped, a single warm amber glow from a lamp behind the glass. Bold, simple shapes that read at very small size, strong negative space. Flat limited palette: fog grey, white glasshouse frame, soot black and one warm amber glow. No people, no lettering, no text, no numbers on the clock face, no border."
+  "coverPrompt": "Minimalist stylised thumbnail poster, square: the flat silhouette of a tall Victorian glasshouse standing in pale fog, and in front of it one plain round electric wall clock with its hands stopped, a single warm amber glow from a lamp behind the glass. Bold, simple shapes that read at very small size, strong negative space. Flat limited palette: fog grey, white glasshouse frame, soot black and one warm amber glow. No people, no lettering, no text, no numbers on the clock face, no border.",
+  "worldPlatePrompt": "A single continuous photograph, one frame: standing in the dim stone-flagged back passage of an old red-brick English manor house in the late 1920s, on a still November morning after a night of storm, looking through an open half-glazed back door down a wet gravel garden path between high old brick walls to a white-painted timber-and-iron glasshouse a long way off, half lost in low bands of pale fog. Inside, on the near walls: dark oak panelling, a whitewashed brick arch leading down to a cellar stair, a brass light switch and a dead electric bulb hanging dark, a small round electric wall clock, an oil lamp burning low on a shelf with one warm amber glow. Materials and condition: soft old red brick, dark oak, whitewash, worn stone flags, dark wet slate, brass, beaded and streaming glass, wet lawn, puddles, scattered leaves and small storm-broken twigs. Light: soft, flat and shadowless grey fog light from outside, with the single small amber lamp glow inside. Period-true: no modern fittings, no people, no text.",
+  "rooms": [
+    {
+      "key": "stair_foot",
+      "title": "The foot of the cellar stair",
+      "technique": "",
+      "puzzleType": 0,
+      "phase": "analysis",
+      "built": false,
+      "unlockedWhen": true,
+      "level": 0,
+      "designNote": "START (rooms[0]), gateless. The cellars' C start re-lit to this foggy Saturday morning by an image EDIT of the committed cellars art, never a fresh generation; the stair door above now OPEN. Lamplit; the bulbs dead. The player came down for the pot-trial book when the lights failed. No rung.",
+      "plannedHotspots": [
+        {
+          "type": "door",
+          "direction": "open",
+          "label": "Up the stair to the hall",
+          "to": "entrance_hall"
+        }
+      ],
+      "mapPos": {
+        "c": 3,
+        "r": 2
+      }
+    },
+    {
+      "key": "entrance_hall",
+      "title": "The entrance hall",
+      "technique": "",
+      "puzzleType": 0,
+      "phase": "analysis",
+      "built": false,
+      "unlockedWhen": true,
+      "level": 0,
+      "designNote": "Hall: a slave dial over the door (6:30 dark, 7:00 lit), the train timetable (departure after 9:15; gives the deadline, never the time), the cupboard under the main stair with the MAIN SWITCH. The front door is simply locked (the caretaker took the key): not a hotspot. Doors: down to the stair foot, west to the study, the back door to the garden. Shared art with cellars' hall.",
+      "plannedHotspots": [
+        {
+          "type": "clue",
+          "label": "The hall dial",
+          "note": "Every clock gets a close-up (notes §4). Electric slave dial: 6:30 in the dark state, 7:00 once the power is back."
+        },
+        {
+          "type": "clue",
+          "label": "The train timetable",
+          "note": "The London train's departure (after 9:15). Deadline only; no current time anywhere."
+        },
+        {
+          "type": "dial",
+          "label": "The main switch",
+          "key": "house_power",
+          "states": [
+            {
+              "value": true,
+              "label": "Throw the main switch",
+              "toast": "The switch clunks home. Bulbs glow through the house, and the hall dial starts to tick."
+            }
+          ],
+          "hint": "The main switch under the stair is off.",
+          "availableWhen": {
+            "solved": "potting_shed"
+          },
+          "lockedBody": "You throw the main switch. Nothing: the line is still dead.",
+          "note": "One-way. After rung 2 (the line is back), throwing it restores the power: the lit state everywhere, every dial resumes at 7:00, and the study panelling unlatches."
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "label": "Down the cellar stair",
+          "to": "stair_foot"
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "label": "The Director's study",
+          "to": "study"
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "label": "Out the back door",
+          "to": "back_garden"
+        }
+      ],
+      "mapPos": {
+        "c": 3,
+        "r": 1
+      }
+    },
+    {
+      "key": "study",
+      "title": "The Director's study",
+      "technique": "one-way ANOVA and ges",
+      "puzzleType": 1,
+      "phase": "analysis",
+      "built": false,
+      "unlockedWhen": true,
+      "level": 1,
+      "designNote": "RUNG 1 at the Director's desk: his draft ('soil makes no difference; water generously') and the pot trial. One-way ANOVA of watering on grain_weight; ges. ANSWER 0.200 (check, ± 0.005). Solving frees the potting-shed key from the desk. The wind-up MANTEL CLOCK stopped at 11:40 (pendulum still); the DUTY ROSTER and the note that its winder left early. The Fisher & Mackenzie 1923 volume on the desk (the plaque). The CLOCK CLOSET behind the panelling: in the lit state the panel stands open on the keeper's REGULATOR, 9:15, pendulum swinging (cinemagraph, tick sfx). Drawn only in the lit state.",
+      "plannedHotspots": [
+        {
+          "type": "puzzle",
+          "label": "The Director's draft",
+          "form": "check",
+          "note": "R1. Answer ges 0.200. Gives the potting-shed key.",
+          "gives": "shed_key"
+        },
+        {
+          "type": "clue",
+          "label": "The mantel clock",
+          "note": "Every clock gets a close-up (notes §4). Wind-up, run down at 11:40; pendulum still."
+        },
+        {
+          "type": "clue",
+          "label": "The duty roster",
+          "note": "Whose job it is to wind the mantel clock, and the note that they left early. Legible."
+        },
+        {
+          "type": "clue",
+          "label": "The regulator",
+          "note": "Every clock gets a close-up (notes §4). Escape input: weight-driven, never stopped, 9:15. Behind the panelling, visible only in the lit state.",
+          "shownWhen": {
+            "eq": [
+              "house_power",
+              true
+            ]
+          }
+        },
+        {
+          "type": "plaque",
+          "label": "Fisher and Mackenzie, 1923",
+          "plaque": true,
+          "note": "Wonder plaque on the bound journal volume on the desk, never a sign. Its ANOVA claim is TENTATIVE (../../research.md): confirm from the paper before the text is written (step 6). Information only."
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "label": "Back to the hall",
+          "to": "entrance_hall"
+        }
+      ],
+      "mapPos": {
+        "c": 2,
+        "r": 1
+      }
+    },
+    {
+      "key": "back_garden",
+      "title": "The back garden",
+      "technique": "",
+      "puzzleType": 0,
+      "phase": "analysis",
+      "built": false,
+      "unlockedWhen": true,
+      "level": 1,
+      "designNote": "THE ONE OUTDOOR ROOM (Lucas's exception). The walled back garden in fog after the storm: wet gravel path, puddles, storm-broken twigs and a fallen branch, the old brick walls, and the door in the garden wall to the glasshouse range ahead, its glass roofs a faint shape. Fog hides the house's far side and every glasshouse interior. Through the door in the garden wall the path turns EAST along the range front to the potting shed, the range's head house at its east end: the glass houses have no outside doors and are entered only through the shed's back corridor (a real range layout; world.py has the gate opposite the pot-culture house, which this routing keeps). The shed door is locked until the key.",
+      "plannedHotspots": [
+        {
+          "type": "door",
+          "direction": "open",
+          "label": "Back into the house",
+          "to": "entrance_hall"
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "label": "Through the gate to the potting shed",
+          "to": "potting_shed",
+          "needsItem": "shed_key",
+          "lockedBody": "The potting shed is locked. The Director keeps its key in his study.",
+          "useBody": "The key from the study turns, and the shed door scrapes open.",
+          "wrongItemBody": "That key doesn't fit the shed."
+        }
+      ],
+      "mapPos": {
+        "c": 3,
+        "r": 0
+      }
+    },
+    {
+      "key": "potting_shed",
+      "title": "The potting shed",
+      "technique": "comparing ges across factors",
+      "puzzleType": 1,
+      "phase": "analysis",
+      "built": false,
+      "unlockedWhen": true,
+      "level": 2,
+      "designNote": "RUNG 2: rank watering, soil, potash by ges. ANSWER watering > potash > soil (check, ordered; soil last at 0.009). Brick shed, the HEATING BOARD (variance meter toy, kind variance_meter, the glasshouses' heating loads; feeds nothing). After R2 the line is back: the main switch in the hall now works (beat: 'after R2 the power returns').",
+      "plannedHotspots": [
+        {
+          "type": "puzzle",
+          "label": "The gardener's tally",
+          "form": "check",
+          "note": "R2. Ranking answer.",
+          "availableWhen": {
+            "solved": "study"
+          }
+        },
+        {
+          "type": "instrument",
+          "kind": "variance_meter",
+          "label": "The heating board",
+          "params": {
+            "utility": "amps"
+          },
+          "note": "TOY (notes §5): not the escape, not a puzzle. Needs its OWN config (the glasshouses' heating loads in amperes), never data/switchboard.json."
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "label": "Back out to the garden",
+          "to": "back_garden"
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "label": "Into the pot-culture house",
+          "to": "pot_culture_house"
+        }
+      ],
+      "mapPos": {
+        "c": 4,
+        "r": -1
+      }
+    },
+    {
+      "key": "pot_culture_house",
+      "title": "The pot-culture house",
+      "technique": "two-way ANOVA and the interaction row",
+      "puzzleType": 1,
+      "phase": "analysis",
+      "built": false,
+      "unlockedWhen": true,
+      "level": 3,
+      "designNote": "RUNG 3 among the benches of barley pots (clay and sand, labelled by treatment). Two-way watering * soil; interaction ges 0.725 (check; watering 0.479, soil 0.039 near-misses).",
+      "plannedHotspots": [
+        {
+          "type": "puzzle",
+          "label": "The pot labels",
+          "form": "check",
+          "note": "R3. Answer 0.725.",
+          "availableWhen": {
+            "solved": "potting_shed"
+          }
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "label": "Back to the potting shed",
+          "to": "potting_shed"
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "label": "Into the big glasshouse",
+          "to": "big_glasshouse_near"
+        }
+      ],
+      "mapPos": {
+        "c": 3,
+        "r": -1
+      }
+    },
+    {
+      "key": "big_glasshouse_near",
+      "title": "The big glasshouse",
+      "technique": "",
+      "puzzleType": 0,
+      "phase": "analysis",
+      "built": false,
+      "unlockedWhen": true,
+      "level": 3,
+      "designNote": "The near end of the tall glasshouse: the scale of it, the central walk running away into grey light, staging, heating pipes, condensation. No rung (Lucas: two rooms for the sense of scale).",
+      "plannedHotspots": [
+        {
+          "type": "door",
+          "direction": "open",
+          "label": "Back to the pot-culture house",
+          "to": "pot_culture_house"
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "label": "Down the walk to the far end",
+          "to": "big_glasshouse_far"
+        }
+      ],
+      "mapPos": {
+        "c": 2,
+        "r": -1
+      }
+    },
+    {
+      "key": "big_glasshouse_far",
+      "title": "The far end of the big glasshouse",
+      "technique": "the interaction plot: where the main effect misleads",
+      "puzzleType": 1,
+      "phase": "analysis",
+      "built": false,
+      "unlockedWhen": true,
+      "level": 4,
+      "designNote": "BOSS (spectacle room) and ESCAPE room. The clay pots: which watering gives the most grain? ANSWER moderate (13.9 g vs sparing 9.9, generous 7.9); shortcut generous (best on average). Form: pick (idColumn watering). The glazed END DOOR looks onto the time-locked LANE GATE a few steps outside in the wall, fog beyond: its keypad is boxed here. The time lock runs on the clock circuit, so it is dead until the power is back.",
+      "plannedHotspots": [
+        {
+          "type": "puzzle",
+          "label": "The clay pots",
+          "form": "pick",
+          "note": "BOSS. Answer moderate.",
+          "availableWhen": {
+            "solved": "pot_culture_house"
+          }
+        },
+        {
+          "type": "lock",
+          "label": "The lane gate's time lock",
+          "length": 3,
+          "availableWhen": {
+            "all": [
+              {
+                "solved": "big_glasshouse_far"
+              },
+              {
+                "eq": [
+                  "house_power",
+                  true
+                ]
+              }
+            ]
+          },
+          "lockedBody": "The time lock's little dial is dead. It runs on the same circuit as the clocks.",
+          "note": "ESCAPE (ungraded, never in the codec). Answer 135: advance the dials by the minutes they lost (regulator 9:15 minus dials 7:00). verify_clocks.py."
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "label": "Out through the gate",
+          "to": "lane",
+          "requires": "The lane gate's time lock",
+          "endsEscape": true,
+          "note": "Travel sequence (held back for the escape): the gate swings open and the camera runs along the lane in fog towards the station. endsEscape; clip at step 5 (escape_room_transits)."
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "label": "Back up the walk",
+          "to": "big_glasshouse_near"
+        }
+      ],
+      "mapPos": {
+        "c": 1,
+        "r": -1
+      }
+    }
+  ],
+  "items": {
+    "shed_key": {
+      "name": "the potting-shed key",
+      "image": "items/shed_key.png"
+    }
+  },
+  "ladderPlain": [
+    {
+      "room": "study",
+      "text": "You ran a one-way ANOVA of watering on grain weight and read ges: watering explains about a fifth of the variation on its own."
+    },
+    {
+      "room": "potting_shed",
+      "text": "You ranked watering, potash and soil by ges from three one-way ANOVAs. Soil came last, explaining almost nothing on its own."
+    },
+    {
+      "room": "pot_culture_house",
+      "text": "You fitted watering and soil together and read the interaction row first: the interaction was large, so the best watering depended on the soil."
+    },
+    {
+      "room": "big_glasshouse_far",
+      "text": "You plotted mean grain for each watering on the clay pots only. Moderate watering gave the most there, although generous watering was best on average."
+    }
+  ],
+  "_clusters": [
+    {
+      "key": "big_glasshouse",
+      "rooms": [
+        "big_glasshouse_near",
+        "big_glasshouse_far"
+      ],
+      "aerial": "recommended",
+      "why": "Two ends of one tall glasshouse that look straight at each other down the central walk; they must agree on the staging, the pipes and the roof."
+    },
+    {
+      "key": "range",
+      "rooms": [
+        "back_garden",
+        "potting_shed",
+        "pot_culture_house",
+        "big_glasshouse_near",
+        "big_glasshouse_far"
+      ],
+      "aerial": "optional",
+      "why": "The garden gate, the range and the lane gate in one strip; fog hides every room from the others, the group skeleton fixes the order along the range path."
+    },
+    {
+      "key": "house_front",
+      "rooms": [
+        "stair_foot",
+        "entrance_hall",
+        "study"
+      ],
+      "aerial": "optional",
+      "why": "Shared with cellars (stair foot, hall, study): same blocks, so the re-lit images agree."
+    }
+  ]
 }
