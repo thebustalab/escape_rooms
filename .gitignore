@@ -189,9 +189,9 @@ rooms/**/*.py
 **/puzzle_editor.html
 **/player_map.html
 
-# The scenario inventory is authoring output (scenario_inventory.py writes it). No runtime consumer:
-# nothing in rooms/, shared/ or the surrounding site fetches it.
-rooms/scenario_inventory.json
+# rooms/scenario_inventory.json is NOT ignored: it is a runtime file. The Lab Quests page
+# (labelling/index.html in the parent site repo) fetches it live to list ready rooms, so
+# ignoring it hides every room from students. Guarded by authoring_v2/test_publish_runtime_files.py.
 
 # PLAYWRIGHT OUTPUT outside tests/. `tests/test-results/` was already ignored; two more copies exist
 # at the repo root and under shared/, left by a run started from the wrong directory.
