@@ -84,27 +84,27 @@
 // A bare `./variant_resolve.js` import is NOT refreshed by bumping the <script> tag's ?v, so a changed
 // helper module (e.g. a new export) leaves browsers on a stale cached copy → "doesn't provide an export
 // named X" SyntaxError → blank page (the 2026-08-05 airship regression). Bump all three together.
-import { WebRConsole } from "./webr-console.js?v=150";
-import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers, pickTransit } from "./variant_resolve.js?v=150";   // Phase 3: per-hotspot state variants; monorail switch-door nav
-import * as PQ from "./puzzle_queue.js?v=150";   // dynamic puzzle queue: location-independent puzzle serving
-import * as CP from "./corr_panel.js?v=150";   // lower-triangle layout of the grid gate (clouds correlation panel)
-import { particleCount } from "./particles.js?v=150";
-import { mountLandingBackdrop } from "./landing_backdrop.js?v=150";   // landing text over a pan of the first room's clip   // ambient-particle vocabulary + per-kind field density
-import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=150";
-import { condHolds } from "./cond.js?v=150";
-import { gridMatches } from "./grid_check.js?v=150";   // grid answer check; `partition:true` accepts any relabelling of the buckets   // ledger + elevation-map card DOM
-import * as LIVE from "./live_session.js?v=150";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
-import * as RIDE from "./ride.js?v=150";
-import { mountPcaPlate } from "./pca_plate.js?v=150";   // the PCA plate instrument (voyage beach)
-import { mountFishBoard } from "./fish_board.js?v=150";   // the fish board instrument (harbour berth)
-import { mountDrawdown } from "./drawdown.js?v=150";
-import { mountTide } from "./tide_machine.js?v=150";   // the tide machine instrument (dunes escape)
-import { mountVarianceMeter } from "./variance_meter.js?v=150";   // the variance meter instrument (anova cellars escape)
+import { WebRConsole } from "./webr-console.js?v=151";
+import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers, pickTransit } from "./variant_resolve.js?v=151";   // Phase 3: per-hotspot state variants; monorail switch-door nav
+import * as PQ from "./puzzle_queue.js?v=151";   // dynamic puzzle queue: location-independent puzzle serving
+import * as CP from "./corr_panel.js?v=151";   // lower-triangle layout of the grid gate (clouds correlation panel)
+import { particleCount } from "./particles.js?v=151";
+import { mountLandingBackdrop } from "./landing_backdrop.js?v=151";   // landing text over a pan of the first room's clip   // ambient-particle vocabulary + per-kind field density
+import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=151";
+import { condHolds } from "./cond.js?v=151";
+import { gridMatches } from "./grid_check.js?v=151";   // grid answer check; `partition:true` accepts any relabelling of the buckets   // ledger + elevation-map card DOM
+import * as LIVE from "./live_session.js?v=151";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
+import * as RIDE from "./ride.js?v=151";
+import { mountPcaPlate } from "./pca_plate.js?v=151";   // the PCA plate instrument (voyage beach)
+import { mountFishBoard } from "./fish_board.js?v=151";   // the fish board instrument (harbour berth)
+import { mountDrawdown } from "./drawdown.js?v=151";
+import { mountTide } from "./tide_machine.js?v=151";   // the tide machine instrument (dunes escape)
+import { mountVarianceMeter } from "./variance_meter.js?v=151";   // the variance meter instrument (anova cellars escape)
    // the drawdown board instrument (diamonds escape)   // THE RIDE (subway): express lever + clip-sequence planner
-import * as BELL from "./bell_pull.js?v=150";
-import * as DATEB from "./date_board.js?v=150";   // date lock: lock mode:"date", two slide-levers (dunes departure board)
-import * as INVY from "./inventory.js?v=150";   // carried items + the door that asks which to use (dunes)   // bell-pull (#16): dial mode:"pull" + lock mode:"state" (spa belfry)
-import { entryYaw } from "./entry_facing.js?v=150";   // face the way out on entering a room (every scenario)
+import * as BELL from "./bell_pull.js?v=151";
+import * as DATEB from "./date_board.js?v=151";   // date lock: lock mode:"date", two slide-levers (dunes departure board)
+import * as INVY from "./inventory.js?v=151";   // carried items + the door that asks which to use (dunes)   // bell-pull (#16): dial mode:"pull" + lock mode:"state" (spa belfry)
+import { entryYaw } from "./entry_facing.js?v=151";   // face the way out on entering a room (every scenario)
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 
@@ -4182,20 +4182,24 @@ function openMenu(h) {
   if (!liveMode()) return toast("The restaurant serves during the live class session.");
   if (!LIVE.isJoined()) return toast("Join the session first.");
   const st = LIVE.state(), menu = st && st.menu;
-  if (!menu || !Array.isArray(menu.dishes) || !menu.dishes.length) return toast("The kitchen is closed.");
+  // A hotspot's own `dishes` (track list) picks its dishes from the pool's menu (bathhouse 2026-11-02: the restaurant
+  // and the kitchen each serve four of their own); with none it lists them all.
+  const own = Array.isArray(h.dishes) && h.dishes.length ? menu && Array.isArray(menu.dishes)
+    ? menu.dishes.filter(x => h.dishes.includes(x.track)) : [] : (menu && menu.dishes) || [];
+  if (!menu || !own.length) return toast("The kitchen is closed.");
   const served = new Set((st && st.served) || []);
   const mins = menu.seconds % 60 === 0 ? menu.seconds / 60 : null;
   const gain = mins ? (mins + " extra minute" + (mins === 1 ? "" : "s")) : (menu.seconds + " extra seconds");
   const d = document.createElement("div");
   const p = document.createElement("p");
-  const left = menu.dishes.filter(x => !served.has(x.track)).length;
+  const left = own.filter(x => !served.has(x.track)).length;
   p.textContent = left
     ? "Pick a dish and solve its sum. Each dish you finish puts " + gain + " on the clock, until the kitchen runs out."
     : "The kitchen has run out of food. Every dish has been eaten!";
   d.appendChild(p);
   const row = document.createElement("div");
   row.style.cssText = "display:flex;flex-direction:column;gap:8px;margin:10px 0";
-  for (const dish of menu.dishes) {
+  for (const dish of own) {
     const b = document.createElement("button");
     b.className = "qsubmit"; b.dataset.track = dish.track;
     const out = served.has(dish.track);

@@ -1,9 +1,10 @@
 // fish_stats.js: the statistics behind the harbour fish board (comparing-means live scenario).
 //
 // WHY: the board is a teaching demo. Every haul is a genuinely random sample and every verdict is the
-// real test the course teaches (Welch t, Wilcox, Shapiro, Tukey, Dunn with Holm), so false positives turn
-// up at their honest rate. These are ports of what R computes (shapiro.test = Royston's swilk, wilcox.test
-// exact/normal, TukeyHSD via ptukey, rstatix::dunn_test), pinned against R by test_fish_stats.mjs.
+// real test the course teaches (Welch t, Wilcox, Shapiro, Games-Howell, Dunn with Holm), so false positives
+// turn up at their honest rate. These are ports of what R computes (shapiro.test = Royston's swilk, wilcox.test
+// exact/normal, rstatix::games_howell_test via ptukey, rstatix::dunn_test), pinned against R by
+// test_fish_stats.mjs. TukeyHSD and the pooled pairwise t stay (pinned too) but the board no longer uses them.
 // Plain script (no modules) so the prototype opens straight from the Finder via file://.
 (function (root) {
   "use strict";
@@ -421,6 +422,30 @@
     }
     return out;
   }
+  // Games-Howell (rstatix::games_howell_test, the course's every-pair test on the parametric road): each pair
+  // keeps its own spread and its own Welch df, then the studentized range corrects for the k groups, so
+  // unequal spreads cannot inflate false positives the way Tukey's pooled spread does.
+  //   q = |diff| / sqrt((s1^2/n1 + s2^2/n2) / 2),  p = 1 - ptukey(q, k, Welch df)
+  function gamesHowell(groups) {
+    const k = groups.length, out = [];
+    for (let i = 0; i < k; i++) for (let j = i + 1; j < k; j++) {
+      const a = groups[i], b = groups[j];
+      const va = variance(a) / a.length, vb = variance(b) / b.length;
+      const diff = mean(b) - mean(a), se = Math.sqrt(va + vb);
+      const df = (va + vb) * (va + vb) / (va * va / (a.length - 1) + vb * vb / (b.length - 1));
+      out.push({ i, j, diff, se, df, p: 1 - ptukey(Math.abs(diff) / se * Math.SQRT2, k, df) });
+    }
+    return out;
+  }
+  // The same pairs as Welch t-tests with NO correction, so the only change from Games-Howell is the correction.
+  function pairwiseWelch(groups) {
+    const k = groups.length, out = [];
+    for (let i = 0; i < k; i++) for (let j = i + 1; j < k; j++) {
+      const w = welch(groups[j], groups[i]);
+      out.push({ i, j, diff: w.diff, df: w.df, p: w.p });
+    }
+    return out;
+  }
   function holm(ps) {
     const m = ps.length, order = ps.map((p, i) => i).sort((a, b) => ps[a] - ps[b]);
     const adj = new Array(m);
@@ -449,7 +474,7 @@
   }
 
   const api = { rng, pnorm, qnorm, pbeta, pt2, ptukey, lgamma, mean, variance, median, rank,
-    welch, wilcox, shapiro, tukey, pairwisePooledT, dunn, holm };
+    welch, wilcox, shapiro, tukey, pairwisePooledT, gamesHowell, pairwiseWelch, dunn, holm };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   else root.FishStats = api;
 })(typeof window !== "undefined" ? window : globalThis);

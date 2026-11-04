@@ -12,7 +12,9 @@
   "setup": "",
   "state": {
     "train_line": "lake",
-    "boiler_hatch": false
+    "boiler_hatch": false,
+    "lift_floor": "atrium",
+    "office_trapdoor": false
   },
   "_designNotes": {
     "buildState": "Rooms, graph and scene specs written by _scratch/build_scenario.py (2026-10-20). Live scenario: puzzles are dealt by the live-class server (authoring_v2/live_class/pool/bathhouse.json), never stored here. Multiple choice, no R. No codec id, no escape, ungraded. See notes.md."
@@ -25,7 +27,7 @@
       "title": "The bridge",
       "built": true,
       "unlockedWhen": true,
-      "designNote": "ARRIVAL. Station (1 herb bundle): the lantern-post basket. Doors to the atrium, the garden path and the boiler-room stairs.",
+      "designNote": "ARRIVAL. Station (1 herb bundle): the lantern-post basket. Doors to the atrium, the garden path, the narrow stairs down to the boiler-room landing (2026-11-02) and back across toward the lake station.",
       "plannedHotspots": [
         {
           "type": "door",
@@ -68,7 +70,7 @@
         {
           "type": "door",
           "direction": "open",
-          "to": "boiler",
+          "to": "landing",
           "label": "The narrow stairs down",
           "box": [
             0.59,
@@ -139,7 +141,7 @@
               "label": "The narrow stairs down",
               "door": {
                 "direction": "open",
-                "to": "boiler"
+                "to": "landing"
               },
               "desc": "at the right-hand end of the bridge, a gap in the green railing where a very narrow, steep wooden staircase with a thin handrail starts at the deck and runs down along the outside wall of the bathhouse toward a small glowing door far below"
             },
@@ -306,7 +308,7 @@
             0.72
           ],
           "direction": "open",
-          "to": "boiler",
+          "to": "landing",
           "boxSource": "moved:agent"
         },
         {
@@ -524,20 +526,13 @@
       "title": "The boiler room",
       "built": true,
       "unlockedWhen": true,
-      "designNote": "Station (1 herb bundle): the wall of herb drawers. Doors: up the outside stairs to the bridge, up the inside stairs to the atrium, and (2026-10-26) the SECRET DOOR: a little green sliding door, locked with a one-digit code. The cue is on the drawer wall: 3 BLUE drawers open high up and 4 YELLOW drawers open low down; blue and yellow make green, so the green door opens with three plus four, seven. Behind it, the gear works.",
+      "designNote": "Station (1 herb bundle): the wall of herb drawers. Doors: out to the landing (2026-11-02), up the inside stairs to the atrium, and (2026-10-26) the SECRET DOOR: a little green sliding door, locked with a one-digit code. The cue is on the drawer wall: 3 BLUE drawers open high up and 4 YELLOW drawers open low down; blue and yellow make green, so the green door opens with three plus four, seven. Behind it, the gear works.",
       "plannedHotspots": [
         {
           "type": "door",
-          "direction": "back",
-          "to": "bridge",
-          "label": "Up the outside stairs to the bridge",
-          "box": [
-            0.135,
-            0.22,
-            0.215,
-            0.66
-          ],
-          "boxSource": "moved:agent"
+          "direction": "open",
+          "to": "landing",
+          "label": "Out to the landing"
         },
         {
           "type": "station",
@@ -631,10 +626,10 @@
             {
               "id": "outside_stairs",
               "at": "to the left",
-              "label": "Up the outside stairs to the bridge",
+              "label": "Out to the landing",
               "door": {
-                "direction": "back",
-                "to": "bridge"
+                "direction": "open",
+                "to": "landing"
               },
               "desc": "a small open wooden door, the floor running level over its sill to the foot of a steep narrow staircase climbing up outside into the dusk"
             },
@@ -856,9 +851,9 @@
         {
           "id": "up_the_outside_stairs_to_the_bridge",
           "type": "door",
-          "label": "Up the outside stairs to the bridge",
-          "direction": "back",
-          "to": "bridge",
+          "label": "Out to the landing",
+          "direction": "open",
+          "to": "landing",
           "box": [
             0.135,
             0.22,
@@ -1025,7 +1020,7 @@
         {
           "type": "door",
           "direction": "open",
-          "to": "hallway",
+          "to": "elevator",
           "label": "The elevator",
           "box": [
             0.7598,
@@ -1103,7 +1098,7 @@
               "label": "The elevator",
               "door": {
                 "direction": "open",
-                "to": "hallway"
+                "to": "elevator"
               },
               "desc": "an old wooden-and-brass elevator cage with its folding gate open and its car waiting level with the floor"
             },
@@ -1300,7 +1295,7 @@
             0.6232
           ],
           "direction": "open",
-          "to": "hallway",
+          "to": "elevator",
           "boxSource": "draft:skeleton"
         }
       ]
@@ -1879,20 +1874,13 @@
       "title": "The guest hallway",
       "built": true,
       "unlockedWhen": true,
-      "designNote": "Station (LEVEL 2, track stall: 2, 3 or 4 times 2, 3 or 4; pays 1 BATH TOKEN): the bath token stall. Doors: the elevator back down to the atrium, the stairs up to the dragon bedroom (2026-10-25), down the corridor to the checkpoint room (2026-10-26).",
+      "designNote": "Station (LEVEL 2, track stall: 2, 3 or 4 times 2, 3 or 4; pays 1 BATH TOKEN): the bath token stall. Doors: the elevator (2026-11-02: a room with a floor lever: up here, the atrium, down to the kitchen), the stairs up to the dragon bedroom (2026-10-25), down the corridor to the checkpoint room (2026-10-26).",
       "plannedHotspots": [
         {
           "type": "door",
           "direction": "back",
-          "to": "atrium",
-          "label": "The elevator down to the atrium",
-          "box": [
-            0.133,
-            0.23,
-            0.218,
-            0.67
-          ],
-          "boxSource": "moved:agent"
+          "to": "elevator",
+          "label": "The elevator"
         },
         {
           "type": "station",
@@ -1951,10 +1939,10 @@
             {
               "id": "elevator_down",
               "at": "to the left",
-              "label": "The elevator down to the atrium",
+              "label": "The elevator",
               "door": {
                 "direction": "back",
-                "to": "atrium"
+                "to": "elevator"
               },
               "desc": "the brass elevator cage with its folding gate open, its car floor level with the corridor floor"
             },
@@ -2080,7 +2068,7 @@
         {
           "id": "the_elevator_down_to_the_atrium",
           "type": "door",
-          "label": "The elevator down to the atrium",
+          "label": "The elevator",
           "box": [
             0.133,
             0.23,
@@ -2088,7 +2076,7 @@
             0.67
           ],
           "direction": "back",
-          "to": "atrium",
+          "to": "elevator",
           "boxSource": "moved:agent"
         },
         {
@@ -2140,7 +2128,7 @@
       "title": "The owner's office",
       "built": true,
       "unlockedWhen": true,
-      "designNote": "Station (LEVEL 2, 2 herb bundles; 4 doors from the tub): the golden desk. At the very top, up the elevator from the dragon bedroom. Doors: back down the elevator, out to the balcony room (2026-10-25).",
+      "designNote": "Station (LEVEL 2, 2 herb bundles; 4 doors from the tub): the golden desk. At the very top, up the elevator from the dragon bedroom. Doors: back down the elevator, out to the balcony room (2026-10-25), and (2026-11-02) the PINK TRAP DOOR: a one-digit lock; three RED vases on the mantel and four WHITE vases on the floor make pink, so it opens with seven, and you fall one way down into the boiler room.",
       "plannedHotspots": [
         {
           "type": "station",
@@ -2165,6 +2153,56 @@
             0.28,
             0.575,
             0.6
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "lock",
+          "label": "The pink trap door",
+          "answer": "7",
+          "length": 1,
+          "maxAttempts": 0,
+          "feedback": {
+            "correct": "Clunk! The padlock falls open and the pink trap door swings up.",
+            "wrong": "The padlock on the pink trap door stays shut."
+          },
+          "onSolve": [
+            {
+              "set": "office_trapdoor",
+              "to": true
+            }
+          ],
+          "shownWhen": {
+            "ne": [
+              "office_trapdoor",
+              true
+            ]
+          },
+          "box": [
+            0.678,
+            0.7,
+            0.8,
+            0.82
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "to": "boiler",
+          "label": "Drop through the trap door",
+          "shownWhen": {
+            "eq": [
+              "office_trapdoor",
+              true
+            ]
+          },
+          "oneWay": true,
+          "box": [
+            0.678,
+            0.7,
+            0.8,
+            0.82
           ],
           "boxSource": "moved:agent"
         },
@@ -2199,7 +2237,7 @@
             {
               "id": "fireplace",
               "at": "to the left",
-              "desc": "a big ornate fireplace with a low glowing fire, gold ornaments and blue-and-white pottery on its mantel"
+              "desc": "a big ornate fireplace with a low glowing fire; on its mantel shelf stand EXACTLY THREE bright solid RED lacquered vases in a row, and on the floor in front of the hearth stand EXACTLY FOUR plain WHITE porcelain vases in a row"
             },
             {
               "id": "golden_desk",
@@ -2221,8 +2259,46 @@
             },
             {
               "id": "chandelier",
-              "at": "just right of centre",
+              "at": "dead ahead in the centre",
               "desc": "a glittering crystal-and-gold chandelier hanging low, its candles dim"
+            },
+            {
+              "id": "trap_door",
+              "at": "just right of centre",
+              "label": "The pink trap door",
+              "lock": {
+                "answer": "7",
+                "length": 1,
+                "feedback": {
+                  "correct": "Clunk! The padlock falls open and the pink trap door swings up.",
+                  "wrong": "The padlock on the pink trap door stays shut."
+                },
+                "onSolve": [
+                  {
+                    "set": "office_trapdoor",
+                    "to": true
+                  }
+                ],
+                "shownWhen": {
+                  "ne": [
+                    "office_trapdoor",
+                    true
+                  ]
+                }
+              },
+              "door": {
+                "direction": "open",
+                "to": "boiler",
+                "label": "Drop through the trap door",
+                "oneWay": true,
+                "shownWhen": {
+                  "eq": [
+                    "office_trapdoor",
+                    true
+                  ]
+                }
+              },
+              "desc": "set flat into the polished wooden floor, a square wooden trap door painted bright candy PINK, shut, with an iron ring handle and a small brass padlock"
             },
             {
               "id": "elevator_back",
@@ -2244,8 +2320,19 @@
           "rigid": "the desk, the fireplace, the pottery, the door and knocker, the chandelier, the elevator",
           "atmosphere": "opulent and a little spooky, gold glinting in dim firelight, beautiful tiles and lanterns",
           "styleLight": "early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red",
-          "negatives": "No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. The door knocker is brass with eyes, not a living face.",
-          "states": {},
+          "negatives": "No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. The door knocker is brass with eyes, not a living face. Exactly three RED vases on the mantel and exactly four WHITE vases on the floor; ONE pink trap door only.",
+          "states": {
+            "trapdoor_open": {
+              "change": "the pink trap door only",
+              "elements": {
+                "trap_door": {
+                  "desc": "the pink trap door has swung up and open on its hinges and leans back, revealing a dark square hole in the floor with warm orange firelight and wisps of steam glowing up from far below"
+                }
+              },
+              "constraints": "Only the trap door changes: it keeps its size, colour and place in the floor, and the desk, the fireplace, the red and white vases and everything else stay exactly as they are. No people, no text.",
+              "stillOnly": true
+            }
+          },
           "continuity": [],
           "scaffold": {
             "kind": "skeleton",
@@ -2294,7 +2381,7 @@
         "plateRefs": [
           "atrium/scene.png"
         ],
-        "scenePrompt": "This is a seamless 360-degree panorama from the grand, dim private office of the bathhouse owner at the very top of a colossal, whimsical spirit bathhouse in old Japan, built entirely of wood: red-lacquered pillars and beams, green-painted rails and panels, gold trim and gold ornaments, yellow paper screens, curved tiled roofs stacked storey on storey like a grand pagoda; hand-painted animated-film look, rich saturated colour, soft painterly detail. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stretch of dark wall of patterned gold-and-green tiles, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: a plain stretch of dark wall of patterned gold-and-green tiles, uniform and unbroken, joining its other half cleanly at the seam directly behind you; to the left, a big ornate fireplace with a low glowing fire, gold ornaments and blue-and-white pottery on its mantel; just left of centre, a huge heavy desk inlaid with gold, on it a gold box of herb bundles tied with red string; dead ahead in the centre, a tall ornate closed door with a large brass door knocker shaped like a round face with big staring eyes; just right of centre, a glittering crystal-and-gold chandelier hanging low, its candles dim; to the right, the brass elevator cage with its folding gate open, its car floor level with the office floor; on the far right, the right half of the calm view directly behind the viewer: a plain stretch of dark wall of patterned gold-and-green tiles, uniform and unbroken, joining its other half cleanly at the seam directly behind you. opulent and a little spooky, gold glinting in dim firelight, beautiful tiles and lanterns. No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. The door knocker is brass with eyes, not a living face. Shot on a full-frame DSLR at 24mm, f/8, early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a plain stretch of dark wall of patterned gold-and-green tiles, uniform and unbroken, with no visible seam, join, or repetition.",
+        "scenePrompt": "This is a seamless 360-degree panorama from the grand, dim private office of the bathhouse owner at the very top of a colossal, whimsical spirit bathhouse in old Japan, built entirely of wood: red-lacquered pillars and beams, green-painted rails and panels, gold trim and gold ornaments, yellow paper screens, curved tiled roofs stacked storey on storey like a grand pagoda; hand-painted animated-film look, rich saturated colour, soft painterly detail. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stretch of dark wall of patterned gold-and-green tiles, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: a plain stretch of dark wall of patterned gold-and-green tiles, uniform and unbroken, joining its other half cleanly at the seam directly behind you; to the left, a big ornate fireplace with a low glowing fire; on its mantel shelf stand EXACTLY THREE bright solid RED lacquered vases in a row, and on the floor in front of the hearth stand EXACTLY FOUR plain WHITE porcelain vases in a row; just left of centre, a huge heavy desk inlaid with gold, on it a gold box of herb bundles tied with red string; dead ahead in the centre, a tall ornate closed door with a large brass door knocker shaped like a round face with big staring eyes; dead ahead in the centre, a glittering crystal-and-gold chandelier hanging low, its candles dim; just right of centre, set flat into the polished wooden floor, a square wooden trap door painted bright candy PINK, shut, with an iron ring handle and a small brass padlock; to the right, the brass elevator cage with its folding gate open, its car floor level with the office floor; on the far right, the right half of the calm view directly behind the viewer: a plain stretch of dark wall of patterned gold-and-green tiles, uniform and unbroken, joining its other half cleanly at the seam directly behind you. opulent and a little spooky, gold glinting in dim firelight, beautiful tiles and lanterns. No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. The door knocker is brass with eyes, not a living face. Exactly three RED vases on the mantel and exactly four WHITE vases on the floor; ONE pink trap door only. Shot on a full-frame DSLR at 24mm, f/8, early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a plain stretch of dark wall of patterned gold-and-green tiles, uniform and unbroken, with no visible seam, join, or repetition.",
         "seam": {
           "stage": "blurred",
           "band": "sky",
@@ -2306,6 +2393,10 @@
           "at": "2026-10-20T20:34:54",
           "acceptedBy": "lucas via agent 2026-10-20",
           "humanNote": "Lucas 2026-10-20: 'Those rooms are all good.'"
+        },
+        "boxesFrom": {
+          "art": "ffc5561e1efd",
+          "at": "2026-11-02T23:16:45"
         }
       },
       "mapPos": {
@@ -2363,6 +2454,89 @@
             0.6
           ],
           "boxSource": "moved:agent"
+        },
+        {
+          "type": "lock",
+          "label": "The pink trap door",
+          "answer": "7",
+          "length": 1,
+          "maxAttempts": 0,
+          "feedback": {
+            "correct": "Clunk! The padlock falls open and the pink trap door swings up.",
+            "wrong": "The padlock on the pink trap door stays shut."
+          },
+          "onSolve": [
+            {
+              "set": "office_trapdoor",
+              "to": true
+            }
+          ],
+          "shownWhen": {
+            "ne": [
+              "office_trapdoor",
+              true
+            ]
+          },
+          "box": [
+            0.678,
+            0.7,
+            0.8,
+            0.82
+          ],
+          "boxSource": "moved:agent",
+          "id": "the_pink_trap_door"
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "to": "boiler",
+          "label": "Drop through the trap door",
+          "shownWhen": {
+            "eq": [
+              "office_trapdoor",
+              true
+            ]
+          },
+          "oneWay": true,
+          "box": [
+            0.678,
+            0.7,
+            0.8,
+            0.82
+          ],
+          "boxSource": "moved:agent",
+          "id": "drop_through_the_trap_door"
+        },
+        {
+          "id": "trapdoor_wash",
+          "type": "ambient",
+          "label": "Nightfall",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Full-scene state variant. `ambient` is filtered out of rendering, so this carrier shows no marker and intercepts no clicks; it exists only to hold the variant art.",
+          "variants": [
+            {
+              "state": "trapdoor_open",
+              "box": [
+                0,
+                0,
+                1,
+                1
+              ],
+              "prompt": "Keep this exact scene, composition, camera framing and every object precisely where it is, and change ONLY the pink trap door only: The pink trap door has swung up and open on its hinges and leans back, revealing a dark square hole in the floor with warm orange firelight and wisps of steam glowing up from far below. Only the trap door changes: it keeps its size, colour and place in the floor, and the desk, the fireplace, the red and white vases and everything else stay exactly as they are. No people, no text.",
+              "panorama": "office/scene_trapdoor_open.png",
+              "when": {
+                "eq": [
+                  "office_trapdoor",
+                  true
+                ]
+              }
+            }
+          ]
         }
       ]
     },
@@ -4937,7 +5111,7 @@
       "title": "The lonely station",
       "built": true,
       "unlockedWhen": true,
-      "designNote": "TICKET BASKET (Lucas, 2026-10-28; level 3, track vocab_lonely): a transport vocabulary question, pays ONE TRAIN TICKET; 7 doors from the tub. Back onto the train only (the train's line switch on 'lonely').",
+      "designNote": "TICKET BASKET (Lucas, 2026-10-28; level 3, track vocab_lonely): a transport vocabulary question, pays ONE TRAIN TICKET; 7 doors from the tub. Doors: back onto the train (the train's line switch on 'lonely'), and (2026-11-02) into the bucket boat across the lake to the dock.",
       "plannedHotspots": [
         {
           "type": "station",
@@ -4955,6 +5129,19 @@
             0.23,
             0.545,
             0.67
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "door",
+          "direction": "back",
+          "to": "boat",
+          "label": "Into the bucket boat",
+          "box": [
+            0.82,
+            0.46,
+            0.955,
+            0.77
           ],
           "boxSource": "moved:agent"
         }
@@ -5002,9 +5189,14 @@
               "desc": "a single old lamp post with a dim round lamp, a soft halo in the swirling mist"
             },
             {
-              "id": "mist_right",
+              "id": "boat_mooring",
               "at": "to the right",
-              "desc": "thick soft white mist over still water, nothing else visible"
+              "label": "Into the bucket boat",
+              "door": {
+                "direction": "back",
+                "to": "boat"
+              },
+              "desc": "a big round wooden bucket boat, like a giant bath bucket made of curved wooden staves bound with dark iron hoops, a long wooden punting pole leaning in it and a little paper lantern on a hooked pole, tied to a post at the right-hand end of the platform, bobbing on the still water in the mist, its rim low beside the planks so you could step straight in"
             },
             {
               "id": "seam_right",
@@ -5066,7 +5258,7 @@
         "plateRefs": [
           "atrium/scene.png"
         ],
-        "scenePrompt": "This is a seamless 360-degree panorama from a tiny lonely railway halt standing all alone in the middle of a vast still shallow lake, wrapped in thick soft white mist at dusk, far from a colossal, whimsical spirit bathhouse in old Japan, built entirely of wood: red-lacquered pillars and beams, green-painted rails and panels, gold trim and gold ornaments, yellow paper screens, curved tiled roofs stacked storey on storey like a grand pagoda; hand-painted animated-film look, rich saturated colour, soft painterly detail. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is thick soft white mist over still water, calm and even, fading to nothing: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: thick soft white mist over still water, calm and even, fading to nothing, joining its other half cleanly at the seam directly behind you; to the left, the empty end of the short plank platform stopping at the still water, mist drifting over it; just left of centre, a tiny wooden shelter with a bench under its little roof, on the bench a woven basket of herb bundles tied with red string; dead ahead in the centre, in the IMMEDIATE FOREGROUND at the viewer's feet, the platform's square plank edge, and just beyond it ONE single pair of steel rails lying in a few centimetres of clear shallow water, running dead straight along that edge; the old-fashioned single-carriage train, deep red and cream with gold lines, stands squarely ON that pair of rails, its wheels in the water on the rails, its floor level with the platform so you could step straight across, its door standing open toward the viewer with warm light inside. THE RAILS UNDER THE TRAIN ARE THE SAME RAILS THAT RUN ON PAST ITS FRONT into the thick white mist, vanishing after a few metres: one unbroken pair you could follow with your eye from under its wheels, never a second set of rails; just right of centre, a single old lamp post with a dim round lamp, a soft halo in the swirling mist; to the right, thick soft white mist over still water, nothing else visible; on the far right, the right half of the calm view directly behind the viewer: thick soft white mist over still water, calm and even, fading to nothing, joining its other half cleanly at the seam directly behind you. lonely, hushed and dreamlike, soft grey-white mist glowing faintly violet. No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. ONE train standing ON its rails, never on the planks or the boardwalk; ONE single pair of rails in the whole view, the same pair under the train; no second track beside or past it; no overhead wires. No buildings beyond the tiny shelter; no other platform. Shot on a full-frame DSLR at 24mm, f/8, early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into thick soft white mist over still water, calm and even, fading to nothing, with no visible seam, join, or repetition.",
+        "scenePrompt": "This is a seamless 360-degree panorama from a tiny lonely railway halt standing all alone in the middle of a vast still shallow lake, wrapped in thick soft white mist at dusk, far from a colossal, whimsical spirit bathhouse in old Japan, built entirely of wood: red-lacquered pillars and beams, green-painted rails and panels, gold trim and gold ornaments, yellow paper screens, curved tiled roofs stacked storey on storey like a grand pagoda; hand-painted animated-film look, rich saturated colour, soft painterly detail. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is thick soft white mist over still water, calm and even, fading to nothing: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: thick soft white mist over still water, calm and even, fading to nothing, joining its other half cleanly at the seam directly behind you; to the left, the empty end of the short plank platform stopping at the still water, mist drifting over it; just left of centre, a tiny wooden shelter with a bench under its little roof, on the bench a woven basket of herb bundles tied with red string; dead ahead in the centre, in the IMMEDIATE FOREGROUND at the viewer's feet, the platform's square plank edge, and just beyond it ONE single pair of steel rails lying in a few centimetres of clear shallow water, running dead straight along that edge; the old-fashioned single-carriage train, deep red and cream with gold lines, stands squarely ON that pair of rails, its wheels in the water on the rails, its floor level with the platform so you could step straight across, its door standing open toward the viewer with warm light inside. THE RAILS UNDER THE TRAIN ARE THE SAME RAILS THAT RUN ON PAST ITS FRONT into the thick white mist, vanishing after a few metres: one unbroken pair you could follow with your eye from under its wheels, never a second set of rails; just right of centre, a single old lamp post with a dim round lamp, a soft halo in the swirling mist; to the right, a big round wooden bucket boat, like a giant bath bucket made of curved wooden staves bound with dark iron hoops, a long wooden punting pole leaning in it and a little paper lantern on a hooked pole, tied to a post at the right-hand end of the platform, bobbing on the still water in the mist, its rim low beside the planks so you could step straight in; on the far right, the right half of the calm view directly behind the viewer: thick soft white mist over still water, calm and even, fading to nothing, joining its other half cleanly at the seam directly behind you. lonely, hushed and dreamlike, soft grey-white mist glowing faintly violet. No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. ONE train standing ON its rails, never on the planks or the boardwalk; ONE single pair of rails in the whole view, the same pair under the train; no second track beside or past it; no overhead wires. No buildings beyond the tiny shelter; no other platform. Shot on a full-frame DSLR at 24mm, f/8, early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into thick soft white mist over still water, calm and even, fading to nothing, with no visible seam, join, or repetition.",
         "seam": {
           "stage": "screened",
           "band": "ground",
@@ -5078,8 +5270,8 @@
           "at": "2026-10-25T22:40:37"
         },
         "boxesFrom": {
-          "art": "fc0d4ac03480",
-          "at": "2026-10-25T22:40:43"
+          "art": "ddeaf0719e9e",
+          "at": "2026-11-02T23:16:45"
         }
       },
       "mapPos": {
@@ -5123,6 +5315,20 @@
           "tier": 3,
           "boxSource": "moved:agent",
           "track": "vocab_lonely"
+        },
+        {
+          "type": "door",
+          "direction": "back",
+          "to": "boat",
+          "label": "Into the bucket boat",
+          "box": [
+            0.82,
+            0.46,
+            0.955,
+            0.77
+          ],
+          "boxSource": "moved:agent",
+          "id": "into_the_bucket_boat"
         }
       ]
     },
@@ -6480,6 +6686,12 @@
           "type": "menu",
           "tier": 3,
           "label": "The menu",
+          "dishes": [
+            "dish_noodles",
+            "dish_dumplings",
+            "dish_riceballs",
+            "dish_skewers"
+          ],
           "box": [
             0.41,
             0.19,
@@ -6658,7 +6870,13 @@
             0.5
           ],
           "tier": 3,
-          "boxSource": "moved:agent"
+          "boxSource": "moved:agent",
+          "dishes": [
+            "dish_noodles",
+            "dish_dumplings",
+            "dish_riceballs",
+            "dish_skewers"
+          ]
         }
       ]
     },
@@ -6757,6 +6975,1548 @@
         "vOffset": -5,
         "pitch": -5
       }
+    },
+    {
+      "key": "landing",
+      "title": "The boiler-room landing",
+      "built": true,
+      "unlockedWhen": true,
+      "designNote": "Station (LEVEL 2, 2 herb bundles; 3 doors from the tub): the basket on the barrel. Doors: up the narrow stairs to the bridge, in through the little door to the boiler room, down the steps to the ledge.",
+      "plannedHotspots": [
+        {
+          "type": "door",
+          "direction": "back",
+          "to": "bridge",
+          "label": "Up the narrow stairs to the bridge",
+          "box": [
+            0.15,
+            0.15,
+            0.25,
+            0.68
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "station",
+          "tier": 2,
+          "label": "The basket on the barrel",
+          "box": [
+            0.258,
+            0.42,
+            0.36,
+            0.8
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "door",
+          "direction": "back",
+          "to": "boiler",
+          "label": "Into the boiler room",
+          "box": [
+            0.405,
+            0.14,
+            0.565,
+            0.7
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "to": "ledge",
+          "label": "Down the steps to the ledge",
+          "box": [
+            0.7,
+            0.6,
+            0.86,
+            0.86
+          ],
+          "boxSource": "moved:agent"
+        }
+      ],
+      "authoring": {
+        "sceneSpec": {
+          "room": "landing",
+          "setting": "a small square wooden landing on tall stilts, built against the lower outside wall of a colossal, whimsical spirit bathhouse in old Japan, built entirely of wood: red-lacquered pillars and beams, green-painted rails and panels, gold trim and gold ornaments, yellow paper screens, curved tiled roofs stacked storey on storey like a grand pagoda; hand-painted animated-film look, rich saturated colour, soft painterly detail, low down above a vast still shallow lake at dusk",
+          "interior": false,
+          "indoor": false,
+          "seam": "the dark red-lacquered outside wall of the bathhouse, plain boards and beams, calm and even",
+          "seamOccluder": "a thick red-lacquered wooden post holding up the landing's little roof",
+          "elements": [
+            {
+              "id": "seam_left",
+              "at": "on the far left",
+              "desc": "the left half of the calm view directly behind the viewer: the dark red-lacquered outside wall of the bathhouse, plain boards and beams, calm and even, joining its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "stairs_up",
+              "at": "to the left",
+              "label": "Up the narrow stairs to the bridge",
+              "door": {
+                "direction": "back",
+                "to": "bridge"
+              },
+              "desc": "the foot of a very narrow, steep wooden staircase with a thin handrail, starting at the landing and climbing up the outside wall of the bathhouse toward the lantern-lit bridge high above"
+            },
+            {
+              "id": "barrel_basket",
+              "at": "just left of centre",
+              "label": "The basket on the barrel",
+              "station": 2,
+              "desc": "an old wooden water barrel by the wall, on its lid a woven basket of herb bundles tied with red string"
+            },
+            {
+              "id": "boiler_door",
+              "at": "dead ahead in the centre",
+              "label": "Into the boiler room",
+              "door": {
+                "direction": "back",
+                "to": "boiler"
+              },
+              "desc": "a small wooden door in the bathhouse wall standing open, hot orange firelight and steam pouring out of the boiler room inside, the landing's planks running level over its sill"
+            },
+            {
+              "id": "lake_view",
+              "at": "just right of centre",
+              "desc": "over the landing's red railing, the vast still lake below, mirror-smooth, glowing violet and rose, soft mist far out on the water"
+            },
+            {
+              "id": "steps_down",
+              "at": "to the right",
+              "label": "Down the steps to the ledge",
+              "door": {
+                "direction": "open",
+                "to": "ledge"
+              },
+              "desc": "the top of a short flight of wooden steps going DOWN from the landing's edge to a narrow plank walkway on stilts that runs along the bathhouse wall"
+            },
+            {
+              "id": "seam_right",
+              "at": "on the far right",
+              "desc": "the right half of the calm view directly behind the viewer: the dark red-lacquered outside wall of the bathhouse, plain boards and beams, calm and even, joining its other half cleanly at the seam directly behind you"
+            }
+          ],
+          "soundBed": "a little landing outside the boiler room: the furnace roaring through the door, wind, the lake lapping below.",
+          "rigid": "the landing and its railing, the stairs, the barrel and basket, the door, the steps",
+          "atmosphere": "snug and secret, firelight spilling from the door into the violet dusk",
+          "styleLight": "early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red",
+          "negatives": "No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. The narrow stairs go UP to the bridge and the short steps go DOWN to the walkway; ONE small door into the bathhouse.",
+          "states": {},
+          "continuity": [],
+          "scaffold": {
+            "kind": "skeleton",
+            "layout": {
+              "surface": "court",
+              "word": "landing",
+              "floor": "plank landing",
+              "size": [
+                2.2,
+                2.2,
+                3,
+                3
+              ],
+              "sides": {
+                "left": "houses",
+                "right": "railing",
+                "front": "houses",
+                "back": "railing"
+              },
+              "parts": [
+                [
+                  "stair_up",
+                  "stairs_up"
+                ],
+                [
+                  "prop",
+                  "barrel_basket",
+                  {
+                    "size": [
+                      0.6,
+                      0.6,
+                      0.9
+                    ]
+                  }
+                ],
+                [
+                  "door",
+                  "boiler_door",
+                  {
+                    "w": 1.0,
+                    "h": 2.0,
+                    "say": "the small open door into the boiler room, the planks running level over its sill"
+                  }
+                ],
+                [
+                  "stair_down",
+                  "steps_down"
+                ]
+              ]
+            }
+          },
+          "stillOnly": true
+        },
+        "plateRefs": [
+          "bridge/scene.png"
+        ],
+        "scenePrompt": "This is a seamless 360-degree panorama from a small square wooden landing on tall stilts, built against the lower outside wall of a colossal, whimsical spirit bathhouse in old Japan, built entirely of wood: red-lacquered pillars and beams, green-painted rails and panels, gold trim and gold ornaments, yellow paper screens, curved tiled roofs stacked storey on storey like a grand pagoda; hand-painted animated-film look, rich saturated colour, soft painterly detail, low down above a vast still shallow lake at dusk. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the dark red-lacquered outside wall of the bathhouse, plain boards and beams, calm and even: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: the dark red-lacquered outside wall of the bathhouse, plain boards and beams, calm and even, joining its other half cleanly at the seam directly behind you; to the left, the foot of a very narrow, steep wooden staircase with a thin handrail, starting at the landing and climbing up the outside wall of the bathhouse toward the lantern-lit bridge high above; just left of centre, an old wooden water barrel by the wall, on its lid a woven basket of herb bundles tied with red string; dead ahead in the centre, a small wooden door in the bathhouse wall standing open, hot orange firelight and steam pouring out of the boiler room inside, the landing's planks running level over its sill; just right of centre, over the landing's red railing, the vast still lake below, mirror-smooth, glowing violet and rose, soft mist far out on the water; to the right, the top of a short flight of wooden steps going DOWN from the landing's edge to a narrow plank walkway on stilts that runs along the bathhouse wall; on the far right, the right half of the calm view directly behind the viewer: the dark red-lacquered outside wall of the bathhouse, plain boards and beams, calm and even, joining its other half cleanly at the seam directly behind you. snug and secret, firelight spilling from the door into the violet dusk. No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. The narrow stairs go UP to the bridge and the short steps go DOWN to the walkway; ONE small door into the bathhouse. Shot on a full-frame DSLR at 24mm, f/8, early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into the dark red-lacquered outside wall of the bathhouse, plain boards and beams, calm and even, with no visible seam, join, or repetition.",
+        "seam": {
+          "stage": "screened",
+          "band": "mid",
+          "ratio": 2.56,
+          "delta": 2.78,
+          "needsWork": false,
+          "accepted": false,
+          "seamBandRun": 0.017,
+          "seamStepRatio": 0.0,
+          "at": "2026-11-02T22:55:59"
+        }
+      },
+      "mapPos": {
+        "c": 2,
+        "r": 4
+      },
+      "panorama": "landing/scene.png",
+      "builtFrom": "l1_landing_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "hotspots": [
+        {
+          "id": "up_the_narrow_stairs_to_the_bridge",
+          "type": "door",
+          "label": "Up the narrow stairs to the bridge",
+          "box": [
+            0.15,
+            0.15,
+            0.25,
+            0.68
+          ],
+          "direction": "back",
+          "to": "bridge",
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "the_basket_on_the_barrel",
+          "type": "station",
+          "label": "The basket on the barrel",
+          "box": [
+            0.258,
+            0.42,
+            0.36,
+            0.8
+          ],
+          "tier": 2,
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "into_the_boiler_room",
+          "type": "door",
+          "label": "Into the boiler room",
+          "box": [
+            0.405,
+            0.14,
+            0.565,
+            0.7
+          ],
+          "direction": "back",
+          "to": "boiler",
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "down_the_steps_to_the_ledge",
+          "type": "door",
+          "label": "Down the steps to the ledge",
+          "box": [
+            0.7,
+            0.6,
+            0.86,
+            0.86
+          ],
+          "direction": "open",
+          "to": "ledge",
+          "boxSource": "moved:agent"
+        }
+      ]
+    },
+    {
+      "key": "ledge",
+      "title": "The ledge",
+      "built": true,
+      "unlockedWhen": true,
+      "designNote": "Station (LEVEL 2, 2 herb bundles; 4 doors from the tub): the basket on the ledge. Doors: up the steps to the landing, down the ladder to the dock.",
+      "plannedHotspots": [
+        {
+          "type": "door",
+          "direction": "back",
+          "to": "landing",
+          "label": "Up the steps to the landing",
+          "box": [
+            0.14,
+            0.08,
+            0.27,
+            0.76
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "station",
+          "tier": 2,
+          "label": "The basket on the ledge",
+          "box": [
+            0.3,
+            0.42,
+            0.43,
+            0.63
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "to": "dock",
+          "label": "Down the ladder to the dock",
+          "box": [
+            0.645,
+            0.47,
+            0.715,
+            0.88
+          ],
+          "boxSource": "moved:agent"
+        }
+      ],
+      "authoring": {
+        "sceneSpec": {
+          "room": "ledge",
+          "setting": "a narrow plank walkway held up on a tall criss-cross scaffold of wooden stilts, running along the lower outside wall of a colossal, whimsical spirit bathhouse in old Japan, built entirely of wood: red-lacquered pillars and beams, green-painted rails and panels, gold trim and gold ornaments, yellow paper screens, curved tiled roofs stacked storey on storey like a grand pagoda; hand-painted animated-film look, rich saturated colour, soft painterly detail, high above a vast still shallow lake at dusk",
+          "interior": false,
+          "indoor": false,
+          "seam": "the dark red-lacquered outside wall of the bathhouse, plain boards and beams, calm and even",
+          "seamOccluder": "a tall wooden scaffold pole lashed with rope",
+          "elements": [
+            {
+              "id": "seam_left",
+              "at": "on the far left",
+              "desc": "the left half of the calm view directly behind the viewer: the dark red-lacquered outside wall of the bathhouse, plain boards and beams, calm and even, joining its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "steps_up",
+              "at": "to the left",
+              "label": "Up the steps to the landing",
+              "door": {
+                "direction": "back",
+                "to": "landing"
+              },
+              "desc": "a short flight of wooden steps climbing up from the walkway to a little lantern-lit landing by a glowing door"
+            },
+            {
+              "id": "ledge_basket",
+              "at": "just left of centre",
+              "label": "The basket on the ledge",
+              "station": 2,
+              "desc": "a wide wooden ledge jutting out from the bathhouse wall at waist height, on it a woven basket of herb bundles tied with red string"
+            },
+            {
+              "id": "walkway",
+              "at": "dead ahead in the centre",
+              "desc": "the narrow plank walkway running on ahead along the bathhouse wall, a simple rope railing on its outer side, the criss-cross wooden scaffold of stilts dropping away beneath it to the water"
+            },
+            {
+              "id": "ladder_down",
+              "at": "just right of centre",
+              "label": "Down the ladder to the dock",
+              "door": {
+                "direction": "open",
+                "to": "dock"
+              },
+              "desc": "a gap in the rope railing where a long wooden ladder goes DOWN the scaffold to a small wooden dock on the water far below, a lantern hanging at its top"
+            },
+            {
+              "id": "lake_right",
+              "at": "to the right",
+              "desc": "the vast still lake spreading away below, mirror-smooth, mist drifting far out on the water"
+            },
+            {
+              "id": "seam_right",
+              "at": "on the far right",
+              "desc": "the right half of the calm view directly behind the viewer: the dark red-lacquered outside wall of the bathhouse, plain boards and beams, calm and even, joining its other half cleanly at the seam directly behind you"
+            }
+          ],
+          "soundBed": "a high walkway on stilts: wind creaking in the scaffold, ropes tapping, the lake lapping far below.",
+          "rigid": "the walkway, the scaffold and stilts, the ledge and basket, the steps, the ladder, the rope railing",
+          "atmosphere": "airy and a little daring, lanterns glowing along the wall against the dusk",
+          "styleLight": "early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red",
+          "negatives": "No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. ONE walkway, held up on wooden stilts; the steps go UP to the landing and the ladder goes DOWN to the dock.",
+          "states": {},
+          "continuity": [],
+          "scaffold": {
+            "kind": "skeleton",
+            "layout": {
+              "surface": "court",
+              "word": "walkway",
+              "floor": "plank walkway",
+              "size": [
+                1.2,
+                1.2,
+                7,
+                3
+              ],
+              "sides": {
+                "left": "houses",
+                "right": "drop",
+                "front": "drop",
+                "back": "drop"
+              },
+              "parts": [
+                [
+                  "stair_up",
+                  "steps_up"
+                ],
+                [
+                  "prop",
+                  "ledge_basket",
+                  {
+                    "size": [
+                      1.0,
+                      0.5,
+                      1.0
+                    ],
+                    "kind": "wall"
+                  }
+                ],
+                [
+                  "stair_down",
+                  "ladder_down"
+                ]
+              ]
+            }
+          },
+          "stillOnly": true
+        },
+        "plateRefs": [
+          "bridge/scene.png"
+        ],
+        "scenePrompt": "This is a seamless 360-degree panorama from a narrow plank walkway held up on a tall criss-cross scaffold of wooden stilts, running along the lower outside wall of a colossal, whimsical spirit bathhouse in old Japan, built entirely of wood: red-lacquered pillars and beams, green-painted rails and panels, gold trim and gold ornaments, yellow paper screens, curved tiled roofs stacked storey on storey like a grand pagoda; hand-painted animated-film look, rich saturated colour, soft painterly detail, high above a vast still shallow lake at dusk. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the dark red-lacquered outside wall of the bathhouse, plain boards and beams, calm and even: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: the dark red-lacquered outside wall of the bathhouse, plain boards and beams, calm and even, joining its other half cleanly at the seam directly behind you; to the left, a short flight of wooden steps climbing up from the walkway to a little lantern-lit landing by a glowing door; just left of centre, a wide wooden ledge jutting out from the bathhouse wall at waist height, on it a woven basket of herb bundles tied with red string; dead ahead in the centre, the narrow plank walkway running on ahead along the bathhouse wall, a simple rope railing on its outer side, the criss-cross wooden scaffold of stilts dropping away beneath it to the water; just right of centre, a gap in the rope railing where a long wooden ladder goes DOWN the scaffold to a small wooden dock on the water far below, a lantern hanging at its top; to the right, the vast still lake spreading away below, mirror-smooth, mist drifting far out on the water; on the far right, the right half of the calm view directly behind the viewer: the dark red-lacquered outside wall of the bathhouse, plain boards and beams, calm and even, joining its other half cleanly at the seam directly behind you. airy and a little daring, lanterns glowing along the wall against the dusk. No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. ONE walkway, held up on wooden stilts; the steps go UP to the landing and the ladder goes DOWN to the dock. Shot on a full-frame DSLR at 24mm, f/8, early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into the dark red-lacquered outside wall of the bathhouse, plain boards and beams, calm and even, with no visible seam, join, or repetition.",
+        "seam": {
+          "stage": "screened",
+          "band": "mid",
+          "ratio": 2.24,
+          "delta": 2.86,
+          "needsWork": false,
+          "accepted": false,
+          "seamBandRun": 0.008,
+          "seamStepRatio": 0.0,
+          "at": "2026-11-02T22:57:38"
+        }
+      },
+      "mapPos": {
+        "c": 3,
+        "r": 4
+      },
+      "panorama": "ledge/scene.png",
+      "builtFrom": "l1_ledge_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "hotspots": [
+        {
+          "id": "up_the_steps_to_the_landing",
+          "type": "door",
+          "label": "Up the steps to the landing",
+          "box": [
+            0.14,
+            0.08,
+            0.27,
+            0.76
+          ],
+          "direction": "back",
+          "to": "landing",
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "the_basket_on_the_ledge",
+          "type": "station",
+          "label": "The basket on the ledge",
+          "box": [
+            0.3,
+            0.42,
+            0.43,
+            0.63
+          ],
+          "tier": 2,
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "down_the_ladder_to_the_dock",
+          "type": "door",
+          "label": "Down the ladder to the dock",
+          "box": [
+            0.645,
+            0.47,
+            0.715,
+            0.88
+          ],
+          "direction": "open",
+          "to": "dock",
+          "boxSource": "moved:agent"
+        }
+      ]
+    },
+    {
+      "key": "dock",
+      "title": "The dock",
+      "built": true,
+      "unlockedWhen": true,
+      "designNote": "Station (LEVEL 2, 2 herb bundles; 5 doors from the tub): the basket on the mooring crate. Doors: up the ladder to the ledge, into the bucket boat.",
+      "plannedHotspots": [
+        {
+          "type": "door",
+          "direction": "back",
+          "to": "ledge",
+          "label": "Up the ladder to the ledge",
+          "box": [
+            0.14,
+            0.05,
+            0.24,
+            0.72
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "station",
+          "tier": 2,
+          "label": "The basket on the mooring crate",
+          "box": [
+            0.245,
+            0.55,
+            0.375,
+            0.88
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "to": "boat",
+          "label": "Into the bucket boat",
+          "box": [
+            0.45,
+            0.48,
+            0.635,
+            0.72
+          ],
+          "boxSource": "moved:agent"
+        }
+      ],
+      "authoring": {
+        "sceneSpec": {
+          "room": "dock",
+          "setting": "a small wooden dock on the still water at the very foot of the stilts and scaffolding under a colossal, whimsical spirit bathhouse in old Japan, built entirely of wood: red-lacquered pillars and beams, green-painted rails and panels, gold trim and gold ornaments, yellow paper screens, curved tiled roofs stacked storey on storey like a grand pagoda; hand-painted animated-film look, rich saturated colour, soft painterly detail, a vast still shallow lake stretching away into soft mist at dusk",
+          "interior": false,
+          "indoor": false,
+          "seam": "the calm mirror-smooth lake stretching away into soft mist under the violet sky",
+          "seamOccluder": "a thick wooden mooring post wrapped in rope",
+          "elements": [
+            {
+              "id": "seam_left",
+              "at": "on the far left",
+              "desc": "the left half of the calm view directly behind the viewer: the calm mirror-smooth lake stretching away into soft mist under the violet sky, joining its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "ladder_up",
+              "at": "to the left",
+              "label": "Up the ladder to the ledge",
+              "door": {
+                "direction": "back",
+                "to": "ledge"
+              },
+              "desc": "the foot of a long wooden ladder climbing straight up the criss-cross scaffold of stilts to a plank walkway along the towering, lantern-lit bathhouse wall high above"
+            },
+            {
+              "id": "crate_basket",
+              "at": "just left of centre",
+              "label": "The basket on the mooring crate",
+              "station": 2,
+              "desc": "a wooden crate by a coil of rope on the dock, on it a woven basket of herb bundles tied with red string"
+            },
+            {
+              "id": "boat",
+              "at": "dead ahead in the centre",
+              "label": "Into the bucket boat",
+              "door": {
+                "direction": "open",
+                "to": "boat"
+              },
+              "desc": "a big round wooden bucket boat, like a giant bath bucket made of curved wooden staves bound with dark iron hoops, a long wooden punting pole leaning in it and a little paper lantern on a hooked pole, tied up at the end of the dock, bobbing on the still water, its rim low beside the planks so you could step straight in"
+            },
+            {
+              "id": "far_lake",
+              "at": "to the right",
+              "desc": "the still lake reaching away into soft white mist, a faint glimmer of a lamp far out on the water"
+            },
+            {
+              "id": "seam_right",
+              "at": "on the far right",
+              "desc": "the right half of the calm view directly behind the viewer: the calm mirror-smooth lake stretching away into soft mist under the violet sky, joining its other half cleanly at the seam directly behind you"
+            }
+          ],
+          "soundBed": "a little dock at dusk: water slapping the stilts, the boat knocking softly, the bathhouse humming high above.",
+          "rigid": "the dock, the stilts and scaffold, the ladder, the crate and basket, the bucket boat, the mooring post",
+          "atmosphere": "quiet, watery and magical, the bathhouse glowing high overhead",
+          "styleLight": "early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red",
+          "negatives": "No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. ONE bucket boat only; no other boats; the ladder goes UP to the walkway.",
+          "states": {},
+          "continuity": [],
+          "scaffold": {
+            "kind": "skeleton",
+            "layout": {
+              "surface": "court",
+              "word": "dock",
+              "floor": "weathered plank dock",
+              "size": [
+                2,
+                2,
+                5,
+                3
+              ],
+              "sides": {
+                "left": "houses",
+                "right": "water",
+                "front": "water",
+                "back": "water"
+              },
+              "parts": [
+                [
+                  "stair_up",
+                  "ladder_up"
+                ],
+                [
+                  "prop",
+                  "crate_basket",
+                  {
+                    "size": [
+                      0.7,
+                      0.6,
+                      0.6
+                    ]
+                  }
+                ],
+                [
+                  "door",
+                  "boat",
+                  {
+                    "w": 1.4,
+                    "h": 1.0,
+                    "say": "the bucket boat tied up at the end of the dock, its rim level with the planks"
+                  }
+                ]
+              ]
+            }
+          },
+          "stillOnly": true
+        },
+        "plateRefs": [
+          "bridge/scene.png"
+        ],
+        "scenePrompt": "This is a seamless 360-degree panorama from a small wooden dock on the still water at the very foot of the stilts and scaffolding under a colossal, whimsical spirit bathhouse in old Japan, built entirely of wood: red-lacquered pillars and beams, green-painted rails and panels, gold trim and gold ornaments, yellow paper screens, curved tiled roofs stacked storey on storey like a grand pagoda; hand-painted animated-film look, rich saturated colour, soft painterly detail, a vast still shallow lake stretching away into soft mist at dusk. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the calm mirror-smooth lake stretching away into soft mist under the violet sky: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: the calm mirror-smooth lake stretching away into soft mist under the violet sky, joining its other half cleanly at the seam directly behind you; to the left, the foot of a long wooden ladder climbing straight up the criss-cross scaffold of stilts to a plank walkway along the towering, lantern-lit bathhouse wall high above; just left of centre, a wooden crate by a coil of rope on the dock, on it a woven basket of herb bundles tied with red string; dead ahead in the centre, a big round wooden bucket boat, like a giant bath bucket made of curved wooden staves bound with dark iron hoops, a long wooden punting pole leaning in it and a little paper lantern on a hooked pole, tied up at the end of the dock, bobbing on the still water, its rim low beside the planks so you could step straight in; to the right, the still lake reaching away into soft white mist, a faint glimmer of a lamp far out on the water; on the far right, the right half of the calm view directly behind the viewer: the calm mirror-smooth lake stretching away into soft mist under the violet sky, joining its other half cleanly at the seam directly behind you. quiet, watery and magical, the bathhouse glowing high overhead. No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. ONE bucket boat only; no other boats; the ladder goes UP to the walkway. Shot on a full-frame DSLR at 24mm, f/8, early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into the calm mirror-smooth lake stretching away into soft mist under the violet sky, with no visible seam, join, or repetition.",
+        "seam": {
+          "stage": "screened",
+          "band": "sky",
+          "ratio": 2.01,
+          "delta": 1.8,
+          "needsWork": false,
+          "accepted": false,
+          "seamBandRun": 0.013,
+          "seamStepRatio": 0.0,
+          "at": "2026-11-02T22:59:16"
+        }
+      },
+      "mapPos": {
+        "c": 4,
+        "r": 4
+      },
+      "panorama": "dock/scene.png",
+      "builtFrom": "l1_dock_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "hotspots": [
+        {
+          "id": "up_the_ladder_to_the_ledge",
+          "type": "door",
+          "label": "Up the ladder to the ledge",
+          "box": [
+            0.14,
+            0.05,
+            0.24,
+            0.72
+          ],
+          "direction": "back",
+          "to": "ledge",
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "the_basket_on_the_mooring_crate",
+          "type": "station",
+          "label": "The basket on the mooring crate",
+          "box": [
+            0.245,
+            0.55,
+            0.375,
+            0.88
+          ],
+          "tier": 2,
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "into_the_bucket_boat",
+          "type": "door",
+          "label": "Into the bucket boat",
+          "box": [
+            0.45,
+            0.48,
+            0.635,
+            0.72
+          ],
+          "direction": "open",
+          "to": "boat",
+          "boxSource": "moved:agent"
+        }
+      ]
+    },
+    {
+      "key": "boat",
+      "title": "The bucket boat",
+      "built": true,
+      "unlockedWhen": true,
+      "designNote": "Station (LEVEL 3, 3 herb bundles; 6 doors from the tub): the basket in the bottom of the boat. Mid-crossing on the lake: row on to the dock under the bathhouse, or back to the lonely station.",
+      "plannedHotspots": [
+        {
+          "type": "door",
+          "direction": "back",
+          "to": "dock",
+          "label": "Row across to the dock",
+          "box": [
+            0.1,
+            0.25,
+            0.36,
+            0.56
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "station",
+          "tier": 3,
+          "label": "The basket in the boat",
+          "box": [
+            0.27,
+            0.8,
+            0.45,
+            0.96
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "to": "lonely",
+          "label": "Row back to the lonely station",
+          "box": [
+            0.785,
+            0.38,
+            0.91,
+            0.6
+          ],
+          "boxSource": "moved:agent"
+        }
+      ],
+      "authoring": {
+        "sceneSpec": {
+          "room": "boat",
+          "setting": "sitting inside a big round wooden bucket boat, like a giant bath bucket made of curved wooden staves bound with dark iron hoops, a long wooden punting pole leaning in it and a little paper lantern on a hooked pole, halfway across a vast still shallow lake at dusk, soft white mist on the water, the huge glowing bathhouse on its cliff on one side and a tiny lonely railway halt in the mist on the other",
+          "interior": false,
+          "indoor": false,
+          "seam": "the calm mirror-smooth lake and soft white mist under the violet sky, seen over the curved wooden rim",
+          "seamOccluder": "the long wooden punting pole standing upright in the boat",
+          "elements": [
+            {
+              "id": "seam_left",
+              "at": "on the far left",
+              "desc": "the left half of the calm view directly behind the viewer: the calm mirror-smooth lake and soft white mist under the violet sky, seen over the curved wooden rim, joining its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "to_dock",
+              "at": "to the left",
+              "label": "Row across to the dock",
+              "door": {
+                "direction": "back",
+                "to": "dock"
+              },
+              "desc": "over the boat's curved wooden rim, a little way off across the water, a small wooden dock at the foot of tall stilts and scaffolding, and above it the colossal bathhouse towering up, glowing with lanterns"
+            },
+            {
+              "id": "boat_basket",
+              "at": "just left of centre",
+              "label": "The basket in the boat",
+              "station": 3,
+              "desc": "in the bottom of the boat, on the curved wooden floor, a woven basket of herb bundles tied with red string"
+            },
+            {
+              "id": "lantern_pole",
+              "at": "dead ahead in the centre",
+              "desc": "the little paper lantern glowing on its hooked pole at the boat's rim, its warm light on the water"
+            },
+            {
+              "id": "to_lonely",
+              "at": "to the right",
+              "label": "Row back to the lonely station",
+              "door": {
+                "direction": "open",
+                "to": "lonely"
+              },
+              "desc": "over the rim, a little way off in the mist, a tiny lonely railway halt: a short plank platform, a little wooden shelter and one dim round lamp, alone on the water"
+            },
+            {
+              "id": "seam_right",
+              "at": "on the far right",
+              "desc": "the right half of the calm view directly behind the viewer: the calm mirror-smooth lake and soft white mist under the violet sky, seen over the curved wooden rim, joining its other half cleanly at the seam directly behind you"
+            }
+          ],
+          "soundBed": "a little boat on still water: the pole dipping, water lapping the staves, mist hushing everything.",
+          "rigid": "the bucket boat's staves and hoops, the basket, the lantern and pole, the dock, the halt, the bathhouse",
+          "atmosphere": "dreamy, hushed and a little adventurous, adrift between two glowing shores",
+          "styleLight": "early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red",
+          "negatives": "No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. ONE bucket boat (the one you sit in); no other boats on the water; no train in view.",
+          "states": {},
+          "continuity": [],
+          "scaffold": {
+            "kind": "skeleton",
+            "layout": {
+              "surface": "court",
+              "word": "boat floor",
+              "floor": "curved wooden floor of the bucket boat",
+              "size": [
+                1.2,
+                1.2,
+                2.4,
+                1.0
+              ],
+              "sides": {
+                "left": "water",
+                "right": "water",
+                "front": "water",
+                "back": "water"
+              },
+              "parts": [
+                [
+                  "door",
+                  "to_dock",
+                  {
+                    "w": 2.0,
+                    "h": 2.0,
+                    "say": "the dock across the water, low beyond the boat's rim"
+                  }
+                ],
+                [
+                  "prop",
+                  "boat_basket",
+                  {
+                    "size": [
+                      0.5,
+                      0.5,
+                      0.3
+                    ]
+                  }
+                ],
+                [
+                  "door",
+                  "to_lonely",
+                  {
+                    "w": 1.6,
+                    "h": 1.6,
+                    "say": "the lonely halt across the water, low beyond the boat's rim"
+                  }
+                ]
+              ]
+            }
+          },
+          "stillOnly": true
+        },
+        "plateRefs": [
+          "lonely/scene.png"
+        ],
+        "scenePrompt": "This is a seamless 360-degree panorama from sitting inside a big round wooden bucket boat, like a giant bath bucket made of curved wooden staves bound with dark iron hoops, a long wooden punting pole leaning in it and a little paper lantern on a hooked pole, halfway across a vast still shallow lake at dusk, soft white mist on the water, the huge glowing bathhouse on its cliff on one side and a tiny lonely railway halt in the mist on the other. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the calm mirror-smooth lake and soft white mist under the violet sky, seen over the curved wooden rim: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: the calm mirror-smooth lake and soft white mist under the violet sky, seen over the curved wooden rim, joining its other half cleanly at the seam directly behind you; to the left, over the boat's curved wooden rim, a little way off across the water, a small wooden dock at the foot of tall stilts and scaffolding, and above it the colossal bathhouse towering up, glowing with lanterns; just left of centre, in the bottom of the boat, on the curved wooden floor, a woven basket of herb bundles tied with red string; dead ahead in the centre, the little paper lantern glowing on its hooked pole at the boat's rim, its warm light on the water; to the right, over the rim, a little way off in the mist, a tiny lonely railway halt: a short plank platform, a little wooden shelter and one dim round lamp, alone on the water; on the far right, the right half of the calm view directly behind the viewer: the calm mirror-smooth lake and soft white mist under the violet sky, seen over the curved wooden rim, joining its other half cleanly at the seam directly behind you. dreamy, hushed and a little adventurous, adrift between two glowing shores. No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. ONE bucket boat (the one you sit in); no other boats on the water; no train in view. Shot on a full-frame DSLR at 24mm, f/8, early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into the calm mirror-smooth lake and soft white mist under the violet sky, seen over the curved wooden rim, with no visible seam, join, or repetition.",
+        "seam": {
+          "stage": "blurred",
+          "band": "sky",
+          "ratio": 0.0,
+          "delta": 0.0,
+          "needsWork": false,
+          "accepted": false,
+          "seamBandRun": 0.0,
+          "seamStepRatio": 0.0,
+          "at": "2026-11-02T23:03:41"
+        }
+      },
+      "mapPos": {
+        "c": 3,
+        "r": 5
+      },
+      "panorama": "boat/scene.png",
+      "builtFrom": "l1_boat_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "hotspots": [
+        {
+          "id": "row_across_to_the_dock",
+          "type": "door",
+          "label": "Row across to the dock",
+          "box": [
+            0.1,
+            0.25,
+            0.36,
+            0.56
+          ],
+          "direction": "back",
+          "to": "dock",
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "the_basket_in_the_boat",
+          "type": "station",
+          "label": "The basket in the boat",
+          "box": [
+            0.27,
+            0.8,
+            0.45,
+            0.96
+          ],
+          "tier": 3,
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "row_back_to_the_lonely_station",
+          "type": "door",
+          "label": "Row back to the lonely station",
+          "box": [
+            0.785,
+            0.38,
+            0.91,
+            0.6
+          ],
+          "direction": "open",
+          "to": "lonely",
+          "boxSource": "moved:agent"
+        }
+      ]
+    },
+    {
+      "key": "elevator",
+      "title": "The elevator",
+      "built": true,
+      "unlockedWhen": true,
+      "designNote": "THE FLOOR LEVER (dial lift_floor: hallway / atrium / kitchen; starts at the atrium) sets where the one gate opens: up to the guest hallway, the atrium, or down to the kitchen. No station.",
+      "plannedHotspots": [
+        {
+          "type": "dial",
+          "label": "The floor lever",
+          "key": "lift_floor",
+          "default": "atrium",
+          "fadeBlackMs": 900,
+          "states": [
+            {
+              "value": "hallway",
+              "label": "Up to the guest hallway",
+              "toast": "Clank, whirr: the elevator rises to the guest hallway."
+            },
+            {
+              "value": "atrium",
+              "label": "The atrium",
+              "toast": "The elevator settles at the atrium."
+            },
+            {
+              "value": "kitchen",
+              "label": "Down to the kitchen",
+              "toast": "Down, down, down: the elevator sinks to the kitchen."
+            }
+          ],
+          "hint": "Pull the lever to choose a floor, then step out through the gate.",
+          "box": [
+            0.232,
+            0.37,
+            0.288,
+            0.78
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "door",
+          "direction": "back",
+          "to": "atrium",
+          "label": "Step out of the elevator",
+          "variants": [
+            {
+              "state": "to_hallway",
+              "when": {
+                "eq": [
+                  "lift_floor",
+                  "hallway"
+                ]
+              },
+              "to": "hallway",
+              "direction": "open"
+            },
+            {
+              "state": "to_kitchen",
+              "when": {
+                "eq": [
+                  "lift_floor",
+                  "kitchen"
+                ]
+              },
+              "to": "kitchen",
+              "direction": "open"
+            }
+          ],
+          "box": [
+            0.37,
+            0.06,
+            0.63,
+            0.78
+          ],
+          "boxSource": "moved:agent"
+        }
+      ],
+      "authoring": {
+        "sceneSpec": {
+          "room": "elevator",
+          "setting": "inside the old wooden-and-brass elevator car of a colossal, whimsical spirit bathhouse in old Japan, built entirely of wood: red-lacquered pillars and beams, green-painted rails and panels, gold trim and gold ornaments, yellow paper screens, curved tiled roofs stacked storey on storey like a grand pagoda; hand-painted animated-film look, rich saturated colour, soft painterly detail, small, ornate and lamp-lit",
+          "interior": true,
+          "indoor": true,
+          "seam": "a plain stretch of dark polished wooden car wall with brass trim, uniform and unbroken",
+          "seamOccluder": "a polished brass handrail post, floor to ceiling",
+          "elements": [
+            {
+              "id": "seam_left",
+              "at": "on the far left",
+              "desc": "the left half of the calm view directly behind the viewer: a plain stretch of dark polished wooden car wall with brass trim, uniform and unbroken, joining its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "car_wall_left",
+              "at": "to the left",
+              "desc": "the car's side wall of dark polished wood panels with gold trim and a little glowing lamp"
+            },
+            {
+              "id": "floor_lever",
+              "at": "just left of centre",
+              "label": "The floor lever",
+              "dial": true,
+              "desc": "a tall polished brass lever standing up from the car floor in a curved brass slot with three notches, a round brass knob on top, gleaming in the lamplight"
+            },
+            {
+              "id": "gate",
+              "at": "dead ahead in the centre",
+              "label": "Step out of the elevator",
+              "door": {
+                "direction": "back",
+                "to": "atrium",
+                "variants": [
+                  {
+                    "state": "to_hallway",
+                    "when": {
+                      "eq": [
+                        "lift_floor",
+                        "hallway"
+                      ]
+                    },
+                    "to": "hallway",
+                    "direction": "open"
+                  },
+                  {
+                    "state": "to_kitchen",
+                    "when": {
+                      "eq": [
+                        "lift_floor",
+                        "kitchen"
+                      ]
+                    },
+                    "to": "kitchen",
+                    "direction": "open"
+                  }
+                ]
+              },
+              "desc": "the car's folding brass gate standing open, the car floor level with the floor outside; through it, the grand lantern-lit atrium of the bathhouse, red pillars and galleries rising"
+            },
+            {
+              "id": "car_wall_right",
+              "at": "to the right",
+              "desc": "the car's other side wall of dark polished wood panels with gold trim, a brass handrail along it"
+            },
+            {
+              "id": "seam_right",
+              "at": "on the far right",
+              "desc": "the right half of the calm view directly behind the viewer: a plain stretch of dark polished wooden car wall with brass trim, uniform and unbroken, joining its other half cleanly at the seam directly behind you"
+            }
+          ],
+          "soundBed": "inside an old elevator: cables humming, a soft clank, the bathhouse murmuring through the gate.",
+          "rigid": "the car walls, the brass lever, the gate, the lamps, the handrail",
+          "atmosphere": "cosy, gleaming and a little old-fashioned, warm lamplight on brass",
+          "styleLight": "early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red",
+          "negatives": "No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. The car is EMPTY; ONE gate, ONE brass lever; no buttons or dials with numbers.",
+          "states": {
+            "at_hallway": {
+              "change": "what is seen OUTSIDE, through the open gate",
+              "elements": {
+                "gate": {
+                  "desc": "through the open gate, a long narrow upper-floor corridor lined with glowing sliding paper doors, paper lanterns hanging from its low beamed ceiling; no atrium, no galleries"
+                }
+              },
+              "constraints": "Inside the car nothing changes: the walls, the brass lever, the lamps, the handrail, the floor and the gate frame stay exactly as they are. No people, no text.",
+              "stillOnly": true
+            },
+            "at_kitchen": {
+              "change": "what is seen OUTSIDE, through the open gate",
+              "elements": {
+                "gate": {
+                  "desc": "through the open gate, a big busy bathhouse kitchen in the basement: iron stoves with steaming pots, a long wooden counter, strings of garlic and lanterns; no atrium, no galleries"
+                }
+              },
+              "constraints": "Inside the car nothing changes: the walls, the brass lever, the lamps, the handrail, the floor and the gate frame stay exactly as they are. No people, no text.",
+              "stillOnly": true
+            }
+          },
+          "continuity": [],
+          "scaffold": {
+            "kind": "skeleton",
+            "layout": {
+              "surface": "room",
+              "word": "floor",
+              "floor": "patterned wooden car floor",
+              "size": [
+                0.9,
+                0.9,
+                1.6,
+                2.4
+              ],
+              "sides": {
+                "left": "houses",
+                "right": "houses",
+                "front": "houses",
+                "back": "houses"
+              },
+              "parts": [
+                [
+                  "door",
+                  "gate",
+                  {
+                    "w": 1.2,
+                    "h": 2.2,
+                    "say": "the open folding gate, the car floor level with the floor outside"
+                  }
+                ],
+                [
+                  "prop",
+                  "floor_lever",
+                  {
+                    "size": [
+                      0.2,
+                      0.2,
+                      1.0
+                    ]
+                  }
+                ]
+              ]
+            }
+          },
+          "stillOnly": true
+        },
+        "plateRefs": [
+          "atrium/scene.png"
+        ],
+        "scenePrompt": "This is a seamless 360-degree panorama from inside the old wooden-and-brass elevator car of a colossal, whimsical spirit bathhouse in old Japan, built entirely of wood: red-lacquered pillars and beams, green-painted rails and panels, gold trim and gold ornaments, yellow paper screens, curved tiled roofs stacked storey on storey like a grand pagoda; hand-painted animated-film look, rich saturated colour, soft painterly detail, small, ornate and lamp-lit. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stretch of dark polished wooden car wall with brass trim, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: a plain stretch of dark polished wooden car wall with brass trim, uniform and unbroken, joining its other half cleanly at the seam directly behind you; to the left, the car's side wall of dark polished wood panels with gold trim and a little glowing lamp; just left of centre, a tall polished brass lever standing up from the car floor in a curved brass slot with three notches, a round brass knob on top, gleaming in the lamplight; dead ahead in the centre, the car's folding brass gate standing open, the car floor level with the floor outside; through it, the grand lantern-lit atrium of the bathhouse, red pillars and galleries rising; to the right, the car's other side wall of dark polished wood panels with gold trim, a brass handrail along it; on the far right, the right half of the calm view directly behind the viewer: a plain stretch of dark polished wooden car wall with brass trim, uniform and unbroken, joining its other half cleanly at the seam directly behind you. cosy, gleaming and a little old-fashioned, warm lamplight on brass. No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. The car is EMPTY; ONE gate, ONE brass lever; no buttons or dials with numbers. Shot on a full-frame DSLR at 24mm, f/8, early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a plain stretch of dark polished wooden car wall with brass trim, uniform and unbroken, with no visible seam, join, or repetition.",
+        "seam": {
+          "stage": "blurred",
+          "band": "sky",
+          "ratio": 0.0,
+          "delta": 0.0,
+          "needsWork": false,
+          "accepted": false,
+          "seamBandRun": 0.0,
+          "seamStepRatio": 1.99,
+          "at": "2026-11-02T23:05:21"
+        }
+      },
+      "mapPos": {
+        "c": 4,
+        "r": 2
+      },
+      "panorama": "elevator/scene.png",
+      "builtFrom": "l1_elevator_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "hotspots": [
+        {
+          "id": "the_floor_lever",
+          "type": "dial",
+          "label": "The floor lever",
+          "box": [
+            0.232,
+            0.37,
+            0.288,
+            0.78
+          ],
+          "key": "lift_floor",
+          "default": "atrium",
+          "fadeBlackMs": 900,
+          "states": [
+            {
+              "value": "hallway",
+              "label": "Up to the guest hallway",
+              "toast": "Clank, whirr: the elevator rises to the guest hallway."
+            },
+            {
+              "value": "atrium",
+              "label": "The atrium",
+              "toast": "The elevator settles at the atrium."
+            },
+            {
+              "value": "kitchen",
+              "label": "Down to the kitchen",
+              "toast": "Down, down, down: the elevator sinks to the kitchen."
+            }
+          ],
+          "hint": "Pull the lever to choose a floor, then step out through the gate.",
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "step_out_of_the_elevator",
+          "type": "door",
+          "label": "Step out of the elevator",
+          "box": [
+            0.37,
+            0.06,
+            0.63,
+            0.78
+          ],
+          "direction": "back",
+          "to": "atrium",
+          "variants": [
+            {
+              "state": "to_hallway",
+              "when": {
+                "eq": [
+                  "lift_floor",
+                  "hallway"
+                ]
+              },
+              "to": "hallway",
+              "direction": "open"
+            },
+            {
+              "state": "to_kitchen",
+              "when": {
+                "eq": [
+                  "lift_floor",
+                  "kitchen"
+                ]
+              },
+              "to": "kitchen",
+              "direction": "open"
+            }
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "floor_view",
+          "type": "ambient",
+          "label": "Nightfall",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Full-scene state variant. `ambient` is filtered out of rendering, so this carrier shows no marker and intercepts no clicks; it exists only to hold the variant art.",
+          "variants": [
+            {
+              "state": "at_hallway",
+              "box": [
+                0,
+                0,
+                1,
+                1
+              ],
+              "prompt": "Keep this exact scene, composition, camera framing and every object precisely where it is, and change ONLY what is seen OUTSIDE, through the open gate: Through the open gate, a long narrow upper-floor corridor lined with glowing sliding paper doors, paper lanterns hanging from its low beamed ceiling; no atrium, no galleries. Inside the car nothing changes: the walls, the brass lever, the lamps, the handrail, the floor and the gate frame stay exactly as they are. No people, no text.",
+              "panorama": "elevator/scene_at_hallway.png",
+              "when": {
+                "eq": [
+                  "lift_floor",
+                  "hallway"
+                ]
+              }
+            },
+            {
+              "state": "at_kitchen",
+              "box": [
+                0,
+                0,
+                1,
+                1
+              ],
+              "prompt": "Keep this exact scene, composition, camera framing and every object precisely where it is, and change ONLY what is seen OUTSIDE, through the open gate: Through the open gate, a big busy bathhouse kitchen in the basement: iron stoves with steaming pots, a long wooden counter, strings of garlic and lanterns; no atrium, no galleries. Inside the car nothing changes: the walls, the brass lever, the lamps, the handrail, the floor and the gate frame stay exactly as they are. No people, no text.",
+              "panorama": "elevator/scene_at_kitchen.png",
+              "when": {
+                "eq": [
+                  "lift_floor",
+                  "kitchen"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "kitchen",
+      "title": "The kitchen",
+      "built": true,
+      "unlockedWhen": true,
+      "designNote": "THE KITCHEN COUNTER (a menu, level 3 like the restaurant's; pool `menu`): four dishes of its own (curry rice, fried tofu, red bean buns, grilled fish), each one extra minute once solved. No herb station. Back into the elevator only.",
+      "plannedHotspots": [
+        {
+          "type": "door",
+          "direction": "back",
+          "to": "elevator",
+          "label": "Back into the elevator",
+          "box": [
+            0.1,
+            0.2,
+            0.21,
+            0.68
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "menu",
+          "tier": 3,
+          "label": "The kitchen counter",
+          "dishes": [
+            "dish_curry",
+            "dish_tofu",
+            "dish_buns",
+            "dish_fish"
+          ],
+          "box": [
+            0.335,
+            0.56,
+            0.67,
+            0.86
+          ],
+          "boxSource": "moved:agent"
+        }
+      ],
+      "authoring": {
+        "sceneSpec": {
+          "room": "kitchen",
+          "setting": "the big, warm, bustling kitchen in the basement of a colossal, whimsical spirit bathhouse in old Japan, built entirely of wood: red-lacquered pillars and beams, green-painted rails and panels, gold trim and gold ornaments, yellow paper screens, curved tiled roofs stacked storey on storey like a grand pagoda; hand-painted animated-film look, rich saturated colour, soft painterly detail: dark wooden beams hung with lanterns, iron stoves, steam rising everywhere",
+          "interior": true,
+          "indoor": true,
+          "seam": "a plain stretch of smoke-darkened wooden kitchen wall hung with copper pans, uniform and unbroken",
+          "seamOccluder": "a thick dark wooden post, floor to ceiling",
+          "elements": [
+            {
+              "id": "seam_left",
+              "at": "on the far left",
+              "desc": "the left half of the calm view directly behind the viewer: a plain stretch of smoke-darkened wooden kitchen wall hung with copper pans, uniform and unbroken, joining its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "elevator_back",
+              "at": "to the left",
+              "label": "Back into the elevator",
+              "door": {
+                "direction": "back",
+                "to": "elevator"
+              },
+              "desc": "the brass elevator cage with its folding gate open, its car floor level with the kitchen floor"
+            },
+            {
+              "id": "stoves",
+              "at": "just left of centre",
+              "desc": "a long row of big black iron stoves with fires glowing in them, huge pots bubbling and woks steaming on top"
+            },
+            {
+              "id": "counter",
+              "at": "dead ahead in the centre",
+              "label": "The kitchen counter",
+              "menu": 3,
+              "desc": "close to the viewer, a long wooden serving counter with FOUR big dishes set out in a row, each under its own little hanging lantern: a pot of curry rice, a plate of golden fried tofu, a basket of round red bean buns, and a platter of grilled fish; food only, no writing"
+            },
+            {
+              "id": "pantry",
+              "at": "just right of centre",
+              "desc": "shelves stacked with rice sacks, barrels and jars, strings of garlic and onions and dried fish hanging above"
+            },
+            {
+              "id": "sink",
+              "at": "to the right",
+              "desc": "a big stone sink with a wooden water pump, racks of clean bowls and stacked steamer baskets beside it"
+            },
+            {
+              "id": "seam_right",
+              "at": "on the far right",
+              "desc": "the right half of the calm view directly behind the viewer: a plain stretch of smoke-darkened wooden kitchen wall hung with copper pans, uniform and unbroken, joining its other half cleanly at the seam directly behind you"
+            }
+          ],
+          "soundBed": "a busy kitchen: pots bubbling, fat sizzling, knives chopping, the stove fires roaring.",
+          "rigid": "the stoves and pots, the counter and its four dishes, the shelves, the sink and pump, the elevator",
+          "atmosphere": "hot, busy-feeling and delicious, steam glowing gold under the lanterns",
+          "styleLight": "early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red",
+          "negatives": "No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. The kitchen is EMPTY of cooks; the four dishes have no labels, words or numbers.",
+          "states": {},
+          "continuity": [],
+          "scaffold": {
+            "kind": "skeleton",
+            "layout": {
+              "surface": "room",
+              "word": "floor",
+              "floor": "worn stone-flagged kitchen floor",
+              "size": [
+                4,
+                4,
+                5,
+                3
+              ],
+              "sides": {
+                "left": "houses",
+                "right": "houses",
+                "front": "houses",
+                "back": "houses"
+              },
+              "parts": [
+                [
+                  "door",
+                  "elevator_back",
+                  {
+                    "w": 1.4,
+                    "h": 2.4,
+                    "say": "the open elevator car, its floor level with the kitchen floor"
+                  }
+                ],
+                [
+                  "prop",
+                  "stoves",
+                  {
+                    "size": [
+                      3.0,
+                      0.9,
+                      1.0
+                    ],
+                    "kind": "wall"
+                  }
+                ],
+                [
+                  "prop",
+                  "counter",
+                  {
+                    "size": [
+                      3.0,
+                      0.8,
+                      0.9
+                    ],
+                    "dist": 2.2
+                  }
+                ]
+              ]
+            }
+          },
+          "stillOnly": true
+        },
+        "plateRefs": [
+          "atrium/scene.png"
+        ],
+        "scenePrompt": "This is a seamless 360-degree panorama from the big, warm, bustling kitchen in the basement of a colossal, whimsical spirit bathhouse in old Japan, built entirely of wood: red-lacquered pillars and beams, green-painted rails and panels, gold trim and gold ornaments, yellow paper screens, curved tiled roofs stacked storey on storey like a grand pagoda; hand-painted animated-film look, rich saturated colour, soft painterly detail: dark wooden beams hung with lanterns, iron stoves, steam rising everywhere. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stretch of smoke-darkened wooden kitchen wall hung with copper pans, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: a plain stretch of smoke-darkened wooden kitchen wall hung with copper pans, uniform and unbroken, joining its other half cleanly at the seam directly behind you; to the left, the brass elevator cage with its folding gate open, its car floor level with the kitchen floor; just left of centre, a long row of big black iron stoves with fires glowing in them, huge pots bubbling and woks steaming on top; dead ahead in the centre, close to the viewer, a long wooden serving counter with FOUR big dishes set out in a row, each under its own little hanging lantern: a pot of curry rice, a plate of golden fried tofu, a basket of round red bean buns, and a platter of grilled fish; food only, no writing; just right of centre, shelves stacked with rice sacks, barrels and jars, strings of garlic and onions and dried fish hanging above; to the right, a big stone sink with a wooden water pump, racks of clean bowls and stacked steamer baskets beside it; on the far right, the right half of the calm view directly behind the viewer: a plain stretch of smoke-darkened wooden kitchen wall hung with copper pans, uniform and unbroken, joining its other half cleanly at the seam directly behind you. hot, busy-feeling and delicious, steam glowing gold under the lanterns. No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. The kitchen is EMPTY of cooks; the four dishes have no labels, words or numbers. Shot on a full-frame DSLR at 24mm, f/8, early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a plain stretch of smoke-darkened wooden kitchen wall hung with copper pans, uniform and unbroken, with no visible seam, join, or repetition.",
+        "seam": {
+          "stage": "screened",
+          "band": "sky",
+          "ratio": 2.42,
+          "delta": 3.63,
+          "needsWork": false,
+          "accepted": false,
+          "seamBandRun": 0.024,
+          "seamStepRatio": 0.0,
+          "at": "2026-11-02T23:06:59"
+        }
+      },
+      "mapPos": {
+        "c": 4,
+        "r": 3
+      },
+      "panorama": "kitchen/scene.png",
+      "builtFrom": "l1_kitchen_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "hotspots": [
+        {
+          "id": "back_into_the_elevator",
+          "type": "door",
+          "label": "Back into the elevator",
+          "box": [
+            0.1,
+            0.2,
+            0.21,
+            0.68
+          ],
+          "direction": "back",
+          "to": "elevator",
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "the_kitchen_counter",
+          "type": "menu",
+          "label": "The kitchen counter",
+          "box": [
+            0.335,
+            0.56,
+            0.67,
+            0.86
+          ],
+          "tier": 3,
+          "dishes": [
+            "dish_curry",
+            "dish_tofu",
+            "dish_buns",
+            "dish_fish"
+          ],
+          "boxSource": "moved:agent"
+        }
+      ]
     }
   ],
   "doorLabels": true,

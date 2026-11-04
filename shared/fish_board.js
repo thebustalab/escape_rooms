@@ -8,7 +8,7 @@
 // READ, never graded: no notebook, no gate, no answer, nothing saved.
 //
 //   1 Population and sample   2 Same water, two nets (Welch)
-//   3 Two waters (Welch vs Wilcox, picked by Shapiro)   4 Ten boats (45 pairs; the lever = Tukey / Dunn-Holm)
+//   3 Two waters (Welch vs Wilcox, picked by Shapiro)   4 Ten boats (45 pairs; the lever = Games-Howell / Dunn-Holm)
 // An "Is the catch normal?" act (Shapiro alone) was cut 2026-10-26 (Lucas: students grasp it); act 3 still
 // runs Shapiro on each catch to pick its road.
 //
@@ -24,7 +24,7 @@
 //   fb.setAct(n); fb.cast(); fb.castMany(k); fb.throwMonster(); fb.toggleLever(); fb.state();
 //   fb.leverClient() → client {x, y} of the act 4 lever; fb.ready (Promise); fb.destroy().
 // The canvas carries the API as `canvas.fishBoard` for tests.
-import "./fish_stats.js?v=150";     // window.FishStats: the board's tests (Welch, Shapiro, Wilcox, Tukey, Dunn), pinned to R
+import "./fish_stats.js?v=151";     // window.FishStats: the board's tests (Welch, Shapiro, Wilcox, Games-Howell, Dunn), pinned to R
 
 const loadImg = (src) => new Promise((res) => {
   if (!src) return res(null);
@@ -243,7 +243,8 @@ export function mountFishBoard(host, opts = {}) {
     const road = st.road5;
     let raw, cor, pairs;
     if (road === "parametric") {
-      const u = S.pairwisePooledT(L), t = S.tukey(L);
+      // uncorrected = a Welch t per pair, so the lever changes only the correction (Games-Howell)
+      const u = S.pairwiseWelch(L), t = S.gamesHowell(L);
       raw = u.map((r) => r.p); cor = t.map((r) => r.p); pairs = t.map((r) => [r.i, r.j]);
     } else {
       const d = S.dunn(L);
@@ -628,7 +629,7 @@ export function mountFishBoard(host, opts = {}) {
   // Act 4: 45 pair lamps in a triangle, lit when p < 0.05 (raw, or corrected with the lever).
   function drawTriangle(ready) {
     const r = st.result, x0 = 950, y0 = 18, cell = 44;
-    const head = st.corrected ? (r.road === "parametric" ? "Tukey (corrected)" : "Dunn, Holm (corrected)") : (r.road === "parametric" ? "every pair, no correction" : "every pair (ranks), no correction");
+    const head = st.corrected ? (r.road === "parametric" ? "Games-Howell (corrected)" : "Dunn, Holm (corrected)") : (r.road === "parametric" ? "every pair, no correction" : "every pair (ranks), no correction");
     placard(x0 + 150, y0 - 6, 330, 40);
     engrave(head, x0 + 315, y0 + 14, 18, "center", "bold", st.corrected ? "rgba(28,70,40,.95)" : "rgba(140,30,12,.95)");
     for (let b = 0; b < 9; b++) {           // columns are boats 1-9, rows boats 2-10
@@ -648,7 +649,7 @@ export function mountFishBoard(host, opts = {}) {
       const lit = ps.filter((p) => p < 0.05).length;
       placard(1236, y0 + 50, 250, 80);
       engrave(`${lit} of 45 pairs lit`, 1361, y0 + 78, 22, "center", "bold");
-      engrave(r.road === "parametric" ? "parametric road: Tukey" : "rank road: Dunn", 1361, y0 + 108, 15, "center", "italic");
+      engrave(r.road === "parametric" ? "parametric road: Games-Howell" : "rank road: Dunn", 1361, y0 + 108, 15, "center", "italic");
     }
     placard(LEVER.x - 62, LEVER.y + 18, 124, 32);
     engrave(st.corrected ? "corrected" : "no correction", LEVER.x, LEVER.y + 34, 15, "center", "italic bold",
@@ -724,7 +725,7 @@ export function mountFishBoard(host, opts = {}) {
     if (st.act === 4) {
       ctl.appendChild(labelled("Water", waterSelect(st.water5, (v) => { st.water5 = v; st.road5 = WATERS[v].kind === "normal" ? "parametric" : "rank"; buildControls(); }, ["open", "lake"])));
       const road = document.createElement("select");
-      for (const [k, t] of [["parametric", "parametric road (Tukey)"], ["rank", "rank road (Dunn)"]]) { const o = document.createElement("option"); o.value = k; o.textContent = t; if (k === st.road5) o.selected = true; road.appendChild(o); }
+      for (const [k, t] of [["parametric", "parametric road (Games-Howell)"], ["rank", "rank road (Dunn)"]]) { const o = document.createElement("option"); o.value = k; o.textContent = t; if (k === st.road5) o.selected = true; road.appendChild(o); }
       road.onchange = () => { st.road5 = road.value; resetAct(); };
       ctl.appendChild(labelled("Road", road));
       ctl.appendChild(check("Boat 1 fishes elsewhere", st.elsewhere, (v) => { st.elsewhere = v; resetAct(); }));

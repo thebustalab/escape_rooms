@@ -4743,12 +4743,12 @@
               "answer"
             ],
             "expr": "{ a <- if (is.data.frame(answer)) answer$value else answer; a <- suppressWarnings(as.numeric(a)); isTRUE(length(a) == 1 && abs(a - 1.0878) < 0.03) }",
-            "hint": "Fit carats_per_100t against terrace_height_m, then read the slope from the model's metrics. In buildModel(), input_variables is x (the predictor, here terrace_height_m) and output_variable is y (what you predict, here carats_per_100t).",
+            "hint": "Fit carats_per_100t against terrace_height_m, then read the slope from the model's metrics. In buildModel(), input_variables is the predictor (here terrace_height_m, on the x axis) and output_variable is the response (what you predict, here carats_per_100t, on the y axis).",
             "maxAttempts": 4,
             "feedback": {
               "correct": "Correct &mdash; noted in your field notebook: on the height line, each extra meter of terrace height goes with about 1.09 more carats per 100 t.",
               "wrong": [
-                "Fit the line with the course function: <code>height_model &lt;- buildModel(data = claim_survey, model_type = &quot;linear_regression&quot;, input_variables = &quot;terrace_height_m&quot;, output_variable = &quot;carats_per_100t&quot;)</code>. input_variables is the x axis (the predictor) and output_variable is the y axis (the outcome). Then look at <code>height_model$metrics</code>.",
+                "Fit the line with the course function: <code>height_model &lt;- buildModel(data = claim_survey, model_type = &quot;linear_regression&quot;, input_variables = &quot;terrace_height_m&quot;, output_variable = &quot;carats_per_100t&quot;)</code>. input_variables is the predictor (the x axis) and output_variable is the response (the y axis). Then look at <code>height_model$metrics</code>.",
                 "The slope is a coefficient: <code>height_model$metrics %&gt;% filter(type == &quot;coefficient&quot;)</code>. It is the terrace_height_m row, not the (Intercept) row, and not r_squared.",
                 "answer is a single number: the value in the terrace_height_m row, for example <code>answer &lt;- 0.123</code> with your own number in place of 0.123."
               ]
@@ -6693,12 +6693,12 @@
               "answer"
             ],
             "expr": "{ a <- if (is.data.frame(answer)) answer$value else answer; a <- suppressWarnings(as.numeric(a)); isTRUE(length(a) == 1 && abs(a - 1.0878) < 0.03) }",
-            "hint": "Fit carats_per_100t against terrace_height_m, then read the slope from the model's metrics. In buildModel(), input_variables is x (the predictor, here terrace_height_m) and output_variable is y (what you predict, here carats_per_100t).",
+            "hint": "Fit carats_per_100t against terrace_height_m, then read the slope from the model's metrics. In buildModel(), input_variables is the predictor (here terrace_height_m, on the x axis) and output_variable is the response (what you predict, here carats_per_100t, on the y axis).",
             "maxAttempts": 4,
             "feedback": {
               "correct": "Correct &mdash; noted in your field notebook: on the height line, each extra meter of terrace height goes with about 1.09 more carats per 100 t.",
               "wrong": [
-                "Fit the line with the course function: <code>height_model &lt;- buildModel(data = claim_survey, model_type = &quot;linear_regression&quot;, input_variables = &quot;terrace_height_m&quot;, output_variable = &quot;carats_per_100t&quot;)</code>. input_variables is the x axis (the predictor) and output_variable is the y axis (the outcome). Then look at <code>height_model$metrics</code>.",
+                "Fit the line with the course function: <code>height_model &lt;- buildModel(data = claim_survey, model_type = &quot;linear_regression&quot;, input_variables = &quot;terrace_height_m&quot;, output_variable = &quot;carats_per_100t&quot;)</code>. input_variables is the predictor (the x axis) and output_variable is the response (the y axis). Then look at <code>height_model$metrics</code>.",
                 "The slope is a coefficient: <code>height_model$metrics %&gt;% filter(type == &quot;coefficient&quot;)</code>. It is the terrace_height_m row, not the (Intercept) row, and not r_squared.",
                 "answer is a single number: the value in the terrace_height_m row, for example <code>answer &lt;- 0.123</code> with your own number in place of 0.123."
               ]
@@ -11011,13 +11011,13 @@
               "answer"
             ],
             "expr": "{ a <- if (is.data.frame(answer)) (if (\"predicted_carats_per_100t\" %in% names(answer)) answer$predicted_carats_per_100t else answer$value) else answer; a <- suppressWarnings(as.numeric(a)); isTRUE(length(a) == 1 && abs(a - 41.92) < 0.1) }",
-            "hint": "Fit the height line on claim_survey (input_variables = x, terrace_height_m; output_variable = y, carats_per_100t), then predict with it on claim_survey_unknown and find Red_Sky.",
+            "hint": "Fit the height line on claim_survey (input_variables = the predictor, terrace_height_m; output_variable = the response, carats_per_100t), then predict with it on claim_survey_unknown and find Red_Sky.",
             "maxAttempts": 4,
             "feedback": {
               "correct": "Correct &mdash; noted in your field notebook: the height line predicts Red_Sky at 41.92 carats per 100 t, under the pay line.",
               "wrong": [
                 "Fit the height line as before (<code>height_model &lt;- buildModel(data = claim_survey, model_type = &quot;linear_regression&quot;, input_variables = &quot;terrace_height_m&quot;, output_variable = &quot;carats_per_100t&quot;)</code>), then predict on the new claims: <code>predictWithModel(data = claim_survey_unknown, model = height_model)</code>.",
-                "Use the line with terrace_height_m as its only input, not a model with more measurements. claim_survey_unknown has no carats_per_100t column: the model supplies it.",
+                "Use the line with terrace_height_m as its only predictor, not a model with more measurements. claim_survey_unknown has no carats_per_100t column: the model supplies it.",
                 "The predictions come back as claim_survey_unknown with a new predicted_carats_per_100t column. <code>filter(claim == &quot;Red_Sky&quot;)</code> finds the one row; assign its prediction (add <code>$predicted_carats_per_100t</code>) to answer."
               ]
             }
@@ -11194,13 +11194,13 @@
               "answer"
             ],
             "expr": "{ a <- if (is.data.frame(answer)) (if (\"predicted_carats_per_100t\" %in% names(answer)) answer$predicted_carats_per_100t else answer$value) else answer; a <- suppressWarnings(as.numeric(a)); isTRUE(length(a) == 1 && abs(a - 41.92) < 0.1) }",
-            "hint": "Fit the height line on claim_survey (input_variables = x, terrace_height_m; output_variable = y, carats_per_100t), then predict with it on claim_survey_unknown and find Red_Sky.",
+            "hint": "Fit the height line on claim_survey (input_variables = the predictor, terrace_height_m; output_variable = the response, carats_per_100t), then predict with it on claim_survey_unknown and find Red_Sky.",
             "maxAttempts": 4,
             "feedback": {
               "correct": "Correct &mdash; noted in your field notebook: the height line predicts Red_Sky at 41.92 carats per 100 t, under the pay line.",
               "wrong": [
                 "Fit the height line as before (<code>height_model &lt;- buildModel(data = claim_survey, model_type = &quot;linear_regression&quot;, input_variables = &quot;terrace_height_m&quot;, output_variable = &quot;carats_per_100t&quot;)</code>), then predict on the new claims: <code>predictWithModel(data = claim_survey_unknown, model = height_model)</code>.",
-                "Use the line with terrace_height_m as its only input, not a model with more measurements. claim_survey_unknown has no carats_per_100t column: the model supplies it.",
+                "Use the line with terrace_height_m as its only predictor, not a model with more measurements. claim_survey_unknown has no carats_per_100t column: the model supplies it.",
                 "The predictions come back as claim_survey_unknown with a new predicted_carats_per_100t column. <code>filter(claim == &quot;Red_Sky&quot;)</code> finds the one row; assign its prediction (add <code>$predicted_carats_per_100t</code>) to answer."
               ]
             }
@@ -17389,13 +17389,13 @@
               "answer"
             ],
             "expr": "{ a <- if (is.data.frame(answer)) answer$claim else answer; isTRUE(setequal(as.character(a), c(\"Pothole_Bay\", \"Shark_Gully\")) && length(a) == 2) }",
-            "hint": "Fit on all six measurements as measured (all six go in input_variables, the x side; carats_per_100t is output_variable, the y), predict the eight new claims, keep those above 60.",
+            "hint": "Fit on all six measurements as measured (all six go in input_variables as predictors; carats_per_100t is output_variable, the response), predict the eight new claims, keep those above 60.",
             "maxAttempts": 4,
             "feedback": {
               "correct": "Correct &mdash; noted in your field notebook: on all six measurements, Pothole_Bay and Shark_Gully clear the pay line; the height line's favorites, Eagle_Terrace and Summit_Beach, are the two poorest of the eight.",
               "wrong": [
                 "Fit on the claims as measured, not scaled: <code>full_model &lt;- buildModel(data = claim_survey, model_type = &quot;linear_regression&quot;, input_variables = c(&quot;terrace_height_m&quot;, &quot;gullies_per_100m&quot;, &quot;cobble_size_cm&quot;, &quot;gravel_thickness_m&quot;, &quot;sand_cover_m&quot;, &quot;distance_to_river_km&quot;), output_variable = &quot;carats_per_100t&quot;)</code>. Then <code>predictWithModel(data = claim_survey_unknown, model = full_model)</code>.",
-                "The height line alone is the shortcut the survey has already overturned: use all six measurements. If predictWithModel() says the variables have different types, the model was fitted on scaled data; a scaled model expects scaled inputs, so refit on claim_survey as measured.",
+                "The height line alone is the shortcut the survey has already overturned: use all six measurements. If predictWithModel() says the variables have different types, the model was fitted on scaled data; a scaled model expects scaled predictors, so refit on claim_survey as measured.",
                 "Keep the predictions above the pay line with <code>filter(predicted_carats_per_100t &gt; 60)</code>, then assign their two claim names: <code>answer &lt;- c(&quot;first&quot;, &quot;second&quot;)</code> with the real names in place."
               ]
             }
@@ -18912,13 +18912,13 @@
               "answer"
             ],
             "expr": "{ a <- if (is.data.frame(answer)) answer$claim else answer; isTRUE(setequal(as.character(a), c(\"Pothole_Bay\", \"Shark_Gully\")) && length(a) == 2) }",
-            "hint": "Fit on all six measurements as measured (all six go in input_variables, the x side; carats_per_100t is output_variable, the y), predict the eight new claims, keep those above 60.",
+            "hint": "Fit on all six measurements as measured (all six go in input_variables as predictors; carats_per_100t is output_variable, the response), predict the eight new claims, keep those above 60.",
             "maxAttempts": 4,
             "feedback": {
               "correct": "Correct &mdash; noted in your field notebook: on all six measurements, Pothole_Bay and Shark_Gully clear the pay line; the height line's favorites, Eagle_Terrace and Summit_Beach, are the two poorest of the eight.",
               "wrong": [
                 "Fit on the claims as measured, not scaled: <code>full_model &lt;- buildModel(data = claim_survey, model_type = &quot;linear_regression&quot;, input_variables = c(&quot;terrace_height_m&quot;, &quot;gullies_per_100m&quot;, &quot;cobble_size_cm&quot;, &quot;gravel_thickness_m&quot;, &quot;sand_cover_m&quot;, &quot;distance_to_river_km&quot;), output_variable = &quot;carats_per_100t&quot;)</code>. Then <code>predictWithModel(data = claim_survey_unknown, model = full_model)</code>.",
-                "The height line alone is the shortcut the survey has already overturned: use all six measurements. If predictWithModel() says the variables have different types, the model was fitted on scaled data; a scaled model expects scaled inputs, so refit on claim_survey as measured.",
+                "The height line alone is the shortcut the survey has already overturned: use all six measurements. If predictWithModel() says the variables have different types, the model was fitted on scaled data; a scaled model expects scaled predictors, so refit on claim_survey as measured.",
                 "Keep the predictions above the pay line with <code>filter(predicted_carats_per_100t &gt; 60)</code>, then assign their two claim names: <code>answer &lt;- c(&quot;first&quot;, &quot;second&quot;)</code> with the real names in place."
               ]
             }
@@ -21454,7 +21454,7 @@
   "_designNotes": "Steps 1-2, 3a, 3b DONE; 4a graph written by _scratch/build_graph.py (2026-10-20, session modeling): 19 rooms, no scene specs or art yet. Landing locked. Design record: notes.md.",
   "debrief": {
     "title": "How this world worked",
-    "intro": "This scenario was linear regression, fitting a straight line to measurements so you can see how much an outcome changes with each input, and then using that line to predict cases you have not measured yet. Here is what you did."
+    "intro": "This scenario was linear regression, fitting a straight line to measurements so you can see how much a response changes with each predictor, and then using that line to predict cases you have not measured yet. Here is what you did."
   },
   "done": {
     "title": "Barges for the gullies",

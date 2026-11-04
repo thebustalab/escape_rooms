@@ -17,7 +17,7 @@
 //     pegs     — the saved setting {arr, z0, t}; onPegs(setting) is called whenever it changes
 //   m.place(shaft, pid); m.arrangement(); m.setDatum(z); m.datum(); m.setTime(iso); m.time(); m.level();
 //   m.penLevel(); m.shelf(); m.ready (Promise); m.destroy();
-import * as M from "./tide_model.js?v=150";
+import * as M from "./tide_model.js?v=151";
 
 const SERIF = 'Georgia, "Times New Roman", "Liberation Serif", serif';
 const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];

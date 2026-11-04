@@ -17,13 +17,13 @@
  * `addStatusEl()`, `plotControls(opts)`, `resetSession()`, `resetControl(opts)`, `.ready`, `.webR`.
  */
 import { WebR } from "https://webr.r-wasm.org/latest/webr.mjs";
-import { VIEW_R_SHIM, VIEW_R_DRAIN, fromR, viewTableHTML, ensureViewStyles } from "./webr_view.js?v=150";
-import { codeToRun, selectionNote } from "./code_sel.js?v=150";
-import { PLOT_ASPECTS, PLOT_DEFAULT_ASPECT, PLOT_LIMITS, PLOT_CTL_CSS, plotGeometry } from "./plot_size.js?v=150";
-import { RESET_R_SHIM, RESET_R_CALL, RESET_CTL_CSS, RESET_LABEL, RESET_CONFIRM_LABEL, RESET_CONFIRM_MS, nextConfirmState } from "./webr_reset.js?v=150";
-import { explainError, looksLikeOrphanLayer } from "./r_diagnose.js?v=150";
-import { R_BIOC_REPOS, BASE_PACKAGES, ANALYSIS_PACKAGES, BIOC_PACKAGES, STATS_PACKAGES, resolvePackages } from "./r_packages.js?v=150";
-import { MATRIX_ANALYSIS_R_SHIM, STATS_TESTS_R_SHIM, MODELS_R_SHIM } from "./r_matrix_analysis.js?v=150";
+import { VIEW_R_SHIM, VIEW_R_DRAIN, fromR, viewTableHTML, ensureViewStyles } from "./webr_view.js?v=151";
+import { codeToRun, selectionNote } from "./code_sel.js?v=151";
+import { PLOT_ASPECTS, PLOT_DEFAULT_ASPECT, PLOT_LIMITS, PLOT_CTL_CSS, plotGeometry } from "./plot_size.js?v=151";
+import { RESET_R_SHIM, RESET_R_CALL, RESET_CTL_CSS, RESET_LABEL, RESET_CONFIRM_LABEL, RESET_CONFIRM_MS, nextConfirmState } from "./webr_reset.js?v=151";
+import { explainError, looksLikeOrphanLayer } from "./r_diagnose.js?v=151";
+import { R_BIOC_REPOS, BASE_PACKAGES, ANALYSIS_PACKAGES, BIOC_PACKAGES, STATS_PACKAGES, resolvePackages } from "./r_packages.js?v=151";
+import { MATRIX_ANALYSIS_R_SHIM, STATS_TESTS_R_SHIM, MODELS_R_SHIM } from "./r_matrix_analysis.js?v=151";
 
 const errText = e => (e && e.message ? e.message : String(e));
 
@@ -301,7 +301,7 @@ export class WebRConsole {
 
       /*
        * The comparing-means test verbs (book ch.11: shapiroTest, leveneTest, tTest, wilcoxTest,
-       * anovaTest, tukeyTest, kruskalTest, dunnTest, pairwiseTTest, pairwiseWilcoxTest), generated from
+       * anovaTest, tukeyTest, gamesHowellTest, kruskalTest, dunnTest, pairwiseTTest, pairwiseWilcoxTest), generated from
        * phylochemistry.R with the matrix shim. Defined whether or not rstatix installed (a call then
        * fails with R's own "no package called" line), and above RESET_R_SHIM so a reset keeps them;
        * before the caller's setup, so a scenario that defines its own wins.

@@ -65,7 +65,7 @@
   ],
   "debrief": {
     "title": "How the soil survey worked",
-    "intro": "This scenario was comparing groups in two ways: by their means (t-tests and Tukey tests) and by their ranks (Wilcoxon and Dunn tests). You and your partner answered the same four questions about the same soil survey, one of you working with means while the other worked with ranks, and you swapped methods along the way. Mostly the two methods agreed. Once, on skewed data, they pointed in opposite directions, and each was right about the question it asks. Here is what you did."
+    "intro": "This scenario was comparing groups in two ways: by their means (t-tests and Games-Howell tests) and by their ranks (Wilcoxon and Dunn tests). You and your partner answered the same four questions about the same soil survey, one of you working with means while the other worked with ranks, and you swapped methods along the way. Mostly the two methods agreed. Once, on skewed data, they pointed in opposite directions, and each was right about the question it asks. Here is what you did."
   },
   "ladderPlain": [
     {
@@ -78,7 +78,7 @@
     },
     {
       "room": "middle_lower",
-      "text": "In the third puzzle you compared pH across the four soil mixes with a test that compares every pair of mixes at once and corrects for the number of comparisons (Tukey for one of you, Dunn for the other), and both found leaf_mould alone more acidic than the other three."
+      "text": "In the third puzzle you compared pH across the four soil mixes with a test that compares every pair of mixes at once and corrects for the number of comparisons (Games-Howell for one of you, Dunn for the other), and both found leaf_mould alone more acidic than the other three."
     },
     {
       "room": "lo_1b",
@@ -5676,7 +5676,7 @@
           "label": "Soil reading 3",
           "starterCode": "garden_soil",
           "question": {
-            "prompt": "The middle garden mixes the soil for the whole city, so its certificate covers all four soil mixes. Using the rows where <code>parameter</code> is pH, compare <code>value</code> across the four groups in the <code>soil_mix</code> column with a Tukey test, which compares every pair of mixes. Which statement matches the Tukey results?",
+            "prompt": "The middle garden mixes the soil for the whole city, so its certificate covers all four soil mixes. Using the rows where <code>parameter</code> is pH, compare <code>value</code> across the four groups in the <code>soil_mix</code> column with a Games-Howell test, which compares every pair of mixes. Which statement matches the Games-Howell results?",
             "options": [
               "5 of 15 comparisons significant: Bice-Clelia, Clelia-Gemma, Clelia-Ines, Dora-Ines, Ines-Zita",
               "Only coir_blend stands apart: its value is higher than each of the other 3; the others do not differ from one another (3 of 6 comparisons significant)",
@@ -5689,9 +5689,9 @@
             ],
             "correct": 6,
             "feedback": {
-              "correct": "Correct, noted in your field notebook: by Tukey test, leaf_mould alone has a lower pH than the other three mixes, which do not differ.",
+              "correct": "Correct, noted in your field notebook: by Games-Howell test, leaf_mould alone has a lower pH than the other three mixes, which do not differ.",
               "wrong": [
-                "Keep only the rows where <code>parameter</code> is \"pH\", then run <code>tukeyTest(value ~ soil_mix)</code> on them.",
+                "Keep only the rows where <code>parameter</code> is \"pH\", then run <code>gamesHowellTest(value ~ soil_mix)</code> on them.",
                 "Each of its six rows is one pair of mixes; a <code>p.adj</code> below 0.05 means that pair differs. The test has already corrected for making six comparisons at once.",
                 "Group by <code>soil_mix</code>, not <code>garden</code>. To see which side of a pair is higher, find each mix's mean: <code>group_by(soil_mix) %&gt;% summarize(mean = mean(value))</code>."
               ]
@@ -6053,7 +6053,7 @@
           ],
           "starterCode": "garden_soil",
           "question": {
-            "prompt": "The middle garden mixes the soil for the whole city, so its certificate covers all four soil mixes. Using the rows where <code>parameter</code> is pH, compare <code>value</code> across the four groups in the <code>soil_mix</code> column with a Tukey test, which compares every pair of mixes. Which statement matches the Tukey results?",
+            "prompt": "The middle garden mixes the soil for the whole city, so its certificate covers all four soil mixes. Using the rows where <code>parameter</code> is pH, compare <code>value</code> across the four groups in the <code>soil_mix</code> column with a Games-Howell test, which compares every pair of mixes. Which statement matches the Games-Howell results?",
             "options": [
               "5 of 15 comparisons significant: Bice-Clelia, Clelia-Gemma, Clelia-Ines, Dora-Ines, Ines-Zita",
               "Only coir_blend stands apart: its value is higher than each of the other 3; the others do not differ from one another (3 of 6 comparisons significant)",
@@ -6066,9 +6066,9 @@
             ],
             "correct": 6,
             "feedback": {
-              "correct": "Correct, noted in your field notebook: by Tukey test, leaf_mould alone has a lower pH than the other three mixes, which do not differ.",
+              "correct": "Correct, noted in your field notebook: by Games-Howell test, leaf_mould alone has a lower pH than the other three mixes, which do not differ.",
               "wrong": [
-                "Keep only the rows where <code>parameter</code> is \"pH\", then run <code>tukeyTest(value ~ soil_mix)</code> on them.",
+                "Keep only the rows where <code>parameter</code> is \"pH\", then run <code>gamesHowellTest(value ~ soil_mix)</code> on them.",
                 "Each of its six rows is one pair of mixes; a <code>p.adj</code> below 0.05 means that pair differs. The test has already corrected for making six comparisons at once.",
                 "Group by <code>soil_mix</code>, not <code>garden</code>. To see which side of a pair is higher, find each mix's mean: <code>group_by(soil_mix) %&gt;% summarize(mean = mean(value))</code>."
               ]
@@ -6193,7 +6193,7 @@
           "volume": 0.4
         }
       ],
-      "debrief": "With four soil mixes, running a separate t-test on every pair would multiply the chances of a false positive, so you used a Tukey test, which compares every pair while correcting for the number of comparisons: leaf_mould alone is more acidic than the other three. Your partner reached the same answer with a Dunn test. Solving it brought the first snow."
+      "debrief": "With four soil mixes, running a separate t-test on every pair would multiply the chances of a false positive, so you used a Games-Howell test, which compares every pair while correcting for the number of comparisons, without assuming the mixes share one spread: leaf_mould alone is more acidic than the other three. Your partner reached the same answer with a Dunn test. Solving it brought the first snow."
     },
     {
       "key": "lo_1b",
@@ -11766,7 +11766,7 @@
           "volume": 0.2
         }
       ],
-      "debrief": "With four soil mixes, testing every pair separately would multiply the chances of a false positive, so you used a Dunn test, which compares every pair on one shared ranking while correcting for the number of comparisons: leaf_mould alone is more acidic than the other three. Your partner reached the same answer with a Tukey test. Solving it brought the first snow."
+      "debrief": "With four soil mixes, testing every pair separately would multiply the chances of a false positive, so you used a Dunn test, which compares every pair on one shared ranking while correcting for the number of comparisons: leaf_mould alone is more acidic than the other three. Your partner reached the same answer with a Games-Howell test. Solving it brought the first snow."
     },
     {
       "key": "up_5b",
@@ -11811,16 +11811,16 @@
           "label": "The full soil survey",
           "starterCode": "garden_soil",
           "question": {
-            "prompt": "The full soil survey certifies phosphorus across all six gardens at once. Using the rows where parameter is phosphorus_mg_kg, compare value between every pair of the six gardens in the garden column (15 pairs) with pairwise t-tests, using the default pooled standard deviation and the default correction for multiple comparisons. Which statement matches the corrected results?",
+            "prompt": "The full soil survey certifies phosphorus across all six gardens at once. Using the rows where parameter is phosphorus_mg_kg, compare value between every pair of the six gardens in the garden column (15 pairs) with pairwise t-tests, keeping the function's default correction for multiple comparisons. Which statement matches the corrected results?",
             "options": [
               "No pair differs (0 of 15 comparisons significant)",
               "Two groups: each of Bice, Gemma, Ines is higher than each of Clelia, Dora, Zita, and also Dora-Zita, Gemma-Ines differ (11 of 15 comparisons significant)",
-              "1 of 15 comparisons significant: Dora-Gemma",
+              "2 of 15 comparisons significant: Clelia-Dora, Dora-Gemma",
               "5 of 15 comparisons significant: Bice-Clelia, Clelia-Gemma, Clelia-Ines, Dora-Ines, Ines-Zita",
-              "1 of 15 comparisons significant: Dora-Zita",
+              "Two groups: each of Bice, Gemma, Ines is higher than each of Clelia, Dora, Zita, and also Dora-Zita differ (10 of 15 comparisons significant)",
               "Two groups: each of Bice, Gemma, Ines is higher than each of Clelia, Dora, Zita; no pair within a group differs (9 of 15 comparisons significant)",
               "No pair differs (0 of 6 comparisons significant)",
-              "Only Zita stands apart: its value is higher than each of the other 5; the others do not differ from one another (5 of 15 comparisons significant)"
+              "Two groups: each of Bice, Zita is higher than each of Clelia, Dora, Gemma, Ines, and also Bice-Zita, Dora-Gemma, Dora-Ines differ (11 of 15 comparisons significant)"
             ],
             "correct": 5,
             "feedback": {
@@ -12127,16 +12127,16 @@
           ],
           "starterCode": "garden_soil",
           "question": {
-            "prompt": "The full soil survey certifies phosphorus across all six gardens at once. Using the rows where parameter is phosphorus_mg_kg, compare value between every pair of the six gardens in the garden column (15 pairs) with pairwise t-tests, using the default pooled standard deviation and the default correction for multiple comparisons. Which statement matches the corrected results?",
+            "prompt": "The full soil survey certifies phosphorus across all six gardens at once. Using the rows where parameter is phosphorus_mg_kg, compare value between every pair of the six gardens in the garden column (15 pairs) with pairwise t-tests, keeping the function's default correction for multiple comparisons. Which statement matches the corrected results?",
             "options": [
               "No pair differs (0 of 15 comparisons significant)",
               "Two groups: each of Bice, Gemma, Ines is higher than each of Clelia, Dora, Zita, and also Dora-Zita, Gemma-Ines differ (11 of 15 comparisons significant)",
-              "1 of 15 comparisons significant: Dora-Gemma",
+              "2 of 15 comparisons significant: Clelia-Dora, Dora-Gemma",
               "5 of 15 comparisons significant: Bice-Clelia, Clelia-Gemma, Clelia-Ines, Dora-Ines, Ines-Zita",
-              "1 of 15 comparisons significant: Dora-Zita",
+              "Two groups: each of Bice, Gemma, Ines is higher than each of Clelia, Dora, Zita, and also Dora-Zita differ (10 of 15 comparisons significant)",
               "Two groups: each of Bice, Gemma, Ines is higher than each of Clelia, Dora, Zita; no pair within a group differs (9 of 15 comparisons significant)",
               "No pair differs (0 of 6 comparisons significant)",
-              "Only Zita stands apart: its value is higher than each of the other 5; the others do not differ from one another (5 of 15 comparisons significant)"
+              "Two groups: each of Bice, Zita is higher than each of Clelia, Dora, Gemma, Ines, and also Bice-Zita, Dora-Gemma, Dora-Ines differ (11 of 15 comparisons significant)"
             ],
             "correct": 5,
             "feedback": {
