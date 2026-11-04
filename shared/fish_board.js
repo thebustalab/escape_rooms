@@ -8,7 +8,11 @@
 // READ, never graded: no notebook, no gate, no answer, nothing saved.
 //
 //   1 Population and sample   2 Same water, two nets (Welch)
-//   3 Two waters (Welch vs Wilcox, picked by Shapiro)   4 Ten boats (45 pairs; the lever = Games-Howell / Dunn-Holm)
+//   3 Two waters (Welch vs Wilcox, picked by Shapiro)
+//   4 Several waters (3-5 waters, one boat each, each water's fish chosen by the player: some the same,
+//     some not; every pair's lamp, the lever = Games-Howell / Dunn-Holm, and each lit lamp marked as a fluke
+//     or a real difference). Replaced the ten-boats-one-water act 2026-11-03 (Lucas: fewer boats, several
+//     waters, so a class can trigger a false positive between two same waters and see a real one survive).
 // An "Is the catch normal?" act (Shapiro alone) was cut 2026-10-26 (Lucas: students grasp it); act 3 still
 // runs Shapiro on each catch to pick its road.
 //
@@ -24,7 +28,7 @@
 //   fb.setAct(n); fb.cast(); fb.castMany(k); fb.throwMonster(); fb.toggleLever(); fb.state();
 //   fb.leverClient() → client {x, y} of the act 4 lever; fb.ready (Promise); fb.destroy().
 // The canvas carries the API as `canvas.fishBoard` for tests.
-import "./fish_stats.js?v=151";     // window.FishStats: the board's tests (Welch, Shapiro, Wilcox, Games-Howell, Dunn), pinned to R
+import "./fish_stats.js?v=152";     // window.FishStats: the board's tests (Welch, Shapiro, Wilcox, Games-Howell, Dunn), pinned to R
 
 const loadImg = (src) => new Promise((res) => {
   if (!src) return res(null);
@@ -32,7 +36,12 @@ const loadImg = (src) => new Promise((res) => {
   im.onload = () => res(im); im.onerror = () => res(null); im.src = src;
 });
 const SPRITES = ["board", "plank", "fish", "dial", "needle", "net", "lamp", "lever"];
-const ACT_NAMES = ["Population and sample", "Same water, two nets", "Two waters", "Ten boats"];
+const ACT_NAMES = ["Population and sample", "Same water, two nets", "Two waters", "Several waters"];
+// Act 4's starting setup: three identical waters (their pairs can only light by chance), the harbor mouth
+// (a modest difference the correction often costs) and the outer reef (a big one it keeps). Simulated
+// 2026-11-03 at 8 fish a net: a fluke lit on ~16% of casts uncorrected vs ~3% corrected.
+const ACT4_START = ["open", "open", "open", "mouth", "reef"];
+const ACT4_MIN = 3, ACT4_MAX = 5;
 
 export function mountFishBoard(host, opts = {}) {
   const G = opts.geometry;
@@ -65,14 +74,15 @@ export function mountFishBoard(host, opts = {}) {
   const WATERS = {
     open:  { name: "Open harbor",   kind: "normal", tint: "#1d4a63", draw: () => R.normal(30, 5) },
     mouth: { name: "Harbor mouth",  kind: "normal", tint: "#1f5568", draw: () => R.normal(35, 5) },
+    reef:  { name: "Outer reef",    kind: "normal", tint: "#1a5f70", draw: () => R.normal(40, 5) },
     // Skewed waters: a shoal of small fry plus about one big fish in seven. Tuned (2026-10-25) so Shapiro
     // flags about 30% of 5-fish catches, 60% of 8 and 90% of 15: small nets often hide the skew.
     lake:  { name: "Lake harbor",   kind: "skewed", tint: "#24524a", draw: () => (R() < 0.15 ? R.normal(45, 7) : 15 * Math.exp(R.normal(0, 0.3))) },
     inlet: { name: "Lake inlet",    kind: "skewed", tint: "#2a5a48", draw: () => (R() < 0.15 ? R.normal(52, 7) : 20 * Math.exp(R.normal(0, 0.3))) },
   };
   const POP = 300, MAXLEN = 80, MINLEN = 6;
-  for (const key of Object.keys(WATERS)) {
-    const w = WATERS[key];
+  const BASE = Object.keys(WATERS);            // the kinds of water a player can choose
+  function stock(w, key) {
     w.fish = [];
     for (let i = 0; i < POP; i++) {
       let len;
@@ -82,14 +92,28 @@ export function mountFishBoard(host, opts = {}) {
     }
     w.trueMean = S.mean(w.fish.map((f) => f.len));
   }
+  for (const key of BASE) stock(WATERS[key], key);
+  // Act 4's waters are their own populations ("w0".."w4"), each stocked from its chosen kind: two waters of
+  // the same kind hold different fish from the same distribution, which is exactly the null hypothesis.
+  const slotKey = (i) => "w" + i;
+  function stockSlots() {
+    for (const k of Object.keys(WATERS)) if (!BASE.includes(k)) delete WATERS[k];
+    st.slots.forEach((kind, i) => {
+      const b = WATERS[kind], key = slotKey(i);
+      WATERS[key] = { name: b.name, kind: b.kind, tint: b.tint, draw: b.draw, base: kind };
+      stock(WATERS[key], key);
+    });
+  }
+  const validSlots = (s) => Array.isArray(s) && s.length >= ACT4_MIN && s.length <= ACT4_MAX && s.every((k) => BASE.includes(k));
 
   // ---------- state ----------
   const st = {
     act: Math.min(4, Math.max(1, Number(saved.act) || 1)),
     n: Number(saved.n) || 8,
     numbers: saved.numbers !== false,
-    water: "open", waterA: "open", waterB: "mouth", water5: "open",
-    drain: false, elsewhere: false, corrected: false, road5: "parametric",
+    water: "open", waterA: "open", waterB: "mouth",
+    slots: validSlots(saved.slots) ? [...saved.slots] : [...ACT4_START],
+    drain: false, corrected: false, road5: "parametric", truth: saved.truth !== false,
     rows: [],            // [{ fish: [fishObj], color, label }]
     nets: [],            // nets rising out of the water: [{ ri, t0, n }]
     flights: [],         // animation of caught fish
@@ -98,9 +122,12 @@ export function mountFishBoard(host, opts = {}) {
     tally: {},
     monster: false,
   };
-  const remember = () => opts.onPegs && opts.onPegs({ act: st.act, n: st.n, numbers: st.numbers });
+  const autoRoad = () => (st.slots.some((k) => WATERS[k].kind === "skewed") ? "rank" : "parametric");
+  st.road5 = autoRoad();
+  stockSlots();
+  const remember = () => opts.onPegs && opts.onPegs({ act: st.act, n: st.n, numbers: st.numbers, slots: [...st.slots], truth: st.truth });
   const C_A = "#e0a83a", C_B = "#4fc0b4";
-  const BOAT_COLS = ["#e0a83a", "#4fc0b4", "#d47a6a", "#9fb85a", "#b48ad6", "#e6d26a", "#6aa6e0", "#e08ab4", "#8ad6c8", "#c8a07a"];
+  const BOAT_COLS = ["#e0a83a", "#4fc0b4", "#d47a6a", "#9fb85a", "#b48ad6"];
 
   // ---------- canvas, letterboxed to the logical board ----------
   // The board is the edge of the quay seen from straight above (Lucas, 2026-10-25): the measuring boards lie
@@ -153,18 +180,23 @@ export function mountFishBoard(host, opts = {}) {
       case 1: return [{ x: 40, y: 26, w: 1060, h: 250 }];
       case 2: return [{ x: 40, y: 16, w: 1060, h: 212 }, { x: 40, y: 240, w: 1060, h: 212 }];
       case 3: return [{ x: 40, y: 10, w: 1060, h: 142 }, { x: 40, y: 160, w: 1060, h: 142 }];
-      case 4: { const out = []; for (let i = 0; i < 10; i++) out.push({ x: 40, y: 12 + i * 45, w: 880, h: 40 }); return out; }
+      case 4: {     // one board per water, filling the paving above the quay edge
+        const k = st.slots.length, gap = 8, top = 10, h = (EDGE - 14 - top - gap * (k - 1)) / k, out = [];
+        for (let i = 0; i < k; i++) out.push({ x: 40, y: top + i * (h + gap), w: 880, h });
+        return out;
+      }
     }
     return [];
   }
   const STRIP = (box) => Math.max(13, Math.min(28, box.h * 0.13));
   const stripTop = (box) => box.y + box.h - STRIP(box) - 5;
-  const lenX = (box, len) => { const x0 = box.x + box.w * (st.act === 4 ? 0.13 : 0.04), x1 = box.x + box.w - 16; return x0 + (len / MAXLEN) * (x1 - x0); };
+  const compact = (box) => box.h < 100;          // a short board: one line of small fish, no numbers on its scale
+  const lenX = (box, len) => { const x0 = box.x + box.w * (st.act === 4 ? 0.15 : 0.04), x1 = box.x + box.w - 16; return x0 + (len / MAXLEN) * (x1 - x0); };
 
   // ---------- casting ----------
   function watersForAct() {
     if (st.act === 3) return [st.waterA, st.waterB];
-    if (st.act === 4) return [st.water5];
+    if (st.act === 4) return st.slots.map((_, i) => slotKey(i));
     return [st.water];
   }
   function releaseAll() { for (const k in WATERS) for (const f of WATERS[k].fish) f.caught = false; }
@@ -186,21 +218,17 @@ export function mountFishBoard(host, opts = {}) {
       rows.push({ fish: netFrom(st.waterA, n), color: C_A, label: WATERS[st.waterA].name, water: st.waterA });
       rows.push({ fish: netFrom(st.waterB, n), color: C_B, label: WATERS[st.waterB].name, water: st.waterB });
     } else if (st.act === 4) {
-      const other = WATERS[st.water5].kind === "normal" ? "mouth" : "inlet";
-      for (let b = 0; b < 10; b++) {
-        const wk = st.elsewhere && b === 0 ? (st.water5 === other ? "open" : other) : st.water5;
-        rows.push({ fish: netFrom(wk, n), color: BOAT_COLS[b], label: "Boat " + (b + 1), water: wk });
-      }
+      st.slots.forEach((kind, i) => rows.push({ fish: netFrom(slotKey(i), n), color: BOAT_COLS[i],
+        label: "Water " + (i + 1), sub: WATERS[kind].name, water: slotKey(i), kind }));
     }
     st.rows = rows;
     compute();
     st.flights = []; st.nets = [];
     if (animate) {
-      // Acts 1-3: each net rises out of the water, then its fish fly up onto the board. Act 4's ten boats
-      // land straight from the water (ten nets at once would bury the lamps).
-      const now = performance.now(), useNets = st.act !== 4;
+      // Each net rises out of its water, then its fish fly up onto its board.
+      const now = performance.now(), useNets = true;
       rows.forEach((row, ri) => {
-        let t0 = now + (st.act === 4 ? ri * 40 : 0);
+        let t0 = now;
         if (useNets) { st.nets.push({ ri, t0: now + ri * 140, n: row.fish.length }); t0 = now + ri * 140 + RISE; }
         row.fish.forEach((f, k) => st.flights.push({ f, ri, t0: t0 + k * 45, dur: useNets ? 600 : 700, fromNet: useNets }));
       });
@@ -224,11 +252,12 @@ export function mountFishBoard(host, opts = {}) {
       st.result = compute3(L);
     } else if (st.act === 4) {
       st.result = compute4(L);
-      const r = st.result;
-      T.anyRaw = (T.anyRaw || 0) + (r.raw.some((p) => p < 0.05) ? 1 : 0);
-      T.anyCor = (T.anyCor || 0) + (r.cor.some((p) => p < 0.05) ? 1 : 0);
-      T.litRaw = (T.litRaw || 0) + r.raw.filter((p) => p < 0.05).length;
-      T.litCor = (T.litCor || 0) + r.cor.filter((p) => p < 0.05).length;
+      const r = st.result, add = (k, v) => { T[k] = (T[k] || 0) + v; };
+      const lit = (ps, want) => r.same.filter((s, k) => s === want && ps[k] < 0.05).length;
+      // flukes: casts where any pair of SAME waters lit; finds: the share of truly different pairs lit
+      if (r.same.some((s) => s)) { add("nullCasts", 1); add("flukeRaw", lit(r.raw, true) ? 1 : 0); add("flukeCor", lit(r.cor, true) ? 1 : 0); }
+      add("realPairs", r.same.filter((s) => !s).length);
+      add("realRaw", lit(r.raw, false)); add("realCor", lit(r.cor, false));
     }
     updateTally();
   }
@@ -238,8 +267,8 @@ export function mountFishBoard(host, opts = {}) {
     return { shA, shB, road, welch: S.welch(L[0], L[1]), wilcox: S.wilcox(L[0], L[1]) };
   }
   function compute4(L) {
-    // The road is Lucas's choice here (a toggle), not ten Shapiro tests: with ten catches, one of them
-    // fails Shapiro by chance often enough to flip the road mid-demo, which would bury the lesson.
+    // The road follows the waters chosen (any lake water: the rank road), with a manual override, not a
+    // Shapiro test per catch: with five catches one fails by chance often enough to flip the road mid-demo.
     const road = st.road5;
     let raw, cor, pairs;
     if (road === "parametric") {
@@ -250,7 +279,8 @@ export function mountFishBoard(host, opts = {}) {
       const d = S.dunn(L);
       raw = d.map((r) => r.p); cor = d.map((r) => r.pAdj); pairs = d.map((r) => [r.i, r.j]);
     }
-    return { road, raw, cor, pairs };
+    const same = pairs.map(([i, j]) => st.slots[i] === st.slots[j]);    // the truth: same kind of water
+    return { road, raw, cor, pairs, same };
   }
   function throwMonster() {
     if (st.act !== 3 || !st.rows.length || st.monster) return;
@@ -331,10 +361,9 @@ export function mountFishBoard(host, opts = {}) {
   // ---------- the water (bottom) ----------
   function waterPanels() {
     const ws = watersForAct();
-    if (st.act === 4 && st.elsewhere && st.rows.length) {
-      const other = st.rows[0].water, w0 = Math.round(WATER_BOX.w * 0.76);
-      return [{ key: st.water5, x: 0, y: WATER_BOX.y, w: w0 - 30, h: WATER_BOX.h },
-        { key: other, x: w0 + 30, y: WATER_BOX.y, w: WATER_BOX.w - w0 - 30, h: WATER_BOX.h }];
+    if (st.act === 4) {           // one panel per water, a jetty between each
+      const k = ws.length, gap = 60, w = (WATER_BOX.w - gap * (k - 1)) / k;
+      return ws.map((key, i) => ({ key, x: i * (w + gap), y: WATER_BOX.y, w, h: WATER_BOX.h, n: i + 1, color: BOAT_COLS[i] }));
     }
     if (ws.length === 2 && ws[0] !== ws[1]) {
       const half = WATER_BOX.w / 2;
@@ -358,12 +387,12 @@ export function mountFishBoard(host, opts = {}) {
   }
   function drawWater(now) {
     const panels = waterPanels();
-    if (panels.length === 2) jetty(panels[0].x + panels[0].w, panels[1].x);
+    for (let i = 0; i + 1 < panels.length; i++) jetty(panels[i].x + panels[i].w, panels[i + 1].x);
     for (const p of panels) {
       const w = WATERS[p.key];
       ctx.save(); ctx.beginPath(); ctx.rect(p.x, p.y, p.w, p.h); ctx.clip();
       if (w.kind === "skewed") { ctx.fillStyle = "rgba(38,92,52,.38)"; ctx.fillRect(p.x, p.y, p.w, p.h); }   // the lake's greener water
-      const shrink = p.w < 500 ? 0.7 : 1;
+      const shrink = p.w < 330 ? 0.55 : p.w < 500 ? 0.7 : 1;
       for (const f of w.fish) {
         if (f.caught) continue;
         f.x += f.v * 0.016 * 6; if (f.x > 1.03) f.x = -0.03; if (f.x < -0.03) f.x = 1.03;
@@ -375,7 +404,12 @@ export function mountFishBoard(host, opts = {}) {
         ctx.restore();
       }
       ctx.restore();
-      label(w.name, p.x + 18, p.y + 24, 24, "#fff1d0", "left", "italic");
+      if (p.n) {        // act 4: the water's number in its boat colour, then what lives in it
+        ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x + 24, p.y + 24, 9, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = "rgba(0,0,0,.6)"; ctx.lineWidth = 1.2; ctx.stroke();
+        label(String(p.n), p.x + 24, p.y + 25, 14, "#1a0f05", "center", "bold");
+        label(w.name, p.x + 40, p.y + 24, 20, "#fff1d0", "left", "italic");
+      } else label(w.name, p.x + 18, p.y + 24, 24, "#fff1d0", "left", "italic");
       if (st.drain && st.act === 1) label(`every fish here: mean ${w.trueMean.toFixed(1)} cm`, p.x + p.w - 18, p.y + 24, 20, "#fff1d0", "right");
     }
     return panels;
@@ -389,8 +423,8 @@ export function mountFishBoard(host, opts = {}) {
   }
   function stackPositions(box, fish) {
     const bins = new Map(), out = new Map();
-    const small = st.act === 4;
-    const base = stripTop(box) - 3, avail = base - box.y - (small ? 2 : 26);
+    const small = compact(box);
+    const base = stripTop(box) - 3, avail = base - box.y - (small ? 2 : st.act === 4 ? 6 : 26);
     const step = small ? 0 : Math.min(34, avail / Math.max(4, maxStack(fish)));
     const w = small ? 34 : Math.min(72, step * 2.4);
     for (const f of [...fish].sort((a, b) => a.len - b.len)) {
@@ -418,10 +452,11 @@ export function mountFishBoard(host, opts = {}) {
     return { landed, flying };
   };
   function drawBoards(now) {
-    const boxes = boardRows(), small = st.act === 4;
+    const boxes = boardRows();
     const { flying } = flightState(now);
     st.rows.forEach((row, ri) => {
       const box = boxes[ri]; if (!box) return;
+      const small = compact(box);
       drawPlanks(box);
       drawScale(box, small);
       if (st.drain && st.act === 1) drawPopulationShadow(box, st.water);
@@ -432,7 +467,13 @@ export function mountFishBoard(host, opts = {}) {
         drawFish(p.x, p.y, w, f.monster ? "#ff7a4a" : row.color, 1);
       }
       if (row.fish.length && row.fish.every((f) => !flying.has(f))) wedge(lenX(box, S.mean(row.fish.map((f) => f.len))), stripTop(box) + 2, small ? 8 : 13);
-      if (small) {
+      if (st.act === 4) {      // the water's number and kind at the left end of its board
+        const cy = box.y + Math.min(box.h / 2 - 8, 34);
+        ctx.fillStyle = row.color; ctx.beginPath(); ctx.arc(box.x + 22, cy, 7, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = "rgba(40,22,6,.8)"; ctx.lineWidth = 1; ctx.stroke();
+        engrave(row.label, box.x + 34, cy, 17, "left", "italic bold");
+        engrave(row.sub, box.x + 16, cy + 22, 13, "left", "italic");
+      } else if (small) {
         ctx.fillStyle = row.color; ctx.beginPath(); ctx.arc(box.x + 42, box.y + box.h / 2 - 2, 6, 0, Math.PI * 2); ctx.fill();
         ctx.strokeStyle = "rgba(40,22,6,.8)"; ctx.lineWidth = 1; ctx.stroke();
         engrave(row.label, box.x + 54, box.y + box.h / 2 - 2, 16, "left", "italic bold");
@@ -445,7 +486,10 @@ export function mountFishBoard(host, opts = {}) {
       }
     });
     if (!st.rows.length) {      // before the first cast: the empty boards, waiting
-      boxes.forEach((box) => { drawPlanks(box); drawScale(box, small); });
+      boxes.forEach((box, i) => {
+        drawPlanks(box); drawScale(box, compact(box));
+        if (st.act === 4) engrave("Water " + (i + 1), box.x + 34, box.y + Math.min(box.h / 2 - 8, 34), 17, "left", "italic bold");
+      });
     }
     return st.flights.every((fl) => now >= fl.t0 + fl.dur);
   }
@@ -541,7 +585,7 @@ export function mountFishBoard(host, opts = {}) {
       if (st.numbers) engrave("p = " + fmtP(p), cx, ty + 76, Math.round(Math.max(15, W * 0.045)), "center");
     }
   }
-  // A terracotta oil lamp, lit or not (act 3's normality lamps, act 4's 45 pair lamps).
+  // A terracotta oil lamp, lit or not (act 3's normality lamps, act 4's pair lamps).
   function lampSprite(cx, cy, w, on) {
     const im = IMG.lamp, h = (w * im.height) / im.width;
     ctx.save(); ctx.shadowColor = "rgba(20,10,0,.45)"; ctx.shadowBlur = 5; ctx.shadowOffsetY = 3;
@@ -626,19 +670,33 @@ export function mountFishBoard(host, opts = {}) {
       engrave("mean rank", x, box.y + 126, 13, "center", "italic");
     });
   }
-  // Act 4: 45 pair lamps in a triangle, lit when p < 0.05 (raw, or corrected with the lever).
+  // Act 4: one lamp per pair of waters, in a triangle, lit when p < 0.05 (raw, or corrected with the lever).
+  // With the truth shown, a lit lamp between two waters of the same kind is tagged a fluke (a false
+  // positive), a lit lamp between different kinds a real difference, and an unlit one there a miss.
+  function waterChip(n, x, y) {
+    ctx.fillStyle = BOAT_COLS[n - 1]; ctx.beginPath(); ctx.arc(x, y, 10, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = "rgba(40,22,6,.85)"; ctx.lineWidth = 1.2; ctx.stroke();
+    engrave(String(n), x, y + 1, 14, "center", "bold");
+  }
   function drawTriangle(ready) {
-    const r = st.result, x0 = 950, y0 = 18, cell = 44;
+    const r = st.result, k = st.slots.length, x0 = 950, y0 = 18, cell = 80;
     const head = st.corrected ? (r.road === "parametric" ? "Games-Howell (corrected)" : "Dunn, Holm (corrected)") : (r.road === "parametric" ? "every pair, no correction" : "every pair (ranks), no correction");
-    placard(x0 + 150, y0 - 6, 330, 40);
-    engrave(head, x0 + 315, y0 + 14, 18, "center", "bold", st.corrected ? "rgba(28,70,40,.95)" : "rgba(140,30,12,.95)");
-    for (let b = 0; b < 9; b++) {           // columns are boats 1-9, rows boats 2-10
-      engrave(String(b + 1), x0 + 26 + b * cell + cell / 2, y0 + 50, 15, "center", "bold");
-      engrave(String(b + 2), x0 + 12, y0 + 70 + b * cell + cell / 2, 15, "center", "bold");
+    placard(x0 + 20, y0 - 6, 340, 40);
+    engrave(head, x0 + 190, y0 + 14, 18, "center", "bold", st.corrected ? "rgba(28,70,40,.95)" : "rgba(140,30,12,.95)");
+    for (let b = 0; b < k - 1; b++) {        // columns are waters 1..k-1, rows waters 2..k
+      waterChip(b + 1, x0 + 30 + b * cell + cell / 2, y0 + 54);
+      waterChip(b + 2, x0 + 14, y0 + 72 + b * cell + cell / 2);
     }
     const ps = st.corrected ? r.cor : r.raw;
-    r.pairs.forEach(([i, j], k) => {
-      lampSprite(x0 + 26 + i * cell + cell / 2, y0 + 70 + (j - 1) * cell + cell / 2, 40, ready && ps[k] < 0.05);
+    let flukes = 0, real = 0;
+    r.pairs.forEach(([i, j], q) => {
+      const cx = x0 + 30 + i * cell + cell / 2, cy = y0 + 66 + (j - 1) * cell + cell / 2, on = ready && ps[q] < 0.05;
+      lampSprite(cx, cy, 56, on);
+      if (on) { if (r.same[q]) flukes++; else real++; }
+      if (!ready || !st.truth) return;
+      const tag = on ? (r.same[q] ? ["fluke!", "rgba(150,26,10,.98)"] : ["real", "rgba(24,78,40,.98)"])
+        : (r.same[q] ? null : ["missed", "rgba(70,50,30,.8)"]);
+      if (tag) engrave(tag[0], cx, cy + 32, 14, "center", "italic bold", tag[1]);
     });
     // the lever: upright = no correction, thrown = corrected
     const lv = IMG.lever, lw = 34, lh = (lw * lv.height) / lv.width;
@@ -646,18 +704,20 @@ export function mountFishBoard(host, opts = {}) {
     ctx.shadowColor = "rgba(0,0,0,.5)"; ctx.shadowBlur = 8; ctx.shadowOffsetY = 5;
     ctx.drawImage(lv, -lw / 2, -lh + 20, lw, lh); ctx.restore();
     if (ready) {
-      const lit = ps.filter((p) => p < 0.05).length;
-      placard(1236, y0 + 50, 250, 80);
-      engrave(`${lit} of 45 pairs lit`, 1361, y0 + 78, 22, "center", "bold");
-      engrave(r.road === "parametric" ? "parametric road: Games-Howell" : "rank road: Dunn", 1361, y0 + 108, 15, "center", "italic");
+      const lit = ps.filter((p) => p < 0.05).length, h = st.truth ? 104 : 80;
+      placard(1316, y0 + 40, 200, h);
+      engrave(`${lit} of ${r.pairs.length} pairs lit`, 1416, y0 + 66, 20, "center", "bold");
+      engrave(r.road === "parametric" ? "parametric: Games-Howell" : "rank road: Dunn", 1416, y0 + 94, 14, "center", "italic");
+      if (st.truth) engrave(`${flukes} fluke${flukes === 1 ? "" : "s"} · ${real} real`, 1416, y0 + 120, 16, "center", "bold",
+        flukes ? "rgba(150,26,10,.98)" : "rgba(40,22,6,.93)");
     }
     placard(LEVER.x - 62, LEVER.y + 18, 124, 32);
     engrave(st.corrected ? "corrected" : "no correction", LEVER.x, LEVER.y + 34, 15, "center", "italic bold",
       st.corrected ? "rgba(28,70,40,.95)" : "rgba(140,30,12,.95)");
   }
 
-  // The act 4 lever stands on the paving between the lamps and the count; click it to throw it.
-  const LEVER = { x: 1345, y: 322 };     // above the triangle's diagonal, clear of the lamps and the amphora
+  // The act 4 lever stands on the paving right of the lamps, under the count; click it to throw it.
+  const LEVER = { x: 1420, y: 396 };     // clear of a five-water triangle (right edge x ~1300) and the count
   const onLever = (p) => Math.abs(p.x - LEVER.x) < 50 && p.y > LEVER.y - 170 && p.y < LEVER.y + 45;
   let leverBtn = null;
   function toggleLever() {
@@ -692,9 +752,9 @@ export function mountFishBoard(host, opts = {}) {
     1: "The harbor holds every fish: that is the population. A net brings up a sample, and its mean is our best guess at the harbor's mean. Cast again: every sample, and every sample mean, comes out a little different.",
     2: "Two nets in the same water, so the null hypothesis is true: there is no difference to find. The needle shows the Welch t-test's p-value. Keep casting, and about one cast in twenty still lands in the red.",
     3: "Two waters. Check each catch for normality, then take the matching road. Welch's t-test compares the means against their spread; the Wilcox test lines every fish up by size and asks whether one net's fish tend to run larger.",
-    4: "Ten boats fishing the same water, so every difference is chance. Compare all 45 pairs with no correction and a couple of lamps light on most casts. Pull the lever to correct for the number of comparisons.",
+    4: "Several waters, one boat in each. Some waters hold the same kind of fish and some do not: you choose. Every pair of waters gets a lamp. With no correction, now and then two waters that are really the same light a lamp, a fluke. Pull the lever to correct for the number of comparisons: the flukes go out, and the big real differences stay lit.",
   };
-  function waterSelect(val, onChange, keys = Object.keys(WATERS)) {
+  function waterSelect(val, onChange, keys = BASE) {
     const s = document.createElement("select");
     for (const k of keys) { const o = document.createElement("option"); o.value = k; o.textContent = WATERS[k].name; if (k === val) o.selected = true; s.appendChild(o); }
     s.onchange = () => { onChange(s.value); resetAct(); };
@@ -723,12 +783,26 @@ export function mountFishBoard(host, opts = {}) {
       ctl.appendChild(btn("Throw in a monster", throwMonster));
     }
     if (st.act === 4) {
-      ctl.appendChild(labelled("Water", waterSelect(st.water5, (v) => { st.water5 = v; st.road5 = WATERS[v].kind === "normal" ? "parametric" : "rank"; buildControls(); }, ["open", "lake"])));
+      const kSel = document.createElement("select"); kSel.className = "fishboardwatercount";
+      for (let k = ACT4_MIN; k <= ACT4_MAX; k++) { const o = document.createElement("option"); o.value = k; o.textContent = k + " waters"; if (k === st.slots.length) o.selected = true; kSel.appendChild(o); }
+      kSel.onchange = () => {
+        const k = Number(kSel.value), s = st.slots.slice(0, k);
+        while (s.length < k) s.push(ACT4_START[s.length] || "open");
+        setWaters(s);
+      };
+      ctl.appendChild(labelled("How many", kSel));
+      st.slots.forEach((kind, i) => {
+        const s = waterSelect(kind, () => {});
+        s.className = "fishboardslot"; s.dataset.slot = String(i);
+        s.onchange = () => { const next = [...st.slots]; next[i] = s.value; setWaters(next); };
+        ctl.appendChild(labelled("Water " + (i + 1), s));
+      });
+      ctl.appendChild(btn("Starting setup", () => setWaters([...ACT4_START])));
       const road = document.createElement("select");
       for (const [k, t] of [["parametric", "parametric road (Games-Howell)"], ["rank", "rank road (Dunn)"]]) { const o = document.createElement("option"); o.value = k; o.textContent = t; if (k === st.road5) o.selected = true; road.appendChild(o); }
       road.onchange = () => { st.road5 = road.value; resetAct(); };
       ctl.appendChild(labelled("Road", road));
-      ctl.appendChild(check("Boat 1 fishes elsewhere", st.elsewhere, (v) => { st.elsewhere = v; resetAct(); }));
+      ctl.appendChild(check("Show flukes and real differences", st.truth, (v) => { st.truth = v; remember(); }));
       leverBtn = btn(st.corrected ? "Lever: corrected" : "Lever: no correction", toggleLever);
       ctl.appendChild(leverBtn);
     }
@@ -744,7 +818,21 @@ export function mountFishBoard(host, opts = {}) {
     if (st.act === 1) el.innerHTML = `casts <b>${h}</b>`;
     if (st.act === 2) el.innerHTML = `casts <b>${h}</b> · in the red <b>${T.sig || 0}</b> (${pct(T.sig || 0, h)})`;
     if (st.act === 3) el.innerHTML = `casts <b>${h}</b>`;
-    if (st.act === 4) el.innerHTML = `casts <b>${h}</b> · any lamp lit: no correction <b>${pct(T.anyRaw || 0, h)}</b>, corrected <b>${pct(T.anyCor || 0, h)}</b> · lamps per cast <b>${h ? ((T.litRaw || 0) / h).toFixed(1) : "-"}</b> vs <b>${h ? ((T.litCor || 0) / h).toFixed(1) : "-"}</b>`;
+    if (st.act === 4) {
+      const parts = [`casts <b>${h}</b>`];
+      if (T.nullCasts) parts.push(`a fluke lit: no correction <b>${pct(T.flukeRaw || 0, T.nullCasts)}</b> of casts, corrected <b>${pct(T.flukeCor || 0, T.nullCasts)}</b>`);
+      if (T.realPairs) parts.push(`real differences found: no correction <b>${pct(T.realRaw || 0, T.realPairs)}</b>, corrected <b>${pct(T.realCor || 0, T.realPairs)}</b>`);
+      el.innerHTML = parts.join(" · ");
+    }
+  }
+  // Act 4's waters: a new setup restocks every water, follows it with the road, and clears the tally.
+  function setWaters(slots) {
+    if (!validSlots(slots)) throw new Error("fish_board: setWaters needs " + ACT4_MIN + "-" + ACT4_MAX + " of " + BASE.join("/"));
+    releaseAll();
+    st.slots = [...slots]; st.road5 = autoRoad(); stockSlots();
+    resetAct();
+    if (st.act === 4) buildControls();
+    remember();
   }
   function resetAct() {
     releaseAll(); st.rows = []; st.flights = []; st.nets = []; st.result = null; st.trail = [];
@@ -776,6 +864,7 @@ export function mountFishBoard(host, opts = {}) {
   const api = {
     ready, seed,
     setAct, cast: () => cast(true), castMany, throwMonster, toggleLever,
+    setWaters,            // act 4: e.g. setWaters(["open", "open", "reef"])
     act: () => st.act,
     state: () => st,
     isSettled: () => flightState(performance.now()).flying.size === 0,

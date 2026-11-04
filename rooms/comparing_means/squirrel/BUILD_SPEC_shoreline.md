@@ -83,11 +83,11 @@ this spec.
 - Replace `data/nut_census.csv` with rooftop-garden soil or substrate chemistry. Write a deterministic
   generator in `_scratch/` with a fixed seed that **asserts** every property below. The old
   `_scratch/build_nut_census.py` is the template.
-- **Ladder shape** (chapter 11): two means t-test → Wilcoxon (mean-vs-median trap) → ANOVA + Tukey /
-  Kruskal-Wallis + Dunn → pairwise + multiple-comparison correction boss.
+- **Ladder shape** (chapter 11): two means t-test → Wilcoxon (mean-vs-median trap) → Games-Howell /
+  Dunn (straight to the pairwise test, no omnibus ANOVA or Kruskal-Wallis first) → pairwise + multiple-comparison correction boss.
 - **Two parallel ladders on the SAME data.**
-  - The parametric player's rungs use t / ANOVA + Tukey / pairwise t + correction.
-  - The rank player's rungs use Wilcoxon / Kruskal-Wallis + Dunn / pairwise Wilcoxon + correction.
+  - The parametric player's rungs use t / Games-Howell / pairwise t + correction.
+  - The rank player's rungs use Wilcoxon / Dunn / pairwise Wilcoxon + correction.
   - Engineer the skew so the two methods **agree in most places and split in exactly the designed
     ones**, where both answers are defensible.
   - Which player (lower or upper) is parametric is open: pick one, flag it for Lucas.
@@ -167,7 +167,7 @@ the one sign-off that is Lucas's. The settled design is in `AGENTS.md` and `note
    - All eight graded puzzles are on `plannedHotspots`, written by the builder: `CONTENT`, `final_options()` and `rung()`.
    - Option texts come only from `soil_ladder_key.json`. The R1 and R2 curation follows notes.md.
    - `ladderPlain` and `escapeBrief` are written.
-   - The hints use the book's own calls (`tTest`, `tukeyTest` and the rest), which the shared console provides.
+   - The hints use the book's own calls (`tTest`, `gamesHowellTest` and the rest), which the shared console provides.
    - `verify_ladder.py` section (6) re-derives the WIRED option sets in R and pins the content rules. Its break test fails as it should.
    - Preflight re-stamped. A Sonnet check confirmed it, and its two findings are fixed: no key sits first or last, and each `ladderPlain` entry is one sentence.
    - The book's test functions now come from the shared console. They are browser-verified, including the `p.adj` columns and the Holm default. A full Seedfall play-through in a browser is still owed at closeout.

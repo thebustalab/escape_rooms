@@ -23,8 +23,8 @@
  * browser (shared/live_solo.js), answering the same calls; everything below works unchanged on top of it.
  */
 
-import "./fish_stats.js?v=151";
-import { SoloSession } from "./live_solo.js?v=151";     // window.FishStats: the fish board's tests (Welch t), pinned to R
+import "./fish_stats.js?v=152";
+import { SoloSession } from "./live_solo.js?v=152";     // window.FishStats: the fish board's tests (Welch t), pinned to R
 
 const POLL_MS = 2000;
 const STORE = "liveSession";        // localStorage: { pid, code }
