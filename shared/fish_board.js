@@ -9,10 +9,11 @@
 //
 //   1 Population and sample   2 Same water, two nets (Welch)
 //   3 Two waters (Welch vs Wilcox, picked by Shapiro)
-//   4 Several waters (3-5 waters, one boat each, each water's fish chosen by the player: some the same,
-//     some not; every pair's lamp, the lever = Games-Howell / Dunn-Holm, and each lit lamp marked as a fluke
-//     or a real difference). Replaced the ten-boats-one-water act 2026-11-03 (Lucas: fewer boats, several
-//     waters, so a class can trigger a false positive between two same waters and see a real one survive).
+//   4 Four waters: four fixed waters, one boat each (three alike, one different and not normal), a small
+//     p dial for each of the six pairs, and the TEST chosen from four (Welch or Wilcox on each pair with no
+//     correction, Games-Howell or Dunn corrected); switching test re-reads the same catch. Replaced the
+//     ten-boats-one-water act 2026-11-03; simplified 2026-11-04 (Lucas: fixed waters, choose the test,
+//     dials like the earlier acts, drop every control that does not change anything).
 // An "Is the catch normal?" act (Shapiro alone) was cut 2026-10-26 (Lucas: students grasp it); act 3 still
 // runs Shapiro on each catch to pick its road.
 //
@@ -25,10 +26,10 @@
 // fish, dial, needle, net, lamp, lever. All are required: a missing one shows "could not load".
 //
 //   const fb = mountFishBoard(hostEl, { geometry, art, pegs?, onPegs?(state), seed? });
-//   fb.setAct(n); fb.cast(); fb.castMany(k); fb.throwMonster(); fb.toggleLever(); fb.state();
-//   fb.leverClient() → client {x, y} of the act 4 lever; fb.ready (Promise); fb.destroy().
+//   fb.setAct(n); fb.cast(); fb.castMany(k); fb.throwMonster(); fb.setTest(key); fb.state();
+//   fb.ready (Promise); fb.destroy().  (The lever sprite is still required art but no act draws it now.)
 // The canvas carries the API as `canvas.fishBoard` for tests.
-import "./fish_stats.js?v=152";     // window.FishStats: the board's tests (Welch, Shapiro, Wilcox, Games-Howell, Dunn), pinned to R
+import "./fish_stats.js?v=153";     // window.FishStats: the board's tests (Welch, Shapiro, Wilcox, Games-Howell, Dunn), pinned to R
 
 const loadImg = (src) => new Promise((res) => {
   if (!src) return res(null);
@@ -36,12 +37,18 @@ const loadImg = (src) => new Promise((res) => {
   im.onload = () => res(im); im.onerror = () => res(null); im.src = src;
 });
 const SPRITES = ["board", "plank", "fish", "dial", "needle", "net", "lamp", "lever"];
-const ACT_NAMES = ["Population and sample", "Same water, two nets", "Two waters", "Several waters"];
-// Act 4's starting setup: three identical waters (their pairs can only light by chance), the harbor mouth
-// (a modest difference the correction often costs) and the outer reef (a big one it keeps). Simulated
-// 2026-11-03 at 8 fish a net: a fluke lit on ~16% of casts uncorrected vs ~3% corrected.
-const ACT4_START = ["open", "open", "open", "mouth", "reef"];
-const ACT4_MIN = 3, ACT4_MAX = 5;
+const ACT_NAMES = ["Population and sample", "Same water, two nets", "Two waters", "Four waters"];
+// Act 4's waters, fixed (Lucas, 2026-11-04): three alike, so their three pairs can only differ by chance, and
+// one lake water, both different and not normal, so the Shapiro result points at the rank tests.
+// Simulated at 8 fish a net: some same-water dial in the red on ~12% of casts with Welch or Wilcox per pair,
+// ~2% with Games-Howell, ~0% with Dunn; the lake's pairs found ~50-60% uncorrected, ~35-40% corrected.
+const ACT4_WATERS = ["open", "open", "open", "lake"];
+const TESTS4 = {
+  welch:  { name: "Welch t-test on each pair (no correction)", short: "Welch t-test, each pair", corrected: false },
+  gh:     { name: "Games-Howell test (corrected)",             short: "Games-Howell (corrected)", corrected: true },
+  wilcox: { name: "Wilcox test on each pair (no correction)",  short: "Wilcox test, each pair", corrected: false },
+  dunn:   { name: "Dunn test (corrected)",                     short: "Dunn, Holm (corrected)", corrected: true },
+};
 
 export function mountFishBoard(host, opts = {}) {
   const G = opts.geometry;
@@ -54,10 +61,12 @@ export function mountFishBoard(host, opts = {}) {
   const R = S.rng(seed);
   let dead = false, raf = 0;
 
-  // ---- DOM: act tabs, caption, the letterboxed canvas, controls ----
+  // ---- DOM: act tabs, then the canvas with the act's lesson beside it (in the space the letterbox used to
+  // waste; below it on a narrow screen), then the controls ----
   const wrap = document.createElement("div"); wrap.className = "fishboard";
   const tabs = document.createElement("div"); tabs.className = "fishboardtabs";
-  const caption = document.createElement("div"); caption.className = "fishboardcaption";
+  const stage = document.createElement("div"); stage.className = "fishboardstage";
+  const lesson = document.createElement("div"); lesson.className = "fishboardlesson";
   const cv = document.createElement("canvas"); cv.className = "fishboardcanvas";
   cv.style.aspectRatio = `${G.imageW} / ${G.imageH}`;
   const ctl = document.createElement("div"); ctl.className = "fishboardcontrols";
@@ -65,7 +74,8 @@ export function mountFishBoard(host, opts = {}) {
     const t = document.createElement("button"); t.type = "button"; t.className = "fishboardtab"; t.dataset.act = String(i + 1);
     t.textContent = `${i + 1} · ${name}`; t.onclick = () => setAct(i + 1); tabs.appendChild(t);
   });
-  wrap.append(tabs, caption, cv, ctl);
+  stage.append(cv, lesson);
+  wrap.append(tabs, stage, ctl);
   host.appendChild(wrap);
   const ctx = cv.getContext("2d");
 
@@ -74,7 +84,6 @@ export function mountFishBoard(host, opts = {}) {
   const WATERS = {
     open:  { name: "Open harbor",   kind: "normal", tint: "#1d4a63", draw: () => R.normal(30, 5) },
     mouth: { name: "Harbor mouth",  kind: "normal", tint: "#1f5568", draw: () => R.normal(35, 5) },
-    reef:  { name: "Outer reef",    kind: "normal", tint: "#1a5f70", draw: () => R.normal(40, 5) },
     // Skewed waters: a shoal of small fry plus about one big fish in seven. Tuned (2026-10-25) so Shapiro
     // flags about 30% of 5-fish catches, 60% of 8 and 90% of 15: small nets often hide the skew.
     lake:  { name: "Lake harbor",   kind: "skewed", tint: "#24524a", draw: () => (R() < 0.15 ? R.normal(45, 7) : 15 * Math.exp(R.normal(0, 0.3))) },
@@ -93,8 +102,8 @@ export function mountFishBoard(host, opts = {}) {
     w.trueMean = S.mean(w.fish.map((f) => f.len));
   }
   for (const key of BASE) stock(WATERS[key], key);
-  // Act 4's waters are their own populations ("w0".."w4"), each stocked from its chosen kind: two waters of
-  // the same kind hold different fish from the same distribution, which is exactly the null hypothesis.
+  // Act 4's waters are their own populations ("w0".."w3"), each stocked from its kind: two waters of the
+  // same kind hold different fish from the same distribution, which is exactly the null hypothesis.
   const slotKey = (i) => "w" + i;
   function stockSlots() {
     for (const k of Object.keys(WATERS)) if (!BASE.includes(k)) delete WATERS[k];
@@ -104,7 +113,6 @@ export function mountFishBoard(host, opts = {}) {
       stock(WATERS[key], key);
     });
   }
-  const validSlots = (s) => Array.isArray(s) && s.length >= ACT4_MIN && s.length <= ACT4_MAX && s.every((k) => BASE.includes(k));
 
   // ---------- state ----------
   const st = {
@@ -112,8 +120,8 @@ export function mountFishBoard(host, opts = {}) {
     n: Number(saved.n) || 8,
     numbers: saved.numbers !== false,
     water: "open", waterA: "open", waterB: "mouth",
-    slots: validSlots(saved.slots) ? [...saved.slots] : [...ACT4_START],
-    drain: false, corrected: false, road5: "parametric", truth: saved.truth !== false,
+    slots: [...ACT4_WATERS], test4: TESTS4[saved.test4] ? saved.test4 : "welch",
+    drain: false,
     rows: [],            // [{ fish: [fishObj], color, label }]
     nets: [],            // nets rising out of the water: [{ ri, t0, n }]
     flights: [],         // animation of caught fish
@@ -122,12 +130,10 @@ export function mountFishBoard(host, opts = {}) {
     tally: {},
     monster: false,
   };
-  const autoRoad = () => (st.slots.some((k) => WATERS[k].kind === "skewed") ? "rank" : "parametric");
-  st.road5 = autoRoad();
   stockSlots();
-  const remember = () => opts.onPegs && opts.onPegs({ act: st.act, n: st.n, numbers: st.numbers, slots: [...st.slots], truth: st.truth });
+  const remember = () => opts.onPegs && opts.onPegs({ act: st.act, n: st.n, numbers: st.numbers, test4: st.test4 });
   const C_A = "#e0a83a", C_B = "#4fc0b4";
-  const BOAT_COLS = ["#e0a83a", "#4fc0b4", "#d47a6a", "#9fb85a", "#b48ad6"];
+  const BOAT_COLS = ["#e0a83a", "#4fc0b4", "#d47a6a", "#9fb85a"];
 
   // ---------- canvas, letterboxed to the logical board ----------
   // The board is the edge of the quay seen from straight above (Lucas, 2026-10-25): the measuring boards lie
@@ -252,12 +258,14 @@ export function mountFishBoard(host, opts = {}) {
       st.result = compute3(L);
     } else if (st.act === 4) {
       st.result = compute4(L);
-      const r = st.result, add = (k, v) => { T[k] = (T[k] || 0) + v; };
-      const lit = (ps, want) => r.same.filter((s, k) => s === want && ps[k] < 0.05).length;
-      // flukes: casts where any pair of SAME waters lit; finds: the share of truly different pairs lit
-      if (r.same.some((s) => s)) { add("nullCasts", 1); add("flukeRaw", lit(r.raw, true) ? 1 : 0); add("flukeCor", lit(r.cor, true) ? 1 : 0); }
-      add("realPairs", r.same.filter((s) => !s).length);
-      add("realRaw", lit(r.raw, false)); add("realCor", lit(r.cor, false));
+      // every test is scored on every cast, so switching test shows its own record at once
+      const r = st.result;
+      for (const key of Object.keys(TESTS4)) {
+        const ps = r.ps[key], U = (T[key] = T[key] || { flukes: 0, found: 0, realPairs: 0 });
+        if (r.same.some((x, q) => x && ps[q] < 0.05)) U.flukes++;
+        U.realPairs += r.same.filter((x) => !x).length;
+        U.found += r.same.filter((x, q) => !x && ps[q] < 0.05).length;
+      }
     }
     updateTally();
   }
@@ -267,20 +275,14 @@ export function mountFishBoard(host, opts = {}) {
     return { shA, shB, road, welch: S.welch(L[0], L[1]), wilcox: S.wilcox(L[0], L[1]) };
   }
   function compute4(L) {
-    // The road follows the waters chosen (any lake water: the rank road), with a manual override, not a
-    // Shapiro test per catch: with five catches one fails by chance often enough to flip the road mid-demo.
-    const road = st.road5;
-    let raw, cor, pairs;
-    if (road === "parametric") {
-      // uncorrected = a Welch t per pair, so the lever changes only the correction (Games-Howell)
-      const u = S.pairwiseWelch(L), t = S.gamesHowell(L);
-      raw = u.map((r) => r.p); cor = t.map((r) => r.p); pairs = t.map((r) => [r.i, r.j]);
-    } else {
-      const d = S.dunn(L);
-      raw = d.map((r) => r.p); cor = d.map((r) => r.pAdj); pairs = d.map((r) => [r.i, r.j]);
-    }
+    const gh = S.gamesHowell(L), welch = S.pairwiseWelch(L), dunn = S.dunn(L);
+    const pairs = gh.map((r) => [r.i, r.j]);
+    const ps = {
+      welch: welch.map((r) => r.p), gh: gh.map((r) => r.p),
+      wilcox: pairs.map(([i, j]) => S.wilcox(L[i], L[j]).p), dunn: dunn.map((r) => r.pAdj),
+    };
     const same = pairs.map(([i, j]) => st.slots[i] === st.slots[j]);    // the truth: same kind of water
-    return { road, raw, cor, pairs, same };
+    return { pairs, same, ps, sh: L.map((x) => S.shapiro(x)) };
   }
   function throwMonster() {
     if (st.act !== 3 || !st.rows.length || st.monster) return;
@@ -473,6 +475,10 @@ export function mountFishBoard(host, opts = {}) {
         ctx.strokeStyle = "rgba(40,22,6,.8)"; ctx.lineWidth = 1; ctx.stroke();
         engrave(row.label, box.x + 34, cy, 17, "left", "italic bold");
         engrave(row.sub, box.x + 16, cy + 22, 13, "left", "italic");
+        const sh = st.result && st.result.sh && st.result.sh[ri];
+        if (sh && row.fish.every((f) => !flying.has(f)))
+          engrave(sh.p < 0.05 ? "not normal" : "normal?", box.x + 16, cy + 42, 13, "left", "bold",
+            sh.p < 0.05 ? "rgba(140,30,12,.95)" : "rgba(28,70,40,.95)");
       } else if (small) {
         ctx.fillStyle = row.color; ctx.beginPath(); ctx.arc(box.x + 42, box.y + box.h / 2 - 2, 6, 0, Math.PI * 2); ctx.fill();
         ctx.strokeStyle = "rgba(40,22,6,.8)"; ctx.lineWidth = 1; ctx.stroke();
@@ -644,7 +650,7 @@ export function mountFishBoard(host, opts = {}) {
       }
       drawRankLine(ready);
     } else if (st.act === 4 && r) {
-      drawTriangle(ready);
+      drawDials(ready);
     }
   }
   // Act 3: both catches nose to tail by size, coloured by net, rank tags, mean-rank wedges.
@@ -670,62 +676,19 @@ export function mountFishBoard(host, opts = {}) {
       engrave("mean rank", x, box.y + 126, 13, "center", "italic");
     });
   }
-  // Act 4: one lamp per pair of waters, in a triangle, lit when p < 0.05 (raw, or corrected with the lever).
-  // With the truth shown, a lit lamp between two waters of the same kind is tagged a fluke (a false
-  // positive), a lit lamp between different kinds a real difference, and an unlit one there a miss.
-  function waterChip(n, x, y) {
-    ctx.fillStyle = BOAT_COLS[n - 1]; ctx.beginPath(); ctx.arc(x, y, 10, 0, Math.PI * 2); ctx.fill();
-    ctx.strokeStyle = "rgba(40,22,6,.85)"; ctx.lineWidth = 1.2; ctx.stroke();
-    engrave(String(n), x, y + 1, 14, "center", "bold");
-  }
-  function drawTriangle(ready) {
-    const r = st.result, k = st.slots.length, x0 = 950, y0 = 18, cell = 80;
-    const head = st.corrected ? (r.road === "parametric" ? "Games-Howell (corrected)" : "Dunn, Holm (corrected)") : (r.road === "parametric" ? "every pair, no correction" : "every pair (ranks), no correction");
-    placard(x0 + 20, y0 - 6, 340, 40);
-    engrave(head, x0 + 190, y0 + 14, 18, "center", "bold", st.corrected ? "rgba(28,70,40,.95)" : "rgba(140,30,12,.95)");
-    for (let b = 0; b < k - 1; b++) {        // columns are waters 1..k-1, rows waters 2..k
-      waterChip(b + 1, x0 + 30 + b * cell + cell / 2, y0 + 54);
-      waterChip(b + 2, x0 + 14, y0 + 72 + b * cell + cell / 2);
-    }
-    const ps = st.corrected ? r.cor : r.raw;
-    let flukes = 0, real = 0;
+  // Act 4: a small p dial for every pair of waters, read with the chosen test, titled with the truth
+  // (same water or different), so a red dial over "same water" is visibly a fluke.
+  function drawDials(ready) {
+    const r = st.result, t = TESTS4[st.test4];
+    placard(962, 4, 548, 32);
+    engrave(t.name, 1236, 21, 17, "center", "bold", t.corrected ? "rgba(28,70,40,.95)" : "rgba(140,30,12,.95)");
+    const W = 180, cols = [1040, 1236, 1432], tops = [42, 252];
     r.pairs.forEach(([i, j], q) => {
-      const cx = x0 + 30 + i * cell + cell / 2, cy = y0 + 66 + (j - 1) * cell + cell / 2, on = ready && ps[q] < 0.05;
-      lampSprite(cx, cy, 56, on);
-      if (on) { if (r.same[q]) flukes++; else real++; }
-      if (!ready || !st.truth) return;
-      const tag = on ? (r.same[q] ? ["fluke!", "rgba(150,26,10,.98)"] : ["real", "rgba(24,78,40,.98)"])
-        : (r.same[q] ? null : ["missed", "rgba(70,50,30,.8)"]);
-      if (tag) engrave(tag[0], cx, cy + 32, 14, "center", "italic bold", tag[1]);
+      const cx = cols[q % 3], top = tops[Math.floor(q / 3)], same = r.same[q];
+      dial("p4_" + q, cx, top, W, ready ? r.ps[st.test4][q] : null,
+        `${i + 1} & ${j + 1}: ${same ? "same" : "differ"}`, "no difference", "different", top + W * 0.539 + 6);
     });
-    // the lever: upright = no correction, thrown = corrected
-    const lv = IMG.lever, lw = 34, lh = (lw * lv.height) / lv.width;
-    ctx.save(); ctx.translate(LEVER.x, LEVER.y); ctx.rotate(st.corrected ? 0.5 : -0.12);
-    ctx.shadowColor = "rgba(0,0,0,.5)"; ctx.shadowBlur = 8; ctx.shadowOffsetY = 5;
-    ctx.drawImage(lv, -lw / 2, -lh + 20, lw, lh); ctx.restore();
-    if (ready) {
-      const lit = ps.filter((p) => p < 0.05).length, h = st.truth ? 104 : 80;
-      placard(1316, y0 + 40, 200, h);
-      engrave(`${lit} of ${r.pairs.length} pairs lit`, 1416, y0 + 66, 20, "center", "bold");
-      engrave(r.road === "parametric" ? "parametric: Games-Howell" : "rank road: Dunn", 1416, y0 + 94, 14, "center", "italic");
-      if (st.truth) engrave(`${flukes} fluke${flukes === 1 ? "" : "s"} · ${real} real`, 1416, y0 + 120, 16, "center", "bold",
-        flukes ? "rgba(150,26,10,.98)" : "rgba(40,22,6,.93)");
-    }
-    placard(LEVER.x - 62, LEVER.y + 18, 124, 32);
-    engrave(st.corrected ? "corrected" : "no correction", LEVER.x, LEVER.y + 34, 15, "center", "italic bold",
-      st.corrected ? "rgba(28,70,40,.95)" : "rgba(140,30,12,.95)");
   }
-
-  // The act 4 lever stands on the paving right of the lamps, under the count; click it to throw it.
-  const LEVER = { x: 1420, y: 396 };     // clear of a five-water triangle (right edge x ~1300) and the count
-  const onLever = (p) => Math.abs(p.x - LEVER.x) < 50 && p.y > LEVER.y - 170 && p.y < LEVER.y + 45;
-  let leverBtn = null;
-  function toggleLever() {
-    st.corrected = !st.corrected;
-    if (leverBtn) leverBtn.textContent = st.corrected ? "Lever: corrected" : "Lever: no correction";
-  }
-  cv.addEventListener("click", (ev) => { if (st.act === 4 && onLever(toBoard(ev))) toggleLever(); });
-  cv.addEventListener("mousemove", (ev) => { cv.style.cursor = st.act === 4 && onLever(toBoard(ev)) ? "pointer" : ""; });
 
   // ---------- frame loop ----------
   function frame(now) {
@@ -748,11 +711,17 @@ export function mountFishBoard(host, opts = {}) {
   }
 
   // ---------- controls ----------
-  const CAPTIONS = {
-    1: "The harbor holds every fish: that is the population. A net brings up a sample, and its mean is our best guess at the harbor's mean. Cast again: every sample, and every sample mean, comes out a little different.",
-    2: "Two nets in the same water, so the null hypothesis is true: there is no difference to find. The needle shows the Welch t-test's p-value. Keep casting, and about one cast in twenty still lands in the red.",
-    3: "Two waters. Check each catch for normality, then take the matching road. Welch's t-test compares the means against their spread; the Wilcox test lines every fish up by size and asks whether one net's fish tend to run larger.",
-    4: "Several waters, one boat in each. Some waters hold the same kind of fish and some do not: you choose. Every pair of waters gets a lamp. With no correction, now and then two waters that are really the same light a lamp, a fluke. Pull the lever to correct for the number of comparisons: the flukes go out, and the big real differences stay lit.",
+  // Each act's takeaway, in the book's own words (chapter 11, "comparing groups"), with the section it
+  // belongs to (Lucas, 2026-11-04: short, the lesson rather than instructions, sharing the book's language).
+  const LESSONS = {
+    1: ["A sample is a subset of the population. Its mean is our estimate of the population's mean, and every new sample gives a slightly different one.",
+      "definitions: populations and independent measurements"],
+    2: ["The null hypothesis is that there is no difference between the distributions. Even when it is true, about 1 test in 20 gives p < 0.05 by chance alone.",
+      "definitions: the null hypothesis, the p value"],
+    3: ["Check each group with the Shapiro test first. Normal: use the t-test. Not normal: use the Wilcox test, which works on ranks, so an extreme value cannot distort it.",
+      "test selection; two means"],
+    4: ["Testing many pairs multiplies the chances of a false positive. The Games-Howell and Dunn tests correct the p values for the number of comparisons. Water 4 is not normal, so here it is Dunn.",
+      "more than two means"],
   };
   function waterSelect(val, onChange, keys = BASE) {
     const s = document.createElement("select");
@@ -766,7 +735,7 @@ export function mountFishBoard(host, opts = {}) {
   function castMany(k) { for (let i = 0; i < k - 1; i++) cast(false); cast(true); }
   let tallyEl = null;
   function buildControls() {
-    ctl.innerHTML = ""; leverBtn = null;
+    ctl.innerHTML = "";
     ctl.appendChild(btn("Cast the net", () => cast(true), true));
     ctl.appendChild(btn("Cast 20 times", () => castMany(20)));
     const nSel = document.createElement("select");
@@ -783,28 +752,10 @@ export function mountFishBoard(host, opts = {}) {
       ctl.appendChild(btn("Throw in a monster", throwMonster));
     }
     if (st.act === 4) {
-      const kSel = document.createElement("select"); kSel.className = "fishboardwatercount";
-      for (let k = ACT4_MIN; k <= ACT4_MAX; k++) { const o = document.createElement("option"); o.value = k; o.textContent = k + " waters"; if (k === st.slots.length) o.selected = true; kSel.appendChild(o); }
-      kSel.onchange = () => {
-        const k = Number(kSel.value), s = st.slots.slice(0, k);
-        while (s.length < k) s.push(ACT4_START[s.length] || "open");
-        setWaters(s);
-      };
-      ctl.appendChild(labelled("How many", kSel));
-      st.slots.forEach((kind, i) => {
-        const s = waterSelect(kind, () => {});
-        s.className = "fishboardslot"; s.dataset.slot = String(i);
-        s.onchange = () => { const next = [...st.slots]; next[i] = s.value; setWaters(next); };
-        ctl.appendChild(labelled("Water " + (i + 1), s));
-      });
-      ctl.appendChild(btn("Starting setup", () => setWaters([...ACT4_START])));
-      const road = document.createElement("select");
-      for (const [k, t] of [["parametric", "parametric road (Games-Howell)"], ["rank", "rank road (Dunn)"]]) { const o = document.createElement("option"); o.value = k; o.textContent = t; if (k === st.road5) o.selected = true; road.appendChild(o); }
-      road.onchange = () => { st.road5 = road.value; resetAct(); };
-      ctl.appendChild(labelled("Road", road));
-      ctl.appendChild(check("Show flukes and real differences", st.truth, (v) => { st.truth = v; remember(); }));
-      leverBtn = btn(st.corrected ? "Lever: corrected" : "Lever: no correction", toggleLever);
-      ctl.appendChild(leverBtn);
+      const tSel = document.createElement("select"); tSel.className = "fishboardtest";
+      for (const [k, t] of Object.entries(TESTS4)) { const o = document.createElement("option"); o.value = k; o.textContent = t.name; if (k === st.test4) o.selected = true; tSel.appendChild(o); }
+      tSel.onchange = () => setTest(tSel.value);
+      ctl.appendChild(labelled("Test", tSel));
     }
     ctl.appendChild(btn("Clear the tally", () => { st.tally[st.act] = {}; st.trail = []; updateTally(); }));
     ctl.appendChild(check("p-values", st.numbers, (v) => { st.numbers = v; remember(); }));
@@ -819,20 +770,16 @@ export function mountFishBoard(host, opts = {}) {
     if (st.act === 2) el.innerHTML = `casts <b>${h}</b> · in the red <b>${T.sig || 0}</b> (${pct(T.sig || 0, h)})`;
     if (st.act === 3) el.innerHTML = `casts <b>${h}</b>`;
     if (st.act === 4) {
-      const parts = [`casts <b>${h}</b>`];
-      if (T.nullCasts) parts.push(`a fluke lit: no correction <b>${pct(T.flukeRaw || 0, T.nullCasts)}</b> of casts, corrected <b>${pct(T.flukeCor || 0, T.nullCasts)}</b>`);
-      if (T.realPairs) parts.push(`real differences found: no correction <b>${pct(T.realRaw || 0, T.realPairs)}</b>, corrected <b>${pct(T.realCor || 0, T.realPairs)}</b>`);
-      el.innerHTML = parts.join(" · ");
+      const U = T[st.test4], t = TESTS4[st.test4];
+      el.innerHTML = `casts <b>${h}</b>` + (U ? ` · ${t.short}: a same-water pair in the red on <b>${pct(U.flukes, h)}</b> of casts · real differences found <b>${pct(U.found, U.realPairs)}</b>` : "");
     }
   }
-  // Act 4's waters: a new setup restocks every water, follows it with the road, and clears the tally.
-  function setWaters(slots) {
-    if (!validSlots(slots)) throw new Error("fish_board: setWaters needs " + ACT4_MIN + "-" + ACT4_MAX + " of " + BASE.join("/"));
-    releaseAll();
-    st.slots = [...slots]; st.road5 = autoRoad(); stockSlots();
-    resetAct();
-    if (st.act === 4) buildControls();
-    remember();
+  // Act 4: choose the test. The catch stays; the dials and the tally re-read it with the new test.
+  function setTest(key) {
+    if (!TESTS4[key]) throw new Error("fish_board: setTest needs one of " + Object.keys(TESTS4).join("/"));
+    st.test4 = key;
+    const sel = ctl.querySelector("select.fishboardtest"); if (sel) sel.value = key;
+    updateTally(); remember();
   }
   function resetAct() {
     releaseAll(); st.rows = []; st.flights = []; st.nets = []; st.result = null; st.trail = [];
@@ -842,7 +789,12 @@ export function mountFishBoard(host, opts = {}) {
   function setAct(a) {
     st.act = Math.min(4, Math.max(1, Number(a) || 1));
     tabs.querySelectorAll(".fishboardtab").forEach((t) => t.classList.toggle("on", Number(t.dataset.act) === st.act));
-    caption.textContent = CAPTIONS[st.act];
+    const [text, where] = LESSONS[st.act];
+    lesson.innerHTML = "";
+    const h = document.createElement("div"); h.className = "fishboardlessonhead"; h.textContent = "Lesson";
+    const t = document.createElement("p"); t.className = "fishboardlessontext"; t.textContent = text;
+    const b = document.createElement("div"); b.className = "fishboardlessonbook"; b.textContent = "In the book: comparing groups, " + where;
+    lesson.append(h, t, b);
     resetAct();
     buildControls();
     remember();
@@ -863,14 +815,11 @@ export function mountFishBoard(host, opts = {}) {
 
   const api = {
     ready, seed,
-    setAct, cast: () => cast(true), castMany, throwMonster, toggleLever,
-    setWaters,            // act 4: e.g. setWaters(["open", "open", "reef"])
+    setAct, cast: () => cast(true), castMany, throwMonster,
+    setTest,              // act 4: "welch" | "gh" | "wilcox" | "dunn"
     act: () => st.act,
     state: () => st,
     isSettled: () => flightState(performance.now()).flying.size === 0,
-    // client coordinates of the act 4 lever's handle, for a real click in tests
-    leverClient: () => { const r = cv.getBoundingClientRect();
-      return { x: r.left + (LEVER.x * scale + ox) / dpr, y: r.top + ((LEVER.y - 80) * scale + oy) / dpr }; },
     destroy() {
       if (dead) return;
       dead = true; cancelAnimationFrame(raf);
