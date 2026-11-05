@@ -4,7 +4,7 @@
   "id": 29,
   "status": "in_development",
   "doorLabels": true,
-  "_designNotes": "Step-2 state (2026-11-01, session ANOVA): locked escape (escapeBrief), verified graded ladder in notes.md \u00a76, data in data/pot_trial.csv. title/subtitle/story/enterLabel are STEP-2 DRAFTS, to be locked at step 3b (escape_room_geography). No rooms, no art. Step 3a (blueprint) 2026-11-01: logline 'The Last Train', Saturday morning, beats, lock escape verified; numbers reworked at step 3b (storm-felled line near dawn: dials 6:30/7:00, regulator 9:15, answer 135), ambience set (notes.md \u00a78). Step 3b (geography) DONE 2026-11-01 and LOCKED: shared world in ../places_brief.md; world skeleton cellars/_scratch/world_skeleton/world.py; accepted aerials cellars/world_plates/master/ (master_sw = fog_in_bands, from_north); landing text vetted (.vetted_story.txt); coverPrompt and worldPlatePrompt authored. Next: step 4a escape_room_network.",
+  "_designNotes": "Step-2 state (2026-11-01, session ANOVA): locked escape (escapeBrief), verified graded ladder in notes.md §6, data in data/pot_trial.csv. title/subtitle/story/enterLabel are STEP-2 DRAFTS, to be locked at step 3b (escape_room_geography). No rooms, no art. Step 3a (blueprint) 2026-11-01: logline 'The Last Train', Saturday morning, beats, lock escape verified; numbers reworked at step 3b (storm-felled line near dawn: dials 6:30/7:00, regulator 9:15, answer 135), ambience set (notes.md §8). Step 3b (geography) DONE 2026-11-01 and LOCKED: shared world in ../places_brief.md; world skeleton cellars/_scratch/world_skeleton/world.py; accepted aerials cellars/world_plates/master/ (master_sw = fog_in_bands, from_north); landing text vetted (.vetted_story.txt); coverPrompt and worldPlatePrompt authored. Next: step 4a escape_room_network.",
   "escapeBrief": "A storm in the night brought the supply line down near dawn, and every electric dial in the house stopped at 6:30: the player is never told, but the bulbs hang dark, the apparatus is dead and they move by torchlight. Mid-ladder they get the power back, and the dials pick up from where they stopped, so from then on every one reads 7:00. A dozen clocks agreeing is the trap: they agree because they share one master clock and stopped together.\n\nTwo clocks are not on the electric system. The keeper's weight-driven regulator, behind a secret door that opens only once the power is back, never stopped: its pendulum swings and it reads 9:15. A wind-up mantel clock has run down at 11:40, its pendulum still; the duty roster shows whose job it was to wind it, and a note shows they left early for the weekend.\n\nThe way out is the back gate from the glasshouse range to the station lane, just past the far end of the big glasshouse: the caretaker has locked the house for the weekend and taken the key. The gate's time-lock runs on the same circuit as the dials. After a power cut the dials have to be advanced by the minutes they lost, and the gate opens when that advance is set. The answer is 135 (9:15 on the running regulator minus 7:00 on the dials), on a three-digit keypad. The gate takes minutes, not a time, so copying any clock face does nothing: the player has to see why the dials are wrong together. That is the boss rung's move: the power cut has an effect on one kind of clock and none on the other, and the answer is the size of the effect where it applies.",
   "title": "The Last Train",
   "subtitle": "Rothamsted Experimental Station, a foggy November morning in the late 1920s",
@@ -48,17 +48,18 @@
           "label": "Up the stair to the hall",
           "to": "entrance_hall",
           "box": [
-            0.4647,
-            0.37,
-            0.5356,
-            0.7765
+            0.455,
+            0.1,
+            0.545,
+            0.72
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "review:agent-vision",
+          "boxNote": "Hand-set 2026-11-04 over the stair and the open door at its head (relit3 art); skeleton draft covered only the threshold."
         }
       ],
       "mapPos": {
-        "c": 3,
-        "r": 2
+        "c": 4,
+        "r": 1
       },
       "authoring": {
         "sceneSpec": {
@@ -96,15 +97,15 @@
             {
               "id": "light_well",
               "at": "just right of centre",
-              "desc": "high in the vault beside the stair, a square iron grating to a light-well open to the fog, and from it a steady stream of last night's storm water still running down into a stone gully that runs along the foot of the wall to an iron drain grating, crossing no doorway",
+              "desc": "high in the vault beside the stair, a square iron grating to a light-well open to the fog, dry, nothing falling from it; below it, along the foot of the wall, a long open stone gully brimming with last night's dark, still storm water, its edges crisp stone, crossing no doorway",
               "motion": {
                 "moves": true,
-                "vigour": "running down steadily and splashing in the gully",
-                "phrase": "a steady stream of storm water runs down from the grating and splashes into the stone gully below"
+                "vigour": "the water in the gully lying almost still",
+                "phrase": "the surface of the water lying in the stone gully ripples very faintly and slowly"
               },
               "sound": {
-                "source": "storm water through the light-well",
-                "character": "a hollow steady splash echoing in the vault",
+                "source": "the water in the gully",
+                "character": "an occasional single drip and a faint hollow lap of water in the vault",
                 "prominence": "hero"
               }
             },
@@ -128,7 +129,8 @@
             "lit": {
               "change": "the lighting -- the cellar's electric lights have just come back on -- and any switch named below",
               "light": "warm yellow light now glows from the bare electric bulbs already hanging under the vault; the oil lamp on the bottom step still burns; the arched doors are still shut",
-              "constraints": "Apart from the bulbs now lit and any switch named above, NOTHING has moved or changed position: the same cellar from the same viewpoint, every door and object exactly where it is in the base scene."
+              "constraints": "Apart from the bulbs now lit and any switch named above, NOTHING has moved or changed position: the same cellar from the same viewpoint, every door and object exactly where it is in the base scene.",
+              "stillOnly": true
             }
           },
           "room": "stair_foot",
@@ -183,24 +185,25 @@
                 ]
               ]
             }
-          }
+          },
+          "stillOnly": true
         },
-        "scenePrompt": "This is a seamless 360-degree panorama from the foot of a narrow stone cellar stair, in a low whitewashed brick-vaulted cellar passage under an old manor house. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stretch of whitewashed brick wall under the vault, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm stretch of wall directly behind the viewer: whitewashed brick under a low brick vault, joining its other half cleanly at the seam directly behind you; to the left, standing well in from the edge of the frame, at the end of the cellar corridor, a low arched plank door in the whitewashed brick, SHUT, whatever lies beyond it hidden; the brick floor runs level to its sill; just left of centre, along the crown of the vault, a few bare electric bulbs hanging dead on cloth flexes; dead ahead in the centre, the narrow stone stair starts on the brick floor at the viewer's feet and climbs straight away UP between whitewashed brick walls to the plank door at its head, standing OPEN, flat grey daylight from the hall falling down the steps; on its bottom step an oil lamp with a glass chimney stands lit, its warm glow on the whitewash; just right of centre, high in the vault beside the stair, a square iron grating to a light-well open to the fog, and from it a steady stream of last night's storm water still running down into a stone gully that runs along the foot of the wall to an iron drain grating, crossing no doorway, running down steadily and splashing in the gully; to the right, standing well in from the edge of the frame, a low arched plank door in the whitewashed brick, SHUT, the brick floor running level to its sill; on the far right, the right half of the calm stretch of wall directly behind the viewer: whitewashed brick under a low brick vault, joining its other half cleanly at the seam directly behind you. a low whitewashed brick-vaulted cellar, damp patches and old cobwebs, a few empty wine racks against the wall, wet brick floor; an English agricultural research station's old red-brick manor house in the late nineteen-twenties, kept and lived in, nothing ruined: dark oak, whitewash, worn stone flags, brass, soft old red brick, beaded wet glass; the morning after a night of storm, still and foggy; photorealistic, restrained colour, fine natural film grain. EXACTLY ONE stair, climbing UP straight ahead from the viewer's feet to the OPEN door at its head. EXACTLY TWO arched plank doors off the passage, both SHUT. No window. No clock. No electric light is lit. No people, no human figures, no faces anywhere. No legible lettering, no readable writing, no captions, no text, no legible numerals on anything except the hands of a clock where one is described. Period-true: no modern fittings, no plastic, no fluorescent tubes, no modern sockets or radiators of modern design. No sunlight, no sun patches, no hard daylight shadows anywhere. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere; everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. Shot on a full-frame DSLR at 24mm, f/8, a warm amber glow from the oil lamp standing lit on the bottom step, and flat fog-grey light, no beam or shaft, coming down the stair from the open door at its head and through an iron grating overhead; the electric bulbs dead, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above \u2014 no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a plain stretch of whitewashed brick wall under the vault, uniform and unbroken, with no visible seam, join, or repetition.",
+        "scenePrompt": "This is a seamless 360-degree panorama from the foot of a narrow stone cellar stair, in a low whitewashed brick-vaulted cellar passage under an old manor house. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stretch of whitewashed brick wall under the vault, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm stretch of wall directly behind the viewer: whitewashed brick under a low brick vault, joining its other half cleanly at the seam directly behind you; to the left, standing well in from the edge of the frame, at the end of the cellar corridor, a low arched plank door in the whitewashed brick, SHUT, whatever lies beyond it hidden; the brick floor runs level to its sill; just left of centre, along the crown of the vault, a few bare electric bulbs hanging dead on cloth flexes; dead ahead in the centre, the narrow stone stair starts on the brick floor at the viewer's feet and climbs straight away UP between whitewashed brick walls to the plank door at its head, standing OPEN, flat grey daylight from the hall falling down the steps; on its bottom step an oil lamp with a glass chimney stands lit, its warm glow on the whitewash; just right of centre, high in the vault beside the stair, a square iron grating to a light-well open to the fog, dry, nothing falling from it; below it, along the foot of the wall, a long open stone gully brimming with last night's dark, still storm water, its edges crisp stone, crossing no doorway, the water in the gully lying almost still; to the right, standing well in from the edge of the frame, a low arched plank door in the whitewashed brick, SHUT, the brick floor running level to its sill; on the far right, the right half of the calm stretch of wall directly behind the viewer: whitewashed brick under a low brick vault, joining its other half cleanly at the seam directly behind you. a low whitewashed brick-vaulted cellar, damp patches and old cobwebs, a few empty wine racks against the wall, wet brick floor; an English agricultural research station's old red-brick manor house in the late nineteen-twenties, kept and lived in, nothing ruined: dark oak, whitewash, worn stone flags, brass, soft old red brick, beaded wet glass; the morning after a night of storm, still and foggy; photorealistic, restrained colour, fine natural film grain. EXACTLY ONE stair, climbing UP straight ahead from the viewer's feet to the OPEN door at its head. EXACTLY TWO arched plank doors off the passage, both SHUT. No window. No clock. No electric light is lit. No people, no human figures, no faces anywhere. No legible lettering, no readable writing, no captions, no text, no legible numerals on anything except the hands of a clock where one is described. Period-true: no modern fittings, no plastic, no fluorescent tubes, no modern sockets or radiators of modern design. No sunlight, no sun patches, no hard daylight shadows anywhere. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere; everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. Shot on a full-frame DSLR at 24mm, f/8, a warm amber glow from the oil lamp standing lit on the bottom step, and flat fog-grey light, no beam or shaft, coming down the stair from the open door at its head and through an iron grating overhead; the electric bulbs dead, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a plain stretch of whitewashed brick wall under the vault, uniform and unbroken, with no visible seam, join, or repetition.",
         "relitFrom": "../cellars/stair_foot/scene.png",
         "relitNote": "the committed cellars art, edited (lamplight, doors as stated), never regenerated",
         "plateRefs": [
           "../cellars/world_plates/interiors/cellar.png"
         ],
         "seam": {
-          "stage": "blurred",
-          "band": "sky",
-          "ratio": 0.0,
-          "delta": 0.0,
+          "stage": "screened",
+          "band": "mid",
+          "ratio": 3.53,
+          "delta": 3.89,
           "needsWork": false,
           "accepted": false,
-          "seamBandRun": 0.0,
+          "seamBandRun": 0.007,
           "seamStepRatio": 0.0,
-          "at": "2026-11-03T00:10:49",
+          "at": "2026-11-04T14:21:18",
           "states": {
             "lit": {
               "stage": "blurred",
@@ -214,10 +217,14 @@
               "at": "2026-11-03T01:30:01"
             }
           }
+        },
+        "boxesFrom": {
+          "art": "85b852600257",
+          "at": "2026-11-04T14:21:42"
         }
       },
       "panorama": "stair_foot/scene.png",
-      "builtFrom": "l1_stair_foot_relit.png",
+      "builtFrom": "l1_stair_foot_relit3.png",
       "wrap": {
         "haov": 360,
         "vaov": 90,
@@ -231,19 +238,20 @@
           "type": "door",
           "label": "Up the stair to the hall",
           "box": [
-            0.4647,
-            0.37,
-            0.5356,
-            0.7765
+            0.455,
+            0.1,
+            0.545,
+            0.72
           ],
           "direction": "open",
           "to": "entrance_hall",
-          "boxSource": "draft:skeleton"
+          "boxSource": "review:agent-vision",
+          "boxNote": "Hand-set 2026-11-04 over the stair and the open door at its head (relit3 art); skeleton draft covered only the threshold."
         },
         {
           "id": "lit_wash",
           "type": "ambient",
-          "label": "Nightfall",
+          "label": "Lights on",
           "box": [
             0,
             0,
@@ -261,7 +269,13 @@
                 1
               ],
               "prompt": "Keep this exact scene, composition, camera framing and every object precisely where it is, and change ONLY the lighting -- the cellar's electric lights have just come back on -- and any switch named below: Warm yellow light now glows from the bare electric bulbs already hanging under the vault; the oil lamp on the bottom step still burns; the arched doors are still shut. Apart from the bulbs now lit and any switch named above, NOTHING has moved or changed position: the same cellar from the same viewpoint, every door and object exactly where it is in the base scene.",
-              "panorama": "stair_foot/scene_lit.png"
+              "panorama": "stair_foot/scene_lit.png",
+              "when": {
+                "eq": [
+                  "house_power",
+                  true
+                ]
+              }
             }
           ]
         }
@@ -281,15 +295,16 @@
         {
           "type": "clue",
           "label": "The hall dial",
-          "note": "Every clock gets a close-up (notes \u00a74). Electric slave dial: 6:30 in the dark state, 7:00 once the power is back.",
+          "note": "Every clock gets a close-up (notes §4). Electric slave dial: 6:30 in the dark state, 7:00 once the power is back.",
           "body": "An electric slave dial, one of a dozen through the house. It moves only when the master clock sends it a pulse.",
           "box": [
-            0.24,
-            0.0595,
-            0.26,
-            0.1205
+            0.322,
+            0.165,
+            0.346,
+            0.229
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "review:agent-vision",
+          "boxNote": "Hand-set 2026-11-04 on the round wall dial above the front doorcase (the placer had it on bare wall)."
         },
         {
           "type": "clue",
@@ -486,6 +501,12 @@
               "elements": {
                 "hall_dial": {
                   "look": "the small electric wall clock above the study door now has its hands at seven o'clock"
+                },
+                "oil_lamp": {
+                  "desc": "standing well in from the edge of the frame, on a half-moon table against the panelling between the foot of the staircase and the pair of drawing-room doors, close to the viewer, with the drawing-room doors standing to its right and a stretch of bare dark oak panelling beyond them, a big brass oil lamp with a tall glass chimney, lit, a warm amber flame and a soft glow on the panelling; the table, the lamp and the glow all lie in the middle of the frame, never near the right-hand edge"
+                },
+                "drawing_door": {
+                  "desc": "standing well in from the edge of the frame, to the right of the half-moon table that stands against the panelling just before them, a pair of tall panelled oak doors to the drawing room, SHUT, set flush in the panelled wall with the flagstones running level to their sill, with a stretch of plain dark oak panelling beyond them filling the rest of the way to the right-hand edge of the image"
                 }
               }
             }
@@ -563,7 +584,7 @@
             }
           }
         },
-        "scenePrompt": "This is a seamless 360-degree panorama from the middle of the dim, panelled entrance hall of an old red-brick English manor house. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stretch of dark oak panelling, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm stretch of wall directly behind the viewer: plain dark oak panelling, joining its other half cleanly at the seam directly behind you; to the left, standing well in from the edge of the frame, the house's broad iron-studded oak front door in a deep stone doorcase, SHUT and locked, a big black iron lock-case and keyhole on it and no bar, pale fog-grey light in the fanlight above it; the flagstone floor at the viewer's feet runs level to its sill; to the left, on the panelling just beside the front door at eye height, a printed railway timetable sheet in a narrow black frame, its columns of tiny print too small to read; just left of centre, a tall six-panelled oak door in a moulded doorcase, SHUT, its brass handle dull, set flush in the panelled wall with the flagstones running level to its sill; just left of centre, high on the wall above that doorcase, a small round electric wall clock in a plain brass rim, white face with black hands, the hands standing at half past six; dead ahead in the centre, at the far end of the hall, at the mouth of a short stone-flagged back passage, the half-glazed back door, SHUT, flat pale fog light through its small wet panes; the hall's flagstones run on level into the passage and up to its sill; just right of centre, standing well in from the edge of the frame, the hall's broad oak staircase: its foot and a carved newel post stand on the flagstones a few steps from the viewer, and its single straight flight climbs away from the viewer up to a landing against the far wall, its underside closed in with panelling; just right of centre, set into the panelling under the high end of that staircase, the narrow plain plank door to the cellar stair swung OPEN inward, a dark opening behind it with a faint glimmer of lamplight from below, its sill flush with the flagstones; just right of centre, under the middle of the same flight, nearer the viewer than the cellar door, a small panelled cupboard door, SHUT, its little brass knob at hand height; to the right, standing well in from the edge of the frame, a pair of tall panelled oak doors to the drawing room, SHUT, set flush in the panelled wall with the flagstones running level to their sill; to the right, on a half-moon table against the panelling beside those doors, close to the viewer, a big brass oil lamp with a tall glass chimney, lit, a warm amber flame and a soft glow on the panelling, its flame steady and alive; on the far right, the right half of the calm stretch of wall directly behind the viewer: plain dark oak panelling, joining its other half cleanly at the seam directly behind you. a dim, tall, panelled hall, a worn Turkey runner on the flags, a dead brass electric pendant hanging dark over the stair, outside every window there is only pale, flat, shadowless grey fog: no garden, no building, no sky detail and no sun; an English agricultural research station's old red-brick manor house in the late nineteen-twenties, kept and lived in, nothing ruined: dark oak, whitewash, worn stone flags, brass, soft old red brick, beaded wet glass; the morning after a night of storm, still and foggy; photorealistic, restrained colour, fine natural film grain. EXACTLY ONE clock in the hall: the small round electric wall clock above the study door, its hands at half past six. Every door in the hall is SHUT except the cellar door under the stair, which stands OPEN. The cellar door and the cupboard door are both under the staircase, the cellar door taller. No window shows anything but fog. No people, no human figures, no faces anywhere. No legible lettering, no readable writing, no captions, no text, no legible numerals on anything except the hands of a clock where one is described. Period-true: no modern fittings, no plastic, no fluorescent tubes, no modern sockets or radiators of modern design. No sunlight, no sun patches, no hard daylight shadows anywhere. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere; everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. Shot on a full-frame DSLR at 24mm, f/8, flat, soft, shadowless grey fog light through the windows, the electric lamps all dead and dark, the room dim but every surface legible, with one small warm glow from an oil lamp on a side table, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above \u2014 no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a plain stretch of dark oak panelling, uniform and unbroken, with no visible seam, join, or repetition.",
+        "scenePrompt": "This is a seamless 360-degree panorama from the middle of the dim, panelled entrance hall of an old red-brick English manor house. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stretch of dark oak panelling, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm stretch of wall directly behind the viewer: plain dark oak panelling, joining its other half cleanly at the seam directly behind you; to the left, standing well in from the edge of the frame, the house's broad iron-studded oak front door in a deep stone doorcase, SHUT and locked, a big black iron lock-case and keyhole on it and no bar, pale fog-grey light in the fanlight above it; the flagstone floor at the viewer's feet runs level to its sill; to the left, on the panelling just beside the front door at eye height, a printed railway timetable sheet in a narrow black frame, its columns of tiny print too small to read; just left of centre, a tall six-panelled oak door in a moulded doorcase, SHUT, its brass handle dull, set flush in the panelled wall with the flagstones running level to its sill; just left of centre, high on the wall above that doorcase, a small round electric wall clock in a plain brass rim, white face with black hands, the hands standing at half past six; dead ahead in the centre, at the far end of the hall, at the mouth of a short stone-flagged back passage, the half-glazed back door, SHUT, flat pale fog light through its small wet panes; the hall's flagstones run on level into the passage and up to its sill; just right of centre, standing well in from the edge of the frame, the hall's broad oak staircase: its foot and a carved newel post stand on the flagstones a few steps from the viewer, and its single straight flight climbs away from the viewer up to a landing against the far wall, its underside closed in with panelling; just right of centre, set into the panelling under the high end of that staircase, the narrow plain plank door to the cellar stair swung OPEN inward, a dark opening behind it with a faint glimmer of lamplight from below, its sill flush with the flagstones; just right of centre, under the middle of the same flight, nearer the viewer than the cellar door, a small panelled cupboard door, SHUT, its little brass knob at hand height; to the right, standing well in from the edge of the frame, a pair of tall panelled oak doors to the drawing room, SHUT, set flush in the panelled wall with the flagstones running level to their sill; to the right, on a half-moon table against the panelling beside those doors, close to the viewer, a big brass oil lamp with a tall glass chimney, lit, a warm amber flame and a soft glow on the panelling, its flame steady and alive; on the far right, the right half of the calm stretch of wall directly behind the viewer: plain dark oak panelling, joining its other half cleanly at the seam directly behind you. a dim, tall, panelled hall, a worn Turkey runner on the flags, a dead brass electric pendant hanging dark over the stair, outside every window there is only pale, flat, shadowless grey fog: no garden, no building, no sky detail and no sun; an English agricultural research station's old red-brick manor house in the late nineteen-twenties, kept and lived in, nothing ruined: dark oak, whitewash, worn stone flags, brass, soft old red brick, beaded wet glass; the morning after a night of storm, still and foggy; photorealistic, restrained colour, fine natural film grain. EXACTLY ONE clock in the hall: the small round electric wall clock above the study door, its hands at half past six. Every door in the hall is SHUT except the cellar door under the stair, which stands OPEN. The cellar door and the cupboard door are both under the staircase, the cellar door taller. No window shows anything but fog. No people, no human figures, no faces anywhere. No legible lettering, no readable writing, no captions, no text, no legible numerals on anything except the hands of a clock where one is described. Period-true: no modern fittings, no plastic, no fluorescent tubes, no modern sockets or radiators of modern design. No sunlight, no sun patches, no hard daylight shadows anywhere. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere; everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. Shot on a full-frame DSLR at 24mm, f/8, flat, soft, shadowless grey fog light through the windows, the electric lamps all dead and dark, the room dim but every surface legible, with one small warm glow from an oil lamp on a side table, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a plain stretch of dark oak panelling, uniform and unbroken, with no visible seam, join, or repetition.",
         "relitFrom": "../cellars/entrance_hall/scene.png",
         "relitNote": "the committed cellars art, edited (lamplight, doors as stated), never regenerated",
         "plateRefs": [
@@ -613,13 +634,14 @@
           "type": "clue",
           "label": "The hall dial",
           "box": [
-            0.24,
-            0.0595,
-            0.26,
-            0.1205
+            0.322,
+            0.165,
+            0.346,
+            0.229
           ],
           "body": "An electric slave dial, one of a dozen through the house. It moves only when the master clock sends it a pulse.",
-          "boxSource": "draft:skeleton"
+          "boxSource": "review:agent-vision",
+          "boxNote": "Hand-set 2026-11-04 on the round wall dial above the front doorcase (the placer had it on bare wall)."
         },
         {
           "id": "the_train_timetable",
@@ -704,7 +726,7 @@
         {
           "id": "lit_wash",
           "type": "ambient",
-          "label": "Nightfall",
+          "label": "Lights on",
           "box": [
             0,
             0,
@@ -722,9 +744,36 @@
                 1
               ],
               "prompt": "Keep this exact scene, composition, camera framing and every object precisely where it is, and change ONLY the lighting -- the electric lamps have just come back on -- and any switch, needle or clock hand named below: Warm yellow electric light now glows from every electric lamp already in the room, mixing with the grey fog light; the room is otherwise exactly as it was; the dead brass pendant over the stair now glows. The small electric wall clock above the study door now has its hands at seven o'clock. Apart from the lamps now lit and any switch, needle or clock hand named above, NOTHING has moved or changed position: the same room from the same viewpoint, every door, object and piece of furniture exactly where it is in the base scene, and it is still the same foggy morning outside.",
-              "panorama": "entrance_hall/scene_lit.png"
+              "panorama": "entrance_hall/scene_lit.png",
+              "when": {
+                "eq": [
+                  "house_power",
+                  true
+                ]
+              }
             }
           ]
+        },
+        {
+          "id": "clip_base",
+          "type": "ambient",
+          "label": "Scene motion (base)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/play-source.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "entrance_hall/cine_base.mp4"
+          }
         }
       ]
     },
@@ -737,7 +786,7 @@
       "built": true,
       "unlockedWhen": true,
       "level": 1,
-      "designNote": "RUNG 1 at the Director's desk: his draft ('soil makes no difference; water generously') and the pot trial. One-way ANOVA of watering on grain_weight; ges. ANSWER 0.200 (check, \u00b1 0.005). Solving frees the potting-shed key from the desk. The wind-up MANTEL CLOCK stopped at 11:40 (pendulum still); the DUTY ROSTER and the note that its winder left early. The Fisher & Mackenzie 1923 volume on the desk (the plaque). The CLOCK CLOSET behind the panelling: in the lit state the panel stands open on the keeper's REGULATOR, 9:15, pendulum swinging (cinemagraph, tick sfx). Drawn only in the lit state.",
+      "designNote": "RUNG 1 at the Director's desk: his draft ('soil makes no difference; water generously') and the pot trial. One-way ANOVA of watering on grain_weight; ges. ANSWER 0.200 (check, ± 0.005). Solving frees the potting-shed key from the desk. The wind-up MANTEL CLOCK stopped at 11:40 (pendulum still); the DUTY ROSTER and the note that its winder left early. The Fisher & Mackenzie 1923 volume on the desk (the plaque). The CLOCK CLOSET behind the panelling: in the lit state the panel stands open on the keeper's REGULATOR, 9:15, pendulum swinging (cinemagraph, tick sfx). Drawn only in the lit state.",
       "plannedHotspots": [
         {
           "type": "puzzle",
@@ -774,7 +823,7 @@
         {
           "type": "clue",
           "label": "The mantel clock",
-          "note": "Every clock gets a close-up (notes \u00a74). Wind-up, run down at 11:40; pendulum still.",
+          "note": "Every clock gets a close-up (notes §4). Wind-up, run down at 11:40; pendulum still.",
           "body": "A wind-up mantel clock. Its hands stand at twenty to twelve, and its pendulum hangs still.",
           "box": [
             0.32,
@@ -800,7 +849,7 @@
         {
           "type": "clue",
           "label": "The regulator",
-          "note": "Every clock gets a close-up (notes \u00a74). Escape input: weight-driven, never stopped, 9:15. Behind the panelling, visible only in the lit state.",
+          "note": "Every clock gets a close-up (notes §4). Escape input: weight-driven, never stopped, 9:15. Behind the panelling, visible only in the lit state.",
           "shownWhen": {
             "eq": [
               "house_power",
@@ -808,7 +857,13 @@
             ]
           },
           "noElement": true,
-          "body": "The keeper's regulator, driven by its own weights and wired to nothing. Its pendulum swings and it ticks steadily. It reads a quarter past nine."
+          "body": "The keeper's regulator, driven by its own weights and wired to nothing. Its pendulum swings and it ticks steadily. It reads a quarter past nine.",
+          "box": [
+            0.858,
+            0.29,
+            0.898,
+            0.72
+          ]
         },
         {
           "type": "plaque",
@@ -1025,7 +1080,7 @@
             }
           }
         },
-        "scenePrompt": "This is a seamless 360-degree panorama from the middle of the Director's oak-panelled study in an old English manor house. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stretch of dark oak panelling, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm stretch of wall directly behind the viewer: plain dark oak panelling, joining its other half cleanly at the seam directly behind you; to the left, standing well in from the edge of the frame, the tall six-panelled study door standing OPEN onto the dim panelled hall, the floorboards running level through it onto the hall's flagstones; just left of centre, a dark carved oak chimneypiece, and in its grate a banked coal fire, red coals with a few low flames, the coals glowing red and a few low flames licking over them; just left of centre, on the mantelshelf above the fire, a wind-up mantel clock in a dark wooden case, its white face clearly showing its hands at twenty to twelve, and behind a small glass in its case a brass pendulum hanging dead still; just left of centre, pinned to the panelling beside the chimneypiece, a small handwritten card ruled into a duty roster with a folded note tucked under its pin, the writing too small to read from here; dead ahead in the centre, a big leather-topped partners' desk in front of a tall window full of fog, a pile of handwritten foolscap sheets on it beside an unlit green-shaded electric desk lamp, an inkstand and a tray of small paper seed packets; dead ahead in the centre, at the end of the desk, on a small revolving oak bookstand, one fat bound volume of a scientific journal lying open, its pages dense with print too small to read; just right of centre, a wide stretch of the wall's plain oak panelling running floor to ceiling with clear carpet in front of it, nothing standing against it, every panel identical and flush, no handle, no hinge and no keyhole on any of them; to the right, standing well in from the edge of the frame, a panelled oak door, SHUT, set flush in the wall with the floorboards running level to its sill; on the far right, the right half of the calm stretch of wall directly behind the viewer: plain dark oak panelling, joining its other half cleanly at the seam directly behind you. a scholar's panelled study crowded with bound journals and box files, a worn Turkey carpet, outside every window there is only pale, flat, shadowless grey fog: no garden, no building, no sky detail and no sun; an English agricultural research station's old red-brick manor house in the late nineteen-twenties, kept and lived in, nothing ruined: dark oak, whitewash, worn stone flags, brass, soft old red brick, beaded wet glass; the morning after a night of storm, still and foggy; photorealistic, restrained colour, fine natural film grain. EXACTLY ONE clock in the study: the wind-up mantel clock, its hands at twenty to twelve, its pendulum still. EXACTLY TWO doors: the open door to the hall and the shut panelled door; the panelling has no door, opening or gap in it. No grandfather clock, no longcase clock, no wristwatch or pocket watch anywhere. No people, no human figures, no faces anywhere. No legible lettering, no readable writing, no captions, no text, no legible numerals on anything except the hands of a clock where one is described. Period-true: no modern fittings, no plastic, no fluorescent tubes, no modern sockets or radiators of modern design. No sunlight, no sun patches, no hard daylight shadows anywhere. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere; everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. Shot on a full-frame DSLR at 24mm, f/8, flat, soft, shadowless grey fog light through the windows, the electric lamps all dead and dark, the room dim but every surface legible, with the low red glow of a coal fire, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above \u2014 no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a plain stretch of dark oak panelling, uniform and unbroken, with no visible seam, join, or repetition.",
+        "scenePrompt": "This is a seamless 360-degree panorama from the middle of the Director's oak-panelled study in an old English manor house. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stretch of dark oak panelling, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm stretch of wall directly behind the viewer: plain dark oak panelling, joining its other half cleanly at the seam directly behind you; to the left, standing well in from the edge of the frame, the tall six-panelled study door standing OPEN onto the dim panelled hall, the floorboards running level through it onto the hall's flagstones; just left of centre, a dark carved oak chimneypiece, and in its grate a banked coal fire, red coals with a few low flames, the coals glowing red and a few low flames licking over them; just left of centre, on the mantelshelf above the fire, a wind-up mantel clock in a dark wooden case, its white face clearly showing its hands at twenty to twelve, and behind a small glass in its case a brass pendulum hanging dead still; just left of centre, pinned to the panelling beside the chimneypiece, a small handwritten card ruled into a duty roster with a folded note tucked under its pin, the writing too small to read from here; dead ahead in the centre, a big leather-topped partners' desk in front of a tall window full of fog, a pile of handwritten foolscap sheets on it beside an unlit green-shaded electric desk lamp, an inkstand and a tray of small paper seed packets; dead ahead in the centre, at the end of the desk, on a small revolving oak bookstand, one fat bound volume of a scientific journal lying open, its pages dense with print too small to read; just right of centre, a wide stretch of the wall's plain oak panelling running floor to ceiling with clear carpet in front of it, nothing standing against it, every panel identical and flush, no handle, no hinge and no keyhole on any of them; to the right, standing well in from the edge of the frame, a panelled oak door, SHUT, set flush in the wall with the floorboards running level to its sill; on the far right, the right half of the calm stretch of wall directly behind the viewer: plain dark oak panelling, joining its other half cleanly at the seam directly behind you. a scholar's panelled study crowded with bound journals and box files, a worn Turkey carpet, outside every window there is only pale, flat, shadowless grey fog: no garden, no building, no sky detail and no sun; an English agricultural research station's old red-brick manor house in the late nineteen-twenties, kept and lived in, nothing ruined: dark oak, whitewash, worn stone flags, brass, soft old red brick, beaded wet glass; the morning after a night of storm, still and foggy; photorealistic, restrained colour, fine natural film grain. EXACTLY ONE clock in the study: the wind-up mantel clock, its hands at twenty to twelve, its pendulum still. EXACTLY TWO doors: the open door to the hall and the shut panelled door; the panelling has no door, opening or gap in it. No grandfather clock, no longcase clock, no wristwatch or pocket watch anywhere. No people, no human figures, no faces anywhere. No legible lettering, no readable writing, no captions, no text, no legible numerals on anything except the hands of a clock where one is described. Period-true: no modern fittings, no plastic, no fluorescent tubes, no modern sockets or radiators of modern design. No sunlight, no sun patches, no hard daylight shadows anywhere. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere; everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. Shot on a full-frame DSLR at 24mm, f/8, flat, soft, shadowless grey fog light through the windows, the electric lamps all dead and dark, the room dim but every surface legible, with the low red glow of a coal fire, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a plain stretch of dark oak panelling, uniform and unbroken, with no visible seam, join, or repetition.",
         "relitFrom": "../cellars/study/scene.png",
         "relitNote": "the committed cellars art, edited (lamplight, doors as stated), never regenerated",
         "plateRefs": [
@@ -1157,7 +1212,7 @@
         {
           "id": "lit_wash",
           "type": "ambient",
-          "label": "Nightfall",
+          "label": "Lights on",
           "box": [
             0,
             0,
@@ -1175,9 +1230,57 @@
                 1
               ],
               "prompt": "Keep this exact scene, composition, camera framing and every object precisely where it is, and change ONLY the lighting -- the electric lamps have just come back on -- and one panel of the panelling, which now stands open on a narrow closet holding a regulator clock: Warm yellow electric light now glows from every electric lamp already in the room, mixing with the grey fog light; the room is otherwise exactly as it was; the green-shaded desk lamp glows; and one tall panel of the plain panelling, clear of the desk and the bookstand, now stands OPEN, swung into the room on hinges at its left edge like a door, onto a narrow shallow closet whose floor is level with the study floor, lit by the study's electric light. In that narrow closet behind the open panel, standing on the floor, a tall weight-driven longcase regulator clock in a plain mahogany case with a glazed door, its white dial clearly showing quarter past nine, its long brass pendulum hanging behind the glass. Apart from the lamps now lit and that one open panel and its closet, NOTHING has moved or changed position: the same room from the same viewpoint, every door, object and piece of furniture exactly where it is in the base scene, and it is still the same foggy morning outside. EXACTLY TWO clocks: the mantel clock at twenty to twelve with its pendulum still, and the regulator in the closet at quarter past nine.",
-              "panorama": "study/scene_lit.png"
+              "panorama": "study/scene_lit.png",
+              "when": {
+                "eq": [
+                  "house_power",
+                  true
+                ]
+              }
             }
           ]
+        },
+        {
+          "id": "clip_base",
+          "type": "ambient",
+          "label": "Scene motion (base)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/play-source.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "study/cine_base.mp4"
+          }
+        },
+        {
+          "id": "the_regulator",
+          "type": "clue",
+          "label": "The regulator",
+          "body": "The keeper's regulator, driven by its own weights and wired to nothing. Its pendulum swings and it ticks steadily. It reads a quarter past nine.",
+          "shownWhen": {
+            "eq": [
+              "house_power",
+              true
+            ]
+          },
+          "noElement": true,
+          "box": [
+            0.858,
+            0.29,
+            0.898,
+            0.72
+          ],
+          "boxSource": "review:agent-vision",
+          "boxNote": "Hand-set 2026-11-04 on the regulator in the closet, LIT art only (it is not in the base still)."
         }
       ]
     },
@@ -1649,7 +1752,7 @@
             }
           }
         },
-        "scenePrompt": "This is a seamless 360-degree panorama from the gravel path in the middle of the walled back garden of an old red-brick English manor house. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the soft red brick of the house's back wall, wet, plain and unbroken, softened by fog: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. To the left, the old brick side wall of the garden running away into the fog, pear trees trained flat against it, and across the bed below them a big storm-broken bough lying where it fell, twigs and wet leaves scattered over the grass; just left of centre, the wet gravel path at the viewer's feet runs straight on to a plain plank door set in the far garden wall, SHUT, the brick of the wall a little above head height; over the top of that wall, faint in the fog, the low white-painted ridges of a range of glasshouses; dead ahead in the centre, beyond the far wall and well above it, a full storey higher than the wall, the faint brick chimney stack of the glasshouses' stoke-hole standing grey in the fog; just right of centre, kitchen-garden beds edged with box, flattened cabbages and leeks, wide puddles lying on the gravel and grass between them; to the right, standing well in from the edge of the frame, the back of the house: the half-glazed back door standing OPEN on a worn stone threshold flush with the flags of the dim back passage inside, and the same gravel path running from the viewer's feet to that threshold; to the right, beside that door on the house wall, a cast-iron downpipe from the gutter, its foot ending in a short iron shoe that runs a steady stream of last night's storm water down into the open top of a wooden water butt standing directly beneath it, the butt full and spilling over onto the gravel, the stream of water running steadily from the shoe into the butt. a kept Victorian walled kitchen garden the morning after a storm: wet gravel, box edging, old soft red brick walls, puddles, storm-broken twigs and wet leaves; pale fog hiding everything more than a garden's length away; an English agricultural research station's old red-brick manor house in the late nineteen-twenties, kept and lived in, nothing ruined: dark oak, whitewash, worn stone flags, brass, soft old red brick, beaded wet glass; the morning after a night of storm, still and foggy; photorealistic, restrained colour, fine natural film grain. EXACTLY ONE door in the far garden wall, SHUT. The glasshouses show only as faint white ridges above the far wall; no glasshouse interior and no glasshouse door is visible. No other building, no tree taller than the wall except the pear trees against it, no person, no animal, no lamp post, no sky colour but grey fog. No people, no human figures, no faces anywhere. No legible lettering, no readable writing, no captions, no text, no legible numerals on anything except the hands of a clock where one is described. Period-true: no modern fittings, no plastic, no fluorescent tubes, no modern sockets or radiators of modern design. No sunlight, no sun patches, no hard daylight shadows anywhere. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere; everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. Shot on a full-frame DSLR at 24mm, f/8, the still grey morning after a night of storm: flat, soft, shadowless light from thick pale fog, no sun and no shadows, everything beaded and dripping, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above \u2014 no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into the soft red brick of the house's back wall, wet, plain and unbroken, softened by fog, with no visible seam, join, or repetition.",
+        "scenePrompt": "This is a seamless 360-degree panorama from the gravel path in the middle of the walled back garden of an old red-brick English manor house. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the soft red brick of the house's back wall, wet, plain and unbroken, softened by fog: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. To the left, the old brick side wall of the garden running away into the fog, pear trees trained flat against it, and across the bed below them a big storm-broken bough lying where it fell, twigs and wet leaves scattered over the grass; just left of centre, the wet gravel path at the viewer's feet runs straight on to a plain plank door set in the far garden wall, SHUT, the brick of the wall a little above head height; over the top of that wall, faint in the fog, the low white-painted ridges of a range of glasshouses; dead ahead in the centre, beyond the far wall and well above it, a full storey higher than the wall, the faint brick chimney stack of the glasshouses' stoke-hole standing grey in the fog; just right of centre, kitchen-garden beds edged with box, flattened cabbages and leeks, wide puddles lying on the gravel and grass between them; to the right, standing well in from the edge of the frame, the back of the house: the half-glazed back door standing OPEN on a worn stone threshold flush with the flags of the dim back passage inside, and the same gravel path running from the viewer's feet to that threshold; to the right, beside that door on the house wall, a cast-iron downpipe from the gutter, its foot ending in a short iron shoe that runs a steady stream of last night's storm water down into the open top of a wooden water butt standing directly beneath it, the butt full and spilling over onto the gravel, the stream of water running steadily from the shoe into the butt. a kept Victorian walled kitchen garden the morning after a storm: wet gravel, box edging, old soft red brick walls, puddles, storm-broken twigs and wet leaves; pale fog hiding everything more than a garden's length away; an English agricultural research station's old red-brick manor house in the late nineteen-twenties, kept and lived in, nothing ruined: dark oak, whitewash, worn stone flags, brass, soft old red brick, beaded wet glass; the morning after a night of storm, still and foggy; photorealistic, restrained colour, fine natural film grain. EXACTLY ONE door in the far garden wall, SHUT. The glasshouses show only as faint white ridges above the far wall; no glasshouse interior and no glasshouse door is visible. No other building, no tree taller than the wall except the pear trees against it, no person, no animal, no lamp post, no sky colour but grey fog. No people, no human figures, no faces anywhere. No legible lettering, no readable writing, no captions, no text, no legible numerals on anything except the hands of a clock where one is described. Period-true: no modern fittings, no plastic, no fluorescent tubes, no modern sockets or radiators of modern design. No sunlight, no sun patches, no hard daylight shadows anywhere. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere; everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. Shot on a full-frame DSLR at 24mm, f/8, the still grey morning after a night of storm: flat, soft, shadowless light from thick pale fog, no sun and no shadows, everything beaded and dripping, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into the soft red brick of the house's back wall, wet, plain and unbroken, softened by fog, with no visible seam, join, or repetition.",
         "plateRefs": [
           "../cellars/world_plates/master/from_north.png"
         ],
@@ -1706,6 +1809,27 @@
           "useBody": "The key from the study turns, and the shed door scrapes open.",
           "wrongItemBody": "That key doesn't fit the shed.",
           "boxSource": "draft:skeleton"
+        },
+        {
+          "id": "clip_base",
+          "type": "ambient",
+          "label": "Scene motion (base)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/play-source.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "back_garden/cine_base.mp4"
+          }
         }
       ]
     },
@@ -1760,7 +1884,7 @@
           "params": {
             "utility": "amps"
           },
-          "note": "TOY (notes \u00a75): not the escape, not a puzzle. Needs its OWN config (the glasshouses' heating loads in amperes), never data/switchboard.json.",
+          "note": "TOY (notes §5): not the escape, not a puzzle. Needs its OWN config (the glasshouses' heating loads in amperes), never data/switchboard.json.",
           "box": [
             0.3107,
             0.4147,
@@ -1797,8 +1921,8 @@
         }
       ],
       "mapPos": {
-        "c": 4,
-        "r": -1
+        "c": 2,
+        "r": 0
       },
       "authoring": {
         "sceneSpec": {
@@ -1961,7 +2085,7 @@
             }
           }
         },
-        "scenePrompt": "This is a seamless 360-degree panorama from the middle of the brick potting shed at the head of a range of glasshouses. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stretch of whitewashed brick wall, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm stretch of wall directly behind the viewer: whitewashed brick, joining its other half cleanly at the seam directly behind you; to the left, standing well in from the edge of the frame, in a brick recess, the squat round iron boiler that heats the glasshouses, a dull red glow at its fire-door, its iron flue rising into the roof, and two black iron flow and return pipes leaving it along the foot of the wall and through the wall towards the glasshouses; just left of centre, on the brick wall beside it, square to the viewer at chest height, a lagged cable from the boiler's casing running up into the bottom of its frame, the glasshouses' heating board: a small black slate panel in a narrow brass-bound frame, its needles at rest, across its top three fan-shaped meter faces each with a single black needle, the right-hand one with one thin red line engraved across its arc, and below them a short row of small two-way brass switches, each under a tiny brass name plate too small to read; dead ahead in the centre, the shed's plank door standing OPEN onto the wet brick path that runs away along the glass front of the range, a low brick garden wall on its far side, pale fog beyond; the brick floor at the viewer's feet runs level out over its sill; just right of centre, close to the viewer, from a beam over the bench, long strings of onions and bunches of dried herbs hanging free in the cold air from the open door, swaying slowly on their strings; just right of centre, a long potting bench under a cobwebbed window, heaped with clay pots, a sieve of soil, raffia, and lying on it a school slate and a small pencilled tally book open at a page of tiny figures too small to read; to the right, standing well in from the edge of the frame, with a broad stretch of plain whitewashed brick wall between it and the right-hand edge of the frame, a half-glazed timber door, SHUT, its small panes misted white, green leaves faint behind them; the brick floor runs level to its sill; on the far right, the right half of the calm stretch of wall directly behind the viewer: whitewashed brick, joining its other half cleanly at the seam directly behind you. a working potting shed: whitewashed brick, a worn brick floor, stacks of clay pots, seed trays, tools on nails, cobwebs, the smell of wet soil; an English agricultural research station's old red-brick manor house in the late nineteen-twenties, kept and lived in, nothing ruined: dark oak, whitewash, worn stone flags, brass, soft old red brick, beaded wet glass; the morning after a night of storm, still and foggy; photorealistic, restrained colour, fine natural film grain. EXACTLY ONE board with meters, with EXACTLY three meter faces; nothing else looks like a meter or a dial, and no clock is anywhere in the shed. EXACTLY TWO doors: the open plank door and the shut half-glazed door. No people, no human figures, no faces anywhere. No legible lettering, no readable writing, no captions, no text, no legible numerals on anything except the hands of a clock where one is described. Period-true: no modern fittings, no plastic, no fluorescent tubes, no modern sockets or radiators of modern design. No sunlight, no sun patches, no hard daylight shadows anywhere. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere; everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. The outermost 184 px at each side edge show only plain whitewashed brick wall and brick floor: the half-glazed door, its frame and its shadow stay well inboard of the right-hand edge, with at least 400 px of bare whitewashed wall between the door frame and that edge, and no door, frame, tool, bucket or other object stands within either edge margin. Shot on a full-frame DSLR at 24mm, f/8, flat grey fog light through the open door and a cobwebbed window, a dull red glow from the boiler's fire-door, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above \u2014 no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a plain stretch of whitewashed brick wall, uniform and unbroken, with no visible seam, join, or repetition.",
+        "scenePrompt": "This is a seamless 360-degree panorama from the middle of the brick potting shed at the head of a range of glasshouses. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stretch of whitewashed brick wall, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm stretch of wall directly behind the viewer: whitewashed brick, joining its other half cleanly at the seam directly behind you; to the left, standing well in from the edge of the frame, in a brick recess, the squat round iron boiler that heats the glasshouses, a dull red glow at its fire-door, its iron flue rising into the roof, and two black iron flow and return pipes leaving it along the foot of the wall and through the wall towards the glasshouses; just left of centre, on the brick wall beside it, square to the viewer at chest height, a lagged cable from the boiler's casing running up into the bottom of its frame, the glasshouses' heating board: a small black slate panel in a narrow brass-bound frame, its needles at rest, across its top three fan-shaped meter faces each with a single black needle, the right-hand one with one thin red line engraved across its arc, and below them a short row of small two-way brass switches, each under a tiny brass name plate too small to read; dead ahead in the centre, the shed's plank door standing OPEN onto the wet brick path that runs away along the glass front of the range, a low brick garden wall on its far side, pale fog beyond; the brick floor at the viewer's feet runs level out over its sill; just right of centre, close to the viewer, from a beam over the bench, long strings of onions and bunches of dried herbs hanging free in the cold air from the open door, swaying slowly on their strings; just right of centre, a long potting bench under a cobwebbed window, heaped with clay pots, a sieve of soil, raffia, and lying on it a school slate and a small pencilled tally book open at a page of tiny figures too small to read; to the right, standing well in from the edge of the frame, with a broad stretch of plain whitewashed brick wall between it and the right-hand edge of the frame, a half-glazed timber door, SHUT, its small panes misted white, green leaves faint behind them; the brick floor runs level to its sill; on the far right, the right half of the calm stretch of wall directly behind the viewer: whitewashed brick, joining its other half cleanly at the seam directly behind you. a working potting shed: whitewashed brick, a worn brick floor, stacks of clay pots, seed trays, tools on nails, cobwebs, the smell of wet soil; an English agricultural research station's old red-brick manor house in the late nineteen-twenties, kept and lived in, nothing ruined: dark oak, whitewash, worn stone flags, brass, soft old red brick, beaded wet glass; the morning after a night of storm, still and foggy; photorealistic, restrained colour, fine natural film grain. EXACTLY ONE board with meters, with EXACTLY three meter faces; nothing else looks like a meter or a dial, and no clock is anywhere in the shed. EXACTLY TWO doors: the open plank door and the shut half-glazed door. No people, no human figures, no faces anywhere. No legible lettering, no readable writing, no captions, no text, no legible numerals on anything except the hands of a clock where one is described. Period-true: no modern fittings, no plastic, no fluorescent tubes, no modern sockets or radiators of modern design. No sunlight, no sun patches, no hard daylight shadows anywhere. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere; everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. The outermost 184 px at each side edge show only plain whitewashed brick wall and brick floor: the half-glazed door, its frame and its shadow stay well inboard of the right-hand edge, with at least 400 px of bare whitewashed wall between the door frame and that edge, and no door, frame, tool, bucket or other object stands within either edge margin. Shot on a full-frame DSLR at 24mm, f/8, flat grey fog light through the open door and a cobwebbed window, a dull red glow from the boiler's fire-door, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a plain stretch of whitewashed brick wall, uniform and unbroken, with no visible seam, join, or repetition.",
         "plateRefs": [
           "../cellars/world_plates/interiors/glasshouse.png"
         ],
@@ -2067,6 +2191,27 @@
           "direction": "open",
           "to": "pot_culture_house",
           "boxSource": "draft:skeleton"
+        },
+        {
+          "id": "clip_base",
+          "type": "ambient",
+          "label": "Scene motion (base)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/play-source.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "potting_shed/cine_base.mp4"
+          }
         }
       ]
     },
@@ -2143,8 +2288,8 @@
         }
       ],
       "mapPos": {
-        "c": 3,
-        "r": -1
+        "c": 1,
+        "r": 1
       },
       "authoring": {
         "sceneSpec": {
@@ -2273,7 +2418,7 @@
             }
           }
         },
-        "scenePrompt": "This is a seamless 360-degree panorama from the middle of a long, low glass pot-culture house full of barley in pots. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain run of whitewashed low brick wall with misted glass panes above it, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm stretch of wall directly behind the viewer: whitewashed low brick wall with misted glass panes above, joining its other half cleanly at the seam directly behind you; to the left, standing well in from the edge of the frame, at the end of the house, a half-glazed timber door, SHUT, its panes misted white; the tiled walk at the viewer's feet runs level to its sill; just left of centre, narrow iron rails laid flush in the tiled floor, running across the house from the far glass side to the near one, and standing on them low flat iron trolleys on small wheels, loaded with pots; dead ahead in the centre, on the low wheeled trolleys straight ahead, rows of barley growing in glazed pots, half the pots filled with dark red clay and half with pale sand, a white wooden plant label pushed into every pot, their pencilled writing too small to read; just right of centre, high overhead, under the glass roof, a long canvas shading blind torn half off its roller, its loose length hanging down in the draught from a broken pane, rippling along its length in the draught; to the right, standing well in from the edge of the frame, at the other end of the house, the half-glazed door standing OPEN onto the dim brick potting shed, the tiled walk running level through it; on the far right, the right half of the calm stretch of wall directly behind the viewer: whitewashed low brick wall with misted glass panes above, joining its other half cleanly at the seam directly behind you. an experimental pot-culture glasshouse: white-painted timber and iron glazing bars, beaded and misted glass, no staging but rows of low iron pot trolleys on floor rails, barley in clay and sand pots, a tiled walk wet with drips; an English agricultural research station's old red-brick manor house in the late nineteen-twenties, kept and lived in, nothing ruined: dark oak, whitewash, worn stone flags, brass, soft old red brick, beaded wet glass; the morning after a night of storm, still and foggy; photorealistic, restrained colour, fine natural film grain. Outside every pane only white fog: no garden, no house, no other glasshouse visible. EXACTLY TWO doors, one at each end. No clock anywhere. No people, no human figures, no faces anywhere. No legible lettering, no readable writing, no captions, no text, no legible numerals on anything except the hands of a clock where one is described. Period-true: no modern fittings, no plastic, no fluorescent tubes, no modern sockets or radiators of modern design. No sunlight, no sun patches, no hard daylight shadows anywhere. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere; everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. Shot on a full-frame DSLR at 24mm, f/8, flat, soft, shadowless pale light from thick fog outside the glass all round and overhead, no sun and no shadows, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above \u2014 no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a plain run of whitewashed low brick wall with misted glass panes above it, uniform and unbroken, with no visible seam, join, or repetition.",
+        "scenePrompt": "This is a seamless 360-degree panorama from the middle of a long, low glass pot-culture house full of barley in pots. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain run of whitewashed low brick wall with misted glass panes above it, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm stretch of wall directly behind the viewer: whitewashed low brick wall with misted glass panes above, joining its other half cleanly at the seam directly behind you; to the left, standing well in from the edge of the frame, at the end of the house, a half-glazed timber door, SHUT, its panes misted white; the tiled walk at the viewer's feet runs level to its sill; just left of centre, narrow iron rails laid flush in the tiled floor, running across the house from the far glass side to the near one, and standing on them low flat iron trolleys on small wheels, loaded with pots; dead ahead in the centre, on the low wheeled trolleys straight ahead, rows of barley growing in glazed pots, half the pots filled with dark red clay and half with pale sand, a white wooden plant label pushed into every pot, their pencilled writing too small to read; just right of centre, high overhead, under the glass roof, a long canvas shading blind torn half off its roller, its loose length hanging down in the draught from a broken pane, rippling along its length in the draught; to the right, standing well in from the edge of the frame, at the other end of the house, the half-glazed door standing OPEN onto the dim brick potting shed, the tiled walk running level through it; on the far right, the right half of the calm stretch of wall directly behind the viewer: whitewashed low brick wall with misted glass panes above, joining its other half cleanly at the seam directly behind you. an experimental pot-culture glasshouse: white-painted timber and iron glazing bars, beaded and misted glass, no staging but rows of low iron pot trolleys on floor rails, barley in clay and sand pots, a tiled walk wet with drips; an English agricultural research station's old red-brick manor house in the late nineteen-twenties, kept and lived in, nothing ruined: dark oak, whitewash, worn stone flags, brass, soft old red brick, beaded wet glass; the morning after a night of storm, still and foggy; photorealistic, restrained colour, fine natural film grain. Outside every pane only white fog: no garden, no house, no other glasshouse visible. EXACTLY TWO doors, one at each end. No clock anywhere. No people, no human figures, no faces anywhere. No legible lettering, no readable writing, no captions, no text, no legible numerals on anything except the hands of a clock where one is described. Period-true: no modern fittings, no plastic, no fluorescent tubes, no modern sockets or radiators of modern design. No sunlight, no sun patches, no hard daylight shadows anywhere. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere; everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. Shot on a full-frame DSLR at 24mm, f/8, flat, soft, shadowless pale light from thick fog outside the glass all round and overhead, no sun and no shadows, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a plain run of whitewashed low brick wall with misted glass panes above it, uniform and unbroken, with no visible seam, join, or repetition.",
         "plateRefs": [
           "../cellars/world_plates/interiors/glasshouse.png"
         ],
@@ -2360,6 +2505,27 @@
           "direction": "open",
           "to": "big_glasshouse_near",
           "boxSource": "draft:skeleton"
+        },
+        {
+          "id": "clip_base",
+          "type": "ambient",
+          "label": "Scene motion (base)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/play-source.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "pot_culture_house/cine_base.mp4"
+          }
         }
       ]
     },
@@ -2402,8 +2568,8 @@
         }
       ],
       "mapPos": {
-        "c": 2,
-        "r": -1
+        "c": 1,
+        "r": 0
       },
       "authoring": {
         "sceneSpec": {
@@ -2812,7 +2978,7 @@
             }
           }
         },
-        "scenePrompt": "This is a seamless 360-degree panorama from the near end of the central walk of a tall Victorian glasshouse on a foggy morning. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain run of misted glass panes above a whitewashed low brick wall, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. To the left, the slatted staging along the glass side, crowded with tall experimental plants in pots, a towering old vine trained up the glass above them; just left of centre, the red tiled central walk starts at the viewer's feet and runs straight away between the two lines of staging and roof posts, a long way, to the far end of the glasshouse, a grey glow of glass at its end; dead ahead in the centre, close by, in the black iron hot-water pipe running under the near end of the staging on that side, a leaking joint spurting a jet of steam sideways into the air beside the walk, the walk itself clear, a jet of white steam spurting and curling up from the joint; just right of centre, the staging along the other glass side, trays of seedlings and rows of pots; to the right, standing well in from the edge of the frame, in the glazed end wall close behind the viewer's shoulder, the half-glazed door standing OPEN onto the low pot-culture house, the tiled walk running level through it. a tall Victorian glasshouse of white-painted iron and timber, its high curved glass roof on slender posts, misted and beaded glass, slatted timber staging along both sides over black iron hot-water pipes, a red tiled central walk wet with drips; an English agricultural research station's old red-brick manor house in the late nineteen-twenties, kept and lived in, nothing ruined: dark oak, whitewash, worn stone flags, brass, soft old red brick, beaded wet glass; the morning after a night of storm, still and foggy; photorealistic, restrained colour, fine natural film grain. Outside the side glass and the roof only white fog: no garden, no house and no other glasshouse visible. The hot-water pipes run only under the staging along both sides. No clock anywhere. EXACTLY ONE way on: the walk running away to the far end; EXACTLY ONE door, the open one behind the viewer's shoulder. No people, no human figures, no faces anywhere. No legible lettering, no readable writing, no captions, no text, no legible numerals on anything except the hands of a clock where one is described. Period-true: no modern fittings, no plastic, no fluorescent tubes, no modern sockets or radiators of modern design. No sunlight, no sun patches, no hard daylight shadows anywhere. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere; everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. Shot on a full-frame DSLR at 24mm, f/8, flat, soft, shadowless pale light from thick fog outside the glass all round and overhead, no sun and no shadows, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above \u2014 no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a plain run of misted glass panes above a whitewashed low brick wall, uniform and unbroken, with no visible seam, join, or repetition.",
+        "scenePrompt": "This is a seamless 360-degree panorama from the near end of the central walk of a tall Victorian glasshouse on a foggy morning. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain run of misted glass panes above a whitewashed low brick wall, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. To the left, the slatted staging along the glass side, crowded with tall experimental plants in pots, a towering old vine trained up the glass above them; just left of centre, the red tiled central walk starts at the viewer's feet and runs straight away between the two lines of staging and roof posts, a long way, to the far end of the glasshouse, a grey glow of glass at its end; dead ahead in the centre, close by, in the black iron hot-water pipe running under the near end of the staging on that side, a leaking joint spurting a jet of steam sideways into the air beside the walk, the walk itself clear, a jet of white steam spurting and curling up from the joint; just right of centre, the staging along the other glass side, trays of seedlings and rows of pots; to the right, standing well in from the edge of the frame, in the glazed end wall close behind the viewer's shoulder, the half-glazed door standing OPEN onto the low pot-culture house, the tiled walk running level through it. a tall Victorian glasshouse of white-painted iron and timber, its high curved glass roof on slender posts, misted and beaded glass, slatted timber staging along both sides over black iron hot-water pipes, a red tiled central walk wet with drips; an English agricultural research station's old red-brick manor house in the late nineteen-twenties, kept and lived in, nothing ruined: dark oak, whitewash, worn stone flags, brass, soft old red brick, beaded wet glass; the morning after a night of storm, still and foggy; photorealistic, restrained colour, fine natural film grain. Outside the side glass and the roof only white fog: no garden, no house and no other glasshouse visible. The hot-water pipes run only under the staging along both sides. No clock anywhere. EXACTLY ONE way on: the walk running away to the far end; EXACTLY ONE door, the open one behind the viewer's shoulder. No people, no human figures, no faces anywhere. No legible lettering, no readable writing, no captions, no text, no legible numerals on anything except the hands of a clock where one is described. Period-true: no modern fittings, no plastic, no fluorescent tubes, no modern sockets or radiators of modern design. No sunlight, no sun patches, no hard daylight shadows anywhere. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere; everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. Shot on a full-frame DSLR at 24mm, f/8, flat, soft, shadowless pale light from thick fog outside the glass all round and overhead, no sun and no shadows, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a plain run of misted glass panes above a whitewashed low brick wall, uniform and unbroken, with no visible seam, join, or repetition.",
         "plateRefs": [
           "../cellars/world_plates/interiors/glasshouse.png"
         ],
@@ -2865,6 +3031,27 @@
           "direction": "open",
           "to": "big_glasshouse_far",
           "boxSource": "draft:skeleton"
+        },
+        {
+          "id": "clip_base",
+          "type": "ambient",
+          "label": "Scene motion (base)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/play-source.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "big_glasshouse_near/cine_base.mp4"
+          }
         }
       ]
     },
@@ -2958,8 +3145,7 @@
           "type": "door",
           "direction": "open",
           "label": "Out through the gate",
-          "to": "lane",
-          "requires": "The lane gate's time lock",
+          "requires": "the_lane_gate_s_time_lock",
           "endsEscape": true,
           "note": "Travel sequence (held back for the escape): the gate swings open and the camera runs along the lane in fog towards the station. endsEscape; clip at step 5 (escape_room_transits).",
           "box": [
@@ -2968,7 +3154,8 @@
             0.6391,
             0.628
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "lockedBody": "The lane gate is locked fast."
         },
         {
           "type": "door",
@@ -2985,8 +3172,8 @@
         }
       ],
       "mapPos": {
-        "c": 1,
-        "r": -1
+        "c": 0,
+        "r": 0
       },
       "authoring": {
         "sceneSpec": {
@@ -3042,7 +3229,7 @@
               "motion": {
                 "moves": true,
                 "vigour": "bellying slowly in the cold air off the glass",
-                "phrase": "the long hessian curtain bellies slowly out and sinks back in the cold air off the glass"
+                "phrase": "only the loose lower hem of the long hessian curtain trembles and sways very slightly, a few inches at most, in the cold air off the glass; the curtain's top, its iron rings, the rail and the folds above the hem stay fixed and motionless, still hanging from every ring"
               },
               "sound": {
                 "source": "the hessian curtain",
@@ -3053,7 +3240,7 @@
           ],
           "soundBed": "the far end of a huge glass room in fog: drips from the high roof, the soft rasp of the hessian curtain, the walk's long echo behind.",
           "rigid": "the glazing bars and roof posts, the staging, every plant, pot and label, the end door, and the gate and its lock box",
-          "motionClosing": "Only the hessian curtain moves; the plants, the gate and everything else stay exactly where they are.",
+          "motionClosing": "Only the loose lower hem of the hessian curtain moves, very slightly; the rail, the rings, the top of the curtain, the plants, the gate and everything else stay exactly where they are.",
           "atmosphere": "a tall Victorian glasshouse of white-painted iron and timber, its high curved glass roof on slender posts, misted and beaded glass, slatted timber staging along both sides over black iron hot-water pipes, a red tiled central walk wet with drips; an English agricultural research station's old red-brick manor house in the late nineteen-twenties, kept and lived in, nothing ruined: dark oak, whitewash, worn stone flags, brass, soft old red brick, beaded wet glass; the morning after a night of storm, still and foggy; photorealistic, restrained colour, fine natural film grain",
           "negatives": "Outside the side glass and the roof only white fog: no garden, no house and no other glasshouse visible. The hot-water pipes run only under the staging along both sides. No clock anywhere. EXACTLY ONE gate, outside the end door, SHUT; its lock box has no clock face. EXACTLY ONE door at this end, the shut one in the end wall. No people, no human figures, no faces anywhere. No legible lettering, no readable writing, no captions, no text, no legible numerals on anything except the hands of a clock where one is described. Period-true: no modern fittings, no plastic, no fluorescent tubes, no modern sockets or radiators of modern design. No sunlight, no sun patches, no hard daylight shadows anywhere. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere; everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. The outermost 184 px at each side edge of the panorama show ONLY the misted glass bays above a plain whitewashed low brick wall and the bare red tiled floor, uniform and unbroken, exactly as at the opposite edge. No pots, no stacked pots, no seed trays, no wooden boxes, no plants, no barley, no watering can or any other tool or vessel, no staging, no furniture and no cast shadow of any of these stands within 184 px of either side edge; every pot, tray, plant and watering can stands well in from the edge with bare tiled floor and plain brick wall between it and that edge, so the join where the two edges meet is only glass, brick and floor.",
           "room": "big_glasshouse_far",
@@ -3404,7 +3591,7 @@
             }
           }
         },
-        "scenePrompt": "This is a seamless 360-degree panorama from the far end of the central walk of a tall Victorian glasshouse on a foggy morning. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain run of misted glass panes above a whitewashed low brick wall, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. To the left, standing well in from the edge of the frame, the red tiled central walk starting at the viewer's feet and running straight back, a long way, between the two lines of staging and roof posts to the near end of the glasshouse; just left of centre, on the slatted staging along the glass side, a long row of barley in pots of dark red clay, each with a white wooden label, the writing too small to read; dead ahead in the centre, the end bay of the glasshouse: tall staging stacked with empty pots and seed trays against the misted glass on either side of the end door, the tiled walk running clear between them to its sill; just right of centre, the half-glazed door in the glass end wall, SHUT, the tiled walk running level to its sill; through its panes, a few steps outside on a wet path, a tall timber gate in a brick wall, SHUT, white fog beyond; just right of centre, on that gate, at hand height, a small square brass lock box with a row of three number wheels on its face, their figures too small to read, and no clock face, seen clearly through the glass; to the right, standing well in from the edge of the frame, close to the viewer beside the walk, a long heavy hessian draught curtain hung on iron rings from a roof bar across the side bay, its loose lower edge hanging free, bellying slowly in the cold air off the glass. a tall Victorian glasshouse of white-painted iron and timber, its high curved glass roof on slender posts, misted and beaded glass, slatted timber staging along both sides over black iron hot-water pipes, a red tiled central walk wet with drips; an English agricultural research station's old red-brick manor house in the late nineteen-twenties, kept and lived in, nothing ruined: dark oak, whitewash, worn stone flags, brass, soft old red brick, beaded wet glass; the morning after a night of storm, still and foggy; photorealistic, restrained colour, fine natural film grain. Outside the side glass and the roof only white fog: no garden, no house and no other glasshouse visible. The hot-water pipes run only under the staging along both sides. No clock anywhere. EXACTLY ONE gate, outside the end door, SHUT; its lock box has no clock face. EXACTLY ONE door at this end, the shut one in the end wall. No people, no human figures, no faces anywhere. No legible lettering, no readable writing, no captions, no text, no legible numerals on anything except the hands of a clock where one is described. Period-true: no modern fittings, no plastic, no fluorescent tubes, no modern sockets or radiators of modern design. No sunlight, no sun patches, no hard daylight shadows anywhere. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere; everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. The outermost 184 px at each side edge of the panorama show ONLY the misted glass bays above a plain whitewashed low brick wall and the bare red tiled floor, uniform and unbroken, exactly as at the opposite edge. No pots, no stacked pots, no seed trays, no wooden boxes, no plants, no barley, no watering can or any other tool or vessel, no staging, no furniture and no cast shadow of any of these stands within 184 px of either side edge; every pot, tray, plant and watering can stands well in from the edge with bare tiled floor and plain brick wall between it and that edge, so the join where the two edges meet is only glass, brick and floor. Shot on a full-frame DSLR at 24mm, f/8, flat, soft, shadowless pale light from thick fog outside the glass all round and overhead, no sun and no shadows, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above \u2014 no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a plain run of misted glass panes above a whitewashed low brick wall, uniform and unbroken, with no visible seam, join, or repetition.",
+        "scenePrompt": "This is a seamless 360-degree panorama from the far end of the central walk of a tall Victorian glasshouse on a foggy morning. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain run of misted glass panes above a whitewashed low brick wall, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. To the left, standing well in from the edge of the frame, the red tiled central walk starting at the viewer's feet and running straight back, a long way, between the two lines of staging and roof posts to the near end of the glasshouse; just left of centre, on the slatted staging along the glass side, a long row of barley in pots of dark red clay, each with a white wooden label, the writing too small to read; dead ahead in the centre, the end bay of the glasshouse: tall staging stacked with empty pots and seed trays against the misted glass on either side of the end door, the tiled walk running clear between them to its sill; just right of centre, the half-glazed door in the glass end wall, SHUT, the tiled walk running level to its sill; through its panes, a few steps outside on a wet path, a tall timber gate in a brick wall, SHUT, white fog beyond; just right of centre, on that gate, at hand height, a small square brass lock box with a row of three number wheels on its face, their figures too small to read, and no clock face, seen clearly through the glass; to the right, standing well in from the edge of the frame, close to the viewer beside the walk, a long heavy hessian draught curtain hung on iron rings from a roof bar across the side bay, its loose lower edge hanging free, bellying slowly in the cold air off the glass. a tall Victorian glasshouse of white-painted iron and timber, its high curved glass roof on slender posts, misted and beaded glass, slatted timber staging along both sides over black iron hot-water pipes, a red tiled central walk wet with drips; an English agricultural research station's old red-brick manor house in the late nineteen-twenties, kept and lived in, nothing ruined: dark oak, whitewash, worn stone flags, brass, soft old red brick, beaded wet glass; the morning after a night of storm, still and foggy; photorealistic, restrained colour, fine natural film grain. Outside the side glass and the roof only white fog: no garden, no house and no other glasshouse visible. The hot-water pipes run only under the staging along both sides. No clock anywhere. EXACTLY ONE gate, outside the end door, SHUT; its lock box has no clock face. EXACTLY ONE door at this end, the shut one in the end wall. No people, no human figures, no faces anywhere. No legible lettering, no readable writing, no captions, no text, no legible numerals on anything except the hands of a clock where one is described. Period-true: no modern fittings, no plastic, no fluorescent tubes, no modern sockets or radiators of modern design. No sunlight, no sun patches, no hard daylight shadows anywhere. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere; everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. The outermost 184 px at each side edge of the panorama show ONLY the misted glass bays above a plain whitewashed low brick wall and the bare red tiled floor, uniform and unbroken, exactly as at the opposite edge. No pots, no stacked pots, no seed trays, no wooden boxes, no plants, no barley, no watering can or any other tool or vessel, no staging, no furniture and no cast shadow of any of these stands within 184 px of either side edge; every pot, tray, plant and watering can stands well in from the edge with bare tiled floor and plain brick wall between it and that edge, so the join where the two edges meet is only glass, brick and floor. Shot on a full-frame DSLR at 24mm, f/8, flat, soft, shadowless pale light from thick fog outside the glass all round and overhead, no sun and no shadows, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a plain run of misted glass panes above a whitewashed low brick wall, uniform and unbroken, with no visible seam, join, or repetition.",
         "plateRefs": [
           "../cellars/world_plates/interiors/glasshouse.png"
         ],
@@ -3520,10 +3707,10 @@
             0.628
           ],
           "direction": "open",
-          "to": "lane",
-          "requires": "The lane gate's time lock",
+          "requires": "the_lane_gate_s_time_lock",
           "endsEscape": true,
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "lockedBody": "The lane gate is locked fast."
         },
         {
           "id": "back_up_the_walk",
@@ -3538,6 +3725,27 @@
           "direction": "open",
           "to": "big_glasshouse_near",
           "boxSource": "draft:skeleton"
+        },
+        {
+          "id": "clip_base",
+          "type": "ambient",
+          "label": "Scene motion (base)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/play-source.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "big_glasshouse_far/cine_base.mp4"
+          }
         }
       ]
     }
@@ -3618,5 +3826,6 @@
     "ggplot2",
     "readr"
   ],
-  "setup": "suppressMessages({library(dplyr); library(ggplot2)})"
+  "setup": "suppressMessages({library(dplyr); library(ggplot2)})",
+  "cover": "cover.png"
 }

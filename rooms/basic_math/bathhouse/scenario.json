@@ -14,7 +14,8 @@
     "train_line": "lake",
     "boiler_hatch": false,
     "lift_floor": "atrium",
-    "office_trapdoor": false
+    "office_trapdoor": false,
+    "temple_door": false
   },
   "_designNotes": {
     "buildState": "Rooms, graph and scene specs written by _scratch/build_scenario.py (2026-10-20). Live scenario: puzzles are dealt by the live-class server (authoring_v2/live_class/pool/bathhouse.json), never stored here. Multiple choice, no R. No codec id, no escape, ungraded. See notes.md."
@@ -6428,7 +6429,7 @@
       "title": "The lantern lane",
       "built": true,
       "unlockedWhen": true,
-      "designNote": "Station (LEVEL 2, 2 herb bundles, track city; 5 doors from the tub): the fan shop's basket. Doors: back to the street of shops, into the restaurant.",
+      "designNote": "Station (LEVEL 2, 2 herb bundles, track city; 5 doors from the tub): the fan shop's basket. Doors: back to the street of shops, into the restaurant, and (2026-11-04) on along the lane to the village square.",
       "plannedHotspots": [
         {
           "type": "door",
@@ -6453,6 +6454,19 @@
             0.3,
             0.4,
             0.72
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "to": "square",
+          "label": "On to the village square",
+          "box": [
+            0.445,
+            0.33,
+            0.53,
+            0.62
           ],
           "boxSource": "moved:agent"
         },
@@ -6505,6 +6519,11 @@
             {
               "id": "lane_ahead",
               "at": "dead ahead in the centre",
+              "label": "On to the village square",
+              "door": {
+                "direction": "open",
+                "to": "square"
+              },
               "desc": "the lane winding on ahead, shops open on four storeys on both sides, little wooden stairs and walkways between them, paper lanterns strung overhead"
             },
             {
@@ -6659,6 +6678,20 @@
           "direction": "open",
           "to": "restaurant",
           "boxSource": "moved:testplay"
+        },
+        {
+          "id": "on_to_the_village_square",
+          "type": "door",
+          "label": "On to the village square",
+          "direction": "open",
+          "to": "square",
+          "box": [
+            0.445,
+            0.33,
+            0.53,
+            0.62
+          ],
+          "boxSource": "moved:agent"
         }
       ]
     },
@@ -8517,6 +8550,1294 @@
           "boxSource": "moved:agent"
         }
       ]
+    },
+    {
+      "key": "square",
+      "title": "The village square",
+      "built": true,
+      "unlockedWhen": true,
+      "designNote": "Station (LEVEL 3, 3 herb bundles, track village; 6 doors from the tub): the basket on the fountain. Doors: back into the lantern lane, across to the temple, into the clothes shop.",
+      "plannedHotspots": [
+        {
+          "type": "door",
+          "direction": "back",
+          "to": "city_lane",
+          "label": "Back into the lantern lane",
+          "box": [
+            0.1698,
+            0.2573,
+            0.2332,
+            0.5215
+          ],
+          "boxSource": "draft:skeleton"
+        },
+        {
+          "type": "station",
+          "tier": 3,
+          "label": "The basket on the fountain",
+          "track": "village",
+          "box": [
+            0.325,
+            0.58,
+            0.395,
+            0.71
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "to": "temple",
+          "label": "Up the steps into the temple",
+          "box": [
+            0.39,
+            0.22,
+            0.505,
+            0.55
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "to": "clothes_shop",
+          "label": "Into the clothes shop",
+          "box": [
+            0.5919,
+            0.3404,
+            0.6919,
+            0.698
+          ],
+          "boxSource": "draft:skeleton"
+        }
+      ],
+      "authoring": {
+        "sceneSpec": {
+          "room": "square",
+          "setting": "a small, cozy paved square in the middle of a magical old Japanese village at dusk, ringed by tall wooden shop-houses glowing with paper lanterns, strings of lanterns criss-crossing overhead",
+          "interior": false,
+          "indoor": false,
+          "seam": "the closed dark wooden front of a tall shop-house, plain boards and shut shutters, calm and even",
+          "seamOccluder": "a tall red-lacquered lantern post with a glowing paper lantern",
+          "elements": [
+            {
+              "id": "seam_left",
+              "at": "on the far left",
+              "desc": "the left half of the calm view directly behind the viewer: the closed dark wooden front of a tall shop-house, plain boards and shut shutters, calm and even, joining its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "back_to_lane",
+              "at": "to the left",
+              "label": "Back into the lantern lane",
+              "door": {
+                "direction": "back",
+                "to": "city_lane"
+              },
+              "desc": "the mouth of a very narrow lane between two tall shop-houses, glowing with lanterns, the paving running level out of the square into it"
+            },
+            {
+              "id": "fountain_basket",
+              "at": "just left of centre",
+              "label": "The basket on the fountain",
+              "station": 3,
+              "track": "village",
+              "desc": "close to the viewer, a round stone fountain with a little spout of water in the middle of the square, and on its wide stone rim a woven basket of herb bundles tied with red string"
+            },
+            {
+              "id": "temple_gate",
+              "at": "dead ahead in the centre",
+              "label": "Up the steps into the temple",
+              "door": {
+                "direction": "open",
+                "to": "temple"
+              },
+              "desc": "across the square on its far side, a small old temple: a short flight of wide stone steps up to its great front doors standing open, warm golden light and incense smoke inside, a sweeping curved tiled roof with gold tips above, two stone lanterns at the foot of the steps"
+            },
+            {
+              "id": "clothes_door",
+              "at": "just right of centre",
+              "label": "Into the clothes shop",
+              "door": {
+                "direction": "open",
+                "to": "clothes_shop"
+              },
+              "desc": "a clothes shop's wide open front at street level, colorful robes, kimonos and scarves hanging on rails just inside under warm lantern light, a short split cloth curtain over the doorway, the paving running level inside"
+            },
+            {
+              "id": "wish_tree",
+              "at": "to the right",
+              "desc": "a small cherry tree in a stone bed, its branches hung with little white paper wishes"
+            },
+            {
+              "id": "seam_right",
+              "at": "on the far right",
+              "desc": "the right half of the calm view directly behind the viewer: the closed dark wooden front of a tall shop-house, plain boards and shut shutters, calm and even, joining its other half cleanly at the seam directly behind you"
+            }
+          ],
+          "soundBed": "a little village square at dusk: the fountain trickling, lanterns creaking, a temple bell far off.",
+          "rigid": "the shop-houses, the fountain and basket, the temple and its steps, the clothes shop front, the tree",
+          "atmosphere": "cozy, peaceful and magical, the square glowing gold under the violet dusk sky",
+          "styleLight": "early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red",
+          "negatives": "No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. The square is EMPTY of people; ONE temple, across the square; ONE fountain.",
+          "states": {},
+          "continuity": [],
+          "scaffold": {
+            "kind": "skeleton",
+            "layout": {
+              "surface": "court",
+              "word": "square",
+              "floor": "stone-paved square",
+              "size": [
+                4,
+                4,
+                6,
+                4
+              ],
+              "sides": {
+                "left": "houses",
+                "right": "houses",
+                "front": "houses",
+                "back": "houses"
+              },
+              "parts": [
+                [
+                  "door",
+                  "back_to_lane",
+                  {
+                    "w": 1.6,
+                    "h": 2.8,
+                    "say": "the mouth of the lane, the paving running level into it"
+                  }
+                ],
+                [
+                  "prop",
+                  "fountain_basket",
+                  {
+                    "size": [
+                      1.4,
+                      1.4,
+                      0.7
+                    ],
+                    "dist": 2.2
+                  }
+                ],
+                [
+                  "door",
+                  "temple_gate",
+                  {
+                    "w": 2.6,
+                    "h": 3.2,
+                    "say": "the temple's open front doors at the top of a few wide stone steps"
+                  }
+                ],
+                [
+                  "door",
+                  "clothes_door",
+                  {
+                    "w": 1.8,
+                    "h": 2.4,
+                    "say": "the clothes shop's open front, its floor level with the square"
+                  }
+                ]
+              ]
+            }
+          },
+          "stillOnly": true
+        },
+        "plateRefs": [
+          "city_lane/scene.png"
+        ],
+        "scenePrompt": "This is a seamless 360-degree panorama from a small, cozy paved square in the middle of a magical old Japanese village at dusk, ringed by tall wooden shop-houses glowing with paper lanterns, strings of lanterns criss-crossing overhead. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the closed dark wooden front of a tall shop-house, plain boards and shut shutters, calm and even: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: the closed dark wooden front of a tall shop-house, plain boards and shut shutters, calm and even, joining its other half cleanly at the seam directly behind you; to the left, the mouth of a very narrow lane between two tall shop-houses, glowing with lanterns, the paving running level out of the square into it; just left of centre, close to the viewer, a round stone fountain with a little spout of water in the middle of the square, and on its wide stone rim a woven basket of herb bundles tied with red string; dead ahead in the centre, across the square on its far side, a small old temple: a short flight of wide stone steps up to its great front doors standing open, warm golden light and incense smoke inside, a sweeping curved tiled roof with gold tips above, two stone lanterns at the foot of the steps; just right of centre, a clothes shop's wide open front at street level, colorful robes, kimonos and scarves hanging on rails just inside under warm lantern light, a short split cloth curtain over the doorway, the paving running level inside; to the right, a small cherry tree in a stone bed, its branches hung with little white paper wishes; on the far right, the right half of the calm view directly behind the viewer: the closed dark wooden front of a tall shop-house, plain boards and shut shutters, calm and even, joining its other half cleanly at the seam directly behind you. cozy, peaceful and magical, the square glowing gold under the violet dusk sky. No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. The square is EMPTY of people; ONE temple, across the square; ONE fountain. Shot on a full-frame DSLR at 24mm, f/8, early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into the closed dark wooden front of a tall shop-house, plain boards and shut shutters, calm and even, with no visible seam, join, or repetition.",
+        "seam": {
+          "stage": "screened",
+          "band": "ground",
+          "ratio": 1.69,
+          "delta": 2.47,
+          "needsWork": false,
+          "accepted": false,
+          "seamBandRun": 0.018,
+          "seamStepRatio": 0.0,
+          "at": "2026-11-04T18:38:23"
+        }
+      },
+      "mapPos": {
+        "c": 0,
+        "r": 7
+      },
+      "panorama": "square/scene.png",
+      "builtFrom": "l1_square_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "hotspots": [
+        {
+          "id": "back_into_the_lantern_lane",
+          "type": "door",
+          "label": "Back into the lantern lane",
+          "box": [
+            0.1698,
+            0.2573,
+            0.2332,
+            0.5215
+          ],
+          "direction": "back",
+          "to": "city_lane",
+          "boxSource": "draft:skeleton"
+        },
+        {
+          "id": "the_basket_on_the_fountain",
+          "type": "station",
+          "label": "The basket on the fountain",
+          "box": [
+            0.325,
+            0.58,
+            0.395,
+            0.71
+          ],
+          "tier": 3,
+          "track": "village",
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "up_the_steps_into_the_temple",
+          "type": "door",
+          "label": "Up the steps into the temple",
+          "box": [
+            0.39,
+            0.22,
+            0.505,
+            0.55
+          ],
+          "direction": "open",
+          "to": "temple",
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "into_the_clothes_shop",
+          "type": "door",
+          "label": "Into the clothes shop",
+          "box": [
+            0.5919,
+            0.3404,
+            0.6919,
+            0.698
+          ],
+          "direction": "open",
+          "to": "clothes_shop",
+          "boxSource": "draft:skeleton"
+        }
+      ]
+    },
+    {
+      "key": "clothes_shop",
+      "title": "The clothes shop",
+      "built": true,
+      "unlockedWhen": true,
+      "designNote": "Station (LEVEL 3, track clothes; 7 doors from the tub): the robe counter pays ONE ROBE (a third item, carry 3), spent on the temple's robe rack. Back out to the square only.",
+      "plannedHotspots": [
+        {
+          "type": "door",
+          "direction": "back",
+          "to": "square",
+          "label": "Back out to the square",
+          "box": [
+            0.1347,
+            0.2993,
+            0.2025,
+            0.7889
+          ],
+          "boxSource": "draft:skeleton"
+        },
+        {
+          "type": "station",
+          "tier": 3,
+          "label": "The robe counter",
+          "track": "clothes",
+          "box": [
+            0.3549,
+            0.5494,
+            0.6453,
+            0.748
+          ],
+          "boxSource": "draft:skeleton"
+        }
+      ],
+      "authoring": {
+        "sceneSpec": {
+          "room": "clothes_shop",
+          "setting": "inside a small, cozy old clothes shop in a magical old Japanese village at dusk: dark wooden beams, paper lanterns, rails and shelves full of colorful clothes",
+          "interior": true,
+          "indoor": true,
+          "seam": "a plain stretch of dark wooden wall hung with plain paper lanterns, uniform and unbroken",
+          "seamOccluder": "a square red-lacquered wooden post, floor to ceiling",
+          "elements": [
+            {
+              "id": "seam_left",
+              "at": "on the far left",
+              "desc": "the left half of the calm view directly behind the viewer: a plain stretch of dark wooden wall hung with plain paper lanterns, uniform and unbroken, joining its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "door_out",
+              "at": "to the left",
+              "label": "Back out to the square",
+              "door": {
+                "direction": "back",
+                "to": "square"
+              },
+              "desc": "the shop's wide open front with its short split cloth curtain, the lantern-lit village square outside, the floor running level out"
+            },
+            {
+              "id": "robe_rails",
+              "at": "just left of centre",
+              "desc": "long wooden rails of hanging robes and kimonos in red, blue, green, gold and white"
+            },
+            {
+              "id": "robe_counter",
+              "at": "dead ahead in the centre",
+              "label": "The robe counter",
+              "station": 3,
+              "track": "clothes",
+              "desc": "close to the viewer, a wooden shop counter with soft folded bathing robes stacked on it in neat piles, a little brass bell and a pair of scissors beside them"
+            },
+            {
+              "id": "shelves",
+              "at": "just right of centre",
+              "desc": "tall wooden shelves of folded cloth in every color, straw hats and wooden sandals on the lowest shelf"
+            },
+            {
+              "id": "mirror",
+              "at": "to the right",
+              "desc": "a tall standing mirror in a carved wooden frame beside a painted paper changing screen"
+            },
+            {
+              "id": "seam_right",
+              "at": "on the far right",
+              "desc": "the right half of the calm view directly behind the viewer: a plain stretch of dark wooden wall hung with plain paper lanterns, uniform and unbroken, joining its other half cleanly at the seam directly behind you"
+            }
+          ],
+          "soundBed": "a quiet little shop: cloth rustling, hangers clicking, the square murmuring outside.",
+          "rigid": "the counter and folded robes, the rails, the shelves, the mirror and screen, the doorway",
+          "atmosphere": "warm, soft and colorful, lantern light glowing on folded cloth",
+          "styleLight": "early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red",
+          "negatives": "No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. The shop is EMPTY of people; no price tags, labels or writing on anything.",
+          "states": {},
+          "continuity": [],
+          "scaffold": {
+            "kind": "skeleton",
+            "layout": {
+              "surface": "room",
+              "word": "floor",
+              "floor": "polished wooden floor",
+              "size": [
+                3,
+                3,
+                4,
+                2.6
+              ],
+              "sides": {
+                "left": "houses",
+                "right": "houses",
+                "front": "houses",
+                "back": "houses"
+              },
+              "parts": [
+                [
+                  "door",
+                  "door_out",
+                  {
+                    "w": 1.6,
+                    "h": 2.2,
+                    "say": "the open shop front, the floor running level out to the square"
+                  }
+                ],
+                [
+                  "prop",
+                  "robe_counter",
+                  {
+                    "size": [
+                      2.0,
+                      0.7,
+                      0.9
+                    ],
+                    "dist": 2.0
+                  }
+                ]
+              ]
+            }
+          },
+          "stillOnly": true
+        },
+        "plateRefs": [
+          "restaurant/scene.png"
+        ],
+        "scenePrompt": "This is a seamless 360-degree panorama from inside a small, cozy old clothes shop in a magical old Japanese village at dusk: dark wooden beams, paper lanterns, rails and shelves full of colorful clothes. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stretch of dark wooden wall hung with plain paper lanterns, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: a plain stretch of dark wooden wall hung with plain paper lanterns, uniform and unbroken, joining its other half cleanly at the seam directly behind you; to the left, the shop's wide open front with its short split cloth curtain, the lantern-lit village square outside, the floor running level out; just left of centre, long wooden rails of hanging robes and kimonos in red, blue, green, gold and white; dead ahead in the centre, close to the viewer, a wooden shop counter with soft folded bathing robes stacked on it in neat piles, a little brass bell and a pair of scissors beside them; just right of centre, tall wooden shelves of folded cloth in every color, straw hats and wooden sandals on the lowest shelf; to the right, a tall standing mirror in a carved wooden frame beside a painted paper changing screen; on the far right, the right half of the calm view directly behind the viewer: a plain stretch of dark wooden wall hung with plain paper lanterns, uniform and unbroken, joining its other half cleanly at the seam directly behind you. warm, soft and colorful, lantern light glowing on folded cloth. No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. The shop is EMPTY of people; no price tags, labels or writing on anything. Shot on a full-frame DSLR at 24mm, f/8, early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a plain stretch of dark wooden wall hung with plain paper lanterns, uniform and unbroken, with no visible seam, join, or repetition.",
+        "seam": {
+          "stage": "blurred",
+          "band": "sky",
+          "ratio": 6.09,
+          "delta": 5.49,
+          "needsWork": false,
+          "accepted": false,
+          "seamBandRun": 0.021,
+          "seamStepRatio": 0.0,
+          "at": "2026-11-04T18:39:59"
+        }
+      },
+      "mapPos": {
+        "c": 1,
+        "r": 7
+      },
+      "panorama": "clothes_shop/scene.png",
+      "builtFrom": "l1_clothes_shop_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "hotspots": [
+        {
+          "id": "back_out_to_the_square",
+          "type": "door",
+          "label": "Back out to the square",
+          "box": [
+            0.1347,
+            0.2993,
+            0.2025,
+            0.7889
+          ],
+          "direction": "back",
+          "to": "square",
+          "boxSource": "draft:skeleton"
+        },
+        {
+          "id": "the_robe_counter",
+          "type": "station",
+          "label": "The robe counter",
+          "box": [
+            0.3549,
+            0.5494,
+            0.6453,
+            0.748
+          ],
+          "tier": 3,
+          "track": "clothes",
+          "boxSource": "draft:skeleton"
+        }
+      ]
+    },
+    {
+      "key": "temple",
+      "title": "The temple",
+      "built": true,
+      "unlockedWhen": true,
+      "designNote": "Station (LEVEL 3, track temple; 7 doors from the tub): the offering table pays ONE BATH TOKEN. Two SINKS of its own (bath tokens, counted toward the win like the small baths): the round stone bath (2) and the big stone bath (3). THE ROBE RACK (Lucas asked for a third thing robes are for; agent's pick, 2026-11-04): hang 3 robes so the temple's bathers have something to wear; a sink that does NOT count toward the baths needed to win. THE YELLOW DOOR: a one-digit lock; SIX GREEN lanterns and TWO BLUE lanterns hang beside it; blue and yellow make green, so green take away blue is yellow: six minus two, FOUR. It opens onto the yard behind the temple and the family car. Back out to the square.",
+      "plannedHotspots": [
+        {
+          "type": "door",
+          "direction": "back",
+          "to": "square",
+          "label": "Back out to the square",
+          "box": [
+            0.1584,
+            0.2275,
+            0.2482,
+            0.6248
+          ],
+          "boxSource": "draft:skeleton"
+        },
+        {
+          "type": "deliver",
+          "sink": "temple_round",
+          "label": "The round stone bath (2 bath tokens)",
+          "box": [
+            0.185,
+            0.64,
+            0.39,
+            0.82
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "station",
+          "tier": 3,
+          "label": "The offering table",
+          "track": "temple",
+          "box": [
+            0.4261,
+            0.7322,
+            0.5742,
+            0.8621
+          ],
+          "boxSource": "draft:skeleton"
+        },
+        {
+          "type": "deliver",
+          "sink": "robe_rack",
+          "label": "The robe rack (3 robes)",
+          "box": [
+            0.445,
+            0.38,
+            0.555,
+            0.6
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "deliver",
+          "sink": "temple_big",
+          "label": "The big stone bath (3 bath tokens)",
+          "box": [
+            0.613,
+            0.64,
+            0.905,
+            0.84
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "lock",
+          "label": "The yellow door",
+          "answer": "4",
+          "length": 1,
+          "maxAttempts": 0,
+          "feedback": {
+            "correct": "Click! The yellow door swings open onto the yard behind the temple.",
+            "wrong": "The yellow door stays shut."
+          },
+          "onSolve": [
+            {
+              "set": "temple_door",
+              "to": true
+            }
+          ],
+          "shownWhen": {
+            "ne": [
+              "temple_door",
+              true
+            ]
+          },
+          "box": [
+            0.788,
+            0.27,
+            0.83,
+            0.61
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "to": "car",
+          "label": "Through the yellow door to the car",
+          "shownWhen": {
+            "eq": [
+              "temple_door",
+              true
+            ]
+          },
+          "noElement": true,
+          "box": [
+            0.788,
+            0.27,
+            0.83,
+            0.61
+          ],
+          "boxSource": "review:copied-from-the_yellow_door"
+        }
+      ],
+      "authoring": {
+        "sceneSpec": {
+          "room": "temple",
+          "setting": "the hushed main hall of a small old temple in a magical old Japanese village at dusk: dark wooden pillars, red-lacquered beams with gold trim, golden lanterns, thin curls of incense smoke, and two stone bathing pools sunk into its polished wooden floor",
+          "interior": true,
+          "indoor": true,
+          "seam": "a plain stretch of dark wooden temple wall with gold trim, uniform and unbroken",
+          "seamOccluder": "a round red-lacquered pillar, floor to ceiling",
+          "elements": [
+            {
+              "id": "seam_left",
+              "at": "on the far left",
+              "desc": "the left half of the calm view directly behind the viewer: a plain stretch of dark wooden temple wall with gold trim, uniform and unbroken, joining its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "front_doors",
+              "at": "to the left",
+              "label": "Back out to the square",
+              "door": {
+                "direction": "back",
+                "to": "square"
+              },
+              "desc": "the temple's great front doors standing open, the floor running level out to the top of a few stone steps and the lantern-lit village square below"
+            },
+            {
+              "id": "round_bath",
+              "at": "just left of centre",
+              "label": "The round stone bath (2 bath tokens)",
+              "sink": "temple_round",
+              "desc": "a round stone bathing pool sunk into the floor, EMPTY and dry, its smooth grey stone rim carved with waves"
+            },
+            {
+              "id": "offering_table",
+              "at": "dead ahead in the centre",
+              "label": "The offering table",
+              "station": 3,
+              "track": "temple",
+              "desc": "close to the viewer, a low red-lacquered offering table holding a bowl of small wooden bath tokens on red cords and a bronze bowl of smoking incense sticks"
+            },
+            {
+              "id": "robe_rack",
+              "at": "dead ahead in the centre",
+              "label": "The robe rack (3 robes)",
+              "sink": "robe_rack",
+              "desc": "against the far wall, a long low wooden robe rack with a row of bare wooden pegs, EMPTY, nothing hanging on it"
+            },
+            {
+              "id": "big_bath",
+              "at": "just right of centre",
+              "label": "The big stone bath (3 bath tokens)",
+              "sink": "temple_big",
+              "desc": "a big square stone bathing pool sunk into the floor with gold corners, EMPTY and dry"
+            },
+            {
+              "id": "yellow_door",
+              "at": "to the right",
+              "label": "The yellow door",
+              "lock": {
+                "answer": "4",
+                "length": 1,
+                "feedback": {
+                  "correct": "Click! The yellow door swings open onto the yard behind the temple.",
+                  "wrong": "The yellow door stays shut."
+                },
+                "onSolve": [
+                  {
+                    "set": "temple_door",
+                    "to": true
+                  }
+                ],
+                "shownWhen": {
+                  "ne": [
+                    "temple_door",
+                    true
+                  ]
+                }
+              },
+              "door": {
+                "direction": "open",
+                "to": "car",
+                "label": "Through the yellow door to the car",
+                "shownWhen": {
+                  "eq": [
+                    "temple_door",
+                    true
+                  ]
+                },
+                "noElement": true
+              },
+              "desc": "a plain wooden door in the side wall painted bright sunny YELLOW, shut, with a round brass handle; hanging from the beam just to its LEFT, a row of EXACTLY SIX GREEN paper lanterns, and hanging just to its RIGHT, a row of EXACTLY TWO BLUE paper lanterns, all glowing softly"
+            },
+            {
+              "id": "seam_right",
+              "at": "on the far right",
+              "desc": "the right half of the calm view directly behind the viewer: a plain stretch of dark wooden temple wall with gold trim, uniform and unbroken, joining its other half cleanly at the seam directly behind you"
+            }
+          ],
+          "soundBed": "a hushed temple hall: incense crackling softly, a bell ringing far off, the village murmuring outside.",
+          "rigid": "the pillars and beams, the two stone pools, the offering table, the robe rack, the yellow door and the lanterns",
+          "atmosphere": "calm, golden and a little mysterious, incense curling through the lantern light",
+          "styleLight": "early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red",
+          "negatives": "No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. The temple is EMPTY of people; no statues of people. BOTH stone pools are EMPTY and dry; the robe rack is bare. Exactly SIX GREEN lanterns on the yellow door's left and exactly TWO BLUE lanterns on its right; no other green or blue lanterns anywhere; ONE yellow door only.",
+          "states": {
+            "filled": {
+              "change": "the two stone pools and the robe rack",
+              "elements": {
+                "round_bath": {
+                  "desc": "the round stone bathing pool is now full to the brim with clear, steaming, pale green herbal water, a few petals floating on it"
+                },
+                "big_bath": {
+                  "desc": "the big square stone bathing pool with gold corners is now full to the brim with clear, steaming, pale green herbal water, a few petals floating on it"
+                },
+                "robe_rack": {
+                  "desc": "the long low wooden robe rack against the far wall now has three soft bathing robes hanging from its pegs, one red, one blue and one white"
+                }
+              },
+              "constraints": "Only the two pools and the robe rack change: they keep their shape, size and place, and the offering table, the yellow door and its green and blue lanterns, the pillars and everything else stay exactly as they are. No people, no text.",
+              "stillOnly": true
+            },
+            "door_open": {
+              "change": "the yellow door only",
+              "elements": {
+                "yellow_door": {
+                  "desc": "the bright yellow door now stands wide OPEN, and through it a small gravel yard behind the temple at dusk where a small family car is parked close by with its back door open and a warm light on inside; the six green lanterns still hang on its left and the two blue lanterns on its right"
+                }
+              },
+              "constraints": "Only the door changes: it keeps its color, size and place in the wall, the green and blue lanterns stay exactly as they are, and so does everything else. No people, no text.",
+              "stillOnly": true
+            }
+          },
+          "continuity": [],
+          "scaffold": {
+            "kind": "skeleton",
+            "layout": {
+              "surface": "room",
+              "word": "floor",
+              "floor": "polished wooden temple floor",
+              "size": [
+                4,
+                4,
+                6,
+                3.5
+              ],
+              "sides": {
+                "left": "houses",
+                "right": "houses",
+                "front": "houses",
+                "back": "houses"
+              },
+              "parts": [
+                [
+                  "door",
+                  "front_doors",
+                  {
+                    "w": 2.4,
+                    "h": 3.0,
+                    "say": "the open front doors, the floor running level out to the steps"
+                  }
+                ],
+                [
+                  "prop",
+                  "round_bath",
+                  {
+                    "size": [
+                      1.4,
+                      1.4,
+                      0.3
+                    ]
+                  }
+                ],
+                [
+                  "prop",
+                  "offering_table",
+                  {
+                    "size": [
+                      1.2,
+                      0.6,
+                      0.5
+                    ],
+                    "dist": 2.0
+                  }
+                ],
+                [
+                  "prop",
+                  "robe_rack",
+                  {
+                    "size": [
+                      2.4,
+                      0.4,
+                      1.6
+                    ],
+                    "kind": "wall"
+                  }
+                ],
+                [
+                  "prop",
+                  "big_bath",
+                  {
+                    "size": [
+                      2.0,
+                      2.0,
+                      0.3
+                    ]
+                  }
+                ],
+                [
+                  "door",
+                  "yellow_door",
+                  {
+                    "w": 1.0,
+                    "h": 2.1,
+                    "say": "the yellow door, shut, its sill level with the floor"
+                  }
+                ]
+              ]
+            }
+          },
+          "stillOnly": true
+        },
+        "plateRefs": [
+          "atrium/scene.png"
+        ],
+        "scenePrompt": "This is a seamless 360-degree panorama from the hushed main hall of a small old temple in a magical old Japanese village at dusk: dark wooden pillars, red-lacquered beams with gold trim, golden lanterns, thin curls of incense smoke, and two stone bathing pools sunk into its polished wooden floor. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stretch of dark wooden temple wall with gold trim, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: a plain stretch of dark wooden temple wall with gold trim, uniform and unbroken, joining its other half cleanly at the seam directly behind you; to the left, the temple's great front doors standing open, the floor running level out to the top of a few stone steps and the lantern-lit village square below; just left of centre, a round stone bathing pool sunk into the floor, EMPTY and dry, its smooth grey stone rim carved with waves; dead ahead in the centre, close to the viewer, a low red-lacquered offering table holding a bowl of small wooden bath tokens on red cords and a bronze bowl of smoking incense sticks; dead ahead in the centre, against the far wall, a long low wooden robe rack with a row of bare wooden pegs, EMPTY, nothing hanging on it; just right of centre, a big square stone bathing pool sunk into the floor with gold corners, EMPTY and dry; to the right, a plain wooden door in the side wall painted bright sunny YELLOW, shut, with a round brass handle; hanging from the beam just to its LEFT, a row of EXACTLY SIX GREEN paper lanterns, and hanging just to its RIGHT, a row of EXACTLY TWO BLUE paper lanterns, all glowing softly; on the far right, the right half of the calm view directly behind the viewer: a plain stretch of dark wooden temple wall with gold trim, uniform and unbroken, joining its other half cleanly at the seam directly behind you. calm, golden and a little mysterious, incense curling through the lantern light. No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. The temple is EMPTY of people; no statues of people. BOTH stone pools are EMPTY and dry; the robe rack is bare. Exactly SIX GREEN lanterns on the yellow door's left and exactly TWO BLUE lanterns on its right; no other green or blue lanterns anywhere; ONE yellow door only. Shot on a full-frame DSLR at 24mm, f/8, early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a plain stretch of dark wooden temple wall with gold trim, uniform and unbroken, with no visible seam, join, or repetition.",
+        "seam": {
+          "stage": "screened",
+          "band": "mid",
+          "ratio": 1.45,
+          "delta": 1.87,
+          "needsWork": false,
+          "accepted": false,
+          "seamBandRun": 0.007,
+          "seamStepRatio": 0.0,
+          "at": "2026-11-04T18:41:40"
+        }
+      },
+      "mapPos": {
+        "c": 0,
+        "r": 8
+      },
+      "panorama": "temple/scene.png",
+      "builtFrom": "l1_temple_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "hotspots": [
+        {
+          "id": "back_out_to_the_square",
+          "type": "door",
+          "label": "Back out to the square",
+          "box": [
+            0.1584,
+            0.2275,
+            0.2482,
+            0.6248
+          ],
+          "direction": "back",
+          "to": "square",
+          "boxSource": "draft:skeleton"
+        },
+        {
+          "id": "the_round_stone_bath_2_bath_tokens",
+          "type": "deliver",
+          "label": "The round stone bath (2 bath tokens)",
+          "box": [
+            0.185,
+            0.64,
+            0.39,
+            0.82
+          ],
+          "sink": "temple_round",
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "the_offering_table",
+          "type": "station",
+          "label": "The offering table",
+          "box": [
+            0.4261,
+            0.7322,
+            0.5742,
+            0.8621
+          ],
+          "tier": 3,
+          "track": "temple",
+          "boxSource": "draft:skeleton"
+        },
+        {
+          "id": "the_robe_rack_3_robes",
+          "type": "deliver",
+          "label": "The robe rack (3 robes)",
+          "box": [
+            0.445,
+            0.38,
+            0.555,
+            0.6
+          ],
+          "sink": "robe_rack",
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "the_big_stone_bath_3_bath_tokens",
+          "type": "deliver",
+          "label": "The big stone bath (3 bath tokens)",
+          "box": [
+            0.613,
+            0.64,
+            0.905,
+            0.84
+          ],
+          "sink": "temple_big",
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "the_yellow_door",
+          "type": "lock",
+          "label": "The yellow door",
+          "box": [
+            0.788,
+            0.27,
+            0.83,
+            0.61
+          ],
+          "answer": "4",
+          "length": 1,
+          "maxAttempts": 0,
+          "feedback": {
+            "correct": "Click! The yellow door swings open onto the yard behind the temple.",
+            "wrong": "The yellow door stays shut."
+          },
+          "onSolve": [
+            {
+              "set": "temple_door",
+              "to": true
+            }
+          ],
+          "shownWhen": {
+            "ne": [
+              "temple_door",
+              true
+            ]
+          },
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "through_the_yellow_door_to_the_car",
+          "type": "door",
+          "label": "Through the yellow door to the car",
+          "direction": "open",
+          "to": "car",
+          "shownWhen": {
+            "eq": [
+              "temple_door",
+              true
+            ]
+          },
+          "noElement": true,
+          "box": [
+            0.788,
+            0.27,
+            0.83,
+            0.61
+          ],
+          "boxSource": "review:copied-from-the_yellow_door"
+        },
+        {
+          "id": "round_bath_water",
+          "type": "ambient",
+          "label": "round bath water",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Region state variant (bathhouse temple, 2026-11-04): pasted from the harness's whole-scene edit onto the base by _scratch/wire_temple_states.py; shown only when its world state holds.",
+          "variants": [
+            {
+              "state": "round_bath_water",
+              "box": [
+                0.17,
+                0.6,
+                0.4,
+                0.86
+              ],
+              "panorama": "temple/scene_filled.png",
+              "when": {
+                "eq": [
+                  "liveFilled_temple_round",
+                  true
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "big_bath_water",
+          "type": "ambient",
+          "label": "big bath water",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Region state variant (bathhouse temple, 2026-11-04): pasted from the harness's whole-scene edit onto the base by _scratch/wire_temple_states.py; shown only when its world state holds.",
+          "variants": [
+            {
+              "state": "big_bath_water",
+              "box": [
+                0.595,
+                0.6,
+                0.92,
+                0.87
+              ],
+              "panorama": "temple/scene_filled.png",
+              "when": {
+                "eq": [
+                  "liveFilled_temple_big",
+                  true
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "robes_on_rack",
+          "type": "ambient",
+          "label": "robes on rack",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Region state variant (bathhouse temple, 2026-11-04): pasted from the harness's whole-scene edit onto the base by _scratch/wire_temple_states.py; shown only when its world state holds.",
+          "variants": [
+            {
+              "state": "robes_on_rack",
+              "box": [
+                0.43,
+                0.36,
+                0.57,
+                0.6
+              ],
+              "panorama": "temple/scene_filled.png",
+              "when": {
+                "eq": [
+                  "liveFilled_robe_rack",
+                  true
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "yellow_door_open",
+          "type": "ambient",
+          "label": "yellow door open",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Region state variant (bathhouse temple, 2026-11-04): pasted from the harness's whole-scene edit onto the base by _scratch/wire_temple_states.py; shown only when its world state holds.",
+          "variants": [
+            {
+              "state": "yellow_door_open",
+              "box": [
+                0.77,
+                0.22,
+                0.885,
+                0.66
+              ],
+              "panorama": "temple/scene_door_open.png",
+              "when": {
+                "eq": [
+                  "temple_door",
+                  true
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "car",
+      "title": "The family car",
+      "built": true,
+      "unlockedWhen": true,
+      "designNote": "Station (LEVEL 3, 3 herb bundles, track vocab_car; 8 doors from the tub): the road map on the back seat, a transport vocabulary question in English or Spanish like the train's ticket windows. Parked in the yard behind the temple; back out through the yellow door only.",
+      "plannedHotspots": [
+        {
+          "type": "door",
+          "direction": "back",
+          "to": "temple",
+          "label": "Back into the temple",
+          "box": [
+            0.09,
+            0.18,
+            0.25,
+            0.75
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "station",
+          "tier": 3,
+          "label": "The road map on the back seat",
+          "track": "vocab_car",
+          "box": [
+            0.2,
+            0.72,
+            0.52,
+            0.98
+          ],
+          "boxSource": "moved:agent"
+        }
+      ],
+      "authoring": {
+        "sceneSpec": {
+          "room": "car",
+          "setting": "sitting in the back seat of a small, cozy family car parked in a quiet gravel yard behind an old temple in a magical old Japanese village at dusk, lantern light glowing through its windows",
+          "interior": true,
+          "indoor": true,
+          "seam": "a plain stretch of soft grey fabric car ceiling and the back of the rear seat, uniform and unbroken",
+          "seamOccluder": "the car's padded grey roof pillar",
+          "elements": [
+            {
+              "id": "seam_left",
+              "at": "on the far left",
+              "desc": "the left half of the calm view directly behind the viewer: a plain stretch of soft grey fabric car ceiling and the back of the rear seat, uniform and unbroken, joining its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "car_door",
+              "at": "to the left",
+              "label": "Back into the temple",
+              "door": {
+                "direction": "back",
+                "to": "temple"
+              },
+              "desc": "the car's back door standing open, and just outside it a small gravel yard and the temple's side wall with its bright yellow door standing open, warm golden light inside"
+            },
+            {
+              "id": "road_map",
+              "at": "just left of centre",
+              "label": "The road map on the back seat",
+              "station": 3,
+              "track": "vocab_car",
+              "desc": "on the soft back seat, an unfolded paper road map of winding roads drawn as pictures only, and a woven basket of herb bundles tied with red string"
+            },
+            {
+              "id": "front_seats",
+              "at": "dead ahead in the centre",
+              "desc": "the two front seats, the dashboard and the round steering wheel, and through the big front windshield the dusky yard, a stone wall and lantern-lit trees beyond"
+            },
+            {
+              "id": "seat_right",
+              "at": "just right of centre",
+              "desc": "the other half of the back seat with a soft cushion and a folded blanket on it"
+            },
+            {
+              "id": "far_door",
+              "at": "to the right",
+              "desc": "the car's other back door, shut, its window showing dark trees and a glowing lantern outside"
+            },
+            {
+              "id": "seam_right",
+              "at": "on the far right",
+              "desc": "the right half of the calm view directly behind the viewer: a plain stretch of soft grey fabric car ceiling and the back of the rear seat, uniform and unbroken, joining its other half cleanly at the seam directly behind you"
+            }
+          ],
+          "soundBed": "inside a parked car at dusk: a soft engine tick as it cools, crickets outside, a temple bell far off.",
+          "rigid": "the seats, the map and basket, the dashboard and steering wheel, the windows, the doors",
+          "atmosphere": "snug, safe and homely, like the end of a long family road trip",
+          "styleLight": "early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red",
+          "negatives": "No people, no figures, no creatures, no faces, no lettering, signs, numbers or text anywhere, not on the dashboard or the map. The car is EMPTY of passengers and parked still; ONE car, the one you sit in.",
+          "states": {},
+          "continuity": [],
+          "scaffold": {
+            "kind": "skeleton",
+            "layout": {
+              "surface": "room",
+              "word": "floor",
+              "floor": "car floor mat",
+              "size": [
+                1.0,
+                1.0,
+                2.6,
+                1.9
+              ],
+              "sides": {
+                "left": "houses",
+                "right": "houses",
+                "front": "houses",
+                "back": "houses"
+              },
+              "parts": [
+                [
+                  "door",
+                  "car_door",
+                  {
+                    "w": 0.9,
+                    "h": 1.3,
+                    "say": "the open back door of the car, the gravel yard just outside"
+                  }
+                ],
+                [
+                  "prop",
+                  "road_map",
+                  {
+                    "size": [
+                      0.6,
+                      0.5,
+                      0.2
+                    ]
+                  }
+                ]
+              ]
+            }
+          },
+          "stillOnly": true
+        },
+        "plateRefs": [
+          "train/scene.png"
+        ],
+        "scenePrompt": "This is a seamless 360-degree panorama from sitting in the back seat of a small, cozy family car parked in a quiet gravel yard behind an old temple in a magical old Japanese village at dusk, lantern light glowing through its windows. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stretch of soft grey fabric car ceiling and the back of the rear seat, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: a plain stretch of soft grey fabric car ceiling and the back of the rear seat, uniform and unbroken, joining its other half cleanly at the seam directly behind you; to the left, the car's back door standing open, and just outside it a small gravel yard and the temple's side wall with its bright yellow door standing open, warm golden light inside; just left of centre, on the soft back seat, an unfolded paper road map of winding roads drawn as pictures only, and a woven basket of herb bundles tied with red string; dead ahead in the centre, the two front seats, the dashboard and the round steering wheel, and through the big front windshield the dusky yard, a stone wall and lantern-lit trees beyond; just right of centre, the other half of the back seat with a soft cushion and a folded blanket on it; to the right, the car's other back door, shut, its window showing dark trees and a glowing lantern outside; on the far right, the right half of the calm view directly behind the viewer: a plain stretch of soft grey fabric car ceiling and the back of the rear seat, uniform and unbroken, joining its other half cleanly at the seam directly behind you. snug, safe and homely, like the end of a long family road trip. No people, no figures, no creatures, no faces, no lettering, signs, numbers or text anywhere, not on the dashboard or the map. The car is EMPTY of passengers and parked still; ONE car, the one you sit in. Shot on a full-frame DSLR at 24mm, f/8, early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a plain stretch of soft grey fabric car ceiling and the back of the rear seat, uniform and unbroken, with no visible seam, join, or repetition.",
+        "seam": {
+          "stage": "blurred",
+          "band": "sky",
+          "ratio": 0.0,
+          "delta": 0.0,
+          "needsWork": false,
+          "accepted": false,
+          "seamBandRun": 0.0,
+          "seamStepRatio": 0.0,
+          "at": "2026-11-04T18:43:16"
+        }
+      },
+      "mapPos": {
+        "c": 1,
+        "r": 8
+      },
+      "panorama": "car/scene.png",
+      "builtFrom": "l1_car_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "hotspots": [
+        {
+          "id": "back_into_the_temple",
+          "type": "door",
+          "label": "Back into the temple",
+          "box": [
+            0.09,
+            0.18,
+            0.25,
+            0.75
+          ],
+          "direction": "back",
+          "to": "temple",
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "the_road_map_on_the_back_seat",
+          "type": "station",
+          "label": "The road map on the back seat",
+          "box": [
+            0.2,
+            0.72,
+            0.52,
+            0.98
+          ],
+          "tier": 3,
+          "track": "vocab_car",
+          "boxSource": "moved:agent"
+        }
+      ]
     }
   ],
   "doorLabels": true,
@@ -8537,7 +9858,7 @@
     "minutes": 15,
     "goal": 15,
     "baths": 1,
-    "maxBaths": 4
+    "maxBaths": 6
   },
   "cover": "cover.png"
 }

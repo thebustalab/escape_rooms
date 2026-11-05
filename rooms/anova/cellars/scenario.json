@@ -353,14 +353,14 @@
           "type": "door",
           "label": "The drawing room",
           "box": [
-            0.7702,
-            0.3375,
-            0.8302,
-            0.6987
+            0.7921,
+            0.3181,
+            0.8521,
+            0.6793
           ],
           "direction": "open",
           "to": "drawing_room",
-          "boxSource": "draft:skeleton"
+          "boxSource": "moved:testplay"
         },
         {
           "id": "the_director_s_study",
@@ -383,7 +383,7 @@
         {
           "id": "lit_wash",
           "type": "ambient",
-          "label": "Nightfall",
+          "label": "Lights on",
           "box": [
             0,
             0,
@@ -401,7 +401,13 @@
                 1
               ],
               "prompt": "Keep this exact scene, composition, camera framing and every object precisely where it is, and change ONLY the lighting -- the electric lamps have just come back on -- and any switch, needle or clock hand named below: Warm yellow electric light now glows from every electric lamp already in the room, mixing with the grey fog light; the room is otherwise exactly as it was; the dead brass pendant over the stair now glows. The small electric wall clock above the study door now has its hands at seven o'clock. Apart from the lamps now lit and any switch, needle or clock hand named above, NOTHING has moved or changed position: the same room from the same viewpoint, every door, object and piece of furniture exactly where it is in the base scene, and it is still the same foggy morning outside.",
-              "panorama": "entrance_hall/scene_lit.png"
+              "panorama": "entrance_hall/scene_lit.png",
+              "when": {
+                "eq": [
+                  "house_power",
+                  true
+                ]
+              }
             }
           ]
         },
@@ -451,7 +457,24 @@
       ],
       "panorama": "entrance_hall/scene.png",
       "built": true,
-      "builtFrom": "l1_entrance_hall_1.png"
+      "builtFrom": "l1_entrance_hall_1.png",
+      "sfx": [
+        {
+          "src": "audio/entrance_hall_bed_far_drips.mp3",
+          "volume": 0.12,
+          "mode": "loop",
+          "crossfade": 4,
+          "needsReplacement": true
+        },
+        {
+          "src": "audio/entrance_hall_shot_floor_creak.mp3",
+          "volume": 0.15,
+          "mode": "interval",
+          "gapMin": 18,
+          "gapMax": 40,
+          "needsReplacement": true
+        }
+      ]
     },
     {
       "key": "drawing_room",
@@ -494,7 +517,12 @@
             0.5157,
             0.6289
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "solveSfx": {
+            "src": "audio/solve_drawing_room_the_weighing_book_book_close.mp3",
+            "volume": 0.077,
+            "needsReplacement": true
+          }
         },
         {
           "type": "door",
@@ -755,40 +783,45 @@
             },
             "expr": "local({ a <- suppressWarnings(as.numeric(unlist(answer))); length(a) == 1 && !is.na(a) && abs(a - 0.397) <= 0.005 })"
           },
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "solveSfx": {
+            "src": "audio/solve_drawing_room_the_weighing_book_book_close.mp3",
+            "volume": 0.077,
+            "needsReplacement": true
+          }
         },
         {
           "id": "back_to_the_hall",
           "type": "door",
           "label": "Back to the hall",
           "box": [
-            0.2004,
-            0.4286,
-            0.2404,
-            0.6454
+            0.1303,
+            0.3964,
+            0.1703,
+            0.6132
           ],
           "direction": "open",
           "to": "entrance_hall",
-          "boxSource": "draft:skeleton"
+          "boxSource": "moved:testplay"
         },
         {
           "id": "through_to_the_kitchen",
           "type": "door",
           "label": "Through to the kitchen",
           "box": [
-            0.7828,
-            0.4423,
-            0.8188,
-            0.6202
+            0.8841,
+            0.4002,
+            0.9201,
+            0.5781
           ],
           "direction": "open",
           "to": "kitchen",
-          "boxSource": "draft:skeleton"
+          "boxSource": "moved:testplay"
         },
         {
           "id": "lit_wash",
           "type": "ambient",
-          "label": "Nightfall",
+          "label": "Lights on",
           "box": [
             0,
             0,
@@ -806,7 +839,13 @@
                 1
               ],
               "prompt": "Keep this exact scene, composition, camera framing and every object precisely where it is, and change ONLY the lighting -- the electric lamps have just come back on -- and any switch, needle or clock hand named below: Warm yellow electric light now glows from every electric lamp already in the room, mixing with the grey fog light; the room is otherwise exactly as it was; the electric standard lamp glows under its silk shade. Apart from the lamps now lit and any switch, needle or clock hand named above, NOTHING has moved or changed position: the same room from the same viewpoint, every door, object and piece of furniture exactly where it is in the base scene, and it is still the same foggy morning outside.",
-              "panorama": "drawing_room/scene_lit.png"
+              "panorama": "drawing_room/scene_lit.png",
+              "when": {
+                "eq": [
+                  "house_power",
+                  true
+                ]
+              }
             }
           ]
         },
@@ -830,6 +869,45 @@
             ],
             "video": "drawing_room/cine_base.mp4"
           }
+        },
+        {
+          "id": "clip_lit",
+          "type": "ambient",
+          "label": "Scene motion (lit)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/play-source.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "drawing_room/cine_lit.mp4",
+            "state": "lit"
+          }
+        }
+      ],
+      "sfx": [
+        {
+          "src": "audio/drawing_room_bed_coal_fire.mp3",
+          "volume": 0.3,
+          "mode": "loop",
+          "crossfade": 4,
+          "needsReplacement": true
+        },
+        {
+          "src": "audio/drawing_room_shot_coal_pop.mp3",
+          "volume": 0.15,
+          "mode": "interval",
+          "gapMin": 12,
+          "gapMax": 30,
+          "needsReplacement": true
         }
       ]
     },
@@ -876,7 +954,12 @@
             0.5094,
             0.6751
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "solveSfx": {
+            "src": "audio/solve_kitchen_the_director_s_draft_key_latch.mp3",
+            "volume": 0.1,
+            "needsReplacement": true
+          }
         },
         {
           "type": "dial",
@@ -901,7 +984,12 @@
             0.7903,
             0.5205
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "sfx": {
+            "src": "audio/kitchen_dial_breaker_throw.mp3",
+            "volume": 0.033,
+            "needsReplacement": true
+          }
         },
         {
           "type": "instrument",
@@ -926,7 +1014,9 @@
             0.6808,
             0.5046
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "geometry": "instruments/variance_meter/geometry.json",
+          "config": "data/switchboard.json"
         },
         {
           "type": "instrument",
@@ -942,7 +1032,15 @@
             ]
           },
           "noElement": true,
-          "note": "ESCAPE INSTRUMENT (M), LIVE copy. Eight rails (amperes), the eight room switches, the between / within / share dials, red line at 35%; printed default grouping by wing; config data/switchboard.json."
+          "note": "ESCAPE INSTRUMENT (M), LIVE copy. Eight rails (amperes), the eight room switches, the between / within / share dials, red line at 35%; printed default grouping by wing; config data/switchboard.json.",
+          "box": [
+            0.6983,
+            0.3805,
+            0.7183,
+            0.4415
+          ],
+          "geometry": "instruments/variance_meter/geometry.json",
+          "config": "data/switchboard.json"
         },
         {
           "type": "door",
@@ -1213,17 +1311,22 @@
             },
             "expr": "local({ a <- tolower(trimws(as.character(unlist(answer)))); identical(a, c(\"nitrogen\", \"minerals\", \"lime\")) })"
           },
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "solveSfx": {
+            "src": "audio/solve_kitchen_the_director_s_draft_key_latch.mp3",
+            "volume": 0.1,
+            "needsReplacement": true
+          }
         },
         {
           "id": "the_house_circuits",
           "type": "dial",
           "label": "The house circuits",
           "box": [
-            0.7603,
-            0.4405,
-            0.7903,
-            0.5205
+            0.762,
+            0.391,
+            0.792,
+            0.471
           ],
           "key": "house_power",
           "states": [
@@ -1238,17 +1341,22 @@
             "solved": "kitchen"
           },
           "lockedBody": "The main switch is thrown, but the breakers trip straight back out.",
-          "boxSource": "draft:skeleton"
+          "boxSource": "moved:testplay",
+          "sfx": {
+            "src": "audio/kitchen_dial_breaker_throw.mp3",
+            "volume": 0.033,
+            "needsReplacement": true
+          }
         },
         {
           "id": "the_switchboard",
           "type": "instrument",
           "label": "The switchboard",
           "box": [
-            0.6608,
-            0.4436,
-            0.6808,
-            0.5046
+            0.6983,
+            0.3805,
+            0.7183,
+            0.4415
           ],
           "kind": "variance_meter",
           "params": {
@@ -1263,26 +1371,54 @@
               ]
             }
           },
-          "boxSource": "draft:skeleton"
+          "boxSource": "moved:testplay",
+          "geometry": "instruments/variance_meter/geometry.json",
+          "config": "data/switchboard.json"
+        },
+        {
+          "id": "the_switchboard_live",
+          "type": "instrument",
+          "label": "The switchboard (live)",
+          "box": [
+            0.6983,
+            0.3805,
+            0.7183,
+            0.4415
+          ],
+          "kind": "variance_meter",
+          "params": {
+            "utility": "amps"
+          },
+          "shownWhen": {
+            "eq": [
+              "house_power",
+              true
+            ]
+          },
+          "boxSource": "review:copied-from-the_switchboard",
+          "boxNote": "Same box as the dead board (hand-placed moved:testplay), copied at closeout 2026-11-04; the two copies are state-switched, never shown together.",
+          "geometry": "instruments/variance_meter/geometry.json",
+          "config": "data/switchboard.json",
+          "noElement": true
         },
         {
           "id": "back_to_the_drawing_room",
           "type": "door",
           "label": "Back to the drawing room",
           "box": [
-            0.1842,
-            0.4501,
-            0.2166,
-            0.6261
+            0.0824,
+            0.3812,
+            0.1148,
+            0.5572
           ],
           "direction": "open",
           "to": "drawing_room",
-          "boxSource": "draft:skeleton"
+          "boxSource": "moved:testplay"
         },
         {
           "id": "lit_wash",
           "type": "ambient",
-          "label": "Nightfall",
+          "label": "Lights on",
           "box": [
             0,
             0,
@@ -1300,7 +1436,13 @@
                 1
               ],
               "prompt": "Keep this exact scene, composition, camera framing and every object precisely where it is, and change ONLY the lighting -- the electric lamps have just come back on -- and any switch, needle or clock hand named below: Warm yellow electric light now glows from every electric lamp already in the room, mixing with the grey fog light; the room is otherwise exactly as it was; the enamel pendant lamp over the table glows. The switchboard's three needles now lifted off their stops, the board live. The circuit breaker's lever now thrown UP to on. Apart from the lamps now lit and any switch, needle or clock hand named above, NOTHING has moved or changed position: the same room from the same viewpoint, every door, object and piece of furniture exactly where it is in the base scene, and it is still the same foggy morning outside.",
-              "panorama": "kitchen/scene_lit.png"
+              "panorama": "kitchen/scene_lit.png",
+              "when": {
+                "eq": [
+                  "house_power",
+                  true
+                ]
+              }
             }
           ]
         },
@@ -1324,11 +1466,50 @@
             ],
             "video": "kitchen/cine_base.mp4"
           }
+        },
+        {
+          "id": "clip_lit",
+          "type": "ambient",
+          "label": "Scene motion (lit)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/play-source.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "kitchen/cine_lit.mp4",
+            "state": "lit"
+          }
         }
       ],
       "panorama": "kitchen/scene.png",
       "built": true,
-      "builtFrom": "l1_kitchen_3.png"
+      "builtFrom": "l1_kitchen_3.png",
+      "sfx": [
+        {
+          "src": "audio/kitchen_bed_kettle_simmer.mp3",
+          "volume": 0.156,
+          "mode": "loop",
+          "crossfade": 4,
+          "needsReplacement": true
+        },
+        {
+          "src": "audio/kitchen_shot_sink_drip.mp3",
+          "volume": 0.046,
+          "mode": "interval",
+          "gapMin": 6,
+          "gapMax": 14,
+          "needsReplacement": true
+        }
+      ]
     },
     {
       "key": "study",
@@ -1603,7 +1784,7 @@
         {
           "id": "lit_wash",
           "type": "ambient",
-          "label": "Nightfall",
+          "label": "Lights on",
           "box": [
             0,
             0,
@@ -1621,7 +1802,13 @@
                 1
               ],
               "prompt": "Keep this exact scene, composition, camera framing and every object precisely where it is, and change ONLY the lighting -- the electric lamps have just come back on -- and any switch, needle or clock hand named below: Warm yellow electric light now glows from every electric lamp already in the room, mixing with the grey fog light; the room is otherwise exactly as it was; the green-shaded desk lamp glows. Apart from the lamps now lit and any switch, needle or clock hand named above, NOTHING has moved or changed position: the same room from the same viewpoint, every door, object and piece of furniture exactly where it is in the base scene, and it is still the same foggy morning outside.",
-              "panorama": "study/scene_lit.png"
+              "panorama": "study/scene_lit.png",
+              "when": {
+                "eq": [
+                  "house_power",
+                  true
+                ]
+              }
             }
           ]
         },
@@ -1667,6 +1854,23 @@
             "video": "study/cine_lit.mp4",
             "state": "lit"
           }
+        }
+      ],
+      "sfx": [
+        {
+          "src": "audio/study_bed_coal_fire.mp3",
+          "volume": 0.097,
+          "mode": "loop",
+          "crossfade": 4,
+          "needsReplacement": true
+        },
+        {
+          "src": "audio/study_shot_ember_tick.mp3",
+          "volume": 0.15,
+          "mode": "interval",
+          "gapMin": 14,
+          "gapMax": 30,
+          "needsReplacement": true
         }
       ]
     },
@@ -1714,7 +1918,12 @@
             0.5187,
             0.6557
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "solveSfx": {
+            "src": "audio/solve_library_the_director_s_trial_ledger_book_close.mp3",
+            "volume": 0.077,
+            "needsReplacement": true
+          }
         },
         {
           "type": "door",
@@ -1818,14 +2027,18 @@
             0.7018,
             0.7965
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "solveSfx": {
+            "src": "audio/solve_library_the_tall_bookcase_panel_swing.mp3",
+            "volume": 0.058,
+            "needsReplacement": true
+          }
         },
         {
           "type": "door",
           "direction": "open",
           "label": "Through the bookcase",
-          "to": "passage_stair",
-          "requires": "The tall bookcase",
+          "requires": "the_tall_bookcase",
           "endsEscape": true,
           "note": "Travel sequence (held back for the escape): the bookcase swings opens and the camera climbs onto the narrow stair inside the wall, where the two players meet. endsEscape; clip at step 5 (escape_room_transits).",
           "box": [
@@ -1834,7 +2047,8 @@
             0.75,
             0.9
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "lockedBody": "The bookcase stands solid against the wall."
         }
       ],
       "mapPos": {
@@ -2084,7 +2298,12 @@
             },
             "expr": "local({ a <- suppressWarnings(as.numeric(unlist(answer))); length(a) == 1 && !is.na(a) && abs(a - 0.435) <= 0.005 })"
           },
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "solveSfx": {
+            "src": "audio/solve_library_the_director_s_trial_ledger_book_close.mp3",
+            "volume": 0.077,
+            "needsReplacement": true
+          }
         },
         {
           "id": "back_to_the_study",
@@ -2190,7 +2409,12 @@
             "incomplete": "Every room needs its switch set first.",
             "out": ""
           },
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "solveSfx": {
+            "src": "audio/solve_library_the_tall_bookcase_panel_swing.mp3",
+            "volume": 0.058,
+            "needsReplacement": true
+          }
         },
         {
           "id": "through_the_bookcase",
@@ -2203,15 +2427,15 @@
             0.9
           ],
           "direction": "open",
-          "to": "passage_stair",
-          "requires": "The tall bookcase",
+          "requires": "the_tall_bookcase",
           "endsEscape": true,
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "lockedBody": "The bookcase stands solid against the wall."
         },
         {
           "id": "lit_wash",
           "type": "ambient",
-          "label": "Nightfall",
+          "label": "Lights on",
           "box": [
             0,
             0,
@@ -2229,7 +2453,13 @@
                 1
               ],
               "prompt": "Keep this exact scene, composition, camera framing and every object precisely where it is, and change ONLY the lighting -- the electric lamps have just come back on -- and any switch, needle or clock hand named below: Warm yellow electric light now glows from every electric lamp already in the room, mixing with the grey fog light; the room is otherwise exactly as it was; the brass reading lamp on the table glows. Apart from the lamps now lit and any switch, needle or clock hand named above, NOTHING has moved or changed position: the same room from the same viewpoint, every door, object and piece of furniture exactly where it is in the base scene, and it is still the same foggy morning outside.",
-              "panorama": "library/scene_lit.png"
+              "panorama": "library/scene_lit.png",
+              "when": {
+                "eq": [
+                  "house_power",
+                  true
+                ]
+              }
             }
           ]
         },
@@ -2253,6 +2483,45 @@
             ],
             "video": "library/cine_base.mp4"
           }
+        },
+        {
+          "id": "clip_lit",
+          "type": "ambient",
+          "label": "Scene motion (lit)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/play-source.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "library/cine_lit.mp4",
+            "state": "lit"
+          }
+        }
+      ],
+      "sfx": [
+        {
+          "src": "audio/library_bed_smouldering_log.mp3",
+          "volume": 0.12,
+          "mode": "loop",
+          "crossfade": 4,
+          "needsReplacement": true
+        },
+        {
+          "src": "audio/library_shot_log_pop.mp3",
+          "volume": 0.1,
+          "mode": "interval",
+          "gapMin": 15,
+          "gapMax": 35,
+          "needsReplacement": true
         }
       ]
     },
@@ -2297,7 +2566,12 @@
             0.4898,
             0.7257
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "solveSfx": {
+            "src": "audio/solve_laboratory_the_farmer_s_letter_stamp.mp3",
+            "volume": 0.07,
+            "needsReplacement": true
+          }
         },
         {
           "type": "door",
@@ -2532,7 +2806,12 @@
               ]
             }
           },
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "solveSfx": {
+            "src": "audio/solve_laboratory_the_farmer_s_letter_stamp.mp3",
+            "volume": 0.07,
+            "needsReplacement": true
+          }
         },
         {
           "id": "back_to_the_library",
@@ -2551,7 +2830,7 @@
         {
           "id": "lit_wash",
           "type": "ambient",
-          "label": "Nightfall",
+          "label": "Lights on",
           "box": [
             0,
             0,
@@ -2569,7 +2848,13 @@
                 1
               ],
               "prompt": "Keep this exact scene, composition, camera framing and every object precisely where it is, and change ONLY the lighting -- the electric lamps have just come back on -- and any switch, needle or clock hand named below: Warm yellow electric light now glows from every electric lamp already in the room, mixing with the grey fog light; the room is otherwise exactly as it was; the white enamel pendant lamps hanging over the bench glow. Apart from the lamps now lit and any switch, needle or clock hand named above, NOTHING has moved or changed position: the same room from the same viewpoint, every door, object and piece of furniture exactly where it is in the base scene, and it is still the same foggy morning outside.",
-              "panorama": "laboratory/scene_lit.png"
+              "panorama": "laboratory/scene_lit.png",
+              "when": {
+                "eq": [
+                  "house_power",
+                  true
+                ]
+              }
             }
           ]
         },
@@ -2593,11 +2878,50 @@
             ],
             "video": "laboratory/cine_base.mp4"
           }
+        },
+        {
+          "id": "clip_lit",
+          "type": "ambient",
+          "label": "Scene motion (lit)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/play-source.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "laboratory/cine_lit.mp4",
+            "state": "lit"
+          }
         }
       ],
       "panorama": "laboratory/scene.png",
       "built": true,
-      "builtFrom": "l1_laboratory_2.png"
+      "builtFrom": "l1_laboratory_2.png",
+      "sfx": [
+        {
+          "src": "audio/laboratory_bed_gas_purr.mp3",
+          "volume": 0.151,
+          "mode": "loop",
+          "crossfade": 4,
+          "needsReplacement": true
+        },
+        {
+          "src": "audio/laboratory_shot_drip.mp3",
+          "volume": 0.046,
+          "mode": "interval",
+          "gapMin": 10,
+          "gapMax": 25,
+          "needsReplacement": true
+        }
+      ]
     },
     {
       "key": "stair_foot",
@@ -2898,7 +3222,7 @@
         {
           "id": "lit_wash",
           "type": "ambient",
-          "label": "Nightfall",
+          "label": "Lights on",
           "box": [
             0,
             0,
@@ -2916,9 +3240,40 @@
                 1
               ],
               "prompt": "Keep this exact scene, composition, camera framing and every object precisely where it is, and change ONLY the lighting -- the cellar's electric lights have just come back on -- and any switch named below: Warm yellow light now glows from the bare electric bulbs already hanging under the vault; the torch's single beam is gone; the arched door on the left is still shut. Apart from the bulbs now lit and any switch named above, NOTHING has moved or changed position: the same cellar from the same viewpoint, every door and object exactly where it is in the base scene.",
-              "panorama": "stair_foot/scene_lit.png"
+              "panorama": "stair_foot/scene_lit.png",
+              "when": {
+                "eq": [
+                  "cellar_lights",
+                  true
+                ]
+              }
             }
           ]
+        }
+      ],
+      "sfx": [
+        {
+          "src": "audio/stair_foot_bed_cellar_tone.mp3",
+          "volume": 0.189,
+          "mode": "loop",
+          "crossfade": 4,
+          "needsReplacement": true
+        },
+        {
+          "src": "audio/stair_foot_shot_gully_drip.mp3",
+          "volume": 0.086,
+          "mode": "interval",
+          "gapMin": 5,
+          "gapMax": 12,
+          "needsReplacement": true
+        },
+        {
+          "src": "audio/stair_foot_shot_overhead_creak.mp3",
+          "volume": 0.12,
+          "mode": "interval",
+          "gapMin": 25,
+          "gapMax": 50,
+          "needsReplacement": true
         }
       ]
     },
@@ -2963,7 +3318,12 @@
             0.5102,
             0.5564
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "solveSfx": {
+            "src": "audio/solve_seed_store_the_botanical_survey_book_close.mp3",
+            "volume": 0.077,
+            "needsReplacement": true
+          }
         },
         {
           "type": "door",
@@ -3211,7 +3571,12 @@
             },
             "expr": "local({ a <- suppressWarnings(as.numeric(unlist(answer))); length(a) == 1 && !is.na(a) && abs(a - 0.068) <= 0.005 })"
           },
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "solveSfx": {
+            "src": "audio/solve_seed_store_the_botanical_survey_book_close.mp3",
+            "volume": 0.077,
+            "needsReplacement": true
+          }
         },
         {
           "id": "back_to_the_stair",
@@ -3244,7 +3609,7 @@
         {
           "id": "lit_wash",
           "type": "ambient",
-          "label": "Nightfall",
+          "label": "Lights on",
           "box": [
             0,
             0,
@@ -3262,7 +3627,13 @@
                 1
               ],
               "prompt": "Keep this exact scene, composition, camera framing and every object precisely where it is, and change ONLY the lighting -- the cellar's electric lights have just come back on -- and any switch named below: Warm yellow light now glows from the bare electric bulbs already hanging under the vault; the torch's single beam is gone; the bulbs over the desk glow. Apart from the bulbs now lit and any switch named above, NOTHING has moved or changed position: the same cellar from the same viewpoint, every door and object exactly where it is in the base scene.",
-              "panorama": "seed_store/scene_lit.png"
+              "panorama": "seed_store/scene_lit.png",
+              "when": {
+                "eq": [
+                  "cellar_lights",
+                  true
+                ]
+              }
             }
           ]
         },
@@ -3309,6 +3680,23 @@
             "state": "lit"
           }
         }
+      ],
+      "sfx": [
+        {
+          "src": "audio/seed_store_bed_seed_hiss.mp3",
+          "volume": 0.25,
+          "mode": "loop",
+          "crossfade": 4,
+          "needsReplacement": true
+        },
+        {
+          "src": "audio/seed_store_shot_seed_pour.mp3",
+          "volume": 0.126,
+          "mode": "interval",
+          "gapMin": 20,
+          "gapMax": 40,
+          "needsReplacement": true
+        }
       ]
     },
     {
@@ -3354,7 +3742,12 @@
             0.6395,
             0.6165
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "solveSfx": {
+            "src": "audio/solve_wash_house_the_survey_summary_stamp.mp3",
+            "volume": 0.07,
+            "needsReplacement": true
+          }
         },
         {
           "type": "dial",
@@ -3379,7 +3772,12 @@
             0.8116,
             0.5528
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "sfx": {
+            "src": "audio/wash_house_dial_breaker_throw.mp3",
+            "volume": 0.033,
+            "needsReplacement": true
+          }
         },
         {
           "type": "instrument",
@@ -3395,7 +3793,9 @@
             0.5402,
             0.5342
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "geometry": "instruments/variance_meter/geometry.json",
+          "config": "data/switchboard.json"
         },
         {
           "type": "door",
@@ -3655,7 +4055,12 @@
             },
             "expr": "local({ a <- tolower(trimws(as.character(unlist(answer)))); identical(a, c(\"lime\", \"nitrogen\", \"minerals\")) })"
           },
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "solveSfx": {
+            "src": "audio/solve_wash_house_the_survey_summary_stamp.mp3",
+            "volume": 0.07,
+            "needsReplacement": true
+          }
         },
         {
           "id": "the_cellar_circuit",
@@ -3680,7 +4085,12 @@
             "solved": "wash_house"
           },
           "lockedBody": "You throw the isolator. Somewhere a breaker snaps, and the dark comes straight back.",
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "sfx": {
+            "src": "audio/wash_house_dial_breaker_throw.mp3",
+            "volume": 0.033,
+            "needsReplacement": true
+          }
         },
         {
           "id": "the_water_board",
@@ -3696,7 +4106,9 @@
           "params": {
             "utility": "gallons"
           },
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "geometry": "instruments/variance_meter/geometry.json",
+          "config": "data/switchboard.json"
         },
         {
           "id": "back_to_the_seed_store",
@@ -3715,7 +4127,7 @@
         {
           "id": "lit_wash",
           "type": "ambient",
-          "label": "Nightfall",
+          "label": "Lights on",
           "box": [
             0,
             0,
@@ -3733,7 +4145,13 @@
                 1
               ],
               "prompt": "Keep this exact scene, composition, camera framing and every object precisely where it is, and change ONLY the lighting -- the cellar's electric lights have just come back on -- and any switch named below: Warm yellow light now glows from the bare electric bulbs already hanging under the vault; the torch's single beam is gone; the bulb over the isolator glows. The isolator's lever now thrown UP to on. Apart from the bulbs now lit and any switch named above, NOTHING has moved or changed position: the same cellar from the same viewpoint, every door and object exactly where it is in the base scene.",
-              "panorama": "wash_house/scene_lit.png"
+              "panorama": "wash_house/scene_lit.png",
+              "when": {
+                "eq": [
+                  "cellar_lights",
+                  true
+                ]
+              }
             }
           ]
         },
@@ -3779,6 +4197,23 @@
             "video": "wash_house/cine_lit.mp4",
             "state": "lit"
           }
+        }
+      ],
+      "sfx": [
+        {
+          "src": "audio/wash_house_bed_drips.mp3",
+          "volume": 0.3,
+          "mode": "loop",
+          "crossfade": 4,
+          "needsReplacement": true
+        },
+        {
+          "src": "audio/wash_house_shot_sheet_flap.mp3",
+          "volume": 0.15,
+          "mode": "interval",
+          "gapMin": 15,
+          "gapMax": 35,
+          "needsReplacement": true
         }
       ]
     },
@@ -3826,7 +4261,12 @@
             0.522,
             0.6372
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "solveSfx": {
+            "src": "audio/solve_archive_vault_the_archive_register_book_close.mp3",
+            "volume": 0.077,
+            "needsReplacement": true
+          }
         },
         {
           "type": "plaque",
@@ -3946,14 +4386,18 @@
             0.6875,
             0.4955
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "solveSfx": {
+            "src": "audio/solve_archive_vault_the_iron_box_iron_door.mp3",
+            "volume": 0.05,
+            "needsReplacement": true
+          }
         },
         {
           "type": "door",
           "direction": "open",
           "label": "Through the iron door",
-          "to": "passage_stair",
-          "requires": "The iron box",
+          "requires": "the_iron_box",
           "endsEscape": true,
           "note": "Travel sequence (held back for the escape): the low iron door at the vault's end opens opens and the camera climbs onto the narrow stair inside the wall, where the two players meet. endsEscape; clip at step 5 (escape_room_transits).",
           "box": [
@@ -3962,7 +4406,8 @@
             0.6544,
             0.6183
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "lockedBody": "The low iron door is shut fast."
         }
       ],
       "mapPos": {
@@ -4195,7 +4640,12 @@
             },
             "expr": "local({ a <- suppressWarnings(as.numeric(unlist(answer))); length(a) == 1 && !is.na(a) && abs(a - 0.793) <= 0.005 })"
           },
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "solveSfx": {
+            "src": "audio/solve_archive_vault_the_archive_register_book_close.mp3",
+            "volume": 0.077,
+            "needsReplacement": true
+          }
         },
         {
           "id": "the_sample_archive",
@@ -4317,7 +4767,12 @@
             "incomplete": "Every room needs its switch set first.",
             "out": ""
           },
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "solveSfx": {
+            "src": "audio/solve_archive_vault_the_iron_box_iron_door.mp3",
+            "volume": 0.05,
+            "needsReplacement": true
+          }
         },
         {
           "id": "through_the_iron_door",
@@ -4330,10 +4785,10 @@
             0.6183
           ],
           "direction": "open",
-          "to": "passage_stair",
-          "requires": "The iron box",
+          "requires": "the_iron_box",
           "endsEscape": true,
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "lockedBody": "The low iron door is shut fast."
         },
         {
           "id": "clip_base",
@@ -4355,6 +4810,23 @@
             ],
             "video": "archive_vault/cine_base.mp4"
           }
+        }
+      ],
+      "sfx": [
+        {
+          "src": "audio/archive_vault_bed_fan_hum.mp3",
+          "volume": 0.281,
+          "mode": "loop",
+          "crossfade": 4,
+          "needsReplacement": true
+        },
+        {
+          "src": "audio/archive_vault_shot_far_boom.mp3",
+          "volume": 0.12,
+          "mode": "interval",
+          "gapMin": 20,
+          "gapMax": 45,
+          "needsReplacement": true
         }
       ]
     },
@@ -4400,7 +4872,12 @@
             0.6602,
             0.6528
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "solveSfx": {
+            "src": "audio/solve_boiler_room_the_director_s_second_draft_stamp.mp3",
+            "volume": 0.07,
+            "needsReplacement": true
+          }
         },
         {
           "type": "door",
@@ -4615,7 +5092,12 @@
               ]
             }
           },
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "solveSfx": {
+            "src": "audio/solve_boiler_room_the_director_s_second_draft_stamp.mp3",
+            "volume": 0.07,
+            "needsReplacement": true
+          }
         },
         {
           "id": "back_to_the_archive_vault",
@@ -4651,6 +5133,23 @@
             ],
             "video": "boiler_room/cine_base.mp4"
           }
+        }
+      ],
+      "sfx": [
+        {
+          "src": "audio/boiler_room_bed_firebox_roar.mp3",
+          "volume": 0.262,
+          "mode": "loop",
+          "crossfade": 4,
+          "needsReplacement": true
+        },
+        {
+          "src": "audio/boiler_room_shot_hot_iron_tick.mp3",
+          "volume": 0.177,
+          "mode": "interval",
+          "gapMin": 6,
+          "gapMax": 15,
+          "needsReplacement": true
         }
       ]
     }
@@ -4736,5 +5235,7 @@
     "ggplot2",
     "readr"
   ],
-  "setup": "suppressMessages({library(dplyr); library(ggplot2)})"
+  "setup": "suppressMessages({library(dplyr); library(ggplot2)})",
+  "cover": "cover.png",
+  "ambient": "dust"
 }

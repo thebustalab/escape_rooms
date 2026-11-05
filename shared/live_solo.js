@@ -94,8 +94,9 @@ export class SoloSession {
     this.byId = Object.fromEntries(pool.puzzles.map(p => [p.id, p]));
     this.durationS = Math.round(minutes * 60);
     this.goal = goal;
-    const sinks = pool.sinks || [];
-    this.winSinks = Math.max(0, Math.min(sinks.length, baths | 0));
+    // a sink with `counts: false` (the temple's robe rack) never counts toward the baths to fill (live_server)
+    this.counting = new Set((pool.sinks || []).filter(s => s.counts !== false).map(s => s.id));
+    this.winSinks = Math.max(0, Math.min(this.counting.size, baths | 0));
     this.startedAt = now();
     this.endedAt = null;
     this.phase = "running";
@@ -116,7 +117,7 @@ export class SoloSession {
       this.phase = "timeup"; this.endedAt = this.startedAt + this.durationS * 1000;
     }
   }
-  sinksNeeded() { return Math.max(0, this.winSinks - this.filled.length); }
+  sinksNeeded() { return Math.max(0, this.winSinks - this.filled.filter(id => this.counting.has(id)).length); }
   maybeWin() {
     if (this.total >= this.goal && !this.sinksNeeded() && this.phase === "running") {
       this.phase = "won"; this.endedAt = this.now();
@@ -163,7 +164,8 @@ export class SoloSession {
       deliver_to: P.deliver_to, deliver_verb: P.deliver_verb,
       items: Object.fromEntries(Object.entries(P.items || {}).map(([k, v]) =>
         [k, { unit: v.unit, carry_max: v.carry_max, deliver_to: v.deliver_to }])),
-      sinks: (P.sinks || []).map(s => ({ id: s.id, label: s.label, item: s.item, cost: s.cost })),
+      sinks: (P.sinks || []).map(s => ({ id: s.id, label: s.label, item: s.item, cost: s.cost,
+                                         ...(s.counts === false ? { counts: false } : {}) })),
       win_sinks: this.winSinks, payouts: poolPayouts(P), backpack: !!P.backpack, won_text: P.won_text || null,
       rides: P.rides || null,
       menu: P.menu ? { seconds: P.menu.seconds, dishes: P.menu.dishes.map(d => ({ track: d.track, label: d.label })) } : null,
