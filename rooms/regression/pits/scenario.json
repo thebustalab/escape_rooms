@@ -4600,14 +4600,14 @@
           "type": "door",
           "label": "The small punt to the sea lock pit",
           "box": [
-            0.257,
-            0.555,
-            0.312,
-            0.632
+            0.1933,
+            0.5665,
+            0.2483,
+            0.6435
           ],
           "direction": "open",
           "to": "pit1",
-          "boxSource": "review:agent-vision",
+          "boxSource": "moved:testplay",
           "boxNote": "Agent-vision 2026-11-06: draft sat on the sluice water behind the small punt; re-measured on the small punt moored by the steps."
         },
         {
@@ -4674,6 +4674,27 @@
           },
           "boxSource": "review:agent-vision",
           "boxNote": "Agent-vision 2026-11-06: checked at native resolution; the draft frames the board face on the easel. Kept."
+        },
+        {
+          "id": "clip_base",
+          "type": "ambient",
+          "label": "Scene motion (base)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/play-source.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "wharf/cine_base.mp4"
+          }
         }
       ],
       "sfx": [
@@ -8949,14 +8970,14 @@
           "type": "door",
           "label": "The punt back to the barge",
           "box": [
-            0.234,
-            0.59,
-            0.41,
-            0.745
+            0.4277,
+            0.5416,
+            0.6037,
+            0.6966
           ],
           "direction": "back",
           "to": "wharf",
-          "boxSource": "review:agent-vision",
+          "boxSource": "moved:testplay",
           "boxNote": "Agent-vision 2026-11-06: draft missed the punt's bow and lower hull; re-measured on the whole punt."
         },
         {
@@ -8972,6 +8993,27 @@
           "tier": 1,
           "boxSource": "review:agent-vision",
           "boxNote": "Agent-vision 2026-11-06: draft boxed the sacks and brazier beside the pit; re-measured on the gravel trench with its shovel and sieve."
+        },
+        {
+          "id": "clip_base",
+          "type": "ambient",
+          "label": "Scene motion (base)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/play-source.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "pit1/cine_base.mp4"
+          }
         }
       ],
       "sfx": [
@@ -9067,16 +9109,15 @@
               "at": "to the left",
               "label": "The pit on the rock platform",
               "station": 2,
-              "desc": "a few strides from the viewer, cut into the flat rock, a COMPACT gravel pit no wider than one sixth of the frame: a shallow hollow in the black rock filled with wet, rounded, many-coloured beach gravel, two shovels standing in it, a tripod of three tall wooden poles standing upright and vertical with its legs planted round the rim and a lit lantern hung from its top, and beside it on the rock a small heap of canvas sacks of wet gravel, each tied at the neck; the whole pit, its rim, every pole, the rope lashings, the sack heap and all their cast shadows stand at least 800 px in from the left edge of the frame, with a broad stretch of bare wet rock and open calm black water of the channel's mouth under the moon between them and that edge, so the left edge shows only water, fog bank, moon, sky and plain bare rock shoreline"
+              "desc": "a few strides from the viewer, cut into the flat rock, a COMPACT gravel pit no wider than one sixth of the frame: a shallow hollow in the black rock filled with wet, rounded, many-coloured beach gravel, two shovels standing in it, a tripod of three tall wooden poles standing upright and vertical with its legs planted round the rim and a lit lantern hung from its top, and beside it on the rock a small heap of canvas sacks of wet gravel, each tied at the neck; the whole pit, its rim, every pole, the rope lashings, the sack heap and all their cast shadows stand at least 800 px in from the left edge of the frame, with a broad stretch of bare wet rock and open calm black water of the channel's mouth under the moon between them and that edge, so the left edge shows only water, fog bank, moon, sky and plain bare rock shoreline",
+              "still_as": "the wet gravel in the pit lies completely still; no water runs into or over the pit"
             },
             {
               "id": "windbreak",
               "at": "left of centre",
               "desc": "a few strides from the viewer, cut into the flat rock well in from the left edge of the frame, a COMPACT gravel pit no wider than one eighth of the frame: a shallow hollow in the black rock filled with wet, rounded, many-coloured beach gravel, two shovels standing in it, a tripod of three tall wooden poles standing upright and vertical with its legs planted round the rim and a lit lantern hung from its top, and beside it on the rock a small heap of canvas sacks of wet gravel, each tied at the neck; the whole pit, its rim wall, every pebble, every pole, the lashings, the sack heap and all their cast shadows stand at least 1100 px in from the left edge of the frame, with a broad stretch of plain bare wet rock and open calm black water of the channel's mouth under the moon between them and that edge, so the left edge shows only water, fog bank, moon, sky and plain bare rock shoreline",
               "motion": {
-                "moves": true,
-                "vigour": "its loose canvas bellying in the sea wind",
-                "phrase": "the canvas windbreak beside the pit bellies and ripples in the sea wind, waves running along its loose edge"
+                "moves": false
               },
               "sound": {
                 "source": "the canvas windbreak in the wind",
@@ -9092,7 +9133,8 @@
                 "direction": "open",
                 "to": "pit3"
               },
-              "desc": "past the windbreak, the flat wet rock of the platform running on level and far toward the sea, low ribs of black rock and pools holding the pale sky across it, and far out near its edge a lantern on a tall marker pole over another pit"
+              "desc": "past the windbreak, the flat wet rock of the platform running on level and far toward the sea, low ribs of black rock and pools holding the pale sky across it, and far out near its edge a lantern on a tall marker pole over another pit",
+              "still_as": "the bare rock platform is solid stone: its wet sheen and the pools on it are glassy and completely still, nothing flows across it"
             },
             {
               "id": "breakwater",
@@ -9102,7 +9144,11 @@
             {
               "id": "ledge",
               "at": "right of centre",
-              "desc": "across the deep black channel, the small squat sea lock with one lit window at the breakwater's end, and below it along the foot of the headland a narrow ledge with the orange glow of a brazier on it"
+              "desc": "across the deep black channel, the small squat sea lock with one lit window at the breakwater's end, and below it along the foot of the headland a narrow ledge with the orange glow of a brazier on it",
+              "motion": {
+                "moves": true,
+                "phrase": "only the deep black water of the channel and the open sea beyond it heave in a slow, low swell, moonlight glinting gently on the ripples"
+              }
             },
             {
               "id": "pit2_punt",
@@ -9121,7 +9167,7 @@
             }
           ],
           "soundBed": "the middle of a bared tidal rock floor at night: wind across open rock, water in the channel, surf beyond.",
-          "rigid": "the rock platform, the channel, the punt, the post, the tripod, the lanterns, the sacks, the headland, the sea lock",
+          "rigid": "the rock platform and its pools, the gravel pit, the canvas windbreak, the tripod, the punt, the post, the lanterns, the sacks, the headland, the sea lock",
           "atmosphere": "Wide and open under the moon, the wet rock floor gleaming, warm lantern light on the pit and the canvas; a cold fog-desert coast in the nineteen-twenties like the Namib's diamond coast near Luderitz, at night: black wet rock, pale cream sand and many-coloured beach gravel silvered by the moon, bone-white bleached timber, rust-red iron, dark dressed stone, black glossy water, warm orange lantern light; painterly, cinematic, fine natural film grain",
           "styleLight": "night at low tide under a bright full moon high in the sky over the sea to the west: cold silver-blue moonlight on wet rock and gravel, a deep blue-black sky with a scatter of stars, and warm orange pools of light from oil lanterns",
           "negatives": "No people, no figures anywhere, no animals or birds, no lettering, writing, captions, numerals or text on anything, no painted signs, no flags with emblems. Night only: no daylight, no sun, no sunset or dawn glow. No palm trees, no quiver trees, no red canyon rock, no turquoise tropical water, no modern machinery, no electric lights, no power lines, no motorboats. Only ONE moon. No rock arch and no sea stack anywhere: the fog bank hides the open sea. No town and no houses on any skyline. Only ONE punt in view, afloat in the channel, never on the rock. No bridge or plank across the channel. The platform's far end sinks into the sea: no shore, path or land bridge joins it to the land. The outermost 184 px at each side edge of the frame show only the calm black water, the fog bank, the moon, the sky and bare wet rock floor: no sack, no sack heap, no pole, no tripod, no punt, no lantern, no post and no cast shadow of any of them may enter either edge margin. The outermost 184 px at each side edge show only the calm black water, the fog bank, the moon, the sky and bare wet rock floor: no gravel, no pit rim or hollow, no tripod pole, no sack, no sack heap, no shovel, no lantern, no post and no cast shadow of any of them may enter either edge margin. The outermost 184 px at each side edge show only the calm black water, the fog bank, the moon, the sky and bare wet rock floor: no pit, no gravel, no pole, no tripod leg, no sack, no lantern, no orange glow, no headland crag and no cast shadow of any of them may enter either edge margin; the headland and the brazier ledge stand well inboard of the right edge. The outermost 184 px at each side edge of the frame show only the calm black water, the fog bank, the moon, the sky and bare wet rock floor: no punt, no punt lantern or its glow, no headland, no timber post, no sack, no sack heap, no gravel, no pole, no tripod, and no cast shadow of any of these crosses into either margin; the sack heap stays at least 600 px in from the left edge and the punt at least 600 px in from the right edge. The outermost 184 px at the left edge and at the right edge of the image show only calm black water, pale fog bank, deep blue-black sky with stars, and bare wet rock floor: no pit, gravel, tripod pole, shovel, sack, canvas, punt, post, lantern, crag, headland or cast shadow of any of these may enter either margin, and no pole leans toward either edge. There is exactly ONE moon in the whole panorama, and it hangs high in the sky well inboard of both edges, at least 600 px from the left and right edges and nowhere near the seam directly behind the viewer; the seam region at both edges holds only empty sky, fog and water with no moon, no moon glow and no moon glitter path, so the two halves of the view behind the viewer join as plain calm black water under the fog bank. The outermost 250 px at each side edge show only calm black water, fog bank, moon, stars, sky and plain bare wet rock: no pit, gravel, rim, pole, rope, sack, shovel, punt, lantern, crag or headland, and no cast shadow of any of them, crosses into either margin. The punt and its lantern sit at least 800 px in from the right edge, and the bare rock shoreline at both edges is the same flat level wet rock meeting open water at the same height. Only ONE moon. The outermost 184 px at the left edge and at the right edge of the frame show ONLY flat calm black water, the pale fog bank, the single high moon and its plain sky, stars, and bare flat wet rock shoreline. In those two strips there is NO punt, NO lantern, NO pole, NO tripod, NO post, NO rope, NO sack, NO gravel, NO headland, NO crag, NO cliff, NO sea lock, NO brazier and NO moon-glade or bright reflection column, and none of their cast shadows or lantern glow enters them. The punt, the lantern at its bow, the headland, the tripod, the pit and the sack heap all stand at least 600 px inboard of their nearest frame edge, so the wrap join is the same plain water, fog and bare rock on both sides. The outermost 184 px at each side edge show only plain bare wet rock, calm black water, fog bank, moon and sky: no pit, no pit rim, no gravel heap, no pebbles in a hollow, no pole, no tripod, no sacks, no punt, no lantern, no crag and no cast shadow of any of these in either margin; the pit stands well inboard, never at the left edge.",
@@ -13214,7 +13260,7 @@
               }
             }
           },
-          "motionClosing": "Only the canvas windbreak moves; the rock, the pit, the punt, the channel and the far lanterns stay exactly where they are."
+          "motionClosing": "The rock platform, the pits, the canvas windbreak, the lanterns, the punt, the sea lock and the headland stay perfectly still"
         },
         "plateRefs": [
           "wharf/scene.png"
@@ -13475,6 +13521,27 @@
           "to": "wharf",
           "boxSource": "review:agent-vision",
           "boxNote": "Agent-vision 2026-11-06: draft covered only the punt's stern half; re-measured on the whole punt."
+        },
+        {
+          "id": "clip_base",
+          "type": "ambient",
+          "label": "Scene motion (base)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/play-source.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "pit2/cine_base.mp4"
+          }
         }
       ],
       "sfx": [
@@ -17757,6 +17824,27 @@
           "tier": 3,
           "boxSource": "review:agent-vision",
           "boxNote": "Agent-vision 2026-11-06: draft covered only the shaft's upper wall; re-measured on the whole shaft and its windlass."
+        },
+        {
+          "id": "clip_base",
+          "type": "ambient",
+          "label": "Scene motion (base)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/play-source.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "pit3/cine_base.mp4"
+          }
         }
       ],
       "sfx": [
