@@ -5,7 +5,7 @@
   "id": 13,
   "title": "Seedfall",
   "subtitle": "Two ends of a cliff city, one soil survey, and the first snow on the way.",
-  "story": "You and your partner tend rooftop orchards for the gardeners' guild of a city built five levels up a sea cliff. The first snow is coming. Before it does, every garden's soil must be certified, and the harbor lantern and the lighthouse lamp must be lit to tell the city its gardens are ready for winter. Player one starts in the harbor garden, at the foot of the cliff; player two starts at the lighthouse, at the city's far end. Certify the soil on your way to the middle garden, then walk home through the far gardens, finishing the full survey on the way. You each test the same survey a different way, so compare answers with your partner. Then light your end of the city.",
+  "story": "You and your partner tend rooftop orchards for the gardeners' guild of a city built five levels up a sea cliff. The first snow is coming. Before it does, every garden's soil must be certified, and the harbor lantern and the lighthouse lamp must be lit to tell the city its gardens are ready for winter. Player one starts in the harbor garden, at the foot of the cliff; player two starts at the lighthouse, at the city's far end. Certify the soil on your way to the middle garden, then walk home through the far gardens, finishing the full survey on the way. Let the data choose each test, and compare answers with your partner. Then light your end of the city.",
   "enterLabel": "Take your end of the city",
   "music": "audio/squirrel_theme.mp3",
   "musicVolume": 0.15,
@@ -65,24 +65,24 @@
   ],
   "debrief": {
     "title": "How the soil survey worked",
-    "intro": "This scenario was comparing groups in two ways: by their means (t-tests and Games-Howell tests) and by their ranks (Wilcoxon and Dunn tests). You and your partner answered the same four questions about the same soil survey, one of you working with means while the other worked with ranks, and you swapped methods along the way. Mostly the two methods agreed. Once, on skewed data, they pointed in opposite directions, and each was right about the question it asks. Here is what you did."
+    "intro": "This scenario was about letting the data choose the test. You and your partner answered the same four questions about the same soil survey, and each time the first step was to check whether every group was roughly normal: if so, compare means (a t-test for two groups, Games-Howell for more); if not, compare ranks and report medians (a Wilcoxon test for two groups, Dunn for more). Here is what you did."
   },
   "ladderPlain": [
     {
       "room": "lo_1a",
-      "text": "In the first puzzle you and your partner compared soil moisture between two gardens, one of you with a t-test on the means and the other with a Wilcoxon rank-sum test on the ranks, and both found Clelia significantly wetter than Ines, because symmetric data give the mean and the median the same story."
+      "text": "In the first puzzle you compared soil moisture between two gardens. Both were roughly normal, so a t-test on the means found Clelia significantly wetter than Ines."
     },
     {
       "room": "lo_2b",
-      "text": "In the second puzzle you swapped tests on nitrate in Bice and Zita and both results were significant in opposite directions, the t-test finding Zita higher on average and the Wilcoxon test finding Bice higher in a typical bed, because a few very high Zita readings pull its mean up but count only as a few high ranks."
+      "text": "In the second puzzle you compared nitrate in Bice and Zita. Zita's readings were skewed by a few very high beds, so a Wilcoxon test and the medians were the honest choice, and they found Bice higher in a typical bed, even though Zita's mean was higher."
     },
     {
       "room": "middle_lower",
-      "text": "In the third puzzle you compared pH across the four soil mixes with a test that compares every pair of mixes at once and corrects for the number of comparisons (Games-Howell for one of you, Dunn for the other), and both found leaf_mould alone more acidic than the other three."
+      "text": "In the third puzzle you compared pH across the four soil mixes. All four were roughly normal, so a Games-Howell test compared every pair of mixes while correcting for the number of comparisons, and found leaf_mould alone more acidic than the other three."
     },
     {
       "room": "lo_1b",
-      "text": "In the last puzzle you compared phosphorus between all fifteen pairs of gardens and applied the default correction for multiple comparisons (Holm's method), which removes the two pairs (Gemma-Ines and Dora-Zita) that cross p < 0.05 only about as often as fifteen tests would by chance, leaving both methods agreeing on two groups of three gardens."
+      "text": "In the last puzzle you compared phosphorus between all fifteen pairs of gardens. All six were roughly normal, so a Games-Howell test again, whose correction for multiple comparisons removes the two pairs (Gemma-Ines and Dora-Zita) that would otherwise cross p < 0.05 by chance, leaving two groups of three gardens."
     }
   ],
   "escapeBrief": "Every terrace of the city grows one variety, and every cliff level has its own emblem carved above its gate locks: level 1, the anchor, pistachio with red leaves; level 2, the scallop shell, almond with orange leaves; level 3, the sheaf of wheat, walnut with yellow leaves; level 4, the bell, purple beech with purple leaves; level 5, the five-pointed star, stone pine with green needles. The gate locks made you read each garden's leaf color as you passed. Neither of you saw the whole cliff: the harbor player walked levels 1 to 3 and the lighthouse player levels 3 to 5, so each of you knew three of the five pairs, with the middle garden in common. The planting board asked for all five, one leaf color per emblem, among eight colors, three of which grow nowhere in the city, so the last two could not be guessed. Telling each other what you had seen is what set the seeds. With the board set and the full survey finished, the stair opened to your end's light, and the lever lit it.",
@@ -749,7 +749,7 @@
           "gapMax": 25
         }
       ],
-      "debrief": "Where you started and where you finished. The planting board asked for one leaf color per cliff level, but you had walked only three of the five levels, so it could be set only by talking to your partner. The whole survey worked the same way: two people, two kinds of test, and the full answer only when you put them together."
+      "debrief": "Where you started and where you finished. The planting board asked for one leaf color per cliff level, but you had walked only three of the five levels, so it could be set only by talking to your partner. The whole survey worked the same way: two people, each seeing part of the picture, and the full answer only when you put them together."
     },
     {
       "key": "lo_1a",
@@ -794,7 +794,7 @@
           "label": "Soil reading 1",
           "starterCode": "garden_soil",
           "question": {
-            "prompt": "The guild's first certificate compares the soil moisture of two gardens. Using the rows where <code>parameter</code> is moisture_pct, use a two-sample t-test to compare <code>value</code> between the gardens Clelia and Ines (the <code>garden</code> column). Is the difference significant, and which garden has the higher mean? Pick the statement that matches your result.",
+            "prompt": "The guild's first certificate compares the soil moisture of two gardens. Using the rows where <code>parameter</code> is moisture_pct, compare <code>value</code> between the gardens Clelia and Ines (the <code>garden</code> column). This is a two-group comparison. Run a Shapiro test on each group to decide which test the flowchart calls for, then report the summary statistic that goes with it: means if every group is normal, medians if any group is not. Is the difference significant, and which garden is higher? Pick the statement that matches your result.",
             "options": [
               "No significant difference (p = 0.36): mean Clelia 16.0 vs Ines 16.5",
               "No significant difference (p = 0.86): mean Clelia 0.61 vs Ines 0.615",
@@ -806,10 +806,10 @@
             ],
             "correct": 5,
             "feedback": {
-              "correct": "Correct, noted in your field notebook: by t-test, Clelia's soil moisture is significantly higher than Ines's (mean 24.0 vs 21.6, p < 0.001).",
+              "correct": "Correct, noted in your field notebook: both gardens are roughly normal, so by t-test Clelia's soil moisture is significantly higher than Ines's (mean 24.0 vs 21.6, p < 0.001).",
               "wrong": [
-                "Keep only the rows where <code>parameter</code> is \"moisture_pct\" and <code>garden</code> is Clelia or Ines, then run <code>tTest(value ~ garden)</code> on them.",
-                "The p-value says whether the difference is significant. To see which garden is higher, find each garden's mean: <code>group_by(garden) %&gt;% summarize(mean = mean(value))</code>.",
+                "Keep only the rows where <code>parameter</code> is \"moisture_pct\" and <code>garden</code> is Clelia or Ines, then check each garden's distribution: <code>group_by(garden) %&gt;% shapiroTest(value)</code>.",
+                "Both gardens look roughly normal, so the flowchart's two-group branch lands on <code>tTest(value ~ garden)</code>, and a t-test is reported with means: <code>group_by(garden) %&gt;% summarize(mean = mean(value))</code>.",
                 "Check your filter: every other parameter, or all of them pooled together, gives a different answer from moisture_pct alone."
               ]
             }
@@ -2177,7 +2177,7 @@
           ],
           "starterCode": "garden_soil",
           "question": {
-            "prompt": "The guild's first certificate compares the soil moisture of two gardens. Using the rows where <code>parameter</code> is moisture_pct, use a two-sample t-test to compare <code>value</code> between the gardens Clelia and Ines (the <code>garden</code> column). Is the difference significant, and which garden has the higher mean? Pick the statement that matches your result.",
+            "prompt": "The guild's first certificate compares the soil moisture of two gardens. Using the rows where <code>parameter</code> is moisture_pct, compare <code>value</code> between the gardens Clelia and Ines (the <code>garden</code> column). This is a two-group comparison. Run a Shapiro test on each group to decide which test the flowchart calls for, then report the summary statistic that goes with it: means if every group is normal, medians if any group is not. Is the difference significant, and which garden is higher? Pick the statement that matches your result.",
             "options": [
               "No significant difference (p = 0.36): mean Clelia 16.0 vs Ines 16.5",
               "No significant difference (p = 0.86): mean Clelia 0.61 vs Ines 0.615",
@@ -2189,10 +2189,10 @@
             ],
             "correct": 5,
             "feedback": {
-              "correct": "Correct, noted in your field notebook: by t-test, Clelia's soil moisture is significantly higher than Ines's (mean 24.0 vs 21.6, p < 0.001).",
+              "correct": "Correct, noted in your field notebook: both gardens are roughly normal, so by t-test Clelia's soil moisture is significantly higher than Ines's (mean 24.0 vs 21.6, p < 0.001).",
               "wrong": [
-                "Keep only the rows where <code>parameter</code> is \"moisture_pct\" and <code>garden</code> is Clelia or Ines, then run <code>tTest(value ~ garden)</code> on them.",
-                "The p-value says whether the difference is significant. To see which garden is higher, find each garden's mean: <code>group_by(garden) %&gt;% summarize(mean = mean(value))</code>.",
+                "Keep only the rows where <code>parameter</code> is \"moisture_pct\" and <code>garden</code> is Clelia or Ines, then check each garden's distribution: <code>group_by(garden) %&gt;% shapiroTest(value)</code>.",
+                "Both gardens look roughly normal, so the flowchart's two-group branch lands on <code>tTest(value ~ garden)</code>, and a t-test is reported with means: <code>group_by(garden) %&gt;% summarize(mean = mean(value))</code>.",
                 "Check your filter: every other parameter, or all of them pooled together, gives a different answer from moisture_pct alone."
               ]
             }
@@ -2332,7 +2332,7 @@
           "volume": 0.35
         }
       ],
-      "debrief": "A t-test asks whether two group means differ by more than the spread of the readings would explain. Clelia averaged 24.0 percent moisture against 21.6 for Ines, a small gap but a consistent one, so the test called it significant. Your partner ran a Wilcoxon rank-sum test on the same gardens and reached the same verdict, because on roughly symmetric data the mean and the median tell the same story."
+      "debrief": "Both gardens' moisture readings passed the normality check, so the flowchart led to a t-test, which asks whether two group means differ by more than the spread of the readings would explain. Clelia averaged 24.0 percent moisture against 21.6 for Ines, a small gap but a consistent one, so the test called it significant."
     },
     {
       "key": "lo_2a",
@@ -3730,7 +3730,7 @@
       "unlockedWhen": true,
       "role": "lower",
       "level": 2,
-      "designNote": "RUNG 2 (lower): the designed method split. Opens the stairs up.",
+      "designNote": "RUNG 2 (lower): skewed nitrate: the data call for a Wilcoxon test. Opens the stairs up.",
       "plannedHotspots": [
         {
           "type": "door",
@@ -3777,7 +3777,7 @@
           "label": "Soil reading 2",
           "starterCode": "garden_soil",
           "question": {
-            "prompt": "The second certificate is for nitrate, the nitrogen the orchard trees feed on. Using the rows where <code>parameter</code> is nitrate_mg_kg, use a Wilcoxon rank-sum test to compare <code>value</code> between the gardens Bice and Zita. Run it on the values as recorded: do not transform them or switch to a different test. Is the difference significant, and whose values tend to run higher? Pick the statement that matches your result.",
+            "prompt": "The second certificate is for nitrate, the nitrogen the orchard trees feed on. Using the rows where <code>parameter</code> is nitrate_mg_kg, compare <code>value</code> between the gardens Bice and Zita, on the values as recorded (do not transform them). This is a two-group comparison. Run a Shapiro test on each group to decide which test the flowchart calls for, then report the summary statistic that goes with it: means if every group is normal, medians if any group is not. Is the difference significant, and which garden is higher? Pick the statement that matches your result.",
             "options": [
               "Significant (p < 0.001): Bice is higher, median 45.75 vs 34.1",
               "No significant difference (p = 0.61): median Bice 0.62 vs Zita 0.645",
@@ -3789,11 +3789,11 @@
             ],
             "correct": 3,
             "feedback": {
-              "correct": "Correct, noted in your field notebook: by Wilcoxon test, Bice's nitrate readings run significantly higher than Zita's (median 19.05 vs 12.95, p < 0.001).",
+              "correct": "Correct, noted in your field notebook: Zita's readings are skewed, so by Wilcoxon test Bice's nitrate readings run significantly higher than Zita's (median 19.05 vs 12.95, p < 0.001).",
               "wrong": [
-                "Keep only the rows where <code>parameter</code> is \"nitrate_mg_kg\" and <code>garden</code> is Bice or Zita, then run <code>wilcoxTest(value ~ garden)</code>.",
-                "To see which garden is higher, find each garden's median: <code>group_by(garden) %&gt;% summarize(median = median(value))</code>. The Wilcoxon test asks whose values tend to run higher, and the medians are the usual way to report that.",
-                "Your partner's test on these same two gardens may point the other way. Answer for your own test: the Wilcoxon test and the medians."
+                "Keep only the rows where <code>parameter</code> is \"nitrate_mg_kg\" and <code>garden</code> is Bice or Zita, then check each garden's distribution first: <code>group_by(garden) %&gt;% shapiroTest(value)</code>.",
+                "Zita's nitrate fails the normality check (a few manured beds make it right-skewed), so the flowchart sends you to <code>wilcoxTest(value ~ garden)</code>, not a t-test.",
+                "A Wilcoxon test is reported with medians: <code>group_by(garden) %&gt;% summarize(median = median(value))</code>. Zita's mean is dragged up by a few very high readings and points the other way."
               ]
             }
           },
@@ -5099,7 +5099,7 @@
           ],
           "starterCode": "garden_soil",
           "question": {
-            "prompt": "The second certificate is for nitrate, the nitrogen the orchard trees feed on. Using the rows where <code>parameter</code> is nitrate_mg_kg, use a Wilcoxon rank-sum test to compare <code>value</code> between the gardens Bice and Zita. Run it on the values as recorded: do not transform them or switch to a different test. Is the difference significant, and whose values tend to run higher? Pick the statement that matches your result.",
+            "prompt": "The second certificate is for nitrate, the nitrogen the orchard trees feed on. Using the rows where <code>parameter</code> is nitrate_mg_kg, compare <code>value</code> between the gardens Bice and Zita, on the values as recorded (do not transform them). This is a two-group comparison. Run a Shapiro test on each group to decide which test the flowchart calls for, then report the summary statistic that goes with it: means if every group is normal, medians if any group is not. Is the difference significant, and which garden is higher? Pick the statement that matches your result.",
             "options": [
               "Significant (p < 0.001): Bice is higher, median 45.75 vs 34.1",
               "No significant difference (p = 0.61): median Bice 0.62 vs Zita 0.645",
@@ -5111,11 +5111,11 @@
             ],
             "correct": 3,
             "feedback": {
-              "correct": "Correct, noted in your field notebook: by Wilcoxon test, Bice's nitrate readings run significantly higher than Zita's (median 19.05 vs 12.95, p < 0.001).",
+              "correct": "Correct, noted in your field notebook: Zita's readings are skewed, so by Wilcoxon test Bice's nitrate readings run significantly higher than Zita's (median 19.05 vs 12.95, p < 0.001).",
               "wrong": [
-                "Keep only the rows where <code>parameter</code> is \"nitrate_mg_kg\" and <code>garden</code> is Bice or Zita, then run <code>wilcoxTest(value ~ garden)</code>.",
-                "To see which garden is higher, find each garden's median: <code>group_by(garden) %&gt;% summarize(median = median(value))</code>. The Wilcoxon test asks whose values tend to run higher, and the medians are the usual way to report that.",
-                "Your partner's test on these same two gardens may point the other way. Answer for your own test: the Wilcoxon test and the medians."
+                "Keep only the rows where <code>parameter</code> is \"nitrate_mg_kg\" and <code>garden</code> is Bice or Zita, then check each garden's distribution first: <code>group_by(garden) %&gt;% shapiroTest(value)</code>.",
+                "Zita's nitrate fails the normality check (a few manured beds make it right-skewed), so the flowchart sends you to <code>wilcoxTest(value ~ garden)</code>, not a t-test.",
+                "A Wilcoxon test is reported with medians: <code>group_by(garden) %&gt;% summarize(median = median(value))</code>. Zita's mean is dragged up by a few very high readings and points the other way."
               ]
             }
           },
@@ -5241,7 +5241,7 @@
           "gapMax": 12
         }
       ],
-      "debrief": "The designed disagreement. Your Wilcoxon test ranked every nitrate reading and found Bice higher in a typical bed (median 19.05 against 12.95). Your partner's t-test on the same numbers found Zita higher on average (mean 40.4 against 19.0). A few very high Zita readings pull its mean up but count as only a handful of high ranks. Both results are correct because they answer different questions, so on skewed data, decide which question you are asking before you choose the test."
+      "debrief": "Zita's nitrate readings failed the normality check: most of its beds are low, but a few manured ones read very high. So the flowchart led to a Wilcoxon test, which ranks every reading and found Bice higher in a typical bed (median 19.05 against 12.95). A t-test on the same numbers would have said the opposite, Zita higher on average (mean 40.4 against 19.0), because those few very high readings pull the mean up but count as only a handful of high ranks. That is why the data, not habit, choose the test and the summary statistic."
     },
     {
       "key": "lo_3a",
@@ -5676,7 +5676,7 @@
           "label": "Soil reading 3",
           "starterCode": "garden_soil",
           "question": {
-            "prompt": "The middle garden mixes the soil for the whole city, so its certificate covers all four soil mixes. Using the rows where <code>parameter</code> is pH, compare <code>value</code> across the four groups in the <code>soil_mix</code> column with a Games-Howell test, which compares every pair of mixes. Which statement matches the Games-Howell results?",
+            "prompt": "The middle garden mixes the soil for the whole city, so its certificate covers all four soil mixes. Using the rows where <code>parameter</code> is pH, compare <code>value</code> across the four groups in the <code>soil_mix</code> column, every pair of mixes. This is a comparison of more than two groups: run a Shapiro test on each group to decide which test the flowchart calls for, and judge which groups are higher by the summary statistic that goes with it: means if every group is normal, medians if any group is not. Which statement matches your results?",
             "options": [
               "5 of 15 comparisons significant: Bice-Clelia, Clelia-Gemma, Clelia-Ines, Dora-Ines, Ines-Zita",
               "Only coir_blend stands apart: its value is higher than each of the other 3; the others do not differ from one another (3 of 6 comparisons significant)",
@@ -5689,11 +5689,11 @@
             ],
             "correct": 6,
             "feedback": {
-              "correct": "Correct, noted in your field notebook: by Games-Howell test, leaf_mould alone has a lower pH than the other three mixes, which do not differ.",
+              "correct": "Correct, noted in your field notebook: all four mixes are roughly normal, so by Games-Howell test leaf_mould alone has a lower pH than the other three mixes, which do not differ.",
               "wrong": [
-                "Keep only the rows where <code>parameter</code> is \"pH\", then run <code>gamesHowellTest(value ~ soil_mix)</code> on them.",
-                "Each of its six rows is one pair of mixes; a <code>p.adj</code> below 0.05 means that pair differs. The test has already corrected for making six comparisons at once.",
-                "Group by <code>soil_mix</code>, not <code>garden</code>. To see which side of a pair is higher, find each mix's mean: <code>group_by(soil_mix) %&gt;% summarize(mean = mean(value))</code>."
+                "Keep only the rows where <code>parameter</code> is \"pH\", then check each mix's distribution: <code>group_by(soil_mix) %&gt;% shapiroTest(value)</code>.",
+                "All four mixes look roughly normal, so the flowchart's more-than-two branch lands on <code>gamesHowellTest(value ~ soil_mix)</code>. Each of its six rows is one pair of mixes; a <code>p.adj</code> below 0.05 means that pair differs.",
+                "Group by <code>soil_mix</code>, not <code>garden</code>. To see which side of a pair is higher, compare each mix's mean: <code>group_by(soil_mix) %&gt;% summarize(mean = mean(value))</code>."
               ]
             }
           },
@@ -6053,7 +6053,7 @@
           ],
           "starterCode": "garden_soil",
           "question": {
-            "prompt": "The middle garden mixes the soil for the whole city, so its certificate covers all four soil mixes. Using the rows where <code>parameter</code> is pH, compare <code>value</code> across the four groups in the <code>soil_mix</code> column with a Games-Howell test, which compares every pair of mixes. Which statement matches the Games-Howell results?",
+            "prompt": "The middle garden mixes the soil for the whole city, so its certificate covers all four soil mixes. Using the rows where <code>parameter</code> is pH, compare <code>value</code> across the four groups in the <code>soil_mix</code> column, every pair of mixes. This is a comparison of more than two groups: run a Shapiro test on each group to decide which test the flowchart calls for, and judge which groups are higher by the summary statistic that goes with it: means if every group is normal, medians if any group is not. Which statement matches your results?",
             "options": [
               "5 of 15 comparisons significant: Bice-Clelia, Clelia-Gemma, Clelia-Ines, Dora-Ines, Ines-Zita",
               "Only coir_blend stands apart: its value is higher than each of the other 3; the others do not differ from one another (3 of 6 comparisons significant)",
@@ -6066,11 +6066,11 @@
             ],
             "correct": 6,
             "feedback": {
-              "correct": "Correct, noted in your field notebook: by Games-Howell test, leaf_mould alone has a lower pH than the other three mixes, which do not differ.",
+              "correct": "Correct, noted in your field notebook: all four mixes are roughly normal, so by Games-Howell test leaf_mould alone has a lower pH than the other three mixes, which do not differ.",
               "wrong": [
-                "Keep only the rows where <code>parameter</code> is \"pH\", then run <code>gamesHowellTest(value ~ soil_mix)</code> on them.",
-                "Each of its six rows is one pair of mixes; a <code>p.adj</code> below 0.05 means that pair differs. The test has already corrected for making six comparisons at once.",
-                "Group by <code>soil_mix</code>, not <code>garden</code>. To see which side of a pair is higher, find each mix's mean: <code>group_by(soil_mix) %&gt;% summarize(mean = mean(value))</code>."
+                "Keep only the rows where <code>parameter</code> is \"pH\", then check each mix's distribution: <code>group_by(soil_mix) %&gt;% shapiroTest(value)</code>.",
+                "All four mixes look roughly normal, so the flowchart's more-than-two branch lands on <code>gamesHowellTest(value ~ soil_mix)</code>. Each of its six rows is one pair of mixes; a <code>p.adj</code> below 0.05 means that pair differs.",
+                "Group by <code>soil_mix</code>, not <code>garden</code>. To see which side of a pair is higher, compare each mix's mean: <code>group_by(soil_mix) %&gt;% summarize(mean = mean(value))</code>."
               ]
             }
           },
@@ -6193,7 +6193,7 @@
           "volume": 0.4
         }
       ],
-      "debrief": "With four soil mixes, running a separate t-test on every pair would multiply the chances of a false positive, so you used a Games-Howell test, which compares every pair while correcting for the number of comparisons, without assuming the mixes share one spread: leaf_mould alone is more acidic than the other three. Your partner reached the same answer with a Dunn test. Solving it brought the first snow."
+      "debrief": "All four soil mixes passed the normality check, so the flowchart led to a Games-Howell test. Running a separate t-test on every pair would multiply the chances of a false positive; Games-Howell compares every pair while correcting for the number of comparisons, without assuming the mixes share one spread. Leaf_mould alone is more acidic than the other three. Solving it brought the first snow."
     },
     {
       "key": "lo_1b",
@@ -6238,23 +6238,24 @@
           "label": "The full soil survey",
           "starterCode": "garden_soil",
           "question": {
-            "prompt": "The full soil survey certifies phosphorus across all six gardens at once. Using the rows where parameter is phosphorus_mg_kg, compare value between every pair of the six gardens in the garden column (15 pairs) with pairwise Wilcoxon rank-sum tests, keeping the function's default correction for multiple comparisons. Which statement matches the corrected results?",
+            "prompt": "The full soil survey certifies phosphorus across all six gardens at once. Using the rows where <code>parameter</code> is phosphorus_mg_kg, compare <code>value</code> between every pair of the six gardens in the <code>garden</code> column (15 pairs). This is a comparison of more than two groups: run a Shapiro test on each group to decide which test the flowchart calls for, and judge which groups are higher by the summary statistic that goes with it: means if every group is normal, medians if any group is not. Keep the test's built-in correction for multiple comparisons. Which statement matches your results?",
             "options": [
-              "2 of 15 comparisons significant: Clelia-Dora, Dora-Gemma",
-              "No pair differs (0 of 6 comparisons significant)",
-              "5 of 15 comparisons significant: Bice-Clelia, Clelia-Gemma, Clelia-Ines, Dora-Ines, Ines-Zita",
-              "Only Bice stands apart: its value is higher than each of the other 5, and also Dora-Gemma, Gemma-Zita, Ines-Zita differ (8 of 15 comparisons significant)",
+              "No pair differs (0 of 15 comparisons significant)",
               "Two groups: each of Bice, Gemma, Ines is higher than each of Clelia, Dora, Zita, and also Dora-Zita, Gemma-Ines differ (11 of 15 comparisons significant)",
+              "2 of 15 comparisons significant: Clelia-Dora, Dora-Gemma",
+              "5 of 15 comparisons significant: Bice-Clelia, Clelia-Gemma, Clelia-Ines, Dora-Ines, Ines-Zita",
+              "Two groups: each of Bice, Gemma, Ines is higher than each of Clelia, Dora, Zita, and also Dora-Zita differ (10 of 15 comparisons significant)",
               "Two groups: each of Bice, Gemma, Ines is higher than each of Clelia, Dora, Zita; no pair within a group differs (9 of 15 comparisons significant)",
-              "No pair differs (0 of 15 comparisons significant)"
+              "No pair differs (0 of 6 comparisons significant)",
+              "Two groups: each of Bice, Zita is higher than each of Clelia, Dora, Gemma, Ines, and also Bice-Zita, Dora-Gemma, Dora-Ines differ (11 of 15 comparisons significant)"
             ],
             "correct": 5,
             "feedback": {
-              "correct": "Correct, noted in your field notebook: by pairwise Wilcoxon tests with the correction for multiple comparisons, the gardens fall into two groups for phosphorus: Bice, Gemma and Ines are each higher than each of Clelia, Dora and Zita, and no pair within a group differs.",
+              "correct": "Correct, noted in your field notebook: all six gardens are roughly normal, so by Games-Howell test the gardens fall into two groups for phosphorus: Bice, Gemma and Ines are each higher than each of Clelia, Dora and Zita, and no pair within a group differs.",
               "wrong": [
-                "Keep only the rows where <code>parameter</code> is \"phosphorus_mg_kg\", then run <code>pairwiseWilcoxTest(value ~ garden)</code>. You should get 15 rows, one per pair of gardens.",
-                "Read <code>p.adj</code>, not <code>p</code>: that is the value corrected for multiple comparisons, the default. With 15 tests at once, a pair or two can dip below 0.05 by chance alone.",
-                "To see which side of each significant pair is higher, find each garden's median: <code>group_by(garden) %&gt;% summarize(median = median(value))</code>."
+                "Keep only the rows where <code>parameter</code> is \"phosphorus_mg_kg\", then check each garden's distribution: <code>group_by(garden) %&gt;% shapiroTest(value)</code>.",
+                "All six gardens look roughly normal, so this is the same branch as the middle garden: <code>gamesHowellTest(value ~ garden)</code>. You should get 15 rows, one per pair of gardens.",
+                "Read <code>p.adj</code>, not <code>p</code>: with 15 comparisons at once, a pair or two can dip below 0.05 by chance alone. To see which side of each significant pair is higher, compare each garden's mean: <code>group_by(garden) %&gt;% summarize(mean = mean(value))</code>."
               ]
             }
           },
@@ -6552,23 +6553,24 @@
           ],
           "starterCode": "garden_soil",
           "question": {
-            "prompt": "The full soil survey certifies phosphorus across all six gardens at once. Using the rows where parameter is phosphorus_mg_kg, compare value between every pair of the six gardens in the garden column (15 pairs) with pairwise Wilcoxon rank-sum tests, keeping the function's default correction for multiple comparisons. Which statement matches the corrected results?",
+            "prompt": "The full soil survey certifies phosphorus across all six gardens at once. Using the rows where <code>parameter</code> is phosphorus_mg_kg, compare <code>value</code> between every pair of the six gardens in the <code>garden</code> column (15 pairs). This is a comparison of more than two groups: run a Shapiro test on each group to decide which test the flowchart calls for, and judge which groups are higher by the summary statistic that goes with it: means if every group is normal, medians if any group is not. Keep the test's built-in correction for multiple comparisons. Which statement matches your results?",
             "options": [
-              "2 of 15 comparisons significant: Clelia-Dora, Dora-Gemma",
-              "No pair differs (0 of 6 comparisons significant)",
-              "5 of 15 comparisons significant: Bice-Clelia, Clelia-Gemma, Clelia-Ines, Dora-Ines, Ines-Zita",
-              "Only Bice stands apart: its value is higher than each of the other 5, and also Dora-Gemma, Gemma-Zita, Ines-Zita differ (8 of 15 comparisons significant)",
+              "No pair differs (0 of 15 comparisons significant)",
               "Two groups: each of Bice, Gemma, Ines is higher than each of Clelia, Dora, Zita, and also Dora-Zita, Gemma-Ines differ (11 of 15 comparisons significant)",
+              "2 of 15 comparisons significant: Clelia-Dora, Dora-Gemma",
+              "5 of 15 comparisons significant: Bice-Clelia, Clelia-Gemma, Clelia-Ines, Dora-Ines, Ines-Zita",
+              "Two groups: each of Bice, Gemma, Ines is higher than each of Clelia, Dora, Zita, and also Dora-Zita differ (10 of 15 comparisons significant)",
               "Two groups: each of Bice, Gemma, Ines is higher than each of Clelia, Dora, Zita; no pair within a group differs (9 of 15 comparisons significant)",
-              "No pair differs (0 of 15 comparisons significant)"
+              "No pair differs (0 of 6 comparisons significant)",
+              "Two groups: each of Bice, Zita is higher than each of Clelia, Dora, Gemma, Ines, and also Bice-Zita, Dora-Gemma, Dora-Ines differ (11 of 15 comparisons significant)"
             ],
             "correct": 5,
             "feedback": {
-              "correct": "Correct, noted in your field notebook: by pairwise Wilcoxon tests with the correction for multiple comparisons, the gardens fall into two groups for phosphorus: Bice, Gemma and Ines are each higher than each of Clelia, Dora and Zita, and no pair within a group differs.",
+              "correct": "Correct, noted in your field notebook: all six gardens are roughly normal, so by Games-Howell test the gardens fall into two groups for phosphorus: Bice, Gemma and Ines are each higher than each of Clelia, Dora and Zita, and no pair within a group differs.",
               "wrong": [
-                "Keep only the rows where <code>parameter</code> is \"phosphorus_mg_kg\", then run <code>pairwiseWilcoxTest(value ~ garden)</code>. You should get 15 rows, one per pair of gardens.",
-                "Read <code>p.adj</code>, not <code>p</code>: that is the value corrected for multiple comparisons, the default. With 15 tests at once, a pair or two can dip below 0.05 by chance alone.",
-                "To see which side of each significant pair is higher, find each garden's median: <code>group_by(garden) %&gt;% summarize(median = median(value))</code>."
+                "Keep only the rows where <code>parameter</code> is \"phosphorus_mg_kg\", then check each garden's distribution: <code>group_by(garden) %&gt;% shapiroTest(value)</code>.",
+                "All six gardens look roughly normal, so this is the same branch as the middle garden: <code>gamesHowellTest(value ~ garden)</code>. You should get 15 rows, one per pair of gardens.",
+                "Read <code>p.adj</code>, not <code>p</code>: with 15 comparisons at once, a pair or two can dip below 0.05 by chance alone. To see which side of each significant pair is higher, compare each garden's mean: <code>group_by(garden) %&gt;% summarize(mean = mean(value))</code>."
               ]
             }
           },
@@ -6664,7 +6666,7 @@
           "volume": 0.4
         }
       ],
-      "debrief": "The full survey compared phosphorus between all fifteen pairs of gardens with Wilcoxon tests. Run fifteen tests and a few will cross p < 0.05 by chance alone, so the function applies a correction by default (Holm's method) that raises the bar for each comparison. Gemma-Ines and Dora-Zita fall away once it is applied, leaving two clean groups: Bice, Gemma and Ines above Clelia, Dora and Zita. Your partner's pairwise t-tests found the same two groups."
+      "debrief": "All six gardens passed the normality check, so the full survey went down the same branch as the middle garden: a Games-Howell test across all fifteen pairs. Run fifteen uncorrected tests and a few will cross p < 0.05 by chance alone (here Gemma-Ines and Dora-Zita would), so the test's adjusted p-values raise the bar for each comparison. Once they are read, two clean groups remain: Bice, Gemma and Ines above Clelia, Dora and Zita."
     },
     {
       "key": "lo_2c",
@@ -7934,7 +7936,7 @@
           "volume": 0.25
         }
       ],
-      "debrief": "The harbor lantern tells the city its gardens are ready for winter. You lit it after answering four questions twice, with two methods that mostly agreed and, once, for good reason, did not."
+      "debrief": "The harbor lantern tells the city its gardens are ready for winter. You lit it after four questions, each answered with the test the data called for."
     },
     {
       "key": "lighthouse",
@@ -8537,7 +8539,7 @@
           "volume": 0.35
         }
       ],
-      "debrief": "Where you started and where you finished. The planting board asked for one leaf color per cliff level, but you had walked only three of the five levels, so it could be set only by talking to your partner. The whole survey worked the same way: two people, two kinds of test, and the full answer only when you put them together."
+      "debrief": "Where you started and where you finished. The planting board asked for one leaf color per cliff level, but you had walked only three of the five levels, so it could be set only by talking to your partner. The whole survey worked the same way: two people, each seeing part of the picture, and the full answer only when you put them together."
     },
     {
       "key": "up_rock",
@@ -9389,22 +9391,22 @@
           "label": "Soil reading 1",
           "starterCode": "garden_soil",
           "question": {
-            "prompt": "The guild's first certificate compares the soil moisture of two gardens. Using the rows where <code>parameter</code> is moisture_pct, use a Wilcoxon rank-sum test to compare <code>value</code> between the gardens Clelia and Ines (the <code>garden</code> column). Is the difference significant, and whose values tend to run higher? Pick the statement that matches your result.",
+            "prompt": "The guild's first certificate compares the soil moisture of two gardens. Using the rows where <code>parameter</code> is moisture_pct, compare <code>value</code> between the gardens Clelia and Ines (the <code>garden</code> column). This is a two-group comparison. Run a Shapiro test on each group to decide which test the flowchart calls for, then report the summary statistic that goes with it: means if every group is normal, medians if any group is not. Is the difference significant, and which garden is higher? Pick the statement that matches your result.",
             "options": [
-              "No significant difference (p = 1.00): median Clelia 6.685 vs Ines 6.665",
-              "No significant difference (p = 0.84): median Clelia 8.70 vs Ines 8.80",
-              "Significant (p < 0.001): Ines is higher, median 46.65 vs 32.4",
-              "No significant difference (p = 0.83): median Clelia 0.70 vs Ines 0.80",
-              "No significant difference (p = 0.99): median Clelia 0.615 vs Ines 0.605",
-              "Significant (p < 0.001): Clelia is higher, median 24.0 vs 21.5",
-              "No significant difference (p = 0.58): median Clelia 16.35 vs Ines 16.15"
+              "No significant difference (p = 0.36): mean Clelia 16.0 vs Ines 16.5",
+              "No significant difference (p = 0.86): mean Clelia 0.61 vs Ines 0.615",
+              "Significant (p < 0.001): Ines is higher, mean 47.4 vs 32.0",
+              "No significant difference (p = 0.07): mean Clelia 12.7 vs Ines 14.6",
+              "No significant difference (p = 0.93): mean Clelia 6.61 vs Ines 6.62",
+              "Significant (p < 0.001): Clelia is higher, mean 24.0 vs 21.6",
+              "No significant difference (p = 0.94): mean Clelia 8.89 vs Ines 8.84"
             ],
             "correct": 5,
             "feedback": {
-              "correct": "Correct, noted in your field notebook: by Wilcoxon test, Clelia's soil moisture readings run significantly higher than Ines's (median 24.0 vs 21.5, p < 0.001).",
+              "correct": "Correct, noted in your field notebook: both gardens are roughly normal, so by t-test Clelia's soil moisture is significantly higher than Ines's (mean 24.0 vs 21.6, p < 0.001).",
               "wrong": [
-                "Keep only the rows where <code>parameter</code> is \"moisture_pct\" and <code>garden</code> is Clelia or Ines, then run <code>wilcoxTest(value ~ garden)</code> on them.",
-                "The p-value says whether the difference is significant. To see which garden is higher, find each garden's median: <code>group_by(garden) %&gt;% summarize(median = median(value))</code>.",
+                "Keep only the rows where <code>parameter</code> is \"moisture_pct\" and <code>garden</code> is Clelia or Ines, then check each garden's distribution: <code>group_by(garden) %&gt;% shapiroTest(value)</code>.",
+                "Both gardens look roughly normal, so the flowchart's two-group branch lands on <code>tTest(value ~ garden)</code>, and a t-test is reported with means: <code>group_by(garden) %&gt;% summarize(mean = mean(value))</code>.",
                 "Check your filter: every other parameter, or all of them pooled together, gives a different answer from moisture_pct alone."
               ]
             }
@@ -9770,22 +9772,22 @@
           ],
           "starterCode": "garden_soil",
           "question": {
-            "prompt": "The guild's first certificate compares the soil moisture of two gardens. Using the rows where <code>parameter</code> is moisture_pct, use a Wilcoxon rank-sum test to compare <code>value</code> between the gardens Clelia and Ines (the <code>garden</code> column). Is the difference significant, and whose values tend to run higher? Pick the statement that matches your result.",
+            "prompt": "The guild's first certificate compares the soil moisture of two gardens. Using the rows where <code>parameter</code> is moisture_pct, compare <code>value</code> between the gardens Clelia and Ines (the <code>garden</code> column). This is a two-group comparison. Run a Shapiro test on each group to decide which test the flowchart calls for, then report the summary statistic that goes with it: means if every group is normal, medians if any group is not. Is the difference significant, and which garden is higher? Pick the statement that matches your result.",
             "options": [
-              "No significant difference (p = 1.00): median Clelia 6.685 vs Ines 6.665",
-              "No significant difference (p = 0.84): median Clelia 8.70 vs Ines 8.80",
-              "Significant (p < 0.001): Ines is higher, median 46.65 vs 32.4",
-              "No significant difference (p = 0.83): median Clelia 0.70 vs Ines 0.80",
-              "No significant difference (p = 0.99): median Clelia 0.615 vs Ines 0.605",
-              "Significant (p < 0.001): Clelia is higher, median 24.0 vs 21.5",
-              "No significant difference (p = 0.58): median Clelia 16.35 vs Ines 16.15"
+              "No significant difference (p = 0.36): mean Clelia 16.0 vs Ines 16.5",
+              "No significant difference (p = 0.86): mean Clelia 0.61 vs Ines 0.615",
+              "Significant (p < 0.001): Ines is higher, mean 47.4 vs 32.0",
+              "No significant difference (p = 0.07): mean Clelia 12.7 vs Ines 14.6",
+              "No significant difference (p = 0.93): mean Clelia 6.61 vs Ines 6.62",
+              "Significant (p < 0.001): Clelia is higher, mean 24.0 vs 21.6",
+              "No significant difference (p = 0.94): mean Clelia 8.89 vs Ines 8.84"
             ],
             "correct": 5,
             "feedback": {
-              "correct": "Correct, noted in your field notebook: by Wilcoxon test, Clelia's soil moisture readings run significantly higher than Ines's (median 24.0 vs 21.5, p < 0.001).",
+              "correct": "Correct, noted in your field notebook: both gardens are roughly normal, so by t-test Clelia's soil moisture is significantly higher than Ines's (mean 24.0 vs 21.6, p < 0.001).",
               "wrong": [
-                "Keep only the rows where <code>parameter</code> is \"moisture_pct\" and <code>garden</code> is Clelia or Ines, then run <code>wilcoxTest(value ~ garden)</code> on them.",
-                "The p-value says whether the difference is significant. To see which garden is higher, find each garden's median: <code>group_by(garden) %&gt;% summarize(median = median(value))</code>.",
+                "Keep only the rows where <code>parameter</code> is \"moisture_pct\" and <code>garden</code> is Clelia or Ines, then check each garden's distribution: <code>group_by(garden) %&gt;% shapiroTest(value)</code>.",
+                "Both gardens look roughly normal, so the flowchart's two-group branch lands on <code>tTest(value ~ garden)</code>, and a t-test is reported with means: <code>group_by(garden) %&gt;% summarize(mean = mean(value))</code>.",
                 "Check your filter: every other parameter, or all of them pooled together, gives a different answer from moisture_pct alone."
               ]
             }
@@ -9919,7 +9921,7 @@
           "volume": 0.12
         }
       ],
-      "debrief": "A Wilcoxon rank-sum test pools the readings from both gardens, ranks them, and asks whether one garden's ranks run consistently higher. Clelia's moisture ranks did, so Clelia is significantly wetter than Ines. Your partner's t-test on the means reached the same verdict, because on roughly symmetric data the mean and the median tell the same story."
+      "debrief": "Both gardens' moisture readings passed the normality check, so the flowchart led to a t-test, which asks whether two group means differ by more than the spread of the readings would explain. Clelia averaged 24.0 percent moisture against 21.6 for Ines, a small gap but a consistent one, so the test called it significant."
     },
     {
       "key": "up_4a",
@@ -10308,7 +10310,7 @@
       "unlockedWhen": true,
       "role": "upper",
       "level": 4,
-      "designNote": "RUNG 2 (upper): the designed method split. Opens the stairs down.",
+      "designNote": "RUNG 2 (upper): skewed nitrate: the data call for a Wilcoxon test. Opens the stairs down.",
       "plannedHotspots": [
         {
           "type": "door",
@@ -10355,23 +10357,23 @@
           "label": "Soil reading 2",
           "starterCode": "garden_soil",
           "question": {
-            "prompt": "The second certificate is for nitrate, the nitrogen the orchard trees feed on. Using the rows where <code>parameter</code> is nitrate_mg_kg, use a two-sample t-test (the default, Welch's) to compare <code>value</code> between the gardens Bice and Zita. Run it on the values as recorded: do not transform them or switch to a different test. Is the difference significant, and which garden has the higher mean? Pick the statement that matches your result.",
+            "prompt": "The second certificate is for nitrate, the nitrogen the orchard trees feed on. Using the rows where <code>parameter</code> is nitrate_mg_kg, compare <code>value</code> between the gardens Bice and Zita, on the values as recorded (do not transform them). This is a two-group comparison. Run a Shapiro test on each group to decide which test the flowchart calls for, then report the summary statistic that goes with it: means if every group is normal, medians if any group is not. Is the difference significant, and which garden is higher? Pick the statement that matches your result.",
             "options": [
-              "No significant difference (p = 0.40): mean Bice 14.8 vs Zita 16.2",
-              "No significant difference (p = 0.60): mean Bice 0.62 vs Zita 0.63",
-              "No significant difference (p = 0.20): mean Bice 22.4 vs Zita 22.9",
+              "Significant (p < 0.001): Bice is higher, median 45.75 vs 34.1",
+              "No significant difference (p = 0.61): median Bice 0.62 vs Zita 0.645",
+              "No significant difference (p = 0.88): median Bice 8.00 vs Zita 8.60",
+              "Significant (p < 0.001): Bice is higher, median 19.05 vs 12.95",
               "Significant (p < 0.01): Zita is higher, mean 40.4 vs 19.0",
-              "No significant difference (p = 0.96): mean Bice 8.47 vs Zita 8.51",
-              "Significant (p < 0.001): Bice is higher, mean 46.0 vs 33.4",
-              "Significant (p < 0.001): Bice is higher, median 19.05 vs 12.95"
+              "No significant difference (p = 0.64): median Bice 8.00 vs Zita 7.30",
+              "No significant difference (p = 0.29): median Bice 22.55 vs Zita 22.9"
             ],
             "correct": 3,
             "feedback": {
-              "correct": "Correct, noted in your field notebook: by t-test, Zita's mean nitrate is significantly higher than Bice's (40.4 vs 19.0, p < 0.01).",
+              "correct": "Correct, noted in your field notebook: Zita's readings are skewed, so by Wilcoxon test Bice's nitrate readings run significantly higher than Zita's (median 19.05 vs 12.95, p < 0.001).",
               "wrong": [
-                "Keep only the rows where <code>parameter</code> is \"nitrate_mg_kg\" and <code>garden</code> is Bice or Zita, then run <code>tTest(value ~ garden)</code>.",
-                "To see which garden is higher, find each garden's mean: <code>group_by(garden) %&gt;% summarize(mean = mean(value))</code>. This question asks about the means, not the medians.",
-                "Your partner's test on these same two gardens may point the other way. Answer for your own test: the t-test and the means."
+                "Keep only the rows where <code>parameter</code> is \"nitrate_mg_kg\" and <code>garden</code> is Bice or Zita, then check each garden's distribution first: <code>group_by(garden) %&gt;% shapiroTest(value)</code>.",
+                "Zita's nitrate fails the normality check (a few manured beds make it right-skewed), so the flowchart sends you to <code>wilcoxTest(value ~ garden)</code>, not a t-test.",
+                "A Wilcoxon test is reported with medians: <code>group_by(garden) %&gt;% summarize(median = median(value))</code>. Zita's mean is dragged up by a few very high readings and points the other way."
               ]
             }
           },
@@ -10703,23 +10705,23 @@
           ],
           "starterCode": "garden_soil",
           "question": {
-            "prompt": "The second certificate is for nitrate, the nitrogen the orchard trees feed on. Using the rows where <code>parameter</code> is nitrate_mg_kg, use a two-sample t-test (the default, Welch's) to compare <code>value</code> between the gardens Bice and Zita. Run it on the values as recorded: do not transform them or switch to a different test. Is the difference significant, and which garden has the higher mean? Pick the statement that matches your result.",
+            "prompt": "The second certificate is for nitrate, the nitrogen the orchard trees feed on. Using the rows where <code>parameter</code> is nitrate_mg_kg, compare <code>value</code> between the gardens Bice and Zita, on the values as recorded (do not transform them). This is a two-group comparison. Run a Shapiro test on each group to decide which test the flowchart calls for, then report the summary statistic that goes with it: means if every group is normal, medians if any group is not. Is the difference significant, and which garden is higher? Pick the statement that matches your result.",
             "options": [
-              "No significant difference (p = 0.40): mean Bice 14.8 vs Zita 16.2",
-              "No significant difference (p = 0.60): mean Bice 0.62 vs Zita 0.63",
-              "No significant difference (p = 0.20): mean Bice 22.4 vs Zita 22.9",
+              "Significant (p < 0.001): Bice is higher, median 45.75 vs 34.1",
+              "No significant difference (p = 0.61): median Bice 0.62 vs Zita 0.645",
+              "No significant difference (p = 0.88): median Bice 8.00 vs Zita 8.60",
+              "Significant (p < 0.001): Bice is higher, median 19.05 vs 12.95",
               "Significant (p < 0.01): Zita is higher, mean 40.4 vs 19.0",
-              "No significant difference (p = 0.96): mean Bice 8.47 vs Zita 8.51",
-              "Significant (p < 0.001): Bice is higher, mean 46.0 vs 33.4",
-              "Significant (p < 0.001): Bice is higher, median 19.05 vs 12.95"
+              "No significant difference (p = 0.64): median Bice 8.00 vs Zita 7.30",
+              "No significant difference (p = 0.29): median Bice 22.55 vs Zita 22.9"
             ],
             "correct": 3,
             "feedback": {
-              "correct": "Correct, noted in your field notebook: by t-test, Zita's mean nitrate is significantly higher than Bice's (40.4 vs 19.0, p < 0.01).",
+              "correct": "Correct, noted in your field notebook: Zita's readings are skewed, so by Wilcoxon test Bice's nitrate readings run significantly higher than Zita's (median 19.05 vs 12.95, p < 0.001).",
               "wrong": [
-                "Keep only the rows where <code>parameter</code> is \"nitrate_mg_kg\" and <code>garden</code> is Bice or Zita, then run <code>tTest(value ~ garden)</code>.",
-                "To see which garden is higher, find each garden's mean: <code>group_by(garden) %&gt;% summarize(mean = mean(value))</code>. This question asks about the means, not the medians.",
-                "Your partner's test on these same two gardens may point the other way. Answer for your own test: the t-test and the means."
+                "Keep only the rows where <code>parameter</code> is \"nitrate_mg_kg\" and <code>garden</code> is Bice or Zita, then check each garden's distribution first: <code>group_by(garden) %&gt;% shapiroTest(value)</code>.",
+                "Zita's nitrate fails the normality check (a few manured beds make it right-skewed), so the flowchart sends you to <code>wilcoxTest(value ~ garden)</code>, not a t-test.",
+                "A Wilcoxon test is reported with medians: <code>group_by(garden) %&gt;% summarize(median = median(value))</code>. Zita's mean is dragged up by a few very high readings and points the other way."
               ]
             }
           },
@@ -10834,7 +10836,7 @@
           "volume": 1.0
         }
       ],
-      "debrief": "The designed disagreement. Your t-test found Zita higher on average (mean 40.4 against 19.0 mg/kg nitrate). Your partner's Wilcoxon test ranked the same readings and found Bice higher in a typical bed (median 19.05 against 12.95). A few very high Zita readings pull its mean up but count as only a handful of high ranks. Both results are correct because they answer different questions, so on skewed data, decide which question you are asking before you choose the test."
+      "debrief": "Zita's nitrate readings failed the normality check: most of its beds are low, but a few manured ones read very high. So the flowchart led to a Wilcoxon test, which ranks every reading and found Bice higher in a typical bed (median 19.05 against 12.95). A t-test on the same numbers would have said the opposite, Zita higher on average (mean 40.4 against 19.0), because those few very high readings pull the mean up but count as only a handful of high ranks. That is why the data, not habit, choose the test and the summary statistic."
     },
     {
       "key": "up_3a",
@@ -11279,23 +11281,24 @@
           "label": "Soil reading 3",
           "starterCode": "garden_soil",
           "question": {
-            "prompt": "The middle garden mixes the soil for the whole city, so its certificate covers all four soil mixes. Using the rows where <code>parameter</code> is pH, compare <code>value</code> across the four groups in the <code>soil_mix</code> column with a Dunn test, which compares every pair of mixes. Which statement matches the Dunn results?",
+            "prompt": "The middle garden mixes the soil for the whole city, so its certificate covers all four soil mixes. Using the rows where <code>parameter</code> is pH, compare <code>value</code> across the four groups in the <code>soil_mix</code> column, every pair of mixes. This is a comparison of more than two groups: run a Shapiro test on each group to decide which test the flowchart calls for, and judge which groups are higher by the summary statistic that goes with it: means if every group is normal, medians if any group is not. Which statement matches your results?",
             "options": [
-              "No pair differs (0 of 6 comparisons significant)",
               "5 of 15 comparisons significant: Bice-Clelia, Clelia-Gemma, Clelia-Ines, Dora-Ines, Ines-Zita",
-              "6 of 15 comparisons significant: Bice-Clelia, Bice-Dora, Bice-Ines, Bice-Zita, Dora-Gemma, Gemma-Zita",
+              "Only coir_blend stands apart: its value is higher than each of the other 3; the others do not differ from one another (3 of 6 comparisons significant)",
+              "No pair differs (0 of 6 comparisons significant)",
+              "Two groups: each of coir_blend, leaf_mould is higher than each of pumice_loam, tuff_grit, and also coir_blend-leaf_mould differ (5 of 6 comparisons significant)",
+              "2 of 6 comparisons significant: coir_blend-pumice_loam, coir_blend-tuff_grit",
               "Every pair differs (all 6 comparisons significant)",
-              "Two groups: each of coir_blend, leaf_mould is higher than each of pumice_loam, tuff_grit; no pair within a group differs (4 of 6 comparisons significant)",
-              "No pair differs (0 of 15 comparisons significant)",
-              "Only leaf_mould stands apart: its value is lower than each of the other 3; the others do not differ from one another (3 of 6 comparisons significant)"
+              "Only leaf_mould stands apart: its value is lower than each of the other 3; the others do not differ from one another (3 of 6 comparisons significant)",
+              "No pair differs (0 of 15 comparisons significant)"
             ],
             "correct": 6,
             "feedback": {
-              "correct": "Correct, noted in your field notebook: by Dunn test, leaf_mould alone has a lower pH than the other three mixes, which do not differ.",
+              "correct": "Correct, noted in your field notebook: all four mixes are roughly normal, so by Games-Howell test leaf_mould alone has a lower pH than the other three mixes, which do not differ.",
               "wrong": [
-                "Keep only the rows where <code>parameter</code> is \"pH\", then run <code>dunnTest(value ~ soil_mix)</code> on them.",
-                "Each of its six rows is one pair of mixes; a <code>p.adj</code> below 0.05 means that pair differs. The test has already corrected for making six comparisons at once.",
-                "Group by <code>soil_mix</code>, not <code>garden</code>. To see which side of a pair is higher, find each mix's median: <code>group_by(soil_mix) %&gt;% summarize(median = median(value))</code>."
+                "Keep only the rows where <code>parameter</code> is \"pH\", then check each mix's distribution: <code>group_by(soil_mix) %&gt;% shapiroTest(value)</code>.",
+                "All four mixes look roughly normal, so the flowchart's more-than-two branch lands on <code>gamesHowellTest(value ~ soil_mix)</code>. Each of its six rows is one pair of mixes; a <code>p.adj</code> below 0.05 means that pair differs.",
+                "Group by <code>soil_mix</code>, not <code>garden</code>. To see which side of a pair is higher, compare each mix's mean: <code>group_by(soil_mix) %&gt;% summarize(mean = mean(value))</code>."
               ]
             }
           },
@@ -11659,23 +11662,24 @@
           ],
           "starterCode": "garden_soil",
           "question": {
-            "prompt": "The middle garden mixes the soil for the whole city, so its certificate covers all four soil mixes. Using the rows where <code>parameter</code> is pH, compare <code>value</code> across the four groups in the <code>soil_mix</code> column with a Dunn test, which compares every pair of mixes. Which statement matches the Dunn results?",
+            "prompt": "The middle garden mixes the soil for the whole city, so its certificate covers all four soil mixes. Using the rows where <code>parameter</code> is pH, compare <code>value</code> across the four groups in the <code>soil_mix</code> column, every pair of mixes. This is a comparison of more than two groups: run a Shapiro test on each group to decide which test the flowchart calls for, and judge which groups are higher by the summary statistic that goes with it: means if every group is normal, medians if any group is not. Which statement matches your results?",
             "options": [
-              "No pair differs (0 of 6 comparisons significant)",
               "5 of 15 comparisons significant: Bice-Clelia, Clelia-Gemma, Clelia-Ines, Dora-Ines, Ines-Zita",
-              "6 of 15 comparisons significant: Bice-Clelia, Bice-Dora, Bice-Ines, Bice-Zita, Dora-Gemma, Gemma-Zita",
+              "Only coir_blend stands apart: its value is higher than each of the other 3; the others do not differ from one another (3 of 6 comparisons significant)",
+              "No pair differs (0 of 6 comparisons significant)",
+              "Two groups: each of coir_blend, leaf_mould is higher than each of pumice_loam, tuff_grit, and also coir_blend-leaf_mould differ (5 of 6 comparisons significant)",
+              "2 of 6 comparisons significant: coir_blend-pumice_loam, coir_blend-tuff_grit",
               "Every pair differs (all 6 comparisons significant)",
-              "Two groups: each of coir_blend, leaf_mould is higher than each of pumice_loam, tuff_grit; no pair within a group differs (4 of 6 comparisons significant)",
-              "No pair differs (0 of 15 comparisons significant)",
-              "Only leaf_mould stands apart: its value is lower than each of the other 3; the others do not differ from one another (3 of 6 comparisons significant)"
+              "Only leaf_mould stands apart: its value is lower than each of the other 3; the others do not differ from one another (3 of 6 comparisons significant)",
+              "No pair differs (0 of 15 comparisons significant)"
             ],
             "correct": 6,
             "feedback": {
-              "correct": "Correct, noted in your field notebook: by Dunn test, leaf_mould alone has a lower pH than the other three mixes, which do not differ.",
+              "correct": "Correct, noted in your field notebook: all four mixes are roughly normal, so by Games-Howell test leaf_mould alone has a lower pH than the other three mixes, which do not differ.",
               "wrong": [
-                "Keep only the rows where <code>parameter</code> is \"pH\", then run <code>dunnTest(value ~ soil_mix)</code> on them.",
-                "Each of its six rows is one pair of mixes; a <code>p.adj</code> below 0.05 means that pair differs. The test has already corrected for making six comparisons at once.",
-                "Group by <code>soil_mix</code>, not <code>garden</code>. To see which side of a pair is higher, find each mix's median: <code>group_by(soil_mix) %&gt;% summarize(median = median(value))</code>."
+                "Keep only the rows where <code>parameter</code> is \"pH\", then check each mix's distribution: <code>group_by(soil_mix) %&gt;% shapiroTest(value)</code>.",
+                "All four mixes look roughly normal, so the flowchart's more-than-two branch lands on <code>gamesHowellTest(value ~ soil_mix)</code>. Each of its six rows is one pair of mixes; a <code>p.adj</code> below 0.05 means that pair differs.",
+                "Group by <code>soil_mix</code>, not <code>garden</code>. To see which side of a pair is higher, compare each mix's mean: <code>group_by(soil_mix) %&gt;% summarize(mean = mean(value))</code>."
               ]
             }
           },
@@ -11766,7 +11770,7 @@
           "volume": 0.2
         }
       ],
-      "debrief": "With four soil mixes, testing every pair separately would multiply the chances of a false positive, so you used a Dunn test, which compares every pair on one shared ranking while correcting for the number of comparisons: leaf_mould alone is more acidic than the other three. Your partner reached the same answer with a Games-Howell test. Solving it brought the first snow."
+      "debrief": "All four soil mixes passed the normality check, so the flowchart led to a Games-Howell test. Running a separate t-test on every pair would multiply the chances of a false positive; Games-Howell compares every pair while correcting for the number of comparisons, without assuming the mixes share one spread. Leaf_mould alone is more acidic than the other three. Solving it brought the first snow."
     },
     {
       "key": "up_5b",
@@ -11811,7 +11815,7 @@
           "label": "The full soil survey",
           "starterCode": "garden_soil",
           "question": {
-            "prompt": "The full soil survey certifies phosphorus across all six gardens at once. Using the rows where parameter is phosphorus_mg_kg, compare value between every pair of the six gardens in the garden column (15 pairs) with pairwise t-tests, keeping the function's default correction for multiple comparisons. Which statement matches the corrected results?",
+            "prompt": "The full soil survey certifies phosphorus across all six gardens at once. Using the rows where <code>parameter</code> is phosphorus_mg_kg, compare <code>value</code> between every pair of the six gardens in the <code>garden</code> column (15 pairs). This is a comparison of more than two groups: run a Shapiro test on each group to decide which test the flowchart calls for, and judge which groups are higher by the summary statistic that goes with it: means if every group is normal, medians if any group is not. Keep the test's built-in correction for multiple comparisons. Which statement matches your results?",
             "options": [
               "No pair differs (0 of 15 comparisons significant)",
               "Two groups: each of Bice, Gemma, Ines is higher than each of Clelia, Dora, Zita, and also Dora-Zita, Gemma-Ines differ (11 of 15 comparisons significant)",
@@ -11824,11 +11828,11 @@
             ],
             "correct": 5,
             "feedback": {
-              "correct": "Correct, noted in your field notebook: by pairwise t-tests with the correction for multiple comparisons, the gardens fall into two groups for phosphorus: Bice, Gemma and Ines are each higher than each of Clelia, Dora and Zita, and no pair within a group differs.",
+              "correct": "Correct, noted in your field notebook: all six gardens are roughly normal, so by Games-Howell test the gardens fall into two groups for phosphorus: Bice, Gemma and Ines are each higher than each of Clelia, Dora and Zita, and no pair within a group differs.",
               "wrong": [
-                "Keep only the rows where <code>parameter</code> is \"phosphorus_mg_kg\", then run <code>pairwiseTTest(value ~ garden)</code>. You should get 15 rows, one per pair of gardens.",
-                "Read <code>p.adj</code>, not <code>p</code>: that is the value corrected for multiple comparisons, the default. With 15 tests at once, a pair or two can dip below 0.05 by chance alone.",
-                "To see which side of each significant pair is higher, find each garden's mean: <code>group_by(garden) %&gt;% summarize(mean = mean(value))</code>."
+                "Keep only the rows where <code>parameter</code> is \"phosphorus_mg_kg\", then check each garden's distribution: <code>group_by(garden) %&gt;% shapiroTest(value)</code>.",
+                "All six gardens look roughly normal, so this is the same branch as the middle garden: <code>gamesHowellTest(value ~ garden)</code>. You should get 15 rows, one per pair of gardens.",
+                "Read <code>p.adj</code>, not <code>p</code>: with 15 comparisons at once, a pair or two can dip below 0.05 by chance alone. To see which side of each significant pair is higher, compare each garden's mean: <code>group_by(garden) %&gt;% summarize(mean = mean(value))</code>."
               ]
             }
           },
@@ -12127,7 +12131,7 @@
           ],
           "starterCode": "garden_soil",
           "question": {
-            "prompt": "The full soil survey certifies phosphorus across all six gardens at once. Using the rows where parameter is phosphorus_mg_kg, compare value between every pair of the six gardens in the garden column (15 pairs) with pairwise t-tests, keeping the function's default correction for multiple comparisons. Which statement matches the corrected results?",
+            "prompt": "The full soil survey certifies phosphorus across all six gardens at once. Using the rows where <code>parameter</code> is phosphorus_mg_kg, compare <code>value</code> between every pair of the six gardens in the <code>garden</code> column (15 pairs). This is a comparison of more than two groups: run a Shapiro test on each group to decide which test the flowchart calls for, and judge which groups are higher by the summary statistic that goes with it: means if every group is normal, medians if any group is not. Keep the test's built-in correction for multiple comparisons. Which statement matches your results?",
             "options": [
               "No pair differs (0 of 15 comparisons significant)",
               "Two groups: each of Bice, Gemma, Ines is higher than each of Clelia, Dora, Zita, and also Dora-Zita, Gemma-Ines differ (11 of 15 comparisons significant)",
@@ -12140,11 +12144,11 @@
             ],
             "correct": 5,
             "feedback": {
-              "correct": "Correct, noted in your field notebook: by pairwise t-tests with the correction for multiple comparisons, the gardens fall into two groups for phosphorus: Bice, Gemma and Ines are each higher than each of Clelia, Dora and Zita, and no pair within a group differs.",
+              "correct": "Correct, noted in your field notebook: all six gardens are roughly normal, so by Games-Howell test the gardens fall into two groups for phosphorus: Bice, Gemma and Ines are each higher than each of Clelia, Dora and Zita, and no pair within a group differs.",
               "wrong": [
-                "Keep only the rows where <code>parameter</code> is \"phosphorus_mg_kg\", then run <code>pairwiseTTest(value ~ garden)</code>. You should get 15 rows, one per pair of gardens.",
-                "Read <code>p.adj</code>, not <code>p</code>: that is the value corrected for multiple comparisons, the default. With 15 tests at once, a pair or two can dip below 0.05 by chance alone.",
-                "To see which side of each significant pair is higher, find each garden's mean: <code>group_by(garden) %&gt;% summarize(mean = mean(value))</code>."
+                "Keep only the rows where <code>parameter</code> is \"phosphorus_mg_kg\", then check each garden's distribution: <code>group_by(garden) %&gt;% shapiroTest(value)</code>.",
+                "All six gardens look roughly normal, so this is the same branch as the middle garden: <code>gamesHowellTest(value ~ garden)</code>. You should get 15 rows, one per pair of gardens.",
+                "Read <code>p.adj</code>, not <code>p</code>: with 15 comparisons at once, a pair or two can dip below 0.05 by chance alone. To see which side of each significant pair is higher, compare each garden's mean: <code>group_by(garden) %&gt;% summarize(mean = mean(value))</code>."
               ]
             }
           },
@@ -12240,7 +12244,7 @@
           "volume": 0.3
         }
       ],
-      "debrief": "The full survey compared phosphorus between all fifteen pairs of gardens with t-tests. Run fifteen tests and a few will cross p < 0.05 by chance alone, so the function applies a correction by default (Holm's method) that raises the bar for each comparison. Gemma-Ines and Dora-Zita fall away once it is applied, leaving two clean groups: Bice, Gemma and Ines above Clelia, Dora and Zita. Your partner's pairwise Wilcoxon tests found the same two groups."
+      "debrief": "All six gardens passed the normality check, so the full survey went down the same branch as the middle garden: a Games-Howell test across all fifteen pairs. Run fifteen uncorrected tests and a few will cross p < 0.05 by chance alone (here Gemma-Ines and Dora-Zita would), so the test's adjusted p-values raise the bar for each comparison. Once they are read, two clean groups remain: Bice, Gemma and Ines above Clelia, Dora and Zita."
     },
     {
       "key": "up_4c",
@@ -13544,7 +13548,7 @@
           "volume": 0.2
         }
       ],
-      "debrief": "The lighthouse lamp tells the city its gardens are ready for winter. You lit it after answering four questions twice, with two methods that mostly agreed and, once, for good reason, did not."
+      "debrief": "The lighthouse lamp tells the city its gardens are ready for winter. You lit it after four questions, each answered with the test the data called for."
     }
   ],
   "cover": "cover.png",

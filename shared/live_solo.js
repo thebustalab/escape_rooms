@@ -1,14 +1,18 @@
 /*
- * live_solo.js — a ONE-PLAYER, SERVERLESS copy of the live-class session (bathhouse, Lucas 2026-10-27).
+ * live_solo.js — a ONE-PLAYER, SERVERLESS copy of the live-class session (bathhouse 2026-10-27; any live scenario
+ * with a `solo` block since 2026-11-06, Harvest Home).
  *
- * A live scenario that carries `scenario.solo` (only basic_math/bathhouse) can be played on its own from the
- * public site: no class server, no join code. The player picks the duration, the herb-bundle goal and how many
- * small baths to fill, and this module answers the same calls live_session.js makes of the server
+ * A live scenario that carries `scenario.solo` can be played on its own from the public site: no class server, no
+ * join code. The player picks the duration (unless the scenario is `untimed`), the goal and, where the pool has
+ * counting sinks, how many to fill, and this module answers the same calls live_session.js makes of the server
  * (state, deal, answer, deliver, backpack, skip), with the same shapes and the same rules:
  * tiers and tracks, carry caps per item (raised by a backpack), the overflow refusal, second items and sinks,
  * the two-part win, the wrong-answer cooldown, the clock, and the sewing table's stitch / ribbon checks.
  * It MIRRORS authoring_v2/live_class/live_server.py; tests/live_solo.test.mjs pins the shared rules, so a change
- * to one side should be made to both.
+ * to one side should be made to both. Two things are SOLO ONLY and have no server twin: `untimed` (no clock at
+ * all) and the worked answer (opt-in `reveal`: a right answer carries the task's `solution`, and the `solution` call
+ * reveals it on request, but only after one wrong try at that task (Lucas, 2026-11-06); a deal never carries it, and
+ * the class server never sends it).
  *
  * The solo pool is a published file (rooms/<scenario>/solo/pool.json, written by the pool builder) and so carries
  * its answers in the clear: fine for an ungraded one-player practice game. The class server refuses to serve it.
@@ -84,15 +88,23 @@ function publicPuzzle(p, dealId, order) {
 }
 
 /*
- * new SoloSession(pool, {minutes, goal, baths}, now?) — `now` (ms) is injectable for the tests.
+ * new SoloSession(pool, {minutes, goal, baths, untimed, reveal}, now?) — `now` (ms) is injectable for the tests.
+ * `untimed` (scenario.solo.untimed): no clock, so the game never times up and the restaurant's time is a no-op;
+ * `minutes` is ignored. `reveal` (scenario.solo.reveal): right answers carry the task's `solution` and the
+ * `solution` call answers; off (bathhouse), neither ever does, whatever the pool holds.
  * handle(path, body) -> {ok, status, j}, the shape live_session.js's api() returns from fetch.
  */
 export class SoloSession {
-  constructor(pool, { minutes, goal, baths }, now = () => Date.now()) {
+  constructor(pool, { minutes, goal, baths, untimed, reveal }, now = () => Date.now()) {
+    // live_server.load_pool's rule: a carry-back pool names its drop and its unit
+    if (pool.carry_back && !(typeof pool.deliver_to === "string" && pool.deliver_to.trim() &&
+        Array.isArray(pool.unit) && pool.unit.length === 2)) throw new Error("solo pool: carry_back needs deliver_to and unit");
     this.pool = pool;
     this.now = now;
     this.byId = Object.fromEntries(pool.puzzles.map(p => [p.id, p]));
-    this.durationS = Math.round(minutes * 60);
+    this.untimed = !!untimed;
+    this.reveal = !!reveal;
+    this.durationS = this.untimed ? null : Math.round(minutes * 60);
     this.goal = goal;
     // a sink with `counts: false` (the temple's robe rack) never counts toward the baths to fill (live_server)
     this.counting = new Set((pool.sinks || []).filter(s => s.counts !== false).map(s => s.id));
@@ -111,9 +123,9 @@ export class SoloSession {
 
   // ---- the clock and the win (Session.tick / maybe_win) ----
   elapsed() { return ((this.endedAt != null ? this.endedAt : this.now()) - this.startedAt) / 1000; }
-  remaining() { return Math.max(0, this.durationS - this.elapsed()); }
+  remaining() { return this.untimed ? Infinity : Math.max(0, this.durationS - this.elapsed()); }
   tick() {
-    if (this.phase === "running" && this.remaining() <= 0) {
+    if (!this.untimed && this.phase === "running" && this.remaining() <= 0) {
       this.phase = "timeup"; this.endedAt = this.startedAt + this.durationS * 1000;
     }
   }
@@ -127,7 +139,7 @@ export class SoloSession {
   // ---- carry caps (item_cfg / player_cap / carry_full) ----
   itemCfg(item) {
     const P = this.pool;
-    if (!item) return { unit: P.unit || ["load", "loads"], carry_max: P.carry_max, deliver_to: P.deliver_to || "the canoe",
+    if (!item) return { unit: P.unit || ["load", "loads"], carry_max: P.carry_max, deliver_to: P.deliver_to || "the drop-off",
                         carry_block_text: P.carry_block_text };
     return (P.items || {})[item] || {};
   }
@@ -148,12 +160,18 @@ export class SoloSession {
     return cap ? n >= cap : !!n;
   }
   tracks() { return [...new Set(this.pool.puzzles.map(trackOf))].filter(Boolean).sort(); }
+  // Does the open deal have a worked answer to show? (the card's "Show me" button; never says what it is)
+  hasSolution(dealId) {
+    const d = this.deal;
+    return !!(this.reveal && d && d.id === dealId && this.byId[d.puzzleId].solution);
+  }
 
   state() {
     this.tick();                       // the clock first, however the state is read
     const P = this.pool, pl = this.pl;
     return {
-      phase: this.phase, remaining_s: Math.round(this.remaining()), duration_s: this.durationS,
+      phase: this.phase, remaining_s: this.untimed ? null : Math.round(this.remaining()), duration_s: this.durationS,
+      untimed: this.untimed,
       total: this.total, goal: this.goal, players: 1, feed: this.feed.slice(-8), tier_counts: { ...this.tierCounts },
       blackout: false, exp: null, filled: [...this.filled], served: [...this.served],
       me: { callsign: pl.callsign, points: pl.points, solved: pl.solved.size,
@@ -212,7 +230,7 @@ export class SoloSession {
       if (cap && carry && this.held(itemOf(p)) + pointsOf(p) > cap) {
         const room = cap - this.held(itemOf(p)), unit = cfg.unit || ["load", "loads"];
         return res({ error: `This one is worth ${plural(pointsOf(p), unit)} and you only have room for ${room} more. ` +
-                            `Take your ${unit[1]} to ${cfg.deliver_to || "the canoe"} first.`,
+                            `Take your ${unit[1]} to ${cfg.deliver_to || "the drop-off"} first.`,
                      carrying: this.held(itemOf(p)) }, 409);
       }
       let order = null;
@@ -250,12 +268,15 @@ export class SoloSession {
         right = choice === p.answer;
       }
       if (!right) {
+        d.missed = true;                // "Show me" unlocks after one wrong try (Lucas, 2026-11-06)
         pl.cooldownUntil = now + WRONG_COOLDOWN_S * 1000;
         return res({ correct: false, cooldown_s: WRONG_COOLDOWN_S, feedback: p.wrong_feedback || "Not that one. Look again." });
       }
+      // SOLO ONLY: a right answer carries the task's worked answer, if the pool has one (never in a deal).
+      const rightRes = (j) => res(this.reveal && p.solution ? { ...j, solution: p.solution } : j);
       if (practice) {                   // right, but the clock is over: mark it and nothing else
         this.deal = null;
-        return res({ correct: true, points: 0, practice: true, feedback: (p.right_feedback || "Right!") + " " + PRACTICE_NOTE });
+        return rightRes({ correct: true, points: 0, practice: true, feedback: (p.right_feedback || "Right!") + " " + PRACTICE_NOTE });
       }
       const pts = pointsOf(p), it = itemOf(p);
       pl.solved.add(p.id);
@@ -264,17 +285,28 @@ export class SoloSession {
       const dish = menuDish(P, trackOf(p));
       if (dish) {                       // the restaurant: a right answer buys time (Session.serve_dish)
         if (this.served.includes(dish.track))
-          return res({ correct: true, points: 0, served_out: true, served: [...this.served],
-                       feedback: `Right! But someone else just ate the last of the ${dish.label.toLowerCase()}, so no extra time this time.` });
+          return rightRes({ correct: true, points: 0, served_out: true, served: [...this.served],
+                         feedback: `Right! But someone else just ate the last of the ${dish.label.toLowerCase()}, so no extra time this time.` });
+        this.served.push(dish.track);
+        if (this.untimed)               // no clock to add to: the dish sells out and that is all
+          return rightRes({ correct: true, points: 0, served: [...this.served], feedback: p.right_feedback || "Delicious!" });
         const secs = parseInt(P.menu.seconds, 10);
         this.durationS += secs;
-        this.served.push(dish.track);
-        return res({ correct: true, points: 0, time_added: secs, served: [...this.served],
-                     remaining_s: Math.round(this.remaining()), feedback: p.right_feedback || "Delicious!" });
+        return rightRes({ correct: true, points: 0, time_added: secs, served: [...this.served],
+                       remaining_s: Math.round(this.remaining()), feedback: p.right_feedback || "Delicious!" });
       }
       if (it) pl.held[it] = (pl.held[it] || 0) + pts; else pl.carrying += pts;
-      return res({ correct: true, points: pts, carrying: this.held(it), carry_full: this.carryFull(it), total: this.total,
-                   ...(it ? { item: it } : {}), feedback: p.right_feedback || null });
+      return rightRes({ correct: true, points: pts, carrying: this.held(it), carry_full: this.carryFull(it), total: this.total,
+                     ...(it ? { item: it } : {}), feedback: p.right_feedback || null });
+    }
+
+    if (route === "solution") {        // SOLO ONLY ("Show me"): the open task's worked answer, on request
+      const d = this.deal;
+      if (!d || d.id !== body.deal_id) return res({ error: "That task has expired — try the station again." }, 409);
+      const p = this.byId[d.puzzleId];
+      if (!this.reveal || !p.solution) return res({ error: "There is no worked answer for this task." }, 404);
+      if (!d.missed) return res({ error: "Have a go first: Show me opens after one try." }, 403);
+      return res({ solution: p.solution });
     }
 
     if (route === "deliver") {

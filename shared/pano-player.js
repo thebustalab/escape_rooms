@@ -84,27 +84,29 @@
 // A bare `./variant_resolve.js` import is NOT refreshed by bumping the <script> tag's ?v, so a changed
 // helper module (e.g. a new export) leaves browsers on a stale cached copy → "doesn't provide an export
 // named X" SyntaxError → blank page (the 2026-08-05 airship regression). Bump all three together.
-import { WebRConsole } from "./webr-console.js?v=154";
-import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers, pickTransit } from "./variant_resolve.js?v=154";   // Phase 3: per-hotspot state variants; monorail switch-door nav
-import * as PQ from "./puzzle_queue.js?v=154";   // dynamic puzzle queue: location-independent puzzle serving
-import * as CP from "./corr_panel.js?v=154";   // lower-triangle layout of the grid gate (clouds correlation panel)
-import { particleCount } from "./particles.js?v=154";
-import { mountLandingBackdrop } from "./landing_backdrop.js?v=154";   // landing text over a pan of the first room's clip   // ambient-particle vocabulary + per-kind field density
-import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=154";
-import { condHolds } from "./cond.js?v=154";
-import { gridMatches } from "./grid_check.js?v=154";   // grid answer check; `partition:true` accepts any relabelling of the buckets   // ledger + elevation-map card DOM
-import * as LIVE from "./live_session.js?v=154";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
-import * as RIDE from "./ride.js?v=154";
-import { mountPcaPlate } from "./pca_plate.js?v=154";   // the PCA plate instrument (voyage beach)
-import { mountFishBoard } from "./fish_board.js?v=154";   // the fish board instrument (harbour berth)
-import { mountDrawdown } from "./drawdown.js?v=154";
-import { mountTide } from "./tide_machine.js?v=154";   // the tide machine instrument (dunes escape)
-import { mountVarianceMeter } from "./variance_meter.js?v=154";   // the variance meter instrument (anova cellars escape)
+import { WebRConsole } from "./webr-console.js?v=155";
+import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers, pickTransit } from "./variant_resolve.js?v=155";   // Phase 3: per-hotspot state variants; monorail switch-door nav
+import * as PQ from "./puzzle_queue.js?v=155";   // dynamic puzzle queue: location-independent puzzle serving
+import * as CP from "./corr_panel.js?v=155";   // lower-triangle layout of the grid gate (clouds correlation panel)
+import { particleCount } from "./particles.js?v=155";
+import { mountLandingBackdrop } from "./landing_backdrop.js?v=155";   // landing text over a pan of the first room's clip   // ambient-particle vocabulary + per-kind field density
+import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=155";
+import { condHolds } from "./cond.js?v=155";
+import { gridMatches } from "./grid_check.js?v=155";   // grid answer check; `partition:true` accepts any relabelling of the buckets   // ledger + elevation-map card DOM
+import * as LIVE from "./live_session.js?v=155";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
+import * as RIDE from "./ride.js?v=155";
+import { mountPcaPlate } from "./pca_plate.js?v=155";   // the PCA plate instrument (voyage beach)
+import { mountFishBoard } from "./fish_board.js?v=155";   // the fish board instrument (harbour berth)
+import { mountDrawdown } from "./drawdown.js?v=155";
+import { mountTide } from "./tide_machine.js?v=155";   // the tide machine instrument (dunes escape)
+import { mountVarianceMeter } from "./variance_meter.js?v=155";   // the variance meter instrument (anova cellars escape)
+import { mountAnovaInstrument } from "./anova_instrument.js?v=155";   // the ANOVA instrument (Fisher's board, anova rooms; also the book, ch.12b)
+import { mountGhostLines } from "./ghost_lines.js?v=155";   // the ghost-line board instrument (regression pits hub)
    // the drawdown board instrument (diamonds escape)   // THE RIDE (subway): express lever + clip-sequence planner
-import * as BELL from "./bell_pull.js?v=154";
-import * as DATEB from "./date_board.js?v=154";   // date lock: lock mode:"date", two slide-levers (dunes departure board)
-import * as INVY from "./inventory.js?v=154";   // carried items + the door that asks which to use (dunes)   // bell-pull (#16): dial mode:"pull" + lock mode:"state" (spa belfry)
-import { entryYaw } from "./entry_facing.js?v=154";   // face the way out on entering a room (every scenario)
+import * as BELL from "./bell_pull.js?v=155";
+import * as DATEB from "./date_board.js?v=155";   // date lock: lock mode:"date", two slide-levers (dunes departure board)
+import * as INVY from "./inventory.js?v=155";   // carried items + the door that asks which to use (dunes)   // bell-pull (#16): dial mode:"pull" + lock mode:"state" (spa belfry)
+import { entryYaw } from "./entry_facing.js?v=155";   // face the way out on entering a room (every scenario)
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 
@@ -2908,6 +2910,22 @@ function openClue(h) {
 // brass-and-enamel frame so students learn on sight that it is not puzzle material. The title is rendered
 // INSIDE the card because `.mtitle` is hidden in the player. All text is real text (never baked into the
 // optional card image), and the image's alt is the title.
+// THE NOTICE-BOARD LINK (2026-11-06, Harvest Home): a plaque with `link` {href, label?} gets an "Open <label>"
+// button that goes to another scenario's play.html (a relative path inside rooms/, which validate_assets.py
+// checks exists). It is how a chapter's home world reaches its graded pair. HIDDEN in a live class session,
+// joined or not (liveMode() && !isSolo()): the class server serves only this scenario's folder, and a class
+// mid-lecture should stay in the game. Shown in ordinary play, test play and a solo game.
+function plaqueLink(h) {
+  const L = h.link;
+  if (!L || typeof L.href !== "string" || !L.href) return null;
+  if (liveMode() && !LIVE.isSolo()) return null;
+  const a = document.createElement("a");
+  a.className = "qsubmit plaquelink";
+  a.href = new URL(L.href, document.baseURI).href;
+  a.textContent = "Open " + (L.label || h.title || h.label || "it");
+  a.style.cssText = "display:inline-block;margin-top:10px;text-decoration:none";
+  return a;
+}
 function openPlaque(h) {
   // IMAGE-ONLY PLAQUE (voyage, Lucas 2026-10-20): an `image` with no `title` and no `body` is a card whose
   // text is baked into the picture, so nothing else is drawn: no kicker, no title, no body, no modal title.
@@ -2916,12 +2934,14 @@ function openPlaque(h) {
     const img = document.createElement("img"); img.className = "plaqueimg";
     img.src = h.image; img.alt = h.alt || h.label || "";
     card.appendChild(img);
+    const go = plaqueLink(h);
+    if (go) card.appendChild(go);
     openModal("", card, null, null, "wide");
     return;
   }
   const card = document.createElement("div"); card.className = "plaquecard";
   const kicker = document.createElement("div"); kicker.className = "plaquekicker";
-  kicker.textContent = "Wonder of the world";
+  kicker.textContent = h.kicker || "Wonder of the world";    // a notice board says something else ("Notice")
   card.appendChild(kicker);
   if (h.image) {
     const img = document.createElement("img"); img.className = "plaqueimg";
@@ -2943,6 +2963,8 @@ function openPlaque(h) {
     card.appendChild(credit);
     tpEditable(credit, () => h.credit || "", v => { h.credit = v; return tpSaveRoom(room); });
   }
+  const go = plaqueLink(h);
+  if (go) card.appendChild(go);
   openModal(h.title || h.label || "Plaque", card, null, h);
 }
 
@@ -2951,7 +2973,8 @@ function openPlaque(h) {
 // `kind` picks the renderer; each kind's fields are documented in the header. Peg positions survive
 // closing and reopening within a visit (in memory only: nothing about an instrument is saved or graded).
 const INSTRUMENTS = { drawdown: mountDrawdown, pca_plate: mountPcaPlate, fish_board: mountFishBoard, tide: mountTide,
-                      variance_meter: mountVarianceMeter };
+                      variance_meter: mountVarianceMeter, ghost_lines: mountGhostLines,
+                      anova_board: (host, o) => mountAnovaInstrument(host, Object.assign({}, o, { params: Object.assign({ skin: "board" }, o.params) })) };
 // Opening zooms from the hotspot's marker into the close-up (settled design, notes §5 of diamonds), so the
 // student sees the board on the wall become the board in their hands. Skipped under reduced motion.
 function zoomFromHotspot(h) {
@@ -3909,6 +3932,30 @@ function buildObjectCard(task, onSolved) {
 
 // LIVE multiple choice (pool kind "mcq", e.g. basic_math/bathhouse): no console, just the dealt options in
 // the server's shuffled order. The keyed answer never reaches the browser; liveGrade sends the option id.
+// THE WORKED ANSWER (SOLO ONLY, 2026-11-06): in a one-player practice game a right answer carries the task's
+// `solution`, and `task.canReveal` adds a "Show me" button, shown after one wrong try, that fetches it (`task.reveal()`). Either way the card
+// shows it and STAYS OPEN until the player closes it (a "Done" button), instead of closing itself. The class
+// server never sends a solution and canReveal is false there, so a class card behaves exactly as before.
+function showWorkedAnswer(card, code) {
+  if (!code || card.querySelector(".qsolution")) return;
+  const box = document.createElement("div"); box.className = "qsolution";
+  box.style.cssText = "margin:10px 0 4px;text-align:left";
+  const h = document.createElement("div"); h.textContent = "A worked answer:";
+  h.style.cssText = "font-weight:600;margin-bottom:4px";
+  const pre = document.createElement("pre");
+  pre.style.cssText = "margin:0;padding:8px 10px;border-radius:8px;background:rgba(0,0,0,.35);white-space:pre-wrap;" +
+    "font:13px/1.4 ui-monospace,Menlo,Consolas,monospace;max-height:40vh;overflow:auto";
+  pre.textContent = code;
+  box.appendChild(h); box.appendChild(pre);
+  const ci = document.querySelector("#modal #code-input");     // an R task: the console sits beside the card
+  if (ci) {
+    const put = document.createElement("button"); put.type = "button"; put.className = "qsubmit qsolput";
+    put.textContent = "Put it in the console"; put.style.marginTop = "6px";
+    put.addEventListener("click", () => { ci.value = code; ci.dispatchEvent(new Event("input")); ci.focus(); });
+    box.appendChild(put);
+  }
+  card.querySelector(".qfeedback").after(box);
+}
 function buildLiveMcqCard(task, onSolved) {
   const card = document.createElement("div"); card.className = "qcard";
   const grp = "lq" + Math.round(performance.now());
@@ -3916,6 +3963,23 @@ function buildLiveMcqCard(task, onSolved) {
      <div class="qfeedback"></div><button class="qsubmit" disabled>Check my answer</button>`;
   const opts = card.querySelector(".qopts"), fb = card.querySelector(".qfeedback"), btn = card.querySelector(".qsubmit");
   let sel = null, done = false;
+  let show = null;
+  if (task.canReveal) {                       // solo only: the worked answer, offered after ONE wrong try (Lucas, 2026-11-06)
+    show = document.createElement("button"); show.type = "button"; show.className = "qsubmit qshowme";
+    show.textContent = "Show me"; show.style.marginLeft = "8px"; show.style.display = "none";
+    show.addEventListener("click", async () => {
+      show.disabled = true;
+      const code = await task.reveal().catch(() => null);
+      if (code) { showWorkedAnswer(card, code); show.style.display = "none"; }
+      else { show.disabled = false; fb.className = "qfeedback no"; fb.textContent = "No worked answer for this one."; }
+    });
+    btn.after(show);
+  }
+  const doneBtn = r => {                      // the card stays open with a worked answer showing: close by hand
+    const b = document.createElement("button"); b.type = "button"; b.className = "qsubmit qdone"; b.textContent = "Done";
+    b.addEventListener("click", () => onSolved(r));
+    (card.querySelector(".qsolution") || fb).after(b);
+  };
   (task.options || []).forEach(o => {
     const l = document.createElement("label"); l.className = "qopt";
     l.innerHTML = `<input type="radio" name="${grp}"><span></span>`;
@@ -3931,11 +3995,15 @@ function buildLiveMcqCard(task, onSolved) {
       if (r.correct) {
         done = true; btn.style.display = "none"; opts.style.pointerEvents = "none";
         fb.className = "qfeedback ok"; fb.textContent = r.feedback || "That's it.";
-        setTimeout(() => onSolved(r), 1600);
+        if (show) show.style.display = "none";
+        if (r.solution || card.querySelector(".qsolution")) { showWorkedAnswer(card, r.solution); doneBtn(r); }
+        else setTimeout(() => onSolved(r), 1600);
       } else if (r.error) {
         done = true; btn.style.display = "none"; opts.style.pointerEvents = "none";
+        if (show) show.style.display = "none";
         fb.className = "qfeedback out"; fb.textContent = r.error;
       } else {
+        if (show && !card.querySelector(".qsolution")) show.style.display = "";   // one wrong try unlocks Show me
         fb.className = "qfeedback no";
         fb.textContent = (r.feedback || "Not quite. Try again.") +
           (r.cooldown_s ? " Try again in " + r.cooldown_s + " s." : "");
@@ -4127,7 +4195,7 @@ async function openStation(h) {
           const myCaps = (st && st.me && st.me.caps) || {};
           const cap = myCaps[a.j.item || ""] || (it ? it.carry_max : st && st.carry_max);
           // The pool's right_feedback (if any) says WHY it is right; the carry line is always ours.
-          const dest = (it ? it.deliver_to : st && st.deliver_to) || "the canoe", them = a.j.carrying === 1 ? "it" : "them";
+          const dest = (it ? it.deliver_to : st && st.deliver_to) || "the drop-off", them = a.j.carrying === 1 ? "it" : "them";
           // A pool with carry_max (bathhouse: 5) lets loads stack: until the arms are full, say both options.
           const room = cap && a.j.carry_full === false;
           a.j.feedback = (a.j.feedback ? a.j.feedback + " " : "Filled! ") +
@@ -4137,9 +4205,12 @@ async function openStation(h) {
         }
         return a.j;
   };
+  // SOLO ONLY: a "Show me" button for the worked answer (LIVE.canReveal is false in a class session)
+  const canReveal = LIVE.canReveal(d.deal_id);
+  const reveal = async () => { const s = await LIVE.solution(d.deal_id); return s.ok ? s.j.solution : null; };
   if (d.kind === "mcq" && !d.starter_code) {     // no R at all: the dealt options, checked by the server
     if (viewer) resumeYaw = viewer.getYaw();
-    const card = buildLiveMcqCard({ prompt: escHtml(d.question || ""), options: d.options, liveGrade },
+    const card = buildLiveMcqCard({ prompt: escHtml(d.question || ""), options: d.options, liveGrade, canReveal, reveal },
                                   () => closeModal());
     return openModal(d.title || h.label, card);
   }
@@ -4169,7 +4240,7 @@ async function openStation(h) {
   // An R task answered by multiple choice (voyage, harbour since 2026-10-26: no clicking on the plot): the
   // console on the left, the dealt options on the right; an oriented one sends its probe via liveGrade.
   right.appendChild(d.kind === "mcq"
-    ? buildLiveMcqCard({ prompt: escHtml(d.question || ""), options: d.options, liveGrade }, () => closeModal())
+    ? buildLiveMcqCard({ prompt: escHtml(d.question || ""), options: d.options, liveGrade, canReveal, reveal }, () => closeModal())
     : isObject ? buildObjectCard(task.object, () => closeModal())
     : buildPickCard(task.pick, () => closeModal(), "live:" + d.deal_id, task));
   grid.appendChild(left); grid.appendChild(right);
@@ -4324,7 +4395,10 @@ async function deliverLoad(h) {
   if (!LIVE.isJoined()) return toast("Join the session first.");
   const r = await LIVE.deliver(h.sink).catch(() => null);
   if (!r) return toast("Can't reach the class session. Check your connection.");
-  if (!r.ok) return toast(r.j.error || "Nothing to load.");
+  if (!r.ok) {
+    const st0 = LIVE.state();
+    return toast(r.j.error || (st0 && st0.deliver_to ? "Nothing to take to " + st0.deliver_to + "." : "Nothing to load."));
+  }
   if (h.sink) {        // a SINK (bathhouse: a small bath), filled once with its cost in a second item
     const st = LIVE.state();
     markFilled(r.j.filled_all || []);
@@ -4332,8 +4406,11 @@ async function deliverLoad(h) {
       (r.j.phase === "won" ? "" : (st && st.total < st.goal) ? "Now keep cleaning the big tub." : ""));
   }
   const st = LIVE.state(), unit = (st && st.unit) || ["gourd", "gourds"];
-  toast(((st && st.deliver_verb) || "Loaded") + " " + r.j.delivered + " " + (r.j.delivered === 1 ? unit[0] : unit[1]) + ". " +
-        "The class has " + r.j.total + (st && st.goal ? " of " + st.goal : "") + ".");
+  // In class the total is everyone's; a solo player's is their own, so it reads against the pool's goal label.
+  const tally = LIVE.isSolo()
+    ? "Now " + r.j.total + (st && st.goal ? " of " + st.goal : "") + (st && st.goal_label ? " " + st.goal_label : "") + "."
+    : "The class has " + r.j.total + (st && st.goal ? " of " + st.goal : "") + ".";
+  toast(((st && st.deliver_verb) || "Loaded") + " " + r.j.delivered + " " + (r.j.delivered === 1 ? unit[0] : unit[1]) + ". " + tally);
 }
 
 // ---- combination lock (two-phase escape — the no-instructions synthesis gate) ----

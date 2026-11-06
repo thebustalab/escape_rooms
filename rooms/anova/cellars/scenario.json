@@ -5,7 +5,7 @@
   "status": "in_development",
   "doorLabels": true,
   "_designNotes": "Step-2 state (2026-11-01, session ANOVA): locked escape (escapeBrief), verified graded ladder in notes.md §5, data in data/. title/subtitle/story/enterLabel are STEP-2 DRAFTS, to be locked at step 3b (escape_room_geography). No rooms, no art; enterButtons land at step 4a. Step 3a (blueprint) in progress 2026-11-01: logline 'Shut In' chosen (notes.md §9). Step 3b (geography) DONE 2026-11-01 and LOCKED: shared world in ../places_brief.md; world skeleton cellars/_scratch/world_skeleton/world.py; accepted aerials cellars/world_plates/master/ (master_sw = fog_in_bands, from_north); landing text vetted (.vetted_story.txt); coverPrompt and worldPlatePrompt authored. Next: step 4a escape_room_network.",
-  "escapeBrief": "Two players, never in the same room. The power has failed in the fog. One player is in the cellars with the water board (mechanical, so it works in the dark); the other is on the main floor with the electrical switchboard, which wakes once they restore the mains. Both boards measure the same eight rooms, each room's load on a rail, and both are the variance meter: between, within, and the share explained, with a red line at 35%.\n\nEach board has the same eight room switches, so any grouping of the rooms can be set; the printed default groups them by wing, house against cellars. On electricity the wing clears the line (37%). On water it explains nothing (0%), while wet rooms against dry clear it (45%). Both players are right about their own board, and that is the trap: each obvious grouping is right for one utility and wrong for the building.\n\nExactly one grouping clears the line on both boards: the four rooms on the hidden service passage (library, laboratory, boiler room, archive vault), at 47% and 51%. The passage carries both the heating main and the heating cable, so those rooms draw more of both. Neither board points to it alone (15 and 17 groupings clear each line, and the passage tops neither), so the pair have to compare which groupings work on whose board. The passage door is a panel of the same eight switches; setting it to the passage rooms opens it, and that is the way out.\n\nThe echo is the interaction rung: the wing's effect depends on what you measure, and only a grouping that explains both holds.",
+  "escapeBrief": "Two players, never in the same room. The power has failed in the fog. One player is in the cellars with the water board (mechanical, so it works in the dark); the other is on the main floor with the electrical switchboard, which wakes once they restore the mains. Both boards measure the same eight rooms, each room's load on a rail, and both are the variance meter: between, noise, and the share explained, with a red line at 35%.\n\nEach board has the same eight room switches, so any grouping of the rooms can be set; the printed default groups them by wing, house against cellars. On electricity the wing clears the line (37%). On water it explains nothing (0%), while wet rooms against dry clear it (45%). Both players are right about their own board, and that is the trap: each obvious grouping is right for one utility and wrong for the building.\n\nExactly one grouping clears the line on both boards: the four rooms on the hidden service passage (library, laboratory, boiler room, archive vault), at 47% and 51%. The passage carries both the heating main and the heating cable, so those rooms draw more of both. Neither board points to it alone (15 and 17 groupings clear each line, and the passage tops neither), so the pair have to compare which groupings work on whose board. The passage door is a panel of the same eight switches; setting it to the passage rooms opens it, and that is the way out.\n\nThe echo is the interaction rung: the wing's effect depends on what you measure, and only a grouping that explains both holds.",
   "title": "Shut In",
   "subtitle": "Rothamsted Experimental Station, a foggy November morning in the late 1920s",
   "story": "The staff have gone home for the long weekend and left the two of you to finish the report on the hay trial: forty-eight plots, each given a nitrogen dressing (none, nitrate of soda or sulphate of ammonia), lime or no lime, and minerals or none. The Director's draft rests on two averages: sulphate of ammonia makes the most hay, and sulphate of ammonia ruins a meadow. Test both. Work out how much of the difference between the plots each treatment explains, and where an average misleads.\n\nA storm blew through in the night, and near dawn it brought the power line down. The caretaker locked the cellar stair on his way out, not knowing anyone was below, and took the key. One of you is shut in the cellars with a fading flashlight and the botanical survey: how many species grow on every plot. The other is on the main floor with the weighing book: the hay cut from every plot. You can call to each other through the floors, but you cannot see each other's pages, and you will not agree on what matters most. You are both right.\n\nSomewhere in this house an old service passage joins the two floors, and nobody remembers its route. The building's switchboard and its water board can find it, but only if you read them together.",
@@ -460,8 +460,8 @@
       "builtFrom": "l1_entrance_hall_1.png",
       "sfx": [
         {
-          "src": "audio/entrance_hall_bed_far_drips.mp3",
-          "volume": 0.12,
+          "src": "audio/entrance_hall_bed_house_hush.mp3",
+          "volume": 0.054,
           "mode": "loop",
           "crossfade": 4,
           "needsReplacement": true
@@ -479,34 +479,34 @@
     {
       "key": "drawing_room",
       "title": "The drawing room",
-      "technique": "one-way ANOVA and ges",
+      "technique": "one-way ANOVA and share explained",
       "puzzleType": 1,
       "phase": "analysis",
       "built": true,
       "unlockedWhen": true,
       "role": "M",
       "level": 1,
-      "designNote": "M RUNG 1 at the window table: the weighing book (hay_yield, 48 plots). One-way ANOVA of nitrogen; read ges. ANSWER 0.397 (check, ± 0.005). Near-miss numbers: additive-model ges, the two-way's nitrogen row. On the board: 8.5 A, 14 gal/h (not a passage room, dry).",
+      "designNote": "M RUNG 1 at the window table: the weighing book (hay_yield, 48 plots). One-way ANOVA of nitrogen; read the nitrogen row's share. ANSWER 0.397 (check, ± 0.005). Near-miss numbers: the noise row (0.603). Balanced design, so nitrogen's share is the same in every model. On the board: 8.5 A, 14 gal/h (not a passage room, dry).",
       "plannedHotspots": [
         {
           "type": "puzzle",
           "label": "The weighing book",
           "form": "check",
-          "note": "M R1. Answer ges 0.397. Prompt at step 6 (escape_room_content).",
+          "note": "M R1. Answer share 0.397. Prompt at step 6 (escape_room_content).",
           "starterCode": "weighing_book",
           "check": {
-            "prompt": "The Director's report on the hay trial opens with how much of the difference in hay comes down to nitrogen. Using <code>weighing_book</code>, run a one-way ANOVA of <code>hay_yield</code> on <code>nitrogen</code> and assign its <code>ges</code> (the share of the variation explained) to <code>answer</code> as a number.",
+            "prompt": "The Director's report on the hay trial opens with how much of the difference in hay comes down to nitrogen. Using <code>weighing_book</code>, run a one-way ANOVA of <code>hay_yield</code> on <code>nitrogen</code> and assign its <code>share</code> (the share of the variation explained) to <code>answer</code> as a number.",
             "requires": [
               "answer"
             ],
             "maxAttempts": 4,
-            "hint": "One factor, one response: the formula is <code>hay_yield ~ nitrogen</code>, and the share of the variation explained is the <code>ges</code> column.",
+            "hint": "One factor, one response: the formula is <code>hay_yield ~ nitrogen</code>: build the model with it, pipe it to <code>anovaTest()</code>, and the share of the variation explained is the <code>share</code> column, on that factor’s row.",
             "feedback": {
-              "correct": "Correct, noted in your field notebook: nitrogen alone explains about 40% of the variation in hay yield (ges 0.397).",
+              "correct": "Correct, noted in your field notebook: nitrogen alone explains about 40% of the variation in hay yield (share 0.397).",
               "wrong": [
-                "<code>weighing_book %&gt;% anovaTest(hay_yield ~ nitrogen)</code> gives one row, for nitrogen. Its <code>ges</code> is the number you want.",
-                "Fit nitrogen on its own. With <code>lime</code> or <code>minerals</code> in the formula as well, nitrogen's <code>ges</code> changes.",
-                "Assign one number, not the whole table: pull the <code>ges</code> value out, or type it in to three decimal places."
+                "<code>weighing_book %&gt;% buildModel(model_type = \"linear_regression\", formula = hay_yield ~ nitrogen) %&gt;% anovaTest()</code> gives a row for nitrogen, then rows for <code>noise</code> and <code>total</code>. The <code>share</code> on the nitrogen row is the number you want.",
+                "Read the nitrogen row, not <code>noise</code> (the share left unexplained) or <code>total</code> (always 1).",
+                "Assign one number, not the whole table: add <code>%&gt;% filter(term == \"nitrogen\") %&gt;% pull(share)</code> after <code>anovaTest()</code> to take that one number out of the table, or type it in to three decimal places."
               ]
             },
             "expr": "local({ a <- suppressWarnings(as.numeric(unlist(answer))); length(a) == 1 && !is.na(a) && abs(a - 0.397) <= 0.005 })"
@@ -767,18 +767,18 @@
           "form": "check",
           "starterCode": "weighing_book",
           "check": {
-            "prompt": "The Director's report on the hay trial opens with how much of the difference in hay comes down to nitrogen. Using <code>weighing_book</code>, run a one-way ANOVA of <code>hay_yield</code> on <code>nitrogen</code> and assign its <code>ges</code> (the share of the variation explained) to <code>answer</code> as a number.",
+            "prompt": "The Director's report on the hay trial opens with how much of the difference in hay comes down to nitrogen. Using <code>weighing_book</code>, run a one-way ANOVA of <code>hay_yield</code> on <code>nitrogen</code> and assign its <code>share</code> (the share of the variation explained) to <code>answer</code> as a number.",
             "requires": [
               "answer"
             ],
             "maxAttempts": 4,
-            "hint": "One factor, one response: the formula is <code>hay_yield ~ nitrogen</code>, and the share of the variation explained is the <code>ges</code> column.",
+            "hint": "One factor, one response: the formula is <code>hay_yield ~ nitrogen</code>: build the model with it, pipe it to <code>anovaTest()</code>, and the share of the variation explained is the <code>share</code> column, on that factor’s row.",
             "feedback": {
-              "correct": "Correct, noted in your field notebook: nitrogen alone explains about 40% of the variation in hay yield (ges 0.397).",
+              "correct": "Correct, noted in your field notebook: nitrogen alone explains about 40% of the variation in hay yield (share 0.397).",
               "wrong": [
-                "<code>weighing_book %&gt;% anovaTest(hay_yield ~ nitrogen)</code> gives one row, for nitrogen. Its <code>ges</code> is the number you want.",
-                "Fit nitrogen on its own. With <code>lime</code> or <code>minerals</code> in the formula as well, nitrogen's <code>ges</code> changes.",
-                "Assign one number, not the whole table: pull the <code>ges</code> value out, or type it in to three decimal places."
+                "<code>weighing_book %&gt;% buildModel(model_type = \"linear_regression\", formula = hay_yield ~ nitrogen) %&gt;% anovaTest()</code> gives a row for nitrogen, then rows for <code>noise</code> and <code>total</code>. The <code>share</code> on the nitrogen row is the number you want.",
+                "Read the nitrogen row, not <code>noise</code> (the share left unexplained) or <code>total</code> (always 1).",
+                "Assign one number, not the whole table: add <code>%&gt;% filter(term == \"nitrogen\") %&gt;% pull(share)</code> after <code>anovaTest()</code> to take that one number out of the table, or type it in to three decimal places."
               ]
             },
             "expr": "local({ a <- suppressWarnings(as.numeric(unlist(answer))); length(a) == 1 && !is.na(a) && abs(a - 0.397) <= 0.005 })"
@@ -895,8 +895,8 @@
       ],
       "sfx": [
         {
-          "src": "audio/drawing_room_bed_coal_fire.mp3",
-          "volume": 0.3,
+          "src": "audio/drawing_room_bed_fire_close.mp3",
+          "volume": 0.077,
           "mode": "loop",
           "crossfade": 4,
           "needsReplacement": true
@@ -914,13 +914,13 @@
     {
       "key": "kitchen",
       "title": "The kitchen",
-      "technique": "comparing ges across factors",
+      "technique": "comparing share explained across factors",
       "puzzleType": 1,
       "phase": "analysis",
       "unlockedWhen": true,
       "role": "M",
       "level": 2,
-      "designNote": "M RUNG 2: rank nitrogen, minerals, lime by ges from three one-way ANOVAs. ANSWER nitrogen > minerals > lime (check, ordered vector; maxAttempts low). The ELECTRICAL SWITCHBOARD hangs on the wall where the supply enters: the variance meter, dead until M resets the house circuits. Solving R2 frees the study key from the key board (the Director's housekeeper's board). Wet room (honest decoy).",
+      "designNote": "M RUNG 2: rank nitrogen, minerals, lime by share explained, from three one-way ANOVAs. ANSWER nitrogen > minerals > lime (check, ordered vector; maxAttempts low). The ELECTRICAL SWITCHBOARD hangs on the wall where the supply enters: the variance meter, dead until M resets the house circuits. Solving R2 frees the study key from the key board (the Director's housekeeper's board). Wet room (honest decoy).",
       "plannedHotspots": [
         {
           "type": "puzzle",
@@ -933,16 +933,16 @@
           "gives": "study_key",
           "starterCode": "weighing_book",
           "check": {
-            "prompt": "The Director's draft lists the three factors in order of how much they matter for the hay. Using <code>weighing_book</code>, run a separate one-way ANOVA of <code>hay_yield</code> on each of <code>nitrogen</code>, <code>lime</code> and <code>minerals</code>, and assign the three factor names to <code>answer</code> as a character vector, in order from the largest <code>ges</code> to the smallest.",
+            "prompt": "The Director's draft lists the three factors in order of how much they matter for the hay. Using <code>weighing_book</code>, run a separate one-way ANOVA of <code>hay_yield</code> on each of <code>nitrogen</code>, <code>lime</code> and <code>minerals</code>, and assign the three factor names to <code>answer</code> as a character vector, in order from the largest <code>share</code> to the smallest.",
             "requires": [
               "answer"
             ],
             "maxAttempts": 2,
-            "hint": "Three formulas, one factor each. Compare their <code>ges</code> values.",
+            "hint": "Three models, one factor each, each built and piped to <code>anovaTest()</code>. Compare the <code>share</code> on each factor’s row.",
             "feedback": {
-              "correct": "Correct, noted in your field notebook: for hay, nitrogen first, then minerals, then lime (ges 0.397, 0.192, 0.135).",
+              "correct": "Correct, noted in your field notebook: for hay, nitrogen first, then minerals, then lime (shares 0.397, 0.192, 0.135).",
               "wrong": [
-                "Run <code>weighing_book %&gt;% anovaTest(hay_yield ~ nitrogen)</code>, then the same with <code>lime</code> and with <code>minerals</code>, and write down each <code>ges</code>. Order them largest first, spelled as the columns are: <code>answer &lt;- c(\"...\", \"...\", \"...\")</code>.",
+                "Run <code>weighing_book %&gt;% buildModel(model_type = \"linear_regression\", formula = hay_yield ~ nitrogen) %&gt;% anovaTest()</code>, then the same with <code>lime</code> and with <code>minerals</code>, and write down the <code>share</code> on each factor’s row. Order them largest first, spelled as the columns are: <code>answer &lt;- c(\"...\", \"...\", \"...\")</code>.",
                 "Each factor gets its own one-way ANOVA. Putting all three in one formula changes the numbers."
               ]
             },
@@ -1032,7 +1032,7 @@
             ]
           },
           "noElement": true,
-          "note": "ESCAPE INSTRUMENT (M), LIVE copy. Eight rails (amperes), the eight room switches, the between / within / share dials, red line at 35%; printed default grouping by wing; config data/switchboard.json.",
+          "note": "ESCAPE INSTRUMENT (M), LIVE copy. Eight rails (amperes), the eight room switches, the between / noise / share dials, red line at 35%; printed default grouping by wing; config data/switchboard.json.",
           "box": [
             0.6983,
             0.3805,
@@ -1296,16 +1296,16 @@
           "gives": "study_key",
           "starterCode": "weighing_book",
           "check": {
-            "prompt": "The Director's draft lists the three factors in order of how much they matter for the hay. Using <code>weighing_book</code>, run a separate one-way ANOVA of <code>hay_yield</code> on each of <code>nitrogen</code>, <code>lime</code> and <code>minerals</code>, and assign the three factor names to <code>answer</code> as a character vector, in order from the largest <code>ges</code> to the smallest.",
+            "prompt": "The Director's draft lists the three factors in order of how much they matter for the hay. Using <code>weighing_book</code>, run a separate one-way ANOVA of <code>hay_yield</code> on each of <code>nitrogen</code>, <code>lime</code> and <code>minerals</code>, and assign the three factor names to <code>answer</code> as a character vector, in order from the largest <code>share</code> to the smallest.",
             "requires": [
               "answer"
             ],
             "maxAttempts": 2,
-            "hint": "Three formulas, one factor each. Compare their <code>ges</code> values.",
+            "hint": "Three models, one factor each, each built and piped to <code>anovaTest()</code>. Compare the <code>share</code> on each factor’s row.",
             "feedback": {
-              "correct": "Correct, noted in your field notebook: for hay, nitrogen first, then minerals, then lime (ges 0.397, 0.192, 0.135).",
+              "correct": "Correct, noted in your field notebook: for hay, nitrogen first, then minerals, then lime (shares 0.397, 0.192, 0.135).",
               "wrong": [
-                "Run <code>weighing_book %&gt;% anovaTest(hay_yield ~ nitrogen)</code>, then the same with <code>lime</code> and with <code>minerals</code>, and write down each <code>ges</code>. Order them largest first, spelled as the columns are: <code>answer &lt;- c(\"...\", \"...\", \"...\")</code>.",
+                "Run <code>weighing_book %&gt;% buildModel(model_type = \"linear_regression\", formula = hay_yield ~ nitrogen) %&gt;% anovaTest()</code>, then the same with <code>lime</code> and with <code>minerals</code>, and write down the <code>share</code> on each factor’s row. Order them largest first, spelled as the columns are: <code>answer &lt;- c(\"...\", \"...\", \"...\")</code>.",
                 "Each factor gets its own one-way ANOVA. Putting all three in one formula changes the numbers."
               ]
             },
@@ -1548,6 +1548,22 @@
             0.7342
           ],
           "boxSource": "draft:skeleton"
+        },
+        {
+          "type": "instrument",
+          "label": "Fisher and Mackenzie's paper",
+          "kind": "anova_board",
+          "note": "The bound journal volume on the desk opens on the ANOVA instrument (Fisher's demonstration board, shared/anova_instrument.js), Lucas 2026-11-05: the plaque's paragraph, then the table built row by row on a demonstration potato trial (../fisher_board/config.json, the book's 30-plant numbers re-skinned), never on graded data. Information only.",
+          "geometry": "../fisher_board/geometry.json",
+          "config": "../fisher_board/config.json",
+          "box": [
+            0.492,
+            0.56,
+            0.56,
+            0.648
+          ],
+          "boxSource": "review:agent-vision",
+          "boxNote": "measured by eye on a gridded crop of scene.png, 2026-11-05 (agent, for Lucas's test play); the two studies share one still"
         }
       ],
       "mapPos": {
@@ -1854,12 +1870,28 @@
             "video": "study/cine_lit.mp4",
             "state": "lit"
           }
+        },
+        {
+          "id": "fisher_and_mackenzie_s_paper",
+          "type": "instrument",
+          "label": "Fisher and Mackenzie's paper",
+          "box": [
+            0.492,
+            0.56,
+            0.56,
+            0.648
+          ],
+          "kind": "anova_board",
+          "geometry": "../fisher_board/geometry.json",
+          "config": "../fisher_board/config.json",
+          "boxSource": "review:agent-vision",
+          "boxNote": "measured by eye on a gridded crop of scene.png, 2026-11-05 (agent, for Lucas's test play); the two studies share one still"
         }
       ],
       "sfx": [
         {
-          "src": "audio/study_bed_coal_fire.mp3",
-          "volume": 0.097,
+          "src": "audio/study_bed_dying_fire.mp3",
+          "volume": 0.34,
           "mode": "loop",
           "crossfade": 4,
           "needsReplacement": true
@@ -1884,33 +1916,33 @@
       "unlockedWhen": true,
       "role": "M",
       "level": 3,
-      "designNote": "M RUNG 3: two-way nitrogen * lime on hay_yield; read the interaction row first. ANSWER interaction ges 0.435 (check, ± 0.005; nitrogen row 0.601, lime 0.338 are the near-misses). The tall bookcase on the west wall (the thick wall) does not read as a door. After M's boss, the passage panel is found behind one hinged shelf. Passage room (9.5 A, 28 gal/h).",
+      "designNote": "M RUNG 3: two-way nitrogen * lime on hay_yield; read the interaction row first. ANSWER interaction share 0.203 (check, ± 0.005; nitrogen row 0.397, lime 0.135, noise 0.264 are the near-misses). The tall bookcase on the west wall (the thick wall) does not read as a door. After M's boss, the passage panel is found behind one hinged shelf. Passage room (9.5 A, 28 gal/h).",
       "plannedHotspots": [
         {
           "type": "puzzle",
           "label": "The Director's trial ledger",
           "form": "check",
-          "note": "M R3. Answer 0.435.",
+          "note": "M R3. Answer share 0.203.",
           "availableWhen": {
             "solved": "kitchen"
           },
           "starterCode": "weighing_book",
           "check": {
-            "prompt": "The ledger asks whether nitrogen does the same for the hay on limed and unlimed ground. Using <code>weighing_book</code>, run a two-way ANOVA of <code>hay_yield</code> on <code>nitrogen</code> and <code>lime</code> with their interaction, and assign the <code>ges</code> of the interaction row to <code>answer</code> as a number.",
+            "prompt": "The ledger asks whether nitrogen does the same for the hay on limed and unlimed ground. Using <code>weighing_book</code>, run a two-way ANOVA of <code>hay_yield</code> on <code>nitrogen</code> and <code>lime</code> with their interaction, and assign the <code>share</code> of the interaction row to <code>answer</code> as a number.",
             "requires": [
               "answer"
             ],
             "maxAttempts": 4,
-            "hint": "The <code>*</code> in a formula asks for both factors and their interaction. The interaction row is named with a colon.",
+            "hint": "The <code>*</code> in a formula asks for both factors and their interaction. Build the model with it, pipe it to <code>anovaTest()</code>, and read the interaction row, the one named with a colon.",
             "feedback": {
-              "correct": "Correct, noted in your field notebook: for hay, the nitrogen by lime interaction has ges 0.435, so what nitrogen does depends on the lime.",
+              "correct": "Correct, noted in your field notebook: for hay, the nitrogen by lime interaction explains a share of 0.203 of the variation, so what nitrogen does depends on the lime.",
               "wrong": [
-                "<code>weighing_book %&gt;% anovaTest(hay_yield ~ nitrogen * lime)</code> returns three rows. Read the one labeled <code>nitrogen:lime</code>.",
+                "<code>weighing_book %&gt;% buildModel(model_type = \"linear_regression\", formula = hay_yield ~ nitrogen * lime) %&gt;% anovaTest()</code> returns a row for each factor, one for their interaction, then <code>noise</code> and <code>total</code>. Read the one labeled <code>nitrogen:lime</code>.",
                 "With <code>+</code> instead of <code>*</code> there is no interaction row at all, and the <code>nitrogen</code> row is not the one asked for.",
-                "Assign one number, not the whole table: pull the <code>ges</code> value out, or type it in to three decimal places."
+                "Assign one number, not the whole table: add <code>%&gt;% filter(term == \"nitrogen:lime\") %&gt;% pull(share)</code> after <code>anovaTest()</code> to take that one number out, or type it in to three decimal places."
               ]
             },
-            "expr": "local({ a <- suppressWarnings(as.numeric(unlist(answer))); length(a) == 1 && !is.na(a) && abs(a - 0.435) <= 0.005 })"
+            "expr": "local({ a <- suppressWarnings(as.numeric(unlist(answer))); length(a) == 1 && !is.na(a) && abs(a - 0.203) <= 0.005 })"
           },
           "box": [
             0.4631,
@@ -2282,21 +2314,21 @@
           },
           "starterCode": "weighing_book",
           "check": {
-            "prompt": "The ledger asks whether nitrogen does the same for the hay on limed and unlimed ground. Using <code>weighing_book</code>, run a two-way ANOVA of <code>hay_yield</code> on <code>nitrogen</code> and <code>lime</code> with their interaction, and assign the <code>ges</code> of the interaction row to <code>answer</code> as a number.",
+            "prompt": "The ledger asks whether nitrogen does the same for the hay on limed and unlimed ground. Using <code>weighing_book</code>, run a two-way ANOVA of <code>hay_yield</code> on <code>nitrogen</code> and <code>lime</code> with their interaction, and assign the <code>share</code> of the interaction row to <code>answer</code> as a number.",
             "requires": [
               "answer"
             ],
             "maxAttempts": 4,
-            "hint": "The <code>*</code> in a formula asks for both factors and their interaction. The interaction row is named with a colon.",
+            "hint": "The <code>*</code> in a formula asks for both factors and their interaction. Build the model with it, pipe it to <code>anovaTest()</code>, and read the interaction row, the one named with a colon.",
             "feedback": {
-              "correct": "Correct, noted in your field notebook: for hay, the nitrogen by lime interaction has ges 0.435, so what nitrogen does depends on the lime.",
+              "correct": "Correct, noted in your field notebook: for hay, the nitrogen by lime interaction explains a share of 0.203 of the variation, so what nitrogen does depends on the lime.",
               "wrong": [
-                "<code>weighing_book %&gt;% anovaTest(hay_yield ~ nitrogen * lime)</code> returns three rows. Read the one labeled <code>nitrogen:lime</code>.",
+                "<code>weighing_book %&gt;% buildModel(model_type = \"linear_regression\", formula = hay_yield ~ nitrogen * lime) %&gt;% anovaTest()</code> returns a row for each factor, one for their interaction, then <code>noise</code> and <code>total</code>. Read the one labeled <code>nitrogen:lime</code>.",
                 "With <code>+</code> instead of <code>*</code> there is no interaction row at all, and the <code>nitrogen</code> row is not the one asked for.",
-                "Assign one number, not the whole table: pull the <code>ges</code> value out, or type it in to three decimal places."
+                "Assign one number, not the whole table: add <code>%&gt;% filter(term == \"nitrogen:lime\") %&gt;% pull(share)</code> after <code>anovaTest()</code> to take that one number out, or type it in to three decimal places."
               ]
             },
-            "expr": "local({ a <- suppressWarnings(as.numeric(unlist(answer))); length(a) == 1 && !is.na(a) && abs(a - 0.435) <= 0.005 })"
+            "expr": "local({ a <- suppressWarnings(as.numeric(unlist(answer))); length(a) == 1 && !is.na(a) && abs(a - 0.203) <= 0.005 })"
           },
           "boxSource": "draft:skeleton",
           "solveSfx": {
@@ -2509,8 +2541,8 @@
       ],
       "sfx": [
         {
-          "src": "audio/library_bed_smouldering_log.mp3",
-          "volume": 0.12,
+          "src": "audio/library_bed_fire_reverberant.mp3",
+          "volume": 0.111,
           "mode": "loop",
           "crossfade": 4,
           "needsReplacement": true
@@ -2907,8 +2939,8 @@
       "builtFrom": "l1_laboratory_2.png",
       "sfx": [
         {
-          "src": "audio/laboratory_bed_gas_purr.mp3",
-          "volume": 0.151,
+          "src": "audio/laboratory_bed_gas_burner.mp3",
+          "volume": 0.095,
           "mode": "loop",
           "crossfade": 4,
           "needsReplacement": true
@@ -3253,8 +3285,8 @@
       ],
       "sfx": [
         {
-          "src": "audio/stair_foot_bed_cellar_tone.mp3",
-          "volume": 0.189,
+          "src": "audio/stair_foot_bed_gully_lapping.mp3",
+          "volume": 0.103,
           "mode": "loop",
           "crossfade": 4,
           "needsReplacement": true
@@ -3280,34 +3312,34 @@
     {
       "key": "seed_store",
       "title": "The seed store",
-      "technique": "one-way ANOVA and ges",
+      "technique": "one-way ANOVA and share explained",
       "puzzleType": 1,
       "phase": "analysis",
       "built": true,
       "unlockedWhen": true,
       "role": "C",
       "level": 1,
-      "designNote": "C RUNG 1 among the seed bins: the botanical survey (species_count, the same 48 plots). One-way ANOVA of nitrogen; ges. ANSWER 0.068 (check). Torch fades a step per solve. Not a passage room, dry (5.5 A, 10 gal/h).",
+      "designNote": "C RUNG 1 among the seed bins: the botanical survey (species_count, the same 48 plots). One-way ANOVA of nitrogen; share. ANSWER 0.068 (check). Torch fades a step per solve. Not a passage room, dry (5.5 A, 10 gal/h).",
       "plannedHotspots": [
         {
           "type": "puzzle",
           "label": "The botanical survey",
           "form": "check",
-          "note": "C R1. Answer ges 0.068.",
+          "note": "C R1. Answer share 0.068.",
           "starterCode": "botanical_survey",
           "check": {
-            "prompt": "The Director's second report is about how many kinds of plant each plot of the hay trial keeps. Using <code>botanical_survey</code>, run a one-way ANOVA of <code>species_count</code> on <code>nitrogen</code> and assign its <code>ges</code> (the share of the variation explained) to <code>answer</code> as a number.",
+            "prompt": "The Director's second report is about how many kinds of plant each plot of the hay trial keeps. Using <code>botanical_survey</code>, run a one-way ANOVA of <code>species_count</code> on <code>nitrogen</code> and assign its <code>share</code> (the share of the variation explained) to <code>answer</code> as a number.",
             "requires": [
               "answer"
             ],
             "maxAttempts": 4,
-            "hint": "One factor, one response: the formula is <code>species_count ~ nitrogen</code>, and the share of the variation explained is the <code>ges</code> column.",
+            "hint": "One factor, one response: the formula is <code>species_count ~ nitrogen</code>: build the model with it, pipe it to <code>anovaTest()</code>, and the share of the variation explained is the <code>share</code> column, on that factor’s row.",
             "feedback": {
-              "correct": "Correct, noted in your field notebook: nitrogen alone explains only about 7% of the variation in species count (ges 0.068).",
+              "correct": "Correct, noted in your field notebook: nitrogen alone explains only about 7% of the variation in species count (share 0.068).",
               "wrong": [
-                "<code>botanical_survey %&gt;% anovaTest(species_count ~ nitrogen)</code> gives one row, for nitrogen. Its <code>ges</code> is the number you want.",
-                "Fit nitrogen on its own. With <code>lime</code> or <code>minerals</code> in the formula as well, nitrogen's <code>ges</code> changes.",
-                "Assign one number, not the whole table: pull the <code>ges</code> value out, or type it in to three decimal places."
+                "<code>botanical_survey %&gt;% buildModel(model_type = \"linear_regression\", formula = species_count ~ nitrogen) %&gt;% anovaTest()</code> gives a row for nitrogen, then rows for <code>noise</code> and <code>total</code>. The <code>share</code> on the nitrogen row is the number you want.",
+                "Read the nitrogen row, not <code>noise</code> (the share left unexplained) or <code>total</code> (always 1).",
+                "Assign one number, not the whole table: add <code>%&gt;% filter(term == \"nitrogen\") %&gt;% pull(share)</code> after <code>anovaTest()</code> to take that one number out of the table, or type it in to three decimal places."
               ]
             },
             "expr": "local({ a <- suppressWarnings(as.numeric(unlist(answer))); length(a) == 1 && !is.na(a) && abs(a - 0.068) <= 0.005 })"
@@ -3555,18 +3587,18 @@
           "form": "check",
           "starterCode": "botanical_survey",
           "check": {
-            "prompt": "The Director's second report is about how many kinds of plant each plot of the hay trial keeps. Using <code>botanical_survey</code>, run a one-way ANOVA of <code>species_count</code> on <code>nitrogen</code> and assign its <code>ges</code> (the share of the variation explained) to <code>answer</code> as a number.",
+            "prompt": "The Director's second report is about how many kinds of plant each plot of the hay trial keeps. Using <code>botanical_survey</code>, run a one-way ANOVA of <code>species_count</code> on <code>nitrogen</code> and assign its <code>share</code> (the share of the variation explained) to <code>answer</code> as a number.",
             "requires": [
               "answer"
             ],
             "maxAttempts": 4,
-            "hint": "One factor, one response: the formula is <code>species_count ~ nitrogen</code>, and the share of the variation explained is the <code>ges</code> column.",
+            "hint": "One factor, one response: the formula is <code>species_count ~ nitrogen</code>: build the model with it, pipe it to <code>anovaTest()</code>, and the share of the variation explained is the <code>share</code> column, on that factor’s row.",
             "feedback": {
-              "correct": "Correct, noted in your field notebook: nitrogen alone explains only about 7% of the variation in species count (ges 0.068).",
+              "correct": "Correct, noted in your field notebook: nitrogen alone explains only about 7% of the variation in species count (share 0.068).",
               "wrong": [
-                "<code>botanical_survey %&gt;% anovaTest(species_count ~ nitrogen)</code> gives one row, for nitrogen. Its <code>ges</code> is the number you want.",
-                "Fit nitrogen on its own. With <code>lime</code> or <code>minerals</code> in the formula as well, nitrogen's <code>ges</code> changes.",
-                "Assign one number, not the whole table: pull the <code>ges</code> value out, or type it in to three decimal places."
+                "<code>botanical_survey %&gt;% buildModel(model_type = \"linear_regression\", formula = species_count ~ nitrogen) %&gt;% anovaTest()</code> gives a row for nitrogen, then rows for <code>noise</code> and <code>total</code>. The <code>share</code> on the nitrogen row is the number you want.",
+                "Read the nitrogen row, not <code>noise</code> (the share left unexplained) or <code>total</code> (always 1).",
+                "Assign one number, not the whole table: add <code>%&gt;% filter(term == \"nitrogen\") %&gt;% pull(share)</code> after <code>anovaTest()</code> to take that one number out of the table, or type it in to three decimal places."
               ]
             },
             "expr": "local({ a <- suppressWarnings(as.numeric(unlist(answer))); length(a) == 1 && !is.na(a) && abs(a - 0.068) <= 0.005 })"
@@ -3683,8 +3715,8 @@
       ],
       "sfx": [
         {
-          "src": "audio/seed_store_bed_seed_hiss.mp3",
-          "volume": 0.25,
+          "src": "audio/seed_store_bed_rice_trickle.mp3",
+          "volume": 0.085,
           "mode": "loop",
           "crossfade": 4,
           "needsReplacement": true
@@ -3702,14 +3734,14 @@
     {
       "key": "wash_house",
       "title": "The wash-house",
-      "technique": "comparing ges across factors",
+      "technique": "comparing share explained across factors",
       "puzzleType": 1,
       "phase": "analysis",
       "built": true,
       "unlockedWhen": true,
       "role": "C",
       "level": 2,
-      "designNote": "C RUNG 2: rank the three treatments by ges. ANSWER lime > nitrogen > minerals (check, ordered). The WATER BOARD hangs where the mains water enters (mechanical, works in the dark): the variance meter in gallons an hour. The cellar circuit's isolator is beside it; after R2 C resets it and the cellars light up (ends the torch clock). Wet room (honest decoy).",
+      "designNote": "C RUNG 2: rank the three treatments by share. ANSWER lime > nitrogen > minerals (check, ordered). The WATER BOARD hangs where the mains water enters (mechanical, works in the dark): the variance meter in gallons an hour. The cellar circuit's isolator is beside it; after R2 C resets it and the cellars light up (ends the torch clock). Wet room (honest decoy).",
       "plannedHotspots": [
         {
           "type": "puzzle",
@@ -3721,16 +3753,16 @@
           },
           "starterCode": "botanical_survey",
           "check": {
-            "prompt": "The survey summary lists the three factors in order of how much they matter for the meadow's plants. Using <code>botanical_survey</code>, run a separate one-way ANOVA of <code>species_count</code> on each of <code>nitrogen</code>, <code>lime</code> and <code>minerals</code>, and assign the three factor names to <code>answer</code> as a character vector, in order from the largest <code>ges</code> to the smallest.",
+            "prompt": "The survey summary lists the three factors in order of how much they matter for the meadow's plants. Using <code>botanical_survey</code>, run a separate one-way ANOVA of <code>species_count</code> on each of <code>nitrogen</code>, <code>lime</code> and <code>minerals</code>, and assign the three factor names to <code>answer</code> as a character vector, in order from the largest <code>share</code> to the smallest.",
             "requires": [
               "answer"
             ],
             "maxAttempts": 2,
-            "hint": "Three formulas, one factor each. Compare their <code>ges</code> values.",
+            "hint": "Three models, one factor each, each built and piped to <code>anovaTest()</code>. Compare the <code>share</code> on each factor’s row.",
             "feedback": {
-              "correct": "Correct, noted in your field notebook: for species, lime first, then nitrogen, then minerals (ges 0.699, 0.068, 0.016).",
+              "correct": "Correct, noted in your field notebook: for species, lime first, then nitrogen, then minerals (shares 0.699, 0.068, 0.016).",
               "wrong": [
-                "Run <code>botanical_survey %&gt;% anovaTest(species_count ~ nitrogen)</code>, then the same with <code>lime</code> and with <code>minerals</code>, and write down each <code>ges</code>. Order them largest first, spelled as the columns are: <code>answer &lt;- c(\"...\", \"...\", \"...\")</code>.",
+                "Run <code>botanical_survey %&gt;% buildModel(model_type = \"linear_regression\", formula = species_count ~ nitrogen) %&gt;% anovaTest()</code>, then the same with <code>lime</code> and with <code>minerals</code>, and write down the <code>share</code> on each factor’s row. Order them largest first, spelled as the columns are: <code>answer &lt;- c(\"...\", \"...\", \"...\")</code>.",
                 "Each factor gets its own one-way ANOVA. Putting all three in one formula changes the numbers."
               ]
             },
@@ -4040,16 +4072,16 @@
           },
           "starterCode": "botanical_survey",
           "check": {
-            "prompt": "The survey summary lists the three factors in order of how much they matter for the meadow's plants. Using <code>botanical_survey</code>, run a separate one-way ANOVA of <code>species_count</code> on each of <code>nitrogen</code>, <code>lime</code> and <code>minerals</code>, and assign the three factor names to <code>answer</code> as a character vector, in order from the largest <code>ges</code> to the smallest.",
+            "prompt": "The survey summary lists the three factors in order of how much they matter for the meadow's plants. Using <code>botanical_survey</code>, run a separate one-way ANOVA of <code>species_count</code> on each of <code>nitrogen</code>, <code>lime</code> and <code>minerals</code>, and assign the three factor names to <code>answer</code> as a character vector, in order from the largest <code>share</code> to the smallest.",
             "requires": [
               "answer"
             ],
             "maxAttempts": 2,
-            "hint": "Three formulas, one factor each. Compare their <code>ges</code> values.",
+            "hint": "Three models, one factor each, each built and piped to <code>anovaTest()</code>. Compare the <code>share</code> on each factor’s row.",
             "feedback": {
-              "correct": "Correct, noted in your field notebook: for species, lime first, then nitrogen, then minerals (ges 0.699, 0.068, 0.016).",
+              "correct": "Correct, noted in your field notebook: for species, lime first, then nitrogen, then minerals (shares 0.699, 0.068, 0.016).",
               "wrong": [
-                "Run <code>botanical_survey %&gt;% anovaTest(species_count ~ nitrogen)</code>, then the same with <code>lime</code> and with <code>minerals</code>, and write down each <code>ges</code>. Order them largest first, spelled as the columns are: <code>answer &lt;- c(\"...\", \"...\", \"...\")</code>.",
+                "Run <code>botanical_survey %&gt;% buildModel(model_type = \"linear_regression\", formula = species_count ~ nitrogen) %&gt;% anovaTest()</code>, then the same with <code>lime</code> and with <code>minerals</code>, and write down the <code>share</code> on each factor’s row. Order them largest first, spelled as the columns are: <code>answer &lt;- c(\"...\", \"...\", \"...\")</code>.",
                 "Each factor gets its own one-way ANOVA. Putting all three in one formula changes the numbers."
               ]
             },
@@ -4208,8 +4240,8 @@
           "needsReplacement": true
         },
         {
-          "src": "audio/wash_house_shot_sheet_flap.mp3",
-          "volume": 0.15,
+          "src": "audio/wash_house_shot_linen_flap.mp3",
+          "volume": 0.094,
           "mode": "interval",
           "gapMin": 15,
           "gapMax": 35,
@@ -4227,33 +4259,33 @@
       "unlockedWhen": true,
       "role": "C",
       "level": 3,
-      "designNote": "C RUNG 3 among the shelves of wax-sealed sample jars (the Sample Archive, since 1843: the plaque's box ON the jars). Two-way nitrogen * lime on species_count; interaction ges 0.793 (check; nitrogen 0.585, lime 0.935 are near-misses). After C's boss, the passage panel at the vault's far (west) end. Directly under the library. Passage room (8.5 A, 24 gal/h).",
+      "designNote": "C RUNG 3 among the shelves of wax-sealed sample jars (the Sample Archive, since 1843: the plaque's box ON the jars). Two-way nitrogen * lime on species_count; interaction share 0.185 (check; nitrogen 0.068, lime 0.699, noise 0.048 are near-misses). After C's boss, the passage panel at the vault's far (west) end. Directly under the library. Passage room (8.5 A, 24 gal/h).",
       "plannedHotspots": [
         {
           "type": "puzzle",
           "label": "The archive register",
           "form": "check",
-          "note": "C R3. Answer 0.793.",
+          "note": "C R3. Answer share 0.185.",
           "availableWhen": {
             "solved": "wash_house"
           },
           "starterCode": "botanical_survey",
           "check": {
-            "prompt": "The register asks whether nitrogen does the same to the meadow's plants on limed and unlimed ground. Using <code>botanical_survey</code>, run a two-way ANOVA of <code>species_count</code> on <code>nitrogen</code> and <code>lime</code> with their interaction, and assign the <code>ges</code> of the interaction row to <code>answer</code> as a number.",
+            "prompt": "The register asks whether nitrogen does the same to the meadow's plants on limed and unlimed ground. Using <code>botanical_survey</code>, run a two-way ANOVA of <code>species_count</code> on <code>nitrogen</code> and <code>lime</code> with their interaction, and assign the <code>share</code> of the interaction row to <code>answer</code> as a number.",
             "requires": [
               "answer"
             ],
             "maxAttempts": 4,
-            "hint": "The <code>*</code> in a formula asks for both factors and their interaction. The interaction row is named with a colon.",
+            "hint": "The <code>*</code> in a formula asks for both factors and their interaction. Build the model with it, pipe it to <code>anovaTest()</code>, and read the interaction row, the one named with a colon.",
             "feedback": {
-              "correct": "Correct, noted in your field notebook: for species, the nitrogen by lime interaction has ges 0.793, so what nitrogen does depends on the lime.",
+              "correct": "Correct, noted in your field notebook: for species, the nitrogen by lime interaction explains a share of 0.185 of the variation, so what nitrogen does depends on the lime.",
               "wrong": [
-                "<code>botanical_survey %&gt;% anovaTest(species_count ~ nitrogen * lime)</code> returns three rows. Read the one labeled <code>nitrogen:lime</code>.",
+                "<code>botanical_survey %&gt;% buildModel(model_type = \"linear_regression\", formula = species_count ~ nitrogen * lime) %&gt;% anovaTest()</code> returns a row for each factor, one for their interaction, then <code>noise</code> and <code>total</code>. Read the one labeled <code>nitrogen:lime</code>.",
                 "With <code>+</code> instead of <code>*</code> there is no interaction row at all, and the <code>nitrogen</code> row is not the one asked for.",
-                "Assign one number, not the whole table: pull the <code>ges</code> value out, or type it in to three decimal places."
+                "Assign one number, not the whole table: add <code>%&gt;% filter(term == \"nitrogen:lime\") %&gt;% pull(share)</code> after <code>anovaTest()</code> to take that one number out, or type it in to three decimal places."
               ]
             },
-            "expr": "local({ a <- suppressWarnings(as.numeric(unlist(answer))); length(a) == 1 && !is.na(a) && abs(a - 0.793) <= 0.005 })"
+            "expr": "local({ a <- suppressWarnings(as.numeric(unlist(answer))); length(a) == 1 && !is.na(a) && abs(a - 0.185) <= 0.005 })"
           },
           "box": [
             0.4784,
@@ -4624,21 +4656,21 @@
           },
           "starterCode": "botanical_survey",
           "check": {
-            "prompt": "The register asks whether nitrogen does the same to the meadow's plants on limed and unlimed ground. Using <code>botanical_survey</code>, run a two-way ANOVA of <code>species_count</code> on <code>nitrogen</code> and <code>lime</code> with their interaction, and assign the <code>ges</code> of the interaction row to <code>answer</code> as a number.",
+            "prompt": "The register asks whether nitrogen does the same to the meadow's plants on limed and unlimed ground. Using <code>botanical_survey</code>, run a two-way ANOVA of <code>species_count</code> on <code>nitrogen</code> and <code>lime</code> with their interaction, and assign the <code>share</code> of the interaction row to <code>answer</code> as a number.",
             "requires": [
               "answer"
             ],
             "maxAttempts": 4,
-            "hint": "The <code>*</code> in a formula asks for both factors and their interaction. The interaction row is named with a colon.",
+            "hint": "The <code>*</code> in a formula asks for both factors and their interaction. Build the model with it, pipe it to <code>anovaTest()</code>, and read the interaction row, the one named with a colon.",
             "feedback": {
-              "correct": "Correct, noted in your field notebook: for species, the nitrogen by lime interaction has ges 0.793, so what nitrogen does depends on the lime.",
+              "correct": "Correct, noted in your field notebook: for species, the nitrogen by lime interaction explains a share of 0.185 of the variation, so what nitrogen does depends on the lime.",
               "wrong": [
-                "<code>botanical_survey %&gt;% anovaTest(species_count ~ nitrogen * lime)</code> returns three rows. Read the one labeled <code>nitrogen:lime</code>.",
+                "<code>botanical_survey %&gt;% buildModel(model_type = \"linear_regression\", formula = species_count ~ nitrogen * lime) %&gt;% anovaTest()</code> returns a row for each factor, one for their interaction, then <code>noise</code> and <code>total</code>. Read the one labeled <code>nitrogen:lime</code>.",
                 "With <code>+</code> instead of <code>*</code> there is no interaction row at all, and the <code>nitrogen</code> row is not the one asked for.",
-                "Assign one number, not the whole table: pull the <code>ges</code> value out, or type it in to three decimal places."
+                "Assign one number, not the whole table: add <code>%&gt;% filter(term == \"nitrogen:lime\") %&gt;% pull(share)</code> after <code>anovaTest()</code> to take that one number out, or type it in to three decimal places."
               ]
             },
-            "expr": "local({ a <- suppressWarnings(as.numeric(unlist(answer))); length(a) == 1 && !is.na(a) && abs(a - 0.793) <= 0.005 })"
+            "expr": "local({ a <- suppressWarnings(as.numeric(unlist(answer))); length(a) == 1 && !is.na(a) && abs(a - 0.185) <= 0.005 })"
           },
           "boxSource": "draft:skeleton",
           "solveSfx": {
@@ -4821,8 +4853,8 @@
           "needsReplacement": true
         },
         {
-          "src": "audio/archive_vault_shot_far_boom.mp3",
-          "volume": 0.12,
+          "src": "audio/archive_vault_shot_boiler_boom.mp3",
+          "volume": 0.07,
           "mode": "interval",
           "gapMin": 20,
           "gapMax": 45,
@@ -5175,15 +5207,15 @@
   "ladderPlain": [
     {
       "room": "drawing_room",
-      "text": "Each of you ran a one-way ANOVA of nitrogen on the same 48 plots and read ges, the share of the variation it explains: about 40% of the hay yield, but only about 7% of the species count."
+      "text": "Each of you ran a one-way ANOVA of nitrogen on the same 48 plots and read its share of the variation explained: about 40% of the hay yield, but only about 7% of the species count."
     },
     {
       "room": "kitchen",
-      "text": "You ranked nitrogen, minerals and lime by ges from three one-way ANOVAs. The order depended on the measurement: nitrogen first for hay, lime first for species."
+      "text": "You ranked nitrogen, minerals and lime by share explained, from three one-way ANOVAs. The order depended on the measurement: nitrogen first for hay, lime first for species."
     },
     {
       "room": "library",
-      "text": "You fitted nitrogen and lime together and read the interaction row first: a large interaction on both measurements, so neither treatment's effect could be read on its own."
+      "text": "You fitted nitrogen and lime together and read the interaction row first: on both measurements the interaction explained about a fifth of the variation, more than lime did for the hay, so neither treatment's effect could be read on its own."
     },
     {
       "room": "laboratory",

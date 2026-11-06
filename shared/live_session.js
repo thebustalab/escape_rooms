@@ -11,26 +11,29 @@
  *   - the JOIN box on the landing screen (code → anonymous callsign; pid kept in localStorage so a
  *     refresh rejoins as the same callsign);
  *   - the HUD strip in the world: callsign, class total / goal, clock, "carrying N gourds";
- *   - polling /api/state every 2 s, and the paused / won / time-up / closed overlays;
+ *   - polling /api/state every 2 s, and the paused / won / time-up / closed overlays; a change of `round`
+ *     (the console's Restart) reloads the page, which rejoins as the same callsign;
  *   - the calls step 5's station and deliver hotspots make: deal(tier, track?), answer(dealId, choice), deliver(sink?);
  *   - the whole-class experiment card (harbour, comparing means): when Lucas opens a round, the student
  *     casts two nets on their own device (fish_stats.js, the fish board's Welch t), sees the catches and
  *     the p, and sends ONLY that p. Shown over the landing screen too, so it works before Enter.
  * Answers never reach the browser: the server deals a task without its answer and checks every click.
  * No student data: callsigns only, never a name or x500.
- * SOLO (bathhouse only, 2026-10-27): a scenario with `solo` played where no live server answers (the public
- * site) shows a setup form instead (minutes, herb bundles, baths to fill) and runs a one-player session in the
- * browser (shared/live_solo.js), answering the same calls; everything below works unchanged on top of it.
+ * SOLO (bathhouse 2026-10-27; generic since 2026-11-06): a scenario with `solo` played where no live server answers
+ * (the public site) shows a setup form instead (minutes unless `untimed`, the goal, and sinks to fill when
+ * `maxBaths` says the pool has them; labels from the `solo` block) and runs a one-player session in the browser
+ * (shared/live_solo.js), answering the same calls; everything below works unchanged on top of it.
  */
 
-import "./fish_stats.js?v=154";
-import { SoloSession } from "./live_solo.js?v=154";     // window.FishStats: the fish board's tests (Welch t), pinned to R
+import "./fish_stats.js?v=155";
+import { SoloSession } from "./live_solo.js?v=155";     // window.FishStats: the fish board's tests (Welch t), pinned to R
 
 const POLL_MS = 2000;
 const STORE = "liveSession";        // localStorage: { pid, code }
 
 let solo = null;                    // a SoloSession once a one-player game has started (no server)
 let st = null, stAt = 0, me = null, pollTimer = null, tickTimer = null, onChange = null, dismissedPhase = null;
+let round = null;                   // the server's game round: the console's Restart bumps it
 const $ = s => document.querySelector(s);
 
 async function api(path, body) {
@@ -126,22 +129,31 @@ function load() { try { return JSON.parse(localStorage.getItem(STORE) || "null")
 export const isSolo = () => !!solo;
 
 /*
- * SOLO setup (scenario.solo: {pool, minutes, goal, baths}): the player sets the length of the day, the herb
- * bundles the big tub needs and how many small baths to fill, then starts. Bounds keep a typo from making an
- * endless or instant game. `onSolo` lets the player turn its sound back on (a live class is silent).
+ * SOLO setup (scenario.solo: {pool, minutes, goal, baths, maxBaths, untimed, reveal, intro, goalLabel, sinksLabel,
+ * startLabel}; `reveal: true` turns on the worked answer, see live_solo.js): the player sets the length of the day, the goal and how many sinks to fill, then starts. The form
+ * renders BEFORE the pool loads, so everything it shows comes from the `solo` block: `untimed: true` drops the
+ * minutes field (no clock at all), the sinks field shows only when `maxBaths` (the pool's counting sinks) is set,
+ * and the words are the block's (bathhouse names its herb bundles and baths there). Bounds keep a typo from making
+ * an endless or instant game. `onSolo` lets the player turn its sound back on (a live class is silent).
  */
 function mountSolo(enterBtn, scenario, onSolo) {
   const cfg = scenario.solo || {};
-  const nSinks = Number.isInteger(cfg.maxBaths) ? cfg.maxBaths : 4;
+  const untimed = cfg.untimed === true;
+  const nSinks = Number.isInteger(cfg.maxBaths) && cfg.maxBaths > 0 ? cfg.maxBaths : 0;
+  const goalLabel = cfg.goalLabel || "Goal", sinksLabel = cfg.sinksLabel || "To fill";
   const box = document.createElement("div");
   box.id = "liveSolo";
-  box.innerHTML = `<div>Play on your own: choose your day.</div>
+  box.innerHTML = `<div class="soloIntro"></div>
     <div class="row">
-      <label>Minutes <input id="soloMinutes" type="number" min="1" max="60" value="${cfg.minutes || 12}"></label>
-      <label>Herb bundles <input id="soloGoal" type="number" min="1" max="500" value="${cfg.goal || 60}"></label>
-      <label>Baths to fill <input id="soloBaths" type="number" min="0" max="${nSinks}" value="${cfg.baths != null ? cfg.baths : 1}"></label>
+      ${untimed ? "" : `<label>Minutes <input id="soloMinutes" type="number" min="1" max="60" value="${Number(cfg.minutes) || 12}"></label>`}
+      <label><span class="soloGoalLabel"></span> <input id="soloGoal" type="number" min="1" max="500" value="${Number(cfg.goal) || 60}"></label>
+      ${nSinks ? `<label><span class="soloBathsLabel"></span> <input id="soloBaths" type="number" min="0" max="${nSinks}" value="${cfg.baths != null ? Number(cfg.baths) : 1}"></label>` : ""}
     </div>
-    <button id="soloGo">Start my day</button><div id="liveMsg"></div>`;
+    <button id="soloGo"></button><div id="liveMsg"></div>`;
+  box.querySelector(".soloIntro").textContent = cfg.intro || "Play on your own: choose your day.";
+  box.querySelector(".soloGoalLabel").textContent = goalLabel;
+  if (nSinks) box.querySelector(".soloBathsLabel").textContent = sinksLabel;
+  box.querySelector("#soloGo").textContent = cfg.startLabel || "Start my day";
   enterBtn.parentElement.insertBefore(box, enterBtn);
   enterBtn.style.display = "none";
   const msg = t => { $("#liveMsg").textContent = t || ""; };
@@ -150,17 +162,18 @@ function mountSolo(enterBtn, scenario, onSolo) {
     return Number.isInteger(v) && v >= lo && v <= hi ? v : null;
   };
   $("#soloGo").onclick = async () => {
-    const minutes = num("#soloMinutes", 1, 60), goal = num("#soloGoal", 1, 500), baths = num("#soloBaths", 0, nSinks);
-    if (minutes == null) return msg("Minutes: a whole number from 1 to 60.");
-    if (goal == null) return msg("Herb bundles: a whole number from 1 to 500.");
-    if (baths == null) return msg(`Baths to fill: a whole number from 0 to ${nSinks}.`);
+    const minutes = untimed ? null : num("#soloMinutes", 1, 60), goal = num("#soloGoal", 1, 500);
+    const baths = nSinks ? num("#soloBaths", 0, nSinks) : 0;
+    if (!untimed && minutes == null) return msg("Minutes: a whole number from 1 to 60.");
+    if (goal == null) return msg(`${goalLabel}: a whole number from 1 to 500.`);
+    if (baths == null) return msg(`${sinksLabel}: a whole number from 0 to ${nSinks}.`);
     $("#soloGo").disabled = true;
     let pool;
     try {
       const r = await fetch(cfg.pool || "solo/pool.json", { cache: "no-store" });
       pool = await r.json();
     } catch (e) { $("#soloGo").disabled = false; return msg("Couldn't load the game. Check your connection and try again."); }
-    solo = new SoloSession(pool, { minutes, goal, baths });
+    solo = new SoloSession(pool, { minutes, goal, baths, untimed, reveal: cfg.reveal === true });
     me = { pid: "solo", callsign: "You" };
     box.style.display = "none";
     if (onSolo) onSolo();
@@ -253,6 +266,14 @@ function startPolling() {
   if (pollTimer) return;
   const poll = () => api("state?pid=" + encodeURIComponent(me ? me.pid : "")).then(r => {
     if (!r.ok) return;
+    // RESTART (live_server.py /api/restart): the class plays again on the same link and code. Everything this
+    // page holds about the old round (world state such as liveWon / liveFilled_*, what the player carries, an
+    // open task, the room they stand in) is dropped by reloading; the saved pid rejoins as the same callsign.
+    // A solo game has no round, so it never reloads.
+    if (r.j.round != null) {
+      if (round != null && r.j.round !== round) { location.reload(); return; }
+      round = r.j.round;
+    }
     st = r.j; stAt = Date.now();
     if (me && !st.me && st.phase !== "closed") rejoinNeeded();
     renderCast();
@@ -319,6 +340,8 @@ function render() {
 function tick() {
   const el = document.querySelector("#liveHud .lhClock");
   if (!el || !st) return;
+  el.style.display = st.untimed ? "none" : "";       // an untimed solo game (scenario.solo.untimed) has no clock
+  if (st.untimed) return;
   if (st.phase === "lobby") { el.textContent = "waiting to start"; el.classList.remove("low"); return; }
   let rem = st.remaining_s || 0;
   if (st.phase === "running") rem = Math.max(0, rem - (Date.now() - stAt) / 1000);
@@ -336,6 +359,10 @@ export async function deal(tier, track) {
 }
 export async function answer(dealId, choice) { return api("answer", { pid: me && me.pid, deal_id: dealId, choice }); }
 export async function skip() { return api("skip", { pid: me && me.pid }); }
+// SOLO ONLY, the worked answer: may the open task's card offer "Show me", and fetch it. The class server has no
+// such call and its answers never carry a `solution`, so in class both are inert.
+export const canReveal = dealId => !!solo && solo.hasSolution(dealId);
+export async function solution(dealId) { return api("solution", { pid: me && me.pid, deal_id: dealId }); }
 // `sink` (optional): a sink id (bathhouse: "bath_1") spends that sink's cost of a second item to fill it.
 export async function deliver(sink) {
   const r = await api("deliver", sink ? { pid: me && me.pid, sink } : { pid: me && me.pid });

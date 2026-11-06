@@ -4,8 +4,8 @@
 // A building's utility board over eight rooms. Each rail shows one room's load (amperes on the electrical
 // switchboard, gallons an hour on the water board), fixed by the world: the player does not set loads.
 // Under each rail a two-way room switch puts the room in the left or the right group. Three meters read the
-// grouping: BETWEEN (each group's average from the whole building's, counted once per room), WITHIN (each
-// room from its own group's average) and SHARE EXPLAINED = between / (between + within), with a red line
+// grouping: BETWEEN (each group's average from the whole building's, counted once per room), NOISE (each
+// room from its own group's average; the book's word since 2026-11-05) and SHARE EXPLAINED = between / (between + noise), with a red line
 // engraved at the scenario's mark. The fiction: each circuit drives a current proportional to its distance
 // from an average, a resistor dissipates I^2 R, so a wattmeter adds up squared distances (shared/variance_math.js,
 // tested against R's aov()). It is READ, never graded: it holds no answer and never logs or gates anything.
@@ -20,7 +20,7 @@
 //                              switchY, dials:[{cx,cy,r}x3] }
 //   m.setSwitches([bool x8]); m.switches(); m.measure(); m.isSettled(); m.ready (Promise); m.destroy();
 //   canvas.varianceMeter exposes the same API for tests.
-import { measure } from "./variance_math.js?v=154";
+import { measure } from "./variance_math.js?v=155";
 
 const DEFAULTS = {
   amps:    { title: "ELECTRICAL SWITCHBOARD", unit: "AMPERES", vMax: 12, fullScale: 25 },
@@ -156,8 +156,8 @@ export function mountVarianceMeter(host, opts = {}) {
       engrave(G.title, W / 2, 50, "bold 30px Georgia", "center", "#d8c79f");
     }
     dial(DIALS[0], needles[0].a, "BETWEEN", "each group's average from the whole");
-    dial(DIALS[1], needles[1].a, "WITHIN", "each room from its group's average");
-    dial(DIALS[2], needles[2].a, "SHARE EXPLAINED", "between ÷ (between + within)", MARK);
+    dial(DIALS[1], needles[1].a, "NOISE", "each room from its group's average");
+    dial(DIALS[2], needles[2].a, "SHARE EXPLAINED", "between ÷ (between + noise)", MARK);
     if (!powered) engrave("The board is dead: no current reaches the meters.", W / 2, 432, "italic 20px Georgia", "center", "#cbb68a");
 
     engrave(G.unit, RAILS.x0 - 70, RAILS.top - 24, "bold 15px Georgia", "left", "#cbb68a");

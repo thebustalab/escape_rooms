@@ -1499,13 +1499,13 @@
           "note": "saltwater x salinity_ppt -> Shapiro FAILS (skewed) -> Wilcox; brine_south saltier, significant (p=9e-4)",
           "starterCode": "spa_water_chem",
           "question": {
-            "prompt": "The saltwater baths spiked overnight and their salinity readings are jumpy. Is one saltwater bath genuinely over-salted — and which test is honest for data shaped like this?",
+            "prompt": "The saltwater baths spiked overnight and their salinity readings are jumpy. Is one saltwater bath genuinely saltier than the other? Run a Shapiro test on each group to decide which test the flowchart calls for, then report the summary statistic that goes with it: means if every group is normal, medians if any group is not.",
             "options": [
-              "A t-test — significant, brine_south is saltier",
-              "The two baths are not significantly different",
-              "A Wilcox test — significant, brine_south is saltier",
-              "A Wilcox test — significant, but brine_north is saltier",
-              "The data are normal, so a plain t-test is fine",
+              "Yes — brine_south is saltier: mean 39.0 vs 33.4 ppt",
+              "No — the two baths are not significantly different",
+              "Yes — brine_south is saltier: median 38.0 vs 32.7 ppt",
+              "Yes — but brine_north is the saltier one",
+              "No — the readings are too skewed for any test to compare them",
               "The difference shows in dissolved solids, not salinity"
             ],
             "correct": 2,
@@ -1515,7 +1515,7 @@
               "wrong": [
                 "Filter to bath_type == 'saltwater_bath' and parameter == 'salinity_ppt', then check normality before you pick a test.",
                 "The Shapiro test fails here — the salinity is right-skewed — so a t-test would mislead. Which two-group test makes no normality assumption?",
-                "Both baths fail the Shapiro test, so compare them with the two-group test that works on ranks, then check which bath sits higher."
+                "Both baths fail the Shapiro test, so compare them with the two-group test that works on ranks, and report medians rather than means, since a few very salty readings pull the means up."
               ]
             }
           },
@@ -1596,13 +1596,13 @@
           ],
           "starterCode": "spa_water_chem",
           "question": {
-            "prompt": "The saltwater baths spiked overnight and their salinity readings are jumpy. Is one saltwater bath genuinely over-salted — and which test is honest for data shaped like this?",
+            "prompt": "The saltwater baths spiked overnight and their salinity readings are jumpy. Is one saltwater bath genuinely saltier than the other? Run a Shapiro test on each group to decide which test the flowchart calls for, then report the summary statistic that goes with it: means if every group is normal, medians if any group is not.",
             "options": [
-              "A t-test — significant, brine_south is saltier",
-              "The two baths are not significantly different",
-              "A Wilcox test — significant, brine_south is saltier",
-              "A Wilcox test — significant, but brine_north is saltier",
-              "The data are normal, so a plain t-test is fine",
+              "Yes — brine_south is saltier: mean 39.0 vs 33.4 ppt",
+              "No — the two baths are not significantly different",
+              "Yes — brine_south is saltier: median 38.0 vs 32.7 ppt",
+              "Yes — but brine_north is the saltier one",
+              "No — the readings are too skewed for any test to compare them",
               "The difference shows in dissolved solids, not salinity"
             ],
             "correct": 2,
@@ -1612,7 +1612,7 @@
               "wrong": [
                 "Filter to bath_type == 'saltwater_bath' and parameter == 'salinity_ppt', then check normality before you pick a test.",
                 "The Shapiro test fails here — the salinity is right-skewed — so a t-test would mislead. Which two-group test makes no normality assumption?",
-                "Both baths fail the Shapiro test, so compare them with the two-group test that works on ranks, then check which bath sits higher."
+                "Both baths fail the Shapiro test, so compare them with the two-group test that works on ranks, and report medians rather than means, since a few very salty readings pull the means up."
               ]
             }
           },

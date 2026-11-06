@@ -1,0 +1,725 @@
+{
+ "title": "Harvest Home",
+ "goal_label": "sheaves on the wagon",
+ "unit": [
+  "sheaf",
+  "sheaves"
+ ],
+ "feed_verb": "loaded",
+ "deliver_to": "the wagon",
+ "carry_back": true,
+ "carry_block_text": "Take your sheaves to the wagon first.",
+ "default_minutes": 12,
+ "default_goal": 60,
+ "scenario": "anova/harvest",
+ "puzzles": [
+  {
+   "id": "h1_s3_grain_variety",
+   "tier": 1,
+   "kind": "mcq",
+   "title": "Read a factor's share",
+   "question": "Use the season 3 plots in harvest_plots (the starter filters them). Fill in the blanks to model grain by variety, then run anovaTest(). What share of the variation in grain does variety explain?",
+   "starter_code": "season_3 <- harvest_plots %>%\n  filter(season == 3)\n\nbuildModel(\n  data = season_3,\n  model_type = \"linear_regression\",\n  formula = ____ ~ ____\n) %>%\n  anovaTest()\n",
+   "solution": "season_3 <- harvest_plots %>%\n  filter(season == 3)\n\nbuildModel(\n  data = season_3,\n  model_type = \"linear_regression\",\n  formula = grain ~ variety\n) %>%\n  anovaTest()\n",
+   "right_feedback": "Right: that is variety's share of the spread in grain; the noise row holds the rest.",
+   "wrong_feedback": "Not that one. Check the formula reads grain ~ variety, then read the share column in the variety row.",
+   "options": [
+    {
+     "id": "o0",
+     "text": "0.053"
+    },
+    {
+     "id": "o1",
+     "text": "0.203"
+    },
+    {
+     "id": "o2",
+     "text": "0.618"
+    },
+    {
+     "id": "o3",
+     "text": "0.797"
+    }
+   ],
+   "ordered": true,
+   "answer": "o1"
+  },
+  {
+   "id": "h1_s3_grain_manure",
+   "tier": 1,
+   "kind": "mcq",
+   "title": "Read a factor's share",
+   "question": "Use the season 3 plots in harvest_plots (the starter filters them). Fill in the blanks to model grain by manure, then run anovaTest(). What share of the variation in grain does manure explain?",
+   "starter_code": "season_3 <- harvest_plots %>%\n  filter(season == 3)\n\nbuildModel(\n  data = season_3,\n  model_type = \"linear_regression\",\n  formula = ____ ~ ____\n) %>%\n  anovaTest()\n",
+   "solution": "season_3 <- harvest_plots %>%\n  filter(season == 3)\n\nbuildModel(\n  data = season_3,\n  model_type = \"linear_regression\",\n  formula = grain ~ manure\n) %>%\n  anovaTest()\n",
+   "right_feedback": "Right: that is manure's share of the spread in grain; the noise row holds the rest.",
+   "wrong_feedback": "Not that one. Check the formula reads grain ~ manure, then read the share column in the manure row.",
+   "options": [
+    {
+     "id": "o0",
+     "text": "0.173"
+    },
+    {
+     "id": "o1",
+     "text": "0.218"
+    },
+    {
+     "id": "o2",
+     "text": "0.403"
+    },
+    {
+     "id": "o3",
+     "text": "0.597"
+    }
+   ],
+   "ordered": true,
+   "answer": "o3"
+  },
+  {
+   "id": "h1_s3_straw_variety",
+   "tier": 1,
+   "kind": "mcq",
+   "title": "Read a factor's share",
+   "question": "Use the season 3 plots in harvest_plots (the starter filters them). Fill in the blanks to model straw by variety, then run anovaTest(). What share of the variation in straw does variety explain?",
+   "starter_code": "season_3 <- harvest_plots %>%\n  filter(season == 3)\n\nbuildModel(\n  data = season_3,\n  model_type = \"linear_regression\",\n  formula = ____ ~ ____\n) %>%\n  anovaTest()\n",
+   "solution": "season_3 <- harvest_plots %>%\n  filter(season == 3)\n\nbuildModel(\n  data = season_3,\n  model_type = \"linear_regression\",\n  formula = straw ~ variety\n) %>%\n  anovaTest()\n",
+   "right_feedback": "Right: that is variety's share of the spread in straw; the noise row holds the rest.",
+   "wrong_feedback": "Not that one. Check the formula reads straw ~ variety, then read the share column in the variety row.",
+   "options": [
+    {
+     "id": "o0",
+     "text": "0.053"
+    },
+    {
+     "id": "o1",
+     "text": "0.203"
+    },
+    {
+     "id": "o2",
+     "text": "0.618"
+    },
+    {
+     "id": "o3",
+     "text": "0.947"
+    }
+   ],
+   "ordered": true,
+   "answer": "o0"
+  },
+  {
+   "id": "h1_s3_straw_manure",
+   "tier": 1,
+   "kind": "mcq",
+   "title": "Read a factor's share",
+   "question": "Use the season 3 plots in harvest_plots (the starter filters them). Fill in the blanks to model straw by manure, then run anovaTest(). What share of the variation in straw does manure explain?",
+   "starter_code": "season_3 <- harvest_plots %>%\n  filter(season == 3)\n\nbuildModel(\n  data = season_3,\n  model_type = \"linear_regression\",\n  formula = ____ ~ ____\n) %>%\n  anovaTest()\n",
+   "solution": "season_3 <- harvest_plots %>%\n  filter(season == 3)\n\nbuildModel(\n  data = season_3,\n  model_type = \"linear_regression\",\n  formula = straw ~ manure\n) %>%\n  anovaTest()\n",
+   "right_feedback": "Right: that is manure's share of the spread in straw; the noise row holds the rest.",
+   "wrong_feedback": "Not that one. Check the formula reads straw ~ manure, then read the share column in the manure row.",
+   "options": [
+    {
+     "id": "o0",
+     "text": "0.173"
+    },
+    {
+     "id": "o1",
+     "text": "0.218"
+    },
+    {
+     "id": "o2",
+     "text": "0.597"
+    },
+    {
+     "id": "o3",
+     "text": "0.827"
+    }
+   ],
+   "ordered": true,
+   "answer": "o0"
+  },
+  {
+   "id": "h1_s3_ears_variety",
+   "tier": 1,
+   "kind": "mcq",
+   "title": "Read a factor's share",
+   "question": "Use the season 3 plots in harvest_plots (the starter filters them). Fill in the blanks to model ears by variety, then run anovaTest(). What share of the variation in ears does variety explain?",
+   "starter_code": "season_3 <- harvest_plots %>%\n  filter(season == 3)\n\nbuildModel(\n  data = season_3,\n  model_type = \"linear_regression\",\n  formula = ____ ~ ____\n) %>%\n  anovaTest()\n",
+   "solution": "season_3 <- harvest_plots %>%\n  filter(season == 3)\n\nbuildModel(\n  data = season_3,\n  model_type = \"linear_regression\",\n  formula = ears ~ variety\n) %>%\n  anovaTest()\n",
+   "right_feedback": "Right: that is variety's share of the spread in ears; the noise row holds the rest.",
+   "wrong_feedback": "Not that one. Check the formula reads ears ~ variety, then read the share column in the variety row.",
+   "options": [
+    {
+     "id": "o0",
+     "text": "0.053"
+    },
+    {
+     "id": "o1",
+     "text": "0.203"
+    },
+    {
+     "id": "o2",
+     "text": "0.382"
+    },
+    {
+     "id": "o3",
+     "text": "0.618"
+    }
+   ],
+   "ordered": true,
+   "answer": "o3"
+  },
+  {
+   "id": "h1_s3_ears_manure",
+   "tier": 1,
+   "kind": "mcq",
+   "title": "Read a factor's share",
+   "question": "Use the season 3 plots in harvest_plots (the starter filters them). Fill in the blanks to model ears by manure, then run anovaTest(). What share of the variation in ears does manure explain?",
+   "starter_code": "season_3 <- harvest_plots %>%\n  filter(season == 3)\n\nbuildModel(\n  data = season_3,\n  model_type = \"linear_regression\",\n  formula = ____ ~ ____\n) %>%\n  anovaTest()\n",
+   "solution": "season_3 <- harvest_plots %>%\n  filter(season == 3)\n\nbuildModel(\n  data = season_3,\n  model_type = \"linear_regression\",\n  formula = ears ~ manure\n) %>%\n  anovaTest()\n",
+   "right_feedback": "Right: that is manure's share of the spread in ears; the noise row holds the rest.",
+   "wrong_feedback": "Not that one. Check the formula reads ears ~ manure, then read the share column in the manure row.",
+   "options": [
+    {
+     "id": "o0",
+     "text": "0.173"
+    },
+    {
+     "id": "o1",
+     "text": "0.218"
+    },
+    {
+     "id": "o2",
+     "text": "0.597"
+    },
+    {
+     "id": "o3",
+     "text": "0.782"
+    }
+   ],
+   "ordered": true,
+   "answer": "o1"
+  },
+  {
+   "id": "h1_s4_grain_variety",
+   "tier": 1,
+   "kind": "mcq",
+   "title": "Read a factor's share",
+   "question": "Use the season 4 plots in harvest_plots (the starter filters them). Fill in the blanks to model grain by variety, then run anovaTest(). What share of the variation in grain does variety explain?",
+   "starter_code": "season_4 <- harvest_plots %>%\n  filter(season == 4)\n\nbuildModel(\n  data = season_4,\n  model_type = \"linear_regression\",\n  formula = ____ ~ ____\n) %>%\n  anovaTest()\n",
+   "solution": "season_4 <- harvest_plots %>%\n  filter(season == 4)\n\nbuildModel(\n  data = season_4,\n  model_type = \"linear_regression\",\n  formula = grain ~ variety\n) %>%\n  anovaTest()\n",
+   "right_feedback": "Right: that is variety's share of the spread in grain; the noise row holds the rest.",
+   "wrong_feedback": "Not that one. Check the formula reads grain ~ variety, then read the share column in the variety row.",
+   "options": [
+    {
+     "id": "o0",
+     "text": "0.035"
+    },
+    {
+     "id": "o1",
+     "text": "0.234"
+    },
+    {
+     "id": "o2",
+     "text": "0.64"
+    },
+    {
+     "id": "o3",
+     "text": "0.965"
+    }
+   ],
+   "ordered": true,
+   "answer": "o0"
+  },
+  {
+   "id": "h1_s4_grain_manure",
+   "tier": 1,
+   "kind": "mcq",
+   "title": "Read a factor's share",
+   "question": "Use the season 4 plots in harvest_plots (the starter filters them). Fill in the blanks to model grain by manure, then run anovaTest(). What share of the variation in grain does manure explain?",
+   "starter_code": "season_4 <- harvest_plots %>%\n  filter(season == 4)\n\nbuildModel(\n  data = season_4,\n  model_type = \"linear_regression\",\n  formula = ____ ~ ____\n) %>%\n  anovaTest()\n",
+   "solution": "season_4 <- harvest_plots %>%\n  filter(season == 4)\n\nbuildModel(\n  data = season_4,\n  model_type = \"linear_regression\",\n  formula = grain ~ manure\n) %>%\n  anovaTest()\n",
+   "right_feedback": "Right: that is manure's share of the spread in grain; the noise row holds the rest.",
+   "wrong_feedback": "Not that one. Check the formula reads grain ~ manure, then read the share column in the manure row.",
+   "options": [
+    {
+     "id": "o0",
+     "text": "0.052"
+    },
+    {
+     "id": "o1",
+     "text": "0.207"
+    },
+    {
+     "id": "o2",
+     "text": "0.397"
+    },
+    {
+     "id": "o3",
+     "text": "0.793"
+    }
+   ],
+   "ordered": true,
+   "answer": "o1"
+  },
+  {
+   "id": "h1_s4_straw_variety",
+   "tier": 1,
+   "kind": "mcq",
+   "title": "Read a factor's share",
+   "question": "Use the season 4 plots in harvest_plots (the starter filters them). Fill in the blanks to model straw by variety, then run anovaTest(). What share of the variation in straw does variety explain?",
+   "starter_code": "season_4 <- harvest_plots %>%\n  filter(season == 4)\n\nbuildModel(\n  data = season_4,\n  model_type = \"linear_regression\",\n  formula = ____ ~ ____\n) %>%\n  anovaTest()\n",
+   "solution": "season_4 <- harvest_plots %>%\n  filter(season == 4)\n\nbuildModel(\n  data = season_4,\n  model_type = \"linear_regression\",\n  formula = straw ~ variety\n) %>%\n  anovaTest()\n",
+   "right_feedback": "Right: that is variety's share of the spread in straw; the noise row holds the rest.",
+   "wrong_feedback": "Not that one. Check the formula reads straw ~ variety, then read the share column in the variety row.",
+   "options": [
+    {
+     "id": "o0",
+     "text": "0.035"
+    },
+    {
+     "id": "o1",
+     "text": "0.234"
+    },
+    {
+     "id": "o2",
+     "text": "0.64"
+    },
+    {
+     "id": "o3",
+     "text": "0.766"
+    }
+   ],
+   "ordered": true,
+   "answer": "o1"
+  },
+  {
+   "id": "h1_s4_straw_manure",
+   "tier": 1,
+   "kind": "mcq",
+   "title": "Read a factor's share",
+   "question": "Use the season 4 plots in harvest_plots (the starter filters them). Fill in the blanks to model straw by manure, then run anovaTest(). What share of the variation in straw does manure explain?",
+   "starter_code": "season_4 <- harvest_plots %>%\n  filter(season == 4)\n\nbuildModel(\n  data = season_4,\n  model_type = \"linear_regression\",\n  formula = ____ ~ ____\n) %>%\n  anovaTest()\n",
+   "solution": "season_4 <- harvest_plots %>%\n  filter(season == 4)\n\nbuildModel(\n  data = season_4,\n  model_type = \"linear_regression\",\n  formula = straw ~ manure\n) %>%\n  anovaTest()\n",
+   "right_feedback": "Right: that is manure's share of the spread in straw; the noise row holds the rest.",
+   "wrong_feedback": "Not that one. Check the formula reads straw ~ manure, then read the share column in the manure row.",
+   "options": [
+    {
+     "id": "o0",
+     "text": "0.052"
+    },
+    {
+     "id": "o1",
+     "text": "0.207"
+    },
+    {
+     "id": "o2",
+     "text": "0.397"
+    },
+    {
+     "id": "o3",
+     "text": "0.603"
+    }
+   ],
+   "ordered": true,
+   "answer": "o2"
+  },
+  {
+   "id": "h1_s4_ears_variety",
+   "tier": 1,
+   "kind": "mcq",
+   "title": "Read a factor's share",
+   "question": "Use the season 4 plots in harvest_plots (the starter filters them). Fill in the blanks to model ears by variety, then run anovaTest(). What share of the variation in ears does variety explain?",
+   "starter_code": "season_4 <- harvest_plots %>%\n  filter(season == 4)\n\nbuildModel(\n  data = season_4,\n  model_type = \"linear_regression\",\n  formula = ____ ~ ____\n) %>%\n  anovaTest()\n",
+   "solution": "season_4 <- harvest_plots %>%\n  filter(season == 4)\n\nbuildModel(\n  data = season_4,\n  model_type = \"linear_regression\",\n  formula = ears ~ variety\n) %>%\n  anovaTest()\n",
+   "right_feedback": "Right: that is variety's share of the spread in ears; the noise row holds the rest.",
+   "wrong_feedback": "Not that one. Check the formula reads ears ~ variety, then read the share column in the variety row.",
+   "options": [
+    {
+     "id": "o0",
+     "text": "0.035"
+    },
+    {
+     "id": "o1",
+     "text": "0.234"
+    },
+    {
+     "id": "o2",
+     "text": "0.36"
+    },
+    {
+     "id": "o3",
+     "text": "0.64"
+    }
+   ],
+   "ordered": true,
+   "answer": "o3"
+  },
+  {
+   "id": "h1_s4_ears_manure",
+   "tier": 1,
+   "kind": "mcq",
+   "title": "Read a factor's share",
+   "question": "Use the season 4 plots in harvest_plots (the starter filters them). Fill in the blanks to model ears by manure, then run anovaTest(). What share of the variation in ears does manure explain?",
+   "starter_code": "season_4 <- harvest_plots %>%\n  filter(season == 4)\n\nbuildModel(\n  data = season_4,\n  model_type = \"linear_regression\",\n  formula = ____ ~ ____\n) %>%\n  anovaTest()\n",
+   "solution": "season_4 <- harvest_plots %>%\n  filter(season == 4)\n\nbuildModel(\n  data = season_4,\n  model_type = \"linear_regression\",\n  formula = ears ~ manure\n) %>%\n  anovaTest()\n",
+   "right_feedback": "Right: that is manure's share of the spread in ears; the noise row holds the rest.",
+   "wrong_feedback": "Not that one. Check the formula reads ears ~ manure, then read the share column in the manure row.",
+   "options": [
+    {
+     "id": "o0",
+     "text": "0.052"
+    },
+    {
+     "id": "o1",
+     "text": "0.207"
+    },
+    {
+     "id": "o2",
+     "text": "0.397"
+    },
+    {
+     "id": "o3",
+     "text": "0.948"
+    }
+   ],
+   "ordered": true,
+   "answer": "o0"
+  },
+  {
+   "id": "h2_s3_grain",
+   "tier": 2,
+   "kind": "mcq",
+   "title": "Which factor explains most?",
+   "question": "Use the season 3 plots in harvest_plots. Build three one-factor models of grain: by variety, by manure and by block, and run anovaTest() on each. Which factor explains the largest share of the variation in grain?",
+   "starter_code": "season_3 <- harvest_plots %>%\n  filter(season == 3)\n\nbuildModel(\n  data = season_3,\n  model_type = \"linear_regression\",\n  formula = grain ~ ____\n) %>%\n  anovaTest()\n",
+   "solution": "season_3 <- harvest_plots %>%\n  filter(season == 3)\n\nbuildModel(\n  data = season_3,\n  model_type = \"linear_regression\",\n  formula = grain ~ variety\n) %>%\n  anovaTest()\n\nbuildModel(\n  data = season_3,\n  model_type = \"linear_regression\",\n  formula = grain ~ manure\n) %>%\n  anovaTest()\n\nbuildModel(\n  data = season_3,\n  model_type = \"linear_regression\",\n  formula = grain ~ block\n) %>%\n  anovaTest()\n",
+   "right_feedback": "Right: its share is the biggest of the three.",
+   "wrong_feedback": "Not that one. Run all three models of grain and compare the share in each factor's own row.",
+   "options": [
+    {
+     "id": "o0",
+     "text": "block"
+    },
+    {
+     "id": "o1",
+     "text": "manure"
+    },
+    {
+     "id": "o2",
+     "text": "variety"
+    }
+   ],
+   "answer": "o1"
+  },
+  {
+   "id": "h2_s3_straw",
+   "tier": 2,
+   "kind": "mcq",
+   "title": "Which factor explains most?",
+   "question": "Use the season 3 plots in harvest_plots. Build three one-factor models of straw: by variety, by manure and by block, and run anovaTest() on each. Which factor explains the largest share of the variation in straw?",
+   "starter_code": "season_3 <- harvest_plots %>%\n  filter(season == 3)\n\nbuildModel(\n  data = season_3,\n  model_type = \"linear_regression\",\n  formula = straw ~ ____\n) %>%\n  anovaTest()\n",
+   "solution": "season_3 <- harvest_plots %>%\n  filter(season == 3)\n\nbuildModel(\n  data = season_3,\n  model_type = \"linear_regression\",\n  formula = straw ~ variety\n) %>%\n  anovaTest()\n\nbuildModel(\n  data = season_3,\n  model_type = \"linear_regression\",\n  formula = straw ~ manure\n) %>%\n  anovaTest()\n\nbuildModel(\n  data = season_3,\n  model_type = \"linear_regression\",\n  formula = straw ~ block\n) %>%\n  anovaTest()\n",
+   "right_feedback": "Right: its share is the biggest of the three.",
+   "wrong_feedback": "Not that one. Run all three models of straw and compare the share in each factor's own row.",
+   "options": [
+    {
+     "id": "o0",
+     "text": "block"
+    },
+    {
+     "id": "o1",
+     "text": "manure"
+    },
+    {
+     "id": "o2",
+     "text": "variety"
+    }
+   ],
+   "answer": "o0"
+  },
+  {
+   "id": "h2_s3_ears",
+   "tier": 2,
+   "kind": "mcq",
+   "title": "Which factor explains most?",
+   "question": "Use the season 3 plots in harvest_plots. Build three one-factor models of ears: by variety, by manure and by block, and run anovaTest() on each. Which factor explains the largest share of the variation in ears?",
+   "starter_code": "season_3 <- harvest_plots %>%\n  filter(season == 3)\n\nbuildModel(\n  data = season_3,\n  model_type = \"linear_regression\",\n  formula = ears ~ ____\n) %>%\n  anovaTest()\n",
+   "solution": "season_3 <- harvest_plots %>%\n  filter(season == 3)\n\nbuildModel(\n  data = season_3,\n  model_type = \"linear_regression\",\n  formula = ears ~ variety\n) %>%\n  anovaTest()\n\nbuildModel(\n  data = season_3,\n  model_type = \"linear_regression\",\n  formula = ears ~ manure\n) %>%\n  anovaTest()\n\nbuildModel(\n  data = season_3,\n  model_type = \"linear_regression\",\n  formula = ears ~ block\n) %>%\n  anovaTest()\n",
+   "right_feedback": "Right: its share is the biggest of the three.",
+   "wrong_feedback": "Not that one. Run all three models of ears and compare the share in each factor's own row.",
+   "options": [
+    {
+     "id": "o0",
+     "text": "block"
+    },
+    {
+     "id": "o1",
+     "text": "manure"
+    },
+    {
+     "id": "o2",
+     "text": "variety"
+    }
+   ],
+   "answer": "o2"
+  },
+  {
+   "id": "h2_s4_grain",
+   "tier": 2,
+   "kind": "mcq",
+   "title": "Which factor explains most?",
+   "question": "Use the season 4 plots in harvest_plots. Build three one-factor models of grain: by variety, by manure and by block, and run anovaTest() on each. Which factor explains the largest share of the variation in grain?",
+   "starter_code": "season_4 <- harvest_plots %>%\n  filter(season == 4)\n\nbuildModel(\n  data = season_4,\n  model_type = \"linear_regression\",\n  formula = grain ~ ____\n) %>%\n  anovaTest()\n",
+   "solution": "season_4 <- harvest_plots %>%\n  filter(season == 4)\n\nbuildModel(\n  data = season_4,\n  model_type = \"linear_regression\",\n  formula = grain ~ variety\n) %>%\n  anovaTest()\n\nbuildModel(\n  data = season_4,\n  model_type = \"linear_regression\",\n  formula = grain ~ manure\n) %>%\n  anovaTest()\n\nbuildModel(\n  data = season_4,\n  model_type = \"linear_regression\",\n  formula = grain ~ block\n) %>%\n  anovaTest()\n",
+   "right_feedback": "Right: its share is the biggest of the three.",
+   "wrong_feedback": "Not that one. Run all three models of grain and compare the share in each factor's own row.",
+   "options": [
+    {
+     "id": "o0",
+     "text": "block"
+    },
+    {
+     "id": "o1",
+     "text": "manure"
+    },
+    {
+     "id": "o2",
+     "text": "variety"
+    }
+   ],
+   "answer": "o0"
+  },
+  {
+   "id": "h2_s4_straw",
+   "tier": 2,
+   "kind": "mcq",
+   "title": "Which factor explains most?",
+   "question": "Use the season 4 plots in harvest_plots. Build three one-factor models of straw: by variety, by manure and by block, and run anovaTest() on each. Which factor explains the largest share of the variation in straw?",
+   "starter_code": "season_4 <- harvest_plots %>%\n  filter(season == 4)\n\nbuildModel(\n  data = season_4,\n  model_type = \"linear_regression\",\n  formula = straw ~ ____\n) %>%\n  anovaTest()\n",
+   "solution": "season_4 <- harvest_plots %>%\n  filter(season == 4)\n\nbuildModel(\n  data = season_4,\n  model_type = \"linear_regression\",\n  formula = straw ~ variety\n) %>%\n  anovaTest()\n\nbuildModel(\n  data = season_4,\n  model_type = \"linear_regression\",\n  formula = straw ~ manure\n) %>%\n  anovaTest()\n\nbuildModel(\n  data = season_4,\n  model_type = \"linear_regression\",\n  formula = straw ~ block\n) %>%\n  anovaTest()\n",
+   "right_feedback": "Right: its share is the biggest of the three.",
+   "wrong_feedback": "Not that one. Run all three models of straw and compare the share in each factor's own row.",
+   "options": [
+    {
+     "id": "o0",
+     "text": "block"
+    },
+    {
+     "id": "o1",
+     "text": "manure"
+    },
+    {
+     "id": "o2",
+     "text": "variety"
+    }
+   ],
+   "answer": "o1"
+  },
+  {
+   "id": "h2_s4_ears",
+   "tier": 2,
+   "kind": "mcq",
+   "title": "Which factor explains most?",
+   "question": "Use the season 4 plots in harvest_plots. Build three one-factor models of ears: by variety, by manure and by block, and run anovaTest() on each. Which factor explains the largest share of the variation in ears?",
+   "starter_code": "season_4 <- harvest_plots %>%\n  filter(season == 4)\n\nbuildModel(\n  data = season_4,\n  model_type = \"linear_regression\",\n  formula = ears ~ ____\n) %>%\n  anovaTest()\n",
+   "solution": "season_4 <- harvest_plots %>%\n  filter(season == 4)\n\nbuildModel(\n  data = season_4,\n  model_type = \"linear_regression\",\n  formula = ears ~ variety\n) %>%\n  anovaTest()\n\nbuildModel(\n  data = season_4,\n  model_type = \"linear_regression\",\n  formula = ears ~ manure\n) %>%\n  anovaTest()\n\nbuildModel(\n  data = season_4,\n  model_type = \"linear_regression\",\n  formula = ears ~ block\n) %>%\n  anovaTest()\n",
+   "right_feedback": "Right: its share is the biggest of the three.",
+   "wrong_feedback": "Not that one. Run all three models of ears and compare the share in each factor's own row.",
+   "options": [
+    {
+     "id": "o0",
+     "text": "block"
+    },
+    {
+     "id": "o1",
+     "text": "manure"
+    },
+    {
+     "id": "o2",
+     "text": "variety"
+    }
+   ],
+   "answer": "o2"
+  },
+  {
+   "id": "h3_s3_grain",
+   "tier": 3,
+   "kind": "mcq",
+   "title": "Which row is largest?",
+   "question": "Use the season 3 plots in harvest_plots. Build one model of grain ~ variety * manure and run anovaTest(). Of the rows above total, which has the largest share of the variation in grain? (Put manure first and the interaction row prints as manure:variety; it is the same row.)",
+   "starter_code": "season_3 <- harvest_plots %>%\n  filter(season == 3)\n",
+   "solution": "season_3 <- harvest_plots %>%\n  filter(season == 3)\n\nbuildModel(\n  data = season_3,\n  model_type = \"linear_regression\",\n  formula = grain ~ variety * manure\n) %>%\n  anovaTest()\n",
+   "right_feedback": "Right: that row holds the biggest share of the variation.",
+   "wrong_feedback": "Not that one. Check the formula is grain ~ variety * manure, then compare the share column across every row except total.",
+   "options": [
+    {
+     "id": "o0",
+     "text": "manure"
+    },
+    {
+     "id": "o1",
+     "text": "noise"
+    },
+    {
+     "id": "o2",
+     "text": "variety"
+    },
+    {
+     "id": "o3",
+     "text": "variety:manure"
+    }
+   ],
+   "answer": "o0"
+  },
+  {
+   "id": "h3_s3_straw",
+   "tier": 3,
+   "kind": "mcq",
+   "title": "Which row is largest?",
+   "question": "Use the season 3 plots in harvest_plots. Build one model of straw ~ variety * manure and run anovaTest(). Of the rows above total, which has the largest share of the variation in straw? (Put manure first and the interaction row prints as manure:variety; it is the same row.)",
+   "starter_code": "season_3 <- harvest_plots %>%\n  filter(season == 3)\n",
+   "solution": "season_3 <- harvest_plots %>%\n  filter(season == 3)\n\nbuildModel(\n  data = season_3,\n  model_type = \"linear_regression\",\n  formula = straw ~ variety * manure\n) %>%\n  anovaTest()\n",
+   "right_feedback": "Right: that row holds the biggest share of the variation.",
+   "wrong_feedback": "Not that one. Check the formula is straw ~ variety * manure, then compare the share column across every row except total.",
+   "options": [
+    {
+     "id": "o0",
+     "text": "manure"
+    },
+    {
+     "id": "o1",
+     "text": "noise"
+    },
+    {
+     "id": "o2",
+     "text": "variety"
+    },
+    {
+     "id": "o3",
+     "text": "variety:manure"
+    }
+   ],
+   "answer": "o3"
+  },
+  {
+   "id": "h3_s3_ears",
+   "tier": 3,
+   "kind": "mcq",
+   "title": "Which row is largest?",
+   "question": "Use the season 3 plots in harvest_plots. Build one model of ears ~ variety * manure and run anovaTest(). Of the rows above total, which has the largest share of the variation in ears? (Put manure first and the interaction row prints as manure:variety; it is the same row.)",
+   "starter_code": "season_3 <- harvest_plots %>%\n  filter(season == 3)\n",
+   "solution": "season_3 <- harvest_plots %>%\n  filter(season == 3)\n\nbuildModel(\n  data = season_3,\n  model_type = \"linear_regression\",\n  formula = ears ~ variety * manure\n) %>%\n  anovaTest()\n",
+   "right_feedback": "Right: that row holds the biggest share of the variation.",
+   "wrong_feedback": "Not that one. Check the formula is ears ~ variety * manure, then compare the share column across every row except total.",
+   "options": [
+    {
+     "id": "o0",
+     "text": "manure"
+    },
+    {
+     "id": "o1",
+     "text": "noise"
+    },
+    {
+     "id": "o2",
+     "text": "variety"
+    },
+    {
+     "id": "o3",
+     "text": "variety:manure"
+    }
+   ],
+   "answer": "o2"
+  },
+  {
+   "id": "h3_s4_grain",
+   "tier": 3,
+   "kind": "mcq",
+   "title": "Which row is largest?",
+   "question": "Use the season 4 plots in harvest_plots. Build one model of grain ~ variety * manure and run anovaTest(). Of the rows above total, which has the largest share of the variation in grain? (Put manure first and the interaction row prints as manure:variety; it is the same row.)",
+   "starter_code": "season_4 <- harvest_plots %>%\n  filter(season == 4)\n",
+   "solution": "season_4 <- harvest_plots %>%\n  filter(season == 4)\n\nbuildModel(\n  data = season_4,\n  model_type = \"linear_regression\",\n  formula = grain ~ variety * manure\n) %>%\n  anovaTest()\n",
+   "right_feedback": "Right: that row holds the biggest share of the variation.",
+   "wrong_feedback": "Not that one. Check the formula is grain ~ variety * manure, then compare the share column across every row except total.",
+   "options": [
+    {
+     "id": "o0",
+     "text": "manure"
+    },
+    {
+     "id": "o1",
+     "text": "noise"
+    },
+    {
+     "id": "o2",
+     "text": "variety"
+    },
+    {
+     "id": "o3",
+     "text": "variety:manure"
+    }
+   ],
+   "answer": "o1"
+  },
+  {
+   "id": "h3_s4_straw",
+   "tier": 3,
+   "kind": "mcq",
+   "title": "Which row is largest?",
+   "question": "Use the season 4 plots in harvest_plots. Build one model of straw ~ variety * manure and run anovaTest(). Of the rows above total, which has the largest share of the variation in straw? (Put manure first and the interaction row prints as manure:variety; it is the same row.)",
+   "starter_code": "season_4 <- harvest_plots %>%\n  filter(season == 4)\n",
+   "solution": "season_4 <- harvest_plots %>%\n  filter(season == 4)\n\nbuildModel(\n  data = season_4,\n  model_type = \"linear_regression\",\n  formula = straw ~ variety * manure\n) %>%\n  anovaTest()\n",
+   "right_feedback": "Right: that row holds the biggest share of the variation.",
+   "wrong_feedback": "Not that one. Check the formula is straw ~ variety * manure, then compare the share column across every row except total.",
+   "options": [
+    {
+     "id": "o0",
+     "text": "manure"
+    },
+    {
+     "id": "o1",
+     "text": "noise"
+    },
+    {
+     "id": "o2",
+     "text": "variety"
+    },
+    {
+     "id": "o3",
+     "text": "variety:manure"
+    }
+   ],
+   "answer": "o0"
+  },
+  {
+   "id": "h3_s4_ears",
+   "tier": 3,
+   "kind": "mcq",
+   "title": "Which row is largest?",
+   "question": "Use the season 4 plots in harvest_plots. Build one model of ears ~ variety * manure and run anovaTest(). Of the rows above total, which has the largest share of the variation in ears? (Put manure first and the interaction row prints as manure:variety; it is the same row.)",
+   "starter_code": "season_4 <- harvest_plots %>%\n  filter(season == 4)\n",
+   "solution": "season_4 <- harvest_plots %>%\n  filter(season == 4)\n\nbuildModel(\n  data = season_4,\n  model_type = \"linear_regression\",\n  formula = ears ~ variety * manure\n) %>%\n  anovaTest()\n",
+   "right_feedback": "Right: that row holds the biggest share of the variation.",
+   "wrong_feedback": "Not that one. Check the formula is ears ~ variety * manure, then compare the share column across every row except total.",
+   "options": [
+    {
+     "id": "o0",
+     "text": "manure"
+    },
+    {
+     "id": "o1",
+     "text": "noise"
+    },
+    {
+     "id": "o2",
+     "text": "variety"
+    },
+    {
+     "id": "o3",
+     "text": "variety:manure"
+    }
+   ],
+   "answer": "o2"
+  }
+ ]
+}
