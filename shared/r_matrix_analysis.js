@@ -1698,7 +1698,7 @@ tukeyTest <- function( data, ..., compare = NULL, slopes_of = NULL ) {
         return(res)
     }
     if (length(list(...)) > 0) {
-        stop("tukeyTest(): a model already contains its formula. Use compare = (which groups) and, for slopes, slopes_of = (which numeric input).", call. = FALSE)
+        stop("tukeyTest(): a model already contains its formula. Use compare = (which groups) and, for slopes, slopes_of = (which numeric predictor).", call. = FALSE)
     }
     if (inherits(data, "lm")) {
         fit <- data
@@ -1714,27 +1714,27 @@ tukeyTest <- function( data, ..., compare = NULL, slopes_of = NULL ) {
     groups <- inputs[!vapply(model_data[inputs], is.numeric, logical(1))]
     if (is.null(compare)) {
         if (length(groups) == 0) {
-            stop("tukeyTest(): this model has no group (text) input to compare. Build it with one, e.g. formula = rate ~ temperature * chemistry.", call. = FALSE)
+            stop("tukeyTest(): this model has no factor (a text predictor) to compare. Build it with one, e.g. formula = rate ~ temperature * chemistry.", call. = FALSE)
         }
         if (length(groups) > 1) {
-            stop("tukeyTest(): this model has more than one group input (", paste(groups, collapse = ", "), "). Choose one with compare =.", call. = FALSE)
+            stop("tukeyTest(): this model has more than one factor (", paste(groups, collapse = ", "), "). Choose one with compare =.", call. = FALSE)
         }
         compare <- groups
     }
     if (!compare %in% groups) {
-        stop("tukeyTest(): compare = should name a group (text) input of the model: ", paste(groups, collapse = ", "), ".", call. = FALSE)
+        stop("tukeyTest(): compare = should name a factor (a text predictor) of the model: ", paste(groups, collapse = ", "), ".", call. = FALSE)
     }
     if (is.null(slopes_of)) {
         in_interaction <- grepl(":", attr(stats::terms(fit), "term.labels")) &
             vapply(strsplit(attr(stats::terms(fit), "term.labels"), ":"), function(t) compare %in% t, logical(1))
         if (any(in_interaction)) {
-            message("tukeyTest(): ", compare, " is part of an interaction in this model, so these are its means averaged over the other inputs. If the interaction matters, compare within each level instead (filter, then test), or use slopes_of = for a numeric input.")
+            message("tukeyTest(): ", compare, " is part of an interaction in this model, so these are its means averaged over the other predictors. If the interaction matters, compare within each level instead (filter, then test), or use slopes_of = for a numeric predictor.")
         }
         em <- emmeans::emmeans(fit, specs = compare, data = model_data)
     } else {
         numeric_inputs <- setdiff(inputs, groups)
         if (!slopes_of %in% numeric_inputs) {
-            stop("tukeyTest(): slopes_of = should name a numeric input of the model: ", paste(numeric_inputs, collapse = ", "), ".", call. = FALSE)
+            stop("tukeyTest(): slopes_of = should name a numeric predictor of the model: ", paste(numeric_inputs, collapse = ", "), ".", call. = FALSE)
         }
         em <- emmeans::emtrends(fit, specs = compare, var = slopes_of, data = model_data)
     }
@@ -1793,10 +1793,10 @@ gamesHowellTest <- function( data, ..., compare = NULL ) {
     inputs <- all.vars(stats::formula(fit)[[3]])
     groups <- inputs[!vapply(model_data[inputs], is.numeric, logical(1))]
     if (length(inputs) != 1 || length(groups) != 1) {
-        stop("gamesHowellTest(): this works on a model with one group input, e.g. formula = abundance ~ aquifer_code. With more inputs, compare the groups within one level of the others (filter, then test), or for slopes use tukeyTest(slopes_of = ).", call. = FALSE)
+        stop("gamesHowellTest(): this works on a model with one predictor, a factor, e.g. formula = abundance ~ aquifer_code. With more predictors, compare the groups within one level of the others (filter, then test), or for slopes use tukeyTest(slopes_of = ).", call. = FALSE)
     }
     if (!is.null(compare) && !identical(compare, groups)) {
-        stop("gamesHowellTest(): compare = should name the model's group input: ", groups, ".", call. = FALSE)
+        stop("gamesHowellTest(): compare = should name the model's factor: ", groups, ".", call. = FALSE)
     }
     d <- as.data.frame(model_data)[, c(response, groups)]
     names(d) <- c("response", "group")
@@ -1888,13 +1888,13 @@ local({
 })
 `;
 
-// The regression verbs (book ch.12: buildModel, predictWithModel), extracted verbatim from
-// phylochemistry.R. Evaluated separately from both shims above so none can take another down.
-// Only the linear_regression branch runs in WebR; see MODELS in the generator.
+// The regression verbs (book ch.12: buildModel, predictWithModel), extracted from phylochemistry.R
+// Evaluated separately from both shims above so none can take another down.
+// Only the linear_regression and logistic_regression branches run in WebR; see MODELS in the generator.
 export const MODELS_R_SHIM = `## The regression verbs (book ch.12: buildModel, predictWithModel), ported for WebR.
 ## GENERATED by authoring_v2/gen_r_matrix_analysis.py — DO NOT EDIT THIS FILE BY HAND.
-## Source: phylochemistry/phylochemistry.R — buildModel 12315-12564; predictWithModel 12573-12683; pGroups 11862-11896.
-## Only model_type = "linear_regression" is supported in the browser; the forest and
+## Source: phylochemistry/phylochemistry.R — buildModel 12315-12661; predictWithModel 12670-12810; pGroups 11862-11896.
+## Only model_type = "linear_regression" and "logistic_regression" are supported in the browser; the forest and
 ## contrastive branches are carried verbatim but need packages WebR does not install.
 
 buildModel <- function(
@@ -1904,76 +1904,91 @@ buildModel <- function(
         "random_forest_classification", "logistic_regression",
         "contrastive_learning"
     ),
-    input_variables = NULL,
-    output_variable = NULL,
+    predictors = NULL,
+    response = NULL,
     fold_cross_validation = 10,
     optimization_parameters = list(
         n_vars_tried_at_split = seq(10,20,5),
         n_trees = seq(100,200,50),
         min_leaf_size = 1
     ),
-    formula = NULL
+    formula = NULL,
+    scale_variance = FALSE,
+    input_variables = NULL,
+    output_variable = NULL
 ) {
 
     ## Prepare the data
 
+        ## predictors / response were input_variables / output_variable until 2026-11-07
+        ## (Lucas). The old names stay accepted, silently and last in the argument list, so
+        ## saved code keeps running; they are resolved here once and never used again.
+            if (!is.null(input_variables)) {
+                if (!is.null(predictors)) stop("Please give the predictors only once.")
+                predictors <- input_variables
+            }
+            if (!is.null(output_variable)) {
+                if (!is.null(response)) stop("Please give the response only once.")
+                response <- output_variable
+            }
+
         ## Correct the formula and the data, start the output
             model_type <- match.arg(model_type)
 
-            ## formula = is the alternative to input_variables / output_variable (linear
-            ## regression only), e.g. formula = rate ~ temperature * chemistry. It is the last
-            ## argument so positional calls are unaffected. The variables it names are worked
+            ## formula = is the alternative to predictors / response (linear regression
+            ## only), e.g. formula = rate ~ temperature * chemistry. It comes after the other
+            ## arguments so positional calls are unaffected. The variables it names are worked
             ## out here so every check below runs unchanged.
             user_formula <- formula
             if (!is.null(user_formula)) {
                 if (is.character(user_formula)) user_formula <- stats::as.formula(user_formula)
                 if (!inherits(user_formula, "formula") || length(user_formula) != 3) {
-                    stop("formula should look like output ~ inputs, for example rate ~ temperature * chemistry.")
+                    stop("formula should look like response ~ predictors, for example rate ~ temperature * chemistry.")
                 }
                 if (model_type != "linear_regression") {
-                    stop("formula = works with model_type = \\"linear_regression\\" only. For other model types, use input_variables and output_variable.")
+                    stop("formula = works with model_type = \\"linear_regression\\" only. For other model types, use predictors and response.")
                 }
-                if (!is.null(input_variables) || !is.null(output_variable)) {
-                    stop("Give either formula, or input_variables and output_variable, not both.")
+                if (!is.null(predictors) || !is.null(response)) {
+                    stop("Give either formula, or predictors and response, not both.")
                 }
                 if (!is.name(user_formula[[2]])) {
                     stop("The left side of the formula should be one column name, not a calculation. Make the column first, e.g. mutate(log_rate = log(rate)), then use log_rate ~ ...")
                 }
-                output_variable <- all.vars(user_formula[[2]])
-                input_variables <- all.vars(user_formula[[3]])
-                if (length(output_variable) != 1) {
+                response <- all.vars(user_formula[[2]])
+                predictors <- all.vars(user_formula[[3]])
+                if (length(response) != 1) {
                     stop("The left side of the formula should be the one column you want to predict.")
                 }
-                if ("." %in% input_variables) {
-                    stop("Please name the input columns in the formula rather than using a dot.")
+                if ("." %in% predictors) {
+                    stop("Please name the predictor columns in the formula rather than using a dot.")
                 }
-                missing_vars <- setdiff(c(output_variable, input_variables), colnames(data))
+                missing_vars <- setdiff(c(response, predictors), colnames(data))
                 if (length(missing_vars) > 0) {
                     stop(paste("The following formula variables are not present in the data:", paste(missing_vars, collapse = ", ")))
                 }
                 ## only the columns the model uses are checked for missing values and fitted
-                data <- as.data.frame(data)[, c(output_variable, input_variables), drop = FALSE]
-                ## text inputs become factors so later tests (tukeyTest) see the groups
-                for (v in input_variables) {
+                data <- as.data.frame(data)[, c(response, predictors), drop = FALSE]
+                ## text predictors become factors so later tests (tukeyTest) see the groups
+                for (v in predictors) {
                     if (is.character(data[[v]])) data[[v]] <- factor(data[[v]])
                 }
             }
 
-            if (is.null(input_variables) || length(input_variables) == 0) {
-                stop("Please provide at least one input variable.")
+            if (is.null(predictors) || length(predictors) == 0) {
+                stop("Please provide at least one predictor.")
             }
-            if (is.null(output_variable) || !nzchar(output_variable)) {
-                stop("Please provide a valid output variable.")
+            if (is.null(response) || !nzchar(response)) {
+                stop("Please provide a valid response.")
             }
-            if (!output_variable %in% colnames(data)) {
-                stop("The specified output variable is not present in the data.")
+            if (!response %in% colnames(data)) {
+                stop("The specified response is not present in the data.")
             }
-            if (!all(input_variables %in% colnames(data))) {
-                missing_inputs <- input_variables[!input_variables %in% colnames(data)]
+            if (!all(predictors %in% colnames(data))) {
+                missing_predictors <- predictors[!predictors %in% colnames(data)]
                 stop(
                     paste(
-                        "The following input variables are not present in the data:",
-                        paste(missing_inputs, collapse = ", ")
+                        "The following predictors are not present in the data:",
+                        paste(missing_predictors, collapse = ", ")
                     )
                 )
             }
@@ -1991,26 +2006,72 @@ buildModel <- function(
             }
             data <- as.data.frame(data)
             if( any(is.na(data)) ) { stop("Yo - there are missing data in your data set, please deal with that before proceeding.") }
-            formula <- paste0("\`", output_variable, "\` ~ \`", paste(input_variables, collapse = "\` + \`"), "\`")
+            ## scale_variance = TRUE: centre each numeric predictor on its mean and divide it by its standard
+            ## deviation, as runMatrixAnalysis does, so the coefficients can be compared across predictors.
+            ## The response column is never scaled, so predictions stay in its units.
+            if (!is.logical(scale_variance) || length(scale_variance) != 1 || is.na(scale_variance)) {
+                stop("scale_variance should be TRUE or FALSE.")
+            }
+            if (isTRUE(scale_variance)) {
+                if (!is.null(user_formula)) {
+                    ## a named function in the formula (log, I, factor, poly) would be applied to the
+                    ## SCALED column, so refuse it; operators such as + * : ^ are fine
+                    if (length(grep("^[A-Za-z._]", setdiff(all.names(user_formula[[3]]), all.vars(user_formula[[3]])))) > 0) {
+                        stop("scale_variance = TRUE needs plain column names in the formula (for example y ~ a + b). Make any calculated column with mutate() first.")
+                    }
+                }
+                scaled_inputs <- setdiff(predictors, response)
+                scaled_inputs <- scaled_inputs[vapply(scaled_inputs, function(v) is.numeric(data[[v]]), logical(1))]
+                if (length(scaled_inputs) == 0) {
+                    stop("scale_variance = TRUE scales numeric predictors, but none of the predictors are numbers.")
+                }
+                input_means <- vapply(scaled_inputs, function(v) mean(data[[v]]), numeric(1))
+                input_sds <- vapply(scaled_inputs, function(v) stats::sd(data[[v]]), numeric(1))
+                if (any(is.na(input_sds) | input_sds == 0)) {
+                    stop(paste0("scale_variance = TRUE cannot scale ", paste(scaled_inputs[is.na(input_sds) | input_sds == 0], collapse = ", "), ": every value in it is the same."))
+                }
+                for (v in scaled_inputs) data[[v]] <- as.numeric((data[[v]] - input_means[[v]]) / input_sds[[v]])
+                predictor_scaling <- data.frame(variable = scaled_inputs, mean = unname(input_means), sd = unname(input_sds))
+            }
+            formula <- paste0("\`", response, "\` ~ \`", paste(predictors, collapse = "\` + \`"), "\`")
             if (!is.null(user_formula)) formula <- user_formula
             output <- list()
             output$model_type <- model_type
-            output$output_variable <- output_variable   # predictWithModel names its column from this
-            ## only on the formula path, so the variable-list output keeps its four parts
+            output$response <- response   # predictWithModel names its column from this
+            output$predictors <- predictors
+            if (isTRUE(scale_variance)) output$predictor_scaling <- predictor_scaling
+            ## only on the formula path, so the variable-list output gains no extra parts
             if (!is.null(user_formula)) {
                 output$formula <- user_formula
                 output$data <- data
             }
 
         ## Various checkes
-                if (dim(data)[1] < length(input_variables)) {
-                    stop("Heyyyyy, there are fewer observations in the data than input variables. You should change the number of input variables or make more observations.")
+                if (dim(data)[1] < length(predictors)) {
+                    stop("Heyyyyy, there are fewer observations in the data than predictors. You should use fewer predictors or make more observations.")
                 }
-                if (!is.numeric(data[[output_variable]]) && !model_type %in% c("random_forest_classification")) {
+                if (!is.numeric(data[[response]]) && !model_type %in% c("random_forest_classification", "logistic_regression")) {
                     stop("Uh oh! You cannot predict the value of a categorical variable with a regression model. Choose a classification model instead.")
                 }
-                if (model_type == "random_forest_classification" && !is.factor(data[[output_variable]])) {
-                    data[[output_variable]] <- as.factor(data[[output_variable]])
+                if (model_type == "logistic_regression") {
+                    outcome_values <- data[[response]]
+                    if (!(is.character(outcome_values) || is.factor(outcome_values) || is.logical(outcome_values))) {
+                        stop(paste0("Uh oh! Logistic regression predicts a yes/no response, but ", response, " is numbers. Make it a yes/no column first, for example mutate(", response, " = ifelse(", response, " > 0, \\"yes\\", \\"no\\")), or use linear_regression to predict a number."))
+                    }
+                    classes <- levels(droplevels(factor(outcome_values)))
+                    if (length(classes) != 2) {
+                        stop(paste0("Uh oh! Logistic regression needs a response with exactly two values (for example \\"yes\\" and \\"no\\"), but ", response, " has ", length(classes), ": ", paste(classes, collapse = ", "), "."))
+                    }
+                    ## The positive class (the one whose probability is predicted): "yes" for a
+                    ## yes/no column (any capitalisation), TRUE for a logical column, otherwise the
+                    ## second factor level (for text, the second in alphabetical order).
+                    positive <- if (setequal(tolower(classes), c("yes", "no"))) classes[tolower(classes) == "yes"] else classes[2]
+                    ## glm() models the probability of the SECOND level, and predictWithModel reads
+                    ## the two levels back from the fitted model, so the order is fixed here.
+                    data[[response]] <- factor(as.character(outcome_values), levels = c(setdiff(classes, positive), positive))
+                }
+                if (model_type == "random_forest_classification" && !is.factor(data[[response]])) {
+                    data[[response]] <- as.factor(data[[response]])
                 }
 
     ## Modeling
@@ -2050,6 +2111,41 @@ buildModel <- function(
                 # Full precision: rounding to 4 dp collapsed small slopes (~1e-4) and their
                 # standard errors to 1e-04 or 0. Round at display time instead.
                 metrics$value <- as.numeric(metrics$value)
+                rownames(metrics) <- NULL
+                output$metrics <- metrics
+        }
+
+        if (model_type == "logistic_regression") {
+
+            ## Run the fit and start the output. Coefficients are on the log-odds scale of
+            ## the positive class; after scaling the predictors, larger absolute values still
+            ## mean a predictor matters more, as in linear regression.
+                fit <- glm(
+                    data = data,
+                    formula = formula,
+                    family = binomial,
+                    x = TRUE, y = TRUE, model = TRUE
+                )
+                output$model <- fit
+
+                metrics <- rbind(
+                    data.frame(
+                        variable = c("null_deviance", "residual_deviance", "aic"),
+                        value = c(fit$null.deviance, fit$deviance, fit$aic),
+                        std_err = NA,
+                        type = "statistic",
+                        p_value = NA,
+                        p_value_adj = NA
+                    ),
+                    data.frame(
+                        variable = names(coefficients(fit)),
+                        value = as.numeric(coefficients(fit)),
+                        std_err = as.numeric(summary(fit)$coefficients[,2]),
+                        type = "coefficient",
+                        p_value = summary(fit)$coefficients[,4],
+                        p_value_adj = p.adjust(summary(fit)$coefficients[,4])
+                    )
+                )
                 rownames(metrics) <- NULL
                 output$metrics <- metrics
         }
@@ -2145,6 +2241,7 @@ buildModel <- function(
 
     ## Return a model trained on all the input data
         
+        if (isTRUE(scale_variance)) attr(output$model, "predictor_scaling") <- predictor_scaling
         return(output)
 }
 
@@ -2173,9 +2270,12 @@ predictWithModel <- function(
         outcome <- NULL
         if (is.list(model) && !is.null(model$model_type) && !is.null(model$model)) {
             if (is.null(model_type)) model_type <- model$model_type
-            outcome <- model$output_variable
+            ## $response; models built before 2026-11-07 carry only $output_variable
+            outcome <- if (!is.null(model$response)) model$response else model$output_variable
             model <- model$model
         }
+        predictor_scaling <- attr(model, "predictor_scaling")
+        if (is.null(predictor_scaling)) predictor_scaling <- attr(model, "input_scaling")  # models built before the 2026-11-08 rename
 
     ## Infer the model type from the fitted object
         if (is.null(model_type)) {
@@ -2198,7 +2298,7 @@ predictWithModel <- function(
             "contrastive_learning"
         ))
 
-    ## The outcome's name, for the column
+    ## The response's name, for the column
         if (is.null(outcome)) {
             if (inherits(model, "lm")) outcome <- names(model$model)[1]
             if (inherits(model, "workflow")) outcome <- names(model$pre$mold$outcomes)[1]
@@ -2207,6 +2307,15 @@ predictWithModel <- function(
 
     ## Predictions, appended to the input data
         output <- as_tibble(data)
+        if (!is.null(predictor_scaling)) {
+            ## built with scale_variance = TRUE: scale the new predictors with the TRAINING means and
+            ## standard deviations (never their own), so the model sees them as it was built
+            data <- as.data.frame(data)
+            for (i in seq_len(nrow(predictor_scaling))) {
+                v <- predictor_scaling$variable[i]
+                if (v %in% colnames(data)) data[[v]] <- as.numeric((data[[v]] - predictor_scaling$mean[i]) / predictor_scaling$sd[i])
+            }
+        }
 
         if (model_type == "linear_regression") {
             output[[pred_col]] <- unname(as.numeric(tryCatch(
@@ -2222,7 +2331,25 @@ predictWithModel <- function(
         }
 
         if (model_type == "logistic_regression") {
-            stop("predictWithModel() does not support logistic_regression yet.")
+            ## buildModel() fits the response as a factor whose second level is the
+            ## positive class; the cut-off is 0.5 (move it with mutate() on the probability)
+            response <- model$model[[1]]
+            classes <- if (is.factor(response)) levels(response) else levels(factor(response))
+            if (length(classes) != 2) {
+                stop("predictWithModel() could not find the two response values of this logistic model. Pass the output of buildModel().")
+            }
+            probability <- unname(as.numeric(tryCatch(
+                stats::predict(model, data, type = "response"),
+                error = function(e) {
+                    if (grepl("new level", conditionMessage(e))) {
+                        stop("predictWithModel(): the new data contain a group the model was not built on (",
+                             conditionMessage(e), "). A model can only predict for groups it has seen.", call. = FALSE)
+                    }
+                    stop(e)
+                }
+            )))
+            output[[paste0("probability_", classes[2])]] <- probability
+            output[["predicted_class"]] <- ifelse(probability >= 0.5, classes[2], classes[1])
         }
 
         if (model_type == "random_forest_regression") {

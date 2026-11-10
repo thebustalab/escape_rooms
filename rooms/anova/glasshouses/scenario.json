@@ -870,7 +870,7 @@
       "built": true,
       "unlockedWhen": true,
       "level": 1,
-      "designNote": "RUNG 1 at the Director's desk: his draft ('soil makes no difference; water generously') and the pot trial. One-way ANOVA of watering on grain_weight; share. ANSWER 0.200 (check, ± 0.005). Solving frees the potting-shed key from the desk. The wind-up MANTEL CLOCK stopped at 11:40 (pendulum still); the DUTY ROSTER and the note that its winder left early. The Fisher & Mackenzie 1923 volume on the desk (the plaque). The CLOCK CLOSET behind the panelling: in the lit state the panel stands open on the keeper's REGULATOR, 9:15, pendulum swinging (cinemagraph, tick sfx). Drawn only in the lit state.",
+      "designNote": "RUNG 1 at the Director's desk: his draft ('soil makes no difference; water generously') and the pot trial. One-way ANOVA of watering on grain_weight; share. ANSWER 0.200 (check, \u00b1 0.005). Solving frees the potting-shed key from the desk. The wind-up MANTEL CLOCK stopped at 11:40 (pendulum still); the DUTY ROSTER and the note that its winder left early. The Fisher & Mackenzie 1923 volume on the desk (the plaque). The CLOCK CLOSET behind the panelling: in the lit state the panel stands open on the keeper's REGULATOR, 9:15, pendulum swinging (cinemagraph, tick sfx). Drawn only in the lit state.",
       "plannedHotspots": [
         {
           "type": "puzzle",
@@ -886,7 +886,7 @@
             ],
             "maxAttempts": 4,
             "expr": "local({ a <- suppressWarnings(as.numeric(unlist(answer))); length(a) == 1 && !is.na(a) && abs(a - 0.2) <= 0.005 })",
-            "hint": "One factor, one response: the formula is <code>grain_weight ~ watering</code>, and the share of the variation explained is the <code>share</code> column, on that factor’s row.",
+            "hint": "One factor, one response: the formula is <code>grain_weight ~ watering</code>, and the share of the variation explained is the <code>share</code> column, on that factor\u2019s row.",
             "feedback": {
               "correct": "Correct, noted in your field notebook: watering alone explains about 20% of the variation in grain weight (share 0.200).",
               "wrong": [
@@ -1238,7 +1238,7 @@
             ],
             "maxAttempts": 4,
             "expr": "local({ a <- suppressWarnings(as.numeric(unlist(answer))); length(a) == 1 && !is.na(a) && abs(a - 0.2) <= 0.005 })",
-            "hint": "One factor, one response: the formula is <code>grain_weight ~ watering</code>, and the share of the variation explained is the <code>share</code> column, on that factor’s row.",
+            "hint": "One factor, one response: the formula is <code>grain_weight ~ watering</code>, and the share of the variation explained is the <code>share</code> column, on that factor\u2019s row.",
             "feedback": {
               "correct": "Correct, noted in your field notebook: watering alone explains about 20% of the variation in grain weight (share 0.200).",
               "wrong": [
@@ -2047,11 +2047,11 @@
             ],
             "maxAttempts": 2,
             "expr": "local({ a <- tolower(trimws(as.character(unlist(answer)))); identical(a, c(\"watering\", \"potash\", \"soil\")) })",
-            "hint": "Three formulas, one factor each. Compare the <code>share</code> on each factor’s row.",
+            "hint": "Three formulas, one factor each. Compare the <code>share</code> on each factor\u2019s row.",
             "feedback": {
               "correct": "Correct, noted in your field notebook: for grain, watering first, then potash, then soil (shares 0.200, 0.136, 0.009).",
               "wrong": [
-                "Build one model per factor and read its ANOVA table: <code>buildModel(data = pot_trial, model_type = \"linear_regression\", formula = grain_weight ~ watering) %&gt;% anovaTest()</code>, then the same with <code>soil</code> and with <code>potash</code>, and write down the <code>share</code> on each factor’s row. Order them largest first, spelled as the columns are: <code>answer &lt;- c(\"...\", \"...\", \"...\")</code>.",
+                "Build one model per factor and read its ANOVA table: <code>buildModel(data = pot_trial, model_type = \"linear_regression\", formula = grain_weight ~ watering) %&gt;% anovaTest()</code>, then the same with <code>soil</code> and with <code>potash</code>, and write down the <code>share</code> on each factor\u2019s row. Order them largest first, spelled as the columns are: <code>answer &lt;- c(\"...\", \"...\", \"...\")</code>.",
                 "Each factor gets its own one-way ANOVA. Putting all three in one formula changes the numbers."
               ]
             }
@@ -2370,11 +2370,11 @@
             ],
             "maxAttempts": 2,
             "expr": "local({ a <- tolower(trimws(as.character(unlist(answer)))); identical(a, c(\"watering\", \"potash\", \"soil\")) })",
-            "hint": "Three formulas, one factor each. Compare the <code>share</code> on each factor’s row.",
+            "hint": "Three formulas, one factor each. Compare the <code>share</code> on each factor\u2019s row.",
             "feedback": {
               "correct": "Correct, noted in your field notebook: for grain, watering first, then potash, then soil (shares 0.200, 0.136, 0.009).",
               "wrong": [
-                "Build one model per factor and read its ANOVA table: <code>buildModel(data = pot_trial, model_type = \"linear_regression\", formula = grain_weight ~ watering) %&gt;% anovaTest()</code>, then the same with <code>soil</code> and with <code>potash</code>, and write down the <code>share</code> on each factor’s row. Order them largest first, spelled as the columns are: <code>answer &lt;- c(\"...\", \"...\", \"...\")</code>.",
+                "Build one model per factor and read its ANOVA table: <code>buildModel(data = pot_trial, model_type = \"linear_regression\", formula = grain_weight ~ watering) %&gt;% anovaTest()</code>, then the same with <code>soil</code> and with <code>potash</code>, and write down the <code>share</code> on each factor\u2019s row. Order them largest first, spelled as the columns are: <code>answer &lt;- c(\"...\", \"...\", \"...\")</code>.",
                 "Each factor gets its own one-way ANOVA. Putting all three in one formula changes the numbers."
               ]
             }
@@ -4251,5 +4251,19 @@
   ],
   "setup": "suppressMessages({library(dplyr); library(ggplot2)})",
   "cover": "cover.png",
-  "ambient": "dust"
+  "ambient": "dust",
+  "escapeHints": [
+    {
+      "after": 4,
+      "text": "Look at every clock in the house, including the ones behind doors you could only open once the power came back."
+    },
+    {
+      "after": 8,
+      "text": "The dials all agree because they stopped together. Look for a clock that has nothing to do with the electric system."
+    },
+    {
+      "after": 12,
+      "text": "The gate wants minutes, not a time: how far the dials fell behind. Compare them with the one clock that never stopped."
+    }
+  ]
 }

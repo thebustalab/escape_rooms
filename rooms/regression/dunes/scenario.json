@@ -2,18 +2,18 @@
   "chapter": "regression",
   "scenario": "dunes",
   "id": 27,
-  "title": "Dunes",
+  "title": "Low Water",
   "subtitle": "A last wagon train, a stranded steamer, and a town with water until December.",
-  "story": "It is October 1928, and the diamond town's tanks run dry on 17 December. The company has written the town off. Its last water steamer, with a sea-water condenser aboard, lies stranded up the coast beyond a breach the storm cut through the sand spit, and the wagon trains are leaving across the desert. You stayed, with a few oxen left for one last train.\n\nThe company left its wagon ledger behind: how many days each past train took to cross, and this season's trains. Use it to work out what sets a crossing time, and whether the last train, carrying everyone who remains, can cross within the company's 14-day limit. The town has given up on the steamer too: it says the bar at the breach never comes dry before the water runs out. Go down the cliff behind the general store, cross the dunes to the flats, and test that on the engineer's tide machine in his wrecked hut above the ford. Then work out when to set off to haul the condenser home.",
+  "story": "It is October 1928, and the diamond town's reservoir has run dry. The town's emergency water tanks will also run dry soon - on December 17th. The company that runs the town has abandoned it. The company's last steamship delivery, which had a sea-water condenser aboard, crashed up the coast beyond a breach that is blocked by water. The town used their tide machine to determine whether the water would ever recede enough to let the condenser be retrived before the 17th. They concluded it would not. Almost everyone has now left the town, crossing the desert on wagon trains. You stayed, with a few oxen left for one last train. The company left its crossing records behind: how many days each past wagon train took to cross the desert. Use the records to work out what determines a crossing time, and whether the last train, which would carry you and everyone who remains, can cross within 14 days - the longest trip you could manage with the water you can carry. If you can't make it within that time, you'll need to find a way to get the condenser from the steamship...",
   "enterLabel": "Walk into town",
   "status": "in_development",
   "doorLabels": true,
-  "escapeBrief": "To get out you worked out when to set off to haul the condenser back from the stranded water steamer. It is 1928; the river has not flooded in two years, the company has abandoned the town and stopped the water shipments, and its last steamer, carrying a sea-water condenser, lies beyond a breach the storm cut through the sand spit. The town's tanks last 70 days, to 17 December. The town has given up: it holds two of the engineer's four pulleys, the moon's and the sun's, and on its two-peg bench machine the water over the bar never drops below the wading line before the tanks run dry, so most people are leaving by land. You took those two pulleys down with you, found the other two in the dunes and on the flats, and rebuilt the engineer's full tide machine in his wrecked hut. A bigger pulley swings the wire further, so which pulley goes on which shaft says how much each rhythm moves the water, and the datum screw sets the average water level; the storm had knocked it out of true. Setting the datum on one of the engineer's measured depths and cranking to the others showed which way round the last two pulleys go: only the right order puts the pen on all three. A survey stake on the flats gave the bar's length, 1,200 m, and the haul gang's note in the store gave the sledge's pace, 400 m a day, so the bar had to stay dry for three days. Cranking forward, it does that only once before the water runs out, from the evening of 7 December, so you set off on 7, 8 or 9 December and rallied the town. The town's machine left two rhythms out, and the machine as found sat on the wrong average level. Adding the missing inputs, each weighted by how much it matters, fitting the average level as well, checking the result against what was measured, and beating the simpler model everyone trusted is exactly what a multiple regression does, on the machine or in R.",
+  "escapeBrief": "To get out you worked out when to set off to haul the condenser back from the stranded water steamer. It is 1928; the river has not flooded in two years, the company has abandoned the town and stopped the water shipments, and its last steamer, carrying a sea-water condenser, lies beyond a breach the storm cut through the sand spit. The town's tanks last 70 days, to 17 December. The town has given up: it holds two of the engineer's four pulleys, the moon's and the sun's, and on its two-peg bench machine the water over the bar never drops below the wading line before the tanks run dry, so most people are leaving by land. You took those two pulleys down with you, found the other two in the dunes and on the flats, and rebuilt the engineer's full tide machine in his wrecked hut. A bigger pulley swings the wire further, so which pulley goes on which shaft says how much each rhythm moves the water, and the datum screw sets the average water level; the storm had knocked it out of true. Setting the datum on one of the engineer's measured depths and cranking to the others showed which way round the last two pulleys go: only the right order puts the pen on all three. A survey stake on the flats gave the bar's length, 1,200 m, and the haul gang's note in the store gave the sledge's pace, 400 m a day, so the bar had to stay dry for three days. Cranking forward, it does that only once before the water runs out, from the evening of 7 December, so you set off on 7, 8 or 9 December and rallied the town. The town's machine left two rhythms out, and the machine as found sat on the wrong average level. Adding the missing predictors, each weighted by how much it matters, fitting the average level as well, checking the result against what was measured, and beating the simpler model everyone trusted is exactly what a multiple regression does, on the machine or in R.",
   "_designNotes": "Steps 1-2, 3a (bar the music) and 3b DONE; 4a graph written by _scratch/build_graph.py (2026-10-24, session 'dunes'): 18 rooms, four item doors, two cluster aerials (_clusters), no scene specs or art yet. Design record: notes.md §12.",
   "ambient": "dust",
   "debrief": {
     "title": "How this world worked",
-    "intro": "This scenario was linear regression with several inputs, fitting one model to many measurements at once so you can see which of them really drive an outcome, and then using that model to predict cases you have not measured yet. Here is what you did."
+    "intro": "This scenario was linear regression with several predictors, fitting one model to many measurements at once so you can see which of them really drive the response, and then using that model to predict cases you have not measured yet. Here is what you did."
   },
   "done": {
     "title": "The last train stays",
@@ -1890,26 +1890,26 @@
         {
           "src": "audio/wagon_yard_bed_desert_windmill.mp3",
           "mode": "loop",
-          "volume": 0.5,
+          "volume": 0.07,
           "crossfade": 4
         },
         {
           "src": "audio/wagon_yard_bed_desert_sand_wind.mp3",
           "mode": "loop",
-          "volume": 0.3,
+          "volume": 0.05,
           "crossfade": 4
         },
         {
           "src": "audio/wagon_yard_oneshot_pump_squeal.mp3",
           "mode": "interval",
-          "volume": 0.3,
+          "volume": 0.05,
           "gapMin": 11,
           "gapMax": 24
         },
         {
           "src": "audio/wagon_yard_oneshot_windmill_stop.mp3",
           "mode": "interval",
-          "volume": 0.3,
+          "volume": 0.1,
           "gapMin": 17,
           "gapMax": 36
         }
@@ -3779,10 +3779,10 @@
           "type": "door",
           "label": "Back to the wagon yard",
           "box": [
-            0.1517,
-            0.5006,
-            0.1717,
-            0.7566
+            0.1375,
+            0.4093,
+            0.1575,
+            0.6653
           ],
           "direction": "open",
           "to": "wagon_yard",
@@ -3793,10 +3793,10 @@
           "type": "door",
           "label": "The town hall",
           "box": [
-            0.6472,
-            0.448,
-            0.6728,
-            0.6208
+            0.6541,
+            0.4489,
+            0.6797,
+            0.6217
           ],
           "direction": "open",
           "to": "town_hall",
@@ -3884,22 +3884,35 @@
       "designNote": "Meeting hall, ground floor. The town's two-peg BENCH MACHINE (the teaching model: moon and sun only) under the town's chalked verdict; the player cranks it, sees no window before the water runs out, and lifts the moon and sun pulleys off. The water board chalked down to 17 December. The company's letter writing off the steamer and the condenser aboard her. An internal stair, depicted, up to the company office.",
       "plannedHotspots": [
         {
-          "type": "clue",
+          "type": "instrument",
           "label": "The town's bench machine",
-          "note": "The two-pulley machine (moon, sun) under the chalked verdict. Cranked, it shows no dry stretch before 17 December (the escape's trap, notes.md §3). Interaction form is the tide instrument's delta (§7); never shows a date as text.",
-          "body": "The town's bench machine: two pegs, with the moon pulley and the sun pulley on them. Chalked above it: <i>Cranked to 17 December. The bar never comes dry. Leave by land.</i>",
+          "note": "The town's two-peg bench machine (moon and sun), a working tide instrument in bench mode: the pulleys sit on it until the player takes them, the datum is the true one, and cranked to 17 December the pen never crosses the wading line (the escape's trap, notes.md §3). The chalked verdict is its caption.",
           "box": [
             0.4775,
             0.5264,
             0.5342,
             0.5874
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "kind": "tide",
+          "geometry": "instruments/tide_bench/geometry.json",
+          "config": "instruments/tide_bench/machine.json",
+          "art": {
+            "board": "instruments/tide_bench/base.png"
+          },
+          "pulleys": {
+            "moon_pulley": "p208",
+            "sun_pulley": "p119"
+          },
+          "params": {
+            "bench": true,
+            "mountedUntilTaken": true,
+            "caption": "Chalked above it: <i>Cranked to 17 December. The sand bar to the grounded steamship never comes dry. Leave by land.</i>"
+          }
         },
         {
           "type": "clue",
           "label": "The moon pulley",
-          "pickup": "The moon pulley, from the town's bench machine.",
           "note": "Escape input: the engineer's moon pulley, off the town's bench machine. A carried item; the tide machine in the hut shelves it once held.",
           "gives": "moon_pulley",
           "body": "The moon pulley, lifted off the bench machine's peg.",
@@ -3909,12 +3922,12 @@
             0.55,
             0.5
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "image": "items/moon_pulley.jpg"
         },
         {
           "type": "clue",
           "label": "The sun pulley",
-          "pickup": "The sun pulley, from the town's bench machine.",
           "note": "Escape input: the engineer's sun pulley, off the town's bench machine. A carried item; the tide machine in the hut shelves it once held.",
           "gives": "sun_pulley",
           "body": "The sun pulley, lifted off the bench machine's peg.",
@@ -3924,14 +3937,15 @@
             0.46,
             0.5355
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "image": "items/sun_pulley.jpg"
         },
         {
           "type": "clue",
           "label": "The water board",
-          "pickup": "The town's tanks run dry on 17 December.",
+          "pickup": "The town's emergency water tanks run dry on 17 December.",
           "note": "Escape input: the tanks run dry on 17 December (70 days from 8 October).",
-          "body": "Chalked on the water board: <i>Tanks dry 17 December.</i>",
+          "body": "Chalked on the water board: <i>Our emergency water tanks will run dry on 17 December.</i>",
           "box": [
             0.033,
             0.252,
@@ -3945,14 +3959,15 @@
           "label": "The company's letter",
           "pickup": "The company has written off the stranded steamer and her condenser.",
           "note": "Story: the company writes off the steamer and its condenser.",
-          "body": "A letter from the company, pinned to the wall: the stranded steamer and the sea-water condenser in her hold are written off, and no ship will be sent for them.",
+          "body": "",
           "box": [
             0.18,
             0.3295,
             0.2,
             0.3905
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "image": "clues/company_letter.jpg"
         },
         {
           "type": "door",
@@ -4197,74 +4212,89 @@
       "hotspots": [
         {
           "id": "the_town_s_bench_machine",
-          "type": "clue",
+          "type": "instrument",
           "label": "The town's bench machine",
           "box": [
-            0.4775,
-            0.5264,
-            0.5342,
-            0.5874
+            0.5045,
+            0.4939,
+            0.5612,
+            0.5549
           ],
-          "body": "The town's bench machine: two pegs, with the moon pulley and the sun pulley on them. Chalked above it: <i>Cranked to 17 December. The bar never comes dry. Leave by land.</i>",
-          "boxSource": "draft:skeleton"
+          "boxSource": "moved:testplay",
+          "kind": "tide",
+          "geometry": "instruments/tide_bench/geometry.json",
+          "config": "instruments/tide_bench/machine.json",
+          "art": {
+            "board": "instruments/tide_bench/base.png"
+          },
+          "pulleys": {
+            "moon_pulley": "p208",
+            "sun_pulley": "p119"
+          },
+          "params": {
+            "bench": true,
+            "mountedUntilTaken": true,
+            "caption": "Chalked above it: <i>Cranked to 17 December. The sand bar to the grounded steamship never comes dry. Leave by land.</i>"
+          }
         },
         {
           "id": "the_moon_pulley",
           "type": "clue",
           "label": "The moon pulley",
           "box": [
-            0.53,
-            0.45,
-            0.55,
-            0.5
+            0.5033,
+            0.4845,
+            0.5233,
+            0.5345
           ],
-          "pickup": "The moon pulley, from the town's bench machine.",
           "gives": "moon_pulley",
           "body": "The moon pulley, lifted off the bench machine's peg.",
-          "boxSource": "draft:skeleton"
+          "boxSource": "moved:testplay",
+          "image": "items/moon_pulley.jpg"
         },
         {
           "id": "the_sun_pulley",
           "type": "clue",
           "label": "The sun pulley",
           "box": [
-            0.44,
-            0.4745,
-            0.46,
-            0.5355
+            0.4763,
+            0.4839,
+            0.4963,
+            0.5449
           ],
-          "pickup": "The sun pulley, from the town's bench machine.",
           "gives": "sun_pulley",
           "body": "The sun pulley, lifted off the bench machine's peg.",
-          "boxSource": "draft:skeleton"
+          "boxSource": "moved:testplay",
+          "image": "items/sun_pulley.jpg"
         },
         {
           "id": "the_water_board",
           "type": "clue",
           "label": "The water board",
           "box": [
-            0.033,
-            0.252,
-            0.105,
-            0.444
+            0.1011,
+            0.3191,
+            0.1731,
+            0.5111
           ],
-          "pickup": "The town's tanks run dry on 17 December.",
-          "body": "Chalked on the water board: <i>Tanks dry 17 December.</i>",
-          "boxSource": "draft:skeleton"
+          "pickup": "The town's emergency water tanks run dry on 17 December.",
+          "body": "Chalked on the water board: <i>Our emergency water tanks will run dry on 17 December.</i>",
+          "boxSource": "moved:testplay"
         },
         {
           "id": "the_company_s_letter",
           "type": "clue",
           "label": "The company's letter",
           "box": [
-            0.18,
-            0.3295,
-            0.2,
-            0.3905
+            0.2168,
+            0.4047,
+            0.2368,
+            0.4657
           ],
           "pickup": "The company has written off the stranded steamer and her condenser.",
-          "body": "A letter from the company, pinned to the wall: the stranded steamer and the sea-water condenser in her hold are written off, and no ship will be sent for them.",
-          "boxSource": "draft:skeleton"
+          "body": "",
+          "boxSource": "moved:testplay",
+          "image": "clues/company_letter.jpg"
         },
         {
           "id": "back_out_to_main_street",
@@ -4285,14 +4315,14 @@
           "type": "door",
           "label": "Up the stair to the company office",
           "box": [
-            0.6181,
-            0.5054,
-            0.6381,
-            0.6297
+            0.6654,
+            0.3224,
+            0.6854,
+            0.4467
           ],
           "direction": "open",
           "to": "company_office",
-          "boxSource": "draft:skeleton"
+          "boxSource": "moved:testplay"
         },
         {
           "id": "clip_base",
@@ -4320,26 +4350,26 @@
         {
           "src": "audio/town_hall_bed_iron_woodstove.mp3",
           "mode": "loop",
-          "volume": 0.5,
+          "volume": 0.0,
           "crossfade": 4
         },
         {
           "src": "audio/town_hall_bed_stove_roar.mp3",
           "mode": "loop",
-          "volume": 0.2213559799913842,
+          "volume": 0.12,
           "crossfade": 4
         },
         {
           "src": "audio/town_hall_oneshot_stove_door_clank.mp3",
           "mode": "interval",
-          "volume": 0.3,
+          "volume": 0.13,
           "gapMin": 11,
           "gapMax": 24
         },
         {
           "src": "audio/town_hall_oneshot_board_creak.mp3",
           "mode": "interval",
-          "volume": 0.3,
+          "volume": 0.04,
           "gapMin": 17,
           "gapMax": 36
         }
@@ -4361,8 +4391,7 @@
           "type": "puzzle",
           "label": "The company's wagon ledger",
           "form": "check",
-          "gives": "store_key",
-          "note": "S1. Answer 0.3886. Gives the store key (the desk drawer). Prompt/options at step 6.",
+          "note": "S1. Answer 0.3886. Solving it unlocks the desk drawer (a clue shown once solved), which gives the store key.",
           "starterCode": "crossing_ledger",
           "check": {
             "prompt": "The company's rule of thumb is that every extra wagon slows a train down, and the council must decide whether to send the last people out in one train or several. Fit a straight line of crossing_days against wagons_in_train in crossing_ledger, find its slope (how many extra days each extra wagon adds), and assign that number to an object called answer. Then click \"Check my answer\".",
@@ -4375,7 +4404,7 @@
             "feedback": {
               "correct": "Correct &mdash; noted in your field notebook: on the wagons line, each extra wagon goes with about 0.39 more days on the crossing.",
               "wrong": [
-                "Fit the line with the course function: <code>wagons_model &lt;- buildModel(data = crossing_ledger, model_type = &quot;linear_regression&quot;, input_variables = &quot;wagons_in_train&quot;, output_variable = &quot;crossing_days&quot;)</code>. Then look at <code>wagons_model$metrics</code>.",
+                "Fit the line with the course function: <code>wagons_model &lt;- buildModel(data = crossing_ledger, model_type = &quot;linear_regression&quot;, predictors = &quot;wagons_in_train&quot;, response = &quot;crossing_days&quot;)</code>. Then look at <code>wagons_model$metrics</code>.",
                 "The slope is a coefficient: <code>wagons_model$metrics %&gt;% filter(type == &quot;coefficient&quot;)</code>. It is the wagons_in_train row, not the (Intercept) row, and not r_squared.",
                 "answer is a single number: the value in the wagons_in_train row, for example <code>answer &lt;- 0.123</code> with your own number in place of 0.123."
               ]
@@ -4392,6 +4421,24 @@
             "src": "audio/solve_company_office_the_company_s_wagon_ledger_ledger_shut.mp3",
             "volume": 0.5340614850539357
           }
+        },
+        {
+          "type": "clue",
+          "label": "The desk drawer",
+          "image": "items/store_key.jpg",
+          "body": "With the ledger's sum worked out, the clerk's drawer comes unlocked. Inside, tied to a loop of red string, is the store key.",
+          "gives": "store_key",
+          "shownWhen": {
+            "solved": "company_office"
+          },
+          "box": [
+            0.7,
+            0.73,
+            0.775,
+            0.8
+          ],
+          "boxSource": "agent:desk_drawer",
+          "note": "Appears once S1 is solved; a carried-item clue with one Take button (Lucas, 2026-11-08)."
         },
         {
           "type": "door",
@@ -4565,13 +4612,12 @@
           "type": "puzzle",
           "label": "The company's wagon ledger",
           "box": [
-            0.5195,
-            0.5166,
-            0.7396,
-            0.9033
+            0.5584,
+            0.4501,
+            0.7785,
+            0.75
           ],
           "form": "check",
-          "gives": "store_key",
           "starterCode": "crossing_ledger",
           "check": {
             "prompt": "The company's rule of thumb is that every extra wagon slows a train down, and the council must decide whether to send the last people out in one train or several. Fit a straight line of crossing_days against wagons_in_train in crossing_ledger, find its slope (how many extra days each extra wagon adds), and assign that number to an object called answer. Then click \"Check my answer\".",
@@ -4584,17 +4630,35 @@
             "feedback": {
               "correct": "Correct &mdash; noted in your field notebook: on the wagons line, each extra wagon goes with about 0.39 more days on the crossing.",
               "wrong": [
-                "Fit the line with the course function: <code>wagons_model &lt;- buildModel(data = crossing_ledger, model_type = &quot;linear_regression&quot;, input_variables = &quot;wagons_in_train&quot;, output_variable = &quot;crossing_days&quot;)</code>. Then look at <code>wagons_model$metrics</code>.",
+                "Fit the line with the course function: <code>wagons_model &lt;- buildModel(data = crossing_ledger, model_type = &quot;linear_regression&quot;, predictors = &quot;wagons_in_train&quot;, response = &quot;crossing_days&quot;)</code>. Then look at <code>wagons_model$metrics</code>.",
                 "The slope is a coefficient: <code>wagons_model$metrics %&gt;% filter(type == &quot;coefficient&quot;)</code>. It is the wagons_in_train row, not the (Intercept) row, and not r_squared.",
                 "answer is a single number: the value in the wagons_in_train row, for example <code>answer &lt;- 0.123</code> with your own number in place of 0.123."
               ]
             }
           },
-          "boxSource": "draft:skeleton",
+          "boxSource": "moved:testplay",
           "solveSfx": {
             "src": "audio/solve_company_office_the_company_s_wagon_ledger_ledger_shut.mp3",
             "volume": 0.5340614850539357
           }
+        },
+        {
+          "id": "the_desk_drawer",
+          "type": "clue",
+          "label": "The desk drawer",
+          "image": "items/store_key.jpg",
+          "body": "With the ledger's sum worked out, the clerk's drawer comes unlocked. Inside, tied to a loop of red string, is the store key.",
+          "gives": "store_key",
+          "shownWhen": {
+            "solved": "company_office"
+          },
+          "box": [
+            0.5367,
+            0.5973,
+            0.6117,
+            0.6673
+          ],
+          "boxSource": "moved:testplay"
         },
         {
           "id": "back_down_the_stair_to_the_hall",
@@ -4691,8 +4755,8 @@
             "feedback": {
               "correct": "Correct &mdash; noted in your field notebook: the wagons line predicts the Desert_Rose across in 13.20 days, inside the company's 14-day limit.",
               "wrong": [
-                "Fit the wagons line as before (<code>wagons_model &lt;- buildModel(data = crossing_ledger, model_type = &quot;linear_regression&quot;, input_variables = &quot;wagons_in_train&quot;, output_variable = &quot;crossing_days&quot;)</code>), then predict on this season's trains: <code>predictWithModel(data = crossing_ledger_unknown, model = wagons_model)</code>.",
-                "Use the line with wagons_in_train as its only input, not a model with more measurements. crossing_ledger_unknown has no crossing_days column: the model supplies it.",
+                "Fit the wagons line as before (<code>wagons_model &lt;- buildModel(data = crossing_ledger, model_type = &quot;linear_regression&quot;, predictors = &quot;wagons_in_train&quot;, response = &quot;crossing_days&quot;)</code>), then predict on this season's trains: <code>predictWithModel(data = crossing_ledger_unknown, model = wagons_model)</code>.",
+                "Use the line with wagons_in_train as its only predictor, not a model with more measurements. crossing_ledger_unknown has no crossing_days column: the model supplies it.",
                 "The predictions come back as crossing_ledger_unknown with a new predicted_crossing_days column. <code>filter(train == &quot;Desert_Rose&quot;)</code> finds the one row; assign its prediction (add <code>$predicted_crossing_days</code>) to answer."
               ]
             }
@@ -4951,8 +5015,8 @@
             "feedback": {
               "correct": "Correct &mdash; noted in your field notebook: the wagons line predicts the Desert_Rose across in 13.20 days, inside the company's 14-day limit.",
               "wrong": [
-                "Fit the wagons line as before (<code>wagons_model &lt;- buildModel(data = crossing_ledger, model_type = &quot;linear_regression&quot;, input_variables = &quot;wagons_in_train&quot;, output_variable = &quot;crossing_days&quot;)</code>), then predict on this season's trains: <code>predictWithModel(data = crossing_ledger_unknown, model = wagons_model)</code>.",
-                "Use the line with wagons_in_train as its only input, not a model with more measurements. crossing_ledger_unknown has no crossing_days column: the model supplies it.",
+                "Fit the wagons line as before (<code>wagons_model &lt;- buildModel(data = crossing_ledger, model_type = &quot;linear_regression&quot;, predictors = &quot;wagons_in_train&quot;, response = &quot;crossing_days&quot;)</code>), then predict on this season's trains: <code>predictWithModel(data = crossing_ledger_unknown, model = wagons_model)</code>.",
+                "Use the line with wagons_in_train as its only predictor, not a model with more measurements. crossing_ledger_unknown has no crossing_days column: the model supplies it.",
                 "The predictions come back as crossing_ledger_unknown with a new predicted_crossing_days column. <code>filter(train == &quot;Desert_Rose&quot;)</code> finds the one row; assign its prediction (add <code>$predicted_crossing_days</code>) to answer."
               ]
             }
@@ -11379,7 +11443,6 @@
         {
           "type": "clue",
           "label": "The engineer's handcart",
-          "pickup": "A padlock key, from the engineer's handcart on the beach.",
           "note": "Holds the yard key (take it). No escape number here.",
           "gives": "yard_key",
           "body": "Under the overturned handcart, a padlock key on a loop of tarred string.",
@@ -11389,7 +11452,8 @@
             0.2,
             0.794
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "image": "items/yard_key.jpg"
         },
         {
           "type": "door",
@@ -13361,10 +13425,10 @@
             0.2,
             0.794
           ],
-          "pickup": "A padlock key, from the engineer's handcart on the beach.",
           "gives": "yard_key",
           "body": "Under the overturned handcart, a padlock key on a loop of tarred string.",
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "image": "items/yard_key.jpg"
         },
         {
           "id": "up_the_old_cart_ramp",
@@ -13486,12 +13550,12 @@
             "width": 7,
             "height": 4.2,
             "maxAttempts": 4,
-            "hint": "Scale the six measurements first, then compare the coefficients by their size.",
+            "hint": "In buildModel(), add scale_variance = TRUE so all six measurements are on the same scale, then compare the coefficients by their size.",
             "feedback": {
               "correct": "Correct &mdash; noted in your field notebook: once the measurements are scaled, load_per_ox_kg has by far the largest effect on the crossing time; wagons_in_train has the smallest.",
               "wrong": [
-                "Scale first, as the chapter does: <code>scaled_crossing_ledger &lt;- crossing_ledger %&gt;% mutate(across(c(wagons_in_train, load_per_ox_kg, loose_sand_km, rim_width_cm, midday_heat_c, driver_years), scale))</code>. Then fit crossing_days on all six with <code>buildModel()</code>, giving it <code>input_variables = c(&quot;wagons_in_train&quot;, &quot;load_per_ox_kg&quot;, &quot;loose_sand_km&quot;, &quot;rim_width_cm&quot;, &quot;midday_heat_c&quot;, &quot;driver_years&quot;)</code>.",
-                "Keep only the measurements: <code>filter(type == &quot;coefficient&quot;, variable != &quot;(Intercept)&quot;) %&gt;% arrange(desc(abs(value)))</code> on the metrics. The intercept is not a measurement, and an unscaled model ranks rim_width_cm first only because one centimeter of rim is a very large step.",
+                "Let buildModel() do the scaling: fit crossing_days on all six with <code>predictors = c(&quot;wagons_in_train&quot;, &quot;load_per_ox_kg&quot;, &quot;loose_sand_km&quot;, &quot;rim_width_cm&quot;, &quot;midday_heat_c&quot;, &quot;driver_years&quot;)</code> and add <code>scale_variance = TRUE</code>.",
+                "Keep only the measurements: <code>filter(type == &quot;coefficient&quot;, variable != &quot;(Intercept)&quot;) %&gt;% arrange(desc(abs(value)))</code> on the metrics. The intercept is not a measurement, and a model without scale_variance = TRUE ranks rim_width_cm first only because one centimeter of rim is a very large step.",
                 "Plot the table you just made: <code>p &lt;- ggplot(coefficients, aes(x = variable, y = abs(value))) + geom_col()</code>, with your own table's name in place of coefficients, then click the tallest bar."
               ]
             }
@@ -13511,7 +13575,6 @@
         {
           "type": "clue",
           "label": "The near-and-far pulley",
-          "pickup": "The near-and-far pulley, from the engineer's sled.",
           "note": "Escape input: the engineer's near-and-far pulley, in the engineer's overturned sled. A carried item; the tide machine in the hut shelves it once held.",
           "gives": "near_far_pulley",
           "body": "The near-and-far pulley, spilled from the engineer's sled.",
@@ -13521,7 +13584,8 @@
             0.565,
             0.6955
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "image": "items/near_far_pulley.jpg"
         },
         {
           "type": "door",
@@ -14771,12 +14835,12 @@
             "width": 7,
             "height": 4.2,
             "maxAttempts": 4,
-            "hint": "Scale the six measurements first, then compare the coefficients by their size.",
+            "hint": "In buildModel(), add scale_variance = TRUE so all six measurements are on the same scale, then compare the coefficients by their size.",
             "feedback": {
               "correct": "Correct &mdash; noted in your field notebook: once the measurements are scaled, load_per_ox_kg has by far the largest effect on the crossing time; wagons_in_train has the smallest.",
               "wrong": [
-                "Scale first, as the chapter does: <code>scaled_crossing_ledger &lt;- crossing_ledger %&gt;% mutate(across(c(wagons_in_train, load_per_ox_kg, loose_sand_km, rim_width_cm, midday_heat_c, driver_years), scale))</code>. Then fit crossing_days on all six with <code>buildModel()</code>, giving it <code>input_variables = c(&quot;wagons_in_train&quot;, &quot;load_per_ox_kg&quot;, &quot;loose_sand_km&quot;, &quot;rim_width_cm&quot;, &quot;midday_heat_c&quot;, &quot;driver_years&quot;)</code>.",
-                "Keep only the measurements: <code>filter(type == &quot;coefficient&quot;, variable != &quot;(Intercept)&quot;) %&gt;% arrange(desc(abs(value)))</code> on the metrics. The intercept is not a measurement, and an unscaled model ranks rim_width_cm first only because one centimeter of rim is a very large step.",
+                "Let buildModel() do the scaling: fit crossing_days on all six with <code>predictors = c(&quot;wagons_in_train&quot;, &quot;load_per_ox_kg&quot;, &quot;loose_sand_km&quot;, &quot;rim_width_cm&quot;, &quot;midday_heat_c&quot;, &quot;driver_years&quot;)</code> and add <code>scale_variance = TRUE</code>.",
+                "Keep only the measurements: <code>filter(type == &quot;coefficient&quot;, variable != &quot;(Intercept)&quot;) %&gt;% arrange(desc(abs(value)))</code> on the metrics. The intercept is not a measurement, and a model without scale_variance = TRUE ranks rim_width_cm first only because one centimeter of rim is a very large step.",
                 "Plot the table you just made: <code>p &lt;- ggplot(coefficients, aes(x = variable, y = abs(value))) + geom_col()</code>, with your own table's name in place of coefficients, then click the tallest bar."
               ]
             }
@@ -14797,10 +14861,10 @@
             0.565,
             0.6955
           ],
-          "pickup": "The near-and-far pulley, from the engineer's sled.",
           "gives": "near_far_pulley",
           "body": "The near-and-far pulley, spilled from the engineer's sled.",
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "image": "items/near_far_pulley.jpg"
         },
         {
           "id": "back_down_the_coast_road_to_the_beach",
@@ -14882,7 +14946,6 @@
         {
           "type": "clue",
           "label": "The wind pulley",
-          "pickup": "The wind pulley, from among the whale's ribs.",
           "note": "Escape input: the engineer's wind pulley, half-buried among the whale's ribs. A carried item; the tide machine in the hut shelves it once held.",
           "gives": "wind_pulley",
           "body": "The wind pulley, half buried in the sand among the ribs.",
@@ -14892,7 +14955,8 @@
             0.45,
             0.68
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "image": "items/wind_pulley.jpg"
         },
         {
           "type": "door",
@@ -16230,10 +16294,10 @@
             0.3267,
             0.7608
           ],
-          "pickup": "The wind pulley, from among the whale's ribs.",
           "gives": "wind_pulley",
           "body": "The wind pulley, half buried in the sand among the ribs.",
-          "boxSource": "moved:testplay"
+          "boxSource": "moved:testplay",
+          "image": "items/wind_pulley.jpg"
         },
         {
           "id": "back_along_the_beach",
@@ -19506,13 +19570,13 @@
               "answer"
             ],
             "expr": "{ a <- if (is.data.frame(answer)) (if (\"predicted_crossing_days\" %in% names(answer)) answer$predicted_crossing_days else answer$value) else answer; a <- suppressWarnings(as.numeric(a)); isTRUE(length(a) == 1 && abs(a - 17.82) < 0.15) }",
-            "hint": "Fit on all six measurements as measured, predict this season's trains, and find Last_Train.",
+            "hint": "Fit on all six measurements, predict this season's trains, and find Last_Train.",
             "maxAttempts": 4,
             "feedback": {
               "correct": "Correct &mdash; noted in your field notebook: on all six measurements, Last_Train would take about 17.8 days, past the 14-day limit. The wagons line said 8.9. The last train cannot go; the condenser is the only plan left.",
               "wrong": [
-                "Fit on the trains as measured, not scaled: <code>full_model &lt;- buildModel(data = crossing_ledger, model_type = &quot;linear_regression&quot;, input_variables = c(&quot;wagons_in_train&quot;, &quot;load_per_ox_kg&quot;, &quot;loose_sand_km&quot;, &quot;rim_width_cm&quot;, &quot;midday_heat_c&quot;, &quot;driver_years&quot;), output_variable = &quot;crossing_days&quot;)</code>. Then <code>predictWithModel(data = crossing_ledger_unknown, model = full_model)</code>.",
-                "The wagons line alone is the shortcut the dumped loads have already overturned: use all six measurements. If predictWithModel() says the variables have different types, the model was fitted on scaled data; a scaled model expects scaled inputs, so refit on crossing_ledger as measured.",
+                "Fit all six on crossing_ledger: <code>full_model &lt;- buildModel(data = crossing_ledger, model_type = &quot;linear_regression&quot;, predictors = c(&quot;wagons_in_train&quot;, &quot;load_per_ox_kg&quot;, &quot;loose_sand_km&quot;, &quot;rim_width_cm&quot;, &quot;midday_heat_c&quot;, &quot;driver_years&quot;), response = &quot;crossing_days&quot;)</code>. Then <code>predictWithModel(data = crossing_ledger_unknown, model = full_model)</code>.",
+                "The wagons line alone is the shortcut the dumped loads have already overturned: use all six measurements. A model fitted with scale_variance = TRUE gives the same predictions: predictWithModel() scales the new trains for you.",
                 "The predictions come back as crossing_ledger_unknown with a new predicted_crossing_days column. <code>filter(train == &quot;Last_Train&quot;)</code> finds your train; assign its prediction (add <code>$predicted_crossing_days</code>) to answer."
               ]
             }
@@ -19560,7 +19624,7 @@
           "boxSource": "draft:skeleton"
         }
       ],
-      "debrief": "Your own train was the one case that mattered most, so the answer had to come from the model that uses everything measured, not from the one-input rule the town trusted.",
+      "debrief": "Your own train was the one case that mattered most, so the answer had to come from the model that uses everything measured, not from the one-predictor rule the town trusted.",
       "mapPos": {
         "c": 1,
         "r": 4
@@ -19735,13 +19799,13 @@
               "answer"
             ],
             "expr": "{ a <- if (is.data.frame(answer)) (if (\"predicted_crossing_days\" %in% names(answer)) answer$predicted_crossing_days else answer$value) else answer; a <- suppressWarnings(as.numeric(a)); isTRUE(length(a) == 1 && abs(a - 17.82) < 0.15) }",
-            "hint": "Fit on all six measurements as measured, predict this season's trains, and find Last_Train.",
+            "hint": "Fit on all six measurements, predict this season's trains, and find Last_Train.",
             "maxAttempts": 4,
             "feedback": {
               "correct": "Correct &mdash; noted in your field notebook: on all six measurements, Last_Train would take about 17.8 days, past the 14-day limit. The wagons line said 8.9. The last train cannot go; the condenser is the only plan left.",
               "wrong": [
-                "Fit on the trains as measured, not scaled: <code>full_model &lt;- buildModel(data = crossing_ledger, model_type = &quot;linear_regression&quot;, input_variables = c(&quot;wagons_in_train&quot;, &quot;load_per_ox_kg&quot;, &quot;loose_sand_km&quot;, &quot;rim_width_cm&quot;, &quot;midday_heat_c&quot;, &quot;driver_years&quot;), output_variable = &quot;crossing_days&quot;)</code>. Then <code>predictWithModel(data = crossing_ledger_unknown, model = full_model)</code>.",
-                "The wagons line alone is the shortcut the dumped loads have already overturned: use all six measurements. If predictWithModel() says the variables have different types, the model was fitted on scaled data; a scaled model expects scaled inputs, so refit on crossing_ledger as measured.",
+                "Fit all six on crossing_ledger: <code>full_model &lt;- buildModel(data = crossing_ledger, model_type = &quot;linear_regression&quot;, predictors = c(&quot;wagons_in_train&quot;, &quot;load_per_ox_kg&quot;, &quot;loose_sand_km&quot;, &quot;rim_width_cm&quot;, &quot;midday_heat_c&quot;, &quot;driver_years&quot;), response = &quot;crossing_days&quot;)</code>. Then <code>predictWithModel(data = crossing_ledger_unknown, model = full_model)</code>.",
+                "The wagons line alone is the shortcut the dumped loads have already overturned: use all six measurements. A model fitted with scale_variance = TRUE gives the same predictions: predictWithModel() scales the new trains for you.",
                 "The predictions come back as crossing_ledger_unknown with a new predicted_crossing_days column. <code>filter(train == &quot;Last_Train&quot;)</code> finds your train; assign its prediction (add <code>$predicted_crossing_days</code>) to answer."
               ]
             }
@@ -23956,35 +24020,35 @@
   "items": {
     "store_key": {
       "name": "the store key",
-      "image": "items/store_key.png"
+      "image": "items/store_key.jpg"
     },
     "rope": {
       "name": "the rope",
-      "image": "items/rope.png"
+      "image": "items/rope.jpg"
     },
     "hut_key": {
       "name": "the hut key",
-      "image": "items/hut_key.png"
+      "image": "items/hut_key.jpg"
     },
     "yard_key": {
       "name": "the yard key",
-      "image": "items/yard_key.png"
+      "image": "items/yard_key.jpg"
     },
     "moon_pulley": {
       "name": "the moon pulley",
-      "image": "items/moon_pulley.png"
+      "image": "items/moon_pulley.jpg"
     },
     "sun_pulley": {
       "name": "the sun pulley",
-      "image": "items/sun_pulley.png"
+      "image": "items/sun_pulley.jpg"
     },
     "near_far_pulley": {
       "name": "the near-and-far pulley",
-      "image": "items/near_far_pulley.png"
+      "image": "items/near_far_pulley.jpg"
     },
     "wind_pulley": {
       "name": "the wind pulley",
-      "image": "items/wind_pulley.png"
+      "image": "items/wind_pulley.jpg"
     }
   },
   "ladderPlain": [
@@ -24052,7 +24116,21 @@
   "music": "audio/dunes_theme.mp3",
   "musicVolume": 0.15,
   "musicCredit": {
-    "text": "AVAYA x Raw Escapes — live at Red Sand Dunes (not AI-generated, per Lucas 2026-10-29)",
+    "text": "AVAYA x Raw Escapes — live at Red Sand Dunes",
     "url": "https://www.youtube.com/watch?v=Vk0phs58chs"
-  }
+  },
+  "escapeHints": [
+    {
+      "after": 4,
+      "text": "The engineer's hut, the survey stake on the flats and the haul gang's note in the store hold everything you need."
+    },
+    {
+      "after": 8,
+      "text": "The town's machine leaves two rhythms out and sits on the wrong average level. Only the full machine, set true, matches all of the engineer's measured depths."
+    },
+    {
+      "after": 12,
+      "text": "Work out how many days the sledge needs to cross the bar. Then crank the corrected machine forward and find the one stretch that long when the bar stays dry, before the tanks run out."
+    }
+  ]
 }

@@ -7,7 +7,7 @@
   "story": "You are the new water master of a diamond town on the desert plateau. The diamonds lie in the beach gravels, and barges carry the gravel up a flight of locks to the washing plant. The annual river flood has just filled the reservoir at the top of the flight of locks, and it is the town's only fresh water until next year. This morning the season's first string of barges waits at the foot of the flight, and it has to reach the top before the evening fog closes in. Sail in to the gravel wharf, then climb the stairs and footbridges that zigzag up along the locks. As you go, do two things. First, analyze data from the town prospectors: they have surveyed new gravel pits along the beach. Use those data to work out what determines if a new pit will be rich in diamonds or not, and whether any of the new pits clear the threshold for being worth mining. Second, fill each lock to lift its barge, note what each fill costs the reservoir, and pick up the lock-keepers' journal pages. At the gatehouse, work out how many more loads the reservoir can support before water runs short.",
   "enterLabel": "Sail in to the locks",
   "music": "audio/diamonds_theme.mp3",
-  "musicVolume": 0.15,
+  "musicVolume": 0.37,
   "musicCredit": {
     "text": "Majnoon — live at Rist Istanbul (Cafe De Anatolia)",
     "url": "https://www.youtube.com/watch?v=tEd1HkyzgsY"
@@ -29,18 +29,18 @@
       "designNote": "ARRIVAL (rooms[0]). Sail in under a Bogenfels-like arch: TRAVEL SEQUENCE into the tide pools. Heaviside's dolphins in the surf. Scenery, no plaque.",
       "plannedHotspots": [
         {
-          "type": "door",
-          "direction": "open",
-          "label": "Sail on toward the coast",
-          "to": "tide_pools",
-          "note": "Travel sequence (arrival clip).",
           "box": [
             0.2731,
             0.0363,
             0.7272,
             0.5438
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "type": "door",
+          "direction": "open",
+          "label": "Sail on toward the coast",
+          "to": "tide_pools",
+          "note": "Travel sequence (arrival clip)."
         }
       ],
       "authoring": {
@@ -1370,7 +1370,7 @@
         {
           "src": "audio/sea_arch_gull_call.mp3",
           "mode": "interval",
-          "volume": 0.4,
+          "volume": 0.11,
           "gapMin": 15,
           "gapMax": 40
         }
@@ -2797,47 +2797,47 @@
       "designNote": "Disembark. The string of gravel barges waits at the foot of the flight; the sea lock is visible across the basin, out of reach on foot, its board NOT legible from here (too far, in fog). Goal front-loaded by the story. Scenery + wonder plaque boxed on the heap of diamond gravel.",
       "plannedHotspots": [
         {
-          "type": "door",
-          "direction": "open",
-          "label": "Back through the sea lock",
-          "to": "tide_pools",
           "box": [
             0.7215,
             0.4564,
             0.7415,
             0.5174
           ],
-          "boxSource": "draft:skeleton"
-        },
-        {
+          "boxSource": "draft:skeleton",
           "type": "door",
           "direction": "open",
-          "label": "The stair up beside the first lock",
-          "to": "lock1",
-          "note": "Depicted stair.",
+          "label": "Back through the sea lock",
+          "to": "tide_pools"
+        },
+        {
           "box": [
             0.4951,
             0.4077,
             0.5218,
             0.6131
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "type": "door",
+          "direction": "open",
+          "label": "The stair up beside the first lock",
+          "to": "lock1",
+          "note": "Depicted stair."
         },
         {
-          "type": "plaque",
-          "label": "The diamond gravel",
-          "plaque": true,
-          "note": "Wonder plaque: Orange River diamonds sorted by the waves. Its box sits ON the heap of diamond gravel on the wharf, never on a painted sign or post. Text and card art at step 6/5; CONFIRMED facts only, no numerals (_scratch/wonders_research.md). Information only.",
-          "title": "Diamonds delivered by a river",
-          "body": "The diamonds in this gravel did not form on the coast. The Orange River carried them out of the African interior to the sea, and the waves, the wind and a current running along the shore then worked the river's cargo into diamond-rich beach gravels. The rush began with a railway worker, Zacharias Lewala, who found a stone by the line and showed it to his supervisor. Soon the government closed almost the entire southern coast as the Sperrgebiet, the forbidden zone.",
-          "credit": "Sources: Spaggiari, Bluck and Ward, Ore Geology Reviews; Wikipedia, Zacharias Lewala and Kolmanskop.",
           "box": [
             0.14,
             0.602,
             0.332,
             0.89
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "type": "plaque",
+          "label": "The diamond gravel",
+          "plaque": true,
+          "note": "Wonder plaque: Orange River diamonds sorted by the waves. Its box sits ON the heap of diamond gravel on the wharf, never on a painted sign or post. Text and card art at step 6/5; CONFIRMED facts only, no numerals (_scratch/wonders_research.md). Information only.",
+          "title": "Diamonds delivered by a river",
+          "body": "The diamonds in this gravel did not form on the coast. The Orange River carried them out of the African interior to the sea, and the waves, the wind and a current running along the shore then worked the river's cargo into diamond-rich beach gravels. The rush began with a railway worker, Zacharias Lewala, who found a stone by the line and showed it to his supervisor. Soon the government closed almost the entire southern coast as the Sperrgebiet, the forbidden zone.",
+          "credit": "Sources: Spaggiari, Bluck and Ward, Ore Geology Reviews; Wikipedia, Zacharias Lewala and Kolmanskop."
         }
       ],
       "authoring": {
@@ -4706,14 +4706,14 @@
         {
           "src": "audio/gravel_wharf_steam_idle_sigh.mp3",
           "mode": "interval",
-          "volume": 0.4,
+          "volume": 0.11,
           "gapMin": 10,
           "gapMax": 30
         },
         {
           "src": "audio/gravel_wharf_barge_chain_creak.mp3",
           "mode": "interval",
-          "volume": 0.4,
+          "volume": 0.02,
           "gapMin": 15,
           "gapMax": 40
         }
@@ -4738,17 +4738,17 @@
           "note": "S1. Answer 1.0878. Prompt/options at step 6.",
           "starterCode": "claim_survey",
           "check": {
-            "prompt": "The diggers on this coast swear by one rule: climb high to get rich. Fit a straight line of carats_per_100t against terrace_height_m in claim_survey, find its slope (how many carats per 100 t each extra meter of terrace height adds), and assign that number to an object called answer. Then click \"Check my answer\".",
+            "prompt": "The diggers on this coast swear by one rule: climb high to get rich. In claim_survey, fit a straight line with terrace_height_m as the predictor and carats_per_100t as the response, find its slope (how many carats per 100 t each extra meter of terrace height adds), and assign that number to an object called answer. Then click \"Check my answer\".",
             "requires": [
               "answer"
             ],
             "expr": "{ a <- if (is.data.frame(answer)) answer$value else answer; a <- suppressWarnings(as.numeric(a)); isTRUE(length(a) == 1 && abs(a - 1.0878) < 0.03) }",
-            "hint": "Fit carats_per_100t against terrace_height_m, then read the slope from the model's metrics. In buildModel(), input_variables is the predictor (here terrace_height_m, on the x axis) and output_variable is the response (what you predict, here carats_per_100t, on the y axis).",
+            "hint": "Fit the line with terrace_height_m as the predictor and carats_per_100t as the response, then read the slope from the model's metrics. In buildModel(), predictors names the predictor (here terrace_height_m) and response names the response variable (here carats_per_100t).",
             "maxAttempts": 4,
             "feedback": {
               "correct": "Correct &mdash; noted in your field notebook: on the height line, each extra meter of terrace height goes with about 1.09 more carats per 100 t.",
               "wrong": [
-                "Fit the line with the course function: <code>height_model &lt;- buildModel(data = claim_survey, model_type = &quot;linear_regression&quot;, input_variables = &quot;terrace_height_m&quot;, output_variable = &quot;carats_per_100t&quot;)</code>. input_variables is the predictor (the x axis) and output_variable is the response (the y axis). Then look at <code>height_model$metrics</code>.",
+                "Fit the line with the course function: <code>height_model &lt;- buildModel(data = claim_survey, model_type = &quot;linear_regression&quot;, predictors = &quot;terrace_height_m&quot;, response = &quot;carats_per_100t&quot;)</code>. predictors names the predictor and response names the response variable. Then look at <code>height_model$metrics</code>.",
                 "The slope is a coefficient: <code>height_model$metrics %&gt;% filter(type == &quot;coefficient&quot;)</code>. It is the terrace_height_m row, not the (Intercept) row, and not r_squared.",
                 "answer is a single number: the value in the terrace_height_m row, for example <code>answer &lt;- 0.123</code> with your own number in place of 0.123."
               ]
@@ -4784,7 +4784,7 @@
             ]
           },
           "note": "Escape input: reads this lockful's cost, 2, directly (no before-and-after). Code-engraved scale, crispest mark in frame.",
-          "body": "The telltale's pointer has settled at 2 inches.",
+          "body": "The telltale's pointer indicates that it took 2 inches of water from the reservoir to fill this lock.",
           "image": "telltales/telltale_lock1.png"
         },
         {
@@ -4893,7 +4893,7 @@
               "motion": {
                 "moves": true,
                 "vigour": "the whole loose side of the tarpaulin lifting off the gravel and bellying in the wind off the sea",
-                "phrase": "the loose side of the barge's tarpaulin lifts off the gravel, bellies and drops back, and the low water in the chamber around the barge ripples and laps gently against the stone walls"
+                "phrase": "the loose edge of the barge's tarpaulin barely stirs, lifting very slightly off the gravel and settling back slowly while the rest of the canvas lies still, and the low water in the chamber around the barge ripples gently against the stone walls"
               },
               "sound": {
                 "source": "the loose side of the tarpaulin on the barge below",
@@ -4960,6 +4960,13 @@
                 },
                 "lock1_telltale": {
                   "look": "the brass pointer has risen a short way up the notched scale and stopped there"
+                },
+                "barge_tarp": {
+                  "motion": {
+                    "moves": true,
+                    "vigour": "the whole loose side of the tarpaulin lifting off the gravel and bellying in the wind off the sea",
+                    "phrase": "the loose side of the barge's tarpaulin lifts off the gravel, bellies and drops back, and the low water in the chamber around the barge ripples and laps gently against the stone walls"
+                  }
                 }
               },
               "constraints": "Change nothing else: the upper gates at the far end, the valve, the telltale post and its scale, the pipe, the coping, the bank, the sky, the fog and every far object stay exactly as they are. No people appear. No numerals appear anywhere."
@@ -6688,17 +6695,17 @@
           "form": "check",
           "starterCode": "claim_survey",
           "check": {
-            "prompt": "The diggers on this coast swear by one rule: climb high to get rich. Fit a straight line of carats_per_100t against terrace_height_m in claim_survey, find its slope (how many carats per 100 t each extra meter of terrace height adds), and assign that number to an object called answer. Then click \"Check my answer\".",
+            "prompt": "The diggers on this coast swear by one rule: climb high to get rich. In claim_survey, fit a straight line with terrace_height_m as the predictor and carats_per_100t as the response, find its slope (how many carats per 100 t each extra meter of terrace height adds), and assign that number to an object called answer. Then click \"Check my answer\".",
             "requires": [
               "answer"
             ],
             "expr": "{ a <- if (is.data.frame(answer)) answer$value else answer; a <- suppressWarnings(as.numeric(a)); isTRUE(length(a) == 1 && abs(a - 1.0878) < 0.03) }",
-            "hint": "Fit carats_per_100t against terrace_height_m, then read the slope from the model's metrics. In buildModel(), input_variables is the predictor (here terrace_height_m, on the x axis) and output_variable is the response (what you predict, here carats_per_100t, on the y axis).",
+            "hint": "Fit the line with terrace_height_m as the predictor and carats_per_100t as the response, then read the slope from the model's metrics. In buildModel(), predictors names the predictor (here terrace_height_m) and response names the response variable (here carats_per_100t).",
             "maxAttempts": 4,
             "feedback": {
               "correct": "Correct &mdash; noted in your field notebook: on the height line, each extra meter of terrace height goes with about 1.09 more carats per 100 t.",
               "wrong": [
-                "Fit the line with the course function: <code>height_model &lt;- buildModel(data = claim_survey, model_type = &quot;linear_regression&quot;, input_variables = &quot;terrace_height_m&quot;, output_variable = &quot;carats_per_100t&quot;)</code>. input_variables is the predictor (the x axis) and output_variable is the response (the y axis). Then look at <code>height_model$metrics</code>.",
+                "Fit the line with the course function: <code>height_model &lt;- buildModel(data = claim_survey, model_type = &quot;linear_regression&quot;, predictors = &quot;terrace_height_m&quot;, response = &quot;carats_per_100t&quot;)</code>. predictors names the predictor and response names the response variable. Then look at <code>height_model$metrics</code>.",
                 "The slope is a coefficient: <code>height_model$metrics %&gt;% filter(type == &quot;coefficient&quot;)</code>. It is the terrace_height_m row, not the (Intercept) row, and not r_squared.",
                 "answer is a single number: the value in the terrace_height_m row, for example <code>answer &lt;- 0.123</code> with your own number in place of 0.123."
               ]
@@ -6736,7 +6743,7 @@
           "boxSource": "moved:testplay",
           "sfx": {
             "src": "audio/dial_fill_valve_canal_sluice_water_rush_2.mp3",
-            "volume": 0.6
+            "volume": 0.13
           }
         },
         {
@@ -6756,7 +6763,7 @@
               true
             ]
           },
-          "body": "The telltale's pointer has settled at 2 inches.",
+          "body": "The telltale's pointer indicates that it took 2 inches of water from the reservoir to fill this lock.",
           "boxSource": "moved:testplay",
           "image": "telltales/telltale_lock1.png"
         },
@@ -6921,14 +6928,14 @@
         {
           "src": "audio/lock1_single_drip.mp3",
           "mode": "interval",
-          "volume": 0.4,
+          "volume": 0.1,
           "gapMin": 10,
           "gapMax": 30
         },
         {
           "src": "audio/lock1_gull_far.mp3",
           "mode": "interval",
-          "volume": 0.4,
+          "volume": 0.06,
           "gapMin": 15,
           "gapMax": 40
         }
@@ -7165,12 +7172,12 @@
         },
         {
           "src": "audio/cottage1_small_flame_loop.mp3",
-          "volume": 0.35
+          "volume": 0.15
         },
         {
           "src": "audio/cottage1_lock_drip.mp3",
           "mode": "interval",
-          "volume": 0.4,
+          "volume": 0.08,
           "gapMin": 10,
           "gapMax": 30
         },
@@ -9078,6 +9085,13 @@
       "designNote": "Lock 2 hangs off the sorting shed's rung (S2 is solved on the balance there, Lucas 2026-10-29): the fill valve and the upper gates wait on it. Journal page 1924 on the paper where the puzzle used to sit.",
       "plannedHotspots": [
         {
+          "box": [
+            0.6427,
+            0.5542,
+            0.6727,
+            0.6342
+          ],
+          "boxSource": "draft:skeleton",
           "type": "dial",
           "key": "lock2_full",
           "label": "The fill valve",
@@ -9093,16 +9107,16 @@
           "availableWhen": {
             "solved": "grease_shed"
           },
-          "lockedBody": "The barge waits for its ruling from the balance in the sorting shed before the lock is filled.",
-          "box": [
-            0.6427,
-            0.5542,
-            0.6727,
-            0.6342
-          ],
-          "boxSource": "draft:skeleton"
+          "lockedBody": "The barge waits for its ruling from the balance in the sorting shed before the lock is filled."
         },
         {
+          "box": [
+            0.6084,
+            0.3022,
+            0.6284,
+            0.6492
+          ],
+          "boxSource": "draft:skeleton",
           "type": "clue",
           "label": "The telltale",
           "pickup": "Lock 2 cost the reservoir 3 inches.",
@@ -9113,22 +9127,10 @@
             ]
           },
           "note": "Escape input: reads this lockful's cost, 3, directly (no before-and-after). Code-engraved scale, crispest mark in frame.",
-          "body": "The telltale's pointer has settled at 3 inches.",
-          "box": [
-            0.6084,
-            0.3022,
-            0.6284,
-            0.6492
-          ],
-          "boxSource": "draft:skeleton",
+          "body": "The telltale's pointer indicates that it took 3 inches of water from the reservoir to fill this lock.",
           "image": "telltales/telltale_lock2.png"
         },
         {
-          "type": "clue",
-          "label": "Lock-keeper's journal, 1924",
-          "pickup": "The lock-keeper's journal, dry season 1924.",
-          "note": "Escape input: one season figure only (notes.md §3). Wording at step 6.",
-          "body": "A page from the lock-keeper's journal.",
           "id": "lock_keeper_s_journal_1924",
           "box": [
             0.8714,
@@ -9137,35 +9139,47 @@
             0.6334
           ],
           "boxSource": "moved:testplay",
+          "type": "clue",
+          "label": "Lock-keeper's journal, 1924",
+          "pickup": "The lock-keeper's journal, dry season 1924.",
+          "note": "Escape input: one season figure only (notes.md §3). Wording at step 6.",
+          "body": "A page from the lock-keeper's journal.",
           "image": "journals/journal_1924.png"
         },
         {
-          "type": "door",
-          "direction": "open",
-          "label": "Back down to lock 1",
-          "to": "lock1",
           "box": [
             0.0191,
             0.496,
             0.0795,
             0.587
           ],
-          "boxSource": "draft:skeleton"
-        },
-        {
+          "boxSource": "draft:skeleton",
           "type": "door",
           "direction": "open",
-          "label": "The sorting shed",
-          "to": "grease_shed",
+          "label": "Back down to lock 1",
+          "to": "lock1"
+        },
+        {
           "box": [
             0.7315,
             0.3471,
             0.9052,
             0.4772
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "type": "door",
+          "direction": "open",
+          "label": "The sorting shed",
+          "to": "grease_shed"
         },
         {
+          "box": [
+            0.2104,
+            0.5246,
+            0.3356,
+            0.6892
+          ],
+          "boxSource": "draft:skeleton",
           "type": "door",
           "direction": "open",
           "label": "Across the lower gates and up to lock 3",
@@ -9183,14 +9197,7 @@
               }
             ]
           },
-          "lockedBody": "The lower gates stand open behind the barge, and the footbridge on top of them is split in two. Fill the lock: the gates swing shut and the footbridge closes across the channel.",
-          "box": [
-            0.2104,
-            0.5246,
-            0.3356,
-            0.6892
-          ],
-          "boxSource": "draft:skeleton"
+          "lockedBody": "The lower gates stand open behind the barge, and the footbridge on top of them is split in two. Fill the lock: the gates swing shut and the footbridge closes across the channel."
         }
       ],
       "authoring": {
@@ -10823,7 +10830,7 @@
           "boxSource": "moved:testplay",
           "sfx": {
             "src": "audio/dial_fill_valve_canal_sluice_water_rush_2.mp3",
-            "volume": 0.6
+            "volume": 0.13
           }
         },
         {
@@ -10831,10 +10838,10 @@
           "type": "clue",
           "label": "The telltale",
           "box": [
-            0.6171,
-            0.3309,
-            0.6371,
-            0.6779
+            0.6193,
+            0.3339,
+            0.6393,
+            0.6809
           ],
           "pickup": "Lock 2 cost the reservoir 3 inches.",
           "shownWhen": {
@@ -10843,7 +10850,7 @@
               true
             ]
           },
-          "body": "The telltale's pointer has settled at 3 inches.",
+          "body": "The telltale's pointer indicates that it took 3 inches of water from the reservoir to fill this lock.",
           "boxSource": "moved:testplay",
           "image": "telltales/telltale_lock2.png"
         },
@@ -11022,28 +11029,6 @@
       "designNote": "RUNG 2, S2 PREDICT AN UNKNOWN, on the brass balance on the right-hand desk (moved from lock 2's paper, Lucas 2026-10-29). The first barge request: Red_Sky, trenched not washed. predictWithModel() with S1's height line on the unknown table. ANSWER Red_Sky 41.92 (under the pay line, no barge). Form: check. Distractors >=10% away: 49.30 (six-input), 54.58 (gully-only), 55.42 (survey mean), 6.53 (no intercept), other claims 46.27-72.38. Opens lock 2's valve and upper gates. Journal page 1922.",
       "plannedHotspots": [
         {
-          "type": "puzzle",
-          "label": "The first barge request",
-          "form": "check",
-          "note": "S2. Answer 41.92. Box on the brass balance.",
-          "starterCode": "claim_survey",
-          "check": {
-            "prompt": "The prospectors want a barge sent for Red_Sky, a new claim that has been trenched but not yet washed. Fit the same straight line of carats_per_100t against terrace_height_m in claim_survey, use it to predict carats_per_100t for every claim in claim_survey_unknown, and assign the prediction for Red_Sky to an object called answer. Then click \"Check my answer\".",
-            "requires": [
-              "answer"
-            ],
-            "expr": "{ a <- if (is.data.frame(answer)) (if (\"predicted_carats_per_100t\" %in% names(answer)) answer$predicted_carats_per_100t else answer$value) else answer; a <- suppressWarnings(as.numeric(a)); isTRUE(length(a) == 1 && abs(a - 41.92) < 0.1) }",
-            "hint": "Fit the height line on claim_survey (input_variables = the predictor, terrace_height_m; output_variable = the response, carats_per_100t), then predict with it on claim_survey_unknown and find Red_Sky.",
-            "maxAttempts": 4,
-            "feedback": {
-              "correct": "Correct &mdash; noted in your field notebook: the height line predicts Red_Sky at 41.92 carats per 100 t, under the pay line.",
-              "wrong": [
-                "Fit the height line as before (<code>height_model &lt;- buildModel(data = claim_survey, model_type = &quot;linear_regression&quot;, input_variables = &quot;terrace_height_m&quot;, output_variable = &quot;carats_per_100t&quot;)</code>), then predict on the new claims: <code>predictWithModel(data = claim_survey_unknown, model = height_model)</code>.",
-                "Use the line with terrace_height_m as its only predictor, not a model with more measurements. claim_survey_unknown has no carats_per_100t column: the model supplies it.",
-                "The predictions come back as claim_survey_unknown with a new predicted_carats_per_100t column. <code>filter(claim == &quot;Red_Sky&quot;)</code> finds the one row; assign its prediction (add <code>$predicted_carats_per_100t</code>) to answer."
-              ]
-            }
-          },
           "id": "the_first_barge_request",
           "box": [
             0.605,
@@ -11051,7 +11036,29 @@
             0.69,
             0.445
           ],
-          "boxSource": "draft:agent-vision"
+          "boxSource": "draft:agent-vision",
+          "type": "puzzle",
+          "label": "The first barge request",
+          "form": "check",
+          "note": "S2. Answer 41.92. Box on the brass balance.",
+          "starterCode": "claim_survey",
+          "check": {
+            "prompt": "The prospectors want a barge sent for Red_Sky, a new claim that has been trenched but not yet washed. Fit the same straight line in claim_survey, with terrace_height_m as the predictor and carats_per_100t as the response, use it to predict carats_per_100t for every claim in claim_survey_unknown, and assign the prediction for Red_Sky to an object called answer. Then click \"Check my answer\".",
+            "requires": [
+              "answer"
+            ],
+            "expr": "{ a <- if (is.data.frame(answer)) (if (\"predicted_carats_per_100t\" %in% names(answer)) answer$predicted_carats_per_100t else answer$value) else answer; a <- suppressWarnings(as.numeric(a)); isTRUE(length(a) == 1 && abs(a - 41.92) < 0.1) }",
+            "hint": "Fit the height line on claim_survey (predictors gets the predictor, terrace_height_m; response gets the response, carats_per_100t), then predict with it on claim_survey_unknown and find Red_Sky.",
+            "maxAttempts": 4,
+            "feedback": {
+              "correct": "Correct &mdash; noted in your field notebook: the height line predicts Red_Sky at 41.92 carats per 100 t, under the pay line.",
+              "wrong": [
+                "Fit the height line as before (<code>height_model &lt;- buildModel(data = claim_survey, model_type = &quot;linear_regression&quot;, predictors = &quot;terrace_height_m&quot;, response = &quot;carats_per_100t&quot;)</code>), then predict on the new claims: <code>predictWithModel(data = claim_survey_unknown, model = height_model)</code>.",
+                "Use the line with terrace_height_m as its only predictor, not a model with more predictors. claim_survey_unknown has no carats_per_100t column: the model supplies it.",
+                "The predictions come back as claim_survey_unknown with a new predicted_carats_per_100t column. <code>filter(claim == &quot;Red_Sky&quot;)</code> finds the one row; assign its prediction (add <code>$predicted_carats_per_100t</code>) to answer."
+              ]
+            }
+          }
         },
         {
           "type": "clue",
@@ -11211,25 +11218,25 @@
           "form": "check",
           "starterCode": "claim_survey",
           "check": {
-            "prompt": "The prospectors want a barge sent for Red_Sky, a new claim that has been trenched but not yet washed. Fit the same straight line of carats_per_100t against terrace_height_m in claim_survey, use it to predict carats_per_100t for every claim in claim_survey_unknown, and assign the prediction for Red_Sky to an object called answer. Then click \"Check my answer\".",
+            "prompt": "The prospectors want a barge sent for Red_Sky, a new claim that has been trenched but not yet washed. Fit the same straight line in claim_survey, with terrace_height_m as the predictor and carats_per_100t as the response, use it to predict carats_per_100t for every claim in claim_survey_unknown, and assign the prediction for Red_Sky to an object called answer. Then click \"Check my answer\".",
             "requires": [
               "answer"
             ],
             "expr": "{ a <- if (is.data.frame(answer)) (if (\"predicted_carats_per_100t\" %in% names(answer)) answer$predicted_carats_per_100t else answer$value) else answer; a <- suppressWarnings(as.numeric(a)); isTRUE(length(a) == 1 && abs(a - 41.92) < 0.1) }",
-            "hint": "Fit the height line on claim_survey (input_variables = the predictor, terrace_height_m; output_variable = the response, carats_per_100t), then predict with it on claim_survey_unknown and find Red_Sky.",
+            "hint": "Fit the height line on claim_survey (predictors gets the predictor, terrace_height_m; response gets the response, carats_per_100t), then predict with it on claim_survey_unknown and find Red_Sky.",
             "maxAttempts": 4,
             "feedback": {
               "correct": "Correct &mdash; noted in your field notebook: the height line predicts Red_Sky at 41.92 carats per 100 t, under the pay line.",
               "wrong": [
-                "Fit the height line as before (<code>height_model &lt;- buildModel(data = claim_survey, model_type = &quot;linear_regression&quot;, input_variables = &quot;terrace_height_m&quot;, output_variable = &quot;carats_per_100t&quot;)</code>), then predict on the new claims: <code>predictWithModel(data = claim_survey_unknown, model = height_model)</code>.",
-                "Use the line with terrace_height_m as its only predictor, not a model with more measurements. claim_survey_unknown has no carats_per_100t column: the model supplies it.",
+                "Fit the height line as before (<code>height_model &lt;- buildModel(data = claim_survey, model_type = &quot;linear_regression&quot;, predictors = &quot;terrace_height_m&quot;, response = &quot;carats_per_100t&quot;)</code>), then predict on the new claims: <code>predictWithModel(data = claim_survey_unknown, model = height_model)</code>.",
+                "Use the line with terrace_height_m as its only predictor, not a model with more predictors. claim_survey_unknown has no carats_per_100t column: the model supplies it.",
                 "The predictions come back as claim_survey_unknown with a new predicted_carats_per_100t column. <code>filter(claim == &quot;Red_Sky&quot;)</code> finds the one row; assign its prediction (add <code>$predicted_carats_per_100t</code>) to answer."
               ]
             }
           },
           "solveSfx": {
             "src": "audio/solve_lock2_the_first_barge_request_rubber_stamp_thud.mp3",
-            "volume": 0.6
+            "volume": 0.23
           },
           "box": [
             0.605,
@@ -11298,7 +11305,7 @@
       "sfx": [
         {
           "src": "audio/grease_shed_running_water_splash.mp3",
-          "volume": 0.6
+          "volume": 0.14
         },
         {
           "src": "audio/grease_shed_dry_breeze.mp3",
@@ -11307,14 +11314,14 @@
         {
           "src": "audio/grease_shed_water_on_wood.mp3",
           "mode": "interval",
-          "volume": 0.4,
+          "volume": 0.38,
           "gapMin": 10,
           "gapMax": 30
         },
         {
           "src": "audio/grease_shed_board_tick.mp3",
           "mode": "interval",
-          "volume": 0.4,
+          "volume": 0.24,
           "gapMin": 15,
           "gapMax": 40
         }
@@ -11357,7 +11364,7 @@
             ]
           },
           "note": "Escape input: reads this lockful's cost, 3, directly (no before-and-after). Code-engraved scale, crispest mark in frame.",
-          "body": "The telltale's pointer has settled at 3 inches.",
+          "body": "The telltale's pointer indicates that it took 3 inches of water from the reservoir to fill this lock.",
           "image": "telltales/telltale_lock3.png"
         },
         {
@@ -11514,7 +11521,11 @@
               "light": "",
               "elements": {
                 "lock3_barge": {
-                  "look": "the chamber is now FULL: the water has risen almost to the top of the chamber walls, a little below the coping, and the same gravel barge now floats high on it, its deck nearly level with the coping, with everything lying on the barge risen with it, lying in exactly the same place along the chamber as before; the shut UPPER GATES at the far end of the chamber stay exactly as they are, two dark timber leaves meeting in a shallow V, their tops standing clear above the risen water"
+                  "look": "the chamber is now FULL: the water has risen almost to the top of the chamber walls, a little below the coping, and the same gravel barge now floats high on it, its deck nearly level with the coping, with everything lying on the barge risen with it, lying in exactly the same place along the chamber as before; the shut UPPER GATES at the far end of the chamber stay exactly as they are, two dark timber leaves meeting in a shallow V, their tops standing clear above the risen water",
+                  "motion": {
+                    "moves": true,
+                    "phrase": "the high water filling the chamber around the barge ripples very gently, small slow ripples on the water surface only"
+                  }
                 },
                 "lock3_footbridge": {
                   "look": "the two lower gate leaves, which in this picture stand open on the RIGHT of the picture, at the chamber's open lower end where it gives onto the short pound and the lock below, have swung SHUT exactly where they stand and meet in a shallow V there, closing the chamber at that spot, so the two halves of the timber footbridge on top of them now join into one whole bridge across the channel at that same place; the shut gates stay on the RIGHT of the picture, set back from the viewer exactly as far as the open leaves were, and are never moved round in front of the viewer: the stone coping in front of the viewer stays clear and unchanged"
@@ -11523,7 +11534,8 @@
                   "look": "the brass pointer has risen a short way up the notched scale and stopped there"
                 }
               },
-              "constraints": "Change nothing else: the upper gates at the far end, the valve, the telltale post and its scale, the pipe, the coping, the bank, the sky, the fog and every far object stay exactly as they are. No people appear. No numerals appear anywhere."
+              "constraints": "Change nothing else: the upper gates at the far end, the valve, the telltale post and its scale, the pipe, the coping, the bank, the sky, the fog and every far object stay exactly as they are. No people appear. No numerals appear anywhere.",
+              "motionClosing": "The camera is locked off on a tripod and does not move or shift at all. Only the water in the full chamber moves, in small gentle ripples. The stone coping, the telltale post, the crane and its hanging rope fender, the barge riding high, the gates and the whole sky and fog are frozen perfectly still."
             }
           },
           "room": "lock3",
@@ -13248,7 +13260,7 @@
           "boxSource": "moved:testplay",
           "sfx": {
             "src": "audio/dial_fill_valve_canal_sluice_water_rush_2.mp3",
-            "volume": 0.6
+            "volume": 0.13
           }
         },
         {
@@ -13268,7 +13280,7 @@
               true
             ]
           },
-          "body": "The telltale's pointer has settled at 3 inches.",
+          "body": "The telltale's pointer indicates that it took 3 inches of water from the reservoir to fill this lock.",
           "boxSource": "moved:testplay",
           "image": "telltales/telltale_lock3.png"
         },
@@ -13305,10 +13317,10 @@
           "type": "door",
           "label": "Across the lower gates and up to lock 4",
           "box": [
-            0.4474,
-            0.2743,
-            0.6144,
-            0.5211
+            0.4581,
+            0.2184,
+            0.6251,
+            0.4652
           ],
           "direction": "open",
           "to": "lock4",
@@ -13372,6 +13384,28 @@
               }
             }
           ]
+        },
+        {
+          "id": "clip_lock3_full",
+          "type": "ambient",
+          "label": "Scene motion (lock3_full)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/play-source.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "lock3/cine_lock3_full.mp4",
+            "state": "lock3_full"
+          }
         }
       ],
       "mapPos": {
@@ -13381,23 +13415,23 @@
       "sfx": [
         {
           "src": "audio/lock3_far_chamber_drips.mp3",
-          "volume": 0.6
+          "volume": 0.23
         },
         {
           "src": "audio/lock3_rope_tension_creak.mp3",
-          "volume": 0.35
+          "volume": 0.06
         },
         {
           "src": "audio/lock3_sheave_wire_creak.mp3",
           "mode": "interval",
-          "volume": 0.4,
+          "volume": 0.04,
           "gapMin": 10,
           "gapMax": 30
         },
         {
           "src": "audio/lock3_rope_creak.mp3",
           "mode": "interval",
-          "volume": 0.4,
+          "volume": 0.02,
           "gapMin": 15,
           "gapMax": 40
         }
@@ -15336,23 +15370,23 @@
       "sfx": [
         {
           "src": "audio/lookout_canvas_screen_flap.mp3",
-          "volume": 0.6
+          "volume": 0.24
         },
         {
           "src": "audio/lookout_open_rock_wind.mp3",
-          "volume": 0.35
+          "volume": 0.13
         },
         {
           "src": "audio/lookout_canvas_thump.mp3",
           "mode": "interval",
-          "volume": 0.4,
+          "volume": 0.17,
           "gapMin": 10,
           "gapMax": 30
         },
         {
           "src": "audio/lookout_gust_whoosh.mp3",
           "mode": "interval",
-          "volume": 0.4,
+          "volume": 0.17,
           "gapMin": 15,
           "gapMax": 40
         }
@@ -15371,38 +15405,45 @@
       "designNote": "RUNG 3, S3 WHICH MEASUREMENT SETS THE GRADE. A journal grumbles that barges sent on the height rule came back poor. Scale the six inputs, fit all six, rank abs(value). ANSWER gullies_per_100m (13.59 vs 6.63); terrace_height_m ranks 4th. Form: pick on a coefficient bar plot (idColumn = variable). Traps: unscaled → gravel_thickness_m; the intercept bar (prompt asks 'which measurement').",
       "plannedHotspots": [
         {
-          "type": "puzzle",
-          "label": "Which measurement sets the grade",
-          "form": "pick",
-          "note": "S3. Answer gullies_per_100m. Prompt at step 6.",
-          "starterCode": "claim_survey",
-          "pick": {
-            "prompt": "Barges sent to the claims that height favored came back poor, so the town wants to know which measurement really sets the grade. Put the six measurements in claim_survey on the same footing, fit carats_per_100t on all six together, plot the size of each measurement's coefficient, assign the plot to p, and click the measurement with the largest effect.",
-            "answer": "gullies_per_100m",
-            "idColumn": "variable",
-            "idNoun": "measurement",
-            "width": 7,
-            "height": 4.2,
-            "maxAttempts": 4,
-            "hint": "Scale the six measurements first, then compare the coefficients by their size.",
-            "feedback": {
-              "correct": "Correct &mdash; noted in your field notebook: once the measurements are scaled, gullies_per_100m has by far the largest effect on the grade; terrace_height_m comes only fourth.",
-              "wrong": [
-                "Scale first, as the chapter does: <code>scaled_claim_survey &lt;- claim_survey %&gt;% mutate(across(c(terrace_height_m, gullies_per_100m, cobble_size_cm, gravel_thickness_m, sand_cover_m, distance_to_river_km), scale))</code>. Then fit carats_per_100t on all six with <code>buildModel()</code>, giving it <code>input_variables = c(&quot;terrace_height_m&quot;, &quot;gullies_per_100m&quot;, &quot;cobble_size_cm&quot;, &quot;gravel_thickness_m&quot;, &quot;sand_cover_m&quot;, &quot;distance_to_river_km&quot;)</code>.",
-                "Keep only the measurements: <code>filter(type == &quot;coefficient&quot;, variable != &quot;(Intercept)&quot;) %&gt;% arrange(desc(abs(value)))</code> on the metrics. The intercept is not a measurement, and an unscaled model ranks gravel_thickness_m first only because one meter of gravel is a very large step.",
-                "Plot the table you just made: <code>p &lt;- ggplot(coefficients, aes(x = variable, y = abs(value))) + geom_col()</code>, with your own table's name in place of coefficients, then click the tallest bar."
-              ]
-            }
-          },
           "box": [
             0.7297,
             0.4569,
             0.7706,
             0.5704
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "type": "puzzle",
+          "label": "Which predictor sets the grade",
+          "form": "pick",
+          "note": "S3. Answer gullies_per_100m. Prompt at step 6.",
+          "starterCode": "claim_survey",
+          "pick": {
+            "prompt": "Barges sent to the claims that height favored came back poor, so the town wants to know which predictor really sets the grade. Put the six predictors in claim_survey on the same footing, fit the response, carats_per_100t, on all six together, plot the size of each predictor's coefficient, assign the plot to p, and click the predictor with the largest effect.",
+            "answer": "gullies_per_100m",
+            "idColumn": "variable",
+            "idNoun": "predictor",
+            "width": 7,
+            "height": 4.2,
+            "maxAttempts": 4,
+            "hint": "In buildModel(), add scale_variance = TRUE so all six predictors are on the same scale, then compare the coefficients by their size.",
+            "feedback": {
+              "correct": "Correct &mdash; noted in your field notebook: once the predictors are scaled, gullies_per_100m has by far the largest effect on the grade; terrace_height_m comes only fourth.",
+              "wrong": [
+                "Let buildModel() do the scaling: fit the response, carats_per_100t, on all six predictors with <code>predictors = c(&quot;terrace_height_m&quot;, &quot;gullies_per_100m&quot;, &quot;cobble_size_cm&quot;, &quot;gravel_thickness_m&quot;, &quot;sand_cover_m&quot;, &quot;distance_to_river_km&quot;)</code> and add <code>scale_variance = TRUE</code>.",
+                "Keep only the predictors: <code>filter(type == &quot;coefficient&quot;, variable != &quot;(Intercept)&quot;) %&gt;% arrange(desc(abs(value)))</code> on the metrics. The intercept is not a predictor, and a model without scale_variance = TRUE ranks gravel_thickness_m first only because one meter of gravel is a very large step.",
+                "Plot the table you just made: <code>p &lt;- ggplot(coefficients, aes(x = variable, y = abs(value))) + geom_col()</code>, with your own table's name in place of coefficients, then click the tallest bar."
+              ]
+            }
+          }
         },
         {
+          "box": [
+            0.6727,
+            0.5137,
+            0.7027,
+            0.5747
+          ],
+          "boxSource": "draft:skeleton",
           "type": "dial",
           "key": "lock4_full",
           "label": "The fill valve",
@@ -15418,16 +15459,16 @@
           "availableWhen": {
             "solved": "lock4"
           },
-          "lockedBody": "The barge waits for its ruling before the lock is filled.",
-          "box": [
-            0.6727,
-            0.5137,
-            0.7027,
-            0.5747
-          ],
-          "boxSource": "draft:skeleton"
+          "lockedBody": "The barge waits for its ruling before the lock is filled."
         },
         {
+          "box": [
+            0.6334,
+            0.3766,
+            0.6534,
+            0.6244
+          ],
+          "boxSource": "draft:skeleton",
           "type": "clue",
           "label": "The telltale",
           "pickup": "Lock 4 cost the reservoir 3 inches.",
@@ -15438,30 +15479,30 @@
             ]
           },
           "note": "Escape input: reads this lockful's cost, 3, directly (no before-and-after). Code-engraved scale, crispest mark in frame.",
-          "body": "The telltale's pointer has settled at 3 inches.",
-          "box": [
-            0.6334,
-            0.3766,
-            0.6534,
-            0.6244
-          ],
-          "boxSource": "draft:skeleton",
+          "body": "The telltale's pointer indicates that it took 3 inches of water from the reservoir to fill this lock.",
           "image": "telltales/telltale_lock4.png"
         },
         {
-          "type": "door",
-          "direction": "open",
-          "label": "Back down to lock 3",
-          "to": "lock3",
           "box": [
             0.0545,
             0.511,
             0.0745,
             0.572
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "type": "door",
+          "direction": "open",
+          "label": "Back down to lock 3",
+          "to": "lock3"
         },
         {
+          "box": [
+            0.1686,
+            0.5657,
+            0.2939,
+            0.6892
+          ],
+          "boxSource": "draft:skeleton",
           "type": "door",
           "direction": "open",
           "label": "Across the lower gates and up to lock 5",
@@ -15479,14 +15520,7 @@
               }
             ]
           },
-          "lockedBody": "The lower gates stand open behind the barge, and the footbridge on top of them is split in two. Fill the lock: the gates swing shut and the footbridge closes across the channel.",
-          "box": [
-            0.1686,
-            0.5657,
-            0.2939,
-            0.6892
-          ],
-          "boxSource": "draft:skeleton"
+          "lockedBody": "The lower gates stand open behind the barge, and the footbridge on top of them is split in two. Fill the lock: the gates swing shut and the footbridge closes across the channel."
         }
       ],
       "authoring": {
@@ -15582,7 +15616,7 @@
             {
               "id": "lock4_puzzle",
               "at": "to the right",
-              "label": "Which measurement sets the grade",
+              "label": "Which predictor sets the grade",
               "puzzle": true,
               "desc": "a few paces back from the chamber on this bank, standing on the level ground, a surveyor's plane table on a timber tripod, a drawing board on top with a sheet of measurements pinned flat to it and a brass sight rule lying across the sheet"
             },
@@ -17178,7 +17212,7 @@
         {
           "id": "which_measurement_sets_the_grade",
           "type": "puzzle",
-          "label": "Which measurement sets the grade",
+          "label": "Which predictor sets the grade",
           "box": [
             0.8275,
             0.4405,
@@ -17188,19 +17222,19 @@
           "form": "pick",
           "starterCode": "claim_survey",
           "pick": {
-            "prompt": "Barges sent to the claims that height favored came back poor, so the town wants to know which measurement really sets the grade. Put the six measurements in claim_survey on the same footing, fit carats_per_100t on all six together, plot the size of each measurement's coefficient, assign the plot to p, and click the measurement with the largest effect.",
+            "prompt": "Barges sent to the claims that height favored came back poor, so the town wants to know which predictor really sets the grade. Put the six predictors in claim_survey on the same footing, fit the response, carats_per_100t, on all six together, plot the size of each predictor's coefficient, assign the plot to p, and click the predictor with the largest effect.",
             "answer": "gullies_per_100m",
             "idColumn": "variable",
-            "idNoun": "measurement",
+            "idNoun": "predictor",
             "width": 7,
             "height": 4.2,
             "maxAttempts": 4,
-            "hint": "Scale the six measurements first, then compare the coefficients by their size.",
+            "hint": "In buildModel(), add scale_variance = TRUE so all six predictors are on the same scale, then compare the coefficients by their size.",
             "feedback": {
-              "correct": "Correct &mdash; noted in your field notebook: once the measurements are scaled, gullies_per_100m has by far the largest effect on the grade; terrace_height_m comes only fourth.",
+              "correct": "Correct &mdash; noted in your field notebook: once the predictors are scaled, gullies_per_100m has by far the largest effect on the grade; terrace_height_m comes only fourth.",
               "wrong": [
-                "Scale first, as the chapter does: <code>scaled_claim_survey &lt;- claim_survey %&gt;% mutate(across(c(terrace_height_m, gullies_per_100m, cobble_size_cm, gravel_thickness_m, sand_cover_m, distance_to_river_km), scale))</code>. Then fit carats_per_100t on all six with <code>buildModel()</code>, giving it <code>input_variables = c(&quot;terrace_height_m&quot;, &quot;gullies_per_100m&quot;, &quot;cobble_size_cm&quot;, &quot;gravel_thickness_m&quot;, &quot;sand_cover_m&quot;, &quot;distance_to_river_km&quot;)</code>.",
-                "Keep only the measurements: <code>filter(type == &quot;coefficient&quot;, variable != &quot;(Intercept)&quot;) %&gt;% arrange(desc(abs(value)))</code> on the metrics. The intercept is not a measurement, and an unscaled model ranks gravel_thickness_m first only because one meter of gravel is a very large step.",
+                "Let buildModel() do the scaling: fit the response, carats_per_100t, on all six predictors with <code>predictors = c(&quot;terrace_height_m&quot;, &quot;gullies_per_100m&quot;, &quot;cobble_size_cm&quot;, &quot;gravel_thickness_m&quot;, &quot;sand_cover_m&quot;, &quot;distance_to_river_km&quot;)</code> and add <code>scale_variance = TRUE</code>.",
+                "Keep only the predictors: <code>filter(type == &quot;coefficient&quot;, variable != &quot;(Intercept)&quot;) %&gt;% arrange(desc(abs(value)))</code> on the metrics. The intercept is not a predictor, and a model without scale_variance = TRUE ranks gravel_thickness_m first only because one meter of gravel is a very large step.",
                 "Plot the table you just made: <code>p &lt;- ggplot(coefficients, aes(x = variable, y = abs(value))) + geom_col()</code>, with your own table's name in place of coefficients, then click the tallest bar."
               ]
             }
@@ -17237,7 +17271,7 @@
           "boxSource": "moved:testplay",
           "sfx": {
             "src": "audio/dial_fill_valve_canal_sluice_water_rush_2.mp3",
-            "volume": 0.6
+            "volume": 0.13
           }
         },
         {
@@ -17245,10 +17279,10 @@
           "type": "clue",
           "label": "The telltale",
           "box": [
-            0.6334,
-            0.3766,
-            0.6534,
-            0.6244
+            0.6376,
+            0.378,
+            0.6576,
+            0.6258
           ],
           "pickup": "Lock 4 cost the reservoir 3 inches.",
           "shownWhen": {
@@ -17257,8 +17291,8 @@
               true
             ]
           },
-          "body": "The telltale's pointer has settled at 3 inches.",
-          "boxSource": "draft:skeleton",
+          "body": "The telltale's pointer indicates that it took 3 inches of water from the reservoir to fill this lock.",
+          "boxSource": "moved:testplay",
           "image": "telltales/telltale_lock4.png"
         },
         {
@@ -17428,18 +17462,18 @@
           "note": "BOSS. Answer Pothole_Bay + Shark_Gully. Prompt/options at step 6.",
           "starterCode": "claim_survey",
           "check": {
-            "prompt": "Eight new claims are waiting for barges, and only a claim above the pay line of 60 carats per 100 t gets one. Using claim_survey, fit carats_per_100t on all six measurements together, use that model to predict carats_per_100t for every claim in claim_survey_unknown, and assign the names of the two claims predicted above 60 to an object called answer, as c(\"first\", \"second\"). Then click \"Check my answer\".",
+            "prompt": "Eight new claims are waiting for barges, and only a claim above the pay line of 60 carats per 100 t gets one. Using claim_survey, fit the response, carats_per_100t, on all six predictors together, use that model to predict carats_per_100t for every claim in claim_survey_unknown, and assign the names of the two claims predicted above 60 to an object called answer, as c(\"first\", \"second\"). Then click \"Check my answer\".",
             "requires": [
               "answer"
             ],
             "expr": "{ a <- if (is.data.frame(answer)) answer$claim else answer; isTRUE(setequal(as.character(a), c(\"Pothole_Bay\", \"Shark_Gully\")) && length(a) == 2) }",
-            "hint": "Fit on all six measurements as measured (all six go in input_variables as predictors; carats_per_100t is output_variable, the response), predict the eight new claims, keep those above 60.",
+            "hint": "Fit on all six predictors (all six go in predictors; carats_per_100t, the response, goes in response), predict the eight new claims, keep those above 60.",
             "maxAttempts": 4,
             "feedback": {
-              "correct": "Correct &mdash; noted in your field notebook: on all six measurements, Pothole_Bay and Shark_Gully clear the pay line; the height line's favorites, Eagle_Terrace and Summit_Beach, are the two poorest of the eight.",
+              "correct": "Correct &mdash; noted in your field notebook: with all six predictors, Pothole_Bay and Shark_Gully clear the pay line; the height line's favorites, Eagle_Terrace and Summit_Beach, are the two poorest of the eight.",
               "wrong": [
-                "Fit on the claims as measured, not scaled: <code>full_model &lt;- buildModel(data = claim_survey, model_type = &quot;linear_regression&quot;, input_variables = c(&quot;terrace_height_m&quot;, &quot;gullies_per_100m&quot;, &quot;cobble_size_cm&quot;, &quot;gravel_thickness_m&quot;, &quot;sand_cover_m&quot;, &quot;distance_to_river_km&quot;), output_variable = &quot;carats_per_100t&quot;)</code>. Then <code>predictWithModel(data = claim_survey_unknown, model = full_model)</code>.",
-                "The height line alone is the shortcut the survey has already overturned: use all six measurements. If predictWithModel() says the variables have different types, the model was fitted on scaled data; a scaled model expects scaled predictors, so refit on claim_survey as measured.",
+                "Fit all six on claim_survey: <code>full_model &lt;- buildModel(data = claim_survey, model_type = &quot;linear_regression&quot;, predictors = c(&quot;terrace_height_m&quot;, &quot;gullies_per_100m&quot;, &quot;cobble_size_cm&quot;, &quot;gravel_thickness_m&quot;, &quot;sand_cover_m&quot;, &quot;distance_to_river_km&quot;), response = &quot;carats_per_100t&quot;)</code>. Then <code>predictWithModel(data = claim_survey_unknown, model = full_model)</code>.",
+                "The height line alone is the shortcut the survey has already overturned: use all six predictors. A model fitted with scale_variance = TRUE gives the same predictions: predictWithModel() scales the new claims for you.",
                 "Keep the predictions above the pay line with <code>filter(predicted_carats_per_100t &gt; 60)</code>, then assign their two claim names: <code>answer &lt;- c(&quot;first&quot;, &quot;second&quot;)</code> with the real names in place."
               ]
             }
@@ -17474,7 +17508,7 @@
             ]
           },
           "note": "Escape input: reads this lockful's cost, 4, directly (no before-and-after). Code-engraved scale, crispest mark in frame.",
-          "body": "The telltale's pointer has settled at 4 inches.",
+          "body": "The telltale's pointer indicates that it took 4 inches of water from the reservoir to fill this lock.",
           "image": "telltales/telltale_lock5.png"
         },
         {
@@ -18943,31 +18977,31 @@
           "type": "puzzle",
           "label": "The new claims",
           "box": [
-            0.2001,
-            0.4136,
-            0.2401,
-            0.5136
+            0.1352,
+            0.4272,
+            0.1752,
+            0.5272
           ],
           "form": "check",
           "starterCode": "claim_survey",
           "check": {
-            "prompt": "Eight new claims are waiting for barges, and only a claim above the pay line of 60 carats per 100 t gets one. Using claim_survey, fit carats_per_100t on all six measurements together, use that model to predict carats_per_100t for every claim in claim_survey_unknown, and assign the names of the two claims predicted above 60 to an object called answer, as c(\"first\", \"second\"). Then click \"Check my answer\".",
+            "prompt": "Eight new claims are waiting for barges, and only a claim above the pay line of 60 carats per 100 t gets one. Using claim_survey, fit the response, carats_per_100t, on all six predictors together, use that model to predict carats_per_100t for every claim in claim_survey_unknown, and assign the names of the two claims predicted above 60 to an object called answer, as c(\"first\", \"second\"). Then click \"Check my answer\".",
             "requires": [
               "answer"
             ],
             "expr": "{ a <- if (is.data.frame(answer)) answer$claim else answer; isTRUE(setequal(as.character(a), c(\"Pothole_Bay\", \"Shark_Gully\")) && length(a) == 2) }",
-            "hint": "Fit on all six measurements as measured (all six go in input_variables as predictors; carats_per_100t is output_variable, the response), predict the eight new claims, keep those above 60.",
+            "hint": "Fit on all six predictors (all six go in predictors; carats_per_100t, the response, goes in response), predict the eight new claims, keep those above 60.",
             "maxAttempts": 4,
             "feedback": {
-              "correct": "Correct &mdash; noted in your field notebook: on all six measurements, Pothole_Bay and Shark_Gully clear the pay line; the height line's favorites, Eagle_Terrace and Summit_Beach, are the two poorest of the eight.",
+              "correct": "Correct &mdash; noted in your field notebook: with all six predictors, Pothole_Bay and Shark_Gully clear the pay line; the height line's favorites, Eagle_Terrace and Summit_Beach, are the two poorest of the eight.",
               "wrong": [
-                "Fit on the claims as measured, not scaled: <code>full_model &lt;- buildModel(data = claim_survey, model_type = &quot;linear_regression&quot;, input_variables = c(&quot;terrace_height_m&quot;, &quot;gullies_per_100m&quot;, &quot;cobble_size_cm&quot;, &quot;gravel_thickness_m&quot;, &quot;sand_cover_m&quot;, &quot;distance_to_river_km&quot;), output_variable = &quot;carats_per_100t&quot;)</code>. Then <code>predictWithModel(data = claim_survey_unknown, model = full_model)</code>.",
-                "The height line alone is the shortcut the survey has already overturned: use all six measurements. If predictWithModel() says the variables have different types, the model was fitted on scaled data; a scaled model expects scaled predictors, so refit on claim_survey as measured.",
+                "Fit all six on claim_survey: <code>full_model &lt;- buildModel(data = claim_survey, model_type = &quot;linear_regression&quot;, predictors = c(&quot;terrace_height_m&quot;, &quot;gullies_per_100m&quot;, &quot;cobble_size_cm&quot;, &quot;gravel_thickness_m&quot;, &quot;sand_cover_m&quot;, &quot;distance_to_river_km&quot;), response = &quot;carats_per_100t&quot;)</code>. Then <code>predictWithModel(data = claim_survey_unknown, model = full_model)</code>.",
+                "The height line alone is the shortcut the survey has already overturned: use all six predictors. A model fitted with scale_variance = TRUE gives the same predictions: predictWithModel() scales the new claims for you.",
                 "Keep the predictions above the pay line with <code>filter(predicted_carats_per_100t &gt; 60)</code>, then assign their two claim names: <code>answer &lt;- c(&quot;first&quot;, &quot;second&quot;)</code> with the real names in place."
               ]
             }
           },
-          "boxSource": "draft:skeleton",
+          "boxSource": "moved:testplay",
           "solveSfx": {
             "src": "audio/solve_lock5_the_new_claims_vintage_steam_whistle_blast.mp3",
             "volume": 0.7
@@ -18978,10 +19012,10 @@
           "type": "dial",
           "label": "The fill valve",
           "box": [
-            0.2926,
-            0.4842,
-            0.3326,
-            0.6042
+            0.3066,
+            0.4865,
+            0.3466,
+            0.6065
           ],
           "key": "lock5_full",
           "states": [
@@ -18996,10 +19030,10 @@
             "solved": "lock5"
           },
           "lockedBody": "The barge waits for its ruling before the lock is filled.",
-          "boxSource": "draft:skeleton",
+          "boxSource": "moved:testplay",
           "sfx": {
             "src": "audio/dial_fill_valve_canal_sluice_water_rush_2.mp3",
-            "volume": 0.6
+            "volume": 0.13
           }
         },
         {
@@ -19007,10 +19041,10 @@
           "type": "clue",
           "label": "The telltale",
           "box": [
-            0.3469,
-            0.2923,
-            0.3669,
-            0.7087
+            0.3602,
+            0.2607,
+            0.3802,
+            0.6771
           ],
           "pickup": "Lock 5 cost the reservoir 4 inches.",
           "shownWhen": {
@@ -19019,8 +19053,8 @@
               true
             ]
           },
-          "body": "The telltale's pointer has settled at 4 inches.",
-          "boxSource": "draft:skeleton",
+          "body": "The telltale's pointer indicates that it took 4 inches of water from the reservoir to fill this lock.",
+          "boxSource": "moved:testplay",
           "image": "telltales/telltale_lock5.png"
         },
         {
@@ -19116,6 +19150,28 @@
               }
             }
           ]
+        },
+        {
+          "id": "clip_lock5_full",
+          "type": "ambient",
+          "label": "Scene motion (lock5_full)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/play-source.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "lock5/cine_lock5_full.mp4",
+            "state": "lock5_full"
+          }
         }
       ],
       "mapPos": {
@@ -19125,23 +19181,23 @@
       "sfx": [
         {
           "src": "audio/lock5_leak_splatter_on_stone.mp3",
-          "volume": 0.6
+          "volume": 0.35
         },
         {
           "src": "audio/lock5_seep_trickle.mp3",
-          "volume": 0.35
+          "volume": 0.21
         },
         {
           "src": "audio/lock5_flange_spray_hiss.mp3",
           "mode": "interval",
-          "volume": 0.4,
+          "volume": 0.15,
           "gapMin": 10,
           "gapMax": 30
         },
         {
           "src": "audio/lock5_seep_drip.mp3",
           "mode": "interval",
-          "volume": 0.4,
+          "volume": 0.1,
           "gapMin": 15,
           "gapMax": 40
         }
@@ -20098,10 +20154,10 @@
           "type": "clue",
           "label": "The reservoir gauge",
           "box": [
-            0.4657,
-            0.3077,
-            0.4857,
-            0.5477
+            0.4745,
+            0.2885,
+            0.4945,
+            0.5285
           ],
           "pickup": "The reservoir after the flood: 360 inches.",
           "body": "The gauge on the dam reads 360 inches above the outlet.",
@@ -20213,6 +20269,13 @@
       "designNote": "The drawdown board (engine instrument, notes.md §5/§7): pegs on five seasons, the rod settles on the line, reads about 80 for this season. Journal page 1925 on the desk (moved here from the cut tramway halt, Lucas 2026-10-28).",
       "plannedHotspots": [
         {
+          "box": [
+            0.4104,
+            0.276,
+            0.5896,
+            0.596
+          ],
+          "boxSource": "draft:skeleton",
           "type": "instrument",
           "kind": "drawdown",
           "label": "The drawdown board",
@@ -20224,14 +20287,7 @@
             "rod": "instruments/drawdown/rod_k.png",
             "leverThrown": "instruments/drawdown/board_lever_thrown.png"
           },
-          "note": "Engine instrument (shared/drawdown.js, built 2026-10-20): opens the board in a modal; the escape pegs read 79.60 at rail 6. The still is a stand-in: regenerate it with this room's panorama as --ref at art time and re-measure geometry.json.",
-          "box": [
-            0.4104,
-            0.276,
-            0.5896,
-            0.596
-          ],
-          "boxSource": "draft:skeleton"
+          "note": "Engine instrument (shared/drawdown.js, built 2026-10-20): opens the board in a modal; the escape pegs read 79.60 at rail 6. The still is a stand-in: regenerate it with this room's panorama as --ref at art time and re-measure geometry.json."
         },
         {
           "type": "clue",
@@ -20242,17 +20298,17 @@
           "image": "journals/journal_1925.png"
         },
         {
-          "type": "door",
-          "direction": "open",
-          "label": "Back to the gatehouse",
-          "to": "gatehouse",
           "box": [
             0.3539,
             0.3282,
             0.3739,
             0.7958
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "type": "door",
+          "direction": "open",
+          "label": "Back to the gatehouse",
+          "to": "gatehouse"
         }
       ],
       "authoring": {
@@ -20444,10 +20500,10 @@
           "type": "door",
           "label": "Back to the gatehouse",
           "box": [
-            0.363,
-            0.2724,
-            0.3929,
-            0.74
+            0.3207,
+            0.2844,
+            0.3506,
+            0.752
           ],
           "direction": "open",
           "to": "gatehouse",
@@ -20482,23 +20538,23 @@
       "sfx": [
         {
           "src": "audio/office_kettle_on_stove.mp3",
-          "volume": 0.6
+          "volume": 0.4
         },
         {
           "src": "audio/office_reservoir_faint.mp3",
-          "volume": 0.35
+          "volume": 0.16
         },
         {
           "src": "audio/office_kettle_hiss_rise.mp3",
           "mode": "interval",
-          "volume": 0.4,
+          "volume": 0.12,
           "gapMin": 10,
           "gapMax": 30
         },
         {
           "src": "audio/office_floor_creak.mp3",
           "mode": "interval",
-          "volume": 0.4,
+          "volume": 0.23,
           "gapMin": 15,
           "gapMax": 40
         }
@@ -20514,13 +20570,21 @@
       "unlockedWhen": true,
       "role": "top",
       "level": 6,
-      "designNote": "Load counter keypad: 16. Opens onto the town: TRAVEL SEQUENCE for escape-doers only.",
+      "designNote": "Load counter keypad: 16. Solving it finishes the escape (deferCard: no card yet) and opens the gate (gate_open state); the door through the arch leads to the town finale room (notes.md §14).",
       "plannedHotspots": [
         {
+          "lockedBody": "",
           "type": "lock",
           "label": "The load counter",
           "answer": "16",
           "endsEscape": true,
+          "deferCard": true,
+          "onSolve": [
+            {
+              "set": "gate_open",
+              "to": true
+            }
+          ],
           "note": "Escape. Traps 12/14/15/17/18/21 all distinct (verify_escape.py).",
           "length": 2
         },
@@ -20529,6 +20593,25 @@
           "direction": "open",
           "label": "Back along the dam",
           "to": "gatehouse"
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "label": "Through the open gate",
+          "to": "town",
+          "availableWhen": {
+            "eq": [
+              "gate_open",
+              true
+            ]
+          },
+          "lockedBody": "The gate is shut. The load counter waits for the season's number.",
+          "shownWhen": {
+            "eq": [
+              "gate_open",
+              true
+            ]
+          }
         }
       ],
       "authoring": {
@@ -21427,7 +21510,16 @@
           "solveSfx": {
             "src": "audio/solve_town_gate_the_load_counter_iron_gate_unlatch_creak_open.mp3",
             "volume": 0.7
-          }
+          },
+          "lockedBody": "",
+          "deferCard": true,
+          "onSolve": [
+            {
+              "set": "gate_open",
+              "to": true
+            }
+          ],
+          "solvedToast": "Sixteen loads. The bolts draw back and the town gate swings open."
         },
         {
           "id": "back_along_the_dam",
@@ -21442,6 +21534,33 @@
           "direction": "open",
           "to": "gatehouse",
           "boxSource": "moved:testplay"
+        },
+        {
+          "id": "through_the_open_gate",
+          "type": "door",
+          "label": "Through the open gate",
+          "box": [
+            0.41,
+            0.33,
+            0.52,
+            0.7
+          ],
+          "direction": "open",
+          "to": "town",
+          "availableWhen": {
+            "eq": [
+              "gate_open",
+              true
+            ]
+          },
+          "shownWhen": {
+            "eq": [
+              "gate_open",
+              true
+            ]
+          },
+          "lockedBody": "The gate is shut. The load counter waits for the season's number.",
+          "boxSource": "agent:2026-11-07"
         },
         {
           "id": "clip_base",
@@ -21463,6 +21582,37 @@
             ],
             "video": "town_gate/cine_base.mp4"
           }
+        },
+        {
+          "id": "gate_open_wash",
+          "type": "ambient",
+          "label": "Gate open",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Full-scene state variant. `ambient` is filtered out of rendering; it holds the variant art.",
+          "variants": [
+            {
+              "state": "gate_open",
+              "box": [
+                0,
+                0,
+                1,
+                1
+              ],
+              "panorama": "town_gate/scene_gate_open.png",
+              "prompt": "Edit this 360 panorama. Change ONLY the town gate in the stone arch at the centre: its two heavy wooden gate leaves now stand WIDE OPEN, each swung inward and away from the viewer against the inside of the arch, so the archway is a clear opening. Through the open archway, a short cobbled street runs straight on into the town between tall pastel plaster houses (ochre, pale blue, cream, salmon, red and grey roofs) with sand drifted against their doorsteps, lit by the same low warm evening sun. Keep EVERYTHING else exactly as it is: the arch, its stonework and hanging lantern, the brass counter box on the right pier, the walls, the paving, the houses seen over the wall, the reservoir, the far hut, the fog bank, the sky, the sun and the light. Same framing, same equirectangular projection, the left and right edges unchanged so they still join. No people, no text, no numerals. Photorealistic, SHARP, no motion blur, fine film grain.",
+              "when": {
+                "eq": [
+                  "gate_open",
+                  true
+                ]
+              }
+            }
+          ]
         }
       ],
       "mapPos": {
@@ -21493,26 +21643,87 @@
           "gapMax": 40
         }
       ]
+    },
+    {
+      "key": "town",
+      "title": "The town",
+      "technique": "",
+      "puzzleType": 0,
+      "phase": "escape",
+      "built": true,
+      "unlockedWhen": true,
+      "role": "finale",
+      "level": 6,
+      "designNote": "Finale (2026-11-07): drawn from a crop of the finale aerial; ~5 s after arrival the flat pull-back (room `finale`) plays, then the escapeDone card.",
+      "plannedHotspots": [
+        {
+          "type": "door",
+          "direction": "open",
+          "label": "Back through the gate",
+          "to": "town_gate"
+        }
+      ],
+      "panorama": "town/scene.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "finale": {
+        "video": "town/finale_pullback.mp4"
+      },
+      "hotspots": [
+        {
+          "id": "back_through_the_gate",
+          "type": "door",
+          "label": "Back through the gate",
+          "box": [
+            0.76,
+            0.42,
+            0.86,
+            0.62
+          ],
+          "direction": "open",
+          "to": "town_gate",
+          "boxSource": "agent:2026-11-07"
+        }
+      ],
+      "mapPos": {
+        "c": 5,
+        "r": 1
+      },
+      "sfx": [
+        {
+          "src": "audio/town_gate_sand_wind_gusts.mp3",
+          "volume": 0.6
+        },
+        {
+          "src": "audio/town_gate_plateau_wind.mp3",
+          "volume": 0.35
+        }
+      ]
     }
   ],
   "_designNotes": "Steps 1-2, 3a, 3b DONE; 4a graph written by _scratch/build_graph.py (2026-10-20, session modeling): 19 rooms, no scene specs or art yet. Landing locked. Design record: notes.md.",
   "debrief": {
     "title": "How this world worked",
-    "intro": "This scenario was linear regression, fitting a straight line to measurements so you can see how much a response changes with each predictor, and then using that line to predict cases you have not measured yet. Here is what you did."
+    "intro": "This scenario was linear regression, fitting a straight line to data so you can see how much the response changes with each predictor, and then using that line to predict cases you have not measured yet. Here is what you did."
   },
   "done": {
     "title": "Barges for the gullies",
-    "body": "The height line said climb high, and the two highest terraces looked like the richest claims. The whole survey says otherwise: the gravel that pays sits where the old shorelines cut gullies and potholes into the rock, and height only mattered because it travels with them. Pothole Bay and Shark Gully get the barges. The other half of the ruling is still waiting at the top of the flight: how many loads the water can afford."
+    "body": "The word around town says that the highest terraces are often the richest claims. However, the data say otherwise: the gravel that has the most diamonds sits where the old shorelines cut gullies and potholes into the rock, and height only mattered because it was correlated with them. Pothole Bay and Shark Gully deserve attention. The other half of your work is still waiting at the top of the flight: how many barge loads the reservoir can afford and still leave enough water for the town to drink."
   },
   "escapeDone": {
-    "title": "The season's ruling",
-    "body": "The town gate swings open and you climb out of the fog into clear sun. Below you the barges sit in their chambers, one to a lock, and the reservoir lies still behind the dam. Sixteen loads, to the two claims that pay: that is the ruling. It will not save the town for ever, but it gives the washing plant its season, and the families who stayed a reason to stay one more year."
+    "title": "This year's water budget",
+    "body": "The town gate swings open and you walk through. The reservoir can afford sixteen loads and still have enough water for the town. That will not be enough water for the town for ever, but it gives the washing plant its season, and the families who stayed a reason to stay one more year."
   },
   "coverPrompt": "Minimalist stylised thumbnail poster, seen square-on and flat: the black silhouette of a stepped flight of canal locks climbing a desert slope from the lower left to the upper right, one low gravel barge in the top lock, set against a band of cold grey fog below and a single warm amber sky above, with one small bright glint on the barge's gravel. Bold, graphic, very few elements, high contrast, poster-like. No people, no text, no lettering, no letters, no numbers, no border.",
   "ladderPlain": [
     {
       "room": "lock1",
-      "text": "In the first puzzle you fit a straight line of claim grade against terrace height and read its slope: each extra meter of height went with about one more carat per hundred tons."
+      "text": "In the first puzzle you fit a straight line with terrace height as the predictor and claim grade as the response, and read its slope: each extra meter of height went with about one more carat per hundred tons."
     },
     {
       "room": "grease_shed",
@@ -21520,11 +21731,11 @@
     },
     {
       "room": "lock4",
-      "text": "In the third puzzle you scaled all six measurements, fit them together and compared their coefficients: gullies per hundred meters had by far the largest effect, and terrace height came fourth."
+      "text": "In the third puzzle you scaled all six predictors, fit them together and compared their coefficients: gullies per hundred meters had by far the largest effect, and terrace height came fourth."
     },
     {
       "room": "lock5",
-      "text": "In the final puzzle you predicted all eight new claims from the six-measurement model, and Pothole_Bay and Shark_Gully were the two over the pay line, while the height line alone pointed to Eagle_Terrace and Summit_Beach, the two highest terraces, which all six measurements together rate among the poorest."
+      "text": "In the final puzzle you predicted all eight new claims from the six-predictor model, and Pothole_Bay and Shark_Gully were the two over the pay line, while the height line alone pointed to Eagle_Terrace and Summit_Beach, the two highest terraces, which all six predictors together rate among the poorest."
     },
     {
       "room": "town_gate",
@@ -21548,5 +21759,19 @@
   ],
   "ambient": "dust",
   "cover": "cover.png",
-  "stateFadeMs": 3000
+  "stateFadeMs": 3000,
+  "escapeHints": [
+    {
+      "after": 4,
+      "text": "Everything you need is in what you have already seen: the lock telltales, the journal pages and the drawdown board in the water master's office."
+    },
+    {
+      "after": 8,
+      "text": "The town's drawdown is not steady: it falls a little every season. And a load costs whatever every lock it passes through costs, from the sea upwards."
+    },
+    {
+      "after": 12,
+      "text": "Use the board's line for this season, not an average or last season alone. Take that from the reservoir gauge, then divide what is left by the cost of one full load. Half a load is no load."
+    }
+  ]
 }

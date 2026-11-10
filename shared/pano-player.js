@@ -84,29 +84,30 @@
 // A bare `./variant_resolve.js` import is NOT refreshed by bumping the <script> tag's ?v, so a changed
 // helper module (e.g. a new export) leaves browsers on a stale cached copy → "doesn't provide an export
 // named X" SyntaxError → blank page (the 2026-08-05 airship regression). Bump all three together.
-import { WebRConsole } from "./webr-console.js?v=155";
-import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers, pickTransit } from "./variant_resolve.js?v=155";   // Phase 3: per-hotspot state variants; monorail switch-door nav
-import * as PQ from "./puzzle_queue.js?v=155";   // dynamic puzzle queue: location-independent puzzle serving
-import * as CP from "./corr_panel.js?v=155";   // lower-triangle layout of the grid gate (clouds correlation panel)
-import { particleCount } from "./particles.js?v=155";
-import { mountLandingBackdrop } from "./landing_backdrop.js?v=155";   // landing text over a pan of the first room's clip   // ambient-particle vocabulary + per-kind field density
-import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=155";
-import { condHolds } from "./cond.js?v=155";
-import { gridMatches } from "./grid_check.js?v=155";   // grid answer check; `partition:true` accepts any relabelling of the buckets   // ledger + elevation-map card DOM
-import * as LIVE from "./live_session.js?v=155";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
-import * as RIDE from "./ride.js?v=155";
-import { mountPcaPlate } from "./pca_plate.js?v=155";   // the PCA plate instrument (voyage beach)
-import { mountFishBoard } from "./fish_board.js?v=155";   // the fish board instrument (harbour berth)
-import { mountDrawdown } from "./drawdown.js?v=155";
-import { mountTide } from "./tide_machine.js?v=155";   // the tide machine instrument (dunes escape)
-import { mountVarianceMeter } from "./variance_meter.js?v=155";   // the variance meter instrument (anova cellars escape)
-import { mountAnovaInstrument } from "./anova_instrument.js?v=155";   // the ANOVA instrument (Fisher's board, anova rooms; also the book, ch.12b)
-import { mountGhostLines } from "./ghost_lines.js?v=155";   // the ghost-line board instrument (regression pits hub)
+import { WebRConsole } from "./webr-console.js?v=164";
+import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers, pickTransit } from "./variant_resolve.js?v=164";   // Phase 3: per-hotspot state variants; monorail switch-door nav
+import * as PQ from "./puzzle_queue.js?v=164";   // dynamic puzzle queue: location-independent puzzle serving
+import * as CP from "./corr_panel.js?v=164";   // lower-triangle layout of the grid gate (clouds correlation panel)
+import { particleCount } from "./particles.js?v=164";
+import { mountLandingBackdrop } from "./landing_backdrop.js?v=164";   // landing text over a pan of the first room's clip   // ambient-particle vocabulary + per-kind field density
+import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=164";
+import { condHolds } from "./cond.js?v=164";
+import { gridMatches } from "./grid_check.js?v=164";   // grid answer check; `partition:true` accepts any relabelling of the buckets   // ledger + elevation-map card DOM
+import * as LIVE from "./live_session.js?v=164";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
+import * as RIDE from "./ride.js?v=164";
+import { mountPcaPlate } from "./pca_plate.js?v=164";   // the PCA plate instrument (voyage beach)
+import { mountFishBoard } from "./fish_board.js?v=164";   // the fish board instrument (harbour berth)
+import { mountDrawdown } from "./drawdown.js?v=164";
+import { mountTide } from "./tide_machine.js?v=164";   // the tide machine instrument (dunes escape)
+import { mountVarianceMeter } from "./variance_meter.js?v=164";   // the variance meter instrument (anova cellars escape)
+import { mountAnovaInstrument } from "./anova_instrument.js?v=164";   // the ANOVA instrument (Fisher's board, anova rooms; also the book, ch.12b)
+import { mountGhostLines } from "./ghost_lines.js?v=164";   // the ghost-line board instrument (regression pits hub)
    // the drawdown board instrument (diamonds escape)   // THE RIDE (subway): express lever + clip-sequence planner
-import * as BELL from "./bell_pull.js?v=155";
-import * as DATEB from "./date_board.js?v=155";   // date lock: lock mode:"date", two slide-levers (dunes departure board)
-import * as INVY from "./inventory.js?v=155";   // carried items + the door that asks which to use (dunes)   // bell-pull (#16): dial mode:"pull" + lock mode:"state" (spa belfry)
-import { entryYaw } from "./entry_facing.js?v=155";   // face the way out on entering a room (every scenario)
+import * as BELL from "./bell_pull.js?v=164";
+import * as DATEB from "./date_board.js?v=164";   // date lock: lock mode:"date", two slide-levers (dunes departure board)
+import * as INVY from "./inventory.js?v=164";   // carried items + the door that asks which to use (dunes)   // bell-pull (#16): dial mode:"pull" + lock mode:"state" (spa belfry)
+import { entryYaw } from "./entry_facing.js?v=164";   // face the way out on entering a room (every scenario)
+import * as HINTS from "./escape_hints.js?v=164";   // escape-phase Hint chip: time-unlocked tiers (SCENARIO.escapeHints)
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 
@@ -135,6 +136,7 @@ root.innerHTML = `
     <button id="mapChip" style="display:none;position:absolute;bottom:42px;right:14px;z-index:20;background:rgba(0,0,0,.42);padding:5px 12px;border-radius:14px;border:1px solid rgba(255,216,140,.35);font:12px system-ui;color:rgba(255,216,140,.92);cursor:pointer;user-select:none" title="The rooms you have found so far, and how they connect">🗺 Map</button>
     <button id="debriefChip" style="display:none;position:absolute;bottom:10px;left:50%;transform:translateX(-50%);z-index:20;background:rgba(0,0,0,.42);padding:5px 12px;border-radius:14px;border:1px solid rgba(255,216,140,.35);font:12px system-ui;color:rgba(255,216,140,.92);cursor:pointer;user-select:none" title="A look behind the scenes — how this world was built to teach the technique">🔎 Reveal how this world worked</button>
     <button id="skipChip" style="display:none;position:absolute;bottom:10px;left:50%;transform:translateX(-50%);z-index:20;background:rgba(0,0,0,.42);padding:5px 12px;border-radius:14px;border:1px solid rgba(255,216,140,.35);font:12px system-ui;color:rgba(255,216,140,.92);cursor:pointer;user-select:none" title="Open your submission — you can come back to it as often as you like">Prepare submission / skip the ungraded escape phase →</button>
+    <button id="hintChip" style="display:none;position:absolute;bottom:42px;left:50%;transform:translateX(-50%);z-index:20;background:rgba(0,0,0,.42);padding:5px 12px;border-radius:14px;border:1px solid rgba(255,216,140,.35);font:12px system-ui;color:rgba(255,216,140,.92);cursor:pointer;user-select:none" title="Stuck? Hints unlock as time passes — open one only if you want it">💡 Hint</button>
     <div id="hud"><span id="hudroom"></span></div>
     <div id="motifHud"></div>
     <div id="headingHud" style="display:none"><div class="hdgDial"><div class="hdgNeedle"></div></div><span class="hdgText"></span></div>
@@ -331,6 +333,8 @@ function init(data) {
   $("#notebookChip").onclick = openNotebook;
   $("#mapChip").onclick = openMap;
   $("#skipChip").onclick = openSubmitPrep;   // the one persistent in-room route to submission (showSubmitChip)
+  $("#hintChip").onclick = openHints;
+  setInterval(updateHintChip, 1000);         // countdown + visibility; a no-op unless SCENARIO.escapeHints is set
   // Two-player scenarios start their players in DIFFERENT rooms, so the landing screen may
   // offer one button per role instead of a single Begin. Additive: a scenario with no
   // `enterButtons` behaves exactly as before. (embeddings/submarine, 2026-09-10.)
@@ -350,6 +354,7 @@ function init(data) {
     attemptCounts.clear();
     queueSolved.clear(); queueResults.clear(); queueAssign.clear();   // dynamic puzzle queue
     analysisFinished = false; escapeFinished = false;                // fresh objective state
+    cancelFinale();
     startTime = Date.now();                                           // per-phase timing: game starts now
     analysisFinishedTime = null; escapeFinishedTime = null;           // fresh timing state
     caseFile.length = 0; pickedClues.clear(); scratchPad = "";        // fresh field notebook + scratch pad
@@ -359,6 +364,7 @@ function init(data) {
     $("#mapChip").style.display = mapEnabled() ? "" : "none";         // stacked above the notebook; hidden when opted out
     $("#debriefChip").style.display = "none";                        // appears only once analysis completes
     $("#skipChip").style.display = "none";                           // shown once analysis is done, then permanent (showSubmitChip)
+    $("#hintChip").style.display = "none";                           // escape phase only (updateHintChip)
     if (SCENARIO.heel) $("#pano").classList.add("heel");              // slow crash-heel of the horizon (opt-in)
     initMotif();                                                      // story-motif HUD (e.g. infection lesion)
     bootConsole();
@@ -468,7 +474,10 @@ function setupSfxToggle() {
     rooms.some(r => r.solveSfx || (r.hotspots || []).some(h => h.solveSfx)) ||
     !!SCENARIO.solveSfx;
   if (!anySfx) { chip.style.display = "none"; return; }
-  sfxOn = localStorage.getItem("panoSfx") !== "off";   // default on; remembers "off"
+  // default on; remembers "off" — EXCEPT in test play, which always starts on: a remembered "off" there
+  // silently emptied the mixer ("No sound effects in this room") with the music still playing, so a
+  // room full of authored sfx looked unsounded (diamonds, 2026-11-06). Regression: e2e/sfx_testplay_on.spec.js
+  sfxOn = isTestPlay() || localStorage.getItem("panoSfx") !== "off";
   chip.style.bottom = SCENARIO.music ? "42px" : "10px";   // stack above the music chip when both show
   chip.style.display = "";
   updateSfxBtn();
@@ -1313,7 +1322,8 @@ function renderPuzzleLabels() {
 // --- The in-game map (opt-out: SCENARIO.playerMap === false) ----------------------------------------
 // A read-only fog-of-war map of the rooms, opened from a chip above the field notebook. Connectivity and
 // room NAMES only — no hotspots (Lucas, 2026-09-15): the harness draws a dot per puzzle/clue/switch on
-// this same graph, and shipping those would spoil every room at a glance. The renderer is the shared
+// this same graph, and shipping those would spoil every room at a glance. Plus a pin / tick on visited
+// graded-puzzle rooms (Lucas, 2026-11-08; mapPuzzleMarks below). The renderer is the shared
 // `map_graph.js` (window.MapGraph, a classic script like codec.js/debrief.js — NOT an ES import, so the
 // authoring harness can load the same file). Plan + phases: notes/z_archive/player_map_plan.md (archived).
 //
@@ -1351,18 +1361,35 @@ function mapSpec() {
   }));
 }
 
+// Which rooms the map may mark (Lucas, 2026-11-08: a pin on each visited room holding a graded puzzle, a
+// tick once solved). "Graded" is exactly the codec's set — gradedAnalysisRooms(), the same filter as
+// analysisComplete(): built, phase "analysis", in this player's role, carrying a `puzzle` hotspot. Locks,
+// grids and escape rooms never qualify. map_graph.js adds the visited test. A room holding a `queueSeries`
+// slot (clouds' console serves rung after rung) is solved once its first rung is, so it ticks only once
+// the whole ladder is done.
+function mapPuzzleMarks() {
+  const graded = gradedAnalysisRooms();
+  const ladderDone = !PQ.usesQueue(SCENARIO) || PQ.queueComplete(SCENARIO.puzzleQueue, queueSolved);
+  const solved = graded.filter(r => solvedRooms.has(r.key) &&
+    (ladderDone || !(r.hotspots || []).some(h => PQ.isSeriesSlot(h, SCENARIO))));
+  return { graded: graded.map(r => r.key), solved: solved.map(r => r.key) };
+}
+
 function openMap() {
   const MG = window.MapGraph;
   const d = document.createElement("div");
   if (!MG) { d.textContent = "The map is unavailable."; return openModal("🗺 Map", d); }
+  const marks = mapPuzzleMarks();
   const g = MG.buildNetSvg(mapSpec(), {
     mode: "player",
-    fog: { visited: [...visitedRooms], current: room ? room.key : null },
+    fog: { visited: [...visitedRooms], current: room ? room.key : null, graded: marks.graded, solved: marks.solved },
   });
   d.className = "mapcard";
   d.innerHTML = `<svg class="mapsvg" viewBox="0 0 ${g.W} ${g.H}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Map of the rooms you have visited">${g.html}</svg>`
     + `<div class="maplegend"><span class="mk-cur"></span> where you are`
-    + `<span class="mk-unknown"></span> somewhere you have not been yet</div>`;
+    + `<span class="mk-unknown"></span> somewhere you have not been yet`
+    + (marks.graded.length ? `<span class="mk-pin"></span> a puzzle waits here<span class="mk-tick"></span> solved` : "")
+    + `</div>`;
   openModal("🗺 Map", d, null, null, "wide");
 }
 
@@ -1414,6 +1441,7 @@ function startRoom(i, arriveYaw, fromKey) {
   if (riding) cancelRide();          // a test-play jump mid-ride: drop the ride, don't arrive anywhere
   transiting = null;                 // ...and likewise a portal transit (its loop stops with the viewer rebuild)
   stopRoomSfx();                   // stop the previous room's ambience + restore music volume
+  clearStateFade();                // a crossfade snapshot belongs to the room it was taken in
   roomIdx = i; room = SCENARIO.rooms[i];
   if (room && room.key) visitedRooms.add(room.key);   // mark entered (so a puzzle-less junction's entry card won't re-show)
   // A `dial` may declare `resetOnEnter` (+ its `default` value): entering the room returns the lever to that
@@ -1435,7 +1463,8 @@ function startRoom(i, arriveYaw, fromKey) {
   const img = basePanorama(room, openState);
   buildViewer(img, arriveYaw != null ? arriveYaw : arrivalYaw(room, fromKey));   // the way out (or the forward door)
   preloadTransits(room);             // fetch this room's portal-transit clips now, so walking through doesn't wait
-  startRoomSfx(room);             // start this room's sound effect(s) (+ optional music duck)
+  armFinale(room);                   // a room `finale` starts its countdown (or a previous room's is dropped)
+  startRoomSfx(room);            // start this room's sound effect(s) (+ optional music duck)
   updateEnvironment();               // progressive heel/sickness reflect current state (persist across rooms)
   if (room.outro) runOutro(room.outro);   // the day's end (bathhouse): look, fade to black, back to the start
 }
@@ -1930,6 +1959,8 @@ let _viewGen = 0;
 // and the picture fades out over stateFadeMs once the new view has loaded AND no modal or card is covering the scene,
 // so the change is seen rather than happening behind the answer box. Room entries and same-state rebuilds snap.
 let _lastScene = null;
+const FADE_CAP_MS = 12000;
+function clearStateFade() { document.querySelectorAll("img.state-fade").forEach(p => p.remove()); }
 function stateFade() {
   const ms = +SCENARIO.stateFadeMs || 0, key = room && room.key, st = roomSceneState(room), prev = _lastScene;
   _lastScene = { key, state: st };
@@ -1945,13 +1976,24 @@ function stateFade() {
   const old = viewer, r = $("#pano").getBoundingClientRect(), pic = new Image();
   pic.className = "state-fade"; pic.src = url;
   pic.style.cssText = `position:fixed;left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px;z-index:5;pointer-events:none;opacity:1`;
-  document.body.appendChild(pic);
+  // Inside the game screen, right after #pano — NOT on <body>. #screen2 is position:fixed, so it is its own
+  // stacking context: a body-level z-index:5 picture painted over the WHOLE screen, dial box included, while
+  // `go` below waited for that box to close — a frozen game until the cap (diamonds lock 1, 2026-11-06).
+  $("#pano").after(pic);
   const t0 = performance.now();
+  // FAIL-SAFE (2026-11-06): the snapshot is a full-screen still over the live view, so if it never lifts the
+  // game looks frozen — no panning, no hotspots (diamonds lock 1 in Firefox on the Mac). Whatever holds it,
+  // it goes after FADE_CAP_MS, with a console warning naming what held it. Regression: e2e/state_fade_cap.spec.js
   const go = () => {
     if (!pic.isConnected) return;
     let ready = false; try { ready = viewer !== old && viewer.isLoaded && viewer.isLoaded(); } catch (e) {}
     const covered = $("#modal").classList.contains("open") || $("#loading").classList.contains("open");
-    if ((!ready && performance.now() - t0 < 8000) || covered) return setTimeout(go, 100);
+    const waited = performance.now() - t0;
+    if (waited >= FADE_CAP_MS) {
+      console.warn("state fade: snapshot held " + Math.round(waited) + " ms, lifting it", JSON.stringify({
+        ready, sameViewer: viewer === old, modal: $("#modal").classList.contains("open"),
+        loading: $("#loading").classList.contains("open") }));
+    } else if ((!ready && waited < 8000) || covered) return setTimeout(go, 100);
     pic.style.transition = `opacity ${ms}ms ease-in-out`;
     requestAnimationFrame(() => requestAnimationFrame(() => { pic.style.opacity = "0"; }));
     setTimeout(() => pic.remove(), ms + 150);
@@ -2265,9 +2307,44 @@ function _releaseTransitVideo(src) {
 function preloadTransits(r) {
   const want = new Set();
   (r && r.hotspots || []).forEach(h => { const t = h && h.type === "door" ? doorTransit(h, r) : null; if (t && t.video) want.add(t.video); });
+  if (r && r.finale && r.finale.video) want.add(r.finale.video);
   Object.keys(_transitVideos).forEach(src => { if (!want.has(src)) _releaseTransitVideo(src); });
   want.forEach(src => _transitVideo(src));
 }
+// ROOM FINALE: `room.finale: {video, delay?, morph?, holdMs?, sfx?, sfxVolume?}` — standing in the room for `delay` s
+// (default 5) once the escape is finished (a `deferCard` lock; test-play arms it regardless) plays `video` as the flat
+// back-out finale (startTransit's `flat` escape path), then the escape card. Once per room entry; re-entry re-arms.
+// Leaving the room (or starting a door transit / ride) drops it; a popup pauses it, and closing the popup restarts
+// the full countdown. Missing clip / refused play() / reduced motion: the card alone (startTransit's fallbacks).
+let _finale = null;   // { key, timer } while armed
+function cancelFinale() { if (_finale) clearTimeout(_finale.timer); _finale = null; }
+function armFinale(r) {
+  cancelFinale();
+  const f = r && r.finale;
+  if (!f || !f.video || !(escapeFinished || isTestPlay())) return;
+  _finale = { key: r.key, timer: 0 };
+  _finaleCountdown();
+}
+function _finaleBlocked() {
+  return ["#modal", "#done", "#loading"].some(s => { const el = $(s); return !!(el && el.classList.contains("open")); });
+}
+function _finaleCountdown() {
+  const run = _finale;
+  if (!run) return;
+  clearTimeout(run.timer);
+  const f = room && room.key === run.key ? room.finale : null;
+  if (!f) return cancelFinale();
+  const d = f.delay != null && isFinite(+f.delay) ? Math.max(0, +f.delay) : 5;
+  run.timer = setTimeout(() => {
+    if (_finale !== run) return;
+    if (!room || room.key !== run.key || transiting || riding) return cancelFinale();   // on the way out
+    if (_finaleBlocked()) return _finaleCountdown();   // e.g. an entry card about to lead elsewhere: wait again
+    _finale = null;
+    const { delay, ...t } = f;
+    if (!startTransit({ id: "__finale", transit: { ...t, flat: true } }, -1, false, showEscapeDone)) showEscapeDone();
+  }, d * 1000);
+}
+function _pauseFinale() { if (_finale) clearTimeout(_finale.timer); }
 // Firefox can suspend the picture (not the sound) of a <video> it judges invisible, and a clip that is only ever drawn
 // into a canvas is never in the page. While a transit plays, its <video> sits in the page as a near-invisible 2 px
 // element so it counts as visible.
@@ -2792,6 +2869,7 @@ const devSolveThunk = (h, qIndex) => () => { closeModal(); solveRoom(correctResu
  */
 function openModal(title, node, onDevSolve, tpLabelOf, size) {
   modalTeardown();
+  _pauseFinale();                    // a room finale waits while a popup is open (closeModal restarts it)
   document.querySelector("#modal .mbox").classList.toggle("wide", size === "wide");
   $("#mtitle").textContent = title;
   // The modal title is the hotspot's `label` — player-facing on every single open, so it is editable
@@ -2812,7 +2890,7 @@ function openModal(title, node, onDevSolve, tpLabelOf, size) {
   $("#modal").classList.add("open");
 }
 $("#mback").onclick = closeModal;
-function closeModal() { modalTeardown(); unmountConsole(); $("#modal").classList.remove("open"); }
+function closeModal() { modalTeardown(); unmountConsole(); $("#modal").classList.remove("open"); _finaleCountdown(); }
 // A modal body that runs its own animation loop or audio (an instrument) registers its teardown here; it
 // runs when the modal closes or another modal replaces it.
 let _modalTeardown = null;
@@ -3014,8 +3092,10 @@ async function openInstrument(h) {
     }
     if (!card.isConnected) return;                       // closed while the geometry loaded
     // `pulleys` (optional, {itemKey: partId}): parts that come from the player's CARRIED items (shared/inventory.js);
-    // only the ones held reach the instrument's shelf.
-    const held = h.pulleys ? Object.entries(h.pulleys).filter(([k]) => INV.held.includes(k)).map(([, pid]) => pid) : undefined;
+    // only the ones held reach the instrument's shelf. `params.mountedUntilTaken` (dunes' town bench machine) inverts
+    // it: the parts are on the machine until the player takes them, so only the ones NOT carried are passed.
+    const untilTaken = !!(h.params && h.params.mountedUntilTaken);
+    const held = h.pulleys ? Object.entries(h.pulleys).filter(([k]) => INV.held.includes(k) !== untilTaken).map(([, pid]) => pid) : undefined;
     // `params` (optional): per-hotspot settings the kind reads (the variance meter: utility, powered).
     const inst = mount(card, { geometry, config, held, params: h.params || {}, art: h.art || {}, pegs: _instrumentState.get(sk), sound: !liveSilent(),
                                onPegs: v => _instrumentState.set(sk, v) });
@@ -4936,7 +5016,14 @@ function solveRoom(result, h, qIndex) {
   applyFx();                                           // a state-gated effect may have just turned on
   // An escape gate flagged `endsEscape` (e.g. a boss-room valve keypad) ends the ungraded escape when
   // solved — the in-room analogue of an endsEscape DOOR (handleDoor). Terminal: show the escape finish.
-  if (h && h.endsEscape) return showEscapeDone();
+  // `deferCard: true` on such a lock: the escape counts as finished NOW, but the card waits for the next room's
+  // `finale` (armFinale); the solve carries on as an ordinary lock (its `requires` door opens). `solvedToast`
+  // replaces the generic door toast.
+  if (h && h.endsEscape && !h.deferCard) return showEscapeDone();
+  if (h && h.endsEscape) {
+    markEscapeFinished();
+    if (h.solvedToast) { toast(h.solvedToast); return; }
+  }
   // If solving THIS analysis puzzle completes the whole analysis objective, end it here — the trigger is
   // "all analysis puzzles solved", not reaching a particular door/room. Let the scene settle, then show
   // the finish (mint code, then Close). Solving an escape puzzle, or a non-final analysis one,
@@ -5039,11 +5126,17 @@ function finishAnalysis() {
 
 // End of the ESCAPE objective (ungraded) — terminal. No code here; it was already minted at the end
 // of the analysis phase. Content from scenario.escapeDone {title, body}.
-function showEscapeDone() {
+// The bookkeeping half of the escape finish, with no card: a `deferCard` lock (solveRoom) counts the escape as done
+// here and leaves the card to the room `finale` (armFinale), so a student who never walks on loses nothing.
+function markEscapeFinished() {
   escapeFinished = true;                            // the escape is solved → debrief no longer needs a spoiler guard
   if (escapeFinishedTime == null) escapeFinishedTime = Date.now();   // stamp escape-phase end (once)
   if (!liveMode()) showSubmitChip();                // stays visible; label drops the now-moot "skip" half (live: nothing to submit)
-  stopRoomSfx();                                    // silence the escape-room ambience on the finish card
+}
+function showEscapeDone() {
+  markEscapeFinished();
+  cancelFinale();                                   // the card is up: a pending room finale has nothing left to do
+  stopRoomSfx();                                   // silence the escape-room ambience on the finish card
   const e = SCENARIO.escapeDone || {};
   $("#doneTitle").textContent = e.title || "You escaped!";
   $("#doneBody").textContent = e.body || "You made it out. Nicely done.";
@@ -5247,6 +5340,70 @@ function showSubmitChip() {
     ? "Open your submission now, skipping the ungraded escape — you can come back as often as you like"
     : "Open your submission — you can come back to it as often as you like";
   chip.style.display = "";
+}
+
+/*
+ * ESCAPE HINTS (Lucas, 2026-11-08). A persistent "💡 Hint" chip, stacked above the submission chip, shown
+ * only during the escape phase while an escape remains, and only when the scenario authors `escapeHints`.
+ * Tiers unlock by time since the escape phase began (= analysisFinishedTime: the moment the analysis
+ * finishes with an escape left). Before tier 1 the chip counts down gently; tapping opens a card listing
+ * the open tiers in order. The pure logic and validation live in escape_hints.js.
+ * The clock is IN MEMORY, like solvedRooms and the notebook: progress does not survive a reload, so
+ * neither does the clock (a reload restarts the scenario). Nothing is recorded in the codec, and each
+ * browser runs its own clock — two-player scenarios included.
+ */
+function escapeClockStart() {
+  if (!analysisFinished || escapeFinished || analysisFinishedTime == null) return null;
+  if (!(hasEscapePhase() || hasPendingEscape())) return null;
+  return analysisFinishedTime;
+}
+function currentHintState() {
+  const t0 = escapeClockStart();
+  if (t0 == null || !SCENARIO || SCENARIO.escapeHints == null) return null;
+  const st = HINTS.hintState(SCENARIO.escapeHints, (Date.now() - t0) / 1000);
+  return st.total ? st : null;
+}
+let hintsWarned = false;
+function updateHintChip() {
+  const chip = $("#hintChip");
+  if (!chip || !SCENARIO) return;
+  if (SCENARIO.escapeHints != null && !hintsWarned) {
+    const v = HINTS.validateEscapeHints(SCENARIO.escapeHints);
+    if (!v.ok) { console.warn("pano-player: escapeHints ignored:", v.errors.join("; ")); }
+    hintsWarned = true;
+  }
+  const st = currentHintState();
+  if (!st) { chip.style.display = "none"; return; }
+  chip.textContent = st.tiers.length
+    ? `💡 Hint${st.total > 1 ? ` (${st.tiers.length} of ${st.total})` : ""}`
+    : `💡 Hint ${HINTS.countdownLabel(st.nextInSec)}`;
+  chip.style.display = "";
+}
+function openHints() {
+  const st = currentHintState();
+  if (!st) return;
+  const d = document.createElement("div");
+  d.className = "hintcard";
+  if (!st.tiers.length) {
+    const p = document.createElement("p");
+    p.textContent = `Keep exploring. Your first hint arrives ${HINTS.countdownLabel(st.nextInSec)}.`;
+    d.appendChild(p);
+  }
+  st.tiers.forEach(h => {
+    const p = document.createElement("p");
+    const b = document.createElement("b");
+    b.textContent = `Hint ${h.tier}. `;
+    p.appendChild(b);
+    p.appendChild(document.createTextNode(h.text));   // plain text, never innerHTML
+    d.appendChild(p);
+  });
+  if (st.tiers.length && st.nextInSec != null) {
+    const p = document.createElement("p");
+    p.style.opacity = ".65";
+    p.textContent = `Another hint opens ${HINTS.countdownLabel(st.nextInSec)}.`;
+    d.appendChild(p);
+  }
+  openModal("💡 Hints", d);
 }
 
 function openSubmitPrep() {

@@ -751,6 +751,16 @@ table.ledger { border-collapse:separate; border-spacing:4px 5px; margin:6px auto
 .maplegend span:first-child { margin-left:0; }
 .maplegend .mk-cur { border:2px solid var(--amber); }
 .maplegend .mk-unknown { border:1px dashed var(--ink); opacity:.5; }
+/* Puzzle marks on visited graded rooms (2026-11-08): pin = puzzle still open here, tick = solved. */
+.rm-pin circle { fill:#12222f; stroke:var(--amber); stroke-width:2; }
+.rm-pin .rmpindot { fill:var(--amber); stroke:none; }
+.rm-tick circle { fill:#3f9a5a; stroke:#bfe8c9; stroke-width:1.5; }
+.rm-tick path { fill:none; stroke:#fff; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round; }
+.maplegend .mk-pin { border:2px solid var(--amber); background:radial-gradient(circle, var(--amber) 30%, transparent 34%); }
+.maplegend .mk-tick { background:#3f9a5a; }
+/* escape-phase hint card (SCENARIO.escapeHints, 2026-11-08) */
+.hintcard p { margin:0 0 10px; line-height:1.5; }
+.hintcard b { color:var(--amber); }
 
 /* live sewing card (stitch rows / cutting ribbon; bathhouse cottage, 2026-10-26) */
 .sewsvg { width:100%; max-width:440px; height:auto; display:block; margin:4px auto 6px; touch-action:none; user-select:none; }

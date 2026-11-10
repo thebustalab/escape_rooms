@@ -27,6 +27,7 @@
 //   "player"           — plain nodes only. The author dots show where every puzzle, clue and switch sits,
 //                        which would spoil rooms outright; and the player gets undirected, deduped lines
 //                        because v1 of the map is a read-only orientation aid, not a route planner.
+//                        `fog.graded` + `fog.solved` add a pin / tick on VISITED graded-puzzle rooms only.
 (function (root) {
   "use strict";
   const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -253,10 +254,20 @@
         const label = isVisited
           ? `<text class="rmname" x="${p.x}" y="${p.y + 4}">${esc(r.title || r.key)}</text>`
           : `<text class="rmname rm-unvisited" x="${p.x}" y="${p.y + 5}">?</text>`;
-        // No solved/unsolved state on the map (Lucas, 2026-09-15). It is an orientation aid — where am I,
-        // how do I get back — and a progress tracker is a different tool that would invite reading the
-        // map as a checklist. `solvedRooms` is deliberately NOT passed in.
-        nodes += `<g class="${cls}" data-room="${esc(r.key)}"><circle class="rmcircle" cx="${p.x}" cy="${p.y}" r="${R}"/>${label}</g>`;
+        // Puzzle marks (Lucas, 2026-11-08): students forgot where they had left a puzzle, so a VISITED room
+        // holding a graded puzzle carries a pin, which becomes a tick once that puzzle is solved. Only
+        // `fog.graded` keys can be marked — the caller passes graded analysis rooms only, never locks or
+        // escape rooms (a mark there would spoil the escape) — and only rooms the player has ENTERED, so
+        // fog of war stands. Still read-only: no click-to-travel, no hotspot dots.
+        const graded = tiers && o.fog.graded ? new Set(o.fog.graded) : null;
+        let mark = "";
+        if (graded && graded.has(r.key) && tiers.visited.has(r.key)) {
+          const mx = (p.x + R * 0.71).toFixed(1), my = (p.y - R * 0.71).toFixed(1);
+          mark = new Set(o.fog.solved || []).has(r.key)
+            ? `<g class="rmmark rm-tick"><circle cx="${mx}" cy="${my}" r="8"/><path d="M ${(+mx - 4).toFixed(1)} ${my} l 3 3 l 5 -6"/></g>`
+            : `<g class="rmmark rm-pin"><circle cx="${mx}" cy="${my}" r="8"/><circle class="rmpindot" cx="${mx}" cy="${my}" r="3"/></g>`;
+        }
+        nodes += `<g class="${cls}" data-room="${esc(r.key)}"><circle class="rmcircle" cx="${p.x}" cy="${p.y}" r="${R}"/>${label}${mark}</g>`;
         return;
       }
       let dots = "";

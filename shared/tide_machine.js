@@ -10,14 +10,18 @@
 // All arithmetic is shared/tide_model.js, the module the prototype's test_model.mjs checks, so the pen drawn here is
 // the number those tests prove.
 //
-//   const m = mountTide(hostEl, { geometry, config, held?, pegs?, onPegs?(setting), sound?, debug? });
-//     geometry — the painting's calibration (instruments/tide/geometry.json; art paths relative to the scenario)
+//   const m = mountTide(hostEl, { geometry, config, held?, params?, pegs?, onPegs?(setting), sound?, debug? });
+//     geometry — the painting's calibration (instruments/tide/geometry.json; art paths relative to the scenario);
+//                one shaft per config shaft (geometry.shaftX.length === config.shafts.length)
 //     config   — the machine's numbers (instruments/tide/machine.json); cloned, never mutated
-//     held     — pulley ids on the shelf (the carried pulleys); absent = all four (author preview)
+//     held     — pulley ids on the shelf (the carried pulleys); absent = all of them (author preview)
 //     pegs     — the saved setting {arr, z0, t}; onPegs(setting) is called whenever it changes
+//     params   — BENCH MODE (the town's two-peg machine, dunes town_hall): {bench: true} fixes each config.true_arrangement
+//                pulley on its shaft if it is in `held` (pano-player's `mountedUntilTaken` passes the ones NOT carried),
+//                no shelf, no drag, datum fixed at the true config.z0, no thumbscrew; `caption` prints a line under it
 //   m.place(shaft, pid); m.arrangement(); m.setDatum(z); m.datum(); m.setTime(iso); m.time(); m.level();
-//   m.penLevel(); m.shelf(); m.ready (Promise); m.destroy();
-import * as M from "./tide_model.js?v=155";
+//   m.penLevel(); m.shelf(); m.ready (Promise); m.destroy();   (also on the canvas as `canvas.tide`)
+import * as M from "./tide_model.js?v=164";
 
 const SERIF = 'Georgia, "Times New Roman", "Liberation Serif", serif';
 const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
@@ -26,11 +30,14 @@ const ENG_HI = 'rgba(255,238,196,0.5)', ENG_LO = 'rgba(46,28,10,0.84)';
 
 export function mountTide(host, opts = {}) {
 const A = opts.geometry, cfg = JSON.parse(JSON.stringify(opts.config || {}));
-if (!A || !Array.isArray(A.shaftX) || A.shaftX.length !== 4) throw new Error("tide: geometry needs four shafts");
+if (!A || !Array.isArray(A.shaftX) || !A.shaftX.length) throw new Error("tide: geometry needs shafts");
 if (!Array.isArray(cfg.shafts) || !Array.isArray(cfg.pulleys)) throw new Error("tide: config needs shafts and pulleys");
+if (A.shaftX.length !== cfg.shafts.length) throw new Error(`tide: geometry has ${A.shaftX.length} shafts, config has ${cfg.shafts.length}`);
+const P = opts.params || {}, BENCH = !!P.bench;
 const DEBUG = !!opts.debug, SOUND = opts.sound !== false, saved = opts.pegs || null;
 const HELD = Array.isArray(opts.held) ? new Set(opts.held) : null;
 const inTray = (pid) => !HELD || HELD.has(pid);
+const SHELF = BENCH || !A.shelf ? { order: [], pegs: [], floorY: 0 } : A.shelf;
 let dead = false, raf = 0, loaded = false, loupeTimer = null;
 const offs = [];
 const on = (el, ev, fn, o) => { el.addEventListener(ev, fn, o); offs.push(() => el.removeEventListener(ev, fn, o)); };
@@ -56,7 +63,7 @@ const SH = A.shadow;
 // The true value is kept only for the debug readout.
 const TRUE_Z0 = cfg.z0, DATUM_MIN = 0.5, DATUM_MAX = 6.0;
 const clampDatum = (z) => Math.min(DATUM_MAX, Math.max(DATUM_MIN, z));
-cfg.z0 = clampDatum(saved && Number.isFinite(saved.z0) ? saved.z0 : (cfg.datum_start ?? cfg.z0));
+if (!BENCH) cfg.z0 = clampDatum(saved && Number.isFinite(saved.z0) ? saved.z0 : (cfg.datum_start ?? cfg.z0));
 
 
 // ---- sprites (loaded async; the frame loop starts once they are in) ----
@@ -74,7 +81,8 @@ const S = {
 };
 S.inkLo = S.inkHi = S.t;
 if (saved && Number.isFinite(saved.t)) S.t = S.inkLo = S.inkHi = Math.min(T_MAX, Math.max(T_MIN, saved.t));
-if (saved && saved.arr) for (const [sh, pid] of Object.entries(saved.arr)) if (sh in S.arr && pid && inTray(pid)) placeRaw(sh, pid);
+if (BENCH) { for (const [sh, pid] of Object.entries(cfg.true_arrangement || {})) if (sh in S.arr && pid && inTray(pid)) placeRaw(sh, pid); }
+else if (saved && saved.arr) for (const [sh, pid] of Object.entries(saved.arr)) if (sh in S.arr && pid && inTray(pid)) placeRaw(sh, pid);
 S.lastHourTick = Math.floor(S.t);
 
 function clampT(t) { return Math.min(T_MAX, Math.max(T_MIN, t)); }
@@ -83,8 +91,12 @@ function placeRaw(shaftId, pid) {
   if (pid) { const was = mountedOn(pid); if (was) S.arr[was] = null; }
   S.arr[shaftId] = pid || null;
 }
-function arrangementChanged() { S.inkLo = S.inkHi = S.t; save(); }
-function setDatum(z) { const v = clampDatum(z); if (v !== cfg.z0) { cfg.z0 = v; arrangementChanged(); } }
+function arrangementChanged() { S.inkLo = S.inkHi = S.t; markMounted(); save(); }
+function setDatum(z) { if (BENCH) return; const v = clampDatum(z); if (v !== cfg.z0) { cfg.z0 = v; arrangementChanged(); } }
+// which pulleys sit on shafts, for tests and the author's eye: data-mounted="moon:p208,sun:p119" ("" when none)
+function markMounted() {
+  if (stage) stage.dataset.mounted = Object.entries(S.arr).filter(([, p]) => p).map(([s, p]) => s + ':' + p).join(',');
+}
 
 // ---- time ----
 function advanceTo(t) {
@@ -135,6 +147,16 @@ const lp = document.createElement('canvas'), lctx = lp.getContext('2d');
 lp.className = 'tideloupe';
 lp.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;pointer-events:none;';
 stage.append(cv, lp); host.appendChild(stage);
+if (BENCH) stage.dataset.bench = '1';
+markMounted();
+let capEl = null;
+if (P.caption) {
+  capEl = document.createElement('p');
+  capEl.className = 'tidecaption';
+  capEl.style.cssText = `margin:8px 4px 2px;text-align:center;font:italic 1.02em ${SERIF};opacity:.92;`;
+  capEl.innerHTML = P.caption;
+  host.appendChild(capEl);
+}
 const stat = document.createElement('canvas'), sctx = stat.getContext('2d');
 let view = { dpr: 1, k: 1, S: 1, ox: 0, oy: 0 };
 function resize() {
@@ -232,10 +254,10 @@ function buildStatic() {
   c.imageSmoothingQuality = 'high';
   if (baseImg) c.drawImage(baseImg, 0, 0, A.imageW, A.imageH);
   cfg.shafts.forEach((sh, i) => {
-    const p = A.plaques[i];
-    (SYMBOLS[sh.id] || symMoon)(c, p.x + p.w / 2, p.y + p.h / 2 + (sh.id === 'wind' ? -1 : 0), sh.id === 'nearfar' ? 9.5 : 9);
+    const p = A.plaques[i], k = p.h / 27;                                    // symbols sized to the plaque (hut: 27 px)
+    (SYMBOLS[sh.id] || symMoon)(c, p.x + p.w / 2, p.y + p.h / 2 + (sh.id === 'wind' ? -1 : 0), (sh.id === 'nearfar' ? 9.5 : 9) * k);
   });
-  engraveDial(c);
+  if (A.dial) engraveDial(c);
 }
 
 // 24-hour dial engraved into the painted blank brass dial; the hand is drawn each frame.
@@ -403,16 +425,16 @@ function drawPen(c, mech) {
 }
 
 function shelfPos(pid) {
-  const i = A.shelf.order.indexOf(pid), r = pulleyR(pid);
-  return [A.shelf.pegs[i].x, A.shelf.floorY - r * SP.pulley.cx / SP.pulley.rGroove];
+  const i = SHELF.order.indexOf(pid), r = pulleyR(pid);
+  return [SHELF.pegs[i].x, SHELF.floorY - r * SP.pulley.cx / SP.pulley.rGroove];
 }
 function drawShelf(c) {
-  for (const pid of A.shelf.order) {
+  for (const pid of SHELF.order) {
     if (!inTray(pid) || mountedOn(pid) || (S.drag && S.drag.pid === pid)) continue;
     const [x, y] = shelfPos(pid);
     drawPulley(c, x, y, pulleyR(pid), 0, 0.8);
   }
-  A.shelf.pegs.forEach((p, i) => { if (pegImgs[i]) c.drawImage(pegImgs[i], p.ox, p.oy); });   // pegs in front
+  SHELF.pegs.forEach((p, i) => { if (pegImgs[i]) c.drawImage(pegImgs[i], p.ox, p.oy); });   // pegs in front
 }
 
 // The crank's axle leaves the cabinet side, so the crank turns in a plane seen nearly edge-on: the arm is
@@ -439,7 +461,7 @@ function drawCrank(c) {
 // Fast-wind knobs: hold to run, speeding up the longer they are held.
 function knobRate(held) { return 24 + 96 * Math.min(1, Math.max(0, (held - 0.35) / 1.2)); }   // 1 day/s up to 5 days/s
 function drawKnobs(c) {
-  for (const [id, kb] of Object.entries(A.knobs)) {
+  for (const [id, kb] of Object.entries(A.knobs || {})) {
     const pressed = S.hold && S.hold.id === id, r = kb.r * (pressed ? 0.93 : 1);
     withShadow(c, () => {
       const g = c.createRadialGradient(kb.x - r * 0.35, kb.y - r * 0.4, r * 0.1, kb.x, kb.y, r);
@@ -462,6 +484,7 @@ function drawKnobs(c) {
 // The datum thumbscrew on the drum bezel: drag it up or down (geared, A.datum.pxPerM of drag per metre) and the
 // pen's rest height moves with it. Its knurl turns with the setting so a change is visible even at a glance.
 function drawDatum(c) {
+  if (BENCH || !A.datum) return;
   const D = A.datum, held = S.datumDrag, r = D.r * (held ? 0.94 : 1), turn = cfg.z0 * 2.4;
   withShadow(c, () => {
     const g = c.createRadialGradient(D.x - r * 0.35, D.y - r * 0.4, r * 0.1, D.x, D.y, r);
@@ -494,10 +517,11 @@ function drawDate(c) {
   const tm = Math.floor(S.t * 60 + 1e-6) / 60;                             // floor to the minute: labels never run ahead of the roll
   const d = M.hoursToDate(tm, cfg), dPrev = M.hoursToDate(tm - 24, cfg), dNext = M.hoursToDate(tm + 24, cfg);
   const hd = M.hourOfDay(S.t, cfg), frac = hd >= 23 ? hd - 23 : 0;         // the drums roll during the last hour of the day
-  const W = A.windows;
-  drawDrum(c, W.day, [dPrev.d, d.d, dNext.d].map(String), frac, 20);
-  drawDrum(c, W.month, [MONTHS[(d.mo + 10) % 12], MONTHS[d.mo - 1], MONTHS[d.mo % 12]], dNext.mo !== d.mo ? frac : 0, 15);
-  drawDrum(c, W.year, [String(dPrev.y), String(d.y), String(dNext.y)], dNext.y !== d.y ? frac : 0, 15);
+  const W = A.windows, fk = A.dateFont || 1;
+  drawDrum(c, W.day, [dPrev.d, d.d, dNext.d].map(String), frac, 20 * fk);
+  drawDrum(c, W.month, [MONTHS[(d.mo + 10) % 12], MONTHS[d.mo - 1], MONTHS[d.mo % 12]], dNext.mo !== d.mo ? frac : 0, 15 * fk);
+  drawDrum(c, W.year, [String(dPrev.y), String(d.y), String(dNext.y)], dNext.y !== d.y ? frac : 0, 15 * fk);
+  if (!A.dial) return;
   const { cx, cy, r: R } = A.dial;
   withShadow(c, () => {
     c.translate(cx, cy); c.rotate(dialAng(hd) + Math.PI / 2);
@@ -539,20 +563,23 @@ function drawCalibration(c, mech) {
   const line = (x0, y0, x1, y1) => { c.beginPath(); c.moveTo(x0, y0); c.lineTo(x1, y1); c.stroke(); };
   const circ = (x, y, r) => { c.beginPath(); c.arc(x, y, r, 0, 7); c.stroke(); };
   const box = (r) => c.strokeRect(r.x, r.y, r.w, r.h);
+  const xL = A.shaftX[0], xR = A.shaftX[A.shaftX.length - 1];
   A.shaftX.forEach((x) => { line(x, A.slot.y0, x, A.slot.y1); circ(x, A.bossY, A.bossR); });
-  line(A.shaftX[0] - 60, A.bossY, A.shaftX[3] + 60, A.bossY);
+  line(xL - 60, A.bossY, xR + 60, A.bossY);
   A.plaques.forEach(box);
   const P = A.paper; c.strokeRect(P.x0, P.y0, P.x1 - P.x0, P.y1 - P.y0);
   c.setLineDash([3, 3]); c.strokeRect(C.x0, C.y0, C.x1 - C.x0, C.y1 - C.y0); c.setLineDash([]);
   Object.values(A.windows).forEach(box);
-  circ(A.dial.cx, A.dial.cy, A.dial.r);
+  if (A.dial) circ(A.dial.cx, A.dial.cy, A.dial.r);
   const K = A.crank; circ(K.cx, K.cy, 6);
   c.beginPath(); c.ellipse(K.cx, K.cy, K.persp * K.R, K.R, 0, 0, 7); c.stroke();
   c.setLineDash([2, 4]); circ(K.cx, K.cy, K.hitR); c.setLineDash([]);
-  Object.values(A.knobs).forEach((kb) => circ(kb.x, kb.y, kb.r));
-  A.shelf.pegs.forEach((p) => line(p.x, A.shelf.floorY - 60, p.x, A.shelf.floorY));
-  line(A.shelf.pegs[0].x - 40, A.shelf.floorY, A.shelf.pegs[3].x + 40, A.shelf.floorY);
-  c.setLineDash([4, 3]); line(A.anchorX, A.idlerY, A.cornerX, A.idlerY); line(A.shaftX[0] - 60, A.pulleyRestY, A.shaftX[3] + 60, A.pulleyRestY); c.setLineDash([]);
+  Object.values(A.knobs || {}).forEach((kb) => circ(kb.x, kb.y, kb.r));
+  if (SHELF.pegs.length) {
+    SHELF.pegs.forEach((p) => line(p.x, SHELF.floorY - 60, p.x, SHELF.floorY));
+    line(SHELF.pegs[0].x - 40, SHELF.floorY, SHELF.pegs[SHELF.pegs.length - 1].x + 40, SHELF.floorY);
+  }
+  c.setLineDash([4, 3]); line(A.anchorX, A.idlerY, A.cornerX, A.idlerY); line(xL - 60, A.pulleyRestY, xR + 60, A.pulleyRestY); c.setLineDash([]);
   line(A.cornerX, A.idlerY - 30, A.cornerX, A.penSheaveY - 20);
   line(A.penX, C.y0 - 8, A.penX, C.y1 + 8);
   circ(DRUM.cx, DRUM.cy, DRUM.R); circ(DRUM.cx, DRUM.cy, DRUM.r);
@@ -587,17 +614,18 @@ function shaftUnder(x, y) {
   return best;
 }
 function pulleyAt(x, y) {
+  if (BENCH) return null;                                                    // the bench's pulleys are fixed
   const mech = M.mechanism(S.t, S.arr, cfg, G);
   for (const yk of mech.yokes) if (yk.pid && Math.hypot(x - yk.x, y - (A.pulleyRestY + yk.dy)) <= Math.max(yk.r, 20) + 4) return { pid: yk.pid, from: yk.id };
-  for (const pid of A.shelf.order) {
+  for (const pid of SHELF.order) {
     if (!inTray(pid) || mountedOn(pid)) continue;
     const [tx, ty] = shelfPos(pid);
     if (Math.hypot(x - tx, y - ty) <= Math.max(pulleyR(pid) * 1.06, 22) + 4) return { pid, from: 'tray' };
   }
   return null;
 }
-function datumHit(x, y) { const D = A.datum; return Math.hypot(x - D.x, y - D.y) < D.r + 12; }
-function knobAt(x, y) { return Object.entries(A.knobs).find(([, kb]) => Math.hypot(x - kb.x, y - kb.y) < kb.r + 9)?.[0] || null; }
+function datumHit(x, y) { const D = A.datum; return !BENCH && !!D && Math.hypot(x - D.x, y - D.y) < D.r + 12; }
+function knobAt(x, y) { return Object.entries(A.knobs || {}).find(([, kb]) => Math.hypot(x - kb.x, y - kb.y) < kb.r + 9)?.[0] || null; }
 function crankHit(x, y) { const K = A.crank; return x < K.hitMaxX && Math.hypot(x - K.cx, y - K.cy) < K.hitR; }
 function crankPointerAngle(x, y) { const K = A.crank; return Math.atan2((x - K.cx) / K.inputPersp, -(y - K.cy)); }
 
@@ -669,7 +697,7 @@ function frame(now) {
 }
 
 const ready = Promise.all([(opts.art && opts.art.board) || A.base, SP.pulley.src, SP.crankwheel.src, SP.yoke.src, SP.crankArm.src, SP.crankKnob.src, SP.pen.src,
-  ...A.shelf.pegs.map((p) => p.sprite)].map(loadImg)).then((ims) => {
+  ...SHELF.pegs.map((p) => p.sprite)].map(loadImg)).then((ims) => {
   [baseImg, pulleyImg, wheelImg, yokeImg, armImg, knobImg, penImg, ...pegImgs] = ims;
   for (const [n, im] of Object.entries({ baseImg, pulleyImg, wheelImg, yokeImg, armImg, knobImg, penImg })) if (!im) console.error('tide: missing art ' + n);
   if (dead) return;
@@ -679,6 +707,7 @@ const ready = Promise.all([(opts.art && opts.art.board) || A.base, SP.pulley.src
 
 const api = {
   place(shaftId, pulleyId) {
+    if (BENCH) throw new Error('the bench machine\'s pulleys are fixed');
     if (!(shaftId in S.arr)) throw new Error('unknown shaft ' + shaftId);
     if (pulleyId && !inTray(pulleyId)) throw new Error('pulley not carried ' + pulleyId);
     placeRaw(shaftId, pulleyId || null); arrangementChanged(); return api.arrangement();
@@ -693,15 +722,17 @@ const api = {
   runTo(iso, ms = 2000) {
     return new Promise((resolve) => { S.run = { from: S.t, to: clampT(M.isoToHours(iso, cfg)), t0: performance.now(), ms: Math.max(1, ms), resolve }; });
   },
-  shelf() { return A.shelf.order.filter(inTray); },
+  shelf() { return SHELF.order.filter(inTray); },
+  bench: BENCH,
   ready,
   destroy() {
     dead = true; cancelAnimationFrame(raf); clearTimeout(loupeTimer);
     if (ro) ro.disconnect();
     offs.forEach((f) => f()); offs.length = 0;
     if (actx) { try { actx.close(); } catch (e) { /* already closed */ } }
-    stage.remove();
+    stage.remove(); if (capEl) capEl.remove();
   },
 };
+cv.tide = api;
 return api;
 }
