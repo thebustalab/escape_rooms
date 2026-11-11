@@ -84,30 +84,31 @@
 // A bare `./variant_resolve.js` import is NOT refreshed by bumping the <script> tag's ?v, so a changed
 // helper module (e.g. a new export) leaves browsers on a stale cached copy → "doesn't provide an export
 // named X" SyntaxError → blank page (the 2026-08-05 airship regression). Bump all three together.
-import { WebRConsole } from "./webr-console.js?v=165";
-import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers, pickTransit } from "./variant_resolve.js?v=165";   // Phase 3: per-hotspot state variants; monorail switch-door nav
-import * as PQ from "./puzzle_queue.js?v=165";   // dynamic puzzle queue: location-independent puzzle serving
-import * as CP from "./corr_panel.js?v=165";   // lower-triangle layout of the grid gate (clouds correlation panel)
-import { particleCount } from "./particles.js?v=165";
-import { mountLandingBackdrop } from "./landing_backdrop.js?v=165";   // landing text over a pan of the first room's clip   // ambient-particle vocabulary + per-kind field density
-import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=165";
-import { condHolds } from "./cond.js?v=165";
-import { gridMatches } from "./grid_check.js?v=165";   // grid answer check; `partition:true` accepts any relabelling of the buckets   // ledger + elevation-map card DOM
-import * as LIVE from "./live_session.js?v=165";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
-import * as RIDE from "./ride.js?v=165";
-import { mountPcaPlate } from "./pca_plate.js?v=165";   // the PCA plate instrument (voyage beach)
-import { mountFishBoard } from "./fish_board.js?v=165";   // the fish board instrument (harbour berth)
-import { mountDrawdown } from "./drawdown.js?v=165";
-import { mountTide } from "./tide_machine.js?v=165";   // the tide machine instrument (dunes escape)
-import { mountVarianceMeter } from "./variance_meter.js?v=165";   // the variance meter instrument (anova cellars escape)
-import { mountAnovaInstrument } from "./anova_instrument.js?v=165";   // the ANOVA instrument (Fisher's board, anova rooms; also the book, ch.12b)
-import { mountGhostLines } from "./ghost_lines.js?v=165";   // the ghost-line board instrument (regression pits hub)
+import { WebRConsole } from "./webr-console.js?v=166";
+import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers, pickTransit } from "./variant_resolve.js?v=166";   // Phase 3: per-hotspot state variants; monorail switch-door nav
+import * as PQ from "./puzzle_queue.js?v=166";   // dynamic puzzle queue: location-independent puzzle serving
+import * as CP from "./corr_panel.js?v=166";   // lower-triangle layout of the grid gate (clouds correlation panel)
+import { particleCount } from "./particles.js?v=166";
+import { mountLandingBackdrop } from "./landing_backdrop.js?v=166";   // landing text over a pan of the first room's clip   // ambient-particle vocabulary + per-kind field density
+import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=166";
+import { condHolds } from "./cond.js?v=166";
+import { gridMatches } from "./grid_check.js?v=166";   // grid answer check; `partition:true` accepts any relabelling of the buckets   // ledger + elevation-map card DOM
+import * as LIVE from "./live_session.js?v=166";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
+import * as RIDE from "./ride.js?v=166";
+import { mountPcaPlate } from "./pca_plate.js?v=166";   // the PCA plate instrument (voyage beach)
+import { mountFishBoard } from "./fish_board.js?v=166";   // the fish board instrument (harbour berth)
+import { mountDrawdown } from "./drawdown.js?v=166";
+import { mountTide } from "./tide_machine.js?v=166";   // the tide machine instrument (dunes escape)
+import { mountVarianceMeter } from "./variance_meter.js?v=166";   // the variance meter instrument (anova cellars escape)
+import { mountAnovaInstrument } from "./anova_instrument.js?v=166";   // the ANOVA instrument (Fisher's board, anova rooms; also the book, ch.12b)
+import { mountGhostLines } from "./ghost_lines.js?v=166";   // the ghost-line board instrument (regression pits hub)
    // the drawdown board instrument (diamonds escape)   // THE RIDE (subway): express lever + clip-sequence planner
-import * as BELL from "./bell_pull.js?v=165";
-import * as DATEB from "./date_board.js?v=165";   // date lock: lock mode:"date", two slide-levers (dunes departure board)
-import * as INVY from "./inventory.js?v=165";   // carried items + the door that asks which to use (dunes)   // bell-pull (#16): dial mode:"pull" + lock mode:"state" (spa belfry)
-import { entryYaw } from "./entry_facing.js?v=165";   // face the way out on entering a room (every scenario)
-import * as HINTS from "./escape_hints.js?v=165";   // escape-phase Hint chip: time-unlocked tiers (SCENARIO.escapeHints)
+import * as BELL from "./bell_pull.js?v=166";
+import * as TCOUNT from "./transit_counter.js?v=166";   // the date plaque over a flat door transit (dunes time-skip)
+import * as DATEB from "./date_board.js?v=166";   // date lock: lock mode:"date", two slide-levers (dunes departure board)
+import * as INVY from "./inventory.js?v=166";   // carried items + the door that asks which to use (dunes)   // bell-pull (#16): dial mode:"pull" + lock mode:"state" (spa belfry)
+import { entryYaw } from "./entry_facing.js?v=166";   // face the way out on entering a room (every scenario)
+import * as HINTS from "./escape_hints.js?v=166";   // escape-phase Hint chip: time-unlocked tiers (SCENARIO.escapeHints)
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 
@@ -244,6 +245,10 @@ const solvedGates = new Set();
 // Carried items (keys, a rope) and the item doors already opened with them — see shared/inventory.js.
 // Session state like solvedGates: cleared on Enter, not persisted across a reload.
 const INV = INVY.createInventory();
+// Date-lock hotspot id → the date posted on it ({day, month, year}), read by `transit.counter.toFromLock`. Kept out of
+// gameState (whose keys feed `cond` readers) and, like solvedGates, not persisted: after a reload the plaque ends on
+// the authored `to`.
+const postedDates = new Map();
 // Per-room result for the submission codec (Phase 5): key -> { answer, attempts }.
 // MCQ rooms store the chosen option index; console-check rooms store answer=1 (solved).
 const roomResults = new Map();
@@ -345,6 +350,7 @@ function init(data) {
     gameState = JSON.parse(JSON.stringify(SCENARIO.state || {}));
     if (role) gameState.role = role;                                  // set by which landing button was taken
     solvedRooms.clear();
+    postedDates.clear();
     // visitedRooms was NOT cleared here (bug, found 2026-09-15 building the map). It only suppressed
     // repeat entry cards, so a "play again" without a page reload silently skipped them; with a map it
     // would also open pre-explored. Session state, like everything else cleared in this block.
@@ -2589,17 +2595,8 @@ function startTransit(h, idx, withEntry = true, onArrive = null) {   // withEntr
 // carries a REVERSED copy of the clip (browsers cannot play video backwards reliably). No rolls: the clip is
 // not a panorama. Escape doors keep the letterboxed `flat` handling inside startTransit.
 const FLAT_DOOR_TIMING = { fadeOut: 500, skip: 0.3, fadeIn: 500, endEarly: 0.3, fadeClip: 500, fadeRoom: 500 };
-// `transit.counter` (dunes time-skip, 2026-11-11): {from: "YYYY-MM-DD", to: "YYYY-MM-DD"} draws a brass date plaque
-// over the flat clip that ticks from `from` to `to` in step with the clip, reaching `to` as the clip fades out.
-const COUNTER_MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September",
-  "October", "November", "December"];
-function _counterDay(from, to, u) {
-  const a = Date.UTC(...from.split("-").map((x, i) => +x - (i === 1 ? 1 : 0)));
-  const b = Date.UTC(...to.split("-").map((x, i) => +x - (i === 1 ? 1 : 0)));
-  const days = Math.round((b - a) / 864e5), k = Math.round(Math.min(1, Math.max(0, u)) * days);
-  const d = new Date(a + k * 864e5);
-  return `${d.getUTCDate()} ${COUNTER_MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
-}
+// `transit.counter` (dunes time-skip, 2026-11-11): a brass date plaque over the flat clip, ticking from `from` to
+// `to` (linearly, or at each `steps` clip time), forced to `to` as the clip fades out. Maths in transit_counter.js.
 function _counterPlaque() {
   const el = document.createElement("div");
   el.className = "transit-counter";
@@ -2677,10 +2674,10 @@ function startFlatDoorTransit(h, idx, withEntry) {
     if (video.currentTime < want - 0.05) { try { video.currentTime = want; } catch (e) {} }
     const outAt = () => (video.duration || 0) - (+T.endEarly || 0) - (+T.fadeClip || 0) / 1000;
     const C = t.counter && t.counter.from && t.counter.to ? t.counter : null;
+    const posted = C && C.toFromLock ? postedDates.get(C.toFromLock) || null : null;
     const tick = () => {
       if (!counterEl) return;
-      const span = Math.max(0.01, outAt() - want);
-      counterEl.textContent = _counterDay(C.from, C.to, (video.currentTime - want) / span);
+      counterEl.textContent = TCOUNT.counterLabel(C, video.currentTime, { start: want, end: outAt(), posted });
     };
     if (C) { counterEl = _counterPlaque(); document.body.appendChild(counterEl); tick(); }   // under the veil (z 6)
     await fade(0, T.fadeIn);
@@ -2692,7 +2689,7 @@ function startFlatDoorTransit(h, idx, withEntry) {
       tick();
       await sleep(30);
     }
-    if (counterEl) counterEl.textContent = _counterDay(C.from, C.to, 1);
+    if (counterEl) counterEl.textContent = TCOUNT.counterDay(C.from, TCOUNT.counterTo(C, posted), 1);
     await fade(1, T.fadeClip);
     arrive();
   })().catch(e => { console.error("flat transit failed; walking through", e); arrive(); });
@@ -4750,6 +4747,7 @@ function buildDateLockCard(h, onSolved) {
     if (DATEB.accepts(h, day, month)) {
       fb.className = "qfeedback ok"; fb.innerHTML = fbk.correct || "The board takes the date.";
       sub.disabled = dEl.disabled = mEl.disabled = true;
+      postedDates.set(h.id, { day, month, year: h.year });
       setTimeout(() => onSolved({ answer: 1, attempts }), 900);
     } else {
       fb.className = "qfeedback no"; fb.innerHTML = fbk.wrong || "Nothing happens.";
