@@ -84,30 +84,30 @@
 // A bare `./variant_resolve.js` import is NOT refreshed by bumping the <script> tag's ?v, so a changed
 // helper module (e.g. a new export) leaves browsers on a stale cached copy → "doesn't provide an export
 // named X" SyntaxError → blank page (the 2026-08-05 airship regression). Bump all three together.
-import { WebRConsole } from "./webr-console.js?v=164";
-import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers, pickTransit } from "./variant_resolve.js?v=164";   // Phase 3: per-hotspot state variants; monorail switch-door nav
-import * as PQ from "./puzzle_queue.js?v=164";   // dynamic puzzle queue: location-independent puzzle serving
-import * as CP from "./corr_panel.js?v=164";   // lower-triangle layout of the grid gate (clouds correlation panel)
-import { particleCount } from "./particles.js?v=164";
-import { mountLandingBackdrop } from "./landing_backdrop.js?v=164";   // landing text over a pan of the first room's clip   // ambient-particle vocabulary + per-kind field density
-import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=164";
-import { condHolds } from "./cond.js?v=164";
-import { gridMatches } from "./grid_check.js?v=164";   // grid answer check; `partition:true` accepts any relabelling of the buckets   // ledger + elevation-map card DOM
-import * as LIVE from "./live_session.js?v=164";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
-import * as RIDE from "./ride.js?v=164";
-import { mountPcaPlate } from "./pca_plate.js?v=164";   // the PCA plate instrument (voyage beach)
-import { mountFishBoard } from "./fish_board.js?v=164";   // the fish board instrument (harbour berth)
-import { mountDrawdown } from "./drawdown.js?v=164";
-import { mountTide } from "./tide_machine.js?v=164";   // the tide machine instrument (dunes escape)
-import { mountVarianceMeter } from "./variance_meter.js?v=164";   // the variance meter instrument (anova cellars escape)
-import { mountAnovaInstrument } from "./anova_instrument.js?v=164";   // the ANOVA instrument (Fisher's board, anova rooms; also the book, ch.12b)
-import { mountGhostLines } from "./ghost_lines.js?v=164";   // the ghost-line board instrument (regression pits hub)
+import { WebRConsole } from "./webr-console.js?v=165";
+import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers, pickTransit } from "./variant_resolve.js?v=165";   // Phase 3: per-hotspot state variants; monorail switch-door nav
+import * as PQ from "./puzzle_queue.js?v=165";   // dynamic puzzle queue: location-independent puzzle serving
+import * as CP from "./corr_panel.js?v=165";   // lower-triangle layout of the grid gate (clouds correlation panel)
+import { particleCount } from "./particles.js?v=165";
+import { mountLandingBackdrop } from "./landing_backdrop.js?v=165";   // landing text over a pan of the first room's clip   // ambient-particle vocabulary + per-kind field density
+import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=165";
+import { condHolds } from "./cond.js?v=165";
+import { gridMatches } from "./grid_check.js?v=165";   // grid answer check; `partition:true` accepts any relabelling of the buckets   // ledger + elevation-map card DOM
+import * as LIVE from "./live_session.js?v=165";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
+import * as RIDE from "./ride.js?v=165";
+import { mountPcaPlate } from "./pca_plate.js?v=165";   // the PCA plate instrument (voyage beach)
+import { mountFishBoard } from "./fish_board.js?v=165";   // the fish board instrument (harbour berth)
+import { mountDrawdown } from "./drawdown.js?v=165";
+import { mountTide } from "./tide_machine.js?v=165";   // the tide machine instrument (dunes escape)
+import { mountVarianceMeter } from "./variance_meter.js?v=165";   // the variance meter instrument (anova cellars escape)
+import { mountAnovaInstrument } from "./anova_instrument.js?v=165";   // the ANOVA instrument (Fisher's board, anova rooms; also the book, ch.12b)
+import { mountGhostLines } from "./ghost_lines.js?v=165";   // the ghost-line board instrument (regression pits hub)
    // the drawdown board instrument (diamonds escape)   // THE RIDE (subway): express lever + clip-sequence planner
-import * as BELL from "./bell_pull.js?v=164";
-import * as DATEB from "./date_board.js?v=164";   // date lock: lock mode:"date", two slide-levers (dunes departure board)
-import * as INVY from "./inventory.js?v=164";   // carried items + the door that asks which to use (dunes)   // bell-pull (#16): dial mode:"pull" + lock mode:"state" (spa belfry)
-import { entryYaw } from "./entry_facing.js?v=164";   // face the way out on entering a room (every scenario)
-import * as HINTS from "./escape_hints.js?v=164";   // escape-phase Hint chip: time-unlocked tiers (SCENARIO.escapeHints)
+import * as BELL from "./bell_pull.js?v=165";
+import * as DATEB from "./date_board.js?v=165";   // date lock: lock mode:"date", two slide-levers (dunes departure board)
+import * as INVY from "./inventory.js?v=165";   // carried items + the door that asks which to use (dunes)   // bell-pull (#16): dial mode:"pull" + lock mode:"state" (spa belfry)
+import { entryYaw } from "./entry_facing.js?v=165";   // face the way out on entering a room (every scenario)
+import * as HINTS from "./escape_hints.js?v=165";   // escape-phase Hint chip: time-unlocked tiers (SCENARIO.escapeHints)
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 
@@ -2589,6 +2589,26 @@ function startTransit(h, idx, withEntry = true, onArrive = null) {   // withEntr
 // carries a REVERSED copy of the clip (browsers cannot play video backwards reliably). No rolls: the clip is
 // not a panorama. Escape doors keep the letterboxed `flat` handling inside startTransit.
 const FLAT_DOOR_TIMING = { fadeOut: 500, skip: 0.3, fadeIn: 500, endEarly: 0.3, fadeClip: 500, fadeRoom: 500 };
+// `transit.counter` (dunes time-skip, 2026-11-11): {from: "YYYY-MM-DD", to: "YYYY-MM-DD"} draws a brass date plaque
+// over the flat clip that ticks from `from` to `to` in step with the clip, reaching `to` as the clip fades out.
+const COUNTER_MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September",
+  "October", "November", "December"];
+function _counterDay(from, to, u) {
+  const a = Date.UTC(...from.split("-").map((x, i) => +x - (i === 1 ? 1 : 0)));
+  const b = Date.UTC(...to.split("-").map((x, i) => +x - (i === 1 ? 1 : 0)));
+  const days = Math.round((b - a) / 864e5), k = Math.round(Math.min(1, Math.max(0, u)) * days);
+  const d = new Date(a + k * 864e5);
+  return `${d.getUTCDate()} ${COUNTER_MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
+}
+function _counterPlaque() {
+  const el = document.createElement("div");
+  el.className = "transit-counter";
+  el.style.cssText = "position:fixed;left:50%;bottom:7vh;transform:translateX(-50%);z-index:5;pointer-events:none;"
+    + "padding:.45em 1.3em;font:700 clamp(18px,3.2vw,34px) Georgia,'Times New Roman',serif;letter-spacing:.06em;"
+    + "color:#2a1606;background:linear-gradient(#f1dca4,#c29a52);border:2px solid #6b4a1c;border-radius:6px;"
+    + "box-shadow:0 3px 10px rgba(0,0,0,.55);white-space:nowrap;font-variant-numeric:tabular-nums";
+  return el;
+}
 function startFlatDoorTransit(h, idx, withEntry) {
   const t = doorTransit(h), target = idx >= 0 ? SCENARIO.rooms[idx] : null, from = room;
   if (!target) return false;
@@ -2607,8 +2627,9 @@ function startFlatDoorTransit(h, idx, withEntry) {
   };
   const back = (target.hotspots || []).find(d => d && d.type === "door" && d.to === (from && from.key) && Array.isArray(d.box));
   const arriveYaw = back ? boxToYP(back.box, target.wrap || { haov: 360, vaov: 90 }).yaw : undefined;
-  let video = null;
+  let video = null, counterEl = null;
   const arrive = async () => {
+    if (counterEl) { counterEl.remove(); counterEl = null; }
     if (video) { try { video.pause(); } catch (e) {} video.style.cssText = ""; _hideAfterDecode(video); }
     if (transiting !== run) { veil.remove(); return; }
     transiting = null;
@@ -2654,15 +2675,24 @@ function startFlatDoorTransit(h, idx, withEntry) {
     try { await video.play(); } catch (e) { return arrive(); }
     const want = +T.skip || 0;                 // a seek on a not-yet-playing element can be dropped: re-apply it
     if (video.currentTime < want - 0.05) { try { video.currentTime = want; } catch (e) {} }
-    await fade(0, T.fadeIn);
     const outAt = () => (video.duration || 0) - (+T.endEarly || 0) - (+T.fadeClip || 0) / 1000;
+    const C = t.counter && t.counter.from && t.counter.to ? t.counter : null;
+    const tick = () => {
+      if (!counterEl) return;
+      const span = Math.max(0.01, outAt() - want);
+      counterEl.textContent = _counterDay(C.from, C.to, (video.currentTime - want) / span);
+    };
+    if (C) { counterEl = _counterPlaque(); document.body.appendChild(counterEl); tick(); }   // under the veil (z 6)
+    await fade(0, T.fadeIn);
     // Wall-clock backstop: a clip that stalls (decoder suspended, network hiccup) must never strand the
     // player behind the veil, so give up 3 s after the clip should have reached its fade-out.
     const deadline = performance.now() + Math.max(0, outAt() - want) * 1000 + 3000;
     while (transiting === run && !video.ended && !(video.currentTime >= outAt()) && performance.now() < deadline) {
       if (video.paused) { try { await video.play(); } catch (e) { break; } }
+      tick();
       await sleep(30);
     }
+    if (counterEl) counterEl.textContent = _counterDay(C.from, C.to, 1);
     await fade(1, T.fadeClip);
     arrive();
   })().catch(e => { console.error("flat transit failed; walking through", e); arrive(); });

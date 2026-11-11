@@ -4,7 +4,7 @@
   "id": 27,
   "title": "Low Water",
   "subtitle": "A last wagon train, a stranded steamer, and a town with water until December.",
-  "story": "It is October 1928, and the diamond town's reservoir has run dry. The town's emergency water tanks will also run dry soon - on December 17th. The company that runs the town has abandoned it. The company's last steamship delivery, which had a sea-water condenser aboard, crashed up the coast beyond a breach that is blocked by water. The town used their tide machine to determine whether the water would ever recede enough to let the condenser be retrived before the 17th. They concluded it would not. Almost everyone has now left the town, crossing the desert on wagon trains. You stayed, with a few oxen left for one last train. The company left its crossing records behind: how many days each past wagon train took to cross the desert. Use the records to work out what determines a crossing time, and whether the last train, which would carry you and everyone who remains, can cross within 14 days - the longest trip you could manage with the water you can carry. If you can't make it within that time, you'll need to find a way to get the condenser from the steamship...",
+  "story": "It is October 1928, and the diamond town's reservoir has run dry. The town's emergency water tanks will also run dry soon - on December 17th. The company that runs the town has abandoned it. The company's last steamship delivery, which had a sea water condenser aboard, crashed up the coast beyond a breach that is blocked by water. The town used their tide prediction machine to determine whether the water would ever recede enough to let the condenser be retrived before the 17th. They concluded it would not. Almost everyone has now left the town, crossing the desert on wagon trains. You and a handful of others stayed, with a few oxen left for one last train. The company left its crossing records behind: how many days each past wagon train took to cross the desert. Use the records to work out what determines a crossing time, and whether the last train, which would carry you and everyone who remains, can cross within 14 days - the longest trip you could manage with the water you can carry. If you can't make it within that time, you'll need to find a way to get the condenser from the steamship...",
   "enterLabel": "Walk into town",
   "status": "in_development",
   "doorLabels": true,
@@ -3907,6 +3907,11 @@
           "params": {
             "bench": true,
             "mountedUntilTaken": true,
+            "run": {
+              "label": "▶ Run the machine from today to 17 December",
+              "to": "1928-12-17T23:00",
+              "ms": 14000
+            },
             "caption": "Chalked above it: <i>Cranked to 17 December. The sand bar to the grounded steamship never comes dry. Leave by land.</i>"
           }
         },
@@ -4234,6 +4239,11 @@
           "params": {
             "bench": true,
             "mountedUntilTaken": true,
+            "run": {
+              "label": "▶ Run the machine from today to 17 December",
+              "to": "1928-12-17T23:00",
+              "ms": 14000
+            },
             "caption": "Chalked above it: <i>Cranked to 17 December. The sand bar to the grounded steamship never comes dry. Leave by land.</i>"
           }
         },
@@ -4700,19 +4710,19 @@
         {
           "src": "audio/company_office_bed_wind_curtains_balcony.mp3",
           "mode": "loop",
-          "volume": 0.5,
+          "volume": 0.25,
           "crossfade": 4
         },
         {
           "src": "audio/company_office_bed_surf_below_cliff.mp3",
           "mode": "loop",
-          "volume": 0.3,
+          "volume": 0.14,
           "crossfade": 4
         },
         {
           "src": "audio/company_office_oneshot_floor_creak.mp3",
           "mode": "interval",
-          "volume": 0.3,
+          "volume": 0.2,
           "gapMin": 11,
           "gapMax": 24
         },
@@ -4741,8 +4751,7 @@
           "type": "puzzle",
           "label": "The storekeeper's note",
           "form": "check",
-          "gives": "rope",
-          "note": "S2. Answer Desert_Rose 13.20. Gives the rope. Prompt/options at step 6.",
+          "note": "S2. Answer Desert_Rose 13.20. Solving it reveals the rope under the counter (a clue shown once solved). Prompt/options at step 6.",
           "starterCode": "crossing_ledger",
           "check": {
             "prompt": "The storekeeper set out this morning on the Desert_Rose and asked whoever stayed behind to work out when his train will reach the far side. Fit the same straight line of crossing_days against wagons_in_train in crossing_ledger, use it to predict crossing_days for every train in crossing_ledger_unknown, and assign the prediction for Desert_Rose to an object called answer. Then click \"Check my answer\".",
@@ -4772,6 +4781,24 @@
             "src": "audio/solve_general_store_the_storekeeper_s_note_till_ching.mp3",
             "volume": 0.17971786847850507
           }
+        },
+        {
+          "type": "clue",
+          "label": "Under the counter",
+          "image": "items/rope.jpg",
+          "body": "With the storekeeper's question answered, you look under the counter where he kept the haul gear. A coil of stout hemp rope is still there, long enough to reach the bottom of the cliff.",
+          "gives": "rope",
+          "shownWhen": {
+            "solved": "general_store"
+          },
+          "box": [
+            0.43,
+            0.63,
+            0.52,
+            0.72
+          ],
+          "boxSource": "agent:reveal_item",
+          "note": "Appears once S2 is solved; a carried-item clue with one Take button, like the desk drawer (Lucas, 2026-11-10)."
         },
         {
           "type": "clue",
@@ -5002,7 +5029,6 @@
             0.6232
           ],
           "form": "check",
-          "gives": "rope",
           "starterCode": "crossing_ledger",
           "check": {
             "prompt": "The storekeeper set out this morning on the Desert_Rose and asked whoever stayed behind to work out when his train will reach the far side. Fit the same straight line of crossing_days against wagons_in_train in crossing_ledger, use it to predict crossing_days for every train in crossing_ledger_unknown, and assign the prediction for Desert_Rose to an object called answer. Then click \"Check my answer\".",
@@ -5026,6 +5052,24 @@
             "src": "audio/solve_general_store_the_storekeeper_s_note_till_ching.mp3",
             "volume": 0.17971786847850507
           }
+        },
+        {
+          "id": "under_the_counter",
+          "type": "clue",
+          "label": "Under the counter",
+          "image": "items/rope.jpg",
+          "body": "With the storekeeper's question answered, you look under the counter where he kept the haul gear. A coil of stout hemp rope is still there, long enough to reach the bottom of the cliff.",
+          "gives": "rope",
+          "shownWhen": {
+            "solved": "general_store"
+          },
+          "box": [
+            0.43,
+            0.63,
+            0.52,
+            0.72
+          ],
+          "boxSource": "agent:reveal_item"
         },
         {
           "id": "the_pace_note",
@@ -9248,15 +9292,19 @@
           "type": "door",
           "label": "Ride the sled down the slip face",
           "box": [
-            0.336,
-            0.536,
-            0.416,
-            0.6
+            0.3456,
+            0.6926,
+            0.4256,
+            0.7566
           ],
           "direction": "open",
           "to": "beach",
-          "boxSource": "draft:skeleton",
-          "oneWay": "sled run down the slip face; the way back up is the sand ramp"
+          "boxSource": "moved:testplay",
+          "oneWay": "sled run down the slip face; the way back up is the sand ramp",
+          "transit": {
+            "video": "dune_crest/transit_sled_ride.mp4",
+            "flat": true
+          }
         },
         {
           "id": "clip_base",
@@ -9287,7 +9335,7 @@
         {
           "src": "audio/dune_crest_bed_flag_halyard_cliff.mp3",
           "mode": "loop",
-          "volume": 0.30980702337157934,
+          "volume": 0.04,
           "crossfade": 4
         },
         {
@@ -11327,10 +11375,10 @@
           "type": "door",
           "label": "Up through the yard gate",
           "box": [
-            0.51,
-            0.152,
-            0.54,
-            0.216
+            0.5027,
+            0.2036,
+            0.5327,
+            0.2676
           ],
           "direction": "open",
           "to": "winch_yard",
@@ -11344,7 +11392,7 @@
               "to": "open"
             }
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "moved:testplay"
         },
         {
           "id": "yard_gate_open_wash",
@@ -13420,14 +13468,14 @@
           "type": "clue",
           "label": "The engineer's handcart",
           "box": [
-            0.04,
-            0.506,
-            0.2,
-            0.794
+            0.1422,
+            0.6586,
+            0.3022,
+            0.9466
           ],
           "gives": "yard_key",
           "body": "Under the overturned handcart, a padlock key on a loop of tarred string.",
-          "boxSource": "draft:skeleton",
+          "boxSource": "moved:testplay",
           "image": "items/yard_key.jpg"
         },
         {
@@ -13435,10 +13483,10 @@
           "type": "door",
           "label": "Up the old cart ramp",
           "box": [
-            0.8234,
-            0.4539,
-            0.8714,
-            0.5179
+            0.8261,
+            0.4585,
+            0.8741,
+            0.5225
           ],
           "direction": "open",
           "to": "sand_ramp",
@@ -13498,13 +13546,13 @@
         {
           "src": "audio/beach_bed_surf_sand_wash.mp3",
           "mode": "loop",
-          "volume": 0.2099380983858927,
+          "volume": 0.1,
           "crossfade": 4
         },
         {
           "src": "audio/beach_bed_flamingos_far.mp3",
           "mode": "loop",
-          "volume": 0.3,
+          "volume": 0.02,
           "crossfade": 4
         },
         {
@@ -13539,8 +13587,7 @@
           "type": "puzzle",
           "label": "The dumped loads",
           "form": "pick",
-          "gives": "hut_key",
-          "note": "S3. Answer load_per_ox_kg. Gives the hut key (in the sled). Prompt at step 6.",
+          "note": "S3. Answer load_per_ox_kg. Solving it reveals the hut key in the sled (a clue shown once solved). Prompt at step 6.",
           "starterCode": "crossing_ledger",
           "pick": {
             "prompt": "Past trains dumped chairs, crates and even a piano here to lighten their oxen, which makes the wagons rule look doubtful. Put the six measurements in crossing_ledger on the same footing, fit crossing_days on all six together, plot the size of each measurement's coefficient, assign the plot to p, and click the measurement with the largest effect.",
@@ -13571,6 +13618,24 @@
             "src": "audio/solve_dune_valley_the_dumped_loads_crate_drop.mp3",
             "volume": 0.8018465390954573
           }
+        },
+        {
+          "type": "clue",
+          "label": "The overturned sled",
+          "image": "items/hut_key.jpg",
+          "body": "With the measurements ranked, you search the engineer's overturned sled properly. Wedged under a slat of its bed is the key to his hut.",
+          "gives": "hut_key",
+          "shownWhen": {
+            "solved": "dune_valley"
+          },
+          "box": [
+            0.47,
+            0.47,
+            0.53,
+            0.56
+          ],
+          "boxSource": "agent:reveal_item",
+          "note": "Appears once S3 is solved; a carried-item clue with one Take button, like the desk drawer (Lucas, 2026-11-10)."
         },
         {
           "type": "clue",
@@ -14825,7 +14890,6 @@
             0.69
           ],
           "form": "pick",
-          "gives": "hut_key",
           "starterCode": "crossing_ledger",
           "pick": {
             "prompt": "Past trains dumped chairs, crates and even a piano here to lighten their oxen, which makes the wagons rule look doubtful. Put the six measurements in crossing_ledger on the same footing, fit crossing_days on all six together, plot the size of each measurement's coefficient, assign the plot to p, and click the measurement with the largest effect.",
@@ -14850,6 +14914,24 @@
             "src": "audio/solve_dune_valley_the_dumped_loads_crate_drop.mp3",
             "volume": 0.8018465390954573
           }
+        },
+        {
+          "id": "the_overturned_sled",
+          "type": "clue",
+          "label": "The overturned sled",
+          "image": "items/hut_key.jpg",
+          "body": "With the measurements ranked, you search the engineer's overturned sled properly. Wedged under a slat of its bed is the key to his hut.",
+          "gives": "hut_key",
+          "shownWhen": {
+            "solved": "dune_valley"
+          },
+          "box": [
+            0.47,
+            0.47,
+            0.53,
+            0.56
+          ],
+          "boxSource": "agent:reveal_item"
         },
         {
           "id": "the_near_and_far_pulley",
@@ -17716,28 +17798,28 @@
           "type": "door",
           "label": "Back to the whale bones",
           "box": [
-            0.65,
-            0.5,
-            0.75,
-            0.6
+            0.7421,
+            0.384,
+            0.8421,
+            0.484
           ],
           "direction": "open",
           "to": "whale_bones",
-          "boxSource": "draft:skeleton"
+          "boxSource": "moved:testplay"
         },
         {
           "id": "up_onto_the_point",
           "type": "door",
           "label": "Up onto the point",
           "box": [
-            0.5,
-            0.436,
-            0.54,
-            0.532
+            0.5324,
+            0.3505,
+            0.5724,
+            0.4465
           ],
           "direction": "open",
           "to": "the_point",
-          "boxSource": "draft:skeleton"
+          "boxSource": "moved:testplay"
         }
       ],
       "panorama": "seal_rocks/scene.png",
@@ -17747,19 +17829,19 @@
         {
           "src": "audio/seal_rocks_bed_waves_between_rocks.mp3",
           "mode": "loop",
-          "volume": 0.4737958572635207,
+          "volume": 0.22,
           "crossfade": 4
         },
         {
           "src": "audio/seal_rocks_bed_boom_inside_rock.mp3",
           "mode": "loop",
-          "volume": 0.3,
+          "volume": 0.18,
           "crossfade": 4
         },
         {
           "src": "audio/seal_rocks_oneshot_blowhole_surge.mp3",
           "mode": "interval",
-          "volume": 0.3,
+          "volume": 0.17,
           "gapMin": 11,
           "gapMax": 24
         },
@@ -19521,26 +19603,26 @@
         {
           "src": "audio/the_point_bed_heavy_rocky_surf.mp3",
           "mode": "loop",
-          "volume": 0.24243273391599193,
+          "volume": 0.16,
           "crossfade": 4
         },
         {
           "src": "audio/the_point_bed_surf_rocks_gulls.mp3",
           "mode": "loop",
-          "volume": 0.3,
+          "volume": 0.15,
           "crossfade": 4
         },
         {
           "src": "audio/the_point_oneshot_swell_burst.mp3",
           "mode": "interval",
-          "volume": 0.3,
+          "volume": 0.15,
           "gapMin": 11,
           "gapMax": 24
         },
         {
           "src": "audio/the_point_oneshot_seal_bark.mp3",
           "mode": "interval",
-          "volume": 0.20002821482449856,
+          "volume": 0.13,
           "gapMin": 17,
           "gapMax": 36
         }
@@ -20389,19 +20471,19 @@
         {
           "src": "audio/machine_room_bed_canvas_blind.mp3",
           "mode": "loop",
-          "volume": 0.5,
+          "volume": 0.16,
           "crossfade": 4
         },
         {
           "src": "audio/machine_room_bed_tide_mill_creak.mp3",
           "mode": "loop",
-          "volume": 0.3,
+          "volume": 0.1,
           "crossfade": 4
         },
         {
           "src": "audio/machine_room_oneshot_sailcloth_flap.mp3",
           "mode": "interval",
-          "volume": 0.3,
+          "volume": 0.23,
           "gapMin": 11,
           "gapMax": 24
         },

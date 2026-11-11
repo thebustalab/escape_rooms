@@ -18,10 +18,12 @@
 //     pegs     — the saved setting {arr, z0, t}; onPegs(setting) is called whenever it changes
 //     params   — BENCH MODE (the town's two-peg machine, dunes town_hall): {bench: true} fixes each config.true_arrangement
 //                pulley on its shaft if it is in `held` (pano-player's `mountedUntilTaken` passes the ones NOT carried),
-//                no shelf, no drag, datum fixed at the true config.z0, no thumbscrew; `caption` prints a line under it
+//                no shelf, no drag, datum fixed at the true config.z0, no thumbscrew; `caption` prints a line under it.
+//                Any mode: `run: {label, to, ms}` adds a button that rewinds to config.today and drives the pen at an
+//                even pace to `to` (an ISO time) over `ms`, so a player can watch the whole run without cranking.
 //   m.place(shaft, pid); m.arrangement(); m.setDatum(z); m.datum(); m.setTime(iso); m.time(); m.level();
 //   m.penLevel(); m.shelf(); m.ready (Promise); m.destroy();   (also on the canvas as `canvas.tide`)
-import * as M from "./tide_model.js?v=164";
+import * as M from "./tide_model.js?v=165";
 
 const SERIF = 'Georgia, "Times New Roman", "Liberation Serif", serif';
 const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
@@ -155,8 +157,31 @@ if (P.caption) {
   capEl.className = 'tidecaption';
   capEl.style.cssText = `margin:8px 4px 2px;text-align:center;font:italic 1.02em ${SERIF};opacity:.92;`;
   capEl.innerHTML = P.caption;
-  host.appendChild(capEl);
 }
+let runBtn = null;
+if (P.run && P.run.to) {
+  runBtn = document.createElement('button');
+  runBtn.type = 'button';
+  runBtn.className = 'tiderun';
+  const label = P.run.label || '▶ Run the machine';
+  runBtn.textContent = label;
+  runBtn.style.cssText = `display:block;margin:10px auto 2px;padding:10px 22px;font:700 1.05em ${SERIF};color:#2a1606;`
+    + 'background:linear-gradient(#f1dca4,#c29a52);border:2px solid #6b4a1c;border-radius:8px;cursor:pointer;'
+    + 'box-shadow:0 2px 6px rgba(0,0,0,.45);';
+  on(runBtn, 'click', () => {
+    unlockAudio();
+    if (S.run) return;
+    S.hold = S.crank = null;
+    jumpTo(M.isoToHours(cfg.today, cfg));
+    runBtn.disabled = true; runBtn.style.opacity = '0.6'; runBtn.textContent = 'Running…';
+    api.runTo(P.run.to, P.run.ms || 14000, true).then(() => {
+      if (dead) return;
+      runBtn.disabled = false; runBtn.style.opacity = ''; runBtn.textContent = label;
+    });
+  });
+  host.appendChild(runBtn);
+}
+if (capEl) host.appendChild(capEl);
 const stat = document.createElement('canvas'), sctx = stat.getContext('2d');
 let view = { dpr: 1, k: 1, S: 1, ox: 0, oy: 0 };
 function resize() {
@@ -687,7 +712,7 @@ function frame(now) {
   const dt = Math.min(0.1, (now - lastFrame) / 1000); lastFrame = now;
   if (S.hold) advanceTo(S.t + S.hold.dir * knobRate((now - S.hold.t0) / 1000) * dt);
   if (S.run) {
-    const u = Math.min(1, (now - S.run.t0) / S.run.ms), e = u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2;
+    const u = Math.min(1, (now - S.run.t0) / S.run.ms), e = S.run.even ? u : u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2;
     advanceTo(S.run.from + (S.run.to - S.run.from) * e);
     if (u >= 1) { const r = S.run; S.run = null; save(); r.resolve(api.time()); }
   }
@@ -719,8 +744,8 @@ const api = {
   time() { return M.hoursToIso(S.t, cfg); },
   level() { return M.mechanism(S.t, S.arr, cfg, G).h; },
   penLevel() { return M.chartLevel(M.mechanism(S.t, S.arr, cfg, G).penY, G); },
-  runTo(iso, ms = 2000) {
-    return new Promise((resolve) => { S.run = { from: S.t, to: clampT(M.isoToHours(iso, cfg)), t0: performance.now(), ms: Math.max(1, ms), resolve }; });
+  runTo(iso, ms = 2000, even = false) {
+    return new Promise((resolve) => { S.run = { from: S.t, to: clampT(M.isoToHours(iso, cfg)), t0: performance.now(), ms: Math.max(1, ms), even, resolve }; });
   },
   shelf() { return SHELF.order.filter(inTray); },
   bench: BENCH,
@@ -730,7 +755,7 @@ const api = {
     if (ro) ro.disconnect();
     offs.forEach((f) => f()); offs.length = 0;
     if (actx) { try { actx.close(); } catch (e) { /* already closed */ } }
-    stage.remove(); if (capEl) capEl.remove();
+    stage.remove(); if (capEl) capEl.remove(); if (runBtn) runBtn.remove();
   },
 };
 cv.tide = api;
