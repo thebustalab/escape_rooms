@@ -7,7 +7,8 @@
  * counting sinks, how many to fill, and this module answers the same calls live_session.js makes of the server
  * (state, deal, answer, deliver, backpack, skip), with the same shapes and the same rules:
  * tiers and tracks, carry caps per item (raised by a backpack), the overflow refusal, second items and sinks,
- * the two-part win, the wrong-answer cooldown, the clock, and the sewing table's stitch / ribbon checks.
+ * the two-part win, the wrong-answer cooldown, the clock, the sewing table's stitch / ribbon checks and the
+ * level-3 matching cards (`match`).
  * It MIRRORS authoring_v2/live_class/live_server.py; tests/live_solo.test.mjs pins the shared rules, so a change
  * to one side should be made to both. Two things are SOLO ONLY and have no server twin: `untimed` (no clock at
  * all) and the worked answer (opt-in `reveal`: a right answer carries the task's `solution`, and the `solution` call
@@ -24,6 +25,8 @@ export const WRONG_COOLDOWN_S = 8;      // live_server.WRONG_COOLDOWN_S
 export const PRACTICE_PHASES = ["timeup", "won"];
 export const PRACTICE_NOTE = "Just for practice now: the game is over, so this one doesn't count.";
 const MAX_SEW_LEN = 64;
+export const MATCH_PAIRS = 4;           // live_server.MATCH_PAIRS / MAX_MATCH_LEN
+export const MAX_MATCH_LEN = 120;
 
 const plural = (n, unit) => `${n} ${n === 1 ? unit[0] : unit[1]}`;
 const trackOf = p => p.track || "";
@@ -45,6 +48,35 @@ export function parseStitch(choice, grid) {
   const n = counts.map(c => parseInt(c, 10));
   if (n.length > grid[0] || n.some(c => c < 0 || c > grid[1])) return null;
   return stitchKey(n, parseInt(total, 10));
+}
+
+// MATCHING (bathhouse level 3, Lucas 2026-11-11; live_server.deal_match / match_right): both columns shuffled
+// separately under fresh ids, so neither the ids nor the order says which goes with which; the key stays here.
+const shuffle = a => {
+  for (let i = a.length - 1; i > 0; i--) { const k = Math.floor(Math.random() * (i + 1)); [a[i], a[k]] = [a[k], a[i]]; }
+  return a;
+};
+export function dealMatch(p) {
+  const ids = new Set();
+  while (ids.size < 2 * MATCH_PAIRS) ids.add(Math.floor(Math.random() * 0x100000000).toString(16).padStart(8, "0"));
+  const all = shuffle([...ids]), lid = all.slice(0, MATCH_PAIRS), rid = all.slice(MATCH_PAIRS);
+  const left = p.pairs.map(([a], i) => [lid[i], a]), right = p.pairs.map(([, b], i) => [rid[i], b]);
+  const key = Object.fromEntries(lid.map((l, i) => [l, rid[i]]));
+  return { left: shuffle(left), right: shuffle(right), key };
+}
+// "lid=rid,lid=rid,..." is right only when it pairs every left id with its own right id; malformed is just wrong
+export function matchRight(choice, key) {
+  if (typeof choice !== "string" || choice.length > MAX_MATCH_LEN || !key) return false;
+  const got = Object.create(null);   // a "__proto__" key must count like any other (server parity)
+  for (const part of choice.split(",")) {
+    const s = part.trim(), i = s.indexOf("=");
+    if (i < 0) return false;
+    const a = s.slice(0, i), b = s.slice(i + 1);
+    if (a in got) return false;
+    got[a] = b;
+  }
+  const ks = Object.keys(key);
+  return Object.keys(got).length === ks.length && ks.every(k => got[k] === key[k]);
 }
 
 export function poolPayouts(pool) {
@@ -75,12 +107,16 @@ export function linked(links, a, b) {
   return seen.has(b);
 }
 
-function publicPuzzle(p, dealId, order) {
+export function publicPuzzle(p, dealId, order, match = null) {
   const out = { deal_id: dealId, tier: p.tier, kind: p.kind || "mcq", title: p.title, flavour: p.flavour || "",
                 question: p.question, image: p.image || null, starter_code: p.starter_code || null, hint: p.hint || null };
   if (out.kind === "stitch") Object.assign(out, { rows: p.rows, per_row: p.per_row, grid: [...p.grid] });
   else if (out.kind === "ribbon") Object.assign(out, { length: p.length, cut: p.cut, tape: p.tape });
-  else {
+  else if (out.kind === "match") {      // the two shuffled columns, never the pairing (live_server.public_puzzle)
+    const m = match || dealMatch(p);
+    out.left = m.left.map(([id, text]) => ({ id, text }));
+    out.right = m.right.map(([id, text]) => ({ id, text }));
+  } else if (Array.isArray(p.options) && order) {
     const opts = Object.fromEntries(p.options.map(o => [o.id, o]));
     out.options = order.map(id => ({ id, text: opts[id].text }));
   }
@@ -233,15 +269,13 @@ export class SoloSession {
                             `Take your ${unit[1]} to ${cfg.deliver_to || "the drop-off"} first.`,
                      carrying: this.held(itemOf(p)) }, 409);
       }
-      let order = null;
+      let order = null, match = null;
       if ((p.kind || "mcq") === "mcq") {
         order = p.options.map(o => o.id);
-        if (!p.ordered) for (let i = order.length - 1; i > 0; i--) {
-          const k = Math.floor(Math.random() * (i + 1)); [order[i], order[k]] = [order[k], order[i]];
-        }
-      }
-      this.deal = { id: randId(), puzzleId: p.id, order };
-      return res(publicPuzzle(p, this.deal.id, order));
+        if (!p.ordered) shuffle(order);
+      } else if (p.kind === "match") match = dealMatch(p);   // the pairing stays in this.deal, never dealt
+      this.deal = { id: randId(), puzzleId: p.id, order, match: match && match.key };
+      return res(publicPuzzle(p, this.deal.id, order, match));
     }
 
     if (route === "answer") {
@@ -263,6 +297,8 @@ export class SoloSession {
         choice = choice.trim();
         if (!/^[0-9]{1,3}$/.test(choice) || parseInt(choice, 10) > p.tape) return res({ error: "bad choice" }, 400);
         right = parseInt(choice, 10) === parseInt(p.answer, 10);
+      } else if (kind === "match") {    // "lid=rid,..." x4: right only with all four pairs; malformed = wrong
+        right = matchRight(choice, d.match);
       } else {
         if (!d.order.includes(choice)) return res({ error: "bad choice" }, 400);
         right = choice === p.answer;

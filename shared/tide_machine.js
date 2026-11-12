@@ -23,7 +23,7 @@
 //                even pace to `to` (an ISO time) over `ms`, so a player can watch the whole run without cranking.
 //   m.place(shaft, pid); m.arrangement(); m.setDatum(z); m.datum(); m.setTime(iso); m.time(); m.level();
 //   m.penLevel(); m.shelf(); m.ready (Promise); m.destroy();   (also on the canvas as `canvas.tide`)
-import * as M from "./tide_model.js?v=166";
+import * as M from "./tide_model.js?v=167";
 
 const SERIF = 'Georgia, "Times New Roman", "Liberation Serif", serif';
 const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];

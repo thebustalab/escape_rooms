@@ -777,3 +777,19 @@ table.ledger { border-collapse:separate; border-spacing:4px 5px; margin:6px auto
 .sewpad button { min-height:44px; font-size:20px; padding:0; }
 .sewsteps { display:flex; gap:12px; margin:6px 0; }
 .sewsteps button { min-height:48px; flex:1; max-width:180px; }
+
+/* live matching card (numbers to their words; bathhouse level 3, 2026-11-11): two columns, big wrapping tap targets */
+.matchhelp { font-size:14px; opacity:.85; margin:0 0 8px; }
+.matchgrid { display:grid; grid-template-columns:minmax(0, 2fr) minmax(0, 3fr); gap:10px; margin:4px 0 6px; }
+.matchcol { display:flex; flex-direction:column; gap:8px; min-width:0; }
+.mitem { display:flex; align-items:center; gap:8px; min-height:56px; padding:8px 10px; text-align:left; font-size:18px;
+         line-height:1.25; white-space:normal; overflow-wrap:anywhere; border:2px solid var(--line); border-radius:10px; cursor:pointer;
+         background:rgba(255,255,255,.07); color:inherit; font-weight:500; }
+.mitem.mnum { font-size:24px; font-weight:700; justify-content:center; }
+.mitem.picked { border-color:var(--amber); box-shadow:0 0 0 3px var(--amber); }
+.mitem.paired { border-color:#1b1b1b; }
+.mbadge { flex:none; display:inline-grid; place-items:center; width:28px; height:28px; border-radius:50%; background:#1b1b1b;
+          color:#fff; font-size:16px; font-weight:700; }
+.mbadge:empty { display:none; }
+.matchdone .mitem { cursor:default; }
+@media (max-width:480px) { .matchgrid { gap:6px; } .mitem { font-size:16px; padding:6px 8px; } .mitem.mnum { font-size:20px; } }

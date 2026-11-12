@@ -84,31 +84,31 @@
 // A bare `./variant_resolve.js` import is NOT refreshed by bumping the <script> tag's ?v, so a changed
 // helper module (e.g. a new export) leaves browsers on a stale cached copy → "doesn't provide an export
 // named X" SyntaxError → blank page (the 2026-08-05 airship regression). Bump all three together.
-import { WebRConsole } from "./webr-console.js?v=166";
-import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers, pickTransit } from "./variant_resolve.js?v=166";   // Phase 3: per-hotspot state variants; monorail switch-door nav
-import * as PQ from "./puzzle_queue.js?v=166";   // dynamic puzzle queue: location-independent puzzle serving
-import * as CP from "./corr_panel.js?v=166";   // lower-triangle layout of the grid gate (clouds correlation panel)
-import { particleCount } from "./particles.js?v=166";
-import { mountLandingBackdrop } from "./landing_backdrop.js?v=166";   // landing text over a pan of the first room's clip   // ambient-particle vocabulary + per-kind field density
-import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=166";
-import { condHolds } from "./cond.js?v=166";
-import { gridMatches } from "./grid_check.js?v=166";   // grid answer check; `partition:true` accepts any relabelling of the buckets   // ledger + elevation-map card DOM
-import * as LIVE from "./live_session.js?v=166";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
-import * as RIDE from "./ride.js?v=166";
-import { mountPcaPlate } from "./pca_plate.js?v=166";   // the PCA plate instrument (voyage beach)
-import { mountFishBoard } from "./fish_board.js?v=166";   // the fish board instrument (harbour berth)
-import { mountDrawdown } from "./drawdown.js?v=166";
-import { mountTide } from "./tide_machine.js?v=166";   // the tide machine instrument (dunes escape)
-import { mountVarianceMeter } from "./variance_meter.js?v=166";   // the variance meter instrument (anova cellars escape)
-import { mountAnovaInstrument } from "./anova_instrument.js?v=166";   // the ANOVA instrument (Fisher's board, anova rooms; also the book, ch.12b)
-import { mountGhostLines } from "./ghost_lines.js?v=166";   // the ghost-line board instrument (regression pits hub)
+import { WebRConsole } from "./webr-console.js?v=167";
+import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers, pickTransit } from "./variant_resolve.js?v=167";   // Phase 3: per-hotspot state variants; monorail switch-door nav
+import * as PQ from "./puzzle_queue.js?v=167";   // dynamic puzzle queue: location-independent puzzle serving
+import * as CP from "./corr_panel.js?v=167";   // lower-triangle layout of the grid gate (clouds correlation panel)
+import { particleCount } from "./particles.js?v=167";
+import { mountLandingBackdrop } from "./landing_backdrop.js?v=167";   // landing text over a pan of the first room's clip   // ambient-particle vocabulary + per-kind field density
+import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=167";
+import { condHolds } from "./cond.js?v=167";
+import { gridMatches } from "./grid_check.js?v=167";   // grid answer check; `partition:true` accepts any relabelling of the buckets   // ledger + elevation-map card DOM
+import * as LIVE from "./live_session.js?v=167";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
+import * as RIDE from "./ride.js?v=167";
+import { mountPcaPlate } from "./pca_plate.js?v=167";   // the PCA plate instrument (voyage beach)
+import { mountFishBoard } from "./fish_board.js?v=167";   // the fish board instrument (harbour berth)
+import { mountDrawdown } from "./drawdown.js?v=167";
+import { mountTide } from "./tide_machine.js?v=167";   // the tide machine instrument (dunes escape)
+import { mountVarianceMeter } from "./variance_meter.js?v=167";   // the variance meter instrument (anova cellars escape)
+import { mountAnovaInstrument } from "./anova_instrument.js?v=167";   // the ANOVA instrument (Fisher's board, anova rooms; also the book, ch.12b)
+import { mountGhostLines } from "./ghost_lines.js?v=167";   // the ghost-line board instrument (regression pits hub)
    // the drawdown board instrument (diamonds escape)   // THE RIDE (subway): express lever + clip-sequence planner
-import * as BELL from "./bell_pull.js?v=166";
-import * as TCOUNT from "./transit_counter.js?v=166";   // the date plaque over a flat door transit (dunes time-skip)
-import * as DATEB from "./date_board.js?v=166";   // date lock: lock mode:"date", two slide-levers (dunes departure board)
-import * as INVY from "./inventory.js?v=166";   // carried items + the door that asks which to use (dunes)   // bell-pull (#16): dial mode:"pull" + lock mode:"state" (spa belfry)
-import { entryYaw } from "./entry_facing.js?v=166";   // face the way out on entering a room (every scenario)
-import * as HINTS from "./escape_hints.js?v=166";   // escape-phase Hint chip: time-unlocked tiers (SCENARIO.escapeHints)
+import * as BELL from "./bell_pull.js?v=167";
+import * as TCOUNT from "./transit_counter.js?v=167";   // the date plaque over a flat door transit (dunes time-skip)
+import * as DATEB from "./date_board.js?v=167";   // date lock: lock mode:"date", two slide-levers (dunes departure board)
+import * as INVY from "./inventory.js?v=167";   // carried items + the door that asks which to use (dunes)   // bell-pull (#16): dial mode:"pull" + lock mode:"state" (spa belfry)
+import { entryYaw } from "./entry_facing.js?v=167";   // face the way out on entering a room (every scenario)
+import * as HINTS from "./escape_hints.js?v=167";   // escape-phase Hint chip: time-unlocked tiers (SCENARIO.escapeHints)
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 
@@ -4120,6 +4120,86 @@ function buildLiveMcqCard(task, onSolved) {
   return card;
 }
 
+// LIVE matching (pool kind "match"; bathhouse level 3, Lucas 2026-11-11): the deal carries two shuffled columns
+// (`left` numbers, `right` their words) under opaque ids, never the pairing. Tap one item, then one in the other
+// column, to pair them; a pair shares a colour AND a letter badge (colour-blind safe); tapping a paired item undoes
+// that pair. Check opens at four pairs and sends "lid=rid,..."; a wrong check keeps the pairs so they can be fixed.
+const MATCH_LETTERS = ["A", "B", "C", "D"];
+const MATCH_COLOURS = ["#e69f00", "#56b4e9", "#cc79a7", "#f0e442"];   // Okabe-Ito: apart for every colour vision
+// The card's pairing state, pure (tests/live_match_card.test.mjs): st = {pairs: [{l, r, letter}], pick: {side, id}|null}.
+function matchTap(st, side, id) {
+  const pairs = st.pairs.slice();
+  const at = pairs.findIndex(p => (side === "l" ? p.l : p.r) === id);
+  if (at >= 0) { pairs.splice(at, 1); return { pairs, pick: null }; }               // undo that pair
+  if (!st.pick) return { pairs, pick: { side, id } };
+  if (st.pick.side === side) return { pairs, pick: st.pick.id === id ? null : { side, id } };   // change of mind
+  const used = new Set(pairs.map(p => p.letter));
+  const letter = MATCH_LETTERS.find(x => !used.has(x)) || "";
+  const l = side === "l" ? id : st.pick.id, r = side === "r" ? id : st.pick.id;
+  pairs.push({ l, r, letter });
+  return { pairs, pick: null };
+}
+function buildLiveMatchCard(d, onSolved) {
+  const card = document.createElement("div"); card.className = "qcard matchcard";
+  card.innerHTML = `<div class="qprompt"></div><div class="matchhelp">Tap a number, then the words that say it.
+     Tap a pair again to undo it.</div><div class="matchgrid"><div class="matchcol"></div><div class="matchcol"></div></div>
+     <div class="qfeedback"></div><button class="qsubmit" disabled>Check my matches</button>`;
+  card.querySelector(".qprompt").textContent = d.question || "";
+  const [colL, colR] = card.querySelectorAll(".matchcol");
+  const fb = card.querySelector(".qfeedback"), btn = card.querySelector(".qsubmit");
+  const need = Math.min((d.left || []).length, (d.right || []).length);
+  let st = { pairs: [], pick: null }, done = false;
+  const els = { l: new Map(), r: new Map() };
+  const paint = () => {
+    for (const side of ["l", "r"]) for (const [id, el] of els[side]) {
+      const p = st.pairs.find(x => (side === "l" ? x.l : x.r) === id);
+      const k = p ? MATCH_LETTERS.indexOf(p.letter) : -1;
+      el.classList.toggle("paired", !!p);
+      el.classList.toggle("picked", !!(st.pick && st.pick.side === side && st.pick.id === id));
+      el.setAttribute("aria-pressed", p || el.classList.contains("picked") ? "true" : "false");
+      el.style.background = p ? MATCH_COLOURS[k] : "";
+      el.style.color = p ? "#1b1b1b" : "";
+      el.querySelector(".mbadge").textContent = p ? p.letter : "";
+    }
+    if (!done) btn.disabled = st.pairs.length < need || !need;
+  };
+  for (const [side, col, list] of [["l", colL, d.left || []], ["r", colR, d.right || []]]) {
+    for (const it of list) {
+      const b = document.createElement("button"); b.type = "button"; b.className = "mitem " + (side === "l" ? "mnum" : "mword");
+      b.innerHTML = `<span class="mbadge" aria-hidden="true"></span><span class="mtext"></span>`;
+      b.querySelector(".mtext").textContent = it.text;
+      b.addEventListener("click", () => {
+        if (done) return;
+        st = matchTap(st, side, it.id);
+        paint();
+      });
+      els[side].set(it.id, b);
+      col.appendChild(b);
+    }
+  }
+  paint();
+  btn.addEventListener("click", async () => {
+    if (done || st.pairs.length < need) return;
+    btn.disabled = true; const label = btn.textContent; btn.textContent = "checking…";
+    try {
+      const r = await d.liveGrade(st.pairs.map(p => p.l + "=" + p.r).join(","));
+      if (r.correct) {
+        done = true; btn.style.display = "none"; card.classList.add("matchdone");
+        fb.className = "qfeedback ok"; fb.textContent = r.feedback || "That's it.";
+        setTimeout(() => onSolved(r), 1600);
+      } else if (r.error) {
+        done = true; btn.style.display = "none";
+        fb.className = "qfeedback out"; fb.textContent = r.error;
+      } else {                                  // the pairs stay put: fix the wrong ones and check again
+        fb.className = "qfeedback no";
+        fb.textContent = (r.feedback || "Not quite. Try again.") +
+          (r.cooldown_s ? " Try again in " + r.cooldown_s + " s." : "");
+      }
+    } finally { btn.textContent = label; if (!done) paint(); }
+  });
+  return card;
+}
+
 // LIVE sewing (pool kinds "stitch" and "ribbon"; bathhouse's cottage sewing table, 2026-10-26). Hands-on, still
 // server-checked: the deal carries the pattern (rows, per_row, grid) or the ribbon (length, cut, tape), never the
 // answer. STITCH: tap the cloth to sew (tap again to unpick), then key the total on the pad; sends
@@ -4324,6 +4404,10 @@ async function openStation(h) {
   if (d.kind === "stitch" || d.kind === "ribbon") {   // the sewing table: drawn widgets, checked by the server
     if (viewer) resumeYaw = viewer.getYaw();
     return openModal(d.title || h.label, buildSewingCard({ ...d, liveGrade }, () => closeModal()));
+  }
+  if (d.kind === "match") {                           // tap-to-pair columns, checked by the server
+    if (viewer) resumeYaw = viewer.getYaw();
+    return openModal(d.title || h.label, buildLiveMatchCard({ ...d, liveGrade }, () => closeModal()));
   }
   const isObject = d.kind === "object";
   const task = {
