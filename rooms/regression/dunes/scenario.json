@@ -4,9 +4,9 @@
   "id": 27,
   "title": "Low Water",
   "subtitle": "A last wagon train, a stranded steamer, and a town with water until December.",
-  "story": "It is October 1928, and the diamond town's reservoir has run dry. The town's emergency water tanks will also run dry soon - on December 17th. The company that runs the town has abandoned it. The company's last steamship delivery, which had a sea water condenser aboard, crashed up the coast beyond a breach that is blocked by water. The town used their tide prediction machine to determine whether the water would ever recede enough to let the condenser be retrived before the 17th. They concluded it would not. Almost everyone has now left the town, crossing the desert on wagon trains. You and a handful of others stayed, with a few oxen left for one last train. The company left its crossing records behind: how many days each past wagon train took to cross the desert. Use the records to work out what determines a crossing time, and whether the last train, which would carry you and everyone who remains, can cross within 14 days - the longest trip you could manage with the water you can carry. If you can't make it within that time, you'll need to find a way to get the condenser from the steamship...",
+  "story": "It is October 1928, and the diamond town's reservoir has run dry. The town's emergency water tanks will also run dry soon - on December 17th. The company that runs the town has abandoned it. The company's last steamship delivery, which had a sea water condenser aboard, crashed up the coast beyond a breach that is blocked by water. The town used their tide prediction machine to determine whether the water would ever recede enough to let the condenser be retrived via a sand bar before the 17th. They concluded it would not. Almost everyone has now left the town, crossing the desert on wagon trains. You and a handful of others have been left behind, with a few oxen left for one last train. The company left its crossing records behind: how many days each past wagon train took to cross the desert. Use the records to work out what determines a crossing time, and whether the last train, which would carry you and everyone who remains, can cross within 14 days - the longest trip you could manage with the water you can carry. If you can't make it within that time, you'll need to find a way to get the condenser from the steamship...",
   "enterLabel": "Walk into town",
-  "status": "in_development",
+  "status": "ready",
   "doorLabels": true,
   "escapeBrief": "To get out you worked out when to set off to haul the condenser back from the stranded water steamer. It is 1928; the river has not flooded in two years, the company has abandoned the town and stopped the water shipments, and its last steamer, carrying a sea-water condenser, lies beyond a breach the storm cut through the sand spit. The town's tanks last 70 days, to 17 December. The town has given up: it holds two of the engineer's four pulleys, the moon's and the sun's, and on its two-peg bench machine the water over the bar never drops below the wading line before the tanks run dry, so most people are leaving by land. You took those two pulleys down with you, found the other two in the dunes and on the flats, and rebuilt the engineer's full tide machine in his wrecked hut. A bigger pulley swings the wire further, so which pulley goes on which shaft says how much each rhythm moves the water, and the datum screw sets the average water level; the storm had knocked it out of true. Setting the datum on one of the engineer's measured depths and cranking to the others showed which way round the last two pulleys go: only the right order puts the pen on all three. A survey stake on the flats gave the bar's length, 1,200 m, and the haul gang's note in the store gave the sledge's pace, 400 m a day, so the bar had to stay dry for three days. Cranking forward, it does that only once before the water runs out, from the evening of 7 December, so you set off on 7, 8 or 9 December and rallied the town. The town's machine left two rhythms out, and the machine as found sat on the wrong average level. Adding the missing predictors, each weighted by how much it matters, fitting the average level as well, checking the result against what was measured, and beating the simpler model everyone trusted is exactly what a multiple regression does, on the machine or in R.",
   "_designNotes": "Steps 1-2, 3a (bar the music) and 3b DONE; 4a graph written by _scratch/build_graph.py (2026-10-24, session 'dunes'): 18 rooms, four item doors, two cluster aerials (_clusters), no scene specs or art yet. Design record: notes.md §12.",
@@ -17,7 +17,7 @@
   },
   "done": {
     "title": "The last train stays",
-    "body": "The wagons line said a small train would cross comfortably inside the limit. The whole ledger says otherwise: the load on each ox sets the crossing time, and the number of wagons barely matters. The last train, with so few oxen pulling so much, would still be out in the desert long after the limit. Nobody leaves by land now. Everything rests on the steamer and the bar at the breach."
+    "body": "Based on the number of wagons in the train, it seemed possible that a small train would cross comfortably inside the 14 day limit. The whole data set says otherwise: the load on each ox is what actually sets the crossing time, and the number of wagons barely matters. The last train, with so few oxen pulling so much, would still be out in the desert long after the limit. Nobody leaves by land now. Everything rests on the steamer and the bar at the breach."
   },
   "escapeDone": {
     "title": "The bar comes dry",
@@ -3950,7 +3950,7 @@
           "label": "The water board",
           "pickup": "The town's emergency water tanks run dry on 17 December.",
           "note": "Escape input: the tanks run dry on 17 December (70 days from 8 October).",
-          "body": "Chalked on the water board: <i>Our emergency water tanks will run dry on 17 December.</i>",
+          "body": "Written in the dust on the wall: <i>Our emergency water tanks will run dry on 17 December.</i>",
           "box": [
             0.033,
             0.252,
@@ -4267,14 +4267,14 @@
           "type": "clue",
           "label": "The town's reckoning",
           "box": [
-            0.455,
-            0.325,
-            0.555,
-            0.47
+            0.0885,
+            0.3413,
+            0.1885,
+            0.4863
           ],
           "pickup": "The town's reckoning: the moon pulls hardest, then the sun; the near-and-far and the afternoon wind were left off, though a second hand asks whether they matter, and the engineer swore by four wheels.",
           "body": "",
-          "boxSource": "placed:agent-2026-11-11",
+          "boxSource": "moved:testplay",
           "image": "clues/town_reckoning.jpg"
         },
         {
@@ -4312,13 +4312,13 @@
           "type": "clue",
           "label": "The water board",
           "box": [
-            0.1011,
-            0.3191,
-            0.1731,
-            0.5111
+            0.4743,
+            0.2753,
+            0.5463,
+            0.4673
           ],
           "pickup": "The town's emergency water tanks run dry on 17 December.",
-          "body": "Chalked on the water board: <i>Our emergency water tanks will run dry on 17 December.</i>",
+          "body": "Written in the dust on the wall: <i>Our emergency water tanks will run dry on 17 December.</i>",
           "boxSource": "moved:testplay"
         },
         {
@@ -5094,12 +5094,12 @@
             "solved": "general_store"
           },
           "box": [
-            0.43,
-            0.63,
-            0.52,
-            0.72
+            0.4197,
+            0.6115,
+            0.5097,
+            0.7015
           ],
-          "boxSource": "agent:reveal_item"
+          "boxSource": "moved:testplay"
         },
         {
           "id": "the_pace_note",
@@ -7230,10 +7230,10 @@
           "type": "door",
           "label": "Over the lip on a rope",
           "box": [
-            0.5209,
-            0.2842,
-            0.606,
-            0.6742
+            0.5472,
+            0.2951,
+            0.6323,
+            0.6851
           ],
           "direction": "open",
           "to": "dune_crest",
@@ -7242,7 +7242,7 @@
           "useBody": "You make the rope fast to the winch and pay it out over the lip. It just reaches the crest.",
           "wrongItemBody": "That won't get you down the cliff.",
           "consumes": true,
-          "boxSource": "draft:skeleton",
+          "boxSource": "moved:testplay",
           "oneWay": "rope descent over the cliff lip; the way back up is the sand ramp to the yard gate"
         },
         {
@@ -14956,12 +14956,12 @@
             "solved": "dune_valley"
           },
           "box": [
-            0.47,
-            0.47,
-            0.53,
-            0.56
+            0.4689,
+            0.5337,
+            0.5289,
+            0.6237
           ],
-          "boxSource": "agent:reveal_item"
+          "boxSource": "moved:testplay"
         },
         {
           "id": "the_near_and_far_pulley",
@@ -17850,6 +17850,27 @@
           "direction": "open",
           "to": "the_point",
           "boxSource": "moved:testplay"
+        },
+        {
+          "id": "clip_base",
+          "type": "ambient",
+          "label": "Scene motion (base)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/play-source.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "seal_rocks/cine_base.mp4"
+          }
         }
       ],
       "panorama": "seal_rocks/scene.png",
@@ -19677,7 +19698,7 @@
           "note": "BOSS. Answer 17.82 (±0.15). Prompt/options at step 6.",
           "starterCode": "crossing_ledger",
           "check": {
-            "prompt": "Your own train, Last_Train, is in crossing_ledger_unknown, and no train expected to take longer than the company's 14-day limit may set out. Using crossing_ledger, fit crossing_days on all six measurements together, use that model to predict crossing_days for every train in crossing_ledger_unknown, and assign the prediction for Last_Train to an object called answer. Then click \"Check my answer\".",
+            "prompt": "Your own train, Last_Train, is in crossing_ledger_unknown, and no train expected to take longer than the company's 14-day limit may set out - they would die of thirst before completing the crossing. Using crossing_ledger, fit crossing_days on all six measurements together, use that model to predict crossing_days for every train in crossing_ledger_unknown, and assign the prediction for Last_Train to an object called answer. Then click \"Check my answer\".",
             "requires": [
               "answer"
             ],
@@ -19906,7 +19927,7 @@
           "form": "check",
           "starterCode": "crossing_ledger",
           "check": {
-            "prompt": "Your own train, Last_Train, is in crossing_ledger_unknown, and no train expected to take longer than the company's 14-day limit may set out. Using crossing_ledger, fit crossing_days on all six measurements together, use that model to predict crossing_days for every train in crossing_ledger_unknown, and assign the prediction for Last_Train to an object called answer. Then click \"Check my answer\".",
+            "prompt": "Your own train, Last_Train, is in crossing_ledger_unknown, and no train expected to take longer than the company's 14-day limit may set out - they would die of thirst before completing the crossing. Using crossing_ledger, fit crossing_days on all six measurements together, use that model to predict crossing_days for every train in crossing_ledger_unknown, and assign the prediction for Last_Train to an object called answer. Then click \"Check my answer\".",
             "requires": [
               "answer"
             ],

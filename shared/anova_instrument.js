@@ -3,7 +3,8 @@
 // Rothamsted rooms (engine instrument kind "anova_board") and the live ANOVA class scenario, so every
 // surface shows the same picture in the same words as the course's anovaTest(): spread (sum of squares),
 // free values (what is left once the values the model fixes are spoken for), variance (spread per free
-// value), F (a row's variance over the noise variance), p, and share (a row's spread over the total).
+// value: variance between groups on a factor's row, variance within groups on the noise row; never "mean
+// square"), F (a row's variance over the noise variance), p, and share (a row's spread over the total).
 // Grown from the prototype temp/mobile_prototypes/anova_step5_fertiliser.html.
 //
 //   mountAnovaInstrument(host, { config, params?, pegs?, onPegs? }) -> { destroy, show(step), steps, table() }
@@ -296,7 +297,7 @@ export function mountAnovaInstrument(host, opts = {}) {
     a: () => `${stepName.a}: each group mean's distance from the grand mean (the blue bars), squared, counted once per value in the group, and added up.`,
     b: () => `${stepName.b}: each group mean's distance from the grand mean (the yellow bars), squared, counted once per value, and added up.`,
     ab: () => `Interaction: where each cell would sit if ${stepName.b} did the same for every ${stepName.a} (dashed line), and how far the real cell mean is from there (the orange bars).`,
-    noise: "Noise: each value's distance from its own " + (two ? "cell" : "group") + " mean, the spread nothing in the model explains. Its variance is the yardstick for F.",
+    noise: "Noise: each value's distance from its own " + (two ? "cell" : "group") + " mean, the spread nothing in the model explains. Its variance, the variance within groups, is the yardstick for F.",
   };
   function show(s) {
     if (!steps.includes(s)) return;
@@ -466,11 +467,12 @@ function mountWide(host, cfg, P, D, opts) {
       el("text", { x: SSX - 62, y: ROWY[k], fill: "#6b7683", "font-size": 14, "text-anchor": "end" }, "+");
       el("text", { x: DFX - 32, y: ROWY[k], fill: "#6b7683", "font-size": 14, "text-anchor": "end" }, "+");
     });
-    const CAP = view === "noise" ? ["#4fd1c5", ["F = a row’s variance ÷ the noise variance.", "F near 1: no more spread than noise alone would give.",
+    const CAP = view === "noise" ? ["#4fd1c5", ["F = a row’s variance ÷ the variance within groups (noise).", "F near 1: no more spread than noise alone would give.",
         "Large F: that term explains real spread.", "p = how often noise alone would give an F this big."]]
-      : (["a", "b", "ab"].includes(view) ? ["#aab4bf", ["Variance = spread ÷ free values,", "so terms with different free values can be compared."]]
+      : (["a", "b"].includes(view) ? ["#aab4bf", ["Variance between groups = spread ÷ free values,", "so terms with different free values can be compared."]]
+      : (view === "ab" ? ["#aab4bf", ["Variance = spread ÷ free values,", "so terms with different free values can be compared."]]
       : (view === "total" ? ["#aab4bf", ["Share of the total = a row’s spread ÷ the total spread."]]
-      : (view === "start" ? ["#aab4bf", [`Click the numbered buttons, 1 to ${steps.length}, to build the table.`]] : null)));
+      : (view === "start" ? ["#aab4bf", [`Click the numbered buttons, 1 to ${steps.length}, to build the table.`]] : null))));
     if (CAP) CAP[1].forEach((t, i) => el("text", { x: TX, y: 600 + i * 20, fill: CAP[0], "font-size": 14, "font-weight": 700 }, t));
   }
 
@@ -586,7 +588,7 @@ function mountWide(host, cfg, P, D, opts) {
       el("text", { x: X0, y: PB + y0, fill: C[0], "font-size": 14, "font-weight": 700 }, C[1]);
       el("text", { x: X0, y: PB + y0 + 18, fill: C[0], "font-size": 14, "font-weight": 700 }, C[2]);
     }
-    if (o.note) ["The grand mean is fixed:", "all spread is measured", "from it, and it pins", "down one value, so",
+    if (o.note) ["The grand mean is fixed:", "all spread is measured", "from it, and it speaks", "for one value, so",
                  `total free values: ${D.N - 1}, not ${D.N}.`].forEach((t, i) =>
       el("text", { x: X0 - 92, y: sy(D.grand) + 4 + (i - 2) * 16, fill: "#e8edf2", "font-size": 12, "text-anchor": "end" }, t));
   }

@@ -84,31 +84,31 @@
 // A bare `./variant_resolve.js` import is NOT refreshed by bumping the <script> tag's ?v, so a changed
 // helper module (e.g. a new export) leaves browsers on a stale cached copy → "doesn't provide an export
 // named X" SyntaxError → blank page (the 2026-08-05 airship regression). Bump all three together.
-import { WebRConsole } from "./webr-console.js?v=167";
-import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers, pickTransit } from "./variant_resolve.js?v=167";   // Phase 3: per-hotspot state variants; monorail switch-door nav
-import * as PQ from "./puzzle_queue.js?v=167";   // dynamic puzzle queue: location-independent puzzle serving
-import * as CP from "./corr_panel.js?v=167";   // lower-triangle layout of the grid gate (clouds correlation panel)
-import { particleCount } from "./particles.js?v=167";
-import { mountLandingBackdrop } from "./landing_backdrop.js?v=167";   // landing text over a pan of the first room's clip   // ambient-particle vocabulary + per-kind field density
-import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=167";
-import { condHolds } from "./cond.js?v=167";
-import { gridMatches } from "./grid_check.js?v=167";   // grid answer check; `partition:true` accepts any relabelling of the buckets   // ledger + elevation-map card DOM
-import * as LIVE from "./live_session.js?v=167";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
-import * as RIDE from "./ride.js?v=167";
-import { mountPcaPlate } from "./pca_plate.js?v=167";   // the PCA plate instrument (voyage beach)
-import { mountFishBoard } from "./fish_board.js?v=167";   // the fish board instrument (harbour berth)
-import { mountDrawdown } from "./drawdown.js?v=167";
-import { mountTide } from "./tide_machine.js?v=167";   // the tide machine instrument (dunes escape)
-import { mountVarianceMeter } from "./variance_meter.js?v=167";   // the variance meter instrument (anova cellars escape)
-import { mountAnovaInstrument } from "./anova_instrument.js?v=167";   // the ANOVA instrument (Fisher's board, anova rooms; also the book, ch.12b)
-import { mountGhostLines } from "./ghost_lines.js?v=167";   // the ghost-line board instrument (regression pits hub)
+import { WebRConsole } from "./webr-console.js?v=168";
+import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers, pickTransit } from "./variant_resolve.js?v=168";   // Phase 3: per-hotspot state variants; monorail switch-door nav
+import * as PQ from "./puzzle_queue.js?v=168";   // dynamic puzzle queue: location-independent puzzle serving
+import * as CP from "./corr_panel.js?v=168";   // lower-triangle layout of the grid gate (clouds correlation panel)
+import { particleCount } from "./particles.js?v=168";
+import { mountLandingBackdrop } from "./landing_backdrop.js?v=168";   // landing text over a pan of the first room's clip   // ambient-particle vocabulary + per-kind field density
+import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=168";
+import { condHolds } from "./cond.js?v=168";
+import { gridMatches } from "./grid_check.js?v=168";   // grid answer check; `partition:true` accepts any relabelling of the buckets   // ledger + elevation-map card DOM
+import * as LIVE from "./live_session.js?v=168";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
+import * as RIDE from "./ride.js?v=168";
+import { mountPcaPlate } from "./pca_plate.js?v=168";   // the PCA plate instrument (voyage beach)
+import { mountFishBoard } from "./fish_board.js?v=168";   // the fish board instrument (harbour berth)
+import { mountDrawdown } from "./drawdown.js?v=168";
+import { mountTide } from "./tide_machine.js?v=168";   // the tide machine instrument (dunes escape)
+import { mountVarianceMeter } from "./variance_meter.js?v=168";   // the variance meter instrument (anova cellars escape)
+import { mountAnovaInstrument } from "./anova_instrument.js?v=168";   // the ANOVA instrument (Fisher's board, anova rooms; also the book, ch.12b)
+import { mountGhostLines } from "./ghost_lines.js?v=168";   // the ghost-line board instrument (regression pits hub)
    // the drawdown board instrument (diamonds escape)   // THE RIDE (subway): express lever + clip-sequence planner
-import * as BELL from "./bell_pull.js?v=167";
-import * as TCOUNT from "./transit_counter.js?v=167";   // the date plaque over a flat door transit (dunes time-skip)
-import * as DATEB from "./date_board.js?v=167";   // date lock: lock mode:"date", two slide-levers (dunes departure board)
-import * as INVY from "./inventory.js?v=167";   // carried items + the door that asks which to use (dunes)   // bell-pull (#16): dial mode:"pull" + lock mode:"state" (spa belfry)
-import { entryYaw } from "./entry_facing.js?v=167";   // face the way out on entering a room (every scenario)
-import * as HINTS from "./escape_hints.js?v=167";   // escape-phase Hint chip: time-unlocked tiers (SCENARIO.escapeHints)
+import * as BELL from "./bell_pull.js?v=168";
+import * as TCOUNT from "./transit_counter.js?v=168";   // the date plaque over a flat door transit (dunes time-skip)
+import * as DATEB from "./date_board.js?v=168";   // date lock: lock mode:"date", two slide-levers (dunes departure board)
+import * as INVY from "./inventory.js?v=168";   // carried items + the door that asks which to use (dunes)   // bell-pull (#16): dial mode:"pull" + lock mode:"state" (spa belfry)
+import { entryYaw } from "./entry_facing.js?v=168";   // face the way out on entering a room (every scenario)
+import * as HINTS from "./escape_hints.js?v=168";   // escape-phase Hint chip: time-unlocked tiers (SCENARIO.escapeHints)
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 
@@ -2885,6 +2885,19 @@ function correctResult(h) {
 // The test-play dev-solve action for a puzzle/lock hotspot: mirror the card's own success path
 // (close the modal, then solveRoom with the correct result) with no answering required.
 const devSolveThunk = (h, qIndex) => () => { closeModal(); solveRoom(correctResult(h), h, qIndex); };
+// A solved PUZZLE or LOCK (keypad, grid, ledger) stays open (Lucas, 2026-11-11/12): the player reads the result and leaves with the X.
+// solveRoom runs once per open, so a second correct submission cannot log the note or re-run effects twice;
+// solveRoom itself closes the popup when the solve hands off to another screen (escape finish, analysis
+// finish, auto-advance). The test-play Solve button still closes on solve.
+function solveKeepingOpen(h, qIndex) {
+  let done = false;
+  return (result) => {
+    if (done) return;
+    done = true;
+    $("#modal").dataset.solved = "1";             // tests: the solve ran (the popup no longer closes to say so)
+    solveRoom(result, h, qIndex);
+  };
+}
 
 /*
  * `size` — "wide" for the full-bleed box, anything else (the default) for a snug, content-sized one.
@@ -2896,6 +2909,7 @@ const devSolveThunk = (h, qIndex) => () => { closeModal(); solveRoom(correctResu
  */
 function openModal(title, node, onDevSolve, tpLabelOf, size) {
   modalTeardown();
+  delete $("#modal").dataset.solved;               // set by solveKeepingOpen; per open
   _pauseFinale();                    // a room finale waits while a popup is open (closeModal restarts it)
   document.querySelector("#modal .mbox").classList.toggle("wide", size === "wide");
   $("#mtitle").textContent = title;
@@ -3485,7 +3499,7 @@ function openMapview(h) {
 // its point. Ungraded (escape phase) — clicking the correct point's box solves the room.
 function openMapPuzzle(h, qIndex) {
   if (viewer) resumeYaw = viewer.getYaw();
-  openModal(h.label || "The survey chart", buildMapCard(h.map, (result) => { closeModal(); solveRoom(result, h, qIndex); }), devSolveThunk(h, qIndex), h, "wide");
+  openModal(h.label || "The survey chart", buildMapCard(h.map, solveKeepingOpen(h, qIndex)), devSolveThunk(h, qIndex), h, "wide");
 }
 function buildMapCard(map, onSolved) {
   const card = document.createElement("div"); card.className = "mapcard";
@@ -3537,7 +3551,7 @@ function openPuzzle(h, qIndex) {
   const left = document.createElement("div");   // console pane
   const right = document.createElement("div");   // question pane
   left.appendChild(cb);                          // move the live console in
-  const onSolved = (result) => { closeModal(); solveRoom(result, h, qIndex); };
+  const onSolved = solveKeepingOpen(h, qIndex);
   // A puzzle grades EITHER on the live R session (`check`) OR by multiple choice (`question`).
   const pid = PQ.attemptKey(gateKey(room.key, h.id), h, qIndex);   // per-room attempt-count key (ids repeat across rooms); per rung on a series slot
   right.appendChild(h.check ? buildCheckCard(h.check, onSolved, pid, h) : buildQuestion(h.question, onSolved, pid));
@@ -3850,7 +3864,7 @@ function openPickPuzzle(h, qIndex) {
   const left = document.createElement("div");    // live console pane
   const right = document.createElement("div");    // prompt + interactive picker
   left.appendChild(cb);
-  const onSolved = (result) => { closeModal(); solveRoom(result, h, qIndex); };
+  const onSolved = solveKeepingOpen(h, qIndex);
   const pid = PQ.attemptKey(gateKey(room.key, h.id), h, qIndex);   // per-room attempt-count key; per rung on a series slot
   right.appendChild(buildPickCard(h.pick, onSolved, pid, h));
   grid.appendChild(left); grid.appendChild(right);
@@ -4614,7 +4628,7 @@ async function deliverLoad(h) {
 const normalizeCode = s => (s || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
 function openLock(h) {
   if (viewer) resumeYaw = viewer.getYaw();   // restore facing after the door swaps in on solve
-  openModal(h.label || "Keypad", buildLockCard(h, (result) => { closeModal(); solveRoom(result, h); }), devSolveThunk(h), h);
+  openModal(h.label || "Keypad", buildLockCard(h, solveKeepingOpen(h)), devSolveThunk(h), h);
 }
 function buildLockCard(h, onSolved) {
   if (h.mode === "stones") return buildStoneLockCard(h, onSolved);
@@ -4864,7 +4878,7 @@ function buildDateLockCard(h, onSolved) {
 // aria-label, so screen readers keep words. First consumer: flat_clustering/waterfalls' reckoning frame.
 function openGrid(h) {
   if (viewer) resumeYaw = viewer.getYaw();   // restore facing after the door swaps in on solve
-  openModal(h.label || "Panel", buildGridCard(h, (result) => { closeModal(); solveRoom(result, h); }), devSolveThunk(h), h);
+  openModal(h.label || "Panel", buildGridCard(h, solveKeepingOpen(h)), devSolveThunk(h), h);
 }
 function buildGridCard(h, onSolved) {
   if (h.layout === "lowerTriangle") return buildTriangleCard(h, onSolved);
@@ -5027,7 +5041,7 @@ const ledgerLocks = new Map();          // gateKey -> Set(locked verdict keys)
 
 function openLedger(h) {
   if (viewer) resumeYaw = viewer.getYaw();
-  const lcard = buildLedgerCard(h, (result) => { closeModal(); solveRoom(result, h); },
+  const lcard = buildLedgerCard(h, solveKeepingOpen(h),
                                 { pid: gateKey(room.key, h.id), attemptCounts, locks: ledgerLocks });
   const save = () => tpSaveRoom(room);
   const fb = k => ({ label: { correct: "On the correct ledger", wrong: "On a wrong ledger",
@@ -5131,7 +5145,7 @@ function solveRoom(result, h, qIndex) {
   // `deferCard: true` on such a lock: the escape counts as finished NOW, but the card waits for the next room's
   // `finale` (armFinale); the solve carries on as an ordinary lock (its `requires` door opens). `solvedToast`
   // replaces the generic door toast.
-  if (h && h.endsEscape && !h.deferCard) return showEscapeDone();
+  if (h && h.endsEscape && !h.deferCard) { closeModal(); return showEscapeDone(); }   // hand-off: a kept-open puzzle closes
   if (h && h.endsEscape) {
     markEscapeFinished();
     if (h.solvedToast) { toast(h.solvedToast); return; }
@@ -5141,6 +5155,7 @@ function solveRoom(result, h, qIndex) {
   // the finish (mint code, then Close). Solving an escape puzzle, or a non-final analysis one,
   // falls through to the normal door prompt.
   if (graded && phaseOf(room) === "analysis" && analysisComplete()) {
+    closeModal();                                     // hand-off: a kept-open puzzle closes for the finish card
     toast("Analysis complete.");
     setTimeout(finishAnalysis, 650);
     return;
@@ -5153,6 +5168,7 @@ function solveRoom(result, h, qIndex) {
   const adv = newRung ? PQ.advanceDoor(h, room) : null;
   if (adv && isShown(adv) && doorIsOpen(adv, room)) {
     const from = room.key;
+    closeModal();                                     // hand-off: the guard below skips the door while a popup is open
     toast(h.advanceToast || "The current carries you on.");
     setTimeout(() => {
       if (room.key === from && !$("#modal").classList.contains("open") && !riding && !transiting) handleDoor(adv);

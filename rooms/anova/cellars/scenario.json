@@ -495,7 +495,7 @@
           "note": "M R1. Answer share 0.397. Prompt at step 6 (escape_room_content).",
           "starterCode": "weighing_book",
           "check": {
-            "prompt": "The Director's report on the hay trial opens with how much of the difference in hay comes down to nitrogen. Using <code>weighing_book</code>, run a one-way ANOVA of <code>hay_yield</code> on <code>nitrogen</code> and assign its <code>share</code> (the share of the variation explained) to <code>answer</code> as a number.",
+            "prompt": "The Director's report on the hay trial opens with how much of the difference in hay comes down to nitrogen. Using <code>weighing_book</code>, find the <code>share</code> of the variation in <code>hay_yield</code> that <code>nitrogen</code> explains, and assign it to <code>answer</code> as a number.",
             "requires": [
               "answer"
             ],
@@ -767,7 +767,7 @@
           "form": "check",
           "starterCode": "weighing_book",
           "check": {
-            "prompt": "The Director's report on the hay trial opens with how much of the difference in hay comes down to nitrogen. Using <code>weighing_book</code>, run a one-way ANOVA of <code>hay_yield</code> on <code>nitrogen</code> and assign its <code>share</code> (the share of the variation explained) to <code>answer</code> as a number.",
+            "prompt": "The Director's report on the hay trial opens with how much of the difference in hay comes down to nitrogen. Using <code>weighing_book</code>, find the <code>share</code> of the variation in <code>hay_yield</code> that <code>nitrogen</code> explains, and assign it to <code>answer</code> as a number.",
             "requires": [
               "answer"
             ],
@@ -933,7 +933,7 @@
           "gives": "study_key",
           "starterCode": "weighing_book",
           "check": {
-            "prompt": "The Director's draft lists the three factors in order of how much they matter for the hay. Using <code>weighing_book</code>, run a separate one-way ANOVA of <code>hay_yield</code> on each of <code>nitrogen</code>, <code>lime</code> and <code>minerals</code>, and assign the three factor names to <code>answer</code> as a character vector, in order from the largest <code>share</code> to the smallest.",
+            "prompt": "The Director's draft lists the three factors in order of how much they matter for the hay. Using <code>weighing_book</code>, rank <code>nitrogen</code>, <code>lime</code> and <code>minerals</code> by the <code>share</code> of the variation in <code>hay_yield</code> that each explains on its own, and assign the three factor names to <code>answer</code> as a character vector, largest <code>share</code> first.",
             "requires": [
               "answer"
             ],
@@ -1015,8 +1015,11 @@
             0.5046
           ],
           "boxSource": "draft:skeleton",
-          "geometry": "instruments/variance_meter/geometry.json",
-          "config": "data/switchboard.json"
+          "geometry": "instruments/variance_meter/switchboard.json",
+          "config": "data/switchboard.json",
+          "art": {
+            "board": "instruments/variance_meter/switchboard.jpg"
+          }
         },
         {
           "type": "instrument",
@@ -1039,8 +1042,11 @@
             0.7183,
             0.4415
           ],
-          "geometry": "instruments/variance_meter/geometry.json",
-          "config": "data/switchboard.json"
+          "geometry": "instruments/variance_meter/switchboard.json",
+          "config": "data/switchboard.json",
+          "art": {
+            "board": "instruments/variance_meter/switchboard.jpg"
+          }
         },
         {
           "type": "door",
@@ -1296,7 +1302,7 @@
           "gives": "study_key",
           "starterCode": "weighing_book",
           "check": {
-            "prompt": "The Director's draft lists the three factors in order of how much they matter for the hay. Using <code>weighing_book</code>, run a separate one-way ANOVA of <code>hay_yield</code> on each of <code>nitrogen</code>, <code>lime</code> and <code>minerals</code>, and assign the three factor names to <code>answer</code> as a character vector, in order from the largest <code>share</code> to the smallest.",
+            "prompt": "The Director's draft lists the three factors in order of how much they matter for the hay. Using <code>weighing_book</code>, rank <code>nitrogen</code>, <code>lime</code> and <code>minerals</code> by the <code>share</code> of the variation in <code>hay_yield</code> that each explains on its own, and assign the three factor names to <code>answer</code> as a character vector, largest <code>share</code> first.",
             "requires": [
               "answer"
             ],
@@ -1372,8 +1378,11 @@
             }
           },
           "boxSource": "moved:testplay",
-          "geometry": "instruments/variance_meter/geometry.json",
-          "config": "data/switchboard.json"
+          "geometry": "instruments/variance_meter/switchboard.json",
+          "config": "data/switchboard.json",
+          "art": {
+            "board": "instruments/variance_meter/switchboard.jpg"
+          }
         },
         {
           "id": "the_switchboard_live",
@@ -1397,9 +1406,12 @@
           },
           "boxSource": "review:copied-from-the_switchboard",
           "boxNote": "Same box as the dead board (hand-placed moved:testplay), copied at closeout 2026-11-04; the two copies are state-switched, never shown together.",
-          "geometry": "instruments/variance_meter/geometry.json",
+          "geometry": "instruments/variance_meter/switchboard.json",
           "config": "data/switchboard.json",
-          "noElement": true
+          "noElement": true,
+          "art": {
+            "board": "instruments/variance_meter/switchboard.jpg"
+          }
         },
         {
           "id": "back_to_the_drawing_room",
@@ -1928,7 +1940,7 @@
           },
           "starterCode": "weighing_book",
           "check": {
-            "prompt": "The ledger asks whether nitrogen does the same for the hay on limed and unlimed ground. Using <code>weighing_book</code>, run a two-way ANOVA of <code>hay_yield</code> on <code>nitrogen</code> and <code>lime</code> with their interaction, and assign the <code>share</code> of the interaction row to <code>answer</code> as a number.",
+            "prompt": "The ledger asks whether nitrogen does the same for the hay on limed and unlimed ground. Using <code>weighing_book</code>, find the <code>share</code> of the variation in <code>hay_yield</code> explained by the interaction between <code>nitrogen</code> and <code>lime</code>, and assign it to <code>answer</code> as a number.",
             "requires": [
               "answer"
             ],
@@ -2314,7 +2326,7 @@
           },
           "starterCode": "weighing_book",
           "check": {
-            "prompt": "The ledger asks whether nitrogen does the same for the hay on limed and unlimed ground. Using <code>weighing_book</code>, run a two-way ANOVA of <code>hay_yield</code> on <code>nitrogen</code> and <code>lime</code> with their interaction, and assign the <code>share</code> of the interaction row to <code>answer</code> as a number.",
+            "prompt": "The ledger asks whether nitrogen does the same for the hay on limed and unlimed ground. Using <code>weighing_book</code>, find the <code>share</code> of the variation in <code>hay_yield</code> explained by the interaction between <code>nitrogen</code> and <code>lime</code>, and assign it to <code>answer</code> as a number.",
             "requires": [
               "answer"
             ],
@@ -2578,7 +2590,7 @@
           },
           "starterCode": "weighing_book",
           "pick": {
-            "prompt": "A farmer writes that his meadow has never been limed, and the Director's draft would tell him that sulphate of ammonia makes the most hay. Using <code>weighing_book</code>, keep only the plots where <code>lime</code> is <code>unlimed</code>, plot the mean <code>hay_yield</code> of each <code>nitrogen</code> treatment with one mark per treatment, assign the plot to <code>p</code>, and click the treatment with the highest mean <code>hay_yield</code>.",
+            "prompt": "A farmer writes that his meadow has never been limed, and the Director's draft would tell him that sulphate of ammonia makes the most hay. Using <code>weighing_book</code> and only the plots where <code>lime</code> is <code>unlimed</code>, find which <code>nitrogen</code> treatment has the highest mean <code>hay_yield</code>: assign a plot with one mark per treatment to <code>p</code>, and click that treatment.",
             "answer": "nitrate of soda",
             "idColumn": "nitrogen",
             "idNoun": "treatment",
@@ -2824,7 +2836,7 @@
           },
           "starterCode": "weighing_book",
           "pick": {
-            "prompt": "A farmer writes that his meadow has never been limed, and the Director's draft would tell him that sulphate of ammonia makes the most hay. Using <code>weighing_book</code>, keep only the plots where <code>lime</code> is <code>unlimed</code>, plot the mean <code>hay_yield</code> of each <code>nitrogen</code> treatment with one mark per treatment, assign the plot to <code>p</code>, and click the treatment with the highest mean <code>hay_yield</code>.",
+            "prompt": "A farmer writes that his meadow has never been limed, and the Director's draft would tell him that sulphate of ammonia makes the most hay. Using <code>weighing_book</code> and only the plots where <code>lime</code> is <code>unlimed</code>, find which <code>nitrogen</code> treatment has the highest mean <code>hay_yield</code>: assign a plot with one mark per treatment to <code>p</code>, and click that treatment.",
             "answer": "nitrate of soda",
             "idColumn": "nitrogen",
             "idNoun": "treatment",
@@ -3319,7 +3331,7 @@
       "unlockedWhen": true,
       "role": "C",
       "level": 1,
-      "designNote": "C RUNG 1 among the seed bins: the botanical survey (species_count, the same 48 plots). One-way ANOVA of nitrogen; share. ANSWER 0.068 (check). Torch fades a step per solve. Not a passage room, dry (5.5 A, 10 gal/h).",
+      "designNote": "C RUNG 1 among the seed bins: the botanical survey (species_count, the same 48 plots). One-way ANOVA of nitrogen; share. ANSWER 0.068 (check). Not a passage room, dry (5.5 A, 10 gal/h).",
       "plannedHotspots": [
         {
           "type": "puzzle",
@@ -3328,7 +3340,7 @@
           "note": "C R1. Answer share 0.068.",
           "starterCode": "botanical_survey",
           "check": {
-            "prompt": "The Director's second report is about how many kinds of plant each plot of the hay trial keeps. Using <code>botanical_survey</code>, run a one-way ANOVA of <code>species_count</code> on <code>nitrogen</code> and assign its <code>share</code> (the share of the variation explained) to <code>answer</code> as a number.",
+            "prompt": "The Director's second report is about how many kinds of plant each plot of the hay trial keeps. Using <code>botanical_survey</code>, find the <code>share</code> of the variation in <code>species_count</code> that <code>nitrogen</code> explains, and assign it to <code>answer</code> as a number.",
             "requires": [
               "answer"
             ],
@@ -3587,7 +3599,7 @@
           "form": "check",
           "starterCode": "botanical_survey",
           "check": {
-            "prompt": "The Director's second report is about how many kinds of plant each plot of the hay trial keeps. Using <code>botanical_survey</code>, run a one-way ANOVA of <code>species_count</code> on <code>nitrogen</code> and assign its <code>share</code> (the share of the variation explained) to <code>answer</code> as a number.",
+            "prompt": "The Director's second report is about how many kinds of plant each plot of the hay trial keeps. Using <code>botanical_survey</code>, find the <code>share</code> of the variation in <code>species_count</code> that <code>nitrogen</code> explains, and assign it to <code>answer</code> as a number.",
             "requires": [
               "answer"
             ],
@@ -3753,7 +3765,7 @@
           },
           "starterCode": "botanical_survey",
           "check": {
-            "prompt": "The survey summary lists the three factors in order of how much they matter for the meadow's plants. Using <code>botanical_survey</code>, run a separate one-way ANOVA of <code>species_count</code> on each of <code>nitrogen</code>, <code>lime</code> and <code>minerals</code>, and assign the three factor names to <code>answer</code> as a character vector, in order from the largest <code>share</code> to the smallest.",
+            "prompt": "The survey summary lists the three factors in order of how much they matter for the meadow's plants. Using <code>botanical_survey</code>, rank <code>nitrogen</code>, <code>lime</code> and <code>minerals</code> by the <code>share</code> of the variation in <code>species_count</code> that each explains on its own, and assign the three factor names to <code>answer</code> as a character vector, largest <code>share</code> first.",
             "requires": [
               "answer"
             ],
@@ -3826,8 +3838,11 @@
             0.5342
           ],
           "boxSource": "draft:skeleton",
-          "geometry": "instruments/variance_meter/geometry.json",
-          "config": "data/switchboard.json"
+          "geometry": "instruments/variance_meter/water_board.json",
+          "config": "data/switchboard.json",
+          "art": {
+            "board": "instruments/variance_meter/water_board.jpg"
+          }
         },
         {
           "type": "door",
@@ -4072,7 +4087,7 @@
           },
           "starterCode": "botanical_survey",
           "check": {
-            "prompt": "The survey summary lists the three factors in order of how much they matter for the meadow's plants. Using <code>botanical_survey</code>, run a separate one-way ANOVA of <code>species_count</code> on each of <code>nitrogen</code>, <code>lime</code> and <code>minerals</code>, and assign the three factor names to <code>answer</code> as a character vector, in order from the largest <code>share</code> to the smallest.",
+            "prompt": "The survey summary lists the three factors in order of how much they matter for the meadow's plants. Using <code>botanical_survey</code>, rank <code>nitrogen</code>, <code>lime</code> and <code>minerals</code> by the <code>share</code> of the variation in <code>species_count</code> that each explains on its own, and assign the three factor names to <code>answer</code> as a character vector, largest <code>share</code> first.",
             "requires": [
               "answer"
             ],
@@ -4139,8 +4154,11 @@
             "utility": "gallons"
           },
           "boxSource": "draft:skeleton",
-          "geometry": "instruments/variance_meter/geometry.json",
-          "config": "data/switchboard.json"
+          "geometry": "instruments/variance_meter/water_board.json",
+          "config": "data/switchboard.json",
+          "art": {
+            "board": "instruments/variance_meter/water_board.jpg"
+          }
         },
         {
           "id": "back_to_the_seed_store",
@@ -4271,7 +4289,7 @@
           },
           "starterCode": "botanical_survey",
           "check": {
-            "prompt": "The register asks whether nitrogen does the same to the meadow's plants on limed and unlimed ground. Using <code>botanical_survey</code>, run a two-way ANOVA of <code>species_count</code> on <code>nitrogen</code> and <code>lime</code> with their interaction, and assign the <code>share</code> of the interaction row to <code>answer</code> as a number.",
+            "prompt": "The register asks whether nitrogen does the same to the meadow's plants on limed and unlimed ground. Using <code>botanical_survey</code>, find the <code>share</code> of the variation in <code>species_count</code> explained by the interaction between <code>nitrogen</code> and <code>lime</code>, and assign it to <code>answer</code> as a number.",
             "requires": [
               "answer"
             ],
@@ -4656,7 +4674,7 @@
           },
           "starterCode": "botanical_survey",
           "check": {
-            "prompt": "The register asks whether nitrogen does the same to the meadow's plants on limed and unlimed ground. Using <code>botanical_survey</code>, run a two-way ANOVA of <code>species_count</code> on <code>nitrogen</code> and <code>lime</code> with their interaction, and assign the <code>share</code> of the interaction row to <code>answer</code> as a number.",
+            "prompt": "The register asks whether nitrogen does the same to the meadow's plants on limed and unlimed ground. Using <code>botanical_survey</code>, find the <code>share</code> of the variation in <code>species_count</code> explained by the interaction between <code>nitrogen</code> and <code>lime</code>, and assign it to <code>answer</code> as a number.",
             "requires": [
               "answer"
             ],
@@ -4884,7 +4902,7 @@
           },
           "starterCode": "botanical_survey",
           "pick": {
-            "prompt": "The Director's second draft says that sulphate of ammonia ruins a meadow, because the plots given it keep the fewest kinds of plant. Using <code>botanical_survey</code>, keep only the plots where <code>lime</code> is <code>limed</code>, plot the mean <code>species_count</code> of each <code>nitrogen</code> treatment with one mark per treatment, assign the plot to <code>p</code>, and click the treatment with the highest mean <code>species_count</code>.",
+            "prompt": "The Director's second draft says that sulphate of ammonia ruins a meadow, because the plots given it keep the fewest kinds of plant. Using <code>botanical_survey</code> and only the plots where <code>lime</code> is <code>limed</code>, find which <code>nitrogen</code> treatment has the highest mean <code>species_count</code>: assign a plot with one mark per treatment to <code>p</code>, and click that treatment.",
             "answer": "sulphate of ammonia",
             "idColumn": "nitrogen",
             "idNoun": "treatment",
@@ -5110,7 +5128,7 @@
           },
           "starterCode": "botanical_survey",
           "pick": {
-            "prompt": "The Director's second draft says that sulphate of ammonia ruins a meadow, because the plots given it keep the fewest kinds of plant. Using <code>botanical_survey</code>, keep only the plots where <code>lime</code> is <code>limed</code>, plot the mean <code>species_count</code> of each <code>nitrogen</code> treatment with one mark per treatment, assign the plot to <code>p</code>, and click the treatment with the highest mean <code>species_count</code>.",
+            "prompt": "The Director's second draft says that sulphate of ammonia ruins a meadow, because the plots given it keep the fewest kinds of plant. Using <code>botanical_survey</code> and only the plots where <code>lime</code> is <code>limed</code>, find which <code>nitrogen</code> treatment has the highest mean <code>species_count</code>: assign a plot with one mark per treatment to <code>p</code>, and click that treatment.",
             "answer": "sulphate of ammonia",
             "idColumn": "nitrogen",
             "idNoun": "treatment",
