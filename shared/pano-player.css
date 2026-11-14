@@ -793,3 +793,29 @@ table.ledger { border-collapse:separate; border-spacing:4px 5px; margin:6px auto
 .mbadge:empty { display:none; }
 .matchdone .mitem { cursor:default; }
 @media (max-width:480px) { .matchgrid { gap:6px; } .mitem { font-size:16px; padding:6px 8px; } .mitem.mnum { font-size:20px; } }
+
+/* live making-change card (bathhouse's sweet stall, 2026-11-13): tap coins into a tray, tap a tray coin to take it back */
+.chgbill { display:flex; gap:10px; flex-wrap:wrap; margin:6px 0 10px; }
+.chgbill > div { flex:1; min-width:120px; padding:8px 12px; border:2px solid var(--line); border-radius:12px; text-align:center; font-size:16px; }
+.chgbill b { display:block; font-size:34px; line-height:1.1; color:var(--amber); }
+.chgcoins { display:flex; gap:14px; justify-content:center; margin:8px 0; }
+.chgcoin { width:76px; height:76px; border-radius:50%; padding:0; font-size:28px; font-weight:800; color:#3b2a06; cursor:pointer;
+           background:radial-gradient(circle at 35% 30%, #fff3b0, #e8b923 60%, #b8860b); border:3px solid #8a6508;
+           box-shadow:0 3px 0 #6b4e05; touch-action:manipulation; }
+.chgcoin:active { transform:translateY(2px); box-shadow:0 1px 0 #6b4e05; }
+.chgcoin:disabled { opacity:.45; cursor:default; }
+.chgtray { min-height:64px; display:flex; flex-wrap:wrap; gap:6px; align-items:center; padding:8px; margin:6px 0;
+           border:2px dashed var(--line); border-radius:12px; }
+.chgtray:empty::before { content:"Tap coins to put them here."; opacity:.6; font-size:15px; }
+.chgtray .chgcoin { width:48px; height:48px; font-size:18px; border-width:2px; box-shadow:none; }
+.chgsum { font-size:18px; margin:4px 0 8px; }
+.chgsum b { font-size:24px; color:var(--amber); }
+.chgbtns { display:flex; gap:10px; }
+.chgbtns button { min-height:52px; flex:1; font-size:18px; }
+
+/* live keypad card (bathhouse's lantern chest, 2026-11-13): big keys, one box per digit */
+.codeboxes { display:flex; gap:10px; justify-content:center; margin:8px 0 10px; }
+.codeboxes span { width:64px; height:72px; display:grid; place-items:center; border:3px solid var(--line); border-radius:12px;
+                  font-size:40px; font-weight:800; }
+.codepad { display:grid; grid-template-columns:repeat(3, 72px); gap:10px; justify-content:center; margin:6px 0 10px; }
+.codepad button { min-height:60px; font-size:26px; font-weight:700; padding:0; touch-action:manipulation; }

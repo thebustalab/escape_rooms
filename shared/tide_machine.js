@@ -23,7 +23,7 @@
 //                even pace to `to` (an ISO time) over `ms`, so a player can watch the whole run without cranking.
 //   m.place(shaft, pid); m.arrangement(); m.setDatum(z); m.datum(); m.setTime(iso); m.time(); m.level();
 //   m.penLevel(); m.shelf(); m.ready (Promise); m.destroy();   (also on the canvas as `canvas.tide`)
-import * as M from "./tide_model.js?v=168";
+import * as M from "./tide_model.js?v=169";
 
 const SERIF = 'Georgia, "Times New Roman", "Liberation Serif", serif';
 const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
@@ -326,10 +326,20 @@ function drawChart(c) {
       c.save(); c.font = `700 11px ${SERIF}`; c.fillStyle = 'rgba(52,26,6,0.95)'; c.textAlign = 'left'; c.textBaseline = 'bottom';
       c.fillText(`${d.d} ${MONTHS[d.mo - 1]}`, x + 2, C.y1 - 4); c.restore();
     } else {
+      c.strokeStyle = 'rgba(90,50,20,0.16)'; c.lineWidth = 0.7; c.beginPath(); c.moveTo(x, C.y0); c.lineTo(x, C.y1); c.stroke();
       c.strokeStyle = 'rgba(74,42,16,0.75)'; c.lineWidth = 0.9;
       c.beginPath(); c.moveTo(x, P.y0); c.lineTo(x, P.y0 + 5); c.moveTo(x, P.y1); c.lineTo(x, P.y1 - 5); c.stroke();
     }
   }
+  // every day's number over the middle of its column, so a date can be read straight off the chart; none in the
+  // outer two days each side, where the drum's curve crowds them together, nor under the top '+N m' label
+  c.save(); c.font = `700 9px ${SERIF}`; c.fillStyle = 'rgba(74,40,14,0.85)'; c.textAlign = 'center'; c.textBaseline = 'top';
+  const edge = 48 * PPH;
+  for (let m = tL - M.hourOfDay(tL, cfg); m <= tR; m += 24) {
+    const x = xAt(m + 12);
+    if (x > Math.max(P.x0 + edge, C.x0 + 30) && x < P.x1 - edge) c.fillText(String(M.hoursToDate(m + 12, cfg).d), x, C.y0 + 3);
+  }
+  c.restore();
   c.strokeStyle = '#a51d16'; c.lineWidth = 1.6; c.beginPath(); c.moveTo(P.x0, G.zeroY); c.lineTo(P.x1, G.zeroY); c.stroke();   // wading line
   // label at the right end, below the line: ink usually lies left of the pen
   c.save(); c.font = `italic 700 9px ${SERIF}`; c.fillStyle = 'rgba(165,29,22,0.92)'; c.textAlign = 'right'; c.textBaseline = 'top';

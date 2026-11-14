@@ -29,7 +29,7 @@
 //   fb.setAct(n); fb.cast(); fb.castMany(k); fb.throwMonster(); fb.setTest(key); fb.state();
 //   fb.ready (Promise); fb.destroy().  (The lever sprite is still required art but no act draws it now.)
 // The canvas carries the API as `canvas.fishBoard` for tests.
-import "./fish_stats.js?v=168";     // window.FishStats: the board's tests (Welch, Shapiro, Wilcox, Games-Howell, Dunn), pinned to R
+import "./fish_stats.js?v=169";     // window.FishStats: the board's tests (Welch, Shapiro, Wilcox, Games-Howell, Dunn), pinned to R
 
 const loadImg = (src) => new Promise((res) => {
   if (!src) return res(null);

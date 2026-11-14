@@ -84,31 +84,31 @@
 // A bare `./variant_resolve.js` import is NOT refreshed by bumping the <script> tag's ?v, so a changed
 // helper module (e.g. a new export) leaves browsers on a stale cached copy → "doesn't provide an export
 // named X" SyntaxError → blank page (the 2026-08-05 airship regression). Bump all three together.
-import { WebRConsole } from "./webr-console.js?v=168";
-import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers, pickTransit } from "./variant_resolve.js?v=168";   // Phase 3: per-hotspot state variants; monorail switch-door nav
-import * as PQ from "./puzzle_queue.js?v=168";   // dynamic puzzle queue: location-independent puzzle serving
-import * as CP from "./corr_panel.js?v=168";   // lower-triangle layout of the grid gate (clouds correlation panel)
-import { particleCount } from "./particles.js?v=168";
-import { mountLandingBackdrop } from "./landing_backdrop.js?v=168";   // landing text over a pan of the first room's clip   // ambient-particle vocabulary + per-kind field density
-import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=168";
-import { condHolds } from "./cond.js?v=168";
-import { gridMatches } from "./grid_check.js?v=168";   // grid answer check; `partition:true` accepts any relabelling of the buckets   // ledger + elevation-map card DOM
-import * as LIVE from "./live_session.js?v=168";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
-import * as RIDE from "./ride.js?v=168";
-import { mountPcaPlate } from "./pca_plate.js?v=168";   // the PCA plate instrument (voyage beach)
-import { mountFishBoard } from "./fish_board.js?v=168";   // the fish board instrument (harbour berth)
-import { mountDrawdown } from "./drawdown.js?v=168";
-import { mountTide } from "./tide_machine.js?v=168";   // the tide machine instrument (dunes escape)
-import { mountVarianceMeter } from "./variance_meter.js?v=168";   // the variance meter instrument (anova cellars escape)
-import { mountAnovaInstrument } from "./anova_instrument.js?v=168";   // the ANOVA instrument (Fisher's board, anova rooms; also the book, ch.12b)
-import { mountGhostLines } from "./ghost_lines.js?v=168";   // the ghost-line board instrument (regression pits hub)
+import { WebRConsole } from "./webr-console.js?v=169";
+import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers, pickTransit } from "./variant_resolve.js?v=169";   // Phase 3: per-hotspot state variants; monorail switch-door nav
+import * as PQ from "./puzzle_queue.js?v=169";   // dynamic puzzle queue: location-independent puzzle serving
+import * as CP from "./corr_panel.js?v=169";   // lower-triangle layout of the grid gate (clouds correlation panel)
+import { particleCount } from "./particles.js?v=169";
+import { mountLandingBackdrop } from "./landing_backdrop.js?v=169";   // landing text over a pan of the first room's clip   // ambient-particle vocabulary + per-kind field density
+import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=169";
+import { condHolds } from "./cond.js?v=169";
+import { gridMatches } from "./grid_check.js?v=169";   // grid answer check; `partition:true` accepts any relabelling of the buckets   // ledger + elevation-map card DOM
+import * as LIVE from "./live_session.js?v=169";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
+import * as RIDE from "./ride.js?v=169";
+import { mountPcaPlate } from "./pca_plate.js?v=169";   // the PCA plate instrument (voyage beach)
+import { mountFishBoard } from "./fish_board.js?v=169";   // the fish board instrument (harbour berth)
+import { mountDrawdown } from "./drawdown.js?v=169";
+import { mountTide } from "./tide_machine.js?v=169";   // the tide machine instrument (dunes escape)
+import { mountVarianceMeter } from "./variance_meter.js?v=169";   // the variance meter instrument (anova cellars escape)
+import { mountAnovaInstrument } from "./anova_instrument.js?v=169";   // the ANOVA instrument (Fisher's board, anova rooms; also the book, ch.12b)
+import { mountGhostLines } from "./ghost_lines.js?v=169";   // the ghost-line board instrument (regression pits hub)
    // the drawdown board instrument (diamonds escape)   // THE RIDE (subway): express lever + clip-sequence planner
-import * as BELL from "./bell_pull.js?v=168";
-import * as TCOUNT from "./transit_counter.js?v=168";   // the date plaque over a flat door transit (dunes time-skip)
-import * as DATEB from "./date_board.js?v=168";   // date lock: lock mode:"date", two slide-levers (dunes departure board)
-import * as INVY from "./inventory.js?v=168";   // carried items + the door that asks which to use (dunes)   // bell-pull (#16): dial mode:"pull" + lock mode:"state" (spa belfry)
-import { entryYaw } from "./entry_facing.js?v=168";   // face the way out on entering a room (every scenario)
-import * as HINTS from "./escape_hints.js?v=168";   // escape-phase Hint chip: time-unlocked tiers (SCENARIO.escapeHints)
+import * as BELL from "./bell_pull.js?v=169";
+import * as TCOUNT from "./transit_counter.js?v=169";   // the date plaque over a flat door transit (dunes time-skip)
+import * as DATEB from "./date_board.js?v=169";   // date lock: lock mode:"date", two slide-levers (dunes departure board)
+import * as INVY from "./inventory.js?v=169";   // carried items + the door that asks which to use (dunes)   // bell-pull (#16): dial mode:"pull" + lock mode:"state" (spa belfry)
+import { entryYaw } from "./entry_facing.js?v=169";   // face the way out on entering a room (every scenario)
+import * as HINTS from "./escape_hints.js?v=169";   // escape-phase Hint chip: time-unlocked tiers (SCENARIO.escapeHints)
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 
@@ -378,9 +378,13 @@ function init(data) {
     // Live: the class reaching its goal sets world state `liveWon`, so a hotspot variant `when:{eq:["liveWon",
     // true]}` can show the payoff in the room (bathhouse: the tub runs clean). Re-render only on a change.
     // Each filled SINK sets `liveFilled_<id>` (bathhouse: liveFilled_bath_1), so a bath can show its water.
+    // This player's own world state from the server (bathhouse's lantern chest, 2026-11-13: `chest_open` once they
+    // have opened it), so the open art shows, and survives a page refresh.
     if (liveMode()) LIVE.onState(st => {
       const won = !!(st && st.phase === "won");
       if (!!gameState.liveWon !== won) { gameState.liveWon = won; rerenderCurrentRoom(); }
+      const world = (st && st.me && st.me.world) || {};
+      if (Object.keys(world).some(k => gameState[k] !== world[k])) { Object.assign(gameState, world); rerenderCurrentRoom(); }
       markFilled((st && st.filled) || []);
       renderPuzzleLabels();                  // payouts arrive with the first poll (idempotent)
     });
@@ -4214,6 +4218,118 @@ function buildLiveMatchCard(d, onSolved) {
   return card;
 }
 
+// LIVE MAKING CHANGE (pool kind "change"; bathhouse's sweet stall, Lucas 2026-11-13). The deal carries the price, the
+// coin paid and the coins on offer, never the change. The child taps coins (1, 5, 10) into a tray, which shows them
+// and their running total; a tray coin tapped goes back. Check sends the tray as "1,1,5"; the server says whether it
+// adds up to paid - price. A wrong check keeps the tray so it can be fixed.
+const CHANGE_MAX_COINS = 30;        // live_server.MAX_CHANGE_COINS
+function buildLiveChangeCard(d, onSolved) {
+  const card = document.createElement("div"); card.className = "qcard chgcard";
+  card.innerHTML = `<div class="qprompt"></div>
+     <div class="chgbill"><div>It costs<b class="chgprice"></b></div><div>Paid with<b class="chgpaid"></b></div></div>
+     <div class="chgcoins"></div><div class="chgtray" aria-label="Your change"></div>
+     <div class="chgsum">Change in the tray: <b class="chgtotal">0</b></div>
+     <div class="qfeedback"></div>
+     <div class="chgbtns"><button type="button" class="chgclear">Clear</button><button class="qsubmit" disabled>Check</button></div>`;
+  card.querySelector(".qprompt").textContent = d.question || "";
+  card.querySelector(".chgprice").textContent = d.price;
+  card.querySelector(".chgpaid").textContent = d.paid;
+  const tray = card.querySelector(".chgtray"), totalEl = card.querySelector(".chgtotal");
+  const fb = card.querySelector(".qfeedback"), btn = card.querySelector(".qsubmit"), clear = card.querySelector(".chgclear");
+  let coins = [], done = false;
+  const adders = [];
+  const paint = () => {
+    tray.replaceChildren();
+    coins.forEach((c, i) => {
+      const b = document.createElement("button"); b.type = "button"; b.className = "chgcoin"; b.textContent = c;
+      b.setAttribute("aria-label", "Take back a " + c);
+      b.addEventListener("click", () => { if (done) return; coins.splice(i, 1); paint(); });
+      tray.appendChild(b);
+    });
+    totalEl.textContent = coins.reduce((a, c) => a + c, 0);
+    for (const a of adders) a.disabled = done || coins.length >= CHANGE_MAX_COINS;
+    clear.disabled = done || !coins.length;
+    if (!done) btn.disabled = !coins.length;
+  };
+  for (const c of d.coins || []) {
+    const b = document.createElement("button"); b.type = "button"; b.className = "chgcoin"; b.textContent = c;
+    b.setAttribute("aria-label", "Add a " + c);
+    b.addEventListener("click", () => { if (done || coins.length >= CHANGE_MAX_COINS) return; coins.push(c); paint(); });
+    adders.push(b);
+    card.querySelector(".chgcoins").appendChild(b);
+  }
+  clear.addEventListener("click", () => { if (done) return; coins = []; paint(); });
+  paint();
+  btn.addEventListener("click", async () => {
+    if (done || !coins.length) return;
+    btn.disabled = true; const label = btn.textContent; btn.textContent = "checking…";
+    try {
+      const r = await d.liveGrade(coins.join(","));
+      if (r.correct) {
+        done = true; btn.style.display = "none"; clear.style.display = "none";
+        fb.className = "qfeedback ok"; fb.textContent = r.feedback || "That's the right change.";
+        setTimeout(() => onSolved(r), 1800);
+      } else if (r.error) {
+        done = true; btn.style.display = "none"; clear.style.display = "none";
+        fb.className = "qfeedback out"; fb.textContent = r.error;
+      } else {                                  // the tray stays: fix it and check again
+        const said = r.feedback || "";
+        fb.className = "qfeedback no";
+        fb.textContent = (/^(not quite|hold on)/i.test(said) ? said : ("Not quite." + (said ? " " + said : ""))) +
+          (r.cooldown_s ? " Try again in " + r.cooldown_s + " s." : "");
+      }
+    } finally { btn.textContent = label; paint(); }
+  });
+  return card;
+}
+
+// LIVE KEYPAD (pool kind "code"; bathhouse's lantern chest, Lucas 2026-11-13). The deal says how many digits, never the
+// code; the server checks every try (unlimited, with the usual cooldown after a wrong one).
+function buildLiveCodeCard(d, onSolved) {
+  const n = Math.max(1, Math.min(4, d.digits | 0 || 2));
+  const card = document.createElement("div"); card.className = "qcard codecard";
+  card.innerHTML = `<div class="qprompt"></div><div class="codeboxes"></div><div class="codepad"></div>
+     <div class="qfeedback"></div><button class="qsubmit" disabled>Check</button>`;
+  card.querySelector(".qprompt").textContent = d.question || "";
+  const boxes = card.querySelector(".codeboxes"), fb = card.querySelector(".qfeedback"), btn = card.querySelector(".qsubmit");
+  const cells = Array.from({ length: n }, () => boxes.appendChild(document.createElement("span")));
+  let typed = "", done = false;
+  const paint = () => {
+    cells.forEach((c, i) => { c.textContent = typed[i] || ""; });
+    if (!done) btn.disabled = !typed;
+  };
+  ["1", "2", "3", "4", "5", "6", "7", "8", "9", "⌫", "0"].forEach(k => {
+    const b = document.createElement("button"); b.type = "button"; b.textContent = k;
+    if (k === "⌫") b.setAttribute("aria-label", "Rub out");
+    b.addEventListener("click", () => {
+      if (done) return;
+      typed = k === "⌫" ? typed.slice(0, -1) : (typed + k).slice(0, n);
+      paint();
+    });
+    card.querySelector(".codepad").appendChild(b);
+  });
+  paint();
+  btn.addEventListener("click", async () => {
+    if (done || !typed) return;
+    btn.disabled = true; const label = btn.textContent; btn.textContent = "checking…";
+    try {
+      const r = await d.liveGrade(typed);
+      if (r.correct) {
+        done = true; btn.style.display = "none"; card.classList.add("codedone");
+        fb.className = "qfeedback ok"; fb.textContent = r.feedback || "It opens!";
+        setTimeout(() => onSolved(r), 2200);
+      } else if (r.error) {
+        done = true; btn.style.display = "none";
+        fb.className = "qfeedback out"; fb.textContent = r.error;
+      } else {
+        fb.className = "qfeedback no";
+        fb.textContent = (r.feedback || "Not quite. Try again.") + (r.cooldown_s ? " Try again in " + r.cooldown_s + " s." : "");
+      }
+    } finally { btn.textContent = label; paint(); }
+  });
+  return card;
+}
+
 // LIVE sewing (pool kinds "stitch" and "ribbon"; bathhouse's cottage sewing table, 2026-10-26). Hands-on, still
 // server-checked: the deal carries the pattern (rows, per_row, grid) or the ribbon (length, cut, tape), never the
 // answer. STITCH: tap the cloth to sew (tap again to unpick), then key the total on the pad; sends
@@ -4386,7 +4502,11 @@ async function openStation(h) {
         const a = await LIVE.answer(d.deal_id, choice).catch(() => null);
         if (!a) return { error: "Can't reach the class session. Close this and try the station again." };
         if (!a.ok) return { error: a.j.error || "That task has expired. Close this and try the station again." };
-        if (a.j.correct && a.j.carrying) {
+        if (a.j.correct && a.j.direct) {    // the lantern chest: straight into the class total, never carried
+          const st = LIVE.state(), unit = (st && st.unit) || ["load", "loads"];   // the pool's words, else ours
+          a.j.feedback = a.j.feedback || (a.j.direct + " " + (a.j.direct === 1 ? unit[0] : unit[1]) +
+            " went straight into " + ((st && st.deliver_to) || "the total") + ".");
+        } else if (a.j.correct && a.j.carrying) {
           LIVE.noteCarrying(a.j.carrying, a.j.item);
           const st = LIVE.state();
           // A task may fill a SECOND item (bathhouse: a bath token), with its own unit, cap and destination.
@@ -4422,6 +4542,11 @@ async function openStation(h) {
   if (d.kind === "match") {                           // tap-to-pair columns, checked by the server
     if (viewer) resumeYaw = viewer.getYaw();
     return openModal(d.title || h.label, buildLiveMatchCard({ ...d, liveGrade }, () => closeModal()));
+  }
+  if (d.kind === "change" || d.kind === "code") {     // the coin tray / the keypad, checked by the server
+    if (viewer) resumeYaw = viewer.getYaw();
+    const build = d.kind === "change" ? buildLiveChangeCard : buildLiveCodeCard;
+    return openModal(d.title || h.label, build({ ...d, liveGrade }, () => closeModal()));
   }
   const isObject = d.kind === "object";
   const task = {
@@ -4607,8 +4732,13 @@ async function deliverLoad(h) {
   if (h.sink) {        // a SINK (bathhouse: a small bath), filled once with its cost in a second item
     const st = LIVE.state();
     markFilled(r.j.filled_all || []);
-    return toast("You filled " + (h.label || "it").replace(/\s*\(.*\)$/, "").toLowerCase() + "! " +
-      (r.j.phase === "won" ? "" : (st && st.total < st.goal) ? "Now keep cleaning the big tub." : ""));
+    // side quest points (2026-11-13): what this sink scored, and the running count against the threshold
+    const sk = st && (st.sinks || []).find(x => x.id === h.sink);
+    const pts = sk && sk.points && st.max_side_points > 0
+      ? "+" + sk.points + " side quest point" + (sk.points === 1 ? "" : "s") + " (" + r.j.side_points + " / " + r.j.win_points + "). " : "";
+    return toast("You filled " + (h.label || "it").replace(/\s*\(.*\)$/, "").toLowerCase() + "! " + pts +
+      (r.j.phase === "won" ? "" : (st && st.total < st.goal) ? "Now keep cleaning the big tub."
+        : pts && r.j.side_points < r.j.win_points ? "Find more side quests!" : ""));
   }
   const st = LIVE.state(), unit = (st && st.unit) || ["gourd", "gourds"];
   // In class the total is everyone's; a solo player's is their own, so it reads against the pool's goal label.

@@ -3,12 +3,13 @@
  * with a `solo` block since 2026-11-06, Harvest Home).
  *
  * A live scenario that carries `scenario.solo` can be played on its own from the public site: no class server, no
- * join code. The player picks the duration (unless the scenario is `untimed`), the goal and, where the pool has
- * counting sinks, how many to fill, and this module answers the same calls live_session.js makes of the server
+ * join code. The player picks the duration (unless the scenario is `untimed`), the goal and, where the pool's sinks
+ * score points, the side quest points to win (an older pool: how many sinks to fill), and this module answers the same calls live_session.js makes of the server
  * (state, deal, answer, deliver, backpack, skip), with the same shapes and the same rules:
- * tiers and tracks, carry caps per item (raised by a backpack), the overflow refusal, second items and sinks,
- * the two-part win, the wrong-answer cooldown, the clock, the sewing table's stitch / ribbon checks and the
- * level-3 matching cards (`match`).
+ * tiers and tracks, carry caps per item (raised by a backpack), the overflow refusal, second items and sinks
+ * (a sink may take a list of items, and scores side quest points), the two-part win, the wrong-answer cooldown,
+ * the clock, the sewing table's stitch / ribbon checks, the matching cards (`match`), making change (`change`) and
+ * the keypad (`code`, with `once` and `direct`).
  * It MIRRORS authoring_v2/live_class/live_server.py; tests/live_solo.test.mjs pins the shared rules, so a change
  * to one side should be made to both. Two things are SOLO ONLY and have no server twin: `untimed` (no clock at
  * all) and the worked answer (opt-in `reveal`: a right answer carries the task's `solution`, and the `solution` call
@@ -27,12 +28,36 @@ export const PRACTICE_NOTE = "Just for practice now: the game is over, so this o
 const MAX_SEW_LEN = 64;
 export const MATCH_PAIRS = 4;           // live_server.MATCH_PAIRS / MAX_MATCH_LEN
 export const MAX_MATCH_LEN = 120;
+export const MAX_CHANGE_COINS = 30;     // live_server.MAX_CHANGE_COINS / MAX_CHANGE_LEN / ONCE_TEXT
+export const MAX_CHANGE_LEN = 4 * MAX_CHANGE_COINS;
+export const ONCE_TEXT = "The chest is already open.";
 
 const plural = (n, unit) => `${n} ${n === 1 ? unit[0] : unit[1]}`;
 const trackOf = p => p.track || "";
 const itemOf = p => p.item || "";
 const pointsOf = p => parseInt(p.points || p.tier, 10);
 const randId = () => Math.random().toString(36).slice(2, 12);
+
+// SIDE QUEST POINTS (bathhouse, Lucas 2026-11-13; live_server.sink_items / sink_points / max_side_points): a sink's
+// item may be a list (the ofrenda: marigolds or sugar skulls, spent in that order), and a filled sink scores its
+// `points` (none, or `counts: false`, scores 0).
+export const sinkItems = s => (typeof s.item === "string" ? [s.item] : [...s.item]);
+export const sinkPoints = s => (s.counts === false ? 0 : parseInt(s.points || 0, 10));
+export const maxSidePoints = pool => (pool.sinks || []).reduce((a, s) => a + sinkPoints(s), 0);
+export const clampWinPoints = (pool, w) => Math.max(0, Math.min(maxSidePoints(pool), Math.trunc(Number(w)) || 0));
+
+// MAKING CHANGE (live_server.parse_change): the tray's coins, or null when malformed, a coin the card does not
+// offer, an empty tray or more than MAX_CHANGE_COINS.
+export function parseChange(choice, coins) {
+  if (typeof choice !== "string" || choice.length > MAX_CHANGE_LEN || !choice.trim()) return null;
+  const out = [];
+  for (const raw of choice.split(",")) {
+    const t = raw.trim();
+    if (!/^[0-9]{1,3}$/.test(t) || !coins.includes(parseInt(t, 10))) return null;
+    out.push(parseInt(t, 10));
+  }
+  return out.length <= MAX_CHANGE_COINS ? out : null;
+}
 
 export function stitchKey(counts, total) {
   return counts.filter(c => c).join(",") + "|" + total;
@@ -81,8 +106,8 @@ export function matchRight(choice, key) {
 
 export function poolPayouts(pool) {
   const rows = new Map();
-  for (const p of pool.puzzles || []) {
-    const k = JSON.stringify([p.tier, trackOf(p), itemOf(p)]), pts = pointsOf(p);
+  for (const p of pool.puzzles || []) {     // a `direct` task: what it puts straight into the total
+    const k = JSON.stringify([p.tier, trackOf(p), itemOf(p)]), pts = p.direct ? parseInt(p.direct, 10) : pointsOf(p);
     const [lo, hi] = rows.get(k) || [pts, pts];
     rows.set(k, [Math.min(lo, pts), Math.max(hi, pts)]);
   }
@@ -116,7 +141,9 @@ export function publicPuzzle(p, dealId, order, match = null) {
     const m = match || dealMatch(p);
     out.left = m.left.map(([id, text]) => ({ id, text }));
     out.right = m.right.map(([id, text]) => ({ id, text }));
-  } else if (Array.isArray(p.options) && order) {
+  } else if (out.kind === "change") Object.assign(out, { price: p.price, paid: p.paid, coins: [...p.coins] });
+  else if (out.kind === "code") out.digits = p.digits;         // how many digits to key, never the code
+  else if (Array.isArray(p.options) && order) {
     const opts = Object.fromEntries(p.options.map(o => [o.id, o]));
     out.options = order.map(id => ({ id, text: opts[id].text }));
   }
@@ -124,14 +151,16 @@ export function publicPuzzle(p, dealId, order, match = null) {
 }
 
 /*
- * new SoloSession(pool, {minutes, goal, baths, untimed, reveal}, now?) — `now` (ms) is injectable for the tests.
+ * new SoloSession(pool, {minutes, goal, sidePoints, baths, untimed, reveal}, now?) — `now` (ms) is injectable for the
+ * tests. `sidePoints`: side quest points needed to win (the setup form's field; absent, the pool's `win_points`),
+ * clamped to 0..the pool's total. `baths`: sinks to fill, for an older pool with `win_sinks`.
  * `untimed` (scenario.solo.untimed): no clock, so the game never times up and the restaurant's time is a no-op;
  * `minutes` is ignored. `reveal` (scenario.solo.reveal): right answers carry the task's `solution` and the
  * `solution` call answers; off (bathhouse), neither ever does, whatever the pool holds.
  * handle(path, body) -> {ok, status, j}, the shape live_session.js's api() returns from fetch.
  */
 export class SoloSession {
-  constructor(pool, { minutes, goal, baths, untimed, reveal }, now = () => Date.now()) {
+  constructor(pool, { minutes, goal, sidePoints, baths, untimed, reveal }, now = () => Date.now()) {
     // live_server.load_pool's rule: a carry-back pool names its drop and its unit
     if (pool.carry_back && !(typeof pool.deliver_to === "string" && pool.deliver_to.trim() &&
         Array.isArray(pool.unit) && pool.unit.length === 2)) throw new Error("solo pool: carry_back needs deliver_to and unit");
@@ -145,6 +174,7 @@ export class SoloSession {
     // a sink with `counts: false` (the temple's robe rack) never counts toward the baths to fill (live_server)
     this.counting = new Set((pool.sinks || []).filter(s => s.counts !== false).map(s => s.id));
     this.winSinks = Math.max(0, Math.min(this.counting.size, baths | 0));
+    this.winPoints = clampWinPoints(pool, sidePoints == null || sidePoints === "" ? pool.win_points || 0 : sidePoints);
     this.startedAt = now();
     this.endedAt = null;
     this.phase = "running";
@@ -154,7 +184,8 @@ export class SoloSession {
     this.feed = [];
     this.tierCounts = { 1: 0, 2: 0, 3: 0 };
     this.deal = null;                 // {id, puzzleId, order}
-    this.pl = { callsign: "You", points: 0, solved: new Set(), cooldownUntil: 0, carrying: 0, held: {}, backpack: false, links: [] };
+    this.pl = { callsign: "You", points: 0, solved: new Set(), cooldownUntil: 0, carrying: 0, held: {}, backpack: false, links: [],
+                world: {} };
   }
 
   // ---- the clock and the win (Session.tick / maybe_win) ----
@@ -166,8 +197,9 @@ export class SoloSession {
     }
   }
   sinksNeeded() { return Math.max(0, this.winSinks - this.filled.filter(id => this.counting.has(id)).length); }
+  sidePoints() { return (this.pool.sinks || []).filter(s => this.filled.includes(s.id)).reduce((a, s) => a + sinkPoints(s), 0); }
   maybeWin() {
-    if (this.total >= this.goal && !this.sinksNeeded() && this.phase === "running") {
+    if (this.total >= this.goal && !this.sinksNeeded() && this.sidePoints() >= this.winPoints && this.phase === "running") {
       this.phase = "won"; this.endedAt = this.now();
     }
   }
@@ -210,16 +242,20 @@ export class SoloSession {
       untimed: this.untimed,
       total: this.total, goal: this.goal, players: 1, feed: this.feed.slice(-8), tier_counts: { ...this.tierCounts },
       blackout: false, exp: null, filled: [...this.filled], served: [...this.served],
+      side_points: this.sidePoints(), win_points: this.winPoints,
       me: { callsign: pl.callsign, points: pl.points, solved: pl.solved.size,
             cooldown_s: Math.max(0, Math.round((pl.cooldownUntil - this.now()) / 1000)),
             carrying: pl.carrying, held: { ...pl.held }, backpack: pl.backpack, links: pl.links.map(l => [...l]),
+            world: { ...pl.world },
             caps: Object.fromEntries(["", ...Object.keys(P.items || {})].map(it => [it, this.cap(it)])), cast: false },
       goal_label: P.goal_label, unit: P.unit, carry_back: !!P.carry_back, carry_max: P.carry_max,
       deliver_to: P.deliver_to, deliver_verb: P.deliver_verb,
       items: Object.fromEntries(Object.entries(P.items || {}).map(([k, v]) =>
         [k, { unit: v.unit, carry_max: v.carry_max, deliver_to: v.deliver_to }])),
       sinks: (P.sinks || []).map(s => ({ id: s.id, label: s.label, item: s.item, cost: s.cost,
+                                         ...("points" in s ? { points: s.points } : {}),
                                          ...(s.counts === false ? { counts: false } : {}) })),
+      max_side_points: maxSidePoints(P),
       win_sinks: this.winSinks, payouts: poolPayouts(P), backpack: !!P.backpack, won_text: P.won_text || null,
       rides: P.rides || null,
       menu: P.menu ? { seconds: P.menu.seconds, dishes: P.menu.dishes.map(d => ({ track: d.track, label: d.label })) } : null,
@@ -244,18 +280,24 @@ export class SoloSession {
       const track = body.track || "";
       if (track && !this.tracks().includes(track)) return res({ error: "bad track" }, 400);
       const here = P.puzzles.filter(p => p.tier === tier && trackOf(p) === track);
+      // ONCE (the lantern chest): a `once` task solved stays done for the session, practice included
+      const onceDone = new Set(here.filter(p => p.once && pl.solved.has(p.id)).map(p => p.id));
+      if (here.length && onceDone.size === here.length) return res({ error: here[0].once_text || ONCE_TEXT, once: true }, 409);
       const dish = track ? menuDish(P, track) : null;          // the restaurant: pays time, never a carry
       if (dish && this.served.includes(track) && !practice)
         return res({ error: `The kitchen has run out of ${dish.label.toLowerCase()}.`, served: [...this.served] }, 409);
-      const carry = !!P.carry_back && !dish && !practice;
-      const itemsHere = here.length ? [...new Set(here.map(itemOf))] : [""];
+      // a `direct` task pays straight into the total, never into the arms, so caps don't apply
+      const directOnly = here.length > 0 && here.every(p => p.direct);
+      const carry = !!P.carry_back && !dish && !directOnly && !practice;
+      const carried = here.filter(p => !p.direct);
+      const itemsHere = carried.length ? [...new Set(carried.map(itemOf))] : [""];
       if (carry && itemsHere.every(it => this.carryFull(it))) {
         const it = [...itemsHere].sort()[0];
         return res({ error: this.blockText(it) || "Deliver what you're carrying first.", carrying: this.held(it) }, 409);
       }
       this.deal = null;
-      let choices = here.filter(p => !pl.solved.has(p.id) && !(carry && this.carryFull(itemOf(p))));
-      if (!choices.length && practice) choices = here;      // practice may repeat a task already solved
+      let choices = here.filter(p => !pl.solved.has(p.id) && !(carry && !p.direct && this.carryFull(itemOf(p))));
+      if (!choices.length && practice) choices = here.filter(p => !onceDone.has(p.id));   // practice may repeat a task
       if (!here.length) return res({ error: `This station has no level ${tier} tasks in this game.` }, 409);
       if (!choices.length) {
         const where = this.tracks().length ? " here — try another level or another station" : " — try another level";
@@ -263,7 +305,7 @@ export class SoloSession {
       }
       const p = choices[Math.floor(Math.random() * choices.length)];
       const cfg = this.itemCfg(itemOf(p)), cap = this.cap(itemOf(p));
-      if (cap && carry && this.held(itemOf(p)) + pointsOf(p) > cap) {
+      if (cap && carry && !p.direct && this.held(itemOf(p)) + pointsOf(p) > cap) {
         const room = cap - this.held(itemOf(p)), unit = cfg.unit || ["load", "loads"];
         return res({ error: `This one is worth ${plural(pointsOf(p), unit)} and you only have room for ${room} more. ` +
                             `Take your ${unit[1]} to ${cfg.deliver_to || "the drop-off"} first.`,
@@ -299,6 +341,14 @@ export class SoloSession {
         right = parseInt(choice, 10) === parseInt(p.answer, 10);
       } else if (kind === "match") {    // "lid=rid,..." x4: right only with all four pairs; malformed = wrong
         right = matchRight(choice, d.match);
+      } else if (kind === "change") {   // the tray's coins: right when they add up to paid - price
+        const coins = parseChange(choice, p.coins);
+        if (coins == null) return res({ error: "bad choice" }, 400);
+        right = coins.reduce((a, c) => a + c, 0) === p.paid - p.price;
+      } else if (kind === "code") {     // the keypad: up to `digits` digits
+        choice = choice.trim();
+        if (!new RegExp(`^[0-9]{1,${p.digits}}$`).test(choice)) return res({ error: "bad choice" }, 400);
+        right = parseInt(choice, 10) === parseInt(p.answer, 10);
       } else {
         if (!d.order.includes(choice)) return res({ error: "bad choice" }, 400);
         right = choice === p.answer;
@@ -331,6 +381,15 @@ export class SoloSession {
         return rightRes({ correct: true, points: 0, time_added: secs, served: [...this.served],
                        remaining_s: Math.round(this.remaining()), feedback: p.right_feedback || "Delicious!" });
       }
+      if (p.direct) {                   // the lantern chest: straight into the total, and the chest is open for good
+        const n = parseInt(p.direct, 10);
+        pl.world.chest_open = true;
+        this.total += n;
+        pl.points += n;
+        this.maybeWin();
+        return rightRes({ correct: true, points: n, direct: n, total: this.total, phase: this.phase, world: { ...pl.world },
+                          feedback: p.right_feedback || null });
+      }
       if (it) pl.held[it] = (pl.held[it] || 0) + pts; else pl.carrying += pts;
       return rightRes({ correct: true, points: pts, carrying: this.held(it), carry_full: this.carryFull(it), total: this.total,
                      ...(it ? { item: it } : {}), feedback: p.right_feedback || null });
@@ -351,18 +410,25 @@ export class SoloSession {
       if (sinkId) {
         const sink = (P.sinks || []).find(s => s.id === sinkId);
         if (!sink) return res({ error: "bad sink" }, 400);
-        const unit = this.itemCfg(sink.item).unit;
         if (this.filled.includes(sinkId)) return res({ error: `${sink.label} is already full.`, filled: [...this.filled] }, 409);
-        const have = this.held(sink.item);
-        if (have < sink.cost)
-          return res({ error: `${sink.label} needs ${plural(sink.cost, unit)} and you have ${have}. Solve more to earn ${unit[1]}.`,
+        const its = sinkItems(sink), heldNow = () => its.reduce((a, it) => a + this.held(it), 0);
+        const words = n => its.map(it => this.itemCfg(it).unit[n === 1 ? 0 : 1]).join(" or ");   // live_server.sink_words
+        const have = heldNow();
+        if (have < sink.cost)            // not enough of its items, in any mix: nothing is spent
+          return res({ error: `${sink.label} needs ${sink.cost} ${words(sink.cost)} and you have ${have}. Solve more to earn ${words(2)}.`,
                        carrying: have }, 409);
-        pl.held[sink.item] -= sink.cost;
+        let left = sink.cost;            // spent in the sink's order (the ofrenda: marigolds, then sugar skulls)
+        for (const it of its) {
+          const take = Math.min(left, this.held(it));
+          if (take) { pl.held[it] -= take; left -= take; }
+        }
         pl.points += sink.cost;
         this.filled.push(sinkId);
         this.maybeWin();
-        return res({ filled: sinkId, cost: sink.cost, carrying: this.held(sink.item), item: sink.item,
-                     filled_all: [...this.filled], total: this.total, sinks_needed: this.sinksNeeded(), phase: this.phase });
+        return res({ filled: sinkId, cost: sink.cost, carrying: heldNow(), item: sink.item,
+                     held: Object.fromEntries(its.map(it => [it, this.held(it)])),
+                     filled_all: [...this.filled], total: this.total, sinks_needed: this.sinksNeeded(),
+                     side_points: this.sidePoints(), win_points: this.winPoints, phase: this.phase });
       }
       const n = pl.carrying;
       if (!n) {

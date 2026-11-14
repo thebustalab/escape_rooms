@@ -10,7 +10,8 @@
  * What it owns:
  *   - the JOIN box on the landing screen (code → anonymous callsign; pid kept in localStorage so a
  *     refresh rejoins as the same callsign);
- *   - the HUD strip in the world: callsign, class total / goal, clock, "carrying N gourds";
+ *   - the HUD strip in the world: callsign, class total / goal, "Side quest points: X / Y" (a pool whose sinks score
+ *     points), clock, "carrying N gourds";
  *   - polling /api/state every 2 s, and the paused / won / time-up / closed overlays; a change of `round`
  *     (the console's Restart) reloads the page, which rejoins as the same callsign;
  *   - the calls step 5's station and deliver hotspots make: deal(tier, track?), answer(dealId, choice), deliver(sink?);
@@ -20,13 +21,13 @@
  * Answers never reach the browser: the server deals a task without its answer and checks every click.
  * No student data: callsigns only, never a name or x500.
  * SOLO (bathhouse 2026-10-27; generic since 2026-11-06): a scenario with `solo` played where no live server answers
- * (the public site) shows a setup form instead (minutes unless `untimed`, the goal, and sinks to fill when
- * `maxBaths` says the pool has them; labels from the `solo` block) and runs a one-player session in the browser
+ * (the public site) shows a setup form instead (minutes unless `untimed`, the goal, and the side quest points to win
+ * when `maxSidePoints` says the pool's sinks score them; labels from the `solo` block) and runs a one-player session in the browser
  * (shared/live_solo.js), answering the same calls; everything below works unchanged on top of it.
  */
 
-import "./fish_stats.js?v=168";
-import { SoloSession } from "./live_solo.js?v=168";     // window.FishStats: the fish board's tests (Welch t), pinned to R
+import "./fish_stats.js?v=169";
+import { SoloSession } from "./live_solo.js?v=169";     // window.FishStats: the fish board's tests (Welch t), pinned to R
 
 const POLL_MS = 2000;
 const STORE = "liveSession";        // localStorage: { pid, code }
@@ -46,6 +47,10 @@ async function api(path, body) {
   return { ok: r.ok, status: r.status, j };
 }
 
+// "Side quest points: 4 / 5", or "" for a pool whose sinks score no points (and so for every older scenario)
+function sideText(s) {
+  return s && s.max_side_points > 0 ? "Side quest points: " + (s.side_points || 0) + " / " + (s.win_points || 0) : "";
+}
 function plural(n, unit) {
   const u = Array.isArray(unit) && unit.length === 2 ? unit : ["point", "points"];
   return n + " " + (n === 1 ? u[0] : u[1]);
@@ -80,7 +85,8 @@ function injectStyle() {
   #liveHud .lhClock { font:700 15px ui-monospace,Menlo,Consolas,monospace; }
   #liveHud .lhClock.low { color:#ff9b8a; }
   #liveHud .lhCarry { color:#9fe7dc; }
-  #liveHud .lhCarry:empty { display:none; }
+  #liveHud .lhCarry:empty, #liveHud .lhSide:empty { display:none; }
+  #liveHud .lhSide.met { color:#9fe7a4; }
   #liveBar { width:90px; height:8px; border-radius:4px; background:rgba(255,255,255,.18); overflow:hidden; }
   #liveBar i { display:block; height:100%; width:0; background:linear-gradient(90deg,#1aa6a6,#7eeedd); }
   #liveOverlay { position:absolute; inset:0; z-index:60; display:none; align-items:center; justify-content:center;
@@ -129,29 +135,36 @@ function load() { try { return JSON.parse(localStorage.getItem(STORE) || "null")
 export const isSolo = () => !!solo;
 
 /*
- * SOLO setup (scenario.solo: {pool, minutes, goal, baths, maxBaths, untimed, reveal, intro, goalLabel, sinksLabel,
- * startLabel}; `reveal: true` turns on the worked answer, see live_solo.js): the player sets the length of the day, the goal and how many sinks to fill, then starts. The form
- * renders BEFORE the pool loads, so everything it shows comes from the `solo` block: `untimed: true` drops the
- * minutes field (no clock at all), the sinks field shows only when `maxBaths` (the pool's counting sinks) is set,
- * and the words are the block's (bathhouse names its herb bundles and baths there). Bounds keep a typo from making
- * an endless or instant game. `onSolo` lets the player turn its sound back on (a live class is silent).
+ * SOLO setup (scenario.solo: {pool, minutes, goal, sidePoints, maxSidePoints, baths, maxBaths, untimed, reveal, intro,
+ * goalLabel, sidePointsLabel, sinksLabel, startLabel}; `reveal: true` turns on the worked answer, see live_solo.js):
+ * the player sets the length of the day, the goal and the side quest points to win, then starts. The form renders
+ * BEFORE the pool loads, so everything it shows comes from the `solo` block: `untimed: true` drops the minutes field
+ * (no clock at all), the side quest points field shows only when `maxSidePoints` (the pool's total sink points) is
+ * set, starting at `sidePoints` (bathhouse, 2026-11-13); an older block's `maxBaths` (the pool's counting sinks)
+ * shows a sinks-to-fill field instead. The words are the block's. Bounds keep a typo from making an endless or
+ * instant game. `onSolo` lets the player turn its sound back on (a live class is silent).
  */
 function mountSolo(enterBtn, scenario, onSolo) {
   const cfg = scenario.solo || {};
   const untimed = cfg.untimed === true;
-  const nSinks = Number.isInteger(cfg.maxBaths) && cfg.maxBaths > 0 ? cfg.maxBaths : 0;
+  const nSide = Number.isInteger(cfg.maxSidePoints) && cfg.maxSidePoints > 0 ? cfg.maxSidePoints : 0;
+  const nSinks = !nSide && Number.isInteger(cfg.maxBaths) && cfg.maxBaths > 0 ? cfg.maxBaths : 0;
+  const sideDefault = Math.max(0, Math.min(nSide, Number.isInteger(cfg.sidePoints) ? cfg.sidePoints : 0));
   const goalLabel = cfg.goalLabel || "Goal", sinksLabel = cfg.sinksLabel || "To fill";
+  const sideLabel = cfg.sidePointsLabel || "Side quest points";
   const box = document.createElement("div");
   box.id = "liveSolo";
   box.innerHTML = `<div class="soloIntro"></div>
     <div class="row">
       ${untimed ? "" : `<label>Minutes <input id="soloMinutes" type="number" min="1" max="60" value="${Number(cfg.minutes) || 12}"></label>`}
       <label><span class="soloGoalLabel"></span> <input id="soloGoal" type="number" min="1" max="500" value="${Number(cfg.goal) || 60}"></label>
+      ${nSide ? `<label><span class="soloSideLabel"></span> <input id="soloSide" type="number" min="0" max="${nSide}" value="${sideDefault}"></label>` : ""}
       ${nSinks ? `<label><span class="soloBathsLabel"></span> <input id="soloBaths" type="number" min="0" max="${nSinks}" value="${cfg.baths != null ? Number(cfg.baths) : 1}"></label>` : ""}
     </div>
     <button id="soloGo"></button><div id="liveMsg"></div>`;
   box.querySelector(".soloIntro").textContent = cfg.intro || "Play on your own: choose your day.";
   box.querySelector(".soloGoalLabel").textContent = goalLabel;
+  if (nSide) box.querySelector(".soloSideLabel").textContent = sideLabel;
   if (nSinks) box.querySelector(".soloBathsLabel").textContent = sinksLabel;
   box.querySelector("#soloGo").textContent = cfg.startLabel || "Start my day";
   enterBtn.parentElement.insertBefore(box, enterBtn);
@@ -164,8 +177,10 @@ function mountSolo(enterBtn, scenario, onSolo) {
   $("#soloGo").onclick = async () => {
     const minutes = untimed ? null : num("#soloMinutes", 1, 60), goal = num("#soloGoal", 1, 500);
     const baths = nSinks ? num("#soloBaths", 0, nSinks) : 0;
+    const sidePoints = nSide ? num("#soloSide", 0, nSide) : undefined;   // absent: the pool's own win_points
     if (!untimed && minutes == null) return msg("Minutes: a whole number from 1 to 60.");
     if (goal == null) return msg(`${goalLabel}: a whole number from 1 to 500.`);
+    if (sidePoints === null) return msg(`${sideLabel}: a whole number from 0 to ${nSide}.`);
     if (baths == null) return msg(`${sinksLabel}: a whole number from 0 to ${nSinks}.`);
     $("#soloGo").disabled = true;
     let pool;
@@ -173,7 +188,7 @@ function mountSolo(enterBtn, scenario, onSolo) {
       const r = await fetch(cfg.pool || "solo/pool.json", { cache: "no-store" });
       pool = await r.json();
     } catch (e) { $("#soloGo").disabled = false; return msg("Couldn't load the game. Check your connection and try again."); }
-    solo = new SoloSession(pool, { minutes, goal, baths, untimed, reveal: cfg.reveal === true });
+    solo = new SoloSession(pool, { minutes, goal, sidePoints, baths, untimed, reveal: cfg.reveal === true });
     me = { pid: "solo", callsign: "You" };
     box.style.display = "none";
     if (onSolo) onSolo();
@@ -244,7 +259,7 @@ export function showHud(screen) {
     const hud = document.createElement("div");
     hud.id = "liveHud";
     hud.innerHTML = `<span class="lhMe"></span><span id="liveBar"><i></i></span><span class="lhTotal"></span>
-      <span class="lhClock"></span><span class="lhCarry"></span>`;
+      <span class="lhSide"></span><span class="lhClock"></span><span class="lhCarry"></span>`;
     screen.appendChild(hud);
     const ov = document.createElement("div");
     ov.id = "liveOverlay";
@@ -310,6 +325,10 @@ function render() {
   hud.querySelector(".lhMe").appendChild(b);
   hud.querySelector("#liveBar i").style.width = (goal ? Math.min(100, 100 * total / goal) : 0) + "%";
   hud.querySelector(".lhTotal").textContent = total + " / " + goal + (label ? " " + label : "");
+  // SIDE QUEST POINTS (2026-11-13): shown only for a pool whose sinks score them
+  const side = hud.querySelector(".lhSide"), sideLine = sideText(st);
+  side.textContent = sideLine;
+  side.classList.toggle("met", !!sideLine && (st.side_points || 0) >= (st.win_points || 0));
   // What you carry: the pool's own unit, then any second item (bathhouse: herb bundles, then bath tokens).
   const carrying = st.me ? st.me.carrying || 0 : 0, heldItems = (st.me && st.me.held) || {}, bits = [];
   if (carrying) bits.push(plural(carrying, st.unit));
@@ -327,7 +346,7 @@ function render() {
   // After the clock the stations stay open for practice (live_server.PRACTICE_PHASES), and a closed session's
   // card can be dismissed, so a stuck student can still show their puzzle after class (Lucas, 2026-10-28).
   else if (ph === "timeup") overlay("show", "Time's up", (st.solo ? "You got " : "The class got ") + total + " / " + goal + (label ? " " + label : "") +
-                                    ". You can keep practising: nothing counts now.", true);
+                                    (sideText(st) ? ". " + sideText(st) : "") + ". You can keep practicing: nothing counts now.", true);
   else if (ph === "closed") overlay("show", "Session over", "Thanks for playing.", true);
   else if (!(me && st && !st.me)) overlay("hide");
   tick();
@@ -357,18 +376,34 @@ export function onState(fn) { onChange = fn; }
 export async function deal(tier, track) {
   return api("deal", track ? { pid: me && me.pid, tier, track } : { pid: me && me.pid, tier });
 }
-export async function answer(dealId, choice) { return api("answer", { pid: me && me.pid, deal_id: dealId, choice }); }
+export async function answer(dealId, choice) {
+  const r = await api("answer", { pid: me && me.pid, deal_id: dealId, choice });
+  // a `direct` task (the lantern chest) has already gone into the total and opened this player's chest
+  if (r.ok && r.j.direct && st) {
+    st.total = r.j.total;
+    if (r.j.phase) st.phase = r.j.phase;
+    if (st.me) st.me.world = { ...(st.me.world || {}), ...(r.j.world || {}) };
+    render();
+    if (onChange) onChange(st);
+  }
+  return r;
+}
 export async function skip() { return api("skip", { pid: me && me.pid }); }
 // SOLO ONLY, the worked answer: may the open task's card offer "Show me", and fetch it. The class server has no
 // such call and its answers never carry a `solution`, so in class both are inert.
 export const canReveal = dealId => !!solo && solo.hasSolution(dealId);
 export async function solution(dealId) { return api("solution", { pid: me && me.pid, deal_id: dealId }); }
-// `sink` (optional): a sink id (bathhouse: "bath_1") spends that sink's cost of a second item to fill it.
+// `sink` (optional): a sink id (bathhouse: "bath_1") spends that sink's cost of a second item to fill it (or of
+// several: the ofrenda takes marigolds or sugar skulls, so the reply's `held` says what is left of each).
 export async function deliver(sink) {
   const r = await api("deliver", sink ? { pid: me && me.pid, sink } : { pid: me && me.pid });
   if (r.ok && st) {
     st.total = r.j.total;
-    if (sink) { st.filled = r.j.filled_all || st.filled; if (st.me) (st.me.held = st.me.held || {})[r.j.item] = r.j.carrying; }
+    if (sink) {
+      st.filled = r.j.filled_all || st.filled;
+      if (r.j.side_points != null) st.side_points = r.j.side_points;
+      if (st.me) Object.assign(st.me.held = st.me.held || {}, r.j.held || { [r.j.item]: r.j.carrying });
+    }
     else if (st.me) st.me.carrying = 0;
     render();
   }
