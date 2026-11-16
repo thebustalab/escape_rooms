@@ -8,7 +8,7 @@
   "escapeBrief": "Two players, never in the same room. The power has failed in the fog. One player is in the cellars with the water board (mechanical, so it works in the dark); the other is on the main floor with the electrical switchboard, which wakes once they restore the mains. Both boards measure the same eight rooms, each room's load on a rail, and both are the variance meter: between, noise, and the share explained, with a red line at 35%.\n\nEach board has the same eight room switches, so any grouping of the rooms can be set; the printed default groups them by wing, house against cellars. On electricity the wing clears the line (37%). On water it explains nothing (0%), while wet rooms against dry clear it (45%). Both players are right about their own board, and that is the trap: each obvious grouping is right for one utility and wrong for the building.\n\nExactly one grouping clears the line on both boards: the four rooms on the hidden service passage (library, laboratory, boiler room, archive vault), at 47% and 51%. The passage carries both the heating main and the heating cable, so those rooms draw more of both. Neither board points to it alone (15 and 17 groupings clear each line, and the passage tops neither), so the pair have to compare which groupings work on whose board. The passage door is a panel of the same eight switches; setting it to the passage rooms opens it, and that is the way out.\n\nThe echo is the interaction rung: the wing's effect depends on what you measure, and only a grouping that explains both holds.",
   "title": "Shut In",
   "subtitle": "Rothamsted Experimental Station, a foggy November morning in the late 1920s",
-  "story": "The staff have gone home for the long weekend and left the two of you to finish the report on the hay trial: forty-eight plots, each given a nitrogen dressing (none, nitrate of soda or sulphate of ammonia), lime or no lime, and minerals or none. The Director's draft rests on two averages: sulphate of ammonia makes the most hay, and sulphate of ammonia ruins a meadow. Test both. Work out how much of the difference between the plots each treatment explains, and where an average misleads.\n\nA storm blew through in the night, and near dawn it brought the power line down. The caretaker locked the cellar stair on his way out, not knowing anyone was below, and took the key. One of you is shut in the cellars with a fading flashlight and the botanical survey: how many species grow on every plot. The other is on the main floor with the weighing book: the hay cut from every plot. You can call to each other through the floors, but you cannot see each other's pages, and you will not agree on what matters most. You are both right.\n\nSomewhere in this house an old service passage joins the two floors, and nobody remembers its route. The building's switchboard and its water board can find it, but only if you read them together.",
+  "story": "The staff have gone home for the long weekend and left the two of you to finish the report on the hay trial: forty-eight plots, each given a nitrogen treatment (none, nitrate of soda, or sulphate of ammonia), lime or no lime, and minerals or none. The Director's draft rests on conclusions from two averages: sulphate of ammonia makes the most hay, and sulphate of ammonia ruins a meadow. Test both. Work out how much of the difference between the plots each treatment explains, and where an average misleads. A storm blew through in the night, and near dawn it brought the power line down. The caretaker locked the cellar stair on his way out, not knowing anyone was below, and took the key. One of you is shut in the cellars with a fading flashlight and the botanical survey: how many species grow on every plot. The other is on the main floor with the weighing book: the hay cut from every plot. You can call to each other through the floors, but you cannot see each other's pages, and you will not agree on what matters most. You are both right. Somewhere in this house an old service passage joins the two floors. The building's switchboard and its water board can find it, but only if you read them together.",
   "enterLabel": "Take your floor",
   "debrief": {
     "title": "What you did",
@@ -3298,26 +3298,23 @@
       "sfx": [
         {
           "src": "audio/stair_foot_bed_gully_lapping.mp3",
-          "volume": 0.103,
+          "volume": 0.02,
           "mode": "loop",
-          "crossfade": 4,
-          "needsReplacement": true
+          "crossfade": 4
         },
         {
           "src": "audio/stair_foot_shot_gully_drip.mp3",
-          "volume": 0.086,
+          "volume": 0.07,
           "mode": "interval",
           "gapMin": 5,
-          "gapMax": 12,
-          "needsReplacement": true
+          "gapMax": 12
         },
         {
           "src": "audio/stair_foot_shot_overhead_creak.mp3",
           "volume": 0.12,
           "mode": "interval",
           "gapMin": 25,
-          "gapMax": 50,
-          "needsReplacement": true
+          "gapMax": 50
         }
       ]
     },
@@ -3340,7 +3337,7 @@
           "note": "C R1. Answer share 0.068.",
           "starterCode": "botanical_survey",
           "check": {
-            "prompt": "The Director's second report is about how many kinds of plant each plot of the hay trial keeps. Using <code>botanical_survey</code>, find the <code>share</code> of the variation in <code>species_count</code> that <code>nitrogen</code> explains, and assign it to <code>answer</code> as a number.",
+            "prompt": "The Director's second report is about how many kinds of plant each plot of the hay trial keeps. Using botanical_survey, find the share of the variation in species_count that nitrogen explains, and assign it to answer as a number.",
             "requires": [
               "answer"
             ],
@@ -3599,7 +3596,7 @@
           "form": "check",
           "starterCode": "botanical_survey",
           "check": {
-            "prompt": "The Director's second report is about how many kinds of plant each plot of the hay trial keeps. Using <code>botanical_survey</code>, find the <code>share</code> of the variation in <code>species_count</code> that <code>nitrogen</code> explains, and assign it to <code>answer</code> as a number.",
+            "prompt": "The Director's second report is about how many kinds of plant each plot of the hay trial keeps. Using botanical_survey, find the share of the variation in species_count that nitrogen explains, and assign it to answer as a number.",
             "requires": [
               "answer"
             ],
@@ -3627,28 +3624,28 @@
           "type": "door",
           "label": "Back to the stair",
           "box": [
-            0.1802,
-            0.4468,
-            0.2002,
-            0.6382
+            0.1409,
+            0.4391,
+            0.1609,
+            0.6305
           ],
           "direction": "open",
           "to": "stair_foot",
-          "boxSource": "draft:skeleton"
+          "boxSource": "moved:testplay"
         },
         {
           "id": "through_to_the_wash_house",
           "type": "door",
           "label": "Through to the wash-house",
           "box": [
-            0.8008,
-            0.5124,
-            0.8408,
-            0.6431
+            0.8378,
+            0.4677,
+            0.8778,
+            0.5984
           ],
           "direction": "open",
           "to": "wash_house",
-          "boxSource": "draft:skeleton"
+          "boxSource": "moved:testplay"
         },
         {
           "id": "lit_wash",
@@ -3765,7 +3762,7 @@
           },
           "starterCode": "botanical_survey",
           "check": {
-            "prompt": "The survey summary lists the three factors in order of how much they matter for the meadow's plants. Using <code>botanical_survey</code>, rank <code>nitrogen</code>, <code>lime</code> and <code>minerals</code> by the <code>share</code> of the variation in <code>species_count</code> that each explains on its own, and assign the three factor names to <code>answer</code> as a character vector, largest <code>share</code> first.",
+            "prompt": "The survey summary lists the three factors in order of how much they matter for the meadow's plants. Using botanical_survey, rank nitrogen, lime and minerals by the share of the variation in species_count that each explains on its own, and assign the three factor names to answer as a character vector, largest share first.",
             "requires": [
               "answer"
             ],
@@ -4087,7 +4084,7 @@
           },
           "starterCode": "botanical_survey",
           "check": {
-            "prompt": "The survey summary lists the three factors in order of how much they matter for the meadow's plants. Using <code>botanical_survey</code>, rank <code>nitrogen</code>, <code>lime</code> and <code>minerals</code> by the <code>share</code> of the variation in <code>species_count</code> that each explains on its own, and assign the three factor names to <code>answer</code> as a character vector, largest <code>share</code> first.",
+            "prompt": "The survey summary lists the three factors in order of how much they matter for the meadow's plants. Using botanical_survey, rank nitrogen, lime and minerals by the share of the variation in species_count that each explains on its own, and assign the three factor names to answer as a character vector, largest share first.",
             "requires": [
               "answer"
             ],
@@ -4114,10 +4111,10 @@
           "type": "dial",
           "label": "The cellar circuit",
           "box": [
-            0.789,
-            0.4804,
-            0.8116,
-            0.5528
+            0.8765,
+            0.4188,
+            0.8991,
+            0.4912
           ],
           "key": "cellar_lights",
           "states": [
@@ -4132,7 +4129,7 @@
             "solved": "wash_house"
           },
           "lockedBody": "You throw the isolator. Somewhere a breaker snaps, and the dark comes straight back.",
-          "boxSource": "draft:skeleton",
+          "boxSource": "moved:testplay",
           "sfx": {
             "src": "audio/wash_house_dial_breaker_throw.mp3",
             "volume": 0.033,
@@ -4144,16 +4141,16 @@
           "type": "instrument",
           "label": "The water board",
           "box": [
-            0.5001,
-            0.4541,
-            0.5402,
-            0.5342
+            0.5376,
+            0.4096,
+            0.5777,
+            0.4897
           ],
           "kind": "variance_meter",
           "params": {
             "utility": "gallons"
           },
-          "boxSource": "draft:skeleton",
+          "boxSource": "moved:testplay",
           "geometry": "instruments/variance_meter/water_board.json",
           "config": "data/switchboard.json",
           "art": {
@@ -4165,14 +4162,14 @@
           "type": "door",
           "label": "Back to the seed store",
           "box": [
-            0.1802,
-            0.4432,
-            0.2002,
-            0.6486
+            0.156,
+            0.4155,
+            0.176,
+            0.6209
           ],
           "direction": "open",
           "to": "seed_store",
-          "boxSource": "draft:skeleton"
+          "boxSource": "moved:testplay"
         },
         {
           "id": "lit_wash",
@@ -4289,7 +4286,7 @@
           },
           "starterCode": "botanical_survey",
           "check": {
-            "prompt": "The register asks whether nitrogen does the same to the meadow's plants on limed and unlimed ground. Using <code>botanical_survey</code>, find the <code>share</code> of the variation in <code>species_count</code> explained by the interaction between <code>nitrogen</code> and <code>lime</code>, and assign it to <code>answer</code> as a number.",
+            "prompt": "It is proper to ask whether nitrogen does the same to the meadow's plants on limed and unlimed ground. Using botanical_survey, find the share of the variation in species_count explained by the interaction between nitrogen and lime, and assign it to answer as a number.",
             "requires": [
               "answer"
             ],
@@ -4674,7 +4671,7 @@
           },
           "starterCode": "botanical_survey",
           "check": {
-            "prompt": "The register asks whether nitrogen does the same to the meadow's plants on limed and unlimed ground. Using <code>botanical_survey</code>, find the <code>share</code> of the variation in <code>species_count</code> explained by the interaction between <code>nitrogen</code> and <code>lime</code>, and assign it to <code>answer</code> as a number.",
+            "prompt": "It is proper to ask whether nitrogen does the same to the meadow's plants on limed and unlimed ground. Using botanical_survey, find the share of the variation in species_count explained by the interaction between nitrogen and lime, and assign it to answer as a number.",
             "requires": [
               "answer"
             ],
@@ -4732,24 +4729,24 @@
           "type": "door",
           "label": "Through to the boiler room",
           "box": [
-            0.8206,
-            0.3978,
-            0.8407,
-            0.6715
+            0.861,
+            0.3972,
+            0.8811,
+            0.6709
           ],
           "direction": "open",
           "to": "boiler_room",
-          "boxSource": "draft:skeleton"
+          "boxSource": "moved:testplay"
         },
         {
           "id": "the_iron_box",
           "type": "grid",
           "label": "The iron box",
           "box": [
-            0.6675,
-            0.4345,
-            0.6875,
-            0.4955
+            0.7565,
+            0.4975,
+            0.7765,
+            0.5585
           ],
           "partition": true,
           "availableWhen": {
@@ -4817,7 +4814,7 @@
             "incomplete": "Every room needs its switch set first.",
             "out": ""
           },
-          "boxSource": "draft:skeleton",
+          "boxSource": "moved:testplay",
           "solveSfx": {
             "src": "audio/solve_archive_vault_the_iron_box_iron_door.mp3",
             "volume": 0.05,
@@ -4829,15 +4826,15 @@
           "type": "door",
           "label": "Through the iron door",
           "box": [
-            0.6288,
-            0.5067,
-            0.6544,
-            0.6183
+            0.715,
+            0.5169,
+            0.7406,
+            0.6285
           ],
           "direction": "open",
           "requires": "the_iron_box",
           "endsEscape": true,
-          "boxSource": "draft:skeleton",
+          "boxSource": "moved:testplay",
           "lockedBody": "The low iron door is shut fast."
         },
         {

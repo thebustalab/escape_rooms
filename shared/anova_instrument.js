@@ -334,7 +334,38 @@ const WIDE_CSS = `
 .anova-inst .aw-scroll{overflow-x:auto} .anova-inst .aw-inner{min-width:900px}
 .anova-inst.wide svg{background:none}
 .anova-inst.wide.skin-book{width:min(96vw,1700px);max-width:none;position:relative;z-index:30;box-shadow:0 0 0 1px var(--line)}
+.anova-inst .ai-qs{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 8px}
+.anova-inst .ai-q{flex:1 1 280px;border:1px solid var(--line);border-radius:8px;padding:6px 10px;color:var(--dim);font-size:15px;transition:all .2s}
+.anova-inst .ai-q b{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;font-weight:600}
+.anova-inst .ai-q.on{color:var(--ink);border-color:#f0a24a;box-shadow:0 0 8px #f0a24a66;background:rgba(240,162,74,.10)}
+.anova-inst .ai-lesson{border-left:3px solid #e2b468;padding:2px 0 4px 10px;margin:4px 0 10px;min-height:4.6em}
+.anova-inst .ai-lesson b{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#e2b468}
+.anova-inst .ai-lesson p{margin:3px 0 0;font-size:clamp(15px,1.15vw,19px);line-height:1.45}
 `;
+// The board's questions and per-step lessons (Lucas, 2026-11-14: like the other demonstration boards' Lesson
+// panel). Shown on the board skin by default (params.lessons overrides; the book's prose already teaches this).
+// config.questions [{text, steps:[...]}] and config.lessons {total,a,b,ab,noise} override the defaults below.
+function boardText(cfg, two, nameA, nameB, response) {
+  const lowA = nameA.toLowerCase(), lowB = nameB.toLowerCase(), resp = response || "the response";
+  const questions = cfg.questions || (two
+    ? [{ text: `Which matters more for ${resp}: ${lowA} or ${lowB}?`, steps: ["a", "b"] },
+       { text: `Does the effect of ${lowB} on ${resp} depend on ${lowA}?`, steps: ["ab"] }]
+    : [{ text: `How much of the variation in ${resp} does ${lowA} explain?`, steps: ["a"] }]);
+  const factor = (name, other) => `Each ${name.toLowerCase()} group's mean is set against the grand mean, once for every measurement in the group. ` +
+    `The row's share is how much of the total spread ${name.toLowerCase()} explains` +
+    (other ? `: compare it with ${other.toLowerCase()}'s share to see which matters more.` : ".") +
+    ` A factor with k groups keeps k − 1 free values.`;
+  const lessons = Object.assign({
+    start: "An ANOVA splits the spread in the measurements into parts: one for each factor, one for their interaction, and the noise left over. Press 1 to begin.",
+    total: "Read the total row first. The total spread is every measurement's squared distance from the grand mean, added up. Every other row is a slice of it, so their shares add up to 1. The grand mean speaks for one measurement, so the total keeps one free value fewer than there are measurements.",
+    a: factor(nameA),
+    b: two ? factor(nameB, nameA) : "",
+    ab: `The interaction asks whether ${lowB} does the same for every ${lowA}. Each cell's mean is set against where it would sit if ${lowB} had the same effect everywhere. ` +
+        `A large share with a small p means the effect of ${lowB} depends on ${lowA}; read this row before the two factors' rows, because a main effect alone can then mislead.`,
+    noise: "Noise is the spread left inside each cell: measurements treated alike still differ. Each row's variance is divided by the variance within groups to give F. F is evidence that a term is real; share is how big it is.",
+  }, cfg.lessons || {});
+  return { questions, lessons };
+}
 function mountWide(host, cfg, P, D, opts) {
   if (!document.getElementById("anova-inst-wide-css")) {
     const st = document.createElement("style"); st.id = "anova-inst-wide-css"; st.textContent = WIDE_CSS; document.head.appendChild(st);
@@ -376,6 +407,21 @@ function mountWide(host, cfg, P, D, opts) {
   root.querySelector(".ai-sub").textContent = cfg.subtitle ||
     `${D.N} measurements of ${cfg.response || "the response"}${cfg.unit ? " (" + cfg.unit + ")" : ""}. Press the numbered buttons in order to build the table.`;
   const svg = root.querySelector("svg");
+  const showLessons = P.lessons != null ? !!P.lessons : P.skin !== "book";
+  let qEls = [], lessonP = null;
+  const BT = boardText(cfg, two, nameA, nameB, cfg.response);
+  if (showLessons) {
+    const qs = document.createElement("div"); qs.className = "ai-qs";
+    qEls = BT.questions.map((q, i) => {
+      const d = document.createElement("div"); d.className = "ai-q";
+      const h = document.createElement("b"); h.textContent = BT.questions.length > 1 ? `Question ${i + 1}` : "The question";
+      d.append(h, document.createTextNode(q.text)); qs.appendChild(d); return d;
+    });
+    const ls = document.createElement("div"); ls.className = "ai-lesson";
+    const lh = document.createElement("b"); lh.textContent = "Lesson"; lessonP = document.createElement("p");
+    ls.append(lh, lessonP);
+    root.querySelector(".ai-sub").after(qs, ls);
+  }
   const stepName = { total: "Total", a: nameA, b: nameB, ab: "Interaction", noise: "Noise" };
   const boxes = root.querySelectorAll(".aw-btns"), btns = {};
   steps.forEach((s, i) => {
@@ -603,6 +649,10 @@ function mountWide(host, cfg, P, D, opts) {
     cur = svg; ox = 0; drawTable();
     const nxt = steps.find(k => !done.has(k));
     steps.forEach(k => { btns[k].classList.toggle("on", k === view); btns[k].classList.toggle("next", k === nxt); });
+    if (lessonP) {
+      lessonP.textContent = BT.lessons[view] || "";
+      BT.questions.forEach((q, i) => qEls[i].classList.toggle("on", (q.steps || []).includes(view)));
+    }
   }
   function show(s) {
     if (!steps.includes(s)) return;
