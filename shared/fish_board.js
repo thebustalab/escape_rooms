@@ -1,3 +1,4 @@
+// Editing this? Read _agent_reference/instruments_and_widgets.md first (beside this file; local, gitignored).
 // The fish board — an engine INSTRUMENT (hotspot `type:"instrument"`, `kind:"fish_board"`), ported
 // 2026-10-26 from the harbour prototype rooms/comparing_means/harbour/_scratch/fish_board/fish_board.js.
 //
@@ -29,7 +30,7 @@
 //   fb.setAct(n); fb.cast(); fb.castMany(k); fb.throwMonster(); fb.setTest(key); fb.state();
 //   fb.ready (Promise); fb.destroy().  (The lever sprite is still required art but no act draws it now.)
 // The canvas carries the API as `canvas.fishBoard` for tests.
-import "./fish_stats.js?v=170";     // window.FishStats: the board's tests (Welch, Shapiro, Wilcox, Games-Howell, Dunn), pinned to R
+import "./fish_stats.js?v=173";     // window.FishStats: the board's tests (Welch, Shapiro, Wilcox, Games-Howell, Dunn), pinned to R
 
 const loadImg = (src) => new Promise((res) => {
   if (!src) return res(null);

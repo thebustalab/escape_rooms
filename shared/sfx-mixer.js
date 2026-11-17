@@ -1,3 +1,4 @@
+// Editing this? Read _agent_reference/viewer_and_motion.md (Ambience engine) first (beside this file; local, gitignored).
 // Sound-mixer overlay for the test player (shared/test_play.html). Loads ONLY when window.SFX_MIXER is
 // set, so it never touches normal play. It talks to window.PanoMixer (defined in pano-player.js) and
 // shows, top-left: a room jumper, a Music slider, and one live volume slider per ACTIVE sfx layer — so

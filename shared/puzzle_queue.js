@@ -1,3 +1,4 @@
+// Editing this? Read _agent_reference/doors_and_progression.md first (beside this file; local, gitignored).
 // puzzle_queue.js — location-independent puzzle serving ("the dynamic puzzle queue").
 //
 // THE PROBLEM IT SOLVES. The normal model pins one puzzle to one room and orders them with an

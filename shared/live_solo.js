@@ -1,3 +1,4 @@
+// Editing this? Read _agent_reference/live_mode.md first (beside this file; local, gitignored).
 /*
  * live_solo.js — a ONE-PLAYER, SERVERLESS copy of the live-class session (bathhouse 2026-10-27; any live scenario
  * with a `solo` block since 2026-11-06, Harvest Home).

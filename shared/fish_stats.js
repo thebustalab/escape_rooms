@@ -1,3 +1,4 @@
+// Editing this? Read _agent_reference/instruments_and_widgets.md (fish board) and live_mode.md (class experiment card) first (beside this file; local, gitignored).
 // fish_stats.js: the statistics behind the harbour fish board (comparing-means live scenario).
 //
 // WHY: the board is a teaching demo. Every haul is a genuinely random sample and every verdict is the

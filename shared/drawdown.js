@@ -1,3 +1,4 @@
+// Editing this? Read _agent_reference/instruments_and_widgets.md first (beside this file; local, gitignored).
 // The Drawdown Board — an engine INSTRUMENT (hotspot `type:"instrument"`, `kind:"drawdown"`), ported
 // 2026-10-20 from the diamonds prototype (rooms/regression/diamonds/_scratch/drawdown_board/).
 //
@@ -15,7 +16,7 @@
 //                                         onPegs?(values), sound?, debug? });
 //   board.setPegs([...]); board.release(); board.clamp(); board.isSettled(); board.rodValueAt(i);
 //   board.olsAt(i); board.pegs(); board.released; board.ready (Promise); board.destroy();
-import { RodSim, ols } from "./drawdown_physics.js?v=170";
+import { RodSim, ols } from "./drawdown_physics.js?v=173";
 
 // Where things sit inside the peg sprite, as fractions of its height (measured from the prototype's
 // peg_k.png; the code-drawn fallback peg uses the same proportions). Geometry may override each

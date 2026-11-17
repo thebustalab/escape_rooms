@@ -1,3 +1,4 @@
+// Editing this? Read _agent_reference/webr_console.md first (beside this file; local, gitignored).
 /*
  * webr_view.js — the `view()` data viewer shared by every WebR surface.
  *

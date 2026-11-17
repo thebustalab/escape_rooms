@@ -1,3 +1,4 @@
+// Editing this? Read _agent_reference/webr_console.md first (beside this file; local, gitignored).
 /*
  * webr_reset.js — "reset session": put the R session back exactly as it booted.
  *

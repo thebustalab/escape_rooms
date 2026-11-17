@@ -1,3 +1,4 @@
+// Editing this? Read _agent_reference/instruments_and_widgets.md first (beside this file; local, gitignored).
 // The ANOVA instrument (2026-11-05, session "variance"): builds an analysis-of-variance table one row at a
 // time, each row drawn as the distances it adds up. Shared by the book (chapter 12b, imported by URL), the
 // Rothamsted rooms (engine instrument kind "anova_board") and the live ANOVA class scenario, so every
@@ -123,7 +124,22 @@ const CSS = `
 .anova-inst.narrow{padding:6px} .anova-inst.narrow table{font-size:11.5px}
 .anova-inst.narrow th small,.anova-inst.narrow td small{display:none}
 .anova-inst.narrow th,.anova-inst.narrow td{padding:4px 2px} .anova-inst.narrow th{font-size:11px}
+.anova-inst .ai-adv-row{display:flex;justify-content:flex-end;margin:6px 0 0}
+.anova-inst button.ai-adv{font-size:12px;padding:5px 9px;color:var(--dim)}
+.anova-inst.adv-off th:nth-child(3),.anova-inst.adv-off td:nth-child(3),.anova-inst.adv-off th:nth-child(4),.anova-inst.adv-off td:nth-child(4),.anova-inst.adv-off th:nth-child(5),.anova-inst.adv-off td:nth-child(5){display:none}
 `;
+
+// Free values (df), Variance and F are hidden until the reader presses "Show advanced stats" (Lucas, 2026-11-16);
+// params.advanced: true starts them shown.
+function advToggle(root, after, initial, onChange) {
+  const row = document.createElement("div"); row.className = "ai-adv-row";
+  const b = document.createElement("button"); b.type = "button"; b.className = "ai-adv";
+  let on = !!initial;
+  const sync = () => { b.textContent = on ? "Hide advanced stats" : "Show advanced stats"; b.setAttribute("aria-pressed", String(on)); root.classList.toggle("adv-off", !on); };
+  b.addEventListener("click", () => { on = !on; sync(); onChange(on); });
+  row.appendChild(b); after.after(row); sync();
+  return () => on;
+}
 
 export function mountAnovaInstrument(host, opts = {}) {
   const cfg = opts.config || {};
@@ -157,6 +173,7 @@ export function mountAnovaInstrument(host, opts = {}) {
   root.querySelector(".ai-sub").textContent = cfg.subtitle ||
     `${D.N} measurements of ${cfg.response || "the response"}${cfg.unit ? " (" + cfg.unit + ")" : ""}. Press the numbered buttons in order to build the table.`;
   const svg = root.querySelector("svg"), cap = root.querySelector(".ai-cap"), tbl = root.querySelector("table");
+  advToggle(root, root.querySelector(".ai-wrap"), P.advanced, () => {});
   const btnBox = root.querySelector(".ai-btns");
   const btns = {};
   steps.forEach((s, i) => {
@@ -353,16 +370,15 @@ function boardText(cfg, two, nameA, nameB, response) {
     : [{ text: `How much of the variation in ${resp} does ${lowA} explain?`, steps: ["a"] }]);
   const factor = (name, other) => `Each ${name.toLowerCase()} group's mean is set against the grand mean, once for every measurement in the group. ` +
     `The row's share is how much of the total spread ${name.toLowerCase()} explains` +
-    (other ? `: compare it with ${other.toLowerCase()}'s share to see which matters more.` : ".") +
-    ` A factor with k groups keeps k − 1 free values.`;
+    (other ? `: compare it with ${other.toLowerCase()}'s share to see which matters more.` : ".");
   const lessons = Object.assign({
     start: "An ANOVA splits the spread in the measurements into parts: one for each factor, one for their interaction, and the noise left over. Press 1 to begin.",
-    total: "Read the total row first. The total spread is every measurement's squared distance from the grand mean, added up. Every other row is a slice of it, so their shares add up to 1. The grand mean speaks for one measurement, so the total keeps one free value fewer than there are measurements.",
+    total: "Read the total row first. The total spread is every measurement's squared distance from the grand mean, added up. Every other row is a slice of it, so their shares add up to 1.",
     a: factor(nameA),
     b: two ? factor(nameB, nameA) : "",
     ab: `The interaction asks whether ${lowB} does the same for every ${lowA}. Each cell's mean is set against where it would sit if ${lowB} had the same effect everywhere. ` +
         `A large share with a small p means the effect of ${lowB} depends on ${lowA}; read this row before the two factors' rows, because a main effect alone can then mislead.`,
-    noise: "Noise is the spread left inside each cell: measurements treated alike still differ. Each row's variance is divided by the variance within groups to give F. F is evidence that a term is real; share is how big it is.",
+    noise: "Noise is the spread left inside each cell: measurements treated alike still differ. Every other row is judged against it: p is how often noise alone would give a row that big, so a small p means the term is real, and share says how big it is.",
   }, cfg.lessons || {});
   return { questions, lessons };
 }
@@ -381,7 +397,7 @@ function mountWide(host, cfg, P, D, opts) {
   let view = done.size ? [...done].slice(-1)[0] : "start";
 
   const VW = 1990, VH = 800, X0 = 250, X1 = 550, PT = 12, PB = 624, DX = 520;
-  const TX = 1310, TW = 650, SSX = TX + 185, DFX = TX + 275, VX = TX + 370, FX = TX + 445, PX = TX + 540, SHX = TX + 640;
+  const TX = 1310, TW = 650;
   const root = document.createElement("div");
   root.className = "anova-inst wide skin-" + P.skin;
   const pc = x => (100 * x / VW).toFixed(2) + "%";
@@ -407,6 +423,7 @@ function mountWide(host, cfg, P, D, opts) {
   root.querySelector(".ai-sub").textContent = cfg.subtitle ||
     `${D.N} measurements of ${cfg.response || "the response"}${cfg.unit ? " (" + cfg.unit + ")" : ""}. Press the numbered buttons in order to build the table.`;
   const svg = root.querySelector("svg");
+  const advOn = advToggle(root, root.querySelector(".aw-scroll"), P.advanced, () => draw());
   const showLessons = P.lessons != null ? !!P.lessons : P.skin !== "book";
   let qEls = [], lessonP = null;
   const BT = boardText(cfg, two, nameA, nameB, cfg.response);
@@ -487,13 +504,16 @@ function mountWide(host, cfg, P, D, opts) {
     return `${D.N} − 1 spoken for (grand mean)`;
   };
   function drawTable() {
-    const noiseDone = done.has("noise");
+    const noiseDone = done.has("noise"), adv = advOn();
+    const [SSX, DFX, VX, FX, PX, SHX] = adv ? [TX + 185, TX + 275, TX + 370, TX + 445, TX + 540, TX + 640]
+                                            : [TX + 260, 0, 0, 0, TX + 450, TX + 640];
     el("rect", { x: TX - 10, y: 12, width: TW + 14, height: 660, rx: 10, style: "fill:var(--card)" });
     const H = (x, y, t, sz, c) => el("text", { x, y, fill: c, "font-size": sz, "text-anchor": "end" }, t);
     const head = (x, a, b, c) => { H(x, 34, a, 13, "#aab4bf"); H(x, 49, b, 13, "#aab4bf"); H(x, 64, c, 10.5, "#7b8693"); };
-    head(SSX, "Sum of", "squares", "spread"); head(DFX, "Free", "values", "degrees of freedom");
-    head(VX, "", "Variance", "spread ÷ free values"); head(SHX, "Share", "of the total", "spread ÷ total");
-    if (noiseDone) { head(FX, "", "F", "÷ noise variance"); head(PX, "", "p", "noise alone"); }
+    head(SSX, "Sum of", "squares", "spread");
+    if (adv) { head(DFX, "Free", "values", "degrees of freedom"); head(VX, "", "Variance", "spread ÷ free values"); }
+    head(SHX, "Share", "of the total", "spread ÷ total");
+    if (noiseDone) { if (adv) head(FX, "", "F", "÷ noise variance"); head(PX, "", "p", "noise alone"); }
     D.rows.forEach(r => {
       const k = r.key, y = ROWY[k], col = ROWCOL[k], shown = done.has(k), on = view === k;
       if (on) el("rect", { x: TX - 6, y: y - 22, width: TW + 6, height: 42, rx: 6, fill: col, "fill-opacity": .18, stroke: col, "stroke-opacity": .7 });
@@ -501,24 +521,29 @@ function mountWide(host, cfg, P, D, opts) {
       el("text", { x: TX, y, fill: shown ? col : "#4a5561", "font-size": 15, "font-weight": on ? 700 : 500 }, r.label);
       if (!shown) return;
       const V = (x, t, sz) => el("text", { x, y, fill: col, "font-size": sz || 15, "font-weight": sz ? 400 : 700, "text-anchor": "end" }, t);
-      V(SSX, fmt.ss(r.ss)); V(DFX, String(r.df));
-      el("text", { x: TX, y: y + 14, fill: "#8c97a3", "font-size": 10.5 }, howText(k));
-      if (r.variance != null) V(VX, fmt.v(r.variance));
-      if (noiseDone && r.F != null) { V(FX, fmt.F(r.F)); V(PX, fmt.p(r.p)); }
-      else if (noiseDone && k === "noise") V(PX, "the yardstick", 12);
+      V(SSX, fmt.ss(r.ss));
+      if (adv) {
+        V(DFX, String(r.df));
+        el("text", { x: TX, y: y + 14, fill: "#8c97a3", "font-size": 10.5 }, howText(k));
+        if (r.variance != null) V(VX, fmt.v(r.variance));
+      }
+      if (noiseDone && r.F != null) { if (adv) V(FX, fmt.F(r.F)); V(PX, fmt.p(r.p)); }
+      else if (adv && noiseDone && k === "noise") V(PX, "the yardstick", 12);
       V(SHX, fmt.share(r.share)).setAttribute("class", "ai-share");
     });
     (two ? ["b", "ab", "noise"] : ["noise"]).forEach(k => {
       if (!done.has(k)) return;
       el("text", { x: SSX - 62, y: ROWY[k], fill: "#6b7683", "font-size": 14, "text-anchor": "end" }, "+");
-      el("text", { x: DFX - 32, y: ROWY[k], fill: "#6b7683", "font-size": 14, "text-anchor": "end" }, "+");
+      if (adv) el("text", { x: DFX - 32, y: ROWY[k], fill: "#6b7683", "font-size": 14, "text-anchor": "end" }, "+");
     });
-    const CAP = view === "noise" ? ["#4fd1c5", ["F = a row’s variance ÷ the variance within groups (noise).", "F near 1: no more spread than noise alone would give.",
+    const CAP = !adv && view === "noise" ? ["#4fd1c5", ["p = how often noise alone would give a row this much spread."]]
+      : view === "noise" ? ["#4fd1c5", ["F = a row’s variance ÷ the variance within groups (noise).", "F near 1: no more spread than noise alone would give.",
         "Large F: that term explains real spread.", "p = how often noise alone would give an F this big."]]
+      : (!adv && ["a", "b", "ab"].includes(view) ? null
       : (["a", "b"].includes(view) ? ["#aab4bf", ["Variance between groups = spread ÷ free values,", "so terms with different free values can be compared."]]
       : (view === "ab" ? ["#aab4bf", ["Variance = spread ÷ free values,", "so terms with different free values can be compared."]]
       : (view === "total" ? ["#aab4bf", ["Share of the total = a row’s spread ÷ the total spread."]]
-      : (view === "start" ? ["#aab4bf", [`Click the numbered buttons, 1 to ${steps.length}, to build the table.`]] : null))));
+      : (view === "start" ? ["#aab4bf", [`Click the numbered buttons, 1 to ${steps.length}, to build the table.`]] : null)))));
     if (CAP) CAP[1].forEach((t, i) => el("text", { x: TX, y: 600 + i * 20, fill: CAP[0], "font-size": 14, "font-weight": 700 }, t));
   }
 

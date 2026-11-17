@@ -1,3 +1,4 @@
+// Editing this? Read _agent_reference/webr_console.md first (beside this file; local, gitignored).
 /*
  * r_highlight.js — a small R tokenizer, and the syntax highlighting built on it.
  *

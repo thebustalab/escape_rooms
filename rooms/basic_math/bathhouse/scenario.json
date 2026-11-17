@@ -4524,7 +4524,7 @@
       "title": "The lake train",
       "built": true,
       "unlockedWhen": true,
-      "designNote": "Station (LEVEL 3, 3 herb bundles): the basket on the seat. THE LINE SWITCH (dial train_line: lake / lonely / soggy / festival, back and forth; 2026-10-25, the festival 2026-11-11) sets where the one carriage door leads: the lake station, the lonely station, Soggy Bottom or the festival. TICKETS (2026-10-28): the switch is a `ride` dial: a ride between two stops not yet linked spends a train ticket and links them for good (pool `rides`).",
+      "designNote": "Station (LEVEL 3, 3 herb bundles): the basket on the seat. THE LINE SWITCH (dial train_line: lake / lonely / soggy / festival / docks, back and forth; 2026-10-25, the festival 2026-11-11, the docks 2026-11-16) sets where the one carriage door leads: the lake station, the lonely station, Soggy Bottom, the festival or the docks. TICKETS (2026-10-28): the switch is a `ride` dial: a ride between two stops not yet linked spends a train ticket and links them for good (pool `rides`).",
       "plannedHotspots": [
         {
           "type": "door",
@@ -4563,6 +4563,17 @@
                 ]
               },
               "to": "festival",
+              "direction": "back"
+            },
+            {
+              "state": "to_docks",
+              "when": {
+                "eq": [
+                  "train_line",
+                  "docks"
+                ]
+              },
+              "to": "docks_station",
               "direction": "back"
             }
           ],
@@ -4613,6 +4624,11 @@
               "value": "festival",
               "label": "The festival",
               "toast": "The train rolls into the festival, glowing with candles."
+            },
+            {
+              "value": "docks",
+              "label": "The docks",
+              "toast": "The train rolls down to the docks, where the lake meets the sea."
             }
           ],
           "hint": "Throw the switch to ride to another stop, then step out of the door. A new ride takes a train ticket; after that you can ride between those two stops for free.",
@@ -4678,6 +4694,17 @@
                       ]
                     },
                     "to": "festival",
+                    "direction": "back"
+                  },
+                  {
+                    "state": "to_docks",
+                    "when": {
+                      "eq": [
+                        "train_line",
+                        "docks"
+                      ]
+                    },
+                    "to": "docks_station",
                     "direction": "back"
                   }
                 ]
@@ -4757,6 +4784,19 @@
                 }
               },
               "constraints": "Inside the carriage nothing changes: the seats, the basket, the brass lever, the lamps, the racks, the floor and the door frame stay exactly as they are. No people, no text, no letters or numbers on the banners.",
+              "stillOnly": true
+            },
+            "at_docks": {
+              "change": "what is seen OUTSIDE, through the windows and the open door",
+              "elements": {
+                "windows": {
+                  "desc": "through every carriage window, a great old seaport at dusk: tall brick warehouses, stacked crates and barrels, and the towering masts and great cream sails of a colossal wooden ship rising over the rooftops, a red-and-gold flag at the top; no bathhouse, no mist"
+                },
+                "door_out": {
+                  "desc": "through the open carriage door, a sturdy stone platform with a stack of wooden crates and a woven basket, a wide stone archway beyond it and a ship's masts rising behind; no bathhouse, no bridge, no red railings"
+                }
+              },
+              "constraints": "Inside the carriage nothing changes: the seats, the basket, the brass lever, the lamps, the racks, the floor and the door frame stay exactly as they are. No people, no text.",
               "stillOnly": true
             }
           },
@@ -4899,6 +4939,17 @@
               },
               "to": "festival",
               "direction": "back"
+            },
+            {
+              "state": "to_docks",
+              "when": {
+                "eq": [
+                  "train_line",
+                  "docks"
+                ]
+              },
+              "to": "docks_station",
+              "direction": "back"
             }
           ]
         },
@@ -4940,6 +4991,11 @@
               "value": "festival",
               "label": "The festival",
               "toast": "The train rolls into the festival, glowing with candles."
+            },
+            {
+              "value": "docks",
+              "label": "The docks",
+              "toast": "The train rolls down to the docks, where the lake meets the sea."
             }
           ],
           "hint": "Throw the switch to ride to another stop, then step out of the door. A new ride takes a train ticket; after that you can ride between those two stops for free.",
@@ -5016,6 +5072,23 @@
                   "festival"
                 ]
               }
+            },
+            {
+              "state": "at_docks",
+              "box": [
+                0,
+                0,
+                1,
+                1
+              ],
+              "prompt": "Keep this exact scene, composition, camera framing and every object precisely where it is, and change ONLY what is seen OUTSIDE, through the windows and the open door: Through the open carriage door, a sturdy stone platform with a stack of wooden crates and a woven basket, a wide stone archway beyond it and a ship's masts rising behind; no bathhouse, no bridge, no red railings. Through every carriage window, a great old seaport at dusk: tall brick warehouses, stacked crates and barrels, and the towering masts and great cream sails of a colossal wooden ship rising over the rooftops, a red-and-gold flag at the top; no bathhouse, no mist. Inside the carriage nothing changes: the seats, the basket, the brass lever, the lamps, the racks, the floor and the door frame stay exactly as they are. No people, no text.",
+              "panorama": "train/scene_at_docks.png",
+              "when": {
+                "eq": [
+                  "train_line",
+                  "docks"
+                ]
+              }
             }
           ]
         }
@@ -5026,7 +5099,7 @@
       "title": "The balcony room",
       "built": true,
       "unlockedWhen": true,
-      "designNote": "Station (LEVEL 2, 2 herb bundles): the gold dish by the window. A lost blue lantern (a note, 2026-11-13). Back into the owner's office only.",
+      "designNote": "Station (LEVEL 2, 2 herb bundles): the gold dish by the window. A lost blue lantern (a note, 2026-11-13). Doors: back into the owner's office, and (2026-11-16) out of the open window, flying up into the sky.",
       "plannedHotspots": [
         {
           "type": "door",
@@ -5038,6 +5111,20 @@
             0.15,
             0.225,
             0.62
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "to": "sky",
+          "label": "Fly out of the window",
+          "fly": true,
+          "box": [
+            0.44,
+            0.2,
+            0.56,
+            0.6
           ],
           "boxSource": "moved:agent"
         },
@@ -5100,6 +5187,12 @@
             {
               "id": "open_windows",
               "at": "dead ahead in the centre",
+              "label": "Fly out of the window",
+              "door": {
+                "direction": "open",
+                "to": "sky",
+                "fly": true
+              },
               "desc": "a wall of tall panelled windows, dark wooden frames with many small square panes, their casements flung wide OPEN outward over a dizzying drop; through them the vast still lake far, far below, mirror-smooth, a thin line of rails across it, the violet dusk sky all around"
             },
             {
@@ -5203,7 +5296,7 @@
         },
         "boxesFrom": {
           "art": "0765c1443b1c",
-          "at": "2026-11-13T19:48:20"
+          "at": "2026-11-16T20:08:36"
         }
       },
       "mapPos": {
@@ -5258,6 +5351,21 @@
             0.44,
             0.773,
             0.55
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "fly_out_of_the_window",
+          "type": "door",
+          "label": "Fly out of the window",
+          "direction": "open",
+          "to": "sky",
+          "fly": true,
+          "box": [
+            0.44,
+            0.2,
+            0.56,
+            0.6
           ],
           "boxSource": "moved:agent"
         }
@@ -11624,6 +11732,1052 @@
           ],
           "tier": 3,
           "track": "skull",
+          "boxSource": "moved:agent"
+        }
+      ]
+    },
+    {
+      "key": "sky",
+      "title": "High above the bathhouse",
+      "built": true,
+      "unlockedWhen": true,
+      "designNote": "Out of the balcony room's open window and into the sky (Lucas, 2026-11-16). No station. Flights down (one way, `fly`) to every train stop: the lake station, the lonely station, Soggy Bottom, the festival and the docks; and back in through the balcony window.",
+      "plannedHotspots": [
+        {
+          "type": "door",
+          "direction": "open",
+          "to": "soggy",
+          "label": "Fly down to Soggy Bottom",
+          "oneWay": true,
+          "fly": true,
+          "box": [
+            0.07,
+            0.64,
+            0.2,
+            0.9
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "to": "lonely",
+          "label": "Fly down to the lonely station",
+          "oneWay": true,
+          "fly": true,
+          "box": [
+            0.175,
+            0.54,
+            0.24,
+            0.66
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "to": "platform",
+          "label": "Fly down to the lake station",
+          "oneWay": true,
+          "fly": true,
+          "box": [
+            0.33,
+            0.52,
+            0.44,
+            0.67
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "to": "docks_station",
+          "label": "Fly down to the docks",
+          "oneWay": true,
+          "fly": true,
+          "box": [
+            0.47,
+            0.28,
+            0.6,
+            0.52
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "to": "festival",
+          "label": "Fly down to the festival",
+          "oneWay": true,
+          "fly": true,
+          "box": [
+            0.6,
+            0.47,
+            0.76,
+            0.72
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "door",
+          "direction": "back",
+          "to": "balcony",
+          "label": "Fly back in through the window",
+          "fly": true,
+          "box": [
+            0.8,
+            0.34,
+            0.94,
+            0.7
+          ],
+          "boxSource": "moved:agent"
+        }
+      ],
+      "authoring": {
+        "sceneSpec": {
+          "room": "sky",
+          "setting": "hanging in the open evening sky high above a vast still shallow lake, as if flying like a bird, looking out level toward the horizon with the whole world spread out far, far below: the colossal spirit bathhouse on its cliff, a thin railway line running out across the shining water to little stops, and soft rose-lit clouds drifting around at eye level",
+          "interior": false,
+          "indoor": false,
+          "seam": "open violet dusk sky with soft rose-lit clouds at eye level, calm and even, nothing below but haze",
+          "seamOccluder": "a tall soft column of drifting cloud",
+          "elements": [
+            {
+              "id": "seam_left",
+              "at": "on the far left",
+              "desc": "the left half of the calm view directly behind the viewer: open violet dusk sky with soft rose-lit clouds at eye level, calm and even, nothing below but haze, joining its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "fly_soggy",
+              "at": "on the far left",
+              "label": "Fly down to Soggy Bottom",
+              "door": {
+                "direction": "open",
+                "to": "soggy",
+                "oneWay": true,
+                "fly": true
+              },
+              "desc": "far below, a dusky green marsh of reeds and lily pads where the railway line ends at a buffer stop, a little mossy cottage with round warm-glowing windows beside it, fireflies glinting"
+            },
+            {
+              "id": "fly_lonely",
+              "at": "to the left",
+              "label": "Fly down to the lonely station",
+              "door": {
+                "direction": "open",
+                "to": "lonely",
+                "oneWay": true,
+                "fly": true
+              },
+              "desc": "far below on the open lake, a tiny lonely railway halt wrapped in a patch of thick white mist, one dim round lamp glowing on its little platform, the thin rails running through it"
+            },
+            {
+              "id": "fly_lake",
+              "at": "just left of centre",
+              "label": "Fly down to the lake station",
+              "door": {
+                "direction": "open",
+                "to": "platform",
+                "oneWay": true,
+                "fly": true
+              },
+              "desc": "far below at the foot of a tall cliff, a small wooden railway platform at the water's edge with a tiny red-and-cream train waiting on its rails, a zigzag wooden stair climbing the cliff above it"
+            },
+            {
+              "id": "fly_docks",
+              "at": "dead ahead in the centre",
+              "label": "Fly down to the docks",
+              "door": {
+                "direction": "open",
+                "to": "docks_station",
+                "oneWay": true,
+                "fly": true
+              },
+              "desc": "far off where the lake opens into the wide sea, a great old seaport of stone wharves and warehouses, and moored at its quay a colossal wooden sailing ship with towering masts and great cream sails, a long red-and-gold flag at its top; the thin railway line runs right down to the port"
+            },
+            {
+              "id": "fly_festival",
+              "at": "just right of centre",
+              "label": "Fly down to the festival",
+              "door": {
+                "direction": "open",
+                "to": "festival",
+                "oneWay": true,
+                "fly": true
+              },
+              "desc": "far below on the lake shore, a little town of low houses painted pink, blue and yellow, glowing orange with hundreds of candles and paper lanterns, the railway line running past it"
+            },
+            {
+              "id": "window_back",
+              "at": "to the right",
+              "label": "Fly back in through the window",
+              "door": {
+                "direction": "back",
+                "to": "balcony",
+                "fly": true
+              },
+              "desc": "close by and a little below, the very top storey of the colossal spirit bathhouse, its curved green roofs and red pillars glowing with lanterns, and one small glassed-in balcony room with its tall windows flung wide open, warm light spilling out"
+            },
+            {
+              "id": "seam_right",
+              "at": "on the far right",
+              "desc": "the right half of the calm view directly behind the viewer: open violet dusk sky with soft rose-lit clouds at eye level, calm and even, nothing below but haze, joining its other half cleanly at the seam directly behind you"
+            }
+          ],
+          "soundBed": "high in the open sky: a soft rushing wind, the faint cry of a gull, the world hushed far below.",
+          "rigid": "the bathhouse and its open balcony window, the railway stops, the seaport and its ship, the town, the marsh",
+          "atmosphere": "breathtaking, free and magical, the whole glowing world spread out far below at dusk",
+          "styleLight": "early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red",
+          "negatives": "No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. The viewer floats in open air: no balloon, no basket, no ropes, no wings, no aircraft, no railing, no ground under the viewer. ONE big ship only, at the seaport; ONE bathhouse.",
+          "states": {},
+          "continuity": [],
+          "noJoins": "the camera hangs in open sky high above the world; nothing to walk to, every way out is a flight",
+          "stillOnly": true
+        },
+        "plateRefs": [
+          "balloon/scene_aloft.png"
+        ],
+        "scenePrompt": "This is a seamless 360-degree panorama from hanging in the open evening sky high above a vast still shallow lake, as if flying like a bird, looking out level toward the horizon with the whole world spread out far, far below: the colossal spirit bathhouse on its cliff, a thin railway line running out across the shining water to little stops, and soft rose-lit clouds drifting around at eye level. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is open violet dusk sky with soft rose-lit clouds at eye level, calm and even, nothing below but haze: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: open violet dusk sky with soft rose-lit clouds at eye level, calm and even, nothing below but haze, joining its other half cleanly at the seam directly behind you; on the far left, far below, a dusky green marsh of reeds and lily pads where the railway line ends at a buffer stop, a little mossy cottage with round warm-glowing windows beside it, fireflies glinting; to the left, far below on the open lake, a tiny lonely railway halt wrapped in a patch of thick white mist, one dim round lamp glowing on its little platform, the thin rails running through it; just left of centre, far below at the foot of a tall cliff, a small wooden railway platform at the water's edge with a tiny red-and-cream train waiting on its rails, a zigzag wooden stair climbing the cliff above it; dead ahead in the centre, far off where the lake opens into the wide sea, a great old seaport of stone wharves and warehouses, and moored at its quay a colossal wooden sailing ship with towering masts and great cream sails, a long red-and-gold flag at its top; the thin railway line runs right down to the port; just right of centre, far below on the lake shore, a little town of low houses painted pink, blue and yellow, glowing orange with hundreds of candles and paper lanterns, the railway line running past it; to the right, close by and a little below, the very top storey of the colossal spirit bathhouse, its curved green roofs and red pillars glowing with lanterns, and one small glassed-in balcony room with its tall windows flung wide open, warm light spilling out; on the far right, the right half of the calm view directly behind the viewer: open violet dusk sky with soft rose-lit clouds at eye level, calm and even, nothing below but haze, joining its other half cleanly at the seam directly behind you. breathtaking, free and magical, the whole glowing world spread out far below at dusk. No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. The viewer floats in open air: no balloon, no basket, no ropes, no wings, no aircraft, no railing, no ground under the viewer. ONE big ship only, at the seaport; ONE bathhouse. Shot on a full-frame DSLR at 24mm, f/8, early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into open violet dusk sky with soft rose-lit clouds at eye level, calm and even, nothing below but haze, with no visible seam, join, or repetition.",
+        "seam": {
+          "stage": "screened",
+          "band": "sky",
+          "ratio": 6.9,
+          "delta": 3.12,
+          "needsWork": false,
+          "accepted": false,
+          "seamBandRun": 0.018,
+          "seamStepRatio": 0.0,
+          "at": "2026-11-16T19:55:52"
+        },
+        "boxesFrom": {
+          "art": "b3d85fd6454c",
+          "at": "2026-11-16T20:08:36"
+        }
+      },
+      "mapPos": {
+        "c": 4,
+        "r": 0
+      },
+      "panorama": "sky/scene.png",
+      "builtFrom": "l1_sky_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "hotspots": [
+        {
+          "id": "fly_down_to_soggy_bottom",
+          "type": "door",
+          "label": "Fly down to Soggy Bottom",
+          "box": [
+            0.07,
+            0.64,
+            0.2,
+            0.9
+          ],
+          "direction": "open",
+          "to": "soggy",
+          "oneWay": true,
+          "fly": true,
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "fly_down_to_the_lonely_station",
+          "type": "door",
+          "label": "Fly down to the lonely station",
+          "box": [
+            0.175,
+            0.54,
+            0.24,
+            0.66
+          ],
+          "direction": "open",
+          "to": "lonely",
+          "oneWay": true,
+          "fly": true,
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "fly_down_to_the_lake_station",
+          "type": "door",
+          "label": "Fly down to the lake station",
+          "box": [
+            0.33,
+            0.52,
+            0.44,
+            0.67
+          ],
+          "direction": "open",
+          "to": "platform",
+          "oneWay": true,
+          "fly": true,
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "fly_down_to_the_docks",
+          "type": "door",
+          "label": "Fly down to the docks",
+          "box": [
+            0.47,
+            0.28,
+            0.6,
+            0.52
+          ],
+          "direction": "open",
+          "to": "docks_station",
+          "oneWay": true,
+          "fly": true,
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "fly_down_to_the_festival",
+          "type": "door",
+          "label": "Fly down to the festival",
+          "box": [
+            0.6,
+            0.47,
+            0.76,
+            0.72
+          ],
+          "direction": "open",
+          "to": "festival",
+          "oneWay": true,
+          "fly": true,
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "fly_back_in_through_the_window",
+          "type": "door",
+          "label": "Fly back in through the window",
+          "box": [
+            0.8,
+            0.34,
+            0.94,
+            0.7
+          ],
+          "direction": "back",
+          "to": "balcony",
+          "fly": true,
+          "boxSource": "moved:agent"
+        }
+      ]
+    },
+    {
+      "key": "docks_station",
+      "title": "The docks station",
+      "built": true,
+      "unlockedWhen": true,
+      "designNote": "The train's fifth stop (2026-11-16). Station (LEVEL 3, track docks, 3 herb bundles): the basket on the crates. No ticket window (like Soggy Bottom and the festival). Doors: back onto the train (line switch on 'docks'), out through the arch to the harbor.",
+      "plannedHotspots": [
+        {
+          "type": "door",
+          "direction": "open",
+          "to": "train",
+          "label": "Back onto the train",
+          "box": [
+            0.17,
+            0.3,
+            0.25,
+            0.71
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "station",
+          "tier": 3,
+          "label": "The basket on the crates",
+          "track": "docks",
+          "box": [
+            0.3,
+            0.5,
+            0.42,
+            0.86
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "to": "harbor",
+          "label": "Out to the harbor",
+          "box": [
+            0.44,
+            0.14,
+            0.56,
+            0.56
+          ],
+          "boxSource": "moved:agent"
+        }
+      ],
+      "authoring": {
+        "sceneSpec": {
+          "room": "docks_station",
+          "setting": "a sturdy stone-and-timber railway platform at dusk at the edge of a great old seaport, where a vast still shallow lake opens into the wide sea; tall warehouses of brick and timber, stacked crates and barrels, and the masts of ships rising beyond the rooftops",
+          "interior": false,
+          "indoor": false,
+          "seam": "a plain stretch of weathered brick warehouse wall, uniform and unbroken",
+          "seamOccluder": "a tall iron lamp post with a glowing lantern",
+          "elements": [
+            {
+              "id": "seam_left",
+              "at": "on the far left",
+              "desc": "the left half of the calm view directly behind the viewer: a plain stretch of weathered brick warehouse wall, uniform and unbroken, joining its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "train_door",
+              "at": "to the left",
+              "label": "Back onto the train",
+              "door": {
+                "direction": "open",
+                "to": "train"
+              },
+              "desc": "in the IMMEDIATE FOREGROUND at the viewer's feet, the platform's square plank edge, and just beyond it ONE single pair of steel rails lying in a few centimetres of clear shallow water, running dead straight along that edge; the old-fashioned single-carriage train, deep red and cream with gold lines, stands squarely ON that pair of rails, its wheels in the water on the rails, its floor level with the platform so you could step straight across, its door standing open toward the viewer with warm light inside. THE RAILS UNDER THE TRAIN ARE THE SAME RAILS THAT COME IN ACROSS THE SHINING LAKE BEHIND IT and END a little way past its front at a sturdy wooden buffer stop: one unbroken pair you could follow with your eye from under its wheels, never a second set of rails"
+            },
+            {
+              "id": "crate_basket",
+              "at": "just left of centre",
+              "label": "The basket on the crates",
+              "station": 3,
+              "track": "docks",
+              "desc": "a stack of big wooden shipping crates bound with rope beside a coil of thick hemp rope, and on top of the crates a woven basket of herb bundles tied with red string"
+            },
+            {
+              "id": "harbor_arch",
+              "at": "dead ahead in the centre",
+              "label": "Out to the harbor",
+              "door": {
+                "direction": "open",
+                "to": "harbor"
+              },
+              "desc": "at the platform's end, a wide open stone archway, the paving running level out through it onto a broad wharf, and beyond it the towering masts and great cream sails of a colossal ship rising high over the rooftops, a long red-and-gold flag streaming from the top"
+            },
+            {
+              "id": "bell_hut",
+              "at": "just right of centre",
+              "desc": "a little wooden harbor-master's hut with a round window, a shiny brass ship's bell hanging by its door, lanterns glowing"
+            },
+            {
+              "id": "warehouses",
+              "at": "to the right",
+              "desc": "tall brick warehouses with big wooden doors, a stack of barrels and a handcart of sacks in front"
+            },
+            {
+              "id": "seam_right",
+              "at": "on the far right",
+              "desc": "the right half of the calm view directly behind the viewer: a plain stretch of weathered brick warehouse wall, uniform and unbroken, joining its other half cleanly at the seam directly behind you"
+            }
+          ],
+          "soundBed": "a seaport station at dusk: gulls calling, ropes creaking, waves slapping the quay, the train ticking at the buffer.",
+          "rigid": "the platform, the train on its rails and the buffer stop, the crates and basket, the stone arch, the hut and bell, the warehouses",
+          "atmosphere": "salty, bustling and grand, warm lamplight against the violet dusk, the promise of the open sea",
+          "styleLight": "early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red",
+          "negatives": "No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. ONE train standing ON its rails, never on the planks or the boardwalk; ONE single pair of rails in the whole view, the same pair under the train; no second track beside or past it; no overhead wires. The platform is EMPTY of people; no writing on the crates, barrels or sacks.",
+          "states": {},
+          "continuity": [],
+          "scaffold": {
+            "kind": "skeleton",
+            "layout": {
+              "surface": "court",
+              "word": "platform",
+              "floor": "stone platform",
+              "size": [
+                3,
+                3,
+                6,
+                3
+              ],
+              "sides": {
+                "left": "water",
+                "right": "houses",
+                "front": "houses",
+                "back": "houses"
+              },
+              "parts": [
+                [
+                  "door",
+                  "train_door",
+                  {
+                    "w": 1.0,
+                    "h": 2.0,
+                    "say": "the open carriage door, its step level with the platform"
+                  }
+                ],
+                [
+                  "prop",
+                  "crate_basket",
+                  {
+                    "size": [
+                      1.4,
+                      1.0,
+                      1.2
+                    ]
+                  }
+                ],
+                [
+                  "door",
+                  "harbor_arch",
+                  {
+                    "w": 2.4,
+                    "h": 3.0,
+                    "say": "the wide open stone archway, the paving running level out through it"
+                  }
+                ]
+              ]
+            }
+          },
+          "stillOnly": true
+        },
+        "plateRefs": [
+          "atrium/scene.png"
+        ],
+        "scenePrompt": "This is a seamless 360-degree panorama from a sturdy stone-and-timber railway platform at dusk at the edge of a great old seaport, where a vast still shallow lake opens into the wide sea; tall warehouses of brick and timber, stacked crates and barrels, and the masts of ships rising beyond the rooftops. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stretch of weathered brick warehouse wall, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: a plain stretch of weathered brick warehouse wall, uniform and unbroken, joining its other half cleanly at the seam directly behind you; to the left, in the IMMEDIATE FOREGROUND at the viewer's feet, the platform's square plank edge, and just beyond it ONE single pair of steel rails lying in a few centimetres of clear shallow water, running dead straight along that edge; the old-fashioned single-carriage train, deep red and cream with gold lines, stands squarely ON that pair of rails, its wheels in the water on the rails, its floor level with the platform so you could step straight across, its door standing open toward the viewer with warm light inside. THE RAILS UNDER THE TRAIN ARE THE SAME RAILS THAT COME IN ACROSS THE SHINING LAKE BEHIND IT and END a little way past its front at a sturdy wooden buffer stop: one unbroken pair you could follow with your eye from under its wheels, never a second set of rails; just left of centre, a stack of big wooden shipping crates bound with rope beside a coil of thick hemp rope, and on top of the crates a woven basket of herb bundles tied with red string; dead ahead in the centre, at the platform's end, a wide open stone archway, the paving running level out through it onto a broad wharf, and beyond it the towering masts and great cream sails of a colossal ship rising high over the rooftops, a long red-and-gold flag streaming from the top; just right of centre, a little wooden harbor-master's hut with a round window, a shiny brass ship's bell hanging by its door, lanterns glowing; to the right, tall brick warehouses with big wooden doors, a stack of barrels and a handcart of sacks in front; on the far right, the right half of the calm view directly behind the viewer: a plain stretch of weathered brick warehouse wall, uniform and unbroken, joining its other half cleanly at the seam directly behind you. salty, bustling and grand, warm lamplight against the violet dusk, the promise of the open sea. No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. ONE train standing ON its rails, never on the planks or the boardwalk; ONE single pair of rails in the whole view, the same pair under the train; no second track beside or past it; no overhead wires. The platform is EMPTY of people; no writing on the crates, barrels or sacks. Shot on a full-frame DSLR at 24mm, f/8, early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a plain stretch of weathered brick warehouse wall, uniform and unbroken, with no visible seam, join, or repetition.",
+        "seam": {
+          "stage": "blurred",
+          "band": "sky",
+          "ratio": 0.0,
+          "delta": 0.0,
+          "needsWork": false,
+          "accepted": false,
+          "seamBandRun": 0.0,
+          "seamStepRatio": 0.0,
+          "at": "2026-11-16T19:50:37"
+        },
+        "boxesFrom": {
+          "art": "07f667c72dec",
+          "at": "2026-11-16T20:08:36"
+        }
+      },
+      "mapPos": {
+        "c": 5,
+        "r": 6
+      },
+      "panorama": "docks_station/scene.png",
+      "builtFrom": "l1_docks_station_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "hotspots": [
+        {
+          "id": "back_onto_the_train",
+          "type": "door",
+          "label": "Back onto the train",
+          "box": [
+            0.17,
+            0.3,
+            0.25,
+            0.71
+          ],
+          "direction": "open",
+          "to": "train",
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "the_basket_on_the_crates",
+          "type": "station",
+          "label": "The basket on the crates",
+          "box": [
+            0.3,
+            0.5,
+            0.42,
+            0.86
+          ],
+          "tier": 3,
+          "track": "docks",
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "out_to_the_harbor",
+          "type": "door",
+          "label": "Out to the harbor",
+          "box": [
+            0.44,
+            0.14,
+            0.56,
+            0.56
+          ],
+          "direction": "open",
+          "to": "harbor",
+          "boxSource": "moved:agent"
+        }
+      ]
+    },
+    {
+      "key": "harbor",
+      "title": "The harbor",
+      "built": true,
+      "unlockedWhen": true,
+      "designNote": "The great wharf (2026-11-16). Station (LEVEL 3, track harbor, 3 herb bundles): the basket on the barrel. THE GREAT SHIP: a colossal galleon, red and gold flag; its gangplank is roped off (a note): boarding it is a later expansion. Doors: back to the docks station, into the library.",
+      "plannedHotspots": [
+        {
+          "type": "door",
+          "direction": "back",
+          "to": "docks_station",
+          "label": "Back to the docks station",
+          "box": [
+            0.14,
+            0.25,
+            0.235,
+            0.63
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "station",
+          "tier": 3,
+          "label": "The basket on the barrel",
+          "track": "harbor",
+          "box": [
+            0.29,
+            0.48,
+            0.4,
+            0.92
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "clue",
+          "id": "galleon",
+          "label": "The gangplank",
+          "body": "A thick rope is tied across the gangplank, and the great ship's deck is quiet. Nobody can go aboard... yet.",
+          "box": [
+            0.5,
+            0.42,
+            0.57,
+            0.62
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "to": "library",
+          "label": "Into the library",
+          "box": [
+            0.68,
+            0.39,
+            0.745,
+            0.66
+          ],
+          "boxSource": "moved:agent"
+        }
+      ],
+      "authoring": {
+        "sceneSpec": {
+          "room": "harbor",
+          "setting": "a broad stone wharf at dusk in a great old seaport where a vast still lake opens into the wide sea, dominated by a colossal, magnificent old wooden sailing ship moored alongside the quay",
+          "interior": false,
+          "indoor": false,
+          "seam": "the open sea at dusk beyond the end of the wharf, calm and even, a few far-off sails on the horizon",
+          "seamOccluder": "a thick wooden mooring post wrapped in rope",
+          "elements": [
+            {
+              "id": "seam_left",
+              "at": "on the far left",
+              "desc": "the left half of the calm view directly behind the viewer: the open sea at dusk beyond the end of the wharf, calm and even, a few far-off sails on the horizon, joining its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "station_back",
+              "at": "to the left",
+              "label": "Back to the docks station",
+              "door": {
+                "direction": "back",
+                "to": "docks_station"
+              },
+              "desc": "the wide stone archway back to the railway platform, the paving running level through it, lamplight and the little train beyond"
+            },
+            {
+              "id": "barrel_basket",
+              "at": "just left of centre",
+              "label": "The basket on the barrel",
+              "station": 3,
+              "track": "harbor",
+              "desc": "close to the viewer, a big oak barrel standing on the wharf with a woven basket of herb bundles tied with red string on its lid, nets and a coil of rope at its foot"
+            },
+            {
+              "id": "galleon",
+              "at": "dead ahead in the centre",
+              "label": "The gangplank",
+              "desc": "filling the view and towering high above everything, a COLOSSAL, magnificent old wooden galleon, the grandest sailing ship ever built, moored broadside along the quay: a dark polished hull with gold trim and rows of little square port windows, a carved gilded stern castle with glowing lantern windows, a long bowsprit, FOUR towering masts carrying tier upon tier of great cream sails, rigging everywhere, and a long RED-AND-GOLD flag streaming from the top of the tallest mast; a wide wooden gangplank slopes down from its side to the wharf, a thick rope tied across its foot"
+            },
+            {
+              "id": "library_door",
+              "at": "just right of centre",
+              "label": "Into the library",
+              "door": {
+                "direction": "open",
+                "to": "library"
+              },
+              "desc": "a cozy old timber-framed library building on the wharf, its arched wooden door standing open with warm golden lamplight spilling out, the floor running level through it, stacks of books glimpsed inside, a lantern over the door"
+            },
+            {
+              "id": "wharf_right",
+              "at": "to the right",
+              "desc": "the wharf running on past stacked crates and a tall wooden crane, smaller fishing boats bobbing at the quay, the open sea glowing beyond"
+            },
+            {
+              "id": "seam_right",
+              "at": "on the far right",
+              "desc": "the right half of the calm view directly behind the viewer: the open sea at dusk beyond the end of the wharf, calm and even, a few far-off sails on the horizon, joining its other half cleanly at the seam directly behind you"
+            }
+          ],
+          "soundBed": "a great harbor at dusk: gulls crying, a huge ship's timbers creaking, ropes and rigging humming in the wind, waves on the quay.",
+          "rigid": "the wharf, the great ship and its masts, sails, flag and gangplank, the barrel and basket, the library building, the crane, the archway",
+          "atmosphere": "awe-inspiring and adventurous, the colossal ship glowing gold in the last light, the open sea calling",
+          "styleLight": "early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red",
+          "negatives": "No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. The wharf and the ship are EMPTY of people. ONE colossal ship moored at the quay; no skull flags, no cannons firing, no writing on the hull or the flag.",
+          "states": {},
+          "continuity": [],
+          "scaffold": {
+            "kind": "skeleton",
+            "layout": {
+              "surface": "court",
+              "word": "wharf",
+              "floor": "broad stone wharf",
+              "size": [
+                6,
+                6,
+                10,
+                3
+              ],
+              "sides": {
+                "left": "houses",
+                "right": "water",
+                "front": "water",
+                "back": "houses"
+              },
+              "parts": [
+                [
+                  "door",
+                  "station_back",
+                  {
+                    "w": 2.4,
+                    "h": 3.0,
+                    "say": "the wide open stone archway, the paving running level through it"
+                  }
+                ],
+                [
+                  "prop",
+                  "barrel_basket",
+                  {
+                    "size": [
+                      0.8,
+                      0.8,
+                      1.0
+                    ],
+                    "dist": 2.0
+                  }
+                ],
+                [
+                  "door",
+                  "library_door",
+                  {
+                    "w": 1.4,
+                    "h": 2.4,
+                    "say": "the open arched wooden door, the floor running level through it"
+                  }
+                ]
+              ]
+            }
+          },
+          "stillOnly": true
+        },
+        "plateRefs": [
+          "docks_station/scene.png"
+        ],
+        "scenePrompt": "This is a seamless 360-degree panorama from a broad stone wharf at dusk in a great old seaport where a vast still lake opens into the wide sea, dominated by a colossal, magnificent old wooden sailing ship moored alongside the quay. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the open sea at dusk beyond the end of the wharf, calm and even, a few far-off sails on the horizon: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: the open sea at dusk beyond the end of the wharf, calm and even, a few far-off sails on the horizon, joining its other half cleanly at the seam directly behind you; to the left, the wide stone archway back to the railway platform, the paving running level through it, lamplight and the little train beyond; just left of centre, close to the viewer, a big oak barrel standing on the wharf with a woven basket of herb bundles tied with red string on its lid, nets and a coil of rope at its foot; dead ahead in the centre, filling the view and towering high above everything, a COLOSSAL, magnificent old wooden galleon, the grandest sailing ship ever built, moored broadside along the quay: a dark polished hull with gold trim and rows of little square port windows, a carved gilded stern castle with glowing lantern windows, a long bowsprit, FOUR towering masts carrying tier upon tier of great cream sails, rigging everywhere, and a long RED-AND-GOLD flag streaming from the top of the tallest mast; a wide wooden gangplank slopes down from its side to the wharf, a thick rope tied across its foot; just right of centre, a cozy old timber-framed library building on the wharf, its arched wooden door standing open with warm golden lamplight spilling out, the floor running level through it, stacks of books glimpsed inside, a lantern over the door; to the right, the wharf running on past stacked crates and a tall wooden crane, smaller fishing boats bobbing at the quay, the open sea glowing beyond; on the far right, the right half of the calm view directly behind the viewer: the open sea at dusk beyond the end of the wharf, calm and even, a few far-off sails on the horizon, joining its other half cleanly at the seam directly behind you. awe-inspiring and adventurous, the colossal ship glowing gold in the last light, the open sea calling. No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. The wharf and the ship are EMPTY of people. ONE colossal ship moored at the quay; no skull flags, no cannons firing, no writing on the hull or the flag. Shot on a full-frame DSLR at 24mm, f/8, early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into the open sea at dusk beyond the end of the wharf, calm and even, a few far-off sails on the horizon, with no visible seam, join, or repetition.",
+        "seam": {
+          "stage": "blurred",
+          "band": "sky",
+          "ratio": 0.0,
+          "delta": 0.0,
+          "needsWork": false,
+          "accepted": false,
+          "seamBandRun": 0.0,
+          "seamStepRatio": 0.0,
+          "at": "2026-11-16T19:52:13"
+        },
+        "boxesFrom": {
+          "art": "b77038a8584d",
+          "at": "2026-11-16T20:08:36"
+        }
+      },
+      "mapPos": {
+        "c": 5,
+        "r": 7
+      },
+      "panorama": "harbor/scene.png",
+      "builtFrom": "l1_harbor_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "hotspots": [
+        {
+          "id": "back_to_the_docks_station",
+          "type": "door",
+          "label": "Back to the docks station",
+          "box": [
+            0.14,
+            0.25,
+            0.235,
+            0.63
+          ],
+          "direction": "back",
+          "to": "docks_station",
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "the_basket_on_the_barrel",
+          "type": "station",
+          "label": "The basket on the barrel",
+          "box": [
+            0.29,
+            0.48,
+            0.4,
+            0.92
+          ],
+          "tier": 3,
+          "track": "harbor",
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "galleon",
+          "type": "clue",
+          "label": "The gangplank",
+          "box": [
+            0.5,
+            0.42,
+            0.57,
+            0.62
+          ],
+          "body": "A thick rope is tied across the gangplank, and the great ship's deck is quiet. Nobody can go aboard... yet.",
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "into_the_library",
+          "type": "door",
+          "label": "Into the library",
+          "box": [
+            0.68,
+            0.39,
+            0.745,
+            0.66
+          ],
+          "direction": "open",
+          "to": "library",
+          "boxSource": "moved:agent"
+        }
+      ]
+    },
+    {
+      "key": "library",
+      "title": "The library",
+      "built": true,
+      "unlockedWhen": true,
+      "designNote": "A rustic harbor library (2026-11-16). Station (LEVEL 3, track reading, 3 herb bundles): the reading table deals READING COMPREHENSION, a short paragraph and a multiple-choice question about it. Back out to the harbor only.",
+      "plannedHotspots": [
+        {
+          "type": "door",
+          "direction": "back",
+          "to": "harbor",
+          "label": "Back out to the harbor",
+          "box": [
+            0.115,
+            0.18,
+            0.205,
+            0.74
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "station",
+          "tier": 3,
+          "label": "The reading table",
+          "track": "reading",
+          "box": [
+            0.34,
+            0.56,
+            0.65,
+            1.0
+          ],
+          "boxSource": "moved:agent"
+        }
+      ],
+      "authoring": {
+        "sceneSpec": {
+          "room": "library",
+          "setting": "inside a cozy, rustic old library in a timber-framed building on a seaport wharf: rough dark wooden beams, wide worn floorboards, tall wooden shelves crammed with old books, brass ship lanterns and a little iron stove glowing",
+          "interior": true,
+          "indoor": true,
+          "seam": "a plain stretch of rough plastered wall between dark timber beams, uniform and unbroken",
+          "seamOccluder": "a thick dark wooden post, floor to beam",
+          "elements": [
+            {
+              "id": "seam_left",
+              "at": "on the far left",
+              "desc": "the left half of the calm view directly behind the viewer: a plain stretch of rough plastered wall between dark timber beams, uniform and unbroken, joining its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "door_out",
+              "at": "to the left",
+              "label": "Back out to the harbor",
+              "door": {
+                "direction": "back",
+                "to": "harbor"
+              },
+              "desc": "the arched wooden door standing open onto the wharf, the floor running level out through it, the great ship's masts and the dusk sky beyond"
+            },
+            {
+              "id": "reading_nook",
+              "at": "just left of centre",
+              "desc": "a deep worn leather armchair with a knitted blanket beside the glowing iron stove, a stack of books on a little stool"
+            },
+            {
+              "id": "reading_table",
+              "at": "dead ahead in the centre",
+              "label": "The reading table",
+              "station": 3,
+              "track": "reading",
+              "desc": "close to the viewer, a big old oak reading table with a brass reading lamp glowing, an open book lying on it, and a woven basket of herb bundles tied with red string beside the book"
+            },
+            {
+              "id": "shelves",
+              "at": "just right of centre",
+              "desc": "tall wooden bookshelves crammed with old books of every color, a rolling library ladder leaning against them, a brass ship's telescope and a globe on a shelf"
+            },
+            {
+              "id": "round_window",
+              "at": "to the right",
+              "desc": "a big round porthole window in the wall looking out at the great ship's masts and sails against the violet dusk, a window seat with cushions beneath it"
+            },
+            {
+              "id": "seam_right",
+              "at": "on the far right",
+              "desc": "the right half of the calm view directly behind the viewer: a plain stretch of rough plastered wall between dark timber beams, uniform and unbroken, joining its other half cleanly at the seam directly behind you"
+            }
+          ],
+          "soundBed": "a quiet old library by the sea: the stove crackling, pages turning, a clock ticking, gulls far off outside.",
+          "rigid": "the shelves and books, the ladder, the reading table and lamp and book, the armchair and stove, the round window, the beams",
+          "atmosphere": "warm, quiet and rustic, golden lamplight and the smell of old paper",
+          "styleLight": "early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red",
+          "negatives": "No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. The library is EMPTY of people. No readable words or letters on any book, page, map or spine.",
+          "states": {},
+          "continuity": [],
+          "scaffold": {
+            "kind": "skeleton",
+            "layout": {
+              "surface": "room",
+              "word": "floor",
+              "floor": "wide worn floorboards",
+              "size": [
+                3,
+                3,
+                4,
+                3
+              ],
+              "sides": {
+                "left": "houses",
+                "right": "houses",
+                "front": "houses",
+                "back": "houses"
+              },
+              "parts": [
+                [
+                  "door",
+                  "door_out",
+                  {
+                    "w": 1.2,
+                    "h": 2.2,
+                    "say": "the open arched door, the floor running level out onto the wharf"
+                  }
+                ],
+                [
+                  "prop",
+                  "reading_table",
+                  {
+                    "size": [
+                      1.6,
+                      0.9,
+                      0.8
+                    ],
+                    "dist": 1.8
+                  }
+                ]
+              ]
+            }
+          },
+          "stillOnly": true
+        },
+        "plateRefs": [
+          "docks_station/scene.png"
+        ],
+        "scenePrompt": "This is a seamless 360-degree panorama from inside a cozy, rustic old library in a timber-framed building on a seaport wharf: rough dark wooden beams, wide worn floorboards, tall wooden shelves crammed with old books, brass ship lanterns and a little iron stove glowing. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stretch of rough plastered wall between dark timber beams, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: a plain stretch of rough plastered wall between dark timber beams, uniform and unbroken, joining its other half cleanly at the seam directly behind you; to the left, the arched wooden door standing open onto the wharf, the floor running level out through it, the great ship's masts and the dusk sky beyond; just left of centre, a deep worn leather armchair with a knitted blanket beside the glowing iron stove, a stack of books on a little stool; dead ahead in the centre, close to the viewer, a big old oak reading table with a brass reading lamp glowing, an open book lying on it, and a woven basket of herb bundles tied with red string beside the book; just right of centre, tall wooden bookshelves crammed with old books of every color, a rolling library ladder leaning against them, a brass ship's telescope and a globe on a shelf; to the right, a big round porthole window in the wall looking out at the great ship's masts and sails against the violet dusk, a window seat with cushions beneath it; on the far right, the right half of the calm view directly behind the viewer: a plain stretch of rough plastered wall between dark timber beams, uniform and unbroken, joining its other half cleanly at the seam directly behind you. warm, quiet and rustic, golden lamplight and the smell of old paper. No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. The library is EMPTY of people. No readable words or letters on any book, page, map or spine. Shot on a full-frame DSLR at 24mm, f/8, early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a plain stretch of rough plastered wall between dark timber beams, uniform and unbroken, with no visible seam, join, or repetition.",
+        "seam": {
+          "stage": "screened",
+          "band": "ground",
+          "ratio": 1.88,
+          "delta": 3.18,
+          "needsWork": false,
+          "accepted": false,
+          "seamBandRun": 0.0,
+          "seamStepRatio": 0.0,
+          "at": "2026-11-16T19:53:47"
+        },
+        "boxesFrom": {
+          "art": "902140b599b3",
+          "at": "2026-11-16T20:08:36"
+        }
+      },
+      "mapPos": {
+        "c": 5,
+        "r": 8
+      },
+      "panorama": "library/scene.png",
+      "builtFrom": "l1_library_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "hotspots": [
+        {
+          "id": "back_out_to_the_harbor",
+          "type": "door",
+          "label": "Back out to the harbor",
+          "box": [
+            0.115,
+            0.18,
+            0.205,
+            0.74
+          ],
+          "direction": "back",
+          "to": "harbor",
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "the_reading_table",
+          "type": "station",
+          "label": "The reading table",
+          "box": [
+            0.34,
+            0.56,
+            0.65,
+            1.0
+          ],
+          "tier": 3,
+          "track": "reading",
           "boxSource": "moved:agent"
         }
       ]

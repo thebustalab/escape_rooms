@@ -1,3 +1,4 @@
+// Editing this? Read _agent_reference/viewer_and_motion.md first (beside this file; local, gitignored).
 // ride.js — pure planning logic for THE RIDE (networks/subway, settled with Lucas 2026-09-17).
 //
 // THE MODEL. A line is an ordered list of named stops. Some stops are BERTHS — a berth room on this line

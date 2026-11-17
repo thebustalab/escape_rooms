@@ -1,3 +1,4 @@
+// Editing this? Read _agent_reference/submission_and_closeout.md and decoder/AGENTS.md (byte-scheme lockstep) first.
 /*
  * codec.js — submission-code encoder for the WebR escape rooms.
  *

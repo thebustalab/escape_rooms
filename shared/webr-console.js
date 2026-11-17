@@ -1,3 +1,4 @@
+// Editing this? Read _agent_reference/webr_console.md first (beside this file; local, gitignored).
 /*
  * webr-console.js — a minimal live R console backed by WebR.
  *
@@ -17,13 +18,13 @@
  * `addStatusEl()`, `plotControls(opts)`, `resetSession()`, `resetControl(opts)`, `.ready`, `.webR`.
  */
 import { WebR } from "https://webr.r-wasm.org/latest/webr.mjs";
-import { VIEW_R_SHIM, VIEW_R_DRAIN, fromR, viewTableHTML, ensureViewStyles } from "./webr_view.js?v=170";
-import { codeToRun, selectionNote } from "./code_sel.js?v=170";
-import { PLOT_ASPECTS, PLOT_DEFAULT_ASPECT, PLOT_LIMITS, PLOT_CTL_CSS, plotGeometry } from "./plot_size.js?v=170";
-import { RESET_R_SHIM, RESET_R_CALL, RESET_CTL_CSS, RESET_LABEL, RESET_CONFIRM_LABEL, RESET_CONFIRM_MS, nextConfirmState } from "./webr_reset.js?v=170";
-import { explainError, looksLikeOrphanLayer } from "./r_diagnose.js?v=170";
-import { R_BIOC_REPOS, BASE_PACKAGES, ANALYSIS_PACKAGES, BIOC_PACKAGES, STATS_PACKAGES, resolvePackages } from "./r_packages.js?v=170";
-import { MATRIX_ANALYSIS_R_SHIM, STATS_TESTS_R_SHIM, MODELS_R_SHIM } from "./r_matrix_analysis.js?v=170";
+import { VIEW_R_SHIM, VIEW_R_DRAIN, fromR, viewTableHTML, ensureViewStyles } from "./webr_view.js?v=173";
+import { codeToRun, selectionNote } from "./code_sel.js?v=173";
+import { PLOT_ASPECTS, PLOT_DEFAULT_ASPECT, PLOT_LIMITS, PLOT_CTL_CSS, plotGeometry } from "./plot_size.js?v=173";
+import { RESET_R_SHIM, RESET_R_CALL, RESET_CTL_CSS, RESET_LABEL, RESET_CONFIRM_LABEL, RESET_CONFIRM_MS, nextConfirmState } from "./webr_reset.js?v=173";
+import { explainError, looksLikeOrphanLayer } from "./r_diagnose.js?v=173";
+import { R_BIOC_REPOS, BASE_PACKAGES, ANALYSIS_PACKAGES, BIOC_PACKAGES, STATS_PACKAGES, resolvePackages } from "./r_packages.js?v=173";
+import { MATRIX_ANALYSIS_R_SHIM, STATS_TESTS_R_SHIM, MODELS_R_SHIM } from "./r_matrix_analysis.js?v=173";
 
 const errText = e => (e && e.message ? e.message : String(e));
 
@@ -217,7 +218,7 @@ export class WebRConsole {
       // here must not cost runMatrixAnalysis, nor a ggtree failure cost the tests.
       let statsOk = true;
       try {
-        this.setStatus("Installing the statistics packages (rstatix, emmeans) …");
+        this.setStatus("Installing the statistics packages (rstatix, emmeans, vegan) …");
         await this.webR.installPackages(STATS_PACKAGES, { quiet: true });
       } catch (e) {
         statsOk = false;

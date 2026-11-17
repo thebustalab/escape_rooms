@@ -1,3 +1,4 @@
+// Editing this? Read _agent_reference/doors_and_progression.md first (beside this file; local, gitignored).
 // Gate conditions (`unlockedWhen` / `availableWhen` / variant `when`), extracted pure so they can be
 // tested without a browser. The player's `condOK` is a thin wrapper that passes its own globals in.
 //

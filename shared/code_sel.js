@@ -1,3 +1,4 @@
+// Editing this? Read _agent_reference/webr_console.md first (beside this file; local, gitignored).
 /*
  * code_sel.js — "run the highlighted bit, or all of it" for a code textarea.
  *

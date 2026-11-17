@@ -1,3 +1,4 @@
+// Editing this? Read _agent_reference/instruments_and_widgets.md first (beside this file; local, gitignored).
 // DATE BOARD — a `lock` with `mode:"date"` (built 2026-10-28, first consumer regression/dunes' departure board).
 //
 // Two slide-levers, a day and a month, on a plain board. Nothing to type and no prompt: the player sets a date

@@ -1,3 +1,4 @@
+// Editing this? Read _agent_reference/submission_and_closeout.md first (beside this file; local, gitignored).
 // escape_hints.js — the escape phase's time-unlocked Hint chip, pure half (tests/escape_hints.test.mjs).
 // No DOM: pano-player.js owns the chip and the card; this decides what they show.
 //

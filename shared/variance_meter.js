@@ -1,3 +1,4 @@
+// Editing this? Read _agent_reference/instruments_and_widgets.md first (beside this file; local, gitignored).
 // The Variance Meter — an engine INSTRUMENT (hotspot `type:"instrument"`, `kind:"variance_meter"`), built
 // 2026-11-01 for anova/cellars from the v2 prototype (rooms/anova/cellars/_scratch/variance_meter/).
 //
@@ -18,9 +19,9 @@
 //   config = rooms/anova/cellars/data/switchboard.json: { mark, rooms:[{name, amps, gallons, wing, ...}] }
 //   geometry (all optional): { imageW, imageH, title, unit, vMax, fullScale, defaultBy, rails:{x0,x1,top,bot},
 //                              switchY, dials:[{cx,cy,r}x3] }
-//   m.setSwitches([bool x8]); m.switches(); m.measure(); m.isSettled(); m.ready (Promise); m.destroy();
+//   m.setSwitches([bool x8]); m.switches(); m.measure(); m.isSettled(); m.isOver(); m.ready (Promise); m.destroy();
 //   canvas.varianceMeter exposes the same API for tests.
-import { measure } from "./variance_math.js?v=170";
+import { measure } from "./variance_math.js?v=173";
 
 const DEFAULTS = {
   amps:    { title: "ELECTRICAL SWITCHBOARD", unit: "AMPERES", vMax: 12, fullScale: 25 },
@@ -137,6 +138,34 @@ export function mountVarianceMeter(host, opts = {}) {
     ctx.restore();
   }
 
+  // Past the line (Lucas, 2026-11-17): when the share needle SETTLES at or above the red line on a live board, a
+  // bell chimes once and the share dial glows for as long as the grouping holds. It says "this grouping clears MY
+  // board", never which grouping the door wants (several clear each board).
+  function chime() {
+    if (opts.sound === false) return;
+    try {
+      audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+      const t = audio.currentTime;
+      [[1046.5, 0], [1568, 0.09]].forEach(([f, d]) => {
+        const o = audio.createOscillator(), g = audio.createGain();
+        o.type = "sine"; o.frequency.setValueAtTime(f, t + d);
+        g.gain.setValueAtTime(0.0001, t + d); g.gain.exponentialRampToValueAtTime(0.16, t + d + 0.01);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + d + 1.1);
+        o.connect(g).connect(audio.destination); o.start(t + d); o.stop(t + d + 1.15);
+      });
+    } catch (e) { /* no audio: the glow still shows */ }
+  }
+  let over = false, glow = 0;
+  function halo(d, k) {
+    if (k < 0.01) return;
+    const { cx, cy, r } = d;
+    ctx.save();
+    const grd = ctx.createRadialGradient(cx, cy, r * 0.7, cx, cy, r + 70);
+    grd.addColorStop(0, "rgba(255,214,120,0)"); grd.addColorStop(0.55, `rgba(255,214,120,${0.55 * k})`); grd.addColorStop(1, "rgba(255,214,120,0)");
+    ctx.fillStyle = grd; ctx.beginPath(); ctx.arc(cx, cy, r + 70, Math.PI, 0); ctx.lineTo(cx + r + 70, cy + 40); ctx.lineTo(cx - r - 70, cy + 40); ctx.closePath(); ctx.fill();
+    ctx.restore();
+  }
+
   function lamp(x, y, r, colour, glow) {
     const g = powered ? Math.max(0, Math.min(1, glow)) : 0;
     if (g > 0.02) {
@@ -157,6 +186,7 @@ export function mountVarianceMeter(host, opts = {}) {
     }
     dial(DIALS[0], needles[0].a, "BETWEEN", "each group's average from the whole");
     dial(DIALS[1], needles[1].a, "NOISE", "each room from its group's average");
+    halo(DIALS[2], glow);
     dial(DIALS[2], needles[2].a, "SHARE EXPLAINED", "between ÷ (between + noise)", MARK);
     if (!powered) engrave("The board is dead: no current reaches the meters.", W / 2, 432, "italic 20px Georgia", "center", "#cbb68a");
 
@@ -218,7 +248,12 @@ export function mountVarianceMeter(host, opts = {}) {
   function frame(t) {
     if (dead) return;
     const dt = Math.min(0.033, (t - last) / 1000); last = t;
-    const m = now(); step(dt, m); draw(m);
+    const m = now(); step(dt, m);
+    const isOver = powered && m.share >= MARK;
+    if (isOver && !over && settled()) { over = true; chime(); }
+    else if (!isOver) over = false;
+    glow += ((over ? 1 : 0) - glow) * Math.min(1, dt * 6);
+    draw(m);
     raf = requestAnimationFrame(frame);
   }
   raf = requestAnimationFrame(frame);
@@ -229,6 +264,7 @@ export function mountVarianceMeter(host, opts = {}) {
     switches: () => sw.slice(),
     measure: now,
     isSettled: settled,
+    isOver: () => over,
     powered,
     destroy() {
       dead = true; cancelAnimationFrame(raf); if (ro) ro.disconnect();

@@ -1,3 +1,4 @@
+// Editing this? Read _agent_reference/viewer_and_motion.md first (beside this file; local, gitignored).
 // The brass date plaque over a flat door transit (`transit.counter`, dunes time-skip, 2026-11-11): pure date maths,
 // import-free so tests/transit_counter.test.mjs can load it in Node.
 //

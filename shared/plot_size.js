@@ -1,3 +1,4 @@
+// Editing this? Read _agent_reference/webr_console.md first (beside this file; local, gitignored).
 /*
  * plot_size.js — the pure half of WebR plot sizing: aspect ratios, the capture-geometry maths, and the
  * size-control stylesheet. No imports, so this is unit-testable in Node (see tests/plot_size.test.mjs);

@@ -942,8 +942,7 @@
             "feedback": {
               "correct": "Correct, noted in your field notebook: for hay, nitrogen first, then minerals, then lime (shares 0.397, 0.192, 0.135).",
               "wrong": [
-                "Run <code>weighing_book %&gt;% buildModel(model_type = \"linear_regression\", formula = hay_yield ~ nitrogen) %&gt;% anovaTest()</code>, then the same with <code>lime</code> and with <code>minerals</code>, and write down the <code>share</code> on each factor’s row. Order them largest first, spelled as the columns are: <code>answer &lt;- c(\"...\", \"...\", \"...\")</code>.",
-                "Each factor gets its own one-way ANOVA. Putting all three in one formula changes the numbers."
+                "Run <code>weighing_book %&gt;% buildModel(model_type = \"linear_regression\", formula = hay_yield ~ nitrogen) %&gt;% anovaTest()</code>, then the same with <code>lime</code> and with <code>minerals</code>, and write down the <code>share</code> on each factor’s row. Order them largest first, spelled as the columns are: <code>answer &lt;- c(\"...\", \"...\", \"...\")</code>."
               ]
             },
             "expr": "local({ a <- tolower(trimws(as.character(unlist(answer)))); identical(a, c(\"nitrogen\", \"minerals\", \"lime\")) })"
@@ -960,6 +959,24 @@
             "volume": 0.1,
             "needsReplacement": true
           }
+        },
+        {
+          "type": "clue",
+          "label": "The Clerk of Works' card",
+          "box": [
+            0.437,
+            0.633,
+            0.47,
+            0.676
+          ],
+          "availableWhen": {
+            "solved": "kitchen"
+          },
+          "body": "<p>A card in the Clerk of Works' hand: <i>Ways the eight rooms on the boards could be split in two.</i></p><ul style=\"margin:6px 0 0 18px;padding:0\"><li><b>A. By floor:</b> Library, Drawing room, Laboratory, Kitchen <i>against</i> Archive vault, Seed store, Boiler room, Wash-house</li><li><b>B. West end and east end:</b> Library, Drawing room, Laboratory, Archive vault <i>against</i> Kitchen, Seed store, Boiler room, Wash-house</li><li><b>C. Wet rooms and dry rooms:</b> Laboratory, Kitchen, Boiler room, Wash-house <i>against</i> Library, Drawing room, Archive vault, Seed store</li><li><b>D. Finished in the first building season (1891) and later:</b> Library, Laboratory, Archive vault, Boiler room <i>against</i> Drawing room, Kitchen, Seed store, Wash-house</li><li><b>E. North side and south side:</b> Library, Laboratory, Kitchen, Boiler room <i>against</i> Drawing room, Archive vault, Seed store, Wash-house</li><li><b>F. Rooms with a chimney flue and rooms without:</b> Library, Drawing room, Kitchen, Boiler room <i>against</i> Laboratory, Archive vault, Seed store, Wash-house</li></ul>",
+          "pickup": "Clerk of Works' card, six ways to split the eight rooms in two: A. By floor: Library, Drawing room, Laboratory, Kitchen against the rest; B. West end and east end: Library, Drawing room, Laboratory, Archive vault against the rest; C. Wet rooms and dry rooms: Laboratory, Kitchen, Boiler room, Wash-house against the rest; D. Finished in the first building season (1891) and later: Library, Laboratory, Archive vault, Boiler room against the rest; E. North side and south side: Library, Laboratory, Kitchen, Boiler room against the rest; F. Rooms with a chimney flue and rooms without: Library, Drawing room, Kitchen, Boiler room against the rest.",
+          "boxSource": "review:agent-vision",
+          "boxNote": "Placed by eye 2026-11-17 on the loose sheet left of the Director's draft (clear of its box).",
+          "note": "Escape-critical (Lucas, 2026-11-17): lists six candidate groupings, only D (the passage rooms) clears the red line on both boards; each player gets a copy."
         },
         {
           "type": "dial",
@@ -1311,8 +1328,7 @@
             "feedback": {
               "correct": "Correct, noted in your field notebook: for hay, nitrogen first, then minerals, then lime (shares 0.397, 0.192, 0.135).",
               "wrong": [
-                "Run <code>weighing_book %&gt;% buildModel(model_type = \"linear_regression\", formula = hay_yield ~ nitrogen) %&gt;% anovaTest()</code>, then the same with <code>lime</code> and with <code>minerals</code>, and write down the <code>share</code> on each factor’s row. Order them largest first, spelled as the columns are: <code>answer &lt;- c(\"...\", \"...\", \"...\")</code>.",
-                "Each factor gets its own one-way ANOVA. Putting all three in one formula changes the numbers."
+                "Run <code>weighing_book %&gt;% buildModel(model_type = \"linear_regression\", formula = hay_yield ~ nitrogen) %&gt;% anovaTest()</code>, then the same with <code>lime</code> and with <code>minerals</code>, and write down the <code>share</code> on each factor’s row. Order them largest first, spelled as the columns are: <code>answer &lt;- c(\"...\", \"...\", \"...\")</code>."
               ]
             },
             "expr": "local({ a <- tolower(trimws(as.character(unlist(answer)))); identical(a, c(\"nitrogen\", \"minerals\", \"lime\")) })"
@@ -1323,6 +1339,24 @@
             "volume": 0.1,
             "needsReplacement": true
           }
+        },
+        {
+          "id": "the_clerk_of_works_card",
+          "type": "clue",
+          "label": "The Clerk of Works' card",
+          "box": [
+            0.437,
+            0.633,
+            0.47,
+            0.676
+          ],
+          "availableWhen": {
+            "solved": "kitchen"
+          },
+          "body": "<p>A card in the Clerk of Works' hand: <i>Ways the eight rooms on the boards could be split in two.</i></p><ul style=\"margin:6px 0 0 18px;padding:0\"><li><b>A. By floor:</b> Library, Drawing room, Laboratory, Kitchen <i>against</i> Archive vault, Seed store, Boiler room, Wash-house</li><li><b>B. West end and east end:</b> Library, Drawing room, Laboratory, Archive vault <i>against</i> Kitchen, Seed store, Boiler room, Wash-house</li><li><b>C. Wet rooms and dry rooms:</b> Laboratory, Kitchen, Boiler room, Wash-house <i>against</i> Library, Drawing room, Archive vault, Seed store</li><li><b>D. Finished in the first building season (1891) and later:</b> Library, Laboratory, Archive vault, Boiler room <i>against</i> Drawing room, Kitchen, Seed store, Wash-house</li><li><b>E. North side and south side:</b> Library, Laboratory, Kitchen, Boiler room <i>against</i> Drawing room, Archive vault, Seed store, Wash-house</li><li><b>F. Rooms with a chimney flue and rooms without:</b> Library, Drawing room, Kitchen, Boiler room <i>against</i> Laboratory, Archive vault, Seed store, Wash-house</li></ul>",
+          "pickup": "Clerk of Works' card, six ways to split the eight rooms in two: A. By floor: Library, Drawing room, Laboratory, Kitchen against the rest; B. West end and east end: Library, Drawing room, Laboratory, Archive vault against the rest; C. Wet rooms and dry rooms: Laboratory, Kitchen, Boiler room, Wash-house against the rest; D. Finished in the first building season (1891) and later: Library, Laboratory, Archive vault, Boiler room against the rest; E. North side and south side: Library, Laboratory, Kitchen, Boiler room against the rest; F. Rooms with a chimney flue and rooms without: Library, Drawing room, Kitchen, Boiler room against the rest.",
+          "boxSource": "review:agent-vision",
+          "boxNote": "Placed by eye 2026-11-17 on the loose sheet left of the Director's draft (clear of its box)."
         },
         {
           "id": "the_house_circuits",
@@ -2063,7 +2097,8 @@
             "correct": "The last switch clicks over and the panel swings inward onto a narrow stone stair.",
             "wrong": "Nothing gives. The panel stays shut.",
             "incomplete": "Every room needs its switch set first.",
-            "out": ""
+            "out": "",
+            "locked": "The panel jams."
           },
           "box": [
             0.6457,
@@ -2076,6 +2111,10 @@
             "src": "audio/solve_library_the_tall_bookcase_panel_swing.mp3",
             "volume": 0.058,
             "needsReplacement": true
+          },
+          "lockout": {
+            "after": 3,
+            "seconds": 60
           }
         },
         {
@@ -2451,13 +2490,18 @@
             "correct": "The last switch clicks over and the panel swings inward onto a narrow stone stair.",
             "wrong": "Nothing gives. The panel stays shut.",
             "incomplete": "Every room needs its switch set first.",
-            "out": ""
+            "out": "",
+            "locked": "The panel jams."
           },
           "boxSource": "draft:skeleton",
           "solveSfx": {
             "src": "audio/solve_library_the_tall_bookcase_panel_swing.mp3",
             "volume": 0.058,
             "needsReplacement": true
+          },
+          "lockout": {
+            "after": 3,
+            "seconds": 60
           }
         },
         {
@@ -3771,8 +3815,7 @@
             "feedback": {
               "correct": "Correct, noted in your field notebook: for species, lime first, then nitrogen, then minerals (shares 0.699, 0.068, 0.016).",
               "wrong": [
-                "Run <code>botanical_survey %&gt;% buildModel(model_type = \"linear_regression\", formula = species_count ~ nitrogen) %&gt;% anovaTest()</code>, then the same with <code>lime</code> and with <code>minerals</code>, and write down the <code>share</code> on each factor’s row. Order them largest first, spelled as the columns are: <code>answer &lt;- c(\"...\", \"...\", \"...\")</code>.",
-                "Each factor gets its own one-way ANOVA. Putting all three in one formula changes the numbers."
+                "Run <code>botanical_survey %&gt;% buildModel(model_type = \"linear_regression\", formula = species_count ~ nitrogen) %&gt;% anovaTest()</code>, then the same with <code>lime</code> and with <code>minerals</code>, and write down the <code>share</code> on each factor’s row. Order them largest first, spelled as the columns are: <code>answer &lt;- c(\"...\", \"...\", \"...\")</code>."
               ]
             },
             "expr": "local({ a <- tolower(trimws(as.character(unlist(answer)))); identical(a, c(\"lime\", \"nitrogen\", \"minerals\")) })"
@@ -4093,8 +4136,7 @@
             "feedback": {
               "correct": "Correct, noted in your field notebook: for species, lime first, then nitrogen, then minerals (shares 0.699, 0.068, 0.016).",
               "wrong": [
-                "Run <code>botanical_survey %&gt;% buildModel(model_type = \"linear_regression\", formula = species_count ~ nitrogen) %&gt;% anovaTest()</code>, then the same with <code>lime</code> and with <code>minerals</code>, and write down the <code>share</code> on each factor’s row. Order them largest first, spelled as the columns are: <code>answer &lt;- c(\"...\", \"...\", \"...\")</code>.",
-                "Each factor gets its own one-way ANOVA. Putting all three in one formula changes the numbers."
+                "Run <code>botanical_survey %&gt;% buildModel(model_type = \"linear_regression\", formula = species_count ~ nitrogen) %&gt;% anovaTest()</code>, then the same with <code>lime</code> and with <code>minerals</code>, and write down the <code>share</code> on each factor’s row. Order them largest first, spelled as the columns are: <code>answer &lt;- c(\"...\", \"...\", \"...\")</code>."
               ]
             },
             "expr": "local({ a <- tolower(trimws(as.character(unlist(answer)))); identical(a, c(\"lime\", \"nitrogen\", \"minerals\")) })"
@@ -4316,6 +4358,24 @@
           }
         },
         {
+          "type": "clue",
+          "label": "The Clerk of Works' card",
+          "box": [
+            0.5,
+            0.545,
+            0.54,
+            0.578
+          ],
+          "availableWhen": {
+            "solved": "wash_house"
+          },
+          "body": "<p>A card in the Clerk of Works' hand: <i>Ways the eight rooms on the boards could be split in two.</i></p><ul style=\"margin:6px 0 0 18px;padding:0\"><li><b>A. By floor:</b> Library, Drawing room, Laboratory, Kitchen <i>against</i> Archive vault, Seed store, Boiler room, Wash-house</li><li><b>B. West end and east end:</b> Library, Drawing room, Laboratory, Archive vault <i>against</i> Kitchen, Seed store, Boiler room, Wash-house</li><li><b>C. Wet rooms and dry rooms:</b> Laboratory, Kitchen, Boiler room, Wash-house <i>against</i> Library, Drawing room, Archive vault, Seed store</li><li><b>D. Finished in the first building season (1891) and later:</b> Library, Laboratory, Archive vault, Boiler room <i>against</i> Drawing room, Kitchen, Seed store, Wash-house</li><li><b>E. North side and south side:</b> Library, Laboratory, Kitchen, Boiler room <i>against</i> Drawing room, Archive vault, Seed store, Wash-house</li><li><b>F. Rooms with a chimney flue and rooms without:</b> Library, Drawing room, Kitchen, Boiler room <i>against</i> Laboratory, Archive vault, Seed store, Wash-house</li></ul>",
+          "pickup": "Clerk of Works' card, six ways to split the eight rooms in two: A. By floor: Library, Drawing room, Laboratory, Kitchen against the rest; B. West end and east end: Library, Drawing room, Laboratory, Archive vault against the rest; C. Wet rooms and dry rooms: Laboratory, Kitchen, Boiler room, Wash-house against the rest; D. Finished in the first building season (1891) and later: Library, Laboratory, Archive vault, Boiler room against the rest; E. North side and south side: Library, Laboratory, Kitchen, Boiler room against the rest; F. Rooms with a chimney flue and rooms without: Library, Drawing room, Kitchen, Boiler room against the rest.",
+          "boxSource": "review:agent-vision",
+          "boxNote": "Placed by eye 2026-11-17 on the papers behind the register; drawn after the register so it sits on top where the two touch.",
+          "note": "Escape-critical (Lucas, 2026-11-17): lists six candidate groupings, only D (the passage rooms) clears the red line on both boards; each player gets a copy."
+        },
+        {
           "type": "plaque",
           "label": "The Sample Archive",
           "plaque": true,
@@ -4425,7 +4485,8 @@
             "correct": "The last switch clicks over and the panel swings inward onto a narrow stone stair.",
             "wrong": "Nothing gives. The panel stays shut.",
             "incomplete": "Every room needs its switch set first.",
-            "out": ""
+            "out": "",
+            "locked": "The panel jams."
           },
           "box": [
             0.6675,
@@ -4438,6 +4499,10 @@
             "src": "audio/solve_archive_vault_the_iron_box_iron_door.mp3",
             "volume": 0.05,
             "needsReplacement": true
+          },
+          "lockout": {
+            "after": 3,
+            "seconds": 60
           }
         },
         {
@@ -4695,6 +4760,24 @@
           }
         },
         {
+          "id": "the_clerk_of_works_card",
+          "type": "clue",
+          "label": "The Clerk of Works' card",
+          "box": [
+            0.5,
+            0.545,
+            0.54,
+            0.578
+          ],
+          "availableWhen": {
+            "solved": "wash_house"
+          },
+          "body": "<p>A card in the Clerk of Works' hand: <i>Ways the eight rooms on the boards could be split in two.</i></p><ul style=\"margin:6px 0 0 18px;padding:0\"><li><b>A. By floor:</b> Library, Drawing room, Laboratory, Kitchen <i>against</i> Archive vault, Seed store, Boiler room, Wash-house</li><li><b>B. West end and east end:</b> Library, Drawing room, Laboratory, Archive vault <i>against</i> Kitchen, Seed store, Boiler room, Wash-house</li><li><b>C. Wet rooms and dry rooms:</b> Laboratory, Kitchen, Boiler room, Wash-house <i>against</i> Library, Drawing room, Archive vault, Seed store</li><li><b>D. Finished in the first building season (1891) and later:</b> Library, Laboratory, Archive vault, Boiler room <i>against</i> Drawing room, Kitchen, Seed store, Wash-house</li><li><b>E. North side and south side:</b> Library, Laboratory, Kitchen, Boiler room <i>against</i> Drawing room, Archive vault, Seed store, Wash-house</li><li><b>F. Rooms with a chimney flue and rooms without:</b> Library, Drawing room, Kitchen, Boiler room <i>against</i> Laboratory, Archive vault, Seed store, Wash-house</li></ul>",
+          "pickup": "Clerk of Works' card, six ways to split the eight rooms in two: A. By floor: Library, Drawing room, Laboratory, Kitchen against the rest; B. West end and east end: Library, Drawing room, Laboratory, Archive vault against the rest; C. Wet rooms and dry rooms: Laboratory, Kitchen, Boiler room, Wash-house against the rest; D. Finished in the first building season (1891) and later: Library, Laboratory, Archive vault, Boiler room against the rest; E. North side and south side: Library, Laboratory, Kitchen, Boiler room against the rest; F. Rooms with a chimney flue and rooms without: Library, Drawing room, Kitchen, Boiler room against the rest.",
+          "boxSource": "review:agent-vision",
+          "boxNote": "Placed by eye 2026-11-17 on the papers behind the register; drawn after the register so it sits on top where the two touch."
+        },
+        {
           "id": "the_sample_archive",
           "type": "plaque",
           "label": "The Sample Archive",
@@ -4812,13 +4895,18 @@
             "correct": "The last switch clicks over and the panel swings inward onto a narrow stone stair.",
             "wrong": "Nothing gives. The panel stays shut.",
             "incomplete": "Every room needs its switch set first.",
-            "out": ""
+            "out": "",
+            "locked": "The panel jams."
           },
           "boxSource": "moved:testplay",
           "solveSfx": {
             "src": "audio/solve_archive_vault_the_iron_box_iron_door.mp3",
             "volume": 0.05,
             "needsReplacement": true
+          },
+          "lockout": {
+            "after": 3,
+            "seconds": 60
           }
         },
         {
@@ -5288,15 +5376,15 @@
   "escapeHints": [
     {
       "after": 4,
-      "text": "The passage door takes a pattern from the same eight switches as both boards."
+      "text": "The Clerk of Works' card lists six ways to split the eight rooms. Set each one on your board and watch the share dial."
     },
     {
       "after": 8,
-      "text": "The obvious grouping on each board is right for that board only. The door wants a grouping that clears the red line on both."
+      "text": "A scheme can carry the needle past the red line on one board and not on the other. The door wants the scheme that clears the line on both."
     },
     {
       "after": 12,
-      "text": "List every grouping that clears the line on your board, swap lists with your partner and find the one you share. Ask what could make some rooms draw more of both water and power."
+      "text": "Tell your partner which schemes clear the line on your board, and listen for which clear it on theirs. Set the door to the one on both lists."
     }
   ]
 }

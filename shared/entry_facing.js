@@ -1,3 +1,4 @@
+// Editing this? Read _agent_reference/viewer_and_motion.md first (beside this file; local, gitignored).
 // entry_facing.js — which way a player faces on walking into a room (Lucas, 2026-10-28, every scenario).
 //
 // RULE: arriving through a door from room `fromKey`, face the WAY OUT — the arrival room's other door, not

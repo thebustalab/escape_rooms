@@ -1,3 +1,4 @@
+// Editing this? Read _agent_reference/instruments_and_widgets.md first (beside this file; local, gitignored).
 // The PCA plate ("coconuts and the stick / the mat") — an engine INSTRUMENT (hotspot `type:"instrument"`,
 // `kind:"pca_plate"`). First built 2026-10-20 (3-D only); reworked 2026-10-26 into a 2-D / 3-D teaching board.
 //

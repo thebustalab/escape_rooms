@@ -1,3 +1,4 @@
+// Editing this? Read _agent_reference/doors_and_progression.md (doors, gated art) and viewer_and_motion.md (cinemagraph + sfx states) first (beside this file; local, gitignored).
 // variant_resolve.js — pure selection logic for per-hotspot STATE VARIANTS (Phase 3 / Option 2).
 //
 // A hotspot (object) may carry `variants: [{state, when, box, prompt, panorama}]`. At runtime each

@@ -1,10 +1,11 @@
+// Editing this? Read _agent_reference/instruments_and_widgets.md first (beside this file; local, gitignored).
 // Ghost lines — the pure half (no DOM) of the ghost-line board (shared/ghost_lines.js, kind "ghost_lines",
 // regression/pits). A hidden POPULATION (a fixed, seeded set of claims: x uniform over the data range, y = a
 // true line + normal noise), random SAMPLES drawn from it without replacement, and the sprung rod of the
 // drawdown board (shared/drawdown_physics.js) let go on each sample until it stops. Its rest state is the
 // sample's least-squares line (drawdown_physics.js proves why); `settle` runs the real physics and never
 // consults ols(), so tests/ghost_lines.test.mjs can check the two agree.
-import { RodSim, ols } from "./drawdown_physics.js?v=170";
+import { RodSim, ols } from "./drawdown_physics.js?v=173";
 
 export { ols };
 

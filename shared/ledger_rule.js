@@ -1,3 +1,4 @@
+// Editing this? Read _agent_reference/instruments_and_widgets.md first (beside this file; local, gitignored).
 // Deduction ledger (#9) — the CONFIRMATION RULE, extracted so it can be tested without a browser.
 //
 // The ledger never confirms a single row. It confirms a whole GROUP, and only when the set of rows

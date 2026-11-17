@@ -1,3 +1,4 @@
+// Editing this? Find your function in the router in shared/AGENTS.md, then read the _agent_reference/ doc it names.
 /*
  * pano-player.js — the shared pseudo-360 room player, scenario-agnostic.
  *
@@ -84,31 +85,31 @@
 // A bare `./variant_resolve.js` import is NOT refreshed by bumping the <script> tag's ?v, so a changed
 // helper module (e.g. a new export) leaves browsers on a stale cached copy → "doesn't provide an export
 // named X" SyntaxError → blank page (the 2026-08-05 airship regression). Bump all three together.
-import { WebRConsole } from "./webr-console.js?v=170";
-import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers, pickTransit } from "./variant_resolve.js?v=170";   // Phase 3: per-hotspot state variants; monorail switch-door nav
-import * as PQ from "./puzzle_queue.js?v=170";   // dynamic puzzle queue: location-independent puzzle serving
-import * as CP from "./corr_panel.js?v=170";   // lower-triangle layout of the grid gate (clouds correlation panel)
-import { particleCount } from "./particles.js?v=170";
-import { mountLandingBackdrop } from "./landing_backdrop.js?v=170";   // landing text over a pan of the first room's clip   // ambient-particle vocabulary + per-kind field density
-import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=170";
-import { condHolds } from "./cond.js?v=170";
-import { gridMatches } from "./grid_check.js?v=170";   // grid answer check; `partition:true` accepts any relabelling of the buckets   // ledger + elevation-map card DOM
-import * as LIVE from "./live_session.js?v=170";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
-import * as RIDE from "./ride.js?v=170";
-import { mountPcaPlate } from "./pca_plate.js?v=170";   // the PCA plate instrument (voyage beach)
-import { mountFishBoard } from "./fish_board.js?v=170";   // the fish board instrument (harbour berth)
-import { mountDrawdown } from "./drawdown.js?v=170";
-import { mountTide } from "./tide_machine.js?v=170";   // the tide machine instrument (dunes escape)
-import { mountVarianceMeter } from "./variance_meter.js?v=170";   // the variance meter instrument (anova cellars escape)
-import { mountAnovaInstrument } from "./anova_instrument.js?v=170";   // the ANOVA instrument (Fisher's board, anova rooms; also the book, ch.12b)
-import { mountGhostLines } from "./ghost_lines.js?v=170";   // the ghost-line board instrument (regression pits hub)
+import { WebRConsole } from "./webr-console.js?v=173";
+import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers, pickTransit } from "./variant_resolve.js?v=173";   // Phase 3: per-hotspot state variants; monorail switch-door nav
+import * as PQ from "./puzzle_queue.js?v=173";   // dynamic puzzle queue: location-independent puzzle serving
+import * as CP from "./corr_panel.js?v=173";   // lower-triangle layout of the grid gate (clouds correlation panel)
+import { particleCount } from "./particles.js?v=173";
+import { mountLandingBackdrop } from "./landing_backdrop.js?v=173";   // landing text over a pan of the first room's clip   // ambient-particle vocabulary + per-kind field density
+import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=173";
+import { condHolds } from "./cond.js?v=173";
+import { gridMatches } from "./grid_check.js?v=173";   // grid answer check; `partition:true` accepts any relabelling of the buckets   // ledger + elevation-map card DOM
+import * as LIVE from "./live_session.js?v=173";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
+import * as RIDE from "./ride.js?v=173";
+import { mountPcaPlate } from "./pca_plate.js?v=173";   // the PCA plate instrument (voyage beach)
+import { mountFishBoard } from "./fish_board.js?v=173";   // the fish board instrument (harbour berth)
+import { mountDrawdown } from "./drawdown.js?v=173";
+import { mountTide } from "./tide_machine.js?v=173";   // the tide machine instrument (dunes escape)
+import { mountVarianceMeter } from "./variance_meter.js?v=173";   // the variance meter instrument (anova cellars escape)
+import { mountAnovaInstrument } from "./anova_instrument.js?v=173";   // the ANOVA instrument (Fisher's board, anova rooms; also the book, ch.12b)
+import { mountGhostLines } from "./ghost_lines.js?v=173";   // the ghost-line board instrument (regression pits hub)
    // the drawdown board instrument (diamonds escape)   // THE RIDE (subway): express lever + clip-sequence planner
-import * as BELL from "./bell_pull.js?v=170";
-import * as TCOUNT from "./transit_counter.js?v=170";   // the date plaque over a flat door transit (dunes time-skip)
-import * as DATEB from "./date_board.js?v=170";   // date lock: lock mode:"date", two slide-levers (dunes departure board)
-import * as INVY from "./inventory.js?v=170";   // carried items + the door that asks which to use (dunes)   // bell-pull (#16): dial mode:"pull" + lock mode:"state" (spa belfry)
-import { entryYaw } from "./entry_facing.js?v=170";   // face the way out on entering a room (every scenario)
-import * as HINTS from "./escape_hints.js?v=170";   // escape-phase Hint chip: time-unlocked tiers (SCENARIO.escapeHints)
+import * as BELL from "./bell_pull.js?v=173";
+import * as TCOUNT from "./transit_counter.js?v=173";   // the date plaque over a flat door transit (dunes time-skip)
+import * as DATEB from "./date_board.js?v=173";   // date lock: lock mode:"date", two slide-levers (dunes departure board)
+import * as INVY from "./inventory.js?v=173";   // carried items + the door that asks which to use (dunes)   // bell-pull (#16): dial mode:"pull" + lock mode:"state" (spa belfry)
+import { entryYaw } from "./entry_facing.js?v=173";   // face the way out on entering a room (every scenario)
+import * as HINTS from "./escape_hints.js?v=173";   // escape-phase Hint chip: time-unlocked tiers (SCENARIO.escapeHints)
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 
@@ -266,6 +267,8 @@ function escHtml(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, c => 
 // count). A plain in-memory Map keeps this static / GitHub-Pages-safe (no server, no storage) and
 // consistent with the rest of the game state, which also resets on a full page reload.
 const attemptCounts = new Map();
+// grid `lockout: {after, seconds}`: every `after` wrong tries locks the panel for `seconds` (survives reopening).
+const gridLocks = new Map();   // pid -> { wrong, until }
 // Scrambling secret for shared/codec.js — MUST match decoder/decode_codes.R's SECRET
 // (it moved here from the archived escape-engine.js). Change it per course, in BOTH files.
 const SECRET = "chem5725-noatak-2026";
@@ -2038,6 +2041,37 @@ function fadeThroughBlack(ms, change) {
     setTimeout(lift, 150);
   }, ms + 50);
 }
+// FLY (opt-in per door: `fly: true`; bathhouse's sky, 2026-11-16, Lucas: "like you're flying out one of the windows").
+// The view rushes forward (the panorama zooms in) as a pale dusk-sky veil rises over it; the next room loads under the
+// veil, which then clears. Like fadeThroughBlack, the veil lifts once the NEW viewer has loaded (or a card has opened
+// over it), and never later than 8 s. prefers-reduced-motion walks straight through.
+const FLY_MS = 900;
+function flyThrough(go, ms = FLY_MS) {
+  let reduce = false;
+  try { reduce = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches); } catch (e) {}
+  if (reduce) return go();
+  const veil = document.createElement("div");
+  veil.className = "fly-veil";
+  veil.style.cssText = `position:fixed;inset:0;z-index:6;pointer-events:all;opacity:0;transition:opacity ${ms}ms ease-in;` +
+    "background:radial-gradient(ellipse at center,#fffaf2 0%,#f6e3ea 40%,#c9b6e0 75%,#8f7fc0 100%)";
+  document.body.appendChild(veil);
+  try { if (viewer && viewer.setHfov) viewer.setHfov(Math.max(25, viewer.getHfov() * 0.35), ms); } catch (e) {}
+  requestAnimationFrame(() => requestAnimationFrame(() => { veil.style.opacity = "1"; }));
+  setTimeout(() => {
+    const old = viewer, t0 = performance.now();
+    go();
+    const lift = () => {
+      let ready = false;
+      try { ready = viewer !== old && viewer.isLoaded && viewer.isLoaded() && $("#pano").style.opacity === "1"; } catch (e) {}
+      const card = $("#modal").classList.contains("open");
+      if (!ready && !card && performance.now() - t0 < 8000) return setTimeout(lift, 100);
+      veil.style.transition = `opacity ${ms}ms ease-out`;
+      veil.style.opacity = "0";
+      setTimeout(() => veil.remove(), ms + 150);
+    };
+    setTimeout(lift, 150);
+  }, ms + 50);
+}
 function buildViewer(img, yaw = 0) {
   syncRoomSfx();   // the backdrop may have changed state (a solve flipping the scene to night) — follow it with sound
   stateFade();
@@ -2228,6 +2262,8 @@ function handleDoor(h) {
     passed();
     const back = resolveDoorTarget(h, "back");
     if (h.transit && back >= 0 && startTransit(h, back, false)) return;   // the forward transit's clip, reversed
+    const from = room.key;
+    if (h.fly && back >= 0) return flyThrough(() => navigateTo(back, false, undefined, from));   // a flight (the sky)
     return navigateTo(back, false, undefined, room.key);       // back: no gate, no entry
   }
   if (!doorIsOpen(h, room)) {
@@ -2255,6 +2291,8 @@ function handleDoor(h) {
     const idx = SCENARIO.rooms.findIndex(r => r.key === nav.to && isBuilt(r));
     if (idx >= 0) {
       if (h.transit && startTransit(h, idx)) return;           // portal transit clip, then arrive (see startTransit)
+      const from = room.key;
+      if (h.fly) return flyThrough(() => navigateTo(idx, true, undefined, from));   // out of a window, down from the sky
       return navigateTo(idx, true, undefined, room.key);
     }
     // the day's end (bathhouse, 2026-10-28) whose art is not drawn yet: end the day from where the player stands
@@ -4084,7 +4122,9 @@ function showWorkedAnswer(card, code) {
 function buildLiveMcqCard(task, onSolved) {
   const card = document.createElement("div"); card.className = "qcard";
   const grp = "lq" + Math.round(performance.now());
-  card.innerHTML = `<div class="qprompt">${task.prompt}</div><div class="qopts"></div>
+  // a prompt with a line break (the bathhouse library's passage, then its question, 2026-11-16) keeps its lines
+  const lines = /\n/.test(task.prompt) ? ' style="white-space:pre-line;text-align:left"' : "";
+  card.innerHTML = `<div class="qprompt"${lines}>${task.prompt}</div><div class="qopts"></div>
      <div class="qfeedback"></div><button class="qsubmit" disabled>Check my answer</button>`;
   const opts = card.querySelector(".qopts"), fb = card.querySelector(".qfeedback"), btn = card.querySelector(".qsubmit");
   let sel = null, done = false;
@@ -5000,7 +5040,9 @@ function buildDateLockCard(h, onSolved) {
 // `answer` (an object `{itemKey: bucketKey}`). Ungraded — never in the codec (like `lock`); solving it
 // solves the room, and ends the escape only if the grid carries `endsEscape` (solveRoom). Recognition, not computation: the player
 // brings the grouping they inferred in-world (e.g. tree heights), no printed method. Schema:
-//   { type:"grid", box, label?, prompt?, items:[{key,label,labelHtml?}], buckets:[{key,label,labelHtml?}], answer:{}, maxAttempts?, feedback?:{correct,wrong,out} }
+//   { type:"grid", box, label?, prompt?, items:[{key,label,labelHtml?}], buckets:[{key,label,labelHtml?}], answer:{}, maxAttempts?, lockout?:{after,seconds}, feedback?:{correct,wrong,out,locked} }
+// `lockout` (anova/cellars' passage doors, Lucas 2026-11-17): every `after` wrong tries lock the submit button for
+// `seconds`, with a countdown; the lock is kept per gate, so closing and reopening the panel does not clear it.
 // `partition:true` makes the buckets unlabelled groups: any relabelling of the keyed grouping (e.g. its mirror)
 // is accepted (shared/grid_check.js; anova/cellars' passage door).
 // `labelHtml` (optional, authored markup — same trust as `prompt`) replaces the visible header, e.g. an inline
@@ -5031,6 +5073,19 @@ function buildGridCard(h, onSolved) {
     // canyon's floodgate panel is the second and says its own thing.
     `</tbody></table><div class="qfeedback"></div><button class="qsubmit">${esc(h.submitLabel || "Set the cache")}</button>`;
   const fb = card.querySelector(".qfeedback"), sub = card.querySelector(".qsubmit");
+  const LO = h.lockout && h.lockout.after ? { after: +h.lockout.after, ms: 1000 * (+h.lockout.seconds || 60) } : null;
+  const lockState = () => { if (!gridLocks.has(pid)) gridLocks.set(pid, { wrong: 0, until: 0 }); return gridLocks.get(pid); };
+  let lockTimer = null;
+  const runLock = () => {
+    const left = Math.ceil((lockState().until - Date.now()) / 1000);
+    if (lockTimer && !card.isConnected) { clearInterval(lockTimer); lockTimer = null; return; }   // panel closed
+    if (left <= 0) { sub.disabled = false; fb.className = "qfeedback"; fb.innerHTML = ""; clearInterval(lockTimer); lockTimer = null; return; }
+    sub.disabled = true;
+    fb.className = "qfeedback out";
+    fb.innerHTML = (fbk.locked || "The panel locks.") + ` Try again in ${left} s.`;
+  };
+  const startLock = () => { runLock(); if (!lockTimer) lockTimer = setInterval(runLock, 500); };
+  if (LO && lockState().until > Date.now()) startLock();
   // Test play: the prompt and both axes' headers edit in place; the button text and every feedback line
   // (seen only one at a time in play) sit in the authoring panel. Keys and the answer map are NOT
   // editable here, so an edit can never re-key the grid. A `labelHtml` header is authored markup and
@@ -5062,6 +5117,7 @@ function buildGridCard(h, onSolved) {
     fb.className = "qfeedback"; fb.innerHTML = "";
   }));
   const submit = () => {
+    if (LO && lockState().until > Date.now()) return;
     if (items.some(it => !sel[it.key])) { fb.className = "qfeedback no"; fb.innerHTML = fbk.incomplete || "Place every kind first."; return; }
     attempts++; attemptCounts.set(pid, attempts);
     if (gridMatches(items, sel, answer, !!h.partition)) {
@@ -5073,6 +5129,10 @@ function buildGridCard(h, onSolved) {
       card.querySelectorAll("button").forEach(b => b.disabled = true);
     } else {
       fb.className = "qfeedback no"; fb.innerHTML = fbk.wrong || "That doesn't sit right — look again at how the kinds stand.";
+      if (LO) {
+        const L = lockState(); L.wrong++;
+        if (L.wrong % LO.after === 0) { L.until = Date.now() + LO.ms; startLock(); }
+      }
     }
   };
   sub.addEventListener("click", submit);

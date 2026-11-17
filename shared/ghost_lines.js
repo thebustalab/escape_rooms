@@ -1,3 +1,4 @@
+// Editing this? Read _agent_reference/instruments_and_widgets.md first (beside this file; local, gitignored).
 // The Ghost-Line Board — an engine INSTRUMENT (hotspot `type:"instrument"`, `kind:"ghost_lines"`), built
 // 2026-11-05 for regression/pits (the live regression scenario's hub) on the drawdown board's physics; put on
 // four TABS with a Lesson panel on 2026-11-07 (Lucas: like the harbour fish board, aligned with the book's
@@ -35,7 +36,7 @@
 import {
   POP_DEFAULTS, makePopulation, sampleIdx, rng, makeRod, placeRod, lineOf, ols, spreadAt, slopeSd, sumSquares,
   totalSquares, makeMultiSet, multiFits, colSd, scaleCol,
-} from "./ghost_lines_math.js?v=170";
+} from "./ghost_lines_math.js?v=173";
 
 const VIEW_DEFAULTS = {
   xView: [0, 20], yView: [0, 90], xLabel: "Gravel depth (ft)", yLabel: "Carats per 100 t",

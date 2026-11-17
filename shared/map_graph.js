@@ -1,3 +1,4 @@
+// Editing this? Read _agent_reference/submission_and_closeout.md (In-game map engine) first (beside this file; local, gitignored).
 // map_graph.js — pure room-graph renderer, shared by the AUTHORING harness (build_world's network view)
 // and the PLAYER's in-game fog-of-war map. NO DOM, so it works in the browser (attaches
 // window.MapGraph) AND under node (module.exports) — which lets tests/map_graph.test.js drive the layout

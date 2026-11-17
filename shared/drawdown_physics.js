@@ -1,3 +1,4 @@
+// Editing this? Read _agent_reference/instruments_and_widgets.md first (beside this file; local, gitignored).
 // Drawdown-board physics (shared/drawdown.js; ported 2026-10-20 from the diamonds prototype):
 // a rigid rod hung on identical vertical linear springs.
 //

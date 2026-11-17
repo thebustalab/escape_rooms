@@ -1,3 +1,4 @@
+// Editing this? Read _agent_reference/instruments_and_widgets.md first (beside this file; local, gitignored).
 // MOVED 2026-10-28 from rooms/regression/dunes/_scratch/tide_machine/model.js, which now re-exports this file,
 // so the engine instrument (shared/tide_machine.js), the prototype pages, the bench and test_model.mjs share one model.
 // Tide machine model + mechanism geometry. ES module, no dependencies; shared by machine.js and test_model.mjs.

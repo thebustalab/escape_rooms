@@ -1,3 +1,4 @@
+// Editing this? Read _agent_reference/doors_and_progression.md first (beside this file; local, gitignored).
 // THE INVENTORY (Lucas, 2026-10-24, first consumer regression/dunes): things the player CARRIES — a key, a
 // rope — and a door that asks which one to use. Pure logic only, so it is unit-tested without a browser
 // (tests/inventory.test.mjs); pano-player.js owns the DOM (the "use what?" card, the notebook's

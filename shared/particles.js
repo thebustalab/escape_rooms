@@ -1,3 +1,4 @@
+// Editing this? Read _agent_reference/viewer_and_motion.md first (beside this file; local, gitignored).
 // Ambient-particle vocabulary + field density. Pure and DOM-free so it can be unit-tested directly
 // (house pattern: same shape as puzzle_queue.js / variant_resolve.js). The DOM-building half lives in
 // `spawnParticles` in pano-player.js; only the decisions live here.

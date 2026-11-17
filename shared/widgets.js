@@ -1,10 +1,11 @@
+// Editing this? Read _agent_reference/instruments_and_widgets.md first (beside this file; local, gitignored).
 // Card builders for the two 2026-08-26 hotspot types, split out of pano-player.js so the DOM layer is
 // reachable from a Playwright fixture (tests/e2e/widgets.spec.js) without booting a whole scenario:
 // the engine's own state — the gate key, the attempt counter, the lock table, the world-state bag — is
 // INJECTED as `ctx` rather than read from module scope. pano-player passes its real objects; the test
 // passes plain ones.
-import { confirmGroups, confirmAll } from "./ledger_rule.js?v=170";
-import { makeScale, junctionsAbove, placedCount } from "./elev_scale.js?v=170";
+import { confirmGroups, confirmAll } from "./ledger_rule.js?v=173";
+import { makeScale, junctionsAbove, placedCount } from "./elev_scale.js?v=173";
 
 export function buildLedgerCard(h, onSolved, ctx) {
   const rows = h.rows || [];

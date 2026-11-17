@@ -1,3 +1,4 @@
+// Editing this? Read _agent_reference/doors_and_progression.md first (beside this file; local, gitignored).
 // corr_panel.js — the LOWER-TRIANGLE layout of the `grid` gate (2026-09-21, clouds / THE SHADOW CITY).
 //
 // A correlation panel: for N attributes, one cell per unordered pair, laid out as the lower triangle of the

@@ -1,3 +1,4 @@
+// Editing this? Read _agent_reference/instruments_and_widgets.md first (beside this file; local, gitignored).
 // BELL-PULL (mechanic #16, built 2026-10-20, comparing_means/spa) — the pure half.
 //
 // Two pieces of world-state plumbing, both reading and writing the ordinary `gameState` bag:

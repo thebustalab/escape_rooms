@@ -1,3 +1,4 @@
+// Editing this? Read _agent_reference/doors_and_progression.md first (beside this file; local, gitignored).
 // The grid gate's answer check, pure so it can be tested (tests/grid_check.test.mjs).
 // Default: every item in exactly the keyed bucket. With `partition` (h.partition:true) the buckets are
 // unlabelled groups, so only WHICH ITEMS SHARE A BUCKET matters: a grouping and its mirror (or any

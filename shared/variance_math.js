@@ -1,3 +1,4 @@
+// Editing this? Read _agent_reference/instruments_and_widgets.md first (beside this file; local, gitignored).
 // The arithmetic behind the variance meter (shared/variance_meter.js, kind "variance_meter", anova/cellars).
 // Pure, no DOM, so node can test it against R's aov().
 //

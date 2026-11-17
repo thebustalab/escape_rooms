@@ -1,3 +1,4 @@
+// Editing this? Read _agent_reference/submission_and_closeout.md first (beside this file; local, gitignored).
 /*
  * debrief.js — the exit-debrief "how this world worked" gallery for the WebR escape rooms.
  *

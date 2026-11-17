@@ -1,3 +1,4 @@
+// Editing this? Read _agent_reference/viewer_and_motion.md first (beside this file; local, gitignored).
 // landing_backdrop.js — the landing screen's moving backdrop (2026-10-23, Lucas).
 //
 // The opening text used to sit on the plain background with the ambient particles. It now sits over a

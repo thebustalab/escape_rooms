@@ -1,3 +1,4 @@
+// Editing this? Read _agent_reference/instruments_and_widgets.md first (beside this file; local, gitignored).
 // Elevation map — the scale maths, extracted so it can be tested without a browser.
 //
 // The map's whole pedagogical claim is that the axis is PROPERLY SCALED: dragging a junction node to its

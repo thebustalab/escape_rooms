@@ -1,3 +1,4 @@
+// Editing this? Read _agent_reference/instruments_and_widgets.md first (beside this file; local, gitignored).
 // THE TIDE MACHINE — an engine INSTRUMENT (hotspot `type:"instrument"`, `kind:"tide"`), ported 2026-10-28 from the
 // dunes prototype (rooms/regression/dunes/_scratch/tide_machine/machine_art.js; its README.md is the full design).
 // Edit THIS file from now on; the prototype page is reference only.
@@ -23,7 +24,7 @@
 //                even pace to `to` (an ISO time) over `ms`, so a player can watch the whole run without cranking.
 //   m.place(shaft, pid); m.arrangement(); m.setDatum(z); m.datum(); m.setTime(iso); m.time(); m.level();
 //   m.penLevel(); m.shelf(); m.ready (Promise); m.destroy();   (also on the canvas as `canvas.tide`)
-import * as M from "./tide_model.js?v=170";
+import * as M from "./tide_model.js?v=173";
 
 const SERIF = 'Georgia, "Times New Roman", "Liberation Serif", serif';
 const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];

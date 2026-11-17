@@ -1,3 +1,4 @@
+// Editing this? Read _agent_reference/webr_console.md first (beside this file; local, gitignored).
 /**
  * r_packages.js — THE list of R packages every WebR surface installs. One file, no drift.
  *
@@ -112,7 +113,8 @@ export const BIOC_PACKAGES = ["ggtree"];
  * is the bulk of the extra boot time; whether the chain LOADS is checked by tests/matrix_analysis_smoke.mjs.
  */
 // emmeans: tukeyTest() on a fitted model; multcompView: pGroups(). Both in repo.r-wasm.org contrib/4.6 (2026-11-02).
-export const STATS_PACKAGES = ["rstatix", "emmeans", "multcompView"];
+// vegan: permanovaTest() (its deps MASS/cluster/lattice/mgcv come with the analysis packages; ~1 s extra, 2026-11-17).
+export const STATS_PACKAGES = ["rstatix", "emmeans", "multcompView", "vegan"];
 
 /**
  * Everything a session ends up with, in one call — for a caller that wants to know, and for the

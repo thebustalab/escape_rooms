@@ -1,3 +1,4 @@
+// Editing this? Read _agent_reference/live_mode.md first (beside this file; local, gitignored). Callsigns only, never x500s; no answers to the browser in class.
 /*
  * live_session.js — LIVE scenarios (`scenario.live: true`): the room player joined to the in-class
  * live session run by authoring_v2/live_class/live_server.py.
@@ -26,8 +27,8 @@
  * (shared/live_solo.js), answering the same calls; everything below works unchanged on top of it.
  */
 
-import "./fish_stats.js?v=170";
-import { SoloSession } from "./live_solo.js?v=170";     // window.FishStats: the fish board's tests (Welch t), pinned to R
+import "./fish_stats.js?v=173";
+import { SoloSession } from "./live_solo.js?v=173";     // window.FishStats: the fish board's tests (Welch t), pinned to R
 
 const POLL_MS = 2000;
 const STORE = "liveSession";        // localStorage: { pid, code }
@@ -341,7 +342,7 @@ function render() {
   if (dismissedPhase && dismissedPhase !== ph) dismissedPhase = null;    // a new phase brings its card back
   if (dismissedPhase === ph) overlay("hide");
   else if (ph === "paused") overlay("paused", "Paused", "Eyes on the screen at the front.");
-  else if (ph === "won") overlay("show", "You did it", total + " / " + goal + (label ? " " + label : "") + ". " +
+  else if (ph === "won") overlay("show", st.won_title || "You did it", total + " / " + goal + (label ? " " + label : "") + ". " +
                                  (st.won_text || "Nice work, crew."), true);   // won_text: e.g. where to escape to
   // After the clock the stations stay open for practice (live_server.PRACTICE_PHASES), and a closed session's
   // card can be dismissed, so a stuck student can still show their puzzle after class (Lucas, 2026-10-28).

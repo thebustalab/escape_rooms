@@ -1,3 +1,4 @@
+// Editing this? Read _agent_reference/webr_console.md first (beside this file; local, gitignored).
 /*
  * r_diagnose.js — turn R's error output into something a student can act on.
  *
@@ -35,7 +36,7 @@
  *
  * PURE — no DOM, no WebR. Tested in Node (`tests/r_diagnose.test.mjs`).
  */
-import { tokenizeR } from "./r_highlight.js?v=170";
+import { tokenizeR } from "./r_highlight.js?v=173";
 
 const OPENERS = { "(": ")", "[": "]", "{": "}" };
 const CLOSERS = { ")": "(", "]": "[", "}": "{" };
