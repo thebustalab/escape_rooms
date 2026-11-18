@@ -18,13 +18,13 @@
  * `addStatusEl()`, `plotControls(opts)`, `resetSession()`, `resetControl(opts)`, `.ready`, `.webR`.
  */
 import { WebR } from "https://webr.r-wasm.org/latest/webr.mjs";
-import { VIEW_R_SHIM, VIEW_R_DRAIN, fromR, viewTableHTML, ensureViewStyles } from "./webr_view.js?v=173";
-import { codeToRun, selectionNote } from "./code_sel.js?v=173";
-import { PLOT_ASPECTS, PLOT_DEFAULT_ASPECT, PLOT_LIMITS, PLOT_CTL_CSS, plotGeometry } from "./plot_size.js?v=173";
-import { RESET_R_SHIM, RESET_R_CALL, RESET_CTL_CSS, RESET_LABEL, RESET_CONFIRM_LABEL, RESET_CONFIRM_MS, nextConfirmState } from "./webr_reset.js?v=173";
-import { explainError, looksLikeOrphanLayer } from "./r_diagnose.js?v=173";
-import { R_BIOC_REPOS, BASE_PACKAGES, ANALYSIS_PACKAGES, BIOC_PACKAGES, STATS_PACKAGES, resolvePackages } from "./r_packages.js?v=173";
-import { MATRIX_ANALYSIS_R_SHIM, STATS_TESTS_R_SHIM, MODELS_R_SHIM } from "./r_matrix_analysis.js?v=173";
+import { VIEW_R_SHIM, VIEW_R_DRAIN, fromR, viewTableHTML, ensureViewStyles } from "./webr_view.js?v=174";
+import { codeToRun, selectionNote } from "./code_sel.js?v=174";
+import { PLOT_ASPECTS, PLOT_DEFAULT_ASPECT, PLOT_LIMITS, PLOT_CTL_CSS, plotGeometry } from "./plot_size.js?v=174";
+import { RESET_R_SHIM, RESET_R_CALL, RESET_CTL_CSS, RESET_LABEL, RESET_CONFIRM_LABEL, RESET_CONFIRM_MS, nextConfirmState } from "./webr_reset.js?v=174";
+import { explainError, looksLikeOrphanLayer } from "./r_diagnose.js?v=174";
+import { R_BIOC_REPOS, BASE_PACKAGES, ANALYSIS_PACKAGES, BIOC_PACKAGES, STATS_PACKAGES, resolvePackages } from "./r_packages.js?v=174";
+import { MATRIX_ANALYSIS_R_SHIM, STATS_TESTS_R_SHIM, MODELS_R_SHIM } from "./r_matrix_analysis.js?v=174";
 
 const errText = e => (e && e.message ? e.message : String(e));
 

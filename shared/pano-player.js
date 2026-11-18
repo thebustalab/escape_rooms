@@ -85,31 +85,32 @@
 // A bare `./variant_resolve.js` import is NOT refreshed by bumping the <script> tag's ?v, so a changed
 // helper module (e.g. a new export) leaves browsers on a stale cached copy → "doesn't provide an export
 // named X" SyntaxError → blank page (the 2026-08-05 airship regression). Bump all three together.
-import { WebRConsole } from "./webr-console.js?v=173";
-import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers, pickTransit } from "./variant_resolve.js?v=173";   // Phase 3: per-hotspot state variants; monorail switch-door nav
-import * as PQ from "./puzzle_queue.js?v=173";   // dynamic puzzle queue: location-independent puzzle serving
-import * as CP from "./corr_panel.js?v=173";   // lower-triangle layout of the grid gate (clouds correlation panel)
-import { particleCount } from "./particles.js?v=173";
-import { mountLandingBackdrop } from "./landing_backdrop.js?v=173";   // landing text over a pan of the first room's clip   // ambient-particle vocabulary + per-kind field density
-import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=173";
-import { condHolds } from "./cond.js?v=173";
-import { gridMatches } from "./grid_check.js?v=173";   // grid answer check; `partition:true` accepts any relabelling of the buckets   // ledger + elevation-map card DOM
-import * as LIVE from "./live_session.js?v=173";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
-import * as RIDE from "./ride.js?v=173";
-import { mountPcaPlate } from "./pca_plate.js?v=173";   // the PCA plate instrument (voyage beach)
-import { mountFishBoard } from "./fish_board.js?v=173";   // the fish board instrument (harbour berth)
-import { mountDrawdown } from "./drawdown.js?v=173";
-import { mountTide } from "./tide_machine.js?v=173";   // the tide machine instrument (dunes escape)
-import { mountVarianceMeter } from "./variance_meter.js?v=173";   // the variance meter instrument (anova cellars escape)
-import { mountAnovaInstrument } from "./anova_instrument.js?v=173";   // the ANOVA instrument (Fisher's board, anova rooms; also the book, ch.12b)
-import { mountGhostLines } from "./ghost_lines.js?v=173";   // the ghost-line board instrument (regression pits hub)
+import { WebRConsole } from "./webr-console.js?v=174";
+import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers, pickTransit } from "./variant_resolve.js?v=174";   // Phase 3: per-hotspot state variants; monorail switch-door nav
+import * as PQ from "./puzzle_queue.js?v=174";   // dynamic puzzle queue: location-independent puzzle serving
+import * as CP from "./corr_panel.js?v=174";   // lower-triangle layout of the grid gate (clouds correlation panel)
+import { particleCount } from "./particles.js?v=174";
+import { mountLandingBackdrop } from "./landing_backdrop.js?v=174";   // landing text over a pan of the first room's clip   // ambient-particle vocabulary + per-kind field density
+import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=174";
+import { condHolds } from "./cond.js?v=174";
+import { gridMatches } from "./grid_check.js?v=174";   // grid answer check; `partition:true` accepts any relabelling of the buckets   // ledger + elevation-map card DOM
+import * as LIVE from "./live_session.js?v=174";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
+import * as RIDE from "./ride.js?v=174";
+import { mountPcaPlate } from "./pca_plate.js?v=174";   // the PCA plate instrument (voyage beach)
+import { mountFishBoard } from "./fish_board.js?v=174";   // the fish board instrument (harbour berth)
+import { mountDrawdown } from "./drawdown.js?v=174";
+import { mountTide } from "./tide_machine.js?v=174";   // the tide machine instrument (dunes escape)
+import { mountVarianceMeter } from "./variance_meter.js?v=174";   // the variance meter instrument (anova cellars escape)
+import { mountAnovaInstrument } from "./anova_instrument.js?v=174";   // the ANOVA instrument (Fisher's board, anova rooms; also the book, ch.12b)
+import { mountPermanovaInstrument } from "./permanova_instrument.js?v=174";   // its PERMANOVA sibling: the board's optional second tab
+import { mountGhostLines } from "./ghost_lines.js?v=174";   // the ghost-line board instrument (regression pits hub)
    // the drawdown board instrument (diamonds escape)   // THE RIDE (subway): express lever + clip-sequence planner
-import * as BELL from "./bell_pull.js?v=173";
-import * as TCOUNT from "./transit_counter.js?v=173";   // the date plaque over a flat door transit (dunes time-skip)
-import * as DATEB from "./date_board.js?v=173";   // date lock: lock mode:"date", two slide-levers (dunes departure board)
-import * as INVY from "./inventory.js?v=173";   // carried items + the door that asks which to use (dunes)   // bell-pull (#16): dial mode:"pull" + lock mode:"state" (spa belfry)
-import { entryYaw } from "./entry_facing.js?v=173";   // face the way out on entering a room (every scenario)
-import * as HINTS from "./escape_hints.js?v=173";   // escape-phase Hint chip: time-unlocked tiers (SCENARIO.escapeHints)
+import * as BELL from "./bell_pull.js?v=174";
+import * as TCOUNT from "./transit_counter.js?v=174";   // the date plaque over a flat door transit (dunes time-skip)
+import * as DATEB from "./date_board.js?v=174";   // date lock: lock mode:"date", two slide-levers (dunes departure board)
+import * as INVY from "./inventory.js?v=174";   // carried items + the door that asks which to use (dunes)   // bell-pull (#16): dial mode:"pull" + lock mode:"state" (spa belfry)
+import { entryYaw } from "./entry_facing.js?v=174";   // face the way out on entering a room (every scenario)
+import * as HINTS from "./escape_hints.js?v=174";   // escape-phase Hint chip: time-unlocked tiers (SCENARIO.escapeHints)
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 
@@ -3135,7 +3136,37 @@ function openPlaque(h) {
 // closing and reopening within a visit (in memory only: nothing about an instrument is saved or graded).
 const INSTRUMENTS = { drawdown: mountDrawdown, pca_plate: mountPcaPlate, fish_board: mountFishBoard, tide: mountTide,
                       variance_meter: mountVarianceMeter, ghost_lines: mountGhostLines,
-                      anova_board: (host, o) => mountAnovaInstrument(host, Object.assign({}, o, { params: Object.assign({ skin: "board" }, o.params) })) };
+                      anova_board: mountAnovaBoard };
+// Fisher's board. A config carrying a `permanova` block (a PERMANOVA instrument config) gets two tabs, "ANOVA" and
+// "PERMANOVA"; without one it is the plain ANOVA board, unchanged. The PERMANOVA tab mounts on first open; the
+// tab last shown is remembered per config for the visit (in memory only, like the board's visited steps).
+const _boardTab = new WeakMap();
+function mountAnovaBoard(host, o) {
+  const anovaOpts = Object.assign({}, o, { params: Object.assign({ skin: "board" }, o.params) });
+  const pcfg = o.config && o.config.permanova;
+  if (!pcfg) return mountAnovaInstrument(host, anovaOpts);
+  const wrap = document.createElement("div"); wrap.className = "boardtabbed";
+  const bar = document.createElement("div"); bar.className = "boardtabs"; bar.setAttribute("role", "tablist");
+  const paneA = document.createElement("div"), paneP = document.createElement("div");
+  paneA.className = "boardpane boardpane-anova"; paneP.className = "boardpane boardpane-permanova";
+  wrap.append(bar, paneA, paneP); host.appendChild(wrap);
+  const inst = { anova: mountAnovaInstrument(paneA, anovaOpts), permanova: null };
+  const tabs = {};
+  const show = which => {
+    if (which === "permanova" && !inst.permanova)
+      inst.permanova = mountPermanovaInstrument(paneP, { config: pcfg, params: Object.assign({ skin: "board" }, pcfg.params) });
+    paneA.hidden = which !== "anova"; paneP.hidden = which !== "permanova";
+    for (const k in tabs) { tabs[k].classList.toggle("on", k === which); tabs[k].setAttribute("aria-selected", String(k === which)); }
+    _boardTab.set(o.config, which);
+  };
+  for (const [k, label] of [["anova", "ANOVA"], ["permanova", "PERMANOVA"]]) {
+    const b = document.createElement("button"); b.type = "button"; b.className = "boardtab boardtab-" + k;
+    b.setAttribute("role", "tab"); b.textContent = label; b.onclick = () => show(k);
+    bar.appendChild(b); tabs[k] = b;
+  }
+  show(_boardTab.get(o.config) || "anova");
+  return { destroy: () => { for (const k in inst) if (inst[k]) inst[k].destroy(); wrap.remove(); } };
+}
 // Opening zooms from the hotspot's marker into the close-up (settled design, notes §5 of diamonds), so the
 // student sees the board on the wall become the board in their hands. Skipped under reduced motion.
 function zoomFromHotspot(h) {

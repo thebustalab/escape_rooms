@@ -296,6 +296,13 @@ button.ghost { background:transparent; color:var(--ink); border:1px solid var(--
    letterboxes the still to its own aspect; max-height keeps a landscape phone from scrolling the modal, and
    touch-action:none lets a peg drag without panning the page. */
 .instrumentcard { display:flex; justify-content:center; }
+/* Fisher's board with a PERMANOVA tab (mountAnovaBoard): two tabs over the two wide boards, board skin colours */
+.boardtabbed { width:100%; min-width:0; }
+.boardtabs { display:flex; gap:6px; margin:0 0 -1px 12px; }
+.boardtab { background:#3a2d20; color:#bfa982; border:1px solid #5a4630; border-bottom:none; border-radius:8px 8px 0 0;
+  padding:8px 18px; font:600 15px Georgia, "Times New Roman", serif; letter-spacing:.04em; cursor:pointer; }
+.boardtab.on { background:#2a2118; color:#f3e6c8; border-color:#7a6040; box-shadow:inset 0 2px 0 #f0a24a; }
+.boardpane > .anova-inst, .boardpane > .perm-inst { margin-top:0; }
 .pcaplate { display:flex; flex-direction:column; gap:8px; width:100%; }
 .pcaplatebar { display:flex; gap:8px; align-items:center; justify-content:center; flex-wrap:wrap; }
 .pcaplatebar button { background:#3b2a14; color:#f3e6c4; border:1px solid #8a6a32; border-radius:6px; padding:6px 12px; font:inherit; cursor:pointer; }

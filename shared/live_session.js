@@ -27,8 +27,8 @@
  * (shared/live_solo.js), answering the same calls; everything below works unchanged on top of it.
  */
 
-import "./fish_stats.js?v=173";
-import { SoloSession } from "./live_solo.js?v=173";     // window.FishStats: the fish board's tests (Welch t), pinned to R
+import "./fish_stats.js?v=174";
+import { SoloSession } from "./live_solo.js?v=174";     // window.FishStats: the fish board's tests (Welch t), pinned to R
 
 const POLL_MS = 2000;
 const STORE = "liveSession";        // localStorage: { pid, code }
