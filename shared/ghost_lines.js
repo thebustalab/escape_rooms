@@ -36,7 +36,7 @@
 import {
   POP_DEFAULTS, makePopulation, sampleIdx, rng, makeRod, placeRod, lineOf, ols, spreadAt, slopeSd, sumSquares,
   totalSquares, makeMultiSet, multiFits, colSd, scaleCol,
-} from "./ghost_lines_math.js?v=174";
+} from "./ghost_lines_math.js?v=175";
 
 const VIEW_DEFAULTS = {
   xView: [0, 20], yView: [0, 90], xLabel: "Gravel depth (ft)", yLabel: "Carats per 100 t",

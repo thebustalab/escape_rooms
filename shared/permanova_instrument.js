@@ -100,6 +100,14 @@ const CSS = `
 .perm-inst .pi-tally{font-size:14px;margin:6px 2px}
 `;
 
+// The Lesson box keeps one height whatever step is shown (Lucas, 2026-11-18): every lesson text sits invisibly in
+// the same grid cell as the live one. A copy of anova_instrument.js's lessonStack (each file loads alone).
+function lessonStack(liveP, texts) {
+  const st = document.createElement("div"); st.className = "lstack";
+  for (const t of texts) { if (!t) continue; const g = document.createElement("p"); g.className = "lghost"; g.setAttribute("aria-hidden", "true"); g.textContent = t; st.appendChild(g); }
+  st.appendChild(liveP); return st;
+}
+
 // What both layouts share: names, steps, the shuffle engine (free permutations of whole label sets, vegan's
 // default; every term's F is recorded, so one batch of shuffles gives every row its p, as adonis2(by = "terms")
 // does), the lessons and the step captions.
@@ -365,6 +373,7 @@ const WIDE_CSS = `
 .perm-inst .pw-lesson{border-left:3px solid #e2b468;padding:2px 0 4px 10px;margin:4px 0 10px;min-height:4.6em}
 .perm-inst .pw-lesson b{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#e2b468}
 .perm-inst .pw-lesson p{margin:3px 0 0;font-size:clamp(15px,1.15vw,19px);line-height:1.45}
+.perm-inst .lstack{display:grid} .perm-inst .lstack>p{grid-area:1/1} .perm-inst .lstack>p.lghost{visibility:hidden}
 .perm-inst .pw-adv-row{display:flex;justify-content:flex-end;margin:6px 0 0}
 `;
 // Greedy word wrap for svg text (no foreignObject): about `n` characters a line.
@@ -407,12 +416,8 @@ function mountWide(host, cfg, P, C) {
     root.style.marginLeft = Math.round((vw - root.offsetWidth) / 2 - left) + "px";
   };
   centre(); addEventListener("resize", centre);
-  $("h4").textContent = cfg.title || "Permutational analysis of variance (PERMANOVA)";
-  if (cfg.intro) {
-    const intro = document.createElement("p"); intro.className = "pi-intro"; intro.textContent = cfg.intro; $(".pi-sub").before(intro);
-    if (cfg.credit) { const c = document.createElement("p"); c.className = "pi-credit"; c.textContent = cfg.credit; intro.after(c); }
-  }
-  $(".pi-sub").textContent = cfg.subtitle || `${N} ${noun}, each with a two-compound profile. Press the numbered buttons in order to build the table.`;
+  // No preamble in the wide layout (Lucas, 2026-11-18), as in anova_instrument.js; .pi-sub stays, hidden, as an anchor.
+  $("h4").hidden = true; $(".pi-sub").hidden = true;
   let qEls = [], qs = [], lessonP = null;
   if (P.lessons !== false) {
     qs = cfg.questions || [{ text: C.question, steps: two ? ["a", "b", "ab", "shuffle"] : ["a", "shuffle"] }];
@@ -424,7 +429,7 @@ function mountWide(host, cfg, P, C) {
     });
     const ls = document.createElement("div"); ls.className = "pw-lesson";
     const lh = document.createElement("b"); lh.textContent = "Lesson"; lessonP = document.createElement("p");
-    ls.append(lh, lessonP);
+    ls.append(lh, lessonStack(lessonP, Object.values(L)));
     $(".pi-sub").after(box, ls);
   }
   const btn = {};

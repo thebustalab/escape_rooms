@@ -23,6 +23,15 @@ const ROWCOL = { a: "#4aa8f0", b: "#f2d14a", ab: "#f0a24a", noise: "#4fd1c5", to
 
 const mean = xs => xs.reduce((s, x) => s + x, 0) / xs.length;
 
+// The Lesson box keeps one height whatever step is shown (Lucas, 2026-11-18: nothing moves when clicking around):
+// every lesson text sits invisibly in the same grid cell as the live one, so the cell is as tall as the longest,
+// at any width. Shared with permanova_instrument.js.
+export function lessonStack(liveP, texts) {
+  const st = document.createElement("div"); st.className = "lstack";
+  for (const t of texts) { if (!t) continue; const g = document.createElement("p"); g.className = "lghost"; g.setAttribute("aria-hidden", "true"); g.textContent = t; st.appendChild(g); }
+  st.appendChild(liveP); return st;
+}
+
 export function anovaDecompose(config) {
   const F = config.factors || [];
   const rows = (config.rows || []).map(r => Object.assign({}, r, { y: +r.y }));
@@ -358,6 +367,7 @@ const WIDE_CSS = `
 .anova-inst .ai-lesson{border-left:3px solid #e2b468;padding:2px 0 4px 10px;margin:4px 0 10px;min-height:4.6em}
 .anova-inst .ai-lesson b{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#e2b468}
 .anova-inst .ai-lesson p{margin:3px 0 0;font-size:clamp(15px,1.15vw,19px);line-height:1.45}
+.anova-inst .lstack{display:grid} .anova-inst .lstack>p{grid-area:1/1} .anova-inst .lstack>p.lghost{visibility:hidden}
 `;
 // The board's questions and per-step lessons (Lucas, 2026-11-14: like the other demonstration boards' Lesson
 // panel). Shown on the board skin by default (params.lessons overrides; the book's prose already teaches this).
@@ -414,14 +424,9 @@ function mountWide(host, cfg, P, D, opts) {
     root.style.marginLeft = Math.round((vw - root.offsetWidth) / 2 - left) + "px";
   };
   centre(); addEventListener("resize", centre);
-  root.querySelector("h4").textContent = cfg.title || "Analysis of variance";
-  if (cfg.intro) {
-    const intro = document.createElement("p"); intro.className = "ai-intro"; intro.textContent = cfg.intro;
-    root.querySelector(".ai-sub").before(intro);
-    if (cfg.credit) { const c = document.createElement("p"); c.className = "ai-credit"; c.textContent = cfg.credit; intro.after(c); }
-  }
-  root.querySelector(".ai-sub").textContent = cfg.subtitle ||
-    `${D.N} measurements of ${cfg.response || "the response"}${cfg.unit ? " (" + cfg.unit + ")" : ""}. Press the numbered buttons in order to build the table.`;
+  // No preamble in the wide layout (Lucas, 2026-11-18): no title, intro, credit or "press the buttons" line; the
+  // page around it (the book's prose, the board's hotspot title) introduces it. .ai-sub stays, hidden, as an anchor.
+  root.querySelector("h4").hidden = true; root.querySelector(".ai-sub").hidden = true;
   const svg = root.querySelector("svg");
   const advOn = advToggle(root, root.querySelector(".aw-scroll"), P.advanced, () => draw());
   const showLessons = P.lessons != null ? !!P.lessons : P.skin !== "book";
@@ -436,7 +441,7 @@ function mountWide(host, cfg, P, D, opts) {
     });
     const ls = document.createElement("div"); ls.className = "ai-lesson";
     const lh = document.createElement("b"); lh.textContent = "Lesson"; lessonP = document.createElement("p");
-    ls.append(lh, lessonP);
+    ls.append(lh, lessonStack(lessonP, Object.values(BT.lessons)));
     root.querySelector(".ai-sub").after(qs, ls);
   }
   const stepName = { total: "Total", a: nameA, b: nameB, ab: "Interaction", noise: "Noise" };

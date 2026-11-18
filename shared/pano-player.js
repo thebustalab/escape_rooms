@@ -85,32 +85,32 @@
 // A bare `./variant_resolve.js` import is NOT refreshed by bumping the <script> tag's ?v, so a changed
 // helper module (e.g. a new export) leaves browsers on a stale cached copy → "doesn't provide an export
 // named X" SyntaxError → blank page (the 2026-08-05 airship regression). Bump all three together.
-import { WebRConsole } from "./webr-console.js?v=174";
-import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers, pickTransit } from "./variant_resolve.js?v=174";   // Phase 3: per-hotspot state variants; monorail switch-door nav
-import * as PQ from "./puzzle_queue.js?v=174";   // dynamic puzzle queue: location-independent puzzle serving
-import * as CP from "./corr_panel.js?v=174";   // lower-triangle layout of the grid gate (clouds correlation panel)
-import { particleCount } from "./particles.js?v=174";
-import { mountLandingBackdrop } from "./landing_backdrop.js?v=174";   // landing text over a pan of the first room's clip   // ambient-particle vocabulary + per-kind field density
-import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=174";
-import { condHolds } from "./cond.js?v=174";
-import { gridMatches } from "./grid_check.js?v=174";   // grid answer check; `partition:true` accepts any relabelling of the buckets   // ledger + elevation-map card DOM
-import * as LIVE from "./live_session.js?v=174";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
-import * as RIDE from "./ride.js?v=174";
-import { mountPcaPlate } from "./pca_plate.js?v=174";   // the PCA plate instrument (voyage beach)
-import { mountFishBoard } from "./fish_board.js?v=174";   // the fish board instrument (harbour berth)
-import { mountDrawdown } from "./drawdown.js?v=174";
-import { mountTide } from "./tide_machine.js?v=174";   // the tide machine instrument (dunes escape)
-import { mountVarianceMeter } from "./variance_meter.js?v=174";   // the variance meter instrument (anova cellars escape)
-import { mountAnovaInstrument } from "./anova_instrument.js?v=174";   // the ANOVA instrument (Fisher's board, anova rooms; also the book, ch.12b)
-import { mountPermanovaInstrument } from "./permanova_instrument.js?v=174";   // its PERMANOVA sibling: the board's optional second tab
-import { mountGhostLines } from "./ghost_lines.js?v=174";   // the ghost-line board instrument (regression pits hub)
+import { WebRConsole } from "./webr-console.js?v=175";
+import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers, pickTransit } from "./variant_resolve.js?v=175";   // Phase 3: per-hotspot state variants; monorail switch-door nav
+import * as PQ from "./puzzle_queue.js?v=175";   // dynamic puzzle queue: location-independent puzzle serving
+import * as CP from "./corr_panel.js?v=175";   // lower-triangle layout of the grid gate (clouds correlation panel)
+import { particleCount } from "./particles.js?v=175";
+import { mountLandingBackdrop } from "./landing_backdrop.js?v=175";   // landing text over a pan of the first room's clip   // ambient-particle vocabulary + per-kind field density
+import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=175";
+import { condHolds } from "./cond.js?v=175";
+import { gridMatches } from "./grid_check.js?v=175";   // grid answer check; `partition:true` accepts any relabelling of the buckets   // ledger + elevation-map card DOM
+import * as LIVE from "./live_session.js?v=175";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
+import * as RIDE from "./ride.js?v=175";
+import { mountPcaPlate } from "./pca_plate.js?v=175";   // the PCA plate instrument (voyage beach)
+import { mountFishBoard } from "./fish_board.js?v=175";   // the fish board instrument (harbour berth)
+import { mountDrawdown } from "./drawdown.js?v=175";
+import { mountTide } from "./tide_machine.js?v=175";   // the tide machine instrument (dunes escape)
+import { mountVarianceMeter } from "./variance_meter.js?v=175";   // the variance meter instrument (anova cellars escape)
+import { mountAnovaInstrument } from "./anova_instrument.js?v=175";   // the ANOVA instrument (Fisher's board, anova rooms; also the book, ch.12b)
+import { mountPermanovaInstrument } from "./permanova_instrument.js?v=175";   // its PERMANOVA sibling: the board's optional second tab
+import { mountGhostLines } from "./ghost_lines.js?v=175";   // the ghost-line board instrument (regression pits hub)
    // the drawdown board instrument (diamonds escape)   // THE RIDE (subway): express lever + clip-sequence planner
-import * as BELL from "./bell_pull.js?v=174";
-import * as TCOUNT from "./transit_counter.js?v=174";   // the date plaque over a flat door transit (dunes time-skip)
-import * as DATEB from "./date_board.js?v=174";   // date lock: lock mode:"date", two slide-levers (dunes departure board)
-import * as INVY from "./inventory.js?v=174";   // carried items + the door that asks which to use (dunes)   // bell-pull (#16): dial mode:"pull" + lock mode:"state" (spa belfry)
-import { entryYaw } from "./entry_facing.js?v=174";   // face the way out on entering a room (every scenario)
-import * as HINTS from "./escape_hints.js?v=174";   // escape-phase Hint chip: time-unlocked tiers (SCENARIO.escapeHints)
+import * as BELL from "./bell_pull.js?v=175";
+import * as TCOUNT from "./transit_counter.js?v=175";   // the date plaque over a flat door transit (dunes time-skip)
+import * as DATEB from "./date_board.js?v=175";   // date lock: lock mode:"date", two slide-levers (dunes departure board)
+import * as INVY from "./inventory.js?v=175";   // carried items + the door that asks which to use (dunes)   // bell-pull (#16): dial mode:"pull" + lock mode:"state" (spa belfry)
+import { entryYaw } from "./entry_facing.js?v=175";   // face the way out on entering a room (every scenario)
+import * as HINTS from "./escape_hints.js?v=175";   // escape-phase Hint chip: time-unlocked tiers (SCENARIO.escapeHints)
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 
@@ -4173,7 +4173,7 @@ function buildLiveMcqCard(task, onSolved) {
   }
   const doneBtn = r => {                      // the card stays open with a worked answer showing: close by hand
     const b = document.createElement("button"); b.type = "button"; b.className = "qsubmit qdone"; b.textContent = "Done";
-    b.addEventListener("click", () => onSolved(r));
+    b.addEventListener("click", () => { onSolved(r); closeModal(); });   // Done always closes (the right answer itself no longer does)
     (card.querySelector(".qsolution") || fb).after(b);
   };
   (task.options || []).forEach(o => {
@@ -4599,25 +4599,28 @@ async function openStation(h) {
   };
   // SOLO ONLY: a "Show me" button for the worked answer (LIVE.canReveal is false in a class session)
   const canReveal = LIVE.canReveal(d.deal_id);
+  // A right answer leaves the card open so the student can read the feedback; the close button (x) shuts it
+  // (Lucas, 2026-11-17). The server has already counted the solve, and each card locks itself once solved.
+  const keepOpen = () => {};
   const reveal = async () => { const s = await LIVE.solution(d.deal_id); return s.ok ? s.j.solution : null; };
   if (d.kind === "mcq" && !d.starter_code) {     // no R at all: the dealt options, checked by the server
     if (viewer) resumeYaw = viewer.getYaw();
     const card = buildLiveMcqCard({ prompt: escHtml(d.question || ""), options: d.options, liveGrade, canReveal, reveal },
-                                  () => closeModal());
+                                  keepOpen);
     return openModal(d.title || h.label, card);
   }
   if (d.kind === "stitch" || d.kind === "ribbon") {   // the sewing table: drawn widgets, checked by the server
     if (viewer) resumeYaw = viewer.getYaw();
-    return openModal(d.title || h.label, buildSewingCard({ ...d, liveGrade }, () => closeModal()));
+    return openModal(d.title || h.label, buildSewingCard({ ...d, liveGrade }, keepOpen));
   }
   if (d.kind === "match") {                           // tap-to-pair columns, checked by the server
     if (viewer) resumeYaw = viewer.getYaw();
-    return openModal(d.title || h.label, buildLiveMatchCard({ ...d, liveGrade }, () => closeModal()));
+    return openModal(d.title || h.label, buildLiveMatchCard({ ...d, liveGrade }, keepOpen));
   }
   if (d.kind === "change" || d.kind === "code") {     // the coin tray / the keypad, checked by the server
     if (viewer) resumeYaw = viewer.getYaw();
     const build = d.kind === "change" ? buildLiveChangeCard : buildLiveCodeCard;
-    return openModal(d.title || h.label, build({ ...d, liveGrade }, () => closeModal()));
+    return openModal(d.title || h.label, build({ ...d, liveGrade }, keepOpen));
   }
   const isObject = d.kind === "object";
   const task = {
@@ -4641,9 +4644,9 @@ async function openStation(h) {
   // An R task answered by multiple choice (voyage, harbour since 2026-10-26: no clicking on the plot): the
   // console on the left, the dealt options on the right; an oriented one sends its probe via liveGrade.
   right.appendChild(d.kind === "mcq"
-    ? buildLiveMcqCard({ prompt: escHtml(d.question || ""), options: d.options, liveGrade, canReveal, reveal }, () => closeModal())
-    : isObject ? buildObjectCard(task.object, () => closeModal())
-    : buildPickCard(task.pick, () => closeModal(), "live:" + d.deal_id, task));
+    ? buildLiveMcqCard({ prompt: escHtml(d.question || ""), options: d.options, liveGrade, canReveal, reveal }, keepOpen)
+    : isObject ? buildObjectCard(task.object, keepOpen)
+    : buildPickCard(task.pick, keepOpen, "live:" + d.deal_id, task));
   grid.appendChild(left); grid.appendChild(right);
   openModal(task.label, grid, null, null, "wide");
 }
