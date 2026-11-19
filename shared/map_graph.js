@@ -29,6 +29,9 @@
 //                        which would spoil rooms outright; and the player gets undirected, deduped lines
 //                        because v1 of the map is a read-only orientation aid, not a route planner.
 //                        `fog.graded` + `fog.solved` add a pin / tick on VISITED graded-puzzle rooms only.
+//
+// ART MAPS. `parseArtMap` / `artReveal` / `artOpenPanels` / `artMarks` / `art*View` are the pure halves of the DRAWN map a
+// scenario opts into with `playerMapArt` (pano-player.js -> openArtMap; tests/map_art.test.js).
 (function (root) {
   "use strict";
   const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -295,6 +298,135 @@
     return { W, H, html: `<defs>${defs}</defs>${edges}${nodes}` };
   }
 
+  // ---- Art maps: SCENARIO.playerMapArt, the code-drawn tolkien sheet ------------------------------------
+  // The bundle is written by authoring_v2/tolkien_map/export.py (`<scenario>/map/map.json` + layer images).
+  // These are the PURE halves the player's openArtMap() draws from, kept here beside fogTiers so the reveal
+  // rule has one tested home (tests/map_graph.test.js). The fog rule matches the grid's: a room is revealed
+  // only once the player has STOOD in it, and a visited room shows every way leaving it (Lucas, phase two);
+  // the far end of such a way stays under the fog, marker and name included.
+
+  const finite = v => typeof v === "number" && isFinite(v);
+  function checkLayer(l, where) {
+    if (!l || typeof l.src !== "string" || !l.src || !["x", "y", "w", "h"].every(k => finite(l[k])))
+      throw new Error("map.json: bad layer for " + where);
+    return { src: l.src, x: l.x, y: l.y, w: l.w, h: l.h };
+  }
+  const checkPt = (p, where) => {
+    if (!Array.isArray(p) || p.length !== 2 || !finite(p[0]) || !finite(p[1])) throw new Error("map.json: bad point in " + where);
+    return [p[0], p[1]];
+  };
+
+  // map.json -> a normalised map, or THROWS naming what is wrong (the player then falls back to the grid map).
+  function parseArtMap(j) {
+    if (!j || typeof j !== "object") throw new Error("map.json: not an object");
+    if (j.format !== 1) throw new Error("map.json: unknown format " + j.format);
+    if (!finite(j.w) || !finite(j.h) || j.w <= 0 || j.h <= 0) throw new Error("map.json: bad sheet size");
+    if (typeof j.base !== "string" || !j.base || typeof j.fog !== "string" || !j.fog) throw new Error("map.json: base and fog images are required");
+    const rv = j.reveal || {};
+    const reveal = {};
+    ["roomR", "labelPad", "pathW", "leaderW", "soft"].forEach(k => {
+      if (!finite(rv[k]) || rv[k] < 0) throw new Error("map.json: bad reveal." + k);
+      reveal[k] = rv[k];
+    });
+    if (!j.rooms || typeof j.rooms !== "object" || !Object.keys(j.rooms).length) throw new Error("map.json: no rooms");
+    const rooms = {};
+    Object.keys(j.rooms).forEach(k => {
+      const r = j.rooms[k];
+      if (!r || !finite(r.x) || !finite(r.y)) throw new Error("map.json: room " + k + " has no position");
+      const lb = r.label;
+      if (!Array.isArray(lb) || lb.length !== 4 || !lb.every(finite)) throw new Error("map.json: room " + k + " has no label box");
+      rooms[k] = { x: r.x, y: r.y, label: lb.slice(), layer: checkLayer(r.layer, "room " + k),
+                   leader: Array.isArray(r.leader) ? r.leader.map(p => checkPt(p, "leader " + k)) : null,
+                   panel: typeof r.panel === "string" && r.panel ? r.panel : null };
+    });
+    // optional: the sheet's panels (a whole map plus insets), each {rect: [x0, y0, x1, y1]}
+    const panels = {};
+    Object.keys(j.panels || {}).forEach(n => {
+      const rc = j.panels[n] && j.panels[n].rect;
+      if (!Array.isArray(rc) || rc.length !== 4 || !rc.every(finite) || rc[2] <= rc[0] || rc[3] <= rc[1])
+        throw new Error("map.json: panel " + n + " has no rect");
+      panels[n] = { rect: rc.slice() };
+    });
+    Object.keys(rooms).forEach(k => {
+      if (rooms[k].panel && !panels[rooms[k].panel]) throw new Error("map.json: room " + k + " names a panel the map lacks");
+    });
+    const paths = {};
+    Object.keys(j.paths || {}).forEach(n => {
+      const p = j.paths[n];
+      if (!p || !rooms[p.a] || !rooms[p.b]) throw new Error("map.json: path " + n + " joins a room the map does not have");
+      if (!Array.isArray(p.pieces) || !p.pieces.length) throw new Error("map.json: path " + n + " has no pieces");
+      paths[n] = { a: p.a, b: p.b, layer: checkLayer(p.layer, "path " + n),
+                   pieces: p.pieces.map(q => { if (!Array.isArray(q) || q.length < 2) throw new Error("map.json: path " + n + " has a short piece"); return q.map(pt => checkPt(pt, "path " + n)); }) };
+    });
+    return { w: j.w, h: j.h, markerR: finite(j.markerR) ? j.markerR : 14, base: j.base, fog: j.fog,
+             furniture: j.furniture ? checkLayer(j.furniture, "furniture") : null, reveal, rooms, paths, panels };
+  }
+
+  // Panels holding NO room (a scenery panel, e.g. an estate overview above the plan) have nothing a visit could
+  // reveal, so a reveal-by-room fog would cover them for ever: they are drawn unfogged from the start. Their
+  // base layer carries terrain and region names only, never a room or a way, so nothing is spoiled. A room
+  // belongs to the panel it names, or (no `panel` field) to the panel whose rect contains its marker.
+  // Returns the open panels' rects in sheet order; a sheet with no `panels` has none.
+  function artOpenPanels(art) {
+    const names = Object.keys(art.panels || {});
+    const holds = n => {
+      const [x0, y0, x1, y1] = art.panels[n].rect;
+      return Object.values(art.rooms).some(r => r.panel ? r.panel === n : r.x >= x0 && r.x <= x1 && r.y >= y0 && r.y <= y1);
+    };
+    return names.filter(n => !holds(n)).map(n => art.panels[n].rect.slice());
+  }
+
+  // Which layers to draw. `fog.visited`: rooms stood in. `fog.inPlay`: the rooms that exist for THIS player
+  // (built, and in their role in a two-player scenario); absent => every room on the sheet. A way shows when
+  // either end is revealed and both ends are in play — so a door into the partner's half, or into a room not
+  // built yet, never draws (the grid map drops those doors too).
+  function artReveal(art, fog) {
+    const visited = new Set(fog && fog.visited || []);
+    const inPlay = fog && fog.inPlay ? new Set(fog.inPlay) : null;
+    const ok = k => !!art.rooms[k] && (!inPlay || inPlay.has(k));
+    const rooms = Object.keys(art.rooms).filter(k => visited.has(k) && ok(k));
+    const shown = new Set(rooms);
+    const paths = Object.keys(art.paths).filter(n => {
+      const p = art.paths[n];
+      return (shown.has(p.a) || shown.has(p.b)) && ok(p.a) && ok(p.b);
+    });
+    return { rooms, paths };
+  }
+
+  // Pin / tick marks for the art map: the grid map's rule (only a REVEALED room in `graded`; a tick once in
+  // `solved`), placed just up and right of the room's marker. No `graded` => no marks.
+  function artMarks(art, revealedRooms, graded, solved) {
+    if (!graded) return [];
+    const g = new Set(graded), s = new Set(solved || []), R = art.markerR;
+    return revealedRooms.filter(k => g.has(k)).map(k => ({
+      key: k, kind: s.has(k) ? "tick" : "pin",
+      x: +(art.rooms[k].x + R * 2.5).toFixed(1), y: +(art.rooms[k].y - R * 2.5).toFixed(1),   // clear of the "you are here" ring
+    }));
+  }
+
+  // View maths for the pan/zoom viewport: screen = s * sheet + (tx, ty). `fitScale` shows the whole sheet;
+  // the opening view shows the sheet at twice the viewport's width (labels are sized for that) centred on
+  // the player's room, never below fit and never above `maxScale` (default 1.5 css px per sheet px).
+  function artFitScale(art, vw, vh) { return Math.min(vw / art.w, vh / art.h); }
+  function artClampView(art, v, vw, vh, maxScale) {
+    const fit = artFitScale(art, vw, vh), max = Math.max(fit, maxScale || 1.5);
+    const s = Math.min(max, Math.max(fit, v.s));
+    const ax = (tx, size, room) => size <= room ? (room - size) / 2 : Math.min(0, Math.max(room - size, tx));
+    return { s, tx: ax(v.tx, s * art.w, vw), ty: ax(v.ty, s * art.h, vh) };
+  }
+  function artInitialView(art, focusKey, vw, vh, maxScale) {
+    const fit = artFitScale(art, vw, vh);
+    const r = focusKey && art.rooms[focusKey];
+    if (!r) return artClampView(art, { s: fit, tx: 0, ty: 0 }, vw, vh, maxScale);
+    const s = Math.max(fit, Math.min(maxScale || 1.5, 2 * vw / art.w));
+    return artClampView(art, { s, tx: vw / 2 - s * r.x, ty: vh / 2 - s * r.y }, vw, vh, maxScale);
+  }
+  // zoom by `factor` keeping the screen point (cx, cy) fixed, then clamp
+  function artZoomAt(art, v, factor, cx, cy, vw, vh, maxScale) {
+    const s = v.s * factor;
+    return artClampView(art, { s, tx: cx - (cx - v.tx) * (s / v.s), ty: cy - (cy - v.ty) * (s / v.s) }, vw, vh, maxScale);
+  }
+
   // helpers the test asserts against without re-deriving the layout constants
   function ringPort(spec, roomKey, x) {                         // absolute (x,y) of a hotspot/door port on its circle
     const c = pixelPositions(spec, { rebase: false }).pos[roomKey];
@@ -303,7 +435,8 @@
   }
 
   const api = { esc, TYPE_COL, DIR_COL, DIR_DASH, GEOM: { R, DX, DY, MX, MY, K },
-                layoutRooms, resolvePositions, gridCells, pixelPositions, fogTiers, buildNetSvg, ringPort };
+                layoutRooms, resolvePositions, gridCells, pixelPositions, fogTiers, buildNetSvg, ringPort,
+                parseArtMap, artReveal, artOpenPanels, artMarks, artFitScale, artClampView, artInitialView, artZoomAt };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   else root.MapGraph = api;
 })(typeof self !== "undefined" ? self : this);

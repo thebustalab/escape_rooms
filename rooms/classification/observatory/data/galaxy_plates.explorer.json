@@ -1,0 +1,27 @@
+{
+  "title": "Galaxy plates",
+  "dataset": "galaxy_plates",
+  "csv": "galaxy_plates.csv",
+  "row": {
+    "noun": "galaxy",
+    "nounPlural": "galaxies",
+    "phrase": "One row is one galaxy, measured from its image on one of the observatory's photographic plates.",
+    "kicker": "Photographic plate",
+    "look": "plate"
+  },
+  "blocks": [
+    {"id": "plate", "title": "Measured on the plate", "blurb": "Read off each galaxy's image on its glass photographic plate."}
+  ],
+  "columns": [
+    {"name": "galaxy", "role": "identifier", "meaning": "The galaxy's catalogue code: G, the year its plate was taken, and a catalogue number. Each galaxy appears once."},
+    {"name": "record", "role": "split", "meaning": "Which part of the catalogue the galaxy belongs to.",
+     "levels": {"training": "galaxies from the main catalogue, used to build (train) the model", "held back": "galaxies from the last observing season, kept aside and never used to build the model, to test how well it predicts galaxies it has not seen"}},
+    {"name": "elliptical", "role": "response", "meaning": "Whether the galaxy is an elliptical (yes) or a spiral (no).",
+     "levels": {"yes": "an elliptical galaxy", "no": "a spiral galaxy"}},
+    {"name": "color_index", "role": "predictor", "block": "plate", "meaning": "The galaxy's color as a color index: larger numbers are redder.", "units": "magnitudes (mag)"},
+    {"name": "concentration", "role": "predictor", "block": "plate", "meaning": "How tightly the galaxy's light is gathered toward its center: the radius holding nearly all of its light divided by the radius holding half of it.", "units": "ratio (no units)"},
+    {"name": "axis_ratio", "role": "predictor", "block": "plate", "meaning": "How round the galaxy's image looks: its short axis divided by its long axis (a perfect circle scores one).", "units": "ratio (no units)"},
+    {"name": "apparent_size_arcsec", "role": "predictor", "block": "plate", "meaning": "How large the galaxy's image is on the plate.", "units": "arcseconds"},
+    {"name": "exposure_minutes", "role": "predictor", "block": "plate", "meaning": "How long the plate was exposed to the sky.", "units": "minutes"}
+  ]
+}

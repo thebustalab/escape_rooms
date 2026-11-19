@@ -21,7 +21,7 @@
 //                              switchY, dials:[{cx,cy,r}x3] }
 //   m.setSwitches([bool x8]); m.switches(); m.measure(); m.isSettled(); m.isOver(); m.ready (Promise); m.destroy();
 //   canvas.varianceMeter exposes the same API for tests.
-import { measure } from "./variance_math.js?v=175";
+import { measure } from "./variance_math.js?v=176";
 
 const DEFAULTS = {
   amps:    { title: "ELECTRICAL SWITCHBOARD", unit: "AMPERES", vMax: 12, fullScale: 25 },
@@ -129,8 +129,9 @@ export function mountVarianceMeter(host, opts = {}) {
       ctx.beginPath(); ctx.moveTo(cx + Math.cos(a) * (r * 0.55), cy + Math.sin(a) * (r * 0.55));
       ctx.lineTo(cx + Math.cos(a) * (r - 2), cy + Math.sin(a) * (r - 2)); ctx.stroke();
     }
-    engrave(title, cx, cy - r * 0.45, "bold 21px Georgia");
-    engrave(sub, cx, cy - r * 0.45 + 22, "italic 15px Georgia");
+    const lines = String(sub).split("\n"), top = cy - r * 0.62;   // sub may run to several lines ("\n")
+    engrave(title, cx, top, "bold 21px Georgia");
+    lines.forEach((ln, i) => engrave(ln, cx, top + 22 + i * 18, "italic 15px Georgia"));
     const a = Math.PI + Math.PI * Math.max(0, Math.min(1, frac));
     ctx.strokeStyle = "#1a1a1a"; ctx.lineWidth = 4;
     ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + Math.cos(a) * (r - 10), cy + Math.sin(a) * (r - 10)); ctx.stroke();
@@ -184,10 +185,10 @@ export function mountVarianceMeter(host, opts = {}) {
       for (let i = 0; i < 40; i++) { ctx.fillStyle = `rgba(0,0,0,${0.03 + (i % 3) * 0.02})`; ctx.fillRect(0, i * 23, W, 11); }
       engrave(G.title, W / 2, 50, "bold 30px Georgia", "center", "#d8c79f");
     }
-    dial(DIALS[0], needles[0].a, "BETWEEN", "each group's average from the whole");
-    dial(DIALS[1], needles[1].a, "NOISE", "each room from its group's average");
+    dial(DIALS[0], needles[0].a, "BETWEEN", "distance from each group's\naverage to the grand mean");
+    dial(DIALS[1], needles[1].a, "NOISE", "distance from each room\nto its group's average");
     halo(DIALS[2], glow);
-    dial(DIALS[2], needles[2].a, "SHARE EXPLAINED", "between ÷ (between + noise)", MARK);
+    dial(DIALS[2], needles[2].a, "SHARE EXPLAINED", "share of variation explained\nby the grouping\nbetween / (between + noise)", MARK);
     if (!powered) engrave("The board is dead: no current reaches the meters.", W / 2, 432, "italic 20px Georgia", "center", "#cbb68a");
 
     engrave(G.unit, RAILS.x0 - 70, RAILS.top - 24, "bold 15px Georgia", "left", "#cbb68a");

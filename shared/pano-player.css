@@ -766,6 +766,20 @@ table.ledger { border-collapse:separate; border-spacing:4px 5px; margin:6px auto
 .rm-tick path { fill:none; stroke:#fff; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round; }
 .maplegend .mk-pin { border:2px solid var(--amber); background:radial-gradient(circle, var(--amber) 30%, transparent 34%); }
 .maplegend .mk-tick { background:#3f9a5a; }
+/* The drawn map (SCENARIO.playerMapArt): a pan/zoom viewport over the tolkien sheet (openArtMap). The stage
+   is the sheet at 1 css px per sheet px, moved by one transform; nothing in it takes clicks (read-only). */
+.artmap .artmap-vp { position:relative; overflow:hidden; height:min(72vh, 820px); touch-action:none;
+                     cursor:grab; background:#e4d2aa; border-radius:8px; user-select:none; -webkit-user-select:none; }
+.artmap .artmap-vp:active { cursor:grabbing; }
+.artmap-stage { position:absolute; left:0; top:0; transform-origin:0 0; }
+.artmap-canvas, .artmap-marks { position:absolute; left:0; top:0; display:block; max-width:none; max-height:none; }
+.artmap-marks { pointer-events:none; overflow:visible; }
+.artmap-wait { position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+               color:#5a4630; font-style:italic; }
+.artmap-ctl { display:flex; gap:6px; justify-content:center; flex-wrap:wrap; margin-top:8px; }
+.artmap-ctl button { min-width:40px; padding:6px 10px; }
+.am-here { fill:none; stroke:#b3261e; }
+.maplegend .mk-here { border:2px solid #b3261e; }
 /* escape-phase hint card (SCENARIO.escapeHints, 2026-11-08) */
 .hintcard p { margin:0 0 10px; line-height:1.5; }
 .hintcard b { color:var(--amber); }

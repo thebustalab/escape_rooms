@@ -85,32 +85,35 @@
 // A bare `./variant_resolve.js` import is NOT refreshed by bumping the <script> tag's ?v, so a changed
 // helper module (e.g. a new export) leaves browsers on a stale cached copy → "doesn't provide an export
 // named X" SyntaxError → blank page (the 2026-08-05 airship regression). Bump all three together.
-import { WebRConsole } from "./webr-console.js?v=175";
-import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers, pickTransit } from "./variant_resolve.js?v=175";   // Phase 3: per-hotspot state variants; monorail switch-door nav
-import * as PQ from "./puzzle_queue.js?v=175";   // dynamic puzzle queue: location-independent puzzle serving
-import * as CP from "./corr_panel.js?v=175";   // lower-triangle layout of the grid gate (clouds correlation panel)
-import { particleCount } from "./particles.js?v=175";
-import { mountLandingBackdrop } from "./landing_backdrop.js?v=175";   // landing text over a pan of the first room's clip   // ambient-particle vocabulary + per-kind field density
-import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=175";
-import { condHolds } from "./cond.js?v=175";
-import { gridMatches } from "./grid_check.js?v=175";   // grid answer check; `partition:true` accepts any relabelling of the buckets   // ledger + elevation-map card DOM
-import * as LIVE from "./live_session.js?v=175";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
-import * as RIDE from "./ride.js?v=175";
-import { mountPcaPlate } from "./pca_plate.js?v=175";   // the PCA plate instrument (voyage beach)
-import { mountFishBoard } from "./fish_board.js?v=175";   // the fish board instrument (harbour berth)
-import { mountDrawdown } from "./drawdown.js?v=175";
-import { mountTide } from "./tide_machine.js?v=175";   // the tide machine instrument (dunes escape)
-import { mountVarianceMeter } from "./variance_meter.js?v=175";   // the variance meter instrument (anova cellars escape)
-import { mountAnovaInstrument } from "./anova_instrument.js?v=175";   // the ANOVA instrument (Fisher's board, anova rooms; also the book, ch.12b)
-import { mountPermanovaInstrument } from "./permanova_instrument.js?v=175";   // its PERMANOVA sibling: the board's optional second tab
-import { mountGhostLines } from "./ghost_lines.js?v=175";   // the ghost-line board instrument (regression pits hub)
+import { WebRConsole } from "./webr-console.js?v=176";
+import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers, pickTransit } from "./variant_resolve.js?v=176";   // Phase 3: per-hotspot state variants; monorail switch-door nav
+import * as PQ from "./puzzle_queue.js?v=176";   // dynamic puzzle queue: location-independent puzzle serving
+import * as CP from "./corr_panel.js?v=176";   // lower-triangle layout of the grid gate (clouds correlation panel)
+import { particleCount } from "./particles.js?v=176";
+import { mountLandingBackdrop } from "./landing_backdrop.js?v=176";   // landing text over a pan of the first room's clip   // ambient-particle vocabulary + per-kind field density
+import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=176";
+import { condHolds } from "./cond.js?v=176";
+import { gridMatches } from "./grid_check.js?v=176";   // grid answer check; `partition:true` accepts any relabelling of the buckets   // ledger + elevation-map card DOM
+import * as LIVE from "./live_session.js?v=176";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
+import * as RIDE from "./ride.js?v=176";
+import { mountPcaPlate } from "./pca_plate.js?v=176";   // the PCA plate instrument (voyage beach)
+import { mountFishBoard } from "./fish_board.js?v=176";   // the fish board instrument (harbour berth)
+import { mountDrawdown } from "./drawdown.js?v=176";
+import { mountTide } from "./tide_machine.js?v=176";   // the tide machine instrument (dunes escape)
+import { mountVarianceMeter } from "./variance_meter.js?v=176";   // the variance meter instrument (anova cellars escape)
+import { mountAnovaInstrument } from "./anova_instrument.js?v=176";   // the ANOVA instrument (Fisher's board, anova rooms; also the book, ch.12b)
+import { mountPermanovaInstrument } from "./permanova_instrument.js?v=176";   // its PERMANOVA sibling: the board's optional second tab
+import { mountGhostLines } from "./ghost_lines.js?v=176";   // the ghost-line board instrument (regression pits hub)
+import { mount as mountDatasetExplorer } from "./dataset_explorer.js?v=176";   // a dataset's STRUCTURE (instrument kind + the graded rooms' chip)
+import { mount as mountSigmoidBoard } from "./sigmoid_board.js?v=176";   // the S-curve board (classification day one, toy data)
+import { mount as mountScoreboard } from "./scoreboard.js?v=176";   // the scoreboard (classification day two, toy data)
    // the drawdown board instrument (diamonds escape)   // THE RIDE (subway): express lever + clip-sequence planner
-import * as BELL from "./bell_pull.js?v=175";
-import * as TCOUNT from "./transit_counter.js?v=175";   // the date plaque over a flat door transit (dunes time-skip)
-import * as DATEB from "./date_board.js?v=175";   // date lock: lock mode:"date", two slide-levers (dunes departure board)
-import * as INVY from "./inventory.js?v=175";   // carried items + the door that asks which to use (dunes)   // bell-pull (#16): dial mode:"pull" + lock mode:"state" (spa belfry)
-import { entryYaw } from "./entry_facing.js?v=175";   // face the way out on entering a room (every scenario)
-import * as HINTS from "./escape_hints.js?v=175";   // escape-phase Hint chip: time-unlocked tiers (SCENARIO.escapeHints)
+import * as BELL from "./bell_pull.js?v=176";
+import * as TCOUNT from "./transit_counter.js?v=176";   // the date plaque over a flat door transit (dunes time-skip)
+import * as DATEB from "./date_board.js?v=176";   // date lock: lock mode:"date", two slide-levers (dunes departure board)
+import * as INVY from "./inventory.js?v=176";   // carried items + the door that asks which to use (dunes)   // bell-pull (#16): dial mode:"pull" + lock mode:"state" (spa belfry)
+import { entryYaw } from "./entry_facing.js?v=176";   // face the way out on entering a room (every scenario)
+import * as HINTS from "./escape_hints.js?v=176";   // escape-phase Hint chip: time-unlocked tiers (SCENARIO.escapeHints)
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 
@@ -137,6 +140,7 @@ root.innerHTML = `
     <div id="sfxChip" style="display:none;position:absolute;bottom:10px;left:14px;z-index:20;background:rgba(0,0,0,.4);padding:4px 11px;border-radius:14px;font:12px system-ui;color:rgba(255,216,140,.9);user-select:none">♫ sound effects: <span id="sfxState" title="Toggle sound effects on/off" style="cursor:pointer;text-decoration:underline;font-weight:600"></span></div>
     <button id="notebookChip" style="display:none;position:absolute;bottom:10px;right:14px;z-index:20;background:rgba(0,0,0,.42);padding:5px 12px;border-radius:14px;border:1px solid rgba(255,216,140,.35);font:12px system-ui;color:rgba(255,216,140,.92);cursor:pointer;user-select:none" title="Everything you've confirmed or picked up so far">🗒 Field notebook <span id="notebookCount" style="opacity:.7"></span></button>
     <button id="mapChip" style="display:none;position:absolute;bottom:42px;right:14px;z-index:20;background:rgba(0,0,0,.42);padding:5px 12px;border-radius:14px;border:1px solid rgba(255,216,140,.35);font:12px system-ui;color:rgba(255,216,140,.92);cursor:pointer;user-select:none" title="The rooms you have found so far, and how they connect">🗺 Map</button>
+    <button id="explorerChip" style="display:none;position:absolute;bottom:74px;right:14px;z-index:20;background:rgba(0,0,0,.42);padding:5px 12px;border-radius:14px;border:1px solid rgba(255,216,140,.35);font:12px system-ui;color:rgba(255,216,140,.92);cursor:pointer;user-select:none" title="How this scenario's dataset is laid out: one row, the columns, the groups">▦ Dataset explorer</button>
     <button id="debriefChip" style="display:none;position:absolute;bottom:10px;left:50%;transform:translateX(-50%);z-index:20;background:rgba(0,0,0,.42);padding:5px 12px;border-radius:14px;border:1px solid rgba(255,216,140,.35);font:12px system-ui;color:rgba(255,216,140,.92);cursor:pointer;user-select:none" title="A look behind the scenes — how this world was built to teach the technique">🔎 Reveal how this world worked</button>
     <button id="skipChip" style="display:none;position:absolute;bottom:10px;left:50%;transform:translateX(-50%);z-index:20;background:rgba(0,0,0,.42);padding:5px 12px;border-radius:14px;border:1px solid rgba(255,216,140,.35);font:12px system-ui;color:rgba(255,216,140,.92);cursor:pointer;user-select:none" title="Open your submission — you can come back to it as often as you like">Prepare submission / skip the ungraded escape phase →</button>
     <button id="hintChip" style="display:none;position:absolute;bottom:42px;left:50%;transform:translateX(-50%);z-index:20;background:rgba(0,0,0,.42);padding:5px 12px;border-radius:14px;border:1px solid rgba(255,216,140,.35);font:12px system-ui;color:rgba(255,216,140,.92);cursor:pointer;user-select:none" title="Stuck? Hints unlock as time passes — open one only if you want it">💡 Hint</button>
@@ -341,6 +345,7 @@ function init(data) {
   $("#subX500").addEventListener("keydown", e => { if (e.key === "Enter") confirmX500(); });
   $("#notebookChip").onclick = openNotebook;
   $("#mapChip").onclick = openMap;
+  $("#explorerChip").onclick = openDatasetExplorer;
   $("#skipChip").onclick = openSubmitPrep;   // the one persistent in-room route to submission (showSubmitChip)
   $("#hintChip").onclick = openHints;
   setInterval(updateHintChip, 1000);         // countdown + visibility; a no-op unless SCENARIO.escapeHints is set
@@ -372,6 +377,9 @@ function init(data) {
     updateNotebookChip();
     $("#notebookChip").style.display = "";                            // persistent chip, in-room only
     $("#mapChip").style.display = mapEnabled() ? "" : "none";         // stacked above the notebook; hidden when opted out
+    _explorerState = undefined;                                       // the explorer's tab + drawn row (session state)
+    $("#explorerChip").style.display = explorerEnabled() ? "" : "none";   // stacked above the map (or the notebook)
+    $("#explorerChip").style.bottom = mapEnabled() ? "74px" : "42px";
     $("#debriefChip").style.display = "none";                        // appears only once analysis completes
     $("#skipChip").style.display = "none";                           // shown once analysis is done, then permanent (showSubmitChip)
     $("#hintChip").style.display = "none";                           // escape phase only (updateHintChip)
@@ -1389,7 +1397,31 @@ function mapPuzzleMarks() {
   return { graded: graded.map(r => r.key), solved: solved.map(r => r.key) };
 }
 
+// The chip's handler: the drawn (tolkien) sheet when the scenario ships one, else the grid map. Any failure
+// to load or draw the sheet falls back to the grid, so a broken bundle never costs a student their map.
 function openMap() {
+  if (artMapEnabled()) return openArtMap();
+  return openGridMap();
+}
+
+// THE DATASET EXPLORER CHIP (2026-11-19): a graded scenario that declares `datasetExplorer` (the path of its dataset's
+// descriptor, beside the CSV) gets a chip stacked above the map that opens shared/dataset_explorer.js in the wide modal,
+// the same module a home world places as an `instrument` of kind `dataset_explorer`. Structure only, never graded or
+// logged; its tab and drawn row are session state (_explorerState, cleared in beginGame).
+let _explorerState;
+function explorerEnabled() {
+  return !!(window.SCENARIO && typeof SCENARIO.datasetExplorer === "string" && SCENARIO.datasetExplorer);
+}
+function openDatasetExplorer() {
+  if (!explorerEnabled()) return;
+  const card = document.createElement("div"); card.className = "instrumentcard dataset_explorer";
+  openModal("Dataset explorer", card, null, null, "wide");
+  const inst = mountDatasetExplorer(card, { descriptor: SCENARIO.datasetExplorer, pegs: _explorerState,
+                                            onPegs: v => { _explorerState = v; } });
+  _modalTeardown = () => inst.destroy();
+}
+
+function openGridMap() {
   const MG = window.MapGraph;
   const d = document.createElement("div");
   if (!MG) { d.textContent = "The map is unavailable."; return openModal("🗺 Map", d); }
@@ -1405,6 +1437,206 @@ function openMap() {
     + (marks.graded.length ? `<span class="mk-pin"></span> a puzzle waits here<span class="mk-tick"></span> solved` : "")
     + `</div>`;
   openModal("🗺 Map", d, null, null, "wide");
+}
+
+// --- The drawn map (opt-in: SCENARIO.playerMapArt) ---------------------------------------------------
+// A scenario that ships a code-drawn, Thrór's-map-style sheet (authoring_v2/tolkien_map, exported to
+// `<scenario>/map/` by its export.py) gets it IN PLACE OF the grid: the base sheet, then each visited room's
+// layer and every way out of it, everything else under parchment fog, the frame and cartouche on top, and
+// the grid's pin / tick marks at the rooms' markers. Same fog source (visitedRooms), same marks
+// (mapPuzzleMarks), same opt-outs (`playerMap: false`, `?playermap=0`); `?mapart=0` shows the grid instead.
+// Read-only like the grid: no click-to-travel, no hotspot dots. Opens zoomed on the player's room (labels
+// are sized for a sheet shown at twice phone width), with drag/pinch/wheel zoom and a whole-map button.
+function artMapEnabled() {
+  if (new URLSearchParams(location.search).get("mapart") === "0") return false;
+  const MG = window.MapGraph;
+  return !!(window.SCENARIO && typeof SCENARIO.playerMapArt === "string" && SCENARIO.playerMapArt
+            && MG && typeof MG.parseArtMap === "function");   // an old cached map_graph.js => the grid
+}
+
+let _artMap = null;              // {url, promise} for the parsed bundle: a static asset, not run state
+const _artImgs = new Map();      // absolute image url -> Promise<HTMLImageElement>
+function loadArtMap() {
+  const url = new URL(SCENARIO.playerMapArt, location.href).href;
+  if (!_artMap || _artMap.url !== url) {
+    const promise = fetch(url)
+      .then(r => { if (!r.ok) throw new Error("map.json HTTP " + r.status); return r.json(); })
+      .then(j => ({ art: window.MapGraph.parseArtMap(j), url }));
+    _artMap = { url, promise };
+    promise.catch(() => { if (_artMap && _artMap.promise === promise) _artMap = null; });   // retry next open
+  }
+  return _artMap.promise;
+}
+function artImg(src, baseUrl) {
+  const u = new URL(src, baseUrl).href;
+  if (!_artImgs.has(u)) {
+    const p = new Promise((res, rej) => {
+      const im = new Image();
+      im.onload = () => res(im);
+      im.onerror = () => rej(new Error("map image failed: " + src));
+      im.src = u;
+    });
+    p.catch(() => _artImgs.delete(u));
+    _artImgs.set(u, p);
+  }
+  return _artImgs.get(u);
+}
+
+function openArtMap() {
+  const MG = window.MapGraph;
+  const card = document.createElement("div");
+  card.className = "mapcard artmap";
+  card.innerHTML = `<div class="artmap-vp" role="img" aria-label="Map of the places you have been">`
+    + `<div class="artmap-stage"></div><div class="artmap-wait">Unrolling the map…</div></div>`
+    + `<div class="artmap-ctl"><button type="button" class="ghost" data-z="in" aria-label="Zoom in">+</button>`
+    + `<button type="button" class="ghost" data-z="out" aria-label="Zoom out">−</button>`
+    + `<button type="button" class="ghost" data-z="here">Where I am</button>`
+    + `<button type="button" class="ghost" data-z="all">Whole map</button></div>`
+    + `<div class="maplegend"></div>`;
+  openModal("🗺 Map", card, null, null, "wide");
+  const fog = {
+    visited: [...visitedRooms], current: room ? room.key : null,
+    // the rooms that exist for THIS player: built, and in their role (two-player scenarios)
+    inPlay: (SCENARIO.rooms || []).filter(r => isBuilt(r) && roomInRole(r, gameState.role)).map(r => r.key),
+  };
+  const marks = mapPuzzleMarks();
+  loadArtMap().then(({ art, url }) => {
+    if (!card.isConnected) return;
+    const shown = MG.artReveal(art, fog);
+    const need = [artImg(art.base, url), artImg(art.fog, url)]
+      .concat(shown.paths.map(n => artImg(art.paths[n].layer.src, url)))
+      .concat(shown.rooms.map(k => artImg(art.rooms[k].layer.src, url)))      .concat(art.furniture ? [artImg(art.furniture.src, url)] : []);
+    return Promise.all(need).then(imgs => { if (card.isConnected) drawArtMap(card, art, shown, imgs, fog, marks); });
+  }).catch(e => {
+    console.warn("The drawn map is unavailable; showing the grid map instead.", e);
+    if (card.isConnected) openGridMap();
+  });
+}
+
+// The fog: the shipped parchment over the whole sheet, with soft holes cut where the player has been. The
+// hole mask is drawn at 1/k scale and scaled up, which feathers its edge without needing canvas `filter`
+// (missing on older Safari).
+function artFogLayer(art, shown, fogImg) {
+  const W = art.w, H = art.h, R = art.reveal;
+  const c = document.createElement("canvas"); c.width = W; c.height = H;
+  const f = c.getContext("2d");
+  f.drawImage(fogImg, 0, 0, W, H);
+  const k = Math.max(4, Math.min(16, Math.round(R.soft * 0.75)));
+  const m = document.createElement("canvas"); m.width = Math.ceil(W / k); m.height = Math.ceil(H / k);
+  const mc = m.getContext("2d");
+  mc.scale(1 / k, 1 / k);
+  mc.fillStyle = mc.strokeStyle = "#000";
+  mc.lineCap = mc.lineJoin = "round";
+  const line = (pts, w) => {
+    if (!pts || pts.length < 2) return;
+    mc.lineWidth = w; mc.beginPath(); mc.moveTo(pts[0][0], pts[0][1]);
+    for (let i = 1; i < pts.length; i++) mc.lineTo(pts[i][0], pts[i][1]);
+    mc.stroke();
+  };
+  shown.rooms.forEach(key => {
+    const r = art.rooms[key], [x0, y0, x1, y1] = r.label, p = R.labelPad;
+    mc.beginPath(); mc.arc(r.x, r.y, R.roomR, 0, 2 * Math.PI); mc.fill();
+    mc.fillRect(x0 - p, y0 - p, x1 - x0 + 2 * p, y1 - y0 + 2 * p);
+    line(r.leader, R.leaderW);
+  });
+  shown.paths.forEach(n => art.paths[n].pieces.forEach(q => line(q, R.pathW)));
+  // a panel holding no room is scenery a visit can never reveal: never fogged (MapGraph.artOpenPanels)
+  const MG = window.MapGraph;
+  (MG && MG.artOpenPanels ? MG.artOpenPanels(art) : []).forEach(([x0, y0, x1, y1]) => mc.fillRect(x0, y0, x1 - x0, y1 - y0));
+  f.globalCompositeOperation = "destination-out";
+  f.imageSmoothingEnabled = true; f.imageSmoothingQuality = "high";
+  f.drawImage(m, 0, 0, W, H);
+  return c;
+}
+
+function drawArtMap(card, art, shown, imgs, fog, marks) {
+  const MG = window.MapGraph, W = art.w, H = art.h, R = art.markerR;
+  const nP = shown.paths.length, nR = shown.rooms.length;
+  const cv = document.createElement("canvas");
+  cv.width = W; cv.height = H; cv.className = "artmap-canvas";
+  const g = cv.getContext("2d");
+  g.drawImage(imgs[0], 0, 0, W, H);
+  shown.paths.forEach((n, i) => { const L = art.paths[n].layer; g.drawImage(imgs[2 + i], L.x, L.y, L.w, L.h); });
+  shown.rooms.forEach((k, i) => { const L = art.rooms[k].layer; g.drawImage(imgs[2 + nP + i], L.x, L.y, L.w, L.h); });
+  g.drawImage(artFogLayer(art, shown, imgs[1]), 0, 0);
+  if (art.furniture) { const L = art.furniture; g.drawImage(imgs[2 + nP + nR], L.x, L.y, L.w, L.h); }
+
+  // "you are here" ring + the grid map's pin / tick, in sheet units (inline stroke widths beat the grid CSS)
+  const cur = fog.current && shown.rooms.includes(fog.current) ? art.rooms[fog.current] : null;
+  let svg = cur ? `<circle class="am-here" cx="${cur.x}" cy="${cur.y}" r="${(R * 2.3).toFixed(1)}" style="stroke-width:${(R * 0.45).toFixed(1)}"/>` : "";
+  MG.artMarks(art, shown.rooms, marks.graded, marks.solved).forEach(m => {
+    const r = R * 1.5, a = MG.esc(m.key);
+    svg += m.kind === "tick"
+      ? `<g class="rmmark rm-tick" data-room="${a}"><circle cx="${m.x}" cy="${m.y}" r="${r.toFixed(1)}" style="stroke-width:${(R * 0.2).toFixed(1)}"/>`
+        + `<path d="M ${(m.x - r * 0.5).toFixed(1)} ${m.y} l ${(r * 0.37).toFixed(1)} ${(r * 0.37).toFixed(1)} l ${(r * 0.63).toFixed(1)} ${(-r * 0.75).toFixed(1)}" style="stroke-width:${(R * 0.28).toFixed(1)}"/></g>`
+      : `<g class="rmmark rm-pin" data-room="${a}"><circle cx="${m.x}" cy="${m.y}" r="${r.toFixed(1)}" style="stroke-width:${(R * 0.25).toFixed(1)}"/>`
+        + `<circle class="rmpindot" cx="${m.x}" cy="${m.y}" r="${(r * 0.38).toFixed(1)}"/></g>`;
+  });
+
+  const vp = card.querySelector(".artmap-vp"), stage = card.querySelector(".artmap-stage");
+  const wait = card.querySelector(".artmap-wait"); if (wait) wait.remove();
+  stage.style.width = W + "px"; stage.style.height = H + "px";
+  stage.appendChild(cv);
+  stage.insertAdjacentHTML("beforeend", `<svg class="artmap-marks" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">${svg}</svg>`);
+  card.querySelector(".maplegend").innerHTML = (cur ? `<span class="mk-here"></span> where you are` : "")
+    + (marks.graded.length ? `<span class="mk-pin"></span> a puzzle waits here<span class="mk-tick"></span> solved` : "");
+  card.dataset.rooms = shown.rooms.join(" ");        // what is drawn (tests read these)
+  card.dataset.paths = shown.paths.join(" ");
+
+  const size = () => [vp.clientWidth || Math.max(200, innerWidth - 40), vp.clientHeight || Math.max(200, innerHeight * 0.6)];
+  let v = null;
+  const apply = nv => {
+    v = nv;
+    stage.style.transform = `translate(${v.tx}px, ${v.ty}px) scale(${v.s})`;
+    vp.dataset.scale = v.s.toFixed(4); vp.dataset.tx = v.tx.toFixed(1); vp.dataset.ty = v.ty.toFixed(1);
+  };
+  const home = () => { const [w, h] = size(); apply(MG.artInitialView(art, cur ? fog.current : null, w, h)); };
+  const whole = () => { const [w, h] = size(); apply(MG.artClampView(art, { s: 0, tx: 0, ty: 0 }, w, h)); };
+  const zoom = (f, cx, cy) => { const [w, h] = size(); apply(MG.artZoomAt(art, v, f, cx == null ? w / 2 : cx, cy == null ? h / 2 : cy, w, h)); };
+  home();
+
+  // drag to pan, two fingers to pinch, wheel to zoom about the cursor
+  const pts = new Map();
+  let last = null;
+  const gesture = () => {
+    const a = [...pts.values()], n = a.length;
+    const cx = a.reduce((s, p) => s + p[0], 0) / n, cy = a.reduce((s, p) => s + p[1], 0) / n;
+    return { n, cx, cy, d: n >= 2 ? Math.hypot(a[0][0] - a[1][0], a[0][1] - a[1][1]) : 0 };
+  };
+  vp.addEventListener("pointerdown", e => {
+    try { vp.setPointerCapture(e.pointerId); } catch (_) { /* synthetic pointer */ }
+    pts.set(e.pointerId, [e.clientX, e.clientY]); last = gesture(); e.preventDefault();
+  });
+  vp.addEventListener("pointermove", e => {
+    if (!pts.has(e.pointerId)) return;
+    pts.set(e.pointerId, [e.clientX, e.clientY]);
+    const now = gesture();
+    if (last && now.n === last.n) {
+      const [w, h] = size(), rect = vp.getBoundingClientRect();
+      const moved = { s: v.s, tx: v.tx + now.cx - last.cx, ty: v.ty + now.cy - last.cy };
+      apply(now.n >= 2 && last.d > 0
+        ? MG.artZoomAt(art, moved, now.d / last.d, now.cx - rect.left, now.cy - rect.top, w, h)
+        : MG.artClampView(art, moved, w, h));
+    }
+    last = now;
+  });
+  const lift = e => { pts.delete(e.pointerId); last = pts.size ? gesture() : null; };
+  vp.addEventListener("pointerup", lift);
+  vp.addEventListener("pointercancel", lift);
+  vp.addEventListener("wheel", e => {
+    e.preventDefault();
+    const rect = vp.getBoundingClientRect();
+    zoom(Math.exp(-e.deltaY * 0.0015), e.clientX - rect.left, e.clientY - rect.top);
+  }, { passive: false });
+  card.querySelector(".artmap-ctl").addEventListener("click", e => {
+    const z = e.target.closest("button") && e.target.closest("button").dataset.z;
+    if (z === "in") zoom(1.4); else if (z === "out") zoom(1 / 1.4); else if (z === "here") home(); else if (z === "all") whole();
+  });
+  if (!cur) card.querySelector('[data-z="here"]').remove();
+  const onResize = () => { const [w, h] = size(); apply(MG.artClampView(art, v, w, h)); };
+  addEventListener("resize", onResize);
+  _modalTeardown = () => removeEventListener("resize", onResize);
+  card.dataset.state = "ready";
 }
 
 // --- Three-phase portals (opt-in: SCENARIO.stonePortals) --------------------------------------------
@@ -3136,7 +3368,8 @@ function openPlaque(h) {
 // closing and reopening within a visit (in memory only: nothing about an instrument is saved or graded).
 const INSTRUMENTS = { drawdown: mountDrawdown, pca_plate: mountPcaPlate, fish_board: mountFishBoard, tide: mountTide,
                       variance_meter: mountVarianceMeter, ghost_lines: mountGhostLines,
-                      anova_board: mountAnovaBoard };
+                      anova_board: mountAnovaBoard, dataset_explorer: mountDatasetExplorer,
+                      sigmoid_board: mountSigmoidBoard, scoreboard: mountScoreboard };
 // Fisher's board. A config carrying a `permanova` block (a PERMANOVA instrument config) gets two tabs, "ANOVA" and
 // "PERMANOVA"; without one it is the plain ANOVA board, unchanged. The PERMANOVA tab mounts on first open; the
 // tab last shown is remembered per config for the visit (in memory only, like the board's visited steps).
@@ -3193,7 +3426,8 @@ async function openInstrument(h) {
     return;
   }
   try {
-    let geometry = _instrumentGeom.get(h.geometry);
+    // `geometry` is optional only for a kind with no painted still (dataset_explorer); every other kind's validator demands it.
+    let geometry = h.geometry ? _instrumentGeom.get(h.geometry) : {};
     if (!geometry) {
       geometry = await (await fetch(h.geometry)).json();
       _instrumentGeom.set(h.geometry, geometry);
@@ -3211,7 +3445,8 @@ async function openInstrument(h) {
     const untilTaken = !!(h.params && h.params.mountedUntilTaken);
     const held = h.pulleys ? Object.entries(h.pulleys).filter(([k]) => INV.held.includes(k) !== untilTaken).map(([, pid]) => pid) : undefined;
     // `params` (optional): per-hotspot settings the kind reads (the variance meter: utility, powered).
-    const inst = mount(card, { geometry, config, held, params: h.params || {}, art: h.art || {}, pegs: _instrumentState.get(sk), sound: !liveSilent(),
+    // `configUrl`: where `config` came from, so a config naming its own files (the dataset explorer's CSV) resolves beside it.
+    const inst = mount(card, { geometry, config, configUrl: h.config, held, params: h.params || {}, art: h.art || {}, pegs: _instrumentState.get(sk), sound: !liveSilent(),
                                onPegs: v => _instrumentState.set(sk, v) });
     _modalTeardown = () => inst.destroy();
   } catch (e) {
