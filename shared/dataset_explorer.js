@@ -15,7 +15,7 @@
  * Used as instrument kind `dataset_explorer` (a hotspot `config` = descriptor path) and by the graded rooms'
  * "Dataset explorer" chip (SCENARIO.datasetExplorer). Code-drawn; CSS injected once (#dsx-style).
  */
-import { buildModel, rowView, fmtCount } from "./dataset_explorer_model.js?v=176";
+import { buildModel, rowView, fmtCount } from "./dataset_explorer_model.js?v=177";
 
 export const GLIMPSE_ROWS = 8;      // tests/dataset_explorer_leak.test.mjs checks the same rows' identifiers
 const TABS = [["row", "One row"], ["table", "The table"], ["groups", "The groups"], ["vars", "The variables"]];

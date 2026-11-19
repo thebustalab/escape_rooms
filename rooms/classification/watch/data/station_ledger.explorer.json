@@ -1,0 +1,121 @@
+{
+  "title": "Station ledger",
+  "dataset": "station_ledger",
+  "csv": "station_ledger.csv",
+  "row": {
+    "noun": "day",
+    "nounPlural": "days",
+    "phrase": "One row is one day in the station's earlier ledger: everything the monitoring stations recorded that day.",
+    "kicker": "The station's day ledger",
+    "look": "logsheet"
+  },
+  "blocks": [
+    {
+      "id": "control",
+      "title": "Control side: ground readings",
+      "blurb": "Ground and weather readings watched from the control room."
+    },
+    {
+      "id": "machine",
+      "title": "Machine side: gas readings",
+      "blurb": "Gas and heat readings watched from the machine side: the vents, the crater lake and the plant."
+    }
+  ],
+  "columns": [
+    {
+      "name": "date",
+      "role": "identifier",
+      "meaning": "The day the readings were taken, written year-month-day. Each day appears once."
+    },
+    {
+      "name": "record",
+      "role": "split",
+      "meaning": "Which part of the record the day belongs to.",
+      "levels": {
+        "training": "the days used to build (train) the model",
+        "held back": "the days kept aside, never used to build the model, to test how well it predicts days it has not seen"
+      }
+    },
+    {
+      "name": "eruption_within_week",
+      "role": "response",
+      "meaning": "Whether an eruption began that day or within the next six days.",
+      "levels": {
+        "yes": "an eruption began that day or within the next six days",
+        "no": "no eruption began in that time"
+      }
+    },
+    {
+      "name": "quake_count",
+      "role": "predictor",
+      "block": "control",
+      "meaning": "How many earthquakes the seismometers recorded that day.",
+      "units": "earthquakes per day"
+    },
+    {
+      "name": "tremor_level",
+      "role": "predictor",
+      "block": "control",
+      "meaning": "How strong the volcano's continuous background shaking (tremor) was, on the observatory's tremor index.",
+      "units": "index (no units)"
+    },
+    {
+      "name": "ground_swelling_cm",
+      "role": "predictor",
+      "block": "control",
+      "meaning": "How far the ground around the crater had swollen upward, measured by the GPS and tilt stations.",
+      "units": "cm"
+    },
+    {
+      "name": "wind_speed_km_per_h",
+      "role": "predictor",
+      "block": "control",
+      "meaning": "Wind speed at the monitoring stations.",
+      "units": "km/h"
+    },
+    {
+      "name": "gas_ratio",
+      "role": "predictor",
+      "block": "machine",
+      "meaning": "Carbon dioxide divided by sulfur dioxide in the gas coming out of the vents.",
+      "units": "ratio (no units)"
+    },
+    {
+      "name": "sulfur_dioxide_tonnes_per_day",
+      "role": "predictor",
+      "block": "machine",
+      "meaning": "How much sulfur dioxide the vents gave off that day.",
+      "units": "tonnes per day"
+    },
+    {
+      "name": "vent_temperature_c",
+      "role": "predictor",
+      "block": "machine",
+      "meaning": "Temperature of the gas at the fumaroles (the steaming vents).",
+      "units": "°C"
+    },
+    {
+      "name": "lake_acidity_ph",
+      "role": "predictor",
+      "block": "machine",
+      "meaning": "Acidity of the crater lake; lower pH means more acidic.",
+      "units": "pH"
+    },
+    {
+      "name": "air_temperature_c",
+      "role": "predictor",
+      "block": "machine",
+      "meaning": "Air temperature at the plant.",
+      "units": "°C"
+    },
+    {
+      "name": "resort_alarm",
+      "role": "flag",
+      "meaning": "The resort's warning-system flag: whether the resort's own alarm was sounding that day.",
+      "levels": {
+        "yes": "the resort's alarm was sounding",
+        "no": "the resort's alarm was quiet"
+      }
+    }
+  ]
+}

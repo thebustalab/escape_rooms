@@ -38,14 +38,14 @@
   "_designNotes": {
     "buildState": "Rooms, graph and scene specs written by _scratch/build_scenario.py (2026-11-19): the graded pair's volcano island (lair + observatory) in Staff Only's year, in morning light. Day one: the monitoring station (hub: bulletin board = deliver, S-curve board = instrument, day ledger = dataset explorer, notice case -> Staff Only) and the footpath up the flank to seismo_hut (L1), gas_vent (L2), crater_rim (L3). Day two: the summit observatory's plate archive (hub: second bulletin board, tally board, plate cabinet, notice case -> Good Seeing) and plate_store (L1), measuring_engine (L2), dome (L3). The truck door to day two is hidden until state.day_two is true (Wednesday). Live scenario: tasks are dealt by the live-class server (authoring_v2/live_class/pool/watch.json); the book's practice pool is solo/pool.json. No codec id, no escape, ungraded. Music: the parent scenarios have no track yet. Art: every room from text + skeleton, the station first."
   },
-  "worldPlatePrompt": "One continuous single-frame view at sunrise from a little above a small volcano monitoring station high on the steep flank of a volcanic island: a tidy gravel yard cut into black cinder with a low whitewashed hut, a slim radio mast and a white four-wheel-drive truck on a mountain road below, a stepped footpath with a rope handrail climbing past a squat stone hut to the level shelf of a crater rim where a thin white plume of steam rises, and far above, the island's steep summit cone with a small pale observatory dome on its top. Low warm gold sunlight from the east-south-east over a deep blue ocean, long cool shadows, a clear sky. Photorealistic. No people, no animals, no text, no night lights.",
+  "worldPlatePrompt": "One continuous single-frame view at sunrise from a little above a small volcano monitoring station high on the steep flank of a volcanic island: a tidy gravel yard cut into black cinder with a low whitewashed hut, a slim radio mast and a white four-wheel-drive truck parked by the yard's gateway, a mountain road winding below, a stepped footpath with a rope handrail climbing past a squat stone hut to the level edge of the crater's shelf where a thin white plume of steam rises, and over the shelf's skyline, small with distance, the tall pale stacks of a geothermal plant on the crater's far rim. Low warm gold sunlight from the east-south-east over a deep blue ocean, long cool shadows, a clear sky. Photorealistic. No people, no animals, no text, no night lights.",
   "coverPrompt": "Minimalist stylised thumbnail poster: the bold silhouette of a steep volcano's summit with one small observatory dome on its top and a thin plume of steam from its flank, against a huge low rising sun. One bold, simple, high-contrast silhouette that reads at thumbnail size; flat limited palette of deep blue sky, dark silhouette and one warm amber glow of the sunrise. Strong negative space, soft film grain. Square. No people, no text.",
-  "story": "It is morning on the volcano island, and the monitoring station needs its calls made: yes or no, from the readings. Climb the footpath to a task at the seismometer hut (one call), the fumarole (two) or the crater rim (three), build the model in R, and choose your answer to fill the calls you carry. Bring each load back down and clip it to the morning bulletin board: the station's numbers are engineered for this class, but every analysis is the real one.",
+  "story": "It is morning on the volcano island, and the monitoring station needs its calls made: yes or no, from the readings. Climb the footpath to a task at the seismometer hut (one call), the fumarole (two) or the crater rim (three), build the model in R, and choose your answer to fill the calls you carry. Bring each load back down and clip it to the morning bulletin board.",
   "rooms": [
     {
       "key": "station",
       "title": "The monitoring station",
-      "built": false,
+      "built": true,
       "unlockedWhen": true,
       "designNote": "DAY-ONE HUB (Monday). The morning bulletin board is a deliver point (carry-back: calls count only once clipped to a bulletin); the S-curve board is the day's instrument (kind sigmoid_board, not built yet); the day ledger is the dataset explorer on the station's earlier record (sister data). The notice case opens Staff Only once lair has a play.html (link left out until then). The footpath climbs to the three day-one stations; the truck is the way up to the day-two hub, hidden until state.day_two.",
       "plannedHotspots": [
@@ -59,40 +59,82 @@
               "day_two",
               true
             ]
-          }
-        },
-        {
-          "type": "plaque",
-          "label": "Notice: Staff Only",
-          "title": "Staff Only",
-          "body": "Pinned in the station's notice case: a press day at the new crater resort, a night tour that a pair of reporters slip away from, and a warning system its owner swears by. This is one of the chapter's homework scenarios, played with a partner. It opens here once it is ready."
+          },
+          "box": [
+            0.194,
+            0.4788,
+            0.295,
+            0.6247
+          ],
+          "boxSource": "draft:skeleton"
         },
         {
           "type": "deliver",
-          "label": "The morning bulletin board"
+          "label": "The morning bulletin board",
+          "box": [
+            0.3452,
+            0.3576,
+            0.4152,
+            0.6756
+          ],
+          "boxSource": "draft:skeleton"
         },
         {
           "type": "door",
           "direction": "open",
           "to": "seismo_hut",
-          "label": "The footpath up the slope"
+          "label": "The footpath up the slope",
+          "box": [
+            0.485,
+            0.2012,
+            0.515,
+            0.5562
+          ],
+          "boxSource": "draft:skeleton"
+        },
+        {
+          "type": "plaque",
+          "label": "Notice: Staff Only",
+          "title": "Staff Only",
+          "body": "Pinned in the station's notice case: a press day at the new crater resort, a night tour that a pair of reporters slip away from, and a warning system its owner swears by. This is one of the chapter's homework scenarios, played with a partner. It opens here once it is ready.",
+          "box": [
+            0.5107,
+            0.4483,
+            0.5307,
+            0.5093
+          ],
+          "boxSource": "draft:skeleton"
         },
         {
           "type": "instrument",
           "kind": "dataset_explorer",
           "label": "The day ledger",
-          "config": "data/station_ledger.explorer.json"
+          "config": "data/station_ledger.explorer.json",
+          "box": [
+            0.6127,
+            0.5784,
+            0.6827,
+            0.6628
+          ],
+          "boxSource": "draft:skeleton"
         },
         {
           "type": "instrument",
           "kind": "sigmoid_board",
-          "label": "The S-curve board"
+          "label": "The S-curve board",
+          "box": [
+            0.7564,
+            0.4583,
+            0.8053,
+            0.5329
+          ],
+          "boxSource": "draft:skeleton"
         }
       ],
       "authoring": {
         "sceneSpec": {
           "room": "station",
-          "setting": "the small levelled gravel yard of a volcano monitoring station cut into a steep cinder slope high on a volcanic island, just below the shelf the crater sits on, at dawn, beside the last bends of the island's mountain road",
+          "setting": "the small levelled gravel yard of a volcano monitoring station cut into a steep cinder slope high on a volcanic island, just below the shelf the crater sits on, at dawn, a little above a hairpin bend of the island's mountain road, which winds on up toward the summit",
           "interior": false,
           "seam": "a low dry-stone wall close behind the viewer at the yard's downhill edge, the sea far below beyond it",
           "seamOccluder": "one tall weathered wooden survey post standing upright against the wall, full height",
@@ -110,7 +152,7 @@
                 "direction": "open",
                 "to": "archive"
               },
-              "desc": "standing well in from the edge of the frame, the station's white four-wheel-drive truck parked on the yard's gravel beside the open gateway, its driver's door standing open, its nose toward the yard's open gateway between two stout gateposts, beyond which a steep gravel track drops away out of sight to the island road below the yard"
+              "desc": "standing well in from the edge of the frame, the station's white four-wheel-drive truck parked on the yard's gravel, its driver's door standing open, its nose toward the yard's open gateway just beyond it between two stout gateposts, where a steep gravel track drops away out of sight to the island road below the yard"
             },
             {
               "id": "far_works",
@@ -118,18 +160,11 @@
               "desc": "far up the slope over the level edge of the crater's shelf, high above the yard and small with distance, the tops of brand-new concrete and glass buildings, a monorail platform's roof and the tall pale stacks of a geothermal plant on the crater's far rim"
             },
             {
-              "id": "notice_case",
-              "at": "left of centre",
-              "label": "Notice: Staff Only",
-              "plaque": true,
-              "desc": "beside the gateway on its own post, a small glass-fronted wooden notice case with one pale paper notice pinned inside, nothing on it readable"
-            },
-            {
               "id": "bulletin_board",
               "at": "left of centre",
               "label": "The morning bulletin board",
               "deliver": true,
-              "desc": "by the yard's open gateway, a tall green-painted wooden board on two posts set in the gravel, facing the viewer, with three long rows of empty brass clips across it and a small tin rubber stamp hanging on a cord from one post"
+              "desc": "on the gateway side of the yard, a few strides right of the truck, a tall green-painted wooden board on two posts set in the gravel, facing the viewer, with three long rows of empty brass clips across it and a small tin rubber stamp hanging on a cord from one post"
             },
             {
               "id": "footpath",
@@ -142,6 +177,13 @@
               "desc": "the yard's gravel running level to the foot of a narrow footpath of steps cut into the black cinder, edged with a rope handrail on short iron posts, climbing away UP the steep slope toward a small squat stone hut a little way above, and beyond it the long level skyline of the crater's shelf against the sky"
             },
             {
+              "id": "notice_case",
+              "at": "just right of the centre",
+              "label": "Notice: Staff Only",
+              "plaque": true,
+              "desc": "at the foot of the footpath, just to the right of its first step on its own short post, a small glass-fronted wooden notice case with one pale paper notice pinned inside, nothing on it readable"
+            },
+            {
               "id": "survey_mast",
               "at": "right of centre",
               "desc": "far up the slope on the edge of the shelf, small with distance, a single thin steel survey mast standing against the sky"
@@ -149,15 +191,15 @@
             {
               "id": "kettle_stove",
               "at": "right of centre",
-              "desc": "on a low bench on the station hut's narrow concrete veranda a few strides off, a small camping stove with a dented enamel kettle on it, a little ring of blue gas flame under the kettle",
+              "desc": "a few strides off at the left end of the station hut's narrow concrete veranda, just past the hut's corner, a small camping stove on a low bench with a dented enamel kettle on it at a rolling boil, the dark cinder slope behind it",
               "motion": {
                 "moves": true,
-                "vigour": "the small ring of gas flame under the kettle flickering",
-                "phrase": "the small ring of blue gas flame under the kettle flickers gently, the kettle itself still"
+                "vigour": "a thick plume of white steam pouring from the kettle's spout, lit gold by the low sun against the dark cinder slope",
+                "phrase": "a thick plume of white steam pours from the kettle's spout, rolls slowly upward and thins into the cool air, lit gold by the low sun; the kettle and the stove stay still"
               },
               "sound": {
-                "source": "the little stove under the kettle",
-                "character": "a soft steady purr of a gas flame",
+                "source": "the kettle on the stove",
+                "character": "a soft steady rushing hiss of a kettle on the boil",
                 "prominence": "hero"
               }
             },
@@ -166,14 +208,19 @@
               "at": "right of centre",
               "label": "The day ledger",
               "instrument": "dataset_explorer",
-              "desc": "beside the bench on the same veranda, a sturdy wooden desk standing on the veranda floor, a big cloth-bound ledger lying open on it, its ruled pages blank at this distance, a pencil in its gutter"
+              "desc": "beside the bench at the same left end of the veranda, in front of the hut's wall, a sturdy wooden desk standing on the veranda floor, a big cloth-bound ledger lying open on it, its ruled pages blank at this distance, a pencil in its gutter"
+            },
+            {
+              "id": "station_hut",
+              "at": "right of centre",
+              "desc": "the station hut close by, a low whitewashed concrete building with a flat roof, a slim radio mast rising from its roof and a small solar panel, its narrow concrete veranda running along its front"
             },
             {
               "id": "s_board",
               "at": "to the right",
               "label": "The S-curve board",
               "instrument": "sigmoid_board",
-              "desc": "standing well in from the edge of the frame, close by, fixed flat on the sunlit front wall of the station hut and square to the viewer, a large plain board painted matt white, ruled with faint grey lines into an empty grid, a felt duster and a tin of markers on its little ledge; the hut itself a low whitewashed concrete building with a flat roof, a slim radio mast rising from its roof and a small solar panel"
+              "desc": "standing well in from the edge of the frame, fixed flat on the sunlit front wall of the station hut toward its right end, well clear of the desk and square to the viewer, a large plain board painted matt white, ruled with faint grey lines into an empty grid, a felt duster and a tin of markers on its little ledge"
             },
             {
               "id": "seam_right",
@@ -182,10 +229,10 @@
             }
           ],
           "soundBed": "a high exposed mountainside at dawn: a light cool breeze over cinder, the odd far bird.",
-          "rigid": "the hut, its mast and panel, the board, the desk and ledger, the kettle, the bench, the bulletin board, the notice case, the posts and rope, the wall, and the truck",
+          "rigid": "the hut, its mast and panel, the board, the desk and ledger, the kettle, the stove, the bench, the bulletin board, the notice case, the posts and rope, the wall, and the truck",
           "atmosphere": "A small, tidy, sunlit work yard on a raw volcanic slope at sunrise, gold light and long shadows; a steep volcanic island high above a deep blue ocean: dark basalt, red-brown and black cinder, pale pumice, crusts of real lemon-yellow sulfur at the vents, sparse silver-green broom bushes, weathered whitewashed concrete and galvanized steel, a deep clear sky; photorealistic, fine natural film grain",
           "styleLight": "the first light of dawn: the sun just risen out of the sea to the east-south-east, low on the viewer's left, warm gold light raking across the slope, long cool blue shadows, a pale clear sky deepening to blue overhead",
-          "negatives": "No people, no human figures, no faces and no statues anywhere; no animals. No readable words, no legible writing, no captions, no logos and no painted numbers on any wall, sign, board, ledger page or label. It is MORNING: no night sky, no stars, no moon, no floodlights, no blue fire at any vent or on the crater floor, no lava and no red glow; no fog, no cloud sea below the mountain, no rain. The image is SHARP: no motion blur and no smeared or doubled detail anywhere. No cable car and no gondola. The board's grid and the bulletin board's clips are EMPTY. EXACTLY ONE whitewashed hut in the yard (the small stone hut up the slope is the only other building near), ONE truck, ONE footpath. The yard has EXACTLY TWO ways out: the footpath dead ahead and the gateway down to the road on the left; no other path, stair or gate.",
+          "negatives": "No people, no human figures, no faces and no statues anywhere; no animals. No readable words, no legible writing, no captions, no logos and no painted numbers on any wall, sign, board, ledger page or label. It is MORNING: no night sky, no stars, no moon, no floodlights, no blue fire at any vent or on the crater floor, no lava and no red glow; no fog, no cloud sea below the mountain, no rain. The image is SHARP: no motion blur and no smeared or doubled detail anywhere. No cable car and no gondola. No town, hotel or harbor anywhere in view. The board's grid and the bulletin board's clips are EMPTY. EXACTLY ONE whitewashed hut in the yard (the small stone hut up the slope is the only other building near), ONE truck, ONE footpath, ONE notice case. The kettle's steam is the only steam in the yard. The yard has EXACTLY TWO ways out: the footpath dead ahead and the gateway down to the road on the left; no other path, stair or gate.",
           "states": {},
           "continuity": [],
           "scaffold": {
@@ -199,6 +246,36 @@
                     4300.0004,
                     1750.0004,
                     1775.0004,
+                    -899.9996,
+                    -699.9996,
+                    "terrain"
+                  ],
+                  [
+                    "rock",
+                    4100.0004,
+                    4200.0004,
+                    1775.0004,
+                    1800.0004,
+                    -1099.9996,
+                    -699.9996,
+                    "terrain"
+                  ],
+                  [
+                    "rock",
+                    4000.0004,
+                    4100.0004,
+                    1800.0004,
+                    1825.0004,
+                    -1299.9996,
+                    -699.9996,
+                    "terrain"
+                  ],
+                  [
+                    "rock",
+                    4100.0004,
+                    4200.0004,
+                    1800.0004,
+                    1825.0004,
                     -899.9996,
                     -699.9996,
                     "terrain"
@@ -251,6 +328,16 @@
                     1770.0004,
                     -336.2396,
                     338.7604,
+                    "terrain"
+                  ],
+                  [
+                    "rock",
+                    2386.3004,
+                    4336.3004,
+                    1770.0004,
+                    1780.0004,
+                    -686.2396,
+                    -211.2396,
                     "terrain"
                   ],
                   [
@@ -725,12 +812,462 @@
                   ],
                   [
                     "walk",
+                    4269.7104,
+                    4282.6104,
+                    1749.0004,
+                    1789.9604,
+                    -967.5096,
+                    -949.3096,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    4254.1004,
+                    4267.0004,
+                    1749.0004,
+                    1793.2104,
+                    -1004.3196,
+                    -986.1196,
+                    "road"
+                  ],
+                  [
+                    "walk",
                     4226.7404,
                     4251.3904,
                     1749.0004,
                     1797.7004,
                     -1063.5996,
                     -1022.9296,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    4211.0804,
+                    4235.7404,
+                    1749.0004,
+                    1801.2104,
+                    -1095.2696,
+                    -1054.5996,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    4195.4304,
+                    4220.0804,
+                    1749.0004,
+                    1804.5904,
+                    -1126.9396,
+                    -1086.2696,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    4179.7804,
+                    4204.4304,
+                    1774.0004,
+                    1807.8504,
+                    -1158.6196,
+                    -1117.9396,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    4164.1304,
+                    4188.7804,
+                    1774.0004,
+                    1810.9904,
+                    -1190.2896,
+                    -1149.6196,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    4148.4704,
+                    4173.1304,
+                    1774.0004,
+                    1814.0104,
+                    -1221.9596,
+                    -1181.2896,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    4132.8204,
+                    4157.4704,
+                    1774.0004,
+                    1816.8904,
+                    -1253.6296,
+                    -1212.9596,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    4082.6104,
+                    4101.2404,
+                    1824.0004,
+                    1844.0504,
+                    -1238.4696,
+                    -1190.9396,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    4092.2404,
+                    4110.8804,
+                    1774.0004,
+                    1844.8104,
+                    -1199.9396,
+                    -1152.3996,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    4101.8804,
+                    4120.5104,
+                    1774.0004,
+                    1845.3904,
+                    -1161.3996,
+                    -1113.8696,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    4111.5104,
+                    4130.1504,
+                    1774.0004,
+                    1845.7904,
+                    -1122.8696,
+                    -1075.3296,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    4121.1504,
+                    4139.7904,
+                    1799.0004,
+                    1846.0104,
+                    -1084.3296,
+                    -1036.7996,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    4130.7904,
+                    4149.4204,
+                    1799.0004,
+                    1846.0504,
+                    -1045.7996,
+                    -998.2596,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    4140.4204,
+                    4151.2904,
+                    1799.0004,
+                    1846.1404,
+                    -1007.2596,
+                    -988.5196,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    4142.2904,
+                    4153.1504,
+                    1799.0004,
+                    1846.3604,
+                    -997.5196,
+                    -978.7796,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    4144.1504,
+                    4155.0204,
+                    1799.0004,
+                    1846.5704,
+                    -987.7796,
+                    -969.0396,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    4146.0204,
+                    4156.8804,
+                    1799.0004,
+                    1846.7704,
+                    -978.0396,
+                    -959.2896,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    4147.8804,
+                    4158.7504,
+                    1799.0004,
+                    1846.9504,
+                    -968.2896,
+                    -949.5496,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    4149.7504,
+                    4160.6104,
+                    1799.0004,
+                    1847.1304,
+                    -958.5496,
+                    -939.8096,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    4151.6104,
+                    4162.4804,
+                    1799.0004,
+                    1847.3004,
+                    -948.8096,
+                    -930.0696,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    4153.4804,
+                    4164.3404,
+                    1799.0004,
+                    1847.4504,
+                    -939.0696,
+                    -920.3196,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    4155.3404,
+                    4166.2104,
+                    1799.0004,
+                    1847.5904,
+                    -929.3196,
+                    -910.5796,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    4157.2104,
+                    4168.0704,
+                    1799.0004,
+                    1847.7204,
+                    -919.5796,
+                    -900.8396,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    4159.0704,
+                    4169.9404,
+                    1799.0004,
+                    1847.8404,
+                    -909.8396,
+                    -891.0996,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    4160.9404,
+                    4171.8004,
+                    1824.0004,
+                    1847.9504,
+                    -900.0996,
+                    -881.3596,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    4162.8004,
+                    4173.6704,
+                    1824.0004,
+                    1848.0504,
+                    -890.3596,
+                    -871.6096,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    4164.6704,
+                    4175.5304,
+                    1824.0004,
+                    1848.1404,
+                    -880.6096,
+                    -861.8696,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    4166.5304,
+                    4177.4004,
+                    1824.0004,
+                    1848.2104,
+                    -870.8696,
+                    -852.1296,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    4168.4004,
+                    4179.2604,
+                    1824.0004,
+                    1848.2804,
+                    -861.1296,
+                    -842.3896,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    4170.2604,
+                    4181.1304,
+                    1824.0004,
+                    1848.3304,
+                    -851.3896,
+                    -832.6496,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    4172.1304,
+                    4182.9904,
+                    1824.0004,
+                    1848.3704,
+                    -841.6496,
+                    -822.8996,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    4173.9904,
+                    4184.8604,
+                    1824.0004,
+                    1848.4004,
+                    -831.8996,
+                    -813.1596,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    4175.8604,
+                    4186.7204,
+                    1824.0004,
+                    1848.4204,
+                    -822.1596,
+                    -803.4196,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    4177.7204,
+                    4188.5904,
+                    1824.0004,
+                    1848.4304,
+                    -812.4196,
+                    -793.6796,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    4179.5904,
+                    4190.4504,
+                    1824.0004,
+                    1848.4304,
+                    -802.6796,
+                    -783.9296,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    4181.4504,
+                    4192.3204,
+                    1824.0004,
+                    1848.4204,
+                    -792.9296,
+                    -774.1896,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    4183.3204,
+                    4194.1804,
+                    1824.0004,
+                    1848.3904,
+                    -783.1896,
+                    -764.4496,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    4185.1804,
+                    4195.5004,
+                    1824.0004,
+                    1848.4904,
+                    -773.4496,
+                    -754.6296,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    4186.5004,
+                    4196.8204,
+                    1824.0004,
+                    1848.7104,
+                    -763.6296,
+                    -744.8096,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    4187.8204,
+                    4198.1304,
+                    1824.0004,
+                    1848.9204,
+                    -753.8096,
+                    -734.9896,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    4189.1304,
+                    4199.4504,
+                    1824.0004,
+                    1849.1104,
+                    -743.9896,
+                    -725.1696,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    4190.4504,
+                    4200.7704,
+                    1824.0004,
+                    1849.3004,
+                    -734.1696,
+                    -715.3496,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    4191.7704,
+                    4202.0804,
+                    1824.0004,
+                    1849.4704,
+                    -724.3496,
+                    -705.5296,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    4193.0804,
+                    4203.4004,
+                    1824.0004,
+                    1849.6304,
+                    -714.5296,
+                    -695.7096,
                     "road"
                   ],
                   [
@@ -1785,42 +2322,42 @@
                   ],
                   [
                     "wall",
-                    4389.8904,
-                    4397.8904,
+                    4387.9304,
+                    4395.9304,
                     1763.2604,
                     1766.4604,
-                    -581.8996,
-                    -573.8996,
+                    -578.8296,
+                    -570.8296,
                     "station_hut"
                   ],
                   [
                     "wall",
-                    4389.5904,
-                    4398.1904,
+                    4387.6304,
+                    4396.2304,
                     1766.4604,
                     1766.7104,
-                    -582.1996,
-                    -573.5996,
+                    -579.1296,
+                    -570.5296,
                     "station_hut"
                   ],
                   [
                     "tower",
-                    4391.8904,
-                    4392.1904,
+                    4389.9304,
+                    4390.2304,
                     1766.7104,
                     1775.2604,
-                    -579.7396,
-                    -579.4396,
+                    -576.6696,
+                    -576.3696,
                     "radio_mast"
                   ],
                   [
                     "wall",
-                    4395.8804,
-                    4398.0804,
+                    4395.1004,
+                    4397.3004,
                     1764.1604,
                     1765.6604,
-                    -576.1596,
-                    -573.9596,
+                    -575.1096,
+                    -572.9096,
                     "s_board"
                   ],
                   [
@@ -1865,22 +2402,22 @@
                   ],
                   [
                     "wall",
-                    4404.3104,
-                    4405.2104,
+                    4397.5104,
+                    4398.4104,
                     1764.2604,
                     1765.2604,
-                    -565.2196,
-                    -564.3196,
+                    -568.6396,
+                    -567.7396,
                     "notice_case"
                   ],
                   [
                     "rail",
-                    4404.6804,
-                    4404.8404,
+                    4397.8804,
+                    4398.0404,
                     1763.2604,
                     1765.2604,
-                    -564.8496,
-                    -564.6896,
+                    -568.2696,
+                    -568.1096,
                     "notice_case"
                   ],
                   [
@@ -2575,11 +3112,114 @@
             }
           },
           "worldPlateRef": false,
-          "motionClosing": "Only the small flame under the kettle flickers; everything else stays exactly where it is."
+          "motionClosing": "Only the steam from the kettle moves; everything else stays exactly where it is."
         },
-        "scenePrompt": "This is a seamless 360-degree panorama from the small levelled gravel yard of a volcano monitoring station cut into a steep cinder slope high on a volcanic island, just below the shelf the crater sits on, at dawn, beside the last bends of the island's mountain road. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a low dry-stone wall close behind the viewer at the yard's downhill edge, the sea far below beyond it: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: a low dry-stone wall close by at the yard's downhill edge and the sea far below beyond it, joining its other half cleanly at the seam directly behind you; to the left, standing well in from the edge of the frame, the station's white four-wheel-drive truck parked on the yard's gravel beside the open gateway, its driver's door standing open, its nose toward the yard's open gateway between two stout gateposts, beyond which a steep gravel track drops away out of sight to the island road below the yard; left of centre, far up the slope over the level edge of the crater's shelf, high above the yard and small with distance, the tops of brand-new concrete and glass buildings, a monorail platform's roof and the tall pale stacks of a geothermal plant on the crater's far rim; left of centre, beside the gateway on its own post, a small glass-fronted wooden notice case with one pale paper notice pinned inside, nothing on it readable; left of centre, by the yard's open gateway, a tall green-painted wooden board on two posts set in the gravel, facing the viewer, with three long rows of empty brass clips across it and a small tin rubber stamp hanging on a cord from one post; dead ahead in the centre, the yard's gravel running level to the foot of a narrow footpath of steps cut into the black cinder, edged with a rope handrail on short iron posts, climbing away UP the steep slope toward a small squat stone hut a little way above, and beyond it the long level skyline of the crater's shelf against the sky; right of centre, far up the slope on the edge of the shelf, small with distance, a single thin steel survey mast standing against the sky; right of centre, on a low bench on the station hut's narrow concrete veranda a few strides off, a small camping stove with a dented enamel kettle on it, a little ring of blue gas flame under the kettle, the small ring of gas flame under the kettle flickering; right of centre, beside the bench on the same veranda, a sturdy wooden desk standing on the veranda floor, a big cloth-bound ledger lying open on it, its ruled pages blank at this distance, a pencil in its gutter; to the right, standing well in from the edge of the frame, close by, fixed flat on the sunlit front wall of the station hut and square to the viewer, a large plain board painted matt white, ruled with faint grey lines into an empty grid, a felt duster and a tin of markers on its little ledge; the hut itself a low whitewashed concrete building with a flat roof, a slim radio mast rising from its roof and a small solar panel; on the far right, the right half of the calm view directly behind the viewer: a low dry-stone wall close by at the yard's downhill edge and the sea far below beyond it, joining its other half cleanly at the seam directly behind you. A small, tidy, sunlit work yard on a raw volcanic slope at sunrise, gold light and long shadows; a steep volcanic island high above a deep blue ocean: dark basalt, red-brown and black cinder, pale pumice, crusts of real lemon-yellow sulfur at the vents, sparse silver-green broom bushes, weathered whitewashed concrete and galvanized steel, a deep clear sky; photorealistic, fine natural film grain. No people, no human figures, no faces and no statues anywhere; no animals. No readable words, no legible writing, no captions, no logos and no painted numbers on any wall, sign, board, ledger page or label. It is MORNING: no night sky, no stars, no moon, no floodlights, no blue fire at any vent or on the crater floor, no lava and no red glow; no fog, no cloud sea below the mountain, no rain. The image is SHARP: no motion blur and no smeared or doubled detail anywhere. No cable car and no gondola. The board's grid and the bulletin board's clips are EMPTY. EXACTLY ONE whitewashed hut in the yard (the small stone hut up the slope is the only other building near), ONE truck, ONE footpath. The yard has EXACTLY TWO ways out: the footpath dead ahead and the gateway down to the road on the left; no other path, stair or gate. Shot on a full-frame DSLR at 24mm, f/8, the first light of dawn: the sun just risen out of the sea to the east-south-east, low on the viewer's left, warm gold light raking across the slope, long cool blue shadows, a pale clear sky deepening to blue overhead, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a low dry-stone wall close behind the viewer at the yard's downhill edge, the sea far below beyond it, with no visible seam, join, or repetition.",
-        "specBuild": "000e92a49175e8d4c8a8"
-      }
+        "scenePrompt": "This is a seamless 360-degree panorama from the small levelled gravel yard of a volcano monitoring station cut into a steep cinder slope high on a volcanic island, just below the shelf the crater sits on, at dawn, a little above a hairpin bend of the island's mountain road, which winds on up toward the summit. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a low dry-stone wall close behind the viewer at the yard's downhill edge, the sea far below beyond it: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: a low dry-stone wall close by at the yard's downhill edge and the sea far below beyond it, joining its other half cleanly at the seam directly behind you; to the left, standing well in from the edge of the frame, the station's white four-wheel-drive truck parked on the yard's gravel, its driver's door standing open, its nose toward the yard's open gateway just beyond it between two stout gateposts, where a steep gravel track drops away out of sight to the island road below the yard; left of centre, far up the slope over the level edge of the crater's shelf, high above the yard and small with distance, the tops of brand-new concrete and glass buildings, a monorail platform's roof and the tall pale stacks of a geothermal plant on the crater's far rim; left of centre, on the gateway side of the yard, a few strides right of the truck, a tall green-painted wooden board on two posts set in the gravel, facing the viewer, with three long rows of empty brass clips across it and a small tin rubber stamp hanging on a cord from one post; dead ahead in the centre, the yard's gravel running level to the foot of a narrow footpath of steps cut into the black cinder, edged with a rope handrail on short iron posts, climbing away UP the steep slope toward a small squat stone hut a little way above, and beyond it the long level skyline of the crater's shelf against the sky; just right of the centre, at the foot of the footpath, just to the right of its first step on its own short post, a small glass-fronted wooden notice case with one pale paper notice pinned inside, nothing on it readable; right of centre, far up the slope on the edge of the shelf, small with distance, a single thin steel survey mast standing against the sky; right of centre, a few strides off at the left end of the station hut's narrow concrete veranda, just past the hut's corner, a small camping stove on a low bench with a dented enamel kettle on it at a rolling boil, the dark cinder slope behind it, a thick plume of white steam pouring from the kettle's spout, lit gold by the low sun against the dark cinder slope; right of centre, beside the bench at the same left end of the veranda, in front of the hut's wall, a sturdy wooden desk standing on the veranda floor, a big cloth-bound ledger lying open on it, its ruled pages blank at this distance, a pencil in its gutter; right of centre, the station hut close by, a low whitewashed concrete building with a flat roof, a slim radio mast rising from its roof and a small solar panel, its narrow concrete veranda running along its front; to the right, standing well in from the edge of the frame, fixed flat on the sunlit front wall of the station hut toward its right end, well clear of the desk and square to the viewer, a large plain board painted matt white, ruled with faint grey lines into an empty grid, a felt duster and a tin of markers on its little ledge; on the far right, the right half of the calm view directly behind the viewer: a low dry-stone wall close by at the yard's downhill edge and the sea far below beyond it, joining its other half cleanly at the seam directly behind you. A small, tidy, sunlit work yard on a raw volcanic slope at sunrise, gold light and long shadows; a steep volcanic island high above a deep blue ocean: dark basalt, red-brown and black cinder, pale pumice, crusts of real lemon-yellow sulfur at the vents, sparse silver-green broom bushes, weathered whitewashed concrete and galvanized steel, a deep clear sky; photorealistic, fine natural film grain. No people, no human figures, no faces and no statues anywhere; no animals. No readable words, no legible writing, no captions, no logos and no painted numbers on any wall, sign, board, ledger page or label. It is MORNING: no night sky, no stars, no moon, no floodlights, no blue fire at any vent or on the crater floor, no lava and no red glow; no fog, no cloud sea below the mountain, no rain. The image is SHARP: no motion blur and no smeared or doubled detail anywhere. No cable car and no gondola. No town, hotel or harbor anywhere in view. The board's grid and the bulletin board's clips are EMPTY. EXACTLY ONE whitewashed hut in the yard (the small stone hut up the slope is the only other building near), ONE truck, ONE footpath, ONE notice case. The kettle's steam is the only steam in the yard. The yard has EXACTLY TWO ways out: the footpath dead ahead and the gateway down to the road on the left; no other path, stair or gate. Shot on a full-frame DSLR at 24mm, f/8, the first light of dawn: the sun just risen out of the sea to the east-south-east, low on the viewer's left, warm gold light raking across the slope, long cool blue shadows, a pale clear sky deepening to blue overhead, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a low dry-stone wall close behind the viewer at the yard's downhill edge, the sea far below beyond it, with no visible seam, join, or repetition.",
+        "specBuild": "56e4c48fabaa1580b2ca",
+        "seam": {
+          "stage": "blurred",
+          "band": "sky",
+          "ratio": 0.0,
+          "delta": 0.0,
+          "needsWork": false,
+          "accepted": false,
+          "seamBandRun": 0.0,
+          "seamStepRatio": 0.0,
+          "at": "2026-11-19T17:57:16"
+        }
+      },
+      "panorama": "station/scene.png",
+      "builtFrom": "l1_station_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "hotspots": [
+        {
+          "id": "the_station_s_truck",
+          "type": "door",
+          "label": "The station's truck",
+          "box": [
+            0.194,
+            0.4788,
+            0.295,
+            0.6247
+          ],
+          "direction": "open",
+          "to": "archive",
+          "shownWhen": {
+            "eq": [
+              "day_two",
+              true
+            ]
+          }
+        },
+        {
+          "id": "the_morning_bulletin_board",
+          "type": "deliver",
+          "label": "The morning bulletin board",
+          "box": [
+            0.3452,
+            0.3576,
+            0.4152,
+            0.6756
+          ]
+        },
+        {
+          "id": "the_footpath_up_the_slope",
+          "type": "door",
+          "label": "The footpath up the slope",
+          "box": [
+            0.485,
+            0.2012,
+            0.515,
+            0.5562
+          ],
+          "direction": "open",
+          "to": "seismo_hut"
+        },
+        {
+          "id": "notice_staff_only",
+          "type": "plaque",
+          "label": "Notice: Staff Only",
+          "box": [
+            0.5107,
+            0.4483,
+            0.5307,
+            0.5093
+          ],
+          "title": "Staff Only",
+          "body": "Pinned in the station's notice case: a press day at the new crater resort, a night tour that a pair of reporters slip away from, and a warning system its owner swears by. This is one of the chapter's homework scenarios, played with a partner. It opens here once it is ready."
+        },
+        {
+          "id": "the_day_ledger",
+          "type": "instrument",
+          "label": "The day ledger",
+          "box": [
+            0.6127,
+            0.5784,
+            0.6827,
+            0.6628
+          ],
+          "kind": "dataset_explorer",
+          "config": "data/station_ledger.explorer.json"
+        },
+        {
+          "id": "the_s_curve_board",
+          "type": "instrument",
+          "label": "The S-curve board",
+          "box": [
+            0.7564,
+            0.4583,
+            0.8053,
+            0.5329
+          ],
+          "kind": "sigmoid_board"
+        }
+      ]
     },
     {
       "key": "seismo_hut",
@@ -2597,7 +3237,6 @@
         {
           "type": "station",
           "tier": 1,
-          "track": "day1",
           "label": "The seismometer hut"
         },
         {
@@ -2640,7 +3279,6 @@
               "at": "dead ahead in the centre",
               "label": "The seismometer hut",
               "station": 1,
-              "track": "day1",
               "desc": "a few strides ahead, a squat hut of dark stone blocks half dug into the slope, its flat concrete roof banked with cinder, a low steel door standing open on a dim interior where a grey instrument case sits on a concrete pier, cables running out of a pipe in its wall"
             },
             {
@@ -2671,7 +3309,7 @@
                 "direction": "back",
                 "to": "station"
               },
-              "desc": "standing well in from the edge of the frame, the pad's cinder running level onto the stepped footpath, which starts DOWN between two short iron posts of its rope handrail and runs DOWN the slope to the small station yard below, the white hut and its radio mast and the parked white truck in it, and far below the sea, the distant coast lost in a pale morning haze"
+              "desc": "standing well in from the edge of the frame, the pad's cinder running level onto the stepped footpath, which starts DOWN between two short iron posts of its rope handrail and runs DOWN the slope to the small station yard below with its white hut and radio mast, the open sea far below beyond"
             },
             {
               "id": "seam_right",
@@ -2682,8 +3320,8 @@
           "soundBed": "an open cinder slope in the morning: a steady breeze, nothing else near.",
           "rigid": "the hut, its door, the pier and case, the solar panel, the cable drum, the posts and the rope",
           "atmosphere": "A lonely little instrument hut on a bare volcanic slope in clean morning light; a steep volcanic island high above a deep blue ocean: dark basalt, red-brown and black cinder, pale pumice, crusts of real lemon-yellow sulfur at the vents, sparse silver-green broom bushes, weathered whitewashed concrete and galvanized steel, a deep clear sky; photorealistic, fine natural film grain",
-          "styleLight": "early morning: the sun a little above the sea to the east-south-east, bright warm light from the viewer's right, crisp shadows, a clear deep-blue sky",
-          "negatives": "No people, no human figures, no faces and no statues anywhere; no animals. No readable words, no legible writing, no captions, no logos and no painted numbers on any wall, sign, board, ledger page or label. It is MORNING: no night sky, no stars, no moon, no floodlights, no blue fire at any vent or on the crater floor, no lava and no red glow; no fog, no cloud sea below the mountain, no rain. The image is SHARP: no motion blur and no smeared or doubled detail anywhere. No cable car and no gondola. EXACTLY ONE stone hut, its door the only opening. The pad has EXACTLY TWO ways off: the footpath up on the left and down on the right; no other path. No town, hotel or harbor on the distant coast: it is lost in haze.",
+          "styleLight": "early morning: the sun a little above the sea to the east-south-east, behind the viewer, bright warm light falling on the hut's face, crisp shadows, a clear deep-blue sky",
+          "negatives": "No people, no human figures, no faces and no statues anywhere; no animals. No readable words, no legible writing, no captions, no logos and no painted numbers on any wall, sign, board, ledger page or label. It is MORNING: no night sky, no stars, no moon, no floodlights, no blue fire at any vent or on the crater floor, no lava and no red glow; no fog, no cloud sea below the mountain, no rain. The image is SHARP: no motion blur and no smeared or doubled detail anywhere. No cable car and no gondola. No town, hotel or harbor anywhere in view. EXACTLY ONE building on the pad, the squat stone hut, its door the only opening; the only other building in view is the station's small white hut far down the slope. The pad has EXACTLY TWO ways off: the footpath up on the left and down on the right; no other path.",
           "states": {},
           "continuity": [],
           "scaffold": {
@@ -9913,23 +10551,33 @@
                   ],
                   [
                     "wall",
-                    4389.8904,
-                    4397.8904,
+                    4387.9304,
+                    4395.9304,
                     1763.2604,
                     1766.4604,
-                    -581.8996,
-                    -573.8996,
+                    -578.8296,
+                    -570.8296,
                     "station_hut"
                   ],
                   [
                     "wall",
-                    4389.5904,
-                    4398.1904,
+                    4387.6304,
+                    4396.2304,
                     1766.4604,
                     1766.7104,
-                    -582.1996,
-                    -573.5996,
+                    -579.1296,
+                    -570.5296,
                     "station_hut"
+                  ],
+                  [
+                    "tower",
+                    4389.9304,
+                    4390.2304,
+                    1766.7104,
+                    1775.2604,
+                    -576.6696,
+                    -576.3696,
+                    "radio_mast"
                   ],
                   [
                     "wall",
@@ -9963,22 +10611,12 @@
                   ],
                   [
                     "wall",
-                    4404.3104,
-                    4405.2104,
+                    4397.5104,
+                    4398.4104,
                     1764.2604,
                     1765.2604,
-                    -565.2196,
-                    -564.3196,
-                    "notice_case"
-                  ],
-                  [
-                    "rail",
-                    4404.6804,
-                    4404.8404,
-                    1763.2604,
-                    1765.2604,
-                    -564.8496,
-                    -564.6896,
+                    -568.6396,
+                    -567.7396,
                     "notice_case"
                   ],
                   [
@@ -10695,8 +11333,8 @@
           "worldPlateRef": false,
           "motionClosing": "Only the tarp's loose corner stirs; everything else stays exactly where it is."
         },
-        "scenePrompt": "This is a seamless 360-degree panorama from a tiny level pad of trodden cinder beside a squat stone seismometer hut half dug into a steep cinder slope, on a stepped footpath climbing toward a volcano's crater, early in the morning. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the steep black cinder slope falling away behind the viewer, plain and even: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: the steep black cinder slope falling away close by, plain and even, joining its other half cleanly at the seam directly behind you; to the left, standing well in from the edge of the frame, a small solar panel on a steel frame set into the cinder a few strides off, tilted to the sun; far beyond it, high up over the level edge of the crater's shelf and small with distance, the tops of brand-new concrete buildings and the tall pale stacks of a geothermal plant; left of centre, the pad's cinder running level onto the stepped footpath, which climbs on away UP the slope with its rope handrail toward the level edge of the crater's shelf above, where a thin white plume of steam rises; dead ahead in the centre, a few strides ahead, a squat hut of dark stone blocks half dug into the slope, its flat concrete roof banked with cinder, a low steel door standing open on a dim interior where a grey instrument case sits on a concrete pier, cables running out of a pipe in its wall; right of centre, beside the hut's door, a wooden cable drum with a loose khaki canvas tarp thrown over it, one corner hanging free and tied down with a cord to a rock, the tarp's loose corner lifting slightly in the breeze; right of centre, far up the slope beyond the drum, small with distance, a single thin steel survey mast standing against the sky; to the right, standing well in from the edge of the frame, the pad's cinder running level onto the stepped footpath, which starts DOWN between two short iron posts of its rope handrail and runs DOWN the slope to the small station yard below, the white hut and its radio mast and the parked white truck in it, and far below the sea, the distant coast lost in a pale morning haze; on the far right, the right half of the calm view directly behind the viewer: the steep black cinder slope falling away close by, plain and even, joining its other half cleanly at the seam directly behind you. A lonely little instrument hut on a bare volcanic slope in clean morning light; a steep volcanic island high above a deep blue ocean: dark basalt, red-brown and black cinder, pale pumice, crusts of real lemon-yellow sulfur at the vents, sparse silver-green broom bushes, weathered whitewashed concrete and galvanized steel, a deep clear sky; photorealistic, fine natural film grain. No people, no human figures, no faces and no statues anywhere; no animals. No readable words, no legible writing, no captions, no logos and no painted numbers on any wall, sign, board, ledger page or label. It is MORNING: no night sky, no stars, no moon, no floodlights, no blue fire at any vent or on the crater floor, no lava and no red glow; no fog, no cloud sea below the mountain, no rain. The image is SHARP: no motion blur and no smeared or doubled detail anywhere. No cable car and no gondola. EXACTLY ONE stone hut, its door the only opening. The pad has EXACTLY TWO ways off: the footpath up on the left and down on the right; no other path. No town, hotel or harbor on the distant coast: it is lost in haze. Shot on a full-frame DSLR at 24mm, f/8, early morning: the sun a little above the sea to the east-south-east, bright warm light from the viewer's right, crisp shadows, a clear deep-blue sky, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into the steep black cinder slope falling away behind the viewer, plain and even, with no visible seam, join, or repetition.",
-        "specBuild": "18fc44a48cf551557b57"
+        "scenePrompt": "This is a seamless 360-degree panorama from a tiny level pad of trodden cinder beside a squat stone seismometer hut half dug into a steep cinder slope, on a stepped footpath climbing toward a volcano's crater, early in the morning. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the steep black cinder slope falling away behind the viewer, plain and even: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: the steep black cinder slope falling away close by, plain and even, joining its other half cleanly at the seam directly behind you; to the left, standing well in from the edge of the frame, a small solar panel on a steel frame set into the cinder a few strides off, tilted to the sun; far beyond it, high up over the level edge of the crater's shelf and small with distance, the tops of brand-new concrete buildings and the tall pale stacks of a geothermal plant; left of centre, the pad's cinder running level onto the stepped footpath, which climbs on away UP the slope with its rope handrail toward the level edge of the crater's shelf above, where a thin white plume of steam rises; dead ahead in the centre, a few strides ahead, a squat hut of dark stone blocks half dug into the slope, its flat concrete roof banked with cinder, a low steel door standing open on a dim interior where a grey instrument case sits on a concrete pier, cables running out of a pipe in its wall; right of centre, beside the hut's door, a wooden cable drum with a loose khaki canvas tarp thrown over it, one corner hanging free and tied down with a cord to a rock, the tarp's loose corner lifting slightly in the breeze; right of centre, far up the slope beyond the drum, small with distance, a single thin steel survey mast standing against the sky; to the right, standing well in from the edge of the frame, the pad's cinder running level onto the stepped footpath, which starts DOWN between two short iron posts of its rope handrail and runs DOWN the slope to the small station yard below with its white hut and radio mast, the open sea far below beyond; on the far right, the right half of the calm view directly behind the viewer: the steep black cinder slope falling away close by, plain and even, joining its other half cleanly at the seam directly behind you. A lonely little instrument hut on a bare volcanic slope in clean morning light; a steep volcanic island high above a deep blue ocean: dark basalt, red-brown and black cinder, pale pumice, crusts of real lemon-yellow sulfur at the vents, sparse silver-green broom bushes, weathered whitewashed concrete and galvanized steel, a deep clear sky; photorealistic, fine natural film grain. No people, no human figures, no faces and no statues anywhere; no animals. No readable words, no legible writing, no captions, no logos and no painted numbers on any wall, sign, board, ledger page or label. It is MORNING: no night sky, no stars, no moon, no floodlights, no blue fire at any vent or on the crater floor, no lava and no red glow; no fog, no cloud sea below the mountain, no rain. The image is SHARP: no motion blur and no smeared or doubled detail anywhere. No cable car and no gondola. No town, hotel or harbor anywhere in view. EXACTLY ONE building on the pad, the squat stone hut, its door the only opening; the only other building in view is the station's small white hut far down the slope. The pad has EXACTLY TWO ways off: the footpath up on the left and down on the right; no other path. Shot on a full-frame DSLR at 24mm, f/8, early morning: the sun a little above the sea to the east-south-east, behind the viewer, bright warm light falling on the hut's face, crisp shadows, a clear deep-blue sky, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into the steep black cinder slope falling away behind the viewer, plain and even, with no visible seam, join, or repetition.",
+        "specBuild": "fbc2f2a9f8484e533a79"
       }
     },
     {
@@ -10715,7 +11353,6 @@
         {
           "type": "station",
           "tier": 2,
-          "track": "day1",
           "label": "The fumarole"
         },
         {
@@ -10736,7 +11373,7 @@
             {
               "id": "seam_left",
               "at": "on the far left",
-              "desc": "the left half of the calm view directly behind the viewer: the flat cinder of the shelf running away close by, and far off beyond it, small with distance, the tops of the tall pale stacks of a geothermal plant, joining its other half cleanly at the seam directly behind you"
+              "desc": "the left half of the calm view directly behind the viewer: the flat cinder of the shelf running away close by, plain and even, joining its other half cleanly at the seam directly behind you"
             },
             {
               "id": "path_up",
@@ -10746,7 +11383,7 @@
                 "direction": "open",
                 "to": "crater_rim"
               },
-              "desc": "standing well in from the edge of the frame, the pad's cinder running level onto the stepped footpath, which crosses the island road and climbs on away UP over the level shelf to the crater's raised rim, a low dark ridge against the sky"
+              "desc": "standing well in from the edge of the frame, the pad's cinder running level onto the stepped footpath, which climbs on away UP over the level shelf to the crater's raised rim, a low dark ridge against the sky"
             },
             {
               "id": "far_summit",
@@ -10758,7 +11395,6 @@
               "at": "dead ahead in the centre",
               "label": "The fumarole",
               "station": 2,
-              "track": "day1",
               "desc": "a few strides ahead, a low mound of cinder crusted bright lemon-yellow and white with sulfur, a steaming crack at its top, a short steel sampling pipe pushed into the crack and its tube running to a small grey box on a stake beside it",
               "motion": {
                 "moves": true,
@@ -10790,8 +11426,8 @@
           "soundBed": "the open edge of a high shelf: a fresh breeze, the vent's steady breath close by.",
           "rigid": "the mound, the pipe, the box and its stake, the posts and the rope",
           "atmosphere": "A raw, bright volcanic shelf, yellow sulfur and white steam against black cinder; a steep volcanic island high above a deep blue ocean: dark basalt, red-brown and black cinder, pale pumice, crusts of real lemon-yellow sulfur at the vents, sparse silver-green broom bushes, weathered whitewashed concrete and galvanized steel, a deep clear sky; photorealistic, fine natural film grain",
-          "styleLight": "early-to-mid morning: the sun well up over the sea to the east-south-east, strong clear light, the steam bright white where the sun catches it, a deep-blue sky",
-          "negatives": "No people, no human figures, no faces and no statues anywhere; no animals. No readable words, no legible writing, no captions, no logos and no painted numbers on any wall, sign, board, ledger page or label. It is MORNING: no night sky, no stars, no moon, no floodlights, no blue fire at any vent or on the crater floor, no lava and no red glow; no fog, no cloud sea below the mountain, no rain. The image is SHARP: no motion blur and no smeared or doubled detail anywhere. No cable car and no gondola. EXACTLY ONE steaming vent. The pad has EXACTLY TWO ways off: the footpath up on the left and down on the right.",
+          "styleLight": "early-to-mid morning: the sun well up over the sea to the east-south-east, behind the viewer over the right shoulder, strong clear light falling on the mound, the steam bright white where the sun catches it, a deep-blue sky",
+          "negatives": "No people, no human figures, no faces and no statues anywhere; no animals. No readable words, no legible writing, no captions, no logos and no painted numbers on any wall, sign, board, ledger page or label. It is MORNING: no night sky, no stars, no moon, no floodlights, no blue fire at any vent or on the crater floor, no lava and no red glow; no fog, no cloud sea below the mountain, no rain. The image is SHARP: no motion blur and no smeared or doubled detail anywhere. No cable car and no gondola. No town, hotel or harbor anywhere in view. EXACTLY ONE steaming vent. The pad has EXACTLY TWO ways off: the footpath up on the left and down on the right; no other path or road.",
           "states": {},
           "continuity": [],
           "scaffold": {
@@ -15673,8 +16309,8 @@
           "worldPlateRef": false,
           "motionClosing": "Only the steam from the vent moves; everything else stays exactly where it is."
         },
-        "scenePrompt": "This is a seamless 360-degree panorama from a small level pad of trodden cinder at the lip of a volcano's high shelf, beside a steaming fumarole crusted with yellow sulfur, on a stepped footpath climbing to the crater's rim, in the early morning. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the flat cinder of the shelf running away behind the viewer, plain and even: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: the flat cinder of the shelf running away close by, and far off beyond it, small with distance, the tops of the tall pale stacks of a geothermal plant, joining its other half cleanly at the seam directly behind you; to the left, standing well in from the edge of the frame, the pad's cinder running level onto the stepped footpath, which crosses the island road and climbs on away UP over the level shelf to the crater's raised rim, a low dark ridge against the sky; left of centre, far off and high above, over the shelf, the island's steep summit cone with a small pale observatory dome on its top; dead ahead in the centre, a few strides ahead, a low mound of cinder crusted bright lemon-yellow and white with sulfur, a steaming crack at its top, a short steel sampling pipe pushed into the crack and its tube running to a small grey box on a stake beside it, a column of white steam rising steadily from the crack; to the right, standing well in from the edge of the frame, the pad's cinder running level onto the stepped footpath, which starts DOWN between two short iron posts of its rope handrail and drops away over the shelf's lip toward the small stone hut on the slope below, and the sea far below beyond; on the far right, the right half of the calm view directly behind the viewer: the flat cinder of the shelf running away close by, plain and even, joining its other half cleanly at the seam directly behind you. A raw, bright volcanic shelf, yellow sulfur and white steam against black cinder; a steep volcanic island high above a deep blue ocean: dark basalt, red-brown and black cinder, pale pumice, crusts of real lemon-yellow sulfur at the vents, sparse silver-green broom bushes, weathered whitewashed concrete and galvanized steel, a deep clear sky; photorealistic, fine natural film grain. No people, no human figures, no faces and no statues anywhere; no animals. No readable words, no legible writing, no captions, no logos and no painted numbers on any wall, sign, board, ledger page or label. It is MORNING: no night sky, no stars, no moon, no floodlights, no blue fire at any vent or on the crater floor, no lava and no red glow; no fog, no cloud sea below the mountain, no rain. The image is SHARP: no motion blur and no smeared or doubled detail anywhere. No cable car and no gondola. EXACTLY ONE steaming vent. The pad has EXACTLY TWO ways off: the footpath up on the left and down on the right. Shot on a full-frame DSLR at 24mm, f/8, early-to-mid morning: the sun well up over the sea to the east-south-east, strong clear light, the steam bright white where the sun catches it, a deep-blue sky, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into the flat cinder of the shelf running away behind the viewer, plain and even, with no visible seam, join, or repetition.",
-        "specBuild": "ad3e87ce233a6d42d990"
+        "scenePrompt": "This is a seamless 360-degree panorama from a small level pad of trodden cinder at the lip of a volcano's high shelf, beside a steaming fumarole crusted with yellow sulfur, on a stepped footpath climbing to the crater's rim, in the early morning. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the flat cinder of the shelf running away behind the viewer, plain and even: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: the flat cinder of the shelf running away close by, plain and even, joining its other half cleanly at the seam directly behind you; to the left, standing well in from the edge of the frame, the pad's cinder running level onto the stepped footpath, which climbs on away UP over the level shelf to the crater's raised rim, a low dark ridge against the sky; left of centre, far off and high above, over the shelf, the island's steep summit cone with a small pale observatory dome on its top; dead ahead in the centre, a few strides ahead, a low mound of cinder crusted bright lemon-yellow and white with sulfur, a steaming crack at its top, a short steel sampling pipe pushed into the crack and its tube running to a small grey box on a stake beside it, a column of white steam rising steadily from the crack; to the right, standing well in from the edge of the frame, the pad's cinder running level onto the stepped footpath, which starts DOWN between two short iron posts of its rope handrail and drops away over the shelf's lip toward the small stone hut on the slope below, and the sea far below beyond; on the far right, the right half of the calm view directly behind the viewer: the flat cinder of the shelf running away close by, plain and even, joining its other half cleanly at the seam directly behind you. A raw, bright volcanic shelf, yellow sulfur and white steam against black cinder; a steep volcanic island high above a deep blue ocean: dark basalt, red-brown and black cinder, pale pumice, crusts of real lemon-yellow sulfur at the vents, sparse silver-green broom bushes, weathered whitewashed concrete and galvanized steel, a deep clear sky; photorealistic, fine natural film grain. No people, no human figures, no faces and no statues anywhere; no animals. No readable words, no legible writing, no captions, no logos and no painted numbers on any wall, sign, board, ledger page or label. It is MORNING: no night sky, no stars, no moon, no floodlights, no blue fire at any vent or on the crater floor, no lava and no red glow; no fog, no cloud sea below the mountain, no rain. The image is SHARP: no motion blur and no smeared or doubled detail anywhere. No cable car and no gondola. No town, hotel or harbor anywhere in view. EXACTLY ONE steaming vent. The pad has EXACTLY TWO ways off: the footpath up on the left and down on the right; no other path or road. Shot on a full-frame DSLR at 24mm, f/8, early-to-mid morning: the sun well up over the sea to the east-south-east, behind the viewer over the right shoulder, strong clear light falling on the mound, the steam bright white where the sun catches it, a deep-blue sky, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into the flat cinder of the shelf running away behind the viewer, plain and even, with no visible seam, join, or repetition.",
+        "specBuild": "e4115eb3bff54b92022a"
       }
     },
     {
@@ -15693,7 +16329,6 @@
         {
           "type": "station",
           "tier": 3,
-          "track": "day1",
           "label": "The survey pillar"
         }
       ],
@@ -15718,19 +16353,19 @@
                 "direction": "back",
                 "to": "gas_vent"
               },
-              "desc": "standing well in from the edge of the frame, the lookout's stone floor running level onto the stepped footpath, which runs level a few strides along the crest to two short iron posts of its rope handrail, where it starts DOWN the outer slope"
+              "desc": "standing well in from the edge of the frame, the lookout's stone floor running level onto the stepped footpath, which runs level a few strides along the crest to two short iron posts of its rope handrail, where it starts DOWN the outer slope toward the level cinder shelf below, where a thin white plume of steam rises from a small yellow-crusted vent beside the path"
             },
             {
               "id": "rim_pennant",
               "at": "left of centre",
-              "desc": "at the lookout's railing close by, a thin steel survey pole with a small orange marker pennant near its top",
+              "desc": "at the lookout's railing close by, a short thin steel marker pole, only a little over head height, clamped to the railing, with a small orange pennant at its tip",
               "motion": {
                 "moves": true,
                 "vigour": "the small orange pennant fluttering in the breeze",
-                "phrase": "the small orange pennant on the survey pole ripples gently in the breeze, the pole still"
+                "phrase": "the small orange pennant on the short marker pole ripples gently in the breeze, the pole still"
               },
               "sound": {
-                "source": "the pennant on the survey pole",
+                "source": "the pennant on the marker pole",
                 "character": "a light quick flutter of cloth",
                 "prominence": "hero"
               }
@@ -15745,7 +16380,6 @@
               "at": "dead ahead in the centre",
               "label": "The survey pillar",
               "station": 3,
-              "track": "day1",
               "desc": "a few strides ahead at the front of the lookout, a squat white-painted concrete survey pillar with a brass plate on its top, and beyond the lookout's iron railing the whole crater below: its steep inner wall, a field of steaming vents and long rows of grey pipes on the crater floor, a small milky-turquoise lake, and steel catwalks on low stilts crossing the floor"
             },
             {
@@ -15762,8 +16396,8 @@
           "soundBed": "the open rim of a crater: a fresh breeze, the faint far breath of the vents below.",
           "rigid": "the pillar, the railing, the pole, the far works, the catwalks, the pipes and the summit",
           "atmosphere": "A wide, bright crater seen from its rim, pale steam, black and ochre rock, a small turquoise lake far below; a steep volcanic island high above a deep blue ocean: dark basalt, red-brown and black cinder, pale pumice, crusts of real lemon-yellow sulfur at the vents, sparse silver-green broom bushes, weathered whitewashed concrete and galvanized steel, a deep clear sky; photorealistic, fine natural film grain",
-          "styleLight": "mid-morning: the sun high in the east-south-east, bright clear light filling the crater, short crisp shadows, a deep-blue sky",
-          "negatives": "No people, no human figures, no faces and no statues anywhere; no animals. No readable words, no legible writing, no captions, no logos and no painted numbers on any wall, sign, board, ledger page or label. It is MORNING: no night sky, no stars, no moon, no floodlights, no blue fire at any vent or on the crater floor, no lava and no red glow; no fog, no cloud sea below the mountain, no rain. The image is SHARP: no motion blur and no smeared or doubled detail anywhere. No cable car and no gondola. The vents only steam: no flame. EXACTLY ONE way off the lookout: the footpath on the left. No path down into the crater from here.",
+          "styleLight": "mid-morning: the sun high in the east-south-east on the viewer's left, well above the far works, bright clear light filling the crater, short crisp shadows, a deep-blue sky",
+          "negatives": "No people, no human figures, no faces and no statues anywhere; no animals. No readable words, no legible writing, no captions, no logos and no painted numbers on any wall, sign, board, ledger page or label. It is MORNING: no night sky, no stars, no moon, no floodlights, no blue fire at any vent or on the crater floor, no lava and no red glow; no fog, no cloud sea below the mountain, no rain. The image is SHARP: no motion blur and no smeared or doubled detail anywhere. No cable car and no gondola. The vents only steam: no flame. The pennant's pole is short and clamped to the railing: no mast, aerial or tower on the lookout. EXACTLY ONE way off the lookout: the footpath on the left. No path down into the crater from here.",
           "states": {},
           "continuity": [],
           "scaffold": {
@@ -24605,8 +25239,8 @@
           "worldPlateRef": false,
           "motionClosing": "Only the pennant moves; everything else stays exactly where it is."
         },
-        "scenePrompt": "This is a seamless 360-degree panorama from a small railed stone lookout on the north rim of a volcano's crater in full morning light, the crater's inner wall dropping steeply away to the crater floor far below. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the dark cinder of the outer slope falling away behind the viewer, plain and even: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: the dark cinder of the outer slope falling away close by, plain and even, joining its other half cleanly at the seam directly behind you; to the left, standing well in from the edge of the frame, the lookout's stone floor running level onto the stepped footpath, which runs level a few strides along the crest to two short iron posts of its rope handrail, where it starts DOWN the outer slope; left of centre, at the lookout's railing close by, a thin steel survey pole with a small orange marker pennant near its top, the small orange pennant fluttering in the breeze; left of centre, far across the crater on its eastern rim, the brand-new concrete and glass buildings of a works and a monorail platform, small with distance, and beyond them the tall pale stacks of a geothermal plant rising high above the rim; dead ahead in the centre, a few strides ahead at the front of the lookout, a squat white-painted concrete survey pillar with a brass plate on its top, and beyond the lookout's iron railing the whole crater below: its steep inner wall, a field of steaming vents and long rows of grey pipes on the crater floor, a small milky-turquoise lake, and steel catwalks on low stilts crossing the floor; right of centre, far off over the crater's western rim, high above it, the island's steep summit cone with a small pale observatory dome on its top; on the far right, the right half of the calm view directly behind the viewer: the dark cinder of the outer slope falling away close by, plain and even, joining its other half cleanly at the seam directly behind you. A wide, bright crater seen from its rim, pale steam, black and ochre rock, a small turquoise lake far below; a steep volcanic island high above a deep blue ocean: dark basalt, red-brown and black cinder, pale pumice, crusts of real lemon-yellow sulfur at the vents, sparse silver-green broom bushes, weathered whitewashed concrete and galvanized steel, a deep clear sky; photorealistic, fine natural film grain. No people, no human figures, no faces and no statues anywhere; no animals. No readable words, no legible writing, no captions, no logos and no painted numbers on any wall, sign, board, ledger page or label. It is MORNING: no night sky, no stars, no moon, no floodlights, no blue fire at any vent or on the crater floor, no lava and no red glow; no fog, no cloud sea below the mountain, no rain. The image is SHARP: no motion blur and no smeared or doubled detail anywhere. No cable car and no gondola. The vents only steam: no flame. EXACTLY ONE way off the lookout: the footpath on the left. No path down into the crater from here. Shot on a full-frame DSLR at 24mm, f/8, mid-morning: the sun high in the east-south-east, bright clear light filling the crater, short crisp shadows, a deep-blue sky, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into the dark cinder of the outer slope falling away behind the viewer, plain and even, with no visible seam, join, or repetition.",
-        "specBuild": "e3c9d0978d70493a201d"
+        "scenePrompt": "This is a seamless 360-degree panorama from a small railed stone lookout on the north rim of a volcano's crater in full morning light, the crater's inner wall dropping steeply away to the crater floor far below. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the dark cinder of the outer slope falling away behind the viewer, plain and even: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: the dark cinder of the outer slope falling away close by, plain and even, joining its other half cleanly at the seam directly behind you; to the left, standing well in from the edge of the frame, the lookout's stone floor running level onto the stepped footpath, which runs level a few strides along the crest to two short iron posts of its rope handrail, where it starts DOWN the outer slope toward the level cinder shelf below, where a thin white plume of steam rises from a small yellow-crusted vent beside the path; left of centre, at the lookout's railing close by, a short thin steel marker pole, only a little over head height, clamped to the railing, with a small orange pennant at its tip, the small orange pennant fluttering in the breeze; left of centre, far across the crater on its eastern rim, the brand-new concrete and glass buildings of a works and a monorail platform, small with distance, and beyond them the tall pale stacks of a geothermal plant rising high above the rim; dead ahead in the centre, a few strides ahead at the front of the lookout, a squat white-painted concrete survey pillar with a brass plate on its top, and beyond the lookout's iron railing the whole crater below: its steep inner wall, a field of steaming vents and long rows of grey pipes on the crater floor, a small milky-turquoise lake, and steel catwalks on low stilts crossing the floor; right of centre, far off over the crater's western rim, high above it, the island's steep summit cone with a small pale observatory dome on its top; on the far right, the right half of the calm view directly behind the viewer: the dark cinder of the outer slope falling away close by, plain and even, joining its other half cleanly at the seam directly behind you. A wide, bright crater seen from its rim, pale steam, black and ochre rock, a small turquoise lake far below; a steep volcanic island high above a deep blue ocean: dark basalt, red-brown and black cinder, pale pumice, crusts of real lemon-yellow sulfur at the vents, sparse silver-green broom bushes, weathered whitewashed concrete and galvanized steel, a deep clear sky; photorealistic, fine natural film grain. No people, no human figures, no faces and no statues anywhere; no animals. No readable words, no legible writing, no captions, no logos and no painted numbers on any wall, sign, board, ledger page or label. It is MORNING: no night sky, no stars, no moon, no floodlights, no blue fire at any vent or on the crater floor, no lava and no red glow; no fog, no cloud sea below the mountain, no rain. The image is SHARP: no motion blur and no smeared or doubled detail anywhere. No cable car and no gondola. The vents only steam: no flame. The pennant's pole is short and clamped to the railing: no mast, aerial or tower on the lookout. EXACTLY ONE way off the lookout: the footpath on the left. No path down into the crater from here. Shot on a full-frame DSLR at 24mm, f/8, mid-morning: the sun high in the east-south-east on the viewer's left, well above the far works, bright clear light filling the crater, short crisp shadows, a deep-blue sky, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into the dark cinder of the outer slope falling away behind the viewer, plain and even, with no visible seam, join, or repetition.",
+        "specBuild": "60dedcd99ed5028b4944"
       }
     },
     {
@@ -24653,7 +25287,7 @@
       "authoring": {
         "sceneSpec": {
           "room": "archive",
-          "setting": "the plate archive of an old mountain-top astronomical observatory, a long high stone room lined with oak plate cabinets, in mid-morning sunlight",
+          "setting": "the plate archive of an old mountain-top astronomical observatory, a high whitewashed stone room holding one tall glass-fronted oak plate cabinet, in mid-morning sunlight",
           "interior": true,
           "seam": "the plain whitewashed stone end wall of the archive close behind the viewer, even and bare",
           "seamOccluder": "one tall square dark-oak pilaster set into the wall, floor to ceiling",
@@ -24671,7 +25305,7 @@
                 "direction": "back",
                 "to": "station"
               },
-              "desc": "standing well in from the edge of the frame, the archive's heavy oak front door standing wide open, the stone floor running level out over its threshold onto the bright gravel of the summit car park, where the station's white four-wheel-drive truck stands parked in the sun"
+              "desc": "standing well in from the edge of the frame, the archive's heavy oak front door standing wide open, the stone floor running level out over its threshold onto the bright gravel of the summit car park, where the station's white four-wheel-drive truck stands parked in the sun before a low stone wall at the car park's edge, nothing beyond the wall but clear blue sky"
             },
             {
               "id": "plate_cabinet",
@@ -24683,11 +25317,11 @@
             {
               "id": "longcase_clock",
               "at": "left of centre",
-              "desc": "beside the cabinet, a tall dark-wood longcase observatory clock with a plain white dial without numerals and a long glass door down its front, its long brass pendulum behind the glass",
+              "desc": "beside the cabinet, a tall dark-wood longcase observatory clock with a plain white dial without numerals and a long glass door down its front, a bar of sun from the windows falling across the glass onto the case's dark, shadowed back board",
               "motion": {
                 "moves": true,
-                "vigour": "the long brass pendulum swinging slowly behind the glass",
-                "phrase": "the clock's long brass pendulum swings slowly and evenly to and fro behind its glass door"
+                "vigour": "the long brass pendulum swinging in a wide slow arc behind the glass, its bright bob gleaming against the dark case",
+                "phrase": "the clock's long brass pendulum swings slowly and evenly to and fro in a wide arc behind its glass door, its bright sunlit bob gleaming against the dark back of the case"
               },
               "sound": {
                 "source": "the longcase clock",
@@ -24736,7 +25370,7 @@
           "rigid": "the cabinet, the drawer and plates, the clock case, the blackboard, the bulletin board, the notice case, both doors, and the truck outside",
           "atmosphere": "A calm, sunlit old archive of glass plates, warm oak and pale stone, bars of morning sun; an old mountain-top astronomical observatory: pale cut stone walls, whitewashed plaster, dark polished oak, worn brass, cast iron painted dark green, glass plates in paper sleeves, morning sunlight on stone; photorealistic, fine natural film grain",
           "styleLight": "mid-morning: bright sunlight falling in through two tall windows ahead in long slanting bars across the stone floor, the rest of the room in soft warm shade",
-          "negatives": "No people, no human figures, no faces and no statues anywhere; no animals. No readable words, no legible writing, no captions, no logos and no painted numbers on any wall, sign, board, ledger page or label. The image is SHARP: no motion blur and no smeared or doubled detail anywhere. No electric strip lights and no computers or screens. It is daytime: no night sky through any opening. The blackboard's columns and the bulletin board's clips are EMPTY. EXACTLY ONE clock, ONE cabinet and ONE blackboard. EXACTLY TWO doorways: the open front door on the left and the open store door on the right.",
+          "negatives": "No people, no human figures, no faces and no statues anywhere; no animals. No readable words, no legible writing, no captions, no logos and no painted numbers on any wall, sign, board, ledger page or label. The image is SHARP: no motion blur and no smeared or doubled detail anywhere. No electric strip lights and no computers or screens. It is daytime: no night sky through any opening. No cloud sea and no clouds below the mountain through any window or door. The blackboard's columns and the bulletin board's clips are EMPTY. EXACTLY ONE clock, ONE cabinet and ONE blackboard. EXACTLY TWO doorways: the open front door on the left and the open store door on the right.",
           "states": {},
           "continuity": [],
           "scaffold": {
@@ -24821,8 +25455,8 @@
           "worldPlateRef": false,
           "motionClosing": "Only the clock's pendulum swings; everything else stays exactly where it is."
         },
-        "scenePrompt": "This is a seamless 360-degree panorama from the plate archive of an old mountain-top astronomical observatory, a long high stone room lined with oak plate cabinets, in mid-morning sunlight. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the plain whitewashed stone end wall of the archive close behind the viewer, even and bare: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: the plain whitewashed stone end wall of the archive close by, joining its other half cleanly at the seam directly behind you; to the left, standing well in from the edge of the frame, the archive's heavy oak front door standing wide open, the stone floor running level out over its threshold onto the bright gravel of the summit car park, where the station's white four-wheel-drive truck stands parked in the sun; left of centre, against the wall a few strides off, a tall glass-fronted dark oak cabinet, its shelves stacked with rows of identical pale card boxes of photographic glass plates, one drawer pulled out showing glass plates in paper sleeves standing on edge; left of centre, beside the cabinet, a tall dark-wood longcase observatory clock with a plain white dial without numerals and a long glass door down its front, its long brass pendulum behind the glass, the long brass pendulum swinging slowly behind the glass; dead ahead in the centre, on the wall straight ahead between the two tall bright windows, square to the viewer, a large plain blackboard in a dark oak frame, ruled with faint white lines into empty columns, a stick of chalk on its ledge; right of centre, on the wall a few strides off, a tall green-baize board in an oak frame with three long rows of empty brass clips across it, a small brass rubber stamp on its ledge; right of centre, beside it on the wall, a small glass-fronted oak notice case with one pale paper notice pinned inside, nothing on it readable; to the right, standing well in from the edge of the frame, a panelled oak door in the side wall standing wide open, the stone floor running level through it into a dim narrow store lined with tall racks; on the far right, the right half of the calm view directly behind the viewer: the plain whitewashed stone end wall of the archive close by, joining its other half cleanly at the seam directly behind you. A calm, sunlit old archive of glass plates, warm oak and pale stone, bars of morning sun; an old mountain-top astronomical observatory: pale cut stone walls, whitewashed plaster, dark polished oak, worn brass, cast iron painted dark green, glass plates in paper sleeves, morning sunlight on stone; photorealistic, fine natural film grain. No people, no human figures, no faces and no statues anywhere; no animals. No readable words, no legible writing, no captions, no logos and no painted numbers on any wall, sign, board, ledger page or label. The image is SHARP: no motion blur and no smeared or doubled detail anywhere. No electric strip lights and no computers or screens. It is daytime: no night sky through any opening. The blackboard's columns and the bulletin board's clips are EMPTY. EXACTLY ONE clock, ONE cabinet and ONE blackboard. EXACTLY TWO doorways: the open front door on the left and the open store door on the right. Shot on a full-frame DSLR at 24mm, f/8, mid-morning: bright sunlight falling in through two tall windows ahead in long slanting bars across the stone floor, the rest of the room in soft warm shade, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into the plain whitewashed stone end wall of the archive close behind the viewer, even and bare, with no visible seam, join, or repetition.",
-        "specBuild": "9a70458e7bd35e94607b"
+        "scenePrompt": "This is a seamless 360-degree panorama from the plate archive of an old mountain-top astronomical observatory, a high whitewashed stone room holding one tall glass-fronted oak plate cabinet, in mid-morning sunlight. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the plain whitewashed stone end wall of the archive close behind the viewer, even and bare: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: the plain whitewashed stone end wall of the archive close by, joining its other half cleanly at the seam directly behind you; to the left, standing well in from the edge of the frame, the archive's heavy oak front door standing wide open, the stone floor running level out over its threshold onto the bright gravel of the summit car park, where the station's white four-wheel-drive truck stands parked in the sun before a low stone wall at the car park's edge, nothing beyond the wall but clear blue sky; left of centre, against the wall a few strides off, a tall glass-fronted dark oak cabinet, its shelves stacked with rows of identical pale card boxes of photographic glass plates, one drawer pulled out showing glass plates in paper sleeves standing on edge; left of centre, beside the cabinet, a tall dark-wood longcase observatory clock with a plain white dial without numerals and a long glass door down its front, a bar of sun from the windows falling across the glass onto the case's dark, shadowed back board, the long brass pendulum swinging in a wide slow arc behind the glass, its bright bob gleaming against the dark case; dead ahead in the centre, on the wall straight ahead between the two tall bright windows, square to the viewer, a large plain blackboard in a dark oak frame, ruled with faint white lines into empty columns, a stick of chalk on its ledge; right of centre, on the wall a few strides off, a tall green-baize board in an oak frame with three long rows of empty brass clips across it, a small brass rubber stamp on its ledge; right of centre, beside it on the wall, a small glass-fronted oak notice case with one pale paper notice pinned inside, nothing on it readable; to the right, standing well in from the edge of the frame, a panelled oak door in the side wall standing wide open, the stone floor running level through it into a dim narrow store lined with tall racks; on the far right, the right half of the calm view directly behind the viewer: the plain whitewashed stone end wall of the archive close by, joining its other half cleanly at the seam directly behind you. A calm, sunlit old archive of glass plates, warm oak and pale stone, bars of morning sun; an old mountain-top astronomical observatory: pale cut stone walls, whitewashed plaster, dark polished oak, worn brass, cast iron painted dark green, glass plates in paper sleeves, morning sunlight on stone; photorealistic, fine natural film grain. No people, no human figures, no faces and no statues anywhere; no animals. No readable words, no legible writing, no captions, no logos and no painted numbers on any wall, sign, board, ledger page or label. The image is SHARP: no motion blur and no smeared or doubled detail anywhere. No electric strip lights and no computers or screens. It is daytime: no night sky through any opening. No cloud sea and no clouds below the mountain through any window or door. The blackboard's columns and the bulletin board's clips are EMPTY. EXACTLY ONE clock, ONE cabinet and ONE blackboard. EXACTLY TWO doorways: the open front door on the left and the open store door on the right. Shot on a full-frame DSLR at 24mm, f/8, mid-morning: bright sunlight falling in through two tall windows ahead in long slanting bars across the stone floor, the rest of the room in soft warm shade, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into the plain whitewashed stone end wall of the archive close behind the viewer, even and bare, with no visible seam, join, or repetition.",
+        "specBuild": "e5b271cf585837c12050"
       }
     },
     {
@@ -24841,8 +25475,8 @@
         {
           "type": "station",
           "tier": 1,
-          "track": "day2",
-          "label": "The plate racks"
+          "label": "The plate racks",
+          "track": "day2"
         },
         {
           "type": "door",
@@ -24854,15 +25488,15 @@
       "authoring": {
         "sceneSpec": {
           "room": "plate_store",
-          "setting": "the narrow plate store of an old mountain-top observatory, its walls lined floor to ceiling with wooden racks of glass photographic plates in their boxes, cool and dim in the morning",
+          "setting": "the narrow plate store of an old mountain-top observatory, a long low room running away to the left and to the right, its long far wall lined with wooden racks of glass photographic plates in their boxes, cool and dim in the morning",
           "interior": true,
-          "seam": "the plain whitewashed stone end wall of the store close behind the viewer",
-          "seamOccluder": "one tall square dark-oak rack upright, floor to ceiling",
+          "seam": "the plain whitewashed stone long wall of the store close behind the viewer",
+          "seamOccluder": "one tall square dark-oak upright set into the wall, floor to ceiling",
           "elements": [
             {
               "id": "seam_left",
               "at": "on the far left",
-              "desc": "the left half of the calm view directly behind the viewer: the plain whitewashed stone end wall of the store close by, joining its other half cleanly at the seam directly behind you"
+              "desc": "the left half of the calm view directly behind the viewer: the plain whitewashed stone long wall of the store close by, joining its other half cleanly at the seam directly behind you"
             },
             {
               "id": "door_back",
@@ -24872,7 +25506,7 @@
                 "direction": "back",
                 "to": "archive"
               },
-              "desc": "standing well in from the edge of the frame, the panelled oak door standing wide open, the stone floor running level out through it into the bright sunlit archive"
+              "desc": "standing well in from the edge of the frame, in the store's left end wall, the panelled oak door standing wide open, the stone floor running level out through it into the bright sunlit archive"
             },
             {
               "id": "paraffin_stove",
@@ -24895,7 +25529,7 @@
               "label": "The plate racks",
               "station": 1,
               "track": "day2",
-              "desc": "straight ahead along the store, tall wooden racks floor to ceiling packed with pale card boxes of glass plates, a short wooden library ladder against them, and a small sloping reading desk under the window with a lamp-less viewing box on it"
+              "desc": "dead ahead against the long far wall a few strides off, tall wooden racks from the floor almost to the ceiling, packed with pale card boxes of glass plates, a short wooden library ladder leaning against them, the small high window above them, and a small sloping reading desk at their foot with a lamp-less viewing box on it"
             },
             {
               "id": "door_on",
@@ -24905,19 +25539,19 @@
                 "direction": "open",
                 "to": "measuring_engine"
               },
-              "desc": "standing well in from the edge of the frame, a second panelled oak door at the store's far end standing wide open, the stone floor running level through it into a bright room beyond"
+              "desc": "standing well in from the edge of the frame, in the store's right end wall, a second panelled oak door standing wide open, the stone floor running level through it into a bright room beyond"
             },
             {
               "id": "seam_right",
               "at": "on the far right",
-              "desc": "the right half of the calm view directly behind the viewer: the plain whitewashed stone end wall of the store close by, joining its other half cleanly at the seam directly behind you"
+              "desc": "the right half of the calm view directly behind the viewer: the plain whitewashed stone long wall of the store close by, joining its other half cleanly at the seam directly behind you"
             }
           ],
           "soundBed": "a small closed store room: a deep hush, the heater's faint purr.",
           "rigid": "the racks, the boxes, the ladder, the desk and box, the heater, and both doors",
           "atmosphere": "A cool, close, dim store of plate boxes, one bright shaft of sun; an old mountain-top astronomical observatory: pale cut stone walls, whitewashed plaster, dark polished oak, worn brass, cast iron painted dark green, glass plates in paper sleeves, morning sunlight on stone; photorealistic, fine natural film grain",
-          "styleLight": "dim and cool: one small high window letting in a single shaft of morning sunlight that falls across the racks, soft shadow elsewhere",
-          "negatives": "No people, no human figures, no faces and no statues anywhere; no animals. No readable words, no legible writing, no captions, no logos and no painted numbers on any wall, sign, board, ledger page or label. The image is SHARP: no motion blur and no smeared or doubled detail anywhere. No electric strip lights and no computers or screens. It is daytime: no night sky through any opening. EXACTLY TWO doorways, both open: one on the left and one on the right.",
+          "styleLight": "dim and cool: one small high window in the long far wall letting in a single shaft of morning sunlight that falls across the racks, soft shadow elsewhere",
+          "negatives": "No people, no human figures, no faces and no statues anywhere; no animals. No readable words, no legible writing, no captions, no logos and no painted numbers on any wall, sign, board, ledger page or label. The image is SHARP: no motion blur and no smeared or doubled detail anywhere. No electric strip lights and no computers or screens. It is daytime: no night sky through any opening. No cloud sea and no clouds below the mountain through any window or door. EXACTLY TWO doorways, both open, one in each end wall: one on the left and one on the right. The racks stand only along the long far wall ahead; no racks in the middle of the floor.",
           "states": {},
           "continuity": [],
           "scaffold": {
@@ -24927,10 +25561,10 @@
               "word": "floor",
               "floor": "stone floor of the plate store",
               "size": [
+                4.5,
+                4.5,
                 2.0,
-                2.0,
-                5.0,
-                2.0
+                1.2
               ],
               "ceiling": 3.6,
               "sides": {
@@ -24958,7 +25592,7 @@
                       0.5,
                       0.8
                     ],
-                    "dist": 1.6
+                    "dist": 1.3
                   }
                 ],
                 [
@@ -24966,11 +25600,11 @@
                   "plate_racks",
                   {
                     "size": [
-                      1.8,
+                      4.0,
                       0.5,
                       2.8
                     ],
-                    "dist": 4.6
+                    "dist": 1.7
                   }
                 ],
                 [
@@ -24988,8 +25622,8 @@
           "worldPlateRef": false,
           "motionClosing": "Only the heater's small flame moves; everything else stays exactly where it is."
         },
-        "scenePrompt": "This is a seamless 360-degree panorama from the narrow plate store of an old mountain-top observatory, its walls lined floor to ceiling with wooden racks of glass photographic plates in their boxes, cool and dim in the morning. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the plain whitewashed stone end wall of the store close behind the viewer: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: the plain whitewashed stone end wall of the store close by, joining its other half cleanly at the seam directly behind you; to the left, standing well in from the edge of the frame, the panelled oak door standing wide open, the stone floor running level out through it into the bright sunlit archive; left of centre, standing on the stone floor a few strides off, a small round paraffin heater of dark green enamelled iron with a little mica window in its side, a calm yellow flame behind the window, keeping the plates dry, the small yellow flame behind the mica window wavering; dead ahead in the centre, straight ahead along the store, tall wooden racks floor to ceiling packed with pale card boxes of glass plates, a short wooden library ladder against them, and a small sloping reading desk under the window with a lamp-less viewing box on it; to the right, standing well in from the edge of the frame, a second panelled oak door at the store's far end standing wide open, the stone floor running level through it into a bright room beyond; on the far right, the right half of the calm view directly behind the viewer: the plain whitewashed stone end wall of the store close by, joining its other half cleanly at the seam directly behind you. A cool, close, dim store of plate boxes, one bright shaft of sun; an old mountain-top astronomical observatory: pale cut stone walls, whitewashed plaster, dark polished oak, worn brass, cast iron painted dark green, glass plates in paper sleeves, morning sunlight on stone; photorealistic, fine natural film grain. No people, no human figures, no faces and no statues anywhere; no animals. No readable words, no legible writing, no captions, no logos and no painted numbers on any wall, sign, board, ledger page or label. The image is SHARP: no motion blur and no smeared or doubled detail anywhere. No electric strip lights and no computers or screens. It is daytime: no night sky through any opening. EXACTLY TWO doorways, both open: one on the left and one on the right. Shot on a full-frame DSLR at 24mm, f/8, dim and cool: one small high window letting in a single shaft of morning sunlight that falls across the racks, soft shadow elsewhere, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into the plain whitewashed stone end wall of the store close behind the viewer, with no visible seam, join, or repetition.",
-        "specBuild": "9bea492dcac0785fb4f4"
+        "scenePrompt": "This is a seamless 360-degree panorama from the narrow plate store of an old mountain-top observatory, a long low room running away to the left and to the right, its long far wall lined with wooden racks of glass photographic plates in their boxes, cool and dim in the morning. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the plain whitewashed stone long wall of the store close behind the viewer: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: the plain whitewashed stone long wall of the store close by, joining its other half cleanly at the seam directly behind you; to the left, standing well in from the edge of the frame, in the store's left end wall, the panelled oak door standing wide open, the stone floor running level out through it into the bright sunlit archive; left of centre, standing on the stone floor a few strides off, a small round paraffin heater of dark green enamelled iron with a little mica window in its side, a calm yellow flame behind the window, keeping the plates dry, the small yellow flame behind the mica window wavering; dead ahead in the centre, dead ahead against the long far wall a few strides off, tall wooden racks from the floor almost to the ceiling, packed with pale card boxes of glass plates, a short wooden library ladder leaning against them, the small high window above them, and a small sloping reading desk at their foot with a lamp-less viewing box on it; to the right, standing well in from the edge of the frame, in the store's right end wall, a second panelled oak door standing wide open, the stone floor running level through it into a bright room beyond; on the far right, the right half of the calm view directly behind the viewer: the plain whitewashed stone long wall of the store close by, joining its other half cleanly at the seam directly behind you. A cool, close, dim store of plate boxes, one bright shaft of sun; an old mountain-top astronomical observatory: pale cut stone walls, whitewashed plaster, dark polished oak, worn brass, cast iron painted dark green, glass plates in paper sleeves, morning sunlight on stone; photorealistic, fine natural film grain. No people, no human figures, no faces and no statues anywhere; no animals. No readable words, no legible writing, no captions, no logos and no painted numbers on any wall, sign, board, ledger page or label. The image is SHARP: no motion blur and no smeared or doubled detail anywhere. No electric strip lights and no computers or screens. It is daytime: no night sky through any opening. No cloud sea and no clouds below the mountain through any window or door. EXACTLY TWO doorways, both open, one in each end wall: one on the left and one on the right. The racks stand only along the long far wall ahead; no racks in the middle of the floor. Shot on a full-frame DSLR at 24mm, f/8, dim and cool: one small high window in the long far wall letting in a single shaft of morning sunlight that falls across the racks, soft shadow elsewhere, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into the plain whitewashed stone long wall of the store close behind the viewer, with no visible seam, join, or repetition.",
+        "specBuild": "3d7efb2898331644878e"
       }
     },
     {
@@ -25008,8 +25642,8 @@
         {
           "type": "station",
           "tier": 2,
-          "track": "day2",
-          "label": "The measuring engine"
+          "label": "The measuring engine",
+          "track": "day2"
         },
         {
           "type": "door",
@@ -25042,17 +25676,17 @@
               "desc": "standing well in from the edge of the frame, a panelled oak door standing wide open, the stone floor running level out through it into the dim plate store"
             },
             {
-              "id": "kettle_ring",
+              "id": "fireplace",
               "at": "left of centre",
-              "desc": "on a side bench against the wall a few strides off, a dented copper kettle on a small gas ring, steam rising from its spout",
+              "desc": "set into the side wall a few strides off, a small fireplace of dark cast iron with a plain stone mantel and a sooty black hearth, a low coal fire burning brightly in its grate",
               "motion": {
                 "moves": true,
-                "vigour": "a thin plume of steam rising from the kettle's spout",
-                "phrase": "a thin plume of white steam curls up slowly from the kettle's spout and fades"
+                "vigour": "lively yellow-orange flames licking up from the glowing coals against the sooty black back of the hearth",
+                "phrase": "the flames of the coal fire flicker and lick up from the glowing coals against the black back of the hearth, the grate and the fireplace still"
               },
               "sound": {
-                "source": "the kettle on the gas ring",
-                "character": "a low soft simmer",
+                "source": "the coal fire in the grate",
+                "character": "a soft crackle and flutter of a coal fire",
                 "prominence": "hero"
               }
             },
@@ -25066,13 +25700,13 @@
             },
             {
               "id": "dome_stair",
-              "at": "to the right",
+              "at": "right of centre",
               "label": "The steps up to the dome",
               "door": {
                 "direction": "open",
                 "to": "dome"
               },
-              "desc": "standing well in from the edge of the frame, a short flight of worn stone steps starting on the floor itself and climbing away UP through an opening in the ceiling to the dome above"
+              "desc": "a few strides off in the corner, a short flight of worn stone steps starting on the floor itself and climbing away UP through a low arched opening in the wall to a small stone landing just beyond it, lit by daylight falling from above, where the stair turns and climbs on UP out of sight toward the dome"
             },
             {
               "id": "seam_right",
@@ -25080,11 +25714,11 @@
               "desc": "the right half of the calm view directly behind the viewer: the plain whitewashed stone wall of the measuring room close by, joining its other half cleanly at the seam directly behind you"
             }
           ],
-          "soundBed": "a quiet work room with a window: a hush, the kettle's simmer close by.",
-          "rigid": "the measuring engine, its pier and wheels, the stool, the bench, the door, and the steps",
+          "soundBed": "a quiet work room with a window: a hush, the fire's soft crackle close by.",
+          "rigid": "the measuring engine, its pier and wheels, the stool, the fireplace and grate, the door, and the steps",
           "atmosphere": "A bright, quiet precision workroom, polished brass and dark iron under a tall window; an old mountain-top astronomical observatory: pale cut stone walls, whitewashed plaster, dark polished oak, worn brass, cast iron painted dark green, glass plates in paper sleeves, morning sunlight on stone; photorealistic, fine natural film grain",
           "styleLight": "bright, even morning daylight from a tall window ahead, soft and shadowless, the brass catching the light",
-          "negatives": "No people, no human figures, no faces and no statues anywhere; no animals. No readable words, no legible writing, no captions, no logos and no painted numbers on any wall, sign, board, ledger page or label. The image is SHARP: no motion blur and no smeared or doubled detail anywhere. No electric strip lights and no computers or screens. It is daytime: no night sky through any opening. EXACTLY ONE measuring engine. EXACTLY TWO ways out: the open door on the left and the steps on the right.",
+          "negatives": "No people, no human figures, no faces and no statues anywhere; no animals. No readable words, no legible writing, no captions, no logos and no painted numbers on any wall, sign, board, ledger page or label. The image is SHARP: no motion blur and no smeared or doubled detail anywhere. No electric strip lights and no computers or screens. It is daytime: no night sky through any opening. No cloud sea and no clouds below the mountain through any window or door. EXACTLY ONE measuring engine and ONE fire, in the grate. EXACTLY TWO ways out: the open door on the left and the steps right of centre; no stair through the ceiling.",
           "states": {},
           "continuity": [],
           "scaffold": {
@@ -25118,14 +25752,14 @@
                 ],
                 [
                   "prop",
-                  "kettle_ring",
+                  "fireplace",
                   {
                     "size": [
-                      1.2,
+                      1.4,
                       0.5,
-                      0.9
+                      1.2
                     ],
-                    "dist": 3.4
+                    "dist": 4.8
                   }
                 ],
                 [
@@ -25148,17 +25782,20 @@
                     "rise": 1.8,
                     "len": 2.6,
                     "n": 8,
-                    "what": "the short flight of stone steps up to the dome"
+                    "land": 1.4,
+                    "land_w": 0.4,
+                    "what": "the short flight of stone steps up to the dome",
+                    "tail": "through a low opening in the wall to a small stone landing just beyond it"
                   }
                 ]
               ]
             }
           },
           "worldPlateRef": false,
-          "motionClosing": "Only the kettle's steam moves; everything else stays exactly where it is."
+          "motionClosing": "Only the flames in the grate move; everything else stays exactly where it is."
         },
-        "scenePrompt": "This is a seamless 360-degree panorama from the measuring room of an old mountain-top observatory, where photographic plates are measured on a heavy brass measuring engine under a tall window, in bright morning light. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the plain whitewashed stone wall of the measuring room close behind the viewer: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: the plain whitewashed stone wall of the measuring room close by, joining its other half cleanly at the seam directly behind you; to the left, standing well in from the edge of the frame, a panelled oak door standing wide open, the stone floor running level out through it into the dim plate store; left of centre, on a side bench against the wall a few strides off, a dented copper kettle on a small gas ring, steam rising from its spout, a thin plume of steam rising from the kettle's spout; dead ahead in the centre, a few strides ahead under the tall bright window, the measuring engine: a heavy cast-iron bed on a stone pier, a brass carriage holding a glass plate over a frosted lamp-less light box, a brass microscope looking down onto the plate, and two big brass hand-wheels with fine scales at the front, an oak stool before it; to the right, standing well in from the edge of the frame, a short flight of worn stone steps starting on the floor itself and climbing away UP through an opening in the ceiling to the dome above; on the far right, the right half of the calm view directly behind the viewer: the plain whitewashed stone wall of the measuring room close by, joining its other half cleanly at the seam directly behind you. A bright, quiet precision workroom, polished brass and dark iron under a tall window; an old mountain-top astronomical observatory: pale cut stone walls, whitewashed plaster, dark polished oak, worn brass, cast iron painted dark green, glass plates in paper sleeves, morning sunlight on stone; photorealistic, fine natural film grain. No people, no human figures, no faces and no statues anywhere; no animals. No readable words, no legible writing, no captions, no logos and no painted numbers on any wall, sign, board, ledger page or label. The image is SHARP: no motion blur and no smeared or doubled detail anywhere. No electric strip lights and no computers or screens. It is daytime: no night sky through any opening. EXACTLY ONE measuring engine. EXACTLY TWO ways out: the open door on the left and the steps on the right. Shot on a full-frame DSLR at 24mm, f/8, bright, even morning daylight from a tall window ahead, soft and shadowless, the brass catching the light, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into the plain whitewashed stone wall of the measuring room close behind the viewer, with no visible seam, join, or repetition.",
-        "specBuild": "40096e09310653c00161"
+        "scenePrompt": "This is a seamless 360-degree panorama from the measuring room of an old mountain-top observatory, where photographic plates are measured on a heavy brass measuring engine under a tall window, in bright morning light. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the plain whitewashed stone wall of the measuring room close behind the viewer: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: the plain whitewashed stone wall of the measuring room close by, joining its other half cleanly at the seam directly behind you; to the left, standing well in from the edge of the frame, a panelled oak door standing wide open, the stone floor running level out through it into the dim plate store; left of centre, set into the side wall a few strides off, a small fireplace of dark cast iron with a plain stone mantel and a sooty black hearth, a low coal fire burning brightly in its grate, lively yellow-orange flames licking up from the glowing coals against the sooty black back of the hearth; dead ahead in the centre, a few strides ahead under the tall bright window, the measuring engine: a heavy cast-iron bed on a stone pier, a brass carriage holding a glass plate over a frosted lamp-less light box, a brass microscope looking down onto the plate, and two big brass hand-wheels with fine scales at the front, an oak stool before it; right of centre, a few strides off in the corner, a short flight of worn stone steps starting on the floor itself and climbing away UP through a low arched opening in the wall to a small stone landing just beyond it, lit by daylight falling from above, where the stair turns and climbs on UP out of sight toward the dome; on the far right, the right half of the calm view directly behind the viewer: the plain whitewashed stone wall of the measuring room close by, joining its other half cleanly at the seam directly behind you. A bright, quiet precision workroom, polished brass and dark iron under a tall window; an old mountain-top astronomical observatory: pale cut stone walls, whitewashed plaster, dark polished oak, worn brass, cast iron painted dark green, glass plates in paper sleeves, morning sunlight on stone; photorealistic, fine natural film grain. No people, no human figures, no faces and no statues anywhere; no animals. No readable words, no legible writing, no captions, no logos and no painted numbers on any wall, sign, board, ledger page or label. The image is SHARP: no motion blur and no smeared or doubled detail anywhere. No electric strip lights and no computers or screens. It is daytime: no night sky through any opening. No cloud sea and no clouds below the mountain through any window or door. EXACTLY ONE measuring engine and ONE fire, in the grate. EXACTLY TWO ways out: the open door on the left and the steps right of centre; no stair through the ceiling. Shot on a full-frame DSLR at 24mm, f/8, bright, even morning daylight from a tall window ahead, soft and shadowless, the brass catching the light, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into the plain whitewashed stone wall of the measuring room close behind the viewer, with no visible seam, join, or repetition.",
+        "specBuild": "43549d22f765d3c0fdd8"
       }
     },
     {
@@ -25177,14 +25814,14 @@
         {
           "type": "station",
           "tier": 3,
-          "track": "day2",
-          "label": "The great telescope"
+          "label": "The great telescope",
+          "track": "day2"
         }
       ],
       "authoring": {
         "sceneSpec": {
           "room": "dome",
-          "setting": "inside the round dome of an old mountain-top observatory in late-morning light, the great brass telescope on its pier under the dome, the dome's shutter slit open to a blue sky",
+          "setting": "inside the round dome of an old mountain-top observatory in late-morning light, the great telescope of dark green-painted iron and brass on its pier under the dome",
           "interior": true,
           "seam": "the dome's plain curved whitewashed wall close behind the viewer",
           "seamOccluder": "one tall dark-green iron dome rib running up the wall, floor to roof",
@@ -25196,13 +25833,13 @@
             },
             {
               "id": "stair_down",
-              "at": "to the left",
+              "at": "left of centre",
               "label": "The steps down to the measuring room",
               "door": {
                 "direction": "back",
                 "to": "measuring_engine"
               },
-              "desc": "standing well in from the edge of the frame, an opening in the dome's floor between two short posts in a low iron balustrade, the head of a short flight of worn stone steps dropping DOWN out of sight through it toward the measuring room below"
+              "desc": "a few strides off at the foot of the curved wall, the dome's wooden floor running level to a stone landing at the head of a short flight of worn stone steps, which drop DOWN out of sight through an opening in the floor between two short posts in a low iron balustrade, toward the measuring room below"
             },
             {
               "id": "telescope",
@@ -25210,7 +25847,7 @@
               "label": "The great telescope",
               "station": 3,
               "track": "day2",
-              "desc": "a few strides ahead, the great telescope: a long tube of dark green-painted iron and brass on a massive iron mounting on a round stone pier, its lower end fitted with a brass plate holder, a wooden observing chair beside it, the dome's open shutter slit above"
+              "desc": "a few strides ahead, the great telescope: a long tube of dark green-painted iron and brass on a massive iron mounting on a round stone pier, its lower end fitted with a brass plate holder, a wooden observing chair beside it"
             },
             {
               "id": "work_lamp",
@@ -25219,7 +25856,7 @@
               "motion": {
                 "moves": true,
                 "vigour": "the hanging lamp swaying slightly on its flex",
-                "phrase": "the unlit work lamp sways slowly to and fro on its long flex in the draught from the shutter"
+                "phrase": "the unlit work lamp sways slowly to and fro on its long flex in the draught"
               },
               "sound": {
                 "source": "the lamp on its flex",
@@ -25237,7 +25874,7 @@
           "rigid": "the telescope, its mounting and pier, the chair, the dome ribs, the steps, and the shutter",
           "atmosphere": "A tall, round, shadowy dome, one beam of sun on old brass; an old mountain-top astronomical observatory: pale cut stone walls, whitewashed plaster, dark polished oak, worn brass, cast iron painted dark green, glass plates in paper sleeves, morning sunlight on stone; photorealistic, fine natural film grain",
           "styleLight": "late morning: a broad bar of blue daylight through the open shutter slit overhead and a single beam of sunlight falling across the telescope and the floor, the rest of the dome in deep soft shade",
-          "negatives": "No people, no human figures, no faces and no statues anywhere; no animals. No readable words, no legible writing, no captions, no logos and no painted numbers on any wall, sign, board, ledger page or label. The image is SHARP: no motion blur and no smeared or doubled detail anywhere. No electric strip lights and no computers or screens. It is daytime: no night sky through any opening. EXACTLY ONE telescope. EXACTLY ONE way out: the steps down on the left.",
+          "negatives": "No people, no human figures, no faces and no statues anywhere; no animals. No readable words, no legible writing, no captions, no logos and no painted numbers on any wall, sign, board, ledger page or label. The image is SHARP: no motion blur and no smeared or doubled detail anywhere. No electric strip lights and no computers or screens. It is daytime: no night sky through any opening. No cloud sea and no clouds below the mountain through any window or door. EXACTLY ONE telescope and ONE shutter slit. EXACTLY ONE way out: the steps down left of centre.",
           "states": {},
           "continuity": [],
           "scaffold": {
@@ -25299,8 +25936,8 @@
           "worldPlateRef": false,
           "motionClosing": "Only the hanging lamp sways; everything else stays exactly where it is."
         },
-        "scenePrompt": "This is a seamless 360-degree panorama from inside the round dome of an old mountain-top observatory in late-morning light, the great brass telescope on its pier under the dome, the dome's shutter slit open to a blue sky. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the dome's plain curved whitewashed wall close behind the viewer: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: the dome's plain curved whitewashed wall close by, joining its other half cleanly at the seam directly behind you; to the left, standing well in from the edge of the frame, an opening in the dome's floor between two short posts in a low iron balustrade, the head of a short flight of worn stone steps dropping DOWN out of sight through it toward the measuring room below; dead ahead in the centre, a few strides ahead, the great telescope: a long tube of dark green-painted iron and brass on a massive iron mounting on a round stone pier, its lower end fitted with a brass plate holder, a wooden observing chair beside it, the dome's open shutter slit above; right of centre, hanging from the dome's ironwork on a long flex near the pier, an unlit enamel work lamp, low over the floor, the hanging lamp swaying slightly on its flex; on the far right, the right half of the calm view directly behind the viewer: the dome's plain curved whitewashed wall close by, joining its other half cleanly at the seam directly behind you. A tall, round, shadowy dome, one beam of sun on old brass; an old mountain-top astronomical observatory: pale cut stone walls, whitewashed plaster, dark polished oak, worn brass, cast iron painted dark green, glass plates in paper sleeves, morning sunlight on stone; photorealistic, fine natural film grain. No people, no human figures, no faces and no statues anywhere; no animals. No readable words, no legible writing, no captions, no logos and no painted numbers on any wall, sign, board, ledger page or label. The image is SHARP: no motion blur and no smeared or doubled detail anywhere. No electric strip lights and no computers or screens. It is daytime: no night sky through any opening. EXACTLY ONE telescope. EXACTLY ONE way out: the steps down on the left. Shot on a full-frame DSLR at 24mm, f/8, late morning: a broad bar of blue daylight through the open shutter slit overhead and a single beam of sunlight falling across the telescope and the floor, the rest of the dome in deep soft shade, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into the dome's plain curved whitewashed wall close behind the viewer, with no visible seam, join, or repetition.",
-        "specBuild": "062d977480f5280b7eee"
+        "scenePrompt": "This is a seamless 360-degree panorama from inside the round dome of an old mountain-top observatory in late-morning light, the great telescope of dark green-painted iron and brass on its pier under the dome. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the dome's plain curved whitewashed wall close behind the viewer: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: the dome's plain curved whitewashed wall close by, joining its other half cleanly at the seam directly behind you; left of centre, a few strides off at the foot of the curved wall, the dome's wooden floor running level to a stone landing at the head of a short flight of worn stone steps, which drop DOWN out of sight through an opening in the floor between two short posts in a low iron balustrade, toward the measuring room below; dead ahead in the centre, a few strides ahead, the great telescope: a long tube of dark green-painted iron and brass on a massive iron mounting on a round stone pier, its lower end fitted with a brass plate holder, a wooden observing chair beside it; right of centre, hanging from the dome's ironwork on a long flex near the pier, an unlit enamel work lamp, low over the floor, the hanging lamp swaying slightly on its flex; on the far right, the right half of the calm view directly behind the viewer: the dome's plain curved whitewashed wall close by, joining its other half cleanly at the seam directly behind you. A tall, round, shadowy dome, one beam of sun on old brass; an old mountain-top astronomical observatory: pale cut stone walls, whitewashed plaster, dark polished oak, worn brass, cast iron painted dark green, glass plates in paper sleeves, morning sunlight on stone; photorealistic, fine natural film grain. No people, no human figures, no faces and no statues anywhere; no animals. No readable words, no legible writing, no captions, no logos and no painted numbers on any wall, sign, board, ledger page or label. The image is SHARP: no motion blur and no smeared or doubled detail anywhere. No electric strip lights and no computers or screens. It is daytime: no night sky through any opening. No cloud sea and no clouds below the mountain through any window or door. EXACTLY ONE telescope and ONE shutter slit. EXACTLY ONE way out: the steps down left of centre. Shot on a full-frame DSLR at 24mm, f/8, late morning: a broad bar of blue daylight through the open shutter slit overhead and a single beam of sunlight falling across the telescope and the floor, the rest of the dome in deep soft shade, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into the dome's plain curved whitewashed wall close behind the viewer, with no visible seam, join, or repetition.",
+        "specBuild": "1cc61caec08b185d25fb"
       }
     }
   ]

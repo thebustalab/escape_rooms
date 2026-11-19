@@ -1,0 +1,648 @@
+{
+ "title": "Morning Watch",
+ "scenario": "classification/watch",
+ "goal_label": "calls on the morning bulletin",
+ "won_title": "The morning bulletin is out",
+ "unit": [
+  "call",
+  "calls"
+ ],
+ "feed_verb": "posted",
+ "deliver_to": "the bulletin board",
+ "deliver_verb": "Posted",
+ "carry_back": true,
+ "carry_block_text": "Take your calls to the bulletin board first.",
+ "default_minutes": 12,
+ "default_goal": 60,
+ "puzzles": [
+  {
+   "id": "w11_s1",
+   "tier": 1,
+   "kind": "mcq",
+   "title": "One reading, one day",
+   "question": "Use the training days in station_ledger. Fit a logistic regression model that predicts eruption_within_week from tremor_level alone, then run predictWithModel() on the training days. What probability_yes does the model give the day 2014-07-15?",
+   "starter_code": "training_days <- station_ledger %>%\n  filter(record == \"training\")\n\nmodel <- buildModel(\n  data = training_days,\n  model_type = \"logistic_regression\",\n  predictors = \"____\",\n  response = \"eruption_within_week\"\n)\n",
+   "solution": "training_days <- station_ledger %>%\n  filter(record == \"training\")\n\nmodel <- buildModel(\n  data = training_days,\n  model_type = \"logistic_regression\",\n  predictors = \"tremor_level\",\n  response = \"eruption_within_week\"\n)\n\npredictWithModel(data = training_days, model = model) %>%\n  filter(date == \"2014-07-15\") %>%\n  select(date, tremor_level, probability_yes)\n",
+   "right_feedback": "Right: the tremor_level model gives 2014-07-15 that probability of an eruption within the week.",
+   "wrong_feedback": "Not that one. Check the model uses tremor_level alone and the training days only, then filter the predictions to the date 2014-07-15 and read probability_yes.",
+   "options": [
+    {
+     "id": "o0",
+     "text": "0.065"
+    },
+    {
+     "id": "o1",
+     "text": "0.132"
+    },
+    {
+     "id": "o2",
+     "text": "0.368"
+    }
+   ],
+   "answer": "o2",
+   "ordered": true
+  },
+  {
+   "id": "w11_s2",
+   "tier": 1,
+   "kind": "mcq",
+   "title": "One reading, one day",
+   "question": "Use the training days in station_ledger. Fit a logistic regression model that predicts eruption_within_week from sulfur_dioxide_tonnes_per_day alone, then run predictWithModel() on the training days. What probability_yes does the model give the day 2017-10-16?",
+   "starter_code": "training_days <- station_ledger %>%\n  filter(record == \"training\")\n\nmodel <- buildModel(\n  data = training_days,\n  model_type = \"logistic_regression\",\n  predictors = \"____\",\n  response = \"eruption_within_week\"\n)\n",
+   "solution": "training_days <- station_ledger %>%\n  filter(record == \"training\")\n\nmodel <- buildModel(\n  data = training_days,\n  model_type = \"logistic_regression\",\n  predictors = \"sulfur_dioxide_tonnes_per_day\",\n  response = \"eruption_within_week\"\n)\n\npredictWithModel(data = training_days, model = model) %>%\n  filter(date == \"2017-10-16\") %>%\n  select(date, sulfur_dioxide_tonnes_per_day, probability_yes)\n",
+   "right_feedback": "Right: the sulfur_dioxide_tonnes_per_day model gives 2017-10-16 that probability of an eruption within the week.",
+   "wrong_feedback": "Not that one. Check the model uses sulfur_dioxide_tonnes_per_day alone and the training days only, then filter the predictions to the date 2017-10-16 and read probability_yes.",
+   "options": [
+    {
+     "id": "o0",
+     "text": "0.320"
+    },
+    {
+     "id": "o1",
+     "text": "0.373"
+    },
+    {
+     "id": "o2",
+     "text": "0.437"
+    }
+   ],
+   "answer": "o0",
+   "ordered": true
+  },
+  {
+   "id": "w11_s3",
+   "tier": 1,
+   "kind": "mcq",
+   "title": "One reading, one day",
+   "question": "Use the training days in station_ledger. Fit a logistic regression model that predicts eruption_within_week from vent_temperature_c alone, then run predictWithModel() on the training days. What probability_yes does the model give the day 2015-03-06?",
+   "starter_code": "training_days <- station_ledger %>%\n  filter(record == \"training\")\n\nmodel <- buildModel(\n  data = training_days,\n  model_type = \"logistic_regression\",\n  predictors = \"____\",\n  response = \"eruption_within_week\"\n)\n",
+   "solution": "training_days <- station_ledger %>%\n  filter(record == \"training\")\n\nmodel <- buildModel(\n  data = training_days,\n  model_type = \"logistic_regression\",\n  predictors = \"vent_temperature_c\",\n  response = \"eruption_within_week\"\n)\n\npredictWithModel(data = training_days, model = model) %>%\n  filter(date == \"2015-03-06\") %>%\n  select(date, vent_temperature_c, probability_yes)\n",
+   "right_feedback": "Right: the vent_temperature_c model gives 2015-03-06 that probability of an eruption within the week.",
+   "wrong_feedback": "Not that one. Check the model uses vent_temperature_c alone and the training days only, then filter the predictions to the date 2015-03-06 and read probability_yes.",
+   "options": [
+    {
+     "id": "o0",
+     "text": "0.024"
+    },
+    {
+     "id": "o1",
+     "text": "0.137"
+    },
+    {
+     "id": "o2",
+     "text": "0.315"
+    }
+   ],
+   "answer": "o2",
+   "ordered": true
+  },
+  {
+   "id": "w11_s4",
+   "tier": 1,
+   "kind": "mcq",
+   "title": "One reading, one day",
+   "question": "Use the training days in station_ledger. Fit a logistic regression model that predicts eruption_within_week from sulfur_dioxide_tonnes_per_day alone, then run predictWithModel() on the training days. What probability_yes does the model give the day 2017-12-19?",
+   "starter_code": "training_days <- station_ledger %>%\n  filter(record == \"training\")\n\nmodel <- buildModel(\n  data = training_days,\n  model_type = \"logistic_regression\",\n  predictors = \"____\",\n  response = \"eruption_within_week\"\n)\n",
+   "solution": "training_days <- station_ledger %>%\n  filter(record == \"training\")\n\nmodel <- buildModel(\n  data = training_days,\n  model_type = \"logistic_regression\",\n  predictors = \"sulfur_dioxide_tonnes_per_day\",\n  response = \"eruption_within_week\"\n)\n\npredictWithModel(data = training_days, model = model) %>%\n  filter(date == \"2017-12-19\") %>%\n  select(date, sulfur_dioxide_tonnes_per_day, probability_yes)\n",
+   "right_feedback": "Right: the sulfur_dioxide_tonnes_per_day model gives 2017-12-19 that probability of an eruption within the week.",
+   "wrong_feedback": "Not that one. Check the model uses sulfur_dioxide_tonnes_per_day alone and the training days only, then filter the predictions to the date 2017-12-19 and read probability_yes.",
+   "options": [
+    {
+     "id": "o0",
+     "text": "0.023"
+    },
+    {
+     "id": "o1",
+     "text": "0.188"
+    },
+    {
+     "id": "o2",
+     "text": "0.327"
+    }
+   ],
+   "answer": "o2",
+   "ordered": true
+  },
+  {
+   "id": "w12_s1",
+   "tier": 2,
+   "kind": "mcq",
+   "title": "Calls on the held-back days",
+   "question": "Use station_ledger. Fit a logistic regression model on the training days with the predictors gas_ratio, sulfur_dioxide_tonnes_per_day, vent_temperature_c and air_temperature_c (response eruption_within_week), then predict the held-back days with predictWithModel(). At the 0.5 cut-off, on how many held-back days does the model say yes (predicted_class is yes)?",
+   "starter_code": "training_days <- station_ledger %>%\n  filter(record == \"training\")\nheld_back_days <- station_ledger %>%\n  filter(record == \"held back\")\n",
+   "solution": "training_days <- station_ledger %>%\n  filter(record == \"training\")\nheld_back_days <- station_ledger %>%\n  filter(record == \"held back\")\n\nmodel <- buildModel(\n  data = training_days,\n  model_type = \"logistic_regression\",\n  predictors = c(\"gas_ratio\", \"sulfur_dioxide_tonnes_per_day\", \"vent_temperature_c\", \"air_temperature_c\"),\n  response = \"eruption_within_week\"\n)\n\npredictions <- predictWithModel(data = held_back_days, model = model)\n\npredictions %>%\n  summarize(called_yes = sum(predicted_class == \"yes\"))\n",
+   "right_feedback": "Right: that is how many held-back days the model calls yes at the 0.5 cut-off.",
+   "wrong_feedback": "Not that one. Check the predictors are gas_ratio, sulfur_dioxide_tonnes_per_day, vent_temperature_c and air_temperature_c, the model is fitted on the training days, and you count predicted_class == \"yes\" on the held-back days.",
+   "options": [
+    {
+     "id": "o0",
+     "text": "19"
+    },
+    {
+     "id": "o1",
+     "text": "27"
+    },
+    {
+     "id": "o2",
+     "text": "34"
+    },
+    {
+     "id": "o3",
+     "text": "38"
+    }
+   ],
+   "answer": "o0",
+   "ordered": true
+  },
+  {
+   "id": "w12_s2",
+   "tier": 2,
+   "kind": "mcq",
+   "title": "Calls on the held-back days",
+   "question": "Use station_ledger. Fit a logistic regression model on the training days with the predictors tremor_level, wind_speed_km_per_h, gas_ratio and lake_acidity_ph (response eruption_within_week), then predict the held-back days with predictWithModel(). At the 0.5 cut-off, on how many held-back days does the model say yes (predicted_class is yes)?",
+   "starter_code": "training_days <- station_ledger %>%\n  filter(record == \"training\")\nheld_back_days <- station_ledger %>%\n  filter(record == \"held back\")\n",
+   "solution": "training_days <- station_ledger %>%\n  filter(record == \"training\")\nheld_back_days <- station_ledger %>%\n  filter(record == \"held back\")\n\nmodel <- buildModel(\n  data = training_days,\n  model_type = \"logistic_regression\",\n  predictors = c(\"tremor_level\", \"wind_speed_km_per_h\", \"gas_ratio\", \"lake_acidity_ph\"),\n  response = \"eruption_within_week\"\n)\n\npredictions <- predictWithModel(data = held_back_days, model = model)\n\npredictions %>%\n  summarize(called_yes = sum(predicted_class == \"yes\"))\n",
+   "right_feedback": "Right: that is how many held-back days the model calls yes at the 0.5 cut-off.",
+   "wrong_feedback": "Not that one. Check the predictors are tremor_level, wind_speed_km_per_h, gas_ratio and lake_acidity_ph, the model is fitted on the training days, and you count predicted_class == \"yes\" on the held-back days.",
+   "options": [
+    {
+     "id": "o0",
+     "text": "27"
+    },
+    {
+     "id": "o1",
+     "text": "44"
+    },
+    {
+     "id": "o2",
+     "text": "47"
+    },
+    {
+     "id": "o3",
+     "text": "53"
+    }
+   ],
+   "answer": "o2",
+   "ordered": true
+  },
+  {
+   "id": "w12_s3",
+   "tier": 2,
+   "kind": "mcq",
+   "title": "Calls on the held-back days",
+   "question": "Use station_ledger. Fit a logistic regression model on the training days with the predictors tremor_level and lake_acidity_ph (response eruption_within_week), then predict the held-back days with predictWithModel(). At the 0.5 cut-off, on how many held-back days does the model say yes (predicted_class is yes)?",
+   "starter_code": "training_days <- station_ledger %>%\n  filter(record == \"training\")\nheld_back_days <- station_ledger %>%\n  filter(record == \"held back\")\n",
+   "solution": "training_days <- station_ledger %>%\n  filter(record == \"training\")\nheld_back_days <- station_ledger %>%\n  filter(record == \"held back\")\n\nmodel <- buildModel(\n  data = training_days,\n  model_type = \"logistic_regression\",\n  predictors = c(\"tremor_level\", \"lake_acidity_ph\"),\n  response = \"eruption_within_week\"\n)\n\npredictions <- predictWithModel(data = held_back_days, model = model)\n\npredictions %>%\n  summarize(called_yes = sum(predicted_class == \"yes\"))\n",
+   "right_feedback": "Right: that is how many held-back days the model calls yes at the 0.5 cut-off.",
+   "wrong_feedback": "Not that one. Check the predictors are tremor_level and lake_acidity_ph, the model is fitted on the training days, and you count predicted_class == \"yes\" on the held-back days.",
+   "options": [
+    {
+     "id": "o0",
+     "text": "27"
+    },
+    {
+     "id": "o1",
+     "text": "42"
+    },
+    {
+     "id": "o2",
+     "text": "46"
+    },
+    {
+     "id": "o3",
+     "text": "53"
+    }
+   ],
+   "answer": "o2",
+   "ordered": true
+  },
+  {
+   "id": "w12_s4",
+   "tier": 2,
+   "kind": "mcq",
+   "title": "Calls on the held-back days",
+   "question": "Use station_ledger. Fit a logistic regression model on the training days with the predictors tremor_level, vent_temperature_c and air_temperature_c (response eruption_within_week), then predict the held-back days with predictWithModel(). At the 0.5 cut-off, on how many held-back days does the model say yes (predicted_class is yes)?",
+   "starter_code": "training_days <- station_ledger %>%\n  filter(record == \"training\")\nheld_back_days <- station_ledger %>%\n  filter(record == \"held back\")\n",
+   "solution": "training_days <- station_ledger %>%\n  filter(record == \"training\")\nheld_back_days <- station_ledger %>%\n  filter(record == \"held back\")\n\nmodel <- buildModel(\n  data = training_days,\n  model_type = \"logistic_regression\",\n  predictors = c(\"tremor_level\", \"vent_temperature_c\", \"air_temperature_c\"),\n  response = \"eruption_within_week\"\n)\n\npredictions <- predictWithModel(data = held_back_days, model = model)\n\npredictions %>%\n  summarize(called_yes = sum(predicted_class == \"yes\"))\n",
+   "right_feedback": "Right: that is how many held-back days the model calls yes at the 0.5 cut-off.",
+   "wrong_feedback": "Not that one. Check the predictors are tremor_level, vent_temperature_c and air_temperature_c, the model is fitted on the training days, and you count predicted_class == \"yes\" on the held-back days.",
+   "options": [
+    {
+     "id": "o0",
+     "text": "27"
+    },
+    {
+     "id": "o1",
+     "text": "34"
+    },
+    {
+     "id": "o2",
+     "text": "43"
+    },
+    {
+     "id": "o3",
+     "text": "47"
+    }
+   ],
+   "answer": "o3",
+   "ordered": true
+  },
+  {
+   "id": "w13_s1",
+   "tier": 3,
+   "kind": "mcq",
+   "title": "Caught and missed",
+   "question": "Use station_ledger. Fit a logistic regression model on the training days with the predictors tremor_level and sulfur_dioxide_tonnes_per_day (response eruption_within_week), then predict the held-back days with predictWithModel(). Of the held-back days followed by an eruption within the week (eruption_within_week is yes), on how many did the model say yes (caught), and on how many did it say no (missed)?",
+   "starter_code": "training_days <- station_ledger %>%\n  filter(record == \"training\")\nheld_back_days <- station_ledger %>%\n  filter(record == \"held back\")\n",
+   "solution": "training_days <- station_ledger %>%\n  filter(record == \"training\")\nheld_back_days <- station_ledger %>%\n  filter(record == \"held back\")\n\nmodel <- buildModel(\n  data = training_days,\n  model_type = \"logistic_regression\",\n  predictors = c(\"tremor_level\", \"sulfur_dioxide_tonnes_per_day\"),\n  response = \"eruption_within_week\"\n)\n\npredictions <- predictWithModel(data = held_back_days, model = model)\n\npredictions %>%\n  filter(eruption_within_week == \"yes\") %>%\n  summarize(caught = sum(predicted_class == \"yes\"),\n            missed = sum(predicted_class == \"no\"))\n",
+   "right_feedback": "Right: caught and missed together are every held-back eruption day.",
+   "wrong_feedback": "Not that one. Keep only the held-back days where eruption_within_week is yes, then count predicted_class yes (caught) and no (missed).",
+   "options": [
+    {
+     "id": "o0",
+     "text": "caught 19, missed 33"
+    },
+    {
+     "id": "o1",
+     "text": "caught 19, missed 8"
+    },
+    {
+     "id": "o2",
+     "text": "caught 52, missed 8"
+    },
+    {
+     "id": "o3",
+     "text": "caught 8, missed 19"
+    }
+   ],
+   "answer": "o1"
+  },
+  {
+   "id": "w13_s2",
+   "tier": 3,
+   "kind": "mcq",
+   "title": "Caught and missed",
+   "question": "Use station_ledger. Fit a logistic regression model on the training days with the predictors tremor_level, ground_swelling_cm and wind_speed_km_per_h (response eruption_within_week), then predict the held-back days with predictWithModel(). Of the held-back days followed by an eruption within the week (eruption_within_week is yes), on how many did the model say yes (caught), and on how many did it say no (missed)?",
+   "starter_code": "training_days <- station_ledger %>%\n  filter(record == \"training\")\nheld_back_days <- station_ledger %>%\n  filter(record == \"held back\")\n",
+   "solution": "training_days <- station_ledger %>%\n  filter(record == \"training\")\nheld_back_days <- station_ledger %>%\n  filter(record == \"held back\")\n\nmodel <- buildModel(\n  data = training_days,\n  model_type = \"logistic_regression\",\n  predictors = c(\"tremor_level\", \"ground_swelling_cm\", \"wind_speed_km_per_h\"),\n  response = \"eruption_within_week\"\n)\n\npredictions <- predictWithModel(data = held_back_days, model = model)\n\npredictions %>%\n  filter(eruption_within_week == \"yes\") %>%\n  summarize(caught = sum(predicted_class == \"yes\"),\n            missed = sum(predicted_class == \"no\"))\n",
+   "right_feedback": "Right: caught and missed together are every held-back eruption day.",
+   "wrong_feedback": "Not that one. Keep only the held-back days where eruption_within_week is yes, then count predicted_class yes (caught) and no (missed).",
+   "options": [
+    {
+     "id": "o0",
+     "text": "caught 19, missed 20"
+    },
+    {
+     "id": "o1",
+     "text": "caught 19, missed 8"
+    },
+    {
+     "id": "o2",
+     "text": "caught 39, missed 8"
+    },
+    {
+     "id": "o3",
+     "text": "caught 8, missed 19"
+    }
+   ],
+   "answer": "o1"
+  },
+  {
+   "id": "w13_s3",
+   "tier": 3,
+   "kind": "mcq",
+   "title": "Caught and missed",
+   "question": "Use station_ledger. Fit a logistic regression model on the training days with the predictors quake_count, ground_swelling_cm, sulfur_dioxide_tonnes_per_day and air_temperature_c (response eruption_within_week), then predict the held-back days with predictWithModel(). Of the held-back days followed by an eruption within the week (eruption_within_week is yes), on how many did the model say yes (caught), and on how many did it say no (missed)?",
+   "starter_code": "training_days <- station_ledger %>%\n  filter(record == \"training\")\nheld_back_days <- station_ledger %>%\n  filter(record == \"held back\")\n",
+   "solution": "training_days <- station_ledger %>%\n  filter(record == \"training\")\nheld_back_days <- station_ledger %>%\n  filter(record == \"held back\")\n\nmodel <- buildModel(\n  data = training_days,\n  model_type = \"logistic_regression\",\n  predictors = c(\"quake_count\", \"ground_swelling_cm\", \"sulfur_dioxide_tonnes_per_day\", \"air_temperature_c\"),\n  response = \"eruption_within_week\"\n)\n\npredictions <- predictWithModel(data = held_back_days, model = model)\n\npredictions %>%\n  filter(eruption_within_week == \"yes\") %>%\n  summarize(caught = sum(predicted_class == \"yes\"),\n            missed = sum(predicted_class == \"no\"))\n",
+   "right_feedback": "Right: caught and missed together are every held-back eruption day.",
+   "wrong_feedback": "Not that one. Keep only the held-back days where eruption_within_week is yes, then count predicted_class yes (caught) and no (missed).",
+   "options": [
+    {
+     "id": "o0",
+     "text": "caught 19, missed 8"
+    },
+    {
+     "id": "o1",
+     "text": "caught 24, missed 3"
+    },
+    {
+     "id": "o2",
+     "text": "caught 3, missed 24"
+    },
+    {
+     "id": "o3",
+     "text": "caught 3, missed 27"
+    }
+   ],
+   "answer": "o2"
+  },
+  {
+   "id": "w13_s4",
+   "tier": 3,
+   "kind": "mcq",
+   "title": "Caught and missed",
+   "question": "Use station_ledger. Fit a logistic regression model on the training days with the predictors gas_ratio, sulfur_dioxide_tonnes_per_day and air_temperature_c (response eruption_within_week), then predict the held-back days with predictWithModel(). Of the held-back days followed by an eruption within the week (eruption_within_week is yes), on how many did the model say yes (caught), and on how many did it say no (missed)?",
+   "starter_code": "training_days <- station_ledger %>%\n  filter(record == \"training\")\nheld_back_days <- station_ledger %>%\n  filter(record == \"held back\")\n",
+   "solution": "training_days <- station_ledger %>%\n  filter(record == \"training\")\nheld_back_days <- station_ledger %>%\n  filter(record == \"held back\")\n\nmodel <- buildModel(\n  data = training_days,\n  model_type = \"logistic_regression\",\n  predictors = c(\"gas_ratio\", \"sulfur_dioxide_tonnes_per_day\", \"air_temperature_c\"),\n  response = \"eruption_within_week\"\n)\n\npredictions <- predictWithModel(data = held_back_days, model = model)\n\npredictions %>%\n  filter(eruption_within_week == \"yes\") %>%\n  summarize(caught = sum(predicted_class == \"yes\"),\n            missed = sum(predicted_class == \"no\"))\n",
+   "right_feedback": "Right: caught and missed together are every held-back eruption day.",
+   "wrong_feedback": "Not that one. Keep only the held-back days where eruption_within_week is yes, then count predicted_class yes (caught) and no (missed).",
+   "options": [
+    {
+     "id": "o0",
+     "text": "caught 24, missed 3"
+    },
+    {
+     "id": "o1",
+     "text": "caught 3, missed 24"
+    },
+    {
+     "id": "o2",
+     "text": "caught 3, missed 35"
+    },
+    {
+     "id": "o3",
+     "text": "caught 38, missed 24"
+    }
+   ],
+   "answer": "o1"
+  },
+  {
+   "id": "w21_s1",
+   "tier": 1,
+   "kind": "mcq",
+   "track": "day2",
+   "title": "Which predictor weighs most?",
+   "question": "Use the training plates in survey_plates. Scale color_index, axis_ratio and apparent_size_arcsec, fit a logistic regression model that predicts elliptical from all three, and look at the three coefficients. Which predictor has the largest scaled coefficient, ignoring its sign?",
+   "starter_code": "training_plates <- survey_plates %>%\n  filter(record == \"training\")\n\nscaled_plates <- training_plates %>%\n  mutate(across(c(____, ____, ____), scale))\n",
+   "solution": "training_plates <- survey_plates %>%\n  filter(record == \"training\")\n\nscaled_plates <- training_plates %>%\n  mutate(across(c(color_index, axis_ratio, apparent_size_arcsec), scale))\n\nmodel <- buildModel(\n  data = scaled_plates,\n  model_type = \"logistic_regression\",\n  predictors = c(\"color_index\", \"axis_ratio\", \"apparent_size_arcsec\"),\n  response = \"elliptical\"\n)\n\nmodel$metrics %>%\n  filter(type == \"coefficient\")\n",
+   "right_feedback": "Right: once all three are scaled, its coefficient is the largest in size.",
+   "wrong_feedback": "Not that one. Scale color_index, axis_ratio and apparent_size_arcsec first, fit on the scaled training plates, and compare the size of the coefficients (not the intercept), ignoring the sign.",
+   "options": [
+    {
+     "id": "o0",
+     "text": "apparent_size_arcsec"
+    },
+    {
+     "id": "o1",
+     "text": "axis_ratio"
+    },
+    {
+     "id": "o2",
+     "text": "color_index"
+    }
+   ],
+   "answer": "o0"
+  },
+  {
+   "id": "w21_s2",
+   "tier": 1,
+   "kind": "mcq",
+   "track": "day2",
+   "title": "Which predictor weighs most?",
+   "question": "Use the training plates in survey_plates. Scale color_index, axis_ratio and exposure_minutes, fit a logistic regression model that predicts elliptical from all three, and look at the three coefficients. Which predictor has the largest scaled coefficient, ignoring its sign?",
+   "starter_code": "training_plates <- survey_plates %>%\n  filter(record == \"training\")\n\nscaled_plates <- training_plates %>%\n  mutate(across(c(____, ____, ____), scale))\n",
+   "solution": "training_plates <- survey_plates %>%\n  filter(record == \"training\")\n\nscaled_plates <- training_plates %>%\n  mutate(across(c(color_index, axis_ratio, exposure_minutes), scale))\n\nmodel <- buildModel(\n  data = scaled_plates,\n  model_type = \"logistic_regression\",\n  predictors = c(\"color_index\", \"axis_ratio\", \"exposure_minutes\"),\n  response = \"elliptical\"\n)\n\nmodel$metrics %>%\n  filter(type == \"coefficient\")\n",
+   "right_feedback": "Right: once all three are scaled, its coefficient is the largest in size.",
+   "wrong_feedback": "Not that one. Scale color_index, axis_ratio and exposure_minutes first, fit on the scaled training plates, and compare the size of the coefficients (not the intercept), ignoring the sign.",
+   "options": [
+    {
+     "id": "o0",
+     "text": "axis_ratio"
+    },
+    {
+     "id": "o1",
+     "text": "color_index"
+    },
+    {
+     "id": "o2",
+     "text": "exposure_minutes"
+    }
+   ],
+   "answer": "o1"
+  },
+  {
+   "id": "w21_s3",
+   "tier": 1,
+   "kind": "mcq",
+   "track": "day2",
+   "title": "Which predictor weighs most?",
+   "question": "Use the training plates in survey_plates. Scale color_index and apparent_size_arcsec, fit a logistic regression model that predicts elliptical from both, and look at the two coefficients. Which predictor has the larger scaled coefficient, ignoring its sign?",
+   "starter_code": "training_plates <- survey_plates %>%\n  filter(record == \"training\")\n\nscaled_plates <- training_plates %>%\n  mutate(across(c(____, ____), scale))\n",
+   "solution": "training_plates <- survey_plates %>%\n  filter(record == \"training\")\n\nscaled_plates <- training_plates %>%\n  mutate(across(c(color_index, apparent_size_arcsec), scale))\n\nmodel <- buildModel(\n  data = scaled_plates,\n  model_type = \"logistic_regression\",\n  predictors = c(\"color_index\", \"apparent_size_arcsec\"),\n  response = \"elliptical\"\n)\n\nmodel$metrics %>%\n  filter(type == \"coefficient\")\n",
+   "right_feedback": "Right: once both are scaled, its coefficient is the larger in size.",
+   "wrong_feedback": "Not that one. Scale color_index and apparent_size_arcsec first, fit on the scaled training plates, and compare the size of the coefficients (not the intercept), ignoring the sign.",
+   "options": [
+    {
+     "id": "o0",
+     "text": "apparent_size_arcsec"
+    },
+    {
+     "id": "o1",
+     "text": "color_index"
+    }
+   ],
+   "answer": "o0"
+  },
+  {
+   "id": "w21_s4",
+   "tier": 1,
+   "kind": "mcq",
+   "track": "day2",
+   "title": "Which predictor weighs most?",
+   "question": "Use the training plates in survey_plates. Scale color_index and exposure_minutes, fit a logistic regression model that predicts elliptical from both, and look at the two coefficients. Which predictor has the larger scaled coefficient, ignoring its sign?",
+   "starter_code": "training_plates <- survey_plates %>%\n  filter(record == \"training\")\n\nscaled_plates <- training_plates %>%\n  mutate(across(c(____, ____), scale))\n",
+   "solution": "training_plates <- survey_plates %>%\n  filter(record == \"training\")\n\nscaled_plates <- training_plates %>%\n  mutate(across(c(color_index, exposure_minutes), scale))\n\nmodel <- buildModel(\n  data = scaled_plates,\n  model_type = \"logistic_regression\",\n  predictors = c(\"color_index\", \"exposure_minutes\"),\n  response = \"elliptical\"\n)\n\nmodel$metrics %>%\n  filter(type == \"coefficient\")\n",
+   "right_feedback": "Right: once both are scaled, its coefficient is the larger in size.",
+   "wrong_feedback": "Not that one. Scale color_index and exposure_minutes first, fit on the scaled training plates, and compare the size of the coefficients (not the intercept), ignoring the sign.",
+   "options": [
+    {
+     "id": "o0",
+     "text": "color_index"
+    },
+    {
+     "id": "o1",
+     "text": "exposure_minutes"
+    }
+   ],
+   "answer": "o0"
+  },
+  {
+   "id": "w22_s1",
+   "tier": 2,
+   "kind": "mcq",
+   "track": "day2",
+   "title": "How accurate on the held-back plates?",
+   "question": "Use survey_plates. Fit a logistic regression model on the training plates with the predictors axis_ratio, apparent_size_arcsec and exposure_minutes (response elliptical), then predict the held-back plates with predictWithModel(). What is its accuracy at the 0.5 cut-off: the fraction of held-back plates whose predicted_class matches elliptical?",
+   "starter_code": "training_plates <- survey_plates %>%\n  filter(record == \"training\")\nheld_back_plates <- survey_plates %>%\n  filter(record == \"held back\")\n",
+   "solution": "training_plates <- survey_plates %>%\n  filter(record == \"training\")\nheld_back_plates <- survey_plates %>%\n  filter(record == \"held back\")\n\nmodel <- buildModel(\n  data = training_plates,\n  model_type = \"logistic_regression\",\n  predictors = c(\"axis_ratio\", \"apparent_size_arcsec\", \"exposure_minutes\"),\n  response = \"elliptical\"\n)\n\npredictions <- predictWithModel(data = held_back_plates, model = model)\n\npredictions %>%\n  summarize(accuracy = mean(predicted_class == elliptical))\n",
+   "right_feedback": "Right: that fraction of the held-back plates gets the right call.",
+   "wrong_feedback": "Not that one. Fit on the training plates, predict the held-back plates, and take the mean of predicted_class == elliptical.",
+   "options": [
+    {
+     "id": "o0",
+     "text": "0.83"
+    },
+    {
+     "id": "o1",
+     "text": "0.84"
+    },
+    {
+     "id": "o2",
+     "text": "0.87"
+    }
+   ],
+   "answer": "o1",
+   "ordered": true
+  },
+  {
+   "id": "w22_s2",
+   "tier": 2,
+   "kind": "mcq",
+   "track": "day2",
+   "title": "How accurate on the held-back plates?",
+   "question": "Use survey_plates. Fit a logistic regression model on the training plates with the predictors concentration and axis_ratio (response elliptical), then predict the held-back plates with predictWithModel(). What is its accuracy at the 0.5 cut-off: the fraction of held-back plates whose predicted_class matches elliptical?",
+   "starter_code": "training_plates <- survey_plates %>%\n  filter(record == \"training\")\nheld_back_plates <- survey_plates %>%\n  filter(record == \"held back\")\n",
+   "solution": "training_plates <- survey_plates %>%\n  filter(record == \"training\")\nheld_back_plates <- survey_plates %>%\n  filter(record == \"held back\")\n\nmodel <- buildModel(\n  data = training_plates,\n  model_type = \"logistic_regression\",\n  predictors = c(\"concentration\", \"axis_ratio\"),\n  response = \"elliptical\"\n)\n\npredictions <- predictWithModel(data = held_back_plates, model = model)\n\npredictions %>%\n  summarize(accuracy = mean(predicted_class == elliptical))\n",
+   "right_feedback": "Right: that fraction of the held-back plates gets the right call.",
+   "wrong_feedback": "Not that one. Fit on the training plates, predict the held-back plates, and take the mean of predicted_class == elliptical.",
+   "options": [
+    {
+     "id": "o0",
+     "text": "0.83"
+    },
+    {
+     "id": "o1",
+     "text": "0.84"
+    },
+    {
+     "id": "o2",
+     "text": "0.87"
+    }
+   ],
+   "answer": "o1",
+   "ordered": true
+  },
+  {
+   "id": "w22_s3",
+   "tier": 2,
+   "kind": "mcq",
+   "track": "day2",
+   "title": "How accurate on the held-back plates?",
+   "question": "Use survey_plates. Fit a logistic regression model on the training plates with the predictors concentration, axis_ratio and apparent_size_arcsec (response elliptical), then predict the held-back plates with predictWithModel(). What is its accuracy at the 0.5 cut-off: the fraction of held-back plates whose predicted_class matches elliptical?",
+   "starter_code": "training_plates <- survey_plates %>%\n  filter(record == \"training\")\nheld_back_plates <- survey_plates %>%\n  filter(record == \"held back\")\n",
+   "solution": "training_plates <- survey_plates %>%\n  filter(record == \"training\")\nheld_back_plates <- survey_plates %>%\n  filter(record == \"held back\")\n\nmodel <- buildModel(\n  data = training_plates,\n  model_type = \"logistic_regression\",\n  predictors = c(\"concentration\", \"axis_ratio\", \"apparent_size_arcsec\"),\n  response = \"elliptical\"\n)\n\npredictions <- predictWithModel(data = held_back_plates, model = model)\n\npredictions %>%\n  summarize(accuracy = mean(predicted_class == elliptical))\n",
+   "right_feedback": "Right: that fraction of the held-back plates gets the right call.",
+   "wrong_feedback": "Not that one. Fit on the training plates, predict the held-back plates, and take the mean of predicted_class == elliptical.",
+   "options": [
+    {
+     "id": "o0",
+     "text": "0.83"
+    },
+    {
+     "id": "o1",
+     "text": "0.84"
+    },
+    {
+     "id": "o2",
+     "text": "0.87"
+    }
+   ],
+   "answer": "o0",
+   "ordered": true
+  },
+  {
+   "id": "w23_s1",
+   "tier": 3,
+   "kind": "mcq",
+   "track": "day2",
+   "title": "The model or calling everything a spiral?",
+   "question": "Use survey_plates. Fit a logistic regression model on the training plates with the predictors concentration, axis_ratio and apparent_size_arcsec (response elliptical), then predict the held-back plates with predictWithModel(). Compare its accuracy with calling every held-back galaxy a spiral (always \"no\"). Which is more accurate, and how many of the held-back ellipticals does the model catch? (Calling everything a spiral catches none.)",
+   "starter_code": "training_plates <- survey_plates %>%\n  filter(record == \"training\")\nheld_back_plates <- survey_plates %>%\n  filter(record == \"held back\")\n",
+   "solution": "training_plates <- survey_plates %>%\n  filter(record == \"training\")\nheld_back_plates <- survey_plates %>%\n  filter(record == \"held back\")\n\nmodel <- buildModel(\n  data = training_plates,\n  model_type = \"logistic_regression\",\n  predictors = c(\"concentration\", \"axis_ratio\", \"apparent_size_arcsec\"),\n  response = \"elliptical\"\n)\n\npredictions <- predictWithModel(data = held_back_plates, model = model)\n\npredictions %>%\n  summarize(model_accuracy = mean(predicted_class == elliptical),\n            all_spiral_accuracy = mean(elliptical == \"no\"),\n            model_catches = sum(predicted_class == \"yes\" & elliptical == \"yes\"))\n",
+   "right_feedback": "Right: accuracy and catches can disagree, which is why you check both.",
+   "wrong_feedback": "Not that one. Compare the two accuracies on the held-back plates, then count the ellipticals whose predicted_class is yes.",
+   "options": [
+    {
+     "id": "o0",
+     "text": "Calling everything a spiral is more accurate; the model catches 23"
+    },
+    {
+     "id": "o1",
+     "text": "Calling everything a spiral is more accurate; the model catches 35"
+    },
+    {
+     "id": "o2",
+     "text": "The model is more accurate; the model catches 23"
+    },
+    {
+     "id": "o3",
+     "text": "The model is more accurate; the model catches 35"
+    }
+   ],
+   "answer": "o0"
+  },
+  {
+   "id": "w23_s2",
+   "tier": 3,
+   "kind": "mcq",
+   "track": "day2",
+   "title": "The model or calling everything a spiral?",
+   "question": "Use survey_plates. Fit a logistic regression model on the training plates with the predictors axis_ratio, apparent_size_arcsec and exposure_minutes (response elliptical), then predict the held-back plates with predictWithModel(). Compare its accuracy with calling every held-back galaxy a spiral (always \"no\"). Which is more accurate, and how many of the held-back ellipticals does the model catch? (Calling everything a spiral catches none.)",
+   "starter_code": "training_plates <- survey_plates %>%\n  filter(record == \"training\")\nheld_back_plates <- survey_plates %>%\n  filter(record == \"held back\")\n",
+   "solution": "training_plates <- survey_plates %>%\n  filter(record == \"training\")\nheld_back_plates <- survey_plates %>%\n  filter(record == \"held back\")\n\nmodel <- buildModel(\n  data = training_plates,\n  model_type = \"logistic_regression\",\n  predictors = c(\"axis_ratio\", \"apparent_size_arcsec\", \"exposure_minutes\"),\n  response = \"elliptical\"\n)\n\npredictions <- predictWithModel(data = held_back_plates, model = model)\n\npredictions %>%\n  summarize(model_accuracy = mean(predicted_class == elliptical),\n            all_spiral_accuracy = mean(elliptical == \"no\"),\n            model_catches = sum(predicted_class == \"yes\" & elliptical == \"yes\"))\n",
+   "right_feedback": "Right: accuracy and catches can disagree, which is why you check both.",
+   "wrong_feedback": "Not that one. Compare the two accuracies on the held-back plates, then count the ellipticals whose predicted_class is yes.",
+   "options": [
+    {
+     "id": "o0",
+     "text": "Calling everything a spiral is more accurate; the model catches 24"
+    },
+    {
+     "id": "o1",
+     "text": "Calling everything a spiral is more accurate; the model catches 33"
+    },
+    {
+     "id": "o2",
+     "text": "The model is more accurate; the model catches 24"
+    },
+    {
+     "id": "o3",
+     "text": "The model is more accurate; the model catches 33"
+    }
+   ],
+   "answer": "o0"
+  },
+  {
+   "id": "w23_s3",
+   "tier": 3,
+   "kind": "mcq",
+   "track": "day2",
+   "title": "The model or calling everything a spiral?",
+   "question": "Use survey_plates. Fit a logistic regression model on the training plates with the predictors concentration and axis_ratio (response elliptical), then predict the held-back plates with predictWithModel(). Compare its accuracy with calling every held-back galaxy a spiral (always \"no\"). Which is more accurate, and how many of the held-back ellipticals does the model catch? (Calling everything a spiral catches none.)",
+   "starter_code": "training_plates <- survey_plates %>%\n  filter(record == \"training\")\nheld_back_plates <- survey_plates %>%\n  filter(record == \"held back\")\n",
+   "solution": "training_plates <- survey_plates %>%\n  filter(record == \"training\")\nheld_back_plates <- survey_plates %>%\n  filter(record == \"held back\")\n\nmodel <- buildModel(\n  data = training_plates,\n  model_type = \"logistic_regression\",\n  predictors = c(\"concentration\", \"axis_ratio\"),\n  response = \"elliptical\"\n)\n\npredictions <- predictWithModel(data = held_back_plates, model = model)\n\npredictions %>%\n  summarize(model_accuracy = mean(predicted_class == elliptical),\n            all_spiral_accuracy = mean(elliptical == \"no\"),\n            model_catches = sum(predicted_class == \"yes\" & elliptical == \"yes\"))\n",
+   "right_feedback": "Right: accuracy and catches can disagree, which is why you check both.",
+   "wrong_feedback": "Not that one. Compare the two accuracies on the held-back plates, then count the ellipticals whose predicted_class is yes.",
+   "options": [
+    {
+     "id": "o0",
+     "text": "Calling everything a spiral is more accurate; the model catches 23"
+    },
+    {
+     "id": "o1",
+     "text": "Calling everything a spiral is more accurate; the model catches 32"
+    },
+    {
+     "id": "o2",
+     "text": "The model is more accurate; the model catches 23"
+    },
+    {
+     "id": "o3",
+     "text": "The model is more accurate; the model catches 32"
+    }
+   ],
+   "answer": "o0"
+  }
+ ]
+}

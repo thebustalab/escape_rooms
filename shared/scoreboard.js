@@ -23,8 +23,8 @@
 //   s.probabilities(night); s.setShare(0..1); s.share(); s.tally(); s.ready; s.destroy().
 //   The root element carries the API as `.scoreboard` for tests.
 import { makeNights, NIGHT_PREDICTORS, fitLogistic, scaledCoefs, logistic, tallyPool, judge, alwaysNo, mean, sd }
-  from "./classification_math.js?v=176";
-import { shell, svgEl, el, button, slider, pct } from "./classification_ui.js?v=176";
+  from "./classification_math.js?v=177";
+import { shell, svgEl, el, button, slider, pct } from "./classification_ui.js?v=177";
 
 const TABS = [["scale", "Which predictors matter most"], ["judge", "Judging a classifier"]];
 const LESSONS = {

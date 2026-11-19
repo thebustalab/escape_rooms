@@ -366,7 +366,7 @@
           "type": "clue",
           "id": "lantern_garden",
           "label": "A little blue lantern",
-          "body": "A little blue lantern. Its tag says 7.",
+          "body": "A little blue lantern. Its tag says 9.",
           "box": [
             0.585,
             0.49,
@@ -548,7 +548,7 @@
           "id": "lantern_garden",
           "type": "clue",
           "label": "A little blue lantern",
-          "body": "A little blue lantern. Its tag says 7.",
+          "body": "A little blue lantern. Its tag says 9.",
           "box": [
             0.585,
             0.49,
@@ -5145,7 +5145,7 @@
           "type": "clue",
           "id": "lantern_balcony",
           "label": "A little blue lantern",
-          "body": "A little blue lantern. Its tag says 8.",
+          "body": "A little blue lantern. Its tag says 6.",
           "box": [
             0.748,
             0.44,
@@ -5345,7 +5345,7 @@
           "id": "lantern_balcony",
           "type": "clue",
           "label": "A little blue lantern",
-          "body": "A little blue lantern. Its tag says 8.",
+          "body": "A little blue lantern. Its tag says 6.",
           "box": [
             0.748,
             0.44,
@@ -7940,7 +7940,7 @@
           "type": "clue",
           "id": "lantern_dock",
           "label": "A little blue lantern",
-          "body": "A little blue lantern. Its tag says 5.",
+          "body": "A little blue lantern. Its tag says 3.",
           "box": [
             0.686,
             0.63,
@@ -8142,7 +8142,7 @@
           "id": "lantern_dock",
           "type": "clue",
           "label": "A little blue lantern",
-          "body": "A little blue lantern. Its tag says 5.",
+          "body": "A little blue lantern. Its tag says 3.",
           "box": [
             0.686,
             0.63,
@@ -9038,7 +9038,7 @@
           "type": "clue",
           "id": "lantern_square",
           "label": "A little blue lantern",
-          "body": "A little blue lantern. Its tag says 6.",
+          "body": "A little blue lantern. Its tag says 5.",
           "box": [
             0.864,
             0.44,
@@ -9281,7 +9281,7 @@
           "id": "lantern_square",
           "type": "clue",
           "label": "A little blue lantern",
-          "body": "A little blue lantern. Its tag says 6.",
+          "body": "A little blue lantern. Its tag says 5.",
           "box": [
             0.864,
             0.44,
@@ -12313,7 +12313,7 @@
       "title": "The harbor",
       "built": true,
       "unlockedWhen": true,
-      "designNote": "The great wharf (2026-11-16). Station (LEVEL 3, track harbor, 3 herb bundles): the basket on the barrel. THE GREAT SHIP: a colossal galleon, red and gold flag; its gangplank is roped off (a note): boarding it is a later expansion. Doors: back to the docks station, into the library.",
+      "designNote": "The great wharf (2026-11-16). Station (LEVEL 3, track harbor, 3 herb bundles): the basket on the barrel. THE GREAT SHIP: a colossal galleon, red and gold flag; its gangplank is a door that asks for the boarding pass (2026-11-19; the library's reading table gives it). Doors: back to the docks station, into the library, up the gangplank to the main deck, and a dive off the wharf down to the coral reef.",
       "plannedHotspots": [
         {
           "type": "door",
@@ -12342,10 +12342,14 @@
           "boxSource": "moved:agent"
         },
         {
-          "type": "clue",
-          "id": "galleon",
+          "type": "door",
+          "direction": "open",
+          "to": "deck",
           "label": "The gangplank",
-          "body": "A thick rope is tied across the gangplank, and the great ship's deck is quiet. Nobody can go aboard... yet.",
+          "needsItem": "boarding_pass",
+          "lockedBody": "A thick rope is tied across the foot of the gangplank, with a little wooden sign: \"Boarding pass, please!\" The library's reading table gives out boarding passes.",
+          "useBody": "You show the boarding pass, and the rope across the gangplank drops away. Up you go!",
+          "wrongItemBody": "That isn't a boarding pass.",
           "box": [
             0.5,
             0.42,
@@ -12363,6 +12367,19 @@
             0.68,
             0.39,
             0.745,
+            0.66
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "to": "reef",
+          "label": "Dive into the water",
+          "box": [
+            0.86,
+            0.5,
+            0.96,
             0.66
           ],
           "boxSource": "moved:agent"
@@ -12404,6 +12421,14 @@
               "id": "galleon",
               "at": "dead ahead in the centre",
               "label": "The gangplank",
+              "door": {
+                "direction": "open",
+                "to": "deck",
+                "needsItem": "boarding_pass",
+                "lockedBody": "A thick rope is tied across the foot of the gangplank, with a little wooden sign: \"Boarding pass, please!\" The library's reading table gives out boarding passes.",
+                "useBody": "You show the boarding pass, and the rope across the gangplank drops away. Up you go!",
+                "wrongItemBody": "That isn't a boarding pass."
+              },
               "desc": "filling the view and towering high above everything, a COLOSSAL, magnificent old wooden galleon, the grandest sailing ship ever built, moored broadside along the quay: a dark polished hull with gold trim and rows of little square port windows, a carved gilded stern castle with glowing lantern windows, a long bowsprit, FOUR towering masts carrying tier upon tier of great cream sails, rigging everywhere, and a long RED-AND-GOLD flag streaming from the top of the tallest mast; a wide wooden gangplank slopes down from its side to the wharf, a thick rope tied across its foot"
             },
             {
@@ -12419,6 +12444,11 @@
             {
               "id": "wharf_right",
               "at": "to the right",
+              "label": "Dive into the water",
+              "door": {
+                "direction": "open",
+                "to": "reef"
+              },
               "desc": "the wharf running on past stacked crates and a tall wooden crane, smaller fishing boats bobbing at the quay, the open sea glowing beyond"
             },
             {
@@ -12552,7 +12582,7 @@
         },
         {
           "id": "galleon",
-          "type": "clue",
+          "type": "door",
           "label": "The gangplank",
           "box": [
             0.5,
@@ -12560,8 +12590,13 @@
             0.57,
             0.62
           ],
-          "body": "A thick rope is tied across the gangplank, and the great ship's deck is quiet. Nobody can go aboard... yet.",
-          "boxSource": "moved:agent"
+          "boxSource": "moved:agent",
+          "to": "deck",
+          "direction": "open",
+          "needsItem": "boarding_pass",
+          "lockedBody": "A thick rope is tied across the foot of the gangplank, with a little wooden sign: \"Boarding pass, please!\" The library's reading table gives out boarding passes.",
+          "useBody": "You show the boarding pass, and the rope across the gangplank drops away. Up you go!",
+          "wrongItemBody": "That isn't a boarding pass."
         },
         {
           "id": "into_the_library",
@@ -12576,6 +12611,20 @@
           "direction": "open",
           "to": "library",
           "boxSource": "moved:agent"
+        },
+        {
+          "id": "dive_into_the_water",
+          "type": "door",
+          "label": "Dive into the water",
+          "box": [
+            0.86,
+            0.5,
+            0.96,
+            0.66
+          ],
+          "direction": "open",
+          "to": "reef",
+          "boxSource": "moved:agent"
         }
       ]
     },
@@ -12584,7 +12633,7 @@
       "title": "The library",
       "built": true,
       "unlockedWhen": true,
-      "designNote": "A rustic harbor library (2026-11-16). Station (LEVEL 3, track reading, 3 herb bundles): the reading table deals READING COMPREHENSION, a short paragraph and a multiple-choice question about it. Back out to the harbor only.",
+      "designNote": "A rustic harbor library (2026-11-16). Station (LEVEL 3, track reading, 3 herb bundles): the reading table deals READING COMPREHENSION, a short paragraph and a multiple-choice question about it; a right answer also gives the boarding pass for the great ship (2026-11-19). Back out to the harbor only.",
       "plannedHotspots": [
         {
           "type": "door",
@@ -12604,6 +12653,7 @@
           "tier": 3,
           "label": "The reading table",
           "track": "reading",
+          "gives": "boarding_pass",
           "box": [
             0.34,
             0.56,
@@ -12778,6 +12828,1118 @@
           ],
           "tier": 3,
           "track": "reading",
+          "boxSource": "moved:agent",
+          "gives": "boarding_pass"
+        }
+      ]
+    },
+    {
+      "key": "deck",
+      "title": "The main deck",
+      "built": true,
+      "unlockedWhen": true,
+      "designNote": "The great ship's main deck (2026-11-19), vast. Station (LEVEL 3, track deck, 3 herb bundles): the basket by the mainmast. Doors: down the gangplank to the harbor, aft up the stairs to the quarterdeck, up the rigging to the crow's nest.",
+      "plannedHotspots": [
+        {
+          "type": "door",
+          "direction": "back",
+          "to": "harbor",
+          "label": "Down the gangplank to the wharf",
+          "box": [
+            0.15,
+            0.47,
+            0.24,
+            0.68
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "station",
+          "tier": 3,
+          "label": "The basket by the mainmast",
+          "track": "deck",
+          "box": [
+            0.31,
+            0.48,
+            0.4,
+            0.62
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "to": "quarterdeck",
+          "label": "Up the stairs to the quarterdeck",
+          "box": [
+            0.5,
+            0.38,
+            0.6,
+            0.59
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "to": "crows_nest",
+          "label": "Climb the rigging to the crow's nest",
+          "box": [
+            0.7,
+            0.15,
+            0.77,
+            0.65
+          ],
+          "boxSource": "moved:agent"
+        }
+      ],
+      "authoring": {
+        "sceneSpec": {
+          "room": "deck",
+          "setting": "standing on the main deck of a COLOSSAL old wooden galleon, the grandest sailing ship ever built, moored at a great seaport at dusk: an enormous open deck of honey-coloured planks stretching far away fore and aft like a town square, gold-trimmed rails along both sides, FOUR gigantic masts rising like towers into tier upon tier of great cream sails, rigging and rope ladders everywhere, lanterns glowing on the masts",
+          "interior": false,
+          "indoor": false,
+          "seam": "the far end of the vast deck toward the bow, the long bowsprit pointing out over the calm sea at dusk, even and calm",
+          "seamOccluder": "a huge round mast trunk banded with iron, rising out of sight",
+          "elements": [
+            {
+              "id": "seam_left",
+              "at": "on the far left",
+              "desc": "the left half of the calm view directly behind the viewer: the far end of the vast deck toward the bow, the long bowsprit pointing out over the calm sea at dusk, even and calm, joining its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "gangplank_down",
+              "at": "to the left",
+              "label": "Down the gangplank to the wharf",
+              "door": {
+                "direction": "back",
+                "to": "harbor"
+              },
+              "desc": "a gap in the gold-trimmed side rail where the wide wooden gangplank slopes down to the stone wharf far below, the seaport's warehouses and the little library glowing beyond"
+            },
+            {
+              "id": "mast_basket",
+              "at": "just left of centre",
+              "label": "The basket by the mainmast",
+              "station": 3,
+              "track": "deck",
+              "desc": "close to the viewer, at the foot of the gigantic mainmast, a coil of thick rope and a wooden bucket, and on a barrel a woven basket of herb bundles tied with red string"
+            },
+            {
+              "id": "quarterdeck_stairs",
+              "at": "dead ahead in the centre",
+              "label": "Up the stairs to the quarterdeck",
+              "door": {
+                "direction": "open",
+                "to": "quarterdeck"
+              },
+              "desc": "far across the vast deck, a broad wooden staircase with carved gold banisters climbing up to the raised quarterdeck at the stern, the ship's great wheel and tall glowing stern lanterns just visible above"
+            },
+            {
+              "id": "rigging",
+              "at": "just right of centre",
+              "label": "Climb the rigging to the crow's nest",
+              "door": {
+                "direction": "open",
+                "to": "crows_nest"
+              },
+              "desc": "a wide rope ladder of tarred rigging running from the deck rail straight up the side of the tallest mast, past the sails, to a round wooden lookout platform high, high above"
+            },
+            {
+              "id": "deck_right",
+              "at": "to the right",
+              "desc": "the long deck running away past a row of big wooden barrels, coiled ropes and a ship's bell, the rail and the open sea glowing beyond"
+            },
+            {
+              "id": "seam_right",
+              "at": "on the far right",
+              "desc": "the right half of the calm view directly behind the viewer: the far end of the vast deck toward the bow, the long bowsprit pointing out over the calm sea at dusk, even and calm, joining its other half cleanly at the seam directly behind you"
+            }
+          ],
+          "soundBed": "a giant ship at anchor at dusk: timbers creaking, sails flapping softly, ropes humming, gulls and waves below.",
+          "rigid": "the deck, the four masts, sails and rigging, the rails, the gangplank, the stairs to the quarterdeck, the barrels, the basket",
+          "atmosphere": "breathtakingly huge and adventurous, the deck as big as a town square, golden lantern light on the sails",
+          "styleLight": "early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red",
+          "negatives": "No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. The ship is EMPTY of people. ONE ship only; no skull flags, no cannons firing, no writing on the sails, barrels or rails.",
+          "states": {},
+          "continuity": [],
+          "scaffold": {
+            "kind": "skeleton",
+            "layout": {
+              "surface": "court",
+              "word": "deck",
+              "floor": "vast deck of honey-coloured planks",
+              "size": [
+                8,
+                8,
+                20,
+                6
+              ],
+              "sides": {
+                "left": "railing",
+                "right": "railing"
+              },
+              "parts": [
+                [
+                  "door",
+                  "gangplank_down",
+                  {
+                    "w": 1.6,
+                    "h": 2.0,
+                    "say": "the gap in the side rail where the gangplank slopes down"
+                  }
+                ],
+                [
+                  "prop",
+                  "mast_basket",
+                  {
+                    "size": [
+                      1.0,
+                      1.0,
+                      1.0
+                    ],
+                    "dist": 2.0
+                  }
+                ],
+                [
+                  "door",
+                  "quarterdeck_stairs",
+                  {
+                    "w": 3.0,
+                    "h": 3.0,
+                    "say": "the broad stairs climbing to the raised deck"
+                  }
+                ],
+                [
+                  "door",
+                  "rigging",
+                  {
+                    "w": 1.4,
+                    "h": 3.0,
+                    "say": "the rope ladder climbing the mast"
+                  }
+                ]
+              ]
+            }
+          },
+          "stillOnly": true
+        },
+        "plateRefs": [
+          "harbor/scene.png"
+        ],
+        "scenePrompt": "This is a seamless 360-degree panorama from standing on the main deck of a COLOSSAL old wooden galleon, the grandest sailing ship ever built, moored at a great seaport at dusk: an enormous open deck of honey-coloured planks stretching far away fore and aft like a town square, gold-trimmed rails along both sides, FOUR gigantic masts rising like towers into tier upon tier of great cream sails, rigging and rope ladders everywhere, lanterns glowing on the masts. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the far end of the vast deck toward the bow, the long bowsprit pointing out over the calm sea at dusk, even and calm: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: the far end of the vast deck toward the bow, the long bowsprit pointing out over the calm sea at dusk, even and calm, joining its other half cleanly at the seam directly behind you; to the left, a gap in the gold-trimmed side rail where the wide wooden gangplank slopes down to the stone wharf far below, the seaport's warehouses and the little library glowing beyond; just left of centre, close to the viewer, at the foot of the gigantic mainmast, a coil of thick rope and a wooden bucket, and on a barrel a woven basket of herb bundles tied with red string; dead ahead in the centre, far across the vast deck, a broad wooden staircase with carved gold banisters climbing up to the raised quarterdeck at the stern, the ship's great wheel and tall glowing stern lanterns just visible above; just right of centre, a wide rope ladder of tarred rigging running from the deck rail straight up the side of the tallest mast, past the sails, to a round wooden lookout platform high, high above; to the right, the long deck running away past a row of big wooden barrels, coiled ropes and a ship's bell, the rail and the open sea glowing beyond; on the far right, the right half of the calm view directly behind the viewer: the far end of the vast deck toward the bow, the long bowsprit pointing out over the calm sea at dusk, even and calm, joining its other half cleanly at the seam directly behind you. breathtakingly huge and adventurous, the deck as big as a town square, golden lantern light on the sails. No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. The ship is EMPTY of people. ONE ship only; no skull flags, no cannons firing, no writing on the sails, barrels or rails. Shot on a full-frame DSLR at 24mm, f/8, early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into the far end of the vast deck toward the bow, the long bowsprit pointing out over the calm sea at dusk, even and calm, with no visible seam, join, or repetition.",
+        "seam": {
+          "stage": "screened",
+          "band": "mid",
+          "ratio": 1.43,
+          "delta": 3.07,
+          "needsWork": false,
+          "accepted": false,
+          "seamBandRun": 0.0,
+          "seamStepRatio": 0.0,
+          "at": "2026-11-19T17:37:10"
+        }
+      },
+      "mapPos": {
+        "c": 6,
+        "r": 7
+      },
+      "panorama": "deck/scene.png",
+      "builtFrom": "l1_deck_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "hotspots": [
+        {
+          "id": "down_the_gangplank_to_the_wharf",
+          "type": "door",
+          "label": "Down the gangplank to the wharf",
+          "box": [
+            0.15,
+            0.47,
+            0.24,
+            0.68
+          ],
+          "direction": "back",
+          "to": "harbor",
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "the_basket_by_the_mainmast",
+          "type": "station",
+          "label": "The basket by the mainmast",
+          "box": [
+            0.31,
+            0.48,
+            0.4,
+            0.62
+          ],
+          "tier": 3,
+          "track": "deck",
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "up_the_stairs_to_the_quarterdeck",
+          "type": "door",
+          "label": "Up the stairs to the quarterdeck",
+          "box": [
+            0.5,
+            0.38,
+            0.6,
+            0.59
+          ],
+          "direction": "open",
+          "to": "quarterdeck",
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "climb_the_rigging_to_the_crow_s_nest",
+          "type": "door",
+          "label": "Climb the rigging to the crow's nest",
+          "box": [
+            0.7,
+            0.15,
+            0.77,
+            0.65
+          ],
+          "direction": "open",
+          "to": "crows_nest",
+          "boxSource": "moved:agent"
+        }
+      ]
+    },
+    {
+      "key": "quarterdeck",
+      "title": "The quarterdeck",
+      "built": true,
+      "unlockedWhen": true,
+      "designNote": "The raised stern deck (2026-11-19). Station (LEVEL 3, track quarterdeck, 3 herb bundles): the basket by the ship's wheel. Doors: down the stairs to the main deck, through the carved door into the captain's cabin.",
+      "plannedHotspots": [
+        {
+          "type": "door",
+          "direction": "back",
+          "to": "deck",
+          "label": "Down the stairs to the main deck",
+          "box": [
+            0.09,
+            0.48,
+            0.2,
+            0.72
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "station",
+          "tier": 3,
+          "label": "The basket by the ship's wheel",
+          "track": "quarterdeck",
+          "box": [
+            0.39,
+            0.78,
+            0.49,
+            0.97
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "to": "cabin",
+          "label": "Into the captain's cabin",
+          "box": [
+            0.46,
+            0.24,
+            0.58,
+            0.62
+          ],
+          "boxSource": "moved:agent"
+        }
+      ],
+      "authoring": {
+        "sceneSpec": {
+          "room": "quarterdeck",
+          "setting": "standing on the high raised quarterdeck at the stern of a COLOSSAL old wooden galleon at dusk, looking out over the ship: the vast main deck spreading far below like a town square, four gigantic masts and their great cream sails towering overhead, gold-trimmed carved rails, tall glowing stern lanterns",
+          "interior": false,
+          "indoor": false,
+          "seam": "the calm open sea at dusk astern of the ship, the ship's wake fading away, even and calm",
+          "seamOccluder": "a tall carved gilded stern lantern on a post",
+          "elements": [
+            {
+              "id": "seam_left",
+              "at": "on the far left",
+              "desc": "the left half of the calm view directly behind the viewer: the calm open sea at dusk astern of the ship, the ship's wake fading away, even and calm, joining its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "stairs_down",
+              "at": "to the left",
+              "label": "Down the stairs to the main deck",
+              "door": {
+                "direction": "back",
+                "to": "deck"
+              },
+              "desc": "the head of a broad wooden staircase with carved gold banisters going down to the vast main deck far below, its masts, barrels and coiled ropes spread out beyond"
+            },
+            {
+              "id": "wheel_basket",
+              "at": "just left of centre",
+              "label": "The basket by the ship's wheel",
+              "station": 3,
+              "track": "quarterdeck",
+              "desc": "close to the viewer, the ship's great wooden steering wheel with gold-tipped spokes on its stand, a brass compass in a wooden box beside it, and a woven basket of herb bundles tied with red string at its foot"
+            },
+            {
+              "id": "cabin_door",
+              "at": "dead ahead in the centre",
+              "label": "Into the captain's cabin",
+              "door": {
+                "direction": "open",
+                "to": "cabin"
+              },
+              "desc": "a grand carved wooden door with gold trim and a round window, standing open at the top of a few steps, warm lamplight spilling out from the captain's cabin inside"
+            },
+            {
+              "id": "flag",
+              "at": "just right of centre",
+              "desc": "a tall flagstaff at the stern rail flying a long red-and-gold flag, a brass ship's bell hanging beside it"
+            },
+            {
+              "id": "rail_right",
+              "at": "to the right",
+              "desc": "the carved gilded stern rail, and beyond it the great seaport at dusk, its wharf, warehouses and lamplit library far below"
+            },
+            {
+              "id": "seam_right",
+              "at": "on the far right",
+              "desc": "the right half of the calm view directly behind the viewer: the calm open sea at dusk astern of the ship, the ship's wake fading away, even and calm, joining its other half cleanly at the seam directly behind you"
+            }
+          ],
+          "soundBed": "high on a giant ship's stern at dusk: the flag snapping, the wheel creaking, gulls and the sea below.",
+          "rigid": "the deck, the masts and sails, the stairs, the wheel and compass, the basket, the cabin door, the flagstaff and bell, the stern rail",
+          "atmosphere": "grand and lofty, like standing on a castle wall, warm lanterns against the violet dusk",
+          "styleLight": "early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red",
+          "negatives": "No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. The ship is EMPTY of people. ONE ship only; no skull flags, no cannons, no writing on the flag or the door.",
+          "states": {},
+          "continuity": [],
+          "scaffold": {
+            "kind": "skeleton",
+            "layout": {
+              "surface": "court",
+              "word": "deck",
+              "floor": "raised deck of honey-coloured planks",
+              "size": [
+                5,
+                5,
+                6,
+                4
+              ],
+              "sides": {
+                "left": "railing",
+                "right": "railing",
+                "front": "houses",
+                "back": "railing"
+              },
+              "parts": [
+                [
+                  "door",
+                  "stairs_down",
+                  {
+                    "w": 2.4,
+                    "h": 2.4,
+                    "say": "the head of the broad stairs going down"
+                  }
+                ],
+                [
+                  "prop",
+                  "wheel_basket",
+                  {
+                    "size": [
+                      1.6,
+                      1.6,
+                      0.8
+                    ],
+                    "dist": 2.0
+                  }
+                ],
+                [
+                  "door",
+                  "cabin_door",
+                  {
+                    "w": 1.4,
+                    "h": 2.4,
+                    "say": "the open carved door, the floor running level through it"
+                  }
+                ]
+              ]
+            }
+          },
+          "stillOnly": true
+        },
+        "plateRefs": [
+          "harbor/scene.png"
+        ],
+        "scenePrompt": "This is a seamless 360-degree panorama from standing on the high raised quarterdeck at the stern of a COLOSSAL old wooden galleon at dusk, looking out over the ship: the vast main deck spreading far below like a town square, four gigantic masts and their great cream sails towering overhead, gold-trimmed carved rails, tall glowing stern lanterns. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the calm open sea at dusk astern of the ship, the ship's wake fading away, even and calm: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: the calm open sea at dusk astern of the ship, the ship's wake fading away, even and calm, joining its other half cleanly at the seam directly behind you; to the left, the head of a broad wooden staircase with carved gold banisters going down to the vast main deck far below, its masts, barrels and coiled ropes spread out beyond; just left of centre, close to the viewer, the ship's great wooden steering wheel with gold-tipped spokes on its stand, a brass compass in a wooden box beside it, and a woven basket of herb bundles tied with red string at its foot; dead ahead in the centre, a grand carved wooden door with gold trim and a round window, standing open at the top of a few steps, warm lamplight spilling out from the captain's cabin inside; just right of centre, a tall flagstaff at the stern rail flying a long red-and-gold flag, a brass ship's bell hanging beside it; to the right, the carved gilded stern rail, and beyond it the great seaport at dusk, its wharf, warehouses and lamplit library far below; on the far right, the right half of the calm view directly behind the viewer: the calm open sea at dusk astern of the ship, the ship's wake fading away, even and calm, joining its other half cleanly at the seam directly behind you. grand and lofty, like standing on a castle wall, warm lanterns against the violet dusk. No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. The ship is EMPTY of people. ONE ship only; no skull flags, no cannons, no writing on the flag or the door. Shot on a full-frame DSLR at 24mm, f/8, early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into the calm open sea at dusk astern of the ship, the ship's wake fading away, even and calm, with no visible seam, join, or repetition.",
+        "seam": {
+          "stage": "screened",
+          "band": "sky",
+          "ratio": 1.11,
+          "delta": 1.25,
+          "needsWork": false,
+          "accepted": false,
+          "seamBandRun": 0.04,
+          "seamStepRatio": 0.0,
+          "at": "2026-11-19T17:38:46"
+        }
+      },
+      "mapPos": {
+        "c": 7,
+        "r": 7
+      },
+      "panorama": "quarterdeck/scene.png",
+      "builtFrom": "l1_quarterdeck_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "hotspots": [
+        {
+          "id": "down_the_stairs_to_the_main_deck",
+          "type": "door",
+          "label": "Down the stairs to the main deck",
+          "box": [
+            0.09,
+            0.48,
+            0.2,
+            0.72
+          ],
+          "direction": "back",
+          "to": "deck",
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "the_basket_by_the_ship_s_wheel",
+          "type": "station",
+          "label": "The basket by the ship's wheel",
+          "box": [
+            0.39,
+            0.78,
+            0.49,
+            0.97
+          ],
+          "tier": 3,
+          "track": "quarterdeck",
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "into_the_captain_s_cabin",
+          "type": "door",
+          "label": "Into the captain's cabin",
+          "box": [
+            0.46,
+            0.24,
+            0.58,
+            0.62
+          ],
+          "direction": "open",
+          "to": "cabin",
+          "boxSource": "moved:agent"
+        }
+      ]
+    },
+    {
+      "key": "cabin",
+      "title": "The captain's cabin",
+      "built": true,
+      "unlockedWhen": true,
+      "designNote": "The captain's cabin under the stern (2026-11-19). Station (LEVEL 3, track cabin, 3 herb bundles): the captain's desk deals READING COMPREHENSION, half in English and half in Spanish. Back out to the quarterdeck only.",
+      "plannedHotspots": [
+        {
+          "type": "door",
+          "direction": "back",
+          "to": "quarterdeck",
+          "label": "Back out to the quarterdeck",
+          "box": [
+            0.11,
+            0.18,
+            0.24,
+            0.75
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "station",
+          "tier": 3,
+          "label": "The captain's desk",
+          "track": "cabin",
+          "box": [
+            0.3,
+            0.56,
+            0.72,
+            0.98
+          ],
+          "boxSource": "moved:agent"
+        }
+      ],
+      "authoring": {
+        "sceneSpec": {
+          "room": "cabin",
+          "setting": "inside the grand captain's cabin at the stern of a colossal old wooden galleon: dark polished wood panelling with gold trim, a low beamed ceiling with a hanging brass lantern, and a wide row of tall leaded stern windows glowing with the violet dusk over the sea",
+          "interior": true,
+          "indoor": true,
+          "seam": "a plain stretch of dark polished wood panelling with gold trim, uniform and unbroken",
+          "seamOccluder": "a thick carved wooden pillar, floor to beam",
+          "elements": [
+            {
+              "id": "seam_left",
+              "at": "on the far left",
+              "desc": "the left half of the calm view directly behind the viewer: a plain stretch of dark polished wood panelling with gold trim, uniform and unbroken, joining its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "door_out",
+              "at": "to the left",
+              "label": "Back out to the quarterdeck",
+              "door": {
+                "direction": "back",
+                "to": "quarterdeck"
+              },
+              "desc": "the grand carved door standing open onto the quarterdeck, the floor running level out through it, the great sails and the dusk sky beyond"
+            },
+            {
+              "id": "chest",
+              "at": "just left of centre",
+              "desc": "a big brass-bound sea chest standing open, rolled-up maps and a spyglass inside it, and a little ship in a glass bottle on a shelf above"
+            },
+            {
+              "id": "captain_desk",
+              "at": "dead ahead in the centre",
+              "label": "The captain's desk",
+              "station": 3,
+              "track": "cabin",
+              "desc": "close to the viewer, a big carved wooden desk under the stern windows with an old sea map spread across it, a brass compass, a feather quill in an inkpot, an open logbook, and a woven basket of herb bundles tied with red string beside the logbook"
+            },
+            {
+              "id": "windows",
+              "at": "just right of centre",
+              "desc": "the wide row of tall leaded stern windows looking out over the calm sea at dusk, a cushioned window seat beneath them"
+            },
+            {
+              "id": "hammock",
+              "at": "to the right",
+              "desc": "a striped canvas hammock slung between two beams, a big brass ship's lantern glowing, a wooden globe on a stand"
+            },
+            {
+              "id": "seam_right",
+              "at": "on the far right",
+              "desc": "the right half of the calm view directly behind the viewer: a plain stretch of dark polished wood panelling with gold trim, uniform and unbroken, joining its other half cleanly at the seam directly behind you"
+            }
+          ],
+          "soundBed": "a ship's cabin at dusk: timbers creaking gently, the lantern swaying, waves lapping the hull outside.",
+          "rigid": "the panelling, the beams and lantern, the stern windows, the desk with its map and logbook and basket, the sea chest, the hammock",
+          "atmosphere": "cozy and grand at once, golden lamplight on dark wood, the sea glowing through the windows",
+          "styleLight": "early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red",
+          "negatives": "No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. The cabin is EMPTY of people. No readable words, letters or numbers on the map, logbook or anything else.",
+          "states": {},
+          "continuity": [],
+          "scaffold": {
+            "kind": "skeleton",
+            "layout": {
+              "surface": "room",
+              "word": "floor",
+              "floor": "dark polished floorboards",
+              "size": [
+                3,
+                3,
+                4,
+                3
+              ],
+              "sides": {
+                "left": "houses",
+                "right": "houses",
+                "front": "houses",
+                "back": "houses"
+              },
+              "parts": [
+                [
+                  "door",
+                  "door_out",
+                  {
+                    "w": 1.2,
+                    "h": 2.2,
+                    "say": "the open carved door, the floor running level out onto the deck"
+                  }
+                ],
+                [
+                  "prop",
+                  "captain_desk",
+                  {
+                    "size": [
+                      1.8,
+                      0.9,
+                      0.8
+                    ],
+                    "dist": 1.8
+                  }
+                ]
+              ]
+            }
+          },
+          "stillOnly": true
+        },
+        "plateRefs": [
+          "library/scene.png"
+        ],
+        "scenePrompt": "This is a seamless 360-degree panorama from inside the grand captain's cabin at the stern of a colossal old wooden galleon: dark polished wood panelling with gold trim, a low beamed ceiling with a hanging brass lantern, and a wide row of tall leaded stern windows glowing with the violet dusk over the sea. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stretch of dark polished wood panelling with gold trim, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: a plain stretch of dark polished wood panelling with gold trim, uniform and unbroken, joining its other half cleanly at the seam directly behind you; to the left, the grand carved door standing open onto the quarterdeck, the floor running level out through it, the great sails and the dusk sky beyond; just left of centre, a big brass-bound sea chest standing open, rolled-up maps and a spyglass inside it, and a little ship in a glass bottle on a shelf above; dead ahead in the centre, close to the viewer, a big carved wooden desk under the stern windows with an old sea map spread across it, a brass compass, a feather quill in an inkpot, an open logbook, and a woven basket of herb bundles tied with red string beside the logbook; just right of centre, the wide row of tall leaded stern windows looking out over the calm sea at dusk, a cushioned window seat beneath them; to the right, a striped canvas hammock slung between two beams, a big brass ship's lantern glowing, a wooden globe on a stand; on the far right, the right half of the calm view directly behind the viewer: a plain stretch of dark polished wood panelling with gold trim, uniform and unbroken, joining its other half cleanly at the seam directly behind you. cozy and grand at once, golden lamplight on dark wood, the sea glowing through the windows. No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. The cabin is EMPTY of people. No readable words, letters or numbers on the map, logbook or anything else. Shot on a full-frame DSLR at 24mm, f/8, early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a plain stretch of dark polished wood panelling with gold trim, uniform and unbroken, with no visible seam, join, or repetition.",
+        "seam": {
+          "stage": "screened",
+          "band": "sky",
+          "ratio": 1.52,
+          "delta": 2.05,
+          "needsWork": false,
+          "accepted": false,
+          "seamBandRun": 0.006,
+          "seamStepRatio": 0.0,
+          "at": "2026-11-19T17:40:28"
+        }
+      },
+      "mapPos": {
+        "c": 7,
+        "r": 8
+      },
+      "panorama": "cabin/scene.png",
+      "builtFrom": "l1_cabin_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "hotspots": [
+        {
+          "id": "back_out_to_the_quarterdeck",
+          "type": "door",
+          "label": "Back out to the quarterdeck",
+          "box": [
+            0.11,
+            0.18,
+            0.24,
+            0.75
+          ],
+          "direction": "back",
+          "to": "quarterdeck",
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "the_captain_s_desk",
+          "type": "station",
+          "label": "The captain's desk",
+          "box": [
+            0.3,
+            0.56,
+            0.72,
+            0.98
+          ],
+          "tier": 3,
+          "track": "cabin",
+          "boxSource": "moved:agent"
+        }
+      ]
+    },
+    {
+      "key": "crows_nest",
+      "title": "The crow's nest",
+      "built": true,
+      "unlockedWhen": true,
+      "designNote": "The round lookout high on the tallest mast (2026-11-19). Station (LEVEL 3, track lookout, 3 herb bundles): the basket in the crow's nest. Back down the rigging to the main deck only.",
+      "plannedHotspots": [
+        {
+          "type": "door",
+          "direction": "back",
+          "to": "deck",
+          "label": "Climb back down the rigging",
+          "box": [
+            0.12,
+            0.6,
+            0.21,
+            0.88
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "station",
+          "tier": 3,
+          "label": "The basket in the crow's nest",
+          "track": "lookout",
+          "box": [
+            0.25,
+            0.66,
+            0.37,
+            0.9
+          ],
+          "boxSource": "moved:agent"
+        }
+      ],
+      "authoring": {
+        "sceneSpec": {
+          "room": "crows_nest",
+          "setting": "standing in the round wooden crow's nest at the very top of the tallest mast of a colossal galleon, so high up the whole seaport looks tiny: a low wooden rim all round at waist height, the top of the mast rising behind with the long red-and-gold flag streaming, and in every direction the wide calm sea at dusk, distant islands and far-off sails",
+          "interior": false,
+          "indoor": false,
+          "seam": "the wide calm sea at dusk far below and the violet sky above, seen over the crow's nest's wooden rim, calm and even",
+          "seamOccluder": "the thick top of the mast rising straight up through the crow's nest",
+          "elements": [
+            {
+              "id": "seam_left",
+              "at": "on the far left",
+              "desc": "the left half of the calm view directly behind the viewer: the wide calm sea at dusk far below and the violet sky above, seen over the crow's nest's wooden rim, calm and even, joining its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "rigging_down",
+              "at": "to the left",
+              "label": "Climb back down the rigging",
+              "door": {
+                "direction": "back",
+                "to": "deck"
+              },
+              "desc": "a gap in the crow's nest rim where the tarred rope ladder of the rigging drops away steeply down the mast, the vast deck tiny far below"
+            },
+            {
+              "id": "nest_basket",
+              "at": "just left of centre",
+              "label": "The basket in the crow's nest",
+              "station": 3,
+              "track": "lookout",
+              "desc": "close to the viewer on the crow's nest floor, a brass spyglass lying on a coil of rope beside a woven basket of herb bundles tied with red string"
+            },
+            {
+              "id": "harbor_far",
+              "at": "dead ahead in the centre",
+              "desc": "over the rim, far far below, the great seaport at dusk: tiny warehouses, the wharf and a little library with glowing windows, toy-sized fishing boats"
+            },
+            {
+              "id": "sails_below",
+              "at": "just right of centre",
+              "desc": "the tops of the great cream sails and the other masts below, rope rigging fanning out, lanterns glowing"
+            },
+            {
+              "id": "sea_right",
+              "at": "to the right",
+              "desc": "the open sea stretching to the horizon, a few distant islands and a far-off ship's sails"
+            },
+            {
+              "id": "seam_right",
+              "at": "on the far right",
+              "desc": "the right half of the calm view directly behind the viewer: the wide calm sea at dusk far below and the violet sky above, seen over the crow's nest's wooden rim, calm and even, joining its other half cleanly at the seam directly behind you"
+            }
+          ],
+          "soundBed": "high in the crow's nest: wind whistling, the flag snapping overhead, gulls crying, the sea far below.",
+          "rigid": "the round crow's nest and its rim, the mast top and flag, the rope ladder, the spyglass and basket, the sails below, the seaport below",
+          "atmosphere": "dizzyingly high and free, the whole world spread out below in the dusk light",
+          "styleLight": "early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red",
+          "negatives": "No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. No people anywhere. ONE great ship only, the one we stand on; no skull flags, no writing on the flag.",
+          "states": {},
+          "continuity": [],
+          "scaffold": {
+            "kind": "skeleton",
+            "layout": {
+              "surface": "court",
+              "word": "platform",
+              "floor": "small round wooden platform",
+              "size": [
+                1.5,
+                1.5,
+                1.5,
+                1.5
+              ],
+              "sides": {
+                "left": "parapet",
+                "right": "parapet",
+                "front": "parapet",
+                "back": "parapet"
+              },
+              "parts": [
+                [
+                  "door",
+                  "rigging_down",
+                  {
+                    "w": 0.9,
+                    "h": 1.2,
+                    "say": "the gap in the rim where the rope ladder drops away"
+                  }
+                ],
+                [
+                  "prop",
+                  "nest_basket",
+                  {
+                    "size": [
+                      0.6,
+                      0.6,
+                      0.5
+                    ],
+                    "dist": 0.9
+                  }
+                ]
+              ]
+            }
+          },
+          "stillOnly": true
+        },
+        "plateRefs": [
+          "harbor/scene.png"
+        ],
+        "scenePrompt": "This is a seamless 360-degree panorama from standing in the round wooden crow's nest at the very top of the tallest mast of a colossal galleon, so high up the whole seaport looks tiny: a low wooden rim all round at waist height, the top of the mast rising behind with the long red-and-gold flag streaming, and in every direction the wide calm sea at dusk, distant islands and far-off sails. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the wide calm sea at dusk far below and the violet sky above, seen over the crow's nest's wooden rim, calm and even: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: the wide calm sea at dusk far below and the violet sky above, seen over the crow's nest's wooden rim, calm and even, joining its other half cleanly at the seam directly behind you; to the left, a gap in the crow's nest rim where the tarred rope ladder of the rigging drops away steeply down the mast, the vast deck tiny far below; just left of centre, close to the viewer on the crow's nest floor, a brass spyglass lying on a coil of rope beside a woven basket of herb bundles tied with red string; dead ahead in the centre, over the rim, far far below, the great seaport at dusk: tiny warehouses, the wharf and a little library with glowing windows, toy-sized fishing boats; just right of centre, the tops of the great cream sails and the other masts below, rope rigging fanning out, lanterns glowing; to the right, the open sea stretching to the horizon, a few distant islands and a far-off ship's sails; on the far right, the right half of the calm view directly behind the viewer: the wide calm sea at dusk far below and the violet sky above, seen over the crow's nest's wooden rim, calm and even, joining its other half cleanly at the seam directly behind you. dizzyingly high and free, the whole world spread out below in the dusk light. No people, no figures, no creatures, no faces, no lettering, signs, characters or text anywhere. Nothing modern: no electric lights, wires, plastic, metal pipes or machines beyond what is described. No people anywhere. ONE great ship only, the one we stand on; no skull flags, no writing on the flag. Shot on a full-frame DSLR at 24mm, f/8, early evening at dusk: the sky a deep violet-blue with the last rose glow low in the west, and hundreds of warm amber paper lanterns lit everywhere, so every surface glows gold and red, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into the wide calm sea at dusk far below and the violet sky above, seen over the crow's nest's wooden rim, calm and even, with no visible seam, join, or repetition.",
+        "seam": {
+          "stage": "blurred",
+          "band": "sky",
+          "ratio": 0.0,
+          "delta": 0.0,
+          "needsWork": false,
+          "accepted": false,
+          "seamBandRun": 0.0,
+          "seamStepRatio": 0.0,
+          "at": "2026-11-19T17:44:07"
+        }
+      },
+      "mapPos": {
+        "c": 6,
+        "r": 6
+      },
+      "panorama": "crows_nest/scene.png",
+      "builtFrom": "l1_crows_nest_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "hotspots": [
+        {
+          "id": "climb_back_down_the_rigging",
+          "type": "door",
+          "label": "Climb back down the rigging",
+          "box": [
+            0.12,
+            0.6,
+            0.21,
+            0.88
+          ],
+          "direction": "back",
+          "to": "deck",
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "the_basket_in_the_crow_s_nest",
+          "type": "station",
+          "label": "The basket in the crow's nest",
+          "box": [
+            0.25,
+            0.66,
+            0.37,
+            0.9
+          ],
+          "tier": 3,
+          "track": "lookout",
+          "boxSource": "moved:agent"
+        }
+      ]
+    },
+    {
+      "key": "reef",
+      "title": "The coral reef",
+      "built": true,
+      "unlockedWhen": true,
+      "designNote": "Under the harbor, a dive off the wharf (2026-11-19). Station (LEVEL 3, track reef, 3 herb bundles): the giant clam deals READING COMPREHENSION, half in English and half in Spanish. Back up to the harbor only.",
+      "plannedHotspots": [
+        {
+          "type": "door",
+          "direction": "back",
+          "to": "harbor",
+          "label": "Swim back up to the wharf",
+          "box": [
+            0.17,
+            0.28,
+            0.24,
+            0.72
+          ],
+          "boxSource": "moved:agent"
+        },
+        {
+          "type": "station",
+          "tier": 3,
+          "label": "The giant clam",
+          "track": "reef",
+          "box": [
+            0.36,
+            0.55,
+            0.6,
+            0.92
+          ],
+          "boxSource": "moved:agent"
+        }
+      ],
+      "authoring": {
+        "sceneSpec": {
+          "room": "reef",
+          "setting": "on the sandy sea floor of a bright, shallow coral reef just off a great seaport, in clear blue-green water: branching and round corals of every colour, waving sea fans, little bright fish darting, the shimmering silver surface overhead",
+          "interior": false,
+          "indoor": false,
+          "seam": "open clear blue-green water fading softly into the distance over pale sand, calm and even",
+          "seamOccluder": "a tall branching column of orange coral",
+          "elements": [
+            {
+              "id": "seam_left",
+              "at": "on the far left",
+              "desc": "the left half of the calm view directly behind the viewer: open clear blue-green water fading softly into the distance over pale sand, calm and even, joining its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "swim_up",
+              "at": "to the left",
+              "label": "Swim back up to the wharf",
+              "door": {
+                "direction": "back",
+                "to": "harbor"
+              },
+              "desc": "the dark wooden pilings of the wharf rising up out of the sand into the shimmering bright surface above, a weedy wooden ladder running up one piling to the air"
+            },
+            {
+              "id": "turtle",
+              "at": "just left of centre",
+              "desc": "a sea turtle gliding slowly past a big round brain coral, small and in the middle distance"
+            },
+            {
+              "id": "giant_clam",
+              "at": "dead ahead in the centre",
+              "label": "The giant clam",
+              "station": 3,
+              "track": "reef",
+              "desc": "close to the viewer on the sand, an enormous giant clam with wavy blue-and-purple lips, its shell open, and resting inside it a woven basket of herb bundles tied with red string"
+            },
+            {
+              "id": "anchor",
+              "at": "just right of centre",
+              "desc": "an old rusty ship's anchor half buried in the sand, covered in little corals and orange sea stars"
+            },
+            {
+              "id": "coral_right",
+              "at": "to the right",
+              "desc": "a wall of colourful coral and waving purple sea fans, a striped octopus peeking from a crack, a school of little yellow fish"
+            },
+            {
+              "id": "seam_right",
+              "at": "on the far right",
+              "desc": "the right half of the calm view directly behind the viewer: open clear blue-green water fading softly into the distance over pale sand, calm and even, joining its other half cleanly at the seam directly behind you"
+            }
+          ],
+          "soundBed": "underwater on a reef: soft muffled bubbles, a gentle hum of the sea, faint crackle of the coral.",
+          "rigid": "the sand, the corals and sea fans, the wharf pilings and ladder, the giant clam and basket, the anchor",
+          "atmosphere": "magical, calm and glowing, light dancing on the sand",
+          "styleLight": "underwater at dusk: soft beams of violet and golden light slanting down through clear blue-green water from the shimmering surface above, the coral glowing in warm reds, oranges, pinks and purples",
+          "negatives": "No people, no divers, no faces, no lettering, signs, characters or text anywhere. No sharks, nothing scary; the animals are small, gentle and in the middle distance. Nothing modern: no plastic, metal pipes or machines.",
+          "states": {},
+          "continuity": [],
+          "scaffold": {
+            "kind": "skeleton",
+            "layout": {
+              "surface": "court",
+              "word": "sea floor",
+              "floor": "pale sandy sea floor",
+              "size": [
+                5,
+                5,
+                6,
+                5
+              ],
+              "sides": {},
+              "parts": [
+                [
+                  "door",
+                  "swim_up",
+                  {
+                    "w": 1.6,
+                    "h": 3.0,
+                    "say": "the wharf pilings and the ladder rising to the surface"
+                  }
+                ],
+                [
+                  "prop",
+                  "giant_clam",
+                  {
+                    "size": [
+                      1.4,
+                      1.0,
+                      0.8
+                    ],
+                    "dist": 2.0
+                  }
+                ]
+              ]
+            }
+          },
+          "stillOnly": true
+        },
+        "plateRefs": [
+          "harbor/scene.png"
+        ],
+        "scenePrompt": "This is a seamless 360-degree panorama from on the sandy sea floor of a bright, shallow coral reef just off a great seaport, in clear blue-green water: branching and round corals of every colour, waving sea fans, little bright fish darting, the shimmering silver surface overhead. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is open clear blue-green water fading softly into the distance over pale sand, calm and even: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: open clear blue-green water fading softly into the distance over pale sand, calm and even, joining its other half cleanly at the seam directly behind you; to the left, the dark wooden pilings of the wharf rising up out of the sand into the shimmering bright surface above, a weedy wooden ladder running up one piling to the air; just left of centre, a sea turtle gliding slowly past a big round brain coral, small and in the middle distance; dead ahead in the centre, close to the viewer on the sand, an enormous giant clam with wavy blue-and-purple lips, its shell open, and resting inside it a woven basket of herb bundles tied with red string; just right of centre, an old rusty ship's anchor half buried in the sand, covered in little corals and orange sea stars; to the right, a wall of colourful coral and waving purple sea fans, a striped octopus peeking from a crack, a school of little yellow fish; on the far right, the right half of the calm view directly behind the viewer: open clear blue-green water fading softly into the distance over pale sand, calm and even, joining its other half cleanly at the seam directly behind you. magical, calm and glowing, light dancing on the sand. No people, no divers, no faces, no lettering, signs, characters or text anywhere. No sharks, nothing scary; the animals are small, gentle and in the middle distance. Nothing modern: no plastic, metal pipes or machines. Shot on a full-frame DSLR at 24mm, f/8, underwater at dusk: soft beams of violet and golden light slanting down through clear blue-green water from the shimmering surface above, the coral glowing in warm reds, oranges, pinks and purples, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into open clear blue-green water fading softly into the distance over pale sand, calm and even, with no visible seam, join, or repetition.",
+        "seam": {
+          "stage": "screened",
+          "band": "ground",
+          "ratio": 0.87,
+          "delta": 1.93,
+          "needsWork": false,
+          "accepted": false,
+          "seamBandRun": 0.013,
+          "seamStepRatio": 0.0,
+          "at": "2026-11-19T17:45:43"
+        }
+      },
+      "mapPos": {
+        "c": 6,
+        "r": 8
+      },
+      "panorama": "reef/scene.png",
+      "builtFrom": "l1_reef_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "hotspots": [
+        {
+          "id": "swim_back_up_to_the_wharf",
+          "type": "door",
+          "label": "Swim back up to the wharf",
+          "box": [
+            0.17,
+            0.28,
+            0.24,
+            0.72
+          ],
+          "direction": "back",
+          "to": "harbor",
+          "boxSource": "moved:agent"
+        },
+        {
+          "id": "the_giant_clam",
+          "type": "station",
+          "label": "The giant clam",
+          "box": [
+            0.36,
+            0.55,
+            0.6,
+            0.92
+          ],
+          "tier": 3,
+          "track": "reef",
           "boxSource": "moved:agent"
         }
       ]
@@ -12801,8 +13963,13 @@
     "minutes": 15,
     "goal": 15,
     "sidePoints": 3,
-    "maxSidePoints": 21,
-    "goalLabel": "Herb bundles"
+    "maxSidePoints": 21
   },
-  "cover": "cover.png"
+  "cover": "cover.png",
+  "items": {
+    "boarding_pass": {
+      "name": "the boarding pass",
+      "image": "items/boarding_pass.png"
+    }
+  }
 }

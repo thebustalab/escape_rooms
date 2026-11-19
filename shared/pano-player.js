@@ -85,35 +85,35 @@
 // A bare `./variant_resolve.js` import is NOT refreshed by bumping the <script> tag's ?v, so a changed
 // helper module (e.g. a new export) leaves browsers on a stale cached copy → "doesn't provide an export
 // named X" SyntaxError → blank page (the 2026-08-05 airship regression). Bump all three together.
-import { WebRConsole } from "./webr-console.js?v=176";
-import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers, pickTransit } from "./variant_resolve.js?v=176";   // Phase 3: per-hotspot state variants; monorail switch-door nav
-import * as PQ from "./puzzle_queue.js?v=176";   // dynamic puzzle queue: location-independent puzzle serving
-import * as CP from "./corr_panel.js?v=176";   // lower-triangle layout of the grid gate (clouds correlation panel)
-import { particleCount } from "./particles.js?v=176";
-import { mountLandingBackdrop } from "./landing_backdrop.js?v=176";   // landing text over a pan of the first room's clip   // ambient-particle vocabulary + per-kind field density
-import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=176";
-import { condHolds } from "./cond.js?v=176";
-import { gridMatches } from "./grid_check.js?v=176";   // grid answer check; `partition:true` accepts any relabelling of the buckets   // ledger + elevation-map card DOM
-import * as LIVE from "./live_session.js?v=176";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
-import * as RIDE from "./ride.js?v=176";
-import { mountPcaPlate } from "./pca_plate.js?v=176";   // the PCA plate instrument (voyage beach)
-import { mountFishBoard } from "./fish_board.js?v=176";   // the fish board instrument (harbour berth)
-import { mountDrawdown } from "./drawdown.js?v=176";
-import { mountTide } from "./tide_machine.js?v=176";   // the tide machine instrument (dunes escape)
-import { mountVarianceMeter } from "./variance_meter.js?v=176";   // the variance meter instrument (anova cellars escape)
-import { mountAnovaInstrument } from "./anova_instrument.js?v=176";   // the ANOVA instrument (Fisher's board, anova rooms; also the book, ch.12b)
-import { mountPermanovaInstrument } from "./permanova_instrument.js?v=176";   // its PERMANOVA sibling: the board's optional second tab
-import { mountGhostLines } from "./ghost_lines.js?v=176";   // the ghost-line board instrument (regression pits hub)
-import { mount as mountDatasetExplorer } from "./dataset_explorer.js?v=176";   // a dataset's STRUCTURE (instrument kind + the graded rooms' chip)
-import { mount as mountSigmoidBoard } from "./sigmoid_board.js?v=176";   // the S-curve board (classification day one, toy data)
-import { mount as mountScoreboard } from "./scoreboard.js?v=176";   // the scoreboard (classification day two, toy data)
+import { WebRConsole } from "./webr-console.js?v=177";
+import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers, pickTransit } from "./variant_resolve.js?v=177";   // Phase 3: per-hotspot state variants; monorail switch-door nav
+import * as PQ from "./puzzle_queue.js?v=177";   // dynamic puzzle queue: location-independent puzzle serving
+import * as CP from "./corr_panel.js?v=177";   // lower-triangle layout of the grid gate (clouds correlation panel)
+import { particleCount } from "./particles.js?v=177";
+import { mountLandingBackdrop } from "./landing_backdrop.js?v=177";   // landing text over a pan of the first room's clip   // ambient-particle vocabulary + per-kind field density
+import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=177";
+import { condHolds } from "./cond.js?v=177";
+import { gridMatches } from "./grid_check.js?v=177";   // grid answer check; `partition:true` accepts any relabelling of the buckets   // ledger + elevation-map card DOM
+import * as LIVE from "./live_session.js?v=177";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
+import * as RIDE from "./ride.js?v=177";
+import { mountPcaPlate } from "./pca_plate.js?v=177";   // the PCA plate instrument (voyage beach)
+import { mountFishBoard } from "./fish_board.js?v=177";   // the fish board instrument (harbour berth)
+import { mountDrawdown } from "./drawdown.js?v=177";
+import { mountTide } from "./tide_machine.js?v=177";   // the tide machine instrument (dunes escape)
+import { mountVarianceMeter } from "./variance_meter.js?v=177";   // the variance meter instrument (anova cellars escape)
+import { mountAnovaInstrument } from "./anova_instrument.js?v=177";   // the ANOVA instrument (Fisher's board, anova rooms; also the book, ch.12b)
+import { mountPermanovaInstrument } from "./permanova_instrument.js?v=177";   // its PERMANOVA sibling: the board's optional second tab
+import { mountGhostLines } from "./ghost_lines.js?v=177";   // the ghost-line board instrument (regression pits hub)
+import { mount as mountDatasetExplorer } from "./dataset_explorer.js?v=177";   // a dataset's STRUCTURE (instrument kind + the graded rooms' chip)
+import { mount as mountSigmoidBoard } from "./sigmoid_board.js?v=177";   // the S-curve board (classification day one, toy data)
+import { mount as mountScoreboard } from "./scoreboard.js?v=177";   // the scoreboard (classification day two, toy data)
    // the drawdown board instrument (diamonds escape)   // THE RIDE (subway): express lever + clip-sequence planner
-import * as BELL from "./bell_pull.js?v=176";
-import * as TCOUNT from "./transit_counter.js?v=176";   // the date plaque over a flat door transit (dunes time-skip)
-import * as DATEB from "./date_board.js?v=176";   // date lock: lock mode:"date", two slide-levers (dunes departure board)
-import * as INVY from "./inventory.js?v=176";   // carried items + the door that asks which to use (dunes)   // bell-pull (#16): dial mode:"pull" + lock mode:"state" (spa belfry)
-import { entryYaw } from "./entry_facing.js?v=176";   // face the way out on entering a room (every scenario)
-import * as HINTS from "./escape_hints.js?v=176";   // escape-phase Hint chip: time-unlocked tiers (SCENARIO.escapeHints)
+import * as BELL from "./bell_pull.js?v=177";
+import * as TCOUNT from "./transit_counter.js?v=177";   // the date plaque over a flat door transit (dunes time-skip)
+import * as DATEB from "./date_board.js?v=177";   // date lock: lock mode:"date", two slide-levers (dunes departure board)
+import * as INVY from "./inventory.js?v=177";   // carried items + the door that asks which to use (dunes)   // bell-pull (#16): dial mode:"pull" + lock mode:"state" (spa belfry)
+import { entryYaw } from "./entry_facing.js?v=177";   // face the way out on entering a room (every scenario)
+import * as HINTS from "./escape_hints.js?v=177";   // escape-phase Hint chip: time-unlocked tiers (SCENARIO.escapeHints)
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 
@@ -1457,7 +1457,9 @@ function artMapEnabled() {
 let _artMap = null;              // {url, promise} for the parsed bundle: a static asset, not run state
 const _artImgs = new Map();      // absolute image url -> Promise<HTMLImageElement>
 function loadArtMap() {
-  const url = new URL(SCENARIO.playerMapArt, location.href).href;
+  // document.baseURI, not location.href: test_play.html sets a <base> at the scenario folder, and resolving
+  // against location.href looked for shared/map/map.json there, 404'd and dropped to the grid.
+  const url = new URL(SCENARIO.playerMapArt, document.baseURI).href;
   if (!_artMap || _artMap.url !== url) {
     const promise = fetch(url)
       .then(r => { if (!r.ok) throw new Error("map.json HTTP " + r.status); return r.json(); })
@@ -4808,6 +4810,10 @@ async function openStation(h) {
         const a = await LIVE.answer(d.deal_id, choice).catch(() => null);
         if (!a) return { error: "Can't reach the class session. Close this and try the station again." };
         if (!a.ok) return { error: a.j.error || "That task has expired. Close this and try the station again." };
+        // A station may also hand over a carried ITEM on a right answer (`gives`, shared/inventory.js): bathhouse's
+        // library reading table gives the boarding pass the gangplank door asks for (2026-11-19). Client-side and
+        // session-only like every carried item; never twice.
+        const gotItems = a.j.correct && h.gives ? INVY.grantItems(INV, h.gives, gameState) : [];
         if (a.j.correct && a.j.direct) {    // the lantern chest: straight into the class total, never carried
           const st = LIVE.state(), unit = (st && st.unit) || ["load", "loads"];   // the pool's words, else ours
           a.j.feedback = a.j.feedback || (a.j.direct + " " + (a.j.direct === 1 ? unit[0] : unit[1]) +
@@ -4830,6 +4836,8 @@ async function openStation(h) {
             (room ? " (you can hold " + cap + "). Solve another, or take " + them + " to " + dest + "."
                   : ". Take " + them + " to " + dest + ".");
         }
+        if (gotItems.length) a.j.feedback = (a.j.feedback ? a.j.feedback + " " : "Right! ") + "You also get " +
+          gotItems.map(k => INVY.itemInfo(SCENARIO, k).name).join(" and ") + ".";
         return a.j;
   };
   // SOLO ONLY: a "Show me" button for the worked answer (LIVE.canReveal is false in a class session)
