@@ -13,7 +13,7 @@
   "enterLabel": "Take your floor",
   "debrief": {
     "title": "What you did",
-    "intro": "This scenario was analysis of variance, run twice on the same hay trial: one of you weighed the hay, the other counted the species on the same forty-eight plots. You each measured how much of the variation one treatment explains on its own, ranked the three treatments by that share, then fitted two treatments together and read the interaction row first. In the last room each of you found that the dressing that looks best on average is not the best on one kind of ground, so the answer depended on where you looked and what you measured. Here is what you did."
+    "intro": "This scenario was analysis of variance, run twice on the same hay trial: one of you weighed the hay, the other counted the species on the same forty-eight plots. You each measured how much of the variation one treatment explains on its own, ranked the three treatments by that share, then ran a PERMANOVA, an analysis of variance on a whole profile of measurements, with two treatments together and read the interaction row first. In the last room each of you found that the dressing that looks best on average is not the best on one kind of ground, so the answer depended on where you looked and what you measured. Here is what you did."
   },
   "music": "audio/satie_gnossiennes_thurzo.mp3",
   "musicVolume": 0.15,
@@ -998,7 +998,7 @@
           "boxSource": "review:agent-vision",
           "boxNote": "Placed by eye 2026-11-17 on the loose sheet left of the Director's draft (clear of its box).",
           "note": "Escape-critical (Lucas, 2026-11-17): lists six candidate groupings, only D (the passage rooms) clears the red line on both boards; each player gets a copy.",
-          "image": "items/clerk_card.jpg?v=1"
+          "image": "items/clerk_card_sq.jpg?v=1"
         },
         {
           "type": "dial",
@@ -1400,7 +1400,7 @@
           "pickup": "Clerk of Works' card, six ways to split the eight rooms in two: A. By floor: Library, Drawing room, Laboratory, Kitchen against the rest; B. West end and east end: Library, Drawing room, Laboratory, Archive vault against the rest; C. Wet rooms and dry rooms: Laboratory, Kitchen, Boiler room, Wash-house against the rest; D. Finished in the first building season (1891) and later: Library, Laboratory, Archive vault, Boiler room against the rest; E. North side and south side: Library, Laboratory, Kitchen, Boiler room against the rest; F. Rooms with a chimney flue and rooms without: Library, Drawing room, Kitchen, Boiler room against the rest.",
           "boxSource": "review:agent-vision",
           "boxNote": "Placed by eye 2026-11-17 on the loose sheet left of the Director's draft (clear of its box).",
-          "image": "items/clerk_card.jpg?v=1"
+          "image": "items/clerk_card_sq.jpg?v=1"
         },
         {
           "id": "the_house_circuits",
@@ -1999,40 +1999,40 @@
     {
       "key": "library",
       "title": "The library",
-      "technique": "two-way ANOVA and the interaction row",
+      "technique": "PERMANOVA of a whole profile and the interaction row",
       "puzzleType": 1,
       "phase": "analysis",
       "built": true,
       "unlockedWhen": true,
       "role": "M",
       "level": 3,
-      "designNote": "M RUNG 3: two-way nitrogen * lime on hay_yield; read the interaction row first. ANSWER interaction share 0.203 (check, ± 0.005; nitrogen row 0.397, lime 0.135, noise 0.264 are the near-misses). The tall bookcase on the west wall (the thick wall) does not read as a door. After M's boss, the passage panel is found behind one hinged shelf. Passage room (9.5 A, 28 gal/h).",
+      "designNote": "M RUNG 3: PERMANOVA of the hay's mineral profile, cbind(hay_protein, hay_phosphate, hay_potash) ~ nitrogen * lime; read the interaction row first. ANSWER interaction share 0.314 (check, ± 0.005; nitrogen row 0.222, lime 0.221, noise 0.243 are the near-misses; the single-response route on hay_yield gives 0.203). The tall bookcase on the west wall (the thick wall) does not read as a door. After M's boss, the passage panel is found behind one hinged shelf. Passage room (9.5 A, 28 gal/h).",
       "plannedHotspots": [
         {
           "type": "puzzle",
           "label": "The Director's trial ledger",
           "form": "check",
-          "note": "M R3. Answer share 0.203.",
+          "note": "M R3. PERMANOVA of the hay's mineral profile. Answer share 0.314.",
           "availableWhen": {
             "solved": "kitchen"
           },
           "starterCode": "weighing_book",
           "check": {
-            "prompt": "The ledger asks whether nitrogen does the same for the hay on limed and unlimed ground. Using <code>weighing_book</code>, find the <code>share</code> of the variation in <code>hay_yield</code> explained by the interaction between <code>nitrogen</code> and <code>lime</code>, and assign it to <code>answer</code> as a number.",
+            "prompt": "The ledger asks whether nitrogen changes the hay's make-up, its chemical analysis, the same way on limed and unlimed ground. Using <code>weighing_book</code>, take <code>hay_protein</code>, <code>hay_phosphate</code> and <code>hay_potash</code> together as each plot's profile and run a PERMANOVA (an analysis of variance on the distances between the plots' whole profiles, with the usual Euclidean distance) on <code>nitrogen</code>, <code>lime</code> and their interaction. Find the <code>share</code> of the variation in the profile explained by the interaction between <code>nitrogen</code> and <code>lime</code>, and assign it to <code>answer</code> as a number.",
             "requires": [
               "answer"
             ],
             "maxAttempts": 4,
-            "hint": "The <code>*</code> in a formula asks for both factors and their interaction. Build the model with it, pipe it to <code>anovaTest()</code>, and read the interaction row, the one named with a colon.",
+            "hint": "A whole profile calls for a PERMANOVA. Put the three columns on the left of the formula inside <code>cbind()</code> and use <code>*</code> on the right for both factors and their interaction, then give the data and that formula straight to <code>permanovaTest()</code>: there is no <code>buildModel()</code> step first. Read the interaction row, the one named with a colon.",
             "feedback": {
-              "correct": "Correct, noted in your field notebook: for hay, the nitrogen by lime interaction explains a share of 0.203 of the variation, so what nitrogen does depends on the lime.",
+              "correct": "Correct, noted in your field notebook: for the hay's chemical analysis, the nitrogen by lime interaction explains a share of 0.314 of the variation in the profile, more than either treatment alone, so what nitrogen does to the hay depends on the lime.",
               "wrong": [
-                "<code>weighing_book %&gt;% buildModel(model_type = \"linear_regression\", formula = hay_yield ~ nitrogen * lime) %&gt;% anovaTest()</code> returns a row for each factor, one for their interaction, then <code>noise</code> and <code>total</code>. Read the one labeled <code>nitrogen:lime</code>.",
-                "With <code>+</code> instead of <code>*</code> there is no interaction row at all, and the <code>nitrogen</code> row is not the one asked for.",
-                "Assign one number, not the whole table: add <code>%&gt;% filter(term == \"nitrogen:lime\") %&gt;% pull(share)</code> after <code>anovaTest()</code> to take that one number out, or type it in to three decimal places."
+                "<code>weighing_book %&gt;% permanovaTest(cbind(hay_protein, hay_phosphate, hay_potash) ~ nitrogen * lime)</code> returns a row for each factor, one for their interaction, then <code>noise</code> and <code>total</code>. Read the <code>share</code> on the row labeled <code>nitrogen:lime</code>, and leave the distance at its default.",
+                "Check that the left of the formula holds the whole profile: <code>hay_yield</code> or one mineral column on its own gives a different table. Put all three of <code>hay_protein</code>, <code>hay_phosphate</code> and <code>hay_potash</code> inside <code>cbind()</code>, and join the factors with <code>*</code>, not <code>+</code>, so the table has an interaction row.",
+                "Assign one number, not the whole table: add <code>%&gt;% filter(term == \"nitrogen:lime\") %&gt;% pull(share)</code> after <code>permanovaTest()</code> to take that one number out, or type it in to three decimal places."
               ]
             },
-            "expr": "local({ a <- suppressWarnings(as.numeric(unlist(answer))); length(a) == 1 && !is.na(a) && abs(a - 0.203) <= 0.005 })"
+            "expr": "local({ a <- suppressWarnings(as.numeric(unlist(answer))); length(a) == 1 && !is.na(a) && abs(a - 0.314) <= 0.005 })"
           },
           "box": [
             0.4631,
@@ -2409,21 +2409,21 @@
           },
           "starterCode": "weighing_book",
           "check": {
-            "prompt": "The ledger asks whether nitrogen does the same for the hay on limed and unlimed ground. Using <code>weighing_book</code>, find the <code>share</code> of the variation in <code>hay_yield</code> explained by the interaction between <code>nitrogen</code> and <code>lime</code>, and assign it to <code>answer</code> as a number.",
+            "prompt": "The ledger asks whether nitrogen changes the hay's make-up, its chemical analysis, the same way on limed and unlimed ground. Using <code>weighing_book</code>, take <code>hay_protein</code>, <code>hay_phosphate</code> and <code>hay_potash</code> together as each plot's profile and run a PERMANOVA (an analysis of variance on the distances between the plots' whole profiles, with the usual Euclidean distance) on <code>nitrogen</code>, <code>lime</code> and their interaction. Find the <code>share</code> of the variation in the profile explained by the interaction between <code>nitrogen</code> and <code>lime</code>, and assign it to <code>answer</code> as a number.",
             "requires": [
               "answer"
             ],
             "maxAttempts": 4,
-            "hint": "The <code>*</code> in a formula asks for both factors and their interaction. Build the model with it, pipe it to <code>anovaTest()</code>, and read the interaction row, the one named with a colon.",
+            "hint": "A whole profile calls for a PERMANOVA. Put the three columns on the left of the formula inside <code>cbind()</code> and use <code>*</code> on the right for both factors and their interaction, then give the data and that formula straight to <code>permanovaTest()</code>: there is no <code>buildModel()</code> step first. Read the interaction row, the one named with a colon.",
             "feedback": {
-              "correct": "Correct, noted in your field notebook: for hay, the nitrogen by lime interaction explains a share of 0.203 of the variation, so what nitrogen does depends on the lime.",
+              "correct": "Correct, noted in your field notebook: for the hay's chemical analysis, the nitrogen by lime interaction explains a share of 0.314 of the variation in the profile, more than either treatment alone, so what nitrogen does to the hay depends on the lime.",
               "wrong": [
-                "<code>weighing_book %&gt;% buildModel(model_type = \"linear_regression\", formula = hay_yield ~ nitrogen * lime) %&gt;% anovaTest()</code> returns a row for each factor, one for their interaction, then <code>noise</code> and <code>total</code>. Read the one labeled <code>nitrogen:lime</code>.",
-                "With <code>+</code> instead of <code>*</code> there is no interaction row at all, and the <code>nitrogen</code> row is not the one asked for.",
-                "Assign one number, not the whole table: add <code>%&gt;% filter(term == \"nitrogen:lime\") %&gt;% pull(share)</code> after <code>anovaTest()</code> to take that one number out, or type it in to three decimal places."
+                "<code>weighing_book %&gt;% permanovaTest(cbind(hay_protein, hay_phosphate, hay_potash) ~ nitrogen * lime)</code> returns a row for each factor, one for their interaction, then <code>noise</code> and <code>total</code>. Read the <code>share</code> on the row labeled <code>nitrogen:lime</code>, and leave the distance at its default.",
+                "Check that the left of the formula holds the whole profile: <code>hay_yield</code> or one mineral column on its own gives a different table. Put all three of <code>hay_protein</code>, <code>hay_phosphate</code> and <code>hay_potash</code> inside <code>cbind()</code>, and join the factors with <code>*</code>, not <code>+</code>, so the table has an interaction row.",
+                "Assign one number, not the whole table: add <code>%&gt;% filter(term == \"nitrogen:lime\") %&gt;% pull(share)</code> after <code>permanovaTest()</code> to take that one number out, or type it in to three decimal places."
               ]
             },
-            "expr": "local({ a <- suppressWarnings(as.numeric(unlist(answer))); length(a) == 1 && !is.na(a) && abs(a - 0.203) <= 0.005 })"
+            "expr": "local({ a <- suppressWarnings(as.numeric(unlist(answer))); length(a) == 1 && !is.na(a) && abs(a - 0.314) <= 0.005 })"
           },
           "boxSource": "draft:skeleton",
           "solveSfx": {
@@ -4353,40 +4353,40 @@
     {
       "key": "archive_vault",
       "title": "The archive vault",
-      "technique": "two-way ANOVA and the interaction row",
+      "technique": "PERMANOVA of a whole profile and the interaction row",
       "puzzleType": 1,
       "phase": "analysis",
       "built": true,
       "unlockedWhen": true,
       "role": "C",
       "level": 3,
-      "designNote": "C RUNG 3 among the shelves of wax-sealed sample jars (the Sample Archive, since 1843: the plaque's box ON the jars). Two-way nitrogen * lime on species_count; interaction share 0.185 (check; nitrogen 0.068, lime 0.699, noise 0.048 are near-misses). After C's boss, the passage panel at the vault's far (west) end. Directly under the library. Passage room (8.5 A, 24 gal/h).",
+      "designNote": "C RUNG 3 among the shelves of wax-sealed sample jars (the Sample Archive, since 1843: the plaque's box ON the jars). PERMANOVA of the sward profile, cbind(grasses, legumes, other_herbs) ~ nitrogen * lime; interaction share 0.272 (check; nitrogen 0.119, lime 0.511, noise 0.098 are near-misses; the single-response route on species_count gives 0.185). After C's boss, the passage panel at the vault's far (west) end. Directly under the library. Passage room (8.5 A, 24 gal/h).",
       "plannedHotspots": [
         {
           "type": "puzzle",
           "label": "The archive register",
           "form": "check",
-          "note": "C R3. Answer share 0.185.",
+          "note": "C R3. PERMANOVA of the sward profile. Answer share 0.272.",
           "availableWhen": {
             "solved": "wash_house"
           },
           "starterCode": "botanical_survey",
           "check": {
-            "prompt": "It is proper to ask whether nitrogen does the same to the meadow's plants on limed and unlimed ground. Using botanical_survey, find the share of the variation in species_count explained by the interaction between nitrogen and lime, and assign it to answer as a number.",
+            "prompt": "It is proper to ask whether nitrogen changes the meadow's make-up, its mix of plants, the same way on limed and unlimed ground. Using <code>botanical_survey</code>, take <code>grasses</code>, <code>legumes</code> and <code>other_herbs</code> (how many species of each kind grow on the plot) together as each plot's profile and run a PERMANOVA (an analysis of variance on the distances between the plots' whole profiles, with the usual Euclidean distance) on <code>nitrogen</code>, <code>lime</code> and their interaction. Find the <code>share</code> of the variation in the profile explained by the interaction between <code>nitrogen</code> and <code>lime</code>, and assign it to <code>answer</code> as a number.",
             "requires": [
               "answer"
             ],
             "maxAttempts": 4,
-            "hint": "The <code>*</code> in a formula asks for both factors and their interaction. Build the model with it, pipe it to <code>anovaTest()</code>, and read the interaction row, the one named with a colon.",
+            "hint": "A whole profile calls for a PERMANOVA. Put the three columns on the left of the formula inside <code>cbind()</code> and use <code>*</code> on the right for both factors and their interaction, then give the data and that formula straight to <code>permanovaTest()</code>: there is no <code>buildModel()</code> step first. Read the interaction row, the one named with a colon.",
             "feedback": {
-              "correct": "Correct, noted in your field notebook: for species, the nitrogen by lime interaction explains a share of 0.185 of the variation, so what nitrogen does depends on the lime.",
+              "correct": "Correct, noted in your field notebook: for the meadow's mix of grasses, legumes and other herbs, the nitrogen by lime interaction explains a share of 0.272 of the variation in the profile, so what nitrogen does to the meadow depends on the lime.",
               "wrong": [
-                "<code>botanical_survey %&gt;% buildModel(model_type = \"linear_regression\", formula = species_count ~ nitrogen * lime) %&gt;% anovaTest()</code> returns a row for each factor, one for their interaction, then <code>noise</code> and <code>total</code>. Read the one labeled <code>nitrogen:lime</code>.",
-                "With <code>+</code> instead of <code>*</code> there is no interaction row at all, and the <code>nitrogen</code> row is not the one asked for.",
-                "Assign one number, not the whole table: add <code>%&gt;% filter(term == \"nitrogen:lime\") %&gt;% pull(share)</code> after <code>anovaTest()</code> to take that one number out, or type it in to three decimal places."
+                "<code>botanical_survey %&gt;% permanovaTest(cbind(grasses, legumes, other_herbs) ~ nitrogen * lime)</code> returns a row for each factor, one for their interaction, then <code>noise</code> and <code>total</code>. Read the <code>share</code> on the row labeled <code>nitrogen:lime</code>, and leave the distance at its default.",
+                "Check that the left of the formula holds the whole profile: <code>species_count</code> or one kind of plant on its own gives a different table. Put all three of <code>grasses</code>, <code>legumes</code> and <code>other_herbs</code> inside <code>cbind()</code>, and join the factors with <code>*</code>, not <code>+</code>, so the table has an interaction row.",
+                "Assign one number, not the whole table: add <code>%&gt;% filter(term == \"nitrogen:lime\") %&gt;% pull(share)</code> after <code>permanovaTest()</code> to take that one number out, or type it in to three decimal places."
               ]
             },
-            "expr": "local({ a <- suppressWarnings(as.numeric(unlist(answer))); length(a) == 1 && !is.na(a) && abs(a - 0.185) <= 0.005 })"
+            "expr": "local({ a <- suppressWarnings(as.numeric(unlist(answer))); length(a) == 1 && !is.na(a) && abs(a - 0.272) <= 0.005 })"
           },
           "box": [
             0.4784,
@@ -4418,7 +4418,7 @@
           "boxSource": "review:agent-vision",
           "boxNote": "Placed by eye 2026-11-17 on the papers behind the register; drawn after the register so it sits on top where the two touch.",
           "note": "Escape-critical (Lucas, 2026-11-17): lists six candidate groupings, only D (the passage rooms) clears the red line on both boards; each player gets a copy.",
-          "image": "items/clerk_card.jpg?v=1"
+          "image": "items/clerk_card_sq.jpg?v=1"
         },
         {
           "type": "plaque",
@@ -4781,21 +4781,21 @@
           },
           "starterCode": "botanical_survey",
           "check": {
-            "prompt": "It is proper to ask whether nitrogen does the same to the meadow's plants on limed and unlimed ground. Using botanical_survey, find the share of the variation in species_count explained by the interaction between nitrogen and lime, and assign it to answer as a number.",
+            "prompt": "It is proper to ask whether nitrogen changes the meadow's make-up, its mix of plants, the same way on limed and unlimed ground. Using <code>botanical_survey</code>, take <code>grasses</code>, <code>legumes</code> and <code>other_herbs</code> (how many species of each kind grow on the plot) together as each plot's profile and run a PERMANOVA (an analysis of variance on the distances between the plots' whole profiles, with the usual Euclidean distance) on <code>nitrogen</code>, <code>lime</code> and their interaction. Find the <code>share</code> of the variation in the profile explained by the interaction between <code>nitrogen</code> and <code>lime</code>, and assign it to <code>answer</code> as a number.",
             "requires": [
               "answer"
             ],
             "maxAttempts": 4,
-            "hint": "The <code>*</code> in a formula asks for both factors and their interaction. Build the model with it, pipe it to <code>anovaTest()</code>, and read the interaction row, the one named with a colon.",
+            "hint": "A whole profile calls for a PERMANOVA. Put the three columns on the left of the formula inside <code>cbind()</code> and use <code>*</code> on the right for both factors and their interaction, then give the data and that formula straight to <code>permanovaTest()</code>: there is no <code>buildModel()</code> step first. Read the interaction row, the one named with a colon.",
             "feedback": {
-              "correct": "Correct, noted in your field notebook: for species, the nitrogen by lime interaction explains a share of 0.185 of the variation, so what nitrogen does depends on the lime.",
+              "correct": "Correct, noted in your field notebook: for the meadow's mix of grasses, legumes and other herbs, the nitrogen by lime interaction explains a share of 0.272 of the variation in the profile, so what nitrogen does to the meadow depends on the lime.",
               "wrong": [
-                "<code>botanical_survey %&gt;% buildModel(model_type = \"linear_regression\", formula = species_count ~ nitrogen * lime) %&gt;% anovaTest()</code> returns a row for each factor, one for their interaction, then <code>noise</code> and <code>total</code>. Read the one labeled <code>nitrogen:lime</code>.",
-                "With <code>+</code> instead of <code>*</code> there is no interaction row at all, and the <code>nitrogen</code> row is not the one asked for.",
-                "Assign one number, not the whole table: add <code>%&gt;% filter(term == \"nitrogen:lime\") %&gt;% pull(share)</code> after <code>anovaTest()</code> to take that one number out, or type it in to three decimal places."
+                "<code>botanical_survey %&gt;% permanovaTest(cbind(grasses, legumes, other_herbs) ~ nitrogen * lime)</code> returns a row for each factor, one for their interaction, then <code>noise</code> and <code>total</code>. Read the <code>share</code> on the row labeled <code>nitrogen:lime</code>, and leave the distance at its default.",
+                "Check that the left of the formula holds the whole profile: <code>species_count</code> or one kind of plant on its own gives a different table. Put all three of <code>grasses</code>, <code>legumes</code> and <code>other_herbs</code> inside <code>cbind()</code>, and join the factors with <code>*</code>, not <code>+</code>, so the table has an interaction row.",
+                "Assign one number, not the whole table: add <code>%&gt;% filter(term == \"nitrogen:lime\") %&gt;% pull(share)</code> after <code>permanovaTest()</code> to take that one number out, or type it in to three decimal places."
               ]
             },
-            "expr": "local({ a <- suppressWarnings(as.numeric(unlist(answer))); length(a) == 1 && !is.na(a) && abs(a - 0.185) <= 0.005 })"
+            "expr": "local({ a <- suppressWarnings(as.numeric(unlist(answer))); length(a) == 1 && !is.na(a) && abs(a - 0.272) <= 0.005 })"
           },
           "boxSource": "draft:skeleton",
           "solveSfx": {
@@ -4821,7 +4821,7 @@
           "pickup": "Clerk of Works' card, six ways to split the eight rooms in two: A. By floor: Library, Drawing room, Laboratory, Kitchen against the rest; B. West end and east end: Library, Drawing room, Laboratory, Archive vault against the rest; C. Wet rooms and dry rooms: Laboratory, Kitchen, Boiler room, Wash-house against the rest; D. Finished in the first building season (1891) and later: Library, Laboratory, Archive vault, Boiler room against the rest; E. North side and south side: Library, Laboratory, Kitchen, Boiler room against the rest; F. Rooms with a chimney flue and rooms without: Library, Drawing room, Kitchen, Boiler room against the rest.",
           "boxSource": "review:agent-vision",
           "boxNote": "Placed by eye 2026-11-17 on the papers behind the register; drawn after the register so it sits on top where the two touch.",
-          "image": "items/clerk_card.jpg?v=1"
+          "image": "items/clerk_card_sq.jpg?v=1"
         },
         {
           "id": "the_sample_archive",
@@ -5364,7 +5364,7 @@
     },
     {
       "room": "library",
-      "text": "You fitted nitrogen and lime together and read the interaction row first: on both measurements the interaction explained about a fifth of the variation, more than lime did for the hay, so neither treatment's effect could be read on its own."
+      "text": "You ran a PERMANOVA on a three-column profile (the hay's chemical analysis for one of you, the mix of grasses, legumes and other herbs for the other) with nitrogen and lime together, and read the interaction row first: it explained nearly a third of the variation in the hay profile and over a quarter in the meadow profile, so neither treatment's effect could be read on its own."
     },
     {
       "room": "laboratory",

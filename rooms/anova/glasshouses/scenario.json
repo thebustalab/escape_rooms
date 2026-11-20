@@ -19,7 +19,7 @@
   },
   "debrief": {
     "title": "What you did",
-    "intro": "This scenario was analysis of variance on a barley pot trial: forty-eight pots, each given a watering, a soil and potash or none. You measured how much of the variation in grain the watering explains on its own, ranked the three treatments by that share, then fitted watering and soil together and read the interaction row first. Soil explained almost nothing on its own, yet it decided which watering was best: on clay, moderate watering gave the most grain, although generous watering was best on average. Here is what you did."
+    "intro": "This scenario was analysis of variance on a barley pot trial: forty-eight pots, each given a watering, a soil and potash or none. You measured how much of the variation in grain the watering explains on its own, ranked the three treatments by that share, then ran a PERMANOVA, an analysis of variance on a whole profile (each pot's grain, straw and root weights), with watering and soil together and read the interaction row first. Soil explained almost nothing on its own, yet it decided which watering was best: on clay, moderate watering gave the most grain, although generous watering was best on average. Here is what you did."
   },
   "done": {
     "title": "The report is finished",
@@ -2533,37 +2533,37 @@
     {
       "key": "pot_culture_house",
       "title": "The pot-culture house",
-      "technique": "two-way ANOVA and the interaction row",
+      "technique": "PERMANOVA of a whole profile and the interaction row",
       "puzzleType": 1,
       "phase": "analysis",
       "built": true,
       "unlockedWhen": true,
       "level": 3,
-      "designNote": "RUNG 3 among the benches of barley pots (clay and sand, labelled by treatment). Two-way watering * soil; interaction share 0.573 (check; watering 0.200, soil 0.009, noise 0.218 near-misses).",
+      "designNote": "RUNG 3 among the benches of barley pots (clay and sand, labelled by treatment). PERMANOVA of cbind(grain_weight, straw_weight, root_weight) ~ watering * soil; interaction share 0.428 (check; watering 0.326, soil 0.040, noise 0.206 near-misses; the grain-only route gives 0.573).",
       "plannedHotspots": [
         {
           "type": "puzzle",
           "label": "The pot labels",
           "form": "check",
-          "note": "R3. Answer share 0.573.",
+          "note": "R3. PERMANOVA of the grain, straw and root profile. Answer share 0.428.",
           "availableWhen": {
             "solved": "potting_shed"
           },
           "starterCode": "pot_trial",
           "check": {
-            "prompt": "Every pot's label gives its soil as well as its watering, so the question is whether a watering does the same in clay and in sand. Using <code>pot_trial</code>, find the <code>share</code> of the variation in <code>grain_weight</code> explained by the interaction between <code>watering</code> and <code>soil</code>, and assign it to <code>answer</code> as a number.",
+            "prompt": "Every pot's label gives its soil as well as its watering, and every pot was weighed three ways, so the question is whether a watering changes how the barley spends its growth the same way in clay and in sand. Using <code>pot_trial</code>, take <code>grain_weight</code>, <code>straw_weight</code> and <code>root_weight</code> together as each pot's profile and run a PERMANOVA (an analysis of variance on the distances between the pots' whole profiles, with the usual Euclidean distance) on <code>watering</code>, <code>soil</code> and their interaction. Find the <code>share</code> of the variation in the profile explained by the interaction between <code>watering</code> and <code>soil</code>, and assign it to <code>answer</code> as a number.",
             "requires": [
               "answer"
             ],
             "maxAttempts": 4,
-            "expr": "local({ a <- suppressWarnings(as.numeric(unlist(answer))); length(a) == 1 && !is.na(a) && abs(a - 0.573) <= 0.005 })",
-            "hint": "The <code>*</code> in a formula asks for both factors and their interaction. The interaction row is named with a colon.",
+            "expr": "local({ a <- suppressWarnings(as.numeric(unlist(answer))); length(a) == 1 && !is.na(a) && abs(a - 0.428) <= 0.005 })",
+            "hint": "A whole profile calls for a PERMANOVA. Put the three columns on the left of the formula inside <code>cbind()</code> and use <code>*</code> on the right for both factors and their interaction, then give the data and that formula straight to <code>permanovaTest()</code>: there is no <code>buildModel()</code> step first. The interaction row is named with a colon.",
             "feedback": {
-              "correct": "Correct, noted in your field notebook: the watering by soil interaction explains a share of 0.573 of the variation, so what a watering does depends on the soil.",
+              "correct": "Correct, noted in your field notebook: the watering by soil interaction explains a share of 0.428 of the variation in the grain, straw and root profile, more than watering itself, so how the barley spends its growth under a watering depends on the soil.",
               "wrong": [
-                "<code>buildModel(data = pot_trial, model_type = \"linear_regression\", formula = grain_weight ~ watering * soil) %&gt;% anovaTest()</code> returns a row for each factor, one for their interaction, then <code>noise</code> and <code>total</code>. Read the one labeled <code>watering:soil</code>.",
-                "With <code>+</code> instead of <code>*</code> there is no interaction row at all, and the <code>watering</code> row is not the one asked for.",
-                "Assign one number, not the whole table: take the <code>share</code> from the row asked for (<code>filter(term == ...) %&gt;% pull(share)</code>), or type it in to three decimal places."
+                "<code>permanovaTest(data = pot_trial, cbind(grain_weight, straw_weight, root_weight) ~ watering * soil)</code> returns a row for each factor, one for their interaction, then <code>noise</code> and <code>total</code>. Read the <code>share</code> on the row labeled <code>watering:soil</code>, and leave the distance at its default.",
+                "Check that the left of the formula holds the whole profile: <code>grain_weight</code> (or any one weight) on its own gives a different table. Put all three of <code>grain_weight</code>, <code>straw_weight</code> and <code>root_weight</code> inside <code>cbind()</code>, and join the factors with <code>*</code>, not <code>+</code>, so the table has an interaction row.",
+                "Assign one number, not the whole table: take the <code>share</code> from the row asked for (<code>filter(term == \"watering:soil\") %&gt;% pull(share)</code>), or type it in to three decimal places."
               ]
             }
           },
@@ -2787,19 +2787,19 @@
           },
           "starterCode": "pot_trial",
           "check": {
-            "prompt": "Every pot's label gives its soil as well as its watering, so the question is whether a watering does the same in clay and in sand. Using <code>pot_trial</code>, find the <code>share</code> of the variation in <code>grain_weight</code> explained by the interaction between <code>watering</code> and <code>soil</code>, and assign it to <code>answer</code> as a number.",
+            "prompt": "Every pot's label gives its soil as well as its watering, and every pot was weighed three ways, so the question is whether a watering changes how the barley spends its growth the same way in clay and in sand. Using <code>pot_trial</code>, take <code>grain_weight</code>, <code>straw_weight</code> and <code>root_weight</code> together as each pot's profile and run a PERMANOVA (an analysis of variance on the distances between the pots' whole profiles, with the usual Euclidean distance) on <code>watering</code>, <code>soil</code> and their interaction. Find the <code>share</code> of the variation in the profile explained by the interaction between <code>watering</code> and <code>soil</code>, and assign it to <code>answer</code> as a number.",
             "requires": [
               "answer"
             ],
             "maxAttempts": 4,
-            "expr": "local({ a <- suppressWarnings(as.numeric(unlist(answer))); length(a) == 1 && !is.na(a) && abs(a - 0.573) <= 0.005 })",
-            "hint": "The <code>*</code> in a formula asks for both factors and their interaction. The interaction row is named with a colon.",
+            "expr": "local({ a <- suppressWarnings(as.numeric(unlist(answer))); length(a) == 1 && !is.na(a) && abs(a - 0.428) <= 0.005 })",
+            "hint": "A whole profile calls for a PERMANOVA. Put the three columns on the left of the formula inside <code>cbind()</code> and use <code>*</code> on the right for both factors and their interaction, then give the data and that formula straight to <code>permanovaTest()</code>: there is no <code>buildModel()</code> step first. The interaction row is named with a colon.",
             "feedback": {
-              "correct": "Correct, noted in your field notebook: the watering by soil interaction explains a share of 0.573 of the variation, so what a watering does depends on the soil.",
+              "correct": "Correct, noted in your field notebook: the watering by soil interaction explains a share of 0.428 of the variation in the grain, straw and root profile, more than watering itself, so how the barley spends its growth under a watering depends on the soil.",
               "wrong": [
-                "<code>buildModel(data = pot_trial, model_type = \"linear_regression\", formula = grain_weight ~ watering * soil) %&gt;% anovaTest()</code> returns a row for each factor, one for their interaction, then <code>noise</code> and <code>total</code>. Read the one labeled <code>watering:soil</code>.",
-                "With <code>+</code> instead of <code>*</code> there is no interaction row at all, and the <code>watering</code> row is not the one asked for.",
-                "Assign one number, not the whole table: take the <code>share</code> from the row asked for (<code>filter(term == ...) %&gt;% pull(share)</code>), or type it in to three decimal places."
+                "<code>permanovaTest(data = pot_trial, cbind(grain_weight, straw_weight, root_weight) ~ watering * soil)</code> returns a row for each factor, one for their interaction, then <code>noise</code> and <code>total</code>. Read the <code>share</code> on the row labeled <code>watering:soil</code>, and leave the distance at its default.",
+                "Check that the left of the formula holds the whole profile: <code>grain_weight</code> (or any one weight) on its own gives a different table. Put all three of <code>grain_weight</code>, <code>straw_weight</code> and <code>root_weight</code> inside <code>cbind()</code>, and join the factors with <code>*</code>, not <code>+</code>, so the table has an interaction row.",
+                "Assign one number, not the whole table: take the <code>share</code> from the row asked for (<code>filter(term == \"watering:soil\") %&gt;% pull(share)</code>), or type it in to three decimal places."
               ]
             }
           },
@@ -4201,7 +4201,7 @@
     },
     {
       "room": "pot_culture_house",
-      "text": "You fitted watering and soil together and read the interaction row first: the interaction was large, so the best watering depended on the soil."
+      "text": "You ran a PERMANOVA on each pot's profile of grain, straw and root weight with watering and soil together, and read the interaction row first: the interaction explained more of the profile than watering did, so how a watering paid off depended on the soil."
     },
     {
       "room": "big_glasshouse_far",
