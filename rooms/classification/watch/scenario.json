@@ -3224,7 +3224,7 @@
     {
       "key": "seismo_hut",
       "title": "The seismometer hut",
-      "built": false,
+      "built": true,
       "unlockedWhen": true,
       "designNote": "LEVEL 1, day-one track: the nearest source, up the footpath. No puzzle content here.",
       "plannedHotspots": [
@@ -3232,18 +3232,39 @@
           "type": "door",
           "direction": "open",
           "to": "gas_vent",
-          "label": "The footpath up to the fumarole"
+          "label": "The footpath up to the fumarole",
+          "box": [
+            0.0948,
+            0.31,
+            0.1524,
+            0.502
+          ],
+          "boxSource": "draft:skeleton"
         },
         {
           "type": "station",
           "tier": 1,
-          "label": "The seismometer hut"
+          "label": "The seismometer hut",
+          "box": [
+            0.3858,
+            0.3489,
+            0.4584,
+            0.6794
+          ],
+          "boxSource": "draft:skeleton"
         },
         {
           "type": "door",
           "direction": "back",
           "to": "station",
-          "label": "The footpath down to the station"
+          "label": "The footpath down to the station",
+          "box": [
+            0.635,
+            0.626,
+            0.715,
+            0.77
+          ],
+          "boxSource": "draft:skeleton"
         }
       ],
       "authoring": {
@@ -11334,13 +11355,78 @@
           "motionClosing": "Only the tarp's loose corner stirs; everything else stays exactly where it is."
         },
         "scenePrompt": "This is a seamless 360-degree panorama from a tiny level pad of trodden cinder beside a squat stone seismometer hut half dug into a steep cinder slope, on a stepped footpath climbing toward a volcano's crater, early in the morning. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the steep black cinder slope falling away behind the viewer, plain and even: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: the steep black cinder slope falling away close by, plain and even, joining its other half cleanly at the seam directly behind you; to the left, standing well in from the edge of the frame, a small solar panel on a steel frame set into the cinder a few strides off, tilted to the sun; far beyond it, high up over the level edge of the crater's shelf and small with distance, the tops of brand-new concrete buildings and the tall pale stacks of a geothermal plant; left of centre, the pad's cinder running level onto the stepped footpath, which climbs on away UP the slope with its rope handrail toward the level edge of the crater's shelf above, where a thin white plume of steam rises; dead ahead in the centre, a few strides ahead, a squat hut of dark stone blocks half dug into the slope, its flat concrete roof banked with cinder, a low steel door standing open on a dim interior where a grey instrument case sits on a concrete pier, cables running out of a pipe in its wall; right of centre, beside the hut's door, a wooden cable drum with a loose khaki canvas tarp thrown over it, one corner hanging free and tied down with a cord to a rock, the tarp's loose corner lifting slightly in the breeze; right of centre, far up the slope beyond the drum, small with distance, a single thin steel survey mast standing against the sky; to the right, standing well in from the edge of the frame, the pad's cinder running level onto the stepped footpath, which starts DOWN between two short iron posts of its rope handrail and runs DOWN the slope to the small station yard below with its white hut and radio mast, the open sea far below beyond; on the far right, the right half of the calm view directly behind the viewer: the steep black cinder slope falling away close by, plain and even, joining its other half cleanly at the seam directly behind you. A lonely little instrument hut on a bare volcanic slope in clean morning light; a steep volcanic island high above a deep blue ocean: dark basalt, red-brown and black cinder, pale pumice, crusts of real lemon-yellow sulfur at the vents, sparse silver-green broom bushes, weathered whitewashed concrete and galvanized steel, a deep clear sky; photorealistic, fine natural film grain. No people, no human figures, no faces and no statues anywhere; no animals. No readable words, no legible writing, no captions, no logos and no painted numbers on any wall, sign, board, ledger page or label. It is MORNING: no night sky, no stars, no moon, no floodlights, no blue fire at any vent or on the crater floor, no lava and no red glow; no fog, no cloud sea below the mountain, no rain. The image is SHARP: no motion blur and no smeared or doubled detail anywhere. No cable car and no gondola. No town, hotel or harbor anywhere in view. EXACTLY ONE building on the pad, the squat stone hut, its door the only opening; the only other building in view is the station's small white hut far down the slope. The pad has EXACTLY TWO ways off: the footpath up on the left and down on the right; no other path. Shot on a full-frame DSLR at 24mm, f/8, early morning: the sun a little above the sea to the east-south-east, behind the viewer, bright warm light falling on the hut's face, crisp shadows, a clear deep-blue sky, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into the steep black cinder slope falling away behind the viewer, plain and even, with no visible seam, join, or repetition.",
-        "specBuild": "fbc2f2a9f8484e533a79"
-      }
+        "specBuild": "fbc2f2a9f8484e533a79",
+        "seam": {
+          "stage": "occluded",
+          "band": "sky",
+          "ratio": 0.96,
+          "delta": 0.36,
+          "needsWork": false,
+          "accepted": false,
+          "seamBandRun": 0.125,
+          "seamBandAt": [
+            0.427734375,
+            0.552734375
+          ],
+          "seamStepRatio": 16.02,
+          "occluderMode": "sprite",
+          "at": "2026-11-19T18:18:42"
+        }
+      },
+      "panorama": "seismo_hut/scene.png",
+      "builtFrom": "l1_seismo_hut_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "hotspots": [
+        {
+          "id": "the_footpath_up_to_the_fumarole",
+          "type": "door",
+          "label": "The footpath up to the fumarole",
+          "box": [
+            0.0948,
+            0.31,
+            0.1524,
+            0.502
+          ],
+          "direction": "open",
+          "to": "gas_vent"
+        },
+        {
+          "id": "the_seismometer_hut",
+          "type": "station",
+          "label": "The seismometer hut",
+          "box": [
+            0.3858,
+            0.3489,
+            0.4584,
+            0.6794
+          ],
+          "tier": 1
+        },
+        {
+          "id": "the_footpath_down_to_the_station",
+          "type": "door",
+          "label": "The footpath down to the station",
+          "box": [
+            0.635,
+            0.626,
+            0.715,
+            0.77
+          ],
+          "direction": "back",
+          "to": "station"
+        }
+      ]
     },
     {
       "key": "gas_vent",
       "title": "The fumarole",
-      "built": false,
+      "built": true,
       "unlockedWhen": true,
       "designNote": "LEVEL 2, day-one track: further up the footpath. No puzzle content here.",
       "plannedHotspots": [
@@ -11348,18 +11434,39 @@
           "type": "door",
           "direction": "open",
           "to": "crater_rim",
-          "label": "The footpath up to the rim"
+          "label": "The footpath up to the rim",
+          "box": [
+            0.13,
+            0.7,
+            0.2196,
+            0.828
+          ],
+          "boxSource": "draft:skeleton"
         },
         {
           "type": "station",
           "tier": 2,
-          "label": "The fumarole"
+          "label": "The fumarole",
+          "box": [
+            0.469,
+            0.4529,
+            0.5047,
+            0.6682
+          ],
+          "boxSource": "draft:skeleton"
         },
         {
           "type": "door",
           "direction": "back",
           "to": "seismo_hut",
-          "label": "The footpath down to the hut"
+          "label": "The footpath down to the hut",
+          "box": [
+            0.727,
+            0.668,
+            0.823,
+            0.86
+          ],
+          "boxSource": "draft:skeleton"
         }
       ],
       "authoring": {
@@ -16310,13 +16417,73 @@
           "motionClosing": "Only the steam from the vent moves; everything else stays exactly where it is."
         },
         "scenePrompt": "This is a seamless 360-degree panorama from a small level pad of trodden cinder at the lip of a volcano's high shelf, beside a steaming fumarole crusted with yellow sulfur, on a stepped footpath climbing to the crater's rim, in the early morning. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the flat cinder of the shelf running away behind the viewer, plain and even: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: the flat cinder of the shelf running away close by, plain and even, joining its other half cleanly at the seam directly behind you; to the left, standing well in from the edge of the frame, the pad's cinder running level onto the stepped footpath, which climbs on away UP over the level shelf to the crater's raised rim, a low dark ridge against the sky; left of centre, far off and high above, over the shelf, the island's steep summit cone with a small pale observatory dome on its top; dead ahead in the centre, a few strides ahead, a low mound of cinder crusted bright lemon-yellow and white with sulfur, a steaming crack at its top, a short steel sampling pipe pushed into the crack and its tube running to a small grey box on a stake beside it, a column of white steam rising steadily from the crack; to the right, standing well in from the edge of the frame, the pad's cinder running level onto the stepped footpath, which starts DOWN between two short iron posts of its rope handrail and drops away over the shelf's lip toward the small stone hut on the slope below, and the sea far below beyond; on the far right, the right half of the calm view directly behind the viewer: the flat cinder of the shelf running away close by, plain and even, joining its other half cleanly at the seam directly behind you. A raw, bright volcanic shelf, yellow sulfur and white steam against black cinder; a steep volcanic island high above a deep blue ocean: dark basalt, red-brown and black cinder, pale pumice, crusts of real lemon-yellow sulfur at the vents, sparse silver-green broom bushes, weathered whitewashed concrete and galvanized steel, a deep clear sky; photorealistic, fine natural film grain. No people, no human figures, no faces and no statues anywhere; no animals. No readable words, no legible writing, no captions, no logos and no painted numbers on any wall, sign, board, ledger page or label. It is MORNING: no night sky, no stars, no moon, no floodlights, no blue fire at any vent or on the crater floor, no lava and no red glow; no fog, no cloud sea below the mountain, no rain. The image is SHARP: no motion blur and no smeared or doubled detail anywhere. No cable car and no gondola. No town, hotel or harbor anywhere in view. EXACTLY ONE steaming vent. The pad has EXACTLY TWO ways off: the footpath up on the left and down on the right; no other path or road. Shot on a full-frame DSLR at 24mm, f/8, early-to-mid morning: the sun well up over the sea to the east-south-east, behind the viewer over the right shoulder, strong clear light falling on the mound, the steam bright white where the sun catches it, a deep-blue sky, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into the flat cinder of the shelf running away behind the viewer, plain and even, with no visible seam, join, or repetition.",
-        "specBuild": "e4115eb3bff54b92022a"
-      }
+        "specBuild": "e4115eb3bff54b92022a",
+        "seam": {
+          "stage": "blurred",
+          "band": "sky",
+          "ratio": 0.0,
+          "delta": 0.0,
+          "needsWork": false,
+          "accepted": false,
+          "seamBandRun": 0.0,
+          "seamStepRatio": 0.0,
+          "at": "2026-11-19T18:38:01"
+        }
+      },
+      "panorama": "gas_vent/scene.png",
+      "builtFrom": "l1_gas_vent_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "hotspots": [
+        {
+          "id": "the_footpath_up_to_the_rim",
+          "type": "door",
+          "label": "The footpath up to the rim",
+          "box": [
+            0.13,
+            0.7,
+            0.2196,
+            0.828
+          ],
+          "direction": "open",
+          "to": "crater_rim"
+        },
+        {
+          "id": "the_fumarole",
+          "type": "station",
+          "label": "The fumarole",
+          "box": [
+            0.469,
+            0.4529,
+            0.5047,
+            0.6682
+          ],
+          "tier": 2
+        },
+        {
+          "id": "the_footpath_down_to_the_hut",
+          "type": "door",
+          "label": "The footpath down to the hut",
+          "box": [
+            0.727,
+            0.668,
+            0.823,
+            0.86
+          ],
+          "direction": "back",
+          "to": "seismo_hut"
+        }
+      ]
     },
     {
       "key": "crater_rim",
       "title": "The crater rim",
-      "built": false,
+      "built": true,
       "unlockedWhen": true,
       "designNote": "LEVEL 3, day-one track: the furthest and highest, on the crater's rim. No puzzle content here.",
       "plannedHotspots": [
@@ -16324,12 +16491,26 @@
           "type": "door",
           "direction": "back",
           "to": "gas_vent",
-          "label": "The footpath down from the rim"
+          "label": "The footpath down from the rim",
+          "box": [
+            0.1,
+            0.65,
+            0.132,
+            0.842
+          ],
+          "boxSource": "draft:skeleton"
         },
         {
           "type": "station",
           "tier": 3,
-          "label": "The survey pillar"
+          "label": "The survey pillar",
+          "box": [
+            0.49,
+            0.674,
+            0.51,
+            0.77
+          ],
+          "boxSource": "draft:skeleton"
         }
       ],
       "authoring": {
@@ -25240,13 +25421,60 @@
           "motionClosing": "Only the pennant moves; everything else stays exactly where it is."
         },
         "scenePrompt": "This is a seamless 360-degree panorama from a small railed stone lookout on the north rim of a volcano's crater in full morning light, the crater's inner wall dropping steeply away to the crater floor far below. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the dark cinder of the outer slope falling away behind the viewer, plain and even: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: the dark cinder of the outer slope falling away close by, plain and even, joining its other half cleanly at the seam directly behind you; to the left, standing well in from the edge of the frame, the lookout's stone floor running level onto the stepped footpath, which runs level a few strides along the crest to two short iron posts of its rope handrail, where it starts DOWN the outer slope toward the level cinder shelf below, where a thin white plume of steam rises from a small yellow-crusted vent beside the path; left of centre, at the lookout's railing close by, a short thin steel marker pole, only a little over head height, clamped to the railing, with a small orange pennant at its tip, the small orange pennant fluttering in the breeze; left of centre, far across the crater on its eastern rim, the brand-new concrete and glass buildings of a works and a monorail platform, small with distance, and beyond them the tall pale stacks of a geothermal plant rising high above the rim; dead ahead in the centre, a few strides ahead at the front of the lookout, a squat white-painted concrete survey pillar with a brass plate on its top, and beyond the lookout's iron railing the whole crater below: its steep inner wall, a field of steaming vents and long rows of grey pipes on the crater floor, a small milky-turquoise lake, and steel catwalks on low stilts crossing the floor; right of centre, far off over the crater's western rim, high above it, the island's steep summit cone with a small pale observatory dome on its top; on the far right, the right half of the calm view directly behind the viewer: the dark cinder of the outer slope falling away close by, plain and even, joining its other half cleanly at the seam directly behind you. A wide, bright crater seen from its rim, pale steam, black and ochre rock, a small turquoise lake far below; a steep volcanic island high above a deep blue ocean: dark basalt, red-brown and black cinder, pale pumice, crusts of real lemon-yellow sulfur at the vents, sparse silver-green broom bushes, weathered whitewashed concrete and galvanized steel, a deep clear sky; photorealistic, fine natural film grain. No people, no human figures, no faces and no statues anywhere; no animals. No readable words, no legible writing, no captions, no logos and no painted numbers on any wall, sign, board, ledger page or label. It is MORNING: no night sky, no stars, no moon, no floodlights, no blue fire at any vent or on the crater floor, no lava and no red glow; no fog, no cloud sea below the mountain, no rain. The image is SHARP: no motion blur and no smeared or doubled detail anywhere. No cable car and no gondola. The vents only steam: no flame. The pennant's pole is short and clamped to the railing: no mast, aerial or tower on the lookout. EXACTLY ONE way off the lookout: the footpath on the left. No path down into the crater from here. Shot on a full-frame DSLR at 24mm, f/8, mid-morning: the sun high in the east-south-east on the viewer's left, well above the far works, bright clear light filling the crater, short crisp shadows, a deep-blue sky, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into the dark cinder of the outer slope falling away behind the viewer, plain and even, with no visible seam, join, or repetition.",
-        "specBuild": "60dedcd99ed5028b4944"
-      }
+        "specBuild": "60dedcd99ed5028b4944",
+        "seam": {
+          "stage": "blurred",
+          "band": "sky",
+          "ratio": 0.0,
+          "delta": 0.0,
+          "needsWork": false,
+          "accepted": false,
+          "seamBandRun": 0.0,
+          "seamStepRatio": 0.0,
+          "at": "2026-11-19T19:10:12"
+        }
+      },
+      "panorama": "crater_rim/scene.png",
+      "builtFrom": "l1_crater_rim_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "hotspots": [
+        {
+          "id": "the_footpath_down_from_the_rim",
+          "type": "door",
+          "label": "The footpath down from the rim",
+          "box": [
+            0.1,
+            0.65,
+            0.132,
+            0.842
+          ],
+          "direction": "back",
+          "to": "gas_vent"
+        },
+        {
+          "id": "the_survey_pillar",
+          "type": "station",
+          "label": "The survey pillar",
+          "box": [
+            0.49,
+            0.674,
+            0.51,
+            0.77
+          ],
+          "tier": 3
+        }
+      ]
     },
     {
       "key": "archive",
       "title": "The plate archive",
-      "built": false,
+      "built": true,
       "unlockedWhen": true,
       "designNote": "DAY-TWO HUB (Wednesday). The archive's bulletin board is the second plain deliver (both feed the one total); the tally board is the day's instrument (kind scoreboard, not built yet); the plate cabinet is the dataset explorer on the second plate collection (sister data). The notice case opens Good Seeing once observatory has a play.html. Reached from the station by the truck (hidden on Monday).",
       "plannedHotspots": [
@@ -25254,34 +25482,77 @@
           "type": "door",
           "direction": "back",
           "to": "station",
-          "label": "The way out to the truck"
+          "label": "The way out to the truck",
+          "box": [
+            0.1507,
+            0.3562,
+            0.1707,
+            0.6573
+          ],
+          "boxSource": "draft:skeleton"
         },
         {
           "type": "instrument",
           "kind": "dataset_explorer",
           "label": "The plate cabinet",
-          "config": "data/survey_plates.explorer.json"
+          "config": "data/survey_plates.explorer.json",
+          "box": [
+            0.3267,
+            0.3944,
+            0.4034,
+            0.7003
+          ],
+          "boxSource": "draft:unconfirmed",
+          "boxNote": "unconfirmed: refine pass did not confirm it (refused or failed on its crop); first-pass box kept"
         },
         {
           "type": "instrument",
           "kind": "scoreboard",
-          "label": "The tally board"
+          "label": "The tally board",
+          "box": [
+            0.4415,
+            0.4072,
+            0.5588,
+            0.5937
+          ],
+          "boxSource": "draft:skeleton"
         },
         {
           "type": "deliver",
-          "label": "The archive's bulletin board"
+          "label": "The archive's bulletin board",
+          "box": [
+            0.6331,
+            0.397,
+            0.6831,
+            0.604
+          ],
+          "boxSource": "draft:skeleton"
         },
         {
           "type": "plaque",
           "label": "Notice: Good Seeing",
           "title": "Good Seeing",
-          "body": "Pinned in the archive's notice case: a night before the resort opened, the observatory's last worker and a telescope that must show its visitors something spectacular before the owner closes it. This is one of the chapter's homework scenarios, played on your own. It opens here once it is ready."
+          "body": "Pinned in the archive's notice case: a night before the resort opened, the observatory's last worker and a telescope that must show its visitors something spectacular before the owner closes it. This is one of the chapter's homework scenarios, played on your own. It opens here once it is ready.",
+          "box": [
+            0.715,
+            0.425,
+            0.74,
+            0.585
+          ],
+          "boxSource": "draft:skeleton"
         },
         {
           "type": "door",
           "direction": "open",
           "to": "plate_store",
-          "label": "The door to the plate store"
+          "label": "The door to the plate store",
+          "box": [
+            0.8002,
+            0.3869,
+            0.8502,
+            0.6824
+          ],
+          "boxSource": "draft:skeleton"
         }
       ],
       "authoring": {
@@ -25456,13 +25727,110 @@
           "motionClosing": "Only the clock's pendulum swings; everything else stays exactly where it is."
         },
         "scenePrompt": "This is a seamless 360-degree panorama from the plate archive of an old mountain-top astronomical observatory, a high whitewashed stone room holding one tall glass-fronted oak plate cabinet, in mid-morning sunlight. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the plain whitewashed stone end wall of the archive close behind the viewer, even and bare: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: the plain whitewashed stone end wall of the archive close by, joining its other half cleanly at the seam directly behind you; to the left, standing well in from the edge of the frame, the archive's heavy oak front door standing wide open, the stone floor running level out over its threshold onto the bright gravel of the summit car park, where the station's white four-wheel-drive truck stands parked in the sun before a low stone wall at the car park's edge, nothing beyond the wall but clear blue sky; left of centre, against the wall a few strides off, a tall glass-fronted dark oak cabinet, its shelves stacked with rows of identical pale card boxes of photographic glass plates, one drawer pulled out showing glass plates in paper sleeves standing on edge; left of centre, beside the cabinet, a tall dark-wood longcase observatory clock with a plain white dial without numerals and a long glass door down its front, a bar of sun from the windows falling across the glass onto the case's dark, shadowed back board, the long brass pendulum swinging in a wide slow arc behind the glass, its bright bob gleaming against the dark case; dead ahead in the centre, on the wall straight ahead between the two tall bright windows, square to the viewer, a large plain blackboard in a dark oak frame, ruled with faint white lines into empty columns, a stick of chalk on its ledge; right of centre, on the wall a few strides off, a tall green-baize board in an oak frame with three long rows of empty brass clips across it, a small brass rubber stamp on its ledge; right of centre, beside it on the wall, a small glass-fronted oak notice case with one pale paper notice pinned inside, nothing on it readable; to the right, standing well in from the edge of the frame, a panelled oak door in the side wall standing wide open, the stone floor running level through it into a dim narrow store lined with tall racks; on the far right, the right half of the calm view directly behind the viewer: the plain whitewashed stone end wall of the archive close by, joining its other half cleanly at the seam directly behind you. A calm, sunlit old archive of glass plates, warm oak and pale stone, bars of morning sun; an old mountain-top astronomical observatory: pale cut stone walls, whitewashed plaster, dark polished oak, worn brass, cast iron painted dark green, glass plates in paper sleeves, morning sunlight on stone; photorealistic, fine natural film grain. No people, no human figures, no faces and no statues anywhere; no animals. No readable words, no legible writing, no captions, no logos and no painted numbers on any wall, sign, board, ledger page or label. The image is SHARP: no motion blur and no smeared or doubled detail anywhere. No electric strip lights and no computers or screens. It is daytime: no night sky through any opening. No cloud sea and no clouds below the mountain through any window or door. The blackboard's columns and the bulletin board's clips are EMPTY. EXACTLY ONE clock, ONE cabinet and ONE blackboard. EXACTLY TWO doorways: the open front door on the left and the open store door on the right. Shot on a full-frame DSLR at 24mm, f/8, mid-morning: bright sunlight falling in through two tall windows ahead in long slanting bars across the stone floor, the rest of the room in soft warm shade, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into the plain whitewashed stone end wall of the archive close behind the viewer, even and bare, with no visible seam, join, or repetition.",
-        "specBuild": "e5b271cf585837c12050"
-      }
+        "specBuild": "e5b271cf585837c12050",
+        "seam": {
+          "stage": "screened",
+          "band": "ground",
+          "ratio": 1.88,
+          "delta": 3.84,
+          "needsWork": false,
+          "accepted": false,
+          "seamBandRun": 0.007,
+          "seamStepRatio": 0.0,
+          "at": "2026-11-19T19:33:19"
+        }
+      },
+      "panorama": "archive/scene.png",
+      "builtFrom": "l1_archive_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "hotspots": [
+        {
+          "id": "the_way_out_to_the_truck",
+          "type": "door",
+          "label": "The way out to the truck",
+          "box": [
+            0.1507,
+            0.3562,
+            0.1707,
+            0.6573
+          ],
+          "direction": "back",
+          "to": "station"
+        },
+        {
+          "id": "the_plate_cabinet",
+          "type": "instrument",
+          "label": "The plate cabinet",
+          "box": [
+            0.3267,
+            0.3944,
+            0.4034,
+            0.7003
+          ],
+          "kind": "dataset_explorer",
+          "config": "data/survey_plates.explorer.json"
+        },
+        {
+          "id": "the_tally_board",
+          "type": "instrument",
+          "label": "The tally board",
+          "box": [
+            0.4415,
+            0.4072,
+            0.5588,
+            0.5937
+          ],
+          "kind": "scoreboard"
+        },
+        {
+          "id": "the_archive_s_bulletin_board",
+          "type": "deliver",
+          "label": "The archive's bulletin board",
+          "box": [
+            0.6331,
+            0.397,
+            0.6831,
+            0.604
+          ]
+        },
+        {
+          "id": "notice_good_seeing",
+          "type": "plaque",
+          "label": "Notice: Good Seeing",
+          "box": [
+            0.715,
+            0.425,
+            0.74,
+            0.585
+          ],
+          "title": "Good Seeing",
+          "body": "Pinned in the archive's notice case: a night before the resort opened, the observatory's last worker and a telescope that must show its visitors something spectacular before the owner closes it. This is one of the chapter's homework scenarios, played on your own. It opens here once it is ready."
+        },
+        {
+          "id": "the_door_to_the_plate_store",
+          "type": "door",
+          "label": "The door to the plate store",
+          "box": [
+            0.8002,
+            0.3869,
+            0.8502,
+            0.6824
+          ],
+          "direction": "open",
+          "to": "plate_store"
+        }
+      ]
     },
     {
       "key": "plate_store",
       "title": "The plate store",
-      "built": false,
+      "built": true,
       "unlockedWhen": true,
       "designNote": "LEVEL 1, day-two track: the store off the archive. No puzzle content here.",
       "plannedHotspots": [
@@ -25470,19 +25838,40 @@
           "type": "door",
           "direction": "back",
           "to": "archive",
-          "label": "Back to the archive"
+          "label": "Back to the archive",
+          "box": [
+            0.1601,
+            0.3537,
+            0.19,
+            0.7615
+          ],
+          "boxSource": "draft:skeleton"
         },
         {
           "type": "station",
           "tier": 1,
           "label": "The plate racks",
-          "track": "day2"
+          "track": "day2",
+          "box": [
+            0.3027,
+            0.3,
+            0.6976,
+            0.8
+          ],
+          "boxSource": "draft:skeleton"
         },
         {
           "type": "door",
           "direction": "open",
           "to": "measuring_engine",
-          "label": "The door to the measuring room"
+          "label": "The door to the measuring room",
+          "box": [
+            0.8003,
+            0.3537,
+            0.8203,
+            0.7615
+          ],
+          "boxSource": "draft:skeleton"
         }
       ],
       "authoring": {
@@ -25623,13 +26012,74 @@
           "motionClosing": "Only the heater's small flame moves; everything else stays exactly where it is."
         },
         "scenePrompt": "This is a seamless 360-degree panorama from the narrow plate store of an old mountain-top observatory, a long low room running away to the left and to the right, its long far wall lined with wooden racks of glass photographic plates in their boxes, cool and dim in the morning. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the plain whitewashed stone long wall of the store close behind the viewer: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: the plain whitewashed stone long wall of the store close by, joining its other half cleanly at the seam directly behind you; to the left, standing well in from the edge of the frame, in the store's left end wall, the panelled oak door standing wide open, the stone floor running level out through it into the bright sunlit archive; left of centre, standing on the stone floor a few strides off, a small round paraffin heater of dark green enamelled iron with a little mica window in its side, a calm yellow flame behind the window, keeping the plates dry, the small yellow flame behind the mica window wavering; dead ahead in the centre, dead ahead against the long far wall a few strides off, tall wooden racks from the floor almost to the ceiling, packed with pale card boxes of glass plates, a short wooden library ladder leaning against them, the small high window above them, and a small sloping reading desk at their foot with a lamp-less viewing box on it; to the right, standing well in from the edge of the frame, in the store's right end wall, a second panelled oak door standing wide open, the stone floor running level through it into a bright room beyond; on the far right, the right half of the calm view directly behind the viewer: the plain whitewashed stone long wall of the store close by, joining its other half cleanly at the seam directly behind you. A cool, close, dim store of plate boxes, one bright shaft of sun; an old mountain-top astronomical observatory: pale cut stone walls, whitewashed plaster, dark polished oak, worn brass, cast iron painted dark green, glass plates in paper sleeves, morning sunlight on stone; photorealistic, fine natural film grain. No people, no human figures, no faces and no statues anywhere; no animals. No readable words, no legible writing, no captions, no logos and no painted numbers on any wall, sign, board, ledger page or label. The image is SHARP: no motion blur and no smeared or doubled detail anywhere. No electric strip lights and no computers or screens. It is daytime: no night sky through any opening. No cloud sea and no clouds below the mountain through any window or door. EXACTLY TWO doorways, both open, one in each end wall: one on the left and one on the right. The racks stand only along the long far wall ahead; no racks in the middle of the floor. Shot on a full-frame DSLR at 24mm, f/8, dim and cool: one small high window in the long far wall letting in a single shaft of morning sunlight that falls across the racks, soft shadow elsewhere, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into the plain whitewashed stone long wall of the store close behind the viewer, with no visible seam, join, or repetition.",
-        "specBuild": "3d7efb2898331644878e"
-      }
+        "specBuild": "3d7efb2898331644878e",
+        "seam": {
+          "stage": "blurred",
+          "band": "sky",
+          "ratio": 0.0,
+          "delta": 0.0,
+          "needsWork": false,
+          "accepted": false,
+          "seamBandRun": 0.0,
+          "seamStepRatio": 0.0,
+          "at": "2026-11-19T19:47:49"
+        }
+      },
+      "panorama": "plate_store/scene.png",
+      "builtFrom": "l1_plate_store_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "hotspots": [
+        {
+          "id": "back_to_the_archive",
+          "type": "door",
+          "label": "Back to the archive",
+          "box": [
+            0.1601,
+            0.3537,
+            0.19,
+            0.7615
+          ],
+          "direction": "back",
+          "to": "archive"
+        },
+        {
+          "id": "the_plate_racks",
+          "type": "station",
+          "label": "The plate racks",
+          "box": [
+            0.3027,
+            0.3,
+            0.6976,
+            0.8
+          ],
+          "tier": 1,
+          "track": "day2"
+        },
+        {
+          "id": "the_door_to_the_measuring_room",
+          "type": "door",
+          "label": "The door to the measuring room",
+          "box": [
+            0.8003,
+            0.3537,
+            0.8203,
+            0.7615
+          ],
+          "direction": "open",
+          "to": "measuring_engine"
+        }
+      ]
     },
     {
       "key": "measuring_engine",
       "title": "The measuring room",
-      "built": false,
+      "built": true,
       "unlockedWhen": true,
       "designNote": "LEVEL 2, day-two track: beyond the store. No puzzle content here.",
       "plannedHotspots": [
@@ -25637,19 +26087,40 @@
           "type": "door",
           "direction": "back",
           "to": "plate_store",
-          "label": "Back to the plate store"
+          "label": "Back to the plate store",
+          "box": [
+            0.1805,
+            0.3325,
+            0.2005,
+            0.7671
+          ],
+          "boxSource": "draft:skeleton"
         },
         {
           "type": "station",
           "tier": 2,
           "label": "The measuring engine",
-          "track": "day2"
+          "track": "day2",
+          "box": [
+            0.4157,
+            0.5046,
+            0.5847,
+            0.7344
+          ],
+          "boxSource": "draft:skeleton"
         },
         {
           "type": "door",
           "direction": "open",
           "to": "dome",
-          "label": "The steps up to the dome"
+          "label": "The steps up to the dome",
+          "box": [
+            0.5997,
+            0.4703,
+            0.6997,
+            0.7065
+          ],
+          "boxSource": "draft:skeleton"
         }
       ],
       "authoring": {
@@ -25795,13 +26266,74 @@
           "motionClosing": "Only the flames in the grate move; everything else stays exactly where it is."
         },
         "scenePrompt": "This is a seamless 360-degree panorama from the measuring room of an old mountain-top observatory, where photographic plates are measured on a heavy brass measuring engine under a tall window, in bright morning light. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the plain whitewashed stone wall of the measuring room close behind the viewer: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: the plain whitewashed stone wall of the measuring room close by, joining its other half cleanly at the seam directly behind you; to the left, standing well in from the edge of the frame, a panelled oak door standing wide open, the stone floor running level out through it into the dim plate store; left of centre, set into the side wall a few strides off, a small fireplace of dark cast iron with a plain stone mantel and a sooty black hearth, a low coal fire burning brightly in its grate, lively yellow-orange flames licking up from the glowing coals against the sooty black back of the hearth; dead ahead in the centre, a few strides ahead under the tall bright window, the measuring engine: a heavy cast-iron bed on a stone pier, a brass carriage holding a glass plate over a frosted lamp-less light box, a brass microscope looking down onto the plate, and two big brass hand-wheels with fine scales at the front, an oak stool before it; right of centre, a few strides off in the corner, a short flight of worn stone steps starting on the floor itself and climbing away UP through a low arched opening in the wall to a small stone landing just beyond it, lit by daylight falling from above, where the stair turns and climbs on UP out of sight toward the dome; on the far right, the right half of the calm view directly behind the viewer: the plain whitewashed stone wall of the measuring room close by, joining its other half cleanly at the seam directly behind you. A bright, quiet precision workroom, polished brass and dark iron under a tall window; an old mountain-top astronomical observatory: pale cut stone walls, whitewashed plaster, dark polished oak, worn brass, cast iron painted dark green, glass plates in paper sleeves, morning sunlight on stone; photorealistic, fine natural film grain. No people, no human figures, no faces and no statues anywhere; no animals. No readable words, no legible writing, no captions, no logos and no painted numbers on any wall, sign, board, ledger page or label. The image is SHARP: no motion blur and no smeared or doubled detail anywhere. No electric strip lights and no computers or screens. It is daytime: no night sky through any opening. No cloud sea and no clouds below the mountain through any window or door. EXACTLY ONE measuring engine and ONE fire, in the grate. EXACTLY TWO ways out: the open door on the left and the steps right of centre; no stair through the ceiling. Shot on a full-frame DSLR at 24mm, f/8, bright, even morning daylight from a tall window ahead, soft and shadowless, the brass catching the light, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into the plain whitewashed stone wall of the measuring room close behind the viewer, with no visible seam, join, or repetition.",
-        "specBuild": "43549d22f765d3c0fdd8"
-      }
+        "specBuild": "43549d22f765d3c0fdd8",
+        "seam": {
+          "stage": "screened",
+          "band": "ground",
+          "ratio": 1.26,
+          "delta": 2.43,
+          "needsWork": false,
+          "accepted": false,
+          "seamBandRun": 0.007,
+          "seamStepRatio": 0.0,
+          "at": "2026-11-19T20:02:17"
+        }
+      },
+      "panorama": "measuring_engine/scene.png",
+      "builtFrom": "l1_measuring_engine_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "hotspots": [
+        {
+          "id": "back_to_the_plate_store",
+          "type": "door",
+          "label": "Back to the plate store",
+          "box": [
+            0.1805,
+            0.3325,
+            0.2005,
+            0.7671
+          ],
+          "direction": "back",
+          "to": "plate_store"
+        },
+        {
+          "id": "the_measuring_engine",
+          "type": "station",
+          "label": "The measuring engine",
+          "box": [
+            0.4157,
+            0.5046,
+            0.5847,
+            0.7344
+          ],
+          "tier": 2,
+          "track": "day2"
+        },
+        {
+          "id": "the_steps_up_to_the_dome",
+          "type": "door",
+          "label": "The steps up to the dome",
+          "box": [
+            0.5997,
+            0.4703,
+            0.6997,
+            0.7065
+          ],
+          "direction": "open",
+          "to": "dome"
+        }
+      ]
     },
     {
       "key": "dome",
       "title": "The dome",
-      "built": false,
+      "built": true,
       "unlockedWhen": true,
       "designNote": "LEVEL 3, day-two track: the furthest, up the steps into the dome. No puzzle content here.",
       "plannedHotspots": [
@@ -25809,13 +26341,27 @@
           "type": "door",
           "direction": "back",
           "to": "measuring_engine",
-          "label": "The steps down to the measuring room"
+          "label": "The steps down to the measuring room",
+          "box": [
+            0.3226,
+            0.5406,
+            0.3526,
+            0.6206
+          ],
+          "boxSource": "draft:skeleton"
         },
         {
           "type": "station",
           "tier": 3,
           "label": "The great telescope",
-          "track": "day2"
+          "track": "day2",
+          "box": [
+            0.4383,
+            0.0499,
+            0.562,
+            0.6485
+          ],
+          "boxSource": "draft:skeleton"
         }
       ],
       "authoring": {
@@ -25937,8 +26483,56 @@
           "motionClosing": "Only the hanging lamp sways; everything else stays exactly where it is."
         },
         "scenePrompt": "This is a seamless 360-degree panorama from inside the round dome of an old mountain-top observatory in late-morning light, the great telescope of dark green-painted iron and brass on its pier under the dome. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the dome's plain curved whitewashed wall close behind the viewer: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: the dome's plain curved whitewashed wall close by, joining its other half cleanly at the seam directly behind you; left of centre, a few strides off at the foot of the curved wall, the dome's wooden floor running level to a stone landing at the head of a short flight of worn stone steps, which drop DOWN out of sight through an opening in the floor between two short posts in a low iron balustrade, toward the measuring room below; dead ahead in the centre, a few strides ahead, the great telescope: a long tube of dark green-painted iron and brass on a massive iron mounting on a round stone pier, its lower end fitted with a brass plate holder, a wooden observing chair beside it; right of centre, hanging from the dome's ironwork on a long flex near the pier, an unlit enamel work lamp, low over the floor, the hanging lamp swaying slightly on its flex; on the far right, the right half of the calm view directly behind the viewer: the dome's plain curved whitewashed wall close by, joining its other half cleanly at the seam directly behind you. A tall, round, shadowy dome, one beam of sun on old brass; an old mountain-top astronomical observatory: pale cut stone walls, whitewashed plaster, dark polished oak, worn brass, cast iron painted dark green, glass plates in paper sleeves, morning sunlight on stone; photorealistic, fine natural film grain. No people, no human figures, no faces and no statues anywhere; no animals. No readable words, no legible writing, no captions, no logos and no painted numbers on any wall, sign, board, ledger page or label. The image is SHARP: no motion blur and no smeared or doubled detail anywhere. No electric strip lights and no computers or screens. It is daytime: no night sky through any opening. No cloud sea and no clouds below the mountain through any window or door. EXACTLY ONE telescope and ONE shutter slit. EXACTLY ONE way out: the steps down left of centre. Shot on a full-frame DSLR at 24mm, f/8, late morning: a broad bar of blue daylight through the open shutter slit overhead and a single beam of sunlight falling across the telescope and the floor, the rest of the dome in deep soft shade, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into the dome's plain curved whitewashed wall close behind the viewer, with no visible seam, join, or repetition.",
-        "specBuild": "1cc61caec08b185d25fb"
-      }
+        "specBuild": "1cc61caec08b185d25fb",
+        "seam": {
+          "stage": "blurred",
+          "band": "sky",
+          "ratio": 0.0,
+          "delta": 0.0,
+          "needsWork": false,
+          "accepted": false,
+          "seamBandRun": 0.0,
+          "seamStepRatio": 0.0,
+          "at": "2026-11-19T20:27:42"
+        }
+      },
+      "panorama": "dome/scene.png",
+      "builtFrom": "l1_dome_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "hotspots": [
+        {
+          "id": "the_steps_down_to_the_measuring_room",
+          "type": "door",
+          "label": "The steps down to the measuring room",
+          "box": [
+            0.3226,
+            0.5406,
+            0.3526,
+            0.6206
+          ],
+          "direction": "back",
+          "to": "measuring_engine"
+        },
+        {
+          "id": "the_great_telescope",
+          "type": "station",
+          "label": "The great telescope",
+          "box": [
+            0.4383,
+            0.0499,
+            0.562,
+            0.6485
+          ],
+          "tier": 3,
+          "track": "day2"
+        }
+      ]
     }
   ]
 }
