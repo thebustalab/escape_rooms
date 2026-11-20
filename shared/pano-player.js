@@ -85,35 +85,35 @@
 // A bare `./variant_resolve.js` import is NOT refreshed by bumping the <script> tag's ?v, so a changed
 // helper module (e.g. a new export) leaves browsers on a stale cached copy → "doesn't provide an export
 // named X" SyntaxError → blank page (the 2026-08-05 airship regression). Bump all three together.
-import { WebRConsole } from "./webr-console.js?v=178";
-import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers, pickTransit } from "./variant_resolve.js?v=178";   // Phase 3: per-hotspot state variants; monorail switch-door nav
-import * as PQ from "./puzzle_queue.js?v=178";   // dynamic puzzle queue: location-independent puzzle serving
-import * as CP from "./corr_panel.js?v=178";   // lower-triangle layout of the grid gate (clouds correlation panel)
-import { particleCount } from "./particles.js?v=178";
-import { mountLandingBackdrop } from "./landing_backdrop.js?v=178";   // landing text over a pan of the first room's clip   // ambient-particle vocabulary + per-kind field density
-import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=178";
-import { condHolds } from "./cond.js?v=178";
-import { gridMatches } from "./grid_check.js?v=178";   // grid answer check; `partition:true` accepts any relabelling of the buckets   // ledger + elevation-map card DOM
-import * as LIVE from "./live_session.js?v=178";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
-import * as RIDE from "./ride.js?v=178";
-import { mountPcaPlate } from "./pca_plate.js?v=178";   // the PCA plate instrument (voyage beach)
-import { mountFishBoard } from "./fish_board.js?v=178";   // the fish board instrument (harbour berth)
-import { mountDrawdown } from "./drawdown.js?v=178";
-import { mountTide } from "./tide_machine.js?v=178";   // the tide machine instrument (dunes escape)
-import { mountVarianceMeter } from "./variance_meter.js?v=178";   // the variance meter instrument (anova cellars escape)
-import { mountAnovaInstrument } from "./anova_instrument.js?v=178";   // the ANOVA instrument (Fisher's board, anova rooms; also the book, ch.12b)
-import { mountPermanovaInstrument } from "./permanova_instrument.js?v=178";   // its PERMANOVA sibling: the board's optional second tab
-import { mountGhostLines } from "./ghost_lines.js?v=178";   // the ghost-line board instrument (regression pits hub)
-import { mount as mountDatasetExplorer } from "./dataset_explorer.js?v=178";   // a dataset's STRUCTURE (instrument kind + the graded rooms' chip)
-import { mount as mountSigmoidBoard } from "./sigmoid_board.js?v=178";   // the S-curve board (classification day one, toy data)
-import { mount as mountScoreboard } from "./scoreboard.js?v=178";   // the scoreboard (classification day two, toy data)
+import { WebRConsole } from "./webr-console.js?v=179";
+import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers, pickTransit } from "./variant_resolve.js?v=179";   // Phase 3: per-hotspot state variants; monorail switch-door nav
+import * as PQ from "./puzzle_queue.js?v=179";   // dynamic puzzle queue: location-independent puzzle serving
+import * as CP from "./corr_panel.js?v=179";   // lower-triangle layout of the grid gate (clouds correlation panel)
+import { particleCount } from "./particles.js?v=179";
+import { mountLandingBackdrop } from "./landing_backdrop.js?v=179";   // landing text over a pan of the first room's clip   // ambient-particle vocabulary + per-kind field density
+import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=179";
+import { condHolds, lockedMessage } from "./cond.js?v=179";
+import { gridMatches } from "./grid_check.js?v=179";   // grid answer check; `partition:true` accepts any relabelling of the buckets   // ledger + elevation-map card DOM
+import * as LIVE from "./live_session.js?v=179";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
+import * as RIDE from "./ride.js?v=179";
+import { mountPcaPlate } from "./pca_plate.js?v=179";   // the PCA plate instrument (voyage beach)
+import { mountFishBoard } from "./fish_board.js?v=179";   // the fish board instrument (harbour berth)
+import { mountDrawdown } from "./drawdown.js?v=179";
+import { mountTide } from "./tide_machine.js?v=179";   // the tide machine instrument (dunes escape)
+import { mountVarianceMeter } from "./variance_meter.js?v=179";   // the variance meter instrument (anova cellars escape)
+import { mountAnovaInstrument } from "./anova_instrument.js?v=179";   // the ANOVA instrument (Fisher's board, anova rooms; also the book, ch.12b)
+import { mountPermanovaInstrument } from "./permanova_instrument.js?v=179";   // its PERMANOVA sibling: the board's optional second tab
+import { mountGhostLines } from "./ghost_lines.js?v=179";   // the ghost-line board instrument (regression pits hub)
+import { mount as mountDatasetExplorer } from "./dataset_explorer.js?v=179";   // a dataset's STRUCTURE (instrument kind + the graded rooms' chip)
+import { mount as mountSigmoidBoard } from "./sigmoid_board.js?v=179";   // the S-curve board (classification day one, toy data)
+import { mount as mountScoreboard } from "./scoreboard.js?v=179";   // the scoreboard (classification day two, toy data)
    // the drawdown board instrument (diamonds escape)   // THE RIDE (subway): express lever + clip-sequence planner
-import * as BELL from "./bell_pull.js?v=178";
-import * as TCOUNT from "./transit_counter.js?v=178";   // the date plaque over a flat door transit (dunes time-skip)
-import * as DATEB from "./date_board.js?v=178";   // date lock: lock mode:"date", two slide-levers (dunes departure board)
-import * as INVY from "./inventory.js?v=178";   // carried items + the door that asks which to use (dunes)   // bell-pull (#16): dial mode:"pull" + lock mode:"state" (spa belfry)
-import { entryYaw } from "./entry_facing.js?v=178";   // face the way out on entering a room (every scenario)
-import * as HINTS from "./escape_hints.js?v=178";   // escape-phase Hint chip: time-unlocked tiers (SCENARIO.escapeHints)
+import * as BELL from "./bell_pull.js?v=179";
+import * as TCOUNT from "./transit_counter.js?v=179";   // the date plaque over a flat door transit (dunes time-skip)
+import * as DATEB from "./date_board.js?v=179";   // date lock: lock mode:"date", two slide-levers (dunes departure board)
+import * as INVY from "./inventory.js?v=179";   // carried items + the door that asks which to use (dunes)   // bell-pull (#16): dial mode:"pull" + lock mode:"state" (spa belfry)
+import { entryYaw } from "./entry_facing.js?v=179";   // face the way out on entering a room (every scenario)
+import * as HINTS from "./escape_hints.js?v=179";   // escape-phase Hint chip: time-unlocked tiers (SCENARIO.escapeHints)
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 
@@ -1163,6 +1163,9 @@ function analysisComplete() {
 // First consumer: hierarchical_clustering/canyon ("The Confluence"). Browser-tested 2026-07-26 via
 // Playwright (headless Chromium): a synthetic maze exercised open-door nav, availableWhen+lockedBody on
 // puzzle AND lock, onPickup→counter, and the {gte} gate — 8/8; alaska+henges still boot clean (no regression).
+// The "not yet" line for a gated hotspot: its first matching `lockedBodies` entry, else `lockedBody` (shared/cond.js).
+const lockedText = (h, fallback) => lockedMessage(h, { solved: solvedRooms, state: gameState }, fallback);
+
 function condOK(cond) {
   // Thin wrapper over the pure evaluator in shared/cond.js — the grammar (and why `all`/`any` exist)
   // is documented there, and tests/cond.test.mjs pins it. Kept as a wrapper so every existing call
@@ -2508,12 +2511,12 @@ function handleDoor(h) {
     if (isTestPlay()) toast("Test-play: locked door bypassed.");
     else if (INVY.itemLocked(INV, room.key, h) && doorIsOpen(h, room, true)) return openItemDoor(h);
     else if (h.availableWhen != null && !condOK(h.availableWhen))
-      return toast(h.lockedBody || "Not yet — something else must be done first.");  // diegetic cross-room gate (e.g. too queasy to climb)
+      return toast(lockedText(h, "Not yet — something else must be done first."));  // diegetic cross-room gate (e.g. too queasy to climb)
     // A `requires` door may also carry a `lockedBody` (2026-09-26): its gate can be something other
     // than this room's own puzzle — heist's handshake doors wait on a token the PARTNER speaks — and
     // the generic "solve the puzzle first" is then simply wrong. Falls through to the generic line
     // when no lockedBody is authored, so every existing door reads exactly as it did.
-    else return toast(h.lockedBody || ((SCENARIO.stonePortals && portalAwakened(room))
+    else return toast(lockedText(h, null) || ((SCENARIO.stonePortals && portalAwakened(room))
       ? "The portal is awake, but sealed — key the stones to open it."
       : "The door won't budge — solve the puzzle first."));
   }
@@ -3225,7 +3228,7 @@ function unmountConsole() { $("#console-holder").appendChild($("#console-block")
 function openLocked(h) {
   const d = document.createElement("div");
   const p = document.createElement("p");
-  p.innerHTML = h.lockedBody || "Not yet — something else must be done first.";
+  p.innerHTML = lockedText(h, "Not yet — something else must be done first.");
   d.appendChild(p);
   if (isTestPlay()) p.textContent = h.lockedBody || "";       // raw source, so an HTML edit round-trips
   tpEditable(p, () => h.lockedBody || "", v => { h.lockedBody = v; return tpSaveRoom(room); });
@@ -5124,6 +5127,53 @@ function buildLockCard(h, onSolved) {
                           `color:#b9a988;margin-bottom:8px">${escHtml(ref.caption)}</div>` : "") +
            rows + `</div>`;
   })();
+  /*
+   * Optional `face` (2026-11-20, glasshouses time lock): the lock drawn as a picture, its
+   * `reference` rows engraved on a plate and the code shown on wheels painted in the image.
+   * Schema: face: { image, plate:[x0,y0,x1,y1], wheels:[[x0,y0,x1,y1], …] } — fractions of the image.
+   * The real input stays `#lockInput` (one field, so every keypad test still drives it), laid
+   * transparent over the wheel window; the wheels mirror its characters one per wheel.
+   */
+  const face = h.face && h.face.image && Array.isArray(h.face.wheels) && h.face.wheels.length ? h.face : null;
+  if (face) {
+    const pct = b => `left:${b[0] * 100}%;top:${b[1] * 100}%;width:${(b[2] - b[0]) * 100}%;height:${(b[3] - b[1]) * 100}%`;
+    const ws = face.wheels;
+    const win = [Math.min(...ws.map(b => b[0])), Math.min(...ws.map(b => b[1])),
+                 Math.max(...ws.map(b => b[2])), Math.max(...ws.map(b => b[3]))];
+    const rows = (h.reference && Array.isArray(h.reference.rows)) ? h.reference.rows : [];
+    const plate = face.plate && rows.length
+      ? `<div class="lockface-plate" style="position:absolute;${pct(face.plate)};display:flex;flex-direction:column;` +
+        `justify-content:center;padding:2.2cqw 3.2cqw;box-sizing:border-box;text-align:center;` +
+        `font:600 3.5cqw/1.32 Georgia,'Times New Roman',serif;color:#3b2a10;` +
+        `text-shadow:0 1px 0 rgba(255,236,190,.55),0 -1px 0 rgba(40,25,5,.35)">` +
+        rows.map(r => `<div>${escHtml(r.label)}</div>`).join("") + `</div>`
+      : "";
+    const wheels = ws.map((b, i) =>
+      `<div class="lockface-wheel" data-i="${i}" style="position:absolute;${pct(b)};display:flex;align-items:center;` +
+      `justify-content:center;font:700 11cqw/1 Georgia,'Times New Roman',serif;color:#2a1c08;` +
+      `text-shadow:0 1px 0 rgba(255,255,255,.45);border-radius:1.2cqw;transition:box-shadow .15s"></div>`).join("");
+    card.innerHTML =
+      `<div class="lockface" style="position:relative;container-type:inline-size;width:min(440px,100%);margin:0 auto 12px">` +
+      `<img src="${escHtml(face.image)}" alt="${escHtml(h.label || "Lock")}" draggable="false" ` +
+      `style="display:block;width:100%;height:auto;border-radius:10px;border:1px solid rgba(201,163,90,.45)">` +
+      plate + wheels +
+      `<input id="lockInput" maxlength="${len}" autocomplete="off" spellcheck="false" inputmode="${/^\d+$/.test(target) ? "numeric" : "text"}" ` +
+      `aria-label="${escHtml(h.label || "Lock")}" style="position:absolute;${pct(win)};opacity:0;cursor:pointer;` +
+      `border:0;padding:0;margin:0;font-size:16px;background:transparent">` +
+      `</div>
+     <div class="qfeedback"></div>
+     <button class="qsubmit">Enter</button>`;
+    const inp = card.querySelector("#lockInput"), wEls = [...card.querySelectorAll(".lockface-wheel")];
+    const paint = () => {
+      const v = (inp.value || "").toUpperCase(), act = document.activeElement === inp && !inp.disabled;
+      wEls.forEach((el, i) => {
+        el.textContent = v[i] || "";
+        el.style.boxShadow = act && i === Math.min(v.length, wEls.length - 1) ? "inset 0 0 0 2px rgba(255,170,60,.85)" : "none";
+      });
+    };
+    ["input", "focus", "blur", "keyup"].forEach(ev => inp.addEventListener(ev, paint));
+    card.querySelector(".lockface").addEventListener("click", () => inp.focus());
+  } else
   // Deliberately NO prompt text — the absence of instructions IS the puzzle (Myst/Riven ethos).
   card.innerHTML =
     refHtml +

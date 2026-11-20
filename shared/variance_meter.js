@@ -15,13 +15,13 @@
 // the geometry's regions place the parts over it; without it a plain panel is drawn (the prototype look).
 //
 //   const m = mountVarianceMeter(hostEl, { geometry, config, art?, pegs?, onPegs?(switches), sound?, debug?,
-//                                          params: { utility: "amps"|"gallons", powered?: bool } });
+//                                          params: { utility: "amps"|"gallons", powered?: bool, deadNote?: string } });
 //   config = rooms/anova/cellars/data/switchboard.json: { mark, rooms:[{name, amps, gallons, wing, ...}] }
 //   geometry (all optional): { imageW, imageH, title, unit, vMax, fullScale, defaultBy, rails:{x0,x1,top,bot},
 //                              switchY, dials:[{cx,cy,r}x3] }
 //   m.setSwitches([bool x8]); m.switches(); m.measure(); m.isSettled(); m.isOver(); m.ready (Promise); m.destroy();
 //   canvas.varianceMeter exposes the same API for tests.
-import { measure } from "./variance_math.js?v=178";
+import { measure } from "./variance_math.js?v=179";
 
 const DEFAULTS = {
   amps:    { title: "ELECTRICAL SWITCHBOARD", unit: "AMPERES", vMax: 12, fullScale: 25 },
@@ -189,7 +189,8 @@ export function mountVarianceMeter(host, opts = {}) {
     dial(DIALS[1], needles[1].a, "NOISE", "distance from each room\nto its group's average");
     halo(DIALS[2], glow);
     dial(DIALS[2], needles[2].a, "SHARE EXPLAINED", "share of variation explained\nby the grouping\nbetween / (between + noise)", MARK);
-    if (!powered) engrave("The board is dead: no current reaches the meters.", W / 2, 432, "italic 20px Georgia", "center", "#cbb68a");
+    // `params.deadNote` (glasshouses, 2026-11-20): the in-world line on an unpowered board, so it can say what restores it
+    if (!powered) engrave(P.deadNote || "The board is dead: no current reaches the meters.", W / 2, 432, "italic 20px Georgia", "center", "#cbb68a");
 
     engrave(G.unit, RAILS.x0 - 70, RAILS.top - 24, "bold 15px Georgia", "left", "#cbb68a");
     if (powered) {                                         // the whole building's average

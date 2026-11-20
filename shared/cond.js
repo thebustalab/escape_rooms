@@ -45,3 +45,15 @@ export function condHolds(cond, ctx) {
   }
   return false;
 }
+
+// WHICH "NOT YET" MESSAGE (Lucas, 2026-11-20, glasshouses): a gate shut for more than one reason should say the
+// reason that applies NOW, in world. `lockedBodies: [{when, body}, ...]` is read in order and the first entry whose
+// `when` holds wins; otherwise the plain `lockedBody`, otherwise the caller's generic line. Glasshouses' time lock
+// waits on the boss AND the house power: with the power off it says the power must be restored, not "finish the
+// pots". Pinned by tests/cond.test.mjs.
+export function lockedMessage(h, ctx, fallback) {
+  for (const e of (h && Array.isArray(h.lockedBodies) ? h.lockedBodies : [])) {
+    if (e && typeof e.body === "string" && condHolds(e.when, ctx)) return e.body;
+  }
+  return (h && h.lockedBody) || fallback;
+}

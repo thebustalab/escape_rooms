@@ -22,8 +22,8 @@
 //   b.setTab("lines"|"curve"|"cutoff"); b.tab(); b.curve(); b.setCurve({middle, steepness}); b.bestFit({instant});
 //   b.best(); b.pick(day|null); b.picked(); b.probability(day); b.setCutoff(c); b.cutoff(); b.calls(); b.changed();
 //   b.setProbe(x); b.lineAt(x); b.ready; b.destroy().   The root element carries the API as `.sigmoidBoard` for tests.
-import { LANDING, olsLine, fitLogistic, curveFromCoef, probAt, fitScore, callAt } from "./classification_math.js?v=178";
-import { shell, svgEl, el, button, slider, svgPoint, fmt2 } from "./classification_ui.js?v=178";
+import { LANDING, olsLine, fitLogistic, curveFromCoef, probAt, fitScore, callAt } from "./classification_math.js?v=179";
+import { shell, svgEl, el, button, slider, svgPoint, fmt2 } from "./classification_ui.js?v=179";
 
 const TABS = [["lines", "From numbers to categories"], ["curve", "A model from one predictor"], ["cutoff", "Predicting held-back cases"]];
 // Each tab's takeaway in the chapter's own wording (12d_classification.Rmd), and the section it belongs to.
