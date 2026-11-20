@@ -284,7 +284,7 @@
       "sfx": [
         {
           "src": "audio/stair_foot_bed_gully_lapping.mp3",
-          "volume": 0.163,
+          "volume": 0.04,
           "mode": "loop",
           "crossfade": 4,
           "needsReplacement": true
@@ -330,13 +330,42 @@
             0.229
           ],
           "boxSource": "review:agent-vision",
-          "boxNote": "Hand-set 2026-11-04 on the round wall dial above the front doorcase (the placer had it on bare wall)."
+          "boxNote": "Hand-set 2026-11-04 on the round wall dial above the front doorcase (the placer had it on bare wall).",
+          "image": "clues/hall_dial_dark.jpg",
+          "shownWhen": {
+            "not": {
+              "eq": [
+                "house_power",
+                true
+              ]
+            }
+          }
+        },
+        {
+          "type": "clue",
+          "label": "The hall dial, lights on",
+          "note": "The lit twin of the_hall_dial (same box): its close-up reads 7:00, the dark one 6:30 (notes.md, the clock proof).",
+          "body": "An electric slave dial, one of a dozen through the house. It moves only when the master clock sends it a pulse.",
+          "box": [
+            0.322,
+            0.165,
+            0.346,
+            0.229
+          ],
+          "boxSource": "review:agent-vision",
+          "boxNote": "Hand-set 2026-11-04 on the round wall dial above the front doorcase (the placer had it on bare wall).",
+          "image": "clues/hall_dial_lit.jpg",
+          "shownWhen": {
+            "eq": [
+              "house_power",
+              true
+            ]
+          }
         },
         {
           "type": "clue",
           "label": "The train timetable",
           "note": "The London train's departure (after 9:15). Deadline only; no current time anywhere.",
-          "body": "Saturdays: the London train leaves Harpenden at 9:45.",
           "box": [
             0.25,
             0.38,
@@ -344,7 +373,9 @@
             0.485
           ],
           "boxSource": "review:agent-vision",
-          "boxNote": "measured by eye on a gridded crop of scene.png, 2026-11-05 (agent, for Lucas's test play)"
+          "boxNote": "measured by eye on a gridded crop of scene.png, 2026-11-05 (agent, for Lucas's test play)",
+          "alt": "Saturdays: the London train leaves Harpenden at 9:45.",
+          "image": "clues/train_timetable.jpg"
         },
         {
           "type": "dial",
@@ -670,14 +701,45 @@
           "type": "clue",
           "label": "The hall dial",
           "box": [
-            0.322,
-            0.165,
-            0.346,
-            0.229
+            0.3239,
+            0.1709,
+            0.3479,
+            0.2349
           ],
           "body": "An electric slave dial, one of a dozen through the house. It moves only when the master clock sends it a pulse.",
-          "boxSource": "review:agent-vision",
-          "boxNote": "Hand-set 2026-11-04 on the round wall dial above the front doorcase (the placer had it on bare wall)."
+          "boxSource": "moved:testplay",
+          "boxNote": "Hand-set 2026-11-04 on the round wall dial above the front doorcase (the placer had it on bare wall).",
+          "image": "clues/hall_dial_dark.jpg",
+          "shownWhen": {
+            "not": {
+              "eq": [
+                "house_power",
+                true
+              ]
+            }
+          }
+        },
+        {
+          "id": "the_hall_dial_lit",
+          "type": "clue",
+          "label": "The hall dial, lights on",
+          "box": [
+            0.3239,
+            0.1709,
+            0.3479,
+            0.2349
+          ],
+          "body": "An electric slave dial, one of a dozen through the house. It moves only when the master clock sends it a pulse.",
+          "boxSource": "moved:testplay",
+          "boxNote": "Hand-set 2026-11-04 on the round wall dial above the front doorcase (the placer had it on bare wall).",
+          "image": "clues/hall_dial_lit.jpg",
+          "shownWhen": {
+            "eq": [
+              "house_power",
+              true
+            ]
+          },
+          "note": "The lit twin of the_hall_dial (same box): its close-up reads 7:00, the dark one 6:30 (notes.md, the clock proof)."
         },
         {
           "id": "the_train_timetable",
@@ -689,9 +751,10 @@
             0.278,
             0.485
           ],
-          "body": "Saturdays: the London train leaves Harpenden at 9:45.",
           "boxSource": "review:agent-vision",
-          "boxNote": "measured by eye on a gridded crop of scene.png, 2026-11-05 (agent, for Lucas's test play)"
+          "boxNote": "measured by eye on a gridded crop of scene.png, 2026-11-05 (agent, for Lucas's test play)",
+          "alt": "Saturdays: the London train leaves Harpenden at 9:45.",
+          "image": "clues/train_timetable.jpg"
         },
         {
           "id": "the_main_switch",
@@ -877,8 +940,7 @@
           "type": "puzzle",
           "label": "The pot-trial draft",
           "form": "check",
-          "note": "R1. Answer share 0.200. Gives the potting-shed key.",
-          "gives": "shed_key",
+          "note": "R1. Answer share 0.200. Solving reveals the potting-shed key on the desk (the_shed_key), taken by hand.",
           "starterCode": "pot_trial",
           "check": {
             "prompt": "The report you have to take to London opens with how much the watering mattered to the barley. Using <code>pot_trial</code>, find the <code>share</code> of the variation in <code>grain_weight</code> that <code>watering</code> explains, and assign it to <code>answer</code> as a number.",
@@ -912,6 +974,21 @@
           "boxNote": "measured by eye on a gridded crop of scene.png, 2026-11-05 (agent, for Lucas's test play)"
         },
         {
+          "id": "the_shed_key",
+          "type": "clue",
+          "label": "The potting-shed key",
+          "image": "items/shed_key.png",
+          "body": "Under the Director's draft, where the papers were weighted down, lies a heavy iron key on a loop of garden twine: the key to the potting shed.",
+          "gives": "shed_key",
+          "shownWhen": {
+            "solved": "study"
+          },
+          "availableWhen": {
+            "solved": "study"
+          },
+          "note": "Appears only once R1 is solved; the player takes it (items are always picked up, never granted by a gate)."
+        },
+        {
           "type": "clue",
           "label": "The mantel clock",
           "note": "Every clock gets a close-up (notes §4). Wind-up, run down at 11:40; pendulum still.",
@@ -923,13 +1000,13 @@
             0.37
           ],
           "boxSource": "review:agent-vision",
-          "boxNote": "measured by eye on a gridded crop of scene.png, 2026-11-05 (agent, for Lucas's test play)"
+          "boxNote": "measured by eye on a gridded crop of scene.png, 2026-11-05 (agent, for Lucas's test play)",
+          "image": "clues/mantel_clock.jpg"
         },
         {
           "type": "clue",
           "label": "The duty roster",
           "note": "Whose job it is to wind the mantel clock, and the note that they left early. Legible.",
-          "body": "Weekend duties. Wind the study clock: Mr. Pearce. Underneath, in pencil: \"Pearce left early for the weekend.\"",
           "box": [
             0.259,
             0.425,
@@ -937,7 +1014,9 @@
             0.498
           ],
           "boxSource": "review:agent-vision",
-          "boxNote": "measured by eye on a gridded crop of scene.png, 2026-11-05 (agent, for Lucas's test play)"
+          "boxNote": "measured by eye on a gridded crop of scene.png, 2026-11-05 (agent, for Lucas's test play)",
+          "alt": "Weekend duties. Wind the study clock: Mr. Pearce. Underneath, in pencil: \"Pearce left early for the weekend.\"",
+          "image": "clues/duty_roster.jpg"
         },
         {
           "type": "clue",
@@ -1230,7 +1309,6 @@
             0.635
           ],
           "form": "check",
-          "gives": "shed_key",
           "starterCode": "pot_trial",
           "check": {
             "prompt": "The report you have to take to London opens with how much the watering mattered to the barley. Using <code>pot_trial</code>, find the <code>share</code> of the variation in <code>grain_weight</code> that <code>watering</code> explains, and assign it to <code>answer</code> as a number.",
@@ -1258,6 +1336,28 @@
           "boxNote": "measured by eye on a gridded crop of scene.png, 2026-11-05 (agent, for Lucas's test play)"
         },
         {
+          "id": "the_shed_key",
+          "type": "clue",
+          "label": "The potting-shed key",
+          "image": "items/shed_key.png",
+          "body": "Under the Director's draft, where the papers were weighted down, lies a heavy iron key on a loop of garden twine: the key to the potting shed.",
+          "gives": "shed_key",
+          "shownWhen": {
+            "solved": "study"
+          },
+          "availableWhen": {
+            "solved": "study"
+          },
+          "box": [
+            0.424,
+            0.6,
+            0.442,
+            0.638
+          ],
+          "boxSource": "review:agent-vision",
+          "boxNote": "Placed by eye 2026-11-19 on the bare desktop left of the draft's book stack. The key is not painted in the still; the pickup card shows items/shed_key.png."
+        },
+        {
           "id": "the_mantel_clock",
           "type": "clue",
           "label": "The mantel clock",
@@ -1269,7 +1369,8 @@
           ],
           "body": "A wind-up mantel clock. Its hands stand at twenty to twelve, and its pendulum hangs still.",
           "boxSource": "review:agent-vision",
-          "boxNote": "measured by eye on a gridded crop of scene.png, 2026-11-05 (agent, for Lucas's test play)"
+          "boxNote": "measured by eye on a gridded crop of scene.png, 2026-11-05 (agent, for Lucas's test play)",
+          "image": "clues/mantel_clock.jpg"
         },
         {
           "id": "the_duty_roster",
@@ -1281,9 +1382,10 @@
             0.276,
             0.498
           ],
-          "body": "Weekend duties. Wind the study clock: Mr. Pearce. Underneath, in pencil: \"Pearce left early for the weekend.\"",
           "boxSource": "review:agent-vision",
-          "boxNote": "measured by eye on a gridded crop of scene.png, 2026-11-05 (agent, for Lucas's test play)"
+          "boxNote": "measured by eye on a gridded crop of scene.png, 2026-11-05 (agent, for Lucas's test play)",
+          "alt": "Weekend duties. Wind the study clock: Mr. Pearce. Underneath, in pencil: \"Pearce left early for the weekend.\"",
+          "image": "clues/duty_roster.jpg"
         },
         {
           "id": "fisher_and_mackenzie_s_paper",
@@ -1908,7 +2010,8 @@
                 "joins": "The gravel path at the viewer's feet runs straight on to the door in the far garden wall, and back the other way to the step of the house's open back door."
               }
             }
-          }
+          },
+          "stillOnly": true
         },
         "scenePrompt": "This is a seamless 360-degree panorama from the gravel path in the middle of the walled back garden of an old red-brick English manor house. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the soft red brick of the house's back wall, wet, plain and unbroken, softened by fog: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. To the left, the old brick side wall of the garden running away into the fog, pear trees trained flat against it, and across the bed below them a big storm-broken bough lying where it fell, twigs and wet leaves scattered over the grass; just left of centre, the wet gravel path at the viewer's feet runs straight on to a plain plank door set in the far garden wall, SHUT, the brick of the wall a little above head height; over the top of that wall, faint in the fog, the low white-painted ridges of a range of glasshouses; dead ahead in the centre, beyond the far wall and well above it, a full storey higher than the wall, the faint brick chimney stack of the glasshouses' stoke-hole standing grey in the fog; just right of centre, kitchen-garden beds edged with box, flattened cabbages and leeks, wide puddles lying on the gravel and grass between them; to the right, standing well in from the edge of the frame, the back of the house: the half-glazed back door standing OPEN on a worn stone threshold flush with the flags of the dim back passage inside, and the same gravel path running from the viewer's feet to that threshold; to the right, beside that door on the house wall, a cast-iron downpipe from the gutter, its foot ending in a short iron shoe that runs a steady stream of last night's storm water down into the open top of a wooden water butt standing directly beneath it, the butt full and spilling over onto the gravel, the stream of water running steadily from the shoe into the butt. a kept Victorian walled kitchen garden the morning after a storm: wet gravel, box edging, old soft red brick walls, puddles, storm-broken twigs and wet leaves; pale fog hiding everything more than a garden's length away; an English agricultural research station's old red-brick manor house in the late nineteen-twenties, kept and lived in, nothing ruined: dark oak, whitewash, worn stone flags, brass, soft old red brick, beaded wet glass; the morning after a night of storm, still and foggy; photorealistic, restrained colour, fine natural film grain. EXACTLY ONE door in the far garden wall, SHUT. The glasshouses show only as faint white ridges above the far wall; no glasshouse interior and no glasshouse door is visible. No other building, no tree taller than the wall except the pear trees against it, no person, no animal, no lamp post, no sky colour but grey fog. No people, no human figures, no faces anywhere. No legible lettering, no readable writing, no captions, no text, no legible numerals on anything except the hands of a clock where one is described. Period-true: no modern fittings, no plastic, no fluorescent tubes, no modern sockets or radiators of modern design. No sunlight, no sun patches, no hard daylight shadows anywhere. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere; everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. Shot on a full-frame DSLR at 24mm, f/8, the still grey morning after a night of storm: flat, soft, shadowless light from thick pale fog, no sun and no shadows, everything beaded and dripping, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into the soft red brick of the house's back wall, wet, plain and unbroken, softened by fog, with no visible seam, join, or repetition.",
         "plateRefs": [
@@ -1973,27 +2076,6 @@
           "wrongItemBody": "That key doesn't fit the shed.",
           "boxSource": "review:agent-vision",
           "boxNote": "measured by eye on a gridded crop of scene.png, 2026-11-05 (agent, for Lucas's test play)"
-        },
-        {
-          "id": "clip_base",
-          "type": "ambient",
-          "label": "Scene motion (base)",
-          "box": [
-            0,
-            0,
-            1,
-            1
-          ],
-          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/play-source.",
-          "cinemagraph": {
-            "box": [
-              0,
-              0,
-              1,
-              1
-            ],
-            "video": "back_garden/cine_base.mp4"
-          }
         }
       ],
       "sfx": [
@@ -2921,7 +3003,7 @@
             0.43,
             0.33,
             0.505,
-            1.0
+            1
           ],
           "boxSource": "review:agent-vision",
           "boxNote": "measured by eye on a gridded crop of scene.png, 2026-11-05 (agent, for Lucas's test play)"
@@ -3373,28 +3455,28 @@
           "type": "door",
           "label": "Back to the pot-culture house",
           "box": [
-            0.7868,
-            0.18,
-            0.8492,
-            0.88
+            0.7641,
+            0.1047,
+            0.8265,
+            0.8047
           ],
           "direction": "open",
           "to": "pot_culture_house",
-          "boxSource": "draft:skeleton"
+          "boxSource": "moved:testplay"
         },
         {
           "id": "down_the_walk_to_the_far_end",
           "type": "door",
           "label": "Down the walk to the far end",
           "box": [
-            0.43,
-            0.33,
-            0.505,
-            1.0
+            0.4003,
+            0.0912,
+            0.4753,
+            0.7612
           ],
           "direction": "open",
           "to": "big_glasshouse_far",
-          "boxSource": "review:agent-vision",
+          "boxSource": "moved:testplay",
           "boxNote": "measured by eye on a gridded crop of scene.png, 2026-11-05 (agent, for Lucas's test play)"
         },
         {
@@ -3568,7 +3650,7 @@
             0.47,
             0.7,
             0.53,
-            1.0
+            1
           ],
           "boxSource": "review:agent-vision",
           "boxNote": "measured by eye on a gridded crop of scene.png, 2026-11-05 (agent, for Lucas's test play)"
@@ -4133,15 +4215,15 @@
           "type": "door",
           "label": "Back up the walk",
           "box": [
-            0.47,
-            0.7,
-            0.53,
-            1.0
+            0.935,
+            0.55,
+            0.995,
+            0.9
           ],
           "direction": "open",
           "to": "big_glasshouse_near",
           "boxSource": "review:agent-vision",
-          "boxNote": "measured by eye on a gridded crop of scene.png, 2026-11-05 (agent, for Lucas's test play)"
+          "boxNote": "Moved 2026-11-19: it sat on top of the end door (so clicking the end door walked you back). Now on the brick floor behind the viewer. The art paints a closed glass apse behind, not the walk back: interim until the room is re-rendered."
         },
         {
           "id": "clip_base",

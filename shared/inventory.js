@@ -6,9 +6,12 @@
 //
 // Authoring (all optional; a scenario that uses none of it behaves exactly as before):
 //   SCENARIO.items = { store_key: { name: "the store key", image?: "items/store_key.png" }, ... }
-//   a gate (puzzle/lock/grid/ledger) or a clue: `gives: "store_key"` (or an array). A gate grants on its
-//     first solve; a clue grants when the player takes it. A LIVE `station` may carry `gives` too: its first
-//     right answer grants it (bathhouse's library reading table → the boarding pass, 2026-11-19).
+//   a clue: `gives: "store_key"` (or an array), granted when the player presses its "Take" button. ITEMS ARE
+//     ALWAYS PICKED UP (Lucas, 2026-11-19): a puzzle's reward is a clue beside the gate with `shownWhen` and
+//     `availableWhen` {solved: <room>}, never `gives` on the gate itself. The engine still honours a gate's
+//     `gives` (first solve), but validate_assets item_wiring FAILs it, because the item lands unseen. A LIVE `station`
+//     never gives either: its `onRight` sets a flag that reveals the pickup (bathhouse's reading table →
+//     `reading_done` → the boarding pass on the table).
 //   a door: `needsItem: "store_key"` — locked until the player picks that item from the door's card.
 //     `consumes: true` takes the item away when it is used (a rope tied off at the winch); default keeps it.
 //     `useBody` (the line shown when it works), `wrongItemBody` (when the wrong thing is tried), `onUse`

@@ -85,35 +85,35 @@
 // A bare `./variant_resolve.js` import is NOT refreshed by bumping the <script> tag's ?v, so a changed
 // helper module (e.g. a new export) leaves browsers on a stale cached copy → "doesn't provide an export
 // named X" SyntaxError → blank page (the 2026-08-05 airship regression). Bump all three together.
-import { WebRConsole } from "./webr-console.js?v=177";
-import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers, pickTransit } from "./variant_resolve.js?v=177";   // Phase 3: per-hotspot state variants; monorail switch-door nav
-import * as PQ from "./puzzle_queue.js?v=177";   // dynamic puzzle queue: location-independent puzzle serving
-import * as CP from "./corr_panel.js?v=177";   // lower-triangle layout of the grid gate (clouds correlation panel)
-import { particleCount } from "./particles.js?v=177";
-import { mountLandingBackdrop } from "./landing_backdrop.js?v=177";   // landing text over a pan of the first room's clip   // ambient-particle vocabulary + per-kind field density
-import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=177";
-import { condHolds } from "./cond.js?v=177";
-import { gridMatches } from "./grid_check.js?v=177";   // grid answer check; `partition:true` accepts any relabelling of the buckets   // ledger + elevation-map card DOM
-import * as LIVE from "./live_session.js?v=177";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
-import * as RIDE from "./ride.js?v=177";
-import { mountPcaPlate } from "./pca_plate.js?v=177";   // the PCA plate instrument (voyage beach)
-import { mountFishBoard } from "./fish_board.js?v=177";   // the fish board instrument (harbour berth)
-import { mountDrawdown } from "./drawdown.js?v=177";
-import { mountTide } from "./tide_machine.js?v=177";   // the tide machine instrument (dunes escape)
-import { mountVarianceMeter } from "./variance_meter.js?v=177";   // the variance meter instrument (anova cellars escape)
-import { mountAnovaInstrument } from "./anova_instrument.js?v=177";   // the ANOVA instrument (Fisher's board, anova rooms; also the book, ch.12b)
-import { mountPermanovaInstrument } from "./permanova_instrument.js?v=177";   // its PERMANOVA sibling: the board's optional second tab
-import { mountGhostLines } from "./ghost_lines.js?v=177";   // the ghost-line board instrument (regression pits hub)
-import { mount as mountDatasetExplorer } from "./dataset_explorer.js?v=177";   // a dataset's STRUCTURE (instrument kind + the graded rooms' chip)
-import { mount as mountSigmoidBoard } from "./sigmoid_board.js?v=177";   // the S-curve board (classification day one, toy data)
-import { mount as mountScoreboard } from "./scoreboard.js?v=177";   // the scoreboard (classification day two, toy data)
+import { WebRConsole } from "./webr-console.js?v=178";
+import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers, pickTransit } from "./variant_resolve.js?v=178";   // Phase 3: per-hotspot state variants; monorail switch-door nav
+import * as PQ from "./puzzle_queue.js?v=178";   // dynamic puzzle queue: location-independent puzzle serving
+import * as CP from "./corr_panel.js?v=178";   // lower-triangle layout of the grid gate (clouds correlation panel)
+import { particleCount } from "./particles.js?v=178";
+import { mountLandingBackdrop } from "./landing_backdrop.js?v=178";   // landing text over a pan of the first room's clip   // ambient-particle vocabulary + per-kind field density
+import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=178";
+import { condHolds } from "./cond.js?v=178";
+import { gridMatches } from "./grid_check.js?v=178";   // grid answer check; `partition:true` accepts any relabelling of the buckets   // ledger + elevation-map card DOM
+import * as LIVE from "./live_session.js?v=178";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
+import * as RIDE from "./ride.js?v=178";
+import { mountPcaPlate } from "./pca_plate.js?v=178";   // the PCA plate instrument (voyage beach)
+import { mountFishBoard } from "./fish_board.js?v=178";   // the fish board instrument (harbour berth)
+import { mountDrawdown } from "./drawdown.js?v=178";
+import { mountTide } from "./tide_machine.js?v=178";   // the tide machine instrument (dunes escape)
+import { mountVarianceMeter } from "./variance_meter.js?v=178";   // the variance meter instrument (anova cellars escape)
+import { mountAnovaInstrument } from "./anova_instrument.js?v=178";   // the ANOVA instrument (Fisher's board, anova rooms; also the book, ch.12b)
+import { mountPermanovaInstrument } from "./permanova_instrument.js?v=178";   // its PERMANOVA sibling: the board's optional second tab
+import { mountGhostLines } from "./ghost_lines.js?v=178";   // the ghost-line board instrument (regression pits hub)
+import { mount as mountDatasetExplorer } from "./dataset_explorer.js?v=178";   // a dataset's STRUCTURE (instrument kind + the graded rooms' chip)
+import { mount as mountSigmoidBoard } from "./sigmoid_board.js?v=178";   // the S-curve board (classification day one, toy data)
+import { mount as mountScoreboard } from "./scoreboard.js?v=178";   // the scoreboard (classification day two, toy data)
    // the drawdown board instrument (diamonds escape)   // THE RIDE (subway): express lever + clip-sequence planner
-import * as BELL from "./bell_pull.js?v=177";
-import * as TCOUNT from "./transit_counter.js?v=177";   // the date plaque over a flat door transit (dunes time-skip)
-import * as DATEB from "./date_board.js?v=177";   // date lock: lock mode:"date", two slide-levers (dunes departure board)
-import * as INVY from "./inventory.js?v=177";   // carried items + the door that asks which to use (dunes)   // bell-pull (#16): dial mode:"pull" + lock mode:"state" (spa belfry)
-import { entryYaw } from "./entry_facing.js?v=177";   // face the way out on entering a room (every scenario)
-import * as HINTS from "./escape_hints.js?v=177";   // escape-phase Hint chip: time-unlocked tiers (SCENARIO.escapeHints)
+import * as BELL from "./bell_pull.js?v=178";
+import * as TCOUNT from "./transit_counter.js?v=178";   // the date plaque over a flat door transit (dunes time-skip)
+import * as DATEB from "./date_board.js?v=178";   // date lock: lock mode:"date", two slide-levers (dunes departure board)
+import * as INVY from "./inventory.js?v=178";   // carried items + the door that asks which to use (dunes)   // bell-pull (#16): dial mode:"pull" + lock mode:"state" (spa belfry)
+import { entryYaw } from "./entry_facing.js?v=178";   // face the way out on entering a room (every scenario)
+import * as HINTS from "./escape_hints.js?v=178";   // escape-phase Hint chip: time-unlocked tiers (SCENARIO.escapeHints)
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 
@@ -3248,8 +3248,11 @@ function openLocked(h) {
 
 function openClue(h) {
   const d = document.createElement("div");
-  // a clue may carry an `image` (path rel. to play.html — a generated artwork), shown above the body
-  const img = h.image ? `<img src="${h.image}" alt="" style="max-width:50%;display:block;margin:0 auto 8px;border-radius:8px">` : "";
+  // a clue may carry an `image` (path rel. to play.html — a generated artwork), shown above the body. An IMAGE-ONLY
+  // clue (no body: the picture IS the clue, e.g. glasshouses' duty roster and timetable, Lucas 2026-11-19) shows it
+  // large; `alt` carries its words for screen readers and for the tests that pin the facts it shows.
+  const imgW = h.body ? "50%" : "92%";
+  const img = h.image ? `<img src="${h.image}" alt="${escHtml(h.alt || "")}" style="max-width:${imgW};display:block;margin:0 auto 8px;border-radius:8px">` : "";
   d.innerHTML = img;
   // clue body as its own element so test-play can make it editable (persists back to the room's hotspots)
   const bodyEl = document.createElement("p");
@@ -4810,10 +4813,16 @@ async function openStation(h) {
         const a = await LIVE.answer(d.deal_id, choice).catch(() => null);
         if (!a) return { error: "Can't reach the class session. Close this and try the station again." };
         if (!a.ok) return { error: a.j.error || "That task has expired. Close this and try the station again." };
-        // A station may also hand over a carried ITEM on a right answer (`gives`, shared/inventory.js): bathhouse's
-        // library reading table gives the boarding pass the gangplank door asks for (2026-11-19). Client-side and
-        // session-only like every carried item; never twice.
-        const gotItems = a.j.correct && h.gives ? INVY.grantItems(INV, h.gives, gameState) : [];
+        // A station's right answer may change the WORLD (`onRight`, the {set,to}/{inc} grammar of onSolve): bathhouse's
+        // reading table sets `reading_done`, which reveals the boarding pass on the table as a pickup clue. A station
+        // never hands an item over itself: items are always picked up (Lucas, 2026-11-19; validate_assets
+        // item_wiring). Applied on the first right answer only, then the room re-renders so the pickup appears.
+        const rightKey = gateKey(room.key, "onRight:" + (h.id || h.label || ""));
+        if (a.j.correct && h.onRight && !pickedClues.has(rightKey)) {
+          pickedClues.add(rightKey);
+          applyEffects(Array.isArray(h.onRight) ? h.onRight : [h.onRight]);
+          rerenderCurrentRoom();
+        }
         if (a.j.correct && a.j.direct) {    // the lantern chest: straight into the class total, never carried
           const st = LIVE.state(), unit = (st && st.unit) || ["load", "loads"];   // the pool's words, else ours
           a.j.feedback = a.j.feedback || (a.j.direct + " " + (a.j.direct === 1 ? unit[0] : unit[1]) +
@@ -4836,8 +4845,6 @@ async function openStation(h) {
             (room ? " (you can hold " + cap + "). Solve another, or take " + them + " to " + dest + "."
                   : ". Take " + them + " to " + dest + ".");
         }
-        if (gotItems.length) a.j.feedback = (a.j.feedback ? a.j.feedback + " " : "Right! ") + "You also get " +
-          gotItems.map(k => INVY.itemInfo(SCENARIO, k).name).join(" and ") + ".";
         return a.j;
   };
   // SOLO ONLY: a "Show me" button for the worked answer (LIVE.canReveal is false in a class session)

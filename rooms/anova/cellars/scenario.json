@@ -2,7 +2,7 @@
   "chapter": "anova",
   "scenario": "cellars",
   "id": 28,
-  "status": "in_development",
+  "status": "ready",
   "doorLabels": true,
   "playerMapArt": "map/map.json?v=81029cda84",
   "_designNotes": "Step-2 state (2026-11-01, session ANOVA): locked escape (escapeBrief), verified graded ladder in notes.md §5, data in data/. title/subtitle/story/enterLabel are STEP-2 DRAFTS, to be locked at step 3b (escape_room_geography). No rooms, no art; enterButtons land at step 4a. Step 3a (blueprint) in progress 2026-11-01: logline 'Shut In' chosen (notes.md §9). Step 3b (geography) DONE 2026-11-01 and LOCKED: shared world in ../places_brief.md; world skeleton cellars/_scratch/world_skeleton/world.py; accepted aerials cellars/world_plates/master/ (master_sw = fog_in_bands, from_north); landing text vetted (.vetted_story.txt); coverPrompt and worldPlatePrompt authored. Next: step 4a escape_room_network.",
@@ -464,16 +464,14 @@
           "src": "audio/entrance_hall_bed_house_hush.mp3",
           "volume": 0.054,
           "mode": "loop",
-          "crossfade": 4,
-          "needsReplacement": true
+          "crossfade": 4
         },
         {
           "src": "audio/entrance_hall_shot_floor_creak.mp3",
           "volume": 0.15,
           "mode": "interval",
           "gapMin": 18,
-          "gapMax": 40,
-          "needsReplacement": true
+          "gapMax": 40
         }
       ]
     },
@@ -521,8 +519,7 @@
           "boxSource": "draft:skeleton",
           "solveSfx": {
             "src": "audio/solve_drawing_room_the_weighing_book_book_close.mp3",
-            "volume": 0.077,
-            "needsReplacement": true
+            "volume": 0.077
           }
         },
         {
@@ -787,8 +784,7 @@
           "boxSource": "draft:skeleton",
           "solveSfx": {
             "src": "audio/solve_drawing_room_the_weighing_book_book_close.mp3",
-            "volume": 0.077,
-            "needsReplacement": true
+            "volume": 0.077
           }
         },
         {
@@ -899,16 +895,14 @@
           "src": "audio/drawing_room_bed_fire_close.mp3",
           "volume": 0.077,
           "mode": "loop",
-          "crossfade": 4,
-          "needsReplacement": true
+          "crossfade": 4
         },
         {
           "src": "audio/drawing_room_shot_coal_pop.mp3",
           "volume": 0.15,
           "mode": "interval",
           "gapMin": 12,
-          "gapMax": 30,
-          "needsReplacement": true
+          "gapMax": 30
         }
       ]
     },
@@ -956,8 +950,7 @@
           "boxSource": "draft:skeleton",
           "solveSfx": {
             "src": "audio/solve_kitchen_the_director_s_draft_key_latch.mp3",
-            "volume": 0.1,
-            "needsReplacement": true
+            "volume": 0.1
           }
         },
         {
@@ -993,12 +986,109 @@
           "availableWhen": {
             "solved": "kitchen"
           },
-          "body": "<p>A card in the Clerk of Works' hand: <i>Ways the eight rooms on the boards could be split in two.</i></p><ul style=\"margin:6px 0 0 18px;padding:0\"><li><b>A. By floor:</b> Library, Drawing room, Laboratory, Kitchen <i>against</i> Archive vault, Seed store, Boiler room, Wash-house</li><li><b>B. West end and east end:</b> Library, Drawing room, Laboratory, Archive vault <i>against</i> Kitchen, Seed store, Boiler room, Wash-house</li><li><b>C. Wet rooms and dry rooms:</b> Laboratory, Kitchen, Boiler room, Wash-house <i>against</i> Library, Drawing room, Archive vault, Seed store</li><li><b>D. Finished in the first building season (1891) and later:</b> Library, Laboratory, Archive vault, Boiler room <i>against</i> Drawing room, Kitchen, Seed store, Wash-house</li><li><b>E. North side and south side:</b> Library, Laboratory, Kitchen, Boiler room <i>against</i> Drawing room, Archive vault, Seed store, Wash-house</li><li><b>F. Rooms with a chimney flue and rooms without:</b> Library, Drawing room, Kitchen, Boiler room <i>against</i> Laboratory, Archive vault, Seed store, Wash-house</li></ul>",
-          "pickup": "Clerk of Works' card, six ways to split the eight rooms in two: A. By floor: Library, Drawing room, Laboratory, Kitchen against the rest; B. West end and east end: Library, Drawing room, Laboratory, Archive vault against the rest; C. Wet rooms and dry rooms: Laboratory, Kitchen, Boiler room, Wash-house against the rest; D. Finished in the first building season (1891) and later: Library, Laboratory, Archive vault, Boiler room against the rest; E. North side and south side: Library, Laboratory, Kitchen, Boiler room against the rest; F. Rooms with a chimney flue and rooms without: Library, Drawing room, Kitchen, Boiler room against the rest.",
+          "pickup": "The Clerk of Works' card",
           "boxSource": "review:agent-vision",
           "boxNote": "Placed by eye 2026-11-17 on the loose sheet left of the Director's draft (clear of its box).",
           "note": "Escape-critical (Lucas, 2026-11-17): lists six candidate groupings, only D (the passage rooms) clears the red line on both boards; each player gets a copy.",
-          "image": "items/clerk_card_sq.jpg?v=1"
+          "image": "items/clerk_card_sq.jpg?v=1",
+          "schemes": [
+            {
+              "letter": "A",
+              "name": "By floor",
+              "rooms": [
+                "Library",
+                "Drawing room",
+                "Laboratory",
+                "Kitchen"
+              ],
+              "against": [
+                "Archive vault",
+                "Seed store",
+                "Boiler room",
+                "Wash-house"
+              ]
+            },
+            {
+              "letter": "B",
+              "name": "West end and east end",
+              "rooms": [
+                "Library",
+                "Drawing room",
+                "Laboratory",
+                "Archive vault"
+              ],
+              "against": [
+                "Kitchen",
+                "Seed store",
+                "Boiler room",
+                "Wash-house"
+              ]
+            },
+            {
+              "letter": "C",
+              "name": "Wet rooms and dry rooms",
+              "rooms": [
+                "Laboratory",
+                "Kitchen",
+                "Boiler room",
+                "Wash-house"
+              ],
+              "against": [
+                "Library",
+                "Drawing room",
+                "Archive vault",
+                "Seed store"
+              ]
+            },
+            {
+              "letter": "D",
+              "name": "Finished in the first building season (1891) and later",
+              "rooms": [
+                "Library",
+                "Laboratory",
+                "Archive vault",
+                "Boiler room"
+              ],
+              "against": [
+                "Drawing room",
+                "Kitchen",
+                "Seed store",
+                "Wash-house"
+              ]
+            },
+            {
+              "letter": "E",
+              "name": "North side and south side",
+              "rooms": [
+                "Library",
+                "Laboratory",
+                "Kitchen",
+                "Boiler room"
+              ],
+              "against": [
+                "Drawing room",
+                "Archive vault",
+                "Seed store",
+                "Wash-house"
+              ]
+            },
+            {
+              "letter": "F",
+              "name": "Rooms with a chimney flue and rooms without",
+              "rooms": [
+                "Library",
+                "Drawing room",
+                "Kitchen",
+                "Boiler room"
+              ],
+              "against": [
+                "Laboratory",
+                "Archive vault",
+                "Seed store",
+                "Wash-house"
+              ]
+            }
+          ]
         },
         {
           "type": "dial",
@@ -1026,8 +1116,7 @@
           "boxSource": "draft:skeleton",
           "sfx": {
             "src": "audio/kitchen_dial_breaker_throw.mp3",
-            "volume": 0.033,
-            "needsReplacement": true
+            "volume": 0.033
           }
         },
         {
@@ -1357,8 +1446,7 @@
           "boxSource": "draft:skeleton",
           "solveSfx": {
             "src": "audio/solve_kitchen_the_director_s_draft_key_latch.mp3",
-            "volume": 0.1,
-            "needsReplacement": true
+            "volume": 0.1
           }
         },
         {
@@ -1396,11 +1484,108 @@
           "availableWhen": {
             "solved": "kitchen"
           },
-          "body": "<p>A card in the Clerk of Works' hand: <i>Ways the eight rooms on the boards could be split in two.</i></p><ul style=\"margin:6px 0 0 18px;padding:0\"><li><b>A. By floor:</b> Library, Drawing room, Laboratory, Kitchen <i>against</i> Archive vault, Seed store, Boiler room, Wash-house</li><li><b>B. West end and east end:</b> Library, Drawing room, Laboratory, Archive vault <i>against</i> Kitchen, Seed store, Boiler room, Wash-house</li><li><b>C. Wet rooms and dry rooms:</b> Laboratory, Kitchen, Boiler room, Wash-house <i>against</i> Library, Drawing room, Archive vault, Seed store</li><li><b>D. Finished in the first building season (1891) and later:</b> Library, Laboratory, Archive vault, Boiler room <i>against</i> Drawing room, Kitchen, Seed store, Wash-house</li><li><b>E. North side and south side:</b> Library, Laboratory, Kitchen, Boiler room <i>against</i> Drawing room, Archive vault, Seed store, Wash-house</li><li><b>F. Rooms with a chimney flue and rooms without:</b> Library, Drawing room, Kitchen, Boiler room <i>against</i> Laboratory, Archive vault, Seed store, Wash-house</li></ul>",
-          "pickup": "Clerk of Works' card, six ways to split the eight rooms in two: A. By floor: Library, Drawing room, Laboratory, Kitchen against the rest; B. West end and east end: Library, Drawing room, Laboratory, Archive vault against the rest; C. Wet rooms and dry rooms: Laboratory, Kitchen, Boiler room, Wash-house against the rest; D. Finished in the first building season (1891) and later: Library, Laboratory, Archive vault, Boiler room against the rest; E. North side and south side: Library, Laboratory, Kitchen, Boiler room against the rest; F. Rooms with a chimney flue and rooms without: Library, Drawing room, Kitchen, Boiler room against the rest.",
+          "pickup": "The Clerk of Works' card",
           "boxSource": "review:agent-vision",
           "boxNote": "Placed by eye 2026-11-17 on the loose sheet left of the Director's draft (clear of its box).",
-          "image": "items/clerk_card_sq.jpg?v=1"
+          "image": "items/clerk_card_sq.jpg?v=1",
+          "schemes": [
+            {
+              "letter": "A",
+              "name": "By floor",
+              "rooms": [
+                "Library",
+                "Drawing room",
+                "Laboratory",
+                "Kitchen"
+              ],
+              "against": [
+                "Archive vault",
+                "Seed store",
+                "Boiler room",
+                "Wash-house"
+              ]
+            },
+            {
+              "letter": "B",
+              "name": "West end and east end",
+              "rooms": [
+                "Library",
+                "Drawing room",
+                "Laboratory",
+                "Archive vault"
+              ],
+              "against": [
+                "Kitchen",
+                "Seed store",
+                "Boiler room",
+                "Wash-house"
+              ]
+            },
+            {
+              "letter": "C",
+              "name": "Wet rooms and dry rooms",
+              "rooms": [
+                "Laboratory",
+                "Kitchen",
+                "Boiler room",
+                "Wash-house"
+              ],
+              "against": [
+                "Library",
+                "Drawing room",
+                "Archive vault",
+                "Seed store"
+              ]
+            },
+            {
+              "letter": "D",
+              "name": "Finished in the first building season (1891) and later",
+              "rooms": [
+                "Library",
+                "Laboratory",
+                "Archive vault",
+                "Boiler room"
+              ],
+              "against": [
+                "Drawing room",
+                "Kitchen",
+                "Seed store",
+                "Wash-house"
+              ]
+            },
+            {
+              "letter": "E",
+              "name": "North side and south side",
+              "rooms": [
+                "Library",
+                "Laboratory",
+                "Kitchen",
+                "Boiler room"
+              ],
+              "against": [
+                "Drawing room",
+                "Archive vault",
+                "Seed store",
+                "Wash-house"
+              ]
+            },
+            {
+              "letter": "F",
+              "name": "Rooms with a chimney flue and rooms without",
+              "rooms": [
+                "Library",
+                "Drawing room",
+                "Kitchen",
+                "Boiler room"
+              ],
+              "against": [
+                "Laboratory",
+                "Archive vault",
+                "Seed store",
+                "Wash-house"
+              ]
+            }
+          ]
         },
         {
           "id": "the_house_circuits",
@@ -1428,8 +1613,7 @@
           "boxSource": "moved:testplay",
           "sfx": {
             "src": "audio/kitchen_dial_breaker_throw.mp3",
-            "volume": 0.033,
-            "needsReplacement": true
+            "volume": 0.033
           }
         },
         {
@@ -1586,18 +1770,16 @@
       "sfx": [
         {
           "src": "audio/kitchen_bed_kettle_simmer.mp3",
-          "volume": 0.156,
+          "volume": 0.09,
           "mode": "loop",
-          "crossfade": 4,
-          "needsReplacement": true
+          "crossfade": 4
         },
         {
           "src": "audio/kitchen_shot_sink_drip.mp3",
           "volume": 0.046,
           "mode": "interval",
           "gapMin": 6,
-          "gapMax": 14,
-          "needsReplacement": true
+          "gapMax": 14
         }
       ]
     },
@@ -1983,16 +2165,14 @@
           "src": "audio/study_bed_dying_fire.mp3",
           "volume": 0.34,
           "mode": "loop",
-          "crossfade": 4,
-          "needsReplacement": true
+          "crossfade": 4
         },
         {
           "src": "audio/study_shot_ember_tick.mp3",
           "volume": 0.15,
           "mode": "interval",
           "gapMin": 14,
-          "gapMax": 30,
-          "needsReplacement": true
+          "gapMax": 30
         }
       ]
     },
@@ -2043,8 +2223,7 @@
           "boxSource": "draft:skeleton",
           "solveSfx": {
             "src": "audio/solve_library_the_director_s_trial_ledger_book_close.mp3",
-            "volume": 0.077,
-            "needsReplacement": true
+            "volume": 0.077
           }
         },
         {
@@ -2118,11 +2297,11 @@
           "buckets": [
             {
               "key": "left",
-              "label": "&#9664;"
+              "label": "◀"
             },
             {
               "key": "right",
-              "label": "&#9654;"
+              "label": "▶"
             }
           ],
           "answer": {
@@ -2153,8 +2332,7 @@
           "boxSource": "draft:skeleton",
           "solveSfx": {
             "src": "audio/solve_library_the_tall_bookcase_panel_swing.mp3",
-            "volume": 0.058,
-            "needsReplacement": true
+            "volume": 0.058
           },
           "lockout": {
             "after": 3,
@@ -2428,8 +2606,7 @@
           "boxSource": "draft:skeleton",
           "solveSfx": {
             "src": "audio/solve_library_the_director_s_trial_ledger_book_close.mp3",
-            "volume": 0.077,
-            "needsReplacement": true
+            "volume": 0.077
           }
         },
         {
@@ -2511,11 +2688,11 @@
           "buckets": [
             {
               "key": "left",
-              "label": "&#9664;"
+              "label": "◀"
             },
             {
               "key": "right",
-              "label": "&#9654;"
+              "label": "▶"
             }
           ],
           "answer": {
@@ -2540,8 +2717,7 @@
           "boxSource": "moved:testplay",
           "solveSfx": {
             "src": "audio/solve_library_the_tall_bookcase_panel_swing.mp3",
-            "volume": 0.058,
-            "needsReplacement": true
+            "volume": 0.058
           },
           "lockout": {
             "after": 3,
@@ -2644,16 +2820,14 @@
           "src": "audio/library_bed_fire_reverberant.mp3",
           "volume": 0.111,
           "mode": "loop",
-          "crossfade": 4,
-          "needsReplacement": true
+          "crossfade": 4
         },
         {
           "src": "audio/library_shot_log_pop.mp3",
           "volume": 0.1,
           "mode": "interval",
           "gapMin": 15,
-          "gapMax": 35,
-          "needsReplacement": true
+          "gapMax": 35
         }
       ]
     },
@@ -2701,8 +2875,7 @@
           "boxSource": "draft:skeleton",
           "solveSfx": {
             "src": "audio/solve_laboratory_the_farmer_s_letter_stamp.mp3",
-            "volume": 0.07,
-            "needsReplacement": true
+            "volume": 0.07
           }
         },
         {
@@ -2941,8 +3114,7 @@
           "boxSource": "draft:skeleton",
           "solveSfx": {
             "src": "audio/solve_laboratory_the_farmer_s_letter_stamp.mp3",
-            "volume": 0.07,
-            "needsReplacement": true
+            "volume": 0.07
           }
         },
         {
@@ -3042,16 +3214,14 @@
           "src": "audio/laboratory_bed_gas_burner.mp3",
           "volume": 0.095,
           "mode": "loop",
-          "crossfade": 4,
-          "needsReplacement": true
+          "crossfade": 4
         },
         {
           "src": "audio/laboratory_shot_drip.mp3",
           "volume": 0.046,
           "mode": "interval",
           "gapMin": 10,
-          "gapMax": 25,
-          "needsReplacement": true
+          "gapMax": 25
         }
       ]
     },
@@ -3425,7 +3595,7 @@
           "note": "C R1. Answer share 0.068.",
           "starterCode": "botanical_survey",
           "check": {
-            "prompt": "The Director's second report is about how many kinds of plant each plot of the hay trial keeps. Using botanical_survey, find the share of the variation in species_count that nitrogen explains, and assign it to answer as a number.",
+            "prompt": "The Director's second report is about how many kinds of plant each plot of the hay trial keeps. Using <code>botanical_survey</code>, find the <code>share</code> of the variation in <code>species_count</code> that <code>nitrogen</code> explains, and assign it to <code>answer</code> as a number.",
             "requires": [
               "answer"
             ],
@@ -3450,8 +3620,7 @@
           "boxSource": "draft:skeleton",
           "solveSfx": {
             "src": "audio/solve_seed_store_the_botanical_survey_book_close.mp3",
-            "volume": 0.077,
-            "needsReplacement": true
+            "volume": 0.077
           }
         },
         {
@@ -3684,7 +3853,7 @@
           "form": "check",
           "starterCode": "botanical_survey",
           "check": {
-            "prompt": "The Director's second report is about how many kinds of plant each plot of the hay trial keeps. Using botanical_survey, find the share of the variation in species_count that nitrogen explains, and assign it to answer as a number.",
+            "prompt": "The Director's second report is about how many kinds of plant each plot of the hay trial keeps. Using <code>botanical_survey</code>, find the <code>share</code> of the variation in <code>species_count</code> that <code>nitrogen</code> explains, and assign it to <code>answer</code> as a number.",
             "requires": [
               "answer"
             ],
@@ -3703,8 +3872,7 @@
           "boxSource": "draft:skeleton",
           "solveSfx": {
             "src": "audio/solve_seed_store_the_botanical_survey_book_close.mp3",
-            "volume": 0.077,
-            "needsReplacement": true
+            "volume": 0.077
           }
         },
         {
@@ -3815,16 +3983,14 @@
           "src": "audio/seed_store_bed_rice_trickle.mp3",
           "volume": 0.085,
           "mode": "loop",
-          "crossfade": 4,
-          "needsReplacement": true
+          "crossfade": 4
         },
         {
           "src": "audio/seed_store_shot_seed_pour.mp3",
           "volume": 0.126,
           "mode": "interval",
           "gapMin": 20,
-          "gapMax": 40,
-          "needsReplacement": true
+          "gapMax": 40
         }
       ]
     },
@@ -3850,7 +4016,7 @@
           },
           "starterCode": "botanical_survey",
           "check": {
-            "prompt": "The survey summary lists the three factors in order of how much they matter for the meadow's plants. Using botanical_survey, rank nitrogen, lime and minerals by the share of the variation in species_count that each explains on its own, and assign the three factor names to answer as a character vector, largest share first.",
+            "prompt": "The survey summary lists the three factors in order of how much they matter for the meadow's plants. Using <code>botanical_survey</code>, rank <code>nitrogen</code>, <code>lime</code> and <code>minerals</code> by the <code>share</code> of the variation in <code>species_count</code> that each explains on its own, and assign the three factor names to <code>answer</code> as a character vector, largest <code>share</code> first.",
             "requires": [
               "answer"
             ],
@@ -3873,8 +4039,7 @@
           "boxSource": "draft:skeleton",
           "solveSfx": {
             "src": "audio/solve_wash_house_the_survey_summary_stamp.mp3",
-            "volume": 0.07,
-            "needsReplacement": true
+            "volume": 0.07
           }
         },
         {
@@ -3903,8 +4068,7 @@
           "boxSource": "draft:skeleton",
           "sfx": {
             "src": "audio/wash_house_dial_breaker_throw.mp3",
-            "volume": 0.033,
-            "needsReplacement": true
+            "volume": 0.033
           }
         },
         {
@@ -4171,7 +4335,7 @@
           },
           "starterCode": "botanical_survey",
           "check": {
-            "prompt": "The survey summary lists the three factors in order of how much they matter for the meadow's plants. Using botanical_survey, rank nitrogen, lime and minerals by the share of the variation in species_count that each explains on its own, and assign the three factor names to answer as a character vector, largest share first.",
+            "prompt": "The survey summary lists the three factors in order of how much they matter for the meadow's plants. Using <code>botanical_survey</code>, rank <code>nitrogen</code>, <code>lime</code> and <code>minerals</code> by the <code>share</code> of the variation in <code>species_count</code> that each explains on its own, and assign the three factor names to <code>answer</code> as a character vector, largest <code>share</code> first.",
             "requires": [
               "answer"
             ],
@@ -4188,8 +4352,7 @@
           "boxSource": "draft:skeleton",
           "solveSfx": {
             "src": "audio/solve_wash_house_the_survey_summary_stamp.mp3",
-            "volume": 0.07,
-            "needsReplacement": true
+            "volume": 0.07
           }
         },
         {
@@ -4218,8 +4381,7 @@
           "boxSource": "moved:testplay",
           "sfx": {
             "src": "audio/wash_house_dial_breaker_throw.mp3",
-            "volume": 0.033,
-            "needsReplacement": true
+            "volume": 0.033
           }
         },
         {
@@ -4337,16 +4499,14 @@
           "src": "audio/wash_house_bed_drips.mp3",
           "volume": 0.3,
           "mode": "loop",
-          "crossfade": 4,
-          "needsReplacement": true
+          "crossfade": 4
         },
         {
           "src": "audio/wash_house_shot_linen_flap.mp3",
           "volume": 0.094,
           "mode": "interval",
           "gapMin": 15,
-          "gapMax": 35,
-          "needsReplacement": true
+          "gapMax": 35
         }
       ]
     },
@@ -4397,8 +4557,7 @@
           "boxSource": "draft:skeleton",
           "solveSfx": {
             "src": "audio/solve_archive_vault_the_archive_register_book_close.mp3",
-            "volume": 0.077,
-            "needsReplacement": true
+            "volume": 0.077
           }
         },
         {
@@ -4413,12 +4572,109 @@
           "availableWhen": {
             "solved": "wash_house"
           },
-          "body": "<p>A card in the Clerk of Works' hand: <i>Ways the eight rooms on the boards could be split in two.</i></p><ul style=\"margin:6px 0 0 18px;padding:0\"><li><b>A. By floor:</b> Library, Drawing room, Laboratory, Kitchen <i>against</i> Archive vault, Seed store, Boiler room, Wash-house</li><li><b>B. West end and east end:</b> Library, Drawing room, Laboratory, Archive vault <i>against</i> Kitchen, Seed store, Boiler room, Wash-house</li><li><b>C. Wet rooms and dry rooms:</b> Laboratory, Kitchen, Boiler room, Wash-house <i>against</i> Library, Drawing room, Archive vault, Seed store</li><li><b>D. Finished in the first building season (1891) and later:</b> Library, Laboratory, Archive vault, Boiler room <i>against</i> Drawing room, Kitchen, Seed store, Wash-house</li><li><b>E. North side and south side:</b> Library, Laboratory, Kitchen, Boiler room <i>against</i> Drawing room, Archive vault, Seed store, Wash-house</li><li><b>F. Rooms with a chimney flue and rooms without:</b> Library, Drawing room, Kitchen, Boiler room <i>against</i> Laboratory, Archive vault, Seed store, Wash-house</li></ul>",
-          "pickup": "Clerk of Works' card, six ways to split the eight rooms in two: A. By floor: Library, Drawing room, Laboratory, Kitchen against the rest; B. West end and east end: Library, Drawing room, Laboratory, Archive vault against the rest; C. Wet rooms and dry rooms: Laboratory, Kitchen, Boiler room, Wash-house against the rest; D. Finished in the first building season (1891) and later: Library, Laboratory, Archive vault, Boiler room against the rest; E. North side and south side: Library, Laboratory, Kitchen, Boiler room against the rest; F. Rooms with a chimney flue and rooms without: Library, Drawing room, Kitchen, Boiler room against the rest.",
+          "pickup": "The Clerk of Works' card",
           "boxSource": "review:agent-vision",
           "boxNote": "Placed by eye 2026-11-17 on the papers behind the register; drawn after the register so it sits on top where the two touch.",
           "note": "Escape-critical (Lucas, 2026-11-17): lists six candidate groupings, only D (the passage rooms) clears the red line on both boards; each player gets a copy.",
-          "image": "items/clerk_card_sq.jpg?v=1"
+          "image": "items/clerk_card_sq.jpg?v=1",
+          "schemes": [
+            {
+              "letter": "A",
+              "name": "By floor",
+              "rooms": [
+                "Library",
+                "Drawing room",
+                "Laboratory",
+                "Kitchen"
+              ],
+              "against": [
+                "Archive vault",
+                "Seed store",
+                "Boiler room",
+                "Wash-house"
+              ]
+            },
+            {
+              "letter": "B",
+              "name": "West end and east end",
+              "rooms": [
+                "Library",
+                "Drawing room",
+                "Laboratory",
+                "Archive vault"
+              ],
+              "against": [
+                "Kitchen",
+                "Seed store",
+                "Boiler room",
+                "Wash-house"
+              ]
+            },
+            {
+              "letter": "C",
+              "name": "Wet rooms and dry rooms",
+              "rooms": [
+                "Laboratory",
+                "Kitchen",
+                "Boiler room",
+                "Wash-house"
+              ],
+              "against": [
+                "Library",
+                "Drawing room",
+                "Archive vault",
+                "Seed store"
+              ]
+            },
+            {
+              "letter": "D",
+              "name": "Finished in the first building season (1891) and later",
+              "rooms": [
+                "Library",
+                "Laboratory",
+                "Archive vault",
+                "Boiler room"
+              ],
+              "against": [
+                "Drawing room",
+                "Kitchen",
+                "Seed store",
+                "Wash-house"
+              ]
+            },
+            {
+              "letter": "E",
+              "name": "North side and south side",
+              "rooms": [
+                "Library",
+                "Laboratory",
+                "Kitchen",
+                "Boiler room"
+              ],
+              "against": [
+                "Drawing room",
+                "Archive vault",
+                "Seed store",
+                "Wash-house"
+              ]
+            },
+            {
+              "letter": "F",
+              "name": "Rooms with a chimney flue and rooms without",
+              "rooms": [
+                "Library",
+                "Drawing room",
+                "Kitchen",
+                "Boiler room"
+              ],
+              "against": [
+                "Laboratory",
+                "Archive vault",
+                "Seed store",
+                "Wash-house"
+              ]
+            }
+          ]
         },
         {
           "type": "plaque",
@@ -4507,11 +4763,11 @@
           "buckets": [
             {
               "key": "left",
-              "label": "&#9664;"
+              "label": "◀"
             },
             {
               "key": "right",
-              "label": "&#9654;"
+              "label": "▶"
             }
           ],
           "answer": {
@@ -4542,8 +4798,7 @@
           "boxSource": "draft:skeleton",
           "solveSfx": {
             "src": "audio/solve_archive_vault_the_iron_box_iron_door.mp3",
-            "volume": 0.05,
-            "needsReplacement": true
+            "volume": 0.05
           },
           "lockout": {
             "after": 3,
@@ -4800,8 +5055,7 @@
           "boxSource": "draft:skeleton",
           "solveSfx": {
             "src": "audio/solve_archive_vault_the_archive_register_book_close.mp3",
-            "volume": 0.077,
-            "needsReplacement": true
+            "volume": 0.077
           }
         },
         {
@@ -4817,11 +5071,108 @@
           "availableWhen": {
             "solved": "wash_house"
           },
-          "body": "<p>A card in the Clerk of Works' hand: <i>Ways the eight rooms on the boards could be split in two.</i></p><ul style=\"margin:6px 0 0 18px;padding:0\"><li><b>A. By floor:</b> Library, Drawing room, Laboratory, Kitchen <i>against</i> Archive vault, Seed store, Boiler room, Wash-house</li><li><b>B. West end and east end:</b> Library, Drawing room, Laboratory, Archive vault <i>against</i> Kitchen, Seed store, Boiler room, Wash-house</li><li><b>C. Wet rooms and dry rooms:</b> Laboratory, Kitchen, Boiler room, Wash-house <i>against</i> Library, Drawing room, Archive vault, Seed store</li><li><b>D. Finished in the first building season (1891) and later:</b> Library, Laboratory, Archive vault, Boiler room <i>against</i> Drawing room, Kitchen, Seed store, Wash-house</li><li><b>E. North side and south side:</b> Library, Laboratory, Kitchen, Boiler room <i>against</i> Drawing room, Archive vault, Seed store, Wash-house</li><li><b>F. Rooms with a chimney flue and rooms without:</b> Library, Drawing room, Kitchen, Boiler room <i>against</i> Laboratory, Archive vault, Seed store, Wash-house</li></ul>",
-          "pickup": "Clerk of Works' card, six ways to split the eight rooms in two: A. By floor: Library, Drawing room, Laboratory, Kitchen against the rest; B. West end and east end: Library, Drawing room, Laboratory, Archive vault against the rest; C. Wet rooms and dry rooms: Laboratory, Kitchen, Boiler room, Wash-house against the rest; D. Finished in the first building season (1891) and later: Library, Laboratory, Archive vault, Boiler room against the rest; E. North side and south side: Library, Laboratory, Kitchen, Boiler room against the rest; F. Rooms with a chimney flue and rooms without: Library, Drawing room, Kitchen, Boiler room against the rest.",
+          "pickup": "The Clerk of Works' card",
           "boxSource": "review:agent-vision",
           "boxNote": "Placed by eye 2026-11-17 on the papers behind the register; drawn after the register so it sits on top where the two touch.",
-          "image": "items/clerk_card_sq.jpg?v=1"
+          "image": "items/clerk_card_sq.jpg?v=1",
+          "schemes": [
+            {
+              "letter": "A",
+              "name": "By floor",
+              "rooms": [
+                "Library",
+                "Drawing room",
+                "Laboratory",
+                "Kitchen"
+              ],
+              "against": [
+                "Archive vault",
+                "Seed store",
+                "Boiler room",
+                "Wash-house"
+              ]
+            },
+            {
+              "letter": "B",
+              "name": "West end and east end",
+              "rooms": [
+                "Library",
+                "Drawing room",
+                "Laboratory",
+                "Archive vault"
+              ],
+              "against": [
+                "Kitchen",
+                "Seed store",
+                "Boiler room",
+                "Wash-house"
+              ]
+            },
+            {
+              "letter": "C",
+              "name": "Wet rooms and dry rooms",
+              "rooms": [
+                "Laboratory",
+                "Kitchen",
+                "Boiler room",
+                "Wash-house"
+              ],
+              "against": [
+                "Library",
+                "Drawing room",
+                "Archive vault",
+                "Seed store"
+              ]
+            },
+            {
+              "letter": "D",
+              "name": "Finished in the first building season (1891) and later",
+              "rooms": [
+                "Library",
+                "Laboratory",
+                "Archive vault",
+                "Boiler room"
+              ],
+              "against": [
+                "Drawing room",
+                "Kitchen",
+                "Seed store",
+                "Wash-house"
+              ]
+            },
+            {
+              "letter": "E",
+              "name": "North side and south side",
+              "rooms": [
+                "Library",
+                "Laboratory",
+                "Kitchen",
+                "Boiler room"
+              ],
+              "against": [
+                "Drawing room",
+                "Archive vault",
+                "Seed store",
+                "Wash-house"
+              ]
+            },
+            {
+              "letter": "F",
+              "name": "Rooms with a chimney flue and rooms without",
+              "rooms": [
+                "Library",
+                "Drawing room",
+                "Kitchen",
+                "Boiler room"
+              ],
+              "against": [
+                "Laboratory",
+                "Archive vault",
+                "Seed store",
+                "Wash-house"
+              ]
+            }
+          ]
         },
         {
           "id": "the_sample_archive",
@@ -4918,11 +5269,11 @@
           "buckets": [
             {
               "key": "left",
-              "label": "&#9664;"
+              "label": "◀"
             },
             {
               "key": "right",
-              "label": "&#9654;"
+              "label": "▶"
             }
           ],
           "answer": {
@@ -4947,8 +5298,7 @@
           "boxSource": "moved:testplay",
           "solveSfx": {
             "src": "audio/solve_archive_vault_the_iron_box_iron_door.mp3",
-            "volume": 0.05,
-            "needsReplacement": true
+            "volume": 0.05
           },
           "lockout": {
             "after": 3,
@@ -4998,16 +5348,14 @@
           "src": "audio/archive_vault_bed_fan_hum.mp3",
           "volume": 0.281,
           "mode": "loop",
-          "crossfade": 4,
-          "needsReplacement": true
+          "crossfade": 4
         },
         {
           "src": "audio/archive_vault_shot_boiler_boom.mp3",
           "volume": 0.07,
           "mode": "interval",
           "gapMin": 20,
-          "gapMax": 45,
-          "needsReplacement": true
+          "gapMax": 45
         }
       ]
     },
@@ -5056,8 +5404,7 @@
           "boxSource": "draft:skeleton",
           "solveSfx": {
             "src": "audio/solve_boiler_room_the_director_s_second_draft_stamp.mp3",
-            "volume": 0.07,
-            "needsReplacement": true
+            "volume": 0.07
           }
         },
         {
@@ -5276,8 +5623,7 @@
           "boxSource": "draft:skeleton",
           "solveSfx": {
             "src": "audio/solve_boiler_room_the_director_s_second_draft_stamp.mp3",
-            "volume": 0.07,
-            "needsReplacement": true
+            "volume": 0.07
           }
         },
         {
@@ -5321,16 +5667,14 @@
           "src": "audio/boiler_room_bed_firebox_roar.mp3",
           "volume": 0.262,
           "mode": "loop",
-          "crossfade": 4,
-          "needsReplacement": true
+          "crossfade": 4
         },
         {
           "src": "audio/boiler_room_shot_hot_iron_tick.mp3",
           "volume": 0.177,
           "mode": "interval",
           "gapMin": 6,
-          "gapMax": 15,
-          "needsReplacement": true
+          "gapMax": 15
         }
       ]
     }

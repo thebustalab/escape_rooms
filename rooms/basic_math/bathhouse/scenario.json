@@ -12653,14 +12653,17 @@
           "tier": 3,
           "label": "The reading table",
           "track": "reading",
-          "gives": "boarding_pass",
           "box": [
             0.34,
             0.56,
             0.65,
             1.0
           ],
-          "boxSource": "moved:agent"
+          "boxSource": "moved:agent",
+          "onRight": {
+            "set": "reading_done",
+            "to": true
+          }
         }
       ],
       "authoring": {
@@ -12829,7 +12832,38 @@
           "tier": 3,
           "track": "reading",
           "boxSource": "moved:agent",
-          "gives": "boarding_pass"
+          "onRight": {
+            "set": "reading_done",
+            "to": true
+          }
+        },
+        {
+          "id": "the_boarding_pass",
+          "type": "clue",
+          "label": "The boarding pass",
+          "image": "items/boarding_pass.png",
+          "body": "A boarding pass is waiting on the reading table, right where you finished your reading.",
+          "gives": "boarding_pass",
+          "shownWhen": {
+            "eq": [
+              "reading_done",
+              true
+            ]
+          },
+          "availableWhen": {
+            "eq": [
+              "reading_done",
+              true
+            ]
+          },
+          "box": [
+            0.555,
+            0.725,
+            0.6,
+            0.775
+          ],
+          "boxSource": "review:agent-vision",
+          "boxNote": "Placed by eye 2026-11-19 on the bare tabletop right of the open book. Listed AFTER the reading table so it sits on top of the station's box. The pass is not painted in the still; the card shows items/boarding_pass.png."
         }
       ]
     },
