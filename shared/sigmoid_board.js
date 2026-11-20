@@ -9,34 +9,42 @@
 //                                  "Compare the S-curve" lays the logistic fit over it.
 //   2 A model from one predictor   the S-curve: drag its MIDDLE (where the probability is 0.5) and its STEEPNESS
 //                                  (handle where it reaches 0.8), or "Best fit" (the maximum-likelihood fit, what
-//                                  buildModel() finds); click a morning to read its probability_yes off the curve.
-//   3 Predicting held-back cases   the best-fit curve with the training mornings faded, ten held-back mornings placed on
+//                                  buildModel() finds); a switch draws the likelihood calculation on the plot.
+//   3 Setting cases aside          the S-curve against a connect-the-dots curve through every training morning; red
+//                                  rings mark wrong calls; "Reveal" shows the ten held-back mornings at what happened,
+//                                  and a table scores both models on training vs held-back mornings (24/30 → 9/10 vs
+//                                  30/30 → 7/10).
+//   4 Predicting held-back cases   the best-fit curve with the training mornings faded, ten held-back mornings placed on
 //                                  it, and the cut-off as a draggable horizontal line turning each probability into a
 //                                  call; calls that differ from the 0.5 call are ringed and listed.
 //
 // TOY DATA ONLY (classification_math.js LANDING: forty invented mornings, swell height vs did the supply boat turn
-// back), labelled as invented on the board. Never graded, never logged, holds no answer. Code-drawn SVG: no art, no
+// back). Never graded, never logged, holds no answer. Code-drawn SVG: no art, no
 // geometry (validate_assets.py NO_GEOMETRY_KINDS).
 //
 //   const b = mount(hostEl, { pegs?, onPegs?(state) });
-//   b.setTab("lines"|"curve"|"cutoff"); b.tab(); b.curve(); b.setCurve({middle, steepness}); b.bestFit({instant});
-//   b.best(); b.pick(day|null); b.picked(); b.probability(day); b.setCutoff(c); b.cutoff(); b.calls(); b.changed();
+//   b.setTab("lines"|"curve"|"holdout"|"cutoff"); b.setModel("s"|"dots"); b.setReveal(on); b.scores(); b.tab(); b.curve(); b.setCurve({middle, steepness}); b.bestFit({instant});
+//   b.best(); b.probability(day); b.setCutoff(c); b.cutoff(); b.calls(); b.changed();
 //   b.setProbe(x); b.lineAt(x); b.ready; b.destroy().   The root element carries the API as `.sigmoidBoard` for tests.
-import { LANDING, olsLine, fitLogistic, curveFromCoef, probAt, fitScore, callAt } from "./classification_math.js?v=179";
-import { shell, svgEl, el, button, slider, svgPoint, fmt2 } from "./classification_ui.js?v=179";
+import { LANDING, olsLine, fitLogistic, curveFromCoef, probAt, fitScore, callAt, connectDotsAt } from "./classification_math.js?v=180";
+import { shell, svgEl, el, button, slider, svgPoint, fmt2 } from "./classification_ui.js?v=180";
 
-const TABS = [["lines", "From numbers to categories"], ["curve", "A model from one predictor"], ["cutoff", "Predicting held-back cases"]];
+const TABS = [["lines", "From numbers to categories"], ["curve", "A model from one predictor"], ["holdout", "Setting cases aside"], ["cutoff", "Predicting held-back cases"]];
 // Each tab's takeaway in the chapter's own wording (12d_classification.Rmd), and the section it belongs to.
 const LESSONS = {
-  lines: ["A model that predicts a category is a classification model. A straight line fitted to a yes/no response coded as 1 and 0 has no floor and no ceiling: it falls below 0 at one end and climbs past 1 at the other, and neither value can be a probability. Logistic regression bends its predictions into an S-shape that stays between 0 and 1.",
+  lines: ["A model that predicts a category is a classification model. A straight line fitted to turned_back coded as 1 and 0 predicts a number, not a category: at 2.3 m it reads 0.45, but is that \"probably not\", or a 45% chance the boat turns back? It’s a bit unclear. Even worse, at the ends the straight line reads below 0 and above 1, which is impossible to interpret. The solution: logistic regression, which is built to give a probability instead: an S-shape that stays between 0 and 1, so a reading of 0.43 means a 43% chance the boat turns back on a morning with that swell.",
     "from numbers to categories"],
-  curve: ["A logistic regression model gives each case a probability_yes: the model's probability that the response is yes, given its predictor. It is not the share of cases that are yes, and it is not a call.",
+  curve: ["A logistic regression model gives each case a probability_yes: the chance that the response is yes at that predictor value. On a morning with a 2.3 m swell, 0.43 means a 43% chance the boat turns back. It is not the share of all mornings that turned back, and it is not a call. The fit is scored by likelihood: each morning gets the probability the curve gives to what actually happened, those are multiplied together, and the best fit is the curve with the highest likelihood.",
+    "a model from one predictor"],
+  holdout: ["A model always appears the most accurate (sometimes perfectly accurate) on the data that were used to create the model’s settings. For example, a connect-the-dots curve (a model that is “overfitted” on the training data) passes through every training morning and gets all 30 right. Unfortunately, such a model has memorized the noise in the data: it does great on the training data, but on the ten held-back mornings it does worse than the S-curve. So, the best practice is to always hold back some of the data we have (a “test set”), then configure (“train”) the model on the remaining data (the “training set”), then evaluate the model on the held-back test set.",
     "a model from one predictor"],
   cutoff: ["The held-back cases were never shown to the model, so it gives them a probability exactly as it would for cases not yet seen. A cut-off turns each probability into a call: yes at 0.5 or more. A lower cut-off calls more cases yes and a higher one fewer; the probabilities themselves do not change, only the line drawn across them moves.",
     "several predictors, and predicting held-back cases"],
 };
 const W = 960, H = 600, PX0 = 100, PX1 = 930, PY0 = 74, PY1 = 524;
 const YES = "#ffc861", NO = "#8fb3d9", LINE = "#ff8a5c", CURVE = "#7fd3ff", CUT = "#ffe39a", BAD = "rgba(255,90,70,.13)";
+// the curve's two handles: kept clear of the yes (amber) and no (blue) dots and of the curve itself (cyan)
+const MID = "#e58cff", STEEP = "#7ee0a1";
 const LN4 = Math.log(4);       // the steepness handle sits where the curve reaches 0.8: logit(0.8) = ln 4
 const START = { middle: 4.1, steepness: 0.8 };   // deliberately off the dots, so "Best fit" has something to do
 
@@ -49,17 +57,19 @@ export function mount(host, opts = {}) {
   const st = {
     tab: TABS.some(([k]) => k === s0.tab) ? s0.tab : "lines",
     curve: s0.curve && Number.isFinite(s0.curve.middle) && Number.isFinite(s0.curve.steepness) ? { ...s0.curve } : { ...START },
-    picked: Number.isFinite(s0.picked) ? s0.picked : null,
     cutoff: Number.isFinite(s0.cutoff) ? s0.cutoff : 0.5,
     probe: Number.isFinite(s0.probe) ? s0.probe : 5.5,
     showS: !!s0.showS,
+    showFit: !!s0.showFit,
+    model: s0.model === "dots" ? "dots" : "s",
+    reveal: !!s0.reveal,
   };
   const reduced = typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
   let dead = false, raf = 0, drag = null;
-  const save = () => opts.onPegs && opts.onPegs({ tab: st.tab, curve: { ...st.curve }, picked: st.picked, cutoff: st.cutoff, probe: st.probe, showS: st.showS });
+  const save = () => opts.onPegs && opts.onPegs({ tab: st.tab, curve: { ...st.curve }, cutoff: st.cutoff, probe: st.probe, showS: st.showS, showFit: st.showFit, model: st.model, reveal: st.reveal });
 
   const F = shell(host, { cls: "sigmoidboard", tabs: TABS, W, H, onTab: (k) => api.setTab(k),
-    ariaLabel: "The S-curve board: invented yes/no mornings against swell height, a straight line, an S-curve and a cut-off" });
+    ariaLabel: "The S-curve board: yes/no mornings against swell height, a straight line, an S-curve and a cut-off" });
   const svg = F.svg;
 
   // ---------- scales ----------
@@ -93,31 +103,24 @@ export function mount(host, opts = {}) {
     const yl = st.tab === "lines" ? "turned_back coded as a number (yes = 1, no = 0)" : "probability_yes (the boat turns back)";
     const t = txt(0, 0, yl, { anchor: "middle", size: 19 });
     t.setAttribute("transform", `translate(${PX0 - 62} ${(PY0 + PY1) / 2}) rotate(-90)`);
-    // the toy label: invented, and not from any room's data
-    txt(PX0, 22, "Invented readings: forty made-up mornings at the island's landing (not from any room's data)", { size: 17, italic: true, fill: "#cdbf9f" });
+    // what the dots are: one sentence of scene-setting
+    txt(PX0 - 40, 12, "Each dot is one morning on the island: the height of the swell (the waves),", { size: 16, italic: true, fill: "#cdbf9f" });
+    txt(PX0 - 40, 31, "and whether the island's supply boat turned back or landed.", { size: 16, italic: true, fill: "#cdbf9f" });
     // legend
-    const lx = PX0, ly = 50;
+    const lx = PX0, ly = 54;
     svgEl(svg, "circle", { cx: lx + 8, cy: ly, r: 8, fill: YES });
     txt(lx + 22, ly, "turned back: yes", { size: 17 });
     svgEl(svg, "circle", { cx: lx + 190, cy: ly, r: 8, fill: NO });
     txt(lx + 204, ly, "turned back: no (landed)", { size: 17 });
-    if (st.tab === "cutoff") {
+    if (st.tab === "cutoff" || (st.tab === "holdout" && st.reveal)) {
       svgEl(svg, "path", { d: diamond(lx + 452, ly, 9), fill: "#fff1d6" });
       txt(lx + 466, ly, "held back (never shown to the model)", { size: 17 });
     }
   }
   const diamond = (x, y, r) => `M${x} ${y - r}L${x + r} ${y}L${x} ${y + r}L${x - r} ${y}Z`;
-  function dots(alpha = 1, pickable = false) {
-    for (const d of T.training) {
-      const c = svgEl(svg, "circle", { cx: X(d.x), cy: Y(d.y), r: 9, fill: d.y ? YES : NO, opacity: alpha,
-        stroke: st.picked === d.day && st.tab === "curve" ? "#fff" : "rgba(0,0,0,.5)", "stroke-width": st.picked === d.day && st.tab === "curve" ? 3 : 1,
-        class: pickable ? "pickable dot" : "dot", "data-day": d.day });
-      if (pickable) {
-        const hit = svgEl(svg, "circle", { cx: X(d.x), cy: Y(d.y), r: 16, fill: "transparent", class: "pickable dothit", "data-day": d.day });
-        hit.addEventListener("click", () => api.pick(st.picked === d.day ? null : d.day));
-        c.addEventListener("click", () => api.pick(st.picked === d.day ? null : d.day));
-      }
-    }
+  function dots(alpha = 1) {
+    for (const d of T.training)
+      svgEl(svg, "circle", { cx: X(d.x), cy: Y(d.y), r: 9, fill: d.y ? YES : NO, opacity: alpha, stroke: "rgba(0,0,0,.5)", "stroke-width": 1, class: "dot", "data-day": d.day });
   }
   function curvePath(cv, attrs) {
     const pts = [];
@@ -159,28 +162,91 @@ export function mount(host, opts = {}) {
     const tw = 12 + lab.length * 10.5, tx = left ? px - 14 - tw : px + 14;
     svgEl(svg, "rect", { x: tx, y: ly - 18, width: tw, height: 36, rx: 6, fill: "rgba(8,17,26,.92)", stroke: out ? "#ff4d3a" : LINE });
     txt(tx + tw / 2, ly, lab, { anchor: "middle", size: 20, bold: true, fill: out ? "#ffb3a0" : "#fff1d6" });
+    // with the S-curve shown, the reader also marks the curve, its tag on the other side of the reader line
+    if (st.showS) {
+      const pc = probAt(best, st.probe), cy = Y(pc);
+      svgEl(svg, "circle", { cx: px, cy, r: 8, fill: CURVE, stroke: "#fff", "stroke-width": 2, class: "curvereader" });
+      const clab = `curve at ${st.probe.toFixed(1)} m: ${pc.toFixed(2)}`;
+      const ctw = 12 + clab.length * 10.5, ctx = left ? px + 14 : px - 14 - ctw;
+      const cly = clamp(cy + (pc > 0.5 ? 30 : -30), PY0 + 20, PY1 - 20);
+      svgEl(svg, "rect", { x: ctx, y: cly - 18, width: ctw, height: 36, rx: 6, fill: "rgba(8,17,26,.92)", stroke: CURVE });
+      txt(ctx + ctw / 2, cly, clab, { anchor: "middle", size: 20, bold: true, fill: "#eaf5ff" });
+    }
     handle(px, PY1, "probe", "drag", CUT);
   }
 
   function drawCurve() {
     for (const v of [0, 1]) svgEl(svg, "line", { x1: PX0, x2: PX1, y1: Y(v), y2: Y(v), stroke: "rgba(255,255,255,.3)", "stroke-dasharray": "6 6" });
     const cv = st.curve;
+    if (st.showFit) drawFitCalc(cv);   // under the curve, the dots and the handles, so dragging stays visible
     curvePath(cv, { class: "scurve" });
-    const d = st.picked != null ? T.training.find((t) => t.day === st.picked) : null;
-    if (d) {
-      const p = probAt(cv, d.x);
-      svgEl(svg, "line", { x1: X(d.x), x2: X(d.x), y1: Y(d.y), y2: Y(p), stroke: "#fff", "stroke-width": 2, "stroke-dasharray": "5 5" });
-      svgEl(svg, "line", { x1: X(d.x), x2: PX0, y1: Y(p), y2: Y(p), stroke: "#fff", "stroke-width": 2, "stroke-dasharray": "5 5" });
-      svgEl(svg, "circle", { cx: X(d.x), cy: Y(p), r: 7, fill: "#fff" });
-      svgEl(svg, "rect", { x: PX0 + 6, y: Y(p) - 17, width: 92, height: 34, rx: 6, fill: "#1f3a52", stroke: "#9ccaf2" });
-      txt(PX0 + 52, Y(p), p.toFixed(2), { anchor: "middle", size: 21, bold: true, fill: "#eaf5ff" });
-    }
-    dots(1, true);
+    dots();
     const mx = clamp(cv.middle, T.xView[0], T.xView[1]);
-    handle(X(mx), Y(0.5), "middle", "middle", CUT, "right");
+    handle(X(mx), Y(0.5), "middle", "middle", MID, "right");
     const x8 = cv.middle + LN4 / cv.steepness;
-    if (x8 <= T.xView[1]) handle(X(x8), Y(0.8), "steep", "steepness", "#9ccaf2", "right");
+    if (x8 <= T.xView[1]) handle(X(x8), Y(0.8), "steep", "steepness", STEEP, "right");
   }
+
+  // The fit calculation, all mornings at once: a dotted line from each dot to the curve (its length is the probability
+  // the curve did NOT give to what happened), and a box in the empty lower right doing the sum: how close this curve comes to the best.
+  function drawFitCalc(cv) {
+    const rows = fitRows(cv);
+    for (const r of rows) svgEl(svg, "line", { x1: X(r.x), x2: X(r.x), y1: Y(r.y), y2: Y(probAt(cv, r.x)),
+      stroke: r.y ? YES : NO, "stroke-width": 2, "stroke-dasharray": "3 4", opacity: 0.9, class: "fitline" });
+    const f = fitSummary(cv), bw = 266, bh = 262, bx = PX1 - bw - 6, by = PY1 - bh - 34, cols = 5, cw = 48, rh = 19;
+    svgEl(svg, "rect", { x: bx, y: by, width: bw, height: bh, rx: 8, fill: "rgba(8,17,26,.82)", stroke: "rgba(255,255,255,.3)", class: "fitbox" });
+    txt(bx + 10, by + 16, "Each morning, left to right, gets:", { size: 15, bold: true });
+    svgEl(svg, "circle", { cx: bx + 15, cy: by + 36, r: 5, fill: YES });
+    txt(bx + 24, by + 36, "turned back: p", { size: 14, fill: YES });
+    svgEl(svg, "circle", { cx: bx + 138, cy: by + 36, r: 5, fill: NO });
+    txt(bx + 147, by + 36, "landed: 1 − p", { size: 14, fill: NO });
+    rows.forEach((r, i) => txt(bx + 10 + (i % cols) * cw + cw / 2, by + 58 + Math.floor(i / cols) * rh, r.g.toFixed(2),
+      { anchor: "middle", size: 14, fill: r.y ? YES : NO }));
+    const y0 = by + 58 + Math.ceil(rows.length / cols) * rh + 6;
+    svgEl(svg, "line", { x1: bx + 8, x2: bx + bw - 8, y1: y0 - 10, y2: y0 - 10, stroke: "rgba(255,255,255,.25)" });
+    txt(bx + 10, y0 + 4, `multiply all ${rows.length}: ` + sci(f.logL), { size: 14 });
+    txt(bx + 10, y0 + 24, "best possible: " + sci(f.logLBest), { size: 14, fill: "#cdbf9f" });
+    txt(bx + 10, y0 + 44, `per morning: ${f.gm.toFixed(3)} (best ${f.gmBest.toFixed(3)})`, { size: 14 });
+    txt(bx + 10, y0 + 64, `vs best: ${f.gm.toFixed(3)} ÷ ${f.gmBest.toFixed(3)} = ${Math.round(100 * f.score)}%`, { size: 14, bold: true, fill: "#ffe39a" });
+  }
+  // each training morning, in swell order, with g = the probability the curve gives to what actually happened
+  const fitRows = (cv) => T.training.map((d) => { const p = probAt(cv, d.x); return { ...d, g: d.y ? p : 1 - p }; });
+  function fitSummary(cv) {
+    const n = T.training.length, ll = (c) => fitRows(c).reduce((a, r) => a + Math.log(Math.max(r.g, 1e-300)), 0);
+    const a = ll(cv), b = ll(best);
+    return { logL: a / Math.LN10, logLBest: b / Math.LN10, gm: Math.exp(a / n), gmBest: Math.exp(b / n), score: fitScore(cv, best, X1, ys) };
+  }
+  const SUP = { "-": "⁻", 0: "⁰", 1: "¹", 2: "²", 3: "³", 4: "⁴", 5: "⁵", 6: "⁶", 7: "⁷", 8: "⁸", 9: "⁹" };
+  function sci(log10) {   // a likelihood from its log10, e.g. 4.1 × 10⁻⁸
+    let e = Math.floor(log10), m = Math.pow(10, log10 - e);
+    if (m >= 9.95) { m = 1; e += 1; }
+    return `${m.toFixed(1)} × 10${String(e).split("").map((c) => SUP[c]).join("")}`;
+  }
+
+  // Setting cases aside: the S-curve against a connect-the-dots curve that memorises every training morning. The
+  // chosen model is drawn bold; red rings mark the mornings it calls wrong at 0.5. The held-back mornings (diamonds,
+  // at what actually happened) appear only when revealed.
+  const DOTS = "#ff8a5c";
+  const modelAt = (m, x) => (m === "dots" ? connectDotsAt(T.training, x) : probAt(best, x));
+  const isRight = (m, d) => (callAt(modelAt(m, d.x)) === "yes" ? 1 : 0) === d.y;
+  function drawHoldout() {
+    for (const v of [0, 1]) svgEl(svg, "line", { x1: PX0, x2: PX1, y1: Y(v), y2: Y(v), stroke: "rgba(255,255,255,.3)", "stroke-dasharray": "6 6" });
+    for (const m of st.model === "s" ? ["dots", "s"] : ["s", "dots"]) {
+      const on = m === st.model, pts = [];
+      for (let i = 0; i <= 600; i++) { const x = T.xView[0] + (i / 600) * (T.xView[1] - T.xView[0]); pts.push(`${i ? "L" : "M"}${X(x).toFixed(1)} ${Y(modelAt(m, x)).toFixed(1)}`); }
+      svgEl(svg, "path", { d: pts.join(""), fill: "none", stroke: m === "s" ? CURVE : DOTS, "stroke-width": on ? 4 : 2.5, opacity: on ? 1 : 0.3,
+        "stroke-linecap": "round", "stroke-linejoin": "round", class: m === "s" ? "scurve" : "dotscurve" });
+    }
+    const ring = (d) => svgEl(svg, "circle", { cx: X(d.x), cy: Y(d.y), r: 16, fill: "none", stroke: "#ff4d3a", "stroke-width": 3, class: "wrongring" });
+    for (const d of T.training) if (!isRight(st.model, d)) ring(d);
+    dots();
+    if (st.reveal) for (const d of T.heldBack) {
+      if (!isRight(st.model, d)) ring(d);
+      svgEl(svg, "path", { d: diamond(X(d.x), Y(d.y), 12), fill: d.y ? YES : NO, stroke: "#fff", "stroke-width": 2.5, class: "held", "data-day": d.day });
+    }
+  }
+  const score = (m, set) => set.filter((d) => isRight(m, d)).length;
+  const scores = () => ({ s: { train: score("s", T.training), held: score("s", T.heldBack) }, dots: { train: score("dots", T.training), held: score("dots", T.heldBack) } });
 
   function drawCutoff() {
     const c = st.cutoff, yc = Y(c);
@@ -213,6 +279,7 @@ export function mount(host, opts = {}) {
     axes();
     if (st.tab === "lines") drawLines();
     else if (st.tab === "curve") drawCurve();
+    else if (st.tab === "holdout") drawHoldout();
     else drawCutoff();
     updateRead();
   }
@@ -238,12 +305,12 @@ export function mount(host, opts = {}) {
   svg.addEventListener("pointercancel", endDrag);
 
   // ---------- panel ----------
-  let sMid = null, sSteep = null, sCut = null, sProbe = null, fitBar = null, sBtn = null;
+  let sMid = null, sSteep = null, sCut = null, sProbe = null, sBtn = null, fBtn = null;
   function buildPanel() {
     F.mark(st.tab);
     F.setLesson(...LESSONS[st.tab]);
     F.ctl.replaceChildren();
-    sMid = sSteep = sCut = sProbe = fitBar = sBtn = null;
+    sMid = sSteep = sCut = sProbe = sBtn = fBtn = null;
     if (st.tab === "lines") {
       sProbe = slider("Read the line at (m)", { min: 0, max: 6, step: 0.1, value: st.probe, fmt: (v) => v.toFixed(1) + " m", onInput: (v) => api.setProbe(v) });
       sBtn = button("Compare the S-curve", "tog", () => { st.showS = !st.showS; sBtn.setAttribute("aria-pressed", String(st.showS)); save(); draw(); },
@@ -253,30 +320,30 @@ export function mount(host, opts = {}) {
     } else if (st.tab === "curve") {
       const row = el("div", "clsbrow");
       row.append(button("Best fit", "primary bestfit", () => api.bestFit(), "Snap to the curve buildModel() would find: the maximum-likelihood fit"),
-                 button("Start again", "", () => { api.setCurve({ ...START }); api.pick(null); }, "Put the curve back where it started"));
+                 button("Start again", "", () => api.setCurve({ ...START }), "Put the curve back where it started"));
       sMid = slider("Middle (m), where the probability is 0.5", { min: 0.3, max: 5.7, step: 0.05, value: st.curve.middle, fmt: (v) => v.toFixed(2) + " m",
         onInput: (v) => api.setCurve({ middle: v, steepness: st.curve.steepness }) });
       sSteep = slider("Steepness", { min: 0.2, max: 6, step: 0.05, value: st.curve.steepness, fmt: (v) => v.toFixed(2),
         onInput: (v) => api.setCurve({ middle: st.curve.middle, steepness: v }) });
-      const pick = el("div", "clsbrow");
-      pick.append(el("span", null, "Read a morning:"),
-        button("◀", "", () => stepPick(-1), "Previous morning"), button("▶", "", () => stepPick(1), "Next morning"));
-      const fb = el("div"); fb.style.cssText = "display:flex;flex-direction:column;gap:4px";
-      const track = el("div"); track.style.cssText = "height:14px;background:#1a1208;border:1px solid #8a6a32;border-radius:7px;overflow:hidden";
-      fitBar = el("i"); fitBar.style.cssText = "display:block;height:100%;background:linear-gradient(90deg,#a8742e,#ffe39a)";
-      track.appendChild(fitBar);
-      fb.append(el("span", "dim", "How well the curve fits the dots (full at the best fit)"), track);
-      F.ctl.append(row, sMid.el, sSteep.el, pick, fb);
+      sMid.el.style.color = MID; sSteep.el.style.color = STEEP;
+      fBtn = button("Show the fit calculation", "tog fitcalc", () => { st.showFit = !st.showFit; fBtn.setAttribute("aria-pressed", String(st.showFit)); save(); draw(); },
+        "Draw each morning's probability on the plot and multiply them out");
+      fBtn.setAttribute("aria-pressed", String(st.showFit));
+      F.ctl.append(row, sMid.el, sSteep.el, el("div", "clsbrow").appendChild(fBtn).parentNode);
+    } else if (st.tab === "holdout") {
+      const row = el("div", "clsbrow"), mS = button("S-curve", "tog model-s", () => api.setModel("s"), "Logistic regression, fit to the training mornings"),
+        mD = button("Connect-the-dots", "tog model-dots", () => api.setModel("dots"), "A curve through every training morning");
+      mS.setAttribute("aria-pressed", String(st.model === "s")); mD.setAttribute("aria-pressed", String(st.model === "dots"));
+      mS.style.color = CURVE; mD.style.color = DOTS;
+      row.append(el("span", null, "Model:"), mS, mD);
+      const rv = button(st.reveal ? "Hide the held-back mornings" : "Reveal the held-back mornings", "primary reveal", () => api.setReveal(!st.reveal),
+        "Show the ten mornings that were set aside, at what actually happened");
+      F.ctl.append(row, el("div", "clsbrow").appendChild(rv).parentNode);
     } else {
       sCut = slider("Cut-off", { min: 0.05, max: 0.95, step: 0.01, value: st.cutoff, fmt: (v) => v.toFixed(2), onInput: (v) => api.setCutoff(v) });
       F.ctl.append(sCut.el, el("div", "clsbrow").appendChild(button("Back to 0.5", "", () => api.setCutoff(0.5))).parentNode);
     }
     updateRead();
-  }
-  function stepPick(dir) {
-    const days = T.training.map((d) => d.day);
-    const i = st.picked == null ? (dir > 0 ? -1 : days.length) : days.indexOf(st.picked);
-    api.pick(days[(i + dir + days.length) % days.length]);
   }
   function updateRead() {
     const R = F.read;
@@ -285,15 +352,19 @@ export function mount(host, opts = {}) {
       const v = lineAt(st.probe);
       R.append(para(`The straight line through the 0/1 codes predicts <b>${fmtSigned(lineAt(0))}</b> at 0 m and <b>${fmtSigned(lineAt(6))}</b> at 6 m.`),
         para(`At ${st.probe.toFixed(1)} m it reads <b>${fmtSigned(v)}</b>${v < 0 || v > 1 ? ": not a probability." : "."}`));
+      if (st.showS) R.append(para(`The S-curve at ${st.probe.toFixed(1)} m reads <b>${probAt(best, st.probe).toFixed(2)}</b>, always between 0 and 1.`));
     } else if (st.tab === "curve") {
       if (sMid) sMid.set(st.curve.middle);
       if (sSteep) sSteep.set(st.curve.steepness);
-      if (fitBar) fitBar.style.width = (100 * fitScore(st.curve, best, X1, ys)).toFixed(1) + "%";
-      const d = st.picked != null ? T.training.find((t) => t.day === st.picked) : null;
-      if (d) {
-        R.append(para(`Morning ${d.day}: swell ${d.x.toFixed(1)} m, turned_back <b>${d.y ? "yes" : "no"}</b>.`),
-          para(`On this curve, probability_yes = <b>${probAt(st.curve, d.x).toFixed(2)}</b>.`));
-      } else R.append(para("Click a morning's dot to read its probability_yes off the curve.", "dim"));
+    } else if (st.tab === "holdout") {
+      const sc = scores(), h = (n) => (st.reveal ? `<b>${n}</b> of 10` : "?");
+      const t = el("table", "clsbtable holdscore");
+      t.innerHTML = `<thead><tr><th>called right (at 0.5)</th><th>training mornings</th><th>held-back mornings</th></tr></thead>` +
+        `<tbody><tr class="${st.model === "s" ? "changed" : ""}"><td style="color:${CURVE}">S-curve</td><td><b>${sc.s.train}</b> of 30</td><td>${h(sc.s.held)}</td></tr>` +
+        `<tr class="${st.model === "dots" ? "changed" : ""}"><td style="color:${DOTS}">Connect-the-dots</td><td><b>${sc.dots.train}</b> of 30</td><td>${h(sc.dots.held)}</td></tr></tbody>`;
+      R.append(para("Red rings: mornings the chosen model calls wrong.", "dim"), t);
+      R.append(para(st.reveal ? "Perfect on the mornings it learned from, worse on new ones: connect-the-dots memorized the noise. The S-curve does about as well on new mornings as on old ones."
+        : "Which model will do better on mornings it has never seen? Reveal the held-back mornings to find out.", "dim"));
     } else {
       if (sCut) sCut.set(st.cutoff);
       const rows = calls(), yesNow = rows.filter((r) => r.call === "yes").length, yes05 = rows.filter((r) => r.call05 === "yes").length;
@@ -337,7 +408,7 @@ export function mount(host, opts = {}) {
 
   const api = {
     ready: Promise.resolve(),
-    setTab(k) { if (!TABS.some(([kk]) => kk === k)) throw new Error("sigmoid_board: setTab needs lines/curve/cutoff"); cancelAnimationFrame(raf); drag = null; st.tab = k; save(); buildPanel(); draw(); },
+    setTab(k) { if (!TABS.some(([kk]) => kk === k)) throw new Error("sigmoid_board: setTab needs lines/curve/holdout/cutoff"); cancelAnimationFrame(raf); drag = null; st.tab = k; save(); buildPanel(); draw(); },
     tab: () => st.tab,
     curve: () => ({ ...st.curve }),
     setCurve(c) {
@@ -349,10 +420,17 @@ export function mount(host, opts = {}) {
     best: () => ({ ...best }),
     line: () => ({ ...line }),
     lineAt,
+    curveAt: (x) => probAt(best, x),
+    setShowFit(on) { st.showFit = !!on; if (fBtn) fBtn.setAttribute("aria-pressed", String(st.showFit)); save(); draw(); },
+    showFit: () => st.showFit,
+    setModel(m) { if (m !== "s" && m !== "dots") throw new Error("sigmoid_board: setModel needs s/dots"); st.model = m; save(); buildPanel(); draw(); },
+    model: () => st.model,
+    setReveal(on) { st.reveal = !!on; save(); buildPanel(); draw(); },
+    revealed: () => st.reveal,
+    scores,
+    fit: () => fitSummary(st.curve),
     setProbe(x) { st.probe = clamp(Math.round(+x * 10) / 10, 0, 6); if (sProbe) sProbe.set(st.probe); save(); draw(); },
     probe: () => st.probe,
-    pick(day) { st.picked = day == null ? null : +day; save(); draw(); },
-    picked: () => st.picked,
     probability(day) { const d = T.training.find((t) => t.day === +day); return d ? probAt(st.curve, d.x) : null; },
     setCutoff(c) { st.cutoff = clamp(Math.round(+c * 100) / 100, 0.05, 0.95); save(); draw(); },
     cutoff: () => st.cutoff,

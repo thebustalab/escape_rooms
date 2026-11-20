@@ -33,10 +33,10 @@
   },
   "doorLabels": true,
   "state": {
-    "day_two": false
+    "day_two": true
   },
   "_designNotes": {
-    "buildState": "Rooms, graph and scene specs written by _scratch/build_scenario.py (2026-11-19): the graded pair's volcano island (lair + observatory) in Staff Only's year, in morning light. Day one: the monitoring station (hub: bulletin board = deliver, S-curve board = instrument, day ledger = dataset explorer, notice case -> Staff Only) and the footpath up the flank to seismo_hut (L1), gas_vent (L2), crater_rim (L3). Day two: the summit observatory's plate archive (hub: second bulletin board, tally board, plate cabinet, notice case -> Good Seeing) and plate_store (L1), measuring_engine (L2), dome (L3). The truck door to day two is hidden until state.day_two is true (Wednesday). Live scenario: tasks are dealt by the live-class server (authoring_v2/live_class/pool/watch.json); the book's practice pool is solo/pool.json. No codec id, no escape, ungraded. Music: the parent scenarios have no track yet. Art: every room from text + skeleton, the station first."
+    "buildState": "Rooms, graph and scene specs written by _scratch/build_scenario.py (2026-11-19; the summit car park added 2026-11-20): the graded pair's volcano island (lair + observatory) in Staff Only's year, in morning light. Day one: the monitoring station (hub: bulletin board = deliver, S-curve board = instrument, day ledger = dataset explorer, notice case -> Staff Only) and the footpath up the flank to seismo_hut (L1), gas_vent (L2), crater_rim (L3). Day two: the station's truck drives up to the summit car park (arrival, no task), whose observatory front door opens into the plate archive (hub: second bulletin board, tally board, plate cabinet, notice case -> Good Seeing) and plate_store (L1), measuring_engine (L2), dome (L3). The truck door to the car park is hidden until state.day_two is true (Wednesday). Live scenario: tasks are dealt by the live-class server (authoring_v2/live_class/pool/watch.json); the book's practice pool is solo/pool.json. No codec id, no escape, ungraded. Music: the parent scenarios have no track yet. Art: every room from text + skeleton, the station first."
   },
   "worldPlatePrompt": "One continuous single-frame view at sunrise from a little above a small volcano monitoring station high on the steep flank of a volcanic island: a tidy gravel yard cut into black cinder with a low whitewashed hut, a slim radio mast and a white four-wheel-drive truck parked by the yard's gateway, a mountain road winding below, a stepped footpath with a rope handrail climbing past a squat stone hut to the level edge of the crater's shelf where a thin white plume of steam rises, and over the shelf's skyline, small with distance, the tall pale stacks of a geothermal plant on the crater's far rim. Low warm gold sunlight from the east-south-east over a deep blue ocean, long cool shadows, a clear sky. Photorealistic. No people, no animals, no text, no night lights.",
   "coverPrompt": "Minimalist stylised thumbnail poster: the bold silhouette of a steep volcano's summit with one small observatory dome on its top and a thin plume of steam from its flank, against a huge low rising sun. One bold, simple, high-contrast silhouette that reads at thumbnail size; flat limited palette of deep blue sky, dark silhouette and one warm amber glow of the sunrise. Strong negative space, soft film grain. Square. No people, no text.",
@@ -47,12 +47,12 @@
       "title": "The monitoring station",
       "built": true,
       "unlockedWhen": true,
-      "designNote": "DAY-ONE HUB (Monday). The morning bulletin board is a deliver point (carry-back: calls count only once clipped to a bulletin); the S-curve board is the day's instrument (kind sigmoid_board, not built yet); the day ledger is the dataset explorer on the station's earlier record (sister data). The notice case opens Staff Only once lair has a play.html (link left out until then). The footpath climbs to the three day-one stations; the truck is the way up to the day-two hub, hidden until state.day_two.",
+      "designNote": "DAY-ONE HUB (Monday). The morning bulletin board is a deliver point (carry-back: calls count only once clipped to a bulletin); the S-curve board is the day's instrument (kind sigmoid_board, not built yet); the day ledger is the dataset explorer on the station's earlier record (sister data). The notice case opens Staff Only once lair has a play.html (link left out until then). The footpath climbs to the three day-one stations; the truck drives up to the summit car park (the way to the day-two hub), hidden until state.day_two.",
       "plannedHotspots": [
         {
           "type": "door",
           "direction": "open",
-          "to": "archive",
+          "to": "car_park",
           "label": "The station's truck",
           "shownWhen": {
             "eq": [
@@ -150,7 +150,7 @@
               "label": "The station's truck",
               "door": {
                 "direction": "open",
-                "to": "archive"
+                "to": "car_park"
               },
               "desc": "standing well in from the edge of the frame, the station's white four-wheel-drive truck parked on the yard's gravel, its driver's door standing open, its nose toward the yard's open gateway just beyond it between two stout gateposts, where a steep gravel track drops away out of sight to the island road below the yard"
             },
@@ -3115,7 +3115,7 @@
           "motionClosing": "Only the steam from the kettle moves; everything else stays exactly where it is."
         },
         "scenePrompt": "This is a seamless 360-degree panorama from the small levelled gravel yard of a volcano monitoring station cut into a steep cinder slope high on a volcanic island, just below the shelf the crater sits on, at dawn, a little above a hairpin bend of the island's mountain road, which winds on up toward the summit. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a low dry-stone wall close behind the viewer at the yard's downhill edge, the sea far below beyond it: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: a low dry-stone wall close by at the yard's downhill edge and the sea far below beyond it, joining its other half cleanly at the seam directly behind you; to the left, standing well in from the edge of the frame, the station's white four-wheel-drive truck parked on the yard's gravel, its driver's door standing open, its nose toward the yard's open gateway just beyond it between two stout gateposts, where a steep gravel track drops away out of sight to the island road below the yard; left of centre, far up the slope over the level edge of the crater's shelf, high above the yard and small with distance, the tops of brand-new concrete and glass buildings, a monorail platform's roof and the tall pale stacks of a geothermal plant on the crater's far rim; left of centre, on the gateway side of the yard, a few strides right of the truck, a tall green-painted wooden board on two posts set in the gravel, facing the viewer, with three long rows of empty brass clips across it and a small tin rubber stamp hanging on a cord from one post; dead ahead in the centre, the yard's gravel running level to the foot of a narrow footpath of steps cut into the black cinder, edged with a rope handrail on short iron posts, climbing away UP the steep slope toward a small squat stone hut a little way above, and beyond it the long level skyline of the crater's shelf against the sky; just right of the centre, at the foot of the footpath, just to the right of its first step on its own short post, a small glass-fronted wooden notice case with one pale paper notice pinned inside, nothing on it readable; right of centre, far up the slope on the edge of the shelf, small with distance, a single thin steel survey mast standing against the sky; right of centre, a few strides off at the left end of the station hut's narrow concrete veranda, just past the hut's corner, a small camping stove on a low bench with a dented enamel kettle on it at a rolling boil, the dark cinder slope behind it, a thick plume of white steam pouring from the kettle's spout, lit gold by the low sun against the dark cinder slope; right of centre, beside the bench at the same left end of the veranda, in front of the hut's wall, a sturdy wooden desk standing on the veranda floor, a big cloth-bound ledger lying open on it, its ruled pages blank at this distance, a pencil in its gutter; right of centre, the station hut close by, a low whitewashed concrete building with a flat roof, a slim radio mast rising from its roof and a small solar panel, its narrow concrete veranda running along its front; to the right, standing well in from the edge of the frame, fixed flat on the sunlit front wall of the station hut toward its right end, well clear of the desk and square to the viewer, a large plain board painted matt white, ruled with faint grey lines into an empty grid, a felt duster and a tin of markers on its little ledge; on the far right, the right half of the calm view directly behind the viewer: a low dry-stone wall close by at the yard's downhill edge and the sea far below beyond it, joining its other half cleanly at the seam directly behind you. A small, tidy, sunlit work yard on a raw volcanic slope at sunrise, gold light and long shadows; a steep volcanic island high above a deep blue ocean: dark basalt, red-brown and black cinder, pale pumice, crusts of real lemon-yellow sulfur at the vents, sparse silver-green broom bushes, weathered whitewashed concrete and galvanized steel, a deep clear sky; photorealistic, fine natural film grain. No people, no human figures, no faces and no statues anywhere; no animals. No readable words, no legible writing, no captions, no logos and no painted numbers on any wall, sign, board, ledger page or label. It is MORNING: no night sky, no stars, no moon, no floodlights, no blue fire at any vent or on the crater floor, no lava and no red glow; no fog, no cloud sea below the mountain, no rain. The image is SHARP: no motion blur and no smeared or doubled detail anywhere. No cable car and no gondola. No town, hotel or harbor anywhere in view. The board's grid and the bulletin board's clips are EMPTY. EXACTLY ONE whitewashed hut in the yard (the small stone hut up the slope is the only other building near), ONE truck, ONE footpath, ONE notice case. The kettle's steam is the only steam in the yard. The yard has EXACTLY TWO ways out: the footpath dead ahead and the gateway down to the road on the left; no other path, stair or gate. Shot on a full-frame DSLR at 24mm, f/8, the first light of dawn: the sun just risen out of the sea to the east-south-east, low on the viewer's left, warm gold light raking across the slope, long cool blue shadows, a pale clear sky deepening to blue overhead, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a low dry-stone wall close behind the viewer at the yard's downhill edge, the sea far below beyond it, with no visible seam, join, or repetition.",
-        "specBuild": "56e4c48fabaa1580b2ca",
+        "specBuild": "c8dfe0529ee3c9f90113",
         "seam": {
           "stage": "blurred",
           "band": "sky",
@@ -3149,7 +3149,7 @@
             0.6247
           ],
           "direction": "open",
-          "to": "archive",
+          "to": "car_park",
           "shownWhen": {
             "eq": [
               "day_two",
@@ -3186,26 +3186,28 @@
           "type": "plaque",
           "label": "Notice: Staff Only",
           "box": [
-            0.5107,
-            0.4483,
-            0.5307,
-            0.5093
+            0.5189,
+            0.5,
+            0.5389,
+            0.561
           ],
           "title": "Staff Only",
-          "body": "Pinned in the station's notice case: a press day at the new crater resort, a night tour that a pair of reporters slip away from, and a warning system its owner swears by. This is one of the chapter's homework scenarios, played with a partner. It opens here once it is ready."
+          "body": "Pinned in the station's notice case: a press day at the new crater resort, a night tour that a pair of reporters slip away from, and a warning system its owner swears by. This is one of the chapter's homework scenarios, played with a partner. It opens here once it is ready.",
+          "boxSource": "moved:testplay"
         },
         {
           "id": "the_day_ledger",
           "type": "instrument",
           "label": "The day ledger",
           "box": [
-            0.6127,
-            0.5784,
-            0.6827,
-            0.6628
+            0.6275,
+            0.5534,
+            0.6975,
+            0.6378
           ],
           "kind": "dataset_explorer",
-          "config": "data/station_ledger.explorer.json"
+          "config": "data/station_ledger.explorer.json",
+          "boxSource": "moved:testplay"
         },
         {
           "id": "the_s_curve_board",
@@ -11409,38 +11411,41 @@
           "type": "door",
           "label": "The footpath up to the fumarole",
           "box": [
-            0.0948,
-            0.31,
-            0.1524,
-            0.502
+            0.177,
+            0.321,
+            0.2346,
+            0.513
           ],
           "direction": "open",
-          "to": "gas_vent"
+          "to": "gas_vent",
+          "boxSource": "moved:testplay"
         },
         {
           "id": "the_seismometer_hut",
           "type": "station",
           "label": "The seismometer hut",
           "box": [
-            0.3858,
-            0.3489,
-            0.4584,
-            0.6794
+            0.3288,
+            0.4559,
+            0.4014,
+            0.7864
           ],
-          "tier": 1
+          "tier": 1,
+          "boxSource": "moved:testplay"
         },
         {
           "id": "the_footpath_down_to_the_station",
           "type": "door",
           "label": "The footpath down to the station",
           "box": [
-            0.635,
-            0.626,
-            0.715,
-            0.77
+            0.7015,
+            0.6029,
+            0.7815,
+            0.7469
           ],
           "direction": "back",
-          "to": "station"
+          "to": "station",
+          "boxSource": "moved:testplay"
         },
         {
           "id": "clip_base",
@@ -11548,7 +11553,7 @@
               "motion": {
                 "moves": true,
                 "vigour": "a column of white steam rising steadily from the crack",
-                "phrase": "white steam pours continuously up out of the crack in the sulfur mound and billows upward, each puff and curl climbing steadily up the plume and drifting away to the right on the breeze as fresh steam wells up from the crack behind it"
+                "phrase": "the thick white plume of steam over the crack in the sulfur mound churns and billows in place along its whole height, its puffs and curls swelling, folding and thinning continuously from the first moment to the last, never pausing"
               },
               "sound": {
                 "source": "the steaming crack in the fumarole",
@@ -16456,10 +16461,10 @@
             }
           },
           "worldPlateRef": false,
-          "motionClosing": "Only the steam moves, and it travels: every wisp flows steadily up and away from the vent. The black cinder ground is solid and sharp and never shimmers or crawls; everything else stays exactly where it is."
+          "motionClosing": "Only the steam moves, churning and billowing busily the whole time, never settling still. The black cinder ground is solid and sharp and never shimmers or crawls; everything else stays exactly where it is."
         },
         "scenePrompt": "This is a seamless 360-degree panorama from a small level pad of trodden cinder at the lip of a volcano's high shelf, beside a steaming fumarole crusted with yellow sulfur, on a stepped footpath climbing to the crater's rim, in the early morning. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the flat cinder of the shelf running away behind the viewer, plain and even: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: the flat cinder of the shelf running away close by, plain and even, joining its other half cleanly at the seam directly behind you; to the left, standing well in from the edge of the frame, the pad's cinder running level onto the stepped footpath, which climbs on away UP over the level shelf to the crater's raised rim, a low dark ridge against the sky; left of centre, far off and high above, over the shelf, the island's steep summit cone with a small pale observatory dome on its top; dead ahead in the centre, a few strides ahead, a low mound of cinder crusted bright lemon-yellow and white with sulfur, a steaming crack at its top, a short steel sampling pipe pushed into the crack and its tube running to a small grey box on a stake beside it, a column of white steam rising steadily from the crack; to the right, standing well in from the edge of the frame, the pad's cinder running level onto the stepped footpath, which starts DOWN between two short iron posts of its rope handrail and drops away over the shelf's lip toward the small stone hut on the slope below, and the sea far below beyond; on the far right, the right half of the calm view directly behind the viewer: the flat cinder of the shelf running away close by, plain and even, joining its other half cleanly at the seam directly behind you. A raw, bright volcanic shelf, yellow sulfur and white steam against black cinder; a steep volcanic island high above a deep blue ocean: dark basalt, red-brown and black cinder, pale pumice, crusts of real lemon-yellow sulfur at the vents, sparse silver-green broom bushes, weathered whitewashed concrete and galvanized steel, a deep clear sky; photorealistic, fine natural film grain. No people, no human figures, no faces and no statues anywhere; no animals. No readable words, no legible writing, no captions, no logos and no painted numbers on any wall, sign, board, ledger page or label. It is MORNING: no night sky, no stars, no moon, no floodlights, no blue fire at any vent or on the crater floor, no lava and no red glow; no fog, no cloud sea below the mountain, no rain. The image is SHARP: no motion blur and no smeared or doubled detail anywhere. No cable car and no gondola. No town, hotel or harbor anywhere in view. EXACTLY ONE steaming vent. The pad has EXACTLY TWO ways off: the footpath up on the left and down on the right; no other path or road. Shot on a full-frame DSLR at 24mm, f/8, early-to-mid morning: the sun well up over the sea to the east-south-east, behind the viewer over the right shoulder, strong clear light falling on the mound, the steam bright white where the sun catches it, a deep-blue sky, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into the flat cinder of the shelf running away behind the viewer, plain and even, with no visible seam, join, or repetition.",
-        "specBuild": "e4115eb3bff54b92022a",
+        "specBuild": "64107afc4a6e864ae92e",
         "seam": {
           "stage": "blurred",
           "band": "sky",
@@ -16487,38 +16492,62 @@
           "type": "door",
           "label": "The footpath up to the rim",
           "box": [
-            0.13,
-            0.7,
-            0.2196,
-            0.828
+            0.2172,
+            0.4144,
+            0.3068,
+            0.5424
           ],
           "direction": "open",
-          "to": "crater_rim"
+          "to": "crater_rim",
+          "boxSource": "moved:testplay"
         },
         {
           "id": "the_fumarole",
           "type": "station",
           "label": "The fumarole",
           "box": [
-            0.469,
-            0.4529,
-            0.5047,
-            0.6682
+            0.5616,
+            0.4678,
+            0.5973,
+            0.6831
           ],
-          "tier": 2
+          "tier": 2,
+          "boxSource": "moved:testplay"
         },
         {
           "id": "the_footpath_down_to_the_hut",
           "type": "door",
           "label": "The footpath down to the hut",
           "box": [
-            0.727,
-            0.668,
-            0.823,
-            0.86
+            0.7607,
+            0.5084,
+            0.8567,
+            0.7004
           ],
           "direction": "back",
-          "to": "seismo_hut"
+          "to": "seismo_hut",
+          "boxSource": "moved:testplay"
+        },
+        {
+          "id": "clip_base",
+          "type": "ambient",
+          "label": "Scene motion (base)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Carrier for this room's BAKED full-scene cinemagraph. `ambient` is filtered out of rendering, so it shows no marker and intercepts no clicks; it exists only to hold the clip. Written by /api/play-source.",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "gas_vent/cine_base.mp4"
+          }
         }
       ]
     },
@@ -25491,25 +25520,27 @@
           "type": "door",
           "label": "The footpath down from the rim",
           "box": [
-            0.1,
-            0.65,
             0.132,
-            0.842
+            0.561,
+            0.164,
+            0.753
           ],
           "direction": "back",
-          "to": "gas_vent"
+          "to": "gas_vent",
+          "boxSource": "moved:testplay"
         },
         {
           "id": "the_survey_pillar",
           "type": "station",
           "label": "The survey pillar",
           "box": [
-            0.49,
-            0.674,
-            0.51,
-            0.77
+            0.5118,
+            0.6553,
+            0.5318,
+            0.7513
           ],
-          "tier": 3
+          "tier": 3,
+          "boxSource": "moved:testplay"
         },
         {
           "id": "clip_base",
@@ -25535,17 +25566,1321 @@
       ]
     },
     {
-      "key": "archive",
-      "title": "The plate archive",
-      "built": true,
+      "key": "car_park",
+      "title": "The summit car park",
+      "built": false,
       "unlockedWhen": true,
-      "designNote": "DAY-TWO HUB (Wednesday). The archive's bulletin board is the second plain deliver (both feed the one total); the tally board is the day's instrument (kind scoreboard, not built yet); the plate cabinet is the dataset explorer on the second plate collection (sister data). The notice case opens Good Seeing once observatory has a play.html. Reached from the station by the truck (hidden on Monday).",
+      "designNote": "ARRIVAL ON THE SUMMIT (day two). No station, deliver, instrument or plaque: the place between the truck and the plate archive. The drive up from the station ends here and the drive down starts here (the truck door goes back to the station; the observatory's front door opens into the archive). Reached only by the station's truck, so it is hidden with everything beyond it until state.day_two.",
       "plannedHotspots": [
         {
           "type": "door",
           "direction": "back",
           "to": "station",
-          "label": "The way out to the truck",
+          "label": "The station's truck"
+        },
+        {
+          "type": "door",
+          "direction": "open",
+          "to": "archive",
+          "label": "The observatory's front door"
+        }
+      ],
+      "authoring": {
+        "sceneSpec": {
+          "room": "car_park",
+          "setting": "the small gravel car park on the bare summit of a steep volcanic island, high above everything, beside an old mountain-top astronomical observatory of pale cut stone, in mid-morning sunlight, at the head of the island's mountain road",
+          "interior": false,
+          "seam": "a low dry-stone wall close behind the viewer at the car park's edge, the sea far below beyond it",
+          "seamOccluder": "one tall weathered wooden marker post standing upright against the wall, full height",
+          "elements": [
+            {
+              "id": "seam_left",
+              "at": "on the far left",
+              "desc": "the left half of the calm view directly behind the viewer: a low dry-stone wall close by at the car park's edge and the sea far below beyond it, joining its other half cleanly at the seam directly behind you"
+            },
+            {
+              "id": "station_truck",
+              "at": "to the left",
+              "label": "The station's truck",
+              "door": {
+                "direction": "back",
+                "to": "station"
+              },
+              "desc": "standing well in from the edge of the frame, a few strides off on the gravel, the station's white four-wheel-drive truck parked with its nose toward the head of the road, its driver's door standing open, the low stone wall at the car park's edge close behind it; just past its nose, two low stone posts where the island's mountain road leaves the gravel and drops away DOWN off the summit out of sight"
+            },
+            {
+              "id": "front_door",
+              "at": "left of centre",
+              "label": "The observatory's front door",
+              "door": {
+                "direction": "open",
+                "to": "archive"
+              },
+              "desc": "across the gravel, a short path of flat stone flags running level from the car park to the long, low, single-storey building of pale cut stone that holds the observatory's plate archive, its heavy oak front door standing wide open in the sunlit wall on a cool shaded stone room within"
+            },
+            {
+              "id": "windsock",
+              "at": "dead ahead in the centre",
+              "desc": "a few strides ahead at the car park's edge, a short slender steel mast with a red-and-white striped canvas windsock on a swivel at its top, high against the clear sky over the observatory's other low pale stone buildings beyond",
+              "motion": {
+                "moves": true,
+                "vigour": "the windsock half filled by the light breeze, its striped tail lifted a little",
+                "phrase": "the half-filled windsock sways gently on its swivel, its striped tail lifting and settling slowly in the light breeze; the mast stays still"
+              },
+              "sound": {
+                "source": "the windsock on its mast",
+                "character": "a soft, slow flap of canvas and a faint creak of its swivel",
+                "prominence": "hero"
+              }
+            },
+            {
+              "id": "far_dome",
+              "at": "right of centre",
+              "desc": "a few dozen strides off on the summit's edge, the observatory's round dome: a drum of pale whitewashed stone under a smooth silver-grey metal cap, against the deep-blue sky"
+            },
+            {
+              "id": "far_view",
+              "at": "to the right",
+              "desc": "standing well in from the edge of the frame, beyond the open edge of the gravel where the summit falls steeply away, far below the viewer: the island's mountain road zigzagging in tight hairpin bends down the steep slope just below the edge, and the long dark slope of the mountain running down to a level shelf of the island and the low raised rim of a wide crater on it, its floor hidden behind the rim, thin white wisps of steam rising out of it above the rim, and on the crater's far rim, small with distance, the brand-new concrete and glass buildings of a works; beyond and far below everything, the deep blue sea to the horizon"
+            },
+            {
+              "id": "seam_right",
+              "at": "on the far right",
+              "desc": "the right half of the calm view directly behind the viewer: a low dry-stone wall close by at the car park's edge and the sea far below beyond it, joining its other half cleanly at the seam directly behind you"
+            }
+          ],
+          "soundBed": "a high bare summit in the morning: a steady cool breeze across the gravel, a wide open hush.",
+          "rigid": "the truck, the observatory building and its door, the dome, the mast, the stone posts, and the wall",
+          "atmosphere": "A small, bright gravel car park on a bare volcanic summit beside an old stone observatory, the whole island falling away far below; a steep volcanic island high above a deep blue ocean: dark basalt, red-brown and black cinder, pale pumice, crusts of real lemon-yellow sulfur at the vents, sparse silver-green broom bushes, weathered whitewashed concrete and galvanized steel, a deep clear sky; pale cut stone and whitewashed plaster of an old observatory; photorealistic, fine natural film grain",
+          "styleLight": "mid-morning: the sun well up in the east-south-east, behind the viewer over the right shoulder, bright clear light on the pale stone of the observatory and on the white truck, short crisp shadows, a deep-blue sky",
+          "negatives": "No people, no human figures, no faces and no statues anywhere; no animals. No readable words, no legible writing, no captions, no logos and no painted numbers on any wall, sign, board, ledger page or label. It is MORNING: no night sky, no stars, no moon, no floodlights, no blue fire at any vent or on the crater floor, no lava and no red glow; no fog, no cloud sea below the mountain, no rain. The image is SHARP: no motion blur and no smeared or doubled detail anywhere. No cable car and no gondola. No town, hotel or harbor anywhere in view. EXACTLY ONE vehicle, the white truck; ONE windsock; ONE dome. No painted parking bays, no signs, no barrier arm. The car park has EXACTLY TWO ways out: the observatory's open front door left of centre and the road down past the truck on the left; no other path, stair or gate.",
+          "states": {},
+          "continuity": [],
+          "scaffold": {
+            "kind": "skeleton",
+            "layout": {
+              "world": {
+                "blocks": [
+                  [
+                    "rock",
+                    1200.0004,
+                    1300.0004,
+                    2400.0004,
+                    2425.0004,
+                    -299.9996,
+                    300.0004,
+                    "terrain"
+                  ],
+                  [
+                    "rock",
+                    1100.0004,
+                    1200.0004,
+                    2425.0004,
+                    2450.0004,
+                    -499.9996,
+                    500.0004,
+                    "terrain"
+                  ],
+                  [
+                    "ground",
+                    2386.3004,
+                    4386.3004,
+                    1750.0004,
+                    1760.0004,
+                    -686.2396,
+                    713.7604,
+                    "terrain"
+                  ],
+                  [
+                    "rock",
+                    2386.3004,
+                    4361.3004,
+                    1760.0004,
+                    1770.0004,
+                    -686.2396,
+                    -211.2396,
+                    "terrain"
+                  ],
+                  [
+                    "rock",
+                    2386.3004,
+                    4336.3004,
+                    1770.0004,
+                    1780.0004,
+                    -686.2396,
+                    -211.2396,
+                    "terrain"
+                  ],
+                  [
+                    "rock",
+                    2386.3004,
+                    4311.3004,
+                    1780.0004,
+                    1790.0004,
+                    -686.2396,
+                    -236.2396,
+                    "terrain"
+                  ],
+                  [
+                    "rock",
+                    2386.3004,
+                    4286.3004,
+                    1790.0004,
+                    1800.0004,
+                    -686.2396,
+                    -236.2396,
+                    "terrain"
+                  ],
+                  [
+                    "rock",
+                    4136.3004,
+                    4286.3004,
+                    1790.0004,
+                    1800.0004,
+                    113.7604,
+                    213.7604,
+                    "terrain"
+                  ],
+                  [
+                    "rock",
+                    2386.3004,
+                    4261.3004,
+                    1800.0004,
+                    1810.0004,
+                    -686.2396,
+                    -261.2396,
+                    "terrain"
+                  ],
+                  [
+                    "rock",
+                    2386.3004,
+                    4261.3004,
+                    1810.0004,
+                    1820.0004,
+                    -686.2396,
+                    -261.2396,
+                    "terrain"
+                  ],
+                  [
+                    "rock",
+                    2386.3004,
+                    4211.3004,
+                    1830.0004,
+                    1840.0004,
+                    -686.2396,
+                    -286.2396,
+                    "terrain"
+                  ],
+                  [
+                    "rock",
+                    2386.3004,
+                    4186.3004,
+                    1840.0004,
+                    1850.0004,
+                    -686.2396,
+                    -311.2396,
+                    "terrain"
+                  ],
+                  [
+                    "rock",
+                    2386.3004,
+                    3811.3004,
+                    1850.0004,
+                    1860.0004,
+                    -686.2396,
+                    -311.2396,
+                    "terrain"
+                  ],
+                  [
+                    "rock",
+                    2386.3004,
+                    3386.3004,
+                    1860.0004,
+                    1870.0004,
+                    -686.2396,
+                    -286.2396,
+                    "terrain"
+                  ],
+                  [
+                    "rock",
+                    2386.3004,
+                    2986.3004,
+                    1860.0004,
+                    1870.0004,
+                    63.7604,
+                    163.7604,
+                    "terrain"
+                  ],
+                  [
+                    "rock",
+                    2386.3004,
+                    3036.3004,
+                    1870.0004,
+                    1880.0004,
+                    -686.2396,
+                    -11.2396,
+                    "terrain"
+                  ],
+                  [
+                    "rock",
+                    2386.3004,
+                    2961.3004,
+                    1870.0004,
+                    1880.0004,
+                    113.7604,
+                    238.7604,
+                    "terrain"
+                  ],
+                  [
+                    "rock",
+                    2386.3004,
+                    2736.3004,
+                    1880.0004,
+                    1890.0004,
+                    -686.2396,
+                    738.7604,
+                    "terrain"
+                  ],
+                  [
+                    "rock",
+                    80.0004,
+                    100.0004,
+                    2860.0004,
+                    2870.0004,
+                    -39.9996,
+                    40.0004,
+                    "terrain"
+                  ],
+                  [
+                    "rock",
+                    60.0004,
+                    80.0004,
+                    2870.0004,
+                    2880.0004,
+                    -39.9996,
+                    40.0004,
+                    "terrain"
+                  ],
+                  [
+                    "rock",
+                    40.0004,
+                    60.0004,
+                    2880.0004,
+                    2890.0004,
+                    -39.9996,
+                    40.0004,
+                    "terrain"
+                  ],
+                  [
+                    "rock",
+                    -39.9996,
+                    40.0004,
+                    2890.0004,
+                    2900.0004,
+                    -39.9996,
+                    40.0004,
+                    "terrain"
+                  ],
+                  [
+                    "walk",
+                    117.8004,
+                    129.0504,
+                    2839.0004,
+                    2858.4204,
+                    26.5504,
+                    41.8904,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    115.2204,
+                    126.8004,
+                    2839.0004,
+                    2858.7204,
+                    32.8904,
+                    48.0704,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    112.3304,
+                    124.2204,
+                    2849.0004,
+                    2859.0204,
+                    39.0704,
+                    54.0904,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    109.1504,
+                    121.3304,
+                    2849.0004,
+                    2859.3204,
+                    45.0904,
+                    59.9304,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    41.8204,
+                    53.0504,
+                    2879.0004,
+                    2895.4104,
+                    44.0504,
+                    55.9404,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    41.2204,
+                    53.0504,
+                    2879.0004,
+                    2895.6904,
+                    44.0504,
+                    55.2804,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    38.2904,
+                    50.2204,
+                    2879.0004,
+                    2895.9004,
+                    46.2804,
+                    57.3404,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    35.2704,
+                    47.2904,
+                    2879.0004,
+                    2896.1104,
+                    48.3404,
+                    59.2404,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    32.1704,
+                    44.2704,
+                    2889.0004,
+                    2896.3104,
+                    50.2404,
+                    60.9704,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    29.0004,
+                    41.1704,
+                    2889.0004,
+                    2896.5204,
+                    51.9704,
+                    62.5204,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    25.7604,
+                    38.0004,
+                    2889.0004,
+                    2896.7304,
+                    53.5204,
+                    63.9004,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    22.4804,
+                    34.7604,
+                    2879.0004,
+                    2896.9404,
+                    54.9004,
+                    65.1004,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    -20.5496,
+                    -8.3896,
+                    2879.0004,
+                    2899.7504,
+                    55.3904,
+                    65.1504,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    -17.3896,
+                    -5.1996,
+                    2879.0004,
+                    2899.7504,
+                    56.1504,
+                    65.7404,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    -4.4996,
+                    4.5004,
+                    2879.0004,
+                    2900.0304,
+                    47.5004,
+                    66.5004,
+                    "road"
+                  ],
+                  [
+                    "walk",
+                    4206.3004,
+                    4286.3004,
+                    1841.0004,
+                    1871.0004,
+                    33.7604,
+                    463.7604,
+                    "rim_pad"
+                  ],
+                  [
+                    "wall",
+                    4216.3004,
+                    4276.3004,
+                    1871.0004,
+                    1886.0004,
+                    53.7604,
+                    143.7604,
+                    "security_block"
+                  ],
+                  [
+                    "walk",
+                    10960.0004,
+                    11360.0004,
+                    0.0004,
+                    5.0004,
+                    -66.2396,
+                    -26.2396,
+                    "harbour_quay"
+                  ],
+                  [
+                    "walk",
+                    4075.3004,
+                    4077.3004,
+                    1849.6604,
+                    1855.6604,
+                    -382.3096,
+                    -380.3096,
+                    "footpath"
+                  ],
+                  [
+                    "walk",
+                    -54.9996,
+                    55.0004,
+                    2880.0004,
+                    2900.3004,
+                    -24.9996,
+                    25.0004,
+                    "summit_plateau"
+                  ],
+                  [
+                    "walk",
+                    -24.9996,
+                    25.0004,
+                    2880.0004,
+                    2900.3004,
+                    -54.9996,
+                    55.0004,
+                    "summit_plateau"
+                  ],
+                  [
+                    "wall",
+                    36.0004,
+                    56.0004,
+                    2900.3004,
+                    2908.0004,
+                    -4.4996,
+                    4.5004,
+                    "dome"
+                  ],
+                  [
+                    "wall",
+                    41.5004,
+                    50.5004,
+                    2900.3004,
+                    2908.0004,
+                    -9.9996,
+                    10.0004,
+                    "dome"
+                  ],
+                  [
+                    "wall",
+                    38.0004,
+                    54.0004,
+                    2900.3004,
+                    2908.0004,
+                    -7.9996,
+                    8.0004,
+                    "dome"
+                  ],
+                  [
+                    "cloth",
+                    38.0004,
+                    54.0004,
+                    2900.3004,
+                    2911.5004,
+                    -7.9996,
+                    8.0004,
+                    "dome"
+                  ],
+                  [
+                    "cloth",
+                    40.5004,
+                    51.5004,
+                    2900.3004,
+                    2914.0004,
+                    -5.4996,
+                    5.5004,
+                    "dome"
+                  ],
+                  [
+                    "cloth",
+                    43.0004,
+                    49.0004,
+                    2900.3004,
+                    2916.0004,
+                    -2.9996,
+                    3.0004,
+                    "dome"
+                  ],
+                  [
+                    "walk",
+                    43.9404,
+                    53.9404,
+                    2898.0004,
+                    2900.5004,
+                    17.8204,
+                    27.8204,
+                    "east_deck"
+                  ],
+                  [
+                    "walk",
+                    5.7304,
+                    25.7304,
+                    2896.0004,
+                    2900.3004,
+                    33.2304,
+                    53.2304,
+                    "summit_car_park"
+                  ],
+                  [
+                    "walk",
+                    -33.9996,
+                    -17.9996,
+                    2899.5004,
+                    2900.5004,
+                    24.0004,
+                    36.0004,
+                    "summit_plateau"
+                  ],
+                  [
+                    "wall",
+                    -33.9996,
+                    -33.5996,
+                    2900.5004,
+                    2905.5004,
+                    24.0004,
+                    36.0004,
+                    "plate_vault"
+                  ],
+                  [
+                    "wall",
+                    -18.3996,
+                    -17.9996,
+                    2900.5004,
+                    2905.5004,
+                    24.0004,
+                    36.0004,
+                    "plate_vault"
+                  ],
+                  [
+                    "wall",
+                    -33.9996,
+                    -17.9996,
+                    2900.5004,
+                    2905.5004,
+                    24.0004,
+                    24.4004,
+                    "plate_vault"
+                  ],
+                  [
+                    "wall",
+                    -33.9996,
+                    -17.9996,
+                    2900.5004,
+                    2905.5004,
+                    35.6004,
+                    36.0004,
+                    "plate_vault"
+                  ],
+                  [
+                    "wall",
+                    -33.9996,
+                    -17.9996,
+                    2905.5004,
+                    2906.0004,
+                    24.0004,
+                    36.0004,
+                    "plate_vault"
+                  ],
+                  [
+                    "cloth",
+                    -33.5996,
+                    -32.3996,
+                    2900.5004,
+                    2901.4504,
+                    25.0004,
+                    28.5004,
+                    "plate_vault_bench"
+                  ],
+                  [
+                    "cloth",
+                    -33.5996,
+                    -32.3996,
+                    2900.5004,
+                    2901.4504,
+                    33.5004,
+                    35.6004,
+                    "plate_vault_bench"
+                  ],
+                  [
+                    "walk",
+                    -49.9996,
+                    -33.9996,
+                    2899.5004,
+                    2900.5004,
+                    7.0004,
+                    25.0004,
+                    "summit_plateau"
+                  ],
+                  [
+                    "wall",
+                    -49.9996,
+                    -49.5996,
+                    2900.5004,
+                    2905.5004,
+                    7.0004,
+                    25.0004,
+                    "notebook_room"
+                  ],
+                  [
+                    "wall",
+                    -34.3996,
+                    -33.9996,
+                    2900.5004,
+                    2905.5004,
+                    7.0004,
+                    25.0004,
+                    "notebook_room"
+                  ],
+                  [
+                    "wall",
+                    -49.9996,
+                    -33.9996,
+                    2900.5004,
+                    2905.5004,
+                    7.0004,
+                    7.4004,
+                    "notebook_room"
+                  ],
+                  [
+                    "wall",
+                    -49.9996,
+                    -33.9996,
+                    2900.5004,
+                    2905.5004,
+                    24.6004,
+                    25.0004,
+                    "notebook_room"
+                  ],
+                  [
+                    "wall",
+                    -49.9996,
+                    -33.9996,
+                    2905.5004,
+                    2906.0004,
+                    7.0004,
+                    25.0004,
+                    "notebook_room"
+                  ],
+                  [
+                    "cloth",
+                    -47.9996,
+                    -44.9996,
+                    2900.5004,
+                    2901.4504,
+                    7.4004,
+                    8.6004,
+                    "notebook_room_bench"
+                  ],
+                  [
+                    "walk",
+                    -13.9996,
+                    0.0004,
+                    2899.5004,
+                    2900.5004,
+                    -4.9996,
+                    11.0004,
+                    "summit_plateau"
+                  ],
+                  [
+                    "wall",
+                    -13.9996,
+                    -13.5996,
+                    2900.5004,
+                    2905.5004,
+                    -4.9996,
+                    11.0004,
+                    "photometer_room"
+                  ],
+                  [
+                    "wall",
+                    -0.3996,
+                    0.0004,
+                    2900.5004,
+                    2905.5004,
+                    -4.9996,
+                    11.0004,
+                    "photometer_room"
+                  ],
+                  [
+                    "wall",
+                    -13.9996,
+                    0.0004,
+                    2900.5004,
+                    2905.5004,
+                    -4.9996,
+                    -4.5996,
+                    "photometer_room"
+                  ],
+                  [
+                    "wall",
+                    -13.9996,
+                    0.0004,
+                    2900.5004,
+                    2905.5004,
+                    10.6004,
+                    11.0004,
+                    "photometer_room"
+                  ],
+                  [
+                    "wall",
+                    -13.9996,
+                    0.0004,
+                    2905.5004,
+                    2906.0004,
+                    -4.9996,
+                    11.0004,
+                    "photometer_room"
+                  ],
+                  [
+                    "cloth",
+                    -2.9996,
+                    -0.3996,
+                    2900.5004,
+                    2901.4504,
+                    -4.5996,
+                    -1.9996,
+                    "photometer_room_bench"
+                  ],
+                  [
+                    "walk",
+                    20.0004,
+                    34.0004,
+                    2899.5004,
+                    2900.5004,
+                    -19.9996,
+                    -1.9996,
+                    "summit_plateau"
+                  ],
+                  [
+                    "wall",
+                    20.0004,
+                    20.4004,
+                    2900.5004,
+                    2905.5004,
+                    -19.9996,
+                    -1.9996,
+                    "directors_office"
+                  ],
+                  [
+                    "wall",
+                    33.6004,
+                    34.0004,
+                    2900.5004,
+                    2905.5004,
+                    -19.9996,
+                    -15.5996,
+                    "directors_office"
+                  ],
+                  [
+                    "wall",
+                    33.6004,
+                    34.0004,
+                    2900.5004,
+                    2905.5004,
+                    -12.3996,
+                    -1.9996,
+                    "directors_office"
+                  ],
+                  [
+                    "wall",
+                    33.6004,
+                    34.0004,
+                    2900.5004,
+                    2901.5004,
+                    -15.5996,
+                    -12.3996,
+                    "directors_office"
+                  ],
+                  [
+                    "wall",
+                    33.6004,
+                    34.0004,
+                    2903.1004,
+                    2905.5004,
+                    -15.5996,
+                    -12.3996,
+                    "directors_office"
+                  ],
+                  [
+                    "wall",
+                    20.0004,
+                    34.0004,
+                    2900.5004,
+                    2905.5004,
+                    -19.9996,
+                    -19.5996,
+                    "directors_office"
+                  ],
+                  [
+                    "wall",
+                    20.0004,
+                    34.0004,
+                    2900.5004,
+                    2905.5004,
+                    -2.3996,
+                    -1.9996,
+                    "directors_office"
+                  ],
+                  [
+                    "wall",
+                    20.0004,
+                    34.0004,
+                    2905.5004,
+                    2906.0004,
+                    -19.9996,
+                    -1.9996,
+                    "directors_office"
+                  ],
+                  [
+                    "cloth",
+                    32.6004,
+                    33.6004,
+                    2900.5004,
+                    2901.4504,
+                    -10.4996,
+                    -6.4996,
+                    "directors_office_bench"
+                  ],
+                  [
+                    "cloth",
+                    22.0004,
+                    26.0004,
+                    2900.5004,
+                    2901.4504,
+                    -19.5996,
+                    -17.9996,
+                    "directors_office_bench"
+                  ],
+                  [
+                    "door",
+                    -17.9996,
+                    -17.8796,
+                    2900.5004,
+                    2902.8004,
+                    29.3004,
+                    30.7004,
+                    "doors"
+                  ],
+                  [
+                    "door",
+                    -18.5196,
+                    -18.3996,
+                    2900.5004,
+                    2902.8004,
+                    29.3004,
+                    30.7004,
+                    "doors"
+                  ],
+                  [
+                    "door",
+                    -34.1196,
+                    -33.9996,
+                    2900.5004,
+                    2902.8004,
+                    30.3004,
+                    31.7004,
+                    "doors"
+                  ],
+                  [
+                    "door",
+                    -33.5996,
+                    -33.4796,
+                    2900.5004,
+                    2902.8004,
+                    30.3004,
+                    31.7004,
+                    "doors"
+                  ],
+                  [
+                    "door",
+                    -39.6996,
+                    -38.2996,
+                    2900.5004,
+                    2902.8004,
+                    25.0004,
+                    25.1204,
+                    "doors"
+                  ],
+                  [
+                    "door",
+                    -39.6996,
+                    -38.2996,
+                    2900.5004,
+                    2902.8004,
+                    24.4804,
+                    24.6004,
+                    "doors"
+                  ],
+                  [
+                    "door",
+                    -45.6996,
+                    -44.2996,
+                    2900.5004,
+                    2902.8004,
+                    6.8804,
+                    7.0004,
+                    "doors"
+                  ],
+                  [
+                    "door",
+                    -45.6996,
+                    -44.2996,
+                    2900.5004,
+                    2902.8004,
+                    7.4004,
+                    7.5204,
+                    "doors"
+                  ],
+                  [
+                    "door",
+                    -14.1196,
+                    -13.9996,
+                    2900.5004,
+                    2902.8004,
+                    -3.6996,
+                    -2.2996,
+                    "doors"
+                  ],
+                  [
+                    "door",
+                    -13.5996,
+                    -13.4796,
+                    2900.5004,
+                    2902.8004,
+                    -3.6996,
+                    -2.2996,
+                    "doors"
+                  ],
+                  [
+                    "door",
+                    0.0004,
+                    0.1204,
+                    2900.5004,
+                    2902.8004,
+                    8.3004,
+                    9.7004,
+                    "doors"
+                  ],
+                  [
+                    "door",
+                    -0.5196,
+                    -0.3996,
+                    2900.5004,
+                    2902.8004,
+                    8.3004,
+                    9.7004,
+                    "doors"
+                  ],
+                  [
+                    "door",
+                    26.3004,
+                    27.7004,
+                    2900.5004,
+                    2902.8004,
+                    -1.9996,
+                    -1.8796,
+                    "doors"
+                  ],
+                  [
+                    "door",
+                    26.3004,
+                    27.7004,
+                    2900.5004,
+                    2902.8004,
+                    -2.5196,
+                    -2.3996,
+                    "doors"
+                  ],
+                  [
+                    "door",
+                    34.0004,
+                    34.1204,
+                    2900.5004,
+                    2902.8004,
+                    -18.6996,
+                    -17.2996,
+                    "doors"
+                  ],
+                  [
+                    "door",
+                    33.4804,
+                    33.6004,
+                    2900.5004,
+                    2902.8004,
+                    -18.6996,
+                    -17.2996,
+                    "doors"
+                  ],
+                  [
+                    "door",
+                    51.8004,
+                    53.2004,
+                    2900.5004,
+                    2902.8004,
+                    -8.1196,
+                    -7.9996,
+                    "doors"
+                  ],
+                  [
+                    "walk",
+                    -43.9996,
+                    -33.9996,
+                    2898.5004,
+                    2900.5004,
+                    25.0004,
+                    38.0004,
+                    "deck_segments"
+                  ],
+                  [
+                    "walk",
+                    -55.9996,
+                    -41.9996,
+                    2898.5004,
+                    2900.5004,
+                    -4.9996,
+                    7.0004,
+                    "deck_segments"
+                  ],
+                  [
+                    "walk",
+                    -41.9996,
+                    -13.9996,
+                    2898.5004,
+                    2900.5004,
+                    -4.9996,
+                    -0.9996,
+                    "deck_segments"
+                  ],
+                  [
+                    "walk",
+                    0.0004,
+                    40.0004,
+                    2898.5004,
+                    2900.5004,
+                    8.0004,
+                    12.0004,
+                    "deck_segments"
+                  ],
+                  [
+                    "walk",
+                    25.0004,
+                    29.0004,
+                    2898.5004,
+                    2900.5004,
+                    -1.9996,
+                    8.0004,
+                    "deck_segments"
+                  ],
+                  [
+                    "walk",
+                    36.0004,
+                    45.0004,
+                    2898.5004,
+                    2900.5004,
+                    12.0004,
+                    18.0004,
+                    "deck_segments"
+                  ],
+                  [
+                    "walk",
+                    34.0004,
+                    44.0004,
+                    2898.5004,
+                    2900.5004,
+                    -19.9996,
+                    -15.9996,
+                    "deck_segments"
+                  ],
+                  [
+                    "walk",
+                    42.0004,
+                    57.0004,
+                    2898.5004,
+                    2900.5004,
+                    -15.9996,
+                    -10.9996,
+                    "deck_segments"
+                  ],
+                  [
+                    "walk",
+                    51.5004,
+                    53.5004,
+                    2898.5004,
+                    2900.5004,
+                    -10.9996,
+                    -7.9996,
+                    "deck_segments"
+                  ],
+                  [
+                    "walk",
+                    -17.9996,
+                    7.0004,
+                    2899.5004,
+                    2900.3504,
+                    28.0004,
+                    32.0004,
+                    "summit_plateau"
+                  ],
+                  [
+                    "walk",
+                    3.0004,
+                    7.0004,
+                    2899.5004,
+                    2900.3504,
+                    28.0004,
+                    34.0004,
+                    "summit_plateau"
+                  ],
+                  [
+                    "wall",
+                    17.2004,
+                    21.6004,
+                    2900.3004,
+                    2902.4004,
+                    46.3104,
+                    50.7104,
+                    "parked_truck"
+                  ],
+                  [
+                    "tower",
+                    20.1404,
+                    20.2804,
+                    2900.3004,
+                    2905.8004,
+                    36.4504,
+                    36.5904,
+                    "windsock"
+                  ],
+                  [
+                    "cloth",
+                    20.3204,
+                    21.2204,
+                    2905.2004,
+                    2905.8004,
+                    35.3704,
+                    36.2704,
+                    "windsock"
+                  ],
+                  [
+                    "wall",
+                    7.7304,
+                    25.7304,
+                    2900.3004,
+                    2901.2004,
+                    52.6304,
+                    53.2304,
+                    "car_park_wall"
+                  ],
+                  [
+                    "wall",
+                    25.1304,
+                    25.7304,
+                    2900.3004,
+                    2901.2004,
+                    47.2304,
+                    53.2304,
+                    "car_park_wall"
+                  ],
+                  [
+                    "rail",
+                    2.9504,
+                    3.4504,
+                    2900.3004,
+                    2901.2004,
+                    53.2504,
+                    53.7504,
+                    "road"
+                  ],
+                  [
+                    "rail",
+                    -3.4496,
+                    -2.9496,
+                    2900.3004,
+                    2901.2004,
+                    53.2504,
+                    53.7504,
+                    "road"
+                  ]
+                ],
+                "eye": [
+                  22.2333,
+                  2900.3004,
+                  43.2263
+                ],
+                "heading": -158.197,
+                "joins": "Here: the flat gravel of the summit car park under the viewer; on the left it runs level to the parked truck and past it to two low stone posts where the island road starts DOWN off the summit; left of centre a short flagstone path runs level from the gravel to the observatory's open front door; behind the viewer a low stone wall stands at the car park's edge."
+              }
+            }
+          },
+          "worldPlateRef": false,
+          "motionClosing": "Only the windsock moves; everything else stays exactly where it is."
+        },
+        "scenePrompt": "This is a seamless 360-degree panorama from the small gravel car park on the bare summit of a steep volcanic island, high above everything, beside an old mountain-top astronomical observatory of pale cut stone, in mid-morning sunlight, at the head of the island's mountain road. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a low dry-stone wall close behind the viewer at the car park's edge, the sea far below beyond it: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: a low dry-stone wall close by at the car park's edge and the sea far below beyond it, joining its other half cleanly at the seam directly behind you; to the left, standing well in from the edge of the frame, a few strides off on the gravel, the station's white four-wheel-drive truck parked with its nose toward the head of the road, its driver's door standing open, the low stone wall at the car park's edge close behind it; just past its nose, two low stone posts where the island's mountain road leaves the gravel and drops away DOWN off the summit out of sight; left of centre, across the gravel, a short path of flat stone flags running level from the car park to the long, low, single-storey building of pale cut stone that holds the observatory's plate archive, its heavy oak front door standing wide open in the sunlit wall on a cool shaded stone room within; dead ahead in the centre, a few strides ahead at the car park's edge, a short slender steel mast with a red-and-white striped canvas windsock on a swivel at its top, high against the clear sky over the observatory's other low pale stone buildings beyond, the windsock half filled by the light breeze, its striped tail lifted a little; right of centre, a few dozen strides off on the summit's edge, the observatory's round dome: a drum of pale whitewashed stone under a smooth silver-grey metal cap, against the deep-blue sky; to the right, standing well in from the edge of the frame, beyond the open edge of the gravel where the summit falls steeply away, far below the viewer: the island's mountain road zigzagging in tight hairpin bends down the steep slope just below the edge, and the long dark slope of the mountain running down to a level shelf of the island and the low raised rim of a wide crater on it, its floor hidden behind the rim, thin white wisps of steam rising out of it above the rim, and on the crater's far rim, small with distance, the brand-new concrete and glass buildings of a works; beyond and far below everything, the deep blue sea to the horizon; on the far right, the right half of the calm view directly behind the viewer: a low dry-stone wall close by at the car park's edge and the sea far below beyond it, joining its other half cleanly at the seam directly behind you. A small, bright gravel car park on a bare volcanic summit beside an old stone observatory, the whole island falling away far below; a steep volcanic island high above a deep blue ocean: dark basalt, red-brown and black cinder, pale pumice, crusts of real lemon-yellow sulfur at the vents, sparse silver-green broom bushes, weathered whitewashed concrete and galvanized steel, a deep clear sky; pale cut stone and whitewashed plaster of an old observatory; photorealistic, fine natural film grain. No people, no human figures, no faces and no statues anywhere; no animals. No readable words, no legible writing, no captions, no logos and no painted numbers on any wall, sign, board, ledger page or label. It is MORNING: no night sky, no stars, no moon, no floodlights, no blue fire at any vent or on the crater floor, no lava and no red glow; no fog, no cloud sea below the mountain, no rain. The image is SHARP: no motion blur and no smeared or doubled detail anywhere. No cable car and no gondola. No town, hotel or harbor anywhere in view. EXACTLY ONE vehicle, the white truck; ONE windsock; ONE dome. No painted parking bays, no signs, no barrier arm. The car park has EXACTLY TWO ways out: the observatory's open front door left of centre and the road down past the truck on the left; no other path, stair or gate. Shot on a full-frame DSLR at 24mm, f/8, mid-morning: the sun well up in the east-south-east, behind the viewer over the right shoulder, bright clear light on the pale stone of the observatory and on the white truck, short crisp shadows, a deep-blue sky, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a low dry-stone wall close behind the viewer at the car park's edge, the sea far below beyond it, with no visible seam, join, or repetition.",
+        "specBuild": "1d57e4e4e7337e9392c6"
+      }
+    },
+    {
+      "key": "archive",
+      "title": "The plate archive",
+      "built": true,
+      "unlockedWhen": true,
+      "designNote": "DAY-TWO HUB (Wednesday). The archive's bulletin board is the second plain deliver (both feed the one total); the tally board is the day's instrument (kind scoreboard, not built yet); the plate cabinet is the dataset explorer on the second plate collection (sister data). The notice case opens Good Seeing once observatory has a play.html. Reached from the summit car park through the observatory's front door (the car park by the station's truck, hidden on Monday).",
+      "plannedHotspots": [
+        {
+          "type": "door",
+          "direction": "back",
+          "to": "car_park",
+          "label": "The way out to the car park",
           "box": [
             0.1507,
             0.3562,
@@ -25634,10 +26969,10 @@
             {
               "id": "front_door",
               "at": "to the left",
-              "label": "The way out to the truck",
+              "label": "The way out to the car park",
               "door": {
                 "direction": "back",
-                "to": "station"
+                "to": "car_park"
               },
               "desc": "standing well in from the edge of the frame, the archive's heavy oak front door standing wide open, the stone floor running level out over its threshold onto the bright gravel of the summit car park, where the station's white four-wheel-drive truck stands parked in the sun before a low stone wall at the car park's edge, nothing beyond the wall but clear blue sky"
             },
@@ -25790,7 +27125,7 @@
           "motionClosing": "Only the clock's pendulum swings; everything else stays exactly where it is."
         },
         "scenePrompt": "This is a seamless 360-degree panorama from the plate archive of an old mountain-top astronomical observatory, a high whitewashed stone room holding one tall glass-fronted oak plate cabinet, in mid-morning sunlight. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the plain whitewashed stone end wall of the archive close behind the viewer, even and bare: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: the plain whitewashed stone end wall of the archive close by, joining its other half cleanly at the seam directly behind you; to the left, standing well in from the edge of the frame, the archive's heavy oak front door standing wide open, the stone floor running level out over its threshold onto the bright gravel of the summit car park, where the station's white four-wheel-drive truck stands parked in the sun before a low stone wall at the car park's edge, nothing beyond the wall but clear blue sky; left of centre, against the wall a few strides off, a tall glass-fronted dark oak cabinet, its shelves stacked with rows of identical pale card boxes of photographic glass plates, one drawer pulled out showing glass plates in paper sleeves standing on edge; left of centre, beside the cabinet, a tall dark-wood longcase observatory clock with a plain white dial without numerals and a long glass door down its front, a bar of sun from the windows falling across the glass onto the case's dark, shadowed back board, the long brass pendulum swinging in a wide slow arc behind the glass, its bright bob gleaming against the dark case; dead ahead in the centre, on the wall straight ahead between the two tall bright windows, square to the viewer, a large plain blackboard in a dark oak frame, ruled with faint white lines into empty columns, a stick of chalk on its ledge; right of centre, on the wall a few strides off, a tall green-baize board in an oak frame with three long rows of empty brass clips across it, a small brass rubber stamp on its ledge; right of centre, beside it on the wall, a small glass-fronted oak notice case with one pale paper notice pinned inside, nothing on it readable; to the right, standing well in from the edge of the frame, a panelled oak door in the side wall standing wide open, the stone floor running level through it into a dim narrow store lined with tall racks; on the far right, the right half of the calm view directly behind the viewer: the plain whitewashed stone end wall of the archive close by, joining its other half cleanly at the seam directly behind you. A calm, sunlit old archive of glass plates, warm oak and pale stone, bars of morning sun; an old mountain-top astronomical observatory: pale cut stone walls, whitewashed plaster, dark polished oak, worn brass, cast iron painted dark green, glass plates in paper sleeves, morning sunlight on stone; photorealistic, fine natural film grain. No people, no human figures, no faces and no statues anywhere; no animals. No readable words, no legible writing, no captions, no logos and no painted numbers on any wall, sign, board, ledger page or label. The image is SHARP: no motion blur and no smeared or doubled detail anywhere. No electric strip lights and no computers or screens. It is daytime: no night sky through any opening. No cloud sea and no clouds below the mountain through any window or door. The blackboard's columns and the bulletin board's clips are EMPTY. EXACTLY ONE clock, ONE cabinet and ONE blackboard. EXACTLY TWO doorways: the open front door on the left and the open store door on the right. Shot on a full-frame DSLR at 24mm, f/8, mid-morning: bright sunlight falling in through two tall windows ahead in long slanting bars across the stone floor, the rest of the room in soft warm shade, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into the plain whitewashed stone end wall of the archive close behind the viewer, even and bare, with no visible seam, join, or repetition.",
-        "specBuild": "e5b271cf585837c12050",
+        "specBuild": "b514f902d6089f48323c",
         "seam": {
           "stage": "screened",
           "band": "ground",
@@ -25814,30 +27149,32 @@
       },
       "hotspots": [
         {
-          "id": "the_way_out_to_the_truck",
+          "id": "the_way_out_to_the_car_park",
           "type": "door",
-          "label": "The way out to the truck",
+          "label": "The way out to the car park",
           "box": [
-            0.1507,
-            0.3562,
-            0.1707,
-            0.6573
+            0.1832,
+            0.3888,
+            0.2032,
+            0.6899
           ],
           "direction": "back",
-          "to": "station"
+          "to": "car_park",
+          "boxSource": "moved:testplay"
         },
         {
           "id": "the_plate_cabinet",
           "type": "instrument",
           "label": "The plate cabinet",
           "box": [
-            0.3267,
-            0.3944,
-            0.4034,
-            0.7003
+            0.2489,
+            0.4844,
+            0.3256,
+            0.7903
           ],
           "kind": "dataset_explorer",
-          "config": "data/survey_plates.explorer.json"
+          "config": "data/survey_plates.explorer.json",
+          "boxSource": "moved:testplay"
         },
         {
           "id": "the_tally_board",
@@ -25856,37 +27193,40 @@
           "type": "deliver",
           "label": "The archive's bulletin board",
           "box": [
-            0.6331,
-            0.397,
-            0.6831,
-            0.604
-          ]
+            0.6537,
+            0.3984,
+            0.7037,
+            0.6054
+          ],
+          "boxSource": "moved:testplay"
         },
         {
           "id": "notice_good_seeing",
           "type": "plaque",
           "label": "Notice: Good Seeing",
           "box": [
-            0.715,
-            0.425,
-            0.74,
-            0.585
+            0.7337,
+            0.4199,
+            0.7587,
+            0.5799
           ],
           "title": "Good Seeing",
-          "body": "Pinned in the archive's notice case: a night before the resort opened, the observatory's last worker and a telescope that must show its visitors something spectacular before the owner closes it. This is one of the chapter's homework scenarios, played on your own. It opens here once it is ready."
+          "body": "Pinned in the archive's notice case: a night before the resort opened, the observatory's last worker and a telescope that must show its visitors something spectacular before the owner closes it. This is one of the chapter's homework scenarios, played on your own. It opens here once it is ready.",
+          "boxSource": "moved:testplay"
         },
         {
           "id": "the_door_to_the_plate_store",
           "type": "door",
           "label": "The door to the plate store",
           "box": [
-            0.8002,
-            0.3869,
-            0.8502,
-            0.6824
+            0.778,
+            0.4029,
+            0.828,
+            0.6984
           ],
           "direction": "open",
-          "to": "plate_store"
+          "to": "plate_store",
+          "boxSource": "moved:testplay"
         },
         {
           "id": "clip_base",
@@ -26124,13 +27464,14 @@
           "type": "door",
           "label": "Back to the archive",
           "box": [
-            0.1601,
-            0.3537,
-            0.19,
-            0.7615
+            0.2049,
+            0.3275,
+            0.2348,
+            0.7353
           ],
           "direction": "back",
-          "to": "archive"
+          "to": "archive",
+          "boxSource": "moved:testplay"
         },
         {
           "id": "the_plate_racks",
@@ -26150,13 +27491,14 @@
           "type": "door",
           "label": "The door to the measuring room",
           "box": [
-            0.8003,
-            0.3537,
-            0.8203,
-            0.7615
+            0.7653,
+            0.3237,
+            0.7853,
+            0.7315
           ],
           "direction": "open",
-          "to": "measuring_engine"
+          "to": "measuring_engine",
+          "boxSource": "moved:testplay"
         },
         {
           "id": "clip_base",
@@ -26399,39 +27741,42 @@
           "type": "door",
           "label": "Back to the plate store",
           "box": [
-            0.1805,
-            0.3325,
-            0.2005,
-            0.7671
+            0.188,
+            0.2961,
+            0.208,
+            0.7307
           ],
           "direction": "back",
-          "to": "plate_store"
+          "to": "plate_store",
+          "boxSource": "moved:testplay"
         },
         {
           "id": "the_measuring_engine",
           "type": "station",
           "label": "The measuring engine",
           "box": [
-            0.4157,
-            0.5046,
-            0.5847,
-            0.7344
+            0.4242,
+            0.475,
+            0.5932,
+            0.7048
           ],
           "tier": 2,
-          "track": "day2"
+          "track": "day2",
+          "boxSource": "moved:testplay"
         },
         {
           "id": "the_steps_up_to_the_dome",
           "type": "door",
           "label": "The steps up to the dome",
           "box": [
-            0.5997,
-            0.4703,
-            0.6997,
-            0.7065
+            0.6352,
+            0.3073,
+            0.7352,
+            0.5435
           ],
           "direction": "open",
-          "to": "dome"
+          "to": "dome",
+          "boxSource": "moved:testplay"
         },
         {
           "id": "clip_base",
@@ -26611,7 +27956,7 @@
           "stillOnlyNote": "Lucas, art review three: 'can we just have a still here, I think that would be fine'. The dome ships as its committed still; its candidate clip was retired to _scratch/cine_deleted."
         },
         "scenePrompt": "This is a seamless 360-degree panorama from inside the round dome of an old mountain-top observatory in late-morning light, the great telescope of dark green-painted iron and brass on its pier under the dome. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the dome's plain curved whitewashed wall close behind the viewer: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: the dome's plain curved whitewashed wall close by, joining its other half cleanly at the seam directly behind you; left of centre, a few strides off at the foot of the curved wall, the dome's wooden floor running level to a stone landing at the head of a short flight of worn stone steps, which drop DOWN out of sight through an opening in the floor between two short posts in a low iron balustrade, toward the measuring room below; dead ahead in the centre, a few strides ahead, the great telescope: a long tube of dark green-painted iron and brass on a massive iron mounting on a round stone pier, its lower end fitted with a brass plate holder, a wooden observing chair beside it; right of centre, hanging from the dome's ironwork on a long flex near the pier, an unlit enamel work lamp, low over the floor, the hanging lamp swaying slightly on its flex; on the far right, the right half of the calm view directly behind the viewer: the dome's plain curved whitewashed wall close by, joining its other half cleanly at the seam directly behind you. A tall, round, shadowy dome, one beam of sun on old brass; an old mountain-top astronomical observatory: pale cut stone walls, whitewashed plaster, dark polished oak, worn brass, cast iron painted dark green, glass plates in paper sleeves, morning sunlight on stone; photorealistic, fine natural film grain. No people, no human figures, no faces and no statues anywhere; no animals. No readable words, no legible writing, no captions, no logos and no painted numbers on any wall, sign, board, ledger page or label. The image is SHARP: no motion blur and no smeared or doubled detail anywhere. No electric strip lights and no computers or screens. It is daytime: no night sky through any opening. No cloud sea and no clouds below the mountain through any window or door. EXACTLY ONE telescope and ONE shutter slit. EXACTLY ONE way out: the steps down left of centre. Shot on a full-frame DSLR at 24mm, f/8, late morning: a broad bar of blue daylight through the open shutter slit overhead and a single beam of sunlight falling across the telescope and the floor, the rest of the dome in deep soft shade, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into the dome's plain curved whitewashed wall close behind the viewer, with no visible seam, join, or repetition.",
-        "specBuild": "1cc61caec08b185d25fb",
+        "specBuild": "9cfbbd533a326c3202e2",
         "seam": {
           "stage": "blurred",
           "band": "sky",
@@ -26662,5 +28007,6 @@
         }
       ]
     }
-  ]
+  ],
+  "cover": "cover.png"
 }

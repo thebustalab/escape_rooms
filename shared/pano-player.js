@@ -85,35 +85,35 @@
 // A bare `./variant_resolve.js` import is NOT refreshed by bumping the <script> tag's ?v, so a changed
 // helper module (e.g. a new export) leaves browsers on a stale cached copy → "doesn't provide an export
 // named X" SyntaxError → blank page (the 2026-08-05 airship regression). Bump all three together.
-import { WebRConsole } from "./webr-console.js?v=179";
-import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers, pickTransit } from "./variant_resolve.js?v=179";   // Phase 3: per-hotspot state variants; monorail switch-door nav
-import * as PQ from "./puzzle_queue.js?v=179";   // dynamic puzzle queue: location-independent puzzle serving
-import * as CP from "./corr_panel.js?v=179";   // lower-triangle layout of the grid gate (clouds correlation panel)
-import { particleCount } from "./particles.js?v=179";
-import { mountLandingBackdrop } from "./landing_backdrop.js?v=179";   // landing text over a pan of the first room's clip   // ambient-particle vocabulary + per-kind field density
-import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=179";
-import { condHolds, lockedMessage } from "./cond.js?v=179";
-import { gridMatches } from "./grid_check.js?v=179";   // grid answer check; `partition:true` accepts any relabelling of the buckets   // ledger + elevation-map card DOM
-import * as LIVE from "./live_session.js?v=179";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
-import * as RIDE from "./ride.js?v=179";
-import { mountPcaPlate } from "./pca_plate.js?v=179";   // the PCA plate instrument (voyage beach)
-import { mountFishBoard } from "./fish_board.js?v=179";   // the fish board instrument (harbour berth)
-import { mountDrawdown } from "./drawdown.js?v=179";
-import { mountTide } from "./tide_machine.js?v=179";   // the tide machine instrument (dunes escape)
-import { mountVarianceMeter } from "./variance_meter.js?v=179";   // the variance meter instrument (anova cellars escape)
-import { mountAnovaInstrument } from "./anova_instrument.js?v=179";   // the ANOVA instrument (Fisher's board, anova rooms; also the book, ch.12b)
-import { mountPermanovaInstrument } from "./permanova_instrument.js?v=179";   // its PERMANOVA sibling: the board's optional second tab
-import { mountGhostLines } from "./ghost_lines.js?v=179";   // the ghost-line board instrument (regression pits hub)
-import { mount as mountDatasetExplorer } from "./dataset_explorer.js?v=179";   // a dataset's STRUCTURE (instrument kind + the graded rooms' chip)
-import { mount as mountSigmoidBoard } from "./sigmoid_board.js?v=179";   // the S-curve board (classification day one, toy data)
-import { mount as mountScoreboard } from "./scoreboard.js?v=179";   // the scoreboard (classification day two, toy data)
+import { WebRConsole } from "./webr-console.js?v=180";
+import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers, pickTransit } from "./variant_resolve.js?v=180";   // Phase 3: per-hotspot state variants; monorail switch-door nav
+import * as PQ from "./puzzle_queue.js?v=180";   // dynamic puzzle queue: location-independent puzzle serving
+import * as CP from "./corr_panel.js?v=180";   // lower-triangle layout of the grid gate (clouds correlation panel)
+import { particleCount } from "./particles.js?v=180";
+import { mountLandingBackdrop } from "./landing_backdrop.js?v=180";   // landing text over a pan of the first room's clip   // ambient-particle vocabulary + per-kind field density
+import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=180";
+import { condHolds, lockedMessage } from "./cond.js?v=180";
+import { gridMatches } from "./grid_check.js?v=180";   // grid answer check; `partition:true` accepts any relabelling of the buckets   // ledger + elevation-map card DOM
+import * as LIVE from "./live_session.js?v=180";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
+import * as RIDE from "./ride.js?v=180";
+import { mountPcaPlate } from "./pca_plate.js?v=180";   // the PCA plate instrument (voyage beach)
+import { mountFishBoard } from "./fish_board.js?v=180";   // the fish board instrument (harbour berth)
+import { mountDrawdown } from "./drawdown.js?v=180";
+import { mountTide } from "./tide_machine.js?v=180";   // the tide machine instrument (dunes escape)
+import { mountVarianceMeter } from "./variance_meter.js?v=180";   // the variance meter instrument (anova cellars escape)
+import { mountAnovaInstrument } from "./anova_instrument.js?v=180";   // the ANOVA instrument (Fisher's board, anova rooms; also the book, ch.12b)
+import { mountPermanovaInstrument } from "./permanova_instrument.js?v=180";   // its PERMANOVA sibling: the board's optional second tab
+import { mountGhostLines } from "./ghost_lines.js?v=180";   // the ghost-line board instrument (regression pits hub)
+import { mount as mountDatasetExplorer } from "./dataset_explorer.js?v=180";   // a dataset's STRUCTURE (instrument kind + the graded rooms' chip)
+import { mount as mountSigmoidBoard } from "./sigmoid_board.js?v=180";   // the S-curve board (classification day one, toy data)
+import { mount as mountScoreboard } from "./scoreboard.js?v=180";   // the scoreboard (classification day two, toy data)
    // the drawdown board instrument (diamonds escape)   // THE RIDE (subway): express lever + clip-sequence planner
-import * as BELL from "./bell_pull.js?v=179";
-import * as TCOUNT from "./transit_counter.js?v=179";   // the date plaque over a flat door transit (dunes time-skip)
-import * as DATEB from "./date_board.js?v=179";   // date lock: lock mode:"date", two slide-levers (dunes departure board)
-import * as INVY from "./inventory.js?v=179";   // carried items + the door that asks which to use (dunes)   // bell-pull (#16): dial mode:"pull" + lock mode:"state" (spa belfry)
-import { entryYaw } from "./entry_facing.js?v=179";   // face the way out on entering a room (every scenario)
-import * as HINTS from "./escape_hints.js?v=179";   // escape-phase Hint chip: time-unlocked tiers (SCENARIO.escapeHints)
+import * as BELL from "./bell_pull.js?v=180";
+import * as TCOUNT from "./transit_counter.js?v=180";   // the date plaque over a flat door transit (dunes time-skip)
+import * as DATEB from "./date_board.js?v=180";   // date lock: lock mode:"date", two slide-levers (dunes departure board)
+import * as INVY from "./inventory.js?v=180";   // carried items + the door that asks which to use (dunes)   // bell-pull (#16): dial mode:"pull" + lock mode:"state" (spa belfry)
+import { entryYaw } from "./entry_facing.js?v=180";   // face the way out on entering a room (every scenario)
+import * as HINTS from "./escape_hints.js?v=180";   // escape-phase Hint chip: time-unlocked tiers (SCENARIO.escapeHints)
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 
@@ -5130,7 +5130,8 @@ function buildLockCard(h, onSolved) {
   /*
    * Optional `face` (2026-11-20, glasshouses time lock): the lock drawn as a picture, its
    * `reference` rows engraved on a plate and the code shown on wheels painted in the image.
-   * Schema: face: { image, plate:[x0,y0,x1,y1], wheels:[[x0,y0,x1,y1], …] } — fractions of the image.
+   * Schema: face: { image, plate:[x0,y0,x1,y1], wheels:[[x0,y0,x1,y1], …], plateFont? } — fractions of the
+   * image; plateFont = the plate text size in % of the face width (default 3.5), for wordy plates.
    * The real input stays `#lockInput` (one field, so every keypad test still drives it), laid
    * transparent over the wheel window; the wheels mirror its characters one per wheel.
    */
@@ -5144,7 +5145,7 @@ function buildLockCard(h, onSolved) {
     const plate = face.plate && rows.length
       ? `<div class="lockface-plate" style="position:absolute;${pct(face.plate)};display:flex;flex-direction:column;` +
         `justify-content:center;padding:2.2cqw 3.2cqw;box-sizing:border-box;text-align:center;` +
-        `font:600 3.5cqw/1.32 Georgia,'Times New Roman',serif;color:#3b2a10;` +
+        `font:600 ${Number(face.plateFont) > 0 ? Number(face.plateFont) : 3.5}cqw/1.32 Georgia,'Times New Roman',serif;color:#3b2a10;` +
         `text-shadow:0 1px 0 rgba(255,236,190,.55),0 -1px 0 rgba(40,25,5,.35)">` +
         rows.map(r => `<div>${escHtml(r.label)}</div>`).join("") + `</div>`
       : "";

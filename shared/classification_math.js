@@ -3,7 +3,7 @@
 // (sigmoid_board.js, day one; scoreboard.js, day two). No DOM; node-testable (tests/classification_math.test.mjs,
 // whose numbers are pinned to R's lm() and glm(family = binomial)).
 //
-// TOY DATA ONLY. Every number here is invented and labelled so on the boards. Never point these instruments at a
+// TOY DATA ONLY. Every number here is invented; the boards deliberately do not say so on screen (no text that does not teach). Never point these instruments at a
 // graded dataset (crater_monitoring, galaxy_plates) or their practice sisters: an S-curve over real rows would show
 // the response-against-predictor relationship the graded rooms test. The toy column names deliberately share
 // nothing with those datasets.
@@ -18,7 +18,9 @@ export const LANDING = {
     [1.9, 0], [2.0, 1], [2.1, 0], [2.3, 1], [2.4, 0], [2.5, 1], [2.6, 0], [2.7, 1], [2.9, 1], [3.0, 0],
     [3.1, 1], [3.3, 1], [3.4, 1], [3.6, 0], [3.7, 1], [3.9, 1], [4.1, 1], [4.4, 1], [4.6, 1], [5.0, 1],
   ].map(([x, y], i) => ({ day: i + 1, x, y })),
-  heldBack: [0.7, 1.3, 1.7, 2.2, 2.45, 2.65, 2.8, 3.2, 3.8, 4.8].map((x, i) => ({ day: 31 + i, x })),
+  // held back: swell and what actually happened, revealed only on the board's "setting cases aside" tab
+  heldBack: [[0.7, 0], [1.3, 0], [1.7, 0], [2.2, 0], [2.45, 0], [2.65, 1], [2.8, 1], [3.2, 0], [3.8, 1], [4.8, 1]]
+    .map(([x, y], i) => ({ day: 31 + i, x, y })),
   xView: [0, 6],
 };
 
@@ -115,6 +117,21 @@ export const probAt = (curve, x) => logistic(curve.steepness * (x - curve.middle
 export function fitScore(curve, best, X, y) {
   const d = logLik(coefFromCurve(curve), X, y) - logLik(coefFromCurve(best), X, y);
   return Math.max(0, Math.min(1, Math.exp(d / X.length)));
+}
+
+// The connect-the-dots curve for "setting cases aside": it passes through every training morning (so it gets all of
+// them right) and swings to the next morning's answer within the first half of each gap. It memorises the noise; on
+// the held-back mornings it does worse than the S-curve. `pts` must be sorted by x.
+export function connectDotsAt(pts, x) {
+  if (x <= pts[0].x) return pts[0].y;
+  for (let i = 0; i < pts.length - 1; i++) {
+    const a = pts[i], b = pts[i + 1];
+    if (x <= b.x) {
+      const t = Math.max(0, Math.min(1, ((x - a.x) / (b.x - a.x) - 0.1) / 0.35));
+      return a.y + (b.y - a.y) * t * t * (3 - 2 * t);
+    }
+  }
+  return pts[pts.length - 1].y;
 }
 
 // A probability becomes a call through the cut-off: yes at the cut-off or above (predictWithModel()'s rule at 0.5).

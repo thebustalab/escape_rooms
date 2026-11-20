@@ -4,30 +4,36 @@
 // two; students return to it at home. One tab per day-two section of the chapter, only its own controls, a Lesson in
 // the book's wording:
 //
-//   1 Which predictors matter most  two invented readings in very different units (a barometer in hPa, humidity as a
+//   1 Several predictors            the S-curve of probability_yes against the barometer at the humidity on a slider
+//                                   (ghost curves at 0.40 and 0.95 show how far humidity slides it), the fitted
+//                                   equation (log-odds = intercept + coefficient x each predictor) and the sum worked
+//                                   out live for the chosen readings. Uses the raw fit of the same 48 nights.
+//   2 Which predictors matter most  two invented readings in very different units (a barometer in hPa, humidity as a
 //                                   0-1 fraction): each reading's spread with "one unit" drawn against it, and the
 //                                   model's coefficients as bars. Raw, humidity's dwarfs the barometer's; "Scaled"
 //                                   (scale_variance = TRUE) puts both in standard deviations and the ranking flips.
 //                                   A night's probability_yes is shown from both models: scaling changes units, not
 //                                   the model.
-//   2 Judging a classifier          a held-back tally of 200 invented nights, the model's calls at the 0.5 cut-off
+//   3 Judging a classifier          a held-back tally of 200 invented nights, the model's calls at the 0.5 cut-off
 //                                   beside "always say no": accuracy, caught and missed. A slider sets how rare yes
 //                                   is; below about one night in eight, always-no wins on accuracy while catching
 //                                   nothing.
 //
-// TOY DATA ONLY (classification_math.js makeNights / tallyPool), labelled as invented on the board. Never graded,
+// TOY DATA ONLY (classification_math.js makeNights / tallyPool); the board carries no "invented data" caption (instruments_and_widgets.md: no text that does not teach). Never graded,
 // never logged, holds no answer. Code-drawn SVG: no art, no geometry (validate_assets.py NO_GEOMETRY_KINDS).
 //
 //   const s = mount(hostEl, { pegs?, onPegs?(state) });
-//   s.setTab("scale"|"judge"); s.tab(); s.setScaled(bool); s.scaled(); s.coefs(); s.rawCoefs(); s.scaledCoefs();
+//   s.setTab("several"|"scale"|"judge"); s.setReadings({pressure, humidity}); s.readings(); s.tab(); s.setScaled(bool); s.scaled(); s.coefs(); s.rawCoefs(); s.scaledCoefs();
 //   s.probabilities(night); s.setShare(0..1); s.share(); s.tally(); s.ready; s.destroy().
 //   The root element carries the API as `.scoreboard` for tests.
 import { makeNights, NIGHT_PREDICTORS, fitLogistic, scaledCoefs, logistic, tallyPool, judge, alwaysNo, mean, sd }
-  from "./classification_math.js?v=179";
-import { shell, svgEl, el, button, slider, pct } from "./classification_ui.js?v=179";
+  from "./classification_math.js?v=180";
+import { shell, svgEl, el, button, slider, pct } from "./classification_ui.js?v=180";
 
-const TABS = [["scale", "Which predictors matter most"], ["judge", "Judging a classifier"]];
+const TABS = [["several", "Several predictors"], ["scale", "Which predictors matter most"], ["judge", "Judging a classifier"]];
 const LESSONS = {
+  several: ["With several predictors, logistic regression adds up one term per predictor (the predictor times its coefficient) plus an intercept. That sum is the log-odds, and the S-curve turns it into a probability_yes between 0 and 1. A coefficient's sign says which way its predictor pushes the probability: higher pressure raises the chance of a clear night, and more humidity lowers it, so changing the humidity slides the whole S-curve along the barometer.",
+    "several predictors, and predicting held-back cases"],
   scale: ["Raw coefficients mostly reflect units: a predictor that barely changes from one case to the next gets a large coefficient for that reason alone. Scale each predictor to a mean of zero and a standard deviation of one, then rank the coefficients by size, ignoring the sign. Scaling changes the units of the coefficients, not the model: every case keeps the same probability.",
     "which predictors matter most"],
   judge: ["Accuracy is the share of calls that are right. When yes is rare, calling every case no scores a high accuracy and catches nothing. So report how many yes-cases were caught and how many were missed beside accuracy, never accuracy alone.",
@@ -44,16 +50,18 @@ export function mount(host, opts = {}) {
   const cols = NIGHT_PREDICTORS.map((p, j) => ({ ...p, values: X.map((r) => r[j]), mean: mean(X.map((r) => r[j])), sd: sd(X.map((r) => r[j])) }));
   const s0 = opts.pegs && typeof opts.pegs === "object" ? opts.pegs : {};
   const st = {
-    tab: TABS.some(([k]) => k === s0.tab) ? s0.tab : "scale",
+    tab: TABS.some(([k]) => k === s0.tab) ? s0.tab : "several",
+    pressure: Number.isFinite(s0.pressure) ? s0.pressure : 1015,
+    humidity: Number.isFinite(s0.humidity) ? s0.humidity : 0.6,
     scaled: !!s0.scaled,
     share: Number.isFinite(s0.share) ? s0.share : 0.3,
     night: Number.isFinite(s0.night) ? s0.night : 7,
   };
   let dead = false;
-  const save = () => opts.onPegs && opts.onPegs({ tab: st.tab, scaled: st.scaled, share: st.share, night: st.night });
+  const save = () => opts.onPegs && opts.onPegs({ tab: st.tab, scaled: st.scaled, share: st.share, night: st.night, pressure: st.pressure, humidity: st.humidity });
 
   const F = shell(host, { cls: "scoreboard", tabs: TABS, W, H, onTab: (k) => api.setTab(k),
-    ariaLabel: "The scoreboard: invented nights at the plate archive, two predictors' coefficients raw and scaled, and a held-back tally" });
+    ariaLabel: "The scoreboard: nights at the plate archive, two predictors' coefficients raw and scaled, and a held-back tally" });
   const svg = F.svg;
   function txt(x, yy, s, o = {}) {
     return svgEl(svg, "text", { x, y: yy, fill: o.fill || "#f3e6c4", "font-size": o.size || 20, "text-anchor": o.anchor || "start",
@@ -72,9 +80,66 @@ export function mount(host, opts = {}) {
     return { night: n, x: d.x, raw: pr, scaled: ps };
   };
 
-  // ---------- tab 1: the spreads, one unit against each, then the bars ----------
+  // ---------- tab 1: several predictors. The S-curve against the barometer at the humidity on the slider, the
+  // fitted equation with its coefficients, and the sum worked out live for one night's readings. Dots are the 48
+  // training nights, brightest where their humidity is close to the slider's.
+  const HUM = "#c9a7ff", PRS = BAR_POS;
+  const PX0 = 100, PX1 = 930, PY0 = 156, PY1 = 506, PV = [994, 1034];
+  const sx = (v) => PX0 + ((v - PV[0]) / (PV[1] - PV[0])) * (PX1 - PX0);
+  const sy = (p) => PY1 - ((p + 0.07) / 1.17) * (PY1 - PY0);
+  const logOdds = (pr, hu) => raw[0] + raw[1] * pr + raw[2] * hu;
+  function parts(pr, hu) { const a = raw[1] * pr, b = raw[2] * hu, z = raw[0] + a + b; return { a, b, z, p: logistic(z) }; }
+  function eqLine(yy, pieces, size = 19) {   // one line of the equation, each piece [text, colour?, bold?]
+    const t = svgEl(svg, "text", { x: 40, y: yy, "font-size": size, fill: "#f3e6c4", "dominant-baseline": "middle", class: "eq" });
+    for (const [s2, c, b, sup] of pieces) svgEl(t, "tspan", { fill: c || null, "font-weight": b ? "bold" : null, "baseline-shift": sup ? "super" : null, "font-size": sup ? Math.round(size * 0.72) : null }, s2);
+    return t;
+  }
+  const neg = (v, d) => (v < 0 ? "\u2212" : "") + Math.abs(v).toFixed(d);
+  const sgn = (v, d) => (v < 0 ? " \u2212 " : " + ") + Math.abs(v).toFixed(d);
+  function drawSeveral() {
+    txt(40, 12, "Each dot is one night at the plate archive: its barometer reading,", { size: 16, italic: true, fill: "#cdbf9f" });
+    txt(40, 31, "and whether it was clear enough to photograph.", { size: 16, italic: true, fill: "#cdbf9f" });
+    eqLine(60, [["log-odds = ", null, true], [neg(raw[0], 3)], [sgn(raw[1], 5), PRS, true], [" \u00d7 pressure_hpa", PRS], [sgn(raw[2], 3), HUM, true], [" \u00d7 humidity_fraction", HUM]]);
+    eqLine(90, [["probability_yes = 1 / (1 + e", null, true], ["\u2212log-odds", null, true, true], [")", null, true]], 19);
+    const q = parts(st.pressure, st.humidity);
+    eqLine(116, [[`at ${st.pressure} hPa and humidity ${st.humidity.toFixed(2)}:  `], [neg(raw[0], 3)], [sgn(q.a, 3), PRS], [sgn(q.b, 3), HUM],
+      [` = ${neg(q.z, 3)}`, null, true], ["   \u2192   probability_yes = ", null], [q.p.toFixed(2), "#ffe39a", true]], 18).setAttribute("class", "eq eqlive");
+    // axes
+    svgEl(svg, "rect", { x: PX0, y: PY0, width: PX1 - PX0, height: PY1 - PY0, fill: "rgba(255,255,255,.025)", stroke: "rgba(255,255,255,.18)" });
+    for (let v = PV[0]; v <= PV[1]; v += 5) {
+      svgEl(svg, "line", { x1: sx(v), x2: sx(v), y1: PY1, y2: PY1 + 7, stroke: "rgba(255,255,255,.6)" });
+      txt(sx(v), PY1 + 22, String(v), { anchor: "middle", size: 17 });
+    }
+    txt((PX0 + PX1) / 2, PY1 + 50, "Barometer (hPa) \u00b7 pressure_hpa", { anchor: "middle", size: 20 });
+    for (const v of [0, 0.5, 1]) {
+      svgEl(svg, "line", { x1: PX0, x2: PX1, y1: sy(v), y2: sy(v), stroke: "rgba(255,255,255,.28)", "stroke-dasharray": "6 6" });
+      txt(PX0 - 12, sy(v), String(v), { anchor: "end", size: 17 });
+    }
+    const yl = txt(0, 0, "probability_yes (clear night)", { anchor: "middle", size: 18 });
+    yl.setAttribute("transform", `translate(${PX0 - 56} ${(PY0 + PY1) / 2}) rotate(-90)`);
+    // ghost curves at the ends of the humidity range, then the live one
+    const path = (hu, attrs) => {
+      const pts = []; for (let i = 0; i <= 200; i++) { const v = PV[0] + (i / 200) * (PV[1] - PV[0]); pts.push(`${i ? "L" : "M"}${sx(v).toFixed(1)} ${sy(logistic(logOdds(v, hu))).toFixed(1)}`); }
+      return svgEl(svg, "path", { d: pts.join(""), fill: "none", "stroke-linecap": "round", ...attrs });
+    };
+    for (const hu of [0.4, 0.95]) {
+      path(hu, { stroke: HUM, "stroke-width": 2, opacity: 0.35, "stroke-dasharray": "6 5" });
+      const mid = (-raw[0] - raw[2] * hu) / raw[1], lab = `humidity ${hu.toFixed(2)}`, o = { size: 15, fill: HUM, opacity: 0.85, anchor: "end" };
+      if (hu < 0.5) txt(sx(mid) - 8, sy(0.5) - 16, lab, o);
+      else txt(PX1 - 8, sy(logistic(logOdds(PV[1], hu))) + 22, lab, o);
+    }
+    nights.forEach((d, i) => {
+      const w = Math.max(0.12, Math.exp(-(((d.x[1] - st.humidity) / 0.1) ** 2)));
+      svgEl(svg, "circle", { cx: sx(d.x[0]), cy: sy(d.y) + ((i * 5) % 3 - 1) * 5, r: 7, fill: d.y ? YES : NO, opacity: w, stroke: "rgba(0,0,0,.5)", class: "night" });
+    });
+    path(st.humidity, { stroke: "#7fd3ff", "stroke-width": 4, class: "scurve" });
+    // the reader at the chosen pressure
+    svgEl(svg, "line", { x1: sx(st.pressure), x2: sx(st.pressure), y1: PY0, y2: PY1, stroke: "#ffe39a", "stroke-width": 2, "stroke-dasharray": "5 5" });
+    svgEl(svg, "circle", { cx: sx(st.pressure), cy: sy(q.p), r: 8, fill: "#ffe39a", stroke: "#fff", "stroke-width": 2, class: "reader" });
+  }
+
+  // ---------- tab 2: the spreads, one unit against each, then the bars ----------
   function drawScale() {
-    txt(40, 26, "Invented readings: 48 made-up training nights at the plate archive's telescope (not from any room's data)", { size: 17, italic: true, fill: "#cdbf9f" });
     txt(40, 54, "response: clear_night (yes / no)  ·  predictors: pressure_hpa, humidity_fraction", { size: 18, fill: "#f3e6c4" });
     const SX0 = 260, SX1 = 920;
     cols.forEach((c, j) => {
@@ -129,7 +194,6 @@ export function mount(host, opts = {}) {
   // ---------- tab 2: the tally ----------
   function drawJudge() {
     const pool = tallyPool(st.share), m = judge(pool), a = judge(alwaysNo(pool));
-    txt(40, 26, "Invented readings: 200 made-up held-back nights at the plate archive (not from any room's data)", { size: 17, italic: true, fill: "#cdbf9f" });
     txt(40, 54, `Clear nights (yes): ${m.yes} of ${m.n}  ·  the model calls yes at a probability of 0.5 or more`, { size: 19, fill: "#f3e6c4" });
     const boards = [["The model", pool, m, 40], ["Always say no", alwaysNo(pool), a, 500]];
     const cell = 21, cols20 = 20;
@@ -171,18 +235,23 @@ export function mount(host, opts = {}) {
   function draw() {
     if (dead) return;
     svg.replaceChildren();
-    if (st.tab === "scale") drawScale(); else drawJudge();
+    if (st.tab === "several") drawSeveral(); else if (st.tab === "scale") drawScale(); else drawJudge();
     updateRead();
   }
 
   // ---------- panel ----------
-  let bRaw = null, bScaled = null, sShare = null;
+  let bRaw = null, bScaled = null, sShare = null, sPr = null, sHu = null;
   function buildPanel() {
     F.mark(st.tab);
     F.setLesson(...LESSONS[st.tab]);
     F.ctl.replaceChildren();
-    bRaw = bScaled = sShare = null;
-    if (st.tab === "scale") {
+    bRaw = bScaled = sShare = sPr = sHu = null;
+    if (st.tab === "several") {
+      sHu = slider("Humidity (humidity_fraction)", { min: 0.4, max: 0.95, step: 0.01, value: st.humidity, fmt: (v) => v.toFixed(2), onInput: (v) => api.setReadings({ humidity: v }) });
+      sPr = slider("Barometer (pressure_hpa)", { min: PV[0], max: PV[1], step: 1, value: st.pressure, fmt: (v) => v + " hPa", onInput: (v) => api.setReadings({ pressure: v }) });
+      sHu.el.style.color = HUM; sPr.el.style.color = PRS;
+      F.ctl.append(sHu.el, sPr.el);
+    } else if (st.tab === "scale") {
       const row = el("div", "clsbrow");
       bRaw = button("Raw", "tog rawbtn", () => api.setScaled(false), "Coefficients in each predictor's own units");
       bScaled = button("Scaled", "tog scalebtn", () => api.setScaled(true), "scale_variance = TRUE: every predictor in standard deviations");
@@ -203,7 +272,11 @@ export function mount(host, opts = {}) {
   const para = (html, cls) => { const p = el("p", cls || null); p.innerHTML = html; return p; };
   function updateRead() {
     const R = F.read; R.replaceChildren();
-    if (st.tab === "scale") {
+    if (st.tab === "several") {
+      if (sHu) sHu.set(st.humidity); if (sPr) sPr.set(st.pressure);
+      R.append(para(`<span style="color:${PRS}">pressure_hpa</span>: coefficient <b>${fmtCoef(raw[1])}</b>, positive, so more pressure means a higher probability of a clear night.`),
+        para(`<span style="color:${HUM}">humidity_fraction</span>: coefficient <b>${fmtCoef(raw[2])}</b>, negative, so more humidity means a lower probability, and the S-curve slides right.`));
+    } else if (st.tab === "scale") {
       if (bRaw) { bRaw.setAttribute("aria-pressed", String(!st.scaled)); bScaled.setAttribute("aria-pressed", String(st.scaled)); }
       const t = el("table", "clsbtable coeftable");
       t.innerHTML = "<thead><tr><th>variable</th><th>value</th></tr></thead>";
@@ -223,8 +296,14 @@ export function mount(host, opts = {}) {
 
   const api = {
     ready: Promise.resolve(),
-    setTab(k) { if (!TABS.some(([kk]) => kk === k)) throw new Error("scoreboard: setTab needs scale/judge"); st.tab = k; save(); buildPanel(); draw(); },
+    setTab(k) { if (!TABS.some(([kk]) => kk === k)) throw new Error("scoreboard: setTab needs several/scale/judge"); st.tab = k; save(); buildPanel(); draw(); },
     tab: () => st.tab,
+    setReadings({ pressure, humidity } = {}) {
+      if (pressure != null) st.pressure = Math.max(PV[0], Math.min(PV[1], Math.round(+pressure)));
+      if (humidity != null) st.humidity = Math.max(0.4, Math.min(0.95, Math.round(+humidity * 100) / 100));
+      save(); draw();
+    },
+    readings: () => ({ pressure: st.pressure, humidity: st.humidity, ...parts(st.pressure, st.humidity) }),
     setScaled(on) { st.scaled = !!on; save(); draw(); },
     scaled: () => st.scaled,
     coefs: coefRows,
