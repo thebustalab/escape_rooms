@@ -21,7 +21,7 @@
 //                              switchY, dials:[{cx,cy,r}x3] }
 //   m.setSwitches([bool x8]); m.switches(); m.measure(); m.isSettled(); m.isOver(); m.ready (Promise); m.destroy();
 //   canvas.varianceMeter exposes the same API for tests.
-import { measure } from "./variance_math.js?v=180";
+import { measure } from "./variance_math.js?v=181";
 
 const DEFAULTS = {
   amps:    { title: "ELECTRICAL SWITCHBOARD", unit: "AMPERES", vMax: 12, fullScale: 25 },

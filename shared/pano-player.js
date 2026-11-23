@@ -85,35 +85,36 @@
 // A bare `./variant_resolve.js` import is NOT refreshed by bumping the <script> tag's ?v, so a changed
 // helper module (e.g. a new export) leaves browsers on a stale cached copy → "doesn't provide an export
 // named X" SyntaxError → blank page (the 2026-08-05 airship regression). Bump all three together.
-import { WebRConsole } from "./webr-console.js?v=180";
-import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers, pickTransit } from "./variant_resolve.js?v=180";   // Phase 3: per-hotspot state variants; monorail switch-door nav
-import * as PQ from "./puzzle_queue.js?v=180";   // dynamic puzzle queue: location-independent puzzle serving
-import * as CP from "./corr_panel.js?v=180";   // lower-triangle layout of the grid gate (clouds correlation panel)
-import { particleCount } from "./particles.js?v=180";
-import { mountLandingBackdrop } from "./landing_backdrop.js?v=180";   // landing text over a pan of the first room's clip   // ambient-particle vocabulary + per-kind field density
-import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=180";
-import { condHolds, lockedMessage } from "./cond.js?v=180";
-import { gridMatches } from "./grid_check.js?v=180";   // grid answer check; `partition:true` accepts any relabelling of the buckets   // ledger + elevation-map card DOM
-import * as LIVE from "./live_session.js?v=180";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
-import * as RIDE from "./ride.js?v=180";
-import { mountPcaPlate } from "./pca_plate.js?v=180";   // the PCA plate instrument (voyage beach)
-import { mountFishBoard } from "./fish_board.js?v=180";   // the fish board instrument (harbour berth)
-import { mountDrawdown } from "./drawdown.js?v=180";
-import { mountTide } from "./tide_machine.js?v=180";   // the tide machine instrument (dunes escape)
-import { mountVarianceMeter } from "./variance_meter.js?v=180";   // the variance meter instrument (anova cellars escape)
-import { mountAnovaInstrument } from "./anova_instrument.js?v=180";   // the ANOVA instrument (Fisher's board, anova rooms; also the book, ch.12b)
-import { mountPermanovaInstrument } from "./permanova_instrument.js?v=180";   // its PERMANOVA sibling: the board's optional second tab
-import { mountGhostLines } from "./ghost_lines.js?v=180";   // the ghost-line board instrument (regression pits hub)
-import { mount as mountDatasetExplorer } from "./dataset_explorer.js?v=180";   // a dataset's STRUCTURE (instrument kind + the graded rooms' chip)
-import { mount as mountSigmoidBoard } from "./sigmoid_board.js?v=180";   // the S-curve board (classification day one, toy data)
-import { mount as mountScoreboard } from "./scoreboard.js?v=180";   // the scoreboard (classification day two, toy data)
+import { WebRConsole } from "./webr-console.js?v=181";
+import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers, pickTransit } from "./variant_resolve.js?v=181";   // Phase 3: per-hotspot state variants; monorail switch-door nav
+import * as PQ from "./puzzle_queue.js?v=181";   // dynamic puzzle queue: location-independent puzzle serving
+import * as CP from "./corr_panel.js?v=181";   // lower-triangle layout of the grid gate (clouds correlation panel)
+import { particleCount } from "./particles.js?v=181";
+import { mountLandingBackdrop } from "./landing_backdrop.js?v=181";   // landing text over a pan of the first room's clip   // ambient-particle vocabulary + per-kind field density
+import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=181";
+import { condHolds, lockedMessage } from "./cond.js?v=181";
+import { gridMatches } from "./grid_check.js?v=181";   // grid answer check; `partition:true` accepts any relabelling of the buckets   // ledger + elevation-map card DOM
+import * as LIVE from "./live_session.js?v=181";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
+import * as RIDE from "./ride.js?v=181";
+import { mountPcaPlate } from "./pca_plate.js?v=181";   // the PCA plate instrument (voyage beach)
+import { mountFishBoard } from "./fish_board.js?v=181";   // the fish board instrument (harbour berth)
+import { mountDrawdown } from "./drawdown.js?v=181";
+import { mountTide } from "./tide_machine.js?v=181";   // the tide machine instrument (dunes escape)
+import { mountVarianceMeter } from "./variance_meter.js?v=181";   // the variance meter instrument (anova cellars escape)
+import { mountAnovaInstrument } from "./anova_instrument.js?v=181";   // the ANOVA instrument (Fisher's board, anova rooms; also the book, ch.12b)
+import { mountPermanovaInstrument } from "./permanova_instrument.js?v=181";   // its PERMANOVA sibling: the board's optional second tab
+import { mountGhostLines } from "./ghost_lines.js?v=181";   // the ghost-line board instrument (regression pits hub)
+import { mount as mountDatasetExplorer } from "./dataset_explorer.js?v=181";   // a dataset's STRUCTURE (instrument kind + the graded rooms' chip)
+import { mount as mountSigmoidBoard } from "./sigmoid_board.js?v=181";   // the S-curve board (classification day one, toy data)
+import { mount as mountScoreboard } from "./scoreboard.js?v=181";   // the scoreboard (classification day two, toy data)
    // the drawdown board instrument (diamonds escape)   // THE RIDE (subway): express lever + clip-sequence planner
-import * as BELL from "./bell_pull.js?v=180";
-import * as TCOUNT from "./transit_counter.js?v=180";   // the date plaque over a flat door transit (dunes time-skip)
-import * as DATEB from "./date_board.js?v=180";   // date lock: lock mode:"date", two slide-levers (dunes departure board)
-import * as INVY from "./inventory.js?v=180";   // carried items + the door that asks which to use (dunes)   // bell-pull (#16): dial mode:"pull" + lock mode:"state" (spa belfry)
-import { entryYaw } from "./entry_facing.js?v=180";   // face the way out on entering a room (every scenario)
-import * as HINTS from "./escape_hints.js?v=180";   // escape-phase Hint chip: time-unlocked tiers (SCENARIO.escapeHints)
+import * as BELL from "./bell_pull.js?v=181";
+import * as TCOUNT from "./transit_counter.js?v=181";   // the date plaque over a flat door transit (dunes time-skip)
+import * as DATEB from "./date_board.js?v=181";   // date lock: lock mode:"date", two slide-levers (dunes departure board)
+import * as INVY from "./inventory.js?v=181";   // carried items + the door that asks which to use (dunes)   // bell-pull (#16): dial mode:"pull" + lock mode:"state" (spa belfry)
+import { entryYaw } from "./entry_facing.js?v=181";   // face the way out on entering a room (every scenario)
+import * as HINTS from "./escape_hints.js?v=181";
+import * as LOCKC from "./lock_console.js?v=181";   // limited-attempt lock: lockout across openings, eyepiece views, failure + retry (observatory)   // escape-phase Hint chip: time-unlocked tiers (SCENARIO.escapeHints)
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 
@@ -5081,7 +5082,8 @@ async function deliverLoad(h) {
 // matches a FIXED, derivable `answer` (compared case/whitespace-insensitively via normalizeCode),
 // is NOT recorded in the codec (escape-phase rooms are excluded there), and on success solves the
 // room like any puzzle. Schema:
-//   { type:"lock", box, label?, answer, length?, maxAttempts?, feedback?:{correct,wrong,out} }
+//   { type:"lock", box, label?, answer, length?, maxAttempts?, feedback?:{correct,wrong,out}, eyepiece?, retry? }
+// (eyepiece/retry and the lockout across reopenings: shared/lock_console.js)
 const normalizeCode = s => (s || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
 function openLock(h) {
   if (viewer) resumeYaw = viewer.getYaw();   // restore facing after the door swaps in on solve
@@ -5198,7 +5200,40 @@ function buildLockCard(h, onSolved) {
     { label: "Shown while the gate is still shut (lockedBody)", get: () => h.lockedBody || "",
       set: v => { h.lockedBody = v; return tpSaveRoom(room); } },
   ]);
+  // `eyepiece.stateKey` (shared/lock_console.js): each miss writes its count into the world state and the retry
+  // writes 0, so a mapview keyed on it shows the next image when opened. If this room carries state art (panorama
+  // variants), re-render at once so it follows, as a dial throw or a bell-pull does.
+  const writeMissState = n => {
+    const v = LOCKC.nextStateValue(h, n);
+    if (v == null) return;
+    gameState[LOCKC.stateKeyOf(h)] = v;
+    if ((room.hotspots || []).some(h2 => h2 && Array.isArray(h2.variants) && h2.variants.length)) rerenderCurrentRoom();
+  };
+  // Out of attempts (shared/lock_console.js): the failure (or the "out" line), keypad disabled, and — if the
+  // lock offers one — a retry that resets only THIS lock's attempts. A reload would wipe the graded run.
+  const showOut = res => {
+    fb.className = "qfeedback out";
+    fb.innerHTML = (res.text ? `<div>${res.text}</div>` : "") +
+      (res.failure ? (res.failure.title ? `<div style="font-weight:700;margin-top:${res.text ? 8 : 0}px">${res.failure.title}</div>` : "") +
+                     (res.failure.body ? `<div>${res.failure.body}</div>` : "") : "");
+    sub.disabled = true; input.disabled = true;
+    const label = LOCKC.retryLabel(h);
+    if (!label || card.querySelector(".lockretry")) return;
+    const again = document.createElement("button");
+    again.className = "ghost lockretry"; again.style.marginTop = "10px"; again.textContent = label;
+    again.onclick = () => {
+      attempts = 0; attemptCounts.set(pid, 0);
+      writeMissState(0);
+      fb.className = "qfeedback"; fb.innerHTML = "";
+      sub.disabled = false; input.disabled = false; input.value = "";
+      input.dispatchEvent(new Event("input"));
+      again.remove();
+      try { input.focus(); } catch (e) {}
+    };
+    sub.insertAdjacentElement("afterend", again);
+  };
   const tryCode = () => {
+    if (input.disabled) return;
     const val = normalizeCode(input.value);
     if (!val) { input.focus(); return; }
     attempts++; attemptCounts.set(pid, attempts);
@@ -5206,14 +5241,15 @@ function buildLockCard(h, onSolved) {
       fb.className = "qfeedback ok"; fb.innerHTML = fbk.correct || "The lock releases.";
       sub.disabled = true; input.disabled = true;
       setTimeout(() => onSolved({ answer: 1, attempts }), 900);
-    } else if (maxA && attempts >= maxA) {
-      fb.className = "qfeedback out"; fb.innerHTML = fbk.out || "The keypad goes dark.";
-      sub.disabled = true; input.disabled = true;
-    } else {
-      fb.className = "qfeedback no"; fb.innerHTML = fbk.wrong || "Nothing happens.";
-      input.select();
+      return;
     }
+    const res = LOCKC.wrongResult(h, val, attempts);
+    writeMissState(attempts);
+    if (res.kind === "out") showOut(res);
+    else { fb.className = "qfeedback no"; fb.innerHTML = res.text; input.select(); }
   };
+  // Reopened after the attempts ran out: stay locked out (before 2026-11-21 a reopen silently re-armed it).
+  if (LOCKC.isLockedOut(h, attempts) && !solvedGates.has(pid)) showOut(LOCKC.lockedOutResult(h));
   sub.addEventListener("click", tryCode);
   input.addEventListener("keydown", e => { if (e.key === "Enter") tryCode(); });
   setTimeout(() => { try { input.focus(); } catch (e) {} }, 60);
@@ -6224,7 +6260,10 @@ function renderDebrief() {
   // Content (the room-by-room gallery) is built by shared/debrief.js — the player only owns the flow
   // (when the reveal is offered, the chip, the spoiler guard, open/close). Pass the room helpers it needs.
   if (window.EscapeDebrief) {
-    window.EscapeDebrief.renderGallery($("#debriefBody"), SCENARIO, { isBuilt, phaseOf });
+    // escapeOpen: the escape brief can carry the escape's answer, so debrief.js holds it behind a click
+    // until the escape is solved (or there is none). Re-evaluated on every tab switch, so it opens after.
+    const escapeOpen = !escapeFinished && (hasEscapePhase() || hasPendingEscape());
+    window.EscapeDebrief.renderGallery($("#debriefBody"), SCENARIO, { isBuilt, phaseOf, escapeOpen });
   } else {
     // Module missing (shouldn't happen — it's loaded before the player) — never leave the screen blank.
     const body = $("#debriefBody"); body.innerHTML = "";

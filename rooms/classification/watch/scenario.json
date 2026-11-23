@@ -33,7 +33,7 @@
   },
   "doorLabels": true,
   "state": {
-    "day_two": true
+    "day_two": false
   },
   "_designNotes": {
     "buildState": "Rooms, graph and scene specs written by _scratch/build_scenario.py (2026-11-19; the summit car park added 2026-11-20): the graded pair's volcano island (lair + observatory) in Staff Only's year, in morning light. Day one: the monitoring station (hub: bulletin board = deliver, S-curve board = instrument, day ledger = dataset explorer, notice case -> Staff Only) and the footpath up the flank to seismo_hut (L1), gas_vent (L2), crater_rim (L3). Day two: the station's truck drives up to the summit car park (arrival, no task), whose observatory front door opens into the plate archive (hub: second bulletin board, tally board, plate cabinet, notice case -> Good Seeing) and plate_store (L1), measuring_engine (L2), dome (L3). The truck door to the car park is hidden until state.day_two is true (Wednesday). Live scenario: tasks are dealt by the live-class server (authoring_v2/live_class/pool/watch.json); the book's practice pool is solo/pool.json. No codec id, no escape, ungraded. Music: the parent scenarios have no track yet. Art: every room from text + skeleton, the station first."
@@ -66,7 +66,11 @@
             0.295,
             0.6247
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "transit": {
+            "video": "station/transit_drive_up.mp4",
+            "flat": true
+          }
         },
         {
           "type": "deliver",
@@ -3155,6 +3159,10 @@
               "day_two",
               true
             ]
+          },
+          "transit": {
+            "video": "station/transit_drive_up.mp4",
+            "flat": true
           }
         },
         {
@@ -25568,7 +25576,7 @@
     {
       "key": "car_park",
       "title": "The summit car park",
-      "built": false,
+      "built": true,
       "unlockedWhen": true,
       "designNote": "ARRIVAL ON THE SUMMIT (day two). No station, deliver, instrument or plaque: the place between the truck and the plate archive. The drive up from the station ends here and the drive down starts here (the truck door goes back to the station; the observatory's front door opens into the archive). Reached only by the station's truck, so it is hidden with everything beyond it until state.day_two.",
       "plannedHotspots": [
@@ -25576,13 +25584,31 @@
           "type": "door",
           "direction": "back",
           "to": "station",
-          "label": "The station's truck"
+          "label": "The station's truck",
+          "box": [
+            0.0528,
+            0.38,
+            0.1872,
+            0.62
+          ],
+          "boxSource": "draft:skeleton",
+          "transit": {
+            "video": "car_park/transit_drive_down.mp4",
+            "flat": true
+          }
         },
         {
           "type": "door",
           "direction": "open",
           "to": "archive",
-          "label": "The observatory's front door"
+          "label": "The observatory's front door",
+          "box": [
+            0.3247,
+            0.402,
+            0.3447,
+            0.498
+          ],
+          "boxSource": "draft:skeleton"
         }
       ],
       "authoring": {
@@ -26866,8 +26892,60 @@
           "motionClosing": "Only the windsock moves; everything else stays exactly where it is."
         },
         "scenePrompt": "This is a seamless 360-degree panorama from the small gravel car park on the bare summit of a steep volcanic island, high above everything, beside an old mountain-top astronomical observatory of pale cut stone, in mid-morning sunlight, at the head of the island's mountain road. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a low dry-stone wall close behind the viewer at the car park's edge, the sea far below beyond it: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, the left half of the calm view directly behind the viewer: a low dry-stone wall close by at the car park's edge and the sea far below beyond it, joining its other half cleanly at the seam directly behind you; to the left, standing well in from the edge of the frame, a few strides off on the gravel, the station's white four-wheel-drive truck parked with its nose toward the head of the road, its driver's door standing open, the low stone wall at the car park's edge close behind it; just past its nose, two low stone posts where the island's mountain road leaves the gravel and drops away DOWN off the summit out of sight; left of centre, across the gravel, a short path of flat stone flags running level from the car park to the long, low, single-storey building of pale cut stone that holds the observatory's plate archive, its heavy oak front door standing wide open in the sunlit wall on a cool shaded stone room within; dead ahead in the centre, a few strides ahead at the car park's edge, a short slender steel mast with a red-and-white striped canvas windsock on a swivel at its top, high against the clear sky over the observatory's other low pale stone buildings beyond, the windsock half filled by the light breeze, its striped tail lifted a little; right of centre, a few dozen strides off on the summit's edge, the observatory's round dome: a drum of pale whitewashed stone under a smooth silver-grey metal cap, against the deep-blue sky; to the right, standing well in from the edge of the frame, beyond the open edge of the gravel where the summit falls steeply away, far below the viewer: the island's mountain road zigzagging in tight hairpin bends down the steep slope just below the edge, and the long dark slope of the mountain running down to a level shelf of the island and the low raised rim of a wide crater on it, its floor hidden behind the rim, thin white wisps of steam rising out of it above the rim, and on the crater's far rim, small with distance, the brand-new concrete and glass buildings of a works; beyond and far below everything, the deep blue sea to the horizon; on the far right, the right half of the calm view directly behind the viewer: a low dry-stone wall close by at the car park's edge and the sea far below beyond it, joining its other half cleanly at the seam directly behind you. A small, bright gravel car park on a bare volcanic summit beside an old stone observatory, the whole island falling away far below; a steep volcanic island high above a deep blue ocean: dark basalt, red-brown and black cinder, pale pumice, crusts of real lemon-yellow sulfur at the vents, sparse silver-green broom bushes, weathered whitewashed concrete and galvanized steel, a deep clear sky; pale cut stone and whitewashed plaster of an old observatory; photorealistic, fine natural film grain. No people, no human figures, no faces and no statues anywhere; no animals. No readable words, no legible writing, no captions, no logos and no painted numbers on any wall, sign, board, ledger page or label. It is MORNING: no night sky, no stars, no moon, no floodlights, no blue fire at any vent or on the crater floor, no lava and no red glow; no fog, no cloud sea below the mountain, no rain. The image is SHARP: no motion blur and no smeared or doubled detail anywhere. No cable car and no gondola. No town, hotel or harbor anywhere in view. EXACTLY ONE vehicle, the white truck; ONE windsock; ONE dome. No painted parking bays, no signs, no barrier arm. The car park has EXACTLY TWO ways out: the observatory's open front door left of centre and the road down past the truck on the left; no other path, stair or gate. Shot on a full-frame DSLR at 24mm, f/8, mid-morning: the sun well up in the east-south-east, behind the viewer over the right shoulder, bright clear light on the pale stone of the observatory and on the white truck, short crisp shadows, a deep-blue sky, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a low dry-stone wall close behind the viewer at the car park's edge, the sea far below beyond it, with no visible seam, join, or repetition.",
-        "specBuild": "1d57e4e4e7337e9392c6"
-      }
+        "specBuild": "1d57e4e4e7337e9392c6",
+        "seam": {
+          "stage": "screened",
+          "band": "sky",
+          "ratio": 9.79,
+          "delta": 2.33,
+          "needsWork": false,
+          "accepted": false,
+          "seamBandRun": 0.102,
+          "seamStepRatio": 1.46,
+          "at": "2026-11-20T12:44:59"
+        }
+      },
+      "panorama": "car_park/scene.png",
+      "builtFrom": "l1_car_park_1.png",
+      "wrap": {
+        "haov": 360,
+        "vaov": 90,
+        "hfov": 120,
+        "vOffset": -5,
+        "pitch": -5
+      },
+      "hotspots": [
+        {
+          "id": "the_station_s_truck",
+          "type": "door",
+          "label": "The station's truck",
+          "box": [
+            0.0528,
+            0.38,
+            0.1872,
+            0.62
+          ],
+          "direction": "back",
+          "to": "station",
+          "transit": {
+            "video": "car_park/transit_drive_down.mp4",
+            "flat": true
+          }
+        },
+        {
+          "id": "the_observatory_s_front_door",
+          "type": "door",
+          "label": "The observatory's front door",
+          "box": [
+            0.3247,
+            0.402,
+            0.3447,
+            0.498
+          ],
+          "direction": "open",
+          "to": "archive"
+        }
+      ]
     },
     {
       "key": "archive",

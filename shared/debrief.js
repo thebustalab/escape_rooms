@@ -103,7 +103,7 @@
   }
 
   // THE LADDER SHAPE — world plate, then one plain numbered line per rung, then the escape.
-  function renderLadder(bodyEl, scenario, lines) {
+  function renderLadder(bodyEl, scenario, lines, helpers) {
     var debrief = scenario.debrief || {};
     if (debrief.intro) {
       var intro = el("p", "dbintro"); intro.textContent = debrief.intro; bodyEl.appendChild(intro);
@@ -125,18 +125,34 @@
     var esc = (scenario.escapeBrief || "").trim();
     if (esc) {
       var h2 = el("h3", "dbladderh"); h2.textContent = "And to get out"; bodyEl.appendChild(h2);
-      var p = el("p", "dbescape"); p.textContent = esc; bodyEl.appendChild(p);
+      var p = el("p", "dbescape");
+      // The escape brief often carries the escape's answer (observatory's code, 2026-11-21), and this tab
+      // is reachable from the analysis finish, before the escape. So while the escape is still open the
+      // brief sits behind a click: the student who has stopped trying still gets it (Lucas: "I want all
+      // my students to learn"), but nobody reads the answer by accident. `escapeOpen` comes from the
+      // player; when absent (the authoring harness) the brief shows as before.
+      if (helpers && helpers.escapeOpen === true) {
+        p.textContent = "This part explains the escape and gives away its answer. Escape first, " +
+          "or open it once you have stopped trying.";
+        bodyEl.appendChild(p);
+        var go = el("button", "ghost dbescapego"); go.textContent = "Show it anyway";
+        go.onclick = function () { p.textContent = esc; go.remove(); };
+        bodyEl.appendChild(go);
+      } else {
+        p.textContent = esc; bodyEl.appendChild(p);
+      }
     }
   }
 
-  // Build the debrief content into bodyEl. helpers = { isBuilt, phaseOf } supplied by the player.
+  // Build the debrief content into bodyEl. helpers = { isBuilt, phaseOf, escapeOpen } supplied by the
+  // player; escapeOpen = true while an escape remains unsolved (the escape brief then waits for a click).
   function renderGallery(bodyEl, scenario, helpers) {
     bodyEl.innerHTML = "";
     var debrief = scenario.debrief || {};
     var isBuilt = helpers.isBuilt;
 
     var lines = ladderLines(scenario);
-    if (lines.length) { renderLadder(bodyEl, scenario, lines); return; }
+    if (lines.length) { renderLadder(bodyEl, scenario, lines, helpers); return; }
 
     if (debrief.intro) {
       var intro = el("p", "dbintro"); intro.textContent = debrief.intro; bodyEl.appendChild(intro);

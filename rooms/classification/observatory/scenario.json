@@ -65,21 +65,41 @@
               true
             ]
           },
-          "lockedBody": "The storm door is dogged shut. The brass wheel will not turn yet."
+          "lockedBody": "The storm door is dogged shut. The brass hand-wheel beside it frees the door once the question on the plate sleeves is answered."
         },
         {
+          "starterCode": "galaxy_plates",
+          "check": {
+            "prompt": "The astronomer's first rule of thumb was that color alone could tell an elliptical galaxy from a spiral. In <code>galaxy_plates</code>, fit a logistic regression on the training galaxies only, with <code>color_index</code> as the one predictor and <code>elliptical</code> as the response. The training galaxies are the rows whose <code>record</code> is \"training\". The galaxy G-1948-5198 (a value in the <code>galaxy</code> column) is one of the training galaxies: find the fitted model's predicted probability that it is an elliptical, and store that probability, as a single number to two decimal places, in an object called <code>answer</code>. Then click \"Check my answer\".",
+            "requires": [
+              "answer"
+            ],
+            "expr": "{ .a <- answer; if (is.data.frame(.a)) { .nm <- names(.a); .a <- if (nrow(.a) != 1) NA else if (\"probability_yes\" %in% .nm) .a[[\"probability_yes\"]] else { .num <- .nm[vapply(.a, is.numeric, logical(1))]; if (length(.num) == 1) .a[[.num]] else NA } }; .a <- suppressWarnings(as.numeric(unlist(.a))); isTRUE(length(.a) == 1 && !is.na(.a) && abs(.a - 0.7078) <= 0.01) }",
+            "hint": "Fit color_index alone on the training galaxies, predict those same training galaxies, and read the probability for G-1948-5198.",
+            "maxAttempts": 4,
+            "feedback": {
+              "correct": "Correct, noted in your field notebook: on color_index alone, the training galaxy G-1948-5198 has a probability of about 0.71 of being an elliptical.",
+              "wrong": [
+                "Set the training galaxies aside first: <code>training_galaxies &lt;- galaxy_plates %&gt;% filter(record == &quot;training&quot;)</code>. Then build the model on them: <code>color_model &lt;- buildModel(data = training_galaxies, model_type = &quot;logistic_regression&quot;, predictors = &quot;color_index&quot;, response = &quot;elliptical&quot;)</code>.",
+                "Predict the same training galaxies and keep the one galaxy: <code>predictWithModel(data = training_galaxies, model = color_model) %&gt;% filter(galaxy == &quot;G-1948-5198&quot;) %&gt;% select(galaxy, color_index, probability_yes)</code>. If your number is near 0.60, the model was built on every row instead of the training galaxies; near 0.76, it used all five predictors.",
+                "answer is one number: that galaxy's probability_yes rounded to two decimal places, for example <code>answer &lt;- 0.12</code> with your own number in place of 0.12."
+              ]
+            }
+          },
           "type": "puzzle",
           "label": "The plate sleeves",
           "form": "check",
           "note": "Rung 1: answer 0.7078. Prompt and options at step 6."
         },
         {
+          "body": "A glossy brochure for tonight's visit, in his sales voice: <i>Up at the summit, the greatest hits of the night sky through a real brass telescope: Andromeda, Saturn's rings, the Comet, the Seven Sisters and the Great Nebula. Every one a showstopper. Every one on a postcard.</i>",
           "type": "clue",
           "label": "The villain's brochure",
-          "pickup": true,
+          "pickup": "The villain's brochure, from the bench in the plate vault: it promises Andromeda, Saturn's rings, the comet, the Seven Sisters and the Great Nebula for tonight.",
           "note": "Read-only; the five crowd-pleasers, left on the bench with tonight's arrangements. Escape input; covered by Lucas's clue waiver (2026-11-09: early, near the landing card, reinforcing it)."
         },
         {
+          "body": "His notes for tonight's pitch to the investors, typed on resort letterhead and left beside the brochure: <i>Call everything a spiral and you're right 9 times in 10, so why pay an astronomer?</i>",
           "type": "clue",
           "label": "The pitch letter",
           "note": "Read-only; the 9-in-10 claim, beside the brochure on the bench. Not an escape input; covered by the same waiver."
@@ -95,11 +115,11 @@
               "toast": "The dogs back off and the storm door swings free."
             }
           ],
-          "hint": "The brass hand-wheel is seated hard. Something has to be settled in this room first.",
+          "hint": "The hand-wheel turns freely now. One turn backs the dogs off the storm door.",
           "availableWhen": {
             "solved": "plate_vault"
           },
-          "lockedBody": "The storm door is dogged shut. The brass wheel will not turn yet.",
+          "lockedBody": "The brass hand-wheel is seated hard. It will turn once the question on the plate sleeves is answered.",
           "note": "One-way gate dial (rung 1). Dead until plate_vault is solved."
         }
       ],
@@ -114,7 +134,7 @@
             {
               "id": "front_door",
               "at": "to the left",
-              "desc": "standing well in from the edge of the frame, with plain wall between it and that edge, in the end wall, the vault's heavy oak front door standing OPEN, the stone floor under the viewer's feet running level out over its sill onto a frosted gravel path under the pale night sky outside"
+              "desc": "standing well in from the edge of the frame, with plain wall between it and that edge, in the end wall, the vault's heavy oak front door standing OPEN, the stone floor under the viewer's feet running level out over its sill onto the frosted flagstones of the summit's forecourt, edged by a low stone kerb with the pale gravel of the car park beyond it, under the pale night sky outside"
             },
             {
               "id": "brochure",
@@ -153,7 +173,7 @@
             {
               "id": "to_deck_moon",
               "at": "just right of centre",
-              "desc": "standing well in from the edge of the frame, in the side wall, the vault's storm door out to the deck: a massive iron-bound oak door, broad and thick as a strongroom door, black iron straps across it and a ring of polished brass dogs round its edge, SHUT and dogged tight in its stone frame, the stone floor under the viewer's feet running level to its sill",
+              "desc": "standing well in from the edge of the frame, in the opposite end wall, the vault's storm door out to the deck: a massive iron-bound oak door, broad and thick as a strongroom door, black iron straps across it and a ring of polished brass dogs round its edge, SHUT and dogged tight in its stone frame, the stone floor under the viewer's feet running level to its sill",
               "label": "The storm door out to the first deck",
               "door": {
                 "direction": "forward",
@@ -182,7 +202,7 @@
             {
               "id": "plate_sleeves",
               "at": "to the right",
-              "desc": "along the same side wall beyond the storm door, tall oak racks from the floor to the ceiling packed with upright paper sleeves of glass photographic plates, row on row, a few sleeves pulled half out",
+              "desc": "along the same end wall beyond the storm door, tall oak racks from the floor to the ceiling packed with upright paper sleeves of glass photographic plates, row on row, a few sleeves pulled half out",
               "label": "The plate sleeves",
               "puzzle": true
             }
@@ -404,16 +424,16 @@
                   30.0
                 ],
                 "heading": 350.0,
-                "joins": "Here: the stone floor of the plate vault under the viewer; ahead and a little to the right it runs level to the sill of the shut storm door in the side wall; on the left it runs level out through the open front door onto the gravel path outside."
+                "joins": "Here: the stone floor of the plate vault under the viewer; ahead and a little to the right it runs level to the sill of the shut storm door in the side wall; on the left it runs level out through the open front door onto the flagstones outside."
               }
             }
           }
         },
-        "scenePrompt": "This is a seamless 360-degree panorama from the middle of a long, low stone plate vault inside an old summit observatory at night, lined with racks of glass photographic plates. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stretch of dressed dark basalt wall, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. To the left, standing well in from the edge of the frame, with plain wall between it and that edge, in the end wall, the vault's heavy oak front door standing OPEN, the stone floor under the viewer's feet running level out over its sill onto a frosted gravel path under the pale night sky outside; just left of centre, against the wall facing the viewer stands a long oak bench, and lying open on its left-hand end a glossy resort brochure with EXACTLY FIVE small bright night-sky photographs: a ringed planet, a pink nebula, a spiral galaxy, a little cluster of blue stars and a comet; nothing on it that can be read; dead ahead in the centre, in the middle of that bench, square in front of the viewer, the plate viewer: a slanted wooden light box with a frosted glass face glowing softly white from inside, one glass plate resting on it; dead ahead in the centre, hanging on a short iron chain from the ceiling beam directly above the plate viewer, a brass storm lantern with a glass chimney, its flame burning low and steady, at rest on its chain, leaning a very little off true; just right of centre, on the right-hand end of the same bench, a typed letter on heavy cream paper lying open beside its torn envelope, its lines too small to read; just right of centre, standing well in from the edge of the frame, in the side wall, the vault's storm door out to the deck: a massive iron-bound oak door, broad and thick as a strongroom door, black iron straps across it and a ring of polished brass dogs round its edge, SHUT and dogged tight in its stone frame, the stone floor under the viewer's feet running level to its sill; just right of centre, set in the middle of that massive door's face, its hand-wheel: a big six-spoked brass wheel on a heavy boss, linked to the brass dogs round the door's edge; to the right, along the same side wall beyond the storm door, tall oak racks from the floor to the ceiling packed with upright paper sleeves of glass photographic plates, row on row, a few sleeves pulled half out. A still, cold, orderly plate vault of dressed dark basalt walls and a flagged stone floor, tall oak racks, black iron and polished brass, lit warm by one lantern over the bench, the racks of plate sleeves in shadow, the soft glow of the light box, and a cool pale spill of frosty skylight at the open front door; inside an old, well-kept astronomical observatory on a high volcanic summit; old, cared for and whole; fine natural film grain. The stone floor under the viewer's feet runs level to the shut storm door's sill and level out through the open front door. EXACTLY ONE storm door, shut, with ONE hand-wheel on it, and ONE front door, open. EXACTLY ONE lantern. EXACTLY ONE brochure with its five pictures, and ONE letter. No window anywhere: the vault is windowless. No moonbeam and no cast moon-shadow through the front door, only a pale spill of skylight. No people, no human figures, no faces and no statues anywhere. No readable words, no writing, no captions, no logos, no signs, no plaques and no painted numbers anywhere. No snow drifts and no icicles. No modern glass-and-steel buildings and no street lamps on the summit. Nothing steampunk: no exposed cogs or pipework on the walls. It is night: no daylight, no sunset glow, no blue-hour sky. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere; everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. Shot on a full-frame DSLR at 24mm, f/8, night, warm storm-lantern light indoors and a cool pale spill of frosty skylight through the open front door, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a plain stretch of dressed dark basalt wall, uniform and unbroken, with no visible seam, join, or repetition.",
+        "scenePrompt": "This is a seamless 360-degree panorama from the middle of a long, low stone plate vault inside an old summit observatory at night, lined with racks of glass photographic plates. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stretch of dressed dark basalt wall, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. To the left, standing well in from the edge of the frame, with plain wall between it and that edge, in the end wall, the vault's heavy oak front door standing OPEN, the stone floor under the viewer's feet running level out over its sill onto the frosted flagstones of the summit's forecourt, edged by a low stone kerb with the pale gravel of the car park beyond it, under the pale night sky outside; just left of centre, against the wall facing the viewer stands a long oak bench, and lying open on its left-hand end a glossy resort brochure with EXACTLY FIVE small bright night-sky photographs: a ringed planet, a pink nebula, a spiral galaxy, a little cluster of blue stars and a comet; nothing on it that can be read; dead ahead in the centre, in the middle of that bench, square in front of the viewer, the plate viewer: a slanted wooden light box with a frosted glass face glowing softly white from inside, one glass plate resting on it; dead ahead in the centre, hanging on a short iron chain from the ceiling beam directly above the plate viewer, a brass storm lantern with a glass chimney, its flame burning low and steady, at rest on its chain, leaning a very little off true; just right of centre, on the right-hand end of the same bench, a typed letter on heavy cream paper lying open beside its torn envelope, its lines too small to read; just right of centre, standing well in from the edge of the frame, in the opposite end wall, the vault's storm door out to the deck: a massive iron-bound oak door, broad and thick as a strongroom door, black iron straps across it and a ring of polished brass dogs round its edge, SHUT and dogged tight in its stone frame, the stone floor under the viewer's feet running level to its sill; just right of centre, set in the middle of that massive door's face, its hand-wheel: a big six-spoked brass wheel on a heavy boss, linked to the brass dogs round the door's edge; to the right, along the same end wall beyond the storm door, tall oak racks from the floor to the ceiling packed with upright paper sleeves of glass photographic plates, row on row, a few sleeves pulled half out. A still, cold, orderly plate vault of dressed dark basalt walls and a flagged stone floor, tall oak racks, black iron and polished brass, lit warm by one lantern over the bench, the racks of plate sleeves in shadow, the soft glow of the light box, and a cool pale spill of frosty skylight at the open front door; inside an old, well-kept astronomical observatory on a high volcanic summit; old, cared for and whole; fine natural film grain. The stone floor under the viewer's feet runs level to the shut storm door's sill and level out through the open front door. EXACTLY ONE storm door, shut, with ONE hand-wheel on it, and ONE front door, open. EXACTLY ONE lantern. EXACTLY ONE brochure with its five pictures, and ONE letter. No window anywhere: the vault is windowless. No moonbeam and no cast moon-shadow through the front door, only a pale spill of skylight. No people, no human figures, no faces and no statues anywhere. No readable words, no writing, no captions, no logos, no signs, no plaques and no painted numbers anywhere. No snow drifts and no icicles. No modern glass-and-steel buildings and no street lamps on the summit. Nothing steampunk: no exposed cogs or pipework on the walls. It is night: no daylight, no sunset glow, no blue-hour sky. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere; everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. Shot on a full-frame DSLR at 24mm, f/8, night, warm storm-lantern light indoors and a cool pale spill of frosty skylight through the open front door, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a plain stretch of dressed dark basalt wall, uniform and unbroken, with no visible seam, join, or repetition.",
         "plateRefs": [
           "_world/aerials/observatory_year_master.png"
         ],
-        "specBuild": "e74e7e626baeddb7a1c8"
+        "specBuild": "bed26890ee0a67a717d1"
       }
     },
     {
@@ -442,9 +462,13 @@
         {
           "type": "mapview",
           "label": "The moon dial",
+          "key": "moon_dial",
           "note": "Brass clockwork moon; reading 8; read-only close-up (mapview; still made with gpt-image at the art step). Moonlight washes out faint fuzzy things."
         },
         {
+          "title": "The sea of clouds",
+          "body": "Moist northeasterly trade winds pile cloud against the windward slopes of the Canary Islands, and a layer of warmer air above holds it down, leaving a white floor far below the summits. Alexander von Humboldt was the first to measure its height, in 1799. On Tenerife, Izaña Observatory opened above that floor on January 1, 1916, founded to study the upper atmosphere in its steady, dry air. Astronomers followed decades later.",
+          "credit": "Source: AEMET (the Spanish state meteorological agency), history of Izaña Observatory",
           "type": "plaque",
           "label": "The sea of clouds",
           "plaque": true,
@@ -453,7 +477,7 @@
       ],
       "authoring": {
         "sceneSpec": {
-          "setting": "a small railed flagstone deck on the south-west brink of an old summit observatory at night, tucked between the long dark wall of the plate vault and the stone wall of a study",
+          "setting": "a small railed flagstone deck on the south-west brink of an old summit observatory at night, tucked between the dark end wall of the plate vault and the stone wall of a study",
           "interior": false,
           "styleLight": "a clear night under a high, bright moon in the south-south-west, the whole deck flooded with cool silver light",
           "seam": "the plain dressed-stone wall of the study close behind the viewer, uniform and unbroken",
@@ -472,7 +496,7 @@
             {
               "id": "to_plate_vault",
               "at": "just left of centre",
-              "desc": "across the deck, set in the long dark basalt wall of the plate vault, the vault's massive iron-bound storm door swung back OPEN against that wall, its big brass wheel on its face and warm lantern light falling out across the flagstones, which run level from the viewer's feet to its sill",
+              "desc": "across the deck, set in the dark basalt end wall of the plate vault, a low building under a gabled green copper roof, the vault's massive iron-bound storm door swung back OPEN against that wall, its big brass wheel on its face and warm lantern light falling out across the flagstones, which run level from the viewer's feet to its sill",
               "label": "Back through the storm door to the plate vault",
               "door": {
                 "direction": "back",
@@ -2591,12 +2615,13 @@
             }
           }
         },
-        "scenePrompt": "This is a seamless 360-degree panorama from a small railed flagstone deck on the south-west brink of an old summit observatory at night, tucked between the long dark wall of the plate vault and the stone wall of a study. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the plain dressed-stone wall of the study close behind the viewer, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. To the left, standing well in from the edge of the frame, right beside the viewer in the study's stone wall, the study's plain oak door standing OPEN with warm lamplight inside, the flagstones under the viewer's feet running level to its sill; just left of centre, across the deck, set in the long dark basalt wall of the plate vault, the vault's massive iron-bound storm door swung back OPEN against that wall, its big brass wheel on its face and warm lantern light falling out across the flagstones, which run level from the viewer's feet to its sill; just left of centre, beyond the far end of the vault and well below the deck, on the steep rocky south slope of the summit, a short pale stretch of the summit road climbing toward the top, empty; dead ahead in the centre, on a waist-high stone pedestal by the railing straight in front of the viewer, the moon dial: a brass clockwork instrument with a silvered moon globe in a ring on its top and a round dial face square to the viewer, at rest; just right of centre, very high in the south-south-west, near the top of the view, the bright waxing gibbous moon, the brightest thing in the sky; just right of centre, beyond the railing the summit drops away out of sight, and a kilometre and a half below lies the sea of cloud, one unbroken shining white floor under the full glare of the moon, stretching flat and seamless to the horizon; to the right, at the deck's back corner where its railing meets the study wall, a short iron staff a little taller than the railing carrying a small frayed pennant of faded blue cloth, lifted a little toward the east-south-east by the light steady breeze from the west-north-west, its frayed tail curling softly. A bright, silent moon deck, the high gibbous moon pouring silver over the frosted flagstones and the vault's dark wall, a vast shining sea of cloud below, warm light spilling from the two open doors; an old, well-kept astronomical observatory on the summit of a steep island volcano, high above a sea of cloud: dressed dark basalt walls, frosted flagstones, green-weathered copper roofs, brass railings with ball-topped posts on low basalt parapets, polished brass, varnished teak and oak, black iron; a light frost on the stone and the brass; old, cared for and whole; fine natural film grain. The flagstones under the viewer's feet run level to both open doors and to the railing. EXACTLY ONE moon. The floor of cloud is unbroken, with no gaps in it. No construction works, no cranes, no floodlights and no orange glow anywhere in view: the summit and its stone buildings hide the eastern slopes. No dome anywhere in view. The road is empty: no vehicles and no headlights on it. The moon dial shows no reading. No people, no human figures, no faces and no statues anywhere. No readable words, no writing, no captions, no logos, no signs, no plaques and no painted numbers anywhere. No snow drifts and no icicles. No modern glass-and-steel buildings and no street lamps on the summit. Nothing steampunk: no exposed cogs or pipework on the walls. It is night: no daylight, no sunset glow, no blue-hour sky. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere; everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. Shot on a full-frame DSLR at 24mm, f/8, a clear night under a high, bright moon in the south-south-west, the whole deck flooded with cool silver light, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into the plain dressed-stone wall of the study close behind the viewer, uniform and unbroken, with no visible seam, join, or repetition.",
+        "scenePrompt": "This is a seamless 360-degree panorama from a small railed flagstone deck on the south-west brink of an old summit observatory at night, tucked between the dark end wall of the plate vault and the stone wall of a study. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the plain dressed-stone wall of the study close behind the viewer, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. To the left, standing well in from the edge of the frame, right beside the viewer in the study's stone wall, the study's plain oak door standing OPEN with warm lamplight inside, the flagstones under the viewer's feet running level to its sill; just left of centre, across the deck, set in the dark basalt end wall of the plate vault, a low building under a gabled green copper roof, the vault's massive iron-bound storm door swung back OPEN against that wall, its big brass wheel on its face and warm lantern light falling out across the flagstones, which run level from the viewer's feet to its sill; just left of centre, beyond the far end of the vault and well below the deck, on the steep rocky south slope of the summit, a short pale stretch of the summit road climbing toward the top, empty; dead ahead in the centre, on a waist-high stone pedestal by the railing straight in front of the viewer, the moon dial: a brass clockwork instrument with a silvered moon globe in a ring on its top and a round dial face square to the viewer, at rest; just right of centre, very high in the south-south-west, near the top of the view, the bright waxing gibbous moon, the brightest thing in the sky; just right of centre, beyond the railing the summit drops away out of sight, and a kilometre and a half below lies the sea of cloud, one unbroken shining white floor under the full glare of the moon, stretching flat and seamless to the horizon; to the right, at the deck's back corner where its railing meets the study wall, a short iron staff a little taller than the railing carrying a small frayed pennant of faded blue cloth, lifted a little toward the east-south-east by the light steady breeze from the west-north-west, its frayed tail curling softly. A bright, silent moon deck, the high gibbous moon pouring silver over the frosted flagstones and the vault's dark wall, a vast shining sea of cloud below, warm light spilling from the two open doors; an old, well-kept astronomical observatory on the summit of a steep island volcano, high above a sea of cloud: dressed dark basalt walls, frosted flagstones, green-weathered copper roofs, brass railings with ball-topped posts on low basalt parapets, polished brass, varnished teak and oak, black iron; a light frost on the stone and the brass; old, cared for and whole; fine natural film grain. The flagstones under the viewer's feet run level to both open doors and to the railing. EXACTLY ONE moon. The floor of cloud is unbroken, with no gaps in it. No construction works, no cranes, no floodlights and no orange glow anywhere in view: the summit and its stone buildings hide the eastern slopes. No dome anywhere in view. The road is empty: no vehicles and no headlights on it. The moon dial shows no reading. No people, no human figures, no faces and no statues anywhere. No readable words, no writing, no captions, no logos, no signs, no plaques and no painted numbers anywhere. No snow drifts and no icicles. No modern glass-and-steel buildings and no street lamps on the summit. Nothing steampunk: no exposed cogs or pipework on the walls. It is night: no daylight, no sunset glow, no blue-hour sky. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere; everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. Shot on a full-frame DSLR at 24mm, f/8, a clear night under a high, bright moon in the south-south-west, the whole deck flooded with cool silver light, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into the plain dressed-stone wall of the study close behind the viewer, uniform and unbroken, with no visible seam, join, or repetition.",
         "plateRefs": [
+          "_world/aerials/cluster_summit.png",
           "_world/aerials/observatory_deck_w.png",
           "_world/aerials/observatory_year_master.png"
         ],
-        "specBuild": "8d63072a9ecee496c0eb"
+        "specBuild": "dfe9519abb41c853904b"
       }
     },
     {
@@ -2627,9 +2652,28 @@
               true
             ]
           },
-          "lockedBody": "The storm door is dogged shut. The brass wheel will not turn yet."
+          "lockedBody": "The storm door is dogged shut. The brass hand-wheel beside it frees the door once the question on the held-back plate box is answered."
         },
         {
+          "starterCode": "galaxy_plates",
+          "pick": {
+            "prompt": "The plates from his last season never made it into the catalog. In <code>galaxy_plates</code>, fit a logistic regression on the training galaxies with all five predictors, <code>color_index</code>, <code>concentration</code>, <code>axis_ratio</code>, <code>apparent_size_arcsec</code> and <code>exposure_minutes</code>, and with <code>elliptical</code> as the response. The training galaxies are the rows whose <code>record</code> is \"training\"; the held-back galaxies are the rows whose <code>record</code> is \"held back\". Use the model to predict the held-back galaxies, plot each held-back galaxy's probability of being an elliptical with the 0.5 cut-off marked (one point per galaxy, plotted against any predictor you like), assign the plot to <code>p</code>, press \"Draw the clickable chart\", and click the galaxy the model rates most likely to be an elliptical.",
+            "answer": "G-1997-9605",
+            "idColumn": "galaxy",
+            "idNoun": "galaxy",
+            "width": 7,
+            "height": 4.2,
+            "maxAttempts": 4,
+            "hint": "Fit all five predictors on the training galaxies, predict the held-back galaxies, plot probability_yes for every held-back galaxy, and click the galaxy with the highest probability.",
+            "feedback": {
+              "correct": "Correct, noted in your field notebook: the five-predictor model rates G-1997-9605 the held-back galaxy most likely to be an elliptical, at about 0.99.",
+              "wrong": [
+                "Another held-back galaxy has a higher probability than that one. Build the model on the training galaxies: <code>training_galaxies &lt;- galaxy_plates %&gt;% filter(record == &quot;training&quot;)</code>, then <code>galaxy_model &lt;- buildModel(data = training_galaxies, model_type = &quot;logistic_regression&quot;, predictors = c(&quot;color_index&quot;, &quot;concentration&quot;, &quot;axis_ratio&quot;, &quot;apparent_size_arcsec&quot;, &quot;exposure_minutes&quot;), response = &quot;elliptical&quot;)</code>.",
+                "Predict the held-back galaxies, which the model has never seen: <code>held_back_galaxies &lt;- galaxy_plates %&gt;% filter(record == &quot;held back&quot;)</code>, then <code>galaxy_predictions &lt;- predictWithModel(data = held_back_galaxies, model = galaxy_model)</code>. It adds probability_yes and predicted_class (the call at the 0.5 cut-off) to every galaxy. Click the galaxy with the highest probability_yes.",
+                "Plot the predictions and assign the plot to p: <code>p &lt;- ggplot(galaxy_predictions, aes(x = axis_ratio, y = probability_yes, color = elliptical)) + geom_point() + geom_hline(yintercept = 0.5, linetype = &quot;dashed&quot;)</code>. Draw the clickable chart and click the galaxy with the highest probability_yes."
+              ]
+            }
+          },
           "type": "puzzle",
           "label": "The held-back plate box",
           "form": "pick",
@@ -2646,11 +2690,11 @@
               "toast": "The dogs back off and the storm door swings free."
             }
           ],
-          "hint": "The brass hand-wheel is seated hard. Something has to be settled in this room first.",
+          "hint": "The hand-wheel turns freely now. One turn backs the dogs off the storm door.",
           "availableWhen": {
             "solved": "notebook_room"
           },
-          "lockedBody": "The storm door is dogged shut. The brass wheel will not turn yet.",
+          "lockedBody": "The brass hand-wheel is seated hard. It will turn once the question on the held-back plate box is answered.",
           "note": "One-way gate dial (rung 2). Dead until notebook_room is solved."
         }
       ],
@@ -2670,7 +2714,7 @@
             {
               "id": "stove",
               "at": "just left of centre",
-              "desc": "tucked into the far corner, a small plain black iron stove, its door SHUT with no glow showing, its thin pipe running straight up through the ceiling"
+              "desc": "tucked into the far corner, a small plain black iron stove banked for the night, its door SHUT with no glow showing, its thin pipe running straight up through the ceiling"
             },
             {
               "id": "to_deck_twinkle",
@@ -2726,7 +2770,7 @@
             {
               "id": "to_deck_moon",
               "at": "to the right",
-              "desc": "standing well in from the edge of the frame, with plain wall between it and that edge, in the end wall, the study's oak door standing OPEN onto the moonlit deck outside, the plank floor under the viewer's feet running level out over its sill",
+              "desc": "standing well in from the edge of the frame, with plain wall between it and that edge, in the end wall opposite the storm door, the study's oak door standing OPEN onto the moonlit deck outside, its frosted flagstones running to a brass railing with the shining floor of cloud beyond, the plank floor under the viewer's feet running level out over its sill",
               "label": "Back out to the moon deck",
               "door": {
                 "direction": "back",
@@ -2946,11 +2990,11 @@
             }
           }
         },
-        "scenePrompt": "This is a seamless 360-degree panorama from the middle of an old astronomer's study inside a summit observatory at night, a plain, sparsely furnished room with whitewashed walls and a plank floor. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stretch of whitewashed stone wall, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. To the left, against the side wall, tall glass-fronted oak cabinets holding boxed photographic plates and rows of leather-bound books; just left of centre, tucked into the far corner, a small plain black iron stove, its door SHUT with no glow showing, its thin pipe running straight up through the ceiling; just left of centre, standing well in from the edge of the frame, in the wall facing the viewer, the study's storm door out to the deck: a plain, narrow iron-bound oak door painted a dull green, SHUT and dogged tight in its whitewashed frame, the plank floor under the viewer's feet running level to its sill; just left of centre, set in the middle of that green door's face, its hand-wheel: a small plain iron wheel with a brass hub, linked to the dogs round the door's edge; dead ahead in the centre, against the same wall a little to the right of the storm door, the astronomer's plain oak writing desk, and on it a long open wooden box of glass plates in paper sleeves beside a thick notebook lying open, its pages of faint handwriting too small to read; dead ahead in the centre, standing on the right-hand end of the desk, an oil lamp with a tall clear glass chimney on a brass base, its small flame burning bright and steady; to the right, standing well in from the edge of the frame, with plain wall between it and that edge, in the end wall, the study's oak door standing OPEN onto the moonlit deck outside, the plank floor under the viewer's feet running level out over its sill. A plain, sparsely furnished study of whitewashed stone walls, a scrubbed plank floor and simple oak furniture, lit by one oil lamp on the desk, the glass of the cabinets catching the light, cold moonlight beyond the open door; inside an old, well-kept astronomical observatory on a high volcanic summit; old, cared for and whole; fine natural film grain. The plank floor under the viewer's feet runs level to the shut storm door's sill and level out through the open door. EXACTLY ONE storm door, shut, with ONE hand-wheel on it. EXACTLY ONE oil lamp. The stove's door is shut, with no flames showing. No window anywhere. No wood panelling and no rugs. No people, no human figures, no faces and no statues anywhere. No readable words, no writing, no captions, no logos, no signs, no plaques and no painted numbers anywhere. No snow drifts and no icicles. No modern glass-and-steel buildings and no street lamps on the summit. Nothing steampunk: no exposed cogs or pipework on the walls. It is night: no daylight, no sunset glow, no blue-hour sky. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere; everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. Shot on a full-frame DSLR at 24mm, f/8, night, the warm light of one oil lamp, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a plain stretch of whitewashed stone wall, uniform and unbroken, with no visible seam, join, or repetition.",
+        "scenePrompt": "This is a seamless 360-degree panorama from the middle of an old astronomer's study inside a summit observatory at night, a plain, sparsely furnished room with whitewashed walls and a plank floor. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stretch of whitewashed stone wall, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. To the left, against the side wall, tall glass-fronted oak cabinets holding boxed photographic plates and rows of leather-bound books; just left of centre, tucked into the far corner, a small plain black iron stove banked for the night, its door SHUT with no glow showing, its thin pipe running straight up through the ceiling; just left of centre, standing well in from the edge of the frame, in the wall facing the viewer, the study's storm door out to the deck: a plain, narrow iron-bound oak door painted a dull green, SHUT and dogged tight in its whitewashed frame, the plank floor under the viewer's feet running level to its sill; just left of centre, set in the middle of that green door's face, its hand-wheel: a small plain iron wheel with a brass hub, linked to the dogs round the door's edge; dead ahead in the centre, against the same wall a little to the right of the storm door, the astronomer's plain oak writing desk, and on it a long open wooden box of glass plates in paper sleeves beside a thick notebook lying open, its pages of faint handwriting too small to read; dead ahead in the centre, standing on the right-hand end of the desk, an oil lamp with a tall clear glass chimney on a brass base, its small flame burning bright and steady; to the right, standing well in from the edge of the frame, with plain wall between it and that edge, in the end wall opposite the storm door, the study's oak door standing OPEN onto the moonlit deck outside, its frosted flagstones running to a brass railing with the shining floor of cloud beyond, the plank floor under the viewer's feet running level out over its sill. A plain, sparsely furnished study of whitewashed stone walls, a scrubbed plank floor and simple oak furniture, lit by one oil lamp on the desk, the glass of the cabinets catching the light, cold moonlight beyond the open door; inside an old, well-kept astronomical observatory on a high volcanic summit; old, cared for and whole; fine natural film grain. The plank floor under the viewer's feet runs level to the shut storm door's sill and level out through the open door. EXACTLY ONE storm door, shut, with ONE hand-wheel on it. EXACTLY ONE oil lamp. The stove's door is shut, with no flames showing. No window anywhere. No wood panelling and no rugs. No people, no human figures, no faces and no statues anywhere. No readable words, no writing, no captions, no logos, no signs, no plaques and no painted numbers anywhere. No snow drifts and no icicles. No modern glass-and-steel buildings and no street lamps on the summit. Nothing steampunk: no exposed cogs or pipework on the walls. It is night: no daylight, no sunset glow, no blue-hour sky. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere; everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. Shot on a full-frame DSLR at 24mm, f/8, night, the warm light of one oil lamp, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a plain stretch of whitewashed stone wall, uniform and unbroken, with no visible seam, join, or repetition.",
         "plateRefs": [
           "_world/aerials/observatory_year_master.png"
         ],
-        "specBuild": "8963aa0b8e3945436946"
+        "specBuild": "00f170dc7706042ec23a"
       }
     },
     {
@@ -2979,6 +3023,7 @@
         {
           "type": "mapview",
           "label": "The twinkle scope",
+          "key": "twinkle_scope",
           "note": "Fine grid, bright star; reading 8; read-only. Bad seeing blurs planets and close doubles."
         }
       ],
@@ -2988,12 +3033,12 @@
           "interior": false,
           "styleLight": "a clear night, the moon high in the south-south-west above the viewer's line of sight, its cool light glancing toward the viewer off the frost",
           "seam": "the open frosted summit ground running away to the north brink under the night sky, uniform and unbroken",
-          "seamOccluder": "a tall plain black iron flagpole with no flag, standing close behind the viewer, from the ground to the top of the frame",
+          "seamOccluder": "a tall plain black iron pole, bare to its top, standing close behind the viewer, from the ground to the top of the frame",
           "elements": [
             {
               "id": "to_photometer_room",
               "at": "on the far left",
-              "desc": "a long flagstone walkway leaving the deck at the viewer's feet and running level away along the summit, and far down it at its end the darkroom, a low stone building whose oak door stands OPEN on a deep red glow; beyond that building's roof, much further off across the summit, the top of another low stone building and the small pale top of the observatory dome",
+              "desc": "a long flagstone walkway leaving the deck at the viewer's feet and running level away along the summit, and far down it at its end the darkroom, a low stone building under a hipped green copper roof with a short capped stovepipe, cold and clear, whose oak door stands OPEN on a deep red glow; beyond that building's roof, much further off across the summit, the copper roof of another low stone building and, beside it, the small white-painted top of the observatory dome",
               "label": "Along the deck to the darkroom",
               "door": {
                 "direction": "back",
@@ -3046,7 +3091,7 @@
           "soundBed": "an exposed deck on the western brink at night: a light steady breeze, a faint whisper of air at the stovepipe's cap, and the enormous quiet of the open sky over the cloud.",
           "rigid": "the railing, the twinkle scope and its tripod, the walkway, both doors, the study and its roof, the far buildings and the dome, the moon, and the floor of cloud",
           "atmosphere": "A long, frosty walkway deck on the summit's western edge, the red glow of the darkroom door far down the walkway, warm lamplight in the study's door close by, a thin thread of smoke over the study roof, and to the west a deep starry sky over a dim plain of cloud; an old, well-kept astronomical observatory on the summit of a steep island volcano, high above a sea of cloud: dressed dark basalt walls, frosted flagstones, green-weathered copper roofs, brass railings with ball-topped posts on low basalt parapets, polished brass, varnished teak and oak, black iron; a light frost on the stone and the brass; old, cared for and whole; fine natural film grain",
-          "negatives": "The flagstones under the viewer's feet run level to the open storm door, onto the walkway and to the railing. EXACTLY ONE moon. The floor of cloud is unbroken, with no gaps in it. EXACTLY ONE stovepipe smoking. No construction works, no cranes, no floodlights and no orange glow anywhere in view: the summit and its stone buildings hide the eastern slopes. No road anywhere in view. EXACTLY ONE dome, small and far off beyond the darkroom's roof. The twinkle scope shows no reading. No people, no human figures, no faces and no statues anywhere. No readable words, no writing, no captions, no logos, no signs, no plaques and no painted numbers anywhere. No snow drifts and no icicles. No modern glass-and-steel buildings and no street lamps on the summit. Nothing steampunk: no exposed cogs or pipework on the walls. It is night: no daylight, no sunset glow, no blue-hour sky. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere; everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still.",
+          "negatives": "The flagstones under the viewer's feet run level to the open storm door, onto the walkway and to the railing. EXACTLY ONE moon. The floor of cloud is unbroken, with no gaps in it. EXACTLY ONE stovepipe smoking: the darkroom's stovepipe and that of the building beside the dome are cold, with no smoke. No flag or pennant on this deck. No construction works, no cranes, no floodlights and no orange glow anywhere in view: the summit and its stone buildings hide the eastern slopes. No road anywhere in view. EXACTLY ONE dome, small and far off beyond the darkroom's roof. The twinkle scope shows no reading. No people, no human figures, no faces and no statues anywhere. No readable words, no writing, no captions, no logos, no signs, no plaques and no painted numbers anywhere. No snow drifts and no icicles. No modern glass-and-steel buildings and no street lamps on the summit. Nothing steampunk: no exposed cogs or pipework on the walls. It is night: no daylight, no sunset glow, no blue-hour sky. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere; everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still.",
           "room": "deck_twinkle",
           "scaffold": {
             "kind": "skeleton",
@@ -3385,12 +3430,13 @@
             }
           }
         },
-        "scenePrompt": "This is a seamless 360-degree panorama from a railed flagstone deck on the west brink of an old summit observatory at night, at the head of a long flagstone walkway that runs away across the summit to a red-lit darkroom. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the open frosted summit ground running away to the north brink under the night sky, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, a long flagstone walkway leaving the deck at the viewer's feet and running level away along the summit, and far down it at its end the darkroom, a low stone building whose oak door stands OPEN on a deep red glow; beyond that building's roof, much further off across the summit, the top of another low stone building and the small pale top of the observatory dome; to the left, close by, in the study's stone wall, the study's plain green storm door swung back OPEN against the wall, a small iron hand-wheel on its face and warm lamplight inside, the flagstones running level from the viewer's feet to its sill; just left of centre, above the study's green copper roof, its short black stovepipe with a round brass cap, a thin, slow thread of grey wood smoke rising from its cap and drifting softly away to the east-south-east, away from the deck, on the light steady breeze from the west-north-west; dead ahead in the centre, on a brass tripod mount bolted to the flagstones by the front railing, the twinkle scope: a short brass telescope with a square eyepiece hood, swung round to aim off to the right, out at the western sky, at rest; dead ahead in the centre, high above the front railing in the south-south-west, near the top of the view, the waxing gibbous moon; to the right, beyond the railing to the west, a deep night sky thick with stars down to the far horizon, and far beneath it the cloud lying as a pale grey-silver plain, faintly moonlit, unbroken from the brink to the horizon. A long, frosty walkway deck on the summit's western edge, the red glow of the darkroom door far down the walkway, warm lamplight in the study's door close by, a thin thread of smoke over the study roof, and to the west a deep starry sky over a dim plain of cloud; an old, well-kept astronomical observatory on the summit of a steep island volcano, high above a sea of cloud: dressed dark basalt walls, frosted flagstones, green-weathered copper roofs, brass railings with ball-topped posts on low basalt parapets, polished brass, varnished teak and oak, black iron; a light frost on the stone and the brass; old, cared for and whole; fine natural film grain. The flagstones under the viewer's feet run level to the open storm door, onto the walkway and to the railing. EXACTLY ONE moon. The floor of cloud is unbroken, with no gaps in it. EXACTLY ONE stovepipe smoking. No construction works, no cranes, no floodlights and no orange glow anywhere in view: the summit and its stone buildings hide the eastern slopes. No road anywhere in view. EXACTLY ONE dome, small and far off beyond the darkroom's roof. The twinkle scope shows no reading. No people, no human figures, no faces and no statues anywhere. No readable words, no writing, no captions, no logos, no signs, no plaques and no painted numbers anywhere. No snow drifts and no icicles. No modern glass-and-steel buildings and no street lamps on the summit. Nothing steampunk: no exposed cogs or pipework on the walls. It is night: no daylight, no sunset glow, no blue-hour sky. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere; everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. Shot on a full-frame DSLR at 24mm, f/8, a clear night, the moon high in the south-south-west above the viewer's line of sight, its cool light glancing toward the viewer off the frost, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into the open frosted summit ground running away to the north brink under the night sky, uniform and unbroken, with no visible seam, join, or repetition.",
+        "scenePrompt": "This is a seamless 360-degree panorama from a railed flagstone deck on the west brink of an old summit observatory at night, at the head of a long flagstone walkway that runs away across the summit to a red-lit darkroom. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the open frosted summit ground running away to the north brink under the night sky, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. On the far left, a long flagstone walkway leaving the deck at the viewer's feet and running level away along the summit, and far down it at its end the darkroom, a low stone building under a hipped green copper roof with a short capped stovepipe, cold and clear, whose oak door stands OPEN on a deep red glow; beyond that building's roof, much further off across the summit, the copper roof of another low stone building and, beside it, the small white-painted top of the observatory dome; to the left, close by, in the study's stone wall, the study's plain green storm door swung back OPEN against the wall, a small iron hand-wheel on its face and warm lamplight inside, the flagstones running level from the viewer's feet to its sill; just left of centre, above the study's green copper roof, its short black stovepipe with a round brass cap, a thin, slow thread of grey wood smoke rising from its cap and drifting softly away to the east-south-east, away from the deck, on the light steady breeze from the west-north-west; dead ahead in the centre, on a brass tripod mount bolted to the flagstones by the front railing, the twinkle scope: a short brass telescope with a square eyepiece hood, swung round to aim off to the right, out at the western sky, at rest; dead ahead in the centre, high above the front railing in the south-south-west, near the top of the view, the waxing gibbous moon; to the right, beyond the railing to the west, a deep night sky thick with stars down to the far horizon, and far beneath it the cloud lying as a pale grey-silver plain, faintly moonlit, unbroken from the brink to the horizon. A long, frosty walkway deck on the summit's western edge, the red glow of the darkroom door far down the walkway, warm lamplight in the study's door close by, a thin thread of smoke over the study roof, and to the west a deep starry sky over a dim plain of cloud; an old, well-kept astronomical observatory on the summit of a steep island volcano, high above a sea of cloud: dressed dark basalt walls, frosted flagstones, green-weathered copper roofs, brass railings with ball-topped posts on low basalt parapets, polished brass, varnished teak and oak, black iron; a light frost on the stone and the brass; old, cared for and whole; fine natural film grain. The flagstones under the viewer's feet run level to the open storm door, onto the walkway and to the railing. EXACTLY ONE moon. The floor of cloud is unbroken, with no gaps in it. EXACTLY ONE stovepipe smoking: the darkroom's stovepipe and that of the building beside the dome are cold, with no smoke. No flag or pennant on this deck. No construction works, no cranes, no floodlights and no orange glow anywhere in view: the summit and its stone buildings hide the eastern slopes. No road anywhere in view. EXACTLY ONE dome, small and far off beyond the darkroom's roof. The twinkle scope shows no reading. No people, no human figures, no faces and no statues anywhere. No readable words, no writing, no captions, no logos, no signs, no plaques and no painted numbers anywhere. No snow drifts and no icicles. No modern glass-and-steel buildings and no street lamps on the summit. Nothing steampunk: no exposed cogs or pipework on the walls. It is night: no daylight, no sunset glow, no blue-hour sky. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere; everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. Shot on a full-frame DSLR at 24mm, f/8, a clear night, the moon high in the south-south-west above the viewer's line of sight, its cool light glancing toward the viewer off the frost, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into the open frosted summit ground running away to the north brink under the night sky, uniform and unbroken, with no visible seam, join, or repetition.",
         "plateRefs": [
+          "_world/aerials/cluster_summit.png",
           "_world/aerials/observatory_deck_w.png",
           "_world/aerials/observatory_year_master.png"
         ],
-        "specBuild": "89d23bcac851acad30de"
+        "specBuild": "58f80deb55802da37623"
       }
     },
     {
@@ -3402,7 +3448,7 @@
       "built": false,
       "unlockedWhen": true,
       "role": "rung3",
-      "designNote": "Darkroom and iris photometer (measures how concentrated a galaxy's light is). The storm door to deck 3 is dogged by a hand-wheel: the rung 3 gate. RUNG 3 (pick). PROMPT: Scale the five predictors the way the regression chapter does, refit on the training plates, and plot the size of each predictor's coefficient. Click the predictor that drives the probability most.\nCODE: scaled_training_plates <- training_plates %>% mutate(across(c(color_index, concentration, axis_ratio, apparent_size_arcsec, exposure_minutes), scale)); scaled_plate_model <- buildModel(data = scaled_training_plates, model_type = \"logistic_regression\", predictors = c(...the same five...), response = \"elliptical\"); coefficients <- scaled_plate_model$metrics %>% filter(type == \"coefficient\", variable != \"(Intercept)\"); p <- ggplot(coefficients, aes(x = variable, y = abs(value))) + geom_col()\nANSWER `concentration` (2.491) vs apparent_size_arcsec (-1.477), color_index 1.399, axis_ratio 1.201, exposure_minutes -0.304: lead 69%. Plot abs(value): apparent size is negative.\nTEMPTING readings, all elsewhere: unscaled coefficients -> color_index (15.98 vs concentration 9.11); highest correlation with the response -> color_index (0.341 vs 0.292); rank correlation -> color_index; largest sd -> exposure_minutes; largest range -> apparent_size_arcsec; largest yes-minus-no mean -> exposure_minutes.",
+      "designNote": "Darkroom and iris photometer (measures how concentrated a galaxy's light is). The storm door to deck 3 is dogged by a hand-wheel: the rung 3 gate. RUNG 3 (pick, idColumn = \"variable\"). PROMPT: Scale the five predictors as the classification chapter does, fit on the training plates, and plot the size of each predictor's coefficient. Click the predictor that moves the probability most.\nCODE (the classification chapter's route): scaled_plate_model <- buildModel(data = training_plates, model_type = \"logistic_regression\", predictors = c(\"color_index\",\"concentration\",\"axis_ratio\",\"apparent_size_arcsec\",\"exposure_minutes\"), response = \"elliptical\", scale_variance = TRUE); scaled_coefficients <- scaled_plate_model$metrics %>% filter(type == \"coefficient\", variable != \"(Intercept)\") %>% arrange(desc(abs(value))); p <- ggplot(scaled_coefficients, aes(x = variable, y = abs(value))) + geom_col()\nANSWER `concentration` (2.491) vs apparent_size_arcsec (-1.477), color_index 1.399, axis_ratio 1.201, exposure_minutes -0.304: lead 69% (asserted on this route by verify_taught.R). Scaling the training rows by hand first gives the same coefficients. Plot abs(value): apparent size is negative.\nTEMPTING readings, all elsewhere: unscaled coefficients -> color_index (15.98 vs concentration 9.11); highest correlation with the response -> color_index (0.341 vs 0.292); rank correlation -> color_index; largest sd -> exposure_minutes; largest range -> apparent_size_arcsec; largest yes-minus-no mean -> exposure_minutes.",
       "plannedHotspots": [
         {
           "type": "door",
@@ -3421,9 +3467,28 @@
               true
             ]
           },
-          "lockedBody": "The storm door is dogged shut. The brass wheel will not turn yet."
+          "lockedBody": "The storm door is dogged shut. The brass hand-wheel beside it frees the door once the question on the photometer's coefficient plot is answered."
         },
         {
+          "starterCode": "galaxy_plates",
+          "pick": {
+            "prompt": "The photometer was built to settle which measurement really separates an elliptical from a spiral. In <code>galaxy_plates</code>, fit a logistic regression on the training galaxies with the five predictors <code>color_index</code>, <code>concentration</code>, <code>axis_ratio</code>, <code>apparent_size_arcsec</code> and <code>exposure_minutes</code> and <code>elliptical</code> as the response, letting the model scale the predictors the way the classification chapter does (each to a mean of zero and a standard deviation of one), and plot the size of each predictor's coefficient (its value ignoring the sign; leave out the intercept). The training galaxies are the rows whose <code>record</code> is \"training\". Assign the plot to <code>p</code>, press \"Draw the clickable chart\", and click the predictor that moves the probability most.",
+            "answer": "concentration",
+            "idColumn": "variable",
+            "idNoun": "predictor",
+            "width": 7,
+            "height": 4.2,
+            "maxAttempts": 4,
+            "hint": "Build the model with scale_variance = TRUE so the predictors are scaled, keep only the predictors' coefficients, and compare them by size.",
+            "feedback": {
+              "correct": "Correct, noted in your field notebook: once the predictors are scaled, concentration moves the probability most; color_index only looks biggest before scaling, because one unit of color_index is a bigger step than its whole spread across the galaxies.",
+              "wrong": [
+                "Work on the training galaxies (<code>training_galaxies &lt;- galaxy_plates %&gt;% filter(record == &quot;training&quot;)</code>) and let the model do the scaling: <code>scaled_galaxy_model &lt;- buildModel(data = training_galaxies, model_type = &quot;logistic_regression&quot;, predictors = c(&quot;color_index&quot;, &quot;concentration&quot;, &quot;axis_ratio&quot;, &quot;apparent_size_arcsec&quot;, &quot;exposure_minutes&quot;), response = &quot;elliptical&quot;, scale_variance = TRUE)</code>. Then rank the predictors: <code>scaled_coefficients &lt;- scaled_galaxy_model$metrics %&gt;% filter(type == &quot;coefficient&quot;, variable != &quot;(Intercept)&quot;) %&gt;% arrange(desc(abs(value)))</code>.",
+                "If color_index came out on top, the predictors were not scaled: without scale_variance = TRUE, one unit of color_index is a very large step, so its coefficient looks big for that reason alone. Rank by abs(value), the size of the coefficient: a negative coefficient (the probability falls as the predictor rises) counts by its size, its absolute value, like the others.",
+                "Plot the table you just made and assign it to p: <code>p &lt;- ggplot(scaled_coefficients, aes(x = variable, y = abs(value))) + geom_col()</code>. Draw the clickable chart and click the bar with the largest abs(value)."
+              ]
+            }
+          },
           "type": "puzzle",
           "label": "The photometer's coefficient plot",
           "form": "pick",
@@ -3440,11 +3505,11 @@
               "toast": "The dogs back off and the storm door swings free."
             }
           ],
-          "hint": "The brass hand-wheel is seated hard. Something has to be settled in this room first.",
+          "hint": "The hand-wheel turns freely now. One turn backs the dogs off the storm door.",
           "availableWhen": {
             "solved": "photometer_room"
           },
-          "lockedBody": "The storm door is dogged shut. The brass wheel will not turn yet.",
+          "lockedBody": "The brass hand-wheel is seated hard. It will turn once the question on the photometer's coefficient plot is answered.",
           "note": "One-way gate dial (rung 3). Dead until photometer_room is solved."
         }
       ],
@@ -3464,7 +3529,7 @@
             {
               "id": "to_deck_twinkle",
               "at": "just left of centre",
-              "desc": "standing well in from the edge of the frame, in the side wall, the darkroom's oak door standing OPEN onto the moonlit walkway outside, the concrete floor under the viewer's feet running level out over its sill",
+              "desc": "standing well in from the edge of the frame, in the side wall, the darkroom's oak door standing OPEN onto the moonlit flagstone walkway outside, running away over the bare frosted summit toward the west deck's brass railing, the concrete floor under the viewer's feet running level out over its sill",
               "label": "Back out to the twinkle deck",
               "door": {
                 "direction": "back",
@@ -3501,7 +3566,7 @@
             {
               "id": "to_deck_glow",
               "at": "to the right",
-              "desc": "standing well in from the edge of the frame, with plain wall between it and that edge, in the end wall, the darkroom's storm door out to the deck: a heavy oak door painted matt black, its frame lined with a black felt light-trap seal, SHUT and dogged tight, the concrete floor under the viewer's feet running level to its sill",
+              "desc": "standing well in from the edge of the frame, with plain wall between it and that edge, in the opposite side wall, the darkroom's storm door out to the deck: a heavy oak door painted matt black, its frame lined with a black felt light-trap seal, SHUT and dogged tight, the concrete floor under the viewer's feet running level to its sill",
               "label": "The storm door out to the third deck",
               "door": {
                 "direction": "forward",
@@ -3750,11 +3815,11 @@
             }
           }
         },
-        "scenePrompt": "This is a seamless 360-degree panorama from the middle of a small darkroom inside an old summit observatory at night, its walls painted matt black. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stretch of matt black painted wall, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. To the left, against the side wall, wooden shelves of brown chemical bottles and stacked enamel developing trays; just left of centre, standing well in from the edge of the frame, in the side wall, the darkroom's oak door standing OPEN onto the moonlit walkway outside, the concrete floor under the viewer's feet running level out over its sill; dead ahead in the centre, against the wall facing the viewer, on a sturdy bench, the iris photometer: a squat brass instrument with a black eyepiece hood and a plate carrier, and clipped to a board beside it one blank sheet of graph paper with only a few faint pencil lines on it, nothing on it that can be read; just right of centre, further along the same wall to the right, a long shallow stone developing sink with three enamel trays in it, dry, its brass tap shut, and above it on the wall a small round safelight glowing deep red; just right of centre, strung across above the sink on a taut cord, a row of long curling strips of film negatives and a few glossy prints held by wooden pegs, hanging still, curled a little at their ends; to the right, standing well in from the edge of the frame, with plain wall between it and that edge, in the end wall, the darkroom's storm door out to the deck: a heavy oak door painted matt black, its frame lined with a black felt light-trap seal, SHUT and dogged tight, the concrete floor under the viewer's feet running level to its sill; to the right, set in the middle of that black door's face, its hand-wheel: a black-enamelled spoked wheel with a dull brass rim, linked to the dogs round the door's edge. A darkroom with walls and ceiling painted matt black and a bare concrete floor, bathed in deep red safelight, glints of dull brass, brown glass and white enamel, a cool pale spill of skylight at the open door, no cast moonbeam; inside an old, well-kept astronomical observatory on a high volcanic summit; old, cared for and whole; fine natural film grain. The concrete floor under the viewer's feet runs level to the shut storm door's sill and level out through the open door. EXACTLY ONE storm door, shut, with ONE hand-wheel on it. The tap is shut: no running water anywhere. No window anywhere. No people, no human figures, no faces and no statues anywhere. No readable words, no writing, no captions, no logos, no signs, no plaques and no painted numbers anywhere. No snow drifts and no icicles. No modern glass-and-steel buildings and no street lamps on the summit. Nothing steampunk: no exposed cogs or pipework on the walls. It is night: no daylight, no sunset glow, no blue-hour sky. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere; everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. Shot on a full-frame DSLR at 24mm, f/8, night, the deep red glow of a darkroom safelight, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a plain stretch of matt black painted wall, uniform and unbroken, with no visible seam, join, or repetition.",
+        "scenePrompt": "This is a seamless 360-degree panorama from the middle of a small darkroom inside an old summit observatory at night, its walls painted matt black. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stretch of matt black painted wall, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. To the left, against the side wall, wooden shelves of brown chemical bottles and stacked enamel developing trays; just left of centre, standing well in from the edge of the frame, in the side wall, the darkroom's oak door standing OPEN onto the moonlit flagstone walkway outside, running away over the bare frosted summit toward the west deck's brass railing, the concrete floor under the viewer's feet running level out over its sill; dead ahead in the centre, against the wall facing the viewer, on a sturdy bench, the iris photometer: a squat brass instrument with a black eyepiece hood and a plate carrier, and clipped to a board beside it one blank sheet of graph paper with only a few faint pencil lines on it, nothing on it that can be read; just right of centre, further along the same wall to the right, a long shallow stone developing sink with three enamel trays in it, dry, its brass tap shut, and above it on the wall a small round safelight glowing deep red; just right of centre, strung across above the sink on a taut cord, a row of long curling strips of film negatives and a few glossy prints held by wooden pegs, hanging still, curled a little at their ends; to the right, standing well in from the edge of the frame, with plain wall between it and that edge, in the opposite side wall, the darkroom's storm door out to the deck: a heavy oak door painted matt black, its frame lined with a black felt light-trap seal, SHUT and dogged tight, the concrete floor under the viewer's feet running level to its sill; to the right, set in the middle of that black door's face, its hand-wheel: a black-enamelled spoked wheel with a dull brass rim, linked to the dogs round the door's edge. A darkroom with walls and ceiling painted matt black and a bare concrete floor, bathed in deep red safelight, glints of dull brass, brown glass and white enamel, a cool pale spill of skylight at the open door, no cast moonbeam; inside an old, well-kept astronomical observatory on a high volcanic summit; old, cared for and whole; fine natural film grain. The concrete floor under the viewer's feet runs level to the shut storm door's sill and level out through the open door. EXACTLY ONE storm door, shut, with ONE hand-wheel on it. The tap is shut: no running water anywhere. No window anywhere. No people, no human figures, no faces and no statues anywhere. No readable words, no writing, no captions, no logos, no signs, no plaques and no painted numbers anywhere. No snow drifts and no icicles. No modern glass-and-steel buildings and no street lamps on the summit. Nothing steampunk: no exposed cogs or pipework on the walls. It is night: no daylight, no sunset glow, no blue-hour sky. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere; everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. Shot on a full-frame DSLR at 24mm, f/8, night, the deep red glow of a darkroom safelight, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a plain stretch of matt black painted wall, uniform and unbroken, with no visible seam, join, or repetition.",
         "plateRefs": [
           "_world/aerials/observatory_year_master.png"
         ],
-        "specBuild": "0b635974fa4990b14ca4"
+        "specBuild": "c8f8c96889cc3cf37c98"
       }
     },
     {
@@ -3783,6 +3848,7 @@
         {
           "type": "mapview",
           "label": "The glow meter",
+          "key": "glow_meter",
           "note": "Aimed at the construction; reading 8; read-only. Floodlights hurt whatever is low over the resort."
         }
       ],
@@ -3791,7 +3857,7 @@
           "setting": "the railed flagstone east deck on the eastern brink of an old summit observatory at night, at the end of a long walkway across the summit",
           "interior": false,
           "styleLight": "a clear moonlit night, cool silver moonlight with a sodium-orange glow far below",
-          "seam": "the smooth pale curved wall of the observatory dome close behind the viewer, with the starry sky above it, uniform and unbroken",
+          "seam": "the curved drum wall of dark dressed stone of the observatory dome close behind the viewer, the curve of its white-painted ribbed metal dome above it against the starry sky, uniform and unbroken",
           "seamOccluder": "a tall plain black iron post standing close behind the viewer, from the ground to the top of the frame",
           "elements": [
             {
@@ -3809,7 +3875,7 @@
             {
               "id": "road",
               "at": "to the left",
-              "desc": "far below, the pale thread of a switchback road climbing the mountainside out of the cloud past the works and on up the cone toward the summit"
+              "desc": "far below, the pale thread of a switchback road climbing the mountainside out of the cloud past the works and on up, out of sight below the brink"
             },
             {
               "id": "moon",
@@ -3839,7 +3905,7 @@
             {
               "id": "to_photometer_room",
               "at": "to the right",
-              "desc": "back across the summit, the flagstone walkway the deck opens onto, running level from the deck's edge to the far darkroom, a small low stone building with its black storm door standing OPEN on a dim red glow, two more low stone buildings of the observatory beyond it to the left",
+              "desc": "back across the summit, the flagstone walkway the deck opens onto, running level from the deck's edge to the far darkroom, a small low stone building under a hipped green copper roof with a short capped stovepipe, its black storm door standing OPEN on a dim red glow, and far beyond it at the walkway's end two more low stone buildings under gabled copper roofs, the study and the plate vault, to the left",
               "label": "Back through the storm door to the darkroom",
               "door": {
                 "direction": "back",
@@ -3849,7 +3915,7 @@
             {
               "id": "to_directors_office",
               "at": "on the far right",
-              "desc": "standing well in from the edge of the frame, partway along that walkway, a short side path running level to the stone director's office, its oak door standing OPEN with warm light inside",
+              "desc": "standing well in from the edge of the frame, partway along that walkway, a short side path running level to the director's office, a low stone building under a hipped green copper roof with a short capped stovepipe, its cap clear and still, standing close beside the dome's drum, its oak door standing OPEN with warm light inside, set in a plain stone wall",
               "label": "Along the deck to the director's office",
               "door": {
                 "direction": "back",
@@ -3860,7 +3926,7 @@
           "soundBed": "an exposed deck on the summit's eastern brink at night: a light steady breeze, the breathing hiss of the fumarole close by, and from far below, so faint it is almost imagined, machinery working on the shelf.",
           "rigid": "the railing, the glow meter and its column, the walkway, both doors, the dome, the works and their cranes, the crater and its lake, the pylons, the road, the car park, and the floor of cloud",
           "atmosphere": "A high, frost-rimed east deck in moonlight above a long drop, and far below on the shelf the hard sodium-orange glow of the works, the strongest warm colour in the night, lighting the steam over the crater; an old, well-kept astronomical observatory on the summit of a steep island volcano, high above a sea of cloud: dressed dark basalt walls, frosted flagstones, green-weathered copper roofs, brass railings with ball-topped posts on low basalt parapets, polished brass, varnished teak and oak, black iron; a light frost on the stone and the brass; old, cared for and whole; fine natural film grain",
-          "negatives": "The flagstones under the viewer's feet run level onto the walkway and to the railing. EXACTLY THREE tower cranes, all on the works far below; the works stand on solid ground on their shelf, above the cloud, not in a gap in it. EXACTLY ONE moon. The road and the car park show no vehicles and no headlights. The dome close behind the viewer is the only dome. The glow meter shows no reading. No tall chimney or smokestack: the works on the shelf are two low unfinished concrete shells, one with a short square stub, never a tall stack. No people, no human figures, no faces and no statues anywhere. No readable words, no writing, no captions, no logos, no signs, no plaques and no painted numbers anywhere. No snow drifts and no icicles. No modern glass-and-steel buildings and no street lamps on the summit. Nothing steampunk: no exposed cogs or pipework on the walls. It is night: no daylight, no sunset glow, no blue-hour sky. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere; everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still.",
+          "negatives": "The flagstones under the viewer's feet run level onto the walkway and to the railing. EXACTLY THREE tower cranes, all on the works far below; the works stand on solid ground on their shelf, above the cloud, not in a gap in it. EXACTLY ONE moon. The road and the car park show no vehicles and no headlights. The dome close behind the viewer is the only dome. The dome has EXACTLY ONE door, on its north side, not seen from here: no door in its drum on this side. The only instrument on this deck is the glow meter: no wire-grid frame or board. No window in the office's wall on this side. No smoke from any stovepipe. The glow meter shows no reading. No tall chimney or smokestack: the works on the shelf are two low unfinished concrete shells, one with a short square stub, never a tall stack. No people, no human figures, no faces and no statues anywhere. No readable words, no writing, no captions, no logos, no signs, no plaques and no painted numbers anywhere. No snow drifts and no icicles. No modern glass-and-steel buildings and no street lamps on the summit. Nothing steampunk: no exposed cogs or pipework on the walls. It is night: no daylight, no sunset glow, no blue-hour sky. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere; everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still.",
           "room": "deck_glow",
           "scaffold": {
             "kind": "skeleton",
@@ -22399,12 +22465,13 @@
             }
           }
         },
-        "scenePrompt": "This is a seamless 360-degree panorama from the railed flagstone east deck on the eastern brink of an old summit observatory at night, at the end of a long walkway across the summit. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the smooth pale curved wall of the observatory dome close behind the viewer, with the starry sky above it, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. To the left, at the deck's corner railing, on a short brass column, the glow meter: a brass instrument like a small telescope with a round dial on its side, tilted DOWN over the railing and aimed down the mountain at the works far below, at rest; to the left, beyond the railing the summit drops away steeply, and far below, a full kilometre down and several kilometres off, on a broad shelf of the mountainside standing above the cloud, a construction site: three yellow tower cranes, two low unfinished concrete shells, one with a short square stub, and tall floodlight masts throwing hard sodium-orange light, and just short of it a steaming crater with a pale milky-turquoise lake in it; beyond the works a line of bare concrete pylons runs on down the mountainside into the cloud; to the left, far below, the pale thread of a switchback road climbing the mountainside out of the cloud past the works and on up the cone toward the summit; just right of centre, high in the south-south-west, near the top of the view, the waxing gibbous moon; just right of centre, just off the walkway where it meets the deck, on the frosted rock of the summit's edge, a warm fumarole: a long low crack in the ground crusted pale sulphur-yellow, a thick, wide, soft white veil of steam welling up from it, staying low over the rock and leaning gently to the east-south-east on the light steady breeze from the west-north-west; just right of centre, beyond the fumarole, across the frosted summit rock and a little lower than the deck, the summit's small gravel car park, empty, where the pale summit road arrives from below, coming up over the south brink; to the right, back across the summit, the flagstone walkway the deck opens onto, running level from the deck's edge to the far darkroom, a small low stone building with its black storm door standing OPEN on a dim red glow, two more low stone buildings of the observatory beyond it to the left; on the far right, standing well in from the edge of the frame, partway along that walkway, a short side path running level to the stone director's office, its oak door standing OPEN with warm light inside. A high, frost-rimed east deck in moonlight above a long drop, and far below on the shelf the hard sodium-orange glow of the works, the strongest warm colour in the night, lighting the steam over the crater; an old, well-kept astronomical observatory on the summit of a steep island volcano, high above a sea of cloud: dressed dark basalt walls, frosted flagstones, green-weathered copper roofs, brass railings with ball-topped posts on low basalt parapets, polished brass, varnished teak and oak, black iron; a light frost on the stone and the brass; old, cared for and whole; fine natural film grain. The flagstones under the viewer's feet run level onto the walkway and to the railing. EXACTLY THREE tower cranes, all on the works far below; the works stand on solid ground on their shelf, above the cloud, not in a gap in it. EXACTLY ONE moon. The road and the car park show no vehicles and no headlights. The dome close behind the viewer is the only dome. The glow meter shows no reading. No tall chimney or smokestack: the works on the shelf are two low unfinished concrete shells, one with a short square stub, never a tall stack. No people, no human figures, no faces and no statues anywhere. No readable words, no writing, no captions, no logos, no signs, no plaques and no painted numbers anywhere. No snow drifts and no icicles. No modern glass-and-steel buildings and no street lamps on the summit. Nothing steampunk: no exposed cogs or pipework on the walls. It is night: no daylight, no sunset glow, no blue-hour sky. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere; everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. Shot on a full-frame DSLR at 24mm, f/8, a clear moonlit night, cool silver moonlight with a sodium-orange glow far below, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into the smooth pale curved wall of the observatory dome close behind the viewer, with the starry sky above it, uniform and unbroken, with no visible seam, join, or repetition.",
+        "scenePrompt": "This is a seamless 360-degree panorama from the railed flagstone east deck on the eastern brink of an old summit observatory at night, at the end of a long walkway across the summit. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the curved drum wall of dark dressed stone of the observatory dome close behind the viewer, the curve of its white-painted ribbed metal dome above it against the starry sky, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. To the left, at the deck's corner railing, on a short brass column, the glow meter: a brass instrument like a small telescope with a round dial on its side, tilted DOWN over the railing and aimed down the mountain at the works far below, at rest; to the left, beyond the railing the summit drops away steeply, and far below, a full kilometre down and several kilometres off, on a broad shelf of the mountainside standing above the cloud, a construction site: three yellow tower cranes, two low unfinished concrete shells, one with a short square stub, and tall floodlight masts throwing hard sodium-orange light, and just short of it a steaming crater with a pale milky-turquoise lake in it; beyond the works a line of bare concrete pylons runs on down the mountainside into the cloud; to the left, far below, the pale thread of a switchback road climbing the mountainside out of the cloud past the works and on up, out of sight below the brink; just right of centre, high in the south-south-west, near the top of the view, the waxing gibbous moon; just right of centre, just off the walkway where it meets the deck, on the frosted rock of the summit's edge, a warm fumarole: a long low crack in the ground crusted pale sulphur-yellow, a thick, wide, soft white veil of steam welling up from it, staying low over the rock and leaning gently to the east-south-east on the light steady breeze from the west-north-west; just right of centre, beyond the fumarole, across the frosted summit rock and a little lower than the deck, the summit's small gravel car park, empty, where the pale summit road arrives from below, coming up over the south brink; to the right, back across the summit, the flagstone walkway the deck opens onto, running level from the deck's edge to the far darkroom, a small low stone building under a hipped green copper roof with a short capped stovepipe, its black storm door standing OPEN on a dim red glow, and far beyond it at the walkway's end two more low stone buildings under gabled copper roofs, the study and the plate vault, to the left; on the far right, standing well in from the edge of the frame, partway along that walkway, a short side path running level to the director's office, a low stone building under a hipped green copper roof with a short capped stovepipe, its cap clear and still, standing close beside the dome's drum, its oak door standing OPEN with warm light inside, set in a plain stone wall. A high, frost-rimed east deck in moonlight above a long drop, and far below on the shelf the hard sodium-orange glow of the works, the strongest warm colour in the night, lighting the steam over the crater; an old, well-kept astronomical observatory on the summit of a steep island volcano, high above a sea of cloud: dressed dark basalt walls, frosted flagstones, green-weathered copper roofs, brass railings with ball-topped posts on low basalt parapets, polished brass, varnished teak and oak, black iron; a light frost on the stone and the brass; old, cared for and whole; fine natural film grain. The flagstones under the viewer's feet run level onto the walkway and to the railing. EXACTLY THREE tower cranes, all on the works far below; the works stand on solid ground on their shelf, above the cloud, not in a gap in it. EXACTLY ONE moon. The road and the car park show no vehicles and no headlights. The dome close behind the viewer is the only dome. The dome has EXACTLY ONE door, on its north side, not seen from here: no door in its drum on this side. The only instrument on this deck is the glow meter: no wire-grid frame or board. No window in the office's wall on this side. No smoke from any stovepipe. The glow meter shows no reading. No tall chimney or smokestack: the works on the shelf are two low unfinished concrete shells, one with a short square stub, never a tall stack. No people, no human figures, no faces and no statues anywhere. No readable words, no writing, no captions, no logos, no signs, no plaques and no painted numbers anywhere. No snow drifts and no icicles. No modern glass-and-steel buildings and no street lamps on the summit. Nothing steampunk: no exposed cogs or pipework on the walls. It is night: no daylight, no sunset glow, no blue-hour sky. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere; everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. Shot on a full-frame DSLR at 24mm, f/8, a clear moonlit night, cool silver moonlight with a sodium-orange glow far below, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into the curved drum wall of dark dressed stone of the observatory dome close behind the viewer, the curve of its white-painted ribbed metal dome above it against the starry sky, uniform and unbroken, with no visible seam, join, or repetition.",
         "plateRefs": [
+          "_world/aerials/cluster_summit.png",
           "_world/aerials/observatory_deck_ene.png",
           "_world/aerials/observatory_year_master.png"
         ],
-        "specBuild": "2677154b9f8f5077ed95"
+        "specBuild": "f6070a7143a920fb0205"
       }
     },
     {
@@ -22431,6 +22498,24 @@
           "to": "deck_stars"
         },
         {
+          "starterCode": "galaxy_plates",
+          "check": {
+            "prompt": "The owner's pitch to the investors is that calling every galaxy a spiral is right 9 times in 10. In <code>galaxy_plates</code>, fit the five-predictor model again (a logistic regression on the training galaxies, with <code>color_index</code>, <code>concentration</code>, <code>axis_ratio</code>, <code>apparent_size_arcsec</code> and <code>exposure_minutes</code> as the predictors and <code>elliptical</code> as the response) and predict the held-back galaxies at the 0.5 cut-off (its <code>predicted_class</code>). The training galaxies are the rows whose <code>record</code> is \"training\"; the held-back galaxies are the rows whose <code>record</code> is \"held back\". Calling every galaxy a spiral means calling every one \"no\" for <code>elliptical</code>. You can compare that rule's accuracy (the share of held-back galaxies called correctly) with your model's, but the answer is a count: of the held-back galaxies that are ellipticals (<code>elliptical</code> is \"yes\"), how many did your model catch by calling them \"yes\"? Store that number of galaxies, as a single whole number, in an object called <code>answer</code>. Then click \"Check my answer\".",
+            "requires": [
+              "answer"
+            ],
+            "expr": "{ .a <- answer; if (is.data.frame(.a)) { .nm <- names(.a); .a <- if (nrow(.a) != 1) NA else if (\"n\" %in% .nm) .a[[\"n\"]] else { .num <- .nm[vapply(.a, is.numeric, logical(1))]; if (length(.num) == 1) .a[[.num]] else NA } }; .a <- suppressWarnings(as.numeric(unlist(.a))); isTRUE(length(.a) == 1 && !is.na(.a) && .a == 13) }",
+            "hint": "Predict the held-back galaxies with your five-predictor model, keep only the galaxies that are ellipticals, and count the ones your model called yes.",
+            "maxAttempts": 4,
+            "feedback": {
+              "correct": "Correct, noted in your field notebook: the model caught 13 of the 30 held-back ellipticals; calling every galaxy a spiral is right on 270 of 300 (the model 265) but catches none.",
+              "wrong": [
+                "Rebuild the predictions if you need them: <code>training_galaxies &lt;- galaxy_plates %&gt;% filter(record == &quot;training&quot;)</code>, <code>held_back_galaxies &lt;- galaxy_plates %&gt;% filter(record == &quot;held back&quot;)</code>, <code>galaxy_model &lt;- buildModel(data = training_galaxies, model_type = &quot;logistic_regression&quot;, predictors = c(&quot;color_index&quot;, &quot;concentration&quot;, &quot;axis_ratio&quot;, &quot;apparent_size_arcsec&quot;, &quot;exposure_minutes&quot;), response = &quot;elliptical&quot;)</code>, then <code>galaxy_predictions &lt;- predictWithModel(data = held_back_galaxies, model = galaxy_model)</code>. To compare accuracy, set the rule that always says no beside your model's calls: <code>galaxy_predictions %&gt;% mutate(always_no = &quot;no&quot;) %&gt;% summarize(model_accuracy = mean(predicted_class == elliptical), always_no_accuracy = mean(always_no == elliptical))</code>.",
+                "Count only the ellipticals the model caught: <code>galaxy_predictions %&gt;% filter(elliptical == &quot;yes&quot;) %&gt;% summarize(ellipticals = n(), caught = sum(predicted_class == &quot;yes&quot;), missed = sum(predicted_class == &quot;no&quot;))</code>.",
+                "answer must be one whole number, not a table: count the caught ellipticals and pull the number out of the summarize with <code>answer &lt;- galaxy_predictions %&gt;% filter(elliptical == &quot;yes&quot;, predicted_class == &quot;yes&quot;) %&gt;% summarize(n = n()) %&gt;% pull(n)</code>."
+              ]
+            }
+          },
           "type": "puzzle",
           "label": "The catalogue ledgers",
           "form": "check",
@@ -22447,11 +22532,11 @@
               "toast": "The switch bangs home. Far off, the dome's drive takes its load."
             }
           ],
-          "hint": "The knife switch lies open. The dome runs off this board.",
+          "hint": "The knife switch lies open. Closing it powers the dome's door and shutter.",
           "availableWhen": {
             "solved": "directors_office"
           },
-          "lockedBody": "The switchboard is dead. The dome's door and shutter wait on it.",
+          "lockedBody": "The knife switch is locked open. It will close once the question in the catalogue ledgers is answered.",
           "note": "Boss gate. One-state dial dome_power, dead until directors_office is solved. Runs the dome's door and shutter."
         }
       ],
@@ -22500,7 +22585,7 @@
             {
               "id": "window",
               "at": "dead ahead in the centre",
-              "desc": "above and beyond the desk, in the wall facing the viewer, one big tall window of small panes, and through it, close outside, a railed flagstone deck running out to the summit's eastern brink, the pale curved flank of the observatory dome just showing at the window's right edge, beyond the brass railing the night sky, and low along the horizon the far floor of cloud faintly tinted a dull sodium-orange by works far below and out of sight"
+              "desc": "above and beyond the desk, in the wall facing the viewer, one big tall window of small panes, and through it, close outside, a railed flagstone deck running out to the summit's eastern brink, the curved drum of dark dressed stone of the observatory dome with the curve of its white-painted ribbed metal dome above just showing at the window's right edge, beyond the brass railing the night sky, and low along the horizon the far floor of cloud faintly tinted a dull sodium-orange by works far below and out of sight"
             },
             {
               "id": "switchboard",
@@ -22892,11 +22977,11 @@
             }
           }
         },
-        "scenePrompt": "This is a seamless 360-degree panorama from the middle of an old observatory director's office at night, a panelled room with a desk, a stove and a switchboard. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stretch of dark oak wall panelling, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. Just left of centre, against the left-hand wall near the corner, a big black iron stove on stone slabs, its small door standing OPEN, its pipe running up through the ceiling, a bed of softly glowing coals inside its open door with small, low flames over them; just left of centre, standing well in from the edge of the frame, in the wall facing the viewer to the left of the window, an oak door standing OPEN onto the moonlit flagstone walkway outside, the floorboards under the viewer's feet running level out over its sill; dead ahead in the centre, a couple of paces in front of the viewer, the director's broad oak desk standing just below the window, a green-shaded brass desk lamp on it, and stacked on it a row of tall leather-bound catalogue ledgers, one lying open, its columns of handwriting too small to read; dead ahead in the centre, above and beyond the desk, in the wall facing the viewer, one big tall window of small panes, and through it, close outside, a railed flagstone deck running out to the summit's eastern brink, the pale curved flank of the observatory dome just showing at the window's right edge, beyond the brass railing the night sky, and low along the horizon the far floor of cloud faintly tinted a dull sodium-orange by works far below and out of sight; just right of centre, on the same wall beside the window, the dome switchboard: a tall polished slate panel with brass meters, rows of small brass switches and one big black-handled knife switch standing OPEN, its blades lifted clear of their contacts; to the right, standing well in from the edge of the frame, with plain wall between it and that edge, in the side wall, the office's oak door standing OPEN onto the moonlit walkway outside, the floorboards under the viewer's feet running level out over its sill. A warm, roomy office panelled in dark oak, with polished floorboards, a polished slate switchboard, brass and black iron, lit by the open stove's glow and one green-shaded desk lamp, the big window dark but for a dull orange tint low on the far cloud; inside an old, well-kept astronomical observatory on a high volcanic summit; old, cared for and whole; fine natural film grain. The floorboards under the viewer's feet run level out through both open doors. EXACTLY ONE window; through it no cranes, no buildings and no floodlights, only the deck and its railing, the edge of the dome, the night sky and the faint orange tint on the far cloud along the horizon, with no glow rising up the sky. EXACTLY ONE knife switch, standing open. EXACTLY ONE stove. No people, no human figures, no faces and no statues anywhere. No readable words, no writing, no captions, no logos, no signs, no plaques and no painted numbers anywhere. No snow drifts and no icicles. No modern glass-and-steel buildings and no street lamps on the summit. Nothing steampunk: no exposed cogs or pipework on the walls. It is night: no daylight, no sunset glow, no blue-hour sky. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere; everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. Shot on a full-frame DSLR at 24mm, f/8, night, warm stove glow and a green-shaded desk lamp, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a plain stretch of dark oak wall panelling, uniform and unbroken, with no visible seam, join, or repetition.",
+        "scenePrompt": "This is a seamless 360-degree panorama from the middle of an old observatory director's office at night, a panelled room with a desk, a stove and a switchboard. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stretch of dark oak wall panelling, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. Just left of centre, against the left-hand wall near the corner, a big black iron stove on stone slabs, its small door standing OPEN, its pipe running up through the ceiling, a bed of softly glowing coals inside its open door with small, low flames over them; just left of centre, standing well in from the edge of the frame, in the wall facing the viewer to the left of the window, an oak door standing OPEN onto the moonlit flagstone walkway outside, the floorboards under the viewer's feet running level out over its sill; dead ahead in the centre, a couple of paces in front of the viewer, the director's broad oak desk standing just below the window, a green-shaded brass desk lamp on it, and stacked on it a row of tall leather-bound catalogue ledgers, one lying open, its columns of handwriting too small to read; dead ahead in the centre, above and beyond the desk, in the wall facing the viewer, one big tall window of small panes, and through it, close outside, a railed flagstone deck running out to the summit's eastern brink, the curved drum of dark dressed stone of the observatory dome with the curve of its white-painted ribbed metal dome above just showing at the window's right edge, beyond the brass railing the night sky, and low along the horizon the far floor of cloud faintly tinted a dull sodium-orange by works far below and out of sight; just right of centre, on the same wall beside the window, the dome switchboard: a tall polished slate panel with brass meters, rows of small brass switches and one big black-handled knife switch standing OPEN, its blades lifted clear of their contacts; to the right, standing well in from the edge of the frame, with plain wall between it and that edge, in the side wall, the office's oak door standing OPEN onto the moonlit walkway outside, the floorboards under the viewer's feet running level out over its sill. A warm, roomy office panelled in dark oak, with polished floorboards, a polished slate switchboard, brass and black iron, lit by the open stove's glow and one green-shaded desk lamp, the big window dark but for a dull orange tint low on the far cloud; inside an old, well-kept astronomical observatory on a high volcanic summit; old, cared for and whole; fine natural film grain. The floorboards under the viewer's feet run level out through both open doors. EXACTLY ONE window; through it no cranes, no buildings and no floodlights, only the deck and its railing, the edge of the dome, the night sky and the faint orange tint on the far cloud along the horizon, with no glow rising up the sky. EXACTLY ONE knife switch, standing open. EXACTLY ONE stove. No people, no human figures, no faces and no statues anywhere. No readable words, no writing, no captions, no logos, no signs, no plaques and no painted numbers anywhere. No snow drifts and no icicles. No modern glass-and-steel buildings and no street lamps on the summit. Nothing steampunk: no exposed cogs or pipework on the walls. It is night: no daylight, no sunset glow, no blue-hour sky. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere; everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. Shot on a full-frame DSLR at 24mm, f/8, night, warm stove glow and a green-shaded desk lamp, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a plain stretch of dark oak wall panelling, uniform and unbroken, with no visible seam, join, or repetition.",
         "plateRefs": [
           "_world/aerials/observatory_year_master.png"
         ],
-        "specBuild": "645c7c49bb034dc71c80"
+        "specBuild": "259c8ca4b2ece86d29f3"
       }
     },
     {
@@ -22927,12 +23012,13 @@
               true
             ]
           },
-          "lockedBody": "The switchboard is dead. The dome's door and shutter wait on it.",
+          "lockedBody": "The dome's door and shutter are dead. Their drive runs off the knife switch on the switchboard in the director's office, and that switch is still open.",
           "note": "Travel sequence 1: entering after the boss plays the shutter rumbling open on the sky (the door's transit clip). Playing it on the first entry only would need an engine change; decide at step 5."
         },
         {
           "type": "mapview",
           "label": "The star-count board",
+          "key": "star_board",
           "note": "Marked patch NNE; 11 of 20; read-only. Darkness and clarity."
         }
       ],
@@ -22947,7 +23033,7 @@
             {
               "id": "to_dome",
               "at": "to the left",
-              "desc": "close beside the viewer, the pale stone drum of the observatory dome rising to its great dome, its near flank in deep shadow and its crown rimmed with silver by the moon hidden behind it, its long shutter closed, and in the drum's wall the dome door: a heavy iron-bound oak door, SHUT, set flush in its frame, the flagstones under the viewer's feet running level to its sill",
+              "desc": "close beside the viewer, the round drum of dark dressed stone of the observatory dome rising to its great white-painted ribbed metal dome, its near flank in deep shadow and its crown rimmed with silver by the moon hidden behind it, its long shutter closed, and in the drum's wall the dome door: a heavy iron-bound oak door, SHUT, set flush in its frame, the flagstones under the viewer's feet running level to its sill",
               "label": "The dome door and shutter",
               "door": {
                 "direction": "open",
@@ -22969,7 +23055,7 @@
             {
               "id": "to_directors_office",
               "at": "just left of centre",
-              "desc": "a flagstone walkway leaving the deck and running level along the dome's side, back across the summit to a stone building with one lit window, whose oak door stands OPEN with warm light inside",
+              "desc": "a flagstone walkway leaving the deck and running level along the dome's side, back across the summit to a low stone building under a hipped green copper roof with a short capped stovepipe, its cap clear and still, standing close beside the dome, one lit window in its wall, whose oak door stands OPEN with warm light inside",
               "label": "Back round the dome's footing to the office",
               "door": {
                 "direction": "back",
@@ -23012,7 +23098,7 @@
           "soundBed": "an exposed deck on the brink at night: a light steady breeze, which the tarpaulin needs under it to read as weather, and from far down the road, now and then, the faint climbing note of a car engine.",
           "rigid": "the railing, the star-count board and its post, the dome and its door, the walkway, the woodpile, the road and its bends, the headlights, the works, and the floor of cloud",
           "atmosphere": "An exposed corner deck high on the brink, dim at the viewer's feet in the great dome's shadow, the dome's crown rimmed silver by the hidden moon, moonlit frost on the flagstones beyond the shadow, the summit's cone falling away steeply to the road's bends, and far below the orange glow of the works over a moonlit floor of cloud; an old, well-kept astronomical observatory on the summit of a steep island volcano, high above a sea of cloud: dressed dark basalt walls, frosted flagstones, green-weathered copper roofs, brass railings with ball-topped posts on low basalt parapets, polished brass, varnished teak and oak, black iron; a light frost on the stone and the brass; old, cared for and whole; fine natural film grain",
-          "negatives": "The flagstones under the viewer's feet run level to the dome door's sill and onto the walkway. EXACTLY ONE pair of headlights, small and far down on the lowest bend. EXACTLY ONE dome. The dome door is shut and the shutter closed. The moon is not in view: it is hidden behind the dome's bulk. The star-count board shows no reading. No tall chimney or smokestack: the works on the shelf are two low unfinished concrete shells, one with a short square stub, never a tall stack. No people, no human figures, no faces and no statues anywhere. No readable words, no writing, no captions, no logos, no signs, no plaques and no painted numbers anywhere. No snow drifts and no icicles. No modern glass-and-steel buildings and no street lamps on the summit. Nothing steampunk: no exposed cogs or pipework on the walls. It is night: no daylight, no sunset glow, no blue-hour sky. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere; everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still.",
+          "negatives": "The flagstones under the viewer's feet run level to the dome door's sill and onto the walkway. EXACTLY ONE pair of headlights, small and far down on the lowest bend. EXACTLY ONE dome, its drum smoothly round, not many-sided. No smoke from any stovepipe. The dome door is shut and the shutter closed. The moon is not in view: it is hidden behind the dome's bulk. The star-count board shows no reading. No tall chimney or smokestack: the works on the shelf are two low unfinished concrete shells, one with a short square stub, never a tall stack. No people, no human figures, no faces and no statues anywhere. No readable words, no writing, no captions, no logos, no signs, no plaques and no painted numbers anywhere. No snow drifts and no icicles. No modern glass-and-steel buildings and no street lamps on the summit. Nothing steampunk: no exposed cogs or pipework on the walls. It is night: no daylight, no sunset glow, no blue-hour sky. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere; everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still.",
           "room": "deck_stars",
           "scaffold": {
             "kind": "skeleton",
@@ -33821,12 +33907,13 @@
             }
           }
         },
-        "scenePrompt": "This is a seamless 360-degree panorama from a railed flagstone deck along the north side of an old observatory dome on the summit's north-east brink at night. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the open night sky over the summit's brink, above the dark steep slope of the cone falling away to the floor of cloud far below, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. To the left, close beside the viewer, the pale stone drum of the observatory dome rising to its great dome, its near flank in deep shadow and its crown rimmed with silver by the moon hidden behind it, its long shutter closed, and in the drum's wall the dome door: a heavy iron-bound oak door, SHUT, set flush in its frame, the flagstones under the viewer's feet running level to its sill; just left of centre, a flagstone walkway leaving the deck and running level along the dome's side, back across the summit to a stone building with one lit window, whose oak door stands OPEN with warm light inside; just left of centre, against the deck's railing, a waist-high stack of split firewood under a lashed canvas tarpaulin, its loose edge on the east-south-east side lifted a little and bellied softly by the light steady breeze from the west-north-west; dead ahead in the centre, at the deck's corner railing, out where the moonlight falls on the frost beyond the dome's shadow, on a brass post, the star-count board: a square brass frame with a fine wire grid stretched across it, aimed up at an empty-looking patch of sky high to the north-north-east, far from the moon, at rest; to the right, beyond the railing the steep cone of the summit falls away, and on it, just below, a road's last switchback bends, the nearest a few dozen metres down and the lowest far down the cone; on the lowest bend in view, one small pair of white headlights; to the right, far beyond and far below, a full kilometre down on a shelf standing above the cloud, the sodium-orange glow of a construction site with its three small tower cranes. An exposed corner deck high on the brink, dim at the viewer's feet in the great dome's shadow, the dome's crown rimmed silver by the hidden moon, moonlit frost on the flagstones beyond the shadow, the summit's cone falling away steeply to the road's bends, and far below the orange glow of the works over a moonlit floor of cloud; an old, well-kept astronomical observatory on the summit of a steep island volcano, high above a sea of cloud: dressed dark basalt walls, frosted flagstones, green-weathered copper roofs, brass railings with ball-topped posts on low basalt parapets, polished brass, varnished teak and oak, black iron; a light frost on the stone and the brass; old, cared for and whole; fine natural film grain. The flagstones under the viewer's feet run level to the dome door's sill and onto the walkway. EXACTLY ONE pair of headlights, small and far down on the lowest bend. EXACTLY ONE dome. The dome door is shut and the shutter closed. The moon is not in view: it is hidden behind the dome's bulk. The star-count board shows no reading. No tall chimney or smokestack: the works on the shelf are two low unfinished concrete shells, one with a short square stub, never a tall stack. No people, no human figures, no faces and no statues anywhere. No readable words, no writing, no captions, no logos, no signs, no plaques and no painted numbers anywhere. No snow drifts and no icicles. No modern glass-and-steel buildings and no street lamps on the summit. Nothing steampunk: no exposed cogs or pipework on the walls. It is night: no daylight, no sunset glow, no blue-hour sky. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere; everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. Shot on a full-frame DSLR at 24mm, f/8, a clear moonlit night, the viewer standing in the dome's moon-shadow, cool silver moonlight lying beyond it, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into the open night sky over the summit's brink, above the dark steep slope of the cone falling away to the floor of cloud far below, uniform and unbroken, with no visible seam, join, or repetition.",
+        "scenePrompt": "This is a seamless 360-degree panorama from a railed flagstone deck along the north side of an old observatory dome on the summit's north-east brink at night. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is the open night sky over the summit's brink, above the dark steep slope of the cone falling away to the floor of cloud far below, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. To the left, close beside the viewer, the round drum of dark dressed stone of the observatory dome rising to its great white-painted ribbed metal dome, its near flank in deep shadow and its crown rimmed with silver by the moon hidden behind it, its long shutter closed, and in the drum's wall the dome door: a heavy iron-bound oak door, SHUT, set flush in its frame, the flagstones under the viewer's feet running level to its sill; just left of centre, a flagstone walkway leaving the deck and running level along the dome's side, back across the summit to a low stone building under a hipped green copper roof with a short capped stovepipe, its cap clear and still, standing close beside the dome, one lit window in its wall, whose oak door stands OPEN with warm light inside; just left of centre, against the deck's railing, a waist-high stack of split firewood under a lashed canvas tarpaulin, its loose edge on the east-south-east side lifted a little and bellied softly by the light steady breeze from the west-north-west; dead ahead in the centre, at the deck's corner railing, out where the moonlight falls on the frost beyond the dome's shadow, on a brass post, the star-count board: a square brass frame with a fine wire grid stretched across it, aimed up at an empty-looking patch of sky high to the north-north-east, far from the moon, at rest; to the right, beyond the railing the steep cone of the summit falls away, and on it, just below, a road's last switchback bends, the nearest a few dozen metres down and the lowest far down the cone; on the lowest bend in view, one small pair of white headlights; to the right, far beyond and far below, a full kilometre down on a shelf standing above the cloud, the sodium-orange glow of a construction site with its three small tower cranes. An exposed corner deck high on the brink, dim at the viewer's feet in the great dome's shadow, the dome's crown rimmed silver by the hidden moon, moonlit frost on the flagstones beyond the shadow, the summit's cone falling away steeply to the road's bends, and far below the orange glow of the works over a moonlit floor of cloud; an old, well-kept astronomical observatory on the summit of a steep island volcano, high above a sea of cloud: dressed dark basalt walls, frosted flagstones, green-weathered copper roofs, brass railings with ball-topped posts on low basalt parapets, polished brass, varnished teak and oak, black iron; a light frost on the stone and the brass; old, cared for and whole; fine natural film grain. The flagstones under the viewer's feet run level to the dome door's sill and onto the walkway. EXACTLY ONE pair of headlights, small and far down on the lowest bend. EXACTLY ONE dome, its drum smoothly round, not many-sided. No smoke from any stovepipe. The dome door is shut and the shutter closed. The moon is not in view: it is hidden behind the dome's bulk. The star-count board shows no reading. No tall chimney or smokestack: the works on the shelf are two low unfinished concrete shells, one with a short square stub, never a tall stack. No people, no human figures, no faces and no statues anywhere. No readable words, no writing, no captions, no logos, no signs, no plaques and no painted numbers anywhere. No snow drifts and no icicles. No modern glass-and-steel buildings and no street lamps on the summit. Nothing steampunk: no exposed cogs or pipework on the walls. It is night: no daylight, no sunset glow, no blue-hour sky. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere; everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. Shot on a full-frame DSLR at 24mm, f/8, a clear moonlit night, the viewer standing in the dome's moon-shadow, cool silver moonlight lying beyond it, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into the open night sky over the summit's brink, above the dark steep slope of the cone falling away to the floor of cloud far below, uniform and unbroken, with no visible seam, join, or repetition.",
         "plateRefs": [
+          "_world/aerials/cluster_summit.png",
           "_world/aerials/observatory_deck_ene.png",
           "_world/aerials/observatory_year_master.png"
         ],
-        "specBuild": "fde8dd93a8910528c46c"
+        "specBuild": "3d17657563fcddfff9f1"
       }
     },
     {
@@ -33840,7 +33927,7 @@
         "solved": "directors_office"
       },
       "role": "escape",
-      "designNote": "ESCAPE. Brass telescope, the showpiece bank, the pointing console, the east port. Keyed answer 29323 (bearing 293, altitude 23) on the console; three pointings then the hard fail (ends the escape only, ungraded, never touches graded state; a reload restores graded progress with pointings reset: engine item 2, asserted at step 6). Travel sequence 2 (held for the escape): the correct pointing slews the telescope to 293 and ends on a transit.flat into the eyepiece view of the Gold & Blue Pair. The telescope and its eyepiece are scenery, not a hotspot: the console shows the eyepiece view after each pointing (a card's poor view tonight, or empty sky), and the correct pointing ends on the Gold & Blue Pair. Room unlockedWhen is belt-and-braces only; the real gate is the door in deck_stars.",
+      "designNote": "ESCAPE. Brass telescope, the showpiece bank, the pointing console, the east port. Keyed answer 29323 (bearing 293, altitude 23) on the console; three pointings then the hard fail (ends the escape only, ungraded, never touches graded state; the console's retry button resets the pointings and keeps the graded run, which a reload would wipe). Travel sequence 2 (held for the escape): the correct pointing slews the telescope to 293 and ends on a transit.flat into the eyepiece view of the Gold & Blue Pair. The telescope and its eyepiece are scenery, not a hotspot: the console shows the eyepiece view after each pointing (a card's poor view tonight, or empty sky), and the correct pointing ends on the Gold & Blue Pair. Room unlockedWhen is belt-and-braces only; the real gate is the door in deck_stars.",
       "plannedHotspots": [
         {
           "type": "door",
@@ -33849,24 +33936,267 @@
           "to": "deck_stars"
         },
         {
+          "cards": [
+            {
+              "name": "Double Double",
+              "bearing": 307,
+              "altitude": 16,
+              "brochure": false,
+              "b": 0.8,
+              "w": [
+                -0.05,
+                -1.0,
+                0.0,
+                0.03
+              ]
+            },
+            {
+              "name": "Andromeda",
+              "bearing": 8,
+              "altitude": 68,
+              "brochure": true,
+              "b": 0.7,
+              "w": [
+                -0.8,
+                0.0,
+                0.0,
+                0.3
+              ]
+            },
+            {
+              "name": "Jupiter’s moons",
+              "bearing": 74,
+              "altitude": 28,
+              "brochure": false,
+              "b": 1.0,
+              "w": [
+                -0.05,
+                -0.4,
+                -0.1,
+                0.03
+              ]
+            },
+            {
+              "name": "Crab Nebula",
+              "bearing": 73,
+              "altitude": 19,
+              "brochure": false,
+              "b": -0.6,
+              "w": [
+                -0.7,
+                -0.05,
+                -0.6,
+                0.3
+              ]
+            },
+            {
+              "name": "Saturn’s rings",
+              "bearing": 153,
+              "altitude": 72,
+              "brochure": true,
+              "b": 1.8,
+              "w": [
+                -0.05,
+                -0.9,
+                0.0,
+                0.03
+              ]
+            },
+            {
+              "name": "Pegasus Cluster",
+              "bearing": 267,
+              "altitude": 47,
+              "brochure": false,
+              "b": 0.4,
+              "w": [
+                -0.3,
+                -0.25,
+                0.0,
+                0.15
+              ]
+            },
+            {
+              "name": "Ring Nebula",
+              "bearing": 300,
+              "altitude": 16,
+              "brochure": false,
+              "b": 0.2,
+              "w": [
+                -0.4,
+                -0.2,
+                0.0,
+                0.2
+              ]
+            },
+            {
+              "name": "Gold & Blue Pair",
+              "bearing": 293,
+              "altitude": 23,
+              "brochure": false,
+              "b": 1.6,
+              "w": [
+                -0.05,
+                -0.1,
+                0.0,
+                0.03
+              ]
+            },
+            {
+              "name": "The Comet",
+              "bearing": 42,
+              "altitude": 15,
+              "brochure": true,
+              "b": 0.6,
+              "w": [
+                -0.7,
+                0.0,
+                -0.6,
+                0.3
+              ]
+            },
+            {
+              "name": "Mars",
+              "bearing": 93,
+              "altitude": 61,
+              "brochure": false,
+              "b": 1.2,
+              "w": [
+                0.0,
+                -0.9,
+                0.0,
+                0.0
+              ]
+            },
+            {
+              "name": "Seven Sisters",
+              "bearing": 75,
+              "altitude": 44,
+              "brochure": true,
+              "b": 0.8,
+              "w": [
+                -0.3,
+                0.0,
+                -0.2,
+                0.1
+              ]
+            },
+            {
+              "name": "Great Nebula",
+              "bearing": 100,
+              "altitude": 10,
+              "brochure": true,
+              "b": 1.1,
+              "w": [
+                -0.5,
+                -0.1,
+                -0.7,
+                0.2
+              ]
+            }
+          ],
+          "inputs": [
+            {
+              "key": "moon",
+              "name": "MOON",
+              "min": 0,
+              "max": 10,
+              "step": 1,
+              "centre": 5
+            },
+            {
+              "key": "twinkle",
+              "name": "TWINKLE",
+              "min": 0,
+              "max": 10,
+              "step": 1,
+              "centre": 5
+            },
+            {
+              "key": "glow",
+              "name": "GLOW",
+              "min": 0,
+              "max": 10,
+              "step": 1,
+              "centre": 5
+            },
+            {
+              "key": "stars",
+              "name": "STARS",
+              "min": 0,
+              "max": 20,
+              "step": 1,
+              "centre": 10
+            }
+          ],
+          "span": 6,
+          "cutStops": [
+            0.05,
+            0.1,
+            0.25,
+            0.5,
+            0.75,
+            0.9,
+            0.95
+          ],
+          "cutDefault": 0.5,
+          "start": [
+            3,
+            1,
+            9,
+            6
+          ],
           "type": "instrument",
           "kind": "bank",
           "label": "The showpiece bank",
           "note": "Twelve cards, four shafts; numbers in _scratch/showpiece_bank/retune_report.md."
         },
         {
+          "answer": "29323",
+          "feedback": {
+            "correct": "The dome grinds around to the west and the telescope settles.",
+            "wrong": "The dome grinds around and the telescope settles, but nothing in the eyepiece is worth the investors' drive. Through the east port, the headlights come a bend closer.",
+            "out": "The car pulls in under the dome. The investors take turns at the eyepiece, see nothing worth the drive, and leave without a word about the observatory. By morning it is closed. This escape is ungraded, so you can try the pointings again."
+          },
+          "eyepiece": {
+            "views": {
+              "30716": "The dome grinds around to the Double Double. In the eyepiece: two bright stars smeared into one shimmering blob; no pairs.",
+              "00868": "The dome grinds around to Andromeda. In the eyepiece: a faint oval smudge almost lost in moonlit gray sky.",
+              "07428": "The dome grinds around to Jupiter's moons. In the eyepiece: Jupiter boiling in unsteady air, its moons soft dots.",
+              "07319": "The dome grinds around to the Crab Nebula. In the eyepiece: orange-gray haze over the floodlights; nothing there.",
+              "15372": "The dome grinds around to Saturn's rings. In the eyepiece: a shimmering yellow blob; the rings blur, no gap.",
+              "26747": "The dome grinds around to the Pegasus Cluster. In the eyepiece: a gray fuzzy ball; no single stars.",
+              "30016": "The dome grinds around to the Ring Nebula. In the eyepiece: a dim gray smudge; the ring barely shows.",
+              "04215": "The dome grinds around to the comet. In the eyepiece: glowing haze low over the floodlights; no tail.",
+              "09361": "The dome grinds around to Mars. In the eyepiece: a wobbling orange disk; no markings.",
+              "07544": "The dome grinds around to the Seven Sisters. In the eyepiece: a few bright stars in a pale sky; the blue haze and the faint stars gone.",
+              "10010": "The dome grinds around to the Great Nebula. In the eyepiece: a dim core sunk in orange glow; no wings."
+            },
+            "emptySky": "The dome grinds around and the telescope settles on empty sky: nothing there worth showing anyone.",
+            "misses": [
+              "Through the east port, the headlights on the road come a bend closer.",
+              "The headlights come another bend closer. They are nearly at the summit."
+            ],
+            "failure": {
+              "title": "The headlights reach the summit",
+              "body": "The car pulls in under the dome. The investors take turns at the eyepiece, see nothing worth the drive, and leave without a word about the observatory. By morning it is closed. This escape is ungraded, so you can try the pointings again."
+            },
+            "stateKey": "pointings"
+          },
+          "retry": {
+            "label": "Try the pointings again"
+          },
           "type": "lock",
           "label": "The pointing console",
           "length": 5,
           "maxAttempts": 3,
           "endsEscape": true,
-          "note": "Bearing 3 digits + altitude 2 digits; key 29323; 3 attempts then failure ending (headlights arrive, he looks, drives off). Reload resets pointings only. Travel sequence 2 plays on the correct pointing."
+          "note": "Bearing 3 digits + altitude 2 digits; key 29323; 3 attempts then failure ending (headlights arrive, he looks, drives off). Its retry button resets the pointings only (a reload would wipe the whole run). Travel sequence 2 plays on the correct pointing."
         },
         {
           "type": "mapview",
           "label": "The east port",
           "key": "pointings",
-          "note": "Headlights a bend closer per pointing: art variants keyed on the numeric state key `pointings` (0 = base art, 1, 2 misses, 3 arrival), which the engine sets at step 6 (engine item 2). deck_stars shows them static."
+          "note": "Headlights a bend closer per pointing: close-up images 0-3 and panorama variants keyed on the numeric state key `pointings` (0 = base art, 1, 2 misses, 3 arrival), written by the console's eyepiece.stateKey on each miss and reset to 0 by its retry. deck_stars shows them static."
         }
       ],
       "authoring": {
@@ -33924,7 +34254,7 @@
             {
               "id": "east_port",
               "at": "to the right",
-              "desc": "in the curved wall close beside the viewer, the east port: a tall narrow opening from the floor to above head height, its iron shutter folded back, and through it, looking steeply down the summit's dark cone, a road's last switchback bends far below; on the lowest bend in view, one small pair of white headlights, still a long way off",
+              "desc": "in the curved wall close beside the viewer, the east port: a tall narrow opening from the floor to above head height, cut through the drum's thick wall of dark dressed stone, its iron shutter folded back, and through it, over the summit's rocky eastern brink, looking steeply down the summit's dark cone, a road's last switchback bends far below; on the lowest bend in view, one small pair of white headlights, still a long way off",
               "label": "The east port",
               "mapview": true,
               "variants": [
@@ -35733,12 +36063,13 @@
             }
           }
         },
-        "scenePrompt": "This is a seamless 360-degree panorama from a raised timber observing floor inside the drum of an old observatory dome at night, beside its east port. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stretch of the dome's curved inner wall of painted planking, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. Just left of centre, in the middle of the floor, the great brass telescope on its heavy cast-iron pier, its long tube parked level on its mount; high overhead the dome's long shutter slot stands open on a strip of starry sky; just left of centre, hanging from a hook on the telescope's pier, a red-glassed hand lantern, at rest on its hook, its wire handle tipped the faintest way; just left of centre, beyond the telescope's pier, against the far curved wall, standing on the observing floor with its glass front square to the viewer, the showpiece bank: a long, low, glass-fronted brass cabinet holding a row of EXACTLY TWELVE small upright engraved cards, each with a small bead in an S-shaped slot, four long brass shafts running its length with knurled knobs at one end, at rest; dead ahead in the centre, standing well in from the edge of the frame, just in front of the viewer, a long hatch in the observing floor between two brass newel posts and a brass handrail down each side, where a steep iron stair goes DOWN through the floor to the dome door standing OPEN at its foot; the floor under the viewer's feet runs level to the newel posts; just right of centre, close by on the floor beside the hatch, the pointing console: a brass pedestal with a slanted face carrying a row of five knurled setting wheels and a lever, at rest; to the right, in the curved wall close beside the viewer, the east port: a tall narrow opening from the floor to above head height, its iron shutter folded back, and through it, looking steeply down the summit's dark cone, a road's last switchback bends far below; on the lowest bend in view, one small pair of white headlights, still a long way off. A dark, lofty dome of curved painted planking over a timber observing floor, cast iron and polished brass, lit only by a red hand lantern and a cool fall of moonlight through the open shutter slot, the great brass telescope gleaming; inside an old, well-kept astronomical observatory on a high volcanic summit; old, cared for and whole; fine natural film grain. The timber observing floor under the viewer's feet runs level to the hatch's newel posts and to the east port. EXACTLY ONE telescope, ONE pier and ONE hatch with its stair going down. EXACTLY ONE pair of headlights, seen only through the east port. The showpiece bank's cards show nothing readable. The moon itself is not seen through the shutter slot; only its cool light falls in. No tall chimney or smokestack: the works on the shelf are two low unfinished concrete shells, one with a short square stub, never a tall stack. No people, no human figures, no faces and no statues anywhere. No readable words, no writing, no captions, no logos, no signs, no plaques and no painted numbers anywhere. No snow drifts and no icicles. No modern glass-and-steel buildings and no street lamps on the summit. Nothing steampunk: no exposed cogs or pipework on the walls. It is night: no daylight, no sunset glow, no blue-hour sky. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere; everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. Shot on a full-frame DSLR at 24mm, f/8, night, the dim glow of a red lantern and cool moonlight through the open shutter, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a plain stretch of the dome's curved inner wall of painted planking, uniform and unbroken, with no visible seam, join, or repetition.",
+        "scenePrompt": "This is a seamless 360-degree panorama from a raised timber observing floor inside the drum of an old observatory dome at night, beside its east port. This is an EQUIRECTANGULAR 360 panorama, not a flat photograph: the walls wrap continuously right around the viewer with strong barrel curvature, the ceiling and floor bow across the frame, and any surface toward the left or right of the frame is at the viewer's SIDE, seen at a glancing angle rather than face-on. It is NOT a flat frontal elevation of one wall, there is no single-vanishing-point composition, and it is never a view of the room from outside it or from across it. Directly behind the viewer, split across the extreme left and extreme right edges, is a plain stretch of the dome's curved inner wall of painted planking, uniform and unbroken: the far-left edge and the far-right edge are the two halves of this one surface and must match exactly in colour, texture, and lighting, joining into a single continuous, unbroken whole when the image wraps left to right. Just left of centre, in the middle of the floor, the great brass telescope on its heavy cast-iron pier, its long tube parked level on its mount; high overhead the dome's long shutter slot stands open on a strip of starry sky; just left of centre, hanging from a hook on the telescope's pier, a red-glassed hand lantern, at rest on its hook, its wire handle tipped the faintest way; just left of centre, beyond the telescope's pier, against the far curved wall, standing on the observing floor with its glass front square to the viewer, the showpiece bank: a long, low, glass-fronted brass cabinet holding a row of EXACTLY TWELVE small upright engraved cards, each with a small bead in an S-shaped slot, four long brass shafts running its length with knurled knobs at one end, at rest; dead ahead in the centre, standing well in from the edge of the frame, just in front of the viewer, a long hatch in the observing floor between two brass newel posts and a brass handrail down each side, where a steep iron stair goes DOWN through the floor to the dome door standing OPEN at its foot; the floor under the viewer's feet runs level to the newel posts; just right of centre, close by on the floor beside the hatch, the pointing console: a brass pedestal with a slanted face carrying a row of five knurled setting wheels and a lever, at rest; to the right, in the curved wall close beside the viewer, the east port: a tall narrow opening from the floor to above head height, cut through the drum's thick wall of dark dressed stone, its iron shutter folded back, and through it, over the summit's rocky eastern brink, looking steeply down the summit's dark cone, a road's last switchback bends far below; on the lowest bend in view, one small pair of white headlights, still a long way off. A dark, lofty dome of curved painted planking over a timber observing floor, cast iron and polished brass, lit only by a red hand lantern and a cool fall of moonlight through the open shutter slot, the great brass telescope gleaming; inside an old, well-kept astronomical observatory on a high volcanic summit; old, cared for and whole; fine natural film grain. The timber observing floor under the viewer's feet runs level to the hatch's newel posts and to the east port. EXACTLY ONE telescope, ONE pier and ONE hatch with its stair going down. EXACTLY ONE pair of headlights, seen only through the east port. The showpiece bank's cards show nothing readable. The moon itself is not seen through the shutter slot; only its cool light falls in. No tall chimney or smokestack: the works on the shelf are two low unfinished concrete shells, one with a short square stub, never a tall stack. No people, no human figures, no faces and no statues anywhere. No readable words, no writing, no captions, no logos, no signs, no plaques and no painted numbers anywhere. No snow drifts and no icicles. No modern glass-and-steel buildings and no street lamps on the summit. Nothing steampunk: no exposed cogs or pipework on the walls. It is night: no daylight, no sunset glow, no blue-hour sky. The image is SHARP: no motion blur, no streaking, no smeared or doubled detail anywhere; everything in this picture is standing still, and any movement described is what the cinemagraph will add later, never something painted into the still. Shot on a full-frame DSLR at 24mm, f/8, night, the dim glow of a red lantern and cool moonlight through the open shutter, high dynamic range, realistic depth of field, fine natural film grain, true-to-life colour. EDGE DISCIPLINE: the leftmost 6% and the rightmost 6% of the image must contain nothing but the plain continuous backdrop named above — no object, structure, post, path, fence, building corner, vehicle or figure may appear, begin or end inside those two margins, and no cast shadow may fall across them. Keep every object of interest well inboard. THE GROUND IS ONE SURFACE: the ground at the extreme left edge and the ground at the extreme right edge are the SAME patch of ground seen from the same standing point. Its paving, texture, colour, wetness and the base of anything resting on it must continue unbroken and perfectly aligned across that join, at the same height and the same scale on both sides. Again: the extreme left and right edges must align perfectly into a plain stretch of the dome's curved inner wall of painted planking, uniform and unbroken, with no visible seam, join, or repetition.",
         "plateRefs": [
+          "_world/aerials/cluster_summit.png",
           "_world/aerials/observatory_deck_ene.png",
           "_world/aerials/observatory_year_master.png"
         ],
-        "specBuild": "54af6bda558d812ebb23"
+        "specBuild": "027460a77554e2e3ad32"
       }
     }
   ],
@@ -35763,5 +36094,19 @@
       "room": "dome",
       "text": "To escape you set the night's four sky readings on the showpiece bank, found the one card that cleared the cut-off, and keyed its bearing and altitude on the pointing console."
     }
-  ]
+  ],
+  "datasets": [
+    {
+      "name": "galaxy_plates",
+      "url": "https://thebustalab.github.io/escape_rooms/rooms/classification/observatory/data/galaxy_plates.csv"
+    }
+  ],
+  "setup": "suppressMessages({library(dplyr); library(ggplot2)})",
+  "state": {
+    "pointings": 0,
+    "moon_dial": 0,
+    "twinkle_scope": 0,
+    "glow_meter": 0,
+    "star_board": 0
+  }
 }

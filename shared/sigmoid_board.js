@@ -10,36 +10,33 @@
 //   2 A model from one predictor   the S-curve: drag its MIDDLE (where the probability is 0.5) and its STEEPNESS
 //                                  (handle where it reaches 0.8), or "Best fit" (the maximum-likelihood fit, what
 //                                  buildModel() finds); a switch draws the likelihood calculation on the plot.
-//   3 Setting cases aside          the S-curve against a connect-the-dots curve through every training morning; red
-//                                  rings mark wrong calls; "Reveal" shows the ten held-back mornings at what happened,
-//                                  and a table scores both models on training vs held-back mornings (24/30 → 9/10 vs
-//                                  30/30 → 7/10).
-//   4 Predicting held-back cases   the best-fit curve with the training mornings faded, ten held-back mornings placed on
-//                                  it, and the cut-off as a draggable horizontal line turning each probability into a
-//                                  call; calls that differ from the 0.5 call are ringed and listed.
+//   3 Setting cases aside          one staged walk: the S-curve alone, held-back mornings hidden → the connect-the-dots
+//                                  model (a curve through every training morning; the other curve stays faint) → reveal
+//                                  the ten held-back mornings at what happened → score them: a dotted line from each to
+//                                  the chosen curve, a draggable cut-off, and a ✓/✗ on each by its call at that cut-off.
+//                                  Red rings mark wrong calls; no table or readout, the plot carries the score
+//                                  (at 0.5: 24/30 → 9/10 vs 30/30 → 7/10, scores() for tests).
 //
 // TOY DATA ONLY (classification_math.js LANDING: forty invented mornings, swell height vs did the supply boat turn
 // back). Never graded, never logged, holds no answer. Code-drawn SVG: no art, no
 // geometry (validate_assets.py NO_GEOMETRY_KINDS).
 //
 //   const b = mount(hostEl, { pegs?, onPegs?(state) });
-//   b.setTab("lines"|"curve"|"holdout"|"cutoff"); b.setModel("s"|"dots"); b.setReveal(on); b.scores(); b.tab(); b.curve(); b.setCurve({middle, steepness}); b.bestFit({instant});
-//   b.best(); b.probability(day); b.setCutoff(c); b.cutoff(); b.calls(); b.changed();
+//   b.setTab("lines"|"curve"|"holdout"); b.setModel("s"|"dots"); b.setReveal(on); b.setScoring(on); b.scores(); b.marks(); b.tab(); b.curve(); b.setCurve({middle, steepness}); b.bestFit({instant});
+//   b.best(); b.probability(day); b.setCutoff(c); b.cutoff();
 //   b.setProbe(x); b.lineAt(x); b.ready; b.destroy().   The root element carries the API as `.sigmoidBoard` for tests.
-import { LANDING, olsLine, fitLogistic, curveFromCoef, probAt, fitScore, callAt, connectDotsAt } from "./classification_math.js?v=180";
-import { shell, svgEl, el, button, slider, svgPoint, fmt2 } from "./classification_ui.js?v=180";
+import { LANDING, olsLine, fitLogistic, curveFromCoef, probAt, fitScore, callAt, connectDotsAt } from "./classification_math.js?v=181";
+import { shell, svgEl, el, button, slider, svgPoint, fmt2 } from "./classification_ui.js?v=181";
 
-const TABS = [["lines", "From numbers to categories"], ["curve", "A model from one predictor"], ["holdout", "Setting cases aside"], ["cutoff", "Predicting held-back cases"]];
+const TABS = [["lines", "From numbers to categories"], ["curve", "A model from one predictor"], ["holdout", "Setting cases aside"]];
 // Each tab's takeaway in the chapter's own wording (12d_classification.Rmd), and the section it belongs to.
 const LESSONS = {
   lines: ["A model that predicts a category is a classification model. A straight line fitted to turned_back coded as 1 and 0 predicts a number, not a category: at 2.3 m it reads 0.45, but is that \"probably not\", or a 45% chance the boat turns back? It’s a bit unclear. Even worse, at the ends the straight line reads below 0 and above 1, which is impossible to interpret. The solution: logistic regression, which is built to give a probability instead: an S-shape that stays between 0 and 1, so a reading of 0.43 means a 43% chance the boat turns back on a morning with that swell.",
     "from numbers to categories"],
   curve: ["A logistic regression model gives each case a probability_yes: the chance that the response is yes at that predictor value. On a morning with a 2.3 m swell, 0.43 means a 43% chance the boat turns back. It is not the share of all mornings that turned back, and it is not a call. The fit is scored by likelihood: each morning gets the probability the curve gives to what actually happened, those are multiplied together, and the best fit is the curve with the highest likelihood.",
     "a model from one predictor"],
-  holdout: ["A model always appears the most accurate (sometimes perfectly accurate) on the data that were used to create the model’s settings. For example, a connect-the-dots curve (a model that is “overfitted” on the training data) passes through every training morning and gets all 30 right. Unfortunately, such a model has memorized the noise in the data: it does great on the training data, but on the ten held-back mornings it does worse than the S-curve. So, the best practice is to always hold back some of the data we have (a “test set”), then configure (“train”) the model on the remaining data (the “training set”), then evaluate the model on the held-back test set.",
-    "a model from one predictor"],
-  cutoff: ["The held-back cases were never shown to the model, so it gives them a probability exactly as it would for cases not yet seen. A cut-off turns each probability into a call: yes at 0.5 or more. A lower cut-off calls more cases yes and a higher one fewer; the probabilities themselves do not change, only the line drawn across them moves.",
-    "several predictors, and predicting held-back cases"],
+  holdout: ["A model always performs the best on the data used to set it up. Here, a connect-the-dots curve (an “overfitted” model) passes through every training morning and gets all 30 right, but it has memorized the noise: on the ten held-back mornings it does worse than the S-curve. So always hold back some data (a “test set”), train the model on the rest (the “training set”), and evaluate the model on the test set. To score held-back data, a cut-off (a threshold) is used to turn a probability_yes into a call: yes at or above the cut-off, no below it. predictWithModel() uses 0.5. Moving the cut-off changes the calls, never the probabilities: a lower cut-off calls more mornings yes, catching more boats that turn back, but at the price of more false alarms.",
+    "a model from one predictor; several predictors, and predicting held-back cases"],
 };
 const W = 960, H = 600, PX0 = 100, PX1 = 930, PY0 = 74, PY1 = 524;
 const YES = "#ffc861", NO = "#8fb3d9", LINE = "#ff8a5c", CURVE = "#7fd3ff", CUT = "#ffe39a", BAD = "rgba(255,90,70,.13)";
@@ -55,7 +52,7 @@ export function mount(host, opts = {}) {
   const best = curveFromCoef(fitLogistic(X1, ys));
   const s0 = opts.pegs && typeof opts.pegs === "object" ? opts.pegs : {};
   const st = {
-    tab: TABS.some(([k]) => k === s0.tab) ? s0.tab : "lines",
+    tab: s0.tab === "cutoff" ? "holdout" : TABS.some(([k]) => k === s0.tab) ? s0.tab : "lines",   // "cutoff" was merged into holdout
     curve: s0.curve && Number.isFinite(s0.curve.middle) && Number.isFinite(s0.curve.steepness) ? { ...s0.curve } : { ...START },
     cutoff: Number.isFinite(s0.cutoff) ? s0.cutoff : 0.5,
     probe: Number.isFinite(s0.probe) ? s0.probe : 5.5,
@@ -63,10 +60,12 @@ export function mount(host, opts = {}) {
     showFit: !!s0.showFit,
     model: s0.model === "dots" ? "dots" : "s",
     reveal: !!s0.reveal,
+    dotsSeen: !!s0.dotsSeen || s0.model === "dots",   // the connect-the-dots curve stays off the plot until first chosen
+    scoring: !!s0.scoring && !!s0.reveal,
   };
   const reduced = typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
   let dead = false, raf = 0, drag = null;
-  const save = () => opts.onPegs && opts.onPegs({ tab: st.tab, curve: { ...st.curve }, cutoff: st.cutoff, probe: st.probe, showS: st.showS, showFit: st.showFit, model: st.model, reveal: st.reveal });
+  const save = () => opts.onPegs && opts.onPegs({ tab: st.tab, curve: { ...st.curve }, cutoff: st.cutoff, probe: st.probe, showS: st.showS, showFit: st.showFit, model: st.model, reveal: st.reveal, dotsSeen: st.dotsSeen, scoring: st.scoring });
 
   const F = shell(host, { cls: "sigmoidboard", tabs: TABS, W, H, onTab: (k) => api.setTab(k),
     ariaLabel: "The S-curve board: yes/no mornings against swell height, a straight line, an S-curve and a cut-off" });
@@ -112,7 +111,7 @@ export function mount(host, opts = {}) {
     txt(lx + 22, ly, "turned back: yes", { size: 17 });
     svgEl(svg, "circle", { cx: lx + 190, cy: ly, r: 8, fill: NO });
     txt(lx + 204, ly, "turned back: no (landed)", { size: 17 });
-    if (st.tab === "cutoff" || (st.tab === "holdout" && st.reveal)) {
+    if (st.tab === "holdout" && st.reveal) {
       svgEl(svg, "path", { d: diamond(lx + 452, ly, 9), fill: "#fff1d6" });
       txt(lx + 466, ly, "held back (never shown to the model)", { size: 17 });
     }
@@ -182,9 +181,9 @@ export function mount(host, opts = {}) {
     curvePath(cv, { class: "scurve" });
     dots();
     const mx = clamp(cv.middle, T.xView[0], T.xView[1]);
-    handle(X(mx), Y(0.5), "middle", "middle", MID, "right");
+    handle(X(mx), Y(0.5), "middle", "middle " + cv.middle.toFixed(2), MID, "right");
     const x8 = cv.middle + LN4 / cv.steepness;
-    if (x8 <= T.xView[1]) handle(X(x8), Y(0.8), "steep", "steepness", STEEP, "right");
+    if (x8 <= T.xView[1]) handle(X(x8), Y(0.8), "steep", "steepness " + cv.steepness.toFixed(2), STEEP, "right");
   }
 
   // The fit calculation, all mornings at once: a dotted line from each dot to the curve (its length is the probability
@@ -223,55 +222,62 @@ export function mount(host, opts = {}) {
     return `${m.toFixed(1)} × 10${String(e).split("").map((c) => SUP[c]).join("")}`;
   }
 
-  // Setting cases aside: the S-curve against a connect-the-dots curve that memorises every training morning. The
-  // chosen model is drawn bold; red rings mark the mornings it calls wrong at 0.5. The held-back mornings (diamonds,
-  // at what actually happened) appear only when revealed.
-  const DOTS = "#ff8a5c";
+  // Setting cases aside, a staged walk: the S-curve alone → connect-the-dots (a curve that memorises every training
+  // morning; once chosen, the other model stays on as a faint curve) → the held-back mornings revealed as diamonds at
+  // what actually happened → scored: a dotted line from each to the chosen curve (its probability_yes), a draggable
+  // cut-off turning that probability into a call, and a ✓/✗ by each. Red rings mark wrong calls throughout.
+  const DOTS = "#ff8a5c", RIGHT = "#7ee0a1", WRONG = "#ff4d3a";
   const modelAt = (m, x) => (m === "dots" ? connectDotsAt(T.training, x) : probAt(best, x));
-  const isRight = (m, d) => (callAt(modelAt(m, d.x)) === "yes" ? 1 : 0) === d.y;
+  const cutNow = () => (st.scoring ? st.cutoff : 0.5);
+  const isRight = (m, d, c = cutNow()) => (callAt(modelAt(m, d.x), c) === "yes" ? 1 : 0) === d.y;
   function drawHoldout() {
+    const c = cutNow();
     for (const v of [0, 1]) svgEl(svg, "line", { x1: PX0, x2: PX1, y1: Y(v), y2: Y(v), stroke: "rgba(255,255,255,.3)", "stroke-dasharray": "6 6" });
-    for (const m of st.model === "s" ? ["dots", "s"] : ["s", "dots"]) {
+    if (st.scoring) {
+      const yc = Y(c);
+      svgEl(svg, "rect", { x: PX0, y: PY0, width: PX1 - PX0, height: yc - PY0, fill: "rgba(255,200,97,.06)" });
+      svgEl(svg, "rect", { x: PX0, y: yc, width: PX1 - PX0, height: PY1 - yc, fill: "rgba(143,179,217,.06)" });
+      txt(PX0 + 12, PY0 + 16, "called yes", { size: 18, italic: true, fill: YES });
+      txt(PX1 - 12, PY1 - 16, "called no", { anchor: "end", size: 18, italic: true, fill: NO });
+      if (Math.abs(c - 0.5) > 1e-9) {
+        svgEl(svg, "line", { x1: PX0, x2: PX1, y1: Y(0.5), y2: Y(0.5), stroke: "rgba(255,255,255,.4)", "stroke-dasharray": "4 6" });
+        txt(PX0 + 8, Y(0.5) + (c > 0.5 ? 16 : -16), "0.5", { size: 16, fill: "#cdbf9f" });
+      }
+    }
+    const shown = st.dotsSeen ? (st.model === "s" ? ["dots", "s"] : ["s", "dots"]) : ["s"];
+    for (const m of shown) {
       const on = m === st.model, pts = [];
       for (let i = 0; i <= 600; i++) { const x = T.xView[0] + (i / 600) * (T.xView[1] - T.xView[0]); pts.push(`${i ? "L" : "M"}${X(x).toFixed(1)} ${Y(modelAt(m, x)).toFixed(1)}`); }
       svgEl(svg, "path", { d: pts.join(""), fill: "none", stroke: m === "s" ? CURVE : DOTS, "stroke-width": on ? 4 : 2.5, opacity: on ? 1 : 0.3,
         "stroke-linecap": "round", "stroke-linejoin": "round", class: m === "s" ? "scurve" : "dotscurve" });
     }
-    const ring = (d) => svgEl(svg, "circle", { cx: X(d.x), cy: Y(d.y), r: 16, fill: "none", stroke: "#ff4d3a", "stroke-width": 3, class: "wrongring" });
+    const ring = (d) => svgEl(svg, "circle", { cx: X(d.x), cy: Y(d.y), r: 16, fill: "none", stroke: WRONG, "stroke-width": 3, class: "wrongring" });
     for (const d of T.training) if (!isRight(st.model, d)) ring(d);
-    dots();
+    dots(st.scoring ? 0.35 : 1);
     if (st.reveal) for (const d of T.heldBack) {
-      if (!isRight(st.model, d)) ring(d);
-      svgEl(svg, "path", { d: diamond(X(d.x), Y(d.y), 12), fill: d.y ? YES : NO, stroke: "#fff", "stroke-width": 2.5, class: "held", "data-day": d.day });
+      const x = X(d.x), y = Y(d.y);
+      if (st.scoring) {
+        const p = modelAt(st.model, d.x), ok = isRight(st.model, d);
+        svgEl(svg, "line", { x1: x, x2: x, y1: y, y2: Y(p), stroke: "#fff1d6", "stroke-width": 2, "stroke-dasharray": "3 4", opacity: 0.85, class: "heldline" });
+        svgEl(svg, "circle", { cx: x, cy: Y(p), r: 6, fill: callAt(p, c) === "yes" ? YES : "#0b1622", stroke: callAt(p, c) === "yes" ? "#1a1208" : NO, "stroke-width": 2.5 });
+        if (!ok) ring(d);
+        txt(x, d.y ? y - 30 : y + 30, ok ? "✓" : "✗", { anchor: "middle", size: 24, bold: true, fill: ok ? RIGHT : WRONG })
+          .setAttribute("class", "mark mark-" + (ok ? "right" : "wrong"));
+      }
+      svgEl(svg, "path", { d: diamond(x, y, 12), fill: d.y ? YES : NO, stroke: "#fff", "stroke-width": 2.5, class: "held", "data-day": d.day });
+    }
+    if (st.scoring) {
+      const yc = Y(c);
+      svgEl(svg, "line", { x1: PX0, x2: PX1, y1: yc, y2: yc, stroke: CUT, "stroke-width": 4, class: "cutline" });
+      txt(PX1 - 60, yc - 18, "cut-off " + c.toFixed(2), { anchor: "end", size: 20, bold: true, fill: CUT });
+      const band = svgEl(svg, "rect", { x: PX0, y: yc - 16, width: PX1 - PX0, height: 32, fill: "transparent", class: "hit handle-cutband" });
+      band.addEventListener("pointerdown", (ev) => startDrag(ev, "cut"));
+      handle(PX1 - 26, yc, "cut", null, CUT);
     }
   }
-  const score = (m, set) => set.filter((d) => isRight(m, d)).length;
-  const scores = () => ({ s: { train: score("s", T.training), held: score("s", T.heldBack) }, dots: { train: score("dots", T.training), held: score("dots", T.heldBack) } });
-
-  function drawCutoff() {
-    const c = st.cutoff, yc = Y(c);
-    svgEl(svg, "rect", { x: PX0, y: PY0, width: PX1 - PX0, height: yc - PY0, fill: "rgba(255,200,97,.07)" });
-    svgEl(svg, "rect", { x: PX0, y: yc, width: PX1 - PX0, height: PY1 - yc, fill: "rgba(143,179,217,.07)" });
-    txt(PX0 + 12, PY0 + 18, "called yes", { size: 18, italic: true, fill: YES });
-    txt(PX0 + 12, PY1 - 18, "called no", { size: 18, italic: true, fill: NO });
-    dots(0.22);
-    curvePath(best, { opacity: 0.9, class: "scurve" });
-    if (Math.abs(c - 0.5) > 1e-9) {
-      svgEl(svg, "line", { x1: PX0, x2: PX1, y1: Y(0.5), y2: Y(0.5), stroke: "rgba(255,255,255,.4)", "stroke-dasharray": "4 6" });
-      txt(PX1 - 8, Y(0.5) + (c > 0.5 ? 16 : -16), "0.5", { anchor: "end", size: 16, fill: "#cdbf9f" });
-    }
-    for (const r of calls()) {
-      const x = X(r.x), y = Y(r.p);
-      if (r.changed) svgEl(svg, "circle", { cx: x, cy: y, r: 19, fill: "none", stroke: "#ffb36b", "stroke-width": 3.5, class: "changedring" });
-      svgEl(svg, "path", { d: diamond(x, y, 12), fill: r.call === "yes" ? YES : "#0b1622", stroke: r.call === "yes" ? "#1a1208" : NO, "stroke-width": 3, class: "held", "data-day": r.day, "data-call": r.call });
-      txt(x, y - 26, String(r.day), { anchor: "middle", size: 15, fill: r.changed ? "#ffb36b" : "#cdbf9f", bold: r.changed });
-    }
-    svgEl(svg, "line", { x1: PX0, x2: PX1, y1: yc, y2: yc, stroke: CUT, "stroke-width": 4, class: "cutline" });
-    txt(PX1 - 60, yc - 18, "cut-off " + c.toFixed(2), { anchor: "end", size: 20, bold: true, fill: CUT });
-    const band = svgEl(svg, "rect", { x: PX0, y: yc - 16, width: PX1 - PX0, height: 32, fill: "transparent", class: "hit handle-cutband" });
-    band.addEventListener("pointerdown", (ev) => startDrag(ev, "cut"));
-    handle(PX1 - 26, yc, "cut", null, CUT);
-  }
+  const score = (m, set, c) => set.filter((d) => isRight(m, d, c)).length;
+  const scores = (c = cutNow()) => ({ s: { train: score("s", T.training, c), held: score("s", T.heldBack, c) }, dots: { train: score("dots", T.training, c), held: score("dots", T.heldBack, c) } });
+  const marks = () => (st.scoring ? T.heldBack.map((d) => ({ day: d.day, right: isRight(st.model, d) })) : []);
 
   function draw() {
     if (dead) return;
@@ -279,8 +285,7 @@ export function mount(host, opts = {}) {
     axes();
     if (st.tab === "lines") drawLines();
     else if (st.tab === "curve") drawCurve();
-    else if (st.tab === "holdout") drawHoldout();
-    else drawCutoff();
+    else drawHoldout();
     updateRead();
   }
 
@@ -319,7 +324,7 @@ export function mount(host, opts = {}) {
       F.ctl.append(sProbe.el, el("div", "clsbrow").appendChild(sBtn).parentNode);
     } else if (st.tab === "curve") {
       const row = el("div", "clsbrow");
-      row.append(button("Best fit", "primary bestfit", () => api.bestFit(), "Snap to the curve buildModel() would find: the maximum-likelihood fit"),
+      row.append(button("Best fit", "bestfit", () => api.bestFit(), "Snap to the curve buildModel() would find: the maximum-likelihood fit"),
                  button("Start again", "", () => api.setCurve({ ...START }), "Put the curve back where it started"));
       sMid = slider("Middle (m), where the probability is 0.5", { min: 0.3, max: 5.7, step: 0.05, value: st.curve.middle, fmt: (v) => v.toFixed(2) + " m",
         onInput: (v) => api.setCurve({ middle: v, steepness: st.curve.steepness }) });
@@ -330,18 +335,25 @@ export function mount(host, opts = {}) {
         "Draw each morning's probability on the plot and multiply them out");
       fBtn.setAttribute("aria-pressed", String(st.showFit));
       F.ctl.append(row, sMid.el, sSteep.el, el("div", "clsbrow").appendChild(fBtn).parentNode);
-    } else if (st.tab === "holdout") {
+    } else {
       const row = el("div", "clsbrow"), mS = button("S-curve", "tog model-s", () => api.setModel("s"), "Logistic regression, fit to the training mornings"),
         mD = button("Connect-the-dots", "tog model-dots", () => api.setModel("dots"), "A curve through every training morning");
       mS.setAttribute("aria-pressed", String(st.model === "s")); mD.setAttribute("aria-pressed", String(st.model === "dots"));
-      mS.style.color = CURVE; mD.style.color = DOTS;
       row.append(el("span", null, "Model:"), mS, mD);
-      const rv = button(st.reveal ? "Hide the held-back mornings" : "Reveal the held-back mornings", "primary reveal", () => api.setReveal(!st.reveal),
+      const rv = button("Reveal the held-back mornings", "tog reveal", () => api.setReveal(!st.reveal),
         "Show the ten mornings that were set aside, at what actually happened");
+      rv.setAttribute("aria-pressed", String(st.reveal));
       F.ctl.append(row, el("div", "clsbrow").appendChild(rv).parentNode);
-    } else {
-      sCut = slider("Cut-off", { min: 0.05, max: 0.95, step: 0.01, value: st.cutoff, fmt: (v) => v.toFixed(2), onInput: (v) => api.setCutoff(v) });
-      F.ctl.append(sCut.el, el("div", "clsbrow").appendChild(button("Back to 0.5", "", () => api.setCutoff(0.5))).parentNode);
+      if (st.reveal) {
+        const sb = button("Score the held-back mornings", "tog score", () => api.setScoring(!st.scoring),
+          "Read each held-back morning's probability off the curve and call it with a cut-off");
+        sb.setAttribute("aria-pressed", String(st.scoring));
+        F.ctl.append(el("div", "clsbrow").appendChild(sb).parentNode);
+      }
+      if (st.scoring) {
+        sCut = slider("Cut-off", { min: 0.05, max: 0.95, step: 0.01, value: st.cutoff, fmt: (v) => v.toFixed(2), onInput: (v) => api.setCutoff(v) });
+        F.ctl.append(sCut.el, el("div", "clsbrow").appendChild(button("Back to 0.5", "", () => api.setCutoff(0.5))).parentNode);
+      }
     }
     updateRead();
   }
@@ -356,39 +368,15 @@ export function mount(host, opts = {}) {
     } else if (st.tab === "curve") {
       if (sMid) sMid.set(st.curve.middle);
       if (sSteep) sSteep.set(st.curve.steepness);
-    } else if (st.tab === "holdout") {
-      const sc = scores(), h = (n) => (st.reveal ? `<b>${n}</b> of 10` : "?");
-      const t = el("table", "clsbtable holdscore");
-      t.innerHTML = `<thead><tr><th>called right (at 0.5)</th><th>training mornings</th><th>held-back mornings</th></tr></thead>` +
-        `<tbody><tr class="${st.model === "s" ? "changed" : ""}"><td style="color:${CURVE}">S-curve</td><td><b>${sc.s.train}</b> of 30</td><td>${h(sc.s.held)}</td></tr>` +
-        `<tr class="${st.model === "dots" ? "changed" : ""}"><td style="color:${DOTS}">Connect-the-dots</td><td><b>${sc.dots.train}</b> of 30</td><td>${h(sc.dots.held)}</td></tr></tbody>`;
-      R.append(para("Red rings: mornings the chosen model calls wrong.", "dim"), t);
-      R.append(para(st.reveal ? "Perfect on the mornings it learned from, worse on new ones: connect-the-dots memorized the noise. The S-curve does about as well on new mornings as on old ones."
-        : "Which model will do better on mornings it has never seen? Reveal the held-back mornings to find out.", "dim"));
+      // the live formula, its two numbers in the handles' colours, so each drag shows exactly which number it changes
+      const c = st.curve;
+      R.append(para(`<span class="curveeq" style="font-size:19px">probability_yes = 1 / (1 + e<sup>−<b style="color:${STEEP}">${c.steepness.toFixed(2)}</b> × (swell_m − <b style="color:${MID}">${c.middle.toFixed(2)}</b>)</sup>)</span>`));
     } else {
-      if (sCut) sCut.set(st.cutoff);
-      const rows = calls(), yesNow = rows.filter((r) => r.call === "yes").length, yes05 = rows.filter((r) => r.call05 === "yes").length;
-      R.append(para(`Called yes: <b>${yesNow}</b> of ${rows.length} held-back mornings (at 0.5: ${yes05}).`));
-      const t = el("table", "clsbtable");
-      t.innerHTML = `<thead><tr><th>day</th><th>swell_m</th><th>probability_yes</th><th>call at 0.5</th><th>at ${st.cutoff.toFixed(2)}</th></tr></thead>`;
-      const tb = el("tbody");
-      for (const r of rows) {
-        const tr = el("tr", r.changed ? "changed" : ""); tr.dataset.day = r.day;
-        tr.innerHTML = `<td>${r.day}</td><td>${r.x.toFixed(2)}</td><td>${r.p.toFixed(3)}</td><td class="${r.call05}">${r.call05}</td><td class="${r.call}">${r.call}</td>`;
-        tb.appendChild(tr);
-      }
-      t.appendChild(tb); R.append(t);
+      if (sCut) sCut.set(st.cutoff);   // the plot carries the score: rings, ✓/✗, no table
     }
   }
   const para = (html, cls) => { const p = el("p", cls || null); p.innerHTML = html; return p; };
   const fmtSigned = (v) => (v < 0 ? "−" + Math.abs(v).toFixed(2) : v.toFixed(2));
-
-  function calls() {
-    return T.heldBack.map((h) => {
-      const p = probAt(best, h.x), call = callAt(p, st.cutoff), call05 = callAt(p, 0.5);
-      return { day: h.day, x: h.x, p, call, call05, changed: call !== call05 };
-    });
-  }
 
   // ---------- best fit: a short glide, instant under reduced motion ----------
   function glideTo(target, ms = 650) {
@@ -408,7 +396,7 @@ export function mount(host, opts = {}) {
 
   const api = {
     ready: Promise.resolve(),
-    setTab(k) { if (!TABS.some(([kk]) => kk === k)) throw new Error("sigmoid_board: setTab needs lines/curve/holdout/cutoff"); cancelAnimationFrame(raf); drag = null; st.tab = k; save(); buildPanel(); draw(); },
+    setTab(k) { if (!TABS.some(([kk]) => kk === k)) throw new Error("sigmoid_board: setTab needs lines/curve/holdout"); cancelAnimationFrame(raf); drag = null; st.tab = k; save(); buildPanel(); draw(); },
     tab: () => st.tab,
     curve: () => ({ ...st.curve }),
     setCurve(c) {
@@ -423,18 +411,20 @@ export function mount(host, opts = {}) {
     curveAt: (x) => probAt(best, x),
     setShowFit(on) { st.showFit = !!on; if (fBtn) fBtn.setAttribute("aria-pressed", String(st.showFit)); save(); draw(); },
     showFit: () => st.showFit,
-    setModel(m) { if (m !== "s" && m !== "dots") throw new Error("sigmoid_board: setModel needs s/dots"); st.model = m; save(); buildPanel(); draw(); },
+    setModel(m) { if (m !== "s" && m !== "dots") throw new Error("sigmoid_board: setModel needs s/dots"); st.model = m; if (m === "dots") st.dotsSeen = true; save(); buildPanel(); draw(); },
     model: () => st.model,
-    setReveal(on) { st.reveal = !!on; save(); buildPanel(); draw(); },
+    setReveal(on) { st.reveal = !!on; if (!st.reveal) st.scoring = false; save(); buildPanel(); draw(); },
+    setScoring(on) { st.scoring = !!on && st.reveal; save(); buildPanel(); draw(); },
+    scoring: () => st.scoring,
+    marks,
     revealed: () => st.reveal,
     scores,
     fit: () => fitSummary(st.curve),
     setProbe(x) { st.probe = clamp(Math.round(+x * 10) / 10, 0, 6); if (sProbe) sProbe.set(st.probe); save(); draw(); },
     probe: () => st.probe,
     probability(day) { const d = T.training.find((t) => t.day === +day); return d ? probAt(st.curve, d.x) : null; },
-    setCutoff(c) { st.cutoff = clamp(Math.round(+c * 100) / 100, 0.05, 0.95); save(); draw(); },
+    setCutoff(c) { st.cutoff = clamp(Math.round(+c * 100) / 100, 0.05, 0.95); save(); draw(); updateRead(); },
     cutoff: () => st.cutoff,
-    calls, changed: () => calls().filter((r) => r.changed).map((r) => r.day),
     destroy() {
       if (dead) return;
       dead = true; cancelAnimationFrame(raf);

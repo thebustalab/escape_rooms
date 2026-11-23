@@ -18,25 +18,32 @@
 //                                   beside "always say no": accuracy, caught and missed. A slider sets how rare yes
 //                                   is; below about one night in eight, always-no wins on accuracy while catching
 //                                   nothing.
+//   4 Confusion matrix              the same held-back nights sorted into the 2 x 2 confusion matrix (what really
+//                                   happened against what the model called: caught, missed, false alarm, correctly
+//                                   called no), with precision and recall worked out from its cells. A cut-off slider
+//                                   (0.5 by default) moves the calls: lower it and recall rises while precision falls.
+//                                   The yes-share slider is shared with tab 3; when yes is rare, precision drops.
 //
 // TOY DATA ONLY (classification_math.js makeNights / tallyPool); the board carries no "invented data" caption (instruments_and_widgets.md: no text that does not teach). Never graded,
 // never logged, holds no answer. Code-drawn SVG: no art, no geometry (validate_assets.py NO_GEOMETRY_KINDS).
 //
 //   const s = mount(hostEl, { pegs?, onPegs?(state) });
 //   s.setTab("several"|"scale"|"judge"); s.setReadings({pressure, humidity}); s.readings(); s.tab(); s.setScaled(bool); s.scaled(); s.coefs(); s.rawCoefs(); s.scaledCoefs();
-//   s.probabilities(night); s.setShare(0..1); s.share(); s.tally(); s.ready; s.destroy().
+//   s.probabilities(night); s.setShare(0..1); s.share(); s.tally(); s.setCutoff(0.1..0.9); s.cutoff(); s.matrix(); s.ready; s.destroy().
 //   The root element carries the API as `.scoreboard` for tests.
-import { makeNights, NIGHT_PREDICTORS, fitLogistic, scaledCoefs, logistic, tallyPool, judge, alwaysNo, mean, sd }
-  from "./classification_math.js?v=180";
-import { shell, svgEl, el, button, slider, pct } from "./classification_ui.js?v=180";
+import { makeNights, NIGHT_PREDICTORS, fitLogistic, scaledCoefs, logistic, tallyPool, judge, alwaysNo, confusion, mean, sd }
+  from "./classification_math.js?v=181";
+import { shell, svgEl, el, button, slider, pct } from "./classification_ui.js?v=181";
 
-const TABS = [["several", "Several predictors"], ["scale", "Which predictors matter most"], ["judge", "Judging a classifier"]];
+const TABS = [["several", "Several predictors"], ["scale", "Which predictors matter most"], ["judge", "Judging a classifier"], ["matrix", "Confusion matrix"]];
 const LESSONS = {
   several: ["With several predictors, logistic regression adds up one term per predictor (the predictor times its coefficient) plus an intercept. That sum is the log-odds, and the S-curve turns it into a probability_yes between 0 and 1. A coefficient's sign says which way its predictor pushes the probability: higher pressure raises the chance of a clear night, and more humidity lowers it, so changing the humidity slides the whole S-curve along the barometer.",
     "several predictors, and predicting held-back cases"],
   scale: ["Raw coefficients mostly reflect units: a predictor that barely changes from one case to the next gets a large coefficient for that reason alone. Scale each predictor to a mean of zero and a standard deviation of one, then rank the coefficients by size, ignoring the sign. Scaling changes the units of the coefficients, not the model: every case keeps the same probability.",
     "which predictors matter most"],
   judge: ["Accuracy is the share of calls that are right. When yes is rare, calling every case no scores a high accuracy and catches nothing. So report how many yes-cases were caught and how many were missed beside accuracy, never accuracy alone.",
+    "judging a classifier on held-back cases"],
+  matrix: ["A confusion matrix sorts every held-back case by what really happened and what the model called, giving four counts: caught (true positives), missed (false negatives), false alarms (false positives) and correctly called no (true negatives). Two numbers come from it. Precision is caught ÷ (caught + false alarms): of the cases the model called yes, the share that really were yes. Recall is caught ÷ (caught + missed): of the cases that really were yes, the share the model caught. Lowering the cut-off raises recall and lowers precision; raising it does the opposite.",
     "judging a classifier on held-back cases"],
 };
 const W = 960, H = 600;
@@ -56,9 +63,10 @@ export function mount(host, opts = {}) {
     scaled: !!s0.scaled,
     share: Number.isFinite(s0.share) ? s0.share : 0.3,
     night: Number.isFinite(s0.night) ? s0.night : 7,
+    cutoff: Number.isFinite(s0.cutoff) ? Math.max(0.1, Math.min(0.9, s0.cutoff)) : 0.5,
   };
   let dead = false;
-  const save = () => opts.onPegs && opts.onPegs({ tab: st.tab, scaled: st.scaled, share: st.share, night: st.night, pressure: st.pressure, humidity: st.humidity });
+  const save = () => opts.onPegs && opts.onPegs({ tab: st.tab, scaled: st.scaled, share: st.share, cutoff: st.cutoff, night: st.night, pressure: st.pressure, humidity: st.humidity });
 
   const F = shell(host, { cls: "scoreboard", tabs: TABS, W, H, onTab: (k) => api.setTab(k),
     ariaLabel: "The scoreboard: nights at the plate archive, two predictors' coefficients raw and scaled, and a held-back tally" });
@@ -232,20 +240,66 @@ export function mount(host, opts = {}) {
     });
   }
 
+  // ---------- tab 4: the confusion matrix, precision and recall ----------
+  const CELL = { caught: [YES, "#1a1208"], missed: ["none", YES], falseAlarm: [WRONG, "#1a1208"], rightNo: ["rgba(143,179,217,.28)", "none"] };
+  const matrixNow = () => confusion(tallyPool(st.share), st.cutoff);
+  const f2 = (v) => (v == null ? "none called" : v.toFixed(2));
+  function drawMatrix() {
+    const m = matrixNow();
+    txt(40, 24, `${m.n} held-back nights, ${m.yes} of them clear (yes)  ·  the model calls yes at a probability of ${st.cutoff.toFixed(2)} or more`, { size: 18, fill: "#cdbf9f" });
+    const GX = 170, GY = 112, CW = 200, CH = 172;
+    txt(GX + CW, 58, "What the model called", { anchor: "middle", size: 19, bold: true, fill: "#ffe39a" });
+    txt(GX + CW / 2, 88, "no", { anchor: "middle", size: 19, bold: true });
+    txt(GX + CW * 1.5, 88, "yes", { anchor: "middle", size: 19, bold: true });
+    const rl = svgEl(svg, "text", { x: 46, y: GY + CH, fill: "#ffe39a", "font-size": 19, "font-weight": "bold", "text-anchor": "middle", "dominant-baseline": "middle", transform: `rotate(-90 46 ${GY + CH})` }, "What really happened");
+    rl.setAttribute("class", "axislabel");
+    txt(GX - 14, GY + CH / 2 - 10, "cloudy", { anchor: "end", size: 19, bold: true }); txt(GX - 14, GY + CH / 2 + 14, "(no)", { anchor: "end", size: 16 });
+    txt(GX - 14, GY + CH * 1.5 - 10, "clear", { anchor: "end", size: 19, bold: true }); txt(GX - 14, GY + CH * 1.5 + 14, "(yes)", { anchor: "end", size: 16 });
+    // no before yes on both axes, the order R prints the book's confusion matrix in
+    const cells = [["rightNo", "correctly called no", "true negative", 0, 0], ["falseAlarm", "false alarm", "false positive", 1, 0],
+      ["missed", "missed", "false negative", 0, 1], ["caught", "caught", "true positive", 1, 1]];
+    for (const [k, name, term, c, r] of cells) {
+      const x0 = GX + c * CW, y0 = GY + r * CH, [fill, stroke] = CELL[k], good = k === "caught" || k === "rightNo";
+      svgEl(svg, "rect", { x: x0, y: y0, width: CW, height: CH, fill: good ? "rgba(127,211,255,.06)" : "rgba(255,122,92,.07)", stroke: "rgba(255,255,255,.35)", class: "mcell " + k });
+      txt(x0 + CW / 2, y0 + 22, name, { anchor: "middle", size: 18, bold: true, fill: k === "falseAlarm" ? "#ffc2b0" : "#f3e6c4" });
+      txt(x0 + CW / 2, y0 + 42, `(${term})`, { anchor: "middle", size: 15, italic: true, fill: "#cdbf9f" });
+      const cnt = m[k], per = 22, sq = 8;
+      for (let i = 0; i < cnt; i++) {
+        const cx = x0 + 3 + (i % per) * sq + (CW - 6 - per * sq) / 2, cy = y0 + 56 + Math.floor(i / per) * sq;
+        svgEl(svg, "rect", { x: cx + 1, y: cy + 1, width: sq - 2, height: sq - 2, rx: 1, fill, stroke, "stroke-width": k === "missed" ? 1.2 : 0.6 });
+      }
+      txt(x0 + CW / 2, y0 + CH - 18, String(cnt), { anchor: "middle", size: 30, bold: true, cls: "mcount " + k });
+    }
+    // precision and recall, each worked from its two cells
+    const RX = 640;
+    const block = (y0, title, def, num, den, v, numName, denName, colour) => {
+      txt(RX, y0, title, { size: 24, bold: true, fill: colour });
+      txt(RX, y0 + 28, def, { size: 16, italic: true, fill: "#cdbf9f" });
+      txt(RX, y0 + 56, `${numName} ÷ (${numName} + ${denName})`, { size: 17 });
+      txt(RX, y0 + 86, `${num} ÷ (${num} + ${den}) = ${f2(v)}`, { size: 22, bold: true, cls: title.toLowerCase() });
+      svgEl(svg, "rect", { x: RX, y: y0 + 106, width: 260, height: 14, rx: 7, fill: "rgba(255,255,255,.12)" });
+      if (v != null) svgEl(svg, "rect", { x: RX, y: y0 + 106, width: 260 * v, height: 14, rx: 7, fill: colour });
+    };
+    block(GY - 4, "Precision", "of the nights called yes, the share really clear", m.caught, m.falseAlarm, m.precision, "caught", "false alarms", "#ffe39a");
+    block(GY + 176, "Recall", "of the clear nights, the share the model caught", m.caught, m.missed, m.recall, "caught", "missed", BAR_POS);
+    txt(RX, GY + 340, `Accuracy: ${pct(m.accuracy)}  (caught + correctly called no)`, { size: 17, fill: "#cdbf9f" });
+    txt(480, 520, "Lower the cut-off: more yes calls, more caught and more false alarms, so recall rises and precision falls.", { anchor: "middle", size: 17, italic: true, fill: "#cdbf9f" });
+  }
+
   function draw() {
     if (dead) return;
     svg.replaceChildren();
-    if (st.tab === "several") drawSeveral(); else if (st.tab === "scale") drawScale(); else drawJudge();
+    if (st.tab === "several") drawSeveral(); else if (st.tab === "scale") drawScale(); else if (st.tab === "judge") drawJudge(); else drawMatrix();
     updateRead();
   }
 
   // ---------- panel ----------
-  let bRaw = null, bScaled = null, sShare = null, sPr = null, sHu = null;
+  let bRaw = null, bScaled = null, sShare = null, sPr = null, sHu = null, sCut = null;
   function buildPanel() {
     F.mark(st.tab);
     F.setLesson(...LESSONS[st.tab]);
     F.ctl.replaceChildren();
-    bRaw = bScaled = sShare = sPr = sHu = null;
+    bRaw = bScaled = sShare = sPr = sHu = sCut = null;
     if (st.tab === "several") {
       sHu = slider("Humidity (humidity_fraction)", { min: 0.4, max: 0.95, step: 0.01, value: st.humidity, fmt: (v) => v.toFixed(2), onInput: (v) => api.setReadings({ humidity: v }) });
       sPr = slider("Barometer (pressure_hpa)", { min: PV[0], max: PV[1], step: 1, value: st.pressure, fmt: (v) => v + " hPa", onInput: (v) => api.setReadings({ pressure: v }) });
@@ -259,6 +313,14 @@ export function mount(host, opts = {}) {
       const nrow = el("div", "clsbrow");
       nrow.append(el("span", null, "A night's probability:"), button("◀", "", () => stepNight(-1), "Previous night"), button("▶", "", () => stepNight(1), "Next night"));
       F.ctl.append(row, nrow);
+    } else if (st.tab === "matrix") {
+      sCut = slider("Cut-off (call yes at this probability or more)", { min: 0.1, max: 0.9, step: 0.05, value: st.cutoff, fmt: (v) => v.toFixed(2),
+        onInput: (v) => api.setCutoff(v) });
+      const row = el("div", "clsbrow");
+      row.append(button("0.3", "", () => api.setCutoff(0.3)), button("0.5", "", () => api.setCutoff(0.5)), button("0.7", "", () => api.setCutoff(0.7)));
+      sShare = slider("How many held-back nights are clear (yes)", { min: 0.02, max: 0.5, step: 0.01, value: st.share, fmt: (v) => pct(v),
+        onInput: (v) => api.setShare(v) });
+      F.ctl.append(sCut.el, row, sShare.el);
     } else {
       sShare = slider("How many held-back nights are clear (yes)", { min: 0.02, max: 0.5, step: 0.01, value: st.share, fmt: (v) => pct(v),
         onInput: (v) => api.setShare(v) });
@@ -285,6 +347,11 @@ export function mount(host, opts = {}) {
       t.appendChild(tb); R.append(t);
       const p = probBoth(st.night);
       R.append(para(`Night ${p.night} (${p.x[0]} hPa, humidity ${p.x[1].toFixed(2)}): probability_yes <b>${p.raw.toFixed(3)}</b> from the raw model and <b>${p.scaled.toFixed(3)}</b> from the scaled one.`, "probline"));
+    } else if (st.tab === "matrix") {
+      if (sCut) sCut.set(st.cutoff); if (sShare) sShare.set(st.share);
+      const m = matrixNow();
+      R.append(para(`At a cut-off of <b>${st.cutoff.toFixed(2)}</b>: caught <b>${m.caught}</b>, missed <b>${m.missed}</b>, false alarms <b>${m.falseAlarm}</b>, correctly called no <b>${m.rightNo}</b>.`),
+        para(`Precision <b>${f2(m.precision)}</b> · recall <b>${f2(m.recall)}</b> · accuracy <b>${pct(m.accuracy)}</b>.`));
     } else {
       if (sShare) sShare.set(st.share);
       const pool = tallyPool(st.share), m = judge(pool), a = judge(alwaysNo(pool));
@@ -296,7 +363,7 @@ export function mount(host, opts = {}) {
 
   const api = {
     ready: Promise.resolve(),
-    setTab(k) { if (!TABS.some(([kk]) => kk === k)) throw new Error("scoreboard: setTab needs several/scale/judge"); st.tab = k; save(); buildPanel(); draw(); },
+    setTab(k) { if (!TABS.some(([kk]) => kk === k)) throw new Error("scoreboard: setTab needs several/scale/judge/matrix"); st.tab = k; save(); buildPanel(); draw(); },
     tab: () => st.tab,
     setReadings({ pressure, humidity } = {}) {
       if (pressure != null) st.pressure = Math.max(PV[0], Math.min(PV[1], Math.round(+pressure)));
@@ -311,6 +378,9 @@ export function mount(host, opts = {}) {
     scaledCoefs: () => sc.coefs.slice(),
     probabilities: probBoth,
     setShare(v) { st.share = Math.max(0.02, Math.min(0.5, Math.round(+v * 100) / 100)); save(); draw(); },
+    setCutoff(v) { st.cutoff = Math.max(0.1, Math.min(0.9, Math.round(+v * 100) / 100)); save(); draw(); },
+    cutoff: () => st.cutoff,
+    matrix: () => matrixNow(),
     share: () => st.share,
     tally() { const pool = tallyPool(st.share); return { model: judge(pool), alwaysNo: judge(alwaysNo(pool)) }; },
     destroy() { if (dead) return; dead = true; F.root.remove(); },

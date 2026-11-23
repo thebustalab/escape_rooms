@@ -194,3 +194,19 @@ export function judge(cases) {
   return { n: cases.length, right, accuracy: cases.length ? right / cases.length : 0, yes: yes.length, caught, missed: yes.length - caught };
 }
 export const alwaysNo = (cases) => cases.map((c) => ({ ...c, call: "no" }));
+// The confusion matrix of a list of {truth, p}, called at a cut-off: the four cells (caught = true positive, missed =
+// false negative, false alarm = false positive, right no = true negative), precision (of the cases called yes, the
+// share really yes; null when nothing is called yes) and recall (of the real yes cases, the share caught; null when
+// there are none). With a cut-off, each case is called afresh from its p; without one, its own call is used.
+export function confusion(cases, cutoff = null) {
+  let caught = 0, missed = 0, falseAlarm = 0, rightNo = 0;
+  for (const c of cases) {
+    const call = cutoff != null ? callAt(c.p, cutoff) : c.call;
+    if (c.truth === "yes") { if (call === "yes") caught++; else missed++; } else if (call === "yes") falseAlarm++; else rightNo++;
+  }
+  const n = caught + missed + falseAlarm + rightNo;
+  return { n, caught, missed, falseAlarm, rightNo, yes: caught + missed, calledYes: caught + falseAlarm,
+    accuracy: n ? (caught + rightNo) / n : 0,
+    precision: caught + falseAlarm ? caught / (caught + falseAlarm) : null,
+    recall: caught + missed ? caught / (caught + missed) : null };
+}

@@ -252,7 +252,7 @@
    "tier": 3,
    "kind": "mcq",
    "title": "Caught and missed",
-   "question": "Use station_ledger. Fit a logistic regression model on the training days with the predictors tremor_level and sulfur_dioxide_tonnes_per_day (response eruption_within_week), then predict the held-back days with predictWithModel(). Of the held-back days followed by an eruption within the week (eruption_within_week is yes), on how many did the model say yes (caught), and on how many did it say no (missed)?",
+   "question": "Use station_ledger. Fit a logistic regression model on the training days with the predictors tremor_level and sulfur_dioxide_tonnes_per_day (response eruption_within_week), then predict the held-back days with predictWithModel(). Using the 0.5 cut-off (the predicted_class column), of the held-back days followed by an eruption within the week (eruption_within_week is yes), on how many did the model say yes (caught), and on how many did it say no (missed)?",
    "starter_code": "training_days <- station_ledger %>%\n  filter(record == \"training\")\nheld_back_days <- station_ledger %>%\n  filter(record == \"held back\")\n",
    "solution": "training_days <- station_ledger %>%\n  filter(record == \"training\")\nheld_back_days <- station_ledger %>%\n  filter(record == \"held back\")\n\nmodel <- buildModel(\n  data = training_days,\n  model_type = \"logistic_regression\",\n  predictors = c(\"tremor_level\", \"sulfur_dioxide_tonnes_per_day\"),\n  response = \"eruption_within_week\"\n)\n\npredictions <- predictWithModel(data = held_back_days, model = model)\n\npredictions %>%\n  filter(eruption_within_week == \"yes\") %>%\n  summarize(caught = sum(predicted_class == \"yes\"),\n            missed = sum(predicted_class == \"no\"))\n",
    "right_feedback": "Right: caught and missed together are every held-back eruption day.",
@@ -282,7 +282,7 @@
    "tier": 3,
    "kind": "mcq",
    "title": "Caught and missed",
-   "question": "Use station_ledger. Fit a logistic regression model on the training days with the predictors tremor_level, ground_swelling_cm and wind_speed_km_per_h (response eruption_within_week), then predict the held-back days with predictWithModel(). Of the held-back days followed by an eruption within the week (eruption_within_week is yes), on how many did the model say yes (caught), and on how many did it say no (missed)?",
+   "question": "Use station_ledger. Fit a logistic regression model on the training days with the predictors tremor_level, ground_swelling_cm and wind_speed_km_per_h (response eruption_within_week), then predict the held-back days with predictWithModel(). Using the 0.5 cut-off (the predicted_class column), of the held-back days followed by an eruption within the week (eruption_within_week is yes), on how many did the model say yes (caught), and on how many did it say no (missed)?",
    "starter_code": "training_days <- station_ledger %>%\n  filter(record == \"training\")\nheld_back_days <- station_ledger %>%\n  filter(record == \"held back\")\n",
    "solution": "training_days <- station_ledger %>%\n  filter(record == \"training\")\nheld_back_days <- station_ledger %>%\n  filter(record == \"held back\")\n\nmodel <- buildModel(\n  data = training_days,\n  model_type = \"logistic_regression\",\n  predictors = c(\"tremor_level\", \"ground_swelling_cm\", \"wind_speed_km_per_h\"),\n  response = \"eruption_within_week\"\n)\n\npredictions <- predictWithModel(data = held_back_days, model = model)\n\npredictions %>%\n  filter(eruption_within_week == \"yes\") %>%\n  summarize(caught = sum(predicted_class == \"yes\"),\n            missed = sum(predicted_class == \"no\"))\n",
    "right_feedback": "Right: caught and missed together are every held-back eruption day.",
@@ -312,7 +312,7 @@
    "tier": 3,
    "kind": "mcq",
    "title": "Caught and missed",
-   "question": "Use station_ledger. Fit a logistic regression model on the training days with the predictors quake_count, ground_swelling_cm, sulfur_dioxide_tonnes_per_day and air_temperature_c (response eruption_within_week), then predict the held-back days with predictWithModel(). Of the held-back days followed by an eruption within the week (eruption_within_week is yes), on how many did the model say yes (caught), and on how many did it say no (missed)?",
+   "question": "Use station_ledger. Fit a logistic regression model on the training days with the predictors quake_count, ground_swelling_cm, sulfur_dioxide_tonnes_per_day and air_temperature_c (response eruption_within_week), then predict the held-back days with predictWithModel(). Using the 0.5 cut-off (the predicted_class column), of the held-back days followed by an eruption within the week (eruption_within_week is yes), on how many did the model say yes (caught), and on how many did it say no (missed)?",
    "starter_code": "training_days <- station_ledger %>%\n  filter(record == \"training\")\nheld_back_days <- station_ledger %>%\n  filter(record == \"held back\")\n",
    "solution": "training_days <- station_ledger %>%\n  filter(record == \"training\")\nheld_back_days <- station_ledger %>%\n  filter(record == \"held back\")\n\nmodel <- buildModel(\n  data = training_days,\n  model_type = \"logistic_regression\",\n  predictors = c(\"quake_count\", \"ground_swelling_cm\", \"sulfur_dioxide_tonnes_per_day\", \"air_temperature_c\"),\n  response = \"eruption_within_week\"\n)\n\npredictions <- predictWithModel(data = held_back_days, model = model)\n\npredictions %>%\n  filter(eruption_within_week == \"yes\") %>%\n  summarize(caught = sum(predicted_class == \"yes\"),\n            missed = sum(predicted_class == \"no\"))\n",
    "right_feedback": "Right: caught and missed together are every held-back eruption day.",
@@ -342,7 +342,7 @@
    "tier": 3,
    "kind": "mcq",
    "title": "Caught and missed",
-   "question": "Use station_ledger. Fit a logistic regression model on the training days with the predictors gas_ratio, sulfur_dioxide_tonnes_per_day and air_temperature_c (response eruption_within_week), then predict the held-back days with predictWithModel(). Of the held-back days followed by an eruption within the week (eruption_within_week is yes), on how many did the model say yes (caught), and on how many did it say no (missed)?",
+   "question": "Use station_ledger. Fit a logistic regression model on the training days with the predictors gas_ratio, sulfur_dioxide_tonnes_per_day and air_temperature_c (response eruption_within_week), then predict the held-back days with predictWithModel(). Using the 0.5 cut-off (the predicted_class column), of the held-back days followed by an eruption within the week (eruption_within_week is yes), on how many did the model say yes (caught), and on how many did it say no (missed)?",
    "starter_code": "training_days <- station_ledger %>%\n  filter(record == \"training\")\nheld_back_days <- station_ledger %>%\n  filter(record == \"held back\")\n",
    "solution": "training_days <- station_ledger %>%\n  filter(record == \"training\")\nheld_back_days <- station_ledger %>%\n  filter(record == \"held back\")\n\nmodel <- buildModel(\n  data = training_days,\n  model_type = \"logistic_regression\",\n  predictors = c(\"gas_ratio\", \"sulfur_dioxide_tonnes_per_day\", \"air_temperature_c\"),\n  response = \"eruption_within_week\"\n)\n\npredictions <- predictWithModel(data = held_back_days, model = model)\n\npredictions %>%\n  filter(eruption_within_week == \"yes\") %>%\n  summarize(caught = sum(predicted_class == \"yes\"),\n            missed = sum(predicted_class == \"no\"))\n",
    "right_feedback": "Right: caught and missed together are every held-back eruption day.",
@@ -556,28 +556,28 @@
    "tier": 3,
    "kind": "mcq",
    "track": "day2",
-   "title": "The model or calling everything a spiral?",
-   "question": "Use survey_plates. Fit a logistic regression model on the training plates with the predictors concentration, axis_ratio and apparent_size_arcsec (response elliptical), then predict the held-back plates with predictWithModel(). Compare its accuracy with calling every held-back galaxy a spiral (always \"no\"). Which is more accurate, and how many of the held-back ellipticals does the model catch? (Calling everything a spiral catches none.)",
+   "title": "Accuracy, precision and recall",
+   "question": "Use survey_plates. Fit a logistic regression model on the training plates with the predictors concentration and axis_ratio (response elliptical), then predict the held-back plates with predictWithModel(). Using the 0.5 cut-off (the predicted_class column), compare its accuracy with calling every held-back galaxy a spiral (always \"no\"). Which is more accurate, and what are the model's precision and recall for ellipticals?",
    "starter_code": "training_plates <- survey_plates %>%\n  filter(record == \"training\")\nheld_back_plates <- survey_plates %>%\n  filter(record == \"held back\")\n",
-   "solution": "training_plates <- survey_plates %>%\n  filter(record == \"training\")\nheld_back_plates <- survey_plates %>%\n  filter(record == \"held back\")\n\nmodel <- buildModel(\n  data = training_plates,\n  model_type = \"logistic_regression\",\n  predictors = c(\"concentration\", \"axis_ratio\", \"apparent_size_arcsec\"),\n  response = \"elliptical\"\n)\n\npredictions <- predictWithModel(data = held_back_plates, model = model)\n\npredictions %>%\n  summarize(model_accuracy = mean(predicted_class == elliptical),\n            all_spiral_accuracy = mean(elliptical == \"no\"),\n            model_catches = sum(predicted_class == \"yes\" & elliptical == \"yes\"))\n",
-   "right_feedback": "Right: accuracy and catches can disagree, which is why you check both.",
-   "wrong_feedback": "Not that one. Compare the two accuracies on the held-back plates, then count the ellipticals whose predicted_class is yes.",
+   "solution": "training_plates <- survey_plates %>%\n  filter(record == \"training\")\nheld_back_plates <- survey_plates %>%\n  filter(record == \"held back\")\n\nmodel <- buildModel(\n  data = training_plates,\n  model_type = \"logistic_regression\",\n  predictors = c(\"concentration\", \"axis_ratio\"),\n  response = \"elliptical\"\n)\n\npredictions <- predictWithModel(data = held_back_plates, model = model)\n\npredictions %>%\n  summarize(model_accuracy = mean(predicted_class == elliptical),\n            all_spiral_accuracy = mean(elliptical == \"no\"))\n\npredictions %>%\n  summarize(precision = sum(elliptical == \"yes\" & predicted_class == \"yes\") /\n              sum(predicted_class == \"yes\"),\n            recall = sum(elliptical == \"yes\" & predicted_class == \"yes\") /\n              sum(elliptical == \"yes\"))\n",
+   "right_feedback": "Right: precision is caught out of everything called elliptical, recall is caught out of every real elliptical, and neither is accuracy.",
+   "wrong_feedback": "Not that one. Compare the two accuracies first. Then count caught, missed and false alarms: precision = caught / (caught + false alarms), recall = caught / (caught + missed).",
    "options": [
     {
      "id": "o0",
-     "text": "Calling everything a spiral is more accurate; the model catches 23"
+     "text": "Calling everything a spiral is more accurate; precision 0.418, recall 0.590"
     },
     {
      "id": "o1",
-     "text": "Calling everything a spiral is more accurate; the model catches 35"
+     "text": "Calling everything a spiral is more accurate; precision 0.439, recall 0.641"
     },
     {
      "id": "o2",
-     "text": "The model is more accurate; the model catches 23"
+     "text": "Calling everything a spiral is more accurate; precision 0.590, recall 0.418"
     },
     {
      "id": "o3",
-     "text": "The model is more accurate; the model catches 35"
+     "text": "The model is more accurate; precision 0.418, recall 0.590"
     }
    ],
    "answer": "o0"
@@ -587,62 +587,62 @@
    "tier": 3,
    "kind": "mcq",
    "track": "day2",
-   "title": "The model or calling everything a spiral?",
-   "question": "Use survey_plates. Fit a logistic regression model on the training plates with the predictors axis_ratio, apparent_size_arcsec and exposure_minutes (response elliptical), then predict the held-back plates with predictWithModel(). Compare its accuracy with calling every held-back galaxy a spiral (always \"no\"). Which is more accurate, and how many of the held-back ellipticals does the model catch? (Calling everything a spiral catches none.)",
+   "title": "Accuracy, precision and recall",
+   "question": "Use survey_plates. Fit a logistic regression model on the training plates with the predictors concentration, axis_ratio and apparent_size_arcsec (response elliptical), then predict the held-back plates with predictWithModel(). Using the 0.5 cut-off (the predicted_class column), compare its accuracy with calling every held-back galaxy a spiral (always \"no\"). Which is more accurate, and what are the model's precision and recall for ellipticals?",
    "starter_code": "training_plates <- survey_plates %>%\n  filter(record == \"training\")\nheld_back_plates <- survey_plates %>%\n  filter(record == \"held back\")\n",
-   "solution": "training_plates <- survey_plates %>%\n  filter(record == \"training\")\nheld_back_plates <- survey_plates %>%\n  filter(record == \"held back\")\n\nmodel <- buildModel(\n  data = training_plates,\n  model_type = \"logistic_regression\",\n  predictors = c(\"axis_ratio\", \"apparent_size_arcsec\", \"exposure_minutes\"),\n  response = \"elliptical\"\n)\n\npredictions <- predictWithModel(data = held_back_plates, model = model)\n\npredictions %>%\n  summarize(model_accuracy = mean(predicted_class == elliptical),\n            all_spiral_accuracy = mean(elliptical == \"no\"),\n            model_catches = sum(predicted_class == \"yes\" & elliptical == \"yes\"))\n",
-   "right_feedback": "Right: accuracy and catches can disagree, which is why you check both.",
-   "wrong_feedback": "Not that one. Compare the two accuracies on the held-back plates, then count the ellipticals whose predicted_class is yes.",
+   "solution": "training_plates <- survey_plates %>%\n  filter(record == \"training\")\nheld_back_plates <- survey_plates %>%\n  filter(record == \"held back\")\n\nmodel <- buildModel(\n  data = training_plates,\n  model_type = \"logistic_regression\",\n  predictors = c(\"concentration\", \"axis_ratio\", \"apparent_size_arcsec\"),\n  response = \"elliptical\"\n)\n\npredictions <- predictWithModel(data = held_back_plates, model = model)\n\npredictions %>%\n  summarize(model_accuracy = mean(predicted_class == elliptical),\n            all_spiral_accuracy = mean(elliptical == \"no\"))\n\npredictions %>%\n  summarize(precision = sum(elliptical == \"yes\" & predicted_class == \"yes\") /\n              sum(predicted_class == \"yes\"),\n            recall = sum(elliptical == \"yes\" & predicted_class == \"yes\") /\n              sum(elliptical == \"yes\"))\n",
+   "right_feedback": "Right: precision is caught out of everything called elliptical, recall is caught out of every real elliptical, and neither is accuracy.",
+   "wrong_feedback": "Not that one. Compare the two accuracies first. Then count caught, missed and false alarms: precision = caught / (caught + false alarms), recall = caught / (caught + missed).",
    "options": [
     {
      "id": "o0",
-     "text": "Calling everything a spiral is more accurate; the model catches 24"
+     "text": "Calling everything a spiral is more accurate; precision 0.134, recall 0.590"
     },
     {
      "id": "o1",
-     "text": "Calling everything a spiral is more accurate; the model catches 33"
+     "text": "Calling everything a spiral is more accurate; precision 0.397, recall 0.590"
     },
     {
      "id": "o2",
-     "text": "The model is more accurate; the model catches 24"
+     "text": "Calling everything a spiral is more accurate; precision 0.590, recall 0.397"
     },
     {
      "id": "o3",
-     "text": "The model is more accurate; the model catches 33"
+     "text": "The model is more accurate; precision 0.397, recall 0.590"
     }
    ],
-   "answer": "o0"
+   "answer": "o1"
   },
   {
    "id": "w23_s3",
    "tier": 3,
    "kind": "mcq",
    "track": "day2",
-   "title": "The model or calling everything a spiral?",
-   "question": "Use survey_plates. Fit a logistic regression model on the training plates with the predictors concentration and axis_ratio (response elliptical), then predict the held-back plates with predictWithModel(). Compare its accuracy with calling every held-back galaxy a spiral (always \"no\"). Which is more accurate, and how many of the held-back ellipticals does the model catch? (Calling everything a spiral catches none.)",
+   "title": "Accuracy, precision and recall",
+   "question": "Use survey_plates. Fit a logistic regression model on the training plates with the predictors axis_ratio, apparent_size_arcsec and exposure_minutes (response elliptical), then predict the held-back plates with predictWithModel(). Using the 0.5 cut-off (the predicted_class column), compare its accuracy with calling every held-back galaxy a spiral (always \"no\"). Which is more accurate, and what are the model's precision and recall for ellipticals?",
    "starter_code": "training_plates <- survey_plates %>%\n  filter(record == \"training\")\nheld_back_plates <- survey_plates %>%\n  filter(record == \"held back\")\n",
-   "solution": "training_plates <- survey_plates %>%\n  filter(record == \"training\")\nheld_back_plates <- survey_plates %>%\n  filter(record == \"held back\")\n\nmodel <- buildModel(\n  data = training_plates,\n  model_type = \"logistic_regression\",\n  predictors = c(\"concentration\", \"axis_ratio\"),\n  response = \"elliptical\"\n)\n\npredictions <- predictWithModel(data = held_back_plates, model = model)\n\npredictions %>%\n  summarize(model_accuracy = mean(predicted_class == elliptical),\n            all_spiral_accuracy = mean(elliptical == \"no\"),\n            model_catches = sum(predicted_class == \"yes\" & elliptical == \"yes\"))\n",
-   "right_feedback": "Right: accuracy and catches can disagree, which is why you check both.",
-   "wrong_feedback": "Not that one. Compare the two accuracies on the held-back plates, then count the ellipticals whose predicted_class is yes.",
+   "solution": "training_plates <- survey_plates %>%\n  filter(record == \"training\")\nheld_back_plates <- survey_plates %>%\n  filter(record == \"held back\")\n\nmodel <- buildModel(\n  data = training_plates,\n  model_type = \"logistic_regression\",\n  predictors = c(\"axis_ratio\", \"apparent_size_arcsec\", \"exposure_minutes\"),\n  response = \"elliptical\"\n)\n\npredictions <- predictWithModel(data = held_back_plates, model = model)\n\npredictions %>%\n  summarize(model_accuracy = mean(predicted_class == elliptical),\n            all_spiral_accuracy = mean(elliptical == \"no\"))\n\npredictions %>%\n  summarize(precision = sum(elliptical == \"yes\" & predicted_class == \"yes\") /\n              sum(predicted_class == \"yes\"),\n            recall = sum(elliptical == \"yes\" & predicted_class == \"yes\") /\n              sum(elliptical == \"yes\"))\n",
+   "right_feedback": "Right: precision is caught out of everything called elliptical, recall is caught out of every real elliptical, and neither is accuracy.",
+   "wrong_feedback": "Not that one. Compare the two accuracies first. Then count caught, missed and false alarms: precision = caught / (caught + false alarms), recall = caught / (caught + missed).",
    "options": [
     {
      "id": "o0",
-     "text": "Calling everything a spiral is more accurate; the model catches 23"
+     "text": "Calling everything a spiral is more accurate; precision 0.379, recall 0.564"
     },
     {
      "id": "o1",
-     "text": "Calling everything a spiral is more accurate; the model catches 32"
+     "text": "Calling everything a spiral is more accurate; precision 0.421, recall 0.615"
     },
     {
      "id": "o2",
-     "text": "The model is more accurate; the model catches 23"
+     "text": "Calling everything a spiral is more accurate; precision 0.615, recall 0.421"
     },
     {
      "id": "o3",
-     "text": "The model is more accurate; the model catches 32"
+     "text": "The model is more accurate; precision 0.421, recall 0.615"
     }
    ],
-   "answer": "o0"
+   "answer": "o1"
   }
  ]
 }

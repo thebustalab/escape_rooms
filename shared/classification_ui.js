@@ -12,9 +12,9 @@ const CSS = `
 .clsbtab:focus-visible, .clsb button:focus-visible, .clsb input:focus-visible { outline:2px solid #ffe39a; outline-offset:2px; }
 .clsbtab.on { background:linear-gradient(#a8742e,#7a5220); border-color:#e2b468; color:#fff6e0; }
 .clsbstage { display:flex; gap:16px; align-items:flex-start; justify-content:center; }
-.clsbsvg { display:block; flex:0 1 auto; width:min(calc(100% - 376px), calc(min(76vh, 100vh - 170px) * var(--clsbr, 1.6))); height:auto;
+.clsbsvg { display:block; flex:0 1 auto; width:min(calc(100% - 476px), calc(min(76vh, 100vh - 170px) * var(--clsbr, 1.6))); height:auto;
   background:#08111a; border-radius:10px; touch-action:none; -webkit-user-select:none; user-select:none; }
-.clsbpanel { flex:0 0 360px; display:flex; flex-direction:column; gap:12px; }
+.clsbpanel { flex:0 0 460px; display:flex; flex-direction:column; gap:12px; }
 .clsblesson { border-left:3px solid #e2b468; padding:2px 0 4px 11px; }
 .clsbhead { color:#e2b468; font-size:15px; font-weight:bold; letter-spacing:.08em; text-transform:uppercase; }
 .clsblessontext { font-size:clamp(17px, 1.25vw, 21px); line-height:1.42; margin:4px 0 6px; color:#fff1d6; }
@@ -23,9 +23,8 @@ const CSS = `
 .clsbrow { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
 .clsb button { background:#3b2a14; color:#f3e6c4; border:1px solid #8a6a32; border-radius:8px; padding:8px 14px; font:inherit; font-size:18px; cursor:pointer; }
 .clsb button:hover { border-color:#e0b55a; }
-.clsb button.primary { background:linear-gradient(#a8742e,#7a5220); border-color:#e2b468; color:#fff6e0; font-weight:bold; }
-.clsb button.tog { border-radius:16px; font-size:16px; padding:6px 12px; }
-.clsb button.tog[aria-pressed="true"] { background:#1f3a52; border-color:#9ccaf2; color:#eaf5ff; }
+/* one button look on both boards: every control button is the same brass rectangle; a toggle shows "on" in blue */
+.clsb button[aria-pressed="true"] { background:#1f3a52; border-color:#9ccaf2; color:#eaf5ff; }
 .clsb label.clsbslider { display:grid; grid-template-columns:1fr auto; gap:2px 10px; align-items:center; font-size:17px; }
 .clsb label.clsbslider input { grid-column:1 / -1; width:100%; accent-color:#e2b468; height:26px; }
 .clsb label.clsbslider output { color:#fff6e0; font-variant-numeric:tabular-nums; font-weight:bold; }
