@@ -69,6 +69,14 @@
       "plannedHotspots": [
         {
           "body": "Hard hats on hooks by the staff door: yellow, red and white.",
+          "box": [
+            0.333,
+            0.48,
+            0.397,
+            0.58
+          ],
+          "boxSource": "review:agent-vision",
+          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)",
           "type": "clue",
           "label": "The staff hat hooks",
           "gives": [
@@ -77,25 +85,10 @@
             "hat_white"
           ],
           "note": "Wearables (wear slots, engine delta 1). On the lobby side of the staff door (L1). Yellow, red and white hard hats on hooks.",
-          "pickup": true,
-          "box": [
-            0.333,
-            0.48,
-            0.397,
-            0.58
-          ],
-          "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)"
+          "pickup": true
         },
         {
           "body": "A guide's lanyard left on a bench, its badge face up.",
-          "type": "clue",
-          "label": "The guide's lanyard",
-          "gives": [
-            "badge_guide"
-          ],
-          "note": "Wearables (wear slots, engine delta 1). The day-look decoy: a guide badge passes the gate by day and is refused at night.",
-          "pickup": true,
           "box": [
             0.895,
             0.64,
@@ -103,17 +96,17 @@
             0.72
           ],
           "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)"
+          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)",
+          "type": "clue",
+          "label": "The guide's lanyard",
+          "gives": [
+            "badge_guide"
+          ],
+          "note": "Wearables (wear slots, engine delta 1). The day-look decoy: a guide badge passes the gate by day and is refused at night.",
+          "pickup": true
         },
         {
           "body": "A kitchen badge on the café counter.",
-          "type": "clue",
-          "label": "The kitchen badge on the café counter",
-          "gives": [
-            "badge_kitchen"
-          ],
-          "note": "Wearables (wear slots, engine delta 1). Decoy badge.",
-          "pickup": true,
           "box": [
             0.13,
             0.66,
@@ -121,20 +114,27 @@
             0.715
           ],
           "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)"
+          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)",
+          "type": "clue",
+          "label": "The kitchen badge on the café counter",
+          "gives": [
+            "badge_kitchen"
+          ],
+          "note": "Wearables (wear slots, engine delta 1). Decoy badge.",
+          "pickup": true
         },
         {
           "body": "A welcome poster beside the café: smiling guides in orange overalls under the line <i>Our team wears orange.</i>",
-          "type": "clue",
-          "label": "The welcome poster",
-          "note": "\"Our team wears orange\": the trap said outright once (notes.md). Orange is on everyone in every log, admitted or refused. Escape information, not a ladder clue (lobby is ungraded).",
           "box": [
             0.2004,
             0.4508,
             0.2404,
             0.5707
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "type": "clue",
+          "label": "The welcome poster",
+          "note": "\"Our team wears orange\": the trap said outright once (notes.md). Orange is on everyone in every log, admitted or refused. Escape information, not a ladder clue (lobby is ungraded)."
         },
         {
           "scanLog": {
@@ -206,11 +206,6 @@
               }
             ]
           },
-          "type": "instrument",
-          "kind": "scan_log",
-          "label": "The staff door's log",
-          "logFor": "L1",
-          "note": "Script-drawn entry log beside door L1 (engine delta 4: rows of HUD figures, tick or cross, sun or moon). The art supplies a BLANK board only (art constraint 2). Rows: notes.md -> ESCAPE DETAIL.",
           "box": [
             0.539,
             0.443,
@@ -218,7 +213,12 @@
             0.633
           ],
           "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)"
+          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)",
+          "type": "instrument",
+          "kind": "scan_log",
+          "label": "The staff door's log",
+          "logFor": "L1",
+          "note": "Script-drawn entry log beside door L1 (engine delta 4: rows of HUD figures, tick or cross, sun or moon). The art supplies a BLANK board only (art constraint 2). Rows: notes.md -> ESCAPE DETAIL."
         },
         {
           "scannerWeights": {
@@ -231,6 +231,18 @@
               }
             ],
             "opensAbove": 0.5
+          },
+          "box": [
+            0.464,
+            0.436,
+            0.514,
+            0.718
+          ],
+          "boxSource": "review:agent-vision",
+          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)",
+          "scanLines": {
+            "prompt": "Step into the scanner",
+            "refused": "The needle stops short of the line. The door stays shut."
           },
           "type": "door",
           "direction": "open",
@@ -259,24 +271,9 @@
             "log": "The staff door's log",
             "weights": "notes.md -> ESCAPE DETAIL -> The logs -> L1 (verify_logs.py)"
           },
-          "note": "Depicted door: a real object in the art, its destination visible from here. The door's box sits on its scanner panel (S-shaped dial, needle drawn by script over a blank panel; art constraint 1). Checks the outfit on the way IN only; passage only, never re-locks.",
-          "box": [
-            0.464,
-            0.436,
-            0.514,
-            0.718
-          ],
-          "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)"
+          "note": "Depicted door: a real object in the art, its destination visible from here. The door's box sits on its scanner panel (S-shaped dial, needle drawn by script over a blank panel; art constraint 1). Checks the outfit on the way IN only; passage only, never re-locks."
         },
         {
-          "type": "door",
-          "direction": "open",
-          "to": "pad",
-          "label": "The glass front doors",
-          "id": "to_pad",
-          "edge": "depicted",
-          "note": "Depicted door: a real object in the art, its destination visible from here. The lobby's glass front doors.",
           "box": [
             0.71,
             0.37,
@@ -284,7 +281,14 @@
             0.75
           ],
           "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)"
+          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)",
+          "type": "door",
+          "direction": "open",
+          "to": "pad",
+          "label": "The glass front doors",
+          "id": "to_pad",
+          "edge": "depicted",
+          "note": "Depicted door: a real object in the art, its destination visible from here. The lobby's glass front doors."
         }
       ],
       "authoring": {
@@ -1827,7 +1831,11 @@
             "weights": "notes.md -> ESCAPE DETAIL -> The logs -> L1 (verify_logs.py)"
           },
           "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)"
+          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)",
+          "scanLines": {
+            "prompt": "Step into the scanner",
+            "refused": "The needle stops short of the line. The door stays shut."
+          }
         },
         {
           "id": "to_pad",
@@ -1844,6 +1852,20 @@
           "edge": "depicted",
           "boxSource": "review:agent-vision",
           "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)"
+        }
+      ],
+      "sfx": [
+        {
+          "src": "audio/lobby_hall_hush_bed_a.mp3",
+          "volume": 0.3,
+          "mode": "loop"
+        },
+        {
+          "src": "audio/lobby_banner_flap.mp3",
+          "volume": 0.35,
+          "mode": "interval",
+          "gapMin": 12,
+          "gapMax": 30
         }
       ]
     },
@@ -1881,17 +1903,21 @@
               ]
             }
           },
-          "type": "puzzle",
-          "label": "The seismic record on the screens",
-          "form": "check",
-          "note": "Graded. Spec in this room's designNote; prompt and content at step 6.",
           "box": [
             0.3731,
             0.3359,
             0.6272,
             0.5991
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "type": "puzzle",
+          "label": "The seismic record on the screens",
+          "form": "check",
+          "note": "Graded. Spec in this room's designNote; prompt and content at step 6.",
+          "solveSfx": {
+            "src": "audio/solve_c_office_the_seismic_record_on_the_screens_ui_confirm.mp3",
+            "volume": 0.6
+          }
         },
         {
           "answer": "8371",
@@ -1900,6 +1926,14 @@
             "correct": "The keypad clicks green and the locker door swings open.",
             "wrong": "The keypad blinks red. This locker's code is not kept in the security block: your partner, on the plant side, can read it off a key tag in the turbine hall."
           },
+          "box": [
+            0.641,
+            0.454,
+            0.692,
+            0.571
+          ],
+          "boxSource": "review:agent-vision",
+          "boxNote": "eye-checked 2026-11-21/22 (Sonnet proposal, agent verified on overlay)",
           "type": "lock",
           "label": "The office locker",
           "partnerCode": "code_keytag",
@@ -1916,6 +1950,13 @@
             ]
           },
           "note": "Keypad (escape lock, never graded). A squat wall cabinet with a keypad on its solid door. Its code is on the key tag in the MACHINE player's turbine hall (control's first partner code). The number is step 6's, and it must not equal or contain any value in _scratch/ladder_key.csv nor any count the ladder's boss rungs produce or tempt (notes.md -> Step 4a -> Partner-code numerals).",
+          "solveSfx": {
+            "src": "audio/solve_c_office_the_office_locker_keypad_unlock.mp3",
+            "volume": 0.6
+          }
+        },
+        {
+          "body": "Inside the office locker, two hard hats on a shelf: one blue, one green.",
           "box": [
             0.641,
             0.454,
@@ -1923,10 +1964,7 @@
             0.571
           ],
           "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-21/22 (Sonnet proposal, agent verified on overlay)"
-        },
-        {
-          "body": "Inside the office locker, two hard hats on a shelf: one blue, one green.",
+          "boxNote": "eye-checked 2026-11-21/22 (Sonnet proposal, agent verified on overlay)",
           "type": "clue",
           "label": "The office locker",
           "gives": [
@@ -1947,38 +1985,23 @@
               "office_locker_open",
               true
             ]
-          },
-          "box": [
-            0.641,
-            0.454,
-            0.692,
-            0.571
-          ],
-          "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-21/22 (Sonnet proposal, agent verified on overlay)"
+          }
         },
         {
           "body": "The door register, open on the desk. In the margin, in a guard's hand: <i>Switchgear locker, turbine hall: 4813.</i>",
           "pickup": "The security office's door register: the switchgear locker in the turbine hall opens with 4813.",
-          "type": "clue",
-          "label": "The door register",
-          "note": "Shows the switchgear-locker code the MACHINE player needs (machine's first partner code). Read aloud; nothing is synced. Escape-critical information, the one legitimate kind of clue in a graded room. The number is step 6's, and it must not equal or contain any value in _scratch/ladder_key.csv nor any count the ladder's boss rungs produce or tempt (notes.md -> Step 4a -> Partner-code numerals).",
           "box": [
             0.1597,
             0.5389,
             0.2097,
             0.6074
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "type": "clue",
+          "label": "The door register",
+          "note": "Shows the switchgear-locker code the MACHINE player needs (machine's first partner code). Read aloud; nothing is synced. Escape-critical information, the one legitimate kind of clue in a graded room. The number is step 6's, and it must not equal or contain any value in _scratch/ladder_key.csv nor any count the ladder's boss rungs produce or tempt (notes.md -> Step 4a -> Partner-code numerals)."
         },
         {
-          "type": "door",
-          "direction": "back",
-          "to": "lobby",
-          "label": "The staff door back to the lobby",
-          "id": "to_lobby",
-          "edge": "depicted",
-          "note": "Return door (always walkable).",
           "box": [
             0.3,
             0.398,
@@ -1986,16 +2009,16 @@
             0.703
           ],
           "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-21/22 (Sonnet proposal, agent verified on overlay)"
+          "boxNote": "eye-checked 2026-11-21/22 (Sonnet proposal, agent verified on overlay)",
+          "type": "door",
+          "direction": "back",
+          "to": "lobby",
+          "label": "The staff door back to the lobby",
+          "id": "to_lobby",
+          "edge": "depicted",
+          "note": "Return door (always walkable)."
         },
         {
-          "type": "door",
-          "direction": "open",
-          "to": "c_roof",
-          "label": "The roof stair",
-          "id": "to_c_roof",
-          "edge": "cut",
-          "note": "Cut.",
           "box": [
             0.76,
             0.377,
@@ -2003,7 +2026,14 @@
             0.75
           ],
           "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-21/22 (Sonnet proposal, agent verified on overlay)"
+          "boxNote": "eye-checked 2026-11-21/22 (Sonnet proposal, agent verified on overlay)",
+          "type": "door",
+          "direction": "open",
+          "to": "c_roof",
+          "label": "The roof stair",
+          "id": "to_c_roof",
+          "edge": "cut",
+          "note": "Cut."
         }
       ],
       "authoring": {
@@ -2226,7 +2256,11 @@
               ]
             }
           },
-          "form": "check"
+          "form": "check",
+          "solveSfx": {
+            "src": "audio/solve_c_office_the_seismic_record_on_the_screens_ui_confirm.mp3",
+            "volume": 0.6
+          }
         },
         {
           "id": "the_office_locker",
@@ -2258,7 +2292,11 @@
             ]
           },
           "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-21/22 (Sonnet proposal, agent verified on overlay)"
+          "boxNote": "eye-checked 2026-11-21/22 (Sonnet proposal, agent verified on overlay)",
+          "solveSfx": {
+            "src": "audio/solve_c_office_the_office_locker_keypad_unlock.mp3",
+            "volume": 0.6
+          }
         },
         {
           "id": "the_office_locker_2",
@@ -2358,6 +2396,20 @@
             "video": "c_office/cine_base.mp4"
           }
         }
+      ],
+      "sfx": [
+        {
+          "src": "audio/c_office_extractor_bed_b.mp3",
+          "volume": 0.3,
+          "mode": "loop"
+        },
+        {
+          "src": "audio/c_office_fan_spinup.mp3",
+          "volume": 0.35,
+          "mode": "interval",
+          "gapMin": 12,
+          "gapMax": 30
+        }
       ]
     },
     {
@@ -2376,30 +2428,23 @@
       "designNote": "CONTROL scenery room, red 1 (Lucas 2026-11-08: control gets two fun rooms too). Across the security block's roof from the roof stair to the far stair: the camera mast; the crater, the monorail line and the harbor in view (a long-sightline room; rim cluster). The GPS/tilt mast stands on the outer flank NE of the crater in world.py, so it is IN VIEW from here, not on the roof (Lucas confirmed 2026-11-08).",
       "plannedHotspots": [
         {
+          "box": [
+            0.1356,
+            0.5052,
+            0.1946,
+            0.6952
+          ],
+          "boxSource": "moved:testplay",
+          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)",
           "type": "door",
           "direction": "back",
           "to": "c_office",
           "label": "Down the roof stair to the security office",
           "id": "to_c_office",
           "edge": "cut",
-          "note": "Return door (always walkable).",
-          "box": [
-            0.128,
-            0.51,
-            0.187,
-            0.7
-          ],
-          "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)"
+          "note": "Return door (always walkable)."
         },
         {
-          "type": "door",
-          "direction": "open",
-          "to": "c_cameras",
-          "label": "The far stair down",
-          "id": "to_c_cameras",
-          "edge": "depicted",
-          "note": "Depicted door: a real object in the art, its destination visible from here.",
           "box": [
             0.254,
             0.615,
@@ -2407,7 +2452,14 @@
             0.717
           ],
           "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)"
+          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)",
+          "type": "door",
+          "direction": "open",
+          "to": "c_cameras",
+          "label": "The far stair down",
+          "id": "to_c_cameras",
+          "edge": "depicted",
+          "note": "Depicted door: a real object in the art, its destination visible from here."
         }
       ],
       "authoring": {
@@ -5018,6 +5070,20 @@
             "video": "c_roof/cine_base.mp4"
           }
         }
+      ],
+      "sfx": [
+        {
+          "src": "audio/c_roof_rim_wind_bed_a.mp3",
+          "volume": 0.3,
+          "mode": "loop"
+        },
+        {
+          "src": "audio/c_roof_tarp_lift.mp3",
+          "volume": 0.35,
+          "mode": "interval",
+          "gapMin": 12,
+          "gapMax": 30
+        }
       ]
     },
     {
@@ -5026,6 +5092,7 @@
       "technique": "logistic regression, several predictors, held-back days",
       "puzzleType": 1,
       "phase": "analysis",
+      "built": true,
       "unlockedWhen": true,
       "role": "control",
       "mapPos": {
@@ -5054,6 +5121,14 @@
               ]
             }
           },
+          "box": [
+            0.36,
+            0.4,
+            0.64,
+            0.7
+          ],
+          "boxSource": "review:agent-vision",
+          "boxNote": "round 1 (2026-11-23), new still: console desk and both monitor rows",
           "type": "puzzle",
           "label": "The camera wall console",
           "form": "pick",
@@ -5062,14 +5137,10 @@
             "solved": "c_office"
           },
           "lockedBody": "The console holds this season's days, but it wants the security office's seismic model first.",
-          "box": [
-            0.36,
-            0.4,
-            0.64,
-            0.7
-          ],
-          "boxSource": "review:agent-vision",
-          "boxNote": "round 1 (2026-11-23), new still: console desk and both monitor rows"
+          "solveSfx": {
+            "src": "audio/solve_c_cameras_the_camera_wall_console_access_blip.mp3",
+            "volume": 0.6
+          }
         },
         {
           "scanLog": {
@@ -5157,11 +5228,6 @@
               }
             ]
           },
-          "type": "instrument",
-          "kind": "scan_log",
-          "label": "The server room door's log",
-          "logFor": "L2'",
-          "note": "Script-drawn entry log beside door L2' (engine delta 4: rows of HUD figures, tick or cross, sun or moon). The art supplies a BLANK board only (art constraint 2). Rows: notes.md -> ESCAPE DETAIL.",
           "box": [
             0.7593,
             0.3829,
@@ -5169,16 +5235,14 @@
             0.6318
           ],
           "boxNote": "eye-checked 2026-11-21/22 (Sonnet proposal, agent verified on overlay)",
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "type": "instrument",
+          "kind": "scan_log",
+          "label": "The server room door's log",
+          "logFor": "L2'",
+          "note": "Script-drawn entry log beside door L2' (engine delta 4: rows of HUD figures, tick or cross, sun or moon). The art supplies a BLANK board only (art constraint 2). Rows: notes.md -> ESCAPE DETAIL."
         },
         {
-          "type": "door",
-          "direction": "back",
-          "to": "c_roof",
-          "label": "Up the stair to the roof",
-          "id": "to_c_roof",
-          "edge": "depicted",
-          "note": "Return door (always walkable).",
           "box": [
             0.3041,
             0.4042,
@@ -5186,7 +5250,14 @@
             0.645
           ],
           "boxNote": "eye-checked 2026-11-21/22 (Sonnet proposal, agent verified on overlay)",
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "type": "door",
+          "direction": "back",
+          "to": "c_roof",
+          "label": "Up the stair to the roof",
+          "id": "to_c_roof",
+          "edge": "depicted",
+          "note": "Return door (always walkable)."
         },
         {
           "scannerWeights": {
@@ -5205,6 +5276,18 @@
             ],
             "opensAbove": 0.5
           },
+          "box": [
+            0.668,
+            0.4,
+            0.718,
+            0.77
+          ],
+          "boxNote": "round 1 (2026-11-23), new still: the steel door itself; the placer's box sat on the bare wall to its left",
+          "boxSource": "review:agent-vision",
+          "scanLines": {
+            "prompt": "Step into the scanner",
+            "refused": "The needle stops short of the line. The door stays shut."
+          },
           "type": "door",
           "direction": "open",
           "to": "c_server",
@@ -5219,15 +5302,7 @@
             "log": "The server room door's log",
             "weights": "notes.md -> ESCAPE DETAIL -> The logs -> L2' (verify_logs.py)"
           },
-          "note": "Depicted door: a real object in the art, its destination visible from here. The door's box sits on its scanner panel (S-shaped dial, needle drawn by script over a blank panel; art constraint 1). Checks the outfit on the way IN only; passage only, never re-locks.",
-          "box": [
-            0.668,
-            0.4,
-            0.718,
-            0.77
-          ],
-          "boxNote": "round 1 (2026-11-23), new still: the steel door itself; the placer's box sat on the bare wall to its left",
-          "boxSource": "review:agent-vision"
+          "note": "Depicted door: a real object in the art, its destination visible from here. The door's box sits on its scanner panel (S-shaped dial, needle drawn by script over a blank panel; art constraint 1). Checks the outfit on the way IN only; passage only, never re-locks."
         }
       ],
       "authoring": {
@@ -5434,7 +5509,11 @@
           },
           "lockedBody": "The console holds this season's days, but it wants the security office's seismic model first.",
           "boxSource": "review:agent-vision",
-          "boxNote": "round 1 (2026-11-23), new still: console desk and both monitor rows"
+          "boxNote": "round 1 (2026-11-23), new still: console desk and both monitor rows",
+          "solveSfx": {
+            "src": "audio/solve_c_cameras_the_camera_wall_console_access_blip.mp3",
+            "volume": 0.6
+          }
         },
         {
           "id": "the_server_room_door_s_log",
@@ -5590,12 +5669,29 @@
             "weights": "notes.md -> ESCAPE DETAIL -> The logs -> L2' (verify_logs.py)"
           },
           "boxNote": "round 1 (2026-11-23), new still: the steel door itself; the placer's box sat on the bare wall to its left",
-          "boxSource": "review:agent-vision"
+          "boxSource": "review:agent-vision",
+          "scanLines": {
+            "prompt": "Step into the scanner",
+            "refused": "The needle stops short of the line. The door stays shut."
+          }
         }
       ],
       "panorama": "c_cameras/scene.png",
-      "built": true,
-      "builtFrom": "l1_c_cameras_2.png"
+      "builtFrom": "l1_c_cameras_2.png",
+      "sfx": [
+        {
+          "src": "audio/c_cameras_stair_wind_bed_a.mp3",
+          "volume": 0.3,
+          "mode": "loop"
+        },
+        {
+          "src": "audio/c_cameras_lamp_cable_creak.mp3",
+          "volume": 0.35,
+          "mode": "interval",
+          "gapMin": 12,
+          "gapMax": 30
+        }
+      ]
     },
     {
       "key": "c_server",
@@ -5632,6 +5728,14 @@
               ]
             }
           },
+          "box": [
+            0.274,
+            0.41,
+            0.352,
+            0.67
+          ],
+          "boxSource": "review:agent-vision",
+          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)",
           "type": "puzzle",
           "label": "The server rack terminal",
           "form": "pick",
@@ -5640,47 +5744,43 @@
             "solved": "c_cameras"
           },
           "lockedBody": "The terminal shows this season's predictions; which reading drives them waits on the camera wall.",
-          "box": [
-            0.274,
-            0.41,
-            0.352,
-            0.67
-          ],
-          "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)"
+          "solveSfx": {
+            "src": "audio/solve_c_server_the_server_rack_terminal_ui_confirm.mp3",
+            "volume": 0.6
+          }
         },
         {
+          "box": [
+            0.6531,
+            0.2582,
+            0.7531,
+            0.8052
+          ],
+          "boxSource": "moved:testplay",
+          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)",
           "type": "door",
           "direction": "back",
           "to": "c_cameras",
           "label": "Back to the camera room",
           "id": "to_c_cameras",
           "edge": "depicted",
-          "note": "Return door (always walkable).",
-          "box": [
-            0.625,
-            0.31,
-            0.725,
-            0.857
-          ],
-          "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)"
+          "note": "Return door (always walkable)."
         },
         {
-          "type": "door",
-          "direction": "open",
-          "to": "c_vault",
-          "label": "The stair down into the rock",
-          "id": "to_c_vault",
-          "edge": "depicted",
-          "note": "Depicted door: a real object in the art, its destination visible from here.",
           "box": [
             0.464,
             0.4705,
             0.5363,
             0.8175
           ],
-          "boxSource": "draft:skeleton"
+          "boxSource": "draft:skeleton",
+          "type": "door",
+          "direction": "open",
+          "to": "c_vault",
+          "label": "The stair down into the rock",
+          "id": "to_c_vault",
+          "edge": "depicted",
+          "note": "Depicted door: a real object in the art, its destination visible from here."
         }
       ],
       "authoring": {
@@ -5882,7 +5982,11 @@
           },
           "lockedBody": "The terminal shows this season's predictions; which reading drives them waits on the camera wall.",
           "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)"
+          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)",
+          "solveSfx": {
+            "src": "audio/solve_c_server_the_server_rack_terminal_ui_confirm.mp3",
+            "volume": 0.6
+          }
         },
         {
           "id": "to_c_cameras",
@@ -5935,6 +6039,20 @@
             "video": "c_server/cine_base.mp4"
           }
         }
+      ],
+      "sfx": [
+        {
+          "src": "audio/c_server_rack_fans_bed_a.mp3",
+          "volume": 0.3,
+          "mode": "loop"
+        },
+        {
+          "src": "audio/c_server_contactor_thunk.mp3",
+          "volume": 0.35,
+          "mode": "interval",
+          "gapMin": 12,
+          "gapMax": 30
+        }
       ]
     },
     {
@@ -5953,13 +6071,6 @@
       "designNote": "CONTROL scenery room, red 3. Down a stair into the rock under the server room: the seismometer on its pier, an orange crack in the floor (the eruption reads in the near field). The villain's own lift up to his office is the way on.",
       "plannedHotspots": [
         {
-          "type": "door",
-          "direction": "back",
-          "to": "c_server",
-          "label": "Up the stair to the server room",
-          "id": "to_c_server",
-          "edge": "depicted",
-          "note": "Return door (always walkable).",
           "box": [
             0.31,
             0.37,
@@ -5967,16 +6078,16 @@
             0.7
           ],
           "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)"
+          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)",
+          "type": "door",
+          "direction": "back",
+          "to": "c_server",
+          "label": "Up the stair to the server room",
+          "id": "to_c_server",
+          "edge": "depicted",
+          "note": "Return door (always walkable)."
         },
         {
-          "type": "door",
-          "direction": "open",
-          "to": "c_villain",
-          "label": "His private lift",
-          "id": "to_c_villain",
-          "edge": "depicted",
-          "note": "Depicted door: a real object in the art, its destination visible from here.",
           "box": [
             0.695,
             0.32,
@@ -5984,7 +6095,14 @@
             0.725
           ],
           "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)"
+          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)",
+          "type": "door",
+          "direction": "open",
+          "to": "c_villain",
+          "label": "His private lift",
+          "id": "to_c_villain",
+          "edge": "depicted",
+          "note": "Depicted door: a real object in the art, its destination visible from here."
         }
       ],
       "authoring": {
@@ -6194,6 +6312,20 @@
             "video": "c_vault/cine_base.mp4"
           }
         }
+      ],
+      "sfx": [
+        {
+          "src": "audio/c_vault_rock_rumble_bed_a.mp3",
+          "volume": 0.3,
+          "mode": "loop"
+        },
+        {
+          "src": "audio/c_vault_seep_drip.mp3",
+          "volume": 0.35,
+          "mode": "interval",
+          "gapMin": 12,
+          "gapMax": 30
+        }
       ]
     },
     {
@@ -6230,6 +6362,14 @@
               ]
             }
           },
+          "box": [
+            0.645,
+            0.53,
+            0.688,
+            0.68
+          ],
+          "boxSource": "review:agent-vision",
+          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)",
           "type": "puzzle",
           "label": "The terminal on his desk",
           "form": "check",
@@ -6238,17 +6378,22 @@
             "solved": "c_server"
           },
           "lockedBody": "His terminal opens on the alarm's record; it is no use to you until you know what drives the risk.",
-          "box": [
-            0.645,
-            0.53,
-            0.688,
-            0.68
-          ],
-          "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)"
+          "solveSfx": {
+            "src": "audio/solve_c_villain_the_terminal_on_his_desk_machine_startup.mp3",
+            "volume": 0.6
+          }
         },
         {
           "body": "His copy station, a port beside the terminal on his desk.",
+          "box": [
+            0.125,
+            0.585,
+            0.217,
+            0.77
+          ],
+          "boxSource": "review:agent-vision",
+          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)",
+          "pickupLabel": "Copy your half onto the stick",
           "type": "clue",
           "label": "The copy station",
           "availableWhen": {
@@ -6262,24 +6407,12 @@
               "to": true
             }
           ],
-          "note": "Copy station: after this room's puzzle, copy your half of the real record onto the press-kit stick (the glossy brochure on it is overwritten). The gate checks the stick is carried and copied. Q5: copy here, in the boss room, so there is no return trip.",
-          "box": [
-            0.125,
-            0.585,
-            0.217,
-            0.77
-          ],
-          "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)"
+          "note": "Copy station: after this room's puzzle, copy your half of the real record onto the press-kit stick (the glossy brochure on it is overwritten). The gate checks the stick is carried and copied. Q5: copy here, in the boss room, so there is no return trip."
         },
         {
           "title": "Teaching a Machine to Warn",
           "body": "Whakaari, an island volcano off New Zealand, erupted one December day while tour groups were on the island, and many died. Researchers later trained an ensemble of decision trees on years of its monitoring record. Eruptions were so rare in that record that they rebalanced the training data, so the model could not score well by always saying no. Looking back, it would have warned hours ahead of the fatal eruption, though most of its alerts were followed by no eruption at all.",
           "credit": "Sources: Dempsey and colleagues, Nature Communications; Wikipedia, \"Whakaari / White Island eruption.\"",
-          "type": "plaque",
-          "label": "The printed study on his desk",
-          "plaque": true,
-          "note": "Wonder plaque 2 of 2: the Whakaari eruption classifier (Dempsey et al.), boxed ON the printed study itself (a small box on the open study on the desk; the crater view through the glass is a separate element with no hotspot), never a sign. Information only: readable whenever you are in the room, gated on nothing. WORDS ONLY, no numerals of any kind: no percentages, no counts, no alert levels, no dates (4b clue-budget panel: a figure on a plaque can stand in for an answer), e.g. 'raised above normal in the weeks before the eruption', no number words either;'decision-tree ensemble', not 'random forest' (TENTATIVE). Facts and sources: notes.md -> Plaque facts re-checked. Text at step 6.",
           "box": [
             0.4489,
             0.7307,
@@ -6287,16 +6420,13 @@
             0.8136
           ],
           "boxSource": "draft:skeleton",
-          "image": "plaques/printed_study.jpg?v=1"
+          "image": "plaques/printed_study.jpg?v=1",
+          "type": "plaque",
+          "label": "The printed study on his desk",
+          "plaque": true,
+          "note": "Wonder plaque 2 of 2: the Whakaari eruption classifier (Dempsey et al.), boxed ON the printed study itself (a small box on the open study on the desk; the crater view through the glass is a separate element with no hotspot), never a sign. Information only: readable whenever you are in the room, gated on nothing. WORDS ONLY, no numerals of any kind: no percentages, no counts, no alert levels, no dates (4b clue-budget panel: a figure on a plaque can stand in for an answer), e.g. 'raised above normal in the weeks before the eruption', no number words either;'decision-tree ensemble', not 'random forest' (TENTATIVE). Facts and sources: notes.md -> Plaque facts re-checked. Text at step 6."
         },
         {
-          "type": "door",
-          "direction": "back",
-          "to": "c_vault",
-          "label": "The lift down to the vault",
-          "id": "to_c_vault",
-          "edge": "depicted",
-          "note": "Return door (always walkable).",
           "box": [
             0.884,
             0.41,
@@ -6304,9 +6434,23 @@
             0.72
           ],
           "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)"
+          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)",
+          "type": "door",
+          "direction": "back",
+          "to": "c_vault",
+          "label": "The lift down to the vault",
+          "id": "to_c_vault",
+          "edge": "depicted",
+          "note": "Return door (always walkable)."
         },
         {
+          "box": [
+            0.7639,
+            0.4541,
+            0.8039,
+            0.5941
+          ],
+          "boxSource": "draft:skeleton",
           "type": "door",
           "direction": "open",
           "to": "pad",
@@ -6314,14 +6458,7 @@
           "id": "to_pad",
           "edge": "depicted",
           "oneWay": "fire stair: push bar inside, no handle on the pad side",
-          "note": "Depicted door: a real object in the art, its destination visible from here. Fire stair: push bar inside, no handle on the pad side.",
-          "box": [
-            0.7639,
-            0.4541,
-            0.8039,
-            0.5941
-          ],
-          "boxSource": "draft:skeleton"
+          "note": "Depicted door: a real object in the art, its destination visible from here. Fire stair: push bar inside, no handle on the pad side."
         }
       ],
       "onSolve": [
@@ -11609,7 +11746,11 @@
           },
           "lockedBody": "His terminal opens on the alarm's record; it is no use to you until you know what drives the risk.",
           "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)"
+          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)",
+          "solveSfx": {
+            "src": "audio/solve_c_villain_the_terminal_on_his_desk_machine_startup.mp3",
+            "volume": 0.6
+          }
         },
         {
           "id": "the_copy_station",
@@ -11634,7 +11775,8 @@
             }
           ],
           "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)"
+          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)",
+          "pickupLabel": "Copy your half onto the stick"
         },
         {
           "id": "the_printed_study_on_his_desk",
@@ -11704,6 +11846,20 @@
             "video": "c_villain/cine_base.mp4"
           }
         }
+      ],
+      "sfx": [
+        {
+          "src": "audio/c_villain_vent_roar_bed_b.mp3",
+          "volume": 0.3,
+          "mode": "loop"
+        },
+        {
+          "src": "audio/c_villain_grille_tick.mp3",
+          "volume": 0.35,
+          "mode": "interval",
+          "gapMin": 12,
+          "gapMax": 30
+        }
       ]
     },
     {
@@ -11723,6 +11879,14 @@
       "plannedHotspots": [
         {
           "body": "A crate of armbands by the turbine hall door: black, brown and gold.",
+          "box": [
+            0.12,
+            0.622,
+            0.194,
+            0.798
+          ],
+          "boxSource": "review:agent-vision",
+          "boxNote": "eye-checked 2026-11-21/22 (Sonnet proposal, agent verified on overlay)",
           "type": "clue",
           "label": "The armband crate",
           "gives": [
@@ -11731,25 +11895,10 @@
             "arm_gold"
           ],
           "note": "Wearables (wear slots, engine delta 1). Moved here from inside the turbine hall: there it sat behind its own door (L1').",
-          "pickup": true,
-          "box": [
-            0.12,
-            0.622,
-            0.194,
-            0.798
-          ],
-          "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-21/22 (Sonnet proposal, agent verified on overlay)"
+          "pickup": true
         },
         {
           "body": "A laundry cart of clean gray overalls.",
-          "type": "clue",
-          "label": "The laundry cart",
-          "gives": [
-            "ov_grey"
-          ],
-          "note": "Wearables (wear slots, engine delta 1). Gray overalls.",
-          "pickup": true,
           "box": [
             0.791,
             0.608,
@@ -11757,7 +11906,14 @@
             0.837
           ],
           "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-21/22 (Sonnet proposal, agent verified on overlay)"
+          "boxNote": "eye-checked 2026-11-21/22 (Sonnet proposal, agent verified on overlay)",
+          "type": "clue",
+          "label": "The laundry cart",
+          "gives": [
+            "ov_grey"
+          ],
+          "note": "Wearables (wear slots, engine delta 1). Gray overalls.",
+          "pickup": true
         },
         {
           "scanLog": {
@@ -11829,11 +11985,6 @@
               }
             ]
           },
-          "type": "instrument",
-          "kind": "scan_log",
-          "label": "The turbine hall door's log",
-          "logFor": "L1'",
-          "note": "Script-drawn entry log beside door L1' (engine delta 4: rows of HUD figures, tick or cross, sun or moon). The art supplies a BLANK board only (art constraint 2). Rows: notes.md -> ESCAPE DETAIL.",
           "box": [
             0.353,
             0.41,
@@ -11841,16 +11992,14 @@
             0.586
           ],
           "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-21/22 (Sonnet proposal, agent verified on overlay)"
+          "boxNote": "eye-checked 2026-11-21/22 (Sonnet proposal, agent verified on overlay)",
+          "type": "instrument",
+          "kind": "scan_log",
+          "label": "The turbine hall door's log",
+          "logFor": "L1'",
+          "note": "Script-drawn entry log beside door L1' (engine delta 4: rows of HUD figures, tick or cross, sun or moon). The art supplies a BLANK board only (art constraint 2). Rows: notes.md -> ESCAPE DETAIL."
         },
         {
-          "type": "door",
-          "direction": "back",
-          "to": "pad",
-          "label": "Up the plant stair to the rim",
-          "id": "to_pad",
-          "edge": "depicted",
-          "note": "Return door (always walkable).",
           "box": [
             0.71,
             0.384,
@@ -11858,7 +12007,14 @@
             0.732
           ],
           "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-21/22 (Sonnet proposal, agent verified on overlay)"
+          "boxNote": "eye-checked 2026-11-21/22 (Sonnet proposal, agent verified on overlay)",
+          "type": "door",
+          "direction": "back",
+          "to": "pad",
+          "label": "Up the plant stair to the rim",
+          "id": "to_pad",
+          "edge": "depicted",
+          "note": "Return door (always walkable)."
         },
         {
           "scannerWeights": {
@@ -11871,6 +12027,18 @@
               }
             ],
             "opensAbove": 0.5
+          },
+          "box": [
+            0.285,
+            0.471,
+            0.32,
+            0.688
+          ],
+          "boxSource": "review:agent-vision",
+          "boxNote": "eye-checked 2026-11-21/22 (Sonnet proposal, agent verified on overlay)",
+          "scanLines": {
+            "prompt": "Step into the scanner",
+            "refused": "The needle stops short of the line. The door stays shut."
           },
           "type": "door",
           "direction": "open",
@@ -11886,15 +12054,7 @@
             "log": "The turbine hall door's log",
             "weights": "notes.md -> ESCAPE DETAIL -> The logs -> L1' (verify_logs.py)"
           },
-          "note": "Depicted door: a real object in the art, its destination visible from here. The door's box sits on its scanner panel (S-shaped dial, needle drawn by script over a blank panel; art constraint 1). Checks the outfit on the way IN only; passage only, never re-locks.",
-          "box": [
-            0.285,
-            0.471,
-            0.32,
-            0.688
-          ],
-          "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-21/22 (Sonnet proposal, agent verified on overlay)"
+          "note": "Depicted door: a real object in the art, its destination visible from here. The door's box sits on its scanner panel (S-shaped dial, needle drawn by script over a blank panel; art constraint 1). Checks the outfit on the way IN only; passage only, never re-locks."
         }
       ],
       "authoring": {
@@ -14330,7 +14490,11 @@
             "weights": "notes.md -> ESCAPE DETAIL -> The logs -> L1' (verify_logs.py)"
           },
           "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-21/22 (Sonnet proposal, agent verified on overlay)"
+          "boxNote": "eye-checked 2026-11-21/22 (Sonnet proposal, agent verified on overlay)",
+          "scanLines": {
+            "prompt": "Step into the scanner",
+            "refused": "The needle stops short of the line. The door stays shut."
+          }
         },
         {
           "id": "clip_base",
@@ -14352,6 +14516,20 @@
             ],
             "video": "m_yard/cine_base.mp4"
           }
+        }
+      ],
+      "sfx": [
+        {
+          "src": "audio/m_yard_plant_hum_bed_b.mp3",
+          "volume": 0.3,
+          "mode": "loop"
+        },
+        {
+          "src": "audio/m_yard_condensate.mp3",
+          "volume": 0.35,
+          "mode": "interval",
+          "gapMin": 12,
+          "gapMax": 30
         }
       ]
     },
@@ -14389,10 +14567,6 @@
               ]
             }
           },
-          "type": "puzzle",
-          "label": "The plant's gas log",
-          "form": "check",
-          "note": "Graded. Spec in this room's designNote; prompt and content at step 6.",
           "box": [
             0.4615,
             0.5478,
@@ -14400,7 +14574,15 @@
             0.6681
           ],
           "boxSource": "draft:unconfirmed",
-          "boxNote": "unconfirmed: refine pass did not confirm it (refused or failed on its crop); first-pass box kept"
+          "boxNote": "unconfirmed: refine pass did not confirm it (refused or failed on its crop); first-pass box kept",
+          "type": "puzzle",
+          "label": "The plant's gas log",
+          "form": "check",
+          "note": "Graded. Spec in this room's designNote; prompt and content at step 6.",
+          "solveSfx": {
+            "src": "audio/solve_m_turbine_the_plant_s_gas_log_access_blip.mp3",
+            "volume": 0.6
+          }
         },
         {
           "answer": "4813",
@@ -14409,6 +14591,14 @@
             "correct": "The keypad clicks green and the locker door swings open.",
             "wrong": "The keypad blinks red. This locker's code is not kept in the plant: your partner, in the security office, can read it in the door register."
           },
+          "box": [
+            0.303,
+            0.458,
+            0.341,
+            0.676
+          ],
+          "boxSource": "review:agent-vision",
+          "boxNote": "eye-checked 2026-11-21/22 (Sonnet proposal, agent verified on overlay)",
           "type": "lock",
           "label": "The switchgear locker",
           "partnerCode": "code_register",
@@ -14425,6 +14615,13 @@
             ]
           },
           "note": "Keypad (escape lock, never graded). Keypad. Its code is on the door register in the CONTROL player's security office (machine's first partner code). The number is step 6's, and it must not equal or contain any value in _scratch/ladder_key.csv nor any count the ladder's boss rungs produce or tempt (notes.md -> Step 4a -> Partner-code numerals).",
+          "solveSfx": {
+            "src": "audio/solve_m_turbine_the_switchgear_locker_keypad_unlock.mp3",
+            "volume": 0.6
+          }
+        },
+        {
+          "body": "Inside the switchgear locker, a plant badge on a lanyard.",
           "box": [
             0.303,
             0.458,
@@ -14432,10 +14629,7 @@
             0.676
           ],
           "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-21/22 (Sonnet proposal, agent verified on overlay)"
-        },
-        {
-          "body": "Inside the switchgear locker, a plant badge on a lanyard.",
+          "boxNote": "eye-checked 2026-11-21/22 (Sonnet proposal, agent verified on overlay)",
           "type": "clue",
           "label": "The switchgear locker",
           "gives": [
@@ -14455,22 +14649,11 @@
               "switchgear_locker_open",
               true
             ]
-          },
-          "box": [
-            0.303,
-            0.458,
-            0.341,
-            0.676
-          ],
-          "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-21/22 (Sonnet proposal, agent verified on overlay)"
+          }
         },
         {
           "body": "A key tag on a hook by the switchgear, inked by hand: <i>Office locker, security office: 8371.</i>",
           "pickup": "The turbine hall's key tag: the office locker in the security office opens with 8371.",
-          "type": "clue",
-          "label": "The key tag",
-          "note": "Carries the office-locker code the CONTROL player needs (control's first partner code). Read aloud. Escape-critical information. The number is step 6's, and it must not equal or contain any value in _scratch/ladder_key.csv nor any count the ladder's boss rungs produce or tempt (notes.md -> Step 4a -> Partner-code numerals).",
           "box": [
             0.078,
             0.476,
@@ -14478,7 +14661,10 @@
             0.586
           ],
           "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-21/22 (Sonnet proposal, agent verified on overlay)"
+          "boxNote": "eye-checked 2026-11-21/22 (Sonnet proposal, agent verified on overlay)",
+          "type": "clue",
+          "label": "The key tag",
+          "note": "Carries the office-locker code the CONTROL player needs (control's first partner code). Read aloud. Escape-critical information. The number is step 6's, and it must not equal or contain any value in _scratch/ladder_key.csv nor any count the ladder's boss rungs produce or tempt (notes.md -> Step 4a -> Partner-code numerals)."
         },
         {
           "scanLog": {
@@ -14550,11 +14736,6 @@
               }
             ]
           },
-          "type": "instrument",
-          "kind": "scan_log",
-          "label": "The pipe gallery door's log",
-          "logFor": "L2",
-          "note": "Script-drawn entry log beside door L2 (engine delta 4: rows of HUD figures, tick or cross, sun or moon). The art supplies a BLANK board only (art constraint 2). Rows: notes.md -> ESCAPE DETAIL.",
           "box": [
             0.777,
             0.425,
@@ -14562,16 +14743,14 @@
             0.615
           ],
           "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-21/22 (Sonnet proposal, agent verified on overlay)"
+          "boxNote": "eye-checked 2026-11-21/22 (Sonnet proposal, agent verified on overlay)",
+          "type": "instrument",
+          "kind": "scan_log",
+          "label": "The pipe gallery door's log",
+          "logFor": "L2",
+          "note": "Script-drawn entry log beside door L2 (engine delta 4: rows of HUD figures, tick or cross, sun or moon). The art supplies a BLANK board only (art constraint 2). Rows: notes.md -> ESCAPE DETAIL."
         },
         {
-          "type": "door",
-          "direction": "back",
-          "to": "m_yard",
-          "label": "Back out to the yard",
-          "id": "to_m_yard",
-          "edge": "depicted",
-          "note": "Return door (always walkable).",
           "box": [
             0.166,
             0.425,
@@ -14579,7 +14758,14 @@
             0.685
           ],
           "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-21/22 (Sonnet proposal, agent verified on overlay)"
+          "boxNote": "eye-checked 2026-11-21/22 (Sonnet proposal, agent verified on overlay)",
+          "type": "door",
+          "direction": "back",
+          "to": "m_yard",
+          "label": "Back out to the yard",
+          "id": "to_m_yard",
+          "edge": "depicted",
+          "note": "Return door (always walkable)."
         },
         {
           "scannerWeights": {
@@ -14598,6 +14784,18 @@
             ],
             "opensAbove": 0.5
           },
+          "box": [
+            0.68,
+            0.457,
+            0.713,
+            0.659
+          ],
+          "boxSource": "review:agent-vision",
+          "boxNote": "eye-checked 2026-11-21/22 (Sonnet proposal, agent verified on overlay)",
+          "scanLines": {
+            "prompt": "Step into the scanner",
+            "refused": "The needle stops short of the line. The door stays shut."
+          },
           "type": "door",
           "direction": "open",
           "to": "m_pipes",
@@ -14613,15 +14811,7 @@
             "log": "The pipe gallery door's log",
             "weights": "notes.md -> ESCAPE DETAIL -> The logs -> L2 (verify_logs.py)"
           },
-          "note": "Depicted door: a real object in the art, its destination visible from here. The door's box sits on its scanner panel (S-shaped dial, needle drawn by script over a blank panel; art constraint 1). Checks the outfit on the way IN only; passage only, never re-locks.",
-          "box": [
-            0.68,
-            0.457,
-            0.713,
-            0.659
-          ],
-          "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-21/22 (Sonnet proposal, agent verified on overlay)"
+          "note": "Depicted door: a real object in the art, its destination visible from here. The door's box sits on its scanner panel (S-shaped dial, needle drawn by script over a blank panel; art constraint 1). Checks the outfit on the way IN only; passage only, never re-locks."
         }
       ],
       "authoring": {
@@ -14873,7 +15063,11 @@
               ]
             }
           },
-          "form": "check"
+          "form": "check",
+          "solveSfx": {
+            "src": "audio/solve_m_turbine_the_plant_s_gas_log_access_blip.mp3",
+            "volume": 0.6
+          }
         },
         {
           "id": "the_switchgear_locker",
@@ -14905,7 +15099,11 @@
             ]
           },
           "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-21/22 (Sonnet proposal, agent verified on overlay)"
+          "boxNote": "eye-checked 2026-11-21/22 (Sonnet proposal, agent verified on overlay)",
+          "solveSfx": {
+            "src": "audio/solve_m_turbine_the_switchgear_locker_keypad_unlock.mp3",
+            "volume": 0.6
+          }
         },
         {
           "id": "the_switchgear_locker_2",
@@ -15092,7 +15290,11 @@
             "weights": "notes.md -> ESCAPE DETAIL -> The logs -> L2 (verify_logs.py)"
           },
           "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-21/22 (Sonnet proposal, agent verified on overlay)"
+          "boxNote": "eye-checked 2026-11-21/22 (Sonnet proposal, agent verified on overlay)",
+          "scanLines": {
+            "prompt": "Step into the scanner",
+            "refused": "The needle stops short of the line. The door stays shut."
+          }
         },
         {
           "id": "clip_base",
@@ -15114,6 +15316,20 @@
             ],
             "video": "m_turbine/cine_base.mp4"
           }
+        }
+      ],
+      "sfx": [
+        {
+          "src": "audio/m_turbine_hall_bed_a.mp3",
+          "volume": 0.3,
+          "mode": "loop"
+        },
+        {
+          "src": "audio/m_turbine_whine.mp3",
+          "volume": 0.35,
+          "mode": "interval",
+          "gapMin": 12,
+          "gapMax": 30
         }
       ]
     },
@@ -15152,6 +15368,14 @@
               ]
             }
           },
+          "box": [
+            0.81,
+            0.35,
+            0.9,
+            0.67
+          ],
+          "boxSource": "review:agent-vision",
+          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)",
           "type": "puzzle",
           "label": "The sensor panel",
           "form": "pick",
@@ -15160,23 +15384,12 @@
             "solved": "m_turbine"
           },
           "lockedBody": "The panel holds this season's days, but it wants the turbine hall's gas model first.",
-          "box": [
-            0.81,
-            0.35,
-            0.9,
-            0.67
-          ],
-          "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)"
+          "solveSfx": {
+            "src": "audio/solve_m_pipes_the_sensor_panel_scanner_beep.mp3",
+            "volume": 0.6
+          }
         },
         {
-          "type": "door",
-          "direction": "back",
-          "to": "m_turbine",
-          "label": "Back to the turbine hall",
-          "id": "to_m_turbine",
-          "edge": "depicted",
-          "note": "Return door (always walkable).",
           "box": [
             0.128,
             0.285,
@@ -15184,23 +15397,30 @@
             0.865
           ],
           "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)"
+          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)",
+          "type": "door",
+          "direction": "back",
+          "to": "m_turbine",
+          "label": "Back to the turbine hall",
+          "id": "to_m_turbine",
+          "edge": "depicted",
+          "note": "Return door (always walkable)."
         },
         {
+          "box": [
+            0.6655,
+            0.458,
+            0.7606,
+            0.9823
+          ],
+          "boxSource": "moved:testplay",
           "type": "door",
           "direction": "open",
           "to": "m_sulphur",
           "label": "Down the steam-pipe corridor",
           "id": "to_m_sulphur",
           "edge": "travel",
-          "note": "Travel sequence (its own clip). Steam-pipe corridor down through the rim cut.",
-          "box": [
-            0.6677,
-            0.2911,
-            0.7628,
-            0.8154
-          ],
-          "boxSource": "draft:skeleton"
+          "note": "Travel sequence (its own clip). Steam-pipe corridor down through the rim cut."
         }
       ],
       "authoring": {
@@ -15428,7 +15648,11 @@
           },
           "lockedBody": "The panel holds this season's days, but it wants the turbine hall's gas model first.",
           "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)"
+          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)",
+          "solveSfx": {
+            "src": "audio/solve_m_pipes_the_sensor_panel_scanner_beep.mp3",
+            "volume": 0.6
+          }
         },
         {
           "id": "to_m_turbine",
@@ -15482,6 +15706,20 @@
             "video": "m_pipes/cine_base.mp4"
           }
         }
+      ],
+      "sfx": [
+        {
+          "src": "audio/m_pipes_boiler_bed_a.mp3",
+          "volume": 0.3,
+          "mode": "loop"
+        },
+        {
+          "src": "audio/m_pipes_steam_jet.mp3",
+          "volume": 0.35,
+          "mode": "interval",
+          "gapMin": 12,
+          "gapMax": 30
+        }
       ]
     },
     {
@@ -15519,6 +15757,14 @@
               ]
             }
           },
+          "box": [
+            0.417,
+            0.51,
+            0.449,
+            0.586
+          ],
+          "boxSource": "review:agent-vision",
+          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)",
           "type": "puzzle",
           "label": "The works control screen",
           "form": "pick",
@@ -15527,23 +15773,15 @@
             "solved": "m_pipes"
           },
           "lockedBody": "The screen shows this season's gas predictions; which reading drives them waits on the pipe gallery.",
-          "box": [
-            0.417,
-            0.51,
-            0.449,
-            0.586
-          ],
-          "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)"
+          "solveSfx": {
+            "src": "audio/solve_m_sulphur_the_works_control_screen_ui_confirm.mp3",
+            "volume": 0.6
+          }
         },
         {
           "title": "Yellow, Red and Blue",
           "body": "Every color on these pipes comes from the same element. Solid sulfur is lemon yellow. Melted, it turns deep red, and at the Kawah Ijen volcano in Indonesia it pours slowly from the ends of pipes like these, turning bright yellow again as it cools. Burning sulfur gives a blue flame: the blue fire that lights Ijen's crater at night is sulfur gas igniting as it escapes from cracks in the rock, sometimes in flames several times taller than a person.",
           "credit": "Sources: Wikipedia, \"Sulfur\" and \"Kawah Ijen.\"",
-          "type": "plaque",
-          "label": "The condenser pipes",
-          "plaque": true,
-          "note": "Wonder plaque 1 of 2: sulfur's colours, boxed ON the condenser pipes in the middle distance, dripping red to yellow (molten sulfur dark red, lemon yellow as it cools; the blue fire is burning sulfur). COLOURS ONLY: no temperatures, no pH, no numerals of any kind (4b clue-budget panel). Re-read the 'flows red' wording before print (only paraphrased in the source). Facts: notes.md -> Plaque facts re-checked. Text at step 6.",
           "box": [
             0.735,
             0.56,
@@ -15552,33 +15790,30 @@
           ],
           "boxSource": "review:agent-vision",
           "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)",
-          "image": "plaques/condenser_pipes.jpg?v=1"
+          "image": "plaques/condenser_pipes.jpg?v=1",
+          "type": "plaque",
+          "label": "The condenser pipes",
+          "plaque": true,
+          "note": "Wonder plaque 1 of 2: sulfur's colours, boxed ON the condenser pipes in the middle distance, dripping red to yellow (molten sulfur dark red, lemon yellow as it cools; the blue fire is burning sulfur). COLOURS ONLY: no temperatures, no pH, no numerals of any kind (4b clue-budget panel). Re-read the 'flows red' wording before print (only paraphrased in the source). Facts: notes.md -> Plaque facts re-checked. Text at step 6."
         },
         {
+          "box": [
+            0.088,
+            0.1557,
+            0.163,
+            0.6257
+          ],
+          "boxSource": "moved:testplay",
+          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)",
           "type": "door",
           "direction": "back",
           "to": "m_pipes",
           "label": "Up the steam-pipe corridor",
           "id": "to_m_pipes",
           "edge": "travel",
-          "note": "Return door (always walkable).",
-          "box": [
-            0.115,
-            0.3,
-            0.19,
-            0.77
-          ],
-          "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)"
+          "note": "Return door (always walkable)."
         },
         {
-          "type": "door",
-          "direction": "open",
-          "to": "m_catwalks",
-          "label": "The catwalk onto the vent field",
-          "id": "to_m_catwalks",
-          "edge": "cut",
-          "note": "Cut.",
           "box": [
             0.54,
             0.59,
@@ -15586,7 +15821,14 @@
             0.74
           ],
           "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)"
+          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)",
+          "type": "door",
+          "direction": "open",
+          "to": "m_catwalks",
+          "label": "The catwalk onto the vent field",
+          "id": "to_m_catwalks",
+          "edge": "cut",
+          "note": "Cut."
         }
       ],
       "authoring": {
@@ -21935,7 +22177,11 @@
           },
           "lockedBody": "The screen shows this season's gas predictions; which reading drives them waits on the pipe gallery.",
           "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)"
+          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)",
+          "solveSfx": {
+            "src": "audio/solve_m_sulphur_the_works_control_screen_ui_confirm.mp3",
+            "volume": 0.6
+          }
         },
         {
           "id": "the_condenser_pipes",
@@ -22008,6 +22254,20 @@
             "video": "m_sulphur/cine_base.mp4"
           }
         }
+      ],
+      "sfx": [
+        {
+          "src": "audio/m_sulphur_crater_bed_a.mp3",
+          "volume": 0.3,
+          "mode": "loop"
+        },
+        {
+          "src": "audio/m_sulphur_pour_sizzle.mp3",
+          "volume": 0.35,
+          "mode": "interval",
+          "gapMin": 12,
+          "gapMax": 30
+        }
       ]
     },
     {
@@ -22026,46 +22286,38 @@
       "designNote": "MACHINE scenery + route, red 3: the spectacle. The catwalk spine over the blue fire; sightline 3 (the plant's stacks on the rim, the summit dome). The crater stair's foot at the spine's E end: its tour gate at the top opens from below only (tours closed), so it is EXIT-ONLY up to the rim. The control room is a spur (a player may climb out without doing the boss, but cannot escape: the gate stays dark in their browser); the spine runs on W through the booth and out to the lake jetty (m_lake). The stacks were raised to 124 m (world.py, 2026-11-09) so they show over the E rim from here.",
       "plannedHotspots": [
         {
+          "box": [
+            0.4575,
+            0.5255,
+            0.5215,
+            0.5895
+          ],
+          "boxSource": "moved:testplay",
           "type": "door",
           "direction": "back",
           "to": "m_sulphur",
           "label": "Back along the catwalk to the sulfur works",
           "id": "to_m_sulphur",
           "edge": "cut",
-          "note": "Return door (always walkable).",
-          "box": [
-            0.468,
-            0.568,
-            0.532,
-            0.632
-          ],
-          "boxSource": "draft:skeleton"
+          "note": "Return door (always walkable)."
         },
         {
+          "box": [
+            0.8112,
+            0.489,
+            0.8592,
+            0.633
+          ],
+          "boxSource": "moved:testplay",
           "type": "door",
           "direction": "open",
           "to": "m_catctl",
           "label": "The control room door",
           "id": "to_m_catctl",
           "edge": "cut",
-          "note": "Cut.",
-          "box": [
-            0.776,
-            0.43,
-            0.824,
-            0.574
-          ],
-          "boxSource": "draft:skeleton"
+          "note": "Cut."
         },
         {
-          "type": "door",
-          "direction": "open",
-          "to": "pad",
-          "label": "The crater stair",
-          "id": "to_pad",
-          "edge": "depicted",
-          "oneWay": "crater stair; tour gate at the top opens from below only (tours closed)",
-          "note": "Depicted door: a real object in the art, its destination visible from here. Crater stair; tour gate at the top opens from below only (tours closed).",
           "box": [
             0.173,
             0.37,
@@ -22073,7 +22325,15 @@
             0.6
           ],
           "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)"
+          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)",
+          "type": "door",
+          "direction": "open",
+          "to": "pad",
+          "label": "The crater stair",
+          "id": "to_pad",
+          "edge": "depicted",
+          "oneWay": "crater stair; tour gate at the top opens from below only (tours closed)",
+          "note": "Depicted door: a real object in the art, its destination visible from here. Crater stair; tour gate at the top opens from below only (tours closed)."
         }
       ],
       "authoring": {
@@ -29355,6 +29615,20 @@
             "video": "m_catwalks/cine_base.mp4"
           }
         }
+      ],
+      "sfx": [
+        {
+          "src": "audio/m_catwalks_vent_bed_a.mp3",
+          "volume": 0.3,
+          "mode": "loop"
+        },
+        {
+          "src": "audio/m_catwalks_gas_jet.mp3",
+          "volume": 0.35,
+          "mode": "interval",
+          "gapMin": 12,
+          "gapMax": 30
+        }
       ]
     },
     {
@@ -29391,6 +29665,13 @@
               ]
             }
           },
+          "box": [
+            0.3158,
+            0.5528,
+            0.3758,
+            0.6138
+          ],
+          "boxSource": "draft:skeleton",
           "type": "puzzle",
           "label": "The catwalk control console",
           "form": "check",
@@ -29399,16 +29680,21 @@
             "solved": "m_sulphur"
           },
           "lockedBody": "The console logs every reading over the vents; it is no use to you until you know what drives the risk.",
-          "box": [
-            0.3158,
-            0.5528,
-            0.3758,
-            0.6138
-          ],
-          "boxSource": "draft:skeleton"
+          "solveSfx": {
+            "src": "audio/solve_m_catctl_the_catwalk_control_console_machine_startup.mp3",
+            "volume": 0.6
+          }
         },
         {
           "body": "The gas-sensor feed's cable cabinet, a port on its face.",
+          "box": [
+            0.1497,
+            0.3958,
+            0.1797,
+            0.7477
+          ],
+          "boxSource": "draft:skeleton",
+          "pickupLabel": "Copy your half onto the stick",
           "type": "clue",
           "label": "The cable cabinet",
           "availableWhen": {
@@ -29422,48 +29708,41 @@
               "to": true
             }
           ],
-          "note": "Copy station: after this room's puzzle, copy your half of the real record onto the press-kit stick (the glossy brochure on it is overwritten). The gate checks the stick is carried and copied. Q5: copy here, in the boss room, so there is no return trip. The gas-sensor feed: the label names only what the art shows, a cable cabinet.",
-          "box": [
-            0.1497,
-            0.3958,
-            0.1797,
-            0.7477
-          ],
-          "boxSource": "draft:skeleton"
+          "note": "Copy station: after this room's puzzle, copy your half of the real record onto the press-kit stick (the glossy brochure on it is overwritten). The gate checks the stick is carried and copied. Q5: copy here, in the boss room, so there is no return trip. The gas-sensor feed: the label names only what the art shows, a cable cabinet."
         },
         {
+          "box": [
+            0.3958,
+            0.266,
+            0.4958,
+            0.716
+          ],
+          "boxSource": "moved:testplay",
+          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)",
           "type": "door",
           "direction": "back",
           "to": "m_catwalks",
           "label": "Out onto the catwalks",
           "id": "to_m_catwalks",
           "edge": "cut",
-          "note": "Return door (always walkable).",
-          "box": [
-            0.41,
-            0.3,
-            0.51,
-            0.75
-          ],
-          "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)"
+          "note": "Return door (always walkable)."
         },
         {
+          "box": [
+            0.752,
+            0.2883,
+            0.847,
+            0.7483
+          ],
+          "boxSource": "moved:testplay",
+          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)",
           "type": "door",
           "direction": "open",
           "to": "m_lake",
           "label": "The west door to the lake jetty",
           "id": "to_m_lake",
           "edge": "depicted",
-          "note": "Depicted door: a real object in the art, its destination visible from here.",
-          "box": [
-            0.745,
-            0.31,
-            0.84,
-            0.77
-          ],
-          "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)"
+          "note": "Depicted door: a real object in the art, its destination visible from here."
         }
       ],
       "onSolve": [
@@ -35071,7 +35350,11 @@
           "availableWhen": {
             "solved": "m_sulphur"
           },
-          "lockedBody": "The console logs every reading over the vents; it is no use to you until you know what drives the risk."
+          "lockedBody": "The console logs every reading over the vents; it is no use to you until you know what drives the risk.",
+          "solveSfx": {
+            "src": "audio/solve_m_catctl_the_catwalk_control_console_machine_startup.mp3",
+            "volume": 0.6
+          }
         },
         {
           "id": "the_cable_cabinet",
@@ -35094,7 +35377,8 @@
               "set": "stick_copied",
               "to": true
             }
-          ]
+          ],
+          "pickupLabel": "Copy your half onto the stick"
         },
         {
           "id": "to_m_catwalks",
@@ -35149,6 +35433,20 @@
             "video": "m_catctl/cine_base.mp4"
           }
         }
+      ],
+      "sfx": [
+        {
+          "src": "audio/m_catctl_booth_bed_a.mp3",
+          "volume": 0.3,
+          "mode": "loop"
+        },
+        {
+          "src": "audio/m_catctl_fumarole_jet.mp3",
+          "volume": 0.35,
+          "mode": "interval",
+          "gapMin": 12,
+          "gapMax": 30
+        }
       ]
     },
     {
@@ -35167,21 +35465,21 @@
       "designNote": "MACHINE scenery, red 3: a close-up on the acid lake, a wonder otherwise seen only from far away. The sampling jetty at the west end of the catwalk spine: a small square steel deck on stilts reaching out over the lake's east edge, where the sampler that takes the lake acidity reading stands, depicted as a plain steel sampler housing with a hose down into the water, its face blank: no gauge, dial, display or digit. No puzzle, no clue hotspots and NO wonder plaque (the scenario is at its two-plaque cap, and a pH figure would collide with the dataset's pH values). Its one door is the booth's west door back to the catwalk control room, open both ways whether or not the boss is solved.",
       "plannedHotspots": [
         {
+          "box": [
+            0.1451,
+            0.3727,
+            0.2351,
+            0.6527
+          ],
+          "boxSource": "moved:testplay",
+          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)",
           "type": "door",
           "direction": "back",
           "to": "m_catctl",
           "label": "Back along the catwalk to the booth",
           "id": "to_m_catctl",
           "edge": "depicted",
-          "note": "Return door (always walkable).",
-          "box": [
-            0.16,
-            0.5,
-            0.25,
-            0.78
-          ],
-          "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)"
+          "note": "Return door (always walkable)."
         }
       ],
       "authoring": {
@@ -41139,6 +41437,20 @@
             "video": "m_lake/cine_base.mp4"
           }
         }
+      ],
+      "sfx": [
+        {
+          "src": "audio/m_lake_swell_bed_a.mp3",
+          "volume": 0.3,
+          "mode": "loop"
+        },
+        {
+          "src": "audio/m_lake_gas_gulp.mp3",
+          "volume": 0.35,
+          "mode": "interval",
+          "gapMin": 12,
+          "gapMax": 30
+        }
       ]
     },
     {
@@ -41156,23 +41468,31 @@
       "designNote": "SHARED HUB, red 1. The open rim pad between the lobby (N), the monorail platform (centre) and the locker room (S). Doors: back into the lobby; machine's role door (the staff gate at the head of the plant stair, S past the locker room); the platform ahead. ARRIVING HERE, EXIT-ONLY: the fire-stair door from the owner's office (no handle on this side) and the crater stair's tour gate (locked from this side); draw both visibly handle-less/locked so they do not read as interactive, and give neither a hotspot. Exists so the platform need not depict seven transitions.",
       "plannedHotspots": [
         {
+          "box": [
+            0.827,
+            0.5542,
+            0.86,
+            0.6592
+          ],
+          "boxSource": "moved:testplay",
+          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)",
           "type": "door",
           "direction": "back",
           "to": "lobby",
           "label": "Back into the tour lobby",
           "id": "to_lobby",
           "edge": "depicted",
-          "note": "Return door (always walkable).",
-          "box": [
-            0.797,
-            0.565,
-            0.83,
-            0.67
-          ],
-          "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)"
+          "note": "Return door (always walkable)."
         },
         {
+          "box": [
+            0.103,
+            0.6,
+            0.147,
+            0.668
+          ],
+          "boxSource": "review:agent-vision",
+          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)",
           "type": "door",
           "direction": "open",
           "to": "m_yard",
@@ -41192,32 +41512,24 @@
             ]
           },
           "lockedBody": "Your partner went down the plant stair. You take the staff door in the tour lobby: one of you works each side.",
-          "note": "Depicted door: a real object in the art, its destination visible from here. Staff gate at the head of the plant stair.",
-          "box": [
-            0.103,
-            0.6,
-            0.147,
-            0.668
-          ],
-          "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)"
+          "note": "Depicted door: a real object in the art, its destination visible from here. Staff gate at the head of the plant stair."
         },
         {
+          "box": [
+            0.2243,
+            0.5177,
+            0.3193,
+            0.6927
+          ],
+          "boxSource": "moved:testplay",
+          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)",
           "type": "door",
           "direction": "open",
           "to": "platform",
           "label": "The monorail platform",
           "id": "to_platform",
           "edge": "depicted",
-          "note": "Depicted door: a real object in the art, its destination visible from here.",
-          "box": [
-            0.205,
-            0.5,
-            0.3,
-            0.675
-          ],
-          "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)"
+          "note": "Depicted door: a real object in the art, its destination visible from here."
         }
       ],
       "authoring": {
@@ -44505,6 +44817,20 @@
             "video": "pad/cine_base.mp4"
           }
         }
+      ],
+      "sfx": [
+        {
+          "src": "audio/pad_roar_bed_b.mp3",
+          "volume": 0.3,
+          "mode": "loop"
+        },
+        {
+          "src": "audio/pad_gust.mp3",
+          "volume": 0.35,
+          "mode": "interval",
+          "gapMin": 12,
+          "gapMax": 30
+        }
       ]
     },
     {
@@ -44543,6 +44869,14 @@
               "body": "The gate panel is dark apart from its keypad. Under it, a label: <i>Station power.</i>"
             }
           ],
+          "box": [
+            0.378,
+            0.555,
+            0.404,
+            0.66
+          ],
+          "boxSource": "review:agent-vision",
+          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)",
           "type": "lock",
           "label": "The gate panel",
           "partnerCode": "code_power",
@@ -44553,14 +44887,10 @@
             }
           ],
           "note": "ONE hotspot for the one panel (its display and keypad merged, 4b panel). Until station_power its modal is the DARK panel with its keypad: in CONTROL's browser, keying the power code machine reads aloud powers the station (control's second partner code). Once station_power is set (MACHINE's browser: the machine boss; CONTROL's: the code keyed) the modal shows the LIT display carrying the power code, which MACHINE reads aloud. On the station's power circuit with the locker-room door. Art: dark in the base, lit in the station_power variant (art constraint 4, blueprint_options.md 3). Engine: a lock whose modal depends on station_power (step 6). The number is step 6's, and it must not equal or contain any value in _scratch/ladder_key.csv nor any count the ladder's boss rungs produce or tempt (notes.md -> Step 4a -> Partner-code numerals).",
-          "box": [
-            0.378,
-            0.555,
-            0.404,
-            0.66
-          ],
-          "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)"
+          "solveSfx": {
+            "src": "audio/solve_platform_the_gate_panel_machine_startup.mp3",
+            "volume": 0.6
+          }
         },
         {
           "scanLog": {
@@ -44688,37 +45018,45 @@
               }
             ]
           },
+          "box": [
+            0.1888,
+            0.4221,
+            0.2288,
+            0.7021
+          ],
+          "boxSource": "moved:testplay",
+          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)",
           "type": "instrument",
           "kind": "scan_log",
           "label": "The gate's log",
           "logFor": "GATE",
-          "note": "Script-drawn entry log beside door GATE (engine delta 4: rows of HUD figures, tick or cross, sun or moon). The art supplies a BLANK board only (art constraint 2). Rows: notes.md -> ESCAPE DETAIL.",
-          "box": [
-            0.19,
-            0.48,
-            0.23,
-            0.76
-          ],
-          "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)"
+          "note": "Script-drawn entry log beside door GATE (engine delta 4: rows of HUD figures, tick or cross, sun or moon). The art supplies a BLANK board only (art constraint 2). Rows: notes.md -> ESCAPE DETAIL."
         },
         {
+          "box": [
+            0.0811,
+            0.389,
+            0.2011,
+            0.699
+          ],
+          "boxSource": "moved:testplay",
           "type": "door",
           "direction": "back",
           "to": "pad",
           "label": "Back across the rim",
           "id": "to_pad",
           "edge": "depicted",
-          "note": "Return door (always walkable).",
-          "box": [
-            0.055,
-            0.69,
-            0.175,
-            1
-          ],
-          "boxSource": "draft:skeleton"
+          "note": "Return door (always walkable)."
         },
         {
+          "box": [
+            0.482,
+            0.52,
+            0.508,
+            0.625
+          ],
+          "boxSource": "review:agent-vision",
+          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)",
           "type": "door",
           "direction": "open",
           "to": "lockers",
@@ -44732,15 +45070,7 @@
             ]
           },
           "lockedBody": "The locker-room door is on the station's power, and the station is dark for the night. Power comes back when the gas half of the record is finished in the catwalk control room, and the gate panel on this platform lights up when it does.",
-          "note": "Depicted door: a real object in the art, its destination visible from here. Locker-room door on station power.",
-          "box": [
-            0.482,
-            0.52,
-            0.508,
-            0.625
-          ],
-          "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)"
+          "note": "Depicted door: a real object in the art, its destination visible from here. Locker-room door on station power."
         },
         {
           "scannerWeights": {
@@ -44793,6 +45123,19 @@
               "body": "The gate's scanner looks for the record you came for. Copy your half onto the press-kit stick first, in the room of your last puzzle."
             }
           ],
+          "box": [
+            0.262,
+            0.58,
+            0.376,
+            0.735
+          ],
+          "boxSource": "review:agent-vision",
+          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)",
+          "scanLines": {
+            "prompt": "Step into the scanner",
+            "refused": "The needle stops short of the line. The gate stays shut.",
+            "lockdown": "The scanner sounds an alarm and the gate locks down. You fall back to the staff locker room until it resets."
+          },
           "type": "door",
           "direction": "open",
           "to": "ride",
@@ -44818,15 +45161,30 @@
             "lockdownTo": "lockers"
           },
           "oneWay": "the last car leaves: the ride down to the harbor hotel ends the escape",
-          "note": "Travel sequence (its own clip). The door's box sits on its scanner panel (S-shaped dial, needle drawn by script over a blank panel; art constraint 1). Checks the outfit on the way IN only; passage only, never re-locks.",
-          "box": [
-            0.262,
-            0.58,
-            0.376,
-            0.735
-          ],
-          "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)"
+          "availableWhen": {
+            "all": [
+              {
+                "eq": [
+                  "station_power",
+                  true
+                ]
+              },
+              {
+                "eq": [
+                  "stick_copied",
+                  true
+                ]
+              },
+              {
+                "eq": [
+                  "has_stick",
+                  true
+                ]
+              }
+            ]
+          },
+          "lockedBody": "The monorail gate stays shut.",
+          "note": "Travel sequence (its own clip). The door's box sits on its scanner panel (S-shaped dial, needle drawn by script over a blank panel; art constraint 1). Checks the outfit on the way IN only; passage only, never re-locks."
         }
       ],
       "authoring": {
@@ -51624,7 +51982,11 @@
             }
           ],
           "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)"
+          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)",
+          "solveSfx": {
+            "src": "audio/solve_platform_the_gate_panel_machine_startup.mp3",
+            "volume": 0.6
+          }
         },
         {
           "id": "the_gate_s_log",
@@ -51887,7 +52249,35 @@
           },
           "oneWay": "the last car leaves: the ride down to the harbor hotel ends the escape",
           "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)"
+          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)",
+          "scanLines": {
+            "prompt": "Step into the scanner",
+            "refused": "The needle stops short of the line. The gate stays shut.",
+            "lockdown": "The scanner sounds an alarm and the gate locks down. You fall back to the staff locker room until it resets."
+          },
+          "availableWhen": {
+            "all": [
+              {
+                "eq": [
+                  "station_power",
+                  true
+                ]
+              },
+              {
+                "eq": [
+                  "stick_copied",
+                  true
+                ]
+              },
+              {
+                "eq": [
+                  "has_stick",
+                  true
+                ]
+              }
+            ]
+          },
+          "lockedBody": "The monorail gate stays shut."
         },
         {
           "id": "station_power_wash",
@@ -51963,6 +52353,31 @@
             "state": "station_power"
           }
         }
+      ],
+      "sfx": [
+        {
+          "src": "audio/platform_dark_roar_bed_b.mp3",
+          "volume": 0.3,
+          "mode": "loop",
+          "states": [
+            "base"
+          ]
+        },
+        {
+          "src": "audio/platform_powered_hum_bed_b.mp3",
+          "volume": 0.3,
+          "mode": "loop",
+          "states": [
+            "station_power"
+          ]
+        },
+        {
+          "src": "audio/platform_windsock_flutter.mp3",
+          "volume": 0.35,
+          "mode": "interval",
+          "gapMin": 12,
+          "gapMax": 30
+        }
       ]
     },
     {
@@ -51986,6 +52401,14 @@
             "correct": "The keypad clicks green and the locker door swings open.",
             "wrong": "The keypad blinks red. Its reset number is on a maintenance tag inside the locker door, and the locker springs open on your partner's side once the seismic half of the record is done: your partner can read the number to you."
           },
+          "box": [
+            0.598,
+            0.377,
+            0.655,
+            0.81
+          ],
+          "boxSource": "review:agent-vision",
+          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)",
           "type": "lock",
           "label": "The tall steel locker",
           "partnerCode": "code_reset",
@@ -52002,17 +52425,21 @@
             ]
           },
           "note": "Keypad (escape lock, never graded). The badge locker's keypad, shut in the base art, nothing inside painted. In CONTROL's browser the control boss springs it (badge_locker_open), so the keypad is gone there; in MACHINE's, keying the reset number opens it (machine's second partner code). The number is step 6's, and it must not equal or contain any value in _scratch/ladder_key.csv nor any count the ladder's boss rungs produce or tempt (notes.md -> Step 4a -> Partner-code numerals).",
-          "box": [
-            0.598,
-            0.377,
-            0.655,
-            0.81
-          ],
-          "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)"
+          "solveSfx": {
+            "src": "audio/solve_lockers_the_tall_steel_locker_locker_door.mp3",
+            "volume": 0.6
+          }
         },
         {
           "body": "Overalls on the rail: gray, white and navy.",
+          "box": [
+            0.165,
+            0.37,
+            0.3,
+            0.78
+          ],
+          "boxSource": "review:agent-vision",
+          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)",
           "type": "clue",
           "label": "The overalls rail",
           "gives": [
@@ -52021,18 +52448,18 @@
             "ov_navy"
           ],
           "note": "Wearables (wear slots, engine delta 1). Gray, white, navy (orange is what they arrived in).",
-          "pickup": true,
-          "box": [
-            0.165,
-            0.37,
-            0.3,
-            0.78
-          ],
-          "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)"
+          "pickup": true
         },
         {
           "body": "Hard hats on the shelf: yellow, white, red and green.",
+          "box": [
+            0.05,
+            0.43,
+            0.152,
+            0.52
+          ],
+          "boxSource": "review:agent-vision",
+          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)",
           "type": "clue",
           "label": "The hat shelf",
           "gives": [
@@ -52042,18 +52469,17 @@
             "hat_green"
           ],
           "note": "Wearables (wear slots, engine delta 1). NO blue hat (Lucas, 2026-11-08): with one here, control could skip the key-tag swap once machine had powered the station (check 5b). Hats carry no weight at the gate anyway.",
-          "pickup": true,
-          "box": [
-            0.05,
-            0.43,
-            0.152,
-            0.52
-          ],
-          "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)"
+          "pickup": true
         },
         {
           "body": "Armbands on the rack: black, purple, silver, pink, brown and gold.",
+          "box": [
+            0.3179,
+            0.4478,
+            0.3982,
+            0.5917
+          ],
+          "boxSource": "draft:skeleton",
           "type": "clue",
           "label": "The armband rack",
           "gives": [
@@ -52065,17 +52491,18 @@
             "arm_gold"
           ],
           "note": "Wearables (wear slots, engine delta 1). All six armbands.",
-          "pickup": true,
-          "box": [
-            0.3179,
-            0.4478,
-            0.3982,
-            0.5917
-          ],
-          "boxSource": "draft:skeleton"
+          "pickup": true
         },
         {
           "body": "Staff badges hang inside on hooks, one of each kind: engineer, plant, guide and kitchen. A maintenance tag is wired inside the door: <i>Locker reset 1739.</i>",
+          "box": [
+            0.598,
+            0.377,
+            0.655,
+            0.81
+          ],
+          "boxSource": "review:agent-vision",
+          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)",
           "type": "clue",
           "label": "The tall steel locker",
           "gives": [
@@ -52098,24 +52525,9 @@
               "badge_locker_open",
               true
             ]
-          },
-          "box": [
-            0.598,
-            0.377,
-            0.655,
-            0.81
-          ],
-          "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)"
+          }
         },
         {
-          "type": "door",
-          "direction": "back",
-          "to": "platform",
-          "label": "Back out to the platform",
-          "id": "to_platform",
-          "edge": "depicted",
-          "note": "Return door (always walkable).",
           "box": [
             0.45,
             0.34,
@@ -52123,7 +52535,14 @@
             0.71
           ],
           "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)"
+          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)",
+          "type": "door",
+          "direction": "back",
+          "to": "platform",
+          "label": "Back out to the platform",
+          "id": "to_platform",
+          "edge": "depicted",
+          "note": "Return door (always walkable)."
         }
       ],
       "authoring": {
@@ -52361,7 +52780,11 @@
             ]
           },
           "boxSource": "review:agent-vision",
-          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)"
+          "boxNote": "eye-checked 2026-11-23 (Sonnet proposal, agent verified on overlay)",
+          "solveSfx": {
+            "src": "audio/solve_lockers_the_tall_steel_locker_locker_door.mp3",
+            "volume": 0.6
+          }
         },
         {
           "id": "the_overalls_rail",
@@ -52549,6 +52972,20 @@
             "state": "badge_locker_open"
           }
         }
+      ],
+      "sfx": [
+        {
+          "src": "audio/lockers_shower_bed_a.mp3",
+          "volume": 0.3,
+          "mode": "loop"
+        },
+        {
+          "src": "audio/lockers_drip.mp3",
+          "volume": 0.35,
+          "mode": "interval",
+          "gapMin": 12,
+          "gapMax": 30
+        }
       ]
     },
     {
@@ -52557,6 +52994,7 @@
       "technique": "",
       "puzzleType": 0,
       "phase": "escape",
+      "built": true,
       "unlockedWhen": true,
       "mapPos": {
         "c": 2,
@@ -52565,12 +53003,6 @@
       "designNote": "ESCAPE TRAVEL SEQUENCE (held back for the escape): the last car down the flank to the harbor hotel, red 3. Reached only through the monorail gate (oneWay). Carries sightline 3b (Lucas 2026-11-08): the whole line down the flank and the lit harbor hotel, the car in view of them all the way down. Ending: the endsEscape exit at the harbor hotel platform.",
       "plannedHotspots": [
         {
-          "type": "door",
-          "direction": "open",
-          "id": "escape_end",
-          "label": "The harbor hotel platform",
-          "endsEscape": true,
-          "note": "The ending (Sonnet audit 2026-11-08: without it the ride was a dead end and escapeDone never fired). The car arrives below; stepping off ends the escape and shows the escape finish card. The ride itself is the escape travel sequence (step 5 decides clip vs room-only).",
           "box": [
             0.436,
             0.55,
@@ -52582,8 +53014,16 @@
           "transit": {
             "video": "ride/transit_victory.mp4",
             "flat": true,
-            "fade": true
-          }
+            "fade": true,
+            "sfx": "audio/ride_transit_night_pass.mp3",
+            "sfxVolume": 0.6
+          },
+          "type": "door",
+          "direction": "open",
+          "id": "escape_end",
+          "label": "The harbor hotel platform",
+          "endsEscape": true,
+          "note": "The ending (Sonnet audit 2026-11-08: without it the ride was a dead end and escapeDone never fired). The car arrives below; stepping off ends the escape and shows the escape finish card. The ride itself is the escape travel sequence (step 5 decides clip vs room-only)."
         }
       ],
       "authoring": {
@@ -56807,13 +57247,21 @@
           "transit": {
             "video": "ride/transit_victory.mp4",
             "flat": true,
-            "fade": true
+            "fade": true,
+            "sfx": "audio/ride_transit_night_pass.mp3",
+            "sfxVolume": 0.6
           }
         }
       ],
       "panorama": "ride/scene.png",
-      "built": true,
-      "builtFrom": "l1_ride_2.png"
+      "builtFrom": "l1_ride_2.png",
+      "sfx": [
+        {
+          "src": "audio/ride_car_bed_a.mp3",
+          "volume": 0.3,
+          "mode": "loop"
+        }
+      ]
     }
   ],
   "ladderPlain": [
@@ -56880,17 +57328,20 @@
     "arm_brown": {
       "name": "a brown armband",
       "slot": "armband",
-      "colour": "brown"
+      "colour": "brown",
+      "decoy": true
     },
     "arm_gold": {
       "name": "a gold armband",
       "slot": "armband",
-      "colour": "gold"
+      "colour": "gold",
+      "decoy": true
     },
     "arm_pink": {
       "name": "a pink armband",
       "slot": "armband",
-      "colour": "pink"
+      "colour": "pink",
+      "decoy": true
     },
     "arm_purple": {
       "name": "a purple armband",
@@ -56900,7 +57351,8 @@
     "arm_silver": {
       "name": "a silver armband",
       "slot": "armband",
-      "colour": "silver"
+      "colour": "silver",
+      "decoy": true
     },
     "badge_engineer": {
       "name": "an engineer badge",
@@ -56935,12 +57387,14 @@
     "hat_green": {
       "name": "a green hard hat",
       "slot": "hat",
-      "colour": "green"
+      "colour": "green",
+      "decoy": true
     },
     "hat_red": {
       "name": "a red hard hat",
       "slot": "hat",
-      "colour": "red"
+      "colour": "red",
+      "decoy": true
     },
     "hat_white": {
       "name": "a white hard hat",
@@ -56960,7 +57414,8 @@
     "ov_navy": {
       "name": "navy overalls",
       "slot": "overalls",
-      "colour": "navy"
+      "colour": "navy",
+      "decoy": true
     },
     "ov_orange": {
       "name": "orange overalls",
@@ -56970,7 +57425,8 @@
     "ov_white": {
       "name": "white overalls",
       "slot": "overalls",
-      "colour": "white"
+      "colour": "white",
+      "decoy": true
     },
     "stick": {
       "name": "the press-kit USB stick",
@@ -56982,5 +57438,26 @@
     "badge_visitor",
     "stick"
   ],
-  "cover": "cover.png"
+  "cover": "cover.png",
+  "scanTime": "night",
+  "ambient": "embers",
+  "stateFadeMs": 3000,
+  "scanSfx": {
+    "pass": {
+      "src": "audio/scan_pass_store_beep.mp3",
+      "volume": 0.5
+    },
+    "refuse": {
+      "src": "audio/scan_refuse_access_denied.mp3",
+      "volume": 0.5
+    },
+    "lockdown": {
+      "src": "audio/scan_lockdown_klaxon.mp3",
+      "volume": 0.5
+    },
+    "tick": {
+      "src": "audio/scan_tick_ping_sweep.mp3",
+      "volume": 0.5
+    }
+  }
 }

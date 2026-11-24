@@ -6,7 +6,7 @@
   "datasetExplorer": "data/galaxy_plates.explorer.json",
   "title": "Good Seeing",
   "subtitle": "A summit observatory above the clouds, the night the owner drives his investors up",
-  "story": "The old observatory on the volcano's summit has one worker left: you. The island's new owner is building his resort far below, and tonight he is driving its investors up to look through the telescope. If they like what they see, the observatory stays open. If not, it closes. He has his pitch ready: \"The astronomer spent decades sorting galaxies by eye. On his last season's plates, call everything a spiral and you're right 9 times in 10, so why pay an astronomer?\"\n\nBefore their headlights reach the summit, open the astronomer's photographic plates: the training plates he classified for the main catalogue, and the held-back plates of his last season, kept in a notebook he never merged. Fit a model that gives each galaxy a probability of being an elliptical, predict the held-back plates at the 0.5 cut-off, and find which predictor drives it. Then score its accuracy against calling everything a spiral, and count the ellipticals it caught. Show what his rule misses, then open the dome.",
+  "story": "The old observatory on the volcano's summit has one worker left: you. The island's new owner is building his resort far below, and tonight he is driving its investors up to look through the telescope. If they like what they see, the observatory stays open. If not, it closes. He has his pitch ready: \"The astronomer spent decades sorting galaxies by eye. On his last season's observations, we could simply call everything a spiral galaxy and we'd be right 9 times in 10, so why pay an astronomer?\" Before their headlights reach the summit, open the old astronomer's observations - their photographic plates. There are the training plates he classified manually for the main catalogue, and the held-back plates from his last season, kept in a notebook and never yet classified. Fit a model that gives each galaxy a probability of being an elliptical, predict the held-back plates at the 0.5 cut-off, and find which predictor most strongly influences your model. Then score your model's accuracy against calling everything a spiral, and count the ellipticals it catches. Show what the new owner's rule misses, then open the dome.",
   "enterLabel": "Open the plate cabinet",
   "doorLabels": true,
   "_designNotes": "Steps 1-3a (2026-11-08, session 'classification'): escape LOCKED in escapeBrief; design record in notes.md (3a choices in 'Premise, beats and ambience'; options record _scratch/blueprint_options.md); showpiece bank prototype and tests in _scratch/showpiece_bank/. Step 2: dataset data/galaxy_plates.csv (engineered, _scratch/build_plates.py) and verified ladder (_scratch/ladder_spec.md, ladder_key.csv). subtitle/story/enterLabel are drafts, locked at step 3b. escapeHints are content-phase wording, revisit at step 6. Single-player partner of classification/lair. No rooms, no enterButtons, no art. id 31 because 24 is reserved by the arc-5 hub; decoder entry at step 6.",
@@ -34,11 +34,11 @@
   ],
   "done": {
     "title": "The view is ready",
-    "body": "His pitch rested on accuracy, and on the held-back plates the model is barely behind him. But calling everything a spiral catches none of the ellipticals; the model catches thirteen. The dome is open. Down the mountain, the investors' headlights are climbing the last bends. You have three pointings before they arrive. Show them something worth keeping the observatory open for."
+    "body": "The new owner's pitch rested on accuracy, and on the held-back plates the model is barely behind him. But calling everything a spiral catches none of the ellipticals; the model catches thirteen. The dome is open. Down the mountain, the investors' headlights are climbing the last bends. You have time to try three pointings before they arrive. Point the telescope at something worth keeping the observatory open for."
   },
   "escapeDone": {
     "title": "Good seeing",
-    "body": "The telescope swings west and settles. In the eyepiece, a gold star and a blue one hang side by side, sharp and still, while everything the brochure promised drowns in moonlight and glare. The investors take turns at the eyepiece and stop talking about the resort. By morning the observatory has its funding for another year."
+    "body": "The telescope swings west and settles. In the eyepiece, a gold star and a blue one hang side by side, sharp and still, while everything the brochure promised drowns in moonlight and glare. The investors take turns at the eyepiece and stop talking about the resort. By morning, the observatory has its funding for another year! Well done!"
   },
   "worldPlatePrompt": "A single continuous photograph, one frame: at night from high above and to the east-north-east of a steep island volcano rising out of a sea of cloud, its true summit crowned by an old stone observatory with a pale dome, a small cluster of stone buildings and railed walkways along the summit's edge. Far below on the volcano's eastern shoulder, standing above the cloud beside a steaming crater with a pale acid lake on its floor, the works are under construction: tower cranes, a bare concrete frame and one low unfinished concrete shell (with a short square stub, never a tall stack) and tall floodlight masts throwing sodium-orange light; a switchback road climbs from the cloud up the cone to the summit; a line of bare pylons descends into the cloud. The cloud sea is an unbroken white floor to the horizon, lit silver by the moon. Sky: a bright waxing gibbous moon high in the south-south-west, the sky a deep moonlit blue-black with stars, the Milky Way faint. Materials and condition: dark basalt, red-brown scoria, frost on the summit rock; the observatory old and well kept, weathered stone and brass; the works brand new concrete and steel. Light: cool silver moonlight over everything, warm lamplight in a few observatory windows, and the only strong warm colour the sodium-orange floodlights of the works. No people, no text, no signs.",
   "coverPrompt": "Minimalist stylized thumbnail poster, seen square-on and flat: the black silhouette of a steep volcanic cone rising out of a pale moonlit sea of cloud, a small white observatory dome on its very top with a thin slit of warm light, a bright gibbous moon in a deep blue night sky, and one small sodium-orange glow on the cone's shoulder far below. Bold, graphic, very few elements, high contrast, poster-like. No people, no text, no lettering, no letters, no numbers, no border.",
@@ -112,10 +112,10 @@
           }
         },
         {
-          "body": "A glossy brochure for tonight's visit, in his sales voice: <i>Up at the summit, the greatest hits of the night sky through a real brass telescope: Andromeda, Saturn's rings, the Comet, the Seven Sisters and the Great Nebula. Every one a showstopper. Every one on a postcard.</i>",
+          "body": "The villain's (ahem, I mean, the new owner's) brochure, from the bench in the plate vault: it promises Andromeda, Saturn's rings, the comet, the Seven Sisters and the Great Nebula for tonight.",
           "type": "clue",
           "label": "The villain's brochure",
-          "pickup": "The villain's brochure, from the bench in the plate vault: it promises Andromeda, Saturn's rings, the comet, the Seven Sisters and the Great Nebula for tonight.",
+          "pickup": "The villain's (ahem, I mean, the new owner's) brochure, from the bench in the plate vault: it promises Andromeda, Saturn's rings, the comet, the Seven Sisters and the Great Nebula for tonight.",
           "note": "Read-only; the five crowd-pleasers, left on the bench with tonight's arrangements. Escape input; covered by Lucas's clue waiver (2026-11-09: early, near the landing card, reinforcing it).",
           "box": [
             0.355,
@@ -124,10 +124,11 @@
             0.685
           ],
           "boxSource": "review:agent-vision",
-          "boxNote": "measured off the committed art at native resolution (observatory art run, 2026-11-23)"
+          "boxNote": "measured off the committed art at native resolution (observatory art run, 2026-11-23)",
+          "image": "clues/brochure.jpg?v=f03b6aaa"
         },
         {
-          "body": "His notes for tonight's pitch to the investors, typed on resort letterhead and left beside the brochure: <i>Call everything a spiral and you're right 9 times in 10, so why pay an astronomer?</i>",
+          "body": "The villain's (whoops! I mean the new owner's) pitch notes, from the bench in the plate vault: call everything a spiral and you're right 9 times in 10.",
           "type": "clue",
           "label": "The pitch letter",
           "note": "Read-only; the 9-in-10 claim, beside the brochure on the bench. Not an escape input; covered by the same waiver.",
@@ -138,7 +139,9 @@
             0.68
           ],
           "boxSource": "review:agent-vision",
-          "boxNote": "measured off the committed art at native resolution (observatory art run, 2026-11-23)"
+          "boxNote": "measured off the committed art at native resolution (observatory art run, 2026-11-23)",
+          "image": "clues/pitch_letter.jpg?v=9027533a",
+          "pickup": "The villain's (whoops! I mean the new owner's) pitch notes, from the bench in the plate vault: call everything a spiral and you're right 9 times in 10."
         },
         {
           "type": "dial",
@@ -511,10 +514,10 @@
           "type": "door",
           "label": "The storm door out to the first deck",
           "box": [
-            0.692,
-            0.39,
-            0.772,
-            0.69
+            0.7091,
+            0.3493,
+            0.7891,
+            0.6493
           ],
           "direction": "forward",
           "to": "deck_moon",
@@ -525,7 +528,7 @@
             ]
           },
           "lockedBody": "The storm door is dogged shut. The brass hand-wheel beside it frees the door once the question on the plate sleeves is answered.",
-          "boxSource": "review:agent-vision",
+          "boxSource": "moved:testplay",
           "boxNote": "measured off the committed art at native resolution (observatory art run, 2026-11-23)"
         },
         {
@@ -574,24 +577,27 @@
             0.439,
             0.685
           ],
-          "body": "A glossy brochure for tonight's visit, in his sales voice: <i>Up at the summit, the greatest hits of the night sky through a real brass telescope: Andromeda, Saturn's rings, the Comet, the Seven Sisters and the Great Nebula. Every one a showstopper. Every one on a postcard.</i>",
-          "pickup": "The villain's brochure, from the bench in the plate vault: it promises Andromeda, Saturn's rings, the comet, the Seven Sisters and the Great Nebula for tonight.",
+          "body": "The villain's (ahem, I mean, the new owner's) brochure, from the bench in the plate vault: it promises Andromeda, Saturn's rings, the comet, the Seven Sisters and the Great Nebula for tonight.",
+          "pickup": "The villain's (ahem, I mean, the new owner's) brochure, from the bench in the plate vault: it promises Andromeda, Saturn's rings, the comet, the Seven Sisters and the Great Nebula for tonight.",
           "boxSource": "review:agent-vision",
-          "boxNote": "measured off the committed art at native resolution (observatory art run, 2026-11-23)"
+          "boxNote": "measured off the committed art at native resolution (observatory art run, 2026-11-23)",
+          "image": "clues/brochure.jpg?v=f03b6aaa"
         },
         {
           "id": "the_pitch_letter",
           "type": "clue",
           "label": "The pitch letter",
           "box": [
-            0.567,
-            0.59,
-            0.634,
-            0.68
+            0.5548,
+            0.5888,
+            0.6218,
+            0.6788
           ],
-          "body": "His notes for tonight's pitch to the investors, typed on resort letterhead and left beside the brochure: <i>Call everything a spiral and you're right 9 times in 10, so why pay an astronomer?</i>",
-          "boxSource": "review:agent-vision",
-          "boxNote": "measured off the committed art at native resolution (observatory art run, 2026-11-23)"
+          "body": "The villain's (whoops! I mean the new owner's) pitch notes, from the bench in the plate vault: call everything a spiral and you're right 9 times in 10.",
+          "boxSource": "moved:testplay",
+          "boxNote": "measured off the committed art at native resolution (observatory art run, 2026-11-23)",
+          "image": "clues/pitch_letter.jpg?v=9027533a",
+          "pickup": "The villain's (whoops! I mean the new owner's) pitch notes, from the bench in the plate vault: call everything a spiral and you're right 9 times in 10."
         },
         {
           "id": "the_storm_door_hand_wheel",
@@ -599,9 +605,9 @@
           "label": "The storm-door hand-wheel",
           "box": [
             0.714,
-            0.478,
+            0.475,
             0.75,
-            0.588
+            0.585
           ],
           "key": "storm_wheel_1",
           "states": [
@@ -616,7 +622,7 @@
             "solved": "plate_vault"
           },
           "lockedBody": "The brass hand-wheel is seated hard. It will turn once the question on the plate sleeves is answered.",
-          "boxSource": "review:agent-vision",
+          "boxSource": "moved:testplay",
           "boxNote": "measured off the committed art at native resolution (observatory art run, 2026-11-23)"
         },
         {
@@ -639,6 +645,58 @@
             ],
             "video": "plate_vault/cine_base.mp4"
           }
+        },
+        {
+          "id": "storm_door_1_open_wash",
+          "type": "ambient",
+          "label": "The door open",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Full-scene door-open state, composited from one masked edit (authoring_v2/door_open_states.py).",
+          "variants": [
+            {
+              "state": "storm_door_1_open",
+              "when": {
+                "eq": [
+                  "storm_wheel_1",
+                  true
+                ]
+              },
+              "box": [
+                0,
+                0,
+                1,
+                1
+              ],
+              "panorama": "plate_vault/scene_storm_door_1_open.png"
+            }
+          ]
+        },
+        {
+          "id": "clip_storm_door_1_open",
+          "type": "ambient",
+          "label": "Scene motion (door open)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "The base clip with the open door composited onto every frame (authoring_v2/door_open_states.py bake).",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "plate_vault/cine_storm_door_1_open.mp4",
+            "state": "storm_door_1_open"
+          }
         }
       ],
       "sfx": [
@@ -649,7 +707,7 @@
         },
         {
           "src": "audio/plate_vault_chain_creak.mp3",
-          "volume": 0.219,
+          "volume": 0.06,
           "mode": "interval",
           "gapMin": 12,
           "gapMax": 30
@@ -2911,14 +2969,14 @@
           "type": "door",
           "label": "Back through the storm door to the plate vault",
           "box": [
-            0.252,
-            0.38,
-            0.346,
-            0.65
+            0.2223,
+            0.3898,
+            0.3163,
+            0.6598
           ],
           "direction": "back",
           "to": "plate_vault",
-          "boxSource": "review:agent-vision",
+          "boxSource": "moved:testplay",
           "boxNote": "measured off the committed art at native resolution (observatory art run, 2026-11-23)"
         },
         {
@@ -2926,14 +2984,14 @@
           "type": "door",
           "label": "Along the deck to the astronomer's study",
           "box": [
-            0.09,
-            0.28,
-            0.17,
-            0.79
+            0.0661,
+            0.2815,
+            0.1461,
+            0.7915
           ],
           "direction": "back",
           "to": "notebook_room",
-          "boxSource": "review:agent-vision",
+          "boxSource": "moved:testplay",
           "boxNote": "measured off the committed art at native resolution (observatory art run, 2026-11-23)"
         },
         {
@@ -3448,14 +3506,14 @@
           "type": "door",
           "label": "Back out to the moon deck",
           "box": [
-            0.812,
-            0.36,
-            0.896,
-            0.75
+            0.8283,
+            0.34,
+            0.9123,
+            0.73
           ],
           "direction": "back",
           "to": "deck_moon",
-          "boxSource": "review:agent-vision",
+          "boxSource": "moved:testplay",
           "boxNote": "measured off the committed art at native resolution (observatory art run, 2026-11-23)"
         },
         {
@@ -3463,10 +3521,10 @@
           "type": "door",
           "label": "The storm door out to the second deck",
           "box": [
-            0.427,
-            0.425,
-            0.47,
-            0.686
+            0.4404,
+            0.4079,
+            0.4834,
+            0.6689
           ],
           "direction": "forward",
           "to": "deck_twinkle",
@@ -3477,7 +3535,7 @@
             ]
           },
           "lockedBody": "The storm door is dogged shut. The brass hand-wheel beside it frees the door once the question on the held-back plate box is answered.",
-          "boxSource": "review:agent-vision",
+          "boxSource": "moved:testplay",
           "boxNote": "measured off the committed art at native resolution (observatory art run, 2026-11-23)"
         },
         {
@@ -3522,10 +3580,10 @@
           "type": "dial",
           "label": "The storm-door hand-wheel",
           "box": [
-            0.438,
-            0.508,
-            0.459,
-            0.57
+            0.4413,
+            0.5267,
+            0.4623,
+            0.5887
           ],
           "key": "storm_wheel_2",
           "states": [
@@ -3540,7 +3598,7 @@
             "solved": "notebook_room"
           },
           "lockedBody": "The brass hand-wheel is seated hard. It will turn once the question on the held-back plate box is answered.",
-          "boxSource": "review:agent-vision",
+          "boxSource": "moved:testplay",
           "boxNote": "measured off the committed art at native resolution (observatory art run, 2026-11-23)"
         },
         {
@@ -3563,6 +3621,58 @@
             ],
             "video": "notebook_room/cine_base.mp4"
           }
+        },
+        {
+          "id": "storm_door_2_open_wash",
+          "type": "ambient",
+          "label": "The door open",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Full-scene door-open state, composited from one masked edit (authoring_v2/door_open_states.py).",
+          "variants": [
+            {
+              "state": "storm_door_2_open",
+              "when": {
+                "eq": [
+                  "storm_wheel_2",
+                  true
+                ]
+              },
+              "box": [
+                0,
+                0,
+                1,
+                1
+              ],
+              "panorama": "notebook_room/scene_storm_door_2_open.png"
+            }
+          ]
+        },
+        {
+          "id": "clip_storm_door_2_open",
+          "type": "ambient",
+          "label": "Scene motion (door open)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "The base clip with the open door composited onto every frame (authoring_v2/door_open_states.py bake).",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "notebook_room/cine_storm_door_2_open.mp4",
+            "state": "storm_door_2_open"
+          }
         }
       ],
       "sfx": [
@@ -3573,7 +3683,7 @@
         },
         {
           "src": "audio/notebook_room_floorboard_creak.mp3",
-          "volume": 0.077,
+          "volume": 0.02,
           "mode": "interval",
           "gapMin": 12,
           "gapMax": 30
@@ -4080,14 +4190,14 @@
           "type": "door",
           "label": "Back through the storm door to the study",
           "box": [
-            0.206,
-            0.4,
-            0.286,
-            0.685
+            0.223,
+            0.3811,
+            0.303,
+            0.6661
           ],
           "direction": "back",
           "to": "notebook_room",
-          "boxSource": "review:agent-vision",
+          "boxSource": "moved:testplay",
           "boxNote": "measured off the committed art at native resolution (observatory art run, 2026-11-23)"
         },
         {
@@ -4610,14 +4720,14 @@
           "type": "door",
           "label": "Back out to the twinkle deck",
           "box": [
-            0.316,
-            0.3,
-            0.398,
-            0.74
+            0.3307,
+            0.3019,
+            0.4127,
+            0.7419
           ],
           "direction": "back",
           "to": "deck_twinkle",
-          "boxSource": "review:agent-vision",
+          "boxSource": "moved:testplay",
           "boxNote": "measured off the committed art at native resolution (observatory art run, 2026-11-23)"
         },
         {
@@ -4704,6 +4814,36 @@
           "lockedBody": "The brass hand-wheel is seated hard. It will turn once the question on the photometer's coefficient plot is answered.",
           "boxSource": "review:agent-vision",
           "boxNote": "measured off the committed art at native resolution (observatory art run, 2026-11-23)"
+        },
+        {
+          "id": "storm_door_3_open_wash",
+          "type": "ambient",
+          "label": "The door open",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Full-scene door-open state, composited from one masked edit (authoring_v2/door_open_states.py).",
+          "variants": [
+            {
+              "state": "storm_door_3_open",
+              "when": {
+                "eq": [
+                  "storm_wheel_3",
+                  true
+                ]
+              },
+              "box": [
+                0,
+                0,
+                1,
+                1
+              ],
+              "panorama": "photometer_room/scene_storm_door_3_open.png"
+            }
+          ]
         }
       ],
       "sfx": [
@@ -23436,14 +23576,14 @@
           "type": "door",
           "label": "Back through the storm door to the darkroom",
           "box": [
-            0.78,
-            0.44,
-            0.836,
-            0.56
+            0.7899,
+            0.452,
+            0.8459,
+            0.572
           ],
           "direction": "back",
           "to": "photometer_room",
-          "boxSource": "review:agent-vision",
+          "boxSource": "moved:testplay",
           "boxNote": "measured off the committed art at native resolution (observatory art run, 2026-11-23)"
         },
         {
@@ -23508,7 +23648,7 @@
         },
         {
           "src": "audio/deck_glow_steam_vent.mp3",
-          "volume": 0.107,
+          "volume": 0.0,
           "mode": "interval",
           "gapMin": 12,
           "gapMax": 30
@@ -23565,11 +23705,11 @@
             "hint": "Predict the held-back galaxies with your five-predictor model, keep only the galaxies that are ellipticals, and count the ones your model called yes.",
             "maxAttempts": 4,
             "feedback": {
-              "correct": "Correct, noted in your field notebook: the model caught 13 of the 30 held-back ellipticals; calling every galaxy a spiral is right on 270 of 300 (the model 265) but catches none.",
+              "correct": "Correct, noted in your field notebook: the model catches 13 of the 30 held-back ellipticals; calling every galaxy a spiral is right on 270 of 300 (the model 265) but catches none.",
               "wrong": [
                 "Rebuild the predictions if you need them: <code>training_galaxies &lt;- galaxy_plates %&gt;% filter(record == &quot;training&quot;)</code>, <code>held_back_galaxies &lt;- galaxy_plates %&gt;% filter(record == &quot;held back&quot;)</code>, <code>galaxy_model &lt;- buildModel(data = training_galaxies, model_type = &quot;logistic_regression&quot;, predictors = c(&quot;color_index&quot;, &quot;concentration&quot;, &quot;axis_ratio&quot;, &quot;apparent_size_arcsec&quot;, &quot;exposure_minutes&quot;), response = &quot;elliptical&quot;)</code>, then <code>galaxy_predictions &lt;- predictWithModel(data = held_back_galaxies, model = galaxy_model)</code>. To compare accuracy, set the rule that always says no beside your model's calls: <code>galaxy_predictions %&gt;% mutate(always_no = &quot;no&quot;) %&gt;% summarize(model_accuracy = mean(predicted_class == elliptical), always_no_accuracy = mean(always_no == elliptical))</code>.",
-                "Count only the ellipticals the model caught: <code>galaxy_predictions %&gt;% filter(elliptical == &quot;yes&quot;) %&gt;% summarize(ellipticals = n(), caught = sum(predicted_class == &quot;yes&quot;), missed = sum(predicted_class == &quot;no&quot;))</code>.",
-                "answer must be one whole number, not a table: count the caught ellipticals and pull the number out of the summarize with <code>answer &lt;- galaxy_predictions %&gt;% filter(elliptical == &quot;yes&quot;, predicted_class == &quot;yes&quot;) %&gt;% summarize(n = n()) %&gt;% pull(n)</code>."
+                "Count only the ellipticals the model catches: <code>galaxy_predictions %&gt;% filter(elliptical == &quot;yes&quot;) %&gt;% summarize(ellipticals = n(), catches = sum(predicted_class == &quot;yes&quot;), missed = sum(predicted_class == &quot;no&quot;))</code>.",
+                "answer must be one whole number, not a table: count the ellipticals it catches and pull the number out of the summarize with <code>answer &lt;- galaxy_predictions %&gt;% filter(elliptical == &quot;yes&quot;, predicted_class == &quot;yes&quot;) %&gt;% summarize(n = n()) %&gt;% pull(n)</code>."
               ]
             }
           },
@@ -23605,7 +23745,7 @@
           "availableWhen": {
             "solved": "directors_office"
           },
-          "lockedBody": "The knife switch is locked open. It will close once the question in the catalogue ledgers is answered.",
+          "lockedBody": "The knife switch is locked open. It will only close once all the puzzles are solved.",
           "note": "Boss gate. One-state dial dome_power, dead until directors_office is solved. Runs the dome's door and shutter.",
           "box": [
             0.688,
@@ -23614,7 +23754,11 @@
             0.58
           ],
           "boxSource": "review:agent-vision",
-          "boxNote": "measured off the committed art at native resolution (observatory art run, 2026-11-23)"
+          "boxNote": "measured off the committed art at native resolution (observatory art run, 2026-11-23)",
+          "sfx": {
+            "src": "audio/directors_office_dial_knife_switch_throw.mp3",
+            "volume": 0.053
+          }
         }
       ],
       "isBoss": true,
@@ -24107,14 +24251,14 @@
           "type": "door",
           "label": "Round the dome's footing to the last deck",
           "box": [
-            0.36,
-            0.37,
-            0.433,
-            0.75
+            0.3773,
+            0.3644,
+            0.4503,
+            0.7444
           ],
           "direction": "back",
           "to": "deck_stars",
-          "boxSource": "review:agent-vision",
+          "boxSource": "moved:testplay",
           "boxNote": "measured off the committed art at native resolution (observatory art run, 2026-11-23)"
         },
         {
@@ -24137,11 +24281,11 @@
             "hint": "Predict the held-back galaxies with your five-predictor model, keep only the galaxies that are ellipticals, and count the ones your model called yes.",
             "maxAttempts": 4,
             "feedback": {
-              "correct": "Correct, noted in your field notebook: the model caught 13 of the 30 held-back ellipticals; calling every galaxy a spiral is right on 270 of 300 (the model 265) but catches none.",
+              "correct": "Correct, noted in your field notebook: the model catches 13 of the 30 held-back ellipticals; calling every galaxy a spiral is right on 270 of 300 (the model 265) but catches none.",
               "wrong": [
                 "Rebuild the predictions if you need them: <code>training_galaxies &lt;- galaxy_plates %&gt;% filter(record == &quot;training&quot;)</code>, <code>held_back_galaxies &lt;- galaxy_plates %&gt;% filter(record == &quot;held back&quot;)</code>, <code>galaxy_model &lt;- buildModel(data = training_galaxies, model_type = &quot;logistic_regression&quot;, predictors = c(&quot;color_index&quot;, &quot;concentration&quot;, &quot;axis_ratio&quot;, &quot;apparent_size_arcsec&quot;, &quot;exposure_minutes&quot;), response = &quot;elliptical&quot;)</code>, then <code>galaxy_predictions &lt;- predictWithModel(data = held_back_galaxies, model = galaxy_model)</code>. To compare accuracy, set the rule that always says no beside your model's calls: <code>galaxy_predictions %&gt;% mutate(always_no = &quot;no&quot;) %&gt;% summarize(model_accuracy = mean(predicted_class == elliptical), always_no_accuracy = mean(always_no == elliptical))</code>.",
-                "Count only the ellipticals the model caught: <code>galaxy_predictions %&gt;% filter(elliptical == &quot;yes&quot;) %&gt;% summarize(ellipticals = n(), caught = sum(predicted_class == &quot;yes&quot;), missed = sum(predicted_class == &quot;no&quot;))</code>.",
-                "answer must be one whole number, not a table: count the caught ellipticals and pull the number out of the summarize with <code>answer &lt;- galaxy_predictions %&gt;% filter(elliptical == &quot;yes&quot;, predicted_class == &quot;yes&quot;) %&gt;% summarize(n = n()) %&gt;% pull(n)</code>."
+                "Count only the ellipticals the model catches: <code>galaxy_predictions %&gt;% filter(elliptical == &quot;yes&quot;) %&gt;% summarize(ellipticals = n(), catches = sum(predicted_class == &quot;yes&quot;), missed = sum(predicted_class == &quot;no&quot;))</code>.",
+                "answer must be one whole number, not a table: count the ellipticals it catches and pull the number out of the summarize with <code>answer &lt;- galaxy_predictions %&gt;% filter(elliptical == &quot;yes&quot;, predicted_class == &quot;yes&quot;) %&gt;% summarize(n = n()) %&gt;% pull(n)</code>."
               ]
             }
           },
@@ -24175,9 +24319,13 @@
           "availableWhen": {
             "solved": "directors_office"
           },
-          "lockedBody": "The knife switch is locked open. It will close once the question in the catalogue ledgers is answered.",
+          "lockedBody": "The knife switch is locked open. It will only close once all the puzzles are solved.",
           "boxSource": "review:agent-vision",
-          "boxNote": "measured off the committed art at native resolution (observatory art run, 2026-11-23)"
+          "boxNote": "measured off the committed art at native resolution (observatory art run, 2026-11-23)",
+          "sfx": {
+            "src": "audio/directors_office_dial_knife_switch_throw.mp3",
+            "volume": 0.053
+          }
         },
         {
           "id": "clip_base",
@@ -35275,6 +35423,58 @@
             ],
             "video": "deck_stars/cine_base.mp4"
           }
+        },
+        {
+          "id": "dome_door_open_wash",
+          "type": "ambient",
+          "label": "The door open",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "Full-scene door-open state, composited from one masked edit (authoring_v2/door_open_states.py).",
+          "variants": [
+            {
+              "state": "dome_door_open",
+              "when": {
+                "eq": [
+                  "dome_power",
+                  true
+                ]
+              },
+              "box": [
+                0,
+                0,
+                1,
+                1
+              ],
+              "panorama": "deck_stars/scene_dome_door_open.png"
+            }
+          ]
+        },
+        {
+          "id": "clip_dome_door_open",
+          "type": "ambient",
+          "label": "Scene motion (door open)",
+          "box": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "note": "The base clip with the open door composited onto every frame (authoring_v2/door_open_states.py bake).",
+          "cinemagraph": {
+            "box": [
+              0,
+              0,
+              1,
+              1
+            ],
+            "video": "deck_stars/cine_dome_door_open.mp4",
+            "state": "dome_door_open"
+          }
         }
       ],
       "sfx": [
@@ -35292,7 +35492,7 @@
         },
         {
           "src": "audio/deck_stars_car_distant.mp3",
-          "volume": 0.419,
+          "volume": 0.0,
           "mode": "interval",
           "gapMin": 12,
           "gapMax": 30
@@ -35642,26 +35842,6 @@
             "volume": 0.221
           },
           "deferCard": true
-        },
-        {
-          "type": "mapview",
-          "label": "The east port",
-          "key": "pointings",
-          "note": "Headlights a bend closer per pointing: close-up images 0-3 and panorama variants keyed on the numeric state key `pointings` (0 = base art, 1, 2 misses, 3 arrival), written by the console's eyepiece.stateKey on each miss and reset to 0 by its retry. deck_stars shows them static.",
-          "box": [
-            0.836,
-            0.3,
-            0.921,
-            0.815
-          ],
-          "images": {
-            "0": "closeups/the_east_port_0.png?v=3d112bcc",
-            "1": "closeups/the_east_port_1.png?v=36a1eeca",
-            "2": "closeups/the_east_port_2.png?v=3f691ae7",
-            "3": "closeups/the_east_port_3.png?v=530cef15"
-          },
-          "boxNote": "measured off the committed art at native resolution (observatory art run, 2026-11-23)",
-          "boxSource": "review:agent-vision"
         }
       ],
       "authoring": {
@@ -38705,26 +38885,6 @@
           "deferCard": true
         },
         {
-          "id": "the_east_port",
-          "type": "mapview",
-          "label": "The east port",
-          "box": [
-            0.836,
-            0.3,
-            0.921,
-            0.815
-          ],
-          "key": "pointings",
-          "images": {
-            "0": "closeups/the_east_port_0.png?v=3d112bcc",
-            "1": "closeups/the_east_port_1.png?v=36a1eeca",
-            "2": "closeups/the_east_port_2.png?v=3f691ae7",
-            "3": "closeups/the_east_port_3.png?v=530cef15"
-          },
-          "boxNote": "measured off the committed art at native resolution (observatory art run, 2026-11-23)",
-          "boxSource": "review:agent-vision"
-        },
-        {
           "id": "clip_base",
           "type": "ambient",
           "label": "Scene motion (base)",
@@ -38757,12 +38917,12 @@
         },
         {
           "src": "audio/dome_clock_drive_tick_loop.mp3",
-          "volume": 0.057,
+          "volume": 0.03,
           "mode": "loop"
         },
         {
           "src": "audio/dome_metal_creak.mp3",
-          "volume": 0.131,
+          "volume": 0.07,
           "mode": "interval",
           "gapMin": 12,
           "gapMax": 30
@@ -38821,5 +38981,6 @@
     "text": "Frédéric Chopin, Nocturnes (YouTube)",
     "url": "https://www.youtube.com/watch?v=sLeEIs3Py6w"
   },
-  "ambient": "dust"
+  "ambient": "dust",
+  "playerMapArt": "map/map.json?v=137e9fc3db"
 }

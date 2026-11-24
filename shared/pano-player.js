@@ -85,37 +85,39 @@
 // A bare `./variant_resolve.js` import is NOT refreshed by bumping the <script> tag's ?v, so a changed
 // helper module (e.g. a new export) leaves browsers on a stale cached copy → "doesn't provide an export
 // named X" SyntaxError → blank page (the 2026-08-05 airship regression). Bump all three together.
-import { WebRConsole } from "./webr-console.js?v=182";
-import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers, pickTransit } from "./variant_resolve.js?v=182";   // Phase 3: per-hotspot state variants; monorail switch-door nav
-import * as PQ from "./puzzle_queue.js?v=182";   // dynamic puzzle queue: location-independent puzzle serving
-import * as CP from "./corr_panel.js?v=182";   // lower-triangle layout of the grid gate (clouds correlation panel)
-import { particleCount } from "./particles.js?v=182";
-import { mountLandingBackdrop } from "./landing_backdrop.js?v=182";   // landing text over a pan of the first room's clip   // ambient-particle vocabulary + per-kind field density
-import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=182";
-import { condHolds, lockedMessage } from "./cond.js?v=182";
-import { gridMatches } from "./grid_check.js?v=182";   // grid answer check; `partition:true` accepts any relabelling of the buckets   // ledger + elevation-map card DOM
-import * as LIVE from "./live_session.js?v=182";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
-import * as RIDE from "./ride.js?v=182";
-import { mountPcaPlate } from "./pca_plate.js?v=182";   // the PCA plate instrument (voyage beach)
-import { mountFishBoard } from "./fish_board.js?v=182";   // the fish board instrument (harbour berth)
-import { mountDrawdown } from "./drawdown.js?v=182";
-import { mountTide } from "./tide_machine.js?v=182";   // the tide machine instrument (dunes escape)
-import { mountVarianceMeter } from "./variance_meter.js?v=182";   // the variance meter instrument (anova cellars escape)
-import { mountAnovaInstrument } from "./anova_instrument.js?v=182";   // the ANOVA instrument (Fisher's board, anova rooms; also the book, ch.12b)
-import { mountPermanovaInstrument } from "./permanova_instrument.js?v=182";   // its PERMANOVA sibling: the board's optional second tab
-import { mountGhostLines } from "./ghost_lines.js?v=182";   // the ghost-line board instrument (regression pits hub)
-import { mount as mountDatasetExplorer } from "./dataset_explorer.js?v=182";   // a dataset's STRUCTURE (instrument kind + the graded rooms' chip)
-import { mount as mountSigmoidBoard } from "./sigmoid_board.js?v=182";   // the S-curve board (classification day one, toy data)
-import { mount as mountScoreboard } from "./scoreboard.js?v=182";   // the scoreboard (classification day two, toy data)
-import { mountBank } from "./showpiece_bank.js?v=182";   // the showpiece bank (observatory's dome; card data inline on the hotspot)
+import { WebRConsole } from "./webr-console.js?v=183";
+import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers, pickTransit } from "./variant_resolve.js?v=183";   // Phase 3: per-hotspot state variants; monorail switch-door nav
+import * as PQ from "./puzzle_queue.js?v=183";   // dynamic puzzle queue: location-independent puzzle serving
+import * as CP from "./corr_panel.js?v=183";   // lower-triangle layout of the grid gate (clouds correlation panel)
+import { particleCount } from "./particles.js?v=183";
+import { mountLandingBackdrop } from "./landing_backdrop.js?v=183";   // landing text over a pan of the first room's clip   // ambient-particle vocabulary + per-kind field density
+import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=183";
+import { condHolds, lockedMessage } from "./cond.js?v=183";
+import { gridMatches } from "./grid_check.js?v=183";   // grid answer check; `partition:true` accepts any relabelling of the buckets   // ledger + elevation-map card DOM
+import * as LIVE from "./live_session.js?v=183";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
+import * as RIDE from "./ride.js?v=183";
+import { mountPcaPlate } from "./pca_plate.js?v=183";   // the PCA plate instrument (voyage beach)
+import { mountFishBoard } from "./fish_board.js?v=183";   // the fish board instrument (harbour berth)
+import { mountDrawdown } from "./drawdown.js?v=183";
+import { mountTide } from "./tide_machine.js?v=183";   // the tide machine instrument (dunes escape)
+import { mountVarianceMeter } from "./variance_meter.js?v=183";   // the variance meter instrument (anova cellars escape)
+import { mountAnovaInstrument } from "./anova_instrument.js?v=183";   // the ANOVA instrument (Fisher's board, anova rooms; also the book, ch.12b)
+import { mountPermanovaInstrument } from "./permanova_instrument.js?v=183";   // its PERMANOVA sibling: the board's optional second tab
+import { mountGhostLines } from "./ghost_lines.js?v=183";   // the ghost-line board instrument (regression pits hub)
+import { mount as mountDatasetExplorer } from "./dataset_explorer.js?v=183";   // a dataset's STRUCTURE (instrument kind + the graded rooms' chip)
+import { mount as mountSigmoidBoard } from "./sigmoid_board.js?v=183";   // the S-curve board (classification day one, toy data)
+import { mount as mountScoreboard } from "./scoreboard.js?v=183";   // the scoreboard (classification day two, toy data)
+import { mountBank } from "./showpiece_bank.js?v=183";   // the showpiece bank (observatory's dome; card data inline on the hotspot)
    // the drawdown board instrument (diamonds escape)   // THE RIDE (subway): express lever + clip-sequence planner
-import * as BELL from "./bell_pull.js?v=182";
-import * as TCOUNT from "./transit_counter.js?v=182";   // the date plaque over a flat door transit (dunes time-skip)
-import * as DATEB from "./date_board.js?v=182";   // date lock: lock mode:"date", two slide-levers (dunes departure board)
-import * as INVY from "./inventory.js?v=182";   // carried items + the door that asks which to use (dunes)   // bell-pull (#16): dial mode:"pull" + lock mode:"state" (spa belfry)
-import { entryYaw } from "./entry_facing.js?v=182";   // face the way out on entering a room (every scenario)
-import * as HINTS from "./escape_hints.js?v=182";
-import * as LOCKC from "./lock_console.js?v=182";   // limited-attempt lock: lockout across openings, eyepiece views, failure + retry (observatory)   // escape-phase Hint chip: time-unlocked tiers (SCENARIO.escapeHints)
+import * as BELL from "./bell_pull.js?v=183";
+import * as TCOUNT from "./transit_counter.js?v=183";   // the date plaque over a flat door transit (dunes time-skip)
+import * as DATEB from "./date_board.js?v=183";   // date lock: lock mode:"date", two slide-levers (dunes departure board)
+import * as INVY from "./inventory.js?v=183";   // carried items + the door that asks which to use (dunes)   // bell-pull (#16): dial mode:"pull" + lock mode:"state" (spa belfry)
+import { entryYaw } from "./entry_facing.js?v=183";   // face the way out on entering a room (every scenario)
+import * as HINTS from "./escape_hints.js?v=183";
+import * as LOCKC from "./lock_console.js?v=183";   // limited-attempt lock: lockout across openings, eyepiece views, failure + retry (observatory)   // escape-phase Hint chip: time-unlocked tiers (SCENARIO.escapeHints)
+import * as WARD from "./wardrobe.js?v=183";   // what the player wears + the outfit scanners on doors (lair)
+import * as WUI from "./wardrobe_ui.js?v=183";   // the wardrobe's drawings: figure, scan log, scanner dial, tote icons
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 
@@ -253,6 +255,9 @@ const solvedGates = new Set();
 // Carried items (keys, a rope) and the item doors already opened with them — see shared/inventory.js.
 // Session state like solvedGates: cleared on Enter, not persisted across a reload.
 const INV = INVY.createInventory();
+// What the player WEARS (shared/wardrobe.js): one item per slot, the scanner doors passed (D1: they stay open) and
+// the refused scans counted against a door's budget. Session state, cleared in beginGame; inert without wearables.
+const WR = WARD.createWardrobe();
 // Date-lock hotspot id → the date posted on it ({day, month, year}), read by `transit.counter.toFromLock`. Kept out of
 // gameState (whose keys feed `cond` readers) and, like solvedGates, not persisted: after a reload the plaque ends on
 // the authored `to`.
@@ -368,6 +373,8 @@ function init(data) {
     visitedRooms.clear();
     solvedGates.clear();
     INVY.resetInventory(INV);                                         // carried items + item doors opened
+    WARD.resetWardrobe(WR);                                           // worn items, scanner doors passed, refusals
+    WARD.startOutfit(WR, SCENARIO, INV, gameState);                   // startingItems: granted, the wearables worn
     attemptCounts.clear();
     queueSolved.clear(); queueResults.clear(); queueAssign.clear();   // dynamic puzzle queue
     analysisFinished = false; escapeFinished = false;                // fresh objective state
@@ -382,6 +389,7 @@ function init(data) {
     _explorerState = undefined;                                       // the explorer's tab + drawn row (session state)
     $("#explorerChip").style.display = explorerEnabled() ? "" : "none";   // stacked above the map (or the notebook)
     $("#explorerChip").style.bottom = mapEnabled() ? "74px" : "42px";
+    updateWardrobeHud();                                              // the worn-outfit figure above the chips (lair)
     $("#debriefChip").style.display = "none";                        // appears only once analysis completes
     $("#skipChip").style.display = "none";                           // shown once analysis is done, then permanent (showSubmitChip)
     $("#hintChip").style.display = "none";                           // escape phase only (updateHintChip)
@@ -496,7 +504,7 @@ function setupSfxToggle() {
   const rooms = SCENARIO.rooms || [];
   const anySfx = rooms.some(r => sfxListFor(r).length) ||
     rooms.some(r => r.solveSfx || (r.hotspots || []).some(h => h.solveSfx)) ||
-    !!SCENARIO.solveSfx;
+    !!SCENARIO.solveSfx || !!SCENARIO.scanSfx;
   if (!anySfx) { chip.style.display = "none"; return; }
   // default on; remembers "off" — EXCEPT in test play, which always starts on: a remembered "off" there
   // silently emptied the mixer ("No sound effects in this room") with the music still playing, so a
@@ -886,16 +894,138 @@ function nbScratchSection() {
 // items are used by tapping a locked door, which asks which one to try.
 function nbCarryingSection() {
   if (!INV.held.length) return null;
+  const tote = WARD.hasWardrobe(SCENARIO);                  // THE TOTE (lair): wearables get Wear / wearing
   const sec = document.createElement("div");
-  sec.className = "nbcarry";
+  sec.className = "nbcarry" + (tote ? " nbtote" : "");
   sec.style.cssText = "margin:0 0 14px";
   sec.innerHTML = `<div style="font:600 12px system-ui;opacity:.6;margin:0 0 6px">Carrying</div>`;
   const row = document.createElement("div");
   row.style.cssText = "display:flex;flex-wrap:wrap;gap:8px";
-  INV.held.forEach(k => row.appendChild(itemTile(INVY.itemInfo(SCENARIO, k))));
+  INV.held.forEach(k => row.appendChild(tote && WARD.isWearable(SCENARIO.items, k) ? toteTile(k) : itemTile(INVY.itemInfo(SCENARIO, k))));
   sec.appendChild(row);
   return sec;
 }
+// ---- THE WARDROBE (shared/wardrobe.js + wardrobe_ui.js; first consumer classification/lair) ----
+// A wearable in the tote: its icon, its name, and "Wear" (or "wearing" if it is on). Wearing one puts the item worn
+// in that slot back in the tote (it stays held). Picking a wearable up never puts it on.
+function toteTile(k) {
+  const info = INVY.itemInfo(SCENARIO, k), on = WARD.isWorn(WR, k);
+  const t = itemTile(info);
+  t.classList.toggle("worn", on);
+  t.insertAdjacentHTML("afterbegin", WUI.itemIconSvg(SCENARIO.items[k], 34));
+  if (on) t.insertAdjacentHTML("beforeend", `<span class="wearing">wearing</span>`);
+  else {
+    const b = document.createElement("button"); b.type = "button"; b.className = "wearbtn"; b.textContent = "Wear";
+    b.onclick = () => wearItem(k);
+    t.appendChild(b);
+  }
+  return t;
+}
+function wearItem(k) {
+  if (!WARD.wear(WR, SCENARIO.items, k, INV.held, gameState).ok) return;
+  updateWardrobeHud();
+  document.querySelectorAll("#modal .nbtote").forEach(s => { const n = nbCarryingSection(); if (n) s.replaceWith(n); });
+  const fig = document.querySelector("#modal .totefig");
+  if (fig) fig.innerHTML = WUI.figureSvg(WARD.outfitWords(WR, SCENARIO.items), { size: 132 });
+}
+// The corner figure (above the chips): what the player has on, slot by slot. Tap opens the tote. Off in live mode
+// and in any scenario with nothing to wear; it lives in #screen2, so the landing card never shows it.
+function updateWardrobeHud() {
+  let el = document.getElementById("wardrobeHud");
+  if (!SCENARIO || !WARD.hasWardrobe(SCENARIO) || liveMode()) { if (el) el.style.display = "none"; return; }
+  WUI.ensureWardrobeStyles(document);
+  if (!el) {
+    el = document.createElement("button"); el.id = "wardrobeHud"; el.type = "button";
+    el.setAttribute("aria-label", "What you are wearing"); el.onclick = openTote;
+    $("#explorerChip").after(el);        // beside the chips, BEFORE #modal/#done (same z 20): cards cover it as they do the chips
+  }
+  el.innerHTML = WUI.figureSvg(WARD.outfitWords(WR, SCENARIO.items), { size: 64 });
+  el.style.bottom = (explorerEnabled() ? (mapEnabled() ? 106 : 74) : (mapEnabled() ? 74 : 42)) + "px";
+  el.style.display = "";
+}
+function openTote() {
+  WUI.ensureWardrobeStyles(document);
+  const d = document.createElement("div");
+  const fig = document.createElement("div"); fig.className = "totefig";
+  fig.innerHTML = WUI.figureSvg(WARD.outfitWords(WR, SCENARIO.items), { size: 132 });
+  d.appendChild(fig);
+  const carry = nbCarryingSection();
+  if (carry) d.appendChild(carry);
+  openModal("Your tote", d);
+}
+// THE SCANNER DOOR: a door with `scannerWeights` weighs the outfit before it lets the player through. It runs AFTER
+// the door's own availableWhen/lockedBodies gate (handleDoor), and once passed the door stays open for the session
+// (D1). Pass: walk on exactly as the door would have (onPass, transit). Refuse: the world's line; at a door whose
+// `scanner.scanBudget` is spent, the lockdown line and then the `scanner.lockdownTo` room, budget reset.
+const scanKey = h => gateKey(room.key, h.id || h.label || "door");
+function playScanSfx(kind) {
+  const s = SCENARIO.scanSfx && SCENARIO.scanSfx[kind];
+  if (s) playOneShot(typeof s === "string" ? s : s.src, typeof s === "object" ? s.volume : undefined);   // behind sfxOn
+}
+function openScanner(h) {
+  WUI.ensureWardrobeStyles(document);
+  const dk = scanKey(h), W = h.scannerWeights, budget = WARD.budgetOf(h), time = WARD.scanTimeOf(SCENARIO);
+  const lines = Object.assign({ prompt: "Step into the scanner", refused: "Refused. The door stays shut.",
+    lockdown: "Too many refused scans. The doors lock down." }, h.scanLines || {});
+  const words = n => ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"][n] || String(n);
+  const card = document.createElement("div"); card.className = "scancard";
+  card.innerHTML = `<div class="scancard-top"><div class="scancard-fig">${WUI.figureSvg(WARD.outfitWords(WR, SCENARIO.items), { size: 110 })}</div>` +
+    `<div class="scancard-time">${WUI.timeSvg(time, 34)}</div></div>` + WUI.dialSvg(0, WARD.opensAbove(W)) +
+    `<div class="scancard-lamps">${WUI.budgetLampsHtml(budget, WARD.refusalsSoFar(WR, dk))}</div>` +
+    `<div class="qfeedback"></div><button class="qsubmit scango" type="button"></button>`;
+  const fb = card.querySelector(".qfeedback"), go = card.querySelector(".scango"), lampsEl = card.querySelector(".scancard-lamps");
+  go.textContent = lines.prompt;
+  go.onclick = () => {
+    go.disabled = true; fb.className = "qfeedback"; fb.textContent = "";
+    const p = WARD.scanProb(W, WARD.wornKeys(WR), time), ok = p > WARD.opensAbove(W);
+    const res = ok ? null : WARD.recordRefusal(WR, dk, budget);   // counted at the scan: closing the card dodges nothing
+    if (ok) WARD.markPassed(WR, dk);
+    const gen = _viewGen, at = room;
+    let reduced = false; try { reduced = matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) {}
+    playScanSfx("tick");
+    WUI.animateDial(card.querySelector(".scandial"), p, { reduced, onDone: () => {
+      if (_viewGen !== gen || room !== at) return;               // the player has left: nothing more to do here
+      if (ok) {
+        playScanSfx("pass");
+        if (!card.isConnected) return;                           // closed mid-scan: the door is open for the next click
+        closeModal();
+        return handleDoor(h, true);
+      }
+      lampsEl.innerHTML = WUI.budgetLampsHtml(budget, res.lockdown ? budget : WARD.refusalsSoFar(WR, dk));
+      fb.className = "qfeedback no";
+      if (!res.lockdown) {
+        playScanSfx("refuse");
+        fb.innerHTML = String(lines.refused).replace(/\{left\}/g, words(res.left));
+        go.disabled = false;
+        return;
+      }
+      playScanSfx("lockdown");
+      fb.innerHTML = lines.lockdown;
+      const to = h.scanner && h.scanner.lockdownTo;
+      const i = to ? SCENARIO.rooms.findIndex(r => r.key === to && isBuilt(r)) : -1;
+      setTimeout(() => {
+        if (_viewGen !== gen || room !== at) return;
+        if (card.isConnected) closeModal();
+        if (i >= 0) navigateTo(i, false, undefined, at.key);
+      }, 2600);
+    } });
+  };
+  // Test play: a tester may walk through without scanning (the locked-door bypass's courtesy). Not marked passed.
+  if (isTestPlay()) {
+    const skip = document.createElement("button"); skip.type = "button"; skip.className = "ghost";
+    skip.textContent = "Test-play: walk through without scanning";
+    skip.onclick = () => { closeModal(); handleDoor(h, true); };
+    card.appendChild(skip);
+  }
+  openModal(h.label || "Scanner", card, null, h);
+}
+// Read-only probe for tests / the author console (like PanoRide): the worn outfit and the scanner state.
+window.PanoWardrobe = {
+  worn: () => WARD.worn(WR),
+  wornKeys: () => WARD.wornKeys(WR),
+  passed: () => [...WR.passed],
+  refusals: () => Object.fromEntries(WR.refusals),
+};
 // One item as a tile (image + name, or the name alone). Shared by the notebook row and the door card.
 function itemTile(info, asButton) {
   const t = document.createElement(asButton ? "button" : "div");
@@ -2492,8 +2622,8 @@ function onHotspot(evt, h) {   // Pannellum calls clickHandlerFunc(event, clickH
 // Door navigation. A door is `direction:"forward"` (default) or `"back"`, with an optional explicit
 // target `to:"<roomKey>"`. forward is gated on the room being solved and shows the target's entry;
 // back is always live and shows no entry. Absent direction/to ⇒ the legacy linear fallback.
-function handleDoor(h) {
-  const nav = doorNav(h);                                      // effective direction/to (a switch-door follows its active variant)
+function handleDoor(h, scanned) {   // scanned: the outfit scanner has let the player through (openScanner)
+  const nav = doorNav(h);                                     // effective direction/to (a switch-door follows its active variant)
   // `onPass` (2026-09-18, subway): world-state effects applied when the player actually walks through —
   // a berth's boarding door records which station the cab stands at ({set:"at_<line>", to:<berth>}).
   // Same {set,to}/{inc} grammar as `onSolve`/`onPickup`. Absent on every other door, so nothing changes.
@@ -2522,7 +2652,9 @@ function handleDoor(h) {
       ? "The portal is awake, but sealed — key the stones to open it."
       : "The door won't budge — solve the puzzle first."));
   }
-  if (h.endsEscape) {                                          // a terminal escape exit inside any room
+  // An outfit SCANNER (lair): after the door's own gate, weigh what is worn; once passed it stays open (D1).
+  if (!scanned && h.scannerWeights && !WARD.hasPassed(WR, scanKey(h))) return openScanner(h);
+  if (h.endsEscape) {                                         // a terminal escape exit inside any room
     if (h.transit && startTransit(h, -1, false, showEscapeDone)) return;   // the victory transit, then the card
     return showEscapeDone();
   }
@@ -2600,7 +2732,8 @@ function preloadTransits(r) {
   want.forEach(src => _transitVideo(src));
 }
 // ROOM FINALE: `room.finale: {video, delay?, morph?, holdMs?, sfx?, sfxVolume?}` — standing in the room for `delay` s
-// (default 5) once the escape is finished (a `deferCard` lock; test-play arms it regardless) plays `video` as the flat
+// (default 5) once the escape is finished (a `deferCard` lock; test play too: entry alone never arms it,
+// finale_testplay_entry.spec.js) plays `video` as the flat
 // back-out finale (startTransit's `flat` escape path), then the escape card. Once per room entry; re-entry re-arms.
 // Leaving the room (or starting a door transit / ride) drops it; a popup pauses it, and closing the popup restarts
 // the full countdown. Missing clip / refused play() / reduced motion: the card alone (startTransit's fallbacks).
@@ -2609,7 +2742,7 @@ function cancelFinale() { if (_finale) clearTimeout(_finale.timer); _finale = nu
 function armFinale(r) {
   cancelFinale();
   const f = r && r.finale;
-  if (!f || !f.video || !(escapeFinished || isTestPlay())) return;
+  if (!f || !f.video || !escapeFinished) return;
   _finale = { key: r.key, timer: 0 };
   _finaleCountdown();
 }
@@ -2963,6 +3096,7 @@ function startFlatDoorTransit(h, idx, withEntry, onArrive = null) {
       video.currentTime = want;
     });
     try { await video.play(); } catch (e) { return arrive(); }
+    if (onArrive) run.snd = _rideSfx(t);       // a faded escape ride's own sound, started with its clip (lair's monorail)
     const want = +T.skip || 0;                 // a seek on a not-yet-playing element can be dropped: re-apply it
     if (video.currentTime < want - 0.05) { try { video.currentTime = want; } catch (e) {} }
     const outAt = onArrive ? () => video.duration || 0                                   // the escape plays to the end
@@ -3001,6 +3135,14 @@ function startFlatDoorTransit(h, idx, withEntry, onArrive = null) {
 // at z 19 the copy is above the HUD and arrows but under the chips (z 20) and #done, so the card's buttons and the
 // submission chip stay live. It blocks clicks on the room underneath (as the back-out overlay does) and goes with
 // the next view build (_cineStop). The veil is removed BEFORE onArrive, never after.
+// `transit.sfx` (+ `sfxVolume`) on a FADED escape ride: one track started with the clip (startFlatDoorTransit), a plain
+// Audio behind the sfx chip, so its tail rings on under the card (showEscapeDone's stopRoomSfx never reaches it). No clip
+// played (missing, refused, reduced motion): no ride, so no ride sound. Ordinary flat doors ignore `sfx`, as before.
+function _rideSfx(t) {
+  if (!t || !t.sfx || !sfxOn) return null;
+  try { const a = new Audio(t.sfx); a.volume = t.sfxVolume != null ? +t.sfxVolume : 0.9; a.play().catch(() => {}); return a; }
+  catch (e) { return null; }
+}
 function _flatEscapeEnd(run, video, veil, held, onArrive) {
   let still = null;
   if (held && video && transiting === run) {
@@ -3301,6 +3443,9 @@ function openLocked(h) {
 }
 
 function openClue(h) {
+  // A clue carrying `availableWhen` is gated like a puzzle (its lockedBody/lockedBodies speak until it holds): lair's
+  // copy stations. Only clues that carry the field change; every other clue opens exactly as before.
+  if (h.availableWhen != null && !condOK(h.availableWhen)) return openLocked(h);
   const d = document.createElement("div");
   // a clue may carry an `image` (path rel. to play.html — a generated artwork), shown above the body. An IMAGE-ONLY
   // clue (no body: the picture IS the clue, e.g. glasshouses' duty roster and timetable, Lucas 2026-11-19) shows it
@@ -3325,7 +3470,7 @@ function openClue(h) {
     const setTaken = () => { btn.textContent = "✓ Taken"; btn.disabled = true; };
     if (taken()) setTaken();
     else {
-      btn.textContent = "Take " + want.map(k => INVY.itemInfo(SCENARIO, k).name).join(" and ");
+      btn.textContent = h.pickupLabel || ("Take " + want.map(k => INVY.itemInfo(SCENARIO, k).name).join(" and "));
       btn.onclick = () => {
         if (taken()) return;
         pickedClues.add(tk);
@@ -3341,7 +3486,7 @@ function openClue(h) {
     const setTaken = () => { btn.textContent = "✓ In your notebook"; btn.disabled = true; };
     if (pickedClues.has(gk)) setTaken();
     else {
-      btn.textContent = "Add to notebook";
+      btn.textContent = h.pickupLabel || "Add to notebook";   // `pickupLabel`: the verb the world uses (lair: copy onto the stick)
       btn.onclick = () => {
         if (pickedClues.has(gk)) return;
         pickedClues.add(gk);
@@ -3428,7 +3573,8 @@ function openPlaque(h) {
 const INSTRUMENTS = { drawdown: mountDrawdown, pca_plate: mountPcaPlate, fish_board: mountFishBoard, tide: mountTide,
                       variance_meter: mountVarianceMeter, ghost_lines: mountGhostLines,
                       anova_board: mountAnovaBoard, dataset_explorer: mountDatasetExplorer,
-                      sigmoid_board: mountSigmoidBoard, scoreboard: mountScoreboard, bank: mountBank };
+                      sigmoid_board: mountSigmoidBoard, scoreboard: mountScoreboard, bank: mountBank,
+                      scan_log: WUI.mountScanLog };   // a scanner door's entry log (lair): rows on the hotspot's scanLog
 // Fisher's board. A config carrying a `permanova` block (a PERMANOVA instrument config) gets two tabs, "ANOVA" and
 // "PERMANOVA"; without one it is the plain ANOVA board, unchanged. The PERMANOVA tab mounts on first open; the
 // tab last shown is remembered per config for the visit (in memory only, like the board's visited steps).
@@ -5239,6 +5385,10 @@ function buildLockCard(h, onSolved) {
      <div class="qfeedback"></div>
      <button class="qsubmit">Enter</button>`;
   const input = card.querySelector("#lockInput"), fb = card.querySelector(".qfeedback"), sub = card.querySelector(".qsubmit");
+  // `stateBodies: [{when, body}]` (lair's gate panel, dark or lit): the first entry whose `when` holds is shown above
+  // the keypad, chosen as lockedBodies are (shared/cond.js). Absent: the lock shows no text, as always.
+  const stateBody = Array.isArray(h.stateBodies) ? lockedMessage({ lockedBodies: h.stateBodies }, { solved: solvedRooms, state: gameState }, null) : null;
+  if (stateBody) card.insertAdjacentHTML("afterbegin", `<p class="lockstatebody">${stateBody}</p>`);
   tpAuthorPanel(card, [
     { note: "The lock shows no prompt to the player — the absence of instructions IS the puzzle. "
           + "The answer itself is not editable here; it is derived from the world and pinned by tests." },
@@ -5759,7 +5909,7 @@ function solveRoom(result, h, qIndex) {
   // replaces the generic door toast. When the lock's OWN room carries the `finale` (observatory's dome), arm it here:
   // armFinale otherwise runs only on room entry, so the player would have to leave and come back. armFinale cancels
   // any earlier countdown first, so it never double-fires; the guard only lets a finale already armed for this room
-  // (test play arms on entry) keep its remaining time. The popup still pauses it.
+  // keep its remaining time. The popup still pauses it.
   if (h && h.endsEscape && !h.deferCard) { closeModal(); return showEscapeDone(); }   // hand-off: a kept-open puzzle closes
   if (h && h.endsEscape) {
     markEscapeFinished();
