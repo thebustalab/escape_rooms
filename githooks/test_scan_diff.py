@@ -454,6 +454,17 @@ class ScannerUnit(unittest.TestCase):
             diff = "diff --git a/x b/x\n+++ b/x\n@@ -0,0 +1 @@\n+" + ok + "\n"
             self.assertEqual(scan_diff.scan(diff), [], ok)
 
+    def test_nucleotide_sequence_is_not_a_secret(self):
+        # 2026-11-24: the website deploy was blocked by the BLAST query DNA in the homology chapter.
+        dna = "AAGCTTGGAAATATTAAGTGAACAGGGAATAGAAAGGATACAACAAAAGGGAAGAACTTAGAGCA"
+        for ok in ('q = "' + dna + '"', "q = '" + dna.lower().replace("t", "u") + "'"):
+            diff = "diff --git a/x b/x\n+++ b/x\n@@ -0,0 +1 @@\n+" + ok + "\n"
+            self.assertEqual(scan_diff.scan(diff), [], ok)
+        # a real base64 token on the same line as a sequence still blocks
+        line = 'q = "' + dna + '"; k = "' + "Zm9vYmFy" * 6 + '"'
+        diff = "diff --git a/x b/x\n+++ b/x\n@@ -0,0 +1 @@\n+" + line + "\n"
+        self.assertTrue(scan_diff.scan(diff))
+
     def test_binary_text_reads_utf16(self):
         blob = ("x" + HOME + "/secret").encode("utf-16-le")
         self.assertIn(HOME, scan_diff.binary_text(blob))

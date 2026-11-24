@@ -74,6 +74,7 @@ PATTERNS = [
 ]
 # Random bytes in a binary blob match these two often enough to be noise; skip them there.
 HEURISTIC = {"long hex literal (32+ chars), token-shaped", "long base64-shaped literal (40+ chars)"}
+_NUCLEOTIDE_RE = re.compile(r"[\"'][ACGTUNacgtun]+[\"']")
 COMPILED = [(re.compile(p), label) for p, label in PATTERNS]
 
 # The four assignment-shaped rules above match `NAME = <anything>`, so they also match a
@@ -135,6 +136,9 @@ def match_line(line: str, identity: bool, binary: bool = False):
         if label in PLACEHOLDER_SUPPRESSIBLE:
             # flag if ANY match on the line is real (`A=YOUR_X; B=realsecret` used to pass)
             m = next((m for m in regex.finditer(line) if not is_placeholder_value(line[m.start():])), None)
+        elif label in HEURISTIC:
+            # a quoted DNA/RNA sequence (book ch16's BLAST query) is base64-shaped; skip only those
+            m = next((m for m in regex.finditer(line) if not _NUCLEOTIDE_RE.fullmatch(m.group(0))), None)
         else:
             m = regex.search(line)
         if not m:
