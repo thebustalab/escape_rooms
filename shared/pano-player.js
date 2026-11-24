@@ -85,36 +85,37 @@
 // A bare `./variant_resolve.js` import is NOT refreshed by bumping the <script> tag's ?v, so a changed
 // helper module (e.g. a new export) leaves browsers on a stale cached copy → "doesn't provide an export
 // named X" SyntaxError → blank page (the 2026-08-05 airship regression). Bump all three together.
-import { WebRConsole } from "./webr-console.js?v=181";
-import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers, pickTransit } from "./variant_resolve.js?v=181";   // Phase 3: per-hotspot state variants; monorail switch-door nav
-import * as PQ from "./puzzle_queue.js?v=181";   // dynamic puzzle queue: location-independent puzzle serving
-import * as CP from "./corr_panel.js?v=181";   // lower-triangle layout of the grid gate (clouds correlation panel)
-import { particleCount } from "./particles.js?v=181";
-import { mountLandingBackdrop } from "./landing_backdrop.js?v=181";   // landing text over a pan of the first room's clip   // ambient-particle vocabulary + per-kind field density
-import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=181";
-import { condHolds, lockedMessage } from "./cond.js?v=181";
-import { gridMatches } from "./grid_check.js?v=181";   // grid answer check; `partition:true` accepts any relabelling of the buckets   // ledger + elevation-map card DOM
-import * as LIVE from "./live_session.js?v=181";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
-import * as RIDE from "./ride.js?v=181";
-import { mountPcaPlate } from "./pca_plate.js?v=181";   // the PCA plate instrument (voyage beach)
-import { mountFishBoard } from "./fish_board.js?v=181";   // the fish board instrument (harbour berth)
-import { mountDrawdown } from "./drawdown.js?v=181";
-import { mountTide } from "./tide_machine.js?v=181";   // the tide machine instrument (dunes escape)
-import { mountVarianceMeter } from "./variance_meter.js?v=181";   // the variance meter instrument (anova cellars escape)
-import { mountAnovaInstrument } from "./anova_instrument.js?v=181";   // the ANOVA instrument (Fisher's board, anova rooms; also the book, ch.12b)
-import { mountPermanovaInstrument } from "./permanova_instrument.js?v=181";   // its PERMANOVA sibling: the board's optional second tab
-import { mountGhostLines } from "./ghost_lines.js?v=181";   // the ghost-line board instrument (regression pits hub)
-import { mount as mountDatasetExplorer } from "./dataset_explorer.js?v=181";   // a dataset's STRUCTURE (instrument kind + the graded rooms' chip)
-import { mount as mountSigmoidBoard } from "./sigmoid_board.js?v=181";   // the S-curve board (classification day one, toy data)
-import { mount as mountScoreboard } from "./scoreboard.js?v=181";   // the scoreboard (classification day two, toy data)
+import { WebRConsole } from "./webr-console.js?v=182";
+import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers, pickTransit } from "./variant_resolve.js?v=182";   // Phase 3: per-hotspot state variants; monorail switch-door nav
+import * as PQ from "./puzzle_queue.js?v=182";   // dynamic puzzle queue: location-independent puzzle serving
+import * as CP from "./corr_panel.js?v=182";   // lower-triangle layout of the grid gate (clouds correlation panel)
+import { particleCount } from "./particles.js?v=182";
+import { mountLandingBackdrop } from "./landing_backdrop.js?v=182";   // landing text over a pan of the first room's clip   // ambient-particle vocabulary + per-kind field density
+import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=182";
+import { condHolds, lockedMessage } from "./cond.js?v=182";
+import { gridMatches } from "./grid_check.js?v=182";   // grid answer check; `partition:true` accepts any relabelling of the buckets   // ledger + elevation-map card DOM
+import * as LIVE from "./live_session.js?v=182";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
+import * as RIDE from "./ride.js?v=182";
+import { mountPcaPlate } from "./pca_plate.js?v=182";   // the PCA plate instrument (voyage beach)
+import { mountFishBoard } from "./fish_board.js?v=182";   // the fish board instrument (harbour berth)
+import { mountDrawdown } from "./drawdown.js?v=182";
+import { mountTide } from "./tide_machine.js?v=182";   // the tide machine instrument (dunes escape)
+import { mountVarianceMeter } from "./variance_meter.js?v=182";   // the variance meter instrument (anova cellars escape)
+import { mountAnovaInstrument } from "./anova_instrument.js?v=182";   // the ANOVA instrument (Fisher's board, anova rooms; also the book, ch.12b)
+import { mountPermanovaInstrument } from "./permanova_instrument.js?v=182";   // its PERMANOVA sibling: the board's optional second tab
+import { mountGhostLines } from "./ghost_lines.js?v=182";   // the ghost-line board instrument (regression pits hub)
+import { mount as mountDatasetExplorer } from "./dataset_explorer.js?v=182";   // a dataset's STRUCTURE (instrument kind + the graded rooms' chip)
+import { mount as mountSigmoidBoard } from "./sigmoid_board.js?v=182";   // the S-curve board (classification day one, toy data)
+import { mount as mountScoreboard } from "./scoreboard.js?v=182";   // the scoreboard (classification day two, toy data)
+import { mountBank } from "./showpiece_bank.js?v=182";   // the showpiece bank (observatory's dome; card data inline on the hotspot)
    // the drawdown board instrument (diamonds escape)   // THE RIDE (subway): express lever + clip-sequence planner
-import * as BELL from "./bell_pull.js?v=181";
-import * as TCOUNT from "./transit_counter.js?v=181";   // the date plaque over a flat door transit (dunes time-skip)
-import * as DATEB from "./date_board.js?v=181";   // date lock: lock mode:"date", two slide-levers (dunes departure board)
-import * as INVY from "./inventory.js?v=181";   // carried items + the door that asks which to use (dunes)   // bell-pull (#16): dial mode:"pull" + lock mode:"state" (spa belfry)
-import { entryYaw } from "./entry_facing.js?v=181";   // face the way out on entering a room (every scenario)
-import * as HINTS from "./escape_hints.js?v=181";
-import * as LOCKC from "./lock_console.js?v=181";   // limited-attempt lock: lockout across openings, eyepiece views, failure + retry (observatory)   // escape-phase Hint chip: time-unlocked tiers (SCENARIO.escapeHints)
+import * as BELL from "./bell_pull.js?v=182";
+import * as TCOUNT from "./transit_counter.js?v=182";   // the date plaque over a flat door transit (dunes time-skip)
+import * as DATEB from "./date_board.js?v=182";   // date lock: lock mode:"date", two slide-levers (dunes departure board)
+import * as INVY from "./inventory.js?v=182";   // carried items + the door that asks which to use (dunes)   // bell-pull (#16): dial mode:"pull" + lock mode:"state" (spa belfry)
+import { entryYaw } from "./entry_facing.js?v=182";   // face the way out on entering a room (every scenario)
+import * as HINTS from "./escape_hints.js?v=182";
+import * as LOCKC from "./lock_console.js?v=182";   // limited-attempt lock: lockout across openings, eyepiece views, failure + retry (observatory)   // escape-phase Hint chip: time-unlocked tiers (SCENARIO.escapeHints)
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 
@@ -2724,6 +2725,7 @@ function startTransit(h, idx, withEntry = true, onArrive = null) {   // withEntr
   if (!t || !t.video || transiting || riding) return false;
   try { if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return false; } catch (e) {}
   if (t.flat && !onArrive) return startFlatDoorTransit(h, idx, withEntry);   // an ordinary door's flat clip (below)
+  if (t.flat && t.fade && onArrive) return startFlatDoorTransit(h, idx, withEntry, onArrive);   // a faded flat escape ride (below)
   const target = idx >= 0 ? SCENARIO.rooms[idx] : null, from = room;
   const rollFrom = +t.rollFrom || 0, rollTo = +t.rollTo || 0;
   let yaw = 0; try { yaw = viewer.getYaw(); } catch (e) {}
@@ -2794,8 +2796,9 @@ function startTransit(h, idx, withEntry = true, onArrive = null) {   // withEntr
     // starts as the player's own 360 view and UN-WRAPS as it plays (`_backoutMorph`): by `morph[1]` of the clip
     // (default 0.85) the whole strip lies flat and letterboxed, centred on the clip's heading, so a pull-back reads as
     // a pull-back whichever way they faced. The last frame holds `holdMs` (default 1000) and then the escape card lands
-    // over it. No fade through black: fades belong to rides (startFlatDoorTransit). Without WebGL it falls back to
-    // the plain flat picture crossfading in. Anything else ignores the flag.
+    // over it. No fade through black: fades belong to rides (startFlatDoorTransit; an escape door that wants one sets
+    // `transit.fade` and never reaches this code). Without WebGL it falls back to the plain flat picture crossfading
+    // in. Anything else ignores the flag.
     const flat = !!(t.flat && onArrive);
     let flatEl = null, morph = null, view0 = null;
     const view = () => {
@@ -2874,7 +2877,15 @@ function startTransit(h, idx, withEntry = true, onArrive = null) {   // withEntr
 // then the arrival room fades in facing the door back to where the player came from. Timings tuned by Lucas in
 // authoring_v2/ui/cart_ride_proto/; a door may override any of them with `transit.timing`. The return door
 // carries a REVERSED copy of the clip (browsers cannot play video backwards reliably). No rolls: the clip is
-// not a panorama. Escape doors keep the letterboxed `flat` handling inside startTransit.
+// not a panorama. Escape doors keep the letterboxed `flat` handling inside startTransit (the back-out morph),
+// UNLESS the transit also sets `fade: true` (lair's monorail ride down to the harbour, 2026-11-24): then this same
+// fade-through-black path runs with `onArrive` (showEscapeDone) and no target room. It fades to black, the clip fades
+// in (`skip`, `fadeIn` as above) and plays to its END (no `endEarly`/`fadeClip` fade-out), the last frame holds
+// `holdMs` (default BACKOUT_HOLD_MS, 1000), then that frame is copied to a canvas INSIDE #screen2 (so the escape card
+// lands over it), the clip and the veil are removed and only then does onArrive run: the body-level veil (z 6) sits
+// above all of #screen2, #done included, so a veil left up kills the card's buttons. A missing clip or a refused
+// play() goes straight to the card; reduced motion never gets here (startTransit returns false → the card alone).
+// Pinned by tests/e2e/escape_ride_fade.spec.js. Without `onArrive` nothing below changes.
 const FLAT_DOOR_TIMING = { fadeOut: 500, skip: 0.3, fadeIn: 500, endEarly: 0.3, fadeClip: 500, fadeRoom: 500 };
 // `transit.counter` (dunes time-skip, 2026-11-11): a brass date plaque over the flat clip, ticking from `from` to
 // `to` (linearly, or at each `steps` clip time), forced to `to` as the clip fades out. Maths in transit_counter.js.
@@ -2887,9 +2898,9 @@ function _counterPlaque() {
     + "box-shadow:0 3px 10px rgba(0,0,0,.55);white-space:nowrap;font-variant-numeric:tabular-nums";
   return el;
 }
-function startFlatDoorTransit(h, idx, withEntry) {
+function startFlatDoorTransit(h, idx, withEntry, onArrive = null) {
   const t = doorTransit(h), target = idx >= 0 ? SCENARIO.rooms[idx] : null, from = room;
-  if (!target) return false;
+  if (!target && !onArrive) return false;
   const T = { ...FLAT_DOOR_TIMING, ...(t.timing || {}) };
   const run = {};
   transiting = run;
@@ -2903,11 +2914,12 @@ function startFlatDoorTransit(h, idx, withEntry) {
     requestAnimationFrame(() => requestAnimationFrame(() => { veil.style.opacity = String(to); }));
     return sleep(ms + 40);
   };
-  const back = (target.hotspots || []).find(d => d && d.type === "door" && d.to === (from && from.key) && Array.isArray(d.box));
+  const back = target ? (target.hotspots || []).find(d => d && d.type === "door" && d.to === (from && from.key) && Array.isArray(d.box)) : null;
   const arriveYaw = back ? boxToYP(back.box, target.wrap || { haov: 360, vaov: 90 }).yaw : undefined;
   let video = null, counterEl = null;
-  const arrive = async () => {
+  const arrive = async (held = false) => {
     if (counterEl) { counterEl.remove(); counterEl = null; }
+    if (onArrive) return _flatEscapeEnd(run, video, veil, held, onArrive);   // the escape: no room to arrive in
     if (video) { try { video.pause(); } catch (e) {} video.style.cssText = ""; _hideAfterDecode(video); }
     if (transiting !== run) { veil.remove(); return; }
     transiting = null;
@@ -2932,7 +2944,7 @@ function startFlatDoorTransit(h, idx, withEntry) {
   };
   // Fetch the arrival art while the clip plays, so the room is ready the moment it ends (the browser cache
   // then serves buildViewer's own load). Best effort: a failure here just means the normal load after arrival.
-  try {
+  if (target) try {
     [target.panorama, ...activeVariants(target).map(v => v.panorama)].filter(Boolean)
       .forEach(src => _loadImg(src).catch(() => {}));
   } catch (e) {}
@@ -2953,7 +2965,8 @@ function startFlatDoorTransit(h, idx, withEntry) {
     try { await video.play(); } catch (e) { return arrive(); }
     const want = +T.skip || 0;                 // a seek on a not-yet-playing element can be dropped: re-apply it
     if (video.currentTime < want - 0.05) { try { video.currentTime = want; } catch (e) {} }
-    const outAt = () => (video.duration || 0) - (+T.endEarly || 0) - (+T.fadeClip || 0) / 1000;
+    const outAt = onArrive ? () => video.duration || 0                                   // the escape plays to the end
+                           : () => (video.duration || 0) - (+T.endEarly || 0) - (+T.fadeClip || 0) / 1000;
     const C = t.counter && t.counter.from && t.counter.to ? t.counter : null;
     const posted = C && C.toFromLock ? postedDates.get(C.toFromLock) || null : null;
     const tick = () => {
@@ -2971,10 +2984,47 @@ function startFlatDoorTransit(h, idx, withEntry) {
       await sleep(30);
     }
     if (counterEl) counterEl.textContent = TCOUNT.counterDay(C.from, TCOUNT.counterTo(C, posted), 1);
+    if (onArrive) {                            // hold the last frame, then the card over it
+      const hold = t.holdMs != null && isFinite(+t.holdMs) ? Math.max(0, +t.holdMs) : BACKOUT_HOLD_MS;
+      if (hold > 0 && transiting === run) await sleep(hold);
+      return arrive(true);
+    }
     await fade(1, T.fadeClip);
     arrive();
   })().catch(e => { console.error("flat transit failed; walking through", e); arrive(); });
   return true;
+}
+// The end of a faded flat ESCAPE ride (`transit.fade` with onArrive). `held`: the clip played (or stalled) through
+// and its last frame has been held, so that frame stays up under the card; otherwise (missing clip, refused play(),
+// a throw) the card lands straight over the room. The frame is COPIED into a canvas inside #screen2 rather than the
+// <video> being kept: the clip sits on <body> above the whole screen (as an ordinary ride's does), and inside #screen2
+// at z 19 the copy is above the HUD and arrows but under the chips (z 20) and #done, so the card's buttons and the
+// submission chip stay live. It blocks clicks on the room underneath (as the back-out overlay does) and goes with
+// the next view build (_cineStop). The veil is removed BEFORE onArrive, never after.
+function _flatEscapeEnd(run, video, veil, held, onArrive) {
+  let still = null;
+  if (held && video && transiting === run) {
+    try {
+      const W = video.videoWidth, H = video.videoHeight;
+      if (W && H && video.readyState >= 2) {
+        still = document.createElement("canvas");
+        still.width = W; still.height = H;
+        still.getContext("2d").drawImage(video, 0, 0, W, H);
+        still.className = "transit-flat transit-fade-last";
+        still.style.cssText = "position:fixed;inset:0;width:100vw;height:100vh;object-fit:contain;background:#000;z-index:19";
+        ($("#screen2") || document.body).appendChild(still);
+      }
+    } catch (e) { if (still) still.remove(); still = null; }
+  }
+  if (video) { try { video.pause(); } catch (e) {} video.style.cssText = ""; _hideAfterDecode(video); }
+  veil.remove();
+  if (transiting !== run) { if (still) still.remove(); return; }
+  transiting = null;
+  if (still) {
+    const prev = _cineStop;                    // the room's own cinemagraph keeps its stop; ours rides along
+    _cineStop = () => { if (prev) { try { prev(); } catch (e) {} } still.remove(); };
+  }
+  onArrive();
 }
 
 // ---- modal helpers ----
@@ -3378,7 +3428,7 @@ function openPlaque(h) {
 const INSTRUMENTS = { drawdown: mountDrawdown, pca_plate: mountPcaPlate, fish_board: mountFishBoard, tide: mountTide,
                       variance_meter: mountVarianceMeter, ghost_lines: mountGhostLines,
                       anova_board: mountAnovaBoard, dataset_explorer: mountDatasetExplorer,
-                      sigmoid_board: mountSigmoidBoard, scoreboard: mountScoreboard };
+                      sigmoid_board: mountSigmoidBoard, scoreboard: mountScoreboard, bank: mountBank };
 // Fisher's board. A config carrying a `permanova` block (a PERMANOVA instrument config) gets two tabs, "ANOVA" and
 // "PERMANOVA"; without one it is the plain ANOVA board, unchanged. The PERMANOVA tab mounts on first open; the
 // tab last shown is remembered per config for the visit (in memory only, like the board's visited steps).
@@ -3455,7 +3505,8 @@ async function openInstrument(h) {
     const held = h.pulleys ? Object.entries(h.pulleys).filter(([k]) => INV.held.includes(k) !== untilTaken).map(([, pid]) => pid) : undefined;
     // `params` (optional): per-hotspot settings the kind reads (the variance meter: utility, powered).
     // `configUrl`: where `config` came from, so a config naming its own files (the dataset explorer's CSV) resolves beside it.
-    const inst = mount(card, { geometry, config, configUrl: h.config, held, params: h.params || {}, art: h.art || {}, pegs: _instrumentState.get(sk), sound: !liveSilent(),
+    // `hotspot`: the hotspot itself, for a kind whose data ride inline on it (the showpiece bank's cards).
+    const inst = mount(card, { geometry, config, configUrl: h.config, held, params: h.params || {}, art: h.art || {}, hotspot: h, pegs: _instrumentState.get(sk), sound: !liveSilent(),
                                onPegs: v => _instrumentState.set(sk, v) });
     _modalTeardown = () => inst.destroy();
   } catch (e) {
@@ -5213,8 +5264,8 @@ function buildLockCard(h, onSolved) {
   // lock offers one — a retry that resets only THIS lock's attempts. A reload would wipe the graded run.
   const showOut = res => {
     fb.className = "qfeedback out";
-    fb.innerHTML = (res.text ? `<div>${res.text}</div>` : "") +
-      (res.failure ? (res.failure.title ? `<div style="font-weight:700;margin-top:${res.text ? 8 : 0}px">${res.failure.title}</div>` : "") +
+    fb.innerHTML = (res.image ? LOCKC.resultHtml(res) : res.text ? `<div>${res.text}</div>` : "") +   // a picture view: image above its text
+      (res.failure ? (res.failure.title ? `<div style="font-weight:700;margin-top:${res.text || res.image ? 8 : 0}px">${res.failure.title}</div>` : "") +
                      (res.failure.body ? `<div>${res.failure.body}</div>` : "") : "");
     sub.disabled = true; input.disabled = true;
     const label = LOCKC.retryLabel(h);
@@ -5238,7 +5289,7 @@ function buildLockCard(h, onSolved) {
     if (!val) { input.focus(); return; }
     attempts++; attemptCounts.set(pid, attempts);
     if (val === target) {
-      fb.className = "qfeedback ok"; fb.innerHTML = fbk.correct || "The lock releases.";
+      fb.className = "qfeedback ok"; fb.innerHTML = LOCKC.solvedHtml(h) + (fbk.correct || "The lock releases.");   // `eyepiece.solved`: "" when absent
       sub.disabled = true; input.disabled = true;
       setTimeout(() => onSolved({ answer: 1, attempts }), 900);
       return;
@@ -5246,7 +5297,7 @@ function buildLockCard(h, onSolved) {
     const res = LOCKC.wrongResult(h, val, attempts);
     writeMissState(attempts);
     if (res.kind === "out") showOut(res);
-    else { fb.className = "qfeedback no"; fb.innerHTML = res.text; input.select(); }
+    else { fb.className = "qfeedback no"; fb.innerHTML = LOCKC.resultHtml(res); input.select(); }   // text views: exactly res.text
   };
   // Reopened after the attempts ran out: stay locked out (before 2026-11-21 a reopen silently re-armed it).
   if (LOCKC.isLockedOut(h, attempts) && !solvedGates.has(pid)) showOut(LOCKC.lockedOutResult(h));
@@ -5703,12 +5754,16 @@ function solveRoom(result, h, qIndex) {
   applyFx();                                           // a state-gated effect may have just turned on
   // An escape gate flagged `endsEscape` (e.g. a boss-room valve keypad) ends the ungraded escape when
   // solved — the in-room analogue of an endsEscape DOOR (handleDoor). Terminal: show the escape finish.
-  // `deferCard: true` on such a lock: the escape counts as finished NOW, but the card waits for the next room's
+  // `deferCard: true` on such a lock: the escape counts as finished NOW, but the card waits for the room
   // `finale` (armFinale); the solve carries on as an ordinary lock (its `requires` door opens). `solvedToast`
-  // replaces the generic door toast.
+  // replaces the generic door toast. When the lock's OWN room carries the `finale` (observatory's dome), arm it here:
+  // armFinale otherwise runs only on room entry, so the player would have to leave and come back. armFinale cancels
+  // any earlier countdown first, so it never double-fires; the guard only lets a finale already armed for this room
+  // (test play arms on entry) keep its remaining time. The popup still pauses it.
   if (h && h.endsEscape && !h.deferCard) { closeModal(); return showEscapeDone(); }   // hand-off: a kept-open puzzle closes
   if (h && h.endsEscape) {
     markEscapeFinished();
+    if (room && room.finale && !(_finale && _finale.key === room.key)) armFinale(room);
     if (h.solvedToast) { toast(h.solvedToast); return; }
   }
   // If solving THIS analysis puzzle completes the whole analysis objective, end it here — the trigger is
