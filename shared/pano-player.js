@@ -85,39 +85,39 @@
 // A bare `./variant_resolve.js` import is NOT refreshed by bumping the <script> tag's ?v, so a changed
 // helper module (e.g. a new export) leaves browsers on a stale cached copy → "doesn't provide an export
 // named X" SyntaxError → blank page (the 2026-08-05 airship regression). Bump all three together.
-import { WebRConsole } from "./webr-console.js?v=183";
-import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers, pickTransit } from "./variant_resolve.js?v=183";   // Phase 3: per-hotspot state variants; monorail switch-door nav
-import * as PQ from "./puzzle_queue.js?v=183";   // dynamic puzzle queue: location-independent puzzle serving
-import * as CP from "./corr_panel.js?v=183";   // lower-triangle layout of the grid gate (clouds correlation panel)
-import { particleCount } from "./particles.js?v=183";
-import { mountLandingBackdrop } from "./landing_backdrop.js?v=183";   // landing text over a pan of the first room's clip   // ambient-particle vocabulary + per-kind field density
-import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=183";
-import { condHolds, lockedMessage } from "./cond.js?v=183";
-import { gridMatches } from "./grid_check.js?v=183";   // grid answer check; `partition:true` accepts any relabelling of the buckets   // ledger + elevation-map card DOM
-import * as LIVE from "./live_session.js?v=183";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
-import * as RIDE from "./ride.js?v=183";
-import { mountPcaPlate } from "./pca_plate.js?v=183";   // the PCA plate instrument (voyage beach)
-import { mountFishBoard } from "./fish_board.js?v=183";   // the fish board instrument (harbour berth)
-import { mountDrawdown } from "./drawdown.js?v=183";
-import { mountTide } from "./tide_machine.js?v=183";   // the tide machine instrument (dunes escape)
-import { mountVarianceMeter } from "./variance_meter.js?v=183";   // the variance meter instrument (anova cellars escape)
-import { mountAnovaInstrument } from "./anova_instrument.js?v=183";   // the ANOVA instrument (Fisher's board, anova rooms; also the book, ch.12b)
-import { mountPermanovaInstrument } from "./permanova_instrument.js?v=183";   // its PERMANOVA sibling: the board's optional second tab
-import { mountGhostLines } from "./ghost_lines.js?v=183";   // the ghost-line board instrument (regression pits hub)
-import { mount as mountDatasetExplorer } from "./dataset_explorer.js?v=183";   // a dataset's STRUCTURE (instrument kind + the graded rooms' chip)
-import { mount as mountSigmoidBoard } from "./sigmoid_board.js?v=183";   // the S-curve board (classification day one, toy data)
-import { mount as mountScoreboard } from "./scoreboard.js?v=183";   // the scoreboard (classification day two, toy data)
-import { mountBank } from "./showpiece_bank.js?v=183";   // the showpiece bank (observatory's dome; card data inline on the hotspot)
+import { WebRConsole } from "./webr-console.js?v=184";
+import { pickActiveVariants, activeDoorVariant, fullSceneState, pickCinemagraphs, pickSfxLayers, pickTransit } from "./variant_resolve.js?v=184";   // Phase 3: per-hotspot state variants; monorail switch-door nav
+import * as PQ from "./puzzle_queue.js?v=184";   // dynamic puzzle queue: location-independent puzzle serving
+import * as CP from "./corr_panel.js?v=184";   // lower-triangle layout of the grid gate (clouds correlation panel)
+import { particleCount } from "./particles.js?v=184";
+import { mountLandingBackdrop } from "./landing_backdrop.js?v=184";   // landing text over a pan of the first room's clip   // ambient-particle vocabulary + per-kind field density
+import { buildLedgerCard, buildElevmapCard } from "./widgets.js?v=184";
+import { condHolds, lockedMessage } from "./cond.js?v=184";
+import { gridMatches } from "./grid_check.js?v=184";   // grid answer check; `partition:true` accepts any relabelling of the buckets   // ledger + elevation-map card DOM
+import * as LIVE from "./live_session.js?v=184";   // live scenarios: join the in-class session, HUD, deal/answer/deliver
+import * as RIDE from "./ride.js?v=184";
+import { mountPcaPlate } from "./pca_plate.js?v=184";   // the PCA plate instrument (voyage beach)
+import { mountFishBoard } from "./fish_board.js?v=184";   // the fish board instrument (harbour berth)
+import { mountDrawdown } from "./drawdown.js?v=184";
+import { mountTide } from "./tide_machine.js?v=184";   // the tide machine instrument (dunes escape)
+import { mountVarianceMeter } from "./variance_meter.js?v=184";   // the variance meter instrument (anova cellars escape)
+import { mountAnovaInstrument } from "./anova_instrument.js?v=184";   // the ANOVA instrument (Fisher's board, anova rooms; also the book, ch.12b)
+import { mountPermanovaInstrument } from "./permanova_instrument.js?v=184";   // its PERMANOVA sibling: the board's optional second tab
+import { mountGhostLines } from "./ghost_lines.js?v=184";   // the ghost-line board instrument (regression pits hub)
+import { mount as mountDatasetExplorer } from "./dataset_explorer.js?v=184";   // a dataset's STRUCTURE (instrument kind + the graded rooms' chip)
+import { mount as mountSigmoidBoard } from "./sigmoid_board.js?v=184";   // the S-curve board (classification day one, toy data)
+import { mount as mountScoreboard } from "./scoreboard.js?v=184";   // the scoreboard (classification day two, toy data)
+import { mountBank } from "./showpiece_bank.js?v=184";   // the showpiece bank (observatory's dome; card data inline on the hotspot)
    // the drawdown board instrument (diamonds escape)   // THE RIDE (subway): express lever + clip-sequence planner
-import * as BELL from "./bell_pull.js?v=183";
-import * as TCOUNT from "./transit_counter.js?v=183";   // the date plaque over a flat door transit (dunes time-skip)
-import * as DATEB from "./date_board.js?v=183";   // date lock: lock mode:"date", two slide-levers (dunes departure board)
-import * as INVY from "./inventory.js?v=183";   // carried items + the door that asks which to use (dunes)   // bell-pull (#16): dial mode:"pull" + lock mode:"state" (spa belfry)
-import { entryYaw } from "./entry_facing.js?v=183";   // face the way out on entering a room (every scenario)
-import * as HINTS from "./escape_hints.js?v=183";
-import * as LOCKC from "./lock_console.js?v=183";   // limited-attempt lock: lockout across openings, eyepiece views, failure + retry (observatory)   // escape-phase Hint chip: time-unlocked tiers (SCENARIO.escapeHints)
-import * as WARD from "./wardrobe.js?v=183";   // what the player wears + the outfit scanners on doors (lair)
-import * as WUI from "./wardrobe_ui.js?v=183";   // the wardrobe's drawings: figure, scan log, scanner dial, tote icons
+import * as BELL from "./bell_pull.js?v=184";
+import * as TCOUNT from "./transit_counter.js?v=184";   // the date plaque over a flat door transit (dunes time-skip)
+import * as DATEB from "./date_board.js?v=184";   // date lock: lock mode:"date", two slide-levers (dunes departure board)
+import * as INVY from "./inventory.js?v=184";   // carried items + the door that asks which to use (dunes)   // bell-pull (#16): dial mode:"pull" + lock mode:"state" (spa belfry)
+import { entryYaw } from "./entry_facing.js?v=184";   // face the way out on entering a room (every scenario)
+import * as HINTS from "./escape_hints.js?v=184";
+import * as LOCKC from "./lock_console.js?v=184";   // limited-attempt lock: lockout across openings, eyepiece views, failure + retry (observatory)   // escape-phase Hint chip: time-unlocked tiers (SCENARIO.escapeHints)
+import * as WARD from "./wardrobe.js?v=184";   // what the player wears + the outfit scanners on doors (lair)
+import * as WUI from "./wardrobe_ui.js?v=184";   // the wardrobe's drawings: figure, scan log, scanner dial, tote icons
 
 let SCENARIO = null;   // assigned once scenario.json loads (see the fetch at the foot of this file)
 

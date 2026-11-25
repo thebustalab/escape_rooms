@@ -373,11 +373,11 @@
    "kind": "mcq",
    "track": "day2",
    "title": "Which predictor weighs most?",
-   "question": "Use the training plates in survey_plates. Scale color_index, axis_ratio and apparent_size_arcsec, fit a logistic regression model that predicts elliptical from all three, and look at the three coefficients. Which predictor has the largest scaled coefficient, ignoring its sign?",
-   "starter_code": "training_plates <- survey_plates %>%\n  filter(record == \"training\")\n\nscaled_plates <- training_plates %>%\n  mutate(across(c(____, ____, ____), scale))\n",
-   "solution": "training_plates <- survey_plates %>%\n  filter(record == \"training\")\n\nscaled_plates <- training_plates %>%\n  mutate(across(c(color_index, axis_ratio, apparent_size_arcsec), scale))\n\nmodel <- buildModel(\n  data = scaled_plates,\n  model_type = \"logistic_regression\",\n  predictors = c(\"color_index\", \"axis_ratio\", \"apparent_size_arcsec\"),\n  response = \"elliptical\"\n)\n\nmodel$metrics %>%\n  filter(type == \"coefficient\")\n",
+   "question": "Use the training plates in survey_plates. Fit a logistic regression model that predicts elliptical from color_index, axis_ratio and apparent_size_arcsec with scale_variance = TRUE, and look at the three coefficients. Which predictor has the largest scaled coefficient, ignoring its sign?",
+   "starter_code": "training_plates <- survey_plates %>%\n  filter(record == \"training\")\n\nmodel <- buildModel(\n  data = training_plates,\n  model_type = \"logistic_regression\",\n  predictors = c(\"____\", \"____\", \"____\"),\n  response = \"elliptical\",\n  scale_variance = ____\n)\n",
+   "solution": "training_plates <- survey_plates %>%\n  filter(record == \"training\")\n\nmodel <- buildModel(\n  data = training_plates,\n  model_type = \"logistic_regression\",\n  predictors = c(\"color_index\", \"axis_ratio\", \"apparent_size_arcsec\"),\n  response = \"elliptical\",\n  scale_variance = TRUE\n)\n\nmodel$metrics %>%\n  filter(type == \"coefficient\")\n",
    "right_feedback": "Right: once all three are scaled, its coefficient is the largest in size.",
-   "wrong_feedback": "Not that one. Scale color_index, axis_ratio and apparent_size_arcsec first, fit on the scaled training plates, and compare the size of the coefficients (not the intercept), ignoring the sign.",
+   "wrong_feedback": "Not that one. Fit on the training plates with scale_variance = TRUE so the predictors are scaled, and compare the size of the coefficients (not the intercept), ignoring the sign.",
    "options": [
     {
      "id": "o0",
@@ -400,11 +400,11 @@
    "kind": "mcq",
    "track": "day2",
    "title": "Which predictor weighs most?",
-   "question": "Use the training plates in survey_plates. Scale color_index, axis_ratio and exposure_minutes, fit a logistic regression model that predicts elliptical from all three, and look at the three coefficients. Which predictor has the largest scaled coefficient, ignoring its sign?",
-   "starter_code": "training_plates <- survey_plates %>%\n  filter(record == \"training\")\n\nscaled_plates <- training_plates %>%\n  mutate(across(c(____, ____, ____), scale))\n",
-   "solution": "training_plates <- survey_plates %>%\n  filter(record == \"training\")\n\nscaled_plates <- training_plates %>%\n  mutate(across(c(color_index, axis_ratio, exposure_minutes), scale))\n\nmodel <- buildModel(\n  data = scaled_plates,\n  model_type = \"logistic_regression\",\n  predictors = c(\"color_index\", \"axis_ratio\", \"exposure_minutes\"),\n  response = \"elliptical\"\n)\n\nmodel$metrics %>%\n  filter(type == \"coefficient\")\n",
+   "question": "Use the training plates in survey_plates. Fit a logistic regression model that predicts elliptical from color_index, axis_ratio and exposure_minutes with scale_variance = TRUE, and look at the three coefficients. Which predictor has the largest scaled coefficient, ignoring its sign?",
+   "starter_code": "training_plates <- survey_plates %>%\n  filter(record == \"training\")\n\nmodel <- buildModel(\n  data = training_plates,\n  model_type = \"logistic_regression\",\n  predictors = c(\"____\", \"____\", \"____\"),\n  response = \"elliptical\",\n  scale_variance = ____\n)\n",
+   "solution": "training_plates <- survey_plates %>%\n  filter(record == \"training\")\n\nmodel <- buildModel(\n  data = training_plates,\n  model_type = \"logistic_regression\",\n  predictors = c(\"color_index\", \"axis_ratio\", \"exposure_minutes\"),\n  response = \"elliptical\",\n  scale_variance = TRUE\n)\n\nmodel$metrics %>%\n  filter(type == \"coefficient\")\n",
    "right_feedback": "Right: once all three are scaled, its coefficient is the largest in size.",
-   "wrong_feedback": "Not that one. Scale color_index, axis_ratio and exposure_minutes first, fit on the scaled training plates, and compare the size of the coefficients (not the intercept), ignoring the sign.",
+   "wrong_feedback": "Not that one. Fit on the training plates with scale_variance = TRUE so the predictors are scaled, and compare the size of the coefficients (not the intercept), ignoring the sign.",
    "options": [
     {
      "id": "o0",
@@ -427,11 +427,11 @@
    "kind": "mcq",
    "track": "day2",
    "title": "Which predictor weighs most?",
-   "question": "Use the training plates in survey_plates. Scale color_index and apparent_size_arcsec, fit a logistic regression model that predicts elliptical from both, and look at the two coefficients. Which predictor has the larger scaled coefficient, ignoring its sign?",
-   "starter_code": "training_plates <- survey_plates %>%\n  filter(record == \"training\")\n\nscaled_plates <- training_plates %>%\n  mutate(across(c(____, ____), scale))\n",
-   "solution": "training_plates <- survey_plates %>%\n  filter(record == \"training\")\n\nscaled_plates <- training_plates %>%\n  mutate(across(c(color_index, apparent_size_arcsec), scale))\n\nmodel <- buildModel(\n  data = scaled_plates,\n  model_type = \"logistic_regression\",\n  predictors = c(\"color_index\", \"apparent_size_arcsec\"),\n  response = \"elliptical\"\n)\n\nmodel$metrics %>%\n  filter(type == \"coefficient\")\n",
+   "question": "Use the training plates in survey_plates. Fit a logistic regression model that predicts elliptical from color_index and apparent_size_arcsec with scale_variance = TRUE, and look at the two coefficients. Which predictor has the larger scaled coefficient, ignoring its sign?",
+   "starter_code": "training_plates <- survey_plates %>%\n  filter(record == \"training\")\n\nmodel <- buildModel(\n  data = training_plates,\n  model_type = \"logistic_regression\",\n  predictors = c(\"____\", \"____\"),\n  response = \"elliptical\",\n  scale_variance = ____\n)\n",
+   "solution": "training_plates <- survey_plates %>%\n  filter(record == \"training\")\n\nmodel <- buildModel(\n  data = training_plates,\n  model_type = \"logistic_regression\",\n  predictors = c(\"color_index\", \"apparent_size_arcsec\"),\n  response = \"elliptical\",\n  scale_variance = TRUE\n)\n\nmodel$metrics %>%\n  filter(type == \"coefficient\")\n",
    "right_feedback": "Right: once both are scaled, its coefficient is the larger in size.",
-   "wrong_feedback": "Not that one. Scale color_index and apparent_size_arcsec first, fit on the scaled training plates, and compare the size of the coefficients (not the intercept), ignoring the sign.",
+   "wrong_feedback": "Not that one. Fit on the training plates with scale_variance = TRUE so the predictors are scaled, and compare the size of the coefficients (not the intercept), ignoring the sign.",
    "options": [
     {
      "id": "o0",
@@ -450,11 +450,11 @@
    "kind": "mcq",
    "track": "day2",
    "title": "Which predictor weighs most?",
-   "question": "Use the training plates in survey_plates. Scale color_index and exposure_minutes, fit a logistic regression model that predicts elliptical from both, and look at the two coefficients. Which predictor has the larger scaled coefficient, ignoring its sign?",
-   "starter_code": "training_plates <- survey_plates %>%\n  filter(record == \"training\")\n\nscaled_plates <- training_plates %>%\n  mutate(across(c(____, ____), scale))\n",
-   "solution": "training_plates <- survey_plates %>%\n  filter(record == \"training\")\n\nscaled_plates <- training_plates %>%\n  mutate(across(c(color_index, exposure_minutes), scale))\n\nmodel <- buildModel(\n  data = scaled_plates,\n  model_type = \"logistic_regression\",\n  predictors = c(\"color_index\", \"exposure_minutes\"),\n  response = \"elliptical\"\n)\n\nmodel$metrics %>%\n  filter(type == \"coefficient\")\n",
+   "question": "Use the training plates in survey_plates. Fit a logistic regression model that predicts elliptical from color_index and exposure_minutes with scale_variance = TRUE, and look at the two coefficients. Which predictor has the larger scaled coefficient, ignoring its sign?",
+   "starter_code": "training_plates <- survey_plates %>%\n  filter(record == \"training\")\n\nmodel <- buildModel(\n  data = training_plates,\n  model_type = \"logistic_regression\",\n  predictors = c(\"____\", \"____\"),\n  response = \"elliptical\",\n  scale_variance = ____\n)\n",
+   "solution": "training_plates <- survey_plates %>%\n  filter(record == \"training\")\n\nmodel <- buildModel(\n  data = training_plates,\n  model_type = \"logistic_regression\",\n  predictors = c(\"color_index\", \"exposure_minutes\"),\n  response = \"elliptical\",\n  scale_variance = TRUE\n)\n\nmodel$metrics %>%\n  filter(type == \"coefficient\")\n",
    "right_feedback": "Right: once both are scaled, its coefficient is the larger in size.",
-   "wrong_feedback": "Not that one. Scale color_index and exposure_minutes first, fit on the scaled training plates, and compare the size of the coefficients (not the intercept), ignoring the sign.",
+   "wrong_feedback": "Not that one. Fit on the training plates with scale_variance = TRUE so the predictors are scaled, and compare the size of the coefficients (not the intercept), ignoring the sign.",
    "options": [
     {
      "id": "o0",
@@ -557,11 +557,11 @@
    "kind": "mcq",
    "track": "day2",
    "title": "Accuracy, precision and recall",
-   "question": "Use survey_plates. Fit a logistic regression model on the training plates with the predictors concentration and axis_ratio (response elliptical), then predict the held-back plates with predictWithModel(). Using the 0.5 cut-off (the predicted_class column), compare its accuracy with calling every held-back galaxy a spiral (always \"no\"). Which is more accurate, and what are the model's precision and recall for ellipticals?",
+   "question": "Use survey_plates. Fit a logistic regression model on the training plates with the predictors concentration and axis_ratio (response elliptical), then predict the held-back plates with predictWithModel(). Score the predictions with scoreModel(), which takes data (the predictions), response (the column that says what really happened, here elliptical) and cutoff (0.5 unless you change it), and compare the model's accuracy with calling every held-back galaxy a spiral (always \"no\"). Which is more accurate, and what are the model's precision and recall for ellipticals?",
    "starter_code": "training_plates <- survey_plates %>%\n  filter(record == \"training\")\nheld_back_plates <- survey_plates %>%\n  filter(record == \"held back\")\n",
-   "solution": "training_plates <- survey_plates %>%\n  filter(record == \"training\")\nheld_back_plates <- survey_plates %>%\n  filter(record == \"held back\")\n\nmodel <- buildModel(\n  data = training_plates,\n  model_type = \"logistic_regression\",\n  predictors = c(\"concentration\", \"axis_ratio\"),\n  response = \"elliptical\"\n)\n\npredictions <- predictWithModel(data = held_back_plates, model = model)\n\npredictions %>%\n  summarize(model_accuracy = mean(predicted_class == elliptical),\n            all_spiral_accuracy = mean(elliptical == \"no\"))\n\npredictions %>%\n  summarize(precision = sum(elliptical == \"yes\" & predicted_class == \"yes\") /\n              sum(predicted_class == \"yes\"),\n            recall = sum(elliptical == \"yes\" & predicted_class == \"yes\") /\n              sum(elliptical == \"yes\"))\n",
+   "solution": "training_plates <- survey_plates %>%\n  filter(record == \"training\")\nheld_back_plates <- survey_plates %>%\n  filter(record == \"held back\")\n\nmodel <- buildModel(\n  data = training_plates,\n  model_type = \"logistic_regression\",\n  predictors = c(\"concentration\", \"axis_ratio\"),\n  response = \"elliptical\"\n)\n\npredictions <- predictWithModel(data = held_back_plates, model = model)\n\nscoreModel(predictions, response = \"elliptical\")\n\npredictions %>%\n  summarize(all_spiral_accuracy = mean(elliptical == \"no\"))\n",
    "right_feedback": "Right: precision is caught out of everything called elliptical, recall is caught out of every real elliptical, and neither is accuracy.",
-   "wrong_feedback": "Not that one. Compare the two accuracies first. Then count caught, missed and false alarms: precision = caught / (caught + false alarms), recall = caught / (caught + missed).",
+   "wrong_feedback": "Not that one. scoreModel(predictions, response = \"elliptical\") gives the model's accuracy, precision and recall; compare that accuracy with calling every plate a spiral, the mean of elliptical == \"no\".",
    "options": [
     {
      "id": "o0",
@@ -588,11 +588,11 @@
    "kind": "mcq",
    "track": "day2",
    "title": "Accuracy, precision and recall",
-   "question": "Use survey_plates. Fit a logistic regression model on the training plates with the predictors concentration, axis_ratio and apparent_size_arcsec (response elliptical), then predict the held-back plates with predictWithModel(). Using the 0.5 cut-off (the predicted_class column), compare its accuracy with calling every held-back galaxy a spiral (always \"no\"). Which is more accurate, and what are the model's precision and recall for ellipticals?",
+   "question": "Use survey_plates. Fit a logistic regression model on the training plates with the predictors concentration, axis_ratio and apparent_size_arcsec (response elliptical), then predict the held-back plates with predictWithModel(). Score the predictions with scoreModel(), which takes data (the predictions), response (the column that says what really happened, here elliptical) and cutoff (0.5 unless you change it), and compare the model's accuracy with calling every held-back galaxy a spiral (always \"no\"). Which is more accurate, and what are the model's precision and recall for ellipticals?",
    "starter_code": "training_plates <- survey_plates %>%\n  filter(record == \"training\")\nheld_back_plates <- survey_plates %>%\n  filter(record == \"held back\")\n",
-   "solution": "training_plates <- survey_plates %>%\n  filter(record == \"training\")\nheld_back_plates <- survey_plates %>%\n  filter(record == \"held back\")\n\nmodel <- buildModel(\n  data = training_plates,\n  model_type = \"logistic_regression\",\n  predictors = c(\"concentration\", \"axis_ratio\", \"apparent_size_arcsec\"),\n  response = \"elliptical\"\n)\n\npredictions <- predictWithModel(data = held_back_plates, model = model)\n\npredictions %>%\n  summarize(model_accuracy = mean(predicted_class == elliptical),\n            all_spiral_accuracy = mean(elliptical == \"no\"))\n\npredictions %>%\n  summarize(precision = sum(elliptical == \"yes\" & predicted_class == \"yes\") /\n              sum(predicted_class == \"yes\"),\n            recall = sum(elliptical == \"yes\" & predicted_class == \"yes\") /\n              sum(elliptical == \"yes\"))\n",
+   "solution": "training_plates <- survey_plates %>%\n  filter(record == \"training\")\nheld_back_plates <- survey_plates %>%\n  filter(record == \"held back\")\n\nmodel <- buildModel(\n  data = training_plates,\n  model_type = \"logistic_regression\",\n  predictors = c(\"concentration\", \"axis_ratio\", \"apparent_size_arcsec\"),\n  response = \"elliptical\"\n)\n\npredictions <- predictWithModel(data = held_back_plates, model = model)\n\nscoreModel(predictions, response = \"elliptical\")\n\npredictions %>%\n  summarize(all_spiral_accuracy = mean(elliptical == \"no\"))\n",
    "right_feedback": "Right: precision is caught out of everything called elliptical, recall is caught out of every real elliptical, and neither is accuracy.",
-   "wrong_feedback": "Not that one. Compare the two accuracies first. Then count caught, missed and false alarms: precision = caught / (caught + false alarms), recall = caught / (caught + missed).",
+   "wrong_feedback": "Not that one. scoreModel(predictions, response = \"elliptical\") gives the model's accuracy, precision and recall; compare that accuracy with calling every plate a spiral, the mean of elliptical == \"no\".",
    "options": [
     {
      "id": "o0",
@@ -619,11 +619,11 @@
    "kind": "mcq",
    "track": "day2",
    "title": "Accuracy, precision and recall",
-   "question": "Use survey_plates. Fit a logistic regression model on the training plates with the predictors axis_ratio, apparent_size_arcsec and exposure_minutes (response elliptical), then predict the held-back plates with predictWithModel(). Using the 0.5 cut-off (the predicted_class column), compare its accuracy with calling every held-back galaxy a spiral (always \"no\"). Which is more accurate, and what are the model's precision and recall for ellipticals?",
+   "question": "Use survey_plates. Fit a logistic regression model on the training plates with the predictors axis_ratio, apparent_size_arcsec and exposure_minutes (response elliptical), then predict the held-back plates with predictWithModel(). Score the predictions with scoreModel(), which takes data (the predictions), response (the column that says what really happened, here elliptical) and cutoff (0.5 unless you change it), and compare the model's accuracy with calling every held-back galaxy a spiral (always \"no\"). Which is more accurate, and what are the model's precision and recall for ellipticals?",
    "starter_code": "training_plates <- survey_plates %>%\n  filter(record == \"training\")\nheld_back_plates <- survey_plates %>%\n  filter(record == \"held back\")\n",
-   "solution": "training_plates <- survey_plates %>%\n  filter(record == \"training\")\nheld_back_plates <- survey_plates %>%\n  filter(record == \"held back\")\n\nmodel <- buildModel(\n  data = training_plates,\n  model_type = \"logistic_regression\",\n  predictors = c(\"axis_ratio\", \"apparent_size_arcsec\", \"exposure_minutes\"),\n  response = \"elliptical\"\n)\n\npredictions <- predictWithModel(data = held_back_plates, model = model)\n\npredictions %>%\n  summarize(model_accuracy = mean(predicted_class == elliptical),\n            all_spiral_accuracy = mean(elliptical == \"no\"))\n\npredictions %>%\n  summarize(precision = sum(elliptical == \"yes\" & predicted_class == \"yes\") /\n              sum(predicted_class == \"yes\"),\n            recall = sum(elliptical == \"yes\" & predicted_class == \"yes\") /\n              sum(elliptical == \"yes\"))\n",
+   "solution": "training_plates <- survey_plates %>%\n  filter(record == \"training\")\nheld_back_plates <- survey_plates %>%\n  filter(record == \"held back\")\n\nmodel <- buildModel(\n  data = training_plates,\n  model_type = \"logistic_regression\",\n  predictors = c(\"axis_ratio\", \"apparent_size_arcsec\", \"exposure_minutes\"),\n  response = \"elliptical\"\n)\n\npredictions <- predictWithModel(data = held_back_plates, model = model)\n\nscoreModel(predictions, response = \"elliptical\")\n\npredictions %>%\n  summarize(all_spiral_accuracy = mean(elliptical == \"no\"))\n",
    "right_feedback": "Right: precision is caught out of everything called elliptical, recall is caught out of every real elliptical, and neither is accuracy.",
-   "wrong_feedback": "Not that one. Compare the two accuracies first. Then count caught, missed and false alarms: precision = caught / (caught + false alarms), recall = caught / (caught + missed).",
+   "wrong_feedback": "Not that one. scoreModel(predictions, response = \"elliptical\") gives the model's accuracy, precision and recall; compare that accuracy with calling every plate a spiral, the mean of elliptical == \"no\".",
    "options": [
     {
      "id": "o0",

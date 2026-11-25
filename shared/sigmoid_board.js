@@ -25,17 +25,17 @@
 //   b.setTab("lines"|"curve"|"holdout"); b.setModel("s"|"dots"); b.setReveal(on); b.setScoring(on); b.scores(); b.marks(); b.tab(); b.curve(); b.setCurve({middle, steepness}); b.bestFit({instant});
 //   b.best(); b.probability(day); b.setCutoff(c); b.cutoff();
 //   b.setProbe(x); b.lineAt(x); b.ready; b.destroy().   The root element carries the API as `.sigmoidBoard` for tests.
-import { LANDING, olsLine, fitLogistic, curveFromCoef, probAt, fitScore, callAt, connectDotsAt } from "./classification_math.js?v=183";
-import { shell, svgEl, el, button, slider, svgPoint, fmt2 } from "./classification_ui.js?v=183";
+import { LANDING, olsLine, fitLogistic, curveFromCoef, probAt, fitScore, callAt, connectDotsAt } from "./classification_math.js?v=184";
+import { shell, svgEl, el, button, slider, svgPoint, fmt2 } from "./classification_ui.js?v=184";
 
 const TABS = [["lines", "From numbers to categories"], ["curve", "A model from one predictor"], ["holdout", "Setting cases aside"]];
 // Each tab's takeaway in the chapter's own wording (12d_classification.Rmd), and the section it belongs to.
 const LESSONS = {
   lines: ["A model that predicts a category is a classification model. A straight line fitted to turned_back coded as 1 and 0 predicts a number, not a category: at 2.3 m it reads 0.45, but is that \"probably not\", or a 45% chance the boat turns back? It’s a bit unclear. Even worse, at the ends the straight line reads below 0 and above 1, which is impossible to interpret. The solution: logistic regression, which is built to give a probability instead: an S-shape that stays between 0 and 1, so a reading of 0.43 means a 43% chance the boat turns back on a morning with that swell.",
     "from numbers to categories"],
-  curve: ["A logistic regression model gives each case a probability_yes: the chance that the response is yes at that predictor value. On a morning with a 2.3 m swell, 0.43 means a 43% chance the boat turns back. It is not the share of all mornings that turned back, and it is not a call. The fit is scored by likelihood: each morning gets the probability the curve gives to what actually happened, those are multiplied together, and the best fit is the curve with the highest likelihood.",
+  curve: ["A logistic regression model gives each case a probability_turned_back: the chance that the boat actually turns back at that swell. On a morning with a 2.3 m swell, 0.43 means a 43% chance the boat turns back. It is not the share of all mornings that turned back, and it is not a call. The fit is scored by likelihood: each morning gets the probability the curve gives to what actually happened, those are multiplied together, and the best fit is the curve with the highest likelihood.",
     "a model from one predictor"],
-  holdout: ["A model always performs the best on the data used to set it up. Here, a connect-the-dots curve (an “overfitted” model) passes through every training morning and gets all 30 right, but it has memorized the noise: on the ten held-back mornings it does worse than the S-curve. So always hold back some data (a “test set”), train the model on the rest (the “training set”), and evaluate the model on the test set. To score held-back data, a cut-off (a threshold) is used to turn a probability_yes into a call: yes at or above the cut-off, no below it. predictWithModel() uses 0.5. Moving the cut-off changes the calls, never the probabilities: a lower cut-off calls more mornings yes, catching more boats that turn back, but at the price of more false alarms.",
+  holdout: ["A model always performs the best on the data used to set it up. Here, a connect-the-dots curve (an “overfitted” model) passes through every training morning and gets all 30 right, but it has memorized the noise: on the ten held-back mornings it does worse than the S-curve. So always hold back some data (a “test set”), train the model on the rest (the “training set”), and evaluate the model on the test set. To score held-back data, a cut-off (a threshold) is used to turn a probability_turned_back into a call: called turned back at or above the cut-off, called landed below it. predictWithModel() uses 0.5. Moving the cut-off changes the calls, never the probabilities: a lower cut-off calls more mornings turned back, catching more boats that actually turn back, but at the price of more false alarms.",
     "a model from one predictor; several predictors, and predicting held-back cases"],
 };
 const W = 960, H = 600, PX0 = 100, PX1 = 930, PY0 = 74, PY1 = 524;
@@ -99,7 +99,7 @@ export function mount(host, opts = {}) {
       svgEl(svg, "line", { x1: PX0 - 8, x2: PX0, y1: Y(v), y2: Y(v), stroke: "rgba(255,255,255,.6)" });
       if (major || st.tab === "lines") txt(PX0 - 14, Y(v), (Math.round(v * 100) / 100).toString(), { anchor: "end", size: major ? 19 : 15, opacity: major ? 1 : 0.7 });
     }
-    const yl = st.tab === "lines" ? "turned_back coded as a number (yes = 1, no = 0)" : "probability_yes (the boat turns back)";
+    const yl = st.tab === "lines" ? "turned_back coded as a number (turned back = 1, landed = 0)" : "probability_turned_back";
     const t = txt(0, 0, yl, { anchor: "middle", size: 19 });
     t.setAttribute("transform", `translate(${PX0 - 62} ${(PY0 + PY1) / 2}) rotate(-90)`);
     // what the dots are: one sentence of scene-setting
@@ -108,9 +108,9 @@ export function mount(host, opts = {}) {
     // legend
     const lx = PX0, ly = 54;
     svgEl(svg, "circle", { cx: lx + 8, cy: ly, r: 8, fill: YES });
-    txt(lx + 22, ly, "turned back: yes", { size: 17 });
-    svgEl(svg, "circle", { cx: lx + 190, cy: ly, r: 8, fill: NO });
-    txt(lx + 204, ly, "turned back: no (landed)", { size: 17 });
+    txt(lx + 22, ly, "actually turned back", { size: 17 });
+    svgEl(svg, "circle", { cx: lx + 210, cy: ly, r: 8, fill: NO });
+    txt(lx + 224, ly, "actually landed", { size: 17 });
     if (st.tab === "holdout" && st.reveal) {
       svgEl(svg, "path", { d: diamond(lx + 452, ly, 9), fill: "#fff1d6" });
       txt(lx + 466, ly, "held back (never shown to the model)", { size: 17 });
@@ -224,7 +224,7 @@ export function mount(host, opts = {}) {
 
   // Setting cases aside, a staged walk: the S-curve alone → connect-the-dots (a curve that memorises every training
   // morning; once chosen, the other model stays on as a faint curve) → the held-back mornings revealed as diamonds at
-  // what actually happened → scored: a dotted line from each to the chosen curve (its probability_yes), a draggable
+  // what actually happened → scored: a dotted line from each to the chosen curve (its probability_turned_back), a draggable
   // cut-off turning that probability into a call, and a ✓/✗ by each. Red rings mark wrong calls throughout.
   const DOTS = "#ff8a5c", RIGHT = "#7ee0a1", WRONG = "#ff4d3a";
   const modelAt = (m, x) => (m === "dots" ? connectDotsAt(T.training, x) : probAt(best, x));
@@ -237,8 +237,8 @@ export function mount(host, opts = {}) {
       const yc = Y(c);
       svgEl(svg, "rect", { x: PX0, y: PY0, width: PX1 - PX0, height: yc - PY0, fill: "rgba(255,200,97,.06)" });
       svgEl(svg, "rect", { x: PX0, y: yc, width: PX1 - PX0, height: PY1 - yc, fill: "rgba(143,179,217,.06)" });
-      txt(PX0 + 12, PY0 + 16, "called yes", { size: 18, italic: true, fill: YES });
-      txt(PX1 - 12, PY1 - 16, "called no", { anchor: "end", size: 18, italic: true, fill: NO });
+      txt(PX0 + 12, PY0 + 16, "called turned back", { size: 18, italic: true, fill: YES });
+      txt(PX1 - 12, PY1 - 16, "called landed", { anchor: "end", size: 18, italic: true, fill: NO });
       if (Math.abs(c - 0.5) > 1e-9) {
         svgEl(svg, "line", { x1: PX0, x2: PX1, y1: Y(0.5), y2: Y(0.5), stroke: "rgba(255,255,255,.4)", "stroke-dasharray": "4 6" });
         txt(PX0 + 8, Y(0.5) + (c > 0.5 ? 16 : -16), "0.5", { size: 16, fill: "#cdbf9f" });
@@ -370,7 +370,7 @@ export function mount(host, opts = {}) {
       if (sSteep) sSteep.set(st.curve.steepness);
       // the live formula, its two numbers in the handles' colours, so each drag shows exactly which number it changes
       const c = st.curve;
-      R.append(para(`<span class="curveeq" style="font-size:19px">probability_yes = 1 / (1 + e<sup>−<b style="color:${STEEP}">${c.steepness.toFixed(2)}</b> × (swell_m − <b style="color:${MID}">${c.middle.toFixed(2)}</b>)</sup>)</span>`));
+      R.append(para(`<span class="curveeq" style="font-size:19px">probability_turned_back = 1 / (1 + e<sup>−<b style="color:${STEEP}">${c.steepness.toFixed(2)}</b> × (swell_m − <b style="color:${MID}">${c.middle.toFixed(2)}</b>)</sup>)</span>`));
     } else {
       if (sCut) sCut.set(st.cutoff);   // the plot carries the score: rings, ✓/✗, no table
     }

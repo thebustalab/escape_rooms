@@ -19,7 +19,7 @@
 // The tote IS the inventory (shared/inventory.js): a worn item stays held, so has_<key> keeps meaning "owns it".
 // Wearing one item in a slot takes the previous one off (it goes back to the tote, still held).
 // World state: worn_<slot> = the key worn in that slot, so an ordinary condition can read it.
-import { grantItems } from "./inventory.js?v=183";
+import { grantItems } from "./inventory.js?v=184";
 
 export const WEAR_SLOTS = ["overalls", "hat", "armband", "badge"];
 

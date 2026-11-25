@@ -5,7 +5,7 @@
 // drawdown board (shared/drawdown_physics.js) let go on each sample until it stops. Its rest state is the
 // sample's least-squares line (drawdown_physics.js proves why); `settle` runs the real physics and never
 // consults ols(), so tests/ghost_lines.test.mjs can check the two agree.
-import { RodSim, ols } from "./drawdown_physics.js?v=183";
+import { RodSim, ols } from "./drawdown_physics.js?v=184";
 
 export { ols };
 
